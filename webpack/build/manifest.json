@@ -1,0 +1,1 @@
+{"description":"Xverse Wallet Extension","version":"0.0.1","name":"xverse","manifest_version":3,"options_ui":{"page":"options.html"},"action":{"default_icon":"/assets/xverse_icon.png","default_popup":"popup.html"},"content_scripts":[{"matches":["<all_urls>"],"js":["js/vendor.js","js/content_script.js"]}],"background":{"service_worker":"js/background.js"}}
