@@ -1,20 +1,18 @@
 {
-  "name": "xverse",
-  "description": "Xverse Wallet Extension",
-  "version": "0.0.1",
-  
-
+  "name": "Xverse Wallet",
+  "description": "A Bitcoin Wallet for Web3",
+  "manifest_version": 3,
   "options_page": "options.html",
   "background": { "service_worker": "background.bundle.js" },
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "icon-34.png"
+    "default_icon": "xverse_icon.png"
   },
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
   "icons": {
-    "128": "icon-128.png"
+    "128": "xverse_icon.png"
   },
   "content_scripts": [
     {
@@ -26,7 +24,7 @@
   "devtools_page": "devtools.html",
   "web_accessible_resources": [
     {
-      "resources": ["content.styles.css", "icon-128.png", "icon-34.png"],
+      "resources": ["content.styles.css", "xverse_icon.png"],
       "matches": []
     }
   ]

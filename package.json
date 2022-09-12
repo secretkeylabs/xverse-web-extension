@@ -1,5 +1,6 @@
 {
   "name": "xverse-web-extension",
+  "description": "A Bitcoin wallet for Web3",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,10 +9,11 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-hot-loader": "^4.13.0"
   },
   "scripts": {
-    "build": "webpack --config webpack/webpack.prod.js",
+    "build": "npx node webpack/utils/build.js",
     "start": "npx node webpack/utils/devServer.js",
     "clean": "rimraf dist",
     "test": "npx jest",
@@ -41,7 +43,6 @@
     "jest": "^27.2.1",
     "path": "^0.12.7",
     "prettier": "^2.2.1",
-    "react-hot-loader": "^4.13.0",
     "rimraf": "^3.0.2 ",
     "source-map-loader": "^4.0.0",
     "style-loader": "^3.3.1",
