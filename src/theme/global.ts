@@ -26,18 +26,28 @@ export const GlobalStyle = createGlobalStyle`
     font-display: block;
   }
   html {
-    box-sizing: border-box
+    box-sizing: border-box;
   }
-* {
-  margin: 0
-  padding: 0
+  * {
+  margin: 0;
+  padding: 0;
+  }
+  * input, * button {
+    outline: 0;
+  }
+  * button {
+    cursor: pointer;
+    border: 0;
+  }
+  * p {
+    margin: 0;
   }
 *,
 *::after,
 *::before {
-  box-sizing: inherit
-  cursor: inherit
-  line-height: normal
+  box-sizing: inherit;
+  cursor: inherit;
+  line-height: normal;
 }
 body {
   width: 360px;

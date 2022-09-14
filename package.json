@@ -8,8 +8,9 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "i18n-js": "^4.1.1",
+    "i18next": "^21.9.1",
     "react": "^18.2.0",
+    "react-i18next": "^11.18.6",
     "styled-components": "^5.3.5"
   },
   "scripts": {
