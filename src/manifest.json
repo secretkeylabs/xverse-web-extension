@@ -3,28 +3,20 @@
   "description": "A Bitcoin Wallet for Web3",
   "manifest_version": 3,
   "options_page": "options.html",
-  "background": { "service_worker": "background.bundle.js" },
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "xverse_icon.png"
+    "default_icon": "assets/img/xverse_icon.png",
+    "default_title": "Xverse Wallet"
   },
-  "chrome_url_overrides": {
-    "newtab": "newtab.html"
-  },
+  "chrome_url_overrides": {},
+  "background": {},
   "icons": {
-    "128": "xverse_icon.png"
+    "128": "assets/img/xverse_icon.png"
   },
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*", "<all_urls>"],
-      "js": ["contentScript.bundle.js"],
-      "css": ["content.styles.css"]
-    }
-  ],
   "devtools_page": "devtools.html",
   "web_accessible_resources": [
     {
-      "resources": ["content.styles.css", "xverse_icon.png"],
+      "resources": ["assets/img/xverse_icon.png"],
       "matches": []
     }
   ]

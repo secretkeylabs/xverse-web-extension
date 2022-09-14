@@ -7,10 +7,8 @@ var webpack = require('webpack'),
 var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const ASSET_PATH = process.env.ASSET_PATH || '/';
-
-
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
-const BUILD_PATH = path.join(__dirname, '../', 'build');
+const BUILD_ROOT_PATH = path.join(__dirname, '../', 'build');
 
 
 var alias = {
@@ -34,20 +32,14 @@ var options = {
   mode: env.NODE_ENV || 'development',
   
   entry: {
-    newtab: path.join(SRC_ROOT_PATH, 'pages', 'Newtab', 'index.jsx'),
     options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.jsx'),
     popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.jsx'),
-    background: path.join(SRC_ROOT_PATH, 'pages', 'Background', 'index.js'),
-    contentScript: path.join(SRC_ROOT_PATH, 'pages', 'Content', 'index.js'),
-    devtools: path.join(SRC_ROOT_PATH, 'pages', 'Devtools', 'index.js'),
-    panel: path.join(SRC_ROOT_PATH, 'pages', 'Panel', 'index.jsx'),
   },
-  xverseWallet: {
-    notHotReload: ['background', 'contentScript', 'devtools'],
-  },
+  // Add Stuff Here to ignore Hot Reloading on like service-workers & background scripts
+  xverseWallet: {},
   output: {
     filename: '[name].bundle.js',
-    path: BUILD_PATH,
+    path: BUILD_ROOT_PATH,
     clean: true,
     publicPath: ASSET_PATH,
   },
@@ -104,7 +96,7 @@ var options = {
       patterns: [
         {
           from: 'src/manifest.json',
-          to: BUILD_PATH,
+          to: BUILD_ROOT_PATH,
           force: true,
           transform: function (content, path) {
             // generates the manifest file using the package.json informations
@@ -122,26 +114,10 @@ var options = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: 'src/pages/Content/content.styles.css',
-          to: BUILD_PATH,
-          force: true,
+          from: path.join(SRC_ROOT_PATH, 'assets'),
+          to: path.join(BUILD_ROOT_PATH, 'assets'),
         },
       ],
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: 'src/assets/img/xverse_icon.png',
-          to: BUILD_PATH,
-          force: true,
-        },
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(SRC_ROOT_PATH, 'pages', 'Newtab', 'index.html'),
-      filename: 'newtab.html',
-      chunks: ['newtab'],
-      cache: false,
     }),
     new HtmlWebpackPlugin({
       template: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.html'),
@@ -153,18 +129,6 @@ var options = {
       template: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.html'),
       filename: 'popup.html',
       chunks: ['popup'],
-      cache: false,
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(SRC_ROOT_PATH, 'pages', 'Devtools', 'index.html'),
-      filename: 'devtools.html',
-      chunks: ['devtools'],
-      cache: false,
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(SRC_ROOT_PATH, 'pages', 'Panel', 'index.html'),
-      filename: 'panel.html',
-      chunks: ['panel'],
       cache: false,
     }),
   ],
