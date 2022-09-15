@@ -4,7 +4,7 @@ import SatoshiBlack from '../assets/fonts/Satoshi-Black.otf';
 import SatoshiMedium from '../assets/fonts/Satoshi-Medium.otf';
 import SatoshiRegular from '../assets/fonts/Satoshi-Regular.otf';
 
-export const GlobalStyle = createGlobalStyle`
+const GlobalStyle = createGlobalStyle`
   @font-face{
     font-family: 'Satoshi-Bold';
     src: url(${SatoshiBold});
@@ -59,3 +59,4 @@ body {
   position: relative;
 }
 `;
+export default GlobalStyle;

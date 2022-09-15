@@ -7,9 +7,9 @@ const StyledHeader = styled.h1`
   color: ${(props) => props.theme.colors.action.classic};
 `;
 
-const Header = () => {
-  const { t } = useTranslation('translation', {keyPrefix: 'common'});
+function Header():JSX.Element {
+  const { t } = useTranslation('translation', { keyPrefix: 'common' });
   return <StyledHeader>{t('appName')}</StyledHeader>;
-};
+}
 
 export default Header;

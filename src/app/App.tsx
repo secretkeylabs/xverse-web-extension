@@ -1,12 +1,11 @@
-import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import logo from '../assets/img/xverse_icon.png';
 import Theme from '../theme';
-import { GlobalStyle } from '../theme/global';
+import GlobalStyle from '../theme/global';
 import Header from './components/header';
 import './locales';
 
-const App: React.FC = () => {
+function App(): JSX.Element {
   return (
     <>
       <GlobalStyle />
@@ -18,6 +17,6 @@ const App: React.FC = () => {
       </ThemeProvider>
     </>
   );
-};
+}
 
 export default App;
