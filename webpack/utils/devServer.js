@@ -9,6 +9,9 @@ var WebpackDevServer = require('webpack-dev-server'),
   env = require('../utils/env'),
   path = require('path');
 
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+
+
 // Add Stuff Here to exclude from hot reloading
 var excludeEntriesToHotReload = [];
 

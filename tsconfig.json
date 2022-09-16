@@ -16,7 +16,13 @@
     "noEmit": false,
     "jsx": "react-jsx",
     "rootDir": "src",
-    "outDir": "build/js"
+    "outDir": "build/js",
+    "baseUrl": "./src",
+    "paths": {
+      "@components/*": ["app/components/*"],
+      "@hooks/*": ["app/hooks/*"],
+      "@assets/*": ["assets/*"],
+    }
   },
   "include": ["src"]
 }

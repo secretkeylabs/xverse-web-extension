@@ -6,7 +6,8 @@ var webpack = require('webpack'),
   TerserPlugin = require('terser-webpack-plugin');
 var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+
 
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
@@ -17,8 +18,8 @@ var options = {
   mode: env.NODE_ENV || 'development',
 
   entry: {
-    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.tsx'),
-    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.tsx'),
+    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.jsx'),
+    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.jsx'),
   },
   output: {
     filename: '[name].bundle.js',
@@ -67,6 +68,7 @@ var options = {
     ],
   },
   resolve: {
+    plugins: [new TsconfigPathsPlugin()],
     extensions: fileExtensions
       .map((extension) => '.' + extension)
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
