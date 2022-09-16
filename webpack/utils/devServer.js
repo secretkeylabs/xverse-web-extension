@@ -9,8 +9,8 @@ var WebpackDevServer = require('webpack-dev-server'),
   env = require('../utils/env'),
   path = require('path');
 
-var options = config.xverseWallet || {};
-var excludeEntriesToHotReload = options.notHotReload || [];
+// Add Stuff Here to exclude from hot reloading
+var excludeEntriesToHotReload = [];
 
 for (var entryName in config.entry) {
   if (excludeEntriesToHotReload.indexOf(entryName) === -1) {
@@ -21,11 +21,10 @@ for (var entryName in config.entry) {
   }
 }
 
-config.plugins = [new webpack.HotModuleReplacementPlugin()].concat(
-  config.plugins || []
-);
-
-delete config.xverseWallet;
+config.plugins = [
+  new webpack.HotModuleReplacementPlugin(),
+  new ReactRefreshWebpackPlugin({ overlay: false }),
+].concat(config.plugins || []);
 
 var compiler = webpack(config);
 

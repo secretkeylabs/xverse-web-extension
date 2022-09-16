@@ -5,38 +5,21 @@ var webpack = require('webpack'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
   TerserPlugin = require('terser-webpack-plugin');
 var { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ReactRefreshTypeScript = require('react-refresh-typescript');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
 const BUILD_ROOT_PATH = path.join(__dirname, '../', 'build');
 
-
-var alias = {
-  'react-dom': '@hot-loader/react-dom',
-};
-
-var fileExtensions = [
-  'jpg',
-  'jpeg',
-  'png',
-  'gif',
-  'eot',
-  'otf',
-  'svg',
-  'ttf',
-  'woff',
-  'woff2',
-];
-
+var fileExtensions = ['jpg', 'jpeg', 'png', 'gif', 'eot', 'otf', 'svg', 'ttf', 'woff', 'woff2'];
 var options = {
   mode: env.NODE_ENV || 'development',
-  
+
   entry: {
-    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.jsx'),
-    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.jsx'),
+    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.tsx'),
+    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.tsx'),
   },
-  // Add Stuff Here to ignore Hot Reloading on like service-workers & background scripts
-  xverseWallet: {},
   output: {
     filename: '[name].bundle.js',
     path: BUILD_ROOT_PATH,
@@ -66,23 +49,24 @@ var options = {
         loader: 'html-loader',
         exclude: /node_modules/,
       },
-      { test: /\.(ts|tsx)$/, loader: 'ts-loader', exclude: /node_modules/ },
       {
-        test: /\.(js|jsx)$/,
+        test: /\.[jt]sx?$/,
+        exclude: /node_modules/,
         use: [
           {
-            loader: 'source-map-loader',
-          },
-          {
-            loader: 'babel-loader',
+            loader: require.resolve('ts-loader'),
+            options: {
+              getCustomTransformers: () => ({
+                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(Boolean),
+              }),
+              transpileOnly: env.NODE_ENV === 'development',
+            },
           },
         ],
-        exclude: /node_modules/,
-      },
+      }
     ],
   },
   resolve: {
-    alias: alias,
     extensions: fileExtensions
       .map((extension) => '.' + extension)
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
