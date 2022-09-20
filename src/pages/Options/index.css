@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  padding: 0;
+  color: #ffffff;
+  background-color: #181b24;
+  position: relative;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 102px 0px 102px;
+  width: 100%;
+}
+
+header h2 {
+  font-family: 'Satoshi-Regular';
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 25px;
+  letter-spacing: 0em;
+  text-align: right;
+}
+#app-container {
+  height: 90vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#app {
+  width: 360px;
+  height: 600px;
+}

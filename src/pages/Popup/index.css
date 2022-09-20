@@ -1,0 +1,10 @@
+body {
+  margin: 0;
+  padding: 0;
+  color: #ffffff;
+  position: relative;
+}
+#app {
+  width: 360px;
+  height: 600px;
+}
