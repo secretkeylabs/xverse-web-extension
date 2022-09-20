@@ -22,6 +22,7 @@
       "@components/*": ["app/components/*"],
       "@hooks/*": ["app/hooks/*"],
       "@assets/*": ["assets/*"],
+      "@screens/*": ["app/screens/*"],
     }
   },
   "include": ["src"]

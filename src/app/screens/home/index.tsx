@@ -1,21 +1,7 @@
-import styled from 'styled-components';
-import Header from '@components/header';
-import logo from '@assets/img/xverse_icon.png';
-
-const AppContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
+import ScreenContainer from '@components/screenContainer';
 
 function Home(): JSX.Element {
-  return (
-    <AppContainer>
-      <img src={logo} alt="logo" />
-      <Header />
-    </AppContainer>
-  );
+  return <ScreenContainer />;
 }
 
 export default Home;

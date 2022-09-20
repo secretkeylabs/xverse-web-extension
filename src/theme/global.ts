@@ -49,14 +49,5 @@ const GlobalStyle = createGlobalStyle`
   cursor: inherit;
   line-height: normal;
 }
-body {
-  width: 360px;
-  height: 600px;
-  margin: 0;
-  padding: 0;
-  color: #FFFFFF;
-  background-color: #12151E;
-  position: relative;
-}
 `;
 export default GlobalStyle;

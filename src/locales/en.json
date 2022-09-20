@@ -1,5 +1,15 @@
 {
-    "common": {
-        "appName": "Xverse Wallet"
-    }
+  "LANDING_SCREEN": {
+    "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
+    "CREATE_WALLET_BUTTON": "Create Wallet",
+    "RESTORE_WALLET_BUTTON": "Restore Wallet"
+  },
+  "ONBOARDING_SCREEN": {
+    "ONBOARDING_1_TITlE": "All your Bitcoin, Stacks assets and NFTs in one place",
+    "ONBOARDING_1_SUBTITlE": "Manage all your Bitcoin and Stacks based digital assets directly from Xverse",
+    "ONBOARDING_2_TITlE": "Stack your STX to earn rewards in Bitcoin",
+    "ONBOARDING_2_SUBTITlE": "Earn Bitcoin yield on your STX without them ever leaving your wallet.",
+    "ONBOARDING_3_TITlE": "Access your favorites Dapps from your wallet",
+    "ONBOARDING_3_SUBTITlE": "From marketplaces to DeFi, and so much more."
+  }
 }

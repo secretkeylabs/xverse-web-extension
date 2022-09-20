@@ -9,6 +9,7 @@ const Theme = {
       400: 'rgba(255, 255, 255, 0.6)',
     },
     background: {
+      'elevation-1': '#070A13',
       elevation0: '#12151E',
       elevation1: '#1D2032',
       elevation2: '#272A44',
