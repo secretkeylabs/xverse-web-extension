@@ -6,8 +6,6 @@ process.env.ASSET_PATH = '/';
 var webpack = require('webpack'),
   config = require('../webpack.config');
 
-delete config.xverseWallet;
-
 config.mode = 'production';
 
 webpack(config, function (err) {

@@ -4,14 +4,29 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@stacks/encryption": "4.3.5",
+    "@stacks/keychain": "4.3.5",
+    "@stacks/network": "4.3.5",
+    "@stacks/transactions": "4.3.5",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "bignumber.js": "^9.1.0",
+    "bip32": "^2.0.6",
+    "bip39": "^3.0.3",
+    "bitcoinjs-lib": "^5.2.0",
+    "bn.js": "^5.2.1",
+    "crypto-browserify": "^3.12.0",
     "i18next": "^21.9.1",
+    "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^11.18.6",
+    "react-redux": "^7.2.1",
     "react-router-dom": "^6.4.0",
+    "redux": "^4.0.5",
+    "redux-saga": "^1.1.3",
+    "stream-browserify": "^3.0.0",
     "styled-components": "^5.3.5"
   },
   "scripts": {
@@ -22,7 +37,8 @@
     "style": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "resolutions": {
-    "styled-components": "^5"
+    "styled-components": "^5",
+    "buffer": "6.0.3"
   },
   "eslintConfig": {
     "extends": [
