@@ -4,6 +4,9 @@ import Landing from '@screens/landing';
 import Onboarding from '@screens/onboarding';
 import ScreenContainer from '@components/screenContainer';
 import LegalLinks from '@screens/legalLinks';
+import BackupWallet from '@screens/backupWallet';
+import CreateWalletSuccess from '@screens/createWalletSuccess';
+import CreatePassword from '@screens/createPassword';
 
 const router = createHashRouter([
   {
@@ -25,6 +28,18 @@ const router = createHashRouter([
       {
         path: 'legal',
         element: <LegalLinks />,
+      },
+      {
+        path: 'backup',
+        element: <BackupWallet />,
+      },
+      {
+        path: 'create-password',
+        element: <CreatePassword />,
+      },
+      {
+        path: 'create-wallet-success',
+        element: <CreateWalletSuccess />,
       },
     ],
   },
