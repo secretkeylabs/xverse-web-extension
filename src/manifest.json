@@ -16,8 +16,15 @@
   "devtools_page": "devtools.html",
   "web_accessible_resources": [
     {
-      "resources": ["assets/img/xverse_icon.png"],
+      "resources": ["assets/img/xverse_icon.png", "inpage.js"],
       "matches": []
+    }
+  ],
+  "content_scripts": [
+    {
+      "js": ["content-script.js"],
+      "matches": ["*://*/*"],
+      "all_frames": true
     }
   ]
 }

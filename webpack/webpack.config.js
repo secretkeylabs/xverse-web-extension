@@ -8,7 +8,6 @@ var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
-
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
 const BUILD_ROOT_PATH = path.join(__dirname, '../', 'build');
@@ -20,6 +19,8 @@ var options = {
   entry: {
     options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.jsx'),
     popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.jsx'),
+    inpage: path.join(SRC_ROOT_PATH, 'inpage', 'inpage.ts'),
+    'content-script': path.join(SRC_ROOT_PATH, 'content-scripts', 'content-script.ts'),
   },
   output: {
     filename: '[name].bundle.js',
@@ -58,13 +59,15 @@ var options = {
             loader: require.resolve('ts-loader'),
             options: {
               getCustomTransformers: () => ({
-                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(Boolean),
+                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(
+                  Boolean
+                ),
               }),
               transpileOnly: env.NODE_ENV === 'development',
             },
           },
         ],
-      }
+      },
     ],
   },
   resolve: {
