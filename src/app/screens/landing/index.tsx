@@ -2,6 +2,9 @@ import styled from 'styled-components';
 import logo from '@assets/img/full_logo_vertical.svg';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getGenerateWalletAction } from '@stores/actions/wallet/actionCreators';
+import { StoreState } from '@stores/reducers/root';
 
 const TopSectionContainer = styled.div({
   display: 'flex',
@@ -38,7 +41,7 @@ const CreateButton = styled.button((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: props.theme.colors.action.classic,
-  marginBottom: props.theme.spacing(10),
+  marginBottom: props.theme.spacing(8),
   width: '100%',
   height: 44,
 }));
@@ -64,9 +67,11 @@ const ButtonText = styled.div((props) => ({
 function Landing(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LANDING_SCREEN' });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handlePressAction = () => {
     navigate('/onboarding');
+    dispatch(getGenerateWalletAction());
   };
   return (
     <>
