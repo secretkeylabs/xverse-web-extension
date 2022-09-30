@@ -66,7 +66,8 @@ const OnBoardingNextButton = styled.button((props) => ({
   height: 44,
 }));
 
-const OnBoardingSkipButton = styled.button((props) => ({
+const OnBoardingSkipButton = styled.button((props) => (
+  {
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',

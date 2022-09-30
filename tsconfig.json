@@ -23,6 +23,7 @@
       "@hooks/*": ["app/hooks/*"],
       "@assets/*": ["assets/*"],
       "@screens/*": ["app/screens/*"],
+      "@utils/*":["app/utils/*"],
     }
   },
   "include": ["src"]

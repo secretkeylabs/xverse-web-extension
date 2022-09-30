@@ -4,6 +4,14 @@ import Landing from '@screens/landing';
 import Onboarding from '@screens/onboarding';
 import ScreenContainer from '@components/screenContainer';
 import LegalLinks from '@screens/legalLinks';
+import ManageTokens from '@screens/manageTokens';
+import AccountList from '@screens/accountList';
+import Receive from '@screens/receive';
+import ConfirmStxTransaction from '@screens/confirmStxTransaxtion';
+import SendStxScreen from '@screens/sendStx';
+import TransactionStatus from '@screens/transactionStatus';
+import SendBtcScreen from '@screens/sendBtc';
+import ConfirmBtcTransaction from '@screens/confrimBtcTransaction';
 
 const router = createHashRouter([
   {
@@ -26,6 +34,38 @@ const router = createHashRouter([
         path: 'legal',
         element: <LegalLinks />,
       },
+      {
+        path: 'manageTokens',
+        element: <ManageTokens />,
+      },
+      {
+      path: 'accountList',
+      element: <AccountList />,
+    },
+    {
+      path:'receive',
+      element:<Receive/>
+    },
+    {
+      path:'send-stx',
+      element:<SendStxScreen/>
+    },
+    {
+      path:'send-btc',
+      element:<SendBtcScreen/>
+    },
+    {
+      path:'confirm-stx-tx',
+      element:<ConfirmStxTransaction/>
+    },
+    {
+      path:'confirm-btc-tx',
+      element:<ConfirmBtcTransaction/>
+    },
+    {
+      path:'tx-status',
+      element:<TransactionStatus/>
+    },
     ],
   },
 ]);
