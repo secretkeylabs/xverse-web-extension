@@ -1,7 +1,6 @@
 import { Network } from 'app/core/types/networks';
 import { Account } from 'app/core/types/accounts';
-import { GenerateWalletKey, GenerateWalletSuccessKey } from '@stores/actions/wallet/types';
-import { WalletActions } from '../actions/wallet/types';
+import { WalletActions, SetWalletKey, ResetWalletKey } from '../actions/types';
 
 interface WalletState {
   stxAddress: string;
@@ -9,10 +8,11 @@ interface WalletState {
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
-  generatingWallet: boolean;
   accountsList: Account[];
   selectedAccount: Account | null;
   network: Network;
+  seedPhrase: string;
+  isLocked: boolean;
 }
 
 const initialWalletState: WalletState = {
@@ -22,9 +22,10 @@ const initialWalletState: WalletState = {
   stxPublicKey: '',
   btcPublicKey: '',
   network: 'Mainnet',
-  generatingWallet: false,
   accountsList: [],
   selectedAccount: null,
+  seedPhrase: '',
+  isLocked: true,
 };
 
 const walletReducer = (
@@ -33,23 +34,16 @@ const walletReducer = (
   action: WalletActions,
 ) => {
   switch (action.type) {
-    case GenerateWalletKey:
+    case SetWalletKey:
       return {
         ...state,
-        generatingWallet: true,
+        ...action.wallet,
+        isLocked: false,
       };
-    case GenerateWalletSuccessKey:
+    case ResetWalletKey:
       return {
         ...state,
-        stxAddress: action.stxAddress,
-        btcAddress: action.btcAddress,
-        masterPubKey: action.masterPubKey,
-        stxPublicKey: action.stxPublicKey,
-        btcPublicKey: action.btcPublicKey,
-        network: action.network,
-        generatingWallet: false,
-        accountsList: action.accountsList,
-        selectedAccount: action.accountsList[0],
+        ...initialWalletState,
       };
     default:
       return state;

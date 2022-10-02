@@ -14,6 +14,8 @@ import {
   BIP32Interface, ECPair, payments, networks,
 } from 'bitcoinjs-lib';
 import BN from 'bn.js';
+import { encryptSeedPhrase } from '@utils/encryptionUtils';
+import { storeEncryptedSeed } from '@utils/localStorage';
 import {
   BTC_PATH_WITHOUT_INDEX,
   BTC_TESTNET_PATH_WITHOUT_INDEX,
@@ -32,10 +34,7 @@ export function getDerivationPath(chain: ChainID, index: BN) {
   return `${derivationPaths[chain]}${index.toString()}`;
 }
 
-export function getBitcoinDerivationPath(
-  index: BN,
-  network: Network = 'Mainnet',
-) {
+export function getBitcoinDerivationPath(index: BN, network: Network = 'Mainnet') {
   return network === 'Mainnet'
     ? `${BTC_PATH_WITHOUT_INDEX}${index.toString()}`
     : `${BTC_TESTNET_PATH_WITHOUT_INDEX}${index.toString()}`;
@@ -45,9 +44,7 @@ export function deriveStxAddressChain(chain: ChainID, index: BN = new BN(0)) {
   return (rootNode: BIP32Interface) => {
     const childKey = rootNode.derivePath(getDerivationPath(chain, index));
     if (!childKey.privateKey) {
-      throw new Error(
-        'Unable to derive private key from `rootNode`, bip32 master keychain',
-      );
+      throw new Error('Unable to derive private key from `rootNode`, bip32 master keychain');
     }
     const privateKey = ecPrivateKeyToHexString(childKey.privateKey);
     const txVersion = chain === ChainID.Mainnet
@@ -84,9 +81,7 @@ export async function walletFromSeedPhrase(
   const seed = await bip39.mnemonicToSeed(mnemonic);
   const master = bip32.fromSeed(seed);
   const masterPubKey = master.publicKey.toString('hex');
-  const stxPublicKey = publicKeyToString(
-    getPublicKey(createStacksPrivateKey(privateKey)),
-  );
+  const stxPublicKey = publicKeyToString(getPublicKey(createStacksPrivateKey(privateKey)));
 
   // derive segwit btc address
 
@@ -137,3 +132,12 @@ export async function getBtcPrivateKey(
   const btcChild = master.derivePath(getBitcoinDerivationPath(index, network));
   return btcChild.privateKey!.toString('hex');
 }
+
+export const storeWalletSeed = async (seedphrase: string, password: string) => {
+  try {
+    const encryptedSeed = await encryptSeedPhrase(seedphrase, password);
+    storeEncryptedSeed(encryptedSeed);
+  } catch (err) {
+    console.log('Failed to save Seed');
+  }
+};

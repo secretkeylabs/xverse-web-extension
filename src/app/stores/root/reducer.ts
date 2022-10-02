@@ -1,9 +1,7 @@
 import { combineReducers } from 'redux';
-import userPrefReducer from './userPreferencesReducer';
-import walletReducer from './walletReducer';
+import walletReducer from '../wallet/reducers/walletReducer';
 
 const appReducer = combineReducers({
-  userPrefState: userPrefReducer,
   walletState: walletReducer,
 });
 
