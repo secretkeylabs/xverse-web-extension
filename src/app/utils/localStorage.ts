@@ -1,23 +1,16 @@
 import { SettingsNetwork } from 'app/core/constants/constants';
 import { Account } from 'app/core/types/accounts';
-import { Network } from 'app/core/types/networks';
 
 const userPrefBackupRemindKey = 'UserPref:BackupRemind';
-const stxAddressKey = 'StxAddress';
-const btcAddressKey = 'BtcAddress';
-const masterPubKeyKey = 'MasterPubKey';
-const stxPublicKeyKey = 'PublicKey';
-const btcPublicKeyKey = 'BtcPublicKey';
-const networkSettingKey = 'NetworkSetting';
-const walletDataVersionKey = 'WalletDataVersion';
-const bnsNameKey = 'BnsNameKey';
 const selectedNetworkKey = 'selectedNetwork';
 const accountsListKey = 'AccountsList';
 const selectedAccountKey = 'SelectedAccount';
 const isTermsAccepted = 'isTermsAccepted';
-const hasFinishedOnboardingKey='hasFinishedOnboarding';
+const hasFinishedOnboardingKey = 'hasFinishedOnboarding';
+const saltKey = 'salt';
+const encryptedSeedKey = 'encSeed';
 
-function saveMultiple(items: { [x: string]: string }) {
+export function saveMultiple(items: { [x: string]: string }) {
   const itemKeys = Object.keys(items);
   itemKeys.forEach((key) => {
     localStorage.setItem(key, items[key]);
@@ -25,7 +18,7 @@ function saveMultiple(items: { [x: string]: string }) {
 }
 
 export function saveHasFinishedOnboarding(finished: boolean) {
-  return localStorage.setItem(hasFinishedOnboardingKey, finished.toString());
+  localStorage.setItem(hasFinishedOnboardingKey, finished.toString());
 }
 
 export function getHasFinishedOnboarding(): boolean {
@@ -37,7 +30,7 @@ export function getHasFinishedOnboarding(): boolean {
 }
 
 export function saveIsTermsAccepted(termsDisplayed: boolean) {
-  return localStorage.setItem(isTermsAccepted, termsDisplayed.toString());
+  localStorage.setItem(isTermsAccepted, termsDisplayed.toString());
 }
 
 export function getIsTermsAccepted(): boolean {
@@ -49,46 +42,15 @@ export function getIsTermsAccepted(): boolean {
 }
 
 export function saveUserPrefBackupRemind(nextBackupRemind: string) {
-  return localStorage.setItem(userPrefBackupRemindKey, nextBackupRemind);
+  localStorage.setItem(userPrefBackupRemindKey, nextBackupRemind);
 }
 
 export function getUserPrefBackupRemind(): string | null {
   return localStorage.getItem(userPrefBackupRemindKey);
 }
 
-export async function saveWalletData({
-  stxAddress,
-  btcAddress,
-  masterPubKey,
-  stxPublicKey,
-  btcPublicKey,
-  network,
-  version,
-  bnsName,
-}: {
-  stxAddress: string;
-  btcAddress: string;
-  masterPubKey: string;
-  stxPublicKey: string;
-  btcPublicKey: string;
-  network: Network;
-  version: number;
-  bnsName: string | undefined;
-}) {
-  saveMultiple({
-    [stxAddressKey]: stxAddress,
-    [btcAddressKey]: btcAddress,
-    [masterPubKeyKey]: masterPubKey,
-    [stxPublicKeyKey]: stxPublicKey,
-    [btcPublicKeyKey]: btcPublicKey,
-    [networkSettingKey]: network,
-    [walletDataVersionKey]: version.toString(),
-    [bnsNameKey]: bnsName || '',
-  });
-}
-
 export function saveSelectedNetwork(network: SettingsNetwork) {
-  return localStorage.setItem(selectedNetworkKey, JSON.stringify(network));
+  localStorage.setItem(selectedNetworkKey, JSON.stringify(network));
 }
 
 export function getSelectedNetwork(): SettingsNetwork {
@@ -105,10 +67,26 @@ export function getSelectedNetwork(): SettingsNetwork {
 }
 
 export function saveAccountsList(accounts: Account[]) {
-  return localStorage.setItem(accountsListKey, JSON.stringify(accounts));
+  localStorage.setItem(accountsListKey, JSON.stringify(accounts));
 }
 
 export function saveSelectedAccount(account: Account) {
   const jsonAccount = JSON.stringify(account);
   return localStorage.setItem(selectedAccountKey, jsonAccount);
+}
+
+export function saveSalt(salt: string) {
+  localStorage.setItem(saltKey, salt);
+}
+
+export function getSalt() {
+  return localStorage.getItem(saltKey);
+}
+
+export function storeEncryptedSeed(seed: string) {
+  localStorage.setItem(encryptedSeedKey, seed);
+}
+
+export function getEncryptedSeed() {
+  return localStorage.getItem(encryptedSeedKey);
 }

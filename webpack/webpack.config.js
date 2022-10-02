@@ -40,6 +40,7 @@ var options = {
     publicPath: ASSET_PATH,
   },
   module: {
+    noParse: /\.wasm$/,
     rules: [
       {
         test: /\.(css)$/,
@@ -76,7 +77,18 @@ var options = {
             },
           },
         ],
-      }
+      },
+      {
+        test: /\.wasm$/,
+        // Tells WebPack that this module should be included as
+        // base64-encoded binary file and not as code
+        loader: 'base64-loader',
+        // Disables WebPack's opinion where WebAssembly should be,
+        // makes it think that it's not WebAssembly
+        //
+        // Error: WebAssembly module is included in initial chunk.
+        type: 'javascript/auto',
+      },
     ],
   },
   resolve: {
@@ -87,7 +99,8 @@ var options = {
     alias: aliases,
     fallback: {
       stream: require.resolve('stream-browserify'),
-      crypto: require.resolve('crypto-browserify')
+      crypto: require.resolve('crypto-browserify'),
+      fs: false,
     },
   },
   plugins: [
