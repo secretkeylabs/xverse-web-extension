@@ -4,10 +4,10 @@ import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getStoreSeedPhraseRequestAction } from '@stores/actions/wallet/actionCreators';
 import NewPassword from './newPassword';
 import ConfirmPassword from './confirmPassword';
-import { StoreState } from '@stores/reducers/root';
+import { StoreState } from '@stores/root/reducer';
+import { storeWalletSeed } from '@core/wallet';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -53,9 +53,7 @@ function CreatePassword(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {
-    seedPhrase,
-  } = useSelector((state: StoreState) => ({
+  const { seedPhrase } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
 
@@ -63,8 +61,8 @@ function CreatePassword(): JSX.Element {
     setCurrentStepIndex(1);
   };
 
-  const handleConfirmPassword = () => {
-    dispatch(getStoreSeedPhraseRequestAction(seedPhrase, password));
+  const handleConfirmPassword = async () => {
+    await storeWalletSeed(seedPhrase, password);
     navigate('/create-wallet-success');
   };
 
@@ -79,9 +77,11 @@ function CreatePassword(): JSX.Element {
   return (
     <Container>
       <StepsContainer>
-        {Array(2).fill(0).map((view, index) => (
-          <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
-        ))}
+        {Array(2)
+          .fill(0)
+          .map((view, index) => (
+            <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
+          ))}
       </StepsContainer>
       <HeaderContainer>
         <img src={PasswordIcon} alt="passoword" />
@@ -89,26 +89,23 @@ function CreatePassword(): JSX.Element {
           {currentStepIndex === 0 ? t('CREATE_PASSWORD_TITLE') : t('CONFIRM_PASSWORD_TITLE')}
         </HeaderText>
       </HeaderContainer>
-      {
-        currentStepIndex === 0 ? (
-          <NewPassword
-            password={password}
-            setPassword={setPassword}
-            handleContinue={handleContinuePasswordCreation}
-            handleBack={handleNewPasswordBack}
-          />
-        ) : (
-          <ConfirmPassword
-            password={password}
-            confirmPassword={confirmPassword}
-            setConfirmPassword={setConfirmPassword}
-            handleContinue={handleConfirmPassword}
-            handleBack={handleConfirmPasswordBack}
-          />
-        )
-      }
+      {currentStepIndex === 0 ? (
+        <NewPassword
+          password={password}
+          setPassword={setPassword}
+          handleContinue={handleContinuePasswordCreation}
+          handleBack={handleNewPasswordBack}
+        />
+      ) : (
+        <ConfirmPassword
+          password={password}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
+          handleContinue={handleConfirmPassword}
+          handleBack={handleConfirmPasswordBack}
+        />
+      )}
     </Container>
-
   );
 }
 

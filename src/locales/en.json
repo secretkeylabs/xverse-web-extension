@@ -46,5 +46,13 @@
     "SCREEN_TITLE": "Wallet created successfully",
     "SCREEN_SUBTITLE": "Your new wallet has been created successfully, you can now connect to your wallet.",
     "OPEN_WALLET_BUTTON": "Open Wallet"
+  },
+  "LOGIN_SCREEN": {
+    "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",
+    "WELCOME_MESSAGE": "Welcome back!",
+    "PASSWORD_INPUT_LABEL": "Password",
+    "PASSWORD_INPUT_PLACEHOLDER": "Enter your password",
+    "VERIFY_PASSWORD_BUTTON": "Verify",
+    "VERIFY_PASSWORD_ERROR": "Incorrect Password"
   }
 }

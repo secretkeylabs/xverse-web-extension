@@ -2,9 +2,9 @@ import styled from 'styled-components';
 import logo from '@assets/img/full_logo_vertical.svg';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { getGenerateWalletAction } from '@stores/actions/wallet/actionCreators';
-import { StoreState } from '@stores/reducers/root';
+import { useDispatch } from 'react-redux';
+import { setWalletAction } from '@stores/wallet/actions/actionCreators';
+import { newWallet } from '@core/wallet';
 
 const TopSectionContainer = styled.div({
   display: 'flex',
@@ -69,9 +69,10 @@ function Landing(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handlePressAction = () => {
+  const handlePressAction = async () => {
     navigate('/onboarding');
-    dispatch(getGenerateWalletAction());
+    const wallet = await newWallet();
+    dispatch(setWalletAction(wallet));
   };
   return (
     <>
