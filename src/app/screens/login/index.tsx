@@ -6,10 +6,11 @@ import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import { useState } from 'react';
 import { decryptSeedPhrase } from '@utils/encryptionUtils';
 import { getEncryptedSeed } from '@utils/localStorage';
-import { walletFromSeedPhrase } from '@core/wallet';
+import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { useDispatch } from 'react-redux';
 import { setWalletAction } from '@stores/wallet/actions/actionCreators';
 import { useNavigate } from 'react-router-dom';
+import { Ring } from 'react-spinners-css';
 
 const ScreenContainer = styled.div((props) => ({
   display: 'flex',
@@ -115,7 +116,12 @@ function Login(): JSX.Element {
     try {
       if (seed) {
         const decrypted = await decryptSeedPhrase(seed, password);
-        const wallet = await walletFromSeedPhrase(decrypted);
+        const wallet = await walletFromSeedPhrase({
+          mnemonic: decrypted,
+          network: 'Mainnet',
+          index: BigInt(0),
+        });
+        console.log(wallet);
         dispatch(setWalletAction(wallet));
         setIsVerifying(false);
         navigate('/');
@@ -147,7 +153,13 @@ function Login(): JSX.Element {
       </PasswordInputContainer>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <VerifyButton onClick={handleVerifyPassword}>
-        {t('VERIFY_PASSWORD_BUTTON')}
+        {
+            !isVerifying ? (
+              t('VERIFY_PASSWORD_BUTTON')
+            ) : (
+              <Ring color="white" size={20} />
+            )
+        }
       </VerifyButton>
     </ScreenContainer>
   );

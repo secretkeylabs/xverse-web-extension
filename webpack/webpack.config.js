@@ -101,6 +101,7 @@ var options = {
       stream: require.resolve('stream-browserify'),
       crypto: require.resolve('crypto-browserify'),
       fs: false,
+      util: require.resolve('util/'),
     },
   },
   plugins: [
@@ -148,6 +149,7 @@ var options = {
       cache: false,
     }),
     new webpack.ProvidePlugin({
+      process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
   ],
