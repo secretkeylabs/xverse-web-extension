@@ -17,7 +17,7 @@ function SendBtcScreen({}: Props) {
     const navigate = useNavigate();
 
     const handleBackButtonClick = () => {
-      navigate('/home');
+      navigate('/');
     };
 
     const handleNextClick = () => {

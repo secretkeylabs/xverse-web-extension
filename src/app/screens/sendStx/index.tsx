@@ -15,7 +15,7 @@ function SendStxScreen({}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
   const handleBackButtonClick = () => {
-    navigate('/home');
+    navigate('/');
   };
 
   function validateFields(associatedAddress: string, amount: string, memo: string): boolean {

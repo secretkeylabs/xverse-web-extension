@@ -168,7 +168,7 @@ function TransactionStatus({ txid, currency, error }: Props) {
   }
 
   const onCloseClick = () => {
-    navigate('/home');
+    navigate('/');
   };
 
   const onCopyClick = () => {

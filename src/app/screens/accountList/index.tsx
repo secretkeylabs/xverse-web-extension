@@ -1,11 +1,23 @@
 import AccountRow from '@components/accountRow';
 import TopRow from '@components/topRow';
-import { Account } from '@utils/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Plus from '@assets/img/dashboard/plus.svg';
+import { useDispatch, useSelector } from 'react-redux';
+import { StoreState } from '@stores/root/reducer';
+import { addAccountRequestAction, selectAccount, } from '@stores/wallet/actions/actionCreators';
+import { Account } from '@core/types/accounts';
+import { saveSelectedAccount } from '@utils/localStorage';
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow-y:auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  `
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -18,17 +30,9 @@ const AccountContainer = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(11),
   paddingRight: props.theme.spacing(11),
-  //overflowY:'scroll'
+  marginBottom: props.theme.spacing(11),
 }));
 
-interface Props {
-  accounts: Account[];
-  loadingActiveAccount: boolean;
-  selectedAccount: Account | null;
-  onClose: () => void;
-  onCreate: () => void;
-  onSelected: (account: Account) => void;
-}
 const Seperator = styled.div((props) => ({
   width: '100%',
   height: 0,
@@ -36,7 +40,7 @@ const Seperator = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
-const AddAccountContainer = styled.div((props) => ({
+const AddAccountContainer = styled.button((props) => ({
   display: 'flex',
   height: 48,
   width: 48,
@@ -57,70 +61,62 @@ const AddAccountText = styled.h1((props) => ({
   opacity: 0.8,
 }));
 
-function AccountList({
-  accounts,
-  loadingActiveAccount,
-  selectedAccount,
-  onClose,
-  onCreate,
-  onSelected,
-}: Props) {
+function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'HEADER' });
   const navigate = useNavigate();
-  const a: Account[] = [
-    {
-      btcAddress: '3QAmUHT9jbsjewuAAjta6mtpH8M4tgQJcE',
-      btcPublicKey: '039137ce06037cd553b3fd3297fc9da72902ab56da1dae90bae21118c7c79e9144',
-      id: 0,
-      masterPubKey: '03306da4bddabf83dd0da13f8116179c1406487172380961236f89ebf7212de4fd',
-      stxAddress: 'SP1TWMXZB83X6KJAYEHNYVPAGX60Q9C2NVXBQCJMY',
-      stxPublicKey: '02d9e3e83034232ab495ca71c43e1ff7fab1413da3b9c05abf4b6925a3642d47cb',
-    },
-    {
-      btcAddress: '36eEWA3dgTbKYd11xggpdccQQxAXTvjzFD',
-      btcPublicKey: '020a0e6761e255363aac7a491bd50baef1a946561cbd49507e7feaff4f26785a36',
-      id: 1,
-      masterPubKey: '03306da4bddabf83dd0da13f8116179c1406487172380961236f89ebf7212de4fd',
-      stxAddress: 'SP2T1CZF3XXZ8TFP62ESRQ68M9VDJE6BR9M7EWZRT',
-      stxPublicKey: '0357e5d3f8fac1419da4bf5e930cb8f68d18962d3d838974f83c0ae2e695867518',
-    },
-    {
-      btcAddress: '3C224GbvNZ836SwfRPMncCsEXsdQD1bX41',
-      btcPublicKey: '03fb333da2efa2541eea8787666346c6dcaeb80200b0cfdded90e901ac685a94d4',
-      id: 2,
-      masterPubKey: '03306da4bddabf83dd0da13f8116179c1406487172380961236f89ebf7212de4fd',
-      stxAddress: 'SP3PZVGQZ1X4CA59KEYNDJXXAQXGA70YRGAMQ9V90',
-      stxPublicKey: '021db2d34e86196d44e5c856adf45288f9eec34ff2d17a5db6b73cf9dccd503b54',
-    },
-    {
-      btcAddress: '3QK6U89ZejRn6kiPDdzitMvn3g4fk2CqLW',
-      btcPublicKey: '022b228bee43d9b5ab301b9124ce6ab56fb9246f9d3389e4915ac0dd98c298fd6c',
-      id: 3,
-      masterPubKey: '03306da4bddabf83dd0da13f8116179c1406487172380961236f89ebf7212de4fd',
-      stxAddress: 'SP2FFKDKR122BZWS7GDPFWC0J0FK4WMW5NPQ0Z21M',
-      stxPublicKey: '033980f56f21108b63eaa1b43df56093876b3fa66ca0caafe0b32d8d449cfd36f3',
-    },
-  ];
-  accounts = a;
+  const dispatch = useDispatch();
+  const {
+    network,
+    accountsList,
+    seedPhrase,
+    selectedAccount,
+    stxAddress,
+        btcAddress,
+        masterPubKey,
+        stxPublicKey,
+        btcPublicKey,
 
-  //change
-  function handleAccountSelect() {
-    onSelected(accounts[0]);
+  } = useSelector((state: StoreState) => {
+    return {
+      ...state.walletState,
+    };
+  });
+
+  function handleAccountSelect(account:Account) {
+    saveSelectedAccount(account)
+     dispatch(selectAccount(account, account.stxAddress,
+      account.btcAddress,
+      account.masterPubKey,
+      account.stxPublicKey,
+      account.btcPublicKey,network));
+      navigate('/');
   }
 
-  const handleBackButtonClick = () => {
-    navigate('/home');
+  function isAccountSelected(account:Account) : boolean {
+    return account.id === selectedAccount?.id;
+  }
+
+  function handleBackButtonClick () {
+    navigate('/');
   };
+
+  function onCreateAccount (){
+    console.log("clicked")
+    dispatch(addAccountRequestAction(seedPhrase, network ?? 'Mainnet'))
+    console.log(accountsList)
+  }
+
   return (
-    <>
+    <Container>
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
-        {accounts.map((account) => {
+        {accountsList.map((account) => {
           return (
             <>
               <AccountRow
+              key={account.id}
                 account={account}
-                isSelected={false}
+                isSelected={isAccountSelected(account)}
                 onAccountSelected={handleAccountSelect}
               />
               <Seperator />
@@ -128,13 +124,13 @@ function AccountList({
           );
         })}
         <RowContainer>
-          <AddAccountContainer>
+          <AddAccountContainer onClick={onCreateAccount}>
             <ButtonImage src={Plus} />
           </AddAccountContainer>
           <AddAccountText>Create a new account</AddAccountText>
         </RowContainer>
       </AccountContainer>
-    </>
+    </Container>
   );
 }
 

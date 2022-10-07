@@ -70,9 +70,32 @@ export function saveAccountsList(accounts: Account[]) {
   localStorage.setItem(accountsListKey, JSON.stringify(accounts));
 }
 
+export async function getAccountsList(): Promise<Account[]> {
+  try {
+    const list =  localStorage.getItem(accountsListKey);
+    if (list !== null) {
+      const accountsList: Account[] = JSON.parse(list);
+      return Promise.resolve(accountsList);
+    } else return Promise.resolve([]);
+  } catch (e) {
+    return Promise.reject([]);
+  }
+}
+
 export function saveSelectedAccount(account: Account) {
   const jsonAccount = JSON.stringify(account);
   return localStorage.setItem(selectedAccountKey, jsonAccount);
+}
+
+export async function getSelectedAccount(): Promise<Account | null> {
+  const jsonAccount: string | null = localStorage.getItem(
+    selectedAccountKey,
+  );
+  if (jsonAccount) {
+    const account: Account = JSON.parse(jsonAccount);
+    return account;
+  }
+  return null;
 }
 
 export function saveSalt(salt: string) {
@@ -90,3 +113,5 @@ export function storeEncryptedSeed(seed: string) {
 export function getEncryptedSeed() {
   return localStorage.getItem(encryptedSeedKey);
 }
+
+

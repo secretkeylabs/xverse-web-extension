@@ -163,7 +163,7 @@ function ManageTokens({
   }
 
   const handleBackButtonClick = () => {
-    navigate('/home');
+    navigate('/');
   };
 
   return (

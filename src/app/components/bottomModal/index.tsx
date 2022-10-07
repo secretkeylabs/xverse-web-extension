@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -9,18 +9,15 @@ const customStyles = {
     backgroundColor: Theme.colors.background.modalBackdrop,
   },
   content: {
-    position: 'fixed',
-    top: '50%',
-    height: '50%',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    inset: "auto auto 0px auto",
     width: '100%',
+    maxHeight: "90%",
     border: 'transparent',
     background: Theme.colors.background.elevation2,
     margin: 0,
     padding: 0,
-    borderRadius: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
 };
 
@@ -55,14 +52,27 @@ interface Props {
   onClose: () => void;
 }
 
-function BottomModal({ header, children, visible ,onClose}: Props) {
-  const [modalIsOpen, setIsOpen] = useState(visible);
 
-  function closeModal() {
-    setIsOpen(false);
-  }
+function BottomModal({ header, children, visible ,onClose}: Props) {
+
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    console.log(modalRef.current?.clientHeight);
+  }, [])
+
   return (
-    <Modal isOpen={visible} backdropOpacity={1} ariaHideApp={false} style={customStyles} contentLabel="Example Modal">
+    <Modal 
+      ref={modalRef}
+      isOpen={visible} 
+      parentSelector={() => { 
+        const parent = document.querySelector('#app') as HTMLElement ?? document.body;
+        return parent;
+      }} 
+      ariaHideApp={false} 
+      style={customStyles} 
+      contentLabel="Example Modal"
+    >
       <RowContainer>
         <BottomModalHeaderText>{header}</BottomModalHeaderText>
         <ButtonImage src={Cross} onClick={onClose} />
@@ -71,6 +81,7 @@ function BottomModal({ header, children, visible ,onClose}: Props) {
 
       {children}
     </Modal>
+
   );
 }
 

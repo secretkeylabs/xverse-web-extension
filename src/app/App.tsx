@@ -7,6 +7,7 @@ import GlobalStyle from '../theme/global';
 import '../locales';
 import router from './routes';
 
+
 function App(): JSX.Element {
   const store = configureStore();
   return (
@@ -15,6 +16,9 @@ function App(): JSX.Element {
       <Provider store={store}>
         <ThemeProvider theme={Theme}>
           <RouterProvider router={router} />
+
+
+
         </ThemeProvider>
       </Provider>
     </>

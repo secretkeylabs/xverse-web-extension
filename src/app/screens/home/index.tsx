@@ -11,10 +11,14 @@ import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import AccountRow from '@components/accountRow';
 import { Account } from '@utils/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CoinSelectModal from '@components/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
+import { StoreState } from '@stores/root/reducer';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAccountsList, getSelectedAccount } from '@utils/localStorage';
+import { fetchAccountAction } from '@stores/wallet/actions/actionCreators';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -50,10 +54,9 @@ const BodyContainer = styled.div((props) => ({
   flex: 1,
 }));
 
-const SelectedAccountContainer = styled.button((props) => ({
+const SelectedAccountContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  background: 'transparent',
 }));
 
 const Seperator = styled.div((props) => ({
@@ -101,8 +104,53 @@ const TokenListButtonContainer = styled.div((props) => ({
 function Home(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
+  const [loadingWalletData, setLoadingWalletData] = useState(true);
+  const {
+    network,
+    stxAddress,
+    btcAddress,
+    masterPubKey,
+    stxPublicKey,
+    btcPublicKey,
+    accountsList,
+    selectedAccount,
+  } = useSelector((state: StoreState) => {
+    return {
+      ...state.walletState,
+    };
+  });
+
+console.log("current")
+console.log(selectedAccount)
+  async function loadInitialData() {
+    if (stxAddress && btcAddress) {
+      const account: Account | null = await getSelectedAccount();
+      const accountList: Account[] = await getAccountsList();
+      if (accountsList.length == 0) {
+        const accounts: Account[] = [
+          {
+            id: 0,
+            stxAddress,
+            btcAddress,
+            masterPubKey,
+            stxPublicKey,
+            btcPublicKey,
+          },
+        ];
+        dispatch(fetchAccountAction(accounts[0], accounts));
+      } else {
+        dispatch(fetchAccountAction(account!, accountList));
+      }
+      setLoadingWalletData(false);
+    }
+  }
+
+  useEffect(() => {
+    loadInitialData();
+  }, []);
 
   function onReceiveModalOpen() {
     setOpenReceiveModal(true);
@@ -124,14 +172,6 @@ function Home(): JSX.Element {
   function handleAccountSelect() {
     navigate('/accountList');
   }
-  const acc: Account = {
-    btcAddress: '3QAmUHT9jbsjewuAAjta6mtpH8M4tgQJcE',
-    btcPublicKey: '039137ce06037cd553b3fd3297fc9da72902ab56da1dae90bae21118c7c79e9144',
-    id: 0,
-    masterPubKey: '03306da4bddabf83dd0da13f8116179c1406487172380961236f89ebf7212de4fd',
-    stxAddress: 'SP1TWMXZB83X6KJAYEHNYVPAGX60Q9C2NVXBQCJMY',
-    stxPublicKey: '02d9e3e83034232ab495ca71c43e1ff7fab1413da3b9c05abf4b6925a3642d47cb',
-  };
 
   function renderBalanceCard() {
     return (
@@ -247,18 +287,18 @@ function Home(): JSX.Element {
     },
     {
       assetName: 'miamicoin',
-      balance: '0',
-      decimals: 0,
-      image: 'https://cdn.citycoins.co/logos/miamicoin.png',
-      name: 'MiamiCoin v1',
-      principal: 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-token',
+      balance: '2000000',
+      decimals: 6,
+      name: 'MiamiCoin v2',
+      principal: 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2',
       supported: true,
       ticker: 'MIA',
       tokenFiatRate: 0.000487,
-      total_received: '4',
-      total_sent: '4',
+      total_received: '3000000',
+      total_sent: '1000000',
       visible: true,
     },
+   
   ];
 
   function renderReceiveScreenModal() {
@@ -290,8 +330,13 @@ function Home(): JSX.Element {
   }
   return (
     <>
-      <SelectedAccountContainer onClick={handleAccountSelect}>
-        <AccountRow account={acc} isSelected={true} onAccountSelected={handleAccountSelect} />
+      <SelectedAccountContainer >
+        <AccountRow
+          account={selectedAccount}
+          isSelected={true}
+          onAccountSelected={handleAccountSelect}
+          loading={loadingWalletData}
+        />
       </SelectedAccountContainer>
       <Seperator />
       <BodyContainer>

@@ -92,7 +92,7 @@ function ConfirmTransation({ fee, currency, children, onConfirmClick, onCancelCl
   const fiatCurrency = 'USD';
 
   const handleBackButtonClick = () => {
-    navigate('/home');
+    navigate('/');
   };
   const getFiatAmountString = (fiatAmount: BigNumber, fiatCurrency: string) => {
     if (fiatAmount) {

@@ -103,7 +103,7 @@ function Receive({ currency }: Props) {
     }
   };
   const handleBackButtonClick = () => {
-    navigate('/home');
+    navigate('/');
   };
 
   const renderHeading = () => {

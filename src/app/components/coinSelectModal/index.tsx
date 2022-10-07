@@ -6,6 +6,7 @@ import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import { useTranslation } from 'react-i18next';
 import Theme from 'theme';
+import { useEffect, useRef } from 'react';
 
 interface Props {
   visible: boolean;
@@ -79,6 +80,7 @@ function CoinSelectModal({
         {renderFixedCoins()}
         {coins.map((coin) => (
           <TokenTile
+          key={coin.principal}
             title={coin.name}
             currency={'FT'}
             icon={IconStacks}
@@ -103,9 +105,12 @@ function CoinSelectModal({
     );
   }
   return (
-    <BottomModal visible={visible} header={title} onClose={onClose}>
+ 
+ 
+    <BottomModal visible={visible} header={title} onClose={onClose} >
       {renderToken()}
     </BottomModal>
+
   );
 }
 

@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setWalletAction } from '@stores/wallet/actions/actionCreators';
 import { newWallet } from '@core/wallet';
+import { saveAccountsList, saveSelectedAccount } from '@utils/localStorage';
+import { Account } from '@core/types/accounts';
 
 const TopSectionContainer = styled.div({
   display: 'flex',
@@ -72,6 +74,25 @@ function Landing(): JSX.Element {
   const handlePressAction = async () => {
     navigate('/onboarding');
     const wallet = await newWallet();
+    const {
+      stxAddress,
+      btcAddress,
+      masterPubKey,
+      stxPublicKey,
+      btcPublicKey,
+    } =wallet;
+    const accounts: Account[] = [
+      {
+        id: 0,
+        stxAddress,
+        btcAddress,
+        masterPubKey,
+        stxPublicKey,
+        btcPublicKey,
+      },
+    ];
+    saveSelectedAccount(accounts[0]);
+    saveAccountsList(accounts);
     dispatch(setWalletAction(wallet));
   };
   return (

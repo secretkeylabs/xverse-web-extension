@@ -1,19 +1,28 @@
+import BarLoader from '@components/barLoader';
+import { LoaderSize } from '@utils/constant';
 import { useAccountGradient } from '@utils/gradient';
 import { Account } from '@utils/utils';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-const GradientCircle = styled.div((props) => ({
+interface GradientCircleProps {
+  firstGradient: string;
+  secondGradient: string;
+  thirdGradient: string;
+}
+
+const GradientCircle = styled.div((props: GradientCircleProps) => ({
   height: 47,
   width: 47,
   borderRadius: 25,
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
 
-const TopSectionContainer = styled.div((props) => ({
+const TopSectionContainer = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   paddingTop: props.theme.spacing(8),
+  backgroundColor: 'transparent',
 }));
 
 const CurrentAcountContainer = styled.div((props) => ({
@@ -26,14 +35,13 @@ const CurrentAcountContainer = styled.div((props) => ({
 const CurrentSelectedAccountText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['0'],
-  textAlign:"start"
+  textAlign: 'start',
 }));
 
 const CurrentUnSelectedAccountText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['400'],
-  textAlign:"start"
-
+  textAlign: 'start',
 }));
 
 const CurrentAccountDetailText = styled.h1((props) => ({
@@ -46,12 +54,13 @@ interface Props {
   account: Account | null;
   isSelected: boolean;
   onAccountSelected: (account: Account) => void;
+  loading?: boolean;
 }
 
-function AccountRow({ account, isSelected, onAccountSelected }: Props) {
+function AccountRow({ account, isSelected, onAccountSelected, loading }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
 
-function getName() {
+  function getName() {
     return account?.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
   }
 
@@ -77,21 +86,24 @@ function getName() {
     }
   }
 
-  function rowPressed() {
+  function onClick() {
     onAccountSelected(account!);
   }
 
-  return (
+  return loading ? (
     <TopSectionContainer>
+      <BarLoader loaderSize={LoaderSize.LARGE} />
+    </TopSectionContainer>
+  ) : (
+    <TopSectionContainer onClick={onClick}>
       {renderCircle()}
       <CurrentAcountContainer>
-      {isSelected ? (
+        {isSelected ? (
           <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
         ) : (
           <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
         )}
         <CurrentAccountDetailText>{getAddressDetail()}</CurrentAccountDetailText>
-        
       </CurrentAcountContainer>
     </TopSectionContainer>
   );
