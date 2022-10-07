@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setWalletAction } from '@stores/wallet/actions/actionCreators';
-import { newWallet } from '@core/wallet';
+import { newWallet } from '@secretkeylabs/xverse-core/wallet';
 import { saveAccountsList, saveSelectedAccount } from '@utils/localStorage';
 import { Account } from '@core/types/accounts';
 
@@ -71,29 +71,24 @@ function Landing(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handlePressAction = async () => {
-    navigate('/onboarding');
-    const wallet = await newWallet();
-    const {
-      stxAddress,
-      btcAddress,
-      masterPubKey,
-      stxPublicKey,
-      btcPublicKey,
-    } =wallet;
-    const accounts: Account[] = [
-      {
-        id: 0,
-        stxAddress,
-        btcAddress,
-        masterPubKey,
-        stxPublicKey,
-        btcPublicKey,
-      },
-    ];
-    saveSelectedAccount(accounts[0]);
-    saveAccountsList(accounts);
-    dispatch(setWalletAction(wallet));
+  const handlePressCreate = async () => {
+    try {
+      const wallet = await newWallet();
+      dispatch(setWalletAction(wallet));
+      navigate('/onboarding');
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handlePressRestore = async () => {
+    try {
+      const wallet = await newWallet();
+      dispatch(setWalletAction(wallet));
+      navigate('/onboarding');
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <>
@@ -102,10 +97,10 @@ function Landing(): JSX.Element {
         <LandingTitle>{t('SCREEN_TITLE')}</LandingTitle>
       </TopSectionContainer>
       <ActionButtonsContainer>
-        <CreateButton onClick={handlePressAction}>
+        <CreateButton onClick={handlePressCreate}>
           <ButtonText>{t('CREATE_WALLET_BUTTON')}</ButtonText>
         </CreateButton>
-        <RestoreButton onClick={handlePressAction}>
+        <RestoreButton onClick={handlePressRestore}>
           <ButtonText>{t('RESTORE_WALLET_BUTTON')}</ButtonText>
         </RestoreButton>
       </ActionButtonsContainer>

@@ -4,10 +4,10 @@ import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import NewPassword from './newPassword';
-import ConfirmPassword from './confirmPassword';
 import { StoreState } from '@stores/root/reducer';
 import { storeWalletSeed } from '@core/wallet';
+import NewPassword from './newPassword';
+import ConfirmPassword from './confirmPassword';
 
 const Container = styled.div((props) => ({
   flex: 1,
