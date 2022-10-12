@@ -10,7 +10,7 @@ import TokenTile from '@components/tokenTile';
 import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import AccountRow from '@components/accountRow';
-import { Account } from '@utils/utils';
+import { Account } from "@core/types/accounts";
 import { useEffect, useState } from 'react';
 import CoinSelectModal from '@components/coinSelectModal';
 import Theme from 'theme';

@@ -6,7 +6,6 @@ import { useDispatch } from 'react-redux';
 import { setWalletAction } from '@stores/wallet/actions/actionCreators';
 import { newWallet } from '@secretkeylabs/xverse-core/wallet';
 import { saveAccountsList, saveSelectedAccount } from '@utils/localStorage';
-import { Account } from '@core/types/accounts';
 
 const TopSectionContainer = styled.div({
   display: 'flex',

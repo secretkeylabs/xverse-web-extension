@@ -2,6 +2,13 @@ import { Network } from 'app/core/types/networks';
 
 export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT';
 
+export enum LoaderSize {
+    SMALLEST,
+    SMALL,
+    MEDIUM,
+    LARGE,
+} 
+
 export type AuthenticationState =
   | 'Authenticated'
   | 'NotAuthenticated'

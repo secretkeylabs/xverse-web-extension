@@ -1,7 +1,6 @@
 import {takeEvery, put, call, all, takeLatest} from 'redux-saga/effects';
-import BN from "bn.js";
 import { Account } from "@core/types/accounts";
-import { walletFromSeedPhrase } from "@core/wallet";
+import { walletFromSeedPhrase } from "@secretkeylabs/xverse-core/wallet";
 import { getAccountsList, saveAccountsList } from "@utils/localStorage";
 import { addAccountFailureAction, addAccoutSuccessAction } from "./actions/actionCreators";
 import { AddAccountRequestAction,AddAccountRequestKey } from "./actions/types";
@@ -12,7 +11,7 @@ function* handleAddAccount(action: AddAccountRequestAction){
     const index = accountsList.length > 0 ? accountsList.length : 1;
 
     const {stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey} =
-      yield walletFromSeedPhrase(action.seed, new BN(index), action.network);
+      yield walletFromSeedPhrase({mnemonic:action.seed, index:BigInt(index), network:action.network});
 
     const account: Account = {
       id: index,

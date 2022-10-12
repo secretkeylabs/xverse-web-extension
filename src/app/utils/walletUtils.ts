@@ -1,7 +1,6 @@
 import BigNumber from "bignumber.js";
 import { Network } from "./constant";
 import {c32addressDecode} from 'c32check';
-import {AddressVersion} from '@stacks/transactions';
 
 export const satsToBtc = (sats: BigNumber) => sats.multipliedBy(0.00000001);
 
