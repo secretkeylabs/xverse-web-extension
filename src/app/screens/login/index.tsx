@@ -7,10 +7,12 @@ import { useState } from 'react';
 import { decryptSeedPhrase } from '@utils/encryptionUtils';
 import { getEncryptedSeed } from '@utils/localStorage';
 import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
-import { useDispatch } from 'react-redux';
-import { setWalletAction } from '@stores/wallet/actions/actionCreators';
+import { useDispatch, useSelector } from 'react-redux';
+import { setWalletAction, storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
 import { useNavigate } from 'react-router-dom';
 import { Ring } from 'react-spinners-css';
+import { StoreState } from '@stores/index';
+import useWalletReducer from '@hooks/useWalletReducer';
 
 const ScreenContainer = styled.div((props) => ({
   display: 'flex',
@@ -90,10 +92,18 @@ const ErrorMessage = styled.h2((props) => ({
   marginTop: props.theme.spacing(4),
 }));
 
+const ForgotPasswordButton = styled.a((props) => ({
+  ...props.theme.body_m,
+  textAlign: 'center',
+  marginTop: props.theme.spacing(12),
+  color: props.theme.colors.white['0'],
+  textDecoration: 'underline',
+}));
+
 function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { unlockWallet } = useWalletReducer();
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -102,7 +112,6 @@ function Login(): JSX.Element {
   const handleTogglePasswordView = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
-
   const handlePasswordChange = (event: React.FormEvent<HTMLInputElement>) => {
     if (error) {
       setError('');
@@ -112,24 +121,18 @@ function Login(): JSX.Element {
 
   const handleVerifyPassword = async () => {
     setIsVerifying(true);
-    const seed = getEncryptedSeed();
     try {
-      if (seed) {
-        const decrypted = await decryptSeedPhrase(seed, password);
-        const wallet = await walletFromSeedPhrase({
-          mnemonic: decrypted,
-          network: 'Mainnet',
-          index: BigInt(0),
-        });
-        console.log(wallet);
-        dispatch(setWalletAction(wallet));
-        setIsVerifying(false);
-        navigate('/');
-      }
+      await unlockWallet(password);
+      setIsVerifying(false);
+      navigate('/');
     } catch (err) {
       setIsVerifying(false);
       setError(t('VERIFY_PASSWORD_ERROR'));
     }
+  };
+
+  const handleForgotPassword = () => {
+    navigate('/forgotPassword');
   };
 
   return (
@@ -161,6 +164,9 @@ function Login(): JSX.Element {
             )
         }
       </VerifyButton>
+      <ForgotPasswordButton onClick={handleForgotPassword}>
+        {t('FORGOT_PASSWORD_BUTTON')}
+      </ForgotPasswordButton>
     </ScreenContainer>
   );
 }

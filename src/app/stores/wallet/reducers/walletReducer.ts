@@ -1,19 +1,7 @@
-import { Network } from 'app/core/types/networks';
-import { Account } from 'app/core/types/accounts';
-import { WalletActions, SetWalletKey, ResetWalletKey } from '../actions/types';
-
-interface WalletState {
-  stxAddress: string;
-  btcAddress: string;
-  masterPubKey: string;
-  stxPublicKey: string;
-  btcPublicKey: string;
-  accountsList: Account[];
-  selectedAccount: Account | null;
-  network: Network;
-  seedPhrase: string;
-  isLocked: boolean;
-}
+import {
+  StoreEncryptedSeedKey,
+  WalletActions, SetWalletKey, ResetWalletKey, WalletState, UnlockWalletKey, LockWalletKey,
+} from '../actions/types';
 
 const initialWalletState: WalletState = {
   stxAddress: '',
@@ -25,25 +13,39 @@ const initialWalletState: WalletState = {
   accountsList: [],
   selectedAccount: null,
   seedPhrase: '',
-  isLocked: true,
+  encryptedSeed: '',
 };
 
 const walletReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: WalletState = initialWalletState,
   action: WalletActions,
-) => {
+): WalletState => {
   switch (action.type) {
     case SetWalletKey:
+      console.log(action.wallet);
       return {
         ...state,
         ...action.wallet,
-        isLocked: false,
       };
     case ResetWalletKey:
       return {
-        ...state,
         ...initialWalletState,
+      };
+    case StoreEncryptedSeedKey:
+      return {
+        ...state,
+        encryptedSeed: action.encryptedSeed,
+      };
+    case UnlockWalletKey:
+      return {
+        ...state,
+        seedPhrase: action.seed,
+      };
+    case LockWalletKey:
+      return {
+        ...state,
+        seedPhrase: '',
       };
     default:
       return state;

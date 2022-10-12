@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
+import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import React, { useEffect, useState } from 'react';
 
 interface NewPasswordProps {
@@ -11,12 +12,23 @@ interface NewPasswordProps {
   handleBack: () => void,
 }
 
-const NewPasswordContainer = styled.div((props) => ({
+const NewPasswordContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'flex-start',
-  marginTop: props.theme.spacing(24),
   flex: 1,
+});
+
+const HeaderText = styled.h1((props) => ({
+  ...props.theme.body_bold_l,
+  textAlign: 'center',
+  marginTop: props.theme.spacing(15),
+}));
+
+const HeaderContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(32),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
 }));
 
 const PasswordInputContainer = styled.div((props) => ({
@@ -32,7 +44,8 @@ const PasswordInputContainer = styled.div((props) => ({
 
 const PasswordInputLabel = styled.h2((props) => ({
   ...props.theme.body_medium_m,
-  textAlign: 'center',
+  textAlign: 'left',
+  marginTop: props.theme.spacing(24),
 }));
 
 const PasswordInput = styled.input((props) => ({
@@ -196,6 +209,12 @@ function NewPassword(props: NewPasswordProps): JSX.Element {
 
   return (
     <NewPasswordContainer>
+      <HeaderContainer>
+        <img src={PasswordIcon} alt="passoword" />
+        <HeaderText>
+          {t('CREATE_PASSWORD_TITLE')}
+        </HeaderText>
+      </HeaderContainer>
       <PasswordInputLabel>{t('TEXT_INPUT_NEW_PASSWORD_LABEL')}</PasswordInputLabel>
       <PasswordInputContainer>
         <PasswordInput type={isPasswordVisible ? 'text' : 'password'} value={password} onChange={handlePasswordChange} />

@@ -1,11 +1,10 @@
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { StoreState } from '@stores/root/reducer';
-import { storeWalletSeed } from '@core/wallet';
+import { StoreState } from '@stores/index';
+import { encryptSeedPhrase } from '@utils/encryptionUtils';
+import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
 import NewPassword from './newPassword';
 import ConfirmPassword from './confirmPassword';
 
@@ -33,21 +32,7 @@ const StepDot = styled.div((props) => ({
   marginRight: props.theme.spacing(4),
 }));
 
-const HeaderText = styled.h1((props) => ({
-  ...props.theme.body_bold_l,
-  textAlign: 'center',
-  marginTop: props.theme.spacing(15),
-}));
-
-const HeaderContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(32),
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
-
 function CreatePassword(): JSX.Element {
-  const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
@@ -62,8 +47,13 @@ function CreatePassword(): JSX.Element {
   };
 
   const handleConfirmPassword = async () => {
-    await storeWalletSeed(seedPhrase, password);
-    navigate('/create-wallet-success');
+    try {
+      const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
+      dispatch(storeEncryptedSeedAction(encryptedSeed));
+      navigate('/create-wallet-success');
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleNewPasswordBack = () => {
@@ -83,12 +73,6 @@ function CreatePassword(): JSX.Element {
             <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
           ))}
       </StepsContainer>
-      <HeaderContainer>
-        <img src={PasswordIcon} alt="passoword" />
-        <HeaderText>
-          {currentStepIndex === 0 ? t('CREATE_PASSWORD_TITLE') : t('CONFIRM_PASSWORD_TITLE')}
-        </HeaderText>
-      </HeaderContainer>
       {currentStepIndex === 0 ? (
         <NewPassword
           password={password}

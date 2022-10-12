@@ -9,9 +9,10 @@
     "default_title": "Xverse Wallet"
   },
   "chrome_url_overrides": {},
-  "content_security_policy":{
+  "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-src 'none'; frame-ancestors 'none';"
-    },
+  },
+  "permissions": ["storage"],
   "background": {},
   "icons": {
     "128": "assets/img/xverse_icon.png"

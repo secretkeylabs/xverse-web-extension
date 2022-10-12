@@ -25,7 +25,6 @@
       "@screens/*": ["app/screens/*"],
       "@stores/*": ["app/stores/*"],
       "@utils/*": ["app/utils/*"],
-      "@core/*": ["app/core/*"],
     }
   },
   "include": ["src"]

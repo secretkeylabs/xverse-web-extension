@@ -53,6 +53,19 @@
     "PASSWORD_INPUT_LABEL": "Password",
     "PASSWORD_INPUT_PLACEHOLDER": "Enter your password",
     "VERIFY_PASSWORD_BUTTON": "Verify",
-    "VERIFY_PASSWORD_ERROR": "Incorrect Password"
+    "VERIFY_PASSWORD_ERROR": "Incorrect Password",
+    "FORGOT_PASSWORD_BUTTON": "Forgot your password?"
+  },
+  "FORGOT_PASSWORD_SCREEN": {
+    "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seedphrase you used when you generated your wallet.",
+    "PARAGRAPH2": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
+    "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"
+  },
+  "RESTORE_WALLET_SCREEN": {
+    "ENTER_SEED_HEADER": "Enter your 12 or 24 word seedphrase to restore your wallet",
+    "SEED_INPUT_PLACEHOLDER": "Enter your seedphrase",
+    "SEED_INPUT_LABEL": "Selected Words",
+    "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
+    "CONTINUE_BUTTON": "Continue"
   }
 }

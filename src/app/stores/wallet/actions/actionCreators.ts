@@ -9,7 +9,21 @@ export function setWalletAction(
   };
 }
 
-export function ResetWalletAction(): actions.ResetWallet {
+export function unlockWalletAction(seed : string) {
+  return {
+    type: actions.UnlockWalletKey,
+    seed,
+  };
+}
+
+export function storeEncryptedSeedAction(encryptedSeed :string): actions.StoreEncryptedSeed {
+  return {
+    type: actions.StoreEncryptedSeedKey,
+    encryptedSeed,
+  };
+}
+
+export function resetWalletAction(): actions.ResetWallet {
   return {
     type: actions.ResetWalletKey,
   };
