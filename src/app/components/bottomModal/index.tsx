@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import styled from 'styled-components';
 import Theme from 'theme';
 import Cross from '@assets/img/dashboard/X.svg';
+import Seperator from '@components/seperator';
 
 const customStyles = {
   overlay: {
@@ -38,12 +39,7 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
-const Seperator = styled.div((props) => ({
-  width: '100%',
-  height: 0,
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  marginTop: props.theme.spacing(8),
-}));
+
 
 interface Props {
   header: string;
@@ -54,16 +50,8 @@ interface Props {
 
 
 function BottomModal({ header, children, visible ,onClose}: Props) {
-
-  const modalRef = useRef(null);
-
-  useEffect(() => {
-    console.log(modalRef.current?.clientHeight);
-  }, [])
-
   return (
     <Modal 
-      ref={modalRef}
       isOpen={visible} 
       parentSelector={() => { 
         const parent = document.querySelector('#app') as HTMLElement ?? document.body;

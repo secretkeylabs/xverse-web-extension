@@ -1,12 +1,7 @@
-import { SettingsNetwork } from "@secretkeylabs/xverse-core";
-import { Account } from "@stores/wallet/actions/types";
-
 const userPrefBackupRemindKey = 'UserPref:BackupRemind';
 const isTermsAccepted = 'isTermsAccepted';
 const hasFinishedOnboardingKey = 'hasFinishedOnboarding';
 const saltKey = 'salt';
-const accountsListKey = 'AccountsList';
-const selectedAccountKey = 'SelectedAccount';
 
 export function saveMultiple(items: { [x: string]: string }) {
   const itemKeys = Object.keys(items);
@@ -45,38 +40,6 @@ export function saveUserPrefBackupRemind(nextBackupRemind: string) {
 
 export function getUserPrefBackupRemind(): string | null {
   return localStorage.getItem(userPrefBackupRemindKey);
-}
-
-export function saveAccountsList(accounts: Account[]) {
-  localStorage.setItem(accountsListKey, JSON.stringify(accounts));
-}
-
-export async function getAccountsList(): Promise<Account[]> {
-  try {
-    const list =  localStorage.getItem(accountsListKey);
-    if (list !== null) {
-      const accountsList: Account[] = JSON.parse(list);
-      return Promise.resolve(accountsList);
-    } else return Promise.resolve([]);
-  } catch (e) {
-    return Promise.reject([]);
-  }
-}
-
-export function saveSelectedAccount(account: Account) {
-  const jsonAccount = JSON.stringify(account);
-  return localStorage.setItem(selectedAccountKey, jsonAccount);
-}
-
-export async function getSelectedAccount(): Promise<Account | null> {
-  const jsonAccount: string | null = localStorage.getItem(
-    selectedAccountKey,
-  );
-  if (jsonAccount) {
-    const account: Account = JSON.parse(jsonAccount);
-    return account;
-  }
-  return null;
 }
 
 export function saveSalt(salt: string) {

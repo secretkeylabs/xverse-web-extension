@@ -4,7 +4,6 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@react-navigation/bottom-tabs": "^6.4.0",
     "@secretkeylabs/xverse-core": "file:/Users/imamah/Desktop/xverse-core/xverse-core",
     "@stacks/encryption": "4.3.5",
     "@testing-library/jest-dom": "^5.16.5",

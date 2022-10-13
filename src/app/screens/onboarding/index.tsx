@@ -129,7 +129,7 @@ function Onboarding(): JSX.Element {
   const handleClickNext = () => {
     setCurrentStepIndex(currentStepIndex + 1);
   };
-console.log(stxAddress);
+
   const handleSkip = () => {
     const isRestore = localStorage.getItem('isRestore');
     saveHasFinishedOnboarding(true);

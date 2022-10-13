@@ -1,16 +1,23 @@
-import {takeEvery, put, call, all, takeLatest} from 'redux-saga/effects';
-import { walletFromSeedPhrase } from "@secretkeylabs/xverse-core/wallet";
-import { getAccountsList, saveAccountsList } from "@utils/localStorage";
-import { addAccountFailureAction, addAccoutSuccessAction } from "./actions/actionCreators";
-import { Account, AddAccountRequestAction,AddAccountRequestKey } from "./actions/types";
+import { takeEvery, put, call, all, takeLatest } from 'redux-saga/effects';
+import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
+import { addAccountFailureAction, addAccoutSuccessAction } from './actions/actionCreators';
+import {
+  Account,
+  AddAccountRequest,
+  AddAccountRequestKey,
+  FetchWalletDataRequest,
+} from './actions/types';
 
-function* handleAddAccount(action: AddAccountRequestAction){
-    try{
-      let accountsList: Account[] = yield getAccountsList();
-    const index = accountsList.length > 0 ? accountsList.length : 1;
+function* handleAddAccount(action: AddAccountRequest) {
+  try {
+    const index = action.accountsList.length > 0 ? action.accountsList.length : 1;
 
-    const {stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey} =
-      yield walletFromSeedPhrase({mnemonic:action.seed, index:BigInt(index), network:action.network});
+    const { stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey } =
+      yield walletFromSeedPhrase({
+        mnemonic: action.seed,
+        index: BigInt(index),
+        network: action.network,
+      });
 
     const account: Account = {
       id: index,
@@ -20,22 +27,14 @@ function* handleAddAccount(action: AddAccountRequestAction){
       stxPublicKey,
       btcPublicKey,
     };
-
-    // add account in the list
-    if (accountsList) {
-      accountsList.push(account);
-    } else {
-      accountsList = [];
-      accountsList.push(account);
-    }
-    console.log(accountsList)
-    yield saveAccountsList(accountsList);
-    yield put(addAccoutSuccessAction(accountsList));
-  } catch (e:any) {
+    const modifiedAccountList = [...action.accountsList];
+    modifiedAccountList.push(account);
+    yield put(addAccoutSuccessAction(modifiedAccountList));
+  } catch (e: any) {
     yield put(addAccountFailureAction(e.toString()));
   }
 }
 
 export function* addAccountSaga() {
-    yield takeEvery(AddAccountRequestKey, handleAddAccount);
+  yield takeEvery(AddAccountRequestKey, handleAddAccount);
 }

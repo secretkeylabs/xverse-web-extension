@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
+import Seperator from '@components/seperator';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -28,13 +29,6 @@ const ValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginTop: props.theme.spacing(2),
   wordBreak:'break-all'
-}));
-
-const Seperator = styled.div((props) => ({
-  width: '100%',
-  height: 0,
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  marginTop: props.theme.spacing(12),
 }));
 
 const ButtonImage = styled.img((props) => ({

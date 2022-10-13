@@ -19,6 +19,7 @@ const initialWalletState: WalletState = {
   seedPhrase: '',
   encryptedSeed: '',
   loadingWalletData: false,
+  fiatCurrency: 'USD',
 };
 
 const walletReducer = (
@@ -28,7 +29,6 @@ const walletReducer = (
 ): WalletState => {
   switch (action.type) {
     case SetWalletKey:
-      console.log(action.wallet);
       return {
         ...state,
         ...action.wallet,

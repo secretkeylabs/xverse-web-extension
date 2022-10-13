@@ -10,15 +10,16 @@ import TokenTile from '@components/tokenTile';
 import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import AccountRow from '@components/accountRow';
-import { Account } from "@core/types/accounts";
 import { useEffect, useState } from 'react';
 import CoinSelectModal from '@components/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
-import { StoreState } from '@stores/root/reducer';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAccountsList, getSelectedAccount } from '@utils/localStorage';
 import { fetchAccountAction } from '@stores/wallet/actions/actionCreators';
+import BottomBar from '@components/tabBar';
+import { StoreState } from '@stores/index';
+import { Account } from '@stores/wallet/actions/types';
+import Seperator from '@components/seperator';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -57,13 +58,6 @@ const BodyContainer = styled.div((props) => ({
 const SelectedAccountContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-}));
-
-const Seperator = styled.div((props) => ({
-  width: '100%',
-  height: 0,
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  marginTop: props.theme.spacing(8),
 }));
 
 const BalanceHeadingText = styled.h1((props) => ({
@@ -109,7 +103,6 @@ function Home(): JSX.Element {
   const [openSendModal, setOpenSendModal] = useState(false);
   const [loadingWalletData, setLoadingWalletData] = useState(true);
   const {
-    network,
     stxAddress,
     btcAddress,
     masterPubKey,
@@ -117,19 +110,11 @@ function Home(): JSX.Element {
     btcPublicKey,
     accountsList,
     selectedAccount,
-  } = useSelector((state: StoreState) => {
-    return {
-      ...state.walletState,
-    };
-  });
-
-console.log("current")
-console.log(selectedAccount)
+  }  = useSelector((state: StoreState) => state.walletState);
+  
   async function loadInitialData() {
     if (stxAddress && btcAddress) {
-      const account: Account | null = await getSelectedAccount();
-      const accountList: Account[] = await getAccountsList();
-      if (accountsList.length == 0) {
+      if (accountsList.length === 0) {
         const accounts: Account[] = [
           {
             id: 0,
@@ -142,7 +127,7 @@ console.log(selectedAccount)
         ];
         dispatch(fetchAccountAction(accounts[0], accounts));
       } else {
-        dispatch(fetchAccountAction(account!, accountList));
+        dispatch(fetchAccountAction(selectedAccount!, accountsList));
       }
       setLoadingWalletData(false);
     }
@@ -168,9 +153,8 @@ console.log(selectedAccount)
     setOpenSendModal(false);
   }
 
-  //change
   function handleAccountSelect() {
-    navigate('/accountList');
+    navigate('/account-list');
   }
 
   function renderBalanceCard() {
@@ -206,7 +190,7 @@ console.log(selectedAccount)
   }
 
   const handleManageTokenListOnClick = () => {
-    navigate('/manageTokens');
+    navigate('/manage-tokens');
   };
 
   const onStxSendClick = () => {
@@ -298,7 +282,6 @@ console.log(selectedAccount)
       total_sent: '1000000',
       visible: true,
     },
-   
   ];
 
   function renderReceiveScreenModal() {
@@ -330,7 +313,7 @@ console.log(selectedAccount)
   }
   return (
     <>
-      <SelectedAccountContainer >
+      <SelectedAccountContainer>
         <AccountRow
           account={selectedAccount}
           isSelected={true}
@@ -347,6 +330,7 @@ console.log(selectedAccount)
         {renderReceiveScreenModal()}
         {renderSendScreenModal()}
       </BodyContainer>
+      <BottomBar />
     </>
   );
 }

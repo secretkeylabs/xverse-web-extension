@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import ArrowLeft from '@assets/img/ArrowLeft.svg';
+import ArrowLeft from '@assets/img/arrow_left.svg';
 
 const Container = styled.div((props) => ({
   display: 'flex',

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-function SendStxScreen({}: Props) {
+function SendStxScreen() {
   const [error, setError] = useState('');
   const stxAddress = 'SP1TWMXZB83X6KJAYEHNYVPAGX60Q9C2NVXBQCJMY';
   const stxAvailableBalance = 120;
@@ -28,9 +28,8 @@ function SendStxScreen({}: Props) {
       setError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
-
     if (!validateStxAddress(associatedAddress, network)) {
-      setError(t('ERRORS.ADDRESS_INVALID'));
+        setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
 
@@ -53,7 +52,7 @@ function SendStxScreen({}: Props) {
       return false;
     }
 
-    if (stxToMicrostacks(parsedAmount).lt(1)) {
+   if (stxToMicrostacks(parsedAmount).lt(1)) {
       setError(t('ERRORS.MINIMUM_AMOUNT'));
       return false;
     }

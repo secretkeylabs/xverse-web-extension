@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Switch from 'react-switch';
 import Theme from 'theme';
 import { getTicker } from '@utils/helper';
+import Seperator from '@components/seperator';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -53,13 +54,6 @@ const UnSelectedCoinTitleText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['400'],
   textAlign: 'center',
-}));
-
-const Seperator = styled.div((props) => ({
-  width: '100%',
-  height: 0,
-  border: `0.2px solid ${props.theme.colors.white['400']}`,
-  marginTop: props.theme.spacing(8),
 }));
 
 interface Props {

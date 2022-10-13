@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setWalletAction } from '@stores/wallet/actions/actionCreators';
 import { newWallet } from '@secretkeylabs/xverse-core/wallet';
-import { saveAccountsList, saveSelectedAccount } from '@utils/localStorage';
 
 const TopSectionContainer = styled.div({
   display: 'flex',

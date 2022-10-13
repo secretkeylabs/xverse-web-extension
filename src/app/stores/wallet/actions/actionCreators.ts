@@ -1,4 +1,5 @@
-import { NetworkType } from '@secretkeylabs/xverse-core/types';
+import { NetworkType, SettingsNetwork, StxTransactionData } from '@secretkeylabs/xverse-core/types';
+import BigNumber from 'bignumber.js';
 import * as actions from './types';
 import { Account } from './types';
 
@@ -42,23 +43,25 @@ export function fetchAccountAction(
 
 export function addAccountRequestAction(
   seed: string,
-  network:NetworkType
-): actions.AddAccountRequestAction {
+  network:NetworkType,
+  accountsList: Account[]
+): actions.AddAccountRequest{
   return {
     type: actions.AddAccountRequestKey,
     seed,
     network,
+    accountsList
   };
 }
 
-export function addAccoutSuccessAction(accountsList: Account[]): actions.AddAccountSuccessAction {
+export function addAccoutSuccessAction(accountsList: Account[]): actions.AddAccountSuccess{
   return {
     type: actions.AddAccountSuccessKey,
     accountsList,
   };
 }
 
-export function addAccountFailureAction(error: string): actions.AddAccountFailureAction {
+export function addAccountFailureAction(error: string): actions.AddAccountFailure {
   return {
     type: actions.AddAccountFailureKey,
     error,
@@ -87,5 +90,51 @@ export function selectAccount(
     network,
    // stackingState,
     bnsName,
+  };
+}
+
+export function fetchWalletDataAction(
+  stxAddress: string,
+  btcAddress: string,
+  network: NetworkType,
+  fiatCurrency: string
+): actions.FetchWalletDataRequest {
+  return {
+    type: actions.FetchWalletDataRequestKey,
+    stxAddress,
+    btcAddress,
+    network,
+    fiatCurrency
+  };
+}
+
+export function fetchWalletDataSuccessAction(
+  totalBalance: BigNumber,
+  stxBalance: BigNumber,
+  stxAvailableBalance: BigNumber,
+  stxLockedBalance: BigNumber,
+  btcBalance: BigNumber,
+  stxTransactions: StxTransactionData[],
+  stxNonce: number,
+  totalTransactions: number,
+  selectedNetwork: SettingsNetwork,
+): actions.FetchWalletDataSuccess {
+  return {
+    type: actions.FetchWalletDataSuccessKey,
+    totalBalance,
+    stxBalance,
+    stxAvailableBalance,
+    stxLockedBalance,
+    btcBalance,
+    stxTransactions,
+    stxNonce,
+    totalTransactions,
+    selectedNetwork,
+  };
+}
+
+export function fetchWalletDataFailureAction() {
+  return {
+    type: actions.FetchWalletDataFailureKey,
   };
 }

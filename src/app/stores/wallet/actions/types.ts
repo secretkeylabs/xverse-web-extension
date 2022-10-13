@@ -1,4 +1,5 @@
-import { NetworkType } from '@secretkeylabs/xverse-core/types';
+import { NetworkType, SettingsNetwork, StxTransactionData } from '@secretkeylabs/xverse-core/types';
+import BigNumber from 'bignumber.js';
 
 export const SetWalletKey = 'SetWallet';
 export const ResetWalletKey = 'ResetWallet';
@@ -11,6 +12,10 @@ export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
 export const AddAccountRequestKey = 'AddAccountRequest';
 export const AddAccountSuccessKey = 'AddAccountSuccess';
 export const AddAccountFailureKey = 'AddAccountFailure';
+
+export const FetchWalletDataRequestKey = 'FetchWalletDataRequest';
+export const FetchWalletDataSuccessKey = 'FetchWalletDataSuccess';
+export const FetchWalletDataFailureKey = 'FetchWalletDataFailure';
 
 export interface Account {
   id: number;
@@ -34,6 +39,7 @@ export interface WalletState {
   seedPhrase: string;
   encryptedSeed: string;
   loadingWalletData:boolean;
+  fiatCurrency: string;
 }
 
 export interface WalletData {
@@ -73,18 +79,19 @@ export interface FetchAccount {
   accountsList: Account[];
 }
 
-export interface AddAccountRequestAction {
+export interface AddAccountRequest {
   type: typeof AddAccountRequestKey;
   seed: string;
-  network: NetworkType
+  network: NetworkType,
+  accountsList: Account[];
 }
 
-export interface AddAccountSuccessAction {
+export interface AddAccountSuccess{
   type: typeof AddAccountSuccessKey;
   accountsList: Account[];
 }
 
-export interface AddAccountFailureAction {
+export interface AddAccountFailure {
   type: typeof AddAccountFailureKey;
   error: string;
 }
@@ -102,5 +109,30 @@ export interface SelectAccount {
   //stackingState: StackingStateData;
 }
 
-export type WalletActions = SetWallet | ResetWallet | FetchAccount |AddAccountRequestAction | AddAccountSuccessAction | AddAccountFailureAction| SelectAccount| StoreEncryptedSeed | UnlockWallet | LockWallet;
+export interface FetchWalletDataRequest {
+  type: typeof FetchWalletDataRequestKey;
+  stxAddress: string;
+  btcAddress: string;
+  network: NetworkType;
+  fiatCurrency: string;
+}
+
+export interface FetchWalletDataSuccess {
+  type: typeof FetchWalletDataSuccessKey;
+  totalBalance: BigNumber;
+  stxBalance: BigNumber;
+  stxAvailableBalance: BigNumber;
+  stxLockedBalance: BigNumber;
+  btcBalance: BigNumber;
+  stxTransactions: StxTransactionData[];
+  stxNonce: number;
+  totalTransactions: number;
+  selectedNetwork: SettingsNetwork;
+}
+
+export interface FetchWalletDataFail {
+  type: typeof FetchWalletDataFailureKey;
+}
+
+export type WalletActions = SetWallet | ResetWallet | FetchAccount |AddAccountRequest | AddAccountSuccess | AddAccountFailure| SelectAccount| StoreEncryptedSeed | UnlockWallet | LockWallet |FetchWalletDataRequest|FetchWalletDataSuccess |FetchWalletDataFail ;
 

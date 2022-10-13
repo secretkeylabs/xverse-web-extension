@@ -41,7 +41,7 @@ function ManageTokens({
   updateVisibleCoins,
   fetchFtData,
 }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'HEADER' });
+  const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
   coins = [
     {
       contract: 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2',

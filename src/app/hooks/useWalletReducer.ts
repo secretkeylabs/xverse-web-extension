@@ -33,7 +33,7 @@ const useWalletReducer = () => {
     const wallet = await walletFromSeedPhrase({
       mnemonic: seed,
       index: 0n,
-      network: 'mainnet',
+      network: 'Mainnet',
     });
     const encryptedSeed = await encryptSeedPhrase(seed, password);
     dispatch(storeEncryptedSeedAction(encryptedSeed));

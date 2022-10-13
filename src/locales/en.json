@@ -25,9 +25,12 @@
     "BUY":"Buy",
     "MANAGE_TOKEN":"Manage token list"
   },
-  "HEADER": {
-    "ADD_COINS": "Manage tokens",
-    "CHANGE_ACCOUNT": "Change account"
+  "TOKEN_SCREEN": {
+    "ADD_COINS": "Manage tokens"
+  },
+  "ACCOUNT_SCREEN":{
+    "CHANGE_ACCOUNT": "Change account",
+    "NEW_ACCOUNT":"Create a new account"
   },
   "RECEIVE": {
     "RECEIVE": "Receive",

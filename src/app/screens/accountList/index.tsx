@@ -5,19 +5,19 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Plus from '@assets/img/dashboard/plus.svg';
 import { useDispatch, useSelector } from 'react-redux';
-import { StoreState } from '@stores/root/reducer';
-import { addAccountRequestAction, selectAccount, } from '@stores/wallet/actions/actionCreators';
-import { Account } from '@core/types/accounts';
-import { saveSelectedAccount } from '@utils/localStorage';
+import { addAccountRequestAction, selectAccount } from '@stores/wallet/actions/actionCreators';
+import Seperator from '@components/seperator';
+import { StoreState } from '@stores/index';
+import { Account } from '@stores/wallet/actions/types';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  overflow-y:auto;
+  overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
   }
-  `
+`;
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -31,13 +31,6 @@ const AccountContainer = styled.div((props) => ({
   paddingLeft: props.theme.spacing(11),
   paddingRight: props.theme.spacing(11),
   marginBottom: props.theme.spacing(11),
-}));
-
-const Seperator = styled.div((props) => ({
-  width: '100%',
-  height: 0,
-  border: `0.2px solid ${props.theme.colors.background.elevation2}`,
-  marginTop: props.theme.spacing(8),
 }));
 
 const AddAccountContainer = styled.button((props) => ({
@@ -62,48 +55,36 @@ const AddAccountText = styled.h1((props) => ({
 }));
 
 function AccountList(): JSX.Element {
-  const { t } = useTranslation('translation', { keyPrefix: 'HEADER' });
+  const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {
-    network,
-    accountsList,
-    seedPhrase,
-    selectedAccount,
-    stxAddress,
-        btcAddress,
-        masterPubKey,
-        stxPublicKey,
-        btcPublicKey,
-
-  } = useSelector((state: StoreState) => {
-    return {
-      ...state.walletState,
-    };
-  });
-
-  function handleAccountSelect(account:Account) {
-    saveSelectedAccount(account)
-     dispatch(selectAccount(account, account.stxAddress,
-      account.btcAddress,
-      account.masterPubKey,
-      account.stxPublicKey,
-      account.btcPublicKey,network));
-      navigate('/');
+  const { network, accountsList, seedPhrase, selectedAccount } = useSelector((state: StoreState) => state.walletState);
+  
+  function handleAccountSelect(account: Account) {
+    dispatch(
+      selectAccount(
+        account,
+        account.stxAddress,
+        account.btcAddress,
+        account.masterPubKey,
+        account.stxPublicKey,
+        account.btcPublicKey,
+        network
+      )
+    );
+    navigate('/');
   }
 
-  function isAccountSelected(account:Account) : boolean {
+  function isAccountSelected(account: Account): boolean {
     return account.id === selectedAccount?.id;
   }
 
-  function handleBackButtonClick () {
+  function handleBackButtonClick() {
     navigate('/');
-  };
+  }
 
-  function onCreateAccount (){
-    console.log("clicked")
-    dispatch(addAccountRequestAction(seedPhrase, network ?? 'Mainnet'))
-    console.log(accountsList)
+  function onCreateAccount() {
+    dispatch(addAccountRequestAction(seedPhrase, network ?? 'Mainnet', accountsList));
   }
 
   return (
@@ -114,7 +95,7 @@ function AccountList(): JSX.Element {
           return (
             <>
               <AccountRow
-              key={account.id}
+                key={account.id}
                 account={account}
                 isSelected={isAccountSelected(account)}
                 onAccountSelected={handleAccountSelect}
@@ -127,7 +108,7 @@ function AccountList(): JSX.Element {
           <AddAccountContainer onClick={onCreateAccount}>
             <ButtonImage src={Plus} />
           </AddAccountContainer>
-          <AddAccountText>Create a new account</AddAccountText>
+          <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
         </RowContainer>
       </AccountContainer>
     </Container>

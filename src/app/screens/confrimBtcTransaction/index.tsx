@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
 import BigNumber from "bignumber.js";
+import Seperator from "@components/seperator";
 
 const InfoContainer = styled.div((props) => ({
     display: 'flex',
@@ -30,13 +31,6 @@ const InfoContainer = styled.div((props) => ({
     wordBreak:'break-all'
   }));
   
-  const Seperator = styled.div((props) => ({
-    width: '100%',
-    height: 0,
-    border: `1px solid ${props.theme.colors.background.elevation3}`,
-    marginTop: props.theme.spacing(12),
-  }));
-  
   const ButtonImage = styled.img((props) => ({
     marginRight: props.theme.spacing(3),
     alignSelf: 'center',
@@ -52,7 +46,7 @@ const InfoContainer = styled.div((props) => ({
     marginLeft: props.theme.spacing(12),
   
   }));
-function ConfirmBtcTransaction({}: Props) {
+function ConfirmBtcTransaction({}) {
     const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
     const navigate = useNavigate();
     const recepientAddress = 'SPJW1XE278YMCEYMXB8ZFGJMH8ZVAAEDP2S2PJYG';

@@ -46,11 +46,11 @@ const router = createHashRouter([
         element: <LegalLinks />,
       },
       {
-        path: 'manageTokens',
+        path: 'manage-tokens',
         element: <ManageTokens />,
       },
       {
-        path: 'accountList',
+        path: 'account-list',
         element: <AccountList />,
       },
       {
