@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { Coin, FungibleToken } from '@utils/utils';
-import { Network } from '@utils/constant';
+import { Coin} from '@utils/utils';
+import { FungibleToken, NetworkType } from '@secretkeylabs/xverse-core/types';
 import { useState } from 'react';
 import CoinItem from '@components/coinItem';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +30,7 @@ interface Props {
   stxAddress: string;
   visibleCoins: Coin[];
   updateVisibleCoins: (coin: Coin, visible: boolean) => void;
-  fetchFtData: (stxAddress: string, network: Network) => void;
+  fetchFtData: (stxAddress: string, network: NetworkType) => void;
 }
 
 function ManageTokens({

@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import LinkIcon from '@assets/img/linkIcon.svg';
-import { PRIVACY_POLICY_LINK, TERMS_LINK } from 'app/core/constants/constants';
 import { useNavigate } from 'react-router-dom';
 import { saveIsTermsAccepted } from '@utils/localStorage';
+import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -63,7 +63,13 @@ function LegalLinks() {
 
   const handleLegalAccept = () => {
     saveIsTermsAccepted(true);
-    navigate('/backup');
+    const isRestore = localStorage.getItem('isRestore');
+    if (isRestore) {
+      localStorage.removeItem('isRestore');
+      navigate('/restoreWallet');
+    } else {
+      navigate('/backup');
+    }
   };
   return (
     <Container>

@@ -1,14 +1,12 @@
-import { SettingsNetwork } from 'app/core/constants/constants';
-import { Account } from 'app/core/types/accounts';
+import { SettingsNetwork } from "@secretkeylabs/xverse-core";
+import { Account } from "@stores/wallet/actions/types";
 
 const userPrefBackupRemindKey = 'UserPref:BackupRemind';
-const selectedNetworkKey = 'selectedNetwork';
-const accountsListKey = 'AccountsList';
-const selectedAccountKey = 'SelectedAccount';
 const isTermsAccepted = 'isTermsAccepted';
 const hasFinishedOnboardingKey = 'hasFinishedOnboarding';
 const saltKey = 'salt';
-const encryptedSeedKey = 'encSeed';
+const accountsListKey = 'AccountsList';
+const selectedAccountKey = 'SelectedAccount';
 
 export function saveMultiple(items: { [x: string]: string }) {
   const itemKeys = Object.keys(items);
@@ -49,23 +47,6 @@ export function getUserPrefBackupRemind(): string | null {
   return localStorage.getItem(userPrefBackupRemindKey);
 }
 
-export function saveSelectedNetwork(network: SettingsNetwork) {
-  localStorage.setItem(selectedNetworkKey, JSON.stringify(network));
-}
-
-export function getSelectedNetwork(): SettingsNetwork {
-  const mainnetNetwork: SettingsNetwork = {
-    name: 'Mainnet',
-    address: 'https://stacks-node-api.mainnet.stacks.co',
-  };
-  const network = localStorage.getItem(selectedNetworkKey);
-  if (!network) {
-    return mainnetNetwork;
-  }
-  const selected: SettingsNetwork = JSON.parse(network);
-  return selected;
-}
-
 export function saveAccountsList(accounts: Account[]) {
   localStorage.setItem(accountsListKey, JSON.stringify(accounts));
 }
@@ -104,14 +85,6 @@ export function saveSalt(salt: string) {
 
 export function getSalt() {
   return localStorage.getItem(saltKey);
-}
-
-export function storeEncryptedSeed(seed: string) {
-  localStorage.setItem(encryptedSeedKey, seed);
-}
-
-export function getEncryptedSeed() {
-  return localStorage.getItem(encryptedSeedKey);
 }
 
 

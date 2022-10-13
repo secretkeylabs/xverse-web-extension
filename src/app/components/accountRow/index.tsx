@@ -1,7 +1,7 @@
 import BarLoader from '@components/barLoader';
-import { LoaderSize } from '@utils/constant';
+import { Account } from '@stores/wallet/actions/types';
+import { LoaderSize } from '@utils/constants';
 import { useAccountGradient } from '@utils/gradient';
-import { Account } from "@core/types/accounts";
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

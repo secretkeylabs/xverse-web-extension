@@ -8,9 +8,9 @@ import IconSats from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import { getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks } from '@utils/walletUtils';
 import { NumericFormat } from 'react-number-format';
-import { currencySymbolMap } from '@utils/currencyConversionUtils';
 import ActionButton from '@components/button';
 import Theme from 'theme';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,

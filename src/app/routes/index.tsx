@@ -17,6 +17,8 @@ import CreateWalletSuccess from '@screens/createWalletSuccess';
 import CreatePassword from '@screens/createPassword';
 import AuthGuard from '@components/guards/auth';
 import Login from '@screens/login';
+import RestoreWallet from '@screens/restoreWallet';
+import ForgotPassword from '@screens/forgotPassword';
 
 const router = createHashRouter([
   {
@@ -90,6 +92,14 @@ const router = createHashRouter([
       {
         path: 'login',
         element: <Login />,
+      },
+      {
+        path: 'restoreWallet',
+        element: <RestoreWallet />,
+      },
+      {
+        path: 'forgotPassword',
+        element: <ForgotPassword />,
       },
     ],
   },

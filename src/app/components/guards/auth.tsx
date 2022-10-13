@@ -1,5 +1,4 @@
-import { StoreState } from '@stores/root/reducer';
-import { getEncryptedSeed } from '@utils/localStorage';
+import { StoreState } from '@stores/index';
 import { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
@@ -9,16 +8,16 @@ interface AuthGuardProps {
 }
 
 function AuthGuard({ children }: AuthGuardProps) {
-  const encryptedSeedPhrase = getEncryptedSeed();
   const {
-    isLocked,
+    encryptedSeed,
+    seedPhrase,
   } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
 
-  if (encryptedSeedPhrase && isLocked) return <Navigate to="/login" />;
+  if (encryptedSeed && !seedPhrase) return <Navigate to="/login" />;
 
-  if (!encryptedSeedPhrase) return <Navigate to="/landing" />;
+  if (!encryptedSeed) return <Navigate to="/landing" />;
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;

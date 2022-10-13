@@ -1,25 +1,25 @@
 import { ThemeProvider } from 'styled-components';
 import { RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import configureStore from '@stores/index';
 import Theme from '../theme';
 import GlobalStyle from '../theme/global';
 import '../locales';
 import router from './routes';
-
+import LoadingScreen from '@components/loadingScreen';
 
 function App(): JSX.Element {
-  const store = configureStore();
+  const { store, persistedStore } = configureStore();
   return (
     <>
       <GlobalStyle />
       <Provider store={store}>
-        <ThemeProvider theme={Theme}>
-          <RouterProvider router={router} />
-
-
-
-        </ThemeProvider>
+        <PersistGate persistor={persistedStore} loading={<LoadingScreen />}>
+          <ThemeProvider theme={Theme}>
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </PersistGate>
       </Provider>
     </>
   );

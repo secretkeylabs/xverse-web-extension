@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { getIsTermsAccepted, saveHasFinishedOnboarding } from '@utils/localStorage';
+import { StoreState } from '@stores/index';
+import { useSelector } from 'react-redux';
 
 const OnBoardingDotsContainer = styled.div((props) => ({
   display: 'flex',
@@ -100,6 +102,9 @@ function Onboarding(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const { t } = useTranslation('translation', { keyPrefix: 'ONBOARDING_SCREEN' });
   const navigate = useNavigate();
+  const { stxAddress } = useSelector((state: StoreState) => ({
+    ...state.walletState,
+  }));
   const onboardingViews = [
     {
       image: onboarding1,
@@ -124,12 +129,18 @@ function Onboarding(): JSX.Element {
   const handleClickNext = () => {
     setCurrentStepIndex(currentStepIndex + 1);
   };
-
+console.log(stxAddress);
   const handleSkip = () => {
+    const isRestore = localStorage.getItem('isRestore');
     saveHasFinishedOnboarding(true);
     const isLegalAccepted = getIsTermsAccepted();
     if (isLegalAccepted) {
-      navigate('/backup');
+      if (isRestore) {
+        localStorage.removeItem('isRestore');
+        navigate('/restoreWallet');
+      } else {
+        navigate('/backup');
+      }
     } else {
       navigate('/legal');
     }
@@ -144,7 +155,7 @@ function Onboarding(): JSX.Element {
       </OnBoardingDotsContainer>
       <OnBoardingImage
         src={onboardingViews[currentStepIndex].image}
-        alt="onboarding1"
+        alt="onboarding"
         width={onboardingViews[currentStepIndex].imageWidth}
       />
       <OnBoardingContentContainer>

@@ -1,6 +1,6 @@
-import { Account } from '@core/types/accounts';
-import { Network } from '@core/types/networks';
+import { NetworkType } from '@secretkeylabs/xverse-core/types';
 import * as actions from './types';
+import { Account } from './types';
 
 export function setWalletAction(wallet: actions.WalletData): actions.SetWallet {
   return {
@@ -9,7 +9,21 @@ export function setWalletAction(wallet: actions.WalletData): actions.SetWallet {
   };
 }
 
-export function ResetWalletAction(): actions.ResetWallet {
+export function unlockWalletAction(seed : string) {
+  return {
+    type: actions.UnlockWalletKey,
+    seed,
+  };
+}
+
+export function storeEncryptedSeedAction(encryptedSeed :string): actions.StoreEncryptedSeed {
+  return {
+    type: actions.StoreEncryptedSeedKey,
+    encryptedSeed,
+  };
+}
+
+export function resetWalletAction(): actions.ResetWallet {
   return {
     type: actions.ResetWalletKey,
   };
@@ -28,7 +42,7 @@ export function fetchAccountAction(
 
 export function addAccountRequestAction(
   seed: string,
-  network: Network
+  network:NetworkType
 ): actions.AddAccountRequestAction {
   return {
     type: actions.AddAccountRequestKey,
@@ -58,7 +72,7 @@ export function selectAccount(
   masterPubKey: string,
   stxPublicKey: string,
   btcPublicKey: string,
-  network: Network,
+  network: NetworkType,
  // stackingState: StackingStateData,
   bnsName?: string,
 ): actions.SelectAccount {

@@ -1,5 +1,5 @@
-import { CurrencyTypes } from '@utils/constant';
-import { FungibleToken, getTicker } from '@utils/utils';
+import { CurrencyTypes } from '@utils/constants';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { SetStateAction, useState } from 'react';
@@ -13,6 +13,7 @@ import {
   getStxFiatEquivalent,
   stxToMicrostacks,
 } from '@utils/walletUtils';
+import { getTicker } from '@utils/helper';
 
 const OuterContainer = styled.div((props) => ({
   display: 'flex',

@@ -1,12 +1,13 @@
-import { FungibleToken, getTicker } from '@utils/utils';
+
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 import { NumericFormat } from 'react-number-format';
-import { CurrencyTypes, LoaderSize } from '@utils/constant';
+import { CurrencyTypes, LoaderSize } from '@utils/constants';
 import BarLoader from '@components/barLoader';
 import { microstacksToStx, satsToBtc } from '@utils/walletUtils';
-import { ftDecimals } from '@utils/helper';
+import { ftDecimals, getTicker } from '@utils/helper';
 import stc from 'string-to-color';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 
 const TileContainer = styled.div((props) => ({
   display: 'flex',

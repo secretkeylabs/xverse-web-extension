@@ -37,6 +37,9 @@ const ActionButtonsContainer = styled.div((props) => ({
 
 const CreateButton = styled.button((props) => ({
   display: 'flex',
+  ...props.theme.body_xs,
+  color: props.theme.colors.white['200'],
+  textAlign: 'center',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
@@ -49,6 +52,9 @@ const CreateButton = styled.button((props) => ({
 
 const RestoreButton = styled.button((props) => ({
   display: 'flex',
+  ...props.theme.body_xs,
+  color: props.theme.colors.white['200'],
+  textAlign: 'center',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
@@ -59,34 +65,35 @@ const RestoreButton = styled.button((props) => ({
   height: 44,
 }));
 
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['200'],
-  textAlign: 'center',
-}));
-
 function Landing(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LANDING_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const openInNewTab = async () => {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL('options.html#/onboarding'),
+    });
+  };
+
   const handlePressCreate = async () => {
     try {
       const wallet = await newWallet();
       dispatch(setWalletAction(wallet));
-      navigate('/onboarding');
     } catch (err) {
-      console.log(err);
+      return await Promise.reject(err);
+    } finally {
+      await openInNewTab();
     }
   };
 
   const handlePressRestore = async () => {
     try {
-      const wallet = await newWallet();
-      dispatch(setWalletAction(wallet));
-      navigate('/onboarding');
+      window.localStorage.setItem('isRestore', 'true');
+      await openInNewTab();
+      return true;
     } catch (err) {
-      console.log(err);
+      return Promise.reject(err);
     }
   };
   return (
@@ -97,10 +104,10 @@ function Landing(): JSX.Element {
       </TopSectionContainer>
       <ActionButtonsContainer>
         <CreateButton onClick={handlePressCreate}>
-          <ButtonText>{t('CREATE_WALLET_BUTTON')}</ButtonText>
+          {t('CREATE_WALLET_BUTTON')}
         </CreateButton>
         <RestoreButton onClick={handlePressRestore}>
-          <ButtonText>{t('RESTORE_WALLET_BUTTON')}</ButtonText>
+          {t('RESTORE_WALLET_BUTTON')}
         </RestoreButton>
       </ActionButtonsContainer>
     </>

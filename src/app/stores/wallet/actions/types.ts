@@ -1,14 +1,40 @@
-import { Account } from "@core/types/accounts";
-import { Network } from "@core/types/networks";
+import { NetworkType } from '@secretkeylabs/xverse-core/types';
 
 export const SetWalletKey = 'SetWallet';
 export const ResetWalletKey = 'ResetWallet';
 export const FetchAccountKey = 'FetchAccount';
 export const SelectAccountKey = 'SelectAccount';
+export const UnlockWalletKey = 'UnlockWallet';
+export const LockWalletKey = 'LockWallet';
+export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
 
 export const AddAccountRequestKey = 'AddAccountRequest';
 export const AddAccountSuccessKey = 'AddAccountSuccess';
 export const AddAccountFailureKey = 'AddAccountFailure';
+
+export interface Account {
+  id: number;
+  stxAddress: string;
+  btcAddress: string;
+  masterPubKey: string;
+  stxPublicKey: string;
+  btcPublicKey: string;
+  bnsName?: string;
+}
+
+export interface WalletState {
+  stxAddress: string;
+  btcAddress: string;
+  masterPubKey: string;
+  stxPublicKey: string;
+  btcPublicKey: string;
+  accountsList: Account[];
+  selectedAccount: Account | null;
+  network: NetworkType;
+  seedPhrase: string;
+  encryptedSeed: string;
+  loadingWalletData:boolean;
+}
 
 export interface WalletData {
   stxAddress: string;
@@ -24,6 +50,19 @@ export interface SetWallet {
   wallet: WalletData;
 }
 
+export interface StoreEncryptedSeed {
+  type: typeof StoreEncryptedSeedKey,
+  encryptedSeed: string,
+}
+
+export interface UnlockWallet {
+  type: typeof UnlockWalletKey,
+  seed: string,
+}
+
+export interface LockWallet {
+  type: typeof LockWalletKey,
+}
 export interface ResetWallet {
   type: typeof ResetWalletKey;
 }
@@ -37,7 +76,7 @@ export interface FetchAccount {
 export interface AddAccountRequestAction {
   type: typeof AddAccountRequestKey;
   seed: string;
-  network: Network
+  network: NetworkType
 }
 
 export interface AddAccountSuccessAction {
@@ -59,8 +98,9 @@ export interface SelectAccount {
   stxPublicKey: string;
   btcPublicKey: string;
   bnsName?: string;
-  network: Network;
+  network: NetworkType;
   //stackingState: StackingStateData;
 }
 
-export type WalletActions = SetWallet | ResetWallet | FetchAccount |AddAccountRequestAction | AddAccountSuccessAction | AddAccountFailureAction| SelectAccount;
+export type WalletActions = SetWallet | ResetWallet | FetchAccount |AddAccountRequestAction | AddAccountSuccessAction | AddAccountFailureAction| SelectAccount| StoreEncryptedSeed | UnlockWallet | LockWallet;
+

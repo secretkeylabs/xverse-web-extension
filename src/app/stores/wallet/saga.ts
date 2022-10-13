@@ -1,9 +1,8 @@
 import {takeEvery, put, call, all, takeLatest} from 'redux-saga/effects';
-import { Account } from "@core/types/accounts";
 import { walletFromSeedPhrase } from "@secretkeylabs/xverse-core/wallet";
 import { getAccountsList, saveAccountsList } from "@utils/localStorage";
 import { addAccountFailureAction, addAccoutSuccessAction } from "./actions/actionCreators";
-import { AddAccountRequestAction,AddAccountRequestKey } from "./actions/types";
+import { Account, AddAccountRequestAction,AddAccountRequestKey } from "./actions/types";
 
 function* handleAddAccount(action: AddAccountRequestAction){
     try{

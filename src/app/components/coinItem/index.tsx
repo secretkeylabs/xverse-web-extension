@@ -1,9 +1,9 @@
-import { Coin, getTicker } from '@utils/utils';
 import { useState } from 'react';
 import stc from 'string-to-color';
 import styled from 'styled-components';
 import Switch from 'react-switch';
 import Theme from 'theme';
+import { getTicker } from '@utils/helper';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',

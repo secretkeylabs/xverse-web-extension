@@ -1,6 +1,6 @@
 import SendForm from "@components/sendForm";
 import TopRow from "@components/topRow";
-import { BITCOIN_DUST_AMOUNT_SATS } from "@utils/constant";
+import { BITCOIN_DUST_AMOUNT_SATS } from "@utils/constants";
 import { btcToSats, satsToBtc, validateBtcAddress } from "@utils/walletUtils";
 import BigNumber from "bignumber.js";
 import { useState } from "react";

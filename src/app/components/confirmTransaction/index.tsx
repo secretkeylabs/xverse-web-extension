@@ -6,7 +6,7 @@ import { NumericFormat } from 'react-number-format';
 import { ReactNode, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import { microStxToStx } from '@utils/helper';
-import { currencySymbolMap } from '@utils/currencyConversionUtils';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import ActionButton from '@components/button';
 import { getBtcFiatEquivalent, getStxFiatEquivalent, satsToBtc } from '@utils/walletUtils';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';

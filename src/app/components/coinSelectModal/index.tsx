@@ -1,6 +1,6 @@
 import BottomModal from '@components/bottomModal';
 import TokenTile from '@components/tokenTile';
-import { FungibleToken } from '@utils/utils';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';

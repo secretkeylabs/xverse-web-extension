@@ -1,4 +1,4 @@
-import { LoaderSize } from "@utils/constant";
+import { LoaderSize } from "@utils/constants";
 import ContentLoader  from "react-content-loader";
 import Theme from "theme";
 

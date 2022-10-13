@@ -1,29 +1,11 @@
-import { Network } from 'app/core/types/networks';
-import { Account } from 'app/core/types/accounts';
 import {
-  WalletActions,
-  SetWalletKey,
-  ResetWalletKey,
-  FetchAccountKey,
+  StoreEncryptedSeedKey,
+  WalletActions, SetWalletKey, ResetWalletKey, WalletState, UnlockWalletKey, LockWalletKey,  FetchAccountKey,
   AddAccountRequestKey,
   AddAccountSuccessKey,
   AddAccountFailureKey,
   SelectAccountKey,
 } from '../actions/types';
-
-interface WalletState {
-  stxAddress: string;
-  btcAddress: string;
-  masterPubKey: string;
-  stxPublicKey: string;
-  btcPublicKey: string;
-  accountsList: Account[];
-  selectedAccount: Account | null;
-  network: Network;
-  seedPhrase: string;
-  isLocked: boolean;
-  loadingWalletData: boolean;
-}
 
 const initialWalletState: WalletState = {
   stxAddress: '',
@@ -35,25 +17,24 @@ const initialWalletState: WalletState = {
   accountsList: [],
   selectedAccount: null,
   seedPhrase: '',
-  isLocked: true,
+  encryptedSeed: '',
   loadingWalletData: false,
 };
 
 const walletReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: WalletState = initialWalletState,
-  action: WalletActions
-) => {
+  action: WalletActions,
+): WalletState => {
   switch (action.type) {
     case SetWalletKey:
+      console.log(action.wallet);
       return {
         ...state,
         ...action.wallet,
-        isLocked: false,
       };
     case ResetWalletKey:
       return {
-        ...state,
         ...initialWalletState,
       };
     case FetchAccountKey:
@@ -88,6 +69,21 @@ const walletReducer = (
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,
         network: action.network,
+      }
+    case StoreEncryptedSeedKey:
+      return {
+        ...state,
+        encryptedSeed: action.encryptedSeed,
+      };
+    case UnlockWalletKey:
+      return {
+        ...state,
+        seedPhrase: action.seed,
+      };
+    case LockWalletKey:
+      return {
+        ...state,
+        seedPhrase: '',
       };
     default:
       return state;
