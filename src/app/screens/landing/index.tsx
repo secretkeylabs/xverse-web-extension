@@ -66,7 +66,6 @@ const RestoreButton = styled.button((props) => ({
 
 function Landing(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LANDING_SCREEN' });
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const openInNewTab = async () => {

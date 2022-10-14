@@ -1,5 +1,6 @@
 import argon2 from 'argon2-browser';
 import { encryptMnemonic, decryptMnemonic } from '@stacks/encryption';
+import { encryptMnemonicWithCallback, decryptMnemonicWithCallback } from '@secretkeylabs/xverse-core/wallet';
 import { getSalt, saveSalt } from './localStorage';
 
 function generateRandomKey(bytesCount: number): string {
@@ -24,23 +25,42 @@ async function generateKeyArgon2(password: string, salt: string): Promise<string
   }
 }
 
+async function generatePasswordHash(password: string) {
+  const existingSalt = getSalt();
+  if (existingSalt) {
+    const argonHash = await generateKeyArgon2(password, existingSalt);
+    return {
+      salt: existingSalt,
+      hash: argonHash,
+    };
+  }
+  const newSalt = generateRandomKey(16);
+  saveSalt(newSalt);
+  const argonHash = await generateKeyArgon2(password, newSalt);
+  return {
+    salt: newSalt,
+    hash: argonHash,
+  };
+}
+
 export async function encryptSeedPhrase(seed: string, password: string): Promise<string> {
-  const salt = generateRandomKey(16);
-  saveSalt(salt);
-  const argonHash = await generateKeyArgon2(password, salt);
-  const encryptedBuffer = await encryptMnemonic(seed, argonHash);
-  return encryptedBuffer.toString('hex');
+  return encryptMnemonicWithCallback({
+    seed,
+    password,
+    mnemonicEncryptionHandler: encryptMnemonic,
+    passwordHashGenerator: generatePasswordHash,
+  });
 }
 
 export async function decryptSeedPhrase(encryptedSeed: string, password: string): Promise<string> {
-  const salt = getSalt();
   try {
-    if (salt) {
-      const pw = await generateKeyArgon2(password, salt);
-      const secretKey = await decryptMnemonic(Buffer.from(encryptedSeed, 'hex'), pw);
-      return secretKey;
-    }
-    return await Promise.reject(Error('Invalid Password'));
+    const seedPhrase = await decryptMnemonicWithCallback({
+      encryptedSeed,
+      password,
+      mnemonicDecryptionHandler: decryptMnemonic,
+      passwordHashGenerator: generatePasswordHash,
+    });
+    return seedPhrase;
   } catch (err) {
     return Promise.reject(Error('Invalid Password'));
   }

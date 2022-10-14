@@ -1,15 +1,12 @@
 import * as bip39 from 'bip39';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ConfirmPassword from '@screens/createPassword/confirmPassword';
 import NewPassword from '@screens/createPassword/newPassword';
-import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
-import { encryptSeedPhrase } from '@utils/encryptionUtils';
 import { useTranslation } from 'react-i18next';
-import EnterSeedPhrase from './enterSeedphrase';
 import useWalletReducer from '@hooks/useWalletReducer';
+import EnterSeedPhrase from './enterSeedphrase';
 
 const Container = styled.div((props) => ({
   display: 'flex',
