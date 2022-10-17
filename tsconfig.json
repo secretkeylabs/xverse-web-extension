@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -23,7 +23,9 @@
       "@hooks/*": ["app/hooks/*"],
       "@assets/*": ["assets/*"],
       "@screens/*": ["app/screens/*"],
+      "@stores/*": ["app/stores/*"],
+      "@utils/*": ["app/utils/*"],
     }
   },
-  "include": ["src"]
+  "include": ["src", "styled.d.ts"]
 }

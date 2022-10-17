@@ -10,6 +10,68 @@
     "ONBOARDING_2_TITlE": "Stack your STX to earn rewards in Bitcoin",
     "ONBOARDING_2_SUBTITlE": "Earn Bitcoin yield on your STX without them ever leaving your wallet.",
     "ONBOARDING_3_TITlE": "Access your favorites Dapps from your wallet",
-    "ONBOARDING_3_SUBTITlE": "From marketplaces to DeFi, and so much more."
+    "ONBOARDING_3_SUBTITlE": "From marketplaces to DeFi, and so much more.",
+    "ONBOARDING_NEXT_BUTTON": "Next",
+    "ONBOARDING_SKIP_BUTTON": "Skip",
+    "ONBOARDING_CONTINUE_BUTTON": "Continue"
+  },
+  "LEGAL_SCREEN": {
+    "SCREEN_TITLE": "Legal",
+    "SCREEN_SUBTITLE": "Please review the Xverse Wallet Privacy Policy and Terms of Services.",
+    "TERMS_SERVICES_LINK_BUTTON": "Terms of Service",
+    "PRIVACY_POLICY_LINK_BUTTON": "Privacy Policy",
+    "ACCEPT_LEGAL_BUTTON": "Accept"
+  },
+  "BACKUP_WALLET_SCREEN": {
+    "SCREEN_TITLE": "Backup your wallet",
+    "SCREEN_SUBTITLE": "Your seedphrase is the unique key that allows you to recover your wallet.",
+    "BACKUP_BUTTON": "Backup now",
+    "BACKUP_SKIP_BUTTON": "Backup later",
+    "SEED_PHRASE_VIEW_HEADING": "Write down your seed phrase and make sure to keep it private. This is the unique key to your wallet. ",
+    "SEED_PHRASE_VIEW_LABEL": "Seedphrase",
+    "SEED_PHRASE_VIEW_CONTINUE": "Continue",
+    "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
+    "SEED_PHRASE_VERIFY_BUTTON": "Verify",
+    "SEED_PHRASE_BACK_BUTTON": "Back"  
+  },
+  "CREATE_PASSWORD_SCREEN": {
+    "CREATE_PASSWORD_TITLE": "Enter your new password",
+    "CONFIRM_PASSWORD_TITLE": "Confirm your new password",
+    "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
+    "TEXT_INPUT_CONFIRM_PASSWORD_LABEL": "Confirm Password",
+    "CONTINUE_BUTTON": "Continue",
+    "BACK_BUTTON": "Back",
+    "PASSWORD_STRENGTH_LABEL": "Security level",
+    "PASSWORD_STRENGTH_WEAK": "Weak",
+    "PASSWORD_STRENGTH_MEDIUM": "Medium",
+    "PASSWORD_STRENGTH_STRONG": "Strong",
+    "PASSWORD_STRENGTH_ERROR": "You need to enter a stronger password",
+    "CONFIRM_PASSWORD_MATCH_ERROR": "please make sure your passwords match"
+  },
+  "WALLET_SUCCESS_SCREEN": {
+    "SCREEN_TITLE": "Wallet created successfully",
+    "SCREEN_SUBTITLE": "Your new wallet has been created successfully, you can now connect to your wallet.",
+    "OPEN_WALLET_BUTTON": "Open Wallet"
+  },
+  "LOGIN_SCREEN": {
+    "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",
+    "WELCOME_MESSAGE": "Welcome back!",
+    "PASSWORD_INPUT_LABEL": "Password",
+    "PASSWORD_INPUT_PLACEHOLDER": "Enter your password",
+    "VERIFY_PASSWORD_BUTTON": "Verify",
+    "VERIFY_PASSWORD_ERROR": "Incorrect Password",
+    "FORGOT_PASSWORD_BUTTON": "Forgot your password?"
+  },
+  "FORGOT_PASSWORD_SCREEN": {
+    "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seedphrase you used when you generated your wallet.",
+    "PARAGRAPH2": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
+    "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"
+  },
+  "RESTORE_WALLET_SCREEN": {
+    "ENTER_SEED_HEADER": "Enter your 12 or 24 word seedphrase to restore your wallet",
+    "SEED_INPUT_PLACEHOLDER": "Enter your seedphrase",
+    "SEED_INPUT_LABEL": "Selected Words",
+    "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
+    "CONTINUE_BUTTON": "Continue"
   }
 }

@@ -4,6 +4,14 @@ import Landing from '@screens/landing';
 import Onboarding from '@screens/onboarding';
 import ScreenContainer from '@components/screenContainer';
 import LegalLinks from '@screens/legalLinks';
+import BackupWallet from '@screens/backupWallet';
+import CreateWalletSuccess from '@screens/createWalletSuccess';
+import CreatePassword from '@screens/createPassword';
+import AuthGuard from '@components/guards/auth';
+import Login from '@screens/login';
+import RestoreWallet from '@screens/restoreWallet';
+import ForgotPassword from '@screens/forgotPassword';
+import BackupWalletSteps from '@screens/backupWalletSteps';
 
 const router = createHashRouter([
   {
@@ -11,7 +19,7 @@ const router = createHashRouter([
     element: <ScreenContainer />,
     children: [
       {
-        index: true,
+        path: 'landing',
         element: <Landing />,
       },
       {
@@ -19,12 +27,44 @@ const router = createHashRouter([
         element: <Onboarding />,
       },
       {
-        path: 'home',
-        element: <Home />,
+        index: true,
+        element: (
+          <AuthGuard>
+            <Home />
+          </AuthGuard>
+        ),
       },
       {
         path: 'legal',
         element: <LegalLinks />,
+      },
+      {
+        path: 'backup',
+        element: <BackupWallet />,
+      },
+      {
+        path: 'create-password',
+        element: <CreatePassword />,
+      },
+      {
+        path: 'create-wallet-success',
+        element: <CreateWalletSuccess />,
+      },
+      {
+        path: 'login',
+        element: <Login />,
+      },
+      {
+        path: 'restoreWallet',
+        element: <RestoreWallet />,
+      },
+      {
+        path: 'forgotPassword',
+        element: <ForgotPassword />,
+      },
+      {
+        path: 'backupWalletSteps',
+        element: <BackupWalletSteps />,
       },
     ],
   },

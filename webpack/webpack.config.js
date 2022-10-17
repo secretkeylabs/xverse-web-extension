@@ -9,6 +9,18 @@ const ReactRefreshTypeScript = require('react-refresh-typescript');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 
+const aliases = {
+  // alias stacks.js packages to their esm (default prefers /dist/polyfill)
+  '@stacks/auth': '@stacks/auth/dist/esm',
+  '@stacks/common': '@stacks/common/dist/esm',
+  '@stacks/encryption': '@stacks/encryption/dist/esm',
+  '@stacks/network': '@stacks/network/dist/esm',
+  '@stacks/profile': '@stacks/profile/dist/esm',
+  '@stacks/storage': '@stacks/storage/dist/esm',
+  '@stacks/transactions': '@stacks/transactions/dist/esm',
+  '@stacks/keychain': '@stacks/keychain/dist/esm',
+};
+
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
 const BUILD_ROOT_PATH = path.join(__dirname, '../', 'build');
@@ -28,6 +40,7 @@ var options = {
     publicPath: ASSET_PATH,
   },
   module: {
+    noParse: /\.wasm$/,
     rules: [
       {
         test: /\.(css)$/,
@@ -64,7 +77,18 @@ var options = {
             },
           },
         ],
-      }
+      },
+      {
+        test: /\.wasm$/,
+        // Tells WebPack that this module should be included as
+        // base64-encoded binary file and not as code
+        loader: 'base64-loader',
+        // Disables WebPack's opinion where WebAssembly should be,
+        // makes it think that it's not WebAssembly
+        //
+        // Error: WebAssembly module is included in initial chunk.
+        type: 'javascript/auto',
+      },
     ],
   },
   resolve: {
@@ -72,6 +96,13 @@ var options = {
     extensions: fileExtensions
       .map((extension) => '.' + extension)
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
+    alias: aliases,
+    fallback: {
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      fs: false,
+      util: require.resolve('util/'),
+    },
   },
   plugins: [
     new CleanWebpackPlugin({ verbose: false }),
@@ -117,7 +148,12 @@ var options = {
       chunks: ['popup'],
       cache: false,
     }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer'],
+    }),
   ],
+  
   infrastructureLogging: {
     level: 'info',
   },

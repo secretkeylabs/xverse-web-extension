@@ -42,6 +42,13 @@ const GlobalStyle = createGlobalStyle`
   * p {
     margin: 0;
   }
+  * a {
+    text-decoration: none;
+  }
+  * a:hover {
+    text-decoration:none; 
+    cursor:pointer;  
+}
 *,
 *::after,
 *::before {
