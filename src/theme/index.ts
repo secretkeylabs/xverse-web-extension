@@ -16,14 +16,14 @@ const Theme = {
       elevation3: '#303354',
       elevation6: '#4C5187',
       elevation8: '#7E89AB',
-      modalBackdrop:'rgba(18,21,30,0.6)'
+      modalBackdrop: 'rgba(18,21,30,0.6)',
     },
     feedback: {
       success: '#51D6A6',
       caution: '#F2A900',
       error: '#D33C3C',
     },
-    grey:'#24252C',
+    grey: '#24252C',
   },
   headline_category_m: {
     fontFamily: 'Satoshi-Medium',

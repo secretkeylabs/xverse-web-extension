@@ -4,14 +4,11 @@ import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 
 interface AuthGuardProps {
-  children: ReactNode,
+  children: ReactNode;
 }
 
 function AuthGuard({ children }: AuthGuardProps) {
-  const {
-    encryptedSeed,
-    seedPhrase,
-  } = useSelector((state: StoreState) => ({
+  const { encryptedSeed, seedPhrase } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
 

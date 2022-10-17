@@ -29,7 +29,7 @@ function SendStxScreen() {
       return false;
     }
     if (!validateStxAddress(associatedAddress, network)) {
-        setError(t('ERRORS.ADDRESS_INVALID'));
+      setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
 
@@ -52,7 +52,7 @@ function SendStxScreen() {
       return false;
     }
 
-   if (stxToMicrostacks(parsedAmount).lt(1)) {
+    if (stxToMicrostacks(parsedAmount).lt(1)) {
       setError(t('ERRORS.MINIMUM_AMOUNT'));
       return false;
     }
@@ -75,10 +75,10 @@ function SendStxScreen() {
     amount = replaceCommaByDot(amount);
     if (validateFields(associatedAddress.trim(), amount, memo)) {
       setError('');
-      navigate('/confirm-stx-tx')
+      navigate('/confirm-stx-tx');
       //generateStxTx(amount, associatedAddress, memo);
     }
-    navigate('/confirm-stx-tx')
+    navigate('/confirm-stx-tx');
   }
   return (
     <>

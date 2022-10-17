@@ -58,8 +58,10 @@ function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { network, accountsList, seedPhrase, selectedAccount } = useSelector((state: StoreState) => state.walletState);
-  
+  const { network, accountsList, seedPhrase, selectedAccount } = useSelector(
+    (state: StoreState) => state.walletState
+  );
+
   function handleAccountSelect(account: Account) {
     dispatch(
       selectAccount(

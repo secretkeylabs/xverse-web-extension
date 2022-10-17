@@ -26,24 +26,19 @@ const Filler = styled.div({
 });
 
 interface BackHeaderProps {
-  headerText: string,
-  onPressBack: () => void,
+  headerText: string;
+  onPressBack: () => void;
 }
 
 function BackHeader(props: BackHeaderProps): JSX.Element {
-  const {
-    headerText,
-    onPressBack,
-  } = props;
+  const { headerText, onPressBack } = props;
   return (
     <Container>
       <HeaderContent>
-        <button type="button" onClick={onPressBack} style={{background: 'none'}}>
+        <button type="button" onClick={onPressBack} style={{ background: 'none' }}>
           <img alt="back" src={ArrowLeft} />
         </button>
-        <HeaderTitle>
-          {headerText}
-        </HeaderTitle>
+        <HeaderTitle>{headerText}</HeaderTitle>
       </HeaderContent>
       <Filler />
     </Container>

@@ -1,10 +1,7 @@
-import BarLoader from '@components/barLoader';
+import styled from 'styled-components';
 import { Account } from '@stores/wallet/actions/types';
-import { LoaderSize } from '@utils/constants';
 import { useAccountGradient } from '@utils/gradient';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-
 interface GradientCircleProps {
   firstGradient: string;
   secondGradient: string;
@@ -54,10 +51,9 @@ interface Props {
   account: Account | null;
   isSelected: boolean;
   onAccountSelected: (account: Account) => void;
-  loading?: boolean;
 }
 
-function AccountRow({ account, isSelected, onAccountSelected, loading }: Props) {
+function AccountRow({ account, isSelected, onAccountSelected }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
 
   function getName() {
@@ -90,11 +86,7 @@ function AccountRow({ account, isSelected, onAccountSelected, loading }: Props) 
     onAccountSelected(account!);
   }
 
-  return loading ? (
-    <TopSectionContainer>
-      <BarLoader loaderSize={LoaderSize.LARGE} />
-    </TopSectionContainer>
-  ) : (
+  return (
     <TopSectionContainer onClick={onClick}>
       {renderCircle()}
       <CurrentAcountContainer>

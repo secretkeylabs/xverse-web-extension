@@ -1,4 +1,13 @@
-import { NetworkType, SettingsNetwork, StxTransactionData } from '@secretkeylabs/xverse-core/types';
+import {
+  BtcTransactionData,
+  Coin,
+  FungibleToken,
+  NetworkType,
+  SettingsNetwork,
+  StxTransactionData,
+  SupportedCurrency,
+  TransactionData,
+} from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
 import { Account } from './types';
@@ -10,14 +19,14 @@ export function setWalletAction(wallet: actions.WalletData): actions.SetWallet {
   };
 }
 
-export function unlockWalletAction(seed : string) {
+export function unlockWalletAction(seed: string) {
   return {
     type: actions.UnlockWalletKey,
     seed,
   };
 }
 
-export function storeEncryptedSeedAction(encryptedSeed :string): actions.StoreEncryptedSeed {
+export function storeEncryptedSeedAction(encryptedSeed: string): actions.StoreEncryptedSeed {
   return {
     type: actions.StoreEncryptedSeedKey,
     encryptedSeed,
@@ -43,18 +52,18 @@ export function fetchAccountAction(
 
 export function addAccountRequestAction(
   seed: string,
-  network:NetworkType,
+  network: NetworkType,
   accountsList: Account[]
-): actions.AddAccountRequest{
+): actions.AddAccountRequest {
   return {
     type: actions.AddAccountRequestKey,
     seed,
     network,
-    accountsList
+    accountsList,
   };
 }
 
-export function addAccoutSuccessAction(accountsList: Account[]): actions.AddAccountSuccess{
+export function addAccoutSuccessAction(accountsList: Account[]): actions.AddAccountSuccess {
   return {
     type: actions.AddAccountSuccessKey,
     accountsList,
@@ -76,8 +85,8 @@ export function selectAccount(
   stxPublicKey: string,
   btcPublicKey: string,
   network: NetworkType,
- // stackingState: StackingStateData,
-  bnsName?: string,
+  // stackingState: StackingStateData,
+  bnsName?: string
 ): actions.SelectAccount {
   return {
     type: actions.SelectAccountKey,
@@ -88,53 +97,131 @@ export function selectAccount(
     stxPublicKey,
     btcPublicKey,
     network,
-   // stackingState,
+    // stackingState,
     bnsName,
   };
 }
 
-export function fetchWalletDataAction(
-  stxAddress: string,
-  btcAddress: string,
-  network: NetworkType,
-  fiatCurrency: string
-): actions.FetchWalletDataRequest {
+export function fetchRatesAction(fiatCurrency: SupportedCurrency): actions.FetchRates {
   return {
-    type: actions.FetchWalletDataRequestKey,
-    stxAddress,
-    btcAddress,
-    network,
-    fiatCurrency
+    type: actions.FetchRatesKey,
+    fiatCurrency,
   };
 }
 
-export function fetchWalletDataSuccessAction(
-  totalBalance: BigNumber,
+export function fetchRatesSuccessAction(
+  stxBtcRate: BigNumber,
+  btcFiatRate: BigNumber
+): actions.FetchRatesSuccess {
+  return {
+    type: actions.FetchRatesSuccessKey,
+    stxBtcRate,
+    btcFiatRate,
+  };
+}
+
+export function fetchRatesFailAction(error: string): actions.FetchRatesFail {
+  return {
+    type: actions.FetchRatesFailureKey,
+    error,
+  };
+}
+
+export function fetchStxWalletDataRequestAction(
+  stxAddress: string,
+  network: NetworkType,
+  fiatCurrency: string,
+  stxBtcRate: BigNumber
+): actions.FetchStxWalletDataRequest {
+  return {
+    type: actions.FetchStxWalletDataRequestKey,
+    stxAddress,
+    network,
+    fiatCurrency,
+    stxBtcRate,
+  };
+}
+
+export function fetchStxWalletDataSuccessAction(
   stxBalance: BigNumber,
   stxAvailableBalance: BigNumber,
   stxLockedBalance: BigNumber,
-  btcBalance: BigNumber,
-  stxTransactions: StxTransactionData[],
-  stxNonce: number,
-  totalTransactions: number,
-  selectedNetwork: SettingsNetwork,
-): actions.FetchWalletDataSuccess {
+  stxTransactions: TransactionData[],
+  stxNonce: number
+): actions.FetchStxWalletDataSuccess {
   return {
-    type: actions.FetchWalletDataSuccessKey,
-    totalBalance,
+    type: actions.FetchStxWalletDataSuccessKey,
     stxBalance,
     stxAvailableBalance,
     stxLockedBalance,
-    btcBalance,
     stxTransactions,
     stxNonce,
-    totalTransactions,
-    selectedNetwork,
   };
 }
 
-export function fetchWalletDataFailureAction() {
+export function fetchStxWalletDataFailureAction() {
   return {
-    type: actions.FetchWalletDataFailureKey,
+    type: actions.FetchStxWalletDataFailureKey,
+  };
+}
+
+export function fetchBtcWalletDataRequestAction(
+  btcAddress: string,
+  network: NetworkType,
+  stxBtcRate: BigNumber,
+  btcFiatRate: BigNumber
+): actions.FetchBtcWalletDataRequest {
+  return {
+    type: actions.FetchBtcWalletDataRequestKey,
+    btcAddress,
+    network,
+    stxBtcRate,
+    btcFiatRate,
+  };
+}
+
+export function fetchBtcWalletDataSuccess(balance: BigNumber): actions.FetchBtcWalletDataSuccess {
+  return {
+    type: actions.FetchBtcWalletDataSuccessKey,
+    balance,
+  };
+}
+
+export function fetchBtcWalletDataFail(): actions.FetchBtcWalletDataFail {
+  return {
+    type: actions.FetchBtcWalletDataFailureKey,
+  };
+}
+
+export function fetchCoinDataRequestAction(
+  stxAddress: string,
+  network: NetworkType,
+  fiatCurrency: string,
+  coinsList: FungibleToken[] | null
+): actions.FetchCoinDataRequest {
+  return {
+    type: actions.FetchCoinDataRequestKey,
+    stxAddress: stxAddress,
+    network: network,
+    fiatCurrency: fiatCurrency,
+    coinsList: coinsList,
+  };
+}
+
+export function FetchCoinDataSuccessAction(
+  coinsList: FungibleToken[],
+  supportedCoins: Coin[]
+): actions.FetchCoinDataSuccess {
+  return {
+    type: actions.FetchCoinDataSuccessKey,
+    coinsList,
+    supportedCoins,
+  };
+}
+
+export function FetchCoinDataFailureAction(error: string): actions.FetchCoinDataFailure {
+  return {
+    type: actions.FetchCoinDataFailureKey,
+    error,
   };
 }

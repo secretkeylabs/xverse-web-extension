@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { Coin} from '@utils/utils';
+import { Coin } from '@utils/utils';
 import { FungibleToken, NetworkType } from '@secretkeylabs/xverse-core/types';
 import { useState } from 'react';
 import CoinItem from '@components/coinItem';
@@ -12,17 +12,16 @@ const TokenContainer = styled.div`
   flex-direction: column;
   padding-left: 22px;
   padding-right: 22px;
-  overflow-y:auto;
+  overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
   }
-  `
+`;
 
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  overflow:'hidden'
-
+  overflow: 'hidden',
 }));
 interface Props {
   coins: Coin[];
@@ -168,7 +167,7 @@ function ManageTokens({
 
   return (
     <Container>
-     <TopRow title={t('ADD_COINS')} onClick={handleBackButtonClick}/>
+      <TopRow title={t('ADD_COINS')} onClick={handleBackButtonClick} />
       <TokenContainer>
         {coins.map((coin) => {
           return <CoinItem coin={coin} disabled={false} toggled={toggled} enabled={coin.visible} />;

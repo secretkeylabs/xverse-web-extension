@@ -11,7 +11,6 @@ import UnselectedStackingTab from '@assets/img/bottomTabBar/unselected_stacking_
 import UnselectedWalletTab from '@assets/img/bottomTabBar/unselected_wallet_tab.svg';
 import Seperator from '@components/seperator';
 
-
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',

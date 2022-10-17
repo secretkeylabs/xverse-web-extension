@@ -76,7 +76,7 @@ function SendBtcScreen({}) {
   }
 
   function getBalance() {
-     return satsToBtc(btcBalance).toNumber();
+    return satsToBtc(btcBalance).toNumber();
   }
 
   return (

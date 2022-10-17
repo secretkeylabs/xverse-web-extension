@@ -102,12 +102,8 @@ function Landing(): JSX.Element {
         <LandingTitle>{t('SCREEN_TITLE')}</LandingTitle>
       </TopSectionContainer>
       <ActionButtonsContainer>
-        <CreateButton onClick={handlePressCreate}>
-          {t('CREATE_WALLET_BUTTON')}
-        </CreateButton>
-        <RestoreButton onClick={handlePressRestore}>
-          {t('RESTORE_WALLET_BUTTON')}
-        </RestoreButton>
+        <CreateButton onClick={handlePressCreate}>{t('CREATE_WALLET_BUTTON')}</CreateButton>
+        <RestoreButton onClick={handlePressRestore}>{t('RESTORE_WALLET_BUTTON')}</RestoreButton>
       </ActionButtonsContainer>
     </>
   );

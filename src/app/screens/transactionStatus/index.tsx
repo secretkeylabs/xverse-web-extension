@@ -6,8 +6,11 @@ import Copy from '@assets/img/dashboard/Copy.svg';
 import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
-import { CurrencyTypes, BTC_TRANSACTION_STATUS_URL,TRANSACTION_STATUS_URL } from '@utils/constants';
-
+import {
+  CurrencyTypes,
+  BTC_TRANSACTION_STATUS_URL,
+  TRANSACTION_STATUS_URL,
+} from '@utils/constants';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -178,9 +181,9 @@ function TransactionStatus({ txid, currency, error }: Props) {
   function openTransactionInBrowser() {
     if (txid) {
       if (currency === 'BTC') {
-        window.open(`${BTC_TRANSACTION_STATUS_URL}${txid}`, "_blank", "noopener,noreferrer");
+        window.open(`${BTC_TRANSACTION_STATUS_URL}${txid}`, '_blank', 'noopener,noreferrer');
       } else {
-        window.open(`${TRANSACTION_STATUS_URL}${txid}`, "_blank", "noopener,noreferrer");
+        window.open(`${TRANSACTION_STATUS_URL}${txid}`, '_blank', 'noopener,noreferrer');
       }
     }
   }

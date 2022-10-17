@@ -15,8 +15,8 @@ const InfoContainer = styled.div((props) => ({
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent:'center',
-  alignItems:'center'
+  justifyContent: 'center',
+  alignItems: 'center',
 }));
 
 const TitleText = styled.h1((props) => ({
@@ -28,7 +28,7 @@ const TitleText = styled.h1((props) => ({
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginTop: props.theme.spacing(2),
-  wordBreak:'break-all'
+  wordBreak: 'break-all',
 }));
 
 const ButtonImage = styled.img((props) => ({
@@ -44,7 +44,6 @@ const ActionButton = styled.button((props) => ({
   alignItems: 'center',
   backgroundColor: 'transparent',
   marginLeft: props.theme.spacing(12),
-
 }));
 
 function ConfirmStxTransaction({}: Props) {
@@ -58,12 +57,11 @@ function ConfirmStxTransaction({}: Props) {
       <InfoContainer>
         <TitleText>{t('RECEPIENT_ADDRESS')}</TitleText>
         <RowContainer>
-        <ValueText>{recepientAddress}</ValueText>
-        <ActionButton>
-          <ButtonImage src={ArrowSquareOut}/>
-        </ActionButton>
+          <ValueText>{recepientAddress}</ValueText>
+          <ActionButton>
+            <ButtonImage src={ArrowSquareOut} />
+          </ActionButton>
         </RowContainer>
-      
       </InfoContainer>
     );
   }
@@ -94,7 +92,12 @@ function ConfirmStxTransaction({}: Props) {
     navigate('/send-stx');
   };
   return (
-    <ConfirmTransation currency="STX" fee={new BigNumber(105)} onConfirmClick={handleOnConfirmClick} onCancelClick={handleOnCancelClick}>
+    <ConfirmTransation
+      currency="STX"
+      fee={new BigNumber(105)}
+      onConfirmClick={handleOnConfirmClick}
+      onCancelClick={handleOnCancelClick}
+    >
       {renderAddressInfoSection()}
       {renderNetworkInfoSection()}
       <Seperator />

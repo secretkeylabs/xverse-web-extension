@@ -10,9 +10,9 @@ const customStyles = {
     backgroundColor: Theme.colors.background.modalBackdrop,
   },
   content: {
-    inset: "auto auto 0px auto",
+    inset: 'auto auto 0px auto',
     width: '100%',
-    maxHeight: "90%",
+    maxHeight: '90%',
     border: 'transparent',
     background: Theme.colors.background.elevation2,
     margin: 0,
@@ -39,8 +39,6 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
-
-
 interface Props {
   header: string;
   visible: boolean;
@@ -48,17 +46,16 @@ interface Props {
   onClose: () => void;
 }
 
-
-function BottomModal({ header, children, visible ,onClose}: Props) {
+function BottomModal({ header, children, visible, onClose }: Props) {
   return (
-    <Modal 
-      isOpen={visible} 
-      parentSelector={() => { 
-        const parent = document.querySelector('#app') as HTMLElement ?? document.body;
+    <Modal
+      isOpen={visible}
+      parentSelector={() => {
+        const parent = (document.querySelector('#app') as HTMLElement) ?? document.body;
         return parent;
-      }} 
-      ariaHideApp={false} 
-      style={customStyles} 
+      }}
+      ariaHideApp={false}
+      style={customStyles}
       contentLabel="Example Modal"
     >
       <RowContainer>
@@ -69,7 +66,6 @@ function BottomModal({ header, children, visible ,onClose}: Props) {
 
       {children}
     </Modal>
-
   );
 }
 

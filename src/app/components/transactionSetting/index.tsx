@@ -55,8 +55,8 @@ const RowContainer = styled.div((props) => ({
 const SelectorContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'flex-end',
-  justifyContent:'flex-end',
-  flex:1,
+  justifyContent: 'flex-end',
+  flex: 1,
   marginLeft: props.theme.spacing(4),
 }));
 
@@ -110,38 +110,38 @@ const InputContainer = styled.div((props) => ({
 }));
 
 const customStyles = {
-  control: (base: any, state: { isFocused: any; }) => ({
+  control: (base: any, state: { isFocused: any }) => ({
     ...base,
-    background:Theme.colors.background.elevation1,
+    background: Theme.colors.background.elevation1,
     borderRadius: 8,
-    color:Theme.colors.white['0'],
-    borderColor:Theme.colors.background.elevation6,
+    color: Theme.colors.white['0'],
+    borderColor: Theme.colors.background.elevation6,
     boxShadow: state.isFocused ? null : null,
-    "&:hover": {
+    '&:hover': {
       // Overwrittes the different states of border
-      borderColor: Theme.colors.background.elevation6
+      borderColor: Theme.colors.background.elevation6,
     },
-   height:45,
+    height: 45,
   }),
-  menu: base => ({
+  menu: (base) => ({
     ...base,
     borderRadius: 0,
     marginTop: 0,
-    color:Theme.colors.white['0'],
+    color: Theme.colors.white['0'],
   }),
-  menuList: base => ({
+  menuList: (base) => ({
     ...base,
     padding: 0,
-    color:Theme.colors.white['0'],
-    background:Theme.colors.background.elevation1,
+    color: Theme.colors.white['0'],
+    background: Theme.colors.background.elevation1,
   }),
-  singleValue:(provided:any) => ({
+  singleValue: (provided: any) => ({
     ...provided,
-    height:'100%',
-    color:Theme.colors.white['0'],
-    paddingTop:'3px',
+    height: '100%',
+    color: Theme.colors.white['0'],
+    paddingTop: '3px',
   }),
-}
+};
 
 interface Props {
   visible: boolean;
@@ -179,10 +179,10 @@ const TransactionSettingAlert: React.FC<Props> = ({
   const [nonceInput, setNonceInput] = useState(nonce);
   const [feeMode, setFeeMode] = useState<FeeModeType>('standard');
   const [error, setError] = useState('');
-  const [selectedOption, setSelectedOption] = useState(    {
+  const [selectedOption, setSelectedOption] = useState({
     label: t('STANDARD'),
     value: 'standard',
-  },);
+  });
   const stxBtcRate = new BigNumber(0.00001686);
   const btcFiatRate = new BigNumber(18935.735);
   const fiatCurrency = 'USD';
@@ -302,33 +302,31 @@ const TransactionSettingAlert: React.FC<Props> = ({
     return (
       <FeeContainer>
         <RowContainer>
-        <InputContainer>
-          <InputFieldContainer>
-            <InputField value={amount} placeholder="0" />
-          </InputFieldContainer>
-          <TickerContainer>
-            <Text>{type}</Text>
-            {getTokenIcon()}
-          </TickerContainer>
-        </InputContainer>
-        <SelectorContainer>
-        <Select
-        defaultValue={selectedOption}
-        onChange={setSelectedOption}
-        styles={customStyles}
-        menuColor='red'
-        options={type === 'STX' ? StxFeeModes : BtcFeeModes}
-      />
-        </SelectorContainer>
-    
+          <InputContainer>
+            <InputFieldContainer>
+              <InputField value={amount} placeholder="0" />
+            </InputFieldContainer>
+            <TickerContainer>
+              <Text>{type}</Text>
+              {getTokenIcon()}
+            </TickerContainer>
+          </InputContainer>
+          <SelectorContainer>
+            <Select
+              defaultValue={selectedOption}
+              onChange={setSelectedOption}
+              styles={customStyles}
+              menuColor="red"
+              options={type === 'STX' ? StxFeeModes : BtcFeeModes}
+            />
+          </SelectorContainer>
         </RowContainer>
-    
+
         <SubText>{getFiatAmountString(getFiatEquivalent(), fiatCurrency)}</SubText>
       </FeeContainer>
     );
   }
 
-  
   function renderFeesSection() {
     return (
       <Container>

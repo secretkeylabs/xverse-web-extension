@@ -80,7 +80,7 @@ function CoinSelectModal({
         {renderFixedCoins()}
         {coins.map((coin) => (
           <TokenTile
-          key={coin.principal}
+            key={coin.principal}
             title={coin.name}
             currency={'FT'}
             icon={IconStacks}
@@ -105,12 +105,9 @@ function CoinSelectModal({
     );
   }
   return (
- 
- 
-    <BottomModal visible={visible} header={title} onClose={onClose} >
+    <BottomModal visible={visible} header={title} onClose={onClose}>
       {renderToken()}
     </BottomModal>
-
   );
 }
 

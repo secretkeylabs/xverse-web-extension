@@ -1,7 +1,11 @@
+import { BtcTransactionData, Coin } from '@secretkeylabs/xverse-core/types';
+
 const userPrefBackupRemindKey = 'UserPref:BackupRemind';
 const isTermsAccepted = 'isTermsAccepted';
 const hasFinishedOnboardingKey = 'hasFinishedOnboarding';
 const saltKey = 'salt';
+const listOfBtcTransactionsKey = 'listOfBtcTransactions';
+const visibleCoinsKey = 'visibleCoins';
 
 export function saveMultiple(items: { [x: string]: string }) {
   const itemKeys = Object.keys(items);
@@ -50,4 +54,10 @@ export function getSalt() {
   return localStorage.getItem(saltKey);
 }
 
+export function saveListOfBtcTransaction(transactions: BtcTransactionData[]) {
+  localStorage.setItem(listOfBtcTransactionsKey, JSON.stringify(transactions));
+}
 
+export function getListOfBtcTransaction() {
+  return localStorage.getItem(listOfBtcTransactionsKey);
+}

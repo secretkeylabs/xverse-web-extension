@@ -64,9 +64,7 @@ function ForgotPassword(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'FORGOT_PASSWORD_SCREEN' });
   const [hasBackedUp, setHasBackedUp] = useState<boolean>(false);
   const navigate = useNavigate();
-  const {
-    resetWallet,
-  } = useWalletReducer();
+  const { resetWallet } = useWalletReducer();
 
   const onBack = () => {
     navigate('/');
@@ -84,12 +82,8 @@ function ForgotPassword(): JSX.Element {
   return (
     <Container>
       <BackHeader headerText="Forgot Password" onPressBack={onBack} />
-      <Paragraph>
-        {t('PARAGRAPH1')}
-      </Paragraph>
-      <Paragraph>
-        {t('PARAGRAPH2')}
-      </Paragraph>
+      <Paragraph>{t('PARAGRAPH1')}</Paragraph>
+      <Paragraph>{t('PARAGRAPH2')}</Paragraph>
       <BottomContainer>
         <CheckBox
           checkBoxLabel={t('BACKUP_CHECKBOX_LABEL')}
@@ -98,9 +92,7 @@ function ForgotPassword(): JSX.Element {
           onCheck={handleToggleBackUp}
         />
         <ButtonsContainer>
-          <CancelButton onClick={onBack}>
-            Cancel
-          </CancelButton>
+          <CancelButton onClick={onBack}>Cancel</CancelButton>
           <ResetButton disabled={!hasBackedUp} onClick={handleResetWallet}>
             Reset
           </ResetButton>

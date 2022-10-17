@@ -187,7 +187,7 @@ function ConfirmTransation({ fee, currency, children, onConfirmClick, onCancelCl
         {renderFeesSection()}
         <ActionButton
           src={SettingIcon}
-          text={currency ==='STX'? t('ADVANCED_SETTING'):t('EDIT_FEES')}
+          text={currency === 'STX' ? t('ADVANCED_SETTING') : t('EDIT_FEES')}
           buttonColor={'transparent'}
           buttonAlignment={'flex-start'}
           onPress={onAdvancedSettingClick}

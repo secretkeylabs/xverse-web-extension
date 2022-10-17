@@ -10,9 +10,9 @@ const Button = styled.button((props) => ({
   backgroundColor: props.color ?? props.theme.colors.action.classic,
   width: '100%',
   padding: '12px 16px 12px 10px',
-  border:`1px solid ${props.border}`,
-  marginRight:props.theme.spacing(props.margin),
-  marginLeft:props.theme.spacing(props.margin),
+  border: `1px solid ${props.border}`,
+  marginRight: props.theme.spacing(props.margin),
+  marginLeft: props.theme.spacing(props.margin),
 }));
 
 const ButtonText = styled.div((props) => ({
@@ -37,7 +37,7 @@ interface Props {
   processing?: boolean;
   buttonColor?: string;
   buttonAlignment?: string;
-  margin?:number
+  margin?: number;
 }
 
 const ActionButton: React.FC<Props> = ({
@@ -49,10 +49,16 @@ const ActionButton: React.FC<Props> = ({
   processing = false,
   buttonColor,
   buttonAlignment,
-  margin
+  margin,
 }) => {
   return (
-    <Button onClick={onPress} color={buttonColor} alignment={buttonAlignment} border={buttonBorderColor} margin={margin}>
+    <Button
+      onClick={onPress}
+      color={buttonColor}
+      alignment={buttonAlignment}
+      border={buttonBorderColor}
+      margin={margin}
+    >
       {processing ? (
         <Ring color="white" size={20} />
       ) : (

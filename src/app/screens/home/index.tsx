@@ -15,11 +15,35 @@ import CoinSelectModal from '@components/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAccountAction } from '@stores/wallet/actions/actionCreators';
+import {
+  fetchAccountAction,
+  fetchBtcWalletDataRequestAction,
+  fetchCoinDataRequestAction,
+  fetchRatesAction,
+  fetchStxWalletDataRequestAction,
+} from '@stores/wallet/actions/actionCreators';
 import BottomBar from '@components/tabBar';
 import { StoreState } from '@stores/index';
 import { Account } from '@stores/wallet/actions/types';
 import Seperator from '@components/seperator';
+import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { NumericFormat } from 'react-number-format';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import BarLoader from '@components/barLoader';
+import { LoaderSize } from '@utils/constants';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-left: 16px;
+  margin-right: 16px;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -36,6 +60,13 @@ const ColumnContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(11),
 }));
 
+const CoinContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'space-between',
+  justifyContent: 'space-between',
+}));
+
 const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -45,14 +76,6 @@ const RowButtonContainer = styled.div((props) => ({
 
 const ButtonContainer = styled.div((props) => ({
   flex: 0.31,
-}));
-
-const BodyContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  flex: 1,
 }));
 
 const SelectedAccountContainer = styled.div((props) => ({
@@ -80,6 +103,11 @@ const BalanceAmountText = styled.h1((props) => ({
   marginTop: props.theme.spacing(4),
 }));
 
+const BarLoaderContainer = styled.div((props) => ({
+  display: 'flex',
+  marginTop: props.theme.spacing(5),
+}));
+
 const CurrencyCard = styled.div((props) => ({
   display: 'flex',
   justifyContent: 'center',
@@ -101,7 +129,6 @@ function Home(): JSX.Element {
   const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
-  const [loadingWalletData, setLoadingWalletData] = useState(true);
   const {
     stxAddress,
     btcAddress,
@@ -110,8 +137,16 @@ function Home(): JSX.Element {
     btcPublicKey,
     accountsList,
     selectedAccount,
-  }  = useSelector((state: StoreState) => state.walletState);
-  
+    fiatCurrency,
+    btcFiatRate,
+    stxBtcRate,
+    network,
+    stxBalance,
+    btcBalance,
+    coinsList,
+    loadingWalletData,
+  } = useSelector((state: StoreState) => state.walletState);
+
   async function loadInitialData() {
     if (stxAddress && btcAddress) {
       if (accountsList.length === 0) {
@@ -129,7 +164,10 @@ function Home(): JSX.Element {
       } else {
         dispatch(fetchAccountAction(selectedAccount!, accountsList));
       }
-      setLoadingWalletData(false);
+      dispatch(fetchRatesAction(fiatCurrency));
+      dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
+      dispatch(fetchBtcWalletDataRequestAction(btcAddress, network, stxBtcRate, btcFiatRate));
+      dispatch(fetchCoinDataRequestAction(stxAddress, network, fiatCurrency, coinsList));
     }
   }
 
@@ -157,16 +195,56 @@ function Home(): JSX.Element {
     navigate('/account-list');
   }
 
+  function getCoinsList() {
+    return coinsList ? coinsList?.filter((ft) => ft.visible) : [];
+  }
+
+  function calculateTotalBalance(
+    stxBalance: BigNumber,
+    btcBalance: BigNumber,
+    stxBtcRate: BigNumber,
+    btcFiatRate: BigNumber
+  ) {
+    const stxFiatEquiv = microstacksToStx(stxBalance)
+      .multipliedBy(stxBtcRate)
+      .multipliedBy(btcFiatRate);
+    const btcFiatEquiv = satsToBtc(btcBalance).multipliedBy(btcFiatRate);
+    const totalBalance = stxFiatEquiv.plus(btcFiatEquiv);
+    return totalBalance.toNumber().toFixed(2);
+  }
+
+  function getBalancePrefix() {
+    return `${currencySymbolMap[fiatCurrency]}`;
+  }
   function renderBalanceCard() {
     return (
       <>
         <RowContainer>
           <BalanceHeadingText>{t('TOTAL_BALANCE')}</BalanceHeadingText>
           <CurrencyCard>
-            <CurrencyText>USD</CurrencyText>
+            <CurrencyText>{fiatCurrency}</CurrencyText>
           </CurrencyCard>
         </RowContainer>
-        <BalanceAmountText>$283,000.00</BalanceAmountText>
+        {loadingWalletData ? (
+          <BarLoaderContainer>
+            <BarLoader loaderSize={LoaderSize.LARGE} />
+          </BarLoaderContainer>
+        ) : (
+          <BalanceAmountText>
+            <NumericFormat
+              value={calculateTotalBalance(
+                new BigNumber(stxBalance),
+                new BigNumber(btcBalance),
+                new BigNumber(stxBtcRate),
+                new BigNumber(btcFiatRate)
+              )}
+              displayType={'text'}
+              prefix={`${getBalancePrefix()} `}
+              thousandSeparator={true}
+              renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
+            />
+          </BalanceAmountText>
+        )}
       </>
     );
   }
@@ -227,62 +305,16 @@ function Home(): JSX.Element {
           currency={'BTC'}
           icon={IconBitcoin}
           underlayColor={Theme.colors.background.elevation1}
-          stxBalance={new BigNumber(103)}
-          btcBalance={new BigNumber(210)}
-          stxBtcRate={new BigNumber(0.00001736)}
-          btcFiatRate={new BigNumber(18816.8499999925912416)}
-          loadingWalletData={false}
-          initializedStxData={true}
-          initializedFtData={true}
-          initializedData={true}
         />
-
         <TokenTile
           title={t('STACKS')}
           currency={'STX'}
           icon={IconStacks}
           underlayColor={Theme.colors.background.elevation1}
-          stxBalance={new BigNumber(103)}
-          btcBalance={new BigNumber(0.0002)}
-          stxBtcRate={new BigNumber(0.00001736)}
-          btcFiatRate={new BigNumber(18816.8499999925912416)}
-          loadingWalletData={false}
-          initializedStxData={true}
-          initializedFtData={true}
-          initializedData={true}
         />
       </ColumnContainer>
     );
   }
-  //remove
-  const coins = [
-    {
-      assetName: 'miamicoin',
-      balance: '2000000',
-      decimals: 6,
-      name: 'MiamiCoin v2',
-      principal: 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2',
-      supported: true,
-      ticker: 'MIA',
-      tokenFiatRate: 0.000487,
-      total_received: '3000000',
-      total_sent: '1000000',
-      visible: true,
-    },
-    {
-      assetName: 'miamicoin',
-      balance: '2000000',
-      decimals: 6,
-      name: 'MiamiCoin v2',
-      principal: 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2',
-      supported: true,
-      ticker: 'MIA',
-      tokenFiatRate: 0.000487,
-      total_received: '3000000',
-      total_sent: '1000000',
-      visible: true,
-    },
-  ];
 
   function renderReceiveScreenModal() {
     return (
@@ -292,7 +324,7 @@ function Home(): JSX.Element {
         onClose={onReceiveModalClose}
         onSelectCoin={handleManageTokenListOnClick}
         visible={openReceiveModal}
-        coins={coins}
+        coins={getCoinsList()}
         title={t('RECEIVE')}
       />
     );
@@ -306,30 +338,50 @@ function Home(): JSX.Element {
         onClose={onSendModalClose}
         onSelectCoin={onStxSendClick}
         visible={openSendModal}
-        coins={coins}
+        coins={getCoinsList()}
         title={t('SEND')}
       />
     );
   }
+  function renderCoinData() {
+    const list: FungibleToken[] = getCoinsList();
+    return (
+      <CoinContainer>
+        {list.map((coin) => {
+          return (
+            <>
+              <TokenTile
+                title={coin.name}
+                currency={'FT'}
+                underlayColor={Theme.colors.background.elevation1}
+                fungibleToken={coin}
+              />
+            </>
+          );
+        })}
+      </CoinContainer>
+    );
+  }
+
   return (
     <>
       <SelectedAccountContainer>
         <AccountRow
-          account={selectedAccount}
+          account={selectedAccount!}
           isSelected={true}
           onAccountSelected={handleAccountSelect}
-          loading={loadingWalletData}
         />
       </SelectedAccountContainer>
       <Seperator />
-      <BodyContainer>
+      <Container>
         {renderBalanceCard()}
         {renderButtons()}
         {renderManageTokenList()}
         {renderFixedCoins()}
+        {renderCoinData()}
         {renderReceiveScreenModal()}
         {renderSendScreenModal()}
-      </BodyContainer>
+      </Container>
       <BottomBar />
     </>
   );

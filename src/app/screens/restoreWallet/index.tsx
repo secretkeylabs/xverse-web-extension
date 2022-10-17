@@ -36,9 +36,7 @@ const StepDot = styled.div((props) => ({
 
 function RestoreWallet(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
-  const {
-    restoreWallet,
-  } = useWalletReducer();
+  const { restoreWallet } = useWalletReducer();
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -46,7 +44,8 @@ function RestoreWallet(): JSX.Element {
   const [seedError, setSeedError] = useState<string>('');
   const navigate = useNavigate();
 
-  const cleanMnemonic = (rawSeed: string): string => rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
+  const cleanMnemonic = (rawSeed: string): string =>
+    rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
   const handleNewPasswordBack = () => {
     setCurrentStepIndex(0);
@@ -107,16 +106,14 @@ function RestoreWallet(): JSX.Element {
       setConfirmPassword={setConfirmPassword}
       handleContinue={handleConfirmPassword}
       handleBack={handleConfirmPasswordBack}
-
     />,
   ];
   return (
     <Container>
       <StepsContainer>
-        {restoreSteps
-          .map((view, index) => (
-            <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
-          ))}
+        {restoreSteps.map((view, index) => (
+          <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
+        ))}
       </StepsContainer>
       {restoreSteps[currentStepIndex]}
     </Container>

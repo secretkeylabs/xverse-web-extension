@@ -50,21 +50,15 @@ const ErrorMessage = styled.h2((props) => ({
 }));
 
 interface Props {
-  seed: string,
-  setSeed: (seed: string) => void,
-  onContinue: () => void,
-  seedError: string,
-  setSeedError: (err: string) => void,
+  seed: string;
+  setSeed: (seed: string) => void;
+  onContinue: () => void;
+  seedError: string;
+  setSeedError: (err: string) => void;
 }
 
 function EnterSeedPhrase(props: Props): JSX.Element {
-  const {
-    onContinue,
-    seed,
-    setSeed,
-    seedError,
-    setSeedError,
-  } = props;
+  const { onContinue, seed, setSeed, seedError, setSeedError } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
 
   const onSeedChange = (event: React.FormEvent<HTMLTextAreaElement>) => {
@@ -74,18 +68,12 @@ function EnterSeedPhrase(props: Props): JSX.Element {
     setSeed(event.currentTarget.value);
   };
 
-  const handleContinue = () => {
-
-  };
+  const handleContinue = () => {};
 
   return (
     <Container>
-      <Title>
-        {t('ENTER_SEED_HEADER')}
-      </Title>
-      <SeedPhraseInputLabel>
-        {t('SEED_INPUT_LABEL')}
-      </SeedPhraseInputLabel>
+      <Title>{t('ENTER_SEED_HEADER')}</Title>
+      <SeedPhraseInputLabel>{t('SEED_INPUT_LABEL')}</SeedPhraseInputLabel>
       <SeedphraseInput
         value={seed}
         name="secretKey"
@@ -95,14 +83,8 @@ function EnterSeedPhrase(props: Props): JSX.Element {
         autoComplete="off"
         autoCorrect="off"
       />
-      {seedError ? (
-        <ErrorMessage>
-          {seedError}
-        </ErrorMessage>
-      ) : null}
-      <ContinueButton onClick={onContinue}>
-        {t('CONTINUE_BUTTON')}
-      </ContinueButton>
+      {seedError ? <ErrorMessage>{seedError}</ErrorMessage> : null}
+      <ContinueButton onClick={onContinue}>{t('CONTINUE_BUTTON')}</ContinueButton>
     </Container>
   );
 }

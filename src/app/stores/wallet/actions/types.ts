@@ -1,4 +1,13 @@
-import { NetworkType, SettingsNetwork, StxTransactionData } from '@secretkeylabs/xverse-core/types';
+import {
+  BtcTransactionData,
+  Coin,
+  FungibleToken,
+  NetworkType,
+  SettingsNetwork,
+  StxTransactionData,
+  SupportedCurrency,
+  TransactionData,
+} from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 
 export const SetWalletKey = 'SetWallet';
@@ -13,9 +22,21 @@ export const AddAccountRequestKey = 'AddAccountRequest';
 export const AddAccountSuccessKey = 'AddAccountSuccess';
 export const AddAccountFailureKey = 'AddAccountFailure';
 
-export const FetchWalletDataRequestKey = 'FetchWalletDataRequest';
-export const FetchWalletDataSuccessKey = 'FetchWalletDataSuccess';
-export const FetchWalletDataFailureKey = 'FetchWalletDataFailure';
+export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
+export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
+export const FetchStxWalletDataFailureKey = 'FetchStxWalletDataFailure';
+
+export const FetchBtcWalletDataRequestKey = 'FetchBtcWalletDataRequest';
+export const FetchBtcWalletDataSuccessKey = 'FetchBtcWalletDataSuccess';
+export const FetchBtcWalletDataFailureKey = 'FetchBtcWalletDataFailure';
+
+export const FetchRatesKey = 'FetchRates';
+export const FetchRatesSuccessKey = 'FetchRatesSuccess';
+export const FetchRatesFailureKey = 'FetchRatesFailure';
+
+export const FetchCoinDataRequestKey = 'FetchCoinDataRequest';
+export const FetchCoinDataSuccessKey = 'FetchCoinDataSuccess';
+export const FetchCoinDataFailureKey = 'FetchCoinDataFailure';
 
 export interface Account {
   id: number;
@@ -38,8 +59,19 @@ export interface WalletState {
   network: NetworkType;
   seedPhrase: string;
   encryptedSeed: string;
-  loadingWalletData:boolean;
-  fiatCurrency: string;
+  loadingWalletData: boolean;
+  fiatCurrency: SupportedCurrency;
+  btcFiatRate: BigNumber;
+  stxBtcRate: BigNumber;
+  stxBalance: BigNumber;
+  stxAvailableBalance: BigNumber;
+  stxLockedBalance: BigNumber;
+  stxTransactions: TransactionData[];
+  stxNonce: number;
+  btcBalance: BigNumber;
+  btcTransactions: BtcTransactionData[];
+  coinsList: FungibleToken[] | null;
+  coins: Coin[];
 }
 
 export interface WalletData {
@@ -57,17 +89,17 @@ export interface SetWallet {
 }
 
 export interface StoreEncryptedSeed {
-  type: typeof StoreEncryptedSeedKey,
-  encryptedSeed: string,
+  type: typeof StoreEncryptedSeedKey;
+  encryptedSeed: string;
 }
 
 export interface UnlockWallet {
-  type: typeof UnlockWalletKey,
-  seed: string,
+  type: typeof UnlockWalletKey;
+  seed: string;
 }
 
 export interface LockWallet {
-  type: typeof LockWalletKey,
+  type: typeof LockWalletKey;
 }
 export interface ResetWallet {
   type: typeof ResetWalletKey;
@@ -82,11 +114,11 @@ export interface FetchAccount {
 export interface AddAccountRequest {
   type: typeof AddAccountRequestKey;
   seed: string;
-  network: NetworkType,
+  network: NetworkType;
   accountsList: Account[];
 }
 
-export interface AddAccountSuccess{
+export interface AddAccountSuccess {
   type: typeof AddAccountSuccessKey;
   accountsList: Account[];
 }
@@ -109,30 +141,99 @@ export interface SelectAccount {
   //stackingState: StackingStateData;
 }
 
-export interface FetchWalletDataRequest {
-  type: typeof FetchWalletDataRequestKey;
-  stxAddress: string;
-  btcAddress: string;
-  network: NetworkType;
-  fiatCurrency: string;
+export interface FetchRates {
+  type: typeof FetchRatesKey;
+  fiatCurrency: SupportedCurrency;
 }
 
-export interface FetchWalletDataSuccess {
-  type: typeof FetchWalletDataSuccessKey;
-  totalBalance: BigNumber;
+export interface FetchRatesSuccess {
+  type: typeof FetchRatesSuccessKey;
+  stxBtcRate: BigNumber;
+  btcFiatRate: BigNumber;
+}
+
+export interface FetchRatesFail {
+  type: typeof FetchRatesFailureKey;
+  error: string;
+}
+
+export interface FetchStxWalletDataRequest {
+  type: typeof FetchStxWalletDataRequestKey;
+  stxAddress: string;
+  network: NetworkType;
+  fiatCurrency: string;
+  stxBtcRate: BigNumber;
+}
+
+export interface FetchStxWalletDataSuccess {
+  type: typeof FetchStxWalletDataSuccessKey;
   stxBalance: BigNumber;
   stxAvailableBalance: BigNumber;
   stxLockedBalance: BigNumber;
-  btcBalance: BigNumber;
-  stxTransactions: StxTransactionData[];
+  stxTransactions: TransactionData[];
   stxNonce: number;
-  totalTransactions: number;
-  selectedNetwork: SettingsNetwork;
 }
 
-export interface FetchWalletDataFail {
-  type: typeof FetchWalletDataFailureKey;
+export interface FetchStxWalletDataFail {
+  type: typeof FetchStxWalletDataFailureKey;
 }
 
-export type WalletActions = SetWallet | ResetWallet | FetchAccount |AddAccountRequest | AddAccountSuccess | AddAccountFailure| SelectAccount| StoreEncryptedSeed | UnlockWallet | LockWallet |FetchWalletDataRequest|FetchWalletDataSuccess |FetchWalletDataFail ;
+export interface FetchBtcWalletDataRequest {
+  type: typeof FetchBtcWalletDataRequestKey;
+  btcAddress: string;
+  network: NetworkType;
+  stxBtcRate: BigNumber;
+  btcFiatRate: BigNumber;
+}
 
+export interface FetchBtcWalletDataSuccess {
+  type: typeof FetchBtcWalletDataSuccessKey;
+  balance: BigNumber;
+}
+
+export interface FetchBtcWalletDataFail {
+  type: typeof FetchBtcWalletDataFailureKey;
+}
+
+export interface FetchCoinDataRequest {
+  type: typeof FetchCoinDataRequestKey;
+  stxAddress: string;
+  network: NetworkType;
+  fiatCurrency: string;
+  coinsList: FungibleToken[] | null;
+}
+
+export interface FetchCoinDataSuccess {
+  type: typeof FetchCoinDataSuccessKey;
+  coinsList: FungibleToken[];
+  supportedCoins: Coin[];
+}
+
+export interface FetchCoinDataFailure {
+  type: typeof FetchCoinDataFailureKey;
+  error: string;
+}
+
+export type WalletActions =
+  | SetWallet
+  | ResetWallet
+  | FetchAccount
+  | AddAccountRequest
+  | AddAccountSuccess
+  | AddAccountFailure
+  | SelectAccount
+  | StoreEncryptedSeed
+  | UnlockWallet
+  | LockWallet
+  | FetchRates
+  | FetchRatesSuccess
+  | FetchRatesFail
+  | FetchStxWalletDataRequest
+  | FetchStxWalletDataSuccess
+  | FetchStxWalletDataFail
+  | FetchBtcWalletDataFail
+  | FetchBtcWalletDataSuccess
+  | FetchBtcWalletDataRequest
+  | FetchCoinDataRequest
+  | FetchCoinDataSuccess
+  | FetchCoinDataFailure;

@@ -1,10 +1,27 @@
+import BigNumber from 'bignumber.js';
 import {
   StoreEncryptedSeedKey,
-  WalletActions, SetWalletKey, ResetWalletKey, WalletState, UnlockWalletKey, LockWalletKey,  FetchAccountKey,
+  WalletActions,
+  SetWalletKey,
+  ResetWalletKey,
+  WalletState,
+  UnlockWalletKey,
+  LockWalletKey,
+  FetchAccountKey,
   AddAccountRequestKey,
   AddAccountSuccessKey,
   AddAccountFailureKey,
   SelectAccountKey,
+  FetchRatesSuccessKey,
+  FetchStxWalletDataRequestKey,
+  FetchStxWalletDataSuccessKey,
+  FetchStxWalletDataFailureKey,
+  FetchBtcWalletDataRequestKey,
+  FetchBtcWalletDataSuccessKey,
+  FetchBtcWalletDataFailureKey,
+  FetchCoinDataRequestKey,
+  FetchCoinDataSuccessKey,
+  FetchCoinDataFailureKey,
 } from '../actions/types';
 
 const initialWalletState: WalletState = {
@@ -20,12 +37,23 @@ const initialWalletState: WalletState = {
   encryptedSeed: '',
   loadingWalletData: false,
   fiatCurrency: 'USD',
+  btcFiatRate: new BigNumber(0),
+  stxBtcRate: new BigNumber(0),
+  stxBalance: new BigNumber(0),
+  stxAvailableBalance: new BigNumber(0),
+  stxLockedBalance: new BigNumber(0),
+  stxTransactions: [],
+  stxNonce: 0,
+  btcBalance: new BigNumber(0),
+  btcTransactions: [],
+  coinsList: null,
+  coins: [],
 };
 
 const walletReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: WalletState = initialWalletState,
-  action: WalletActions,
+  action: WalletActions
 ): WalletState => {
   switch (action.type) {
     case SetWalletKey:
@@ -59,7 +87,7 @@ const walletReducer = (
         ...state,
         loadingWalletData: false,
       };
-      case SelectAccountKey:
+    case SelectAccountKey:
       return {
         ...state,
         selectedAccount: action.selectedAccount,
@@ -69,7 +97,7 @@ const walletReducer = (
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,
         network: action.network,
-      }
+      };
     case StoreEncryptedSeedKey:
       return {
         ...state,
@@ -84,6 +112,62 @@ const walletReducer = (
       return {
         ...state,
         seedPhrase: '',
+      };
+    case FetchRatesSuccessKey:
+      return {
+        ...state,
+        btcFiatRate: action.btcFiatRate,
+        stxBtcRate: action.stxBtcRate,
+      };
+    case FetchStxWalletDataRequestKey:
+      return {
+        ...state,
+        loadingWalletData: true,
+      };
+    case FetchStxWalletDataSuccessKey:
+      return {
+        ...state,
+        stxBalance: action.stxBalance,
+        stxAvailableBalance: action.stxAvailableBalance,
+        stxLockedBalance: action.stxLockedBalance,
+        stxTransactions: action.stxTransactions,
+        stxNonce: action.stxNonce,
+        loadingWalletData: false,
+      };
+    case FetchStxWalletDataFailureKey:
+      return {
+        ...state,
+        loadingWalletData: false,
+      };
+    case FetchBtcWalletDataRequestKey:
+      return {
+        ...state,
+      };
+    case FetchBtcWalletDataSuccessKey:
+      return {
+        ...state,
+        btcBalance: action.balance,
+      };
+    case FetchBtcWalletDataFailureKey:
+      return {
+        ...state,
+      };
+    case FetchCoinDataRequestKey:
+      return {
+        ...state,
+        loadingWalletData: true,
+      };
+    case FetchCoinDataSuccessKey:
+      return {
+        ...state,
+        coinsList: action.coinsList,
+        coins: action.supportedCoins,
+        loadingWalletData: false,
+      };
+    case FetchCoinDataFailureKey:
+      return {
+        ...state,
+        loadingWalletData: false,
       };
     default:
       return state;

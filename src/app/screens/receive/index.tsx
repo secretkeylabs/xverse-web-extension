@@ -135,17 +135,22 @@ function Receive({ currency }: Props) {
         <InfoContainer>
           <AddressText>{getAddress()} </AddressText>
         </InfoContainer>
-   
       </Container>
       {addressCopied ? (
-          <CopyContainer>
-            <ActionButton src={Copy} text={t('COPIED_ADDRESS')} onPress={handleOnClick} buttonColor={'transparent'} buttonBorderColor={Theme.colors.background.elevation6}/>
-          </CopyContainer>
-        ) : (
-          <CopyContainer>
-            <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
-          </CopyContainer>
-        )}
+        <CopyContainer>
+          <ActionButton
+            src={Copy}
+            text={t('COPIED_ADDRESS')}
+            onPress={handleOnClick}
+            buttonColor={'transparent'}
+            buttonBorderColor={Theme.colors.background.elevation6}
+          />
+        </CopyContainer>
+      ) : (
+        <CopyContainer>
+          <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
+        </CopyContainer>
+      )}
     </>
   );
 }

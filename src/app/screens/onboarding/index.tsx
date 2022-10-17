@@ -69,8 +69,7 @@ const OnBoardingNextButton = styled.button((props) => ({
   height: 44,
 }));
 
-const OnBoardingSkipButton = styled.button((props) => (
-  {
+const OnBoardingSkipButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -163,11 +162,17 @@ function Onboarding(): JSX.Element {
         <OnboardingSubTitle>{onboardingViews[currentStepIndex].subtitle}</OnboardingSubTitle>
       </OnBoardingContentContainer>
       {currentStepIndex === onboardingViews.length - 1 ? (
-        <OnBoardingContinueButton onClick={handleSkip}>{t('ONBOARDING_CONTINUE_BUTTON')}</OnBoardingContinueButton>
+        <OnBoardingContinueButton onClick={handleSkip}>
+          {t('ONBOARDING_CONTINUE_BUTTON')}
+        </OnBoardingContinueButton>
       ) : (
         <OnBoardingActionsContainer>
-          <OnBoardingSkipButton onClick={handleSkip}>{t('ONBOARDING_SKIP_BUTTON')}</OnBoardingSkipButton>
-          <OnBoardingNextButton onClick={handleClickNext}>{t('ONBOARDING_NEXT_BUTTON')}</OnBoardingNextButton>
+          <OnBoardingSkipButton onClick={handleSkip}>
+            {t('ONBOARDING_SKIP_BUTTON')}
+          </OnBoardingSkipButton>
+          <OnBoardingNextButton onClick={handleClickNext}>
+            {t('ONBOARDING_NEXT_BUTTON')}
+          </OnBoardingNextButton>
         </OnBoardingActionsContainer>
       )}
     </>
