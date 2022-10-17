@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@secretkeylabs/xverse-core": "file://",
+    "@secretkeylabs/xverse-core": "github:secretkeylabs/xverse-core",
     "@stacks/encryption": "4.3.5",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
