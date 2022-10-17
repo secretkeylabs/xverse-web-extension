@@ -26,7 +26,13 @@
     "SCREEN_TITLE": "Backup your wallet",
     "SCREEN_SUBTITLE": "Your seedphrase is the unique key that allows you to recover your wallet.",
     "BACKUP_BUTTON": "Backup now",
-    "BACKUP_SKIP_BUTTON": "Backup later"
+    "BACKUP_SKIP_BUTTON": "Backup later",
+    "SEED_PHRASE_VIEW_HEADING": "Write down your seed phrase and make sure to keep it private. This is the unique key to your wallet. ",
+    "SEED_PHRASE_VIEW_LABEL": "Seedphrase",
+    "SEED_PHRASE_VIEW_CONTINUE": "Continue",
+    "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
+    "SEED_PHRASE_VERIFY_BUTTON": "Verify",
+    "SEED_PHRASE_BACK_BUTTON": "Back"  
   },
   "CREATE_PASSWORD_SCREEN": {
     "CREATE_PASSWORD_TITLE": "Enter your new password",

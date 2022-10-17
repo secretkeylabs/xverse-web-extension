@@ -6,22 +6,12 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { getIsTermsAccepted, saveHasFinishedOnboarding } from '@utils/localStorage';
+import Steps from '@components/steps';
 
-const OnBoardingDotsContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
+const StepsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(10),
-  justifyContent: 'center',
 }));
-const OnboardingDot = styled.div((props) => ({
-  width: 8,
-  height: 8,
-  borderRadius: 4,
-  backgroundColor: props.active
-    ? props.theme.colors.action.classic
-    : props.theme.colors.background.elevation3,
-  marginRight: props.theme.spacing(4),
-}));
+
 const OnBoardingImage = styled.img((props) => ({
   marginTop: props.theme.spacing(25),
   alignSelf: 'center',
@@ -143,11 +133,9 @@ function Onboarding(): JSX.Element {
 
   return (
     <>
-      <OnBoardingDotsContainer>
-        {onboardingViews.map((view, index) => (
-          <OnboardingDot active={index === currentStepIndex} key={view.title} />
-        ))}
-      </OnBoardingDotsContainer>
+      <StepsContainer>
+        <Steps data={onboardingViews} activeIndex={currentStepIndex} />
+      </StepsContainer>
       <OnBoardingImage
         src={onboardingViews[currentStepIndex].image}
         alt="onboarding"
@@ -158,11 +146,17 @@ function Onboarding(): JSX.Element {
         <OnboardingSubTitle>{onboardingViews[currentStepIndex].subtitle}</OnboardingSubTitle>
       </OnBoardingContentContainer>
       {currentStepIndex === onboardingViews.length - 1 ? (
-        <OnBoardingContinueButton onClick={handleSkip}>{t('ONBOARDING_CONTINUE_BUTTON')}</OnBoardingContinueButton>
+        <OnBoardingContinueButton onClick={handleSkip}>
+          {t('ONBOARDING_CONTINUE_BUTTON')}
+        </OnBoardingContinueButton>
       ) : (
         <OnBoardingActionsContainer>
-          <OnBoardingSkipButton onClick={handleSkip}>{t('ONBOARDING_SKIP_BUTTON')}</OnBoardingSkipButton>
-          <OnBoardingNextButton onClick={handleClickNext}>{t('ONBOARDING_NEXT_BUTTON')}</OnBoardingNextButton>
+          <OnBoardingSkipButton onClick={handleSkip}>
+            {t('ONBOARDING_SKIP_BUTTON')}
+          </OnBoardingSkipButton>
+          <OnBoardingNextButton onClick={handleClickNext}>
+            {t('ONBOARDING_NEXT_BUTTON')}
+          </OnBoardingNextButton>
         </OnBoardingActionsContainer>
       )}
     </>

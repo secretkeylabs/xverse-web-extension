@@ -11,18 +11,18 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
 }));
 
-const IconContainer = styled.div((props) => ({
+const IconContainer = styled.div({
   display: 'flex',
-  flex: 0.6,
   justifyContent: 'center',
   alignItems: 'center',
-}));
+  flex: 1,
+});
 
 const ContentContainer = styled.div((props) => ({
   display: 'flex',
-  flex: 0.4,
   flexDirection: 'column',
   justifyContent: 'center',
+  marginBottom: props.theme.spacing(32),
 }));
 
 const Title = styled.h1((props) => ({
@@ -75,7 +75,7 @@ function BackupWallet(): JSX.Element {
   const navigate = useNavigate();
 
   const handleBackup = () => {
-    navigate('/');
+    navigate('/backupWalletSteps');
   };
 
   const handleSkip = () => {

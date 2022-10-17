@@ -95,7 +95,7 @@ const BackButton = styled.button((props) => ({
 
 const ErrorMessage = styled.h2((props) => ({
   ...props.theme.body_medium_m,
-  textAlign: 'center',
+  textAlign: 'left',
   color: props.theme.colors.feedback.error,
   marginTop: props.theme.spacing(4),
 }));

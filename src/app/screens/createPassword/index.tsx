@@ -47,7 +47,6 @@ function CreatePassword(): JSX.Element {
   };
 
   const handleConfirmPassword = async () => {
-    console.log(seedPhrase);
     try {
       const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
       dispatch(storeEncryptedSeedAction(encryptedSeed));

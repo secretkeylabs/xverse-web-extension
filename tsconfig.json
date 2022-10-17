@@ -27,5 +27,5 @@
       "@utils/*": ["app/utils/*"],
     }
   },
-  "include": ["src"]
+  "include": ["src", "styled.d.ts"]
 }

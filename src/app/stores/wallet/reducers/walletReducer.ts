@@ -23,7 +23,6 @@ const walletReducer = (
 ): WalletState => {
   switch (action.type) {
     case SetWalletKey:
-      console.log(action.wallet);
       return {
         ...state,
         ...action.wallet,

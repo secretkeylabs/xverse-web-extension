@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import logo from '@assets/img/full_logo_vertical.svg';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setWalletAction } from '@stores/wallet/actions/actionCreators';
 import { newWallet } from '@secretkeylabs/xverse-core/wallet';
