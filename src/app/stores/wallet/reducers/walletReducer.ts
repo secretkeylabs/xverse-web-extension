@@ -8,9 +8,6 @@ import {
   UnlockWalletKey,
   LockWalletKey,
   FetchAccountKey,
-  AddAccountRequestKey,
-  AddAccountSuccessKey,
-  AddAccountFailureKey,
   SelectAccountKey,
   FetchRatesSuccessKey,
   FetchStxWalletDataRequestKey,
@@ -22,6 +19,8 @@ import {
   FetchCoinDataRequestKey,
   FetchCoinDataSuccessKey,
   FetchCoinDataFailureKey,
+  AddAccountKey,
+  UpdateVisibleCoinListKey,
 } from '../actions/types';
 
 const initialWalletState: WalletState = {
@@ -71,21 +70,10 @@ const walletReducer = (
         selectedAccount: action.selectedAccount,
         accountsList: action.accountsList,
       };
-    case AddAccountRequestKey:
+    case AddAccountKey:
       return {
         ...state,
-        loadingWalletData: true,
-      };
-    case AddAccountSuccessKey:
-      return {
-        ...state,
-        loadingWalletData: false,
         accountsList: action.accountsList,
-      };
-    case AddAccountFailureKey:
-      return {
-        ...state,
-        loadingWalletData: false,
       };
     case SelectAccountKey:
       return {
@@ -168,6 +156,11 @@ const walletReducer = (
       return {
         ...state,
         loadingWalletData: false,
+      };
+    case UpdateVisibleCoinListKey:
+      return {
+        ...state,
+        coinsList: action.coinsList,
       };
     default:
       return state;

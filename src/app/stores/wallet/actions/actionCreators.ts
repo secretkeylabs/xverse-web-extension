@@ -1,10 +1,7 @@
 import {
-  BtcTransactionData,
   Coin,
   FungibleToken,
   NetworkType,
-  SettingsNetwork,
-  StxTransactionData,
   SupportedCurrency,
   TransactionData,
 } from '@secretkeylabs/xverse-core/types';
@@ -50,30 +47,10 @@ export function fetchAccountAction(
   };
 }
 
-export function addAccountRequestAction(
-  seed: string,
-  network: NetworkType,
-  accountsList: Account[]
-): actions.AddAccountRequest {
+export function addAccoutAction(accountsList: Account[]): actions.AddAccount {
   return {
-    type: actions.AddAccountRequestKey,
-    seed,
-    network,
+    type: actions.AddAccountKey,
     accountsList,
-  };
-}
-
-export function addAccoutSuccessAction(accountsList: Account[]): actions.AddAccountSuccess {
-  return {
-    type: actions.AddAccountSuccessKey,
-    accountsList,
-  };
-}
-
-export function addAccountFailureAction(error: string): actions.AddAccountFailure {
-  return {
-    type: actions.AddAccountFailureKey,
-    error,
   };
 }
 
@@ -223,5 +200,14 @@ export function FetchCoinDataFailureAction(error: string): actions.FetchCoinData
   return {
     type: actions.FetchCoinDataFailureKey,
     error,
+  };
+}
+
+export function FetchUpdatedVisibleCoinListAction(
+  coinsList: FungibleToken[]
+): actions.UpdateVisibleCoinList {
+  return {
+    type: actions.UpdateVisibleCoinListKey,
+    coinsList,
   };
 }

@@ -1,6 +1,5 @@
 import { all } from 'redux-saga/effects';
 import {
-  addAccountSaga,
   fetchBtcWalletSaga,
   fetchCoinDataSaga,
   fetchRatesSaga,
@@ -9,7 +8,6 @@ import {
 
 export function* rootSaga() {
   const sagasList = [
-    addAccountSaga(),
     fetchRatesSaga(),
     fetchStxWalletSaga(),
     fetchBtcWalletSaga(),

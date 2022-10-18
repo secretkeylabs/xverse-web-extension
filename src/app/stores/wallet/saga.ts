@@ -1,8 +1,5 @@
 import { takeEvery, put, call, all, takeLatest } from 'redux-saga/effects';
-import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import {
-  addAccountFailureAction,
-  addAccoutSuccessAction,
   fetchBtcWalletDataFail,
   fetchBtcWalletDataSuccess,
   FetchCoinDataFailureAction,
@@ -13,9 +10,6 @@ import {
   fetchStxWalletDataSuccessAction,
 } from './actions/actionCreators';
 import {
-  Account,
-  AddAccountRequest,
-  AddAccountRequestKey,
   FetchStxWalletDataRequestKey,
   FetchRates,
   FetchRatesKey,
@@ -40,37 +34,9 @@ import {
   SettingsNetwork,
   StxAddressData,
   FungibleToken,
-  Coin,
   CoinsResponse,
 } from '@secretkeylabs/xverse-core/types';
 import { saveListOfBtcTransaction } from '@utils/localStorage';
-
-function* handleAddAccount(action: AddAccountRequest) {
-  try {
-    const index = action.accountsList.length > 0 ? action.accountsList.length : 1;
-
-    const { stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey } =
-      yield walletFromSeedPhrase({
-        mnemonic: action.seed,
-        index: BigInt(index),
-        network: action.network,
-      });
-
-    const account: Account = {
-      id: index,
-      stxAddress,
-      btcAddress,
-      masterPubKey,
-      stxPublicKey,
-      btcPublicKey,
-    };
-    const modifiedAccountList = [...action.accountsList];
-    modifiedAccountList.push(account);
-    yield put(addAccoutSuccessAction(modifiedAccountList));
-  } catch (e: any) {
-    yield put(addAccountFailureAction(e.toString()));
-  }
-}
 
 function* fetchRates(action: FetchRates) {
   try {
@@ -179,6 +145,7 @@ function* fetchCoinData(action: FetchCoinDataRequest) {
           ft.image = coin.image;
           ft.name = coin.name;
           ft.tokenFiatRate = coin.tokenFiatRate;
+          coin.visible = ft.visible;
         }
       });
     });
@@ -194,10 +161,6 @@ function* fetchCoinData(action: FetchCoinDataRequest) {
   } catch (error: any) {
     yield put(FetchCoinDataFailureAction(error.toString()));
   }
-}
-
-export function* addAccountSaga() {
-  yield takeEvery(AddAccountRequestKey, handleAddAccount);
 }
 
 export function* fetchRatesSaga() {

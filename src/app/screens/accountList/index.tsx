@@ -5,10 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Plus from '@assets/img/dashboard/plus.svg';
 import { useDispatch, useSelector } from 'react-redux';
-import { addAccountRequestAction, selectAccount } from '@stores/wallet/actions/actionCreators';
+import { addAccoutAction, selectAccount } from '@stores/wallet/actions/actionCreators';
 import Seperator from '@components/seperator';
 import { StoreState } from '@stores/index';
 import { Account } from '@stores/wallet/actions/types';
+import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 
 const Container = styled.div`
   display: flex;
@@ -85,8 +86,26 @@ function AccountList(): JSX.Element {
     navigate('/');
   }
 
-  function onCreateAccount() {
-    dispatch(addAccountRequestAction(seedPhrase, network ?? 'Mainnet', accountsList));
+  async function onCreateAccount(accountsList: Account[], seed: string, network: string) {
+    const index = accountsList.length > 0 ? accountsList.length : 1;
+    const { stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey } =
+      await walletFromSeedPhrase({
+        mnemonic: seed,
+        index: BigInt(index),
+        network: network,
+      });
+
+    const account: Account = {
+      id: index,
+      stxAddress,
+      btcAddress,
+      masterPubKey,
+      stxPublicKey,
+      btcPublicKey,
+    };
+    const modifiedAccountList = [...accountsList];
+    modifiedAccountList.push(account);
+    dispatch(addAccoutAction(modifiedAccountList));
   }
 
   return (
@@ -107,7 +126,9 @@ function AccountList(): JSX.Element {
           );
         })}
         <RowContainer>
-          <AddAccountContainer onClick={onCreateAccount}>
+          <AddAccountContainer
+            onClick={async () => onCreateAccount(accountsList, seedPhrase, network)}
+          >
             <ButtonImage src={Plus} />
           </AddAccountContainer>
           <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>

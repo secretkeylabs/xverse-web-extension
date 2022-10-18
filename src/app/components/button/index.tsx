@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
 
-interface ButtonProps{
+interface ButtonProps {
   alignment?: string;
   border?: string;
-  margin:number
+  margin: number;
 }
 
 const Button = styled.button<ButtonProps>((props) => ({

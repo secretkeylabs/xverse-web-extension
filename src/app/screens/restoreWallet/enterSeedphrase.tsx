@@ -35,30 +35,20 @@ interface Props {
 }
 
 function EnterSeedPhrase(props: Props): JSX.Element {
-  const {
-    onContinue,
-    seed,
-    setSeed,
-    seedError,
-    setSeedError,
-  } = props;
+  const { onContinue, seed, setSeed, seedError, setSeedError } = props;
 
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
 
   return (
     <Container>
-      <Title>
-        {t('ENTER_SEED_HEADER')}
-      </Title>
+      <Title>{t('ENTER_SEED_HEADER')}</Title>
       <SeedPhraseInput
         seed={seed}
         onSeedChange={setSeed}
         seedError={seedError}
         setSeedError={setSeedError}
       />
-      <ContinueButton onClick={onContinue}>
-        {t('CONTINUE_BUTTON')}
-      </ContinueButton>
+      <ContinueButton onClick={onContinue}>{t('CONTINUE_BUTTON')}</ContinueButton>
     </Container>
   );
 }

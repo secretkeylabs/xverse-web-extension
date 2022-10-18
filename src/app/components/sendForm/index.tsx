@@ -15,7 +15,6 @@ import {
 } from '@utils/walletUtils';
 import { getTicker } from '@utils/helper';
 
-
 const ScrollContainer = styled.div`
   display: flex;
   flex-direction: column;

@@ -17,10 +17,8 @@ export const SelectAccountKey = 'SelectAccount';
 export const UnlockWalletKey = 'UnlockWallet';
 export const LockWalletKey = 'LockWallet';
 export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
-
-export const AddAccountRequestKey = 'AddAccountRequest';
-export const AddAccountSuccessKey = 'AddAccountSuccess';
-export const AddAccountFailureKey = 'AddAccountFailure';
+export const UpdateVisibleCoinListKey = 'UpdateVisibleCoinList';
+export const AddAccountKey = 'AddAccount';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
@@ -92,7 +90,6 @@ export interface StoreEncryptedSeed {
   type: typeof StoreEncryptedSeedKey;
   encryptedSeed: string;
 }
-
 export interface UnlockWallet {
   type: typeof UnlockWalletKey;
   seed: string;
@@ -111,23 +108,10 @@ export interface FetchAccount {
   accountsList: Account[];
 }
 
-export interface AddAccountRequest {
-  type: typeof AddAccountRequestKey;
-  seed: string;
-  network: NetworkType;
+export interface AddAccount {
+  type: typeof AddAccountKey;
   accountsList: Account[];
 }
-
-export interface AddAccountSuccess {
-  type: typeof AddAccountSuccessKey;
-  accountsList: Account[];
-}
-
-export interface AddAccountFailure {
-  type: typeof AddAccountFailureKey;
-  error: string;
-}
-
 export interface SelectAccount {
   type: typeof SelectAccountKey;
   selectedAccount: Account | null;
@@ -213,14 +197,16 @@ export interface FetchCoinDataFailure {
   type: typeof FetchCoinDataFailureKey;
   error: string;
 }
+export interface UpdateVisibleCoinList {
+  type: typeof UpdateVisibleCoinListKey;
+  coinsList: FungibleToken[];
+}
 
 export type WalletActions =
   | SetWallet
   | ResetWallet
   | FetchAccount
-  | AddAccountRequest
-  | AddAccountSuccess
-  | AddAccountFailure
+  | AddAccount
   | SelectAccount
   | StoreEncryptedSeed
   | UnlockWallet
@@ -236,4 +222,5 @@ export type WalletActions =
   | FetchBtcWalletDataRequest
   | FetchCoinDataRequest
   | FetchCoinDataSuccess
-  | FetchCoinDataFailure;
+  | FetchCoinDataFailure
+  | UpdateVisibleCoinList;

@@ -1,6 +1,9 @@
 import argon2 from 'argon2-browser';
 import { encryptMnemonic, decryptMnemonic } from '@stacks/encryption';
-import { encryptMnemonicWithCallback, decryptMnemonicWithCallback } from '@secretkeylabs/xverse-core/wallet';
+import {
+  encryptMnemonicWithCallback,
+  decryptMnemonicWithCallback,
+} from '@secretkeylabs/xverse-core/wallet';
 import { getSalt, saveSalt } from './localStorage';
 
 function generateRandomKey(bytesCount: number): string {

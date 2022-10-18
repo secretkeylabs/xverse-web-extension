@@ -12,7 +12,7 @@ import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
 
 interface TileProps {
-  margin?:number;
+  margin?: number;
 }
 const TileContainer = styled.div<TileProps>((props) => ({
   display: 'flex',

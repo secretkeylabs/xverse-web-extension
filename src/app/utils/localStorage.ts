@@ -5,7 +5,6 @@ const isTermsAccepted = 'isTermsAccepted';
 const hasFinishedOnboardingKey = 'hasFinishedOnboarding';
 const saltKey = 'salt';
 const listOfBtcTransactionsKey = 'listOfBtcTransactions';
-const visibleCoinsKey = 'visibleCoins';
 
 export function saveMultiple(items: { [x: string]: string }) {
   const itemKeys = Object.keys(items);

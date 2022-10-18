@@ -173,7 +173,7 @@ function Home(): JSX.Element {
 
   useEffect(() => {
     loadInitialData();
-  }, []);
+  }, [masterPubKey, stxAddress, btcAddress]);
 
   function onReceiveModalOpen() {
     setOpenReceiveModal(true);

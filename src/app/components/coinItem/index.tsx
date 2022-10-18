@@ -43,6 +43,8 @@ const TickerText = styled.h1((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white['0'],
   textAlign: 'center',
+  wordBreak: 'break-all',
+  fontSize: 10,
 }));
 
 const SelectedCoinTitleText = styled.h1((props) => ({
@@ -100,7 +102,7 @@ function CoinItem({ coin, disabled, toggled, enabled }: Props) {
         onColor={Theme.colors.action.classic}
         offColor={Theme.colors.background.elevation3}
         onChange={toggleSwitch}
-        checked={isEnabled}
+        checked={isEnabled!}
         uncheckedIcon={false}
         checkedIcon={false}
         disabled={disabled}
