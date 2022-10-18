@@ -28,13 +28,16 @@ var options = {
   mode: env.NODE_ENV || 'development',
 
   entry: {
+    background: path.join(SRC_ROOT_PATH, 'background', 'background.ts'),
+    inpage: path.join(SRC_ROOT_PATH, 'inpage', 'inpage.ts'),
+    'content-script': path.join(SRC_ROOT_PATH, 'content-scripts', 'content-script.ts'),
     options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.jsx'),
     popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.jsx'),
     inpage: path.join(SRC_ROOT_PATH, 'inpage', 'inpage.ts'),
     'content-script': path.join(SRC_ROOT_PATH, 'content-scripts', 'content-script.ts'),
   },
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].js',
     path: BUILD_ROOT_PATH,
     clean: true,
     publicPath: ASSET_PATH,

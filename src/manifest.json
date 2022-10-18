@@ -9,17 +9,17 @@
     "default_title": "Xverse Wallet"
   },
   "chrome_url_overrides": {},
-  "background": {},
-  "icons": {
-    "128": "assets/img/xverse_icon.png"
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
   },
   "devtools_page": "devtools.html",
-  "web_accessible_resources": [
-    {
-      "resources": ["assets/img/xverse_icon.png", "inpage.js"],
-      "matches": []
-    }
-  ],
+  "web_accessible_resources": [{ "resources": ["inpage.js"], "matches": ["*://*/*"] }],
+  "host_permissions": ["*://*/*"],
+  "permissions": ["scripting", "contextMenus", "storage"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-src 'none'; frame-ancestors 'none';"
+  },
   "content_scripts": [
     {
       "js": ["content-script.js"],

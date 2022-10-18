@@ -10,20 +10,20 @@ import {
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
   MESSAGE_SOURCE,
-} from '@shared/message-types';
+} from './message-types';
 import {
   AuthenticationRequestEvent,
   DomEventName,
   SignatureRequestEvent,
   TransactionRequestEvent,
-} from '@shared/inpage-types';
-import { RouteUrls } from '@shared/route-urls';
-import { getEventSourceWindow } from '@shared/utils/get-event-source-window';
+} from './inpage-types';
+import { RouteUrls } from './route-urls';
+import { getEventSourceWindow } from './get-event-source-window';
 
 // Legacy messaging to work with older versions of Connect
 window.addEventListener('message', (event) => {
   const { data } = event;
-  if (data.source === 'blockstack-app') {
+  if (data.source === 'xverse-app') {
     const { method } = data;
     if (method === 'getURL') {
       const url = chrome.runtime.getURL('index.html');
@@ -32,7 +32,7 @@ window.addEventListener('message', (event) => {
         {
           url,
           method: 'getURLResponse',
-          source: 'blockstack-extension',
+          source: 'xverse-extension',
         },
         event.origin
       );
@@ -120,5 +120,5 @@ document.addEventListener(DomEventName.structuredDataSignatureRequest, ((
 // Inject inpage script (Stacks Provider)
 const inpage = document.createElement('script');
 inpage.src = chrome.runtime.getURL('inpage.js');
-inpage.id = 'stacks-wallet-provider';
+inpage.id = 'xverse-wallet-provider';
 document.body.appendChild(inpage);

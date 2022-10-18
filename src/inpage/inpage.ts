@@ -1,12 +1,11 @@
 import { StacksProvider } from '@stacks/connect';
 
-import { BRANCH, COMMIT_SHA } from '@shared/environment';
 import {
   AuthenticationRequestEventDetails,
   DomEventName,
   SignatureRequestEventDetails,
   TransactionRequestEventDetails,
-} from '@shared/inpage-types';
+} from '../content-scripts/inpage-types';
 import {
   AuthenticationResponseMessage,
   ExternalMethods,
@@ -14,13 +13,12 @@ import {
   MESSAGE_SOURCE,
   SignatureResponseMessage,
   TransactionResponseMessage,
-} from '@shared/message-types';
-import { logger } from '@shared/logger';
+} from '../content-scripts/message-types';
 
 type CallableMethods = keyof typeof ExternalMethods;
 
 interface ExtensionResponse {
-  source: 'blockstack-extension';
+  source: 'xverse-extension';
   method: CallableMethods;
 
   [key: string]: any;
@@ -31,13 +29,12 @@ const callAndReceive = async (
   opts: any = {}
 ): Promise<ExtensionResponse> => {
   return new Promise((resolve, reject) => {
-    logger.info(`BlockstackApp.${methodName}:`, opts);
     const timeout = setTimeout(() => {
-      reject('Unable to get response from Blockstack extension');
+      reject('Unable to get response from xverse extension');
     }, 1000);
     const waitForResponse = (event: MessageEvent) => {
       if (
-        event.data.source === 'blockstack-extension' &&
+        event.data.source === 'xverse-extension' &&
         event.data.method === `${methodName}Response`
       ) {
         clearTimeout(timeout);
@@ -49,7 +46,7 @@ const callAndReceive = async (
     window.postMessage(
       {
         method: methodName,
-        source: 'blockstack-app',
+        source: 'xverse-app',
         ...opts,
       },
       window.location.origin
@@ -160,7 +157,7 @@ const provider: StacksProvider = {
   getProductInfo() {
     return {
       version: '0.0.1',
-      name: 'Xverse Web Extension',
+      name: 'Hiro Wallet for Web',
     };
   },
   request: function (_method: string): Promise<Record<string, any>> {

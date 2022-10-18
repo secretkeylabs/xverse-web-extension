@@ -1,19 +1,18 @@
-import { formatAuthResponse } from '@shared/actions/finalize-auth-response';
-import { formatMessageSigningResponse } from '@shared/actions/finalize-message-signature';
-import { formatTxSignatureResponse } from '@shared/actions/finalize-tx-signature';
+// import { formatAuthResponse } from '../content-scripts/actions/finalize-auth-reaponse-format';
+// import { formatMessageSigningResponse } from '../content-scripts/actions/finalize-message-signature-format';
+// import { formatTxSignatureResponse } from '../content-scripts/actions/finalize-tx-signature-format';
 import {
   ExternalMethods,
   InternalMethods,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
-} from '@shared/message-types';
-import { sendMessage } from '@shared/messages';
-import { RouteUrls } from '@shared/route-urls';
-import { getCoreApiUrl, getPayloadFromToken } from '@shared/utils/requests';
-
+  MESSAGE_SOURCE,
+} from '../content-scripts/message-types';
+import { sendMessage } from '../content-scripts/messages';
+import { RouteUrls } from '../content-scripts/route-urls';
 import { popupCenter } from './popup-center';
 
-const IS_TEST_ENV = process.env.TEST_ENV === 'true';
+// const IS_TEST_ENV = process.env.TEST_ENV === 'true';
 
 //
 // Playwright does not currently support Chrome extension popup testing:
@@ -62,7 +61,7 @@ interface ListenForPopupCloseArgs {
   response: LegacyMessageToContentScript;
 }
 function listenForPopupClose({ id, tabId, response }: ListenForPopupCloseArgs) {
-  chrome.windows.onRemoved.addListener(winId => {
+  chrome.windows.onRemoved.addListener((winId) => {
     if (winId !== id || !tabId) return;
     const responseMessage = response;
     chrome.tabs.sendMessage(tabId, responseMessage);
@@ -73,25 +72,15 @@ interface ListenForOriginTabCloseArgs {
   tabId?: number;
 }
 function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) {
-  chrome.tabs.onRemoved.addListener(closedTabId => {
+  chrome.tabs.onRemoved.addListener((closedTabId) => {
     if (tabId !== closedTabId) return;
     sendMessage({ method: InternalMethods.OriginatingTabClosed, payload: { tabId } });
   });
 }
 
-async function triggerRequestWindowOpen(path: RouteUrls, urlParams: URLSearchParams) {
-  if (IS_TEST_ENV) return openRequestInFullPage(path, urlParams);
-  return popupCenter({ url: `/popup-center.html#${path}?${urlParams.toString()}` });
-}
-
-function getNetworkParamsFromPayload(payload: string): [string, string][] {
-  const { network } = getPayloadFromToken(payload);
-  if (!network) return [];
-  const developerDefinedApiUrl = getCoreApiUrl(network);
-  return [
-    ['coreApiUrl', developerDefinedApiUrl],
-    ['networkChainId', network.chainId.toString()],
-  ];
+async function triggerRequstWindowOpen(path: RouteUrls, urlParams: URLSearchParams) {
+  // if (IS_TEST_ENV) return openRequestInFullPage(path, urlParams);
+  return popupCenter({ url: `/options.html#${path}?${urlParams.toString()}` });
 }
 
 export async function handleLegacyExternalMethodFormat(
@@ -104,62 +93,58 @@ export async function handleLegacyExternalMethodFormat(
     case ExternalMethods.authenticationRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['authRequest', payload]]);
 
-      const { id } = await triggerRequestWindowOpen(RouteUrls.ChooseAccount, urlParams);
-      listenForPopupClose({
-        id,
-        tabId,
-        response: formatAuthResponse({ request: payload, response: 'cancel' }),
-      });
-      listenForOriginTabClose({ tabId });
+      const { id } = await triggerRequstWindowOpen(RouteUrls.TransactionRequest, urlParams);
+      // listenForPopupClose({
+      //   id,
+      //   tabId,
+      //   response: formatAuthResponse({ request: payload, response: 'cancel' }),
+      // });
+      // listenForOriginTabClose({ tabId });
       break;
     }
 
     case ExternalMethods.transactionRequest: {
-      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
-        ['request', payload],
-        ...getNetworkParamsFromPayload(payload),
-      ]);
+      // const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['request', payload]]);
 
-      const { id } = await triggerRequestWindowOpen(RouteUrls.TransactionRequest, urlParams);
-      listenForPopupClose({
-        id,
-        tabId,
-        response: formatTxSignatureResponse({ payload, response: 'cancel' }),
-      });
-      listenForOriginTabClose({ tabId });
+      // const { id } = await triggerRequstWindowOpen(RouteUrls.TransactionRequest, urlParams);
+      // listenForPopupClose({
+      //   id,
+      //   tabId,
+      //   response: formatTxSignatureResponse({ payload, response: 'cancel' }),
+      // });
+      // listenForOriginTabClose({ tabId });
       break;
     }
 
     case ExternalMethods.signatureRequest: {
-      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
-        ['request', payload],
-        ['messageType', 'utf8'],
-        ...getNetworkParamsFromPayload(payload),
-      ]);
+      // const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+      //   ['request', payload],
+      //   ['messageType', 'utf8'],
+      // ]);
 
-      const { id } = await triggerRequestWindowOpen(RouteUrls.SignatureRequest, urlParams);
-      listenForPopupClose({
-        id,
-        tabId,
-        response: formatMessageSigningResponse({ request: payload, response: 'cancel' }),
-      });
-      listenForOriginTabClose({ tabId });
+      // const { id } = await triggerRequstWindowOpen(RouteUrls.SignatureRequest, urlParams);
+      // listenForPopupClose({
+      //   id,
+      //   tabId,
+      //   response: formatMessageSigningResponse({ request: payload, response: 'cancel' }),
+      // });
+      // listenForOriginTabClose({ tabId });
       break;
     }
 
     case ExternalMethods.structuredDataSignatureRequest: {
-      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
-        ['request', payload],
-        ['messageType', 'structured'],
-      ]);
+      // const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+      //   ['request', payload],
+      //   ['messageType', 'structured'],
+      // ]);
 
-      const { id } = await triggerRequestWindowOpen(RouteUrls.SignatureRequest, urlParams);
-      listenForPopupClose({
-        id,
-        tabId,
-        response: formatMessageSigningResponse({ request: payload, response: 'cancel' }),
-      });
-      listenForOriginTabClose({ tabId });
+      // const { id } = await triggerRequstWindowOpen(RouteUrls.SignatureRequest, urlParams);
+      // listenForPopupClose({
+      //   id,
+      //   tabId,
+      //   response: formatMessageSigningResponse({ request: payload, response: 'cancel' }),
+      // });
+      // listenForOriginTabClose({ tabId });
       break;
     }
   }

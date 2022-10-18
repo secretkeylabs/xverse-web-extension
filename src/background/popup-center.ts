@@ -1,4 +1,3 @@
-import { POPUP_CENTER_HEIGHT, POPUP_CENTER_WIDTH } from '@shared/constants';
 import type { Windows } from 'webextension-polyfill';
 
 interface PopupOptions {
@@ -9,11 +8,11 @@ interface PopupOptions {
   skipPopupFallback?: boolean;
 }
 export function popupCenter(options: PopupOptions): Promise<Windows.Window> {
-  const { url, w = POPUP_CENTER_WIDTH, h = POPUP_CENTER_HEIGHT } = options;
+  const { url, w = 442, h = 646 } = options;
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     // @see https://developer.chrome.com/docs/extensions/reference/windows/#method-getCurrent
-    chrome.windows.getCurrent(async win => {
+    chrome.windows.getCurrent(async (win) => {
       // these units take into account the distance from
       // the farthest left/top sides of all displays
       const dualScreenLeft = win.left || window.screenLeft;
@@ -26,7 +25,7 @@ export function popupCenter(options: PopupOptions): Promise<Windows.Window> {
       const left = Math.floor(width / 2 - w / 2 + dualScreenLeft);
       const top = Math.floor(height / 2 - h / 2 + dualScreenTop);
 
-      const popup = await browser.windows.create({
+      const popup = await chrome.windows.create({
         url,
         width: w,
         height: h,

@@ -11,9 +11,8 @@ var WebpackDevServer = require('webpack-dev-server'),
 
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
-
 // Add Stuff Here to exclude from hot reloading
-var excludeEntriesToHotReload = [];
+var excludeEntriesToHotReload = ['content-script', 'inpage', 'background'];
 
 for (var entryName in config.entry) {
   if (excludeEntriesToHotReload.indexOf(entryName) === -1) {
