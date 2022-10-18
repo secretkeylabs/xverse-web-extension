@@ -36,8 +36,8 @@ const useWalletReducer = () => {
       index: 0n,
       network: 'Mainnet',
     });
-    const encryptedSeed = await encryptSeedPhrase(seed, password);
-    dispatch(storeEncryptedSeedAction(encryptedSeed));
+    const encryptSeed = await encryptSeedPhrase(seed, password);
+    dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
   };
 

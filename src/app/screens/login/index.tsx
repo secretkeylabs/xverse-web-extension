@@ -4,14 +4,8 @@ import styled from 'styled-components';
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import { useState } from 'react';
-import { decryptSeedPhrase } from '@utils/encryptionUtils';
-import { getEncryptedSeed } from '@utils/localStorage';
-import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
-import { useDispatch, useSelector } from 'react-redux';
-import { setWalletAction, storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
 import { useNavigate } from 'react-router-dom';
 import { Ring } from 'react-spinners-css';
-import { StoreState } from '@stores/index';
 import useWalletReducer from '@hooks/useWalletReducer';
 
 const ScreenContainer = styled.div((props) => ({

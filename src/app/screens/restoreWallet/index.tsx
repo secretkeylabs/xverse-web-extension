@@ -1,37 +1,20 @@
 import * as bip39 from 'bip39';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ConfirmPassword from '@screens/createPassword/confirmPassword';
 import NewPassword from '@screens/createPassword/newPassword';
-import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
-import { encryptSeedPhrase } from '@utils/encryptionUtils';
 import { useTranslation } from 'react-i18next';
-import EnterSeedPhrase from './enterSeedphrase';
 import useWalletReducer from '@hooks/useWalletReducer';
+import Steps from '@components/steps';
+import EnterSeedPhrase from './enterSeedphrase';
 
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
   backgroundColor: props.theme.colors.background.elevation0,
-  padding: `0 ${props.theme.spacing(8)}px 0 ${props.theme.spacing(8)}px`,
-}));
-const StepsContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(10),
-  justifyContent: 'center',
-}));
-const StepDot = styled.div((props) => ({
-  width: 8,
-  height: 8,
-  borderRadius: 4,
-  backgroundColor: props.active
-    ? props.theme.colors.action.classic
-    : props.theme.colors.background.elevation3,
-  marginRight: props.theme.spacing(4),
+  padding: `${props.theme.spacing(12)}px ${props.theme.spacing(8)}px 0 ${props.theme.spacing(8)}px`,
 }));
 
 function RestoreWallet(): JSX.Element {
@@ -110,11 +93,7 @@ function RestoreWallet(): JSX.Element {
   ];
   return (
     <Container>
-      <StepsContainer>
-        {restoreSteps.map((view, index) => (
-          <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
-        ))}
-      </StepsContainer>
+      <Steps data={restoreSteps} activeIndex={currentStepIndex} />
       {restoreSteps[currentStepIndex]}
     </Container>
   );

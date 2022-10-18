@@ -1,7 +1,13 @@
 import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
 
-const Button = styled.button((props) => ({
+interface ButtonProps{
+  alignment?: string;
+  border?: string;
+  margin:number
+}
+
+const Button = styled.button<ButtonProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: props.alignment ?? 'center',
@@ -57,7 +63,7 @@ const ActionButton: React.FC<Props> = ({
       color={buttonColor}
       alignment={buttonAlignment}
       border={buttonBorderColor}
-      margin={margin}
+      margin={margin ?? 0}
     >
       {processing ? (
         <Ring color="white" size={20} />

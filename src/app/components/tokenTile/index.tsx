@@ -11,7 +11,10 @@ import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
 
-const TileContainer = styled.div((props) => ({
+interface TileProps {
+  margin?:number;
+}
+const TileContainer = styled.div<TileProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'flex-start',

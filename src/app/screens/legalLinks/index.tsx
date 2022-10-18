@@ -9,7 +9,9 @@ const Container = styled.div((props) => ({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  padding: props.theme.spacing(8),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(8),
 }));
 
 const Title = styled.h1((props) => ({
@@ -36,21 +38,14 @@ const ActionButtonsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(20),
 }));
 
-const AcceptButtonContainer = styled.div((props) => ({
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'flex-end',
-  marginBottom: props.theme.spacing(20),
-}));
-
 const AcceptButton = styled.button((props) => ({
   ...props.theme.body_bold_m,
   display: 'flex',
   color: props.theme.colors.white['0'],
   alignItems: 'center',
   justifyContent: 'center',
-  marginTop: props.theme.spacing(8),
+  marginTop: 'auto',
+  marginBottom: props.theme.spacing(32),
   backgroundColor: props.theme.colors.action.classic,
   borderRadius: props.theme.radius(1),
   height: 44,
@@ -85,9 +80,7 @@ function LegalLinks() {
           <img src={LinkIcon} alt="privacy" />
         </ActionButton>
       </ActionButtonsContainer>
-      <AcceptButtonContainer>
-        <AcceptButton onClick={handleLegalAccept}>{t('ACCEPT_LEGAL_BUTTON')}</AcceptButton>
-      </AcceptButtonContainer>
+      <AcceptButton onClick={handleLegalAccept}>{t('ACCEPT_LEGAL_BUTTON')}</AcceptButton>
     </Container>
   );
 }

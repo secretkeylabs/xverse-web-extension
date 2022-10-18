@@ -3,11 +3,11 @@ import { RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import configureStore from '@stores/index';
+import LoadingScreen from '@components/loadingScreen';
 import Theme from '../theme';
 import GlobalStyle from '../theme/global';
 import '../locales';
 import router from './routes';
-import LoadingScreen from '@components/loadingScreen';
 
 function App(): JSX.Element {
   const { store, persistedStore } = configureStore();

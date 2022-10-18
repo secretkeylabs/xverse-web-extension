@@ -10,16 +10,10 @@ export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
 const rootPersistConfig = {
   key: 'root',
   storage,
-  blacklist: ['walletState'],
-};
-
-const walletPersistConfig = {
-  key: 'wallet',
-  storage,
 };
 
 const appReducer = combineReducers({
-  walletState: persistReducer(walletPersistConfig, walletReducer),
+  walletState: walletReducer,
 });
 
 const rootReducer = (state: any, action: any) => appReducer(state, action);

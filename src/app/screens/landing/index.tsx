@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import logo from '@assets/img/full_logo_vertical.svg';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setWalletAction } from '@stores/wallet/actions/actionCreators';
 import { newWallet } from '@secretkeylabs/xverse-core/wallet';
@@ -66,7 +65,6 @@ const RestoreButton = styled.button((props) => ({
 
 function Landing(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LANDING_SCREEN' });
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const openInNewTab = async () => {

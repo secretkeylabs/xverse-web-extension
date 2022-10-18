@@ -5,6 +5,7 @@ import Switch from 'react-switch';
 import Theme from 'theme';
 import { getTicker } from '@utils/helper';
 import Seperator from '@components/seperator';
+import { Coin } from '@secretkeylabs/xverse-core/types';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',

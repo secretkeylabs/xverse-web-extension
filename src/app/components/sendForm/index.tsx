@@ -15,6 +15,15 @@ import {
 } from '@utils/walletUtils';
 import { getTicker } from '@utils/helper';
 
+
+const ScrollContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 const OuterContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -93,9 +102,9 @@ const BalanceText = styled.h1((props) => ({
 }));
 
 const InputField = styled.input((props) => ({
+  ...props.theme.body_m,
   backgroundColor: props.theme.colors.background['elevation-1'],
   color: props.theme.colors.white['400'],
-  font: props.theme.body_m,
   width: '100%',
   border: 'transparent',
 }));
@@ -329,7 +338,7 @@ function SendForm({
   }
 
   return (
-    <>
+    <ScrollContainer>
       <OuterContainer>
         {!disableAmountInput && renderEnterAmountSection()}
         {renderEnterRecepientSection()}
@@ -342,7 +351,7 @@ function SendForm({
       <SendButton onClick={() => onPressSend(recipientAddress, amount, memo)}>
         <ButtonText>{buttonText ?? t('NEXT')}</ButtonText>
       </SendButton>
-    </>
+    </ScrollContainer>
   );
 }
 

@@ -8,7 +8,7 @@ interface GradientCircleProps {
   thirdGradient: string;
 }
 
-const GradientCircle = styled.div((props: GradientCircleProps) => ({
+const GradientCircle = styled.div<GradientCircleProps>((props) => ({
   height: 47,
   width: 47,
   borderRadius: 25,
