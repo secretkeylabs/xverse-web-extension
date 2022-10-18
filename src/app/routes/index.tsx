@@ -4,6 +4,7 @@ import Landing from '@screens/landing';
 import Onboarding from '@screens/onboarding';
 import ScreenContainer from '@components/screenContainer';
 import LegalLinks from '@screens/legalLinks';
+import TransactionRequest from '@screens/transactionRequest';
 
 const router = createHashRouter([
   {
@@ -25,6 +26,10 @@ const router = createHashRouter([
       {
         path: 'legal',
         element: <LegalLinks />,
+      },
+      {
+        path: 'transactionRequest',
+        element: <TransactionRequest />,
       },
     ],
   },

@@ -8,7 +8,6 @@ var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
-
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
 const BUILD_ROOT_PATH = path.join(__dirname, '../', 'build');
@@ -18,11 +17,14 @@ var options = {
   mode: env.NODE_ENV || 'development',
 
   entry: {
+    background: path.join(SRC_ROOT_PATH, 'background', 'background.ts'),
+    inpage: path.join(SRC_ROOT_PATH, 'inpage', 'inpage.ts'),
+    'content-script': path.join(SRC_ROOT_PATH, 'content-scripts', 'content-script.ts'),
     options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.jsx'),
     popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.jsx'),
   },
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].js',
     path: BUILD_ROOT_PATH,
     clean: true,
     publicPath: ASSET_PATH,
@@ -58,13 +60,15 @@ var options = {
             loader: require.resolve('ts-loader'),
             options: {
               getCustomTransformers: () => ({
-                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(Boolean),
+                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(
+                  Boolean
+                ),
               }),
               transpileOnly: env.NODE_ENV === 'development',
             },
           },
         ],
-      }
+      },
     ],
   },
   resolve: {
