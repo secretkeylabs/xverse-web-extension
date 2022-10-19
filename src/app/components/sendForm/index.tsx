@@ -14,6 +14,8 @@ import {
   stxToMicrostacks,
 } from '@utils/walletUtils';
 import { getTicker } from '@utils/helper';
+import { useSelector } from 'react-redux';
+import { StoreState } from '@stores/index';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -103,7 +105,7 @@ const BalanceText = styled.h1((props) => ({
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
   backgroundColor: props.theme.colors.background['elevation-1'],
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white['0'],
   width: '100%',
   border: 'transparent',
 }));
@@ -156,16 +158,10 @@ interface Props {
   onPressSend: (recipientID: string, amount: string, memo: string) => void;
   onFormFilled?: (recipientID: string, amount: string, memo: string) => void;
   currencyType: CurrencyTypes;
-  recipientAddress?: string;
   error?: string;
-  processing?: boolean;
-  disabled?: boolean;
   fungibleToken?: FungibleToken;
   disableAmountInput?: boolean;
-  balanceText?: React.ReactNode;
   balance?: number;
-  showNetwork?: boolean;
-  hideAddress?: boolean;
   hideMemo?: boolean;
   buttonText?: string;
 }
@@ -174,14 +170,9 @@ function SendForm({
   onPressSend,
   currencyType,
   error,
-  processing,
-  disabled = true,
   fungibleToken,
   disableAmountInput,
-  balanceText,
   balance,
-  showNetwork = true,
-  hideAddress = false,
   hideMemo = false,
   buttonText,
 }: Props) {
@@ -192,12 +183,9 @@ function SendForm({
   const [recipientAddress, setRecipientAddress] = useState('');
   const [buttonDisabled, setButtonDisabled] = useState(true);
 
-  /*const {stxBtcRate, btcFiatRate, fiatCurrency} = useSelector(
+  const {stxBtcRate, btcFiatRate, fiatCurrency} = useSelector(
     (state: StoreState) => state.walletState,
-  );*/
-  const stxBtcRate = 0.00001686;
-  const btcFiatRate = 18935.735;
-  const fiatCurrency = 'USD';
+  );
 
   function getFiatEquivalent(amount: number) {
     if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT')
@@ -250,20 +238,16 @@ function SendForm({
   }
 
   function onInputChange(e: React.FormEvent<HTMLInputElement>) {
-    const newValue = e.currentTarget.value;
+    let newValue = e.currentTarget.value;
 
-    const resultRegex = /[^0-9.]/g;
-    let formattedValue = parseFloat(newValue.replace(resultRegex, ''));
-    if (isNaN(formattedValue)) {
-      formattedValue = 0;
+    const resultRegex =new RegExp(/^\d*\.?\d*$/);
+    if (!resultRegex.test(newValue)) {
       setAmount('');
-    } else if (formattedValue > 1000000000) {
-      formattedValue = formattedValue - 1;
     } else {
-      setAmount(formattedValue.toString());
+      setAmount(newValue);
     }
 
-    const amountInCurrency: string = getFiatEquivalent(formattedValue);
+    const amountInCurrency: string = getFiatEquivalent(Number(newValue));
     setFiatAmount(amountInCurrency);
   }
 

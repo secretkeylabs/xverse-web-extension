@@ -1,17 +1,21 @@
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
+import { StoreState } from '@stores/';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { btcToSats, satsToBtc, validateBtcAddress } from '@utils/walletUtils';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 function SendBtcScreen({}) {
   const [error, setError] = useState('');
-  const btcAddress = '3QAmUHT9jbsjewuAAjta6mtpH8M4tgQJcE';
-  const btcBalance = new BigNumber(120);
-  const network = 'Mainnet';
+  const {
+    btcAddress,
+    network,
+    btcBalance,
+  } = useSelector((state: StoreState) => state.walletState);
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
 
@@ -19,11 +23,12 @@ function SendBtcScreen({}) {
     navigate('/');
   };
 
-  const handleNextClick = () => {
-    navigate('/confirm-btc-tx');
+  const handleNextClick = (recipientAddress: string, amount: string) => {
+   if( validateFields(recipientAddress, amount))
+     navigate('/confirm-btc-tx');
   };
 
-  function validateFields(recipientAddress: string, amount: string, memo: string): boolean {
+  function validateFields(recipientAddress: string, amount: string): boolean {
     if (!recipientAddress) {
       setError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
@@ -76,7 +81,7 @@ function SendBtcScreen({}) {
   }
 
   function getBalance() {
-    return satsToBtc(btcBalance).toNumber();
+    return satsToBtc(new BigNumber(btcBalance)).toNumber();
   }
 
   return (
