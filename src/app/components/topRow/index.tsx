@@ -1,26 +1,26 @@
 import styled from 'styled-components';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 
-const TopSectionContainer = styled.div((props) => ({
+const TopSectionContainer = styled.div({
   display: 'flex',
   flex: 1,
   flexDirection: 'row',
   justifyContent: 'center',
-}));
+});
 
 const HeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
 }));
 
-const BackButton = styled.button((props) => ({
+const BackButton = styled.button({
   backgroundColor: 'transparent',
   height: 44,
-}));
+});
 
-const ButtonImage = styled.img((props) => ({
+const ButtonImage = styled.img({
   alignSelf: 'center',
   transform: 'all',
-}));
+});
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',

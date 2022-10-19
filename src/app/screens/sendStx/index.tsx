@@ -38,16 +38,16 @@ function SendStxScreen() {
       return false;
     }
 
-    var parsedAmount = new BigNumber(0);
+    let parsedAmount = new BigNumber(0);
 
     try {
-      if (!isNaN(Number(amount))) {
+      if (!Number.isNaN(Number(amount))) {
         parsedAmount = new BigNumber(amount);
       } else {
         setError(t('ERRORS.INVALID_AMOUNT'));
         return false;
       }
-    } catch (error) {
+    } catch (e) {
       setError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
@@ -71,15 +71,15 @@ function SendStxScreen() {
     return true;
   }
 
-  async function onPressSendSTX(associatedAddress: string, amount: string, memo: string) {
-    amount = replaceCommaByDot(amount);
-    if (validateFields(associatedAddress.trim(), amount, memo)) {
+  const onPressSendSTX = async (associatedAddress: string, amount: string, memo: string) => {
+    const modifyAmount = replaceCommaByDot(amount);
+    if (validateFields(associatedAddress.trim(), modifyAmount, memo)) {
       setError('');
       navigate('/confirm-stx-tx');
-      //generateStxTx(amount, associatedAddress, memo);
+      // generateStxTx(amount, associatedAddress, memo);
     }
     navigate('/confirm-stx-tx');
-  }
+  };
   return (
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />

@@ -40,23 +40,23 @@ const FeeText = styled.h1((props) => ({
   ...props.theme.body_m,
 }));
 
-const FeeTitleContainer = styled.div((props) => ({
+const FeeTitleContainer = styled.div({
   display: 'flex',
   flex: 1,
-}));
+});
 
-const FeeContainer = styled.div((props) => ({
+const FeeContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-end',
-}));
+});
 
-const SendAmountContainer = styled.div((props) => ({
+const SendAmountContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-}));
+});
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
@@ -82,7 +82,9 @@ interface Props {
   onCancelClick: () => void;
 }
 
-function ConfirmTransation({ fee, currency, children, onConfirmClick, onCancelClick }: Props) {
+function ConfirmTransation({
+  fee, currency, children, onConfirmClick, onCancelClick,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const navigate = useNavigate();
@@ -94,41 +96,38 @@ function ConfirmTransation({ fee, currency, children, onConfirmClick, onCancelCl
   const handleBackButtonClick = () => {
     navigate('/');
   };
-  const getFiatAmountString = (fiatAmount: BigNumber, fiatCurrency: string) => {
+  const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (fiatAmount) {
       if (fiatAmount.isLessThan(0.01)) {
         return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      } else {
-        return (
-          <NumericFormat
-            value={fiatAmount.toFixed(2).toString()}
-            displayType={'text'}
-            thousandSeparator={true}
-            prefix={`${currencySymbolMap[fiatCurrency]} `}
-            suffix={` ${fiatCurrency}`}
-            renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
-          />
-        );
       }
-    } else {
-      return '';
+      return (
+        <NumericFormat
+          value={fiatAmount.toFixed(2).toString()}
+          displayType="text"
+          thousandSeparator
+          prefix={`${currencySymbolMap[fiatCurrency]} `}
+          suffix={` ${fiatCurrency}`}
+          renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
+        />
+      );
     }
+    return '';
   };
 
   function getFiatEquivalent() {
     if (currency === 'STX') {
       return getStxFiatEquivalent(new BigNumber(fee), stxBtcRate, btcFiatRate);
-    } else if (currency === 'BTC') {
+    } if (currency === 'BTC') {
       return getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
-    } else {
-      return new BigNumber(0);
     }
+    return new BigNumber(0);
   }
 
   function renderFee() {
     if (currency === 'STX') {
       return `${microStxToStx(fee)} ${currency}`;
-    } else if (currency === 'BTC') {
+    } if (currency === 'BTC') {
       return `${satsToBtc(fee)} ${currency}`;
     }
   }
@@ -138,7 +137,9 @@ function ConfirmTransation({ fee, currency, children, onConfirmClick, onCancelCl
       <SendAmountContainer>
         <TitleText>{t('INDICATION')}</TitleText>
         <AmountText>
-          {amount} {currency}
+          {amount}
+          {' '}
+          {currency}
         </AmountText>
       </SendAmountContainer>
     );
@@ -153,25 +154,25 @@ function ConfirmTransation({ fee, currency, children, onConfirmClick, onCancelCl
 
         <FeeContainer>
           <FeeText>{renderFee()}</FeeText>
-          <FiatAmountText>{getFiatAmountString(getFiatEquivalent(), fiatCurrency)}</FiatAmountText>
+          <FiatAmountText>{getFiatAmountString(getFiatEquivalent())}</FiatAmountText>
         </FeeContainer>
       </RowContainer>
     );
   }
 
-  function onAdvancedSettingClick() {
+  const onAdvancedSettingClick = () => {
     setOpenTransactionSettingModal(true);
-  }
+  };
 
-  function closeTransactionSettingAlert() {
+  const closeTransactionSettingAlert = () => {
     setOpenTransactionSettingModal(false);
-  }
+  };
 
   function renderTransactionSettingAlert() {
     return (
       <TransactionSettingAlert
         visible={openTransactionSettingModal}
-        fee={'102'}
+        fee="102"
         type={currency}
         onApplyClick={closeTransactionSettingAlert}
         onCrossClick={closeTransactionSettingAlert}
@@ -188,8 +189,8 @@ function ConfirmTransation({ fee, currency, children, onConfirmClick, onCancelCl
         <ActionButton
           src={SettingIcon}
           text={currency === 'STX' ? t('ADVANCED_SETTING') : t('EDIT_FEES')}
-          buttonColor={'transparent'}
-          buttonAlignment={'flex-start'}
+          buttonColor="transparent"
+          buttonAlignment="flex-start"
           onPress={onAdvancedSettingClick}
         />
         {renderTransactionSettingAlert()}
@@ -197,7 +198,7 @@ function ConfirmTransation({ fee, currency, children, onConfirmClick, onCancelCl
       <ButtonContainer>
         <ActionButton
           text={t('CANCEL')}
-          buttonColor={'transparent'}
+          buttonColor="transparent"
           buttonBorderColor={Theme.colors.background.elevation2}
           onPress={onCancelClick}
           margin={3}

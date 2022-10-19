@@ -19,11 +19,11 @@ const TokenContainer = styled.div`
   }
 `;
 
-const Container = styled.div((props) => ({
+const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
-}));
+});
 
 function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
@@ -31,10 +31,11 @@ function ManageTokens() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  function toggled(isEnabled: boolean, coin: Coin) {
-    //if coins exists in list of fungible token, update the visible property otherwise add coin in list if coin is set to visible
+  const toggled = (isEnabled: boolean, coin: Coin) => {
+    /* if coins exists in list of fungible token, update the visible property otherwise
+     add coin in list if coin is set to visible */
     const coinToBeUpdated: FungibleToken | undefined = coinsList?.find(
-      (ft) => ft.principal === coin.contract
+      (ft) => ft.principal === coin.contract,
     );
     if (coinToBeUpdated) coinToBeUpdated.visible = isEnabled;
     else if (!coinToBeUpdated && isEnabled) {
@@ -53,7 +54,7 @@ function ManageTokens() {
       const modifiedCoinsList = [...coinsList];
       dispatch(FetchUpdatedVisibleCoinListAction(modifiedCoinsList));
     }
-  }
+  };
 
   const handleBackButtonClick = () => {
     navigate('/');
@@ -63,9 +64,9 @@ function ManageTokens() {
     <Container>
       <TopRow title={t('ADD_COINS')} onClick={handleBackButtonClick} />
       <TokenContainer>
-        {coins.map((coin) => {
-          return <CoinItem coin={coin} disabled={false} toggled={toggled} enabled={coin.visible} />;
-        })}
+        {coins.map((coin) => (
+          <CoinItem coin={coin} disabled={false} toggled={toggled} enabled={coin.visible} />
+        ))}
       </TokenContainer>
     </Container>
   );

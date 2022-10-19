@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -34,10 +33,10 @@ const RowContainer = styled.div((props) => ({
   margin: props.theme.spacing(12),
 }));
 
-const ButtonImage = styled.img((props) => ({
+const ButtonImage = styled.img({
   alignSelf: 'center',
   transform: 'all',
-}));
+});
 
 interface Props {
   header: string;

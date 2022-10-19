@@ -39,24 +39,22 @@ interface Props {
   text: string;
   onPress: () => void;
   buttonBorderColor?: string;
-  disabled?: boolean;
   processing?: boolean;
   buttonColor?: string;
   buttonAlignment?: string;
   margin?: number;
 }
 
-const ActionButton: React.FC<Props> = ({
+function ActionButton({
   src,
   text,
   onPress,
   buttonBorderColor,
-  disabled,
   processing = false,
   buttonColor,
   buttonAlignment,
   margin,
-}) => {
+}: Props) {
   return (
     <Button
       onClick={onPress}
@@ -75,5 +73,5 @@ const ActionButton: React.FC<Props> = ({
       )}
     </Button>
   );
-};
+}
 export default ActionButton;

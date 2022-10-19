@@ -3,8 +3,6 @@ import {
   Coin,
   FungibleToken,
   NetworkType,
-  SettingsNetwork,
-  StxTransactionData,
   SupportedCurrency,
   TransactionData,
 } from '@secretkeylabs/xverse-core/types';
@@ -122,7 +120,7 @@ export interface SelectAccount {
   btcPublicKey: string;
   bnsName?: string;
   network: NetworkType;
-  //stackingState: StackingStateData;
+  // stackingState: StackingStateData;
 }
 
 export interface FetchRates {

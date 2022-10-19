@@ -6,7 +6,7 @@ import {
   fetchStxWalletSaga,
 } from '@stores/wallet/saga';
 
-export function* rootSaga() {
+function* rootSaga() {
   const sagasList = [
     fetchRatesSaga(),
     fetchStxWalletSaga(),
@@ -16,3 +16,5 @@ export function* rootSaga() {
 
   yield all(sagasList);
 }
+
+export default rootSaga;

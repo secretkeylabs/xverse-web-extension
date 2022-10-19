@@ -7,10 +7,9 @@ import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import TokenTile from '@components/tokenTile';
-import BigNumber from 'bignumber.js';
 import { useNavigate } from 'react-router-dom';
 import AccountRow from '@components/accountRow';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import CoinSelectModal from '@components/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
@@ -32,6 +31,7 @@ import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import BarLoader from '@components/barLoader';
 import { LoaderSize } from '@utils/constants';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import BigNumber from 'bignumber.js';
 
 const Container = styled.div`
   display: flex;
@@ -60,12 +60,12 @@ const ColumnContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(11),
 }));
 
-const CoinContainer = styled.div((props) => ({
+const CoinContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'space-between',
   justifyContent: 'space-between',
-}));
+});
 
 const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -74,9 +74,9 @@ const RowButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(11),
 }));
 
-const ButtonContainer = styled.div((props) => ({
+const ButtonContainer = styled.div({
   flex: 0.31,
-}));
+});
 
 const SelectedAccountContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
@@ -147,7 +147,7 @@ function Home(): JSX.Element {
     loadingWalletData,
   } = useSelector((state: StoreState) => state.walletState);
 
-  async function loadInitialData() {
+  const loadInitialData = useCallback(() => {
     if (stxAddress && btcAddress) {
       if (accountsList.length === 0) {
         const accounts: Account[] = [
@@ -169,46 +169,43 @@ function Home(): JSX.Element {
       dispatch(fetchBtcWalletDataRequestAction(btcAddress, network, stxBtcRate, btcFiatRate));
       dispatch(fetchCoinDataRequestAction(stxAddress, network, fiatCurrency, coinsList));
     }
-  }
+  }, [stxAddress, btcAddress]);
 
   useEffect(() => {
     loadInitialData();
-  }, [masterPubKey, stxAddress, btcAddress]);
+  }, [masterPubKey, stxAddress, btcAddress, loadInitialData]);
 
-  function onReceiveModalOpen() {
+  const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
-  }
+  };
 
-  function onReceiveModalClose() {
+  const onReceiveModalClose = () => {
     setOpenReceiveModal(false);
-  }
+  };
 
-  function onSendModalOpen() {
+  const onSendModalOpen = () => {
     setOpenSendModal(true);
-  }
+  };
 
-  function onSendModalClose() {
+  const onSendModalClose = () => {
     setOpenSendModal(false);
-  }
+  };
 
-  function handleAccountSelect() {
+  const handleAccountSelect = () => {
     navigate('/account-list');
-  }
+  };
 
   function getCoinsList() {
     return coinsList ? coinsList?.filter((ft) => ft.visible) : [];
   }
 
-  function calculateTotalBalance(
-    stxBalance: BigNumber,
-    btcBalance: BigNumber,
-    stxBtcRate: BigNumber,
-    btcFiatRate: BigNumber
-  ) {
-    const stxFiatEquiv = microstacksToStx(stxBalance)
-      .multipliedBy(stxBtcRate)
-      .multipliedBy(btcFiatRate);
-    const btcFiatEquiv = satsToBtc(btcBalance).multipliedBy(btcFiatRate);
+  function calculateTotalBalance() {
+    const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
+      .multipliedBy(new BigNumber(stxBtcRate))
+      .multipliedBy(new BigNumber(btcFiatRate));
+    const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
+      new BigNumber(btcFiatRate),
+    );
     const totalBalance = stxFiatEquiv.plus(btcFiatEquiv);
     return totalBalance.toNumber().toFixed(2);
   }
@@ -232,15 +229,10 @@ function Home(): JSX.Element {
         ) : (
           <BalanceAmountText>
             <NumericFormat
-              value={calculateTotalBalance(
-                new BigNumber(stxBalance),
-                new BigNumber(btcBalance),
-                new BigNumber(stxBtcRate),
-                new BigNumber(btcFiatRate)
-              )}
-              displayType={'text'}
+              value={calculateTotalBalance()}
+              displayType="text"
               prefix={`${getBalancePrefix()} `}
-              thousandSeparator={true}
+              thousandSeparator
               renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
             />
           </BalanceAmountText>
@@ -288,9 +280,9 @@ function Home(): JSX.Element {
       <TokenListButtonContainer>
         <ActionButton
           src={ListDashes}
-          buttonColor={'transparent'}
+          buttonColor="transparent"
           text={t('MANAGE_TOKEN')}
-          buttonAlignment={'flex-end'}
+          buttonAlignment="flex-end"
           onPress={handleManageTokenListOnClick}
         />
       </TokenListButtonContainer>
@@ -302,13 +294,13 @@ function Home(): JSX.Element {
       <ColumnContainer>
         <TokenTile
           title={t('BITCOIN')}
-          currency={'BTC'}
+          currency="BTC"
           icon={IconBitcoin}
           underlayColor={Theme.colors.background.elevation1}
         />
         <TokenTile
           title={t('STACKS')}
-          currency={'STX'}
+          currency="STX"
           icon={IconStacks}
           underlayColor={Theme.colors.background.elevation1}
         />
@@ -347,18 +339,14 @@ function Home(): JSX.Element {
     const list: FungibleToken[] = getCoinsList();
     return (
       <CoinContainer>
-        {list.map((coin) => {
-          return (
-            <>
-              <TokenTile
-                title={coin.name}
-                currency={'FT'}
-                underlayColor={Theme.colors.background.elevation1}
-                fungibleToken={coin}
-              />
-            </>
-          );
-        })}
+        {list.map((coin) => (
+          <TokenTile
+            title={coin.name}
+            currency="FT"
+            underlayColor={Theme.colors.background.elevation1}
+            fungibleToken={coin}
+          />
+        ))}
       </CoinContainer>
     );
   }
@@ -366,11 +354,7 @@ function Home(): JSX.Element {
   return (
     <>
       <SelectedAccountContainer>
-        <AccountRow
-          account={selectedAccount!}
-          isSelected={true}
-          onAccountSelected={handleAccountSelect}
-        />
+        <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
       </SelectedAccountContainer>
       <Seperator />
       <Container>

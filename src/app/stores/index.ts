@@ -3,7 +3,7 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
 import createSagaMiddleware from 'redux-saga';
 import walletReducer from './wallet/reducers/walletReducer';
-import { rootSaga } from './root/saga';
+import rootSaga from './root/saga';
 
 export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
 

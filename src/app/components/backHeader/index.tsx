@@ -1,19 +1,19 @@
 import styled from 'styled-components';
 import ArrowLeft from '@assets/img/arrow_left.svg';
 
-const Container = styled.div((props) => ({
+const Container = styled.div(() => ({
   display: 'flex',
   height: 62,
   alignItems: 'center',
   justifyContent: 'space-between',
 }));
 
-const HeaderContent = styled.div((props) => ({
+const HeaderContent = styled.div({
   display: 'flex',
   flex: 1,
   alignItems: 'center',
   justifyContent: 'space-between',
-}));
+});
 
 const HeaderTitle = styled.h1((props) => ({
   ...props.theme.body_bold_m,
