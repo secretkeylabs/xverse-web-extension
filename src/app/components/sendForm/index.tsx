@@ -250,20 +250,16 @@ function SendForm({
   }
 
   function onInputChange(e: React.FormEvent<HTMLInputElement>) {
-    const newValue = e.currentTarget.value;
+    let newValue = e.currentTarget.value;
 
-    const resultRegex = /[^0-9.]/g;
-    let formattedValue = parseFloat(newValue.replace(resultRegex, ''));
-    if (isNaN(formattedValue)) {
-      formattedValue = 0;
+    const resultRegex =new RegExp(/^\d*\.?\d*$/);
+    if (!resultRegex.test(newValue)) {
       setAmount('');
-    } else if (formattedValue > 1000000000) {
-      formattedValue = formattedValue - 1;
     } else {
-      setAmount(formattedValue.toString());
+      setAmount(newValue);
     }
 
-    const amountInCurrency: string = getFiatEquivalent(formattedValue);
+    const amountInCurrency: string = getFiatEquivalent(Number(newValue));
     setFiatAmount(amountInCurrency);
   }
 
