@@ -83,9 +83,9 @@ const FeeContainer = styled.div((props) => ({
 }));
 
 const InputField = styled.input((props) => ({
+  ...props.theme.body_m,
   backgroundColor: props.theme.colors.background.elevation1,
   color: props.theme.colors.white['400'],
-  font: props.theme.body_m,
   width: '100%',
   border: 'transparent',
 }));
@@ -123,13 +123,13 @@ const customStyles = {
     },
     height: 45,
   }),
-  menu: (base) => ({
+  menu: (base: any) => ({
     ...base,
     borderRadius: 0,
     marginTop: 0,
     color: Theme.colors.white['0'],
   }),
-  menuList: (base) => ({
+  menuList: (base: any) => ({
     ...base,
     padding: 0,
     color: Theme.colors.white['0'],

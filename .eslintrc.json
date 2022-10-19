@@ -16,7 +16,12 @@
   "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles"],
   "rules": {
     "no-inline-styles/no-inline-styles": 2,
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "no-param-reassign":"off",
+    "react/require-default-props":"off",
+    "consistent-return":"off",
+    "max-len":"off",
+    "react-hooks/exhaustive-deps":"off"
   },
   "settings": {
     "import/resolver": {

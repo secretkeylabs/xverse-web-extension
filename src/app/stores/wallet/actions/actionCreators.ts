@@ -38,7 +38,7 @@ export function resetWalletAction(): actions.ResetWallet {
 
 export function fetchAccountAction(
   selectedAccount: Account,
-  accountsList: Account[]
+  accountsList: Account[],
 ): actions.FetchAccount {
   return {
     type: actions.FetchAccountKey,
@@ -63,7 +63,7 @@ export function selectAccount(
   btcPublicKey: string,
   network: NetworkType,
   // stackingState: StackingStateData,
-  bnsName?: string
+  bnsName?: string,
 ): actions.SelectAccount {
   return {
     type: actions.SelectAccountKey,
@@ -88,7 +88,7 @@ export function fetchRatesAction(fiatCurrency: SupportedCurrency): actions.Fetch
 
 export function fetchRatesSuccessAction(
   stxBtcRate: BigNumber,
-  btcFiatRate: BigNumber
+  btcFiatRate: BigNumber,
 ): actions.FetchRatesSuccess {
   return {
     type: actions.FetchRatesSuccessKey,
@@ -108,7 +108,7 @@ export function fetchStxWalletDataRequestAction(
   stxAddress: string,
   network: NetworkType,
   fiatCurrency: string,
-  stxBtcRate: BigNumber
+  stxBtcRate: BigNumber,
 ): actions.FetchStxWalletDataRequest {
   return {
     type: actions.FetchStxWalletDataRequestKey,
@@ -124,7 +124,7 @@ export function fetchStxWalletDataSuccessAction(
   stxAvailableBalance: BigNumber,
   stxLockedBalance: BigNumber,
   stxTransactions: TransactionData[],
-  stxNonce: number
+  stxNonce: number,
 ): actions.FetchStxWalletDataSuccess {
   return {
     type: actions.FetchStxWalletDataSuccessKey,
@@ -146,7 +146,7 @@ export function fetchBtcWalletDataRequestAction(
   btcAddress: string,
   network: NetworkType,
   stxBtcRate: BigNumber,
-  btcFiatRate: BigNumber
+  btcFiatRate: BigNumber,
 ): actions.FetchBtcWalletDataRequest {
   return {
     type: actions.FetchBtcWalletDataRequestKey,
@@ -174,20 +174,20 @@ export function fetchCoinDataRequestAction(
   stxAddress: string,
   network: NetworkType,
   fiatCurrency: string,
-  coinsList: FungibleToken[] | null
+  coinsList: FungibleToken[] | null,
 ): actions.FetchCoinDataRequest {
   return {
     type: actions.FetchCoinDataRequestKey,
-    stxAddress: stxAddress,
-    network: network,
-    fiatCurrency: fiatCurrency,
-    coinsList: coinsList,
+    stxAddress,
+    network,
+    fiatCurrency,
+    coinsList,
   };
 }
 
 export function FetchCoinDataSuccessAction(
   coinsList: FungibleToken[],
-  supportedCoins: Coin[]
+  supportedCoins: Coin[],
 ): actions.FetchCoinDataSuccess {
   return {
     type: actions.FetchCoinDataSuccessKey,
@@ -204,7 +204,7 @@ export function FetchCoinDataFailureAction(error: string): actions.FetchCoinData
 }
 
 export function FetchUpdatedVisibleCoinListAction(
-  coinsList: FungibleToken[]
+  coinsList: FungibleToken[],
 ): actions.UpdateVisibleCoinList {
   return {
     type: actions.UpdateVisibleCoinListKey,

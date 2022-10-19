@@ -5,7 +5,7 @@ import Theme from 'theme';
 interface Props {
   loaderSize?: LoaderSize;
 }
-const BarLoader: React.FC<Props> = ({ loaderSize }) => {
+function BarLoader({ loaderSize }: Props) {
   function getHeight() {
     switch (loaderSize) {
       case LoaderSize.SMALLEST:
@@ -51,7 +51,7 @@ const BarLoader: React.FC<Props> = ({ loaderSize }) => {
 
   return (
     <ContentLoader
-      animate={true}
+      animate
       speed={1}
       interval={0.1}
       viewBox="0 0 380 40"
@@ -61,6 +61,6 @@ const BarLoader: React.FC<Props> = ({ loaderSize }) => {
       <rect y="0" x="0" rx={getRadius()} ry={getRadius()} width={getWidth()} height={getHeight()} />
     </ContentLoader>
   );
-};
+}
 
 export default BarLoader;

@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { Account } from '@stores/wallet/actions/types';
 import { useAccountGradient } from '@utils/gradient';
 import { useTranslation } from 'react-i18next';
+
 interface GradientCircleProps {
   firstGradient: string;
   secondGradient: string;
@@ -80,11 +81,12 @@ function AccountRow({ account, isSelected, onAccountSelected }: Props) {
         account.stxAddress.length
       )}`;
     }
+    return '';
   }
 
-  function onClick() {
+  const onClick = () => {
     onAccountSelected(account!);
-  }
+  };
 
   return (
     <TopSectionContainer onClick={onClick}>

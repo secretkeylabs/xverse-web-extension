@@ -45,10 +45,10 @@ const AddAccountContainer = styled.button((props) => ({
   marginRight: props.theme.spacing(8),
 }));
 
-const ButtonImage = styled.img((props) => ({
+const ButtonImage = styled.img({
   alignSelf: 'center',
   transform: 'all',
-}));
+});
 
 const AddAccountText = styled.h1((props) => ({
   ...props.theme.body_m,
@@ -59,11 +59,13 @@ function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { network, accountsList, seedPhrase, selectedAccount } = useSelector(
-    (state: StoreState) => state.walletState
+  const {
+    network, accountsList, seedPhrase, selectedAccount,
+  } = useSelector(
+    (state: StoreState) => state.walletState,
   );
 
-  function handleAccountSelect(account: Account) {
+  const handleAccountSelect = (account: Account) => {
     dispatch(
       selectAccount(
         account,
@@ -72,28 +74,27 @@ function AccountList(): JSX.Element {
         account.masterPubKey,
         account.stxPublicKey,
         account.btcPublicKey,
-        network
-      )
+        network,
+      ),
     );
     navigate('/');
-  }
+  };
 
-  function isAccountSelected(account: Account): boolean {
-    return account.id === selectedAccount?.id;
-  }
+  const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;
 
-  function handleBackButtonClick() {
+  const handleBackButtonClick = () => {
     navigate('/');
-  }
+  };
 
-  async function onCreateAccount(accountsList: Account[], seed: string, network: string) {
+  async function onCreateAccount() {
     const index = accountsList.length > 0 ? accountsList.length : 1;
-    const { stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey } =
-      await walletFromSeedPhrase({
-        mnemonic: seed,
-        index: BigInt(index),
-        network: network,
-      });
+    const {
+      stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey,
+    } = await walletFromSeedPhrase({
+      mnemonic: seedPhrase,
+      index: BigInt(index),
+      network,
+    });
 
     const account: Account = {
       id: index,
@@ -112,23 +113,19 @@ function AccountList(): JSX.Element {
     <Container>
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
-        {accountsList.map((account) => {
-          return (
-            <>
-              <AccountRow
-                key={account.id}
-                account={account}
-                isSelected={isAccountSelected(account)}
-                onAccountSelected={handleAccountSelect}
-              />
-              <Seperator />
-            </>
-          );
-        })}
+        {accountsList.map((account) => (
+          <>
+            <AccountRow
+              key={account.id}
+              account={account}
+              isSelected={isAccountSelected(account)}
+              onAccountSelected={handleAccountSelect}
+            />
+            <Seperator />
+          </>
+        ))}
         <RowContainer>
-          <AddAccountContainer
-            onClick={async () => onCreateAccount(accountsList, seedPhrase, network)}
-          >
+          <AddAccountContainer onClick={async () => onCreateAccount()}>
             <ButtonImage src={Plus} />
           </AddAccountContainer>
           <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>

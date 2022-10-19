@@ -22,9 +22,9 @@ const RowContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(30),
 }));
 
-const Button = styled.button((props) => ({
+const Button = styled.button({
   backgroundColor: 'transparent',
-}));
+});
 
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
@@ -49,8 +49,10 @@ function BottomTabBar() {
         break;
       case 'settings':
         break;
+      default:
+        break;
     }
-  }, [activeTab]);
+  }, [activeTab, navigate]);
 
   return (
     <>

@@ -1,24 +1,4 @@
-import { takeEvery, put, call, all, takeLatest } from 'redux-saga/effects';
-import {
-  fetchBtcWalletDataFail,
-  fetchBtcWalletDataSuccess,
-  FetchCoinDataFailureAction,
-  FetchCoinDataSuccessAction,
-  fetchRatesFailAction,
-  fetchRatesSuccessAction,
-  fetchStxWalletDataFailureAction,
-  fetchStxWalletDataSuccessAction,
-} from './actions/actionCreators';
-import {
-  FetchStxWalletDataRequestKey,
-  FetchRates,
-  FetchRatesKey,
-  FetchStxWalletDataRequest,
-  FetchBtcWalletDataRequest,
-  FetchBtcWalletDataRequestKey,
-  FetchCoinDataRequest,
-  FetchCoinDataRequestKey,
-} from './actions/types';
+import { takeEvery, put, call } from 'redux-saga/effects';
 import {
   fetchBtcToCurrencyRate,
   fetchBtcTransactionsData,
@@ -37,6 +17,26 @@ import {
   CoinsResponse,
 } from '@secretkeylabs/xverse-core/types';
 import { saveListOfBtcTransaction } from '@utils/localStorage';
+import {
+  FetchStxWalletDataRequestKey,
+  FetchRates,
+  FetchRatesKey,
+  FetchStxWalletDataRequest,
+  FetchBtcWalletDataRequest,
+  FetchBtcWalletDataRequestKey,
+  FetchCoinDataRequest,
+  FetchCoinDataRequestKey,
+} from './actions/types';
+import {
+  fetchBtcWalletDataFail,
+  fetchBtcWalletDataSuccess,
+  FetchCoinDataFailureAction,
+  FetchCoinDataSuccessAction,
+  fetchRatesFailAction,
+  fetchRatesSuccessAction,
+  fetchStxWalletDataFailureAction,
+  fetchStxWalletDataSuccessAction,
+} from './actions/actionCreators';
 
 function* fetchRates(action: FetchRates) {
   try {
@@ -52,13 +52,12 @@ function* fetchRates(action: FetchRates) {
 
 function* fetchStxWalletData(action: FetchStxWalletDataRequest) {
   try {
-    const selectedNetwork: SettingsNetwork =
-      action.network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1];
+    const selectedNetwork: SettingsNetwork = action.network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1];
     const stxData: StxAddressData = yield fetchStxAddressData(
       action.stxAddress,
       selectedNetwork,
       0,
-      PAGINATION_LIMIT
+      PAGINATION_LIMIT,
     );
     const stxBalance = stxData.balance;
     const stxAvailableBalance = stxData.availableBalance;
@@ -71,8 +70,8 @@ function* fetchStxWalletData(action: FetchStxWalletDataRequest) {
         stxAvailableBalance,
         stxLockedBalance,
         stxTransactions,
-        stxNonce
-      )
+        stxNonce,
+      ),
     );
   } catch (error) {
     yield put(fetchStxWalletDataFailureAction());
@@ -83,7 +82,7 @@ function* fetchBtcWalletData(action: FetchBtcWalletDataRequest) {
   try {
     const btcData: BtcAddressData = yield fetchBtcTransactionsData(
       action.btcAddress,
-      action.network
+      action.network,
     );
     const btcBalance = new BigNumber(btcData.finalBalance);
     const btcTransactions = btcData.transactions;
@@ -96,25 +95,22 @@ function* fetchBtcWalletData(action: FetchBtcWalletDataRequest) {
 
 function* fetchCoinData(action: FetchCoinDataRequest) {
   try {
-    const selectedNetwork: SettingsNetwork =
-      action.network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1];
+    const selectedNetwork: SettingsNetwork = action.network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1];
     const fungibleTokenList: Array<FungibleToken> = yield call(
       getFtData,
       action.stxAddress,
-      selectedNetwork
+      selectedNetwork,
     );
-    let visibleCoins: FungibleToken[] | null = action.coinsList;
+    const visibleCoins: FungibleToken[] | null = action.coinsList;
     if (visibleCoins) {
       visibleCoins.forEach((visibleCoin) => {
-        let coinToBeUpdated = fungibleTokenList.find(
-          (ft) => ft.principal === visibleCoin.principal
+        const coinToBeUpdated = fungibleTokenList.find(
+          (ft) => ft.principal === visibleCoin.principal,
         );
         if (coinToBeUpdated) coinToBeUpdated.visible = visibleCoin.visible;
-        else {
-          if (visibleCoin.visible) {
-            visibleCoin.balance = '0';
-            fungibleTokenList.push(visibleCoin);
-          }
+        else if (visibleCoin.visible) {
+          visibleCoin.balance = '0';
+          fungibleTokenList.push(visibleCoin);
         }
       });
     } else {
@@ -135,7 +131,7 @@ function* fetchCoinData(action: FetchCoinDataRequest) {
       }
     });
 
-    //update attributes of fungible token list
+    // update attributes of fungible token list
     fungibleTokenList.forEach((ft) => {
       coinsReponse.forEach((coin) => {
         if (ft.principal === coin.contract) {
@@ -154,7 +150,8 @@ function* fetchCoinData(action: FetchCoinDataRequest) {
     const supportedFts: FungibleToken[] = [];
     const unSupportedFts: FungibleToken[] = [];
     fungibleTokenList.forEach((ft) => {
-      ft.supported ? supportedFts.push(ft) : unSupportedFts.push(ft);
+      if (ft.supported) supportedFts.push(ft);
+      else unSupportedFts.push(ft);
     });
     const sortedFtList: FungibleToken[] = [...supportedFts, ...unSupportedFts];
     yield put(FetchCoinDataSuccessAction(sortedFtList, coinsReponse));

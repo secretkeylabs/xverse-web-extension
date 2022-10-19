@@ -15,11 +15,11 @@ const RowContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(11),
 }));
 
-const CoinContainer = styled.div((props) => ({
+const CoinContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-}));
+});
 
 const CoinIcon = styled.img((props) => ({
   marginRight: props.theme.spacing(7),
@@ -66,7 +66,9 @@ interface Props {
   enabled?: boolean;
 }
 
-function CoinItem({ coin, disabled, toggled, enabled }: Props) {
+function CoinItem({
+  coin, disabled, toggled, enabled,
+}: Props) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const toggleSwitch = () => {
     setIsEnabled((previousState) => !previousState);
@@ -74,20 +76,19 @@ function CoinItem({ coin, disabled, toggled, enabled }: Props) {
   };
 
   function getFtTicker() {
-    let ticker = coin.ticker;
+    const { ticker } = coin;
     return !ticker && coin.name ? getTicker(coin.name) : ticker;
   }
 
   function renderCoinIcon() {
-    if (coin.image) return <CoinIcon src={coin.image}></CoinIcon>;
-    else {
-      const background = stc(getFtTicker());
-      return (
-        <TickerIconContainer color={background}>
-          <TickerText>{getFtTicker()}</TickerText>
-        </TickerIconContainer>
-      );
-    }
+    if (coin.image) return <CoinIcon src={coin.image} />;
+
+    const background = stc(getFtTicker());
+    return (
+      <TickerIconContainer color={background}>
+        <TickerText>{getFtTicker()}</TickerText>
+      </TickerIconContainer>
+    );
   }
   function renderCoinText() {
     return isEnabled ? (

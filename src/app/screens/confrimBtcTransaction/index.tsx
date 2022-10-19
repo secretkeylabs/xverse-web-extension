@@ -12,12 +12,12 @@ const InfoContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-}));
+});
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
@@ -45,7 +45,7 @@ const ActionButton = styled.button((props) => ({
   backgroundColor: 'transparent',
   marginLeft: props.theme.spacing(12),
 }));
-function ConfirmBtcTransaction({}) {
+function ConfirmBtcTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const recepientAddress = 'SPJW1XE278YMCEYMXB8ZFGJMH8ZVAAEDP2S2PJYG';

@@ -2,12 +2,12 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import TopRow from '@components/topRow';
 import { useNavigate } from 'react-router-dom';
-import { CurrencyTypes } from '@utils/constant';
 import QRCode from 'react-qr-code';
 import Copy from '@assets/img/dashboard/Copy.svg';
 import { useState } from 'react';
 import ActionButton from '@components/button';
 import Theme from 'theme';
+import { CurrencyTypes } from '@utils/constants';
 
 const TopTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
@@ -106,13 +106,12 @@ function Receive({ currency }: Props) {
     navigate('/');
   };
 
-  const renderHeading = () => {
-    return currency === 'BTC' ? (
+  const renderHeading = () =>
+    currency === 'BTC' ? (
       <TopTitleText>{t('BTC_ADDRESS')} </TopTitleText>
     ) : (
       <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>
     );
-  };
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
@@ -142,7 +141,7 @@ function Receive({ currency }: Props) {
             src={Copy}
             text={t('COPIED_ADDRESS')}
             onPress={handleOnClick}
-            buttonColor={'transparent'}
+            buttonColor="transparent"
             buttonBorderColor={Theme.colors.background.elevation6}
           />
         </CopyContainer>

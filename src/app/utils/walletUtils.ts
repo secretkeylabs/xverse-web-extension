@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
-import { Network } from './constant';
 import { c32addressDecode } from 'c32check';
+import { Network } from './constant';
 
 export const satsToBtc = (sats: BigNumber) => sats.multipliedBy(0.00000001);
 
@@ -33,13 +33,11 @@ export function validateStxAddress(stxAddress: string, network: Network) {
         ) {
           return false;
         }
-      } else {
-        if (
-          result[0] !== AddressVersion.TestnetSingleSig &&
-          result[0] !== AddressVersion.TestnetMultiSig
-        ) {
-          return false;
-        }
+      } else if (
+        result[0] !== AddressVersion.TestnetSingleSig &&
+        result[0] !== AddressVersion.TestnetMultiSig
+      ) {
+        return false;
       }
 
       return true;
@@ -50,13 +48,13 @@ export function validateStxAddress(stxAddress: string, network: Network) {
   }
 }
 
-//change
+// change
 export function validateBtcAddress(btcAddress: string, network: Network): boolean {
   /* const btcNetwork =
       network === 'Mainnet'
         ? bitcoin.networks.bitcoin
         : bitcoin.networks.testnet;
     try {
-      bitcoin.address.toOutputScript(btcAddress, btcNetwork);*/
+      bitcoin.address.toOutputScript(btcAddress, btcNetwork); */
   return true;
 }

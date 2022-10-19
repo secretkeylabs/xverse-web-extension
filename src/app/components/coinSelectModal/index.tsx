@@ -1,12 +1,10 @@
 import BottomModal from '@components/bottomModal';
 import TokenTile from '@components/tokenTile';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
-import BigNumber from 'bignumber.js';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import { useTranslation } from 'react-i18next';
 import Theme from 'theme';
-import { useEffect, useRef } from 'react';
 
 interface Props {
   visible: boolean;
@@ -28,12 +26,13 @@ function CoinSelectModal({
   onClose,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+
   function renderFixedCoins() {
     return (
       <>
         <TokenTile
           title={t('BITCOIN')}
-          currency={'BTC'}
+          currency="BTC"
           icon={IconBitcoin}
           underlayColor={Theme.colors.background.elevation2}
           margin={2}
@@ -41,19 +40,11 @@ function CoinSelectModal({
             onSelectBitcoin();
             onClose();
           }}
-          stxBalance={new BigNumber(103)}
-          btcBalance={new BigNumber(210)}
-          stxBtcRate={new BigNumber(0.00001736)}
-          btcFiatRate={new BigNumber(18816.8499999925912416)}
-          loadingWalletData={false}
-          initializedStxData={true}
-          initializedFtData={true}
-          initializedData={true}
         />
 
         <TokenTile
           title={t('STACKS')}
-          currency={'STX'}
+          currency="STX"
           icon={IconStacks}
           underlayColor={Theme.colors.background.elevation2}
           margin={2}
@@ -61,14 +52,6 @@ function CoinSelectModal({
             onSelectStacks();
             onClose();
           }}
-          stxBalance={new BigNumber(103)}
-          btcBalance={new BigNumber(0.0002)}
-          stxBtcRate={new BigNumber(0.00001736)}
-          btcFiatRate={new BigNumber(18816.8499999925912416)}
-          loadingWalletData={false}
-          initializedStxData={true}
-          initializedFtData={true}
-          initializedData={true}
         />
       </>
     );
@@ -82,7 +65,7 @@ function CoinSelectModal({
           <TokenTile
             key={coin.principal}
             title={coin.name}
-            currency={'FT'}
+            currency="FT"
             icon={IconStacks}
             underlayColor={Theme.colors.background.elevation2}
             margin={2}
@@ -91,14 +74,6 @@ function CoinSelectModal({
               onClose();
             }}
             fungibleToken={coin}
-            stxBalance={new BigNumber(103)}
-            btcBalance={new BigNumber(0.0002)}
-            stxBtcRate={new BigNumber(0.00001736)}
-            btcFiatRate={new BigNumber(18816.8499999925912416)}
-            loadingWalletData={false}
-            initializedStxData={true}
-            initializedFtData={true}
-            initializedData={true}
           />
         ))}
       </>

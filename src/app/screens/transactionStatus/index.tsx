@@ -12,11 +12,11 @@ import {
   TRANSACTION_STATUS_URL,
 } from '@utils/constants';
 
-const Container = styled.div((props) => ({
+const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-}));
+});
 
 const OuterContainer = styled.div((props) => ({
   display: 'flex',
@@ -51,16 +51,16 @@ const RowContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(16),
 }));
 
-const TxIDContainer = styled.div((props) => ({
+const TxIDContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-}));
+});
 
-const Image = styled.img((props) => ({
+const Image = styled.img({
   alignSelf: 'center',
   transform: 'all',
-}));
+});
 
 const HeadingText = styled.h1((props) => ({
   ...props.theme.headline_s,
@@ -131,16 +131,33 @@ function TransactionStatus({ txid, currency, error }: Props) {
           <BodyText>{t('SUCCESS_MSG')}</BodyText>
         </Container>
       );
-    } else {
-      return (
-        <Container>
-          <Image src={Failure} />
-          <HeadingText>{t('FAILED')}</HeadingText>
-          <BodyText>{error}</BodyText>
-        </Container>
-      );
     }
+    return (
+      <Container>
+        <Image src={Failure} />
+        <HeadingText>{t('FAILED')}</HeadingText>
+        <BodyText>{error}</BodyText>
+      </Container>
+    );
   }
+
+  const openTransactionInBrowser = () => {
+    if (txid) {
+      if (currency === 'BTC') {
+        window.open(`${BTC_TRANSACTION_STATUS_URL}${txid}`, '_blank', 'noopener,noreferrer');
+      } else {
+        window.open(`${TRANSACTION_STATUS_URL}${txid}`, '_blank', 'noopener,noreferrer');
+      }
+    }
+  };
+
+  const onCloseClick = () => {
+    navigate('/');
+  };
+
+  const onCopyClick = () => {
+    navigator.clipboard.writeText(txid!);
+  };
 
   function renderLink() {
     return (
@@ -168,24 +185,6 @@ function TransactionStatus({ txid, currency, error }: Props) {
         </TxIDContainer>
       </TransactionIDContainer>
     );
-  }
-
-  const onCloseClick = () => {
-    navigate('/');
-  };
-
-  const onCopyClick = () => {
-    navigator.clipboard.writeText(txid!);
-  };
-
-  function openTransactionInBrowser() {
-    if (txid) {
-      if (currency === 'BTC') {
-        window.open(`${BTC_TRANSACTION_STATUS_URL}${txid}`, '_blank', 'noopener,noreferrer');
-      } else {
-        window.open(`${TRANSACTION_STATUS_URL}${txid}`, '_blank', 'noopener,noreferrer');
-      }
-    }
   }
 
   return (

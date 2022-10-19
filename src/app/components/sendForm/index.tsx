@@ -14,6 +14,8 @@ import {
   stxToMicrostacks,
 } from '@utils/walletUtils';
 import { getTicker } from '@utils/helper';
+import { StoreState } from '@stores/index';
+import { useSelector } from 'react-redux';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -23,17 +25,17 @@ const ScrollContainer = styled.div`
     display: none;
   }
 `;
-const OuterContainer = styled.div((props) => ({
+const OuterContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-}));
+});
 
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-}));
+});
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -73,11 +75,11 @@ const InputFieldContainer = styled.div(() => ({
   flex: 1,
 }));
 
-const TickerContainer = styled.div((props) => ({
+const TickerContainer = styled.div({
   display: 'flex',
   flexDirection: 'row-reverse',
   alignItems: 'center',
-}));
+});
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
@@ -154,18 +156,11 @@ const ButtonText = styled.div((props) => ({
 
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo: string) => void;
-  onFormFilled?: (recipientID: string, amount: string, memo: string) => void;
   currencyType: CurrencyTypes;
-  recipientAddress?: string;
   error?: string;
-  processing?: boolean;
-  disabled?: boolean;
   fungibleToken?: FungibleToken;
   disableAmountInput?: boolean;
-  balanceText?: React.ReactNode;
   balance?: number;
-  showNetwork?: boolean;
-  hideAddress?: boolean;
   hideMemo?: boolean;
   buttonText?: string;
 }
@@ -174,74 +169,69 @@ function SendForm({
   onPressSend,
   currencyType,
   error,
-  processing,
-  disabled = true,
   fungibleToken,
   disableAmountInput,
-  balanceText,
   balance,
-  showNetwork = true,
-  hideAddress = false,
   hideMemo = false,
   buttonText,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const [amount, setAmount] = useState('');
   const [memo, setMemo] = useState('');
-  const [fiatAmount, setFiatAmount] = useState('0');
+  const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [buttonDisabled, setButtonDisabled] = useState(true);
 
-  /*const {stxBtcRate, btcFiatRate, fiatCurrency} = useSelector(
+  const { stxBtcRate, btcFiatRate, fiatCurrency } = useSelector(
     (state: StoreState) => state.walletState,
-  );*/
-  const stxBtcRate = 0.00001686;
-  const btcFiatRate = 18935.735;
-  const fiatCurrency = 'USD';
+  );
 
-  function getFiatEquivalent(amount: number) {
-    if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT')
+  function getFiatEquivalent(value: number) {
+    if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
       return '';
-    if (!amount) return '0';
+    }
+    if (!value) return '0';
     switch (currencyType) {
       case 'STX':
         return getStxFiatEquivalent(
-          stxToMicrostacks(new BigNumber(amount)),
+          stxToMicrostacks(new BigNumber(value)),
           new BigNumber(stxBtcRate),
-          new BigNumber(btcFiatRate)
+          new BigNumber(btcFiatRate),
         )
           .toFixed(2)
           .toString();
       case 'BTC':
-        return getBtcFiatEquivalent(btcToSats(new BigNumber(amount)), new BigNumber(btcFiatRate))
+        return getBtcFiatEquivalent(btcToSats(new BigNumber(value)), new BigNumber(btcFiatRate))
           .toFixed(2)
           .toString();
       case 'FT':
         if (fungibleToken?.tokenFiatRate) {
-          return new BigNumber(amount)
+          return new BigNumber(value)
             .multipliedBy(fungibleToken.tokenFiatRate)
             .toFixed(2)
             .toString();
         }
+        break;
+      default:
         return '';
     }
   }
 
   function getTokenIcon() {
-    if (currencyType == 'STX') {
+    if (currencyType === 'STX') {
       return <TickerImage src={IconStacks} />;
-    } else if (currencyType == 'BTC') {
-      return <TickerImage src={IconBitcoin} />;
-    } else {
-      return null;
     }
+    if (currencyType === 'BTC') {
+      return <TickerImage src={IconBitcoin} />;
+    }
+    return null;
   }
 
   function getTokenCurrency() {
     if (fungibleToken) {
       if (fungibleToken?.ticker) {
         return fungibleToken.ticker.toUpperCase();
-      } else if (fungibleToken?.name) {
+      }
+      if (fungibleToken?.name) {
         return getTicker(fungibleToken.name).toUpperCase();
       }
     } else {
@@ -249,26 +239,29 @@ function SendForm({
     }
   }
 
-  function onInputChange(e: React.FormEvent<HTMLInputElement>) {
-    let newValue = e.currentTarget.value;
+  const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const newValue = e.currentTarget.value;
 
-    const resultRegex =new RegExp(/^\d*\.?\d*$/);
+    const resultRegex = /^\d*\.?\d*$/;
     if (!resultRegex.test(newValue)) {
       setAmount('');
     } else {
       setAmount(newValue);
     }
 
-    const amountInCurrency: string = getFiatEquivalent(Number(newValue));
+    const amountInCurrency = getFiatEquivalent(Number(newValue));
     setFiatAmount(amountInCurrency);
-  }
+  };
 
   function renderEnterAmountSection() {
     return (
       <Container>
         <RowContainer>
           <TitleText>{t('AMOUNT')}</TitleText>
-          <BalanceText>{t('BALANCE')}:</BalanceText>
+          <BalanceText>
+            {t('BALANCE')}
+            :
+          </BalanceText>
           <Text>{balance}</Text>
         </RowContainer>
         <AmountInputContainer>
@@ -293,9 +286,7 @@ function SendForm({
           <InputFieldContainer>
             <InputField
               placeholder={t('RECEPIENT_PLACEHOLDER')}
-              onChange={(e: { target: { value: SetStateAction<string> } }) =>
-                setRecipientAddress(e.target.value)
-              }
+              onChange={(e: { target: { value: SetStateAction<string> } }) => setRecipientAddress(e.target.value)}
             />
           </InputFieldContainer>
         </AmountInputContainer>
@@ -311,9 +302,7 @@ function SendForm({
           <InputFieldContainer>
             <InputField
               placeholder={t('MEMO_PLACEHOLDER')}
-              onChange={(e: { target: { value: SetStateAction<string> } }) =>
-                setMemo(e.target.value)
-              }
+              onChange={(e: { target: { value: SetStateAction<string> } }) => setMemo(e.target.value)}
             />
           </InputFieldContainer>
         </AmountInputContainer>

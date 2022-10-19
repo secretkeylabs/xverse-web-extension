@@ -61,10 +61,10 @@ const TextContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(6),
 }));
 
-const AmountContainer = styled.div((props) => ({
+const AmountContainer = styled.div({
   alignContent: 'flex-end',
   flex: 1,
-}));
+});
 
 const LoaderMainContainer = styled.div((props) => ({
   flex: 1,
@@ -74,9 +74,9 @@ const LoaderMainContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(15),
 }));
 
-const LoaderImageContainer = styled.div((props) => ({
+const LoaderImageContainer = styled.div({
   flex: 0.5,
-}));
+});
 
 const CoinTickerText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -112,7 +112,7 @@ interface Props {
   onPress?: (event: any) => void;
   fungibleToken?: FungibleToken;
 }
-const TokenTile = ({
+function TokenTile({
   icon,
   title,
   underlayColor,
@@ -120,36 +120,29 @@ const TokenTile = ({
   currency,
   onPress,
   fungibleToken,
-}: Props) => {
-  const { fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate, loadingWalletData } =
-    useSelector((state: StoreState) => state.walletState);
+}: Props) {
+  const {
+    fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate, loadingWalletData,
+  } = useSelector((state: StoreState) => state.walletState);
 
   function getFtTicker() {
     if (fungibleToken?.ticker) {
       return fungibleToken.ticker.toUpperCase();
-    } else if (fungibleToken?.name) {
+    } if (fungibleToken?.name) {
       return getTicker(fungibleToken.name).toUpperCase();
-    } else return '';
+    } return '';
   }
 
   function getTickerTitle() {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
-    else return `${getFtTicker()}`;
+    return `${getFtTicker()}`;
   }
 
-  function getBalance() {
-    return currency === 'STX'
-      ? renderStxBalanceView()
-      : currency === 'BTC'
-      ? renderBtcBalanceView()
-      : renderFtBalanceView();
-  }
-
-  function getFtBalance(fungibleToken: FungibleToken) {
-    if (fungibleToken.decimals) {
-      return ftDecimals(fungibleToken.balance, fungibleToken.decimals);
+  function getFtBalance(ft: FungibleToken) {
+    if (ft.decimals) {
+      return ftDecimals(ft.balance, ft.decimals);
     }
-    return fungibleToken.balance;
+    return ft.balance;
   }
 
   function getBalanceAmount() {
@@ -160,6 +153,7 @@ const TokenTile = ({
         return satsToBtc(new BigNumber(btcBalance)).toString();
       case 'FT':
         return fungibleToken ? getFtBalance(fungibleToken) : '';
+      default:
     }
   }
 
@@ -167,8 +161,8 @@ const TokenTile = ({
     return (
       <NumericFormat
         value={getBalanceAmount()}
-        displayType={'text'}
-        thousandSeparator={true}
+        displayType="text"
+        thousandSeparator
         renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
       />
     );
@@ -178,8 +172,8 @@ const TokenTile = ({
     return (
       <NumericFormat
         value={getBalanceAmount()}
-        displayType={'text'}
-        thousandSeparator={true}
+        displayType="text"
+        thousandSeparator
         renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
       />
     );
@@ -189,11 +183,17 @@ const TokenTile = ({
     return (
       <NumericFormat
         value={getBalanceAmount()}
-        displayType={'text'}
-        thousandSeparator={true}
+        displayType="text"
+        thousandSeparator
         renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
       />
     );
+  }
+
+  function getBalance() {
+    if (currency === 'STX') return renderStxBalanceView();
+    if (currency === 'BTC') return renderBtcBalanceView();
+    return renderFtBalanceView();
   }
 
   function getFtFiatEquivalent() {
@@ -201,7 +201,7 @@ const TokenTile = ({
       const balance = new BigNumber(getFtBalance(fungibleToken));
       const rate = new BigNumber(fungibleToken.tokenFiatRate);
       return balance.multipliedBy(rate).toFixed(2).toString();
-    } else return '';
+    } return '';
   }
 
   function getFiatEquivalent() {
@@ -230,8 +230,8 @@ const TokenTile = ({
         return (
           <NumericFormat
             value={getFiatEquivalent()}
-            displayType={'text'}
-            thousandSeparator={true}
+            displayType="text"
+            thousandSeparator
             prefix={`${currencySymbolMap[fiatCurrency]} `}
             suffix={` ${fiatCurrency}`}
             renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
@@ -241,25 +241,28 @@ const TokenTile = ({
         return (
           <NumericFormat
             value={getFiatEquivalent()}
-            displayType={'text'}
-            thousandSeparator={true}
+            displayType="text"
+            thousandSeparator
             prefix={`${currencySymbolMap[fiatCurrency]} `}
             suffix={` ${fiatCurrency}`}
             renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
           />
         );
       case 'FT':
-        if (fungibleToken?.tokenFiatRate)
+        if (fungibleToken?.tokenFiatRate) {
           return (
             <NumericFormat
               value={getFiatEquivalent()}
-              displayType={'text'}
-              thousandSeparator={true}
+              displayType="text"
+              thousandSeparator
               prefix={`${currencySymbolMap[fiatCurrency]} `}
               suffix={` ${fiatCurrency}`}
               renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
             />
           );
+        }
+        break;
+      default:
     }
   }
 
@@ -267,31 +270,29 @@ const TokenTile = ({
     if (!loadingWalletData) {
       if (fungibleToken?.image) {
         return <TickerImage src={fungibleToken.image} />;
-      } else {
-        // render ticker icon
-        let ticker = fungibleToken?.ticker;
-        if (!ticker && fungibleToken?.name) {
-          ticker = getTicker(fungibleToken?.name);
-        }
-        const background = stc(ticker);
-        ticker = ticker && ticker.substring(0, 4);
-        return (
-          <TickerIconContainer color={background}>
-            <TickerIconText>{ticker}</TickerIconText>
-          </TickerIconContainer>
-        );
       }
-    } else {
+      // render ticker icon
+      let ticker = fungibleToken?.ticker;
+      if (!ticker && fungibleToken?.name) {
+        ticker = getTicker(fungibleToken?.name);
+      }
+      const background = stc(ticker);
+      ticker = ticker && ticker.substring(0, 4);
       return (
-        <LoaderImageContainer>
-          <BarLoader loaderSize={LoaderSize.LARGE} />
-        </LoaderImageContainer>
+        <TickerIconContainer color={background}>
+          <TickerIconText>{ticker}</TickerIconText>
+        </TickerIconContainer>
       );
     }
+    return (
+      <LoaderImageContainer>
+        <BarLoader loaderSize={LoaderSize.LARGE} />
+      </LoaderImageContainer>
+    );
   }
   function renderIcon() {
     if (currency === 'STX' || currency === 'BTC') return <TickerImage src={icon} />;
-    else return renderFTIcon();
+    return renderFTIcon();
   }
 
   function renderLoader() {
@@ -320,6 +321,6 @@ const TokenTile = ({
       )}
     </TileContainer>
   );
-};
+}
 
 export default TokenTile;

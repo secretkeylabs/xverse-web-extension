@@ -1,4 +1,4 @@
-import { BtcTransactionData, Coin } from '@secretkeylabs/xverse-core/types';
+import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
 
 const userPrefBackupRemindKey = 'UserPref:BackupRemind';
 const isTermsAccepted = 'isTermsAccepted';
