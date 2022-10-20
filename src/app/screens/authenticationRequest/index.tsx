@@ -3,6 +3,9 @@ import { useLocation } from 'react-router-dom';
 import ConfirmScreen from '@components/confirmScreen';
 import { decodeToken } from 'jsontokens';
 import { useTranslation } from 'react-i18next';
+import { createAuthResponse } from '@secretkeylabs/xverse-core';
+import { useSelector } from 'react-redux';
+import { StoreState } from 'app/stores/reducers/root';
 
 const MainContainer = styled.div((props) => ({
   display: 'flex',
@@ -40,14 +43,22 @@ function AuthenticationRequest() {
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken);
 
-  const confirmCallback = () => {
+  const { seedPhrase, selectedAccount } = useSelector((state: StoreState) => ({
+    ...state.walletState,
+  }));
+
+  const confirmCallback = async () => {
+    const authResponse = await createAuthResponse(
+      seedPhrase,
+      new BN(selectedAccount?.id ?? 0),
+      authRequest
+    );
     window.postMessage(
       JSON.stringify({
         source: 'Xverse Wallet',
         payload: {
           authenticationRequest: authRequestToken,
-          // authenticationResponse: authResponse,
-          // authenticationResponse: 'cancel',
+          authenticationResponse: authResponse,
         },
         method: 'authenticationResponse',
       })
