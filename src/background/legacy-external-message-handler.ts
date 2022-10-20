@@ -80,6 +80,7 @@ function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) {
 
 async function triggerRequstWindowOpen(path: RouteUrls, urlParams: URLSearchParams) {
   // if (IS_TEST_ENV) return openRequestInFullPage(path, urlParams);
+  console.log(`/options.html#${path}?${urlParams.toString()}`);
   return popupCenter({ url: `/options.html#${path}?${urlParams.toString()}` });
 }
 
@@ -93,7 +94,7 @@ export async function handleLegacyExternalMethodFormat(
     case ExternalMethods.authenticationRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['authRequest', payload]]);
 
-      const { id } = await triggerRequstWindowOpen(RouteUrls.TransactionRequest, urlParams);
+      const { id } = await triggerRequstWindowOpen(RouteUrls.AuthenticationRequest, urlParams);
       // listenForPopupClose({
       //   id,
       //   tabId,

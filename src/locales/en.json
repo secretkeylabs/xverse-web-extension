@@ -46,5 +46,15 @@
     "SCREEN_TITLE": "Wallet created successfully",
     "SCREEN_SUBTITLE": "Your new wallet has been created successfully, you can now connect to your wallet.",
     "OPEN_WALLET_BUTTON": "Open Wallet"
+  },
+  "CONFIRM_TRANSACTION_SCREEN": {
+    "CONFIRM_BUTTON": "Confirm",
+    "CANCEL_BUTTON": "Cancel"
+  },
+  "AUTH_REQUEST_SCREEN": {
+    "TITLE": "Connection",
+    "REQUEST_TOOLTIP": "Requested by",
+    "CONNECT_BUTTON": "Connect",
+    "CANCEL_BUTTON": "Cancel"
   }
 }

@@ -8,6 +8,7 @@ import BackupWallet from '@screens/backupWallet';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import CreatePassword from '@screens/createPassword';
 import TransactionRequest from '@screens/transactionRequest';
+import AuthenticationRequest from '@screens/authenticationRequest';
 
 const router = createHashRouter([
   {
@@ -43,8 +44,12 @@ const router = createHashRouter([
         element: <CreateWalletSuccess />,
       },
       {
-        path: 'transactionRequest',
+        path: 'transaction-request',
         element: <TransactionRequest />,
+      },
+      {
+        path: 'authentication-request',
+        element: <AuthenticationRequest />,
       },
     ],
   },
