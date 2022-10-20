@@ -13,6 +13,9 @@
     "service_worker": "background.js",
     "type": "module"
   },
+  "icons": {
+    "128": "assets/img/xverse_icon.png"
+  },
   "devtools_page": "devtools.html",
   "web_accessible_resources": [{ "resources": ["inpage.js"], "matches": ["*://*/*"] }],
   "host_permissions": ["*://*/*"],

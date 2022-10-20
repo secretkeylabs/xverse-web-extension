@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -29,5 +29,5 @@
       "@core/*": ["app/core/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "styled.d.ts"]
 }

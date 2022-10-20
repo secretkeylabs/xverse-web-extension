@@ -43,7 +43,7 @@ function CreateWalletSuccess(): JSX.Element {
   const navigate = useNavigate();
 
   const handleOpenWallet = () => {
-    navigate('/home');
+    navigate('/');
   };
 
   return (

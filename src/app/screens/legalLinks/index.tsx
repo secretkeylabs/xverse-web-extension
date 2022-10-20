@@ -1,15 +1,17 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import LinkIcon from '@assets/img/linkIcon.svg';
-import { PRIVACY_POLICY_LINK, TERMS_LINK } from 'app/core/constants/constants';
 import { useNavigate } from 'react-router-dom';
 import { saveIsTermsAccepted } from '@utils/localStorage';
+import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 
 const Container = styled.div((props) => ({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  padding: props.theme.spacing(8),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(8),
 }));
 
 const Title = styled.h1((props) => ({
@@ -36,21 +38,14 @@ const ActionButtonsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(20),
 }));
 
-const AcceptButtonContainer = styled.div((props) => ({
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'flex-end',
-  marginBottom: props.theme.spacing(20),
-}));
-
 const AcceptButton = styled.button((props) => ({
   ...props.theme.body_bold_m,
   display: 'flex',
   color: props.theme.colors.white['0'],
   alignItems: 'center',
   justifyContent: 'center',
-  marginTop: props.theme.spacing(8),
+  marginTop: 'auto',
+  marginBottom: props.theme.spacing(32),
   backgroundColor: props.theme.colors.action.classic,
   borderRadius: props.theme.radius(1),
   height: 44,
@@ -63,7 +58,13 @@ function LegalLinks() {
 
   const handleLegalAccept = () => {
     saveIsTermsAccepted(true);
-    navigate('/backup');
+    const isRestore = localStorage.getItem('isRestore');
+    if (isRestore) {
+      localStorage.removeItem('isRestore');
+      navigate('/restoreWallet');
+    } else {
+      navigate('/backup');
+    }
   };
   return (
     <Container>
@@ -79,9 +80,7 @@ function LegalLinks() {
           <img src={LinkIcon} alt="privacy" />
         </ActionButton>
       </ActionButtonsContainer>
-      <AcceptButtonContainer>
-        <AcceptButton onClick={handleLegalAccept}>{t('ACCEPT_LEGAL_BUTTON')}</AcceptButton>
-      </AcceptButtonContainer>
+      <AcceptButton onClick={handleLegalAccept}>{t('ACCEPT_LEGAL_BUTTON')}</AcceptButton>
     </Container>
   );
 }

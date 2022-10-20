@@ -1,13 +1,12 @@
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getStoreSeedPhraseRequestAction } from '@stores/actions/wallet/actionCreators';
+import { StoreState } from '@stores/index';
+import { encryptSeedPhrase } from '@utils/encryptionUtils';
+import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
 import NewPassword from './newPassword';
 import ConfirmPassword from './confirmPassword';
-import { StoreState } from '@stores/reducers/root';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -33,29 +32,13 @@ const StepDot = styled.div((props) => ({
   marginRight: props.theme.spacing(4),
 }));
 
-const HeaderText = styled.h1((props) => ({
-  ...props.theme.body_bold_l,
-  textAlign: 'center',
-  marginTop: props.theme.spacing(15),
-}));
-
-const HeaderContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(32),
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
-
 function CreatePassword(): JSX.Element {
-  const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {
-    seedPhrase,
-  } = useSelector((state: StoreState) => ({
+  const { seedPhrase } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
 
@@ -63,9 +46,14 @@ function CreatePassword(): JSX.Element {
     setCurrentStepIndex(1);
   };
 
-  const handleConfirmPassword = () => {
-    dispatch(getStoreSeedPhraseRequestAction(seedPhrase, password));
-    navigate('/create-wallet-success');
+  const handleConfirmPassword = async () => {
+    try {
+      const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
+      dispatch(storeEncryptedSeedAction(encryptedSeed));
+      navigate('/create-wallet-success');
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleNewPasswordBack = () => {
@@ -79,36 +67,29 @@ function CreatePassword(): JSX.Element {
   return (
     <Container>
       <StepsContainer>
-        {Array(2).fill(0).map((view, index) => (
-          <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
-        ))}
+        {Array(2)
+          .fill(0)
+          .map((view, index) => (
+            <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
+          ))}
       </StepsContainer>
-      <HeaderContainer>
-        <img src={PasswordIcon} alt="passoword" />
-        <HeaderText>
-          {currentStepIndex === 0 ? t('CREATE_PASSWORD_TITLE') : t('CONFIRM_PASSWORD_TITLE')}
-        </HeaderText>
-      </HeaderContainer>
-      {
-        currentStepIndex === 0 ? (
-          <NewPassword
-            password={password}
-            setPassword={setPassword}
-            handleContinue={handleContinuePasswordCreation}
-            handleBack={handleNewPasswordBack}
-          />
-        ) : (
-          <ConfirmPassword
-            password={password}
-            confirmPassword={confirmPassword}
-            setConfirmPassword={setConfirmPassword}
-            handleContinue={handleConfirmPassword}
-            handleBack={handleConfirmPasswordBack}
-          />
-        )
-      }
+      {currentStepIndex === 0 ? (
+        <NewPassword
+          password={password}
+          setPassword={setPassword}
+          handleContinue={handleContinuePasswordCreation}
+          handleBack={handleNewPasswordBack}
+        />
+      ) : (
+        <ConfirmPassword
+          password={password}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
+          handleContinue={handleConfirmPassword}
+          handleBack={handleConfirmPasswordBack}
+        />
+      )}
     </Container>
-
   );
 }
 

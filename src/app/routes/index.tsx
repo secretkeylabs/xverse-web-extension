@@ -9,6 +9,11 @@ import CreateWalletSuccess from '@screens/createWalletSuccess';
 import CreatePassword from '@screens/createPassword';
 import TransactionRequest from '@screens/transactionRequest';
 import AuthenticationRequest from '@screens/authenticationRequest';
+import AuthGuard from '@components/guards/auth';
+import Login from '@screens/login';
+import RestoreWallet from '@screens/restoreWallet';
+import ForgotPassword from '@screens/forgotPassword';
+import BackupWalletSteps from '@screens/backupWalletSteps';
 
 const router = createHashRouter([
   {
@@ -16,7 +21,7 @@ const router = createHashRouter([
     element: <ScreenContainer />,
     children: [
       {
-        index: true,
+        path: 'landing',
         element: <Landing />,
       },
       {
@@ -24,8 +29,12 @@ const router = createHashRouter([
         element: <Onboarding />,
       },
       {
-        path: 'home',
-        element: <Home />,
+        index: true,
+        element: (
+          <AuthGuard>
+            <Home />
+          </AuthGuard>
+        ),
       },
       {
         path: 'legal',
@@ -50,6 +59,23 @@ const router = createHashRouter([
       {
         path: 'authentication-request',
         element: <AuthenticationRequest />,
+      },
+      {
+
+        path: 'login',
+        element: <Login />,
+      },
+      {
+        path: 'restoreWallet',
+        element: <RestoreWallet />,
+      },
+      {
+        path: 'forgotPassword',
+        element: <ForgotPassword />,
+      },
+      {
+        path: 'backupWalletSteps',
+        element: <BackupWalletSteps />,
       },
     ],
   },

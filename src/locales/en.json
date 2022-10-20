@@ -26,7 +26,13 @@
     "SCREEN_TITLE": "Backup your wallet",
     "SCREEN_SUBTITLE": "Your seedphrase is the unique key that allows you to recover your wallet.",
     "BACKUP_BUTTON": "Backup now",
-    "BACKUP_SKIP_BUTTON": "Backup later"
+    "BACKUP_SKIP_BUTTON": "Backup later",
+    "SEED_PHRASE_VIEW_HEADING": "Write down your seed phrase and make sure to keep it private. This is the unique key to your wallet. ",
+    "SEED_PHRASE_VIEW_LABEL": "Seedphrase",
+    "SEED_PHRASE_VIEW_CONTINUE": "Continue",
+    "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
+    "SEED_PHRASE_VERIFY_BUTTON": "Verify",
+    "SEED_PHRASE_BACK_BUTTON": "Back"  
   },
   "CREATE_PASSWORD_SCREEN": {
     "CREATE_PASSWORD_TITLE": "Enter your new password",
@@ -56,5 +62,26 @@
     "REQUEST_TOOLTIP": "Requested by",
     "CONNECT_BUTTON": "Connect",
     "CANCEL_BUTTON": "Cancel"
+  },
+  "LOGIN_SCREEN": {
+    "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",
+    "WELCOME_MESSAGE": "Welcome back!",
+    "PASSWORD_INPUT_LABEL": "Password",
+    "PASSWORD_INPUT_PLACEHOLDER": "Enter your password",
+    "VERIFY_PASSWORD_BUTTON": "Verify",
+    "VERIFY_PASSWORD_ERROR": "Incorrect Password",
+    "FORGOT_PASSWORD_BUTTON": "Forgot your password?"
+  },
+  "FORGOT_PASSWORD_SCREEN": {
+    "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seedphrase you used when you generated your wallet.",
+    "PARAGRAPH2": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
+    "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"
+  },
+  "RESTORE_WALLET_SCREEN": {
+    "ENTER_SEED_HEADER": "Enter your 12 or 24 word seedphrase to restore your wallet",
+    "SEED_INPUT_PLACEHOLDER": "Enter your seedphrase",
+    "SEED_INPUT_LABEL": "Selected Words",
+    "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
+    "CONTINUE_BUTTON": "Continue"
   }
 }
