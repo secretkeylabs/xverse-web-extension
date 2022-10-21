@@ -1,3 +1,4 @@
+import { Account } from '@stores/wallet/actions/types';
 import BigNumber from 'bignumber.js';
 
 export function initBigNumber(num: string | number | BigNumber) {
@@ -33,4 +34,17 @@ export function getTicker(name: string) {
     return `${name[0]}${name[1]}${name[2]}`;
   }
   return name;
+}
+
+export function getAddressDetail(account:Account) {
+  if (account) {
+    return `${account.btcAddress.substring(0, 4)}...${account.btcAddress.substring(
+      account.btcAddress.length - 4,
+      account.btcAddress.length,
+    )} / ${account.stxAddress.substring(0, 4)}...${account.stxAddress.substring(
+      account.stxAddress.length - 4,
+      account.stxAddress.length,
+    )}`;
+  }
+  return '';
 }

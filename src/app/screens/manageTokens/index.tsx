@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Coin, FungibleToken } from '@secretkeylabs/xverse-core/types';
-import CoinItem from '@components/coinItem';
+import CoinItem from '@screens/manageTokens/coinItem';
 import TopRow from '@components/topRow';
 import { StoreState } from '@stores/index';
 import { FetchUpdatedVisibleCoinListAction } from '@stores/wallet/actions/actionCreators';

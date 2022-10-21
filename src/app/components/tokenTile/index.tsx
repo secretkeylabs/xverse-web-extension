@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import { NumericFormat } from 'react-number-format';
 import { CurrencyTypes, LoaderSize } from '@utils/constants';
 import BarLoader from '@components/barLoader';
-import { microstacksToStx, satsToBtc } from '@utils/walletUtils';
 import { ftDecimals, getTicker } from '@utils/helper';
 import stc from 'string-to-color';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
+import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 
 interface TileProps {
   margin?: number;

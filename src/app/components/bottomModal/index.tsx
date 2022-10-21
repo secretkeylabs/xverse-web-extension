@@ -1,25 +1,7 @@
 import Modal from 'react-modal';
-import styled from 'styled-components';
-import Theme from 'theme';
+import styled, { useTheme } from 'styled-components';
 import Cross from '@assets/img/dashboard/X.svg';
 import Seperator from '@components/seperator';
-
-const customStyles = {
-  overlay: {
-    backgroundColor: Theme.colors.background.modalBackdrop,
-  },
-  content: {
-    inset: 'auto auto 0px auto',
-    width: '100%',
-    maxHeight: '90%',
-    border: 'transparent',
-    background: Theme.colors.background.elevation2,
-    margin: 0,
-    padding: 0,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-};
 
 const BottomModalHeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -45,7 +27,27 @@ interface Props {
   onClose: () => void;
 }
 
-function BottomModal({ header, children, visible, onClose }: Props) {
+function BottomModal({
+  header, children, visible, onClose,
+}: Props) {
+  const theme = useTheme();
+  const customStyles = {
+    overlay: {
+      backgroundColor: theme.colors.background.modalBackdrop,
+    },
+    content: {
+      inset: 'auto auto 0px auto',
+      width: '100%',
+      maxHeight: '90%',
+      border: 'transparent',
+      background: theme.colors.background.elevation2,
+      margin: 0,
+      padding: 0,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+    },
+  };
+
   return (
     <Modal
       isOpen={visible}

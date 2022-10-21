@@ -4,13 +4,13 @@ import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import { useTranslation } from 'react-i18next';
-import Theme from 'theme';
+import { useTheme } from 'styled-components';
 
 interface Props {
   visible: boolean;
   coins: FungibleToken[];
   title: string;
-  onSelectBitcoin?: () => void;
+  onSelectBitcoin: () => void;
   onSelectStacks: () => void;
   onSelectCoin: (coin: FungibleToken) => void;
   onClose: () => void;
@@ -26,6 +26,22 @@ function CoinSelectModal({
   onClose,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const theme = useTheme();
+
+  const handleOnBitcoinPress = () => {
+    onSelectBitcoin();
+    onClose();
+  };
+
+  const handleOnStackPress = () => {
+    onSelectStacks();
+    onClose();
+  };
+
+  const handleOnCoinPress = (coin:FungibleToken) => {
+    onSelectCoin(coin);
+    onClose();
+  };
 
   function renderFixedCoins() {
     return (
@@ -34,24 +50,18 @@ function CoinSelectModal({
           title={t('BITCOIN')}
           currency="BTC"
           icon={IconBitcoin}
-          underlayColor={Theme.colors.background.elevation2}
+          underlayColor={theme.colors.background.elevation2}
           margin={2}
-          onPress={() => {
-            onSelectBitcoin();
-            onClose();
-          }}
+          onPress={handleOnBitcoinPress}
         />
 
         <TokenTile
           title={t('STACKS')}
           currency="STX"
           icon={IconStacks}
-          underlayColor={Theme.colors.background.elevation2}
+          underlayColor={theme.colors.background.elevation2}
           margin={2}
-          onPress={() => {
-            onSelectStacks();
-            onClose();
-          }}
+          onPress={handleOnStackPress}
         />
       </>
     );
@@ -67,12 +77,9 @@ function CoinSelectModal({
             title={coin.name}
             currency="FT"
             icon={IconStacks}
-            underlayColor={Theme.colors.background.elevation2}
+            underlayColor={theme.colors.background.elevation2}
             margin={2}
-            onPress={() => {
-              onSelectCoin(coin);
-              onClose();
-            }}
+            onPress={handleOnCoinPress}
             fungibleToken={coin}
           />
         ))}

@@ -1,9 +1,10 @@
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
 import { StoreState } from '@stores/index';
-import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
-import { btcToSats, satsToBtc, validateBtcAddress } from '@utils/walletUtils';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
+import { btcToSats, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
+import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +31,7 @@ function SendBtcScreen() {
     isLoading,
     data,
     error: txError,
-    refetch
+    refetch,
   } = useQuery(
     [
       'btc-signed-transaction',
@@ -62,16 +63,14 @@ function SendBtcScreen() {
 
   useEffect(() => {
     if (data) {
-      console.log("data");
-      console.log(data);
       navigate('/confirm-btc-tx');
     }
   }, [data]);
 
   useEffect(() => {
-      if (txError) {
-        setError(txError.toString());
-      }
+    if (txError) {
+      setError(txError.toString());
+    }
   }, [txError]);
 
   function validateFields(address: string, amountToSend: string): boolean {
@@ -85,7 +84,7 @@ function SendBtcScreen() {
       return false;
     }
 
-    if (!validateBtcAddress(address, network)) {
+    if (!validateBtcAddress({ btcAddress: recipientAddress, network })) {
       setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }

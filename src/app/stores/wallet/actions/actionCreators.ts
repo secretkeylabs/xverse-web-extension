@@ -1,4 +1,5 @@
 import {
+  BtcTransactionData,
   Coin,
   FungibleToken,
   NetworkType,
@@ -157,10 +158,11 @@ export function fetchBtcWalletDataRequestAction(
   };
 }
 
-export function fetchBtcWalletDataSuccess(balance: BigNumber): actions.FetchBtcWalletDataSuccess {
+export function fetchBtcWalletDataSuccess(balance: BigNumber, btctransactions: BtcTransactionData[]): actions.FetchBtcWalletDataSuccess {
   return {
     type: actions.FetchBtcWalletDataSuccessKey,
     balance,
+    btctransactions,
   };
 }
 

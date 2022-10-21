@@ -2,10 +2,10 @@ import { useState } from 'react';
 import stc from 'string-to-color';
 import styled from 'styled-components';
 import Switch from 'react-switch';
+import { Coin } from '@secretkeylabs/xverse-core/types';
 import Theme from 'theme';
 import { getTicker } from '@utils/helper';
 import Seperator from '@components/seperator';
-import { Coin } from '@secretkeylabs/xverse-core/types';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -79,45 +79,33 @@ function CoinItem({
     const { ticker } = coin;
     return !ticker && coin.name ? getTicker(coin.name) : ticker;
   }
+  const background = stc(getFtTicker());
 
-  function renderCoinIcon() {
-    if (coin.image) return <CoinIcon src={coin.image} />;
-
-    const background = stc(getFtTicker());
-    return (
-      <TickerIconContainer color={background}>
-        <TickerText>{getFtTicker()}</TickerText>
-      </TickerIconContainer>
-    );
-  }
-  function renderCoinText() {
-    return isEnabled ? (
-      <SelectedCoinTitleText>{coin.name}</SelectedCoinTitleText>
-    ) : (
-      <UnSelectedCoinTitleText>{coin.name}</UnSelectedCoinTitleText>
-    );
-  }
-  function renderSwitch() {
-    return (
-      <Switch
-        onColor={Theme.colors.action.classic}
-        offColor={Theme.colors.background.elevation3}
-        onChange={toggleSwitch}
-        checked={isEnabled!}
-        uncheckedIcon={false}
-        checkedIcon={false}
-        disabled={disabled}
-      />
-    );
-  }
   return (
     <>
       <RowContainer>
         <CoinContainer>
-          {renderCoinIcon()}
-          {renderCoinText()}
+          {coin.image ? <CoinIcon src={coin.image} />
+            : (
+              <TickerIconContainer color={background}>
+                <TickerText>{getFtTicker()}</TickerText>
+              </TickerIconContainer>
+            )}
+          { isEnabled ? (
+            <SelectedCoinTitleText>{coin.name}</SelectedCoinTitleText>
+          ) : (
+            <UnSelectedCoinTitleText>{coin.name}</UnSelectedCoinTitleText>
+          )}
         </CoinContainer>
-        {renderSwitch()}
+        <Switch
+          onColor={Theme.colors.action.classic}
+          offColor={Theme.colors.background.elevation3}
+          onChange={toggleSwitch}
+          checked={isEnabled!}
+          uncheckedIcon={false}
+          checkedIcon={false}
+          disabled={disabled}
+        />
       </RowContainer>
       <Seperator />
     </>

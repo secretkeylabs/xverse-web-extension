@@ -1,7 +1,8 @@
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
+import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import { validateStxAddress } from '@secretkeylabs/xverse-core/wallet';
 import { replaceCommaByDot } from '@utils/helper';
-import { stxToMicrostacks, validateStxAddress } from '@utils/walletUtils';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +29,7 @@ function SendStxScreen() {
       setError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
-    if (!validateStxAddress(associatedAddress, network)) {
+    if (!validateStxAddress({ stxAddress: associatedAddress, network })) {
       setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
