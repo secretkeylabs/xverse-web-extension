@@ -16,6 +16,7 @@ import {
 import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
+import ActionButton from '@components/button';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -132,28 +133,13 @@ const TickerImage = styled.img((props) => ({
   width: 26,
 }));
 
-const SendButton = styled.button((props) => ({
-  width: 330,
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
+const SendButtonContainer = styled.div((props) => ({
+
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  backgroundColor: props.theme.colors.action.classic,
-  padding: props.theme.spacing(7),
-  borderRadius: props.theme.radius(1),
   marginTop: props.theme.spacing(11),
   marginBottom: props.theme.spacing(11),
 }));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 700,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo: string) => void;
   currencyType: CurrencyTypes;
@@ -163,6 +149,7 @@ interface Props {
   balance?: number;
   hideMemo?: boolean;
   buttonText?: string;
+  processing?: boolean;
 }
 
 function SendForm({
@@ -174,6 +161,7 @@ function SendForm({
   balance,
   hideMemo = false,
   buttonText,
+  processing,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const [amount, setAmount] = useState('');
@@ -332,9 +320,13 @@ function SendForm({
       <ErrorContainer>
         <ErrorText>{error}</ErrorText>
       </ErrorContainer>
-      <SendButton onClick={() => onPressSend(recipientAddress, amount, memo)}>
-        <ButtonText>{buttonText ?? t('NEXT')}</ButtonText>
-      </SendButton>
+      <SendButtonContainer>
+        <ActionButton
+          text={buttonText ?? t('NEXT')}
+          processing={processing}
+          onPress={() => onPressSend(recipientAddress, amount, memo)}
+        />
+      </SendButtonContainer>
     </ScrollContainer>
   );
 }

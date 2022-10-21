@@ -1,64 +1,110 @@
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
-import { StoreState } from '@stores/';
+import { StoreState } from '@stores/index';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { btcToSats, satsToBtc, validateBtcAddress } from '@utils/walletUtils';
+import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-function SendBtcScreen({}) {
+function SendBtcScreen() {
   const [error, setError] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState('');
+  const [amount, setAmount] = useState('');
   const {
     btcAddress,
     network,
     btcBalance,
+    selectedAccount,
+    seedPhrase,
   } = useSelector((state: StoreState) => state.walletState);
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+
   const navigate = useNavigate();
 
+  const {
+    isLoading,
+    data,
+    error: txError,
+    refetch
+  } = useQuery(
+    [
+      'btc-signed-transaction',
+      {
+        recipientAddress,
+        btcAddress,
+        amount,
+        accountId: selectedAccount?.id,
+        seedPhrase,
+        network,
+      },
+    ],
+    async () => signBtcTransaction({
+      recipientAddress,
+      btcAddress,
+      amount,
+      index: selectedAccount?.id ?? 0,
+      fee: new BigNumber(0),
+      seedPhrase,
+      network,
+    }),
+    {
+      enabled: false,
+    },
+  );
   const handleBackButtonClick = () => {
     navigate('/');
   };
 
-  const handleNextClick = (recipientAddress: string, amount: string) => {
-   if( validateFields(recipientAddress, amount))
-     navigate('/confirm-btc-tx');
-  };
+  useEffect(() => {
+    if (data) {
+      console.log("data");
+      console.log(data);
+      navigate('/confirm-btc-tx');
+    }
+  }, [data]);
 
-  function validateFields(recipientAddress: string, amount: string): boolean {
-    if (!recipientAddress) {
+  useEffect(() => {
+      if (txError) {
+        setError(txError.toString());
+      }
+  }, [txError]);
+
+  function validateFields(address: string, amountToSend: string): boolean {
+    if (!address) {
       setError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
     }
 
-    if (!amount) {
+    if (!amountToSend) {
       setError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
 
-    if (!validateBtcAddress(recipientAddress, network)) {
+    if (!validateBtcAddress(address, network)) {
       setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
 
-    if (recipientAddress === btcAddress) {
+    if (address === btcAddress) {
       setError(t('ERRORS.SEND_TO_SELF'));
       return false;
     }
 
-    var parsedAmount = new BigNumber(0);
+    let parsedAmount = new BigNumber(0);
 
     try {
-      if (!isNaN(Number(amount))) {
-        parsedAmount = new BigNumber(amount);
+      if (!Number.isNaN(Number(amountToSend))) {
+        parsedAmount = new BigNumber(amountToSend);
       } else {
         setError(t('ERRORS.INVALID_AMOUNT'));
         return false;
       }
-    } catch (error) {
+    } catch (e) {
       setError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
@@ -80,6 +126,12 @@ function SendBtcScreen({}) {
     return true;
   }
 
+  const handleNextClick = (address: string, amountToSend: string) => {
+    setRecipientAddress(address);
+    setAmount(amountToSend);
+    if (validateFields(address, amountToSend)) { refetch(); }
+  };
+
   function getBalance() {
     return satsToBtc(new BigNumber(btcBalance)).toNumber();
   }
@@ -92,6 +144,7 @@ function SendBtcScreen({}) {
         error={error}
         balance={getBalance()}
         onPressSend={handleNextClick}
+        processing={isLoading}
       />
     </>
   );

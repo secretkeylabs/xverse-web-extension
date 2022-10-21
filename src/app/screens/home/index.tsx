@@ -169,7 +169,7 @@ function Home(): JSX.Element {
       dispatch(fetchBtcWalletDataRequestAction(btcAddress, network, stxBtcRate, btcFiatRate));
       dispatch(fetchCoinDataRequestAction(stxAddress, network, fiatCurrency, coinsList));
     }
-  }, [stxAddress, btcAddress]);
+  }, []);
 
   useEffect(() => {
     loadInitialData();
