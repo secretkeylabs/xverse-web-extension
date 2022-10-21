@@ -7,15 +7,12 @@ import BigNumber from 'bignumber.js';
 import IconBitcoin from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import InfoIcon from '@assets/img/send/info.svg';
-import {
-  btcToSats,
-  getBtcFiatEquivalent,
-  getStxFiatEquivalent,
-  stxToMicrostacks,
-} from '@utils/walletUtils';
 import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
+import {
+  btcToSats, getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
+} from '@secretkeylabs/xverse-core/currency';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -294,45 +291,42 @@ function SendForm({
     );
   }
 
-  function renderEnterMemoSection() {
-    return (
-      <Container>
-        <TitleText>{t('MEMO')}</TitleText>
-        <AmountInputContainer>
-          <InputFieldContainer>
-            <InputField
-              placeholder={t('MEMO_PLACEHOLDER')}
-              onChange={(e: { target: { value: SetStateAction<string> } }) => setMemo(e.target.value)}
-            />
-          </InputFieldContainer>
-        </AmountInputContainer>
-      </Container>
-    );
-  }
-
-  function renderMemoInfoSection() {
-    return (
-      <InfoContainer>
-        <TickerImage src={InfoIcon} />
-        <TextContainer>
-          <SubText>{t('MEMO_INFO')}</SubText>
-        </TextContainer>
-      </InfoContainer>
-    );
-  }
+  const handleOnPress = () => {
+    onPressSend(recipientAddress, amount, memo);
+  };
 
   return (
     <ScrollContainer>
       <OuterContainer>
         {!disableAmountInput && renderEnterAmountSection()}
         {renderEnterRecepientSection()}
-        {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && renderEnterMemoSection()}
-        {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && renderMemoInfoSection()}
+        {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
+          <>
+            <Container>
+              <TitleText>{t('MEMO')}</TitleText>
+              <AmountInputContainer>
+                <InputFieldContainer>
+                  <InputField
+                    placeholder={t('MEMO_PLACEHOLDER')}
+                    onChange={(e: { target: { value: SetStateAction<string> } }) => setMemo(e.target.value)}
+                  />
+                </InputFieldContainer>
+              </AmountInputContainer>
+            </Container>
+            <InfoContainer>
+              <TickerImage src={InfoIcon} />
+              <TextContainer>
+                <SubText>{t('MEMO_INFO')}</SubText>
+              </TextContainer>
+            </InfoContainer>
+          </>
+
+        )}
       </OuterContainer>
       <ErrorContainer>
         <ErrorText>{error}</ErrorText>
       </ErrorContainer>
-      <SendButton onClick={() => onPressSend(recipientAddress, amount, memo)}>
+      <SendButton onClick={handleOnPress}>
         <ButtonText>{buttonText ?? t('NEXT')}</ButtonText>
       </SendButton>
     </ScrollContainer>

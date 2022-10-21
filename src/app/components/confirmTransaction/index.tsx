@@ -8,10 +8,10 @@ import BigNumber from 'bignumber.js';
 import { microStxToStx } from '@utils/helper';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import ActionButton from '@components/button';
-import { getBtcFiatEquivalent, getStxFiatEquivalent, satsToBtc } from '@utils/walletUtils';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
 import Theme from 'theme';
+import { getBtcFiatEquivalent, getStxFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -132,34 +132,6 @@ function ConfirmTransation({
     }
   }
 
-  function renderAmountSendSection() {
-    return (
-      <SendAmountContainer>
-        <TitleText>{t('INDICATION')}</TitleText>
-        <AmountText>
-          {amount}
-          {' '}
-          {currency}
-        </AmountText>
-      </SendAmountContainer>
-    );
-  }
-
-  function renderFeesSection() {
-    return (
-      <RowContainer>
-        <FeeTitleContainer>
-          <TitleText>{t('FEES')}</TitleText>
-        </FeeTitleContainer>
-
-        <FeeContainer>
-          <FeeText>{renderFee()}</FeeText>
-          <FiatAmountText>{getFiatAmountString(getFiatEquivalent())}</FiatAmountText>
-        </FeeContainer>
-      </RowContainer>
-    );
-  }
-
   const onAdvancedSettingClick = () => {
     setOpenTransactionSettingModal(true);
   };
@@ -168,24 +140,28 @@ function ConfirmTransation({
     setOpenTransactionSettingModal(false);
   };
 
-  function renderTransactionSettingAlert() {
-    return (
-      <TransactionSettingAlert
-        visible={openTransactionSettingModal}
-        fee="102"
-        type={currency}
-        onApplyClick={closeTransactionSettingAlert}
-        onCrossClick={closeTransactionSettingAlert}
-      />
-    );
-  }
   return (
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
       <Container>
-        {renderAmountSendSection()}
+        <SendAmountContainer>
+          <TitleText>{t('INDICATION')}</TitleText>
+          <AmountText>
+            {amount}
+            {' '}
+            {currency}
+          </AmountText>
+        </SendAmountContainer>
         {children}
-        {renderFeesSection()}
+        <RowContainer>
+          <FeeTitleContainer>
+            <TitleText>{t('FEES')}</TitleText>
+          </FeeTitleContainer>
+          <FeeContainer>
+            <FeeText>{renderFee()}</FeeText>
+            <FiatAmountText>{getFiatAmountString(getFiatEquivalent())}</FiatAmountText>
+          </FeeContainer>
+        </RowContainer>
         <ActionButton
           src={SettingIcon}
           text={currency === 'STX' ? t('ADVANCED_SETTING') : t('EDIT_FEES')}
@@ -193,7 +169,13 @@ function ConfirmTransation({
           buttonAlignment="flex-start"
           onPress={onAdvancedSettingClick}
         />
-        {renderTransactionSettingAlert()}
+        <TransactionSettingAlert
+          visible={openTransactionSettingModal}
+          fee="102"
+          type={currency}
+          onApplyClick={closeTransactionSettingAlert}
+          onCrossClick={closeTransactionSettingAlert}
+        />
       </Container>
       <ButtonContainer>
         <ActionButton

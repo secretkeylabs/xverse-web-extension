@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import { Account } from '@stores/wallet/actions/types';
-import { useAccountGradient } from '@utils/gradient';
+import { getAccountGradient } from '@utils/gradient';
 import { useTranslation } from 'react-i18next';
+import { getAddressDetail } from '@utils/helper';
 
 interface GradientCircleProps {
   firstGradient: string;
@@ -56,32 +57,10 @@ interface Props {
 
 function AccountRow({ account, isSelected, onAccountSelected }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const gradient = getAccountGradient(account?.stxAddress!);
 
   function getName() {
     return account?.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
-  }
-
-  function renderCircle() {
-    const gradient = useAccountGradient(account?.stxAddress!);
-    return (
-      <GradientCircle
-        firstGradient={gradient[0]}
-        secondGradient={gradient[1]}
-        thirdGradient={gradient[2]}
-      />
-    );
-  }
-  function getAddressDetail() {
-    if (account) {
-      return `${account.btcAddress.substring(0, 4)}...${account.btcAddress.substring(
-        account.btcAddress.length - 4,
-        account.btcAddress.length
-      )} / ${account.stxAddress.substring(0, 4)}...${account.stxAddress.substring(
-        account.stxAddress.length - 4,
-        account.stxAddress.length
-      )}`;
-    }
-    return '';
   }
 
   const onClick = () => {
@@ -90,14 +69,18 @@ function AccountRow({ account, isSelected, onAccountSelected }: Props) {
 
   return (
     <TopSectionContainer onClick={onClick}>
-      {renderCircle()}
+      <GradientCircle
+        firstGradient={gradient[0]}
+        secondGradient={gradient[1]}
+        thirdGradient={gradient[2]}
+      />
       <CurrentAcountContainer>
         {isSelected ? (
           <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
         ) : (
           <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
         )}
-        <CurrentAccountDetailText>{getAddressDetail()}</CurrentAccountDetailText>
+        <CurrentAccountDetailText>{getAddressDetail(account!)}</CurrentAccountDetailText>
       </CurrentAcountContainer>
     </TopSectionContainer>
   );

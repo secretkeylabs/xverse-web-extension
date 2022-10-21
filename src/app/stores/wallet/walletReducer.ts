@@ -21,7 +21,7 @@ import {
   FetchCoinDataFailureKey,
   AddAccountKey,
   UpdateVisibleCoinListKey,
-} from '../actions/types';
+} from './actions/types';
 
 const initialWalletState: WalletState = {
   stxAddress: '',
@@ -135,6 +135,7 @@ const walletReducer = (
       return {
         ...state,
         btcBalance: action.balance,
+        btcTransactions: action.btctransactions,
       };
     case FetchBtcWalletDataFailureKey:
       return {

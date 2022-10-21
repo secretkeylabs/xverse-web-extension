@@ -3,24 +3,23 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select from 'react-select';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import IconSats from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import { getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks } from '@utils/walletUtils';
 import { NumericFormat } from 'react-number-format';
 import ActionButton from '@components/button';
-import Theme from 'theme';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,
 }));
 
-const TickerContainer = styled.div((props) => ({
+const TickerContainer = styled.div({
   display: 'flex',
   flexDirection: 'row-reverse',
   alignItems: 'center',
-}));
+});
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.body_xs,
@@ -46,11 +45,11 @@ const TickerImage = styled.img((props) => ({
   width: 26,
 }));
 
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-}));
+});
 
 const SelectorContainer = styled.div((props) => ({
   display: 'flex',
@@ -77,10 +76,10 @@ const ButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(8),
 }));
 
-const FeeContainer = styled.div((props) => ({
+const FeeContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-}));
+});
 
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
@@ -108,41 +107,6 @@ const InputContainer = styled.div((props) => ({
   paddingTop: props.theme.spacing(5),
   paddingBottom: props.theme.spacing(5),
 }));
-
-const customStyles = {
-  control: (base: any, state: { isFocused: any }) => ({
-    ...base,
-    background: Theme.colors.background.elevation1,
-    borderRadius: 8,
-    color: Theme.colors.white['0'],
-    borderColor: Theme.colors.background.elevation6,
-    boxShadow: state.isFocused ? null : null,
-    '&:hover': {
-      // Overwrittes the different states of border
-      borderColor: Theme.colors.background.elevation6,
-    },
-    height: 45,
-  }),
-  menu: (base: any) => ({
-    ...base,
-    borderRadius: 0,
-    marginTop: 0,
-    color: Theme.colors.white['0'],
-  }),
-  menuList: (base: any) => ({
-    ...base,
-    padding: 0,
-    color: Theme.colors.white['0'],
-    background: Theme.colors.background.elevation1,
-  }),
-  singleValue: (provided: any) => ({
-    ...provided,
-    height: '100%',
-    color: Theme.colors.white['0'],
-    paddingTop: '3px',
-  }),
-};
-
 interface Props {
   visible: boolean;
   fee: string;
@@ -160,7 +124,7 @@ interface Props {
 type TxType = 'STX' | 'BTC';
 type FeeModeType = 'low' | 'standard' | 'high' | 'custom';
 
-const TransactionSettingAlert: React.FC<Props> = ({
+function TransactionSettingAlert({
   visible,
   fee,
   loading,
@@ -173,9 +137,10 @@ const TransactionSettingAlert: React.FC<Props> = ({
   type = 'STX',
   btcRecepientAddress,
   amount,
-}) => {
+}:Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
   const [feeInput, setFeeInput] = useState(fee);
+  const theme = useTheme();
   const [nonceInput, setNonceInput] = useState(nonce);
   const [feeMode, setFeeMode] = useState<FeeModeType>('standard');
   const [error, setError] = useState('');
@@ -188,6 +153,39 @@ const TransactionSettingAlert: React.FC<Props> = ({
   const fiatCurrency = 'USD';
   const selectedAccount = '';
   const btcBalance = 0;
+
+  const customStyles = {
+    control: (base: any, state: { isFocused: any }) => ({
+      ...base,
+      background: theme.colors.background.elevation1,
+      borderRadius: 8,
+      color: theme.colors.white['0'],
+      borderColor: theme.colors.background.elevation6,
+      boxShadow: state.isFocused ? null : null,
+      '&:hover': {
+        borderColor: theme.colors.background.elevation6,
+      },
+      height: 45,
+    }),
+    menu: (base: any) => ({
+      ...base,
+      borderRadius: 0,
+      marginTop: 0,
+      color: theme.colors.white['0'],
+    }),
+    menuList: (base: any) => ({
+      ...base,
+      padding: 0,
+      color: theme.colors.white['0'],
+      background: theme.colors.background.elevation1,
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      height: '100%',
+      color: theme.colors.white['0'],
+      paddingTop: '3px',
+    }),
+  };
 
   const StxFeeModes: { label: string; value: FeeModeType }[] = [
     {
@@ -222,12 +220,6 @@ const TransactionSettingAlert: React.FC<Props> = ({
     },
   ];
 
-  useEffect(() => {
-    if (type === 'STX' && feeMode !== 'custom') {
-      modifyStxFees(feeMode);
-    }
-  }, [feeMode]);
-
   const modifyStxFees = (mode: FeeModeType) => {
     const currentFee = new BigNumber(fee);
 
@@ -244,8 +236,16 @@ const TransactionSettingAlert: React.FC<Props> = ({
       case 'custom':
         // inputRef.current?.focus();
         break;
+      default:
+        break;
     }
   };
+
+  useEffect(() => {
+    if (type === 'STX' && feeMode !== 'custom') {
+      modifyStxFees(feeMode);
+    }
+  }, [feeMode]);
 
   const modifyBtcFees = async (mode: FeeModeType) => {
     /* try {
@@ -263,7 +263,7 @@ const TransactionSettingAlert: React.FC<Props> = ({
           }
         } catch (error) {
           console.error(error);
-        }*/
+        } */
   };
   function getFiatEquivalent() {
     return type === 'STX'
@@ -275,70 +275,60 @@ const TransactionSettingAlert: React.FC<Props> = ({
     if (fiatAmount) {
       if (fiatAmount.isLessThan(0.01)) {
         return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      } else {
-        return (
-          <NumericFormat
-            value={fiatAmount.toFixed(2).toString()}
-            displayType={'text'}
-            thousandSeparator={true}
-            prefix={`${currencySymbolMap[fiatCurrency]} `}
-            suffix={` ${fiatCurrency}`}
-            renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
-          />
-        );
       }
-    } else {
-      return '';
+      return (
+        <NumericFormat
+          value={fiatAmount.toFixed(2).toString()}
+          displayType="text"
+          thousandSeparator
+          prefix={`${currencySymbolMap[fiatCurrency]} `}
+          suffix={` ${fiatCurrency}`}
+          renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
+        />
+      );
     }
+    return '';
   };
   function getTokenIcon() {
-    if (type == 'STX') {
+    if (type === 'STX') {
       return <TickerImage src={IconStacks} />;
-    } else if (type == 'BTC') {
+    } if (type === 'BTC') {
       return <TickerImage src={IconSats} />;
     }
   }
-  function renderEnterAmountSection() {
-    return (
-      <FeeContainer>
-        <RowContainer>
-          <InputContainer>
-            <InputFieldContainer>
-              <InputField value={amount} placeholder="0" />
-            </InputFieldContainer>
-            <TickerContainer>
-              <Text>{type}</Text>
-              {getTokenIcon()}
-            </TickerContainer>
-          </InputContainer>
-          <SelectorContainer>
-            <Select
-              defaultValue={selectedOption}
-              onChange={setSelectedOption}
-              styles={customStyles}
-              menuColor="red"
-              options={type === 'STX' ? StxFeeModes : BtcFeeModes}
-            />
-          </SelectorContainer>
-        </RowContainer>
 
-        <SubText>{getFiatAmountString(getFiatEquivalent(), fiatCurrency)}</SubText>
-      </FeeContainer>
-    );
-  }
-
-  function renderFeesSection() {
-    return (
+  return (
+    <BottomModal visible={visible} header={t('ADVANCED_SETTING')} onClose={onCrossClick}>
       <Container>
         <Text>{t('FEE')}</Text>
-        <RowContainer>{renderEnterAmountSection()}</RowContainer>
+        <RowContainer>
+          <FeeContainer>
+            <RowContainer>
+              <InputContainer>
+                <InputFieldContainer>
+                  <InputField value={amount} placeholder="0" />
+                </InputFieldContainer>
+                <TickerContainer>
+                  <Text>{type}</Text>
+                  {getTokenIcon()}
+                </TickerContainer>
+              </InputContainer>
+              <SelectorContainer>
+                <Select
+                  defaultValue={selectedOption}
+                  onChange={setSelectedOption}
+                  styles={customStyles}
+                  menuColor="red"
+                  options={type === 'STX' ? StxFeeModes : BtcFeeModes}
+                />
+              </SelectorContainer>
+            </RowContainer>
+            <SubText>{getFiatAmountString(getFiatEquivalent(), fiatCurrency)}</SubText>
+          </FeeContainer>
+        </RowContainer>
         <DetailText>{t('FEE_INFO')}</DetailText>
       </Container>
-    );
-  }
-
-  function renderNonceSection() {
-    return (
+      {allowEditNonce && type === 'STX' && (
       <Container>
         <Text>{t('NONCE')}</Text>
         <InputContainer>
@@ -348,23 +338,12 @@ const TransactionSettingAlert: React.FC<Props> = ({
         </InputContainer>
         <DetailText>{t('NONCE_INFO')}</DetailText>
       </Container>
-    );
-  }
-  function renderButton() {
-    return (
+      )}
       <ButtonContainer onClick={onApplyClick}>
         <ActionButton text={t('APPLY')} onPress={() => {}} />
       </ButtonContainer>
-    );
-  }
-
-  return (
-    <BottomModal visible={visible} header={t('ADVANCED_SETTING')} onClose={onCrossClick}>
-      {renderFeesSection()}
-      {allowEditNonce && type === 'STX' && renderNonceSection()}
-      {renderButton()}
     </BottomModal>
   );
-};
+}
 
 export default TransactionSettingAlert;

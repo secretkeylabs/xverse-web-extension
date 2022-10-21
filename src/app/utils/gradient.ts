@@ -34,7 +34,7 @@ export function stringToHslColor(str: string, saturation: number, lightness: num
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
-export function useAccountGradient(text: string): string[] {
+export function getAccountGradient(text: string): string[] {
   const pubKeyLikeString = toHex(text);
 
   const bg = stringToHslColor(text, 50, 60);

@@ -86,8 +86,7 @@ function* fetchBtcWalletData(action: FetchBtcWalletDataRequest) {
     );
     const btcBalance = new BigNumber(btcData.finalBalance);
     const btcTransactions = btcData.transactions;
-    saveListOfBtcTransaction(btcTransactions);
-    yield put(fetchBtcWalletDataSuccess(btcBalance));
+    yield put(fetchBtcWalletDataSuccess(btcBalance, btcTransactions));
   } catch (error) {
     yield put(fetchBtcWalletDataFail());
   }

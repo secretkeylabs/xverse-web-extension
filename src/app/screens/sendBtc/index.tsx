@@ -1,13 +1,14 @@
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
+import { btcToSats, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
-import { btcToSats, satsToBtc, validateBtcAddress } from '@utils/walletUtils';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-function SendBtcScreen({}) {
+function SendBtcScreen() {
   const [error, setError] = useState('');
   const btcAddress = '3QAmUHT9jbsjewuAAjta6mtpH8M4tgQJcE';
   const btcBalance = new BigNumber(120);
@@ -23,7 +24,7 @@ function SendBtcScreen({}) {
     navigate('/confirm-btc-tx');
   };
 
-  function validateFields(recipientAddress: string, amount: string, memo: string): boolean {
+  function validateFields(recipientAddress: string, amount: string): boolean {
     if (!recipientAddress) {
       setError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
@@ -34,7 +35,7 @@ function SendBtcScreen({}) {
       return false;
     }
 
-    if (!validateBtcAddress(recipientAddress, network)) {
+    if (!validateBtcAddress({ btcAddress: recipientAddress, network })) {
       setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
@@ -44,16 +45,16 @@ function SendBtcScreen({}) {
       return false;
     }
 
-    var parsedAmount = new BigNumber(0);
+    let parsedAmount = new BigNumber(0);
 
     try {
-      if (!isNaN(Number(amount))) {
+      if (!Number.isNaN(Number(amount))) {
         parsedAmount = new BigNumber(amount);
       } else {
         setError(t('ERRORS.INVALID_AMOUNT'));
         return false;
       }
-    } catch (error) {
+    } catch (e) {
       setError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }

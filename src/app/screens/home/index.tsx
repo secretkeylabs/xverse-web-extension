@@ -10,7 +10,7 @@ import TokenTile from '@components/tokenTile';
 import { useNavigate } from 'react-router-dom';
 import AccountRow from '@components/accountRow';
 import { useCallback, useEffect, useState } from 'react';
-import CoinSelectModal from '@components/coinSelectModal';
+import CoinSelectModal from '@screens/home/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
 import { useDispatch, useSelector } from 'react-redux';
