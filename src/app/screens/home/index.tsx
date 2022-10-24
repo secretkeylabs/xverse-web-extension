@@ -25,13 +25,8 @@ import BottomBar from '@components/tabBar';
 import { StoreState } from '@stores/index';
 import { Account } from '@stores/wallet/actions/types';
 import Seperator from '@components/seperator';
-import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
-import { NumericFormat } from 'react-number-format';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import BarLoader from '@components/barLoader';
-import { LoaderSize } from '@utils/constants';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
-import BigNumber from 'bignumber.js';
+import BalanceCard from './balanceCard';
 
 const Container = styled.div`
   display: flex;
@@ -44,13 +39,6 @@ const Container = styled.div`
     display: none;
   }
 `;
-
-const RowContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(11),
-}));
 
 const ColumnContainer = styled.div((props) => ({
   display: 'flex',
@@ -83,40 +71,6 @@ const SelectedAccountContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(8),
 }));
 
-const BalanceHeadingText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['200'],
-  textTransform: 'uppercase',
-  opacity: 0.7,
-}));
-
-const CurrencyText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['0'],
-  fontSize: 13,
-  padding: props.theme.spacing(1),
-}));
-
-const BalanceAmountText = styled.h1((props) => ({
-  ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
-  marginTop: props.theme.spacing(4),
-}));
-
-const BarLoaderContainer = styled.div((props) => ({
-  display: 'flex',
-  marginTop: props.theme.spacing(5),
-}));
-
-const CurrencyCard = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  backgroundColor: props.theme.colors.background.elevation3,
-  width: 45,
-  borderRadius: 30,
-  marginLeft: props.theme.spacing(4),
-}));
-
 const TokenListButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -141,10 +95,7 @@ function Home(): JSX.Element {
     btcFiatRate,
     stxBtcRate,
     network,
-    stxBalance,
-    btcBalance,
     coinsList,
-    loadingWalletData,
   } = useSelector((state: StoreState) => state.walletState);
 
   const loadInitialData = useCallback(() => {
@@ -199,66 +150,6 @@ function Home(): JSX.Element {
     return coinsList ? coinsList?.filter((ft) => ft.visible) : [];
   }
 
-  function calculateTotalBalance() {
-    const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
-      .multipliedBy(new BigNumber(stxBtcRate))
-      .multipliedBy(new BigNumber(btcFiatRate));
-    const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
-      new BigNumber(btcFiatRate),
-    );
-    const totalBalance = stxFiatEquiv.plus(btcFiatEquiv);
-    return totalBalance.toNumber().toFixed(2);
-  }
-
-  function getBalancePrefix() {
-    return `${currencySymbolMap[fiatCurrency]}`;
-  }
-  function renderBalanceCard() {
-    return (
-      <>
-        <RowContainer>
-          <BalanceHeadingText>{t('TOTAL_BALANCE')}</BalanceHeadingText>
-          <CurrencyCard>
-            <CurrencyText>{fiatCurrency}</CurrencyText>
-          </CurrencyCard>
-        </RowContainer>
-        {loadingWalletData ? (
-          <BarLoaderContainer>
-            <BarLoader loaderSize={LoaderSize.LARGE} />
-          </BarLoaderContainer>
-        ) : (
-          <BalanceAmountText>
-            <NumericFormat
-              value={calculateTotalBalance()}
-              displayType="text"
-              prefix={`${getBalancePrefix()} `}
-              thousandSeparator
-              renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
-            />
-          </BalanceAmountText>
-        )}
-      </>
-    );
-  }
-
-  function renderButtons() {
-    return (
-      <RowButtonContainer>
-        <ButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
-        </ButtonContainer>
-
-        <ButtonContainer>
-          <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
-        </ButtonContainer>
-
-        <ButtonContainer>
-          <ActionButton src={CreditCard} text={t('BUY')} onPress={onReceiveModalOpen} />
-        </ButtonContainer>
-      </RowButtonContainer>
-    );
-  }
-
   const handleManageTokenListOnClick = () => {
     navigate('/manage-tokens');
   };
@@ -275,67 +166,7 @@ function Home(): JSX.Element {
     navigate('/receive');
   };
 
-  function renderManageTokenList() {
-    return (
-      <TokenListButtonContainer>
-        <ActionButton
-          src={ListDashes}
-          buttonColor="transparent"
-          text={t('MANAGE_TOKEN')}
-          buttonAlignment="flex-end"
-          onPress={handleManageTokenListOnClick}
-        />
-      </TokenListButtonContainer>
-    );
-  }
-
-  function renderFixedCoins() {
-    return (
-      <ColumnContainer>
-        <TokenTile
-          title={t('BITCOIN')}
-          currency="BTC"
-          icon={IconBitcoin}
-          underlayColor={Theme.colors.background.elevation1}
-        />
-        <TokenTile
-          title={t('STACKS')}
-          currency="STX"
-          icon={IconStacks}
-          underlayColor={Theme.colors.background.elevation1}
-        />
-      </ColumnContainer>
-    );
-  }
-
-  function renderReceiveScreenModal() {
-    return (
-      <CoinSelectModal
-        onSelectBitcoin={handleManageTokenListOnClick}
-        onSelectStacks={onBTCReceiveSelect}
-        onClose={onReceiveModalClose}
-        onSelectCoin={handleManageTokenListOnClick}
-        visible={openReceiveModal}
-        coins={getCoinsList()}
-        title={t('RECEIVE')}
-      />
-    );
-  }
-
-  function renderSendScreenModal() {
-    return (
-      <CoinSelectModal
-        onSelectBitcoin={onBtcSendClick}
-        onSelectStacks={onStxSendClick}
-        onClose={onSendModalClose}
-        onSelectCoin={onStxSendClick}
-        visible={openSendModal}
-        coins={getCoinsList()}
-        title={t('SEND')}
-      />
-    );
-  }
-  function renderCoinData() {
+  function CoinData() {
     const list: FungibleToken[] = getCoinsList();
     return (
       <CoinContainer>
@@ -357,14 +188,66 @@ function Home(): JSX.Element {
         <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
       </SelectedAccountContainer>
       <Seperator />
+
       <Container>
-        {renderBalanceCard()}
-        {renderButtons()}
-        {renderManageTokenList()}
-        {renderFixedCoins()}
-        {renderCoinData()}
-        {renderReceiveScreenModal()}
-        {renderSendScreenModal()}
+        <BalanceCard />
+        <RowButtonContainer>
+          <ButtonContainer>
+            <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
+          </ButtonContainer>
+          <ButtonContainer>
+            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
+          </ButtonContainer>
+          <ButtonContainer>
+            <ActionButton src={CreditCard} text={t('BUY')} onPress={onReceiveModalOpen} />
+          </ButtonContainer>
+        </RowButtonContainer>
+
+        <TokenListButtonContainer>
+          <ActionButton
+            src={ListDashes}
+            buttonColor="transparent"
+            text={t('MANAGE_TOKEN')}
+            buttonAlignment="flex-end"
+            onPress={handleManageTokenListOnClick}
+          />
+        </TokenListButtonContainer>
+
+        <ColumnContainer>
+          <TokenTile
+            title={t('BITCOIN')}
+            currency="BTC"
+            icon={IconBitcoin}
+            underlayColor={Theme.colors.background.elevation1}
+          />
+          <TokenTile
+            title={t('STACKS')}
+            currency="STX"
+            icon={IconStacks}
+            underlayColor={Theme.colors.background.elevation1}
+          />
+        </ColumnContainer>
+
+        <CoinData/>
+        <CoinSelectModal
+          onSelectBitcoin={handleManageTokenListOnClick}
+          onSelectStacks={onBTCReceiveSelect}
+          onClose={onReceiveModalClose}
+          onSelectCoin={handleManageTokenListOnClick}
+          visible={openReceiveModal}
+          coins={getCoinsList()}
+          title={t('RECEIVE')}
+        />
+
+        <CoinSelectModal
+          onSelectBitcoin={onBtcSendClick}
+          onSelectStacks={onStxSendClick}
+          onClose={onSendModalClose}
+          onSelectCoin={onStxSendClick}
+          visible={openSendModal}
+          coins={getCoinsList()}
+          title={t('SEND')}
+        />
       </Container>
       <BottomBar />
     </>
