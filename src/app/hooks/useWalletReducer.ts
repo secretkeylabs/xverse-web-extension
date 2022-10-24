@@ -1,15 +1,16 @@
 import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { StoreState } from '@stores/index';
 import {
-  resetWalletAction, setWalletAction, storeEncryptedSeedAction, unlockWalletAction,
+  resetWalletAction,
+  setWalletAction,
+  storeEncryptedSeedAction,
+  unlockWalletAction,
 } from '@stores/wallet/actions/actionCreators';
 import { decryptSeedPhrase, encryptSeedPhrase } from '@utils/encryptionUtils';
 import { useSelector, useDispatch } from 'react-redux';
 
 const useWalletReducer = () => {
-  const {
-    encryptedSeed,
-  } = useSelector((state: StoreState) => ({
+  const { encryptedSeed } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
   const dispatch = useDispatch();

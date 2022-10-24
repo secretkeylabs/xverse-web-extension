@@ -6,11 +6,11 @@ import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import { useState } from 'react';
 
 interface ConfirmPasswordProps {
-  confirmPassword: string,
-  password: string,
-  setConfirmPassword: (confirmPassword: string) => void,
-  handleContinue: () => void,
-  handleBack: () => void,
+  confirmPassword: string;
+  password: string;
+  setConfirmPassword: (confirmPassword: string) => void;
+  handleContinue: () => void;
+  handleBack: () => void;
 }
 
 const Container = styled.div((props) => ({
@@ -101,13 +101,7 @@ const ErrorMessage = styled.h2((props) => ({
 }));
 
 function ConfirmPassword(props: ConfirmPasswordProps): JSX.Element {
-  const {
-    confirmPassword,
-    password,
-    setConfirmPassword,
-    handleContinue,
-    handleBack,
-  } = props;
+  const { confirmPassword, password, setConfirmPassword, handleContinue, handleBack } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -135,29 +129,23 @@ function ConfirmPassword(props: ConfirmPasswordProps): JSX.Element {
     <Container>
       <HeaderContainer>
         <img src={PasswordIcon} alt="passoword" />
-        <HeaderText>
-          {t('CONFIRM_PASSWORD_TITLE')}
-        </HeaderText>
+        <HeaderText>{t('CONFIRM_PASSWORD_TITLE')}</HeaderText>
       </HeaderContainer>
       <PasswordInputLabel>{t('TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}</PasswordInputLabel>
       <PasswordInputContainer>
-        <PasswordInput type={isPasswordVisible ? 'text' : 'password'} value={confirmPassword} onChange={handlePasswordChange} />
+        <PasswordInput
+          type={isPasswordVisible ? 'text' : 'password'}
+          value={confirmPassword}
+          onChange={handlePasswordChange}
+        />
         <button type="button" onClick={handleTogglePasswordView} style={{ background: 'none' }}>
           <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
         </button>
       </PasswordInputContainer>
-      {error && (
-        <ErrorMessage>
-            {error}
-        </ErrorMessage>
-      )}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
       <ButtonsContainer>
-        <BackButton onClick={handleBack}>
-          {t('BACK_BUTTON')}
-        </BackButton>
-        <ContinueButton onClick={onClickContinue}>
-          {t('CONTINUE_BUTTON')}
-        </ContinueButton>
+        <BackButton onClick={handleBack}>{t('BACK_BUTTON')}</BackButton>
+        <ContinueButton onClick={onClickContinue}>{t('CONTINUE_BUTTON')}</ContinueButton>
       </ButtonsContainer>
     </Container>
   );

@@ -18,8 +18,8 @@ const StepsDot = styled.div<StepDotProps>((props) => ({
 }));
 
 interface StepsProps {
-  data: any[],
-  activeIndex: number,
+  data: any[];
+  activeIndex: number;
 }
 
 interface StepDotProps {
@@ -27,10 +27,7 @@ interface StepDotProps {
 }
 
 export default function Steps(props: StepsProps): JSX.Element {
-  const {
-    data,
-    activeIndex,
-  } = props;
+  const { data, activeIndex } = props;
   return (
     <StepsContainer>
       {data.map((view, index) => (

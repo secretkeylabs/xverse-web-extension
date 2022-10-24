@@ -38,28 +38,19 @@ const ContinueButton = styled.button((props) => ({
 }));
 
 interface SeedCheckPros {
-  onContinue: () => void,
-  seedPhrase: string,
+  onContinue: () => void;
+  seedPhrase: string;
 }
 
 export default function SeedCheck(props: SeedCheckPros): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
-  const {
-    onContinue,
-    seedPhrase,
-  } = props;
+  const { onContinue, seedPhrase } = props;
   return (
     <Container>
-      <Heading>
-        {t('SEED_PHRASE_VIEW_HEADING')}
-      </Heading>
-      <Label>
-        {t('SEED_PHRASE_VIEW_LABEL')}
-      </Label>
+      <Heading>{t('SEED_PHRASE_VIEW_HEADING')}</Heading>
+      <Label>{t('SEED_PHRASE_VIEW_LABEL')}</Label>
       <SeedphraseView seedPhrase={seedPhrase} />
-      <ContinueButton onClick={onContinue}>
-        {t('SEED_PHRASE_VIEW_CONTINUE')}
-      </ContinueButton>
+      <ContinueButton onClick={onContinue}>{t('SEED_PHRASE_VIEW_CONTINUE')}</ContinueButton>
     </Container>
   );
 }

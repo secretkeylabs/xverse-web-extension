@@ -6,10 +6,10 @@ import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import React, { useEffect, useState } from 'react';
 
 interface NewPasswordProps {
-  password: string,
-  setPassword: (password: string) => void,
-  handleContinue: () => void,
-  handleBack: () => void,
+  password: string;
+  setPassword: (password: string) => void;
+  handleContinue: () => void;
+  handleBack: () => void;
 }
 
 const NewPasswordContainer = styled.div({
@@ -125,16 +125,13 @@ export enum PasswordStrength {
 }
 
 function NewPassword(props: NewPasswordProps): JSX.Element {
-  const {
-    password,
-    setPassword,
-    handleContinue,
-    handleBack,
-  } = props;
+  const { password, setPassword, handleContinue, handleBack } = props;
   const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>(PasswordStrength.EMPTY);
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>(
+    PasswordStrength.EMPTY
+  );
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
@@ -167,7 +164,8 @@ function NewPassword(props: NewPasswordProps): JSX.Element {
             {t('PASSWORD_STRENGTH_WEAK')}
           </PasswordStrengthContainer>
         );
-      } if (password.length <= PasswordStrength.MEDIUM) {
+      }
+      if (password.length <= PasswordStrength.MEDIUM) {
         return (
           <PasswordStrengthContainer>
             {t('PASSWORD_STRENGTH_LABEL')}
@@ -211,30 +209,24 @@ function NewPassword(props: NewPasswordProps): JSX.Element {
     <NewPasswordContainer>
       <HeaderContainer>
         <img src={PasswordIcon} alt="passoword" />
-        <HeaderText>
-          {t('CREATE_PASSWORD_TITLE')}
-        </HeaderText>
+        <HeaderText>{t('CREATE_PASSWORD_TITLE')}</HeaderText>
       </HeaderContainer>
       <PasswordInputLabel>{t('TEXT_INPUT_NEW_PASSWORD_LABEL')}</PasswordInputLabel>
       <PasswordInputContainer>
-        <PasswordInput type={isPasswordVisible ? 'text' : 'password'} value={password} onChange={handlePasswordChange} />
+        <PasswordInput
+          type={isPasswordVisible ? 'text' : 'password'}
+          value={password}
+          onChange={handlePasswordChange}
+        />
         <button type="button" onClick={handleTogglePasswordView} style={{ background: 'none' }}>
           <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
         </button>
       </PasswordInputContainer>
-      {error && (
-        <ErrorMessage>
-            {error}
-        </ErrorMessage>
-      )}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
       {password.length > 0 ? renderStrengthBar() : null}
       <ButtonsContainer>
-        <BackButton onClick={handleBack}>
-          {t('BACK_BUTTON')}
-        </BackButton>
-        <ContinueButton onClick={onClickContinue}>
-          {t('CONTINUE_BUTTON')}
-        </ContinueButton>
+        <BackButton onClick={handleBack}>{t('BACK_BUTTON')}</BackButton>
+        <ContinueButton onClick={onClickContinue}>{t('CONTINUE_BUTTON')}</ContinueButton>
       </ButtonsContainer>
     </NewPasswordContainer>
   );
