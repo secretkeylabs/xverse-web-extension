@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { createAuthResponse } from '@secretkeylabs/xverse-core';
 import { useSelector } from 'react-redux';
 import { StoreState } from 'app/stores/reducers/root';
+import { MESSAGE_SOURCE } from 'content-scripts/message-types';
 
 const MainContainer = styled.div((props) => ({
   display: 'flex',
@@ -50,22 +51,33 @@ function AuthenticationRequest() {
   const confirmCallback = async () => {
     const authResponse = await createAuthResponse(
       seedPhrase,
-      new BN(selectedAccount?.id ?? 0),
+      selectedAccount?.id ?? 0,
       authRequest
     );
+    chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
+      source: MESSAGE_SOURCE,
+      payload: {
+        authenticationRequest: authRequestToken,
+        authenticationResponse: authResponse,
+      },
+      method: 'authenticationResponse',
+    });
+
+    alert('Done');
+    // window.close();
+  };
+
+  const cancelCallback = () => {
     window.postMessage(
       JSON.stringify({
-        source: 'Xverse Wallet',
+        source: MESSAGE_SOURCE,
         payload: {
           authenticationRequest: authRequestToken,
-          authenticationResponse: authResponse,
+          authenticationResponse: 'cancel',
         },
         method: 'authenticationResponse',
       })
     );
-  };
-
-  const cancelCallback = () => {
     window.close();
   };
 

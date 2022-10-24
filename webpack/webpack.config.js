@@ -106,7 +106,7 @@ var options = {
       stream: require.resolve('stream-browserify'),
       crypto: require.resolve('crypto-browserify'),
       fs: false,
-      util: require.resolve('util/'),
+      // util: require.resolve('util/'),
     },
   },
   plugins: [
