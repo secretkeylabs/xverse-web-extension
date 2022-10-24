@@ -16,7 +16,6 @@ import {
   FungibleToken,
   CoinsResponse,
 } from '@secretkeylabs/xverse-core/types';
-import { saveListOfBtcTransaction } from '@utils/localStorage';
 import {
   FetchStxWalletDataRequestKey,
   FetchRates,

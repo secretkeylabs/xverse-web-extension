@@ -83,6 +83,7 @@ function Home(): JSX.Element {
   const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
+  const [list, setList] = useState<FungibleToken[]>([]);
   const {
     stxAddress,
     btcAddress,
@@ -126,6 +127,11 @@ function Home(): JSX.Element {
     loadInitialData();
   }, [masterPubKey, stxAddress, btcAddress, loadInitialData]);
 
+  useEffect(() => {
+    const userCoinList: FungibleToken[] = coinsList ? coinsList?.filter((ft) => ft.visible) : [];
+    setList(userCoinList);
+  }, [coinsList]);
+
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
   };
@@ -165,22 +171,6 @@ function Home(): JSX.Element {
   const onBTCReceiveSelect = () => {
     navigate('/receive');
   };
-
-  function CoinData() {
-    const list: FungibleToken[] = getCoinsList();
-    return (
-      <CoinContainer>
-        {list.map((coin) => (
-          <TokenTile
-            title={coin.name}
-            currency="FT"
-            underlayColor={Theme.colors.background.elevation1}
-            fungibleToken={coin}
-          />
-        ))}
-      </CoinContainer>
-    );
-  }
 
   return (
     <>
@@ -228,7 +218,16 @@ function Home(): JSX.Element {
           />
         </ColumnContainer>
 
-        <CoinData/>
+        <CoinContainer>
+          {list.map((coin) => (
+            <TokenTile
+              title={coin.name}
+              currency="FT"
+              underlayColor={Theme.colors.background.elevation1}
+              fungibleToken={coin}
+            />
+          ))}
+        </CoinContainer>
         <CoinSelectModal
           onSelectBitcoin={handleManageTokenListOnClick}
           onSelectStacks={onBTCReceiveSelect}
