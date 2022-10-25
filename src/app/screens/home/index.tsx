@@ -366,7 +366,7 @@ function Home(): JSX.Element {
         {renderReceiveScreenModal()}
         {renderSendScreenModal()}
       </Container>
-      <BottomBar />
+      <BottomBar tab="dashboard" />
     </>
   );
 }

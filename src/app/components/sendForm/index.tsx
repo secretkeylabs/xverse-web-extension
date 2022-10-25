@@ -17,6 +17,7 @@ import {
 
 const ScrollContainer = styled.div`
   display: flex;
+  flex:1;
   flex-direction: column;
   overflow-y: auto;
   &::-webkit-scrollbar {
@@ -135,10 +136,10 @@ const SendButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginTop: props.theme.spacing(11),
-  marginBottom: props.theme.spacing(11),
+  marginBottom: props.theme.spacing(8),
 }));
 interface Props {
-  onPressSend: (recipientID: string, amount: string, memo: string) => void;
+  onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
   error?: string;
   fungibleToken?: FungibleToken;
@@ -284,11 +285,12 @@ function SendForm({
   };
 
   return (
-    <ScrollContainer>
-      <OuterContainer>
-        {!disableAmountInput && renderEnterAmountSection()}
-        {renderEnterRecepientSection()}
-        {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
+    <>
+      <ScrollContainer>
+        <OuterContainer>
+          {!disableAmountInput && renderEnterAmountSection()}
+          {renderEnterRecepientSection()}
+          {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
@@ -309,11 +311,13 @@ function SendForm({
             </InfoContainer>
           </>
 
-        )}
-      </OuterContainer>
-      <ErrorContainer>
-        <ErrorText>{error}</ErrorText>
-      </ErrorContainer>
+          )}
+        </OuterContainer>
+        <ErrorContainer>
+          <ErrorText>{error}</ErrorText>
+        </ErrorContainer>
+
+      </ScrollContainer>
       <SendButtonContainer>
         <ActionButton
           text={buttonText ?? t('NEXT')}
@@ -321,7 +325,7 @@ function SendForm({
           onPress={handleOnPress}
         />
       </SendButtonContainer>
-    </ScrollContainer>
+    </>
   );
 }
 

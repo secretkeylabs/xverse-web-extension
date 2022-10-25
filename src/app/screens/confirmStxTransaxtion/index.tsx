@@ -1,4 +1,4 @@
-import ConfirmTransation from '@components/confirmTransaction';
+import ConfirmTransation from '@screens/confrimBtcTransaction/confirmBtcTransactionComponent';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';

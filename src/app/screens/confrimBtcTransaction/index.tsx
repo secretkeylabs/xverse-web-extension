@@ -1,10 +1,17 @@
-import ConfirmTransation from '@components/confirmTransaction';
+import ConfirmBtcTransactionComponent from '@screens/confrimBtcTransaction/confirmBtcTransactionComponent';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
-import BigNumber from 'bignumber.js';
 import Seperator from '@components/seperator';
+import { useDispatch, useSelector } from 'react-redux';
+import { StoreState } from '@stores/index';
+import { useEffect, useState } from 'react';
+import { broadcastRawBtcTransaction } from '@secretkeylabs/xverse-core/api';
+import { useMutation } from '@tanstack/react-query';
+import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
+import BottomBar from '@components/tabBar';
+import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -15,8 +22,11 @@ const InfoContainer = styled.div((props) => ({
 const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
+});
+
+const AddressContainer = styled.div({
+  display: 'flex',
+  flex: 1,
 });
 
 const TitleText = styled.h1((props) => ({
@@ -45,18 +55,68 @@ const ActionButton = styled.button((props) => ({
   backgroundColor: 'transparent',
   marginLeft: props.theme.spacing(12),
 }));
+
 function ConfirmBtcTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
-  const recepientAddress = 'SPJW1XE278YMCEYMXB8ZFGJMH8ZVAAEDP2S2PJYG';
-  const network = 'Mainnet';
+  const dispatch = useDispatch();
+  const {
+    network,
+    btcAddress, stxBtcRate, btcFiatRate,
+  } = useSelector((state: StoreState) => state.walletState);
+  const [recipientAddress, setRecipientAddress] = useState('');
+  const location = useLocation();
+  const { fee, amount, signedTxHex } = location.state;
+
+  const {
+    isLoading,
+    error: txError,
+    data: btcTxBroadcastData,
+    mutate,
+  } = useMutation<
+  BtcTransactionBroadcastResponse,
+  Error,
+  { signedTx: string }>(async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network));
+
+  useEffect(() => {
+    setRecipientAddress(location.state.recipientAddress);
+  }, [location]);
+
+  useEffect(() => {
+    if (btcTxBroadcastData) {
+      navigate('/tx-status', {
+        state: {
+          txid: btcTxBroadcastData.tx.hash,
+          currency: 'BTC',
+          error: '',
+        },
+      });
+      setTimeout(() => {
+        dispatch(fetchBtcWalletDataRequestAction(btcAddress, network, stxBtcRate, btcFiatRate));
+      }, 1000);
+    }
+  }, [btcTxBroadcastData]);
+
+  useEffect(() => {
+    if (txError) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error: txError.toString(),
+        },
+      });
+    }
+  }, [txError]);
 
   function renderAddressInfoSection() {
     return (
       <InfoContainer>
         <TitleText>{t('RECEPIENT_ADDRESS')}</TitleText>
         <RowContainer>
-          <ValueText>{recepientAddress}</ValueText>
+          <AddressContainer>
+            <ValueText>{recipientAddress}</ValueText>
+          </AddressContainer>
           <ActionButton>
             <ButtonImage src={ArrowSquareOut} />
           </ActionButton>
@@ -74,24 +134,31 @@ function ConfirmBtcTransaction() {
     );
   }
 
-  const handleOnConfirmClick = () => {
-    navigate('/tx-status');
+  const handleOnConfirmClick = (txHex: string) => {
+    mutate({ signedTx: txHex });
   };
 
-  const handleOnCancelClick = () => {
+  const goBackToScreen = () => {
     navigate('/send-btc');
   };
   return (
-    <ConfirmTransation
-      currency="BTC"
-      fee={new BigNumber(105)}
-      onConfirmClick={handleOnConfirmClick}
-      onCancelClick={handleOnCancelClick}
-    >
-      {renderAddressInfoSection()}
-      {renderNetworkInfoSection()}
-      <Seperator />
-    </ConfirmTransation>
+    <>
+      <ConfirmBtcTransactionComponent
+        fee={fee}
+        amount={amount}
+        recipientAddress={recipientAddress}
+        loadingBroadcastedTx={isLoading}
+        signedTxHex={signedTxHex}
+        onConfirmClick={handleOnConfirmClick}
+        onCancelClick={goBackToScreen}
+        onBackButtonClick={goBackToScreen}
+      >
+        {renderAddressInfoSection()}
+        {renderNetworkInfoSection()}
+        <Seperator />
+      </ConfirmBtcTransactionComponent>
+      <BottomBar tab="dashboard" />
+    </>
   );
 }
 

@@ -1,16 +1,18 @@
-import SendForm from '@components/sendForm';
-import TopRow from '@components/topRow';
-import { StoreState } from '@stores/index';
-import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { btcToSats, satsToBtc } from '@secretkeylabs/xverse-core/currency';
-import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
-import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import SendForm from '@components/sendForm';
+import TopRow from '@components/topRow';
+import BottomBar from '@components/tabBar';
+import { StoreState } from '@stores/index';
+import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
+import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
+import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
+import { SignedBtcTxResponse } from '@secretkeylabs/xverse-core/transactions/btc';
 
 function SendBtcScreen() {
   const [error, setError] = useState('');
@@ -22,53 +24,57 @@ function SendBtcScreen() {
     btcBalance,
     selectedAccount,
     seedPhrase,
+    btcFiatRate,
   } = useSelector((state: StoreState) => state.walletState);
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 
   const navigate = useNavigate();
-
   const {
     isLoading,
     data,
     error: txError,
-    refetch,
-  } = useQuery(
-    [
-      'btc-signed-transaction',
-      {
-        recipientAddress,
-        btcAddress,
-        amount,
-        accountId: selectedAccount?.id,
-        seedPhrase,
-        network,
-      },
-    ],
-    async () => signBtcTransaction({
-      recipientAddress,
-      btcAddress,
-      amount,
-      index: selectedAccount?.id ?? 0,
-      fee: new BigNumber(0),
-      seedPhrase,
-      network,
-    }),
-    {
-      enabled: false,
-    },
-  );
+    mutate,
+  } = useMutation<
+  SignedBtcTxResponse,
+  Error,
+  {
+    address: string;
+    amountToSend: string;
+  }
+  >(async ({ address, amountToSend }) => signBtcTransaction({
+    recipientAddress: address,
+    btcAddress,
+    amount: amountToSend,
+    index: selectedAccount?.id ?? 0,
+    fee: undefined,
+    seedPhrase,
+    network,
+  }));
+
   const handleBackButtonClick = () => {
     navigate('/');
   };
 
   useEffect(() => {
     if (data) {
-      navigate('/confirm-btc-tx');
+      const parsedAmountSats = btcToSats(new BigNumber(amount));
+      navigate('/confirm-btc-tx', {
+        state: {
+          signedTxHex: data.signedTx,
+          recipientAddress,
+          amount,
+          fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
+          fee: data.fee,
+          fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
+          total: data.total,
+          fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),
+        },
+      });
     }
   }, [data]);
 
   useEffect(() => {
-    if (txError) {
+    if (recipientAddress && amount && txError) {
       setError(txError.toString());
     }
   }, [txError]);
@@ -84,7 +90,7 @@ function SendBtcScreen() {
       return false;
     }
 
-    if (!validateBtcAddress({ btcAddress: recipientAddress, network })) {
+    if (!validateBtcAddress({ btcAddress: address, network })) {
       setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
@@ -119,16 +125,16 @@ function SendBtcScreen() {
     }
 
     if (btcToSats(parsedAmount).gt(btcBalance)) {
-      setError(t('ERRORS.INSUFFICIENT_BALANCE'));
+      setError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
       return false;
     }
     return true;
   }
 
-  const handleNextClick = (address: string, amountToSend: string) => {
+  const handleNextClick = async (address: string, amountToSend: string) => {
     setRecipientAddress(address);
     setAmount(amountToSend);
-    if (validateFields(address, amountToSend)) { refetch(); }
+    if (validateFields(address, amountToSend)) { mutate({ address, amountToSend }); }
   };
 
   function getBalance() {
@@ -143,8 +149,9 @@ function SendBtcScreen() {
         error={error}
         balance={getBalance()}
         onPressSend={handleNextClick}
-        processing={isLoading}
+        processing={recipientAddress !== '' && amount !== '' && isLoading}
       />
+      <BottomBar tab="dashboard" />
     </>
   );
 }

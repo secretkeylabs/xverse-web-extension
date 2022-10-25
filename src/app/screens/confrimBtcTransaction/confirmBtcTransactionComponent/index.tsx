@@ -1,17 +1,20 @@
 import TopRow from '@components/topRow';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { NumericFormat } from 'react-number-format';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
-import { microStxToStx } from '@utils/helper';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
 import Theme from 'theme';
-import { getBtcFiatEquivalent, getStxFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import { useSelector } from 'react-redux';
+import { StoreState } from '@stores/index';
+import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
+import { useMutation } from '@tanstack/react-query';
+import { SignedBtcTxResponse } from '@secretkeylabs/xverse-core/transactions/btc';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -66,6 +69,7 @@ const TitleText = styled.h1((props) => ({
 
 const AmountText = styled.h1((props) => ({
   ...props.theme.headline_category_m,
+  textTransform: 'uppercase',
   fontSize: 28,
 }));
 
@@ -76,26 +80,68 @@ const FiatAmountText = styled.h1((props) => ({
 
 interface Props {
   fee: BigNumber;
-  currency: 'BTC' | 'STX';
   children: ReactNode;
-  onConfirmClick: () => void;
+  loadingBroadcastedTx: boolean;
+  amount: BigNumber;
+  recipientAddress: string;
+  signedTxHex: string;
+  onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
+  onBackButtonClick: () => void;
 }
 
-function ConfirmTransation({
-  fee, currency, children, onConfirmClick, onCancelClick,
+function ConfirmBtcTransactionComponent({
+  fee,
+  children,
+  loadingBroadcastedTx,
+  amount,
+  recipientAddress,
+  signedTxHex,
+  onConfirmClick,
+  onCancelClick,
+  onBackButtonClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
-  const navigate = useNavigate();
-  const amount = 1000;
-  const stxBtcRate = new BigNumber(0.00001686);
-  const btcFiatRate = new BigNumber(18935.735);
-  const fiatCurrency = 'USD';
+  const {
+    btcFiatRate,
+    fiatCurrency,
+    btcAddress,
+    selectedAccount,
+    seedPhrase,
+    network,
+  } = useSelector((state: StoreState) => state.walletState);
+  const [currentFee, setCurrentFee] = useState(fee);
+  const [signedTx, setSignedTx] = useState(signedTxHex);
+  const {
+    isLoading,
+    data,
+    mutate,
+  } = useMutation<
+  SignedBtcTxResponse,
+  Error,
+  {
+    address: string;
+    amountToSend: string;
+    txFee : string;
+  }
+  >(async ({ address, amountToSend, txFee }) => signBtcTransaction({
+    recipientAddress: address,
+    btcAddress,
+    amount: amountToSend,
+    index: selectedAccount?.id ?? 0,
+    fee: new BigNumber(txFee),
+    seedPhrase,
+    network,
+  }));
 
-  const handleBackButtonClick = () => {
-    navigate('/');
-  };
+  useEffect(() => {
+    if (data) {
+      setCurrentFee(data.fee);
+      setSignedTx(data.signedTx);
+    }
+  }, [data]);
+
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (fiatAmount) {
       if (fiatAmount.isLessThan(0.01)) {
@@ -115,23 +161,6 @@ function ConfirmTransation({
     return '';
   };
 
-  function getFiatEquivalent() {
-    if (currency === 'STX') {
-      return getStxFiatEquivalent(new BigNumber(fee), stxBtcRate, btcFiatRate);
-    } if (currency === 'BTC') {
-      return getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
-    }
-    return new BigNumber(0);
-  }
-
-  function renderFee() {
-    if (currency === 'STX') {
-      return `${microStxToStx(fee)} ${currency}`;
-    } if (currency === 'BTC') {
-      return `${satsToBtc(fee)} ${currency}`;
-    }
-  }
-
   const onAdvancedSettingClick = () => {
     setOpenTransactionSettingModal(true);
   };
@@ -140,41 +169,65 @@ function ConfirmTransation({
     setOpenTransactionSettingModal(false);
   };
 
+  const onApplyClick = (modifiedFee: string) => {
+    setOpenTransactionSettingModal(false);
+    setCurrentFee(new BigNumber(modifiedFee));
+    mutate({ address: recipientAddress, amountToSend: amount.toString(), txFee: modifiedFee });
+  };
+
+  const amountComponent = (
+    <SendAmountContainer>
+      <TitleText>{t('INDICATION')}</TitleText>
+      <NumericFormat
+        value={Number(amount)}
+        displayType="text"
+        thousandSeparator
+        suffix=" BTC"
+        renderText={(value) => <AmountText>{value}</AmountText>}
+      />
+    </SendAmountContainer>
+  );
+
+  const feeComponent = (
+    <RowContainer>
+      <FeeTitleContainer>
+        <TitleText>{t('FEES')}</TitleText>
+      </FeeTitleContainer>
+      <FeeContainer>
+        <FeeText>{`${currentFee} ${t('SATS')}`}</FeeText>
+        <FiatAmountText>
+          {getFiatAmountString(getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate))}
+        </FiatAmountText>
+      </FeeContainer>
+    </RowContainer>
+  );
+
+  const handleOnConfirmClick = () => {
+    onConfirmClick(signedTx);
+  };
+
   return (
     <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
+      <TopRow title={t('SEND')} onClick={onBackButtonClick} />
       <Container>
-        <SendAmountContainer>
-          <TitleText>{t('INDICATION')}</TitleText>
-          <AmountText>
-            {amount}
-            {' '}
-            {currency}
-          </AmountText>
-        </SendAmountContainer>
+        {amountComponent}
         {children}
-        <RowContainer>
-          <FeeTitleContainer>
-            <TitleText>{t('FEES')}</TitleText>
-          </FeeTitleContainer>
-          <FeeContainer>
-            <FeeText>{renderFee()}</FeeText>
-            <FiatAmountText>{getFiatAmountString(getFiatEquivalent())}</FiatAmountText>
-          </FeeContainer>
-        </RowContainer>
+        {feeComponent}
         <ActionButton
           src={SettingIcon}
-          text={currency === 'STX' ? t('ADVANCED_SETTING') : t('EDIT_FEES')}
+          text={t('EDIT_FEES')}
           buttonColor="transparent"
           buttonAlignment="flex-start"
           onPress={onAdvancedSettingClick}
         />
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
-          fee="102"
-          type={currency}
-          onApplyClick={closeTransactionSettingAlert}
+          fee={currentFee.toString()}
+          type="BTC"
+          amount={amount}
+          onApplyClick={onApplyClick}
           onCrossClick={closeTransactionSettingAlert}
+          btcRecepientAddress={recipientAddress}
         />
       </Container>
       <ButtonContainer>
@@ -184,11 +237,17 @@ function ConfirmTransation({
           buttonBorderColor={Theme.colors.background.elevation2}
           onPress={onCancelClick}
           margin={3}
+          disabled={loadingBroadcastedTx || isLoading}
         />
-        <ActionButton text={t('CONFIRM')} onPress={onConfirmClick} />
+        <ActionButton
+          text={t('CONFIRM')}
+          disabled={loadingBroadcastedTx || isLoading}
+          processing={loadingBroadcastedTx || isLoading}
+          onPress={handleOnConfirmClick}
+        />
       </ButtonContainer>
     </>
   );
 }
 
-export default ConfirmTransation;
+export default ConfirmBtcTransactionComponent;

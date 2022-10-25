@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import NftTab from '@assets/img/bottomTabBar/nft_tab.svg';
 import SettingsTab from '@assets/img/bottomTabBar/setting_tab.svg';
 import StackingTab from '@assets/img/bottomTabBar/stacking_tab.svg';
@@ -32,43 +31,45 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
-type Tab = 'home' | 'nft' | 'stacking' | 'settings';
+type Tab = 'dashboard' | 'nft' | 'stacking' | 'settings';
 
-function BottomTabBar() {
+interface Props {
+  tab: Tab
+}
+function BottomTabBar({ tab }:Props) {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<Tab>('home');
 
-  useEffect(() => {
-    switch (activeTab) {
-      case 'home':
-        navigate('/');
-        break;
-      case 'nft':
-        break;
-      case 'stacking':
-        break;
-      case 'settings':
-        break;
-      default:
-        break;
-    }
-  }, [activeTab, navigate]);
+  const handleDashboardButtonClick = () => {
+    if (tab !== 'dashboard') { navigate('/'); }
+  };
+
+  const handleNftButtonClick = () => {
+
+  };
+
+  const handleStackingButtonClick = () => {
+
+  };
+
+  const handleSettingButtonClick = () => {
+
+  };
 
   return (
     <>
       <Seperator />
       <RowContainer>
-        <Button onClick={() => setActiveTab('home')}>
-          <ButtonImage src={activeTab === 'home' ? WalletTab : UnselectedWalletTab} />
+        <Button onClick={handleDashboardButtonClick}>
+          <ButtonImage src={tab === 'dashboard' ? WalletTab : UnselectedWalletTab} />
         </Button>
-        <Button onClick={() => setActiveTab('nft')}>
-          <ButtonImage src={activeTab === 'nft' ? NftTab : UnselectedNftTab} />
+        <Button onClick={handleNftButtonClick}>
+          <ButtonImage src={tab === 'nft' ? NftTab : UnselectedNftTab} />
         </Button>
-        <Button onClick={() => setActiveTab('stacking')}>
-          <ButtonImage src={activeTab === 'stacking' ? StackingTab : UnselectedStackingTab} />
+        <Button onClick={handleStackingButtonClick}>
+          <ButtonImage src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} />
         </Button>
-        <Button onClick={() => setActiveTab('settings')}>
-          <ButtonImage src={activeTab === 'settings' ? SettingsTab : UnselectedSettingsTab} />
+        <Button onClick={handleSettingButtonClick}>
+          <ButtonImage src={tab === 'settings' ? SettingsTab : UnselectedSettingsTab} />
         </Button>
       </RowContainer>
     </>

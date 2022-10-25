@@ -1,13 +1,12 @@
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ActionButton from '@components/button';
 import Copy from '@assets/img/dashboard/Copy.svg';
 import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
 import {
-  CurrencyTypes,
   BTC_TRANSACTION_STATUS_URL,
   TRANSACTION_STATUS_URL,
 } from '@utils/constants';
@@ -110,18 +109,11 @@ const Button = styled.button((props) => ({
   marginLeft: props.theme.spacing(3),
 }));
 
-interface Props {
-  txid: string | null;
-  currency: CurrencyTypes;
-  error: string;
-}
-
-function TransactionStatus({ txid, currency, error }: Props) {
-  txid = 'e8ac27dca63acf4693c25a1817b031b42e7cac9865166c13d9464e1983dbd4e2';
-  currency = 'STX';
-  error = 'Xverse Wallet Router : ERROR_TYPE_LOREM_TIMEOUT';
+function TransactionStatus() {
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_STATUS' });
   const navigate = useNavigate();
+  const location = useLocation();
+  const { txid, currency, error } = location.state;
   function renderTransactionStatus() {
     if (txid) {
       return (
