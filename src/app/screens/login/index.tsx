@@ -150,13 +150,7 @@ function Login(): JSX.Element {
       </PasswordInputContainer>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <VerifyButton onClick={handleVerifyPassword}>
-        {
-            !isVerifying ? (
-              t('VERIFY_PASSWORD_BUTTON')
-            ) : (
-              <Ring color="white" size={20} />
-            )
-        }
+        {!isVerifying ? t('VERIFY_PASSWORD_BUTTON') : <Ring color="white" size={20} />}
       </VerifyButton>
       <ForgotPasswordButton onClick={handleForgotPassword}>
         {t('FORGOT_PASSWORD_BUTTON')}

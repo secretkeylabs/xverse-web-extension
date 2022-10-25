@@ -50,16 +50,10 @@ function CreateWalletSuccess(): JSX.Element {
     <>
       <ContentContainer>
         <img src={CheckCircle} alt="success" />
-        <Title>
-          {t('SCREEN_TITLE')}
-        </Title>
-        <Subtitle>
-          {t('SCREEN_SUBTITLE')}
-        </Subtitle>
+        <Title>{t('SCREEN_TITLE')}</Title>
+        <Subtitle>{t('SCREEN_SUBTITLE')}</Subtitle>
       </ContentContainer>
-      <ContinueButton onClick={handleOpenWallet}>
-        {t('OPEN_WALLET_BUTTON')}
-      </ContinueButton>
+      <ContinueButton onClick={handleOpenWallet}>{t('OPEN_WALLET_BUTTON')}</ContinueButton>
     </>
   );
 }

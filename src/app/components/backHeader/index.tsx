@@ -1,19 +1,19 @@
 import styled from 'styled-components';
-import ArrowLeft from '@assets/img/ArrowLeft.svg';
+import ArrowLeft from '@assets/img/arrow_left.svg';
 
-const Container = styled.div((props) => ({
+const Container = styled.div(() => ({
   display: 'flex',
   height: 62,
   alignItems: 'center',
   justifyContent: 'space-between',
 }));
 
-const HeaderContent = styled.div((props) => ({
+const HeaderContent = styled.div({
   display: 'flex',
   flex: 1,
   alignItems: 'center',
   justifyContent: 'space-between',
-}));
+});
 
 const HeaderTitle = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -26,24 +26,19 @@ const Filler = styled.div({
 });
 
 interface BackHeaderProps {
-  headerText: string,
-  onPressBack: () => void,
+  headerText: string;
+  onPressBack: () => void;
 }
 
 function BackHeader(props: BackHeaderProps): JSX.Element {
-  const {
-    headerText,
-    onPressBack,
-  } = props;
+  const { headerText, onPressBack } = props;
   return (
     <Container>
       <HeaderContent>
-        <button type="button" onClick={onPressBack} style={{background: 'none'}}>
+        <button type="button" onClick={onPressBack} style={{ background: 'none' }}>
           <img alt="back" src={ArrowLeft} />
         </button>
-        <HeaderTitle>
-          {headerText}
-        </HeaderTitle>
+        <HeaderTitle>{headerText}</HeaderTitle>
       </HeaderContent>
       <Filler />
     </Container>

@@ -7,7 +7,7 @@ interface SeedPhraseViewProps {
 }
 
 interface SeedContainerProps {
-  isVisible: boolean,
+  isVisible: boolean;
 }
 
 const Container = styled.div({
@@ -53,9 +53,7 @@ const ShowSeedButton = styled.button((props) => ({
 }));
 
 export default function SeedphraseView(props: SeedPhraseViewProps) {
-  const {
-    seedPhrase,
-  } = props;
+  const { seedPhrase } = props;
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const seedPhraseWords = useMemo(() => seedPhrase?.split(' '), [seedPhrase]);
 
@@ -74,14 +72,12 @@ export default function SeedphraseView(props: SeedPhraseViewProps) {
           </SeedWord>
         ))}
       </SeedContainer>
-      {
-        !isVisible && (
+      {!isVisible && (
         <ShowSeedButton onClick={handleToggleVisibility}>
           <img src={Eye} alt="show-password" height={24} />
           Show
         </ShowSeedButton>
-        )
-      }
+      )}
     </Container>
   );
 }

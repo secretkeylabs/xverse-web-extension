@@ -31,20 +31,15 @@ const ErrorMessage = styled.h2((props) => ({
 }));
 
 interface SeedPhraseInputProps {
-  seed: string,
-  onSeedChange: (seed: string) => void,
-  seedError: string,
-  setSeedError: (err: string) => void,
+  seed: string;
+  onSeedChange: (seed: string) => void;
+  seedError: string;
+  setSeedError: (err: string) => void;
 }
 
 export default function SeedPhraseInput(props: SeedPhraseInputProps): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
-  const {
-    onSeedChange,
-    seed,
-    seedError,
-    setSeedError,
-  } = props;
+  const { onSeedChange, seed, seedError, setSeedError } = props;
 
   const handleSeedChange = (event: React.FormEvent<HTMLTextAreaElement>) => {
     if (seedError) {
@@ -55,9 +50,7 @@ export default function SeedPhraseInput(props: SeedPhraseInputProps): JSX.Elemen
 
   return (
     <InputContainer>
-      <SeedPhraseInputLabel>
-        {t('SEED_INPUT_LABEL')}
-      </SeedPhraseInputLabel>
+      <SeedPhraseInputLabel>{t('SEED_INPUT_LABEL')}</SeedPhraseInputLabel>
       <SeedphraseInput
         value={seed}
         name="secretKey"
@@ -67,11 +60,7 @@ export default function SeedPhraseInput(props: SeedPhraseInputProps): JSX.Elemen
         autoComplete="off"
         autoCorrect="off"
       />
-      {seedError ? (
-        <ErrorMessage>
-          {seedError}
-        </ErrorMessage>
-      ) : null}
+      {seedError ? <ErrorMessage>{seedError}</ErrorMessage> : null}
     </InputContainer>
   );
 }

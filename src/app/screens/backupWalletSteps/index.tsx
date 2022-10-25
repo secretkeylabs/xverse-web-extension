@@ -61,10 +61,7 @@ export default function BackupWalletSteps(): JSX.Element {
   };
 
   const backupSteps = [
-    <SeedCheck
-      seedPhrase={seedPhrase}
-      onContinue={handleSeedCheckContinue}
-    />,
+    <SeedCheck seedPhrase={seedPhrase} onContinue={handleSeedCheckContinue} />,
     <VerifySeed
       onBack={handleVerifySeedBack}
       onVerifySuccess={handleVerifySeedSuccess}

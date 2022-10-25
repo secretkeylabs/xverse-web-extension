@@ -91,12 +91,8 @@ function BackupWallet(): JSX.Element {
         <Title>{t('SCREEN_TITLE')}</Title>
         <SubTitle>{t('SCREEN_SUBTITLE')}</SubTitle>
         <BackupActionsContainer>
-          <SkipBackupButton onClick={handleSkip}>
-            {t('BACKUP_SKIP_BUTTON')}
-          </SkipBackupButton>
-          <BackupButton onClick={handleBackup}>
-            {t('BACKUP_BUTTON')}
-          </BackupButton>
+          <SkipBackupButton onClick={handleSkip}>{t('BACKUP_SKIP_BUTTON')}</SkipBackupButton>
+          <BackupButton onClick={handleBackup}>{t('BACKUP_BUTTON')}</BackupButton>
         </BackupActionsContainer>
       </ContentContainer>
     </Container>

@@ -63,7 +63,8 @@ export default function VerifySeed(props: VerifySeedProps): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const { onBack, onVerifySuccess, seedPhrase } = props;
 
-  const cleanMnemonic = (rawSeed: string): string => rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
+  const cleanMnemonic = (rawSeed: string): string =>
+    rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
   const handleVerify = () => {
     if (seedPhrase === cleanMnemonic(seedInput)) {
