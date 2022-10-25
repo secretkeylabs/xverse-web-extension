@@ -7,6 +7,7 @@ import { createAuthResponse } from '@secretkeylabs/xverse-core';
 import { useSelector } from 'react-redux';
 import { StoreState } from 'app/stores/reducers/root';
 import { MESSAGE_SOURCE } from 'content-scripts/message-types';
+import { useState } from 'react';
 
 const MainContainer = styled.div((props) => ({
   display: 'flex',
@@ -37,6 +38,7 @@ const DappTitle = styled.h2((props) => ({
 }));
 
 function AuthenticationRequest() {
+  const [loading, setLoading] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'AUTH_REQUEST_SCREEN' });
 
   const { search } = useLocation();
@@ -49,35 +51,38 @@ function AuthenticationRequest() {
   }));
 
   const confirmCallback = async () => {
-    const authResponse = await createAuthResponse(
-      seedPhrase,
-      selectedAccount?.id ?? 0,
-      authRequest
-    );
+    setLoading(true);
+    try {
+      const authResponse = await createAuthResponse(
+        seedPhrase,
+        selectedAccount?.id ?? 0,
+        authRequest
+      );
+      chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
+        source: MESSAGE_SOURCE,
+        payload: {
+          authenticationRequest: authRequestToken,
+          authenticationResponse: authResponse,
+        },
+        method: 'authenticationResponse',
+      });
+      window.close();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelCallback = () => {
     chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
       source: MESSAGE_SOURCE,
       payload: {
         authenticationRequest: authRequestToken,
-        authenticationResponse: authResponse,
+        authenticationResponse: 'cancel',
       },
       method: 'authenticationResponse',
     });
-
-    alert('Done');
-    // window.close();
-  };
-
-  const cancelCallback = () => {
-    window.postMessage(
-      JSON.stringify({
-        source: MESSAGE_SOURCE,
-        payload: {
-          authenticationRequest: authRequestToken,
-          authenticationResponse: 'cancel',
-        },
-        method: 'authenticationResponse',
-      })
-    );
     window.close();
   };
 

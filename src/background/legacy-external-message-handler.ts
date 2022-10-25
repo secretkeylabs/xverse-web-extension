@@ -95,25 +95,39 @@ export async function handleLegacyExternalMethodFormat(
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['authRequest', payload]]);
 
       const { id } = await triggerRequstWindowOpen(RouteUrls.AuthenticationRequest, urlParams);
-      // listenForPopupClose({
-      //   id,
-      //   tabId,
-      //   response: formatAuthResponse({ request: payload, response: 'cancel' }),
-      // });
-      // listenForOriginTabClose({ tabId });
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            authenticationRequest: payload,
+            authenticationResponse: 'cancel',
+          },
+          method: ExternalMethods.authenticationResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
       break;
     }
 
     case ExternalMethods.transactionRequest: {
-      // const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['request', payload]]);
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['request', payload]]);
 
-      // const { id } = await triggerRequstWindowOpen(RouteUrls.TransactionRequest, urlParams);
-      // listenForPopupClose({
-      //   id,
-      //   tabId,
-      //   response: formatTxSignatureResponse({ payload, response: 'cancel' }),
-      // });
-      // listenForOriginTabClose({ tabId });
+      const { id } = await triggerRequstWindowOpen(RouteUrls.TransactionRequest, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          method: ExternalMethods.transactionResponse,
+          payload: {
+            transactionRequest: payload,
+            transactionResponse: 'cancel',
+          },
+        },
+      });
+      listenForOriginTabClose({ tabId });
       break;
     }
 

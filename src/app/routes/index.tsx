@@ -61,7 +61,6 @@ const router = createHashRouter([
         element: <AuthenticationRequest />,
       },
       {
-
         path: 'login',
         element: <Login />,
       },

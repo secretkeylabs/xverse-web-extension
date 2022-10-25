@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import ConfirmTransaction from '@components/confirmTransactionScreen';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import PostCondition from '@components/postCondition';
 
 const headerImageMapping = {
   'purchase-asset': NFTImage,
@@ -55,6 +56,7 @@ function TransactionRequest() {
         <TopImage src={headerImageMapping['buy-in-ustx']} alt="" />
         <FunctionTitle>{functionName}</FunctionTitle>
         <DappTitle>{`Requested by ${appName}`} </DappTitle>
+        {/* <PostCondition postCondition={} showMore={false} /> */}
       </MainContainer>
     </ConfirmTransaction>
   );
