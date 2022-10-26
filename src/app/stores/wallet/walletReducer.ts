@@ -35,6 +35,7 @@ const initialWalletState: WalletState = {
   seedPhrase: '',
   encryptedSeed: '',
   loadingWalletData: false,
+  loadingBtcData: false,
   fiatCurrency: 'USD',
   btcFiatRate: new BigNumber(0),
   stxBtcRate: new BigNumber(0),
@@ -130,16 +131,19 @@ const walletReducer = (
     case FetchBtcWalletDataRequestKey:
       return {
         ...state,
+        loadingBtcData: true,
       };
     case FetchBtcWalletDataSuccessKey:
       return {
         ...state,
         btcBalance: action.balance,
         btcTransactions: action.btctransactions,
+        loadingBtcData: false,
       };
     case FetchBtcWalletDataFailureKey:
       return {
         ...state,
+        loadingBtcData: false,
       };
     case FetchCoinDataRequestKey:
       return {

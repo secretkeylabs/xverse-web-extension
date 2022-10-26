@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@secretkeylabs/xverse-core": "file:/Users/imamah/Desktop/xverse-core/xverse-core",
+    "@secretkeylabs/xverse-core": "github:secretkeylabs/xverse-core",
     "@stacks/encryption": "4.3.5",
     "@tanstack/react-query": "^4.12.0",
     "@testing-library/jest-dom": "^5.16.5",

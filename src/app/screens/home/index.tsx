@@ -97,6 +97,8 @@ function Home(): JSX.Element {
     stxBtcRate,
     network,
     coinsList,
+    loadingWalletData,
+    loadingBtcData,
   } = useSelector((state: StoreState) => state.walletState);
 
   const loadInitialData = useCallback(() => {
@@ -208,12 +210,14 @@ function Home(): JSX.Element {
             title={t('BITCOIN')}
             currency="BTC"
             icon={IconBitcoin}
+            loading={loadingBtcData}
             underlayColor={Theme.colors.background.elevation1}
           />
           <TokenTile
             title={t('STACKS')}
             currency="STX"
             icon={IconStacks}
+            loading={loadingWalletData}
             underlayColor={Theme.colors.background.elevation1}
           />
         </ColumnContainer>
@@ -223,6 +227,7 @@ function Home(): JSX.Element {
             <TokenTile
               title={coin.name}
               currency="FT"
+              loading={loadingWalletData}
               underlayColor={Theme.colors.background.elevation1}
               fungibleToken={coin}
             />

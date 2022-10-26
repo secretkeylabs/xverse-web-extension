@@ -114,24 +114,22 @@ function TransactionStatus() {
   const navigate = useNavigate();
   const location = useLocation();
   const { txid, currency, error } = location.state;
-  function renderTransactionStatus() {
-    if (txid) {
-      return (
-        <Container>
-          <Image src={Success} />
-          <HeadingText>{t('BROADCASTED')}</HeadingText>
-          <BodyText>{t('SUCCESS_MSG')}</BodyText>
-        </Container>
-      );
-    }
-    return (
-      <Container>
-        <Image src={Failure} />
-        <HeadingText>{t('FAILED')}</HeadingText>
-        <BodyText>{error}</BodyText>
-      </Container>
-    );
-  }
+
+  const renderTransactionSuccessStatus = (
+    <Container>
+      <Image src={Success} />
+      <HeadingText>{t('BROADCASTED')}</HeadingText>
+      <BodyText>{t('SUCCESS_MSG')}</BodyText>
+    </Container>
+  );
+
+  const renderTransactionFailureStatus = (
+    <Container>
+      <Image src={Failure} />
+      <HeadingText>{t('FAILED')}</HeadingText>
+      <BodyText>{error}</BodyText>
+    </Container>
+  );
 
   const openTransactionInBrowser = () => {
     if (txid) {
@@ -151,40 +149,36 @@ function TransactionStatus() {
     navigator.clipboard.writeText(txid!);
   };
 
-  function renderLink() {
-    return (
-      <RowContainer>
-        <BeforeButtonText>{t('SEE_ON')}</BeforeButtonText>
-        <Button onClick={openTransactionInBrowser}>
-          <ButtonText>
-            {currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}
-          </ButtonText>
-          <ButtonImage src={ArrowSquareOut} />
-        </Button>
-      </RowContainer>
-    );
-  }
+  const renderLink = (
+    <RowContainer>
+      <BeforeButtonText>{t('SEE_ON')}</BeforeButtonText>
+      <Button onClick={openTransactionInBrowser}>
+        <ButtonText>
+          {currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}
+        </ButtonText>
+        <ButtonImage src={ArrowSquareOut} />
+      </Button>
+    </RowContainer>
+  );
 
-  function renderTransactionID() {
-    return (
-      <TransactionIDContainer>
-        <BodyText>{t('TRANSACTION_ID')}</BodyText>
-        <TxIDContainer>
-          <IDText>{txid}</IDText>
-          <Button onClick={onCopyClick}>
-            <ButtonImage src={Copy} />
-          </Button>
-        </TxIDContainer>
-      </TransactionIDContainer>
-    );
-  }
+  const renderTransactionID = (
+    <TransactionIDContainer>
+      <BodyText>{t('TRANSACTION_ID')}</BodyText>
+      <TxIDContainer>
+        <IDText>{txid}</IDText>
+        <Button onClick={onCopyClick}>
+          <ButtonImage src={Copy} />
+        </Button>
+      </TxIDContainer>
+    </TransactionIDContainer>
+  );
 
   return (
     <>
       <OuterContainer>
-        {renderTransactionStatus()}
-        {renderLink()}
-        {txid && renderTransactionID()}
+        {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
+        {txid && renderLink}
+        {txid && renderTransactionID}
       </OuterContainer>
       <ButtonContainer>
         <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
