@@ -1,6 +1,3 @@
-// import { formatAuthResponse } from '../content-scripts/actions/finalize-auth-reaponse-format';
-// import { formatMessageSigningResponse } from '../content-scripts/actions/finalize-message-signature-format';
-// import { formatTxSignatureResponse } from '../content-scripts/actions/finalize-tx-signature-format';
 import {
   ExternalMethods,
   InternalMethods,
@@ -11,17 +8,6 @@ import {
 import { sendMessage } from '../content-scripts/messages';
 import { RouteUrls } from '../content-scripts/route-urls';
 import { popupCenter } from './popup-center';
-
-// const IS_TEST_ENV = process.env.TEST_ENV === 'true';
-
-//
-// Playwright does not currently support Chrome extension popup testing:
-// https://github.com/microsoft/playwright/issues/5593
-async function openRequestInFullPage(path: string, urlParams: URLSearchParams) {
-  return chrome.tabs.create({
-    url: chrome.runtime.getURL(`index.html#${path}?${urlParams.toString()}`),
-  });
-}
 
 export function inferLegacyMessage(message: any): message is LegacyMessageFromContentScript {
   // Now that we use a RPC communication style, we can infer

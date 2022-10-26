@@ -9,16 +9,6 @@ import {
   inferLegacyMessage,
 } from './legacy-external-message-handler';
 
-// initContextMenuActions();
-
-// const IS_TEST_ENV = process.env.TEST_ENV === 'true';
-
-// chrome.runtime.onInstalled.addListener(async (details) => {
-//   if (details.reason === 'install' && !IS_TEST_ENV) {
-//     await chrome.tabs.create({ url: chrome.runtime.getURL(`index.html#${RouteUrls.Onboarding}`) });
-//   }
-// });
-
 // Listen for connection to the content-script - port for two-way communication
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== CONTENT_SCRIPT_PORT) return;
@@ -28,9 +18,5 @@ chrome.runtime.onConnect.addListener((port) => {
       void handleLegacyExternalMethodFormat(message, port);
       return;
     }
-
-    // TODO:
-    // Here we'll handle all messages using the rpc style comm method
-    // For now all messages are handled as legacy format
   });
 });
