@@ -39,9 +39,9 @@
     "styled-components": "^5.3.5"
   },
   "scripts": {
-    "build": "npx node webpack/utils/build.js",
+    "build": "npm run clean && NODE_ENV=production npx node webpack/utils/build.js ",
     "start": "npx node webpack/utils/devServer.js",
-    "clean": "rimraf dist",
+    "clean": "rimraf build",
     "test": "npx jest",
     "style": "prettier --write \"src/**/*.{ts,tsx}\""
   },

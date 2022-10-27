@@ -75,7 +75,7 @@ var options = {
                   Boolean
                 ),
               }),
-              transpileOnly: env.NODE_ENV === 'development',
+              transpileOnly: true,
             },
           },
         ],
@@ -133,8 +133,8 @@ var options = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.join(SRC_ROOT_PATH, 'assets'),
-          to: path.join(BUILD_ROOT_PATH, 'assets'),
+          from: path.join(SRC_ROOT_PATH, 'assets/img/xverse_icon.png'),
+          to: BUILD_ROOT_PATH,
         },
       ],
     }),
