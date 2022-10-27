@@ -8,7 +8,6 @@ var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
-
 const aliases = {
   // alias stacks.js packages to their esm (default prefers /dist/polyfill)
   '@stacks/auth': '@stacks/auth/dist/esm',
@@ -19,6 +18,7 @@ const aliases = {
   '@stacks/storage': '@stacks/storage/dist/esm',
   '@stacks/transactions': '@stacks/transactions/dist/esm',
   '@stacks/keychain': '@stacks/keychain/dist/esm',
+  '@secretkeylabs/xverse-core': '@secretkeylabs/xverse-core/dist',
 };
 
 const ASSET_PATH = process.env.ASSET_PATH || '/';
@@ -71,9 +71,11 @@ var options = {
             loader: require.resolve('ts-loader'),
             options: {
               getCustomTransformers: () => ({
-                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(Boolean),
+                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(
+                  Boolean
+                ),
               }),
-              transpileOnly: env.NODE_ENV === 'development',
+              transpileOnly: true,
             },
           },
         ],
@@ -131,8 +133,8 @@ var options = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.join(SRC_ROOT_PATH, 'assets'),
-          to: path.join(BUILD_ROOT_PATH, 'assets'),
+          from: path.join(SRC_ROOT_PATH, 'assets/img/xverse_icon.png'),
+          to: BUILD_ROOT_PATH,
         },
       ],
     }),
@@ -153,7 +155,7 @@ var options = {
       Buffer: ['buffer', 'Buffer'],
     }),
   ],
-  
+
   infrastructureLogging: {
     level: 'info',
   },
