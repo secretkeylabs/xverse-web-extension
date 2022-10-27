@@ -1,6 +1,7 @@
 import {
   BtcTransactionData,
   Coin,
+  FeesMultipliers,
   FungibleToken,
   NetworkType,
   SupportedCurrency,
@@ -77,6 +78,13 @@ export function selectAccount(
     network,
     // stackingState,
     bnsName,
+  };
+}
+
+export function FetchFeeMultiplierAction(feeMultipliers: FeesMultipliers): actions.FetchFeeMultiplier {
+  return {
+    type: actions.FetchFeeMultiplierKey,
+    feeMultipliers,
   };
 }
 

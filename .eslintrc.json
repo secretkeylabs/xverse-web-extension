@@ -22,7 +22,7 @@
     "consistent-return":"off",
     "max-len":"off",
     "react-hooks/exhaustive-deps":"off",
-    "no-nested-ternary": "off",
+    "no-nested-ternary": "off"
   },
   "settings": {
     "import/resolver": {

@@ -1,33 +1,23 @@
-import ConfirmBtcTransactionComponent from '@screens/confrimBtcTransaction/confirmBtcTransactionComponent';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
-import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
-import Seperator from '@components/seperator';
 import { useDispatch, useSelector } from 'react-redux';
-import { StoreState } from '@stores/index';
 import { useEffect, useState } from 'react';
-import { broadcastRawBtcTransaction } from '@secretkeylabs/xverse-core/api';
+import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
-import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
-import BottomBar from '@components/tabBar';
+import { broadcastRawBtcTransaction } from '@secretkeylabs/xverse-core/api';
 import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
+import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
+import Seperator from '@components/seperator';
+import { StoreState } from '@stores/index';
+import BottomBar from '@components/tabBar';
+import RecipientAddressView from '@components/recipinetAddressView';
+import ConfirmBtcTransactionComponent from '@screens/confrimBtcTransaction/confirmBtcTransactionComponent';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   marginTop: props.theme.spacing(12),
 }));
-
-const RowContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-});
-
-const AddressContainer = styled.div({
-  display: 'flex',
-  flex: 1,
-});
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
@@ -41,29 +31,15 @@ const ValueText = styled.h1((props) => ({
   wordBreak: 'break-all',
 }));
 
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
-
-const ActionButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: 'transparent',
-  marginLeft: props.theme.spacing(12),
-}));
-
 function ConfirmBtcTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
-    network,
-    btcAddress, stxBtcRate, btcFiatRate,
-  } = useSelector((state: StoreState) => state.walletState);
+    network, btcAddress, stxBtcRate, btcFiatRate,
+  } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
   const { fee, amount, signedTxHex } = location.state;
@@ -73,10 +49,9 @@ function ConfirmBtcTransaction() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<
-  BtcTransactionBroadcastResponse,
-  Error,
-  { signedTx: string }>(async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network));
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
+    async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network),
+  );
 
   useEffect(() => {
     setRecipientAddress(location.state.recipientAddress);
@@ -109,30 +84,12 @@ function ConfirmBtcTransaction() {
     }
   }, [txError]);
 
-  function renderAddressInfoSection() {
-    return (
-      <InfoContainer>
-        <TitleText>{t('RECEPIENT_ADDRESS')}</TitleText>
-        <RowContainer>
-          <AddressContainer>
-            <ValueText>{recipientAddress}</ValueText>
-          </AddressContainer>
-          <ActionButton>
-            <ButtonImage src={ArrowSquareOut} />
-          </ActionButton>
-        </RowContainer>
-      </InfoContainer>
-    );
-  }
-
-  function renderNetworkInfoSection() {
-    return (
-      <InfoContainer>
-        <TitleText>{t('NETWORK')}</TitleText>
-        <ValueText>{network}</ValueText>
-      </InfoContainer>
-    );
-  }
+  const networkInfoSection = (
+    <InfoContainer>
+      <TitleText>{t('NETWORK')}</TitleText>
+      <ValueText>{network}</ValueText>
+    </InfoContainer>
+  );
 
   const handleOnConfirmClick = (txHex: string) => {
     mutate({ signedTx: txHex });
@@ -153,8 +110,8 @@ function ConfirmBtcTransaction() {
         onCancelClick={goBackToScreen}
         onBackButtonClick={goBackToScreen}
       >
-        {renderAddressInfoSection()}
-        {renderNetworkInfoSection()}
+        <RecipientAddressView recipient={recipientAddress} />
+        {networkInfoSection}
         <Seperator />
       </ConfirmBtcTransactionComponent>
       <BottomBar tab="dashboard" />

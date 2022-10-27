@@ -48,3 +48,7 @@ export function getAddressDetail(account:Account) {
   }
   return '';
 }
+
+export function getExplorerUrl(stxAddress: string): string {
+  return `https://explorer.stacks.co/address/${stxAddress}?chain=mainnet`;
+}

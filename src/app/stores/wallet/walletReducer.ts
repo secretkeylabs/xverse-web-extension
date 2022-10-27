@@ -21,6 +21,7 @@ import {
   FetchCoinDataFailureKey,
   AddAccountKey,
   UpdateVisibleCoinListKey,
+  FetchFeeMultiplierKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -48,6 +49,7 @@ const initialWalletState: WalletState = {
   btcTransactions: [],
   coinsList: null,
   coins: [],
+  feeMultipliers: null,
 };
 
 const walletReducer = (
@@ -166,6 +168,11 @@ const walletReducer = (
       return {
         ...state,
         coinsList: action.coinsList,
+      };
+    case FetchFeeMultiplierKey:
+      return {
+        ...state,
+        feeMultipliers: action.feeMultipliers,
       };
     default:
       return state;

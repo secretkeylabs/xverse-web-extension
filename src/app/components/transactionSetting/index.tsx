@@ -263,7 +263,7 @@ function TransactionSettingAlert({
   const modifyBtcFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
     try {
       setSelectedOption(mode!);
-      if (mode?.value === 'custom') inputRef.current?.focus();
+      if (mode?.value === 'custom') inputRef?.current?.focus();
       else {
         const btcFee = await getBtcFees(
           btcRecepientAddress!,
@@ -389,7 +389,7 @@ function TransactionSettingAlert({
       <Text>{t('NONCE')}</Text>
       <InputContainer>
         <InputFieldContainer>
-          <InputField value={nonceInput} placeholder="0" />
+          <InputField value={nonceInput} onChange={(e: { target: { value: SetStateAction<string> } }) => setNonceInput(e.target.value)} placeholder="0" />
         </InputFieldContainer>
       </InputContainer>
       <DetailText>{t('NONCE_INFO')}</DetailText>
