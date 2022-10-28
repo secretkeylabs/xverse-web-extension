@@ -103,6 +103,14 @@ const CoinBalanceText = styled.h1((props) => ({
   textAlign: 'end',
 }));
 
+function TokenLoader() {
+  return (
+    <LoaderMainContainer>
+      <BarLoader loaderSize={LoaderSize.LARGE} />
+      <BarLoader loaderSize={LoaderSize.MEDIUM} />
+    </LoaderMainContainer>
+  );
+}
 interface Props {
   title: string;
   icon?: string;
@@ -190,11 +198,11 @@ function TokenTile({
     />
   );
 
-  const getBalance = currency === 'STX'
-    ? renderStxBalanceView
-    : currency === 'BTC'
-      ? renderBtcBalanceView
-      : renderFtBalanceView;
+  function getBalance() {
+    if (currency === 'STX') return renderStxBalanceView;
+    if (currency === 'BTC') return renderBtcBalanceView;
+    return renderFtBalanceView;
+  }
 
   function getFtFiatEquivalent() {
     if (fungibleToken?.tokenFiatRate) {
@@ -225,36 +233,47 @@ function TokenTile({
     }
   }
 
-  const renderFiatEquivalentView = currency === 'STX' ? (
-    <NumericFormat
-      value={getFiatEquivalent()}
-      displayType="text"
-      thousandSeparator
-      prefix={`${currencySymbolMap[fiatCurrency]} `}
-      suffix={` ${fiatCurrency}`}
-      renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
-    />
-  ) : currency === 'BTC' ? (
-    <NumericFormat
-      value={getFiatEquivalent()}
-      displayType="text"
-      thousandSeparator
-      prefix={`${currencySymbolMap[fiatCurrency]} `}
-      suffix={` ${fiatCurrency}`}
-      renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
-    />
-  ) : (
-    fungibleToken?.tokenFiatRate && (
-    <NumericFormat
-      value={getFiatEquivalent()}
-      displayType="text"
-      thousandSeparator
-      prefix={`${currencySymbolMap[fiatCurrency]} `}
-      suffix={` ${fiatCurrency}`}
-      renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
-    />
-    )
-  );
+  function renderFiatEquivalentView() {
+    switch (currency) {
+      case 'STX':
+        return (
+          <NumericFormat
+            value={getFiatEquivalent()}
+            displayType="text"
+            thousandSeparator
+            prefix={`${currencySymbolMap[fiatCurrency]} `}
+            suffix={` ${fiatCurrency}`}
+            renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
+          />
+        );
+      case 'BTC':
+        return (
+          <NumericFormat
+            value={getFiatEquivalent()}
+            displayType="text"
+            thousandSeparator
+            prefix={`${currencySymbolMap[fiatCurrency]} `}
+            suffix={` ${fiatCurrency}`}
+            renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
+          />
+        );
+      case 'FT':
+        if (fungibleToken?.tokenFiatRate) {
+          return (
+            <NumericFormat
+              value={getFiatEquivalent()}
+              displayType="text"
+              thousandSeparator
+              prefix={`${currencySymbolMap[fiatCurrency]} `}
+              suffix={` ${fiatCurrency}`}
+              renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
+            />
+          );
+        }
+        break;
+      default:
+    }
+  }
 
   function renderFTIcon() {
     if (!loading) {
@@ -286,13 +305,6 @@ function TokenTile({
     return renderFTIcon();
   }
 
-  const renderLoader = (
-    <LoaderMainContainer>
-      <BarLoader loaderSize={LoaderSize.LARGE} />
-      <BarLoader loaderSize={LoaderSize.MEDIUM} />
-    </LoaderMainContainer>
-  );
-
   return (
     <TileContainer color={underlayColor} margin={margin} onClick={onPress}>
       {renderIcon()}
@@ -301,11 +313,11 @@ function TokenTile({
         <SubText>{title}</SubText>
       </TextContainer>
       {loading ? (
-        renderLoader
+        <TokenLoader />
       ) : (
         <AmountContainer>
-          {getBalance}
-          {renderFiatEquivalentView}
+          {getBalance()}
+          {renderFiatEquivalentView()}
         </AmountContainer>
       )}
     </TileContainer>

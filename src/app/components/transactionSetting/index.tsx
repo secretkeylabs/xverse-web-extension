@@ -159,7 +159,7 @@ function TransactionSettingAlert({
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
   const [feeInput, setFeeInput] = useState(fee);
   const theme = useTheme();
-  const [nonceInput, setNonceInput] = useState(nonce);
+  const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const [error, setError] = useState('');
   const [selectedOption, setSelectedOption] = useState({
     label: t('STANDARD'),
@@ -346,6 +346,12 @@ function TransactionSettingAlert({
     onApplyClick(feeInput.toString());
   }
 
+  const onInputEditFeesChange = (e: { target: { value: SetStateAction<string> } }) => {
+    setFeeInput(e.target.value);
+  };
+
+  const onFeeOptionChange = (value: { label: string; value: string } | null) => (type === 'STX' ? modifyStxFees(value) : modifyBtcFees(value));
+
   const editFeesSection = (
     <Container>
       <Text>{t('FEE')}</Text>
@@ -354,7 +360,7 @@ function TransactionSettingAlert({
           <RowContainer>
             <InputContainer>
               <InputFieldContainer>
-                <InputField ref={inputRef} value={feeInput} onChange={(e: { target: { value: SetStateAction<string> } }) => setFeeInput(e.target.value)} />
+                <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
               </InputFieldContainer>
               <TickerContainer>
                 <Text>{type === 'STX' ? 'STX' : 'SATS'}</Text>
@@ -365,7 +371,7 @@ function TransactionSettingAlert({
               <Select
                 defaultValue={selectedOption}
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                onChange={(value) => { type === 'STX' ? modifyStxFees(value) : modifyBtcFees(value); }}
+                onChange={onFeeOptionChange}
                 styles={customStyles}
                 options={type === 'STX' ? StxFeeModes : BtcFeeModes}
               />
@@ -384,12 +390,16 @@ function TransactionSettingAlert({
     </ErrorContainer>
   );
 
+  const onInputEditNonceChange = (e: { target: { value: SetStateAction<string> } }) => {
+    setNonceInput(e.target.value);
+  };
+
   const editNonceSection = (
     <Container>
       <Text>{t('NONCE')}</Text>
       <InputContainer>
         <InputFieldContainer>
-          <InputField value={nonceInput} onChange={(e: { target: { value: SetStateAction<string> } }) => setNonceInput(e.target.value)} placeholder="0" />
+          <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
         </InputFieldContainer>
       </InputContainer>
       <DetailText>{t('NONCE_INFO')}</DetailText>
