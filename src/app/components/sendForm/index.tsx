@@ -10,12 +10,14 @@ import InfoIcon from '@assets/img/send/info.svg';
 import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
+import ActionButton from '@components/button';
 import {
   btcToSats, getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
 
 const ScrollContainer = styled.div`
   display: flex;
+  flex:1;
   flex-direction: column;
   overflow-y: auto;
   &::-webkit-scrollbar {
@@ -102,7 +104,7 @@ const BalanceText = styled.h1((props) => ({
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
   backgroundColor: props.theme.colors.background['elevation-1'],
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white['0'],
   width: '100%',
   border: 'transparent',
 }));
@@ -129,30 +131,15 @@ const TickerImage = styled.img((props) => ({
   width: 26,
 }));
 
-const SendButton = styled.button((props) => ({
-  width: 330,
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
+const SendButtonContainer = styled.div((props) => ({
+
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  backgroundColor: props.theme.colors.action.classic,
-  padding: props.theme.spacing(7),
-  borderRadius: props.theme.radius(1),
   marginTop: props.theme.spacing(11),
-  marginBottom: props.theme.spacing(11),
+  marginBottom: props.theme.spacing(8),
 }));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 700,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
 interface Props {
-  onPressSend: (recipientID: string, amount: string, memo: string) => void;
+  onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
   error?: string;
   fungibleToken?: FungibleToken;
@@ -160,6 +147,7 @@ interface Props {
   balance?: number;
   hideMemo?: boolean;
   buttonText?: string;
+  processing?: boolean;
 }
 
 function SendForm({
@@ -171,6 +159,7 @@ function SendForm({
   balance,
   hideMemo = false,
   buttonText,
+  processing,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const [amount, setAmount] = useState('');
@@ -296,11 +285,12 @@ function SendForm({
   };
 
   return (
-    <ScrollContainer>
-      <OuterContainer>
-        {!disableAmountInput && renderEnterAmountSection()}
-        {renderEnterRecepientSection()}
-        {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
+    <>
+      <ScrollContainer>
+        <OuterContainer>
+          {!disableAmountInput && renderEnterAmountSection()}
+          {renderEnterRecepientSection()}
+          {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
@@ -321,15 +311,21 @@ function SendForm({
             </InfoContainer>
           </>
 
-        )}
-      </OuterContainer>
-      <ErrorContainer>
-        <ErrorText>{error}</ErrorText>
-      </ErrorContainer>
-      <SendButton onClick={handleOnPress}>
-        <ButtonText>{buttonText ?? t('NEXT')}</ButtonText>
-      </SendButton>
-    </ScrollContainer>
+          )}
+        </OuterContainer>
+        <ErrorContainer>
+          <ErrorText>{error}</ErrorText>
+        </ErrorContainer>
+
+      </ScrollContainer>
+      <SendButtonContainer>
+        <ActionButton
+          text={buttonText ?? t('NEXT')}
+          processing={processing}
+          onPress={handleOnPress}
+        />
+      </SendButtonContainer>
+    </>
   );
 }
 

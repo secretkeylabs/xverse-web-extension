@@ -56,6 +56,7 @@ export interface WalletState {
   seedPhrase: string;
   encryptedSeed: string;
   loadingWalletData: boolean;
+  loadingBtcData: boolean;
   fiatCurrency: SupportedCurrency;
   btcFiatRate: BigNumber;
   stxBtcRate: BigNumber;
