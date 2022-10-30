@@ -159,7 +159,7 @@ function TransactionSettingAlert({
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
   const [feeInput, setFeeInput] = useState(fee);
   const theme = useTheme();
-  const [nonceInput, setNonceInput] = useState(nonce);
+  const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const [error, setError] = useState('');
   const [selectedOption, setSelectedOption] = useState({
     label: t('STANDARD'),
@@ -263,7 +263,7 @@ function TransactionSettingAlert({
   const modifyBtcFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
     try {
       setSelectedOption(mode!);
-      if (mode?.value === 'custom') inputRef.current?.focus();
+      if (mode?.value === 'custom') inputRef?.current?.focus();
       else {
         const btcFee = await getBtcFees(
           btcRecepientAddress!,
@@ -390,12 +390,16 @@ function TransactionSettingAlert({
     </ErrorContainer>
   );
 
+  const onInputEditNonceChange = (e: { target: { value: SetStateAction<string> } }) => {
+    setNonceInput(e.target.value);
+  };
+
   const editNonceSection = (
     <Container>
       <Text>{t('NONCE')}</Text>
       <InputContainer>
         <InputFieldContainer>
-          <InputField value={nonceInput} placeholder="0" />
+          <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
         </InputFieldContainer>
       </InputContainer>
       <DetailText>{t('NONCE_INFO')}</DetailText>

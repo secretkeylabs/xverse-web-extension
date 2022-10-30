@@ -1,6 +1,7 @@
 import {
   BtcTransactionData,
   Coin,
+  FeesMultipliers,
   FungibleToken,
   NetworkType,
   SupportedCurrency,
@@ -17,6 +18,7 @@ export const LockWalletKey = 'LockWallet';
 export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
 export const UpdateVisibleCoinListKey = 'UpdateVisibleCoinList';
 export const AddAccountKey = 'AddAccount';
+export const FetchFeeMultiplierKey = 'FetchFeeMultiplier';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
@@ -69,6 +71,7 @@ export interface WalletState {
   btcTransactions: BtcTransactionData[];
   coinsList: FungibleToken[] | null;
   coins: Coin[];
+  feeMultipliers: FeesMultipliers | null;
 }
 
 export interface WalletData {
@@ -92,6 +95,11 @@ export interface StoreEncryptedSeed {
 export interface UnlockWallet {
   type: typeof UnlockWalletKey;
   seed: string;
+}
+
+export interface FetchFeeMultiplier {
+  type: typeof FetchFeeMultiplierKey;
+  feeMultipliers: FeesMultipliers;
 }
 
 export interface LockWallet {
@@ -211,6 +219,7 @@ export type WalletActions =
   | StoreEncryptedSeed
   | UnlockWallet
   | LockWallet
+  | FetchFeeMultiplier
   | FetchRates
   | FetchRatesSuccess
   | FetchRatesFail

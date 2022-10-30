@@ -1,5 +1,10 @@
 import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { fetchAppInfo } from '@secretkeylabs/xverse-core/api';
+import { FeesMultipliers, FungibleToken } from '@secretkeylabs/xverse-core/types';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
@@ -7,17 +12,15 @@ import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import TokenTile from '@components/tokenTile';
-import { useNavigate } from 'react-router-dom';
 import AccountRow from '@components/accountRow';
-import { useCallback, useEffect, useState } from 'react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchAccountAction,
   fetchBtcWalletDataRequestAction,
   fetchCoinDataRequestAction,
+  FetchFeeMultiplierAction,
   fetchRatesAction,
   fetchStxWalletDataRequestAction,
 } from '@stores/wallet/actions/actionCreators';
@@ -25,7 +28,6 @@ import BottomBar from '@components/tabBar';
 import { StoreState } from '@stores/index';
 import { Account } from '@stores/wallet/actions/types';
 import Seperator from '@components/seperator';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -101,6 +103,11 @@ function Home(): JSX.Element {
     loadingBtcData,
   } = useSelector((state: StoreState) => state.walletState);
 
+  const fetchFeeMultiplierData = async () => {
+    const response: FeesMultipliers = await fetchAppInfo();
+    dispatch(FetchFeeMultiplierAction(response));
+  };
+
   const loadInitialData = useCallback(() => {
     if (stxAddress && btcAddress) {
       if (accountsList.length === 0) {
@@ -118,6 +125,7 @@ function Home(): JSX.Element {
       } else {
         dispatch(fetchAccountAction(selectedAccount!, accountsList));
       }
+      fetchFeeMultiplierData();
       dispatch(fetchRatesAction(fiatCurrency));
       dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
       dispatch(fetchBtcWalletDataRequestAction(btcAddress, network, stxBtcRate, btcFiatRate));

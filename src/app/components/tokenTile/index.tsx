@@ -103,6 +103,14 @@ const CoinBalanceText = styled.h1((props) => ({
   textAlign: 'end',
 }));
 
+function TokenLoader() {
+  return (
+    <LoaderMainContainer>
+      <BarLoader loaderSize={LoaderSize.LARGE} />
+      <BarLoader loaderSize={LoaderSize.MEDIUM} />
+    </LoaderMainContainer>
+  );
+}
 interface Props {
   title: string;
   icon?: string;

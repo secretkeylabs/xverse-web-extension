@@ -132,11 +132,9 @@ const TickerImage = styled.img((props) => ({
 }));
 
 const SendButtonContainer = styled.div((props) => ({
-
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginTop: props.theme.spacing(11),
-  marginBottom: props.theme.spacing(8),
 }));
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
