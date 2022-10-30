@@ -55,7 +55,7 @@ const router = createHashRouter([
         element: <AccountList />,
       },
       {
-        path: 'receive',
+        path: 'receive/:currency',
         element: <Receive />,
       },
       {

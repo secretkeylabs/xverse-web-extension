@@ -122,15 +122,6 @@ interface Props {
   fungibleToken?: FungibleToken;
 }
 
-function TokenLoader() {
-  return (
-    <LoaderMainContainer>
-      <BarLoader loaderSize={LoaderSize.LARGE} />
-      <BarLoader loaderSize={LoaderSize.MEDIUM} />
-    </LoaderMainContainer>
-  );
-}
-
 function TokenTile({
   icon,
   title,

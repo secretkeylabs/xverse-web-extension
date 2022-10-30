@@ -39,7 +39,6 @@ const RowContainer = styled.div({
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginTop: props.theme.spacing(11),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   padding: props.theme.spacing(8),
@@ -132,9 +131,9 @@ const TickerImage = styled.img((props) => ({
 }));
 
 const SendButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  marginTop: props.theme.spacing(11),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  paddingBottom: props.theme.spacing(8),
 }));
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;

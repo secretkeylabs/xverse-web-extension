@@ -179,7 +179,11 @@ function Home(): JSX.Element {
   };
 
   const onBTCReceiveSelect = () => {
-    navigate('/receive');
+    navigate('/receive/BTC');
+  };
+
+  const onSTXReceiveSelect = () => {
+    navigate('/receive/STX');
   };
 
   return (
@@ -242,10 +246,10 @@ function Home(): JSX.Element {
           ))}
         </CoinContainer>
         <CoinSelectModal
-          onSelectBitcoin={handleManageTokenListOnClick}
-          onSelectStacks={onBTCReceiveSelect}
+          onSelectBitcoin={onBTCReceiveSelect}
+          onSelectStacks={onSTXReceiveSelect}
           onClose={onReceiveModalClose}
-          onSelectCoin={handleManageTokenListOnClick}
+          onSelectCoin={onSTXReceiveSelect}
           visible={openReceiveModal}
           coins={getCoinsList()}
           title={t('RECEIVE')}
