@@ -8,6 +8,7 @@ import { useState } from 'react';
 import ActionButton from '@components/button';
 import Theme from 'theme';
 import useWalletSelector from '@hooks/useWalletSelector';
+import BottomTabBar from '@components/tabBar';
 
 const TopTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
@@ -69,6 +70,10 @@ const AddressText = styled.h1((props) => ({
   color: props.theme.colors.white['200'],
   wordBreak: 'break-all',
 }));
+
+const BottomBarContainer = styled.div({
+  marginTop: 'auto',
+});
 
 function Receive(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
@@ -145,6 +150,9 @@ function Receive(): JSX.Element {
           <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
         </CopyContainer>
       )}
+      <BottomBarContainer>
+        <BottomTabBar tab="dashboard" />
+      </BottomBarContainer>
     </>
   );
 }
