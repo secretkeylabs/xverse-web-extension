@@ -29,6 +29,7 @@ const ButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(8),
 }));
 
 interface Props {
