@@ -161,5 +161,19 @@
     "SEED_INPUT_LABEL": "Selected Words",
     "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
     "CONTINUE_BUTTON": "Continue"
+  },
+  "SETTING_SCREEN": {
+    "GENERAL": "General",
+    "CURRENCY": "Fiat Currency",
+    "NETWORK": "Network",
+    "SECURITY": "Security",
+    "UPDATE_PASSWORD": "Update Password",
+    "BACKUP_WALLET": "Backup Wallet",
+    "REST_WALLET": "Reset Wallet",
+    "ABOUT": "About",
+    "TERMS_OF_SERVICE": "Terms of Service",
+    "PRIVACY_POLICY": "Privacy Policy",
+    "SUPPORT_CENTER": "Support Center",
+    "VERSION": "Version"
   }
 }
