@@ -134,6 +134,7 @@ const SendButtonContainer = styled.div((props) => ({
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   paddingBottom: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(4),
 }));
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
@@ -282,12 +283,11 @@ function SendForm({
   };
 
   return (
-    <>
-      <ScrollContainer>
-        <OuterContainer>
-          {!disableAmountInput && renderEnterAmountSection()}
-          {renderEnterRecepientSection()}
-          {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
+    <ScrollContainer>
+      <OuterContainer>
+        {!disableAmountInput && renderEnterAmountSection()}
+        {renderEnterRecepientSection()}
+        {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
@@ -308,13 +308,12 @@ function SendForm({
             </InfoContainer>
           </>
 
-          )}
-        </OuterContainer>
-        <ErrorContainer>
-          <ErrorText>{error}</ErrorText>
-        </ErrorContainer>
+        )}
+      </OuterContainer>
+      <ErrorContainer>
+        <ErrorText>{error}</ErrorText>
+      </ErrorContainer>
 
-      </ScrollContainer>
       <SendButtonContainer>
         <ActionButton
           text={buttonText ?? t('NEXT')}
@@ -322,7 +321,7 @@ function SendForm({
           onPress={handleOnPress}
         />
       </SendButtonContainer>
-    </>
+    </ScrollContainer>
   );
 }
 
