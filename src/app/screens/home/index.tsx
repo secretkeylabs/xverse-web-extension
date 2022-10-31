@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { fetchAppInfo } from '@secretkeylabs/xverse-core/api';
-import { FeesMultipliers, FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { fetchAppInfo, getBnsName } from '@secretkeylabs/xverse-core/api';
+import { FeesMultipliers, FungibleToken, SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
@@ -28,6 +28,7 @@ import BottomBar from '@components/tabBar';
 import { StoreState } from '@stores/index';
 import { Account } from '@stores/wallet/actions/types';
 import Seperator from '@components/seperator';
+import { initialNetworksList } from '@utils/constants';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -108,23 +109,33 @@ function Home(): JSX.Element {
     dispatch(FetchFeeMultiplierAction(response));
   };
 
+  const fetchAccount = async () => {
+    const selectedNetwork: SettingsNetwork = network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1];
+    const bnsName = await getBnsName(stxAddress, selectedNetwork);
+    if (accountsList.length === 0) {
+      const accounts: Account[] = [
+        {
+          id: 0,
+          stxAddress,
+          btcAddress,
+          masterPubKey,
+          stxPublicKey,
+          btcPublicKey,
+          bnsName,
+        },
+      ];
+      dispatch(fetchAccountAction(accounts[0], accounts));
+    } else {
+      selectedAccount!.bnsName = bnsName;
+      const account = accountsList.find((accountInArray) => accountInArray.stxAddress === selectedAccount?.stxAddress);
+      account!.bnsName = bnsName;
+      dispatch(fetchAccountAction(selectedAccount!, accountsList));
+    }
+  };
+
   const loadInitialData = useCallback(() => {
     if (stxAddress && btcAddress) {
-      if (accountsList.length === 0) {
-        const accounts: Account[] = [
-          {
-            id: 0,
-            stxAddress,
-            btcAddress,
-            masterPubKey,
-            stxPublicKey,
-            btcPublicKey,
-          },
-        ];
-        dispatch(fetchAccountAction(accounts[0], accounts));
-      } else {
-        dispatch(fetchAccountAction(selectedAccount!, accountsList));
-      }
+      fetchAccount();
       fetchFeeMultiplierData();
       dispatch(fetchRatesAction(fiatCurrency));
       dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
@@ -237,6 +248,7 @@ function Home(): JSX.Element {
         <CoinContainer>
           {list.map((coin) => (
             <TokenTile
+              key={coin.name.toString()}
               title={coin.name}
               currency="FT"
               loading={loadingWalletData}
