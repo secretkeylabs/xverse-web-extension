@@ -1,12 +1,20 @@
-import Seperator from '@components/seperator';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
-const RowContainer = styled.div((props) => ({
+interface ButtonProps {
+  border: string;
+}
+interface TitleProps {
+  textColor: string;
+}
+
+const Button = styled.button<ButtonProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'space-between',
-  justifyContent: 'space-between',
-  marginTop: props.theme.spacing(11),
+  alignItems: 'center',
+  background: 'transparent',
+  justifyContent: 'flex-start',
+  marginTop: props.theme.spacing(6),
+  borderBottom: props.border,
 }));
 
 const ColumnContainer = styled.div((props) => ({
@@ -22,17 +30,20 @@ const TitleText = styled.h1((props) => ({
   paddingTop: props.theme.spacing(12),
 }));
 
-const ComponentText = styled.h1((props) => ({
+const ComponentText = styled.h1<TitleProps>((props) => ({
   ...props.theme.body_m,
   paddingTop: props.theme.spacing(8),
   paddingBottom: props.theme.spacing(8),
+  color: props.textColor,
   flex: 1,
+  textAlign: 'left',
 }));
 
 const ComponentDescriptionText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   paddingTop: props.theme.spacing(8),
   paddingBottom: props.theme.spacing(8),
+  color: props.theme.colors.white['0'],
 }));
 
 interface SettingComponentProps {
@@ -40,8 +51,9 @@ interface SettingComponentProps {
   text: string;
   textDetail?: string;
   onClick?: () => void;
-  icon?: React.ReactNode;
+  icon?: string;
   showDivider?: boolean;
+  showWarningTitle?: boolean;
 }
 
 function SettingComponent({
@@ -51,26 +63,30 @@ function SettingComponent({
   onClick,
   icon,
   showDivider,
+  showWarningTitle,
 }: SettingComponentProps) {
-  const showTitle = (
-    <TitleText>
-      {title}
-    </TitleText>
-  );
+  const theme = useTheme();
+  const showTitle = <TitleText>{title}</TitleText>;
 
-  const showDescriptionText = (
-    <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>
-  );
+  const showDescriptionText = <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>;
+
+  const showIcon = <img src={icon} alt="arrow icon" />;
   return (
     <ColumnContainer>
       {title && showTitle}
-      <RowContainer>
-        <ComponentText>{text}</ComponentText>
+      <Button
+        onClick={onClick}
+        border={showDivider ? `1px solid ${theme.colors.background.elevation3}` : 'transparent'}
+      >
+        <ComponentText
+          textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white['200']}
+        >
+          {text}
+        </ComponentText>
         {textDetail && showDescriptionText}
-      </RowContainer>
-      {showDivider && <Seperator />}
+        {icon && showIcon}
+      </Button>
     </ColumnContainer>
-
   );
 }
 

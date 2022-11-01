@@ -22,6 +22,7 @@ import {
   AddAccountKey,
   UpdateVisibleCoinListKey,
   FetchFeeMultiplierKey,
+  ChangeFiatCurrencyKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -173,6 +174,11 @@ const walletReducer = (
       return {
         ...state,
         feeMultipliers: action.feeMultipliers,
+      };
+    case ChangeFiatCurrencyKey:
+      return {
+        ...state,
+        fiatCurrency: action.fiatCurrency,
       };
     default:
       return state;

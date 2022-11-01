@@ -221,3 +221,10 @@ export function FetchUpdatedVisibleCoinListAction(
     coinsList,
   };
 }
+
+export function ChangeFiatCurrencyAction(fiatCurrency: SupportedCurrency): actions.ChangeFiatCurrency {
+  return {
+    type: actions.ChangeFiatCurrencyKey,
+    fiatCurrency,
+  };
+}

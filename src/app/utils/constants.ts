@@ -1,10 +1,8 @@
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 
-/**
- * terms of service and privacy policy links
- */
 export const TERMS_LINK = 'https://xverse.app/terms';
 export const PRIVACY_POLICY_LINK = 'https://xverse.app/privacy';
+export const SUPPORT_LINK = 'https://support.xverse.app/hc/en-us';
 export const BTC_TRANSACTION_STATUS_URL = 'https://www.blockchain.com/btc/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 

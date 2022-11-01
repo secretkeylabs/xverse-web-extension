@@ -19,6 +19,7 @@ export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
 export const UpdateVisibleCoinListKey = 'UpdateVisibleCoinList';
 export const AddAccountKey = 'AddAccount';
 export const FetchFeeMultiplierKey = 'FetchFeeMultiplier';
+export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
@@ -210,6 +211,11 @@ export interface UpdateVisibleCoinList {
   coinsList: FungibleToken[];
 }
 
+export interface ChangeFiatCurrency {
+  type: typeof ChangeFiatCurrencyKey;
+  fiatCurrency: SupportedCurrency;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -232,4 +238,5 @@ export type WalletActions =
   | FetchCoinDataRequest
   | FetchCoinDataSuccess
   | FetchCoinDataFailure
-  | UpdateVisibleCoinList;
+  | UpdateVisibleCoinList
+  | ChangeFiatCurrency;
