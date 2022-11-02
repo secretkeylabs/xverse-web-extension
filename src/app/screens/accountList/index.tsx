@@ -99,7 +99,6 @@ function AccountList(): JSX.Element {
       index: BigInt(index),
       network: selectedNetwork,
     });
-    const selectedNetwork: SettingsNetwork = network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1];
     const bnsName = await getBnsName(stxAddress, selectedNetwork);
 
     const account: Account = {
