@@ -87,13 +87,14 @@ function AccountList(): JSX.Element {
   };
 
   async function onCreateAccount() {
+    const selectedNetwork = network.type;
     const index = accountsList.length > 0 ? accountsList.length : 1;
     const {
       stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey,
     } = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
       index: BigInt(index),
-      network,
+      network: selectedNetwork,
     });
 
     const account: Account = {

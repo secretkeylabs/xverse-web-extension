@@ -79,6 +79,21 @@ const TokenListButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(4),
 }));
 
+const TestnetContainer = styled.div((props) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: props.theme.colors.background.elevation1,
+  paddingTop: props.theme.spacing(3),
+  paddingBottom: props.theme.spacing(3),
+}));
+
+const TestnetText = styled.h1((props) => ({
+  ...props.theme.body_xs,
+  textAlign: 'center',
+  color: props.theme.colors.white['200'],
+}));
+
 function Home(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const navigate = useNavigate();
@@ -128,10 +143,10 @@ function Home(): JSX.Element {
       fetchFeeMultiplierData();
       dispatch(fetchRatesAction(fiatCurrency));
       dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
-      dispatch(fetchBtcWalletDataRequestAction(btcAddress, network, stxBtcRate, btcFiatRate));
+      dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
       dispatch(fetchCoinDataRequestAction(stxAddress, network, fiatCurrency, coinsList));
     }
-  }, []);
+  }, [stxAddress]);
 
   useEffect(() => {
     loadInitialData();
@@ -186,8 +201,17 @@ function Home(): JSX.Element {
     navigate('/receive/STX');
   };
 
+  const testnetBannerView = network.type === 'Testnet' && (
+    <TestnetContainer>
+      <TestnetText>
+        {t('TESTNET')}
+      </TestnetText>
+    </TestnetContainer>
+  );
+
   return (
     <>
+      {testnetBannerView}
       <SelectedAccountContainer>
         <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
       </SelectedAccountContainer>
@@ -237,6 +261,7 @@ function Home(): JSX.Element {
         <CoinContainer>
           {list.map((coin) => (
             <TokenTile
+              key={coin.name.toString()}
               title={coin.name}
               currency="FT"
               loading={loadingWalletData}

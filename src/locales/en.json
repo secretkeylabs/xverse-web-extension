@@ -23,7 +23,8 @@
     "RECEIVE": "Receive",
     "SEND": "Send",
     "BUY":"Buy",
-    "MANAGE_TOKEN":"Manage token list"
+    "MANAGE_TOKEN":"Manage token list",
+    "TESTNET": "Testnet"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -125,7 +126,9 @@
   "CREATE_PASSWORD_SCREEN": {
     "CREATE_PASSWORD_TITLE": "Enter your new password",
     "CONFIRM_PASSWORD_TITLE": "Confirm your new password",
+    "ENTER_PASSWORD": "Enter your current password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
+    "TEXT_INPUT_ENTER_PASSWORD_LABEL": "Enter your current password",
     "TEXT_INPUT_CONFIRM_PASSWORD_LABEL": "Confirm Password",
     "CONTINUE_BUTTON": "Continue",
     "BACK_BUTTON": "Back",
@@ -134,7 +137,8 @@
     "PASSWORD_STRENGTH_MEDIUM": "Medium",
     "PASSWORD_STRENGTH_STRONG": "Strong",
     "PASSWORD_STRENGTH_ERROR": "You need to enter a stronger password",
-    "CONFIRM_PASSWORD_MATCH_ERROR": "please make sure your passwords match"
+    "CONFIRM_PASSWORD_MATCH_ERROR": "Please make sure your passwords match",
+    "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
   "WALLET_SUCCESS_SCREEN": {
     "SCREEN_TITLE": "Wallet created successfully",
@@ -162,6 +166,13 @@
     "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
     "CONTINUE_BUTTON": "Continue"
   },
+  "RESET_WALLET_SCREEN": {
+    "ENTER_PASSWORD": "Enter your password to reset your wallet",
+    "PASSWORD": "Password",
+    "RESET": "Reset",
+    "BACK": "Back",
+    "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+  },
   "SETTING_SCREEN": {
     "GENERAL": "General",
     "CURRENCY": "Fiat Currency",
@@ -169,11 +180,22 @@
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",
     "BACKUP_WALLET": "Backup Wallet",
-    "REST_WALLET": "Reset Wallet",
+    "RESET_WALLET": "Reset Wallet",
     "ABOUT": "About",
     "TERMS_OF_SERVICE": "Terms of Service",
     "PRIVACY_POLICY": "Privacy Policy",
     "SUPPORT_CENTER": "Support Center",
-    "VERSION": "Version"
+    "VERSION": "Version",
+    "UPDATE_PASSWORD_SUCCESS": "Password successfully updated",
+    "OK": "OK",
+    "RESET_WALLET_DESCRIPTION": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
+    "CANCEL": "Cancel",
+    "NODE": "STX Node",
+    "BACKUP_WALLET_UNLOCK_SEED": "Enter your password to reveal your seedphrase",
+    "REVEAL": "Reveal",
+    "BACK": "Back",
+    "PASSWORD": "Password",
+    "SAVE": "Save",
+    "INVALID_URL": "Invalid URL"
   }
 }

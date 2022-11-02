@@ -4,6 +4,7 @@ import {
   FeesMultipliers,
   FungibleToken,
   NetworkType,
+  SettingsNetwork,
   SupportedCurrency,
   TransactionData,
 } from '@secretkeylabs/xverse-core/types';
@@ -63,7 +64,7 @@ export function selectAccount(
   masterPubKey: string,
   stxPublicKey: string,
   btcPublicKey: string,
-  network: NetworkType,
+  network: SettingsNetwork,
   // stackingState: StackingStateData,
   bnsName?: string,
 ): actions.SelectAccount {
@@ -115,7 +116,7 @@ export function fetchRatesFailAction(error: string): actions.FetchRatesFail {
 
 export function fetchStxWalletDataRequestAction(
   stxAddress: string,
-  network: NetworkType,
+  network: SettingsNetwork,
   fiatCurrency: string,
   stxBtcRate: BigNumber,
 ): actions.FetchStxWalletDataRequest {
@@ -182,7 +183,7 @@ export function fetchBtcWalletDataFail(): actions.FetchBtcWalletDataFail {
 
 export function fetchCoinDataRequestAction(
   stxAddress: string,
-  network: NetworkType,
+  network: SettingsNetwork,
   fiatCurrency: string,
   coinsList: FungibleToken[] | null,
 ): actions.FetchCoinDataRequest {
@@ -226,5 +227,12 @@ export function ChangeFiatCurrencyAction(fiatCurrency: SupportedCurrency): actio
   return {
     type: actions.ChangeFiatCurrencyKey,
     fiatCurrency,
+  };
+}
+
+export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNetwork {
+  return {
+    type: actions.ChangeNetworkKey,
+    network,
   };
 }

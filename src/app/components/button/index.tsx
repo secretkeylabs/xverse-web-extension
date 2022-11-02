@@ -5,6 +5,7 @@ interface ButtonProps {
   alignment?: string;
   border?: string;
   margin: number;
+  marginTop: number;
   disabled?: boolean;
 }
 
@@ -20,6 +21,7 @@ const Button = styled.button<ButtonProps>((props) => ({
   border: `1px solid ${props.border}`,
   marginRight: props.theme.spacing(props.margin),
   marginLeft: props.theme.spacing(props.margin),
+  marginTop: props.theme.spacing(props.marginTop),
   opacity: props.disabled ? 0.6 : 1,
 }));
 
@@ -46,6 +48,7 @@ interface Props {
   buttonColor?: string;
   buttonAlignment?: string;
   margin?: number;
+  marginTop?: number;
 }
 
 function ActionButton({
@@ -58,6 +61,7 @@ function ActionButton({
   buttonColor,
   buttonAlignment,
   margin,
+  marginTop,
 }: Props) {
   const handleOnPress = () => {
     if (!disabled) { onPress(); }
@@ -70,6 +74,7 @@ function ActionButton({
       alignment={buttonAlignment}
       border={buttonBorderColor}
       margin={margin ?? 0}
+      marginTop={marginTop ?? 0}
       disabled={disabled}
     >
       {processing ? (

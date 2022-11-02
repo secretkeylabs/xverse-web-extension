@@ -28,6 +28,8 @@ export const currencyList: Currency[] = [
   { name: 'JPY', flag: JapanFlag },
   { name: 'SGD', flag: SGD },
   { name: 'GBP', flag: GBP },
+  { name: 'BRL', flag: BRL },
+  { name: 'RUB', flag: RUB },
 
 ];
 

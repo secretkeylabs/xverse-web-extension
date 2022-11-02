@@ -15,9 +15,6 @@ display: flex;
 flex-direction: column;
 flex: 1;
 overflow-y: auto;
-function showDivider(index: number): boolean {
-  return !(index === currencyList.length - 1);
-}
 padding-left: 16px;
 padding-right: 16px;
 padding-bottom: 16px;

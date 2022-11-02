@@ -7,11 +7,10 @@ import {
   getCoinsInfo,
   getFtData,
 } from '@secretkeylabs/xverse-core/api';
-import { initialNetworksList, PAGINATION_LIMIT } from '@utils/constants';
+import { PAGINATION_LIMIT } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import {
   BtcAddressData,
-  SettingsNetwork,
   StxAddressData,
   FungibleToken,
   CoinsResponse,
@@ -51,10 +50,9 @@ function* fetchRates(action: FetchRates) {
 
 function* fetchStxWalletData(action: FetchStxWalletDataRequest) {
   try {
-    const selectedNetwork: SettingsNetwork = action.network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1];
     const stxData: StxAddressData = yield fetchStxAddressData(
       action.stxAddress,
-      selectedNetwork,
+      action.network,
       0,
       PAGINATION_LIMIT,
     );
@@ -93,11 +91,10 @@ function* fetchBtcWalletData(action: FetchBtcWalletDataRequest) {
 
 function* fetchCoinData(action: FetchCoinDataRequest) {
   try {
-    const selectedNetwork: SettingsNetwork = action.network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1];
     const fungibleTokenList: Array<FungibleToken> = yield call(
       getFtData,
       action.stxAddress,
-      selectedNetwork,
+      action.network,
     );
     const visibleCoins: FungibleToken[] | null = action.coinsList;
     if (visibleCoins) {

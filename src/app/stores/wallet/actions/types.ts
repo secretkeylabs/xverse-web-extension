@@ -4,6 +4,7 @@ import {
   FeesMultipliers,
   FungibleToken,
   NetworkType,
+  SettingsNetwork,
   SupportedCurrency,
   TransactionData,
 } from '@secretkeylabs/xverse-core/types';
@@ -20,6 +21,7 @@ export const UpdateVisibleCoinListKey = 'UpdateVisibleCoinList';
 export const AddAccountKey = 'AddAccount';
 export const FetchFeeMultiplierKey = 'FetchFeeMultiplier';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
+export const ChangeNetworkKey = 'ChangeNetwork';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
@@ -55,7 +57,7 @@ export interface WalletState {
   btcPublicKey: string;
   accountsList: Account[];
   selectedAccount: Account | null;
-  network: NetworkType;
+  network: SettingsNetwork;
   seedPhrase: string;
   encryptedSeed: string;
   loadingWalletData: boolean;
@@ -129,7 +131,7 @@ export interface SelectAccount {
   stxPublicKey: string;
   btcPublicKey: string;
   bnsName?: string;
-  network: NetworkType;
+  network: SettingsNetwork;
   // stackingState: StackingStateData;
 }
 
@@ -152,7 +154,7 @@ export interface FetchRatesFail {
 export interface FetchStxWalletDataRequest {
   type: typeof FetchStxWalletDataRequestKey;
   stxAddress: string;
-  network: NetworkType;
+  network: SettingsNetwork;
   fiatCurrency: string;
   stxBtcRate: BigNumber;
 }
@@ -191,7 +193,7 @@ export interface FetchBtcWalletDataFail {
 export interface FetchCoinDataRequest {
   type: typeof FetchCoinDataRequestKey;
   stxAddress: string;
-  network: NetworkType;
+  network: SettingsNetwork;
   fiatCurrency: string;
   coinsList: FungibleToken[] | null;
 }
@@ -214,6 +216,10 @@ export interface UpdateVisibleCoinList {
 export interface ChangeFiatCurrency {
   type: typeof ChangeFiatCurrencyKey;
   fiatCurrency: SupportedCurrency;
+}
+export interface ChangeNetwork {
+  type: typeof ChangeNetworkKey;
+  network: SettingsNetwork;
 }
 
 export type WalletActions =
@@ -239,4 +245,5 @@ export type WalletActions =
   | FetchCoinDataSuccess
   | FetchCoinDataFailure
   | UpdateVisibleCoinList
-  | ChangeFiatCurrency;
+  | ChangeFiatCurrency
+  | ChangeNetwork;
