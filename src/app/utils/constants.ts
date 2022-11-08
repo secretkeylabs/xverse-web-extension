@@ -1,5 +1,7 @@
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 
+export const BNS_CONTRACT = 'SP000000000000000000002Q6VF78.bns::names';
+export const GAMMA_URL = 'https://gamma.io/';
 /**
  * terms of service and privacy policy links
  */

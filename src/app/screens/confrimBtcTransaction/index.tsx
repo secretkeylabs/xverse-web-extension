@@ -67,7 +67,7 @@ function ConfirmBtcTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchBtcWalletDataRequestAction(btcAddress, network, stxBtcRate, btcFiatRate));
+        dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
       }, 1000);
     }
   }, [btcTxBroadcastData]);
@@ -87,7 +87,7 @@ function ConfirmBtcTransaction() {
   const networkInfoSection = (
     <InfoContainer>
       <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network}</ValueText>
+      <ValueText>{network.type}</ValueText>
     </InfoContainer>
   );
 

@@ -52,3 +52,13 @@ export function getAddressDetail(account:Account) {
 export function getExplorerUrl(stxAddress: string): string {
   return `https://explorer.stacks.co/address/${stxAddress}?chain=mainnet`;
 }
+
+export function getFetchableUrl(uri: string, protocol: string): string | undefined {
+  const publicIpfs = 'https://ipfs.io/ipfs';
+  if (protocol === 'http') return uri;
+  if (protocol === 'ipfs') {
+    const url = uri.split('//');
+    return `${publicIpfs}/${url[1]}`;
+  }
+  return undefined;
+}
