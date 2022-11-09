@@ -5,6 +5,7 @@ import { NonFungibleToken, getBnsNftName } from '@secretkeylabs/xverse-core/type
 import { BNS_CONTRACT } from '@utils/constants';
 import NftUser from '@assets/img/nftDashboard/nft_user.svg';
 import { useNavigate } from 'react-router-dom';
+import useNftDataReducer from '@hooks/useNftReducer';
 import NftImage from './nftImage';
 
 interface Props {
@@ -42,6 +43,8 @@ const GridItemContainer = styled.button((props) => ({
 
 function Nft({ asset }: Props) {
   const navigate = useNavigate();
+  const { storeNftData } = useNftDataReducer();
+  const url = `${asset.asset_identifier}::${asset.value.repr}`;
   const { data } = useQuery(
     ['nft-meta-data', asset.asset_identifier],
     async () => {
@@ -63,30 +66,26 @@ function Nft({ asset }: Props) {
     }
   }
 
-  const nftName = (
-    <NftNameText>{getName()}</NftNameText>
-  );
-
-  const bnsPlaceholder = (
-    <GradientContainer>
-      <img src={NftUser} alt="user" />
-    </GradientContainer>
-  );
-
   const handleOnClick = () => {
-
+    storeNftData(data);
+    if (asset.asset_identifier !== BNS_CONTRACT) {
+      navigate(`nft-detail/${url}`);
+    }
   };
 
   return (
     <GridItemContainer onClick={handleOnClick}>
-      {asset.asset_identifier === BNS_CONTRACT ? bnsPlaceholder : (
+      {asset.asset_identifier === BNS_CONTRACT ? (
+        <GradientContainer>
+          <img src={NftUser} alt="user" />
+        </GradientContainer>
+      ) : (
         <NftImage
           metadata={data?.data.token_metadata}
         />
       )}
-      {nftName}
+      <NftNameText>{getName()}</NftNameText>
     </GridItemContainer>
-
   );
 }
 export default Nft;

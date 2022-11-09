@@ -180,6 +180,25 @@
     "COPY": "Copy link",
     "NFT_DETAIL":"Item detail"
   },
+  "NFT_DETAIL_SCREEN": {
+    "NFT_DETAIL":"Item detail",
+    "WEB_GALLERY": "Open web gallery",
+    "SEND": "Send",
+    "SHARE": "Share",
+    "OWNED_BY": "Owned By",
+    "DESCRIPTION": "Description",
+    "NAME": "Name",
+    "CREATOR": "Creator",
+    "LAST_SOLD": "Last sold",
+    "STATUS": "Status",
+    "RARITY": "Overall rarity",
+    "CONTRACT_ID": "Contract ID",
+    "ATTRIBUTES": "Attributes",
+    "VIEW_CONTRACT": "View the contract on",
+    "STACKS_EXPLORER":"Stacks Explorer",
+    "DETAILS": "See detail on",
+    "GAMMA": "Gamma.io"
+  },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
     "PASSWORD": "Password",

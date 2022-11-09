@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
+import Img from 'react-image';
 import { TokenMetaData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getFetchableUrl } from '@utils/helper';
 import NftPlaceholderImage from '@assets/img/nftDashboard/ic_nft_diamond.svg';
-import Img from 'react-image';
 
 const ImageContainer = styled.div((props) => ({
   padding: props.theme.spacing(10),
@@ -22,12 +22,6 @@ interface Props {
   metadata: TokenMetaData;
 }
 
-const showloader = (
-  <ImageContainer>
-    <Ring color="white" size={30} />
-  </ImageContainer>
-);
-
 const showNftImagePlaceholder = (
   <ImageContainer>
     <img src={NftPlaceholderImage} alt="nft" />
@@ -38,21 +32,30 @@ function NftImage({ metadata }: Props) {
   if (metadata?.image_protocol) {
     return (
       <Suspense>
-        <Img width="100%" src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')} loader={showloader} unloader={showNftImagePlaceholder} />
+        <Img
+          width="100%"
+          src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
+          loader={(
+            <ImageContainer>
+              <Ring color="white" size={30} />
+            </ImageContainer>
+          )}
+          unloader={showNftImagePlaceholder}
+        />
       </Suspense>
     );
   }
 
   if (metadata?.asset_protocol) {
     return (
-      <ImageContainer>
-        <Video src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')} />
-      </ImageContainer>
+      <Video src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')} autoPlay loop playsInline controls preload="auto" poster="" />
     );
   }
 
   return (
-    showloader
+    <ImageContainer>
+      <Ring color="white" size={30} />
+    </ImageContainer>
   );
 }
 

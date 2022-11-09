@@ -21,6 +21,7 @@ import RestoreWallet from '@screens/restoreWallet';
 import ForgotPassword from '@screens/forgotPassword';
 import BackupWalletSteps from '@screens/backupWalletSteps';
 import NftDashboard from '@screens/nftDashboard';
+import NftDetailScreen from '@screens/nftDetail';
 
 const router = createHashRouter([
   {
@@ -110,6 +111,10 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard',
         element: <NftDashboard />,
+      },
+      {
+        path: 'nft-dashboard/nft-detail/:id',
+        element: <NftDetailScreen />,
       },
     ],
   },
