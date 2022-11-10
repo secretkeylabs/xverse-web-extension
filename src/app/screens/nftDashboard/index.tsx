@@ -68,6 +68,12 @@ const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
 
+const ShareDialogeContainerContainer = styled.div({
+  position: 'absolute',
+  top: 0,
+  right: 0,
+});
+
 const CollectiblesHeadingText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['200'],
@@ -105,7 +111,7 @@ function NftDashboard() {
 
   const { isLoading, data } = useQuery(
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNftsData('SP2VC4CXTWYRZEV7MSGXPNHE739N14ECQWX8JP2BF', network, offset.current),
+    async () => getNftsData(stxAddress, network, offset.current),
   );
 
   useEffect(() => {
@@ -181,7 +187,10 @@ function NftDashboard() {
             buttonBorderColor={theme.colors.background.elevation2}
           />
           {showShareNftOptions && (
-            <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />
+            <ShareDialogeContainerContainer>
+              <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />
+            </ShareDialogeContainerContainer>
+
           )}
         </ButtonContainer>
         {isLoading ? (

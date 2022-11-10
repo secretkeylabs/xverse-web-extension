@@ -71,7 +71,7 @@ function SendStxScreen() {
       setError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
-    if (!validateStxAddress({ stxAddress: associatedAddress, network })) {
+    if (!validateStxAddress({ stxAddress: associatedAddress, network: network.type })) {
       setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }

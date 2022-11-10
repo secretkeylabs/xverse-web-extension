@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
 import { getExplorerUrl } from '@utils/helper';
+import { useBnsName } from '@hooks/useBnsName';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -47,8 +49,9 @@ interface Props {
   recipient: string;
 }
 function RecipientAddressView({ recipient }: Props) {
+  const { network } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-
+  const bnsName = useBnsName(recipient, network);
   const handleOnPress = () => {
     window.open(getExplorerUrl(recipient));
   };
@@ -56,6 +59,7 @@ function RecipientAddressView({ recipient }: Props) {
   return (
     <InfoContainer>
       <TitleText>{t('RECEPIENT_ADDRESS')}</TitleText>
+      <ValueText>{bnsName}</ValueText>
       <RowContainer>
         <ValueText>{recipient}</ValueText>
         <ActionButton onClick={handleOnPress}>

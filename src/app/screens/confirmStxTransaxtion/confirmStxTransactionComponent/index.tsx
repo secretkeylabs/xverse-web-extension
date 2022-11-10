@@ -48,6 +48,7 @@ interface Props {
   onConfirmClick: (transactions: StacksTransaction[]) => void;
   children: ReactNode;
   isSponsored?: boolean;
+  isNft?: boolean;
 }
 
 function ConfirmStxTransationComponent({
@@ -57,6 +58,7 @@ function ConfirmStxTransationComponent({
   children,
   onConfirmClick,
   onCancelClick,
+  isNft,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const {
@@ -148,7 +150,7 @@ function ConfirmStxTransationComponent({
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
       <Container>
-        <TransferAmountView currency="STX" amount={getAmount()} />
+        {!isNft && <TransferAmountView currency="STX" amount={getAmount()} />}
         {children}
         <TransferFeeView
           fee={microstacksToStx(getFee())}

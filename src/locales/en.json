@@ -49,6 +49,7 @@
     "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
+    "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
     "ERRORS": {
@@ -61,8 +62,10 @@
       "MINIMUM_AMOUNT": "Minimum amount is 0.000001 STX",
       "INSUFFICIENT_BALANCE": "Insufficient balance",
       "MEMO_LENGTH": "Memo exceeds allowed length",
-      "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees"
-    }
+      "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
+      "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
+    },
+    "SEND_NFT":"Send NFT"
   },
   "CONFIRM_TRANSACTION": {
     "SEND":"Send",

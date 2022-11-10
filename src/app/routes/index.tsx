@@ -22,6 +22,8 @@ import ForgotPassword from '@screens/forgotPassword';
 import BackupWalletSteps from '@screens/backupWalletSteps';
 import NftDashboard from '@screens/nftDashboard';
 import NftDetailScreen from '@screens/nftDetail';
+import SendNft from '@screens/sendNft';
+import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 
 const router = createHashRouter([
   {
@@ -67,6 +69,10 @@ const router = createHashRouter([
       {
         path: 'send-btc',
         element: <SendBtcScreen />,
+      },
+      {
+        path: 'nft-dashboard/nft-detail/:id/send-nft',
+        element: <SendNft />,
       },
       {
         path: 'confirm-stx-tx',
@@ -115,6 +121,10 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/nft-detail/:id',
         element: <NftDetailScreen />,
+      },
+      {
+        path: 'confirm-nft-tx/:id',
+        element: <ConfirmNftTransaction />,
       },
     ],
   },
