@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ChangeFiatCurrencyAction } from '@stores/wallet/actions/actionCreators';
 import { SupportedCurrency } from '@secretkeylabs/xverse-core';
-import { currencyList } from './helper';
+import { currencyList } from '../../../utils/currency';
 import CurrencyRow from './currencyRow';
 
 const Container = styled.div`

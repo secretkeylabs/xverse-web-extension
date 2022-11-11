@@ -45,29 +45,23 @@ function BackupWalletScreen() {
     }
   };
 
-  const enterPassword = (
-    <PasswordInput
-      title={t('SETTING_SCREEN.BACKUP_WALLET_UNLOCK_SEED')}
-      inputLabel={t('SETTING_SCREEN.PASSWORD')}
-      enteredPassword={password}
-      setEnteredPassword={setPassword}
-      handleContinue={handlePasswordNextClick}
-      handleBack={goToSettingScreen}
-      passwordError={error}
-      stackButtonAlignment
-    />
-  );
-
-  const seedPhraseView = (
-    <SeedCheck seedPhrase={seedPhrase} onContinue={goToSettingScreen} />
-  );
-
   return (
     <>
       <TopRow title={t('SETTING_SCREEN.BACKUP_WALLET')} onClick={goToSettingScreen} />
       <Container>
-        {!showSeed && enterPassword}
-        {showSeed && seedPhraseView}
+        {!showSeed && (
+        <PasswordInput
+          title={t('SETTING_SCREEN.BACKUP_WALLET_UNLOCK_SEED')}
+          inputLabel={t('SETTING_SCREEN.PASSWORD')}
+          enteredPassword={password}
+          setEnteredPassword={setPassword}
+          handleContinue={handlePasswordNextClick}
+          handleBack={goToSettingScreen}
+          passwordError={error}
+          stackButtonAlignment
+        />
+        )}
+        {showSeed && <SeedCheck seedPhrase={seedPhrase} onContinue={goToSettingScreen} />}
       </Container>
       <BottomBar tab="settings" />
     </>

@@ -1,7 +1,7 @@
 import styled, { useTheme } from 'styled-components';
 import TickIcon from '@assets/img/settings/tick.svg';
 import { SupportedCurrency } from '@secretkeylabs/xverse-core/types';
-import { Currency } from './helper';
+import { Currency } from '../../../utils/currency';
 
 interface TitleProps {
   color: string;
@@ -41,9 +41,6 @@ function CurrencyRow({
   currency, isSelected, onCurrencySelected, showDivider,
 }: Props) {
   const theme = useTheme();
-  const showTick = (
-    <img src={TickIcon} alt="tick" />
-  );
   const onClick = () => {
     onCurrencySelected(currency.name);
   };
@@ -56,7 +53,7 @@ function CurrencyRow({
       <Text color={isSelected ? theme.colors.white['0'] : theme.colors.white['200']}>
         {currency.name}
       </Text>
-      {isSelected && showTick}
+      {isSelected && <img src={TickIcon} alt="tick" />}
     </Button>
   );
 }

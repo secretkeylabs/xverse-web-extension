@@ -116,6 +116,15 @@ export enum PasswordStrength {
   STRONG = 12,
   EMPTY = 0,
 }
+interface TransparentButtonContainerProps {
+  stackButtonAlignment: boolean;
+}
+const ButtonContainer = styled.div<TransparentButtonContainerProps>((props) => ({
+  marginLeft: props.stackButtonAlignment ? 0 : 3,
+  marginRight: props.stackButtonAlignment ? 0 : 3,
+  marginTop: props.theme.spacing(4),
+  width: '100%',
+}));
 
 function PasswordInput(props: PasswordInputProps): JSX.Element {
   const {
@@ -222,14 +231,14 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
       {error && <ErrorMessage>{error}</ErrorMessage>}
       {checkPasswordStrength && (enteredPassword.length > 0 ? renderStrengthBar() : null)}
       <ButtonsContainer stackButtonAlignment={stackButtonAlignment} ifError={error !== ''}>
-        <ActionButton
-          text={t('BACK_BUTTON')}
-          buttonColor="transparent"
-          buttonBorderColor={theme.colors.background.elevation2}
-          onPress={handleBack}
-          marginTop={5}
-          margin={stackButtonAlignment ? 0 : 3}
-        />
+        <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
+          <ActionButton
+            text={t('BACK_BUTTON')}
+            onPress={handleBack}
+            transparent
+          />
+        </ButtonContainer>
+
         <ActionButton
           text={t('CONTINUE_BUTTON')}
           onPress={checkPasswordStrength ? checkStrengthAndContinue : handleContinue}

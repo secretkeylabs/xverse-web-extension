@@ -7,7 +7,6 @@ import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
-import Theme from 'theme';
 import {
   microstacksToStx, stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
@@ -41,6 +40,35 @@ const ButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(8),
 }));
 
+const TransparentButtonContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(2),
+  marginRight: props.theme.spacing(2),
+  width: '100%',
+}));
+
+const Button = styled.button((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
+  width: '100%',
+  marginTop: props.theme.spacing(5),
+}));
+
+const ButtonText = styled.div((props) => ({
+  ...props.theme.body_xs,
+  fontWeight: 700,
+  color: props.theme.colors.white['0'],
+  textAlign: 'center',
+}));
+
+const ButtonImage = styled.img((props) => ({
+  marginRight: props.theme.spacing(3),
+  alignSelf: 'center',
+  transform: 'all',
+}));
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
@@ -126,15 +154,6 @@ function ConfirmStxTransationComponent({
     onConfirmClick(signedTxs);
   };
 
-  const advancedSettingButton = (
-    <ActionButton
-      src={SettingIcon}
-      text={t('ADVANCED_SETTING')}
-      buttonColor="transparent"
-      buttonAlignment="flex-start"
-      onPress={onAdvancedSettingClick}
-    />
-  );
   const applyTxSettings = (settingFee: string, nonce?: string) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
     setFee(stateTx[0], BigInt(fee.toString()));
@@ -154,7 +173,14 @@ function ConfirmStxTransationComponent({
           fee={microstacksToStx(getFee())}
           currency="STX"
         />
-        {!isSponsored && advancedSettingButton}
+        {!isSponsored && (
+        <Button onClick={onAdvancedSettingClick}>
+          <>
+            <ButtonImage src={SettingIcon} />
+            <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
+          </>
+        </Button>
+        )}
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
           fee={microstacksToStx(getFee()).toString()}
@@ -165,14 +191,15 @@ function ConfirmStxTransationComponent({
         />
       </Container>
       <ButtonContainer>
-        <ActionButton
-          text={t('CANCEL')}
-          buttonColor="transparent"
-          disabled={buttonLoading}
-          buttonBorderColor={Theme.colors.background.elevation2}
-          onPress={onCancelClick}
-          margin={3}
-        />
+        <TransparentButtonContainer>
+          <ActionButton
+            text={t('CANCEL')}
+            transparent
+            disabled={buttonLoading}
+            onPress={onCancelClick}
+          />
+        </TransparentButtonContainer>
+
         <ActionButton
           text={t('CONFIRM')}
           disabled={buttonLoading}

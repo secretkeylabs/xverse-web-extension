@@ -120,7 +120,7 @@ function ConfirmStxTransaction() {
   const networkInfoSection = (
     <InfoContainer>
       <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network}</ValueText>
+      <ValueText>{network.type}</ValueText>
     </InfoContainer>
   );
 

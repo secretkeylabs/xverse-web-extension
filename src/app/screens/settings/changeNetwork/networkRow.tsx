@@ -40,12 +40,10 @@ function NetworkRow({
   network, isSelected, onNetworkSelected, showDivider,
 }: Props) {
   const theme = useTheme();
-  const showTick = (
-    <img src={TickIcon} alt="tick" />
-  );
   const onClick = () => {
     onNetworkSelected(network);
   };
+
   return (
     <Button
       onClick={onClick}
@@ -54,7 +52,7 @@ function NetworkRow({
       <Text color={isSelected ? theme.colors.white['0'] : theme.colors.white['200']}>
         {network.type}
       </Text>
-      {isSelected && showTick}
+      {isSelected && <img src={TickIcon} alt="tick" />}
     </Button>
   );
 }

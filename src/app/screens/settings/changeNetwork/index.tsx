@@ -77,7 +77,7 @@ function ChangeNetworkScreen() {
   const { network, seedPhrase } = useWalletSelector();
   const [changeNetwork, setChangeNetwork] = useState<SettingsNetwork>(network);
   const [error, setError] = useState<string>('');
-  const [url, setUrl] = useState<string>('https://stacks-node-api.mainnet.stacks.co');
+  const [url, setUrl] = useState<string>(network.address);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -99,7 +99,8 @@ function ChangeNetworkScreen() {
   };
 
   const onSubmit = async () => {
-    if (isValidURL(url)) {
+    const response = await isValidURL(url);
+    if (response) {
       dispatch(ChangeNetworkAction(changeNetwork));
       const wallet = await walletFromSeedPhrase({
         mnemonic: seedPhrase,
@@ -113,50 +114,32 @@ function ChangeNetworkScreen() {
     }
   };
 
-  const mainnetNetworkRow = (
-    <NetworkRow
-      network={initialNetworksList[0]}
-      isSelected={changeNetwork.type === 'Mainnet'}
-      onNetworkSelected={onNetworkSelected}
-      showDivider
-    />
-  );
-
-  const testnetNetworkRow = (
-    <NetworkRow
-      network={initialNetworksList[1]}
-      isSelected={changeNetwork.type === 'Testnet'}
-      onNetworkSelected={onNetworkSelected}
-      showDivider={false}
-    />
-  );
-  const stxNodeField = (
-    <>
-      <NodeText>{t('NODE')}</NodeText>
-      <InputContainer>
-        <Input onChange={onChange} value={url} />
-        <Button onClick={onCrossClick}>
-          <img width={15} height={15} src={Cross} alt="cross" />
-        </Button>
-      </InputContainer>
-
-    </>
-  );
-
-  const errorMessage = (
-    <ErrorMessage>
-      {error}
-    </ErrorMessage>
-  );
-
   return (
     <>
       <TopRow title={t('CURRENCY')} onClick={handleBackButtonClick} />
       <Container>
-        {mainnetNetworkRow}
-        {testnetNetworkRow}
-        {stxNodeField}
-        {errorMessage}
+        <NetworkRow
+          network={initialNetworksList[0]}
+          isSelected={changeNetwork.type === 'Mainnet'}
+          onNetworkSelected={onNetworkSelected}
+          showDivider
+        />
+        <NetworkRow
+          network={initialNetworksList[1]}
+          isSelected={changeNetwork.type === 'Testnet'}
+          onNetworkSelected={onNetworkSelected}
+          showDivider={false}
+        />
+        <NodeText>{t('NODE')}</NodeText>
+        <InputContainer>
+          <Input onChange={onChange} value={url} />
+          <Button onClick={onCrossClick}>
+            <img width={15} height={15} src={Cross} alt="cross" />
+          </Button>
+        </InputContainer>
+        <ErrorMessage>
+          {error}
+        </ErrorMessage>
       </Container>
       <ButtonContainer>
         <ActionButton

@@ -67,7 +67,7 @@ function ConfirmBtcTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchBtcWalletDataRequestAction(btcAddress, network, stxBtcRate, btcFiatRate));
+        dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
       }, 1000);
     }
   }, [btcTxBroadcastData]);
@@ -83,13 +83,6 @@ function ConfirmBtcTransaction() {
       });
     }
   }, [txError]);
-
-  const networkInfoSection = (
-    <InfoContainer>
-      <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network}</ValueText>
-    </InfoContainer>
-  );
 
   const handleOnConfirmClick = (txHex: string) => {
     mutate({ signedTx: txHex });
@@ -111,7 +104,10 @@ function ConfirmBtcTransaction() {
         onBackButtonClick={goBackToScreen}
       >
         <RecipientAddressView recipient={recipientAddress} />
-        {networkInfoSection}
+        <InfoContainer>
+          <TitleText>{t('NETWORK')}</TitleText>
+          <ValueText>{network.type}</ValueText>
+        </InfoContainer>
         <Seperator />
       </ConfirmBtcTransactionComponent>
       <BottomBar tab="dashboard" />

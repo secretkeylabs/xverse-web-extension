@@ -1,4 +1,4 @@
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
 import XverseLogo from '@assets/img/settings/logo.svg';
@@ -25,6 +25,12 @@ const Container = styled.div`
     display: none;
   }
 `;
+
+const TransparentButtonContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(2),
+  marginRight: props.theme.spacing(2),
+  width: '100%',
+}));
 
 const PasswordChangedSuccessContainer = styled.div((props) => ({
   display: 'flex',
@@ -86,7 +92,6 @@ function Setting() {
   const [showResetWalletPrompt, setShowResetWalletPrompt] = useState<boolean>(false);
   const { fiatCurrency, network } = useWalletSelector();
   const navigate = useNavigate();
-  const theme = useTheme();
 
   useEffect(() => {
     if (location?.state?.passwordUpdated) {
@@ -158,16 +163,17 @@ function Setting() {
     >
       <ResetWalletText>{t('RESET_WALLET_DESCRIPTION')}</ResetWalletText>
       <ButtonContainer>
-        <ActionButton
-          text={t('CANCEL')}
-          buttonColor="transparent"
-          buttonBorderColor={theme.colors.background.elevation6}
-          onPress={onResetWalletPromptClose}
-          margin={3}
-        />
+        <TransparentButtonContainer>
+          <ActionButton
+            text={t('CANCEL')}
+            transparent
+            onPress={onResetWalletPromptClose}
+          />
+        </TransparentButtonContainer>
+
         <ActionButton
           text={t('RESET_WALLET')}
-          buttonColor={theme.colors.feedback.error}
+          warning
           onPress={openResetWalletScreen}
         />
       </ButtonContainer>
