@@ -66,14 +66,10 @@ function SettingComponent({
   showWarningTitle,
 }: SettingComponentProps) {
   const theme = useTheme();
-  const showTitle = <TitleText>{title}</TitleText>;
 
-  const showDescriptionText = <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>;
-
-  const showIcon = <img src={icon} alt="arrow icon" />;
   return (
     <ColumnContainer>
-      {title && showTitle}
+      {title && <TitleText>{title}</TitleText>}
       <Button
         onClick={onClick}
         border={showDivider ? `1px solid ${theme.colors.background.elevation3}` : 'transparent'}
@@ -83,8 +79,8 @@ function SettingComponent({
         >
           {text}
         </ComponentText>
-        {textDetail && showDescriptionText}
-        {icon && showIcon}
+        {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
+        {icon && <img src={icon} alt="arrow icon" />}
       </Button>
     </ColumnContainer>
   );

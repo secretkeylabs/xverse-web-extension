@@ -1,60 +1,65 @@
-import PasswordInput from '@components/passwordInput';
-import useWalletReducer from '@hooks/useWalletReducer';
-import { useState } from 'react';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(30),
-  marginLeft: props.theme.spacing(13),
-  marginRight: props.theme.spacing(13),
-
+const ResetWalletText = styled.h1((props) => ({
+  ...props.theme.body_l,
+  textAlign: 'center',
+  color: props.theme.colors.white['200'],
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(12),
+  paddingBottom: props.theme.spacing(12),
 }));
 
-function ResetWalletScreen() {
-  const { t } = useTranslation('translation', { keyPrefix: 'RESET_WALLET_SCREEN' });
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const navigate = useNavigate();
-  const { unlockWallet, resetWallet } = useWalletReducer();
+const ButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  paddingBottom: props.theme.spacing(16),
+}));
 
-  const goToSettingScreen = () => {
-    navigate('/settings');
-  };
+const TransparentButtonContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(2),
+  marginRight: props.theme.spacing(2),
+  width: '100%',
+}));
 
-  const handleResetWallet = () => {
-    resetWallet();
-    navigate('/');
-  };
-
-  const handlePasswordNextClick = async () => {
-    try {
-      await unlockWallet(password);
-      setPassword('');
-      setError('');
-      handleResetWallet();
-    } catch (e) {
-      setError(t('INCORRECT_PASSWORD_ERROR'));
-    }
-  };
-
+interface Props {
+  showResetWalletPrompt: boolean;
+  onResetWalletPromptClose: () => void;
+  openResetWalletScreen: () => void;
+}
+function ResetWalletPrompt({ showResetWalletPrompt, onResetWalletPromptClose, openResetWalletScreen }:Props) {
+  const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   return (
-    <Container>
-      <PasswordInput
-        title={t('ENTER_PASSWORD')}
-        inputLabel={t('PASSWORD')}
-        enteredPassword={password}
-        setEnteredPassword={setPassword}
-        handleContinue={handlePasswordNextClick}
-        handleBack={goToSettingScreen}
-        passwordError={error}
-        stackButtonAlignment
-      />
-    </Container>
+    <BottomModal
+      visible={showResetWalletPrompt}
+      header={t('RESET_WALLET')}
+      onClose={onResetWalletPromptClose}
+    >
+      <ResetWalletText>{t('RESET_WALLET_DESCRIPTION')}</ResetWalletText>
+      <ButtonContainer>
+        <TransparentButtonContainer>
+          <ActionButton
+            text={t('CANCEL')}
+            transparent
+            onPress={onResetWalletPromptClose}
+          />
+        </TransparentButtonContainer>
+
+        <ActionButton
+          text={t('RESET_WALLET')}
+          warning
+          onPress={openResetWalletScreen}
+        />
+      </ButtonContainer>
+    </BottomModal>
   );
 }
 
-export default ResetWalletScreen;
+export default ResetWalletPrompt;

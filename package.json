@@ -30,6 +30,7 @@
     "react-redux": "^7.2.1",
     "react-router-dom": "^6.4.0",
     "react-select": "^5.4.0",
+    "react-simple-snackbar": "^1.1.11",
     "react-spinners-css": "^2.0.1",
     "react-switch": "^7.0.0",
     "redux": "^4.0.5",

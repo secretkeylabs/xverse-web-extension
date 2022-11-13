@@ -25,7 +25,6 @@ import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import ChangePasswordScreen from '@screens/settings/changePassword';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import BackupWalletScreen from '@screens/settings/backupWallet';
-import ResetWalletScreen from '@screens/settings/resetWallet';
 
 const router = createHashRouter([
   {
@@ -131,10 +130,6 @@ const router = createHashRouter([
       {
         path: 'backup-wallet',
         element: <BackupWalletScreen />,
-      },
-      {
-        path: 'reset-wallet',
-        element: <ResetWalletScreen />,
       },
     ],
   },
