@@ -33,6 +33,7 @@ import ConfirmFtTransaction from '@screens/confirmFtTransaction';
 import Buy from '@screens/buy';
 import SendNft from '@screens/sendNft';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
+import CoinDashboard from '@screens/coinDashboard';
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
 
 const router = createHashRouter([
@@ -167,6 +168,10 @@ const router = createHashRouter([
       {
         path: 'confirm-nft-tx/:id',
         element: <ConfirmNftTransaction />,
+      },
+      {
+        path: 'coinDashboard/:coin',
+        element: <CoinDashboard />,
       },
     ],
   },

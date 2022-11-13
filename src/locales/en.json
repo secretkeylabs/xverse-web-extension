@@ -271,5 +271,26 @@
     "TRANSAK": "Buy on Transak",
     "DISCLAIMER": "Disclaimer",
     "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider."
+  },
+  "COIN_DASHBOARD_SCREEN": {
+    "SEND_COIN_BUTTON": "SEND",
+    "RECEIVE_COIN_BUTTON": "Receive",
+    "BUY_COIN_BUTTON": "Buy",
+    "TRANSACTION_HISTORY_TITLE": "Transaction History",
+    "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
+    "TRANSACTION_SENT": "Sent",
+    "TRANSACTION_RECEIVED": "Received",
+    "TRANSACTION_PENDING_RECEIVING": "Receiving",
+    "TRANSACTION_PENDING_SENDING": "Sending",
+    "TRANSACTION_STATUS_UNKNOWN": "Unknown",
+    "TRANSACTION_COINBASE": "Coinbase",
+    "TRANSACTION_CONTRACT_CALL": "Smart Contract Call",
+    "TRANSACTION_CONTRACT_DEPLOY": "Smart Contract Deploy",
+    "TRANSACTION_POISON_MICRO_BLOCK": "Poison Microblock",
+    "TRANSACTION_CONTRACT_TOKEN_TRANSFER": "Contract Token Transfer",
+    "TRANSACTION_STACKING_DELEGATION": "Stacking Delegation",
+    "TRANSACTION_STACKING_CONTRACT_AUTHORIZE": "Stacking Contract Authorize",
+    "TRANSACTION_STACKING_REVOKE_DELEGATION": "Stacking Revoke Delegation",
+    "TRANSACTION_FUNGIBLE_TOKEN_TRANSFER": "transfer"
   }
 }

@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import { NumericFormat } from 'react-number-format';
 import { CurrencyTypes, LoaderSize } from '@utils/constants';
 import BarLoader from '@components/barLoader';
-import { ftDecimals, getTicker } from '@utils/helper';
+import { getTicker } from '@utils/helper';
 import stc from 'string-to-color';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
 import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { getFtBalance, getFtTicker } from '@utils/tokens';
 
 interface TileProps {
   margin?: number;
@@ -123,7 +124,10 @@ interface Props {
   loading: boolean;
   margin?: number;
   currency?: CurrencyTypes;
-  onPress?: (event: any) => void;
+  onPress: (token: {
+    coin: CurrencyTypes;
+    ticker: string | undefined;
+  }) => void;
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
 }
@@ -145,26 +149,9 @@ function TokenTile({
     (state: StoreState) => state.walletState,
   );
 
-  function getFtTicker() {
-    if (fungibleToken?.ticker) {
-      return fungibleToken.ticker.toUpperCase();
-    }
-    if (fungibleToken?.name) {
-      return getTicker(fungibleToken.name).toUpperCase();
-    }
-    return '';
-  }
-
   function getTickerTitle() {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
-    return `${getFtTicker()}`;
-  }
-
-  function getFtBalance(ft: FungibleToken) {
-    if (ft.decimals) {
-      return ftDecimals(ft.balance, ft.decimals);
-    }
-    return ft.balance;
+    return `${getFtTicker(fungibleToken as FungibleToken)}`;
   }
 
   function getBalanceAmount() {
@@ -313,8 +300,15 @@ function TokenTile({
     return renderFTIcon();
   }
 
+  const handleTokenPressed = () => {
+    onPress({
+      coin: currency as CurrencyTypes,
+      ticker: fungibleToken && getFtTicker(fungibleToken),
+    });
+  };
+
   return (
-    <TileContainer color={underlayColor} margin={margin} onClick={onPress}>
+    <TileContainer color={underlayColor} margin={margin} onClick={handleTokenPressed}>
       {renderIcon()}
       <TextContainer>
         <CoinTickerText>{getTickerTitle()}</CoinTickerText>

@@ -37,3 +37,8 @@ export const initialNetworksList: SettingsNetwork[] = [
     address: 'https://stacks-node-api.testnet.stacks.co',
   },
 ];
+
+/**
+ * contract id of send_many transaction type
+ */
+export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
