@@ -63,28 +63,22 @@ function Nft({ asset }: Props) {
     }
   }
 
-  const nftName = (
-    <NftNameText>{getName()}</NftNameText>
-  );
-
-  const bnsPlaceholder = (
-    <GradientContainer>
-      <img src={NftUser} alt="user" />
-    </GradientContainer>
-  );
-
   const handleOnClick = () => {
 
   };
 
   return (
     <GridItemContainer onClick={handleOnClick}>
-      {asset.asset_identifier === BNS_CONTRACT ? bnsPlaceholder : (
+      {asset.asset_identifier === BNS_CONTRACT ? (
+        <GradientContainer>
+          <img src={NftUser} alt="user" />
+        </GradientContainer>
+      ) : (
         <NftImage
           metadata={data?.data.token_metadata}
         />
       )}
-      {nftName}
+      <NftNameText>{getName()}</NftNameText>
     </GridItemContainer>
 
   );

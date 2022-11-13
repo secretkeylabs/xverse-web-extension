@@ -132,15 +132,6 @@ function NftDashboard() {
     });
   };
 
-  const collectiblesCard = (
-    <CollectibleContainer>
-      <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>
-      {isLoading ? loader
-        : <CollectiblesValueText>{`${nftTotal} ${t('ITEMS')}`}</CollectiblesValueText>}
-      <ActionButton src={SquaresFour} text={t('WEB_GALLERY')} onPress={openInGalleryView} buttonColor="transparent" buttonAlignment="flex-start" />
-    </CollectibleContainer>
-  );
-
   const nftListView = (
     nftTotal === 0 ? (
       <NoCollectiblesText>
@@ -167,27 +158,6 @@ function NftDashboard() {
     navigate('/receive/STX');
   };
 
-  const buttons = (
-    <ButtonContainer>
-      <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
-      <ActionButton
-        src={ShareNetwork}
-        text={t('SHARE')}
-        onPress={onSharePress}
-        buttonColor="transparent"
-        margin={3}
-        buttonBorderColor={theme.colors.background.elevation2}
-      />
-      {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />}
-    </ButtonContainer>
-  );
-
-  const showLoader = (
-    <LoaderContainer>
-      <Ring color="white" size={30} />
-    </LoaderContainer>
-  );
-
   return (
     <>
       <SelectedAccountContainer>
@@ -195,9 +165,29 @@ function NftDashboard() {
       </SelectedAccountContainer>
       <Seperator />
       <Container>
-        {collectiblesCard}
-        {buttons}
-        {isLoading ? showLoader : nftListView}
+        <CollectibleContainer>
+          <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>
+          {isLoading ? loader
+            : <CollectiblesValueText>{`${nftTotal} ${t('ITEMS')}`}</CollectiblesValueText>}
+          <ActionButton src={SquaresFour} text={t('WEB_GALLERY')} onPress={openInGalleryView} buttonColor="transparent" buttonAlignment="flex-start" />
+        </CollectibleContainer>
+        <ButtonContainer>
+          <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
+          <ActionButton
+            src={ShareNetwork}
+            text={t('SHARE')}
+            onPress={onSharePress}
+            buttonColor="transparent"
+            margin={3}
+            buttonBorderColor={theme.colors.background.elevation2}
+          />
+          {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />}
+        </ButtonContainer>
+        {isLoading ? (
+          <LoaderContainer>
+            <Ring color="white" size={30} />
+          </LoaderContainer>
+        ) : nftListView}
       </Container>
 
       <BottomBarContainer>

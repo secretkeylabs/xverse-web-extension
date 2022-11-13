@@ -22,12 +22,6 @@ interface Props {
   metadata: TokenMetaData;
 }
 
-const showloader = (
-  <ImageContainer>
-    <Ring color="white" size={30} />
-  </ImageContainer>
-);
-
 const showNftImagePlaceholder = (
   <ImageContainer>
     <img src={NftPlaceholderImage} alt="nft" />
@@ -38,7 +32,16 @@ function NftImage({ metadata }: Props) {
   if (metadata?.image_protocol) {
     return (
       <Suspense>
-        <Img width="100%" src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')} loader={showloader} unloader={showNftImagePlaceholder} />
+        <Img
+          width="100%"
+          src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
+          loader={(
+            <ImageContainer>
+              <Ring color="white" size={30} />
+            </ImageContainer>
+)}
+          unloader={showNftImagePlaceholder}
+        />
       </Suspense>
     );
   }
@@ -52,7 +55,9 @@ function NftImage({ metadata }: Props) {
   }
 
   return (
-    showloader
+    <ImageContainer>
+      <Ring color="white" size={30} />
+    </ImageContainer>
   );
 }
 
