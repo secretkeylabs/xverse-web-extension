@@ -35,7 +35,9 @@ interface Props {
 }
 
 function EnterSeedPhrase(props: Props): JSX.Element {
-  const { onContinue, seed, setSeed, seedError, setSeedError } = props;
+  const {
+    onContinue, seed, setSeed, seedError, setSeedError,
+  } = props;
 
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
 

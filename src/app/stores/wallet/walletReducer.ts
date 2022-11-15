@@ -22,6 +22,8 @@ import {
   AddAccountKey,
   UpdateVisibleCoinListKey,
   FetchFeeMultiplierKey,
+  ChangeFiatCurrencyKey,
+  ChangeNetworkKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -30,7 +32,10 @@ const initialWalletState: WalletState = {
   masterPubKey: '',
   stxPublicKey: '',
   btcPublicKey: '',
-  network: 'Mainnet',
+  network: {
+    type: 'Mainnet',
+    address: 'https://stacks-node-api.mainnet.stacks.co',
+  },
   accountsList: [],
   selectedAccount: null,
   seedPhrase: '',
@@ -173,6 +178,18 @@ const walletReducer = (
       return {
         ...state,
         feeMultipliers: action.feeMultipliers,
+      };
+    case ChangeFiatCurrencyKey:
+      return {
+        ...state,
+        fiatCurrency: action.fiatCurrency,
+      };
+    case ChangeNetworkKey:
+      return {
+        ...state,
+        network: action.network,
+        selectedAccount: null,
+        accountsList: [],
       };
     default:
       return state;

@@ -6,7 +6,6 @@ import QRCode from 'react-qr-code';
 import Copy from '@assets/img/dashboard/Copy.svg';
 import { useState } from 'react';
 import ActionButton from '@components/button';
-import Theme from 'theme';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
 
@@ -141,8 +140,7 @@ function Receive(): JSX.Element {
             src={Copy}
             text={t('COPIED_ADDRESS')}
             onPress={handleOnClick}
-            buttonColor="transparent"
-            buttonBorderColor={Theme.colors.background.elevation6}
+            transparent
           />
         </CopyContainer>
       ) : (

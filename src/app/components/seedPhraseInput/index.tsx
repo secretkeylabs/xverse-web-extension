@@ -2,10 +2,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-const InputContainer = styled.div((props) => ({
+const InputContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-}));
+});
 
 const SeedPhraseInputLabel = styled.p((props) => ({
   textAlign: 'left',
@@ -39,7 +39,9 @@ interface SeedPhraseInputProps {
 
 export default function SeedPhraseInput(props: SeedPhraseInputProps): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
-  const { onSeedChange, seed, seedError, setSeedError } = props;
+  const {
+    onSeedChange, seed, seedError, setSeedError,
+  } = props;
 
   const handleSeedChange = (event: React.FormEvent<HTMLTextAreaElement>) => {
     if (seedError) {

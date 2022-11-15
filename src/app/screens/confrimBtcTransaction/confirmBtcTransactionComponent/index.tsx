@@ -6,7 +6,6 @@ import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
-import Theme from 'theme';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
@@ -30,6 +29,36 @@ const ButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(8),
+}));
+
+const TransparentButtonContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(2),
+  marginRight: props.theme.spacing(2),
+  width: '100%',
+}));
+
+const Button = styled.button((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
+  width: '100%',
+  marginTop: props.theme.spacing(5),
+}));
+
+const ButtonText = styled.div((props) => ({
+  ...props.theme.body_xs,
+  fontWeight: 700,
+  color: props.theme.colors.white['0'],
+  textAlign: 'center',
+}));
+
+const ButtonImage = styled.img((props) => ({
+  marginRight: props.theme.spacing(3),
+  alignSelf: 'center',
+  transform: 'all',
 }));
 
 interface Props {
@@ -119,13 +148,12 @@ function ConfirmBtcTransactionComponent({
         <TransferAmountView currency="BTC" amount={amount} />
         {children}
         <TransferFeeView fee={currentFee} currency={t('SATS')} />
-        <ActionButton
-          src={SettingIcon}
-          text={t('EDIT_FEES')}
-          buttonColor="transparent"
-          buttonAlignment="flex-start"
-          onPress={onAdvancedSettingClick}
-        />
+        <Button onClick={onAdvancedSettingClick}>
+          <>
+            <ButtonImage src={SettingIcon} />
+            <ButtonText>{t('EDIT_FEES')}</ButtonText>
+          </>
+        </Button>
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
           fee={currentFee.toString()}
@@ -137,14 +165,14 @@ function ConfirmBtcTransactionComponent({
         />
       </Container>
       <ButtonContainer>
-        <ActionButton
-          text={t('CANCEL')}
-          buttonColor="transparent"
-          buttonBorderColor={Theme.colors.background.elevation2}
-          onPress={onCancelClick}
-          margin={3}
-          disabled={loadingBroadcastedTx || isLoading}
-        />
+        <TransparentButtonContainer>
+          <ActionButton
+            text={t('CANCEL')}
+            transparent
+            onPress={onCancelClick}
+            disabled={loadingBroadcastedTx || isLoading}
+          />
+        </TransparentButtonContainer>
         <ActionButton
           text={t('CONFIRM')}
           disabled={loadingBroadcastedTx || isLoading}
