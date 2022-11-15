@@ -57,6 +57,30 @@ const CoinContainer = styled.div({
   justifyContent: 'space-between',
 });
 
+const Button = styled.button((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
+  width: '100%',
+  marginTop: props.theme.spacing(5),
+}));
+
+const ButtonText = styled.div((props) => ({
+  ...props.theme.body_xs,
+  fontWeight: 700,
+  color: props.theme.colors.white['0'],
+  textAlign: 'center',
+}));
+
+const ButtonImage = styled.img((props) => ({
+  marginRight: props.theme.spacing(3),
+  alignSelf: 'center',
+  transform: 'all',
+}));
+
 const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -77,6 +101,21 @@ const TokenListButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.spacing(4),
+}));
+
+const TestnetContainer = styled.div((props) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: props.theme.colors.background.elevation1,
+  paddingTop: props.theme.spacing(3),
+  paddingBottom: props.theme.spacing(3),
+}));
+
+const TestnetText = styled.h1((props) => ({
+  ...props.theme.body_xs,
+  textAlign: 'center',
+  color: props.theme.colors.white['200'],
 }));
 
 function Home(): JSX.Element {
@@ -140,7 +179,7 @@ function Home(): JSX.Element {
       dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
       dispatch(fetchCoinDataRequestAction(stxAddress, network, fiatCurrency, coinsList));
     }
-  }, []);
+  }, [stxAddress]);
 
   useEffect(() => {
     loadInitialData();
@@ -197,6 +236,14 @@ function Home(): JSX.Element {
 
   return (
     <>
+      { network.type === 'Testnet'
+    && (
+    <TestnetContainer>
+      <TestnetText>
+        {t('TESTNET')}
+      </TestnetText>
+    </TestnetContainer>
+    )}
       <SelectedAccountContainer>
         <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
       </SelectedAccountContainer>
@@ -217,13 +264,12 @@ function Home(): JSX.Element {
         </RowButtonContainer>
 
         <TokenListButtonContainer>
-          <ActionButton
-            src={ListDashes}
-            buttonColor="transparent"
-            text={t('MANAGE_TOKEN')}
-            buttonAlignment="flex-end"
-            onPress={handleManageTokenListOnClick}
-          />
+          <Button onClick={handleManageTokenListOnClick}>
+            <>
+              <ButtonImage src={ListDashes} />
+              <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
+            </>
+          </Button>
         </TokenListButtonContainer>
 
         <ColumnContainer>

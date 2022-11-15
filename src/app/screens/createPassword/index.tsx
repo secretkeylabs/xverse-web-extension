@@ -5,9 +5,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import { encryptSeedPhrase } from '@utils/encryptionUtils';
 import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
-import NewPassword from './newPassword';
-import ConfirmPassword from './confirmPassword';
+import { useTranslation } from 'react-i18next';
+import PasswordInput from '@components/passwordInput';
 
+interface StepDotProps {
+  active: boolean;
+}
 const Container = styled.div((props) => ({
   flex: 1,
   display: 'flex',
@@ -22,7 +25,13 @@ const StepsContainer = styled.div((props) => ({
   justifyContent: 'center',
 }));
 
-const StepDot = styled.div((props) => ({
+const PasswordContainer = styled.div((props) => ({
+  display: 'flex',
+  height: '100%',
+  marginBottom: props.theme.spacing(15),
+}));
+
+const StepDot = styled.div<StepDotProps>((props) => ({
   width: 8,
   height: 8,
   borderRadius: 4,
@@ -35,12 +44,14 @@ const StepDot = styled.div((props) => ({
 function CreatePassword(): JSX.Element {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { seedPhrase } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
+  const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
 
   const handleContinuePasswordCreation = () => {
     setCurrentStepIndex(1);
@@ -48,11 +59,13 @@ function CreatePassword(): JSX.Element {
 
   const handleConfirmPassword = async () => {
     try {
-      const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
-      dispatch(storeEncryptedSeedAction(encryptedSeed));
-      navigate('/create-wallet-success');
+      if (confirmPassword === password) {
+        const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
+        dispatch(storeEncryptedSeedAction(encryptedSeed));
+        navigate('/create-wallet-success');
+      }
     } catch (err) {
-      console.log(err);
+      setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));
     }
   };
 
@@ -73,22 +86,30 @@ function CreatePassword(): JSX.Element {
             <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
           ))}
       </StepsContainer>
-      {currentStepIndex === 0 ? (
-        <NewPassword
-          password={password}
-          setPassword={setPassword}
-          handleContinue={handleContinuePasswordCreation}
-          handleBack={handleNewPasswordBack}
-        />
-      ) : (
-        <ConfirmPassword
-          password={password}
-          confirmPassword={confirmPassword}
-          setConfirmPassword={setConfirmPassword}
-          handleContinue={handleConfirmPassword}
-          handleBack={handleConfirmPasswordBack}
-        />
-      )}
+      <PasswordContainer>
+        {currentStepIndex === 0 ? (
+          <PasswordInput
+            title={t('CREATE_PASSWORD_TITLE')}
+            inputLabel={t('TEXT_INPUT_NEW_PASSWORD_LABEL')}
+            enteredPassword={password}
+            setEnteredPassword={setPassword}
+            handleContinue={handleContinuePasswordCreation}
+            handleBack={handleNewPasswordBack}
+            checkPasswordStrength
+          />
+        ) : (
+          <PasswordInput
+            title={t('CONFIRM_PASSWORD_TITLE')}
+            inputLabel={t('TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
+            enteredPassword={confirmPassword}
+            setEnteredPassword={setConfirmPassword}
+            handleContinue={handleConfirmPassword}
+            handleBack={handleConfirmPasswordBack}
+            passwordError={error}
+          />
+        )}
+      </PasswordContainer>
+
     </Container>
   );
 }

@@ -1,5 +1,8 @@
 import { Account } from '@stores/wallet/actions/types';
+import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BigNumber from 'bignumber.js';
+
+const validUrl = require('valid-url');
 
 export function initBigNumber(num: string | number | BigNumber) {
   return BigNumber.isBigNumber(num) ? num : new BigNumber(num);
@@ -51,4 +54,14 @@ export function getAddressDetail(account:Account) {
 
 export function getExplorerUrl(stxAddress: string): string {
   return `https://explorer.stacks.co/address/${stxAddress}?chain=mainnet`;
+}
+
+export async function isValidURL(str: string): Promise<boolean> {
+  if (validUrl.isUri(str)) {
+    const response = await getStacksInfo(str);
+    if (response) {
+      return true;
+    }
+  }
+  return false;
 }

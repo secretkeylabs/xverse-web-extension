@@ -46,7 +46,7 @@ function BottomTabBar({ tab }:Props) {
   };
 
   const handleSettingButtonClick = () => {
-
+    if (tab !== 'settings') { navigate('/settings'); }
   };
 
   return (
