@@ -270,7 +270,7 @@ function TransactionSettingAlert({
           btcAddress,
           amount?.toString()!,
           selectedAccount?.id ?? 0,
-          network,
+          network.type,
           seedPhrase,
           mode?.value,
         );

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ActionButton from '@components/button';
 import Copy from '@assets/img/dashboard/Copy.svg';
-import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
+import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
 import {

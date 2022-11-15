@@ -1,7 +1,5 @@
 import SeedphraseView from '@components/seedPhraseView';
-import { StoreState } from '@stores/index';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
@@ -30,7 +28,7 @@ const ContinueButton = styled.button((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: props.theme.colors.action.classic,
-  marginTop: 'auto',
+  marginTop: props.theme.spacing(10),
   marginBottom: props.theme.spacing(30),
   color: props.theme.colors.white['0'],
   width: '100%',

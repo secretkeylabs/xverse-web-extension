@@ -154,6 +154,9 @@ var options = {
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
+    new webpack.DefinePlugin({
+      VERSION: JSON.stringify(require("../package.json").version),
+    }),
   ],
 
   infrastructureLogging: {

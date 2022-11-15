@@ -1,10 +1,10 @@
+import PasswordInput from '@components/passwordInput';
 import Steps from '@components/steps';
-import ConfirmPassword from '@screens/createPassword/confirmPassword';
-import NewPassword from '@screens/createPassword/newPassword';
 import { StoreState } from '@stores/index';
 import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
 import { encryptSeedPhrase } from '@utils/encryptionUtils';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -21,8 +21,10 @@ const Container = styled.div((props) => ({
 }));
 
 export default function BackupWalletSteps(): JSX.Element {
+  const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const [currentActiveIndex, setCurrentActiveIndex] = useState<number>(0);
   const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -55,9 +57,15 @@ export default function BackupWalletSteps(): JSX.Element {
   };
 
   const handleConfirmPasswordContinue = async () => {
-    const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
-    dispatch(storeEncryptedSeedAction(encryptedSeed));
-    navigate('/create-wallet-success');
+    try {
+      if (confirmPassword === password) {
+        const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
+        dispatch(storeEncryptedSeedAction(encryptedSeed));
+        navigate('/create-wallet-success');
+      }
+    } catch (err) {
+      setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));
+    }
   };
 
   const backupSteps = [
@@ -67,18 +75,23 @@ export default function BackupWalletSteps(): JSX.Element {
       onVerifySuccess={handleVerifySeedSuccess}
       seedPhrase={seedPhrase}
     />,
-    <NewPassword
-      handleBack={handleNewPasswordBack}
-      password={password}
-      setPassword={setPassword}
+    <PasswordInput
+      title={t('CREATE_PASSWORD_TITLE')}
+      inputLabel={t('TEXT_INPUT_NEW_PASSWORD_LABEL')}
+      enteredPassword={password}
+      setEnteredPassword={setPassword}
       handleContinue={handleNewPasswordContinue}
+      handleBack={handleNewPasswordBack}
+      checkPasswordStrength
     />,
-    <ConfirmPassword
-      handleBack={handleConfirmPasswordBack}
+    <PasswordInput
+      title={t('CONFIRM_PASSWORD_TITLE')}
+      inputLabel={t('TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
+      enteredPassword={confirmPassword}
+      setEnteredPassword={setConfirmPassword}
       handleContinue={handleConfirmPasswordContinue}
-      password={password}
-      confirmPassword={confirmPassword}
-      setConfirmPassword={setConfirmPassword}
+      handleBack={handleConfirmPasswordBack}
+      passwordError={error}
     />,
   ];
 

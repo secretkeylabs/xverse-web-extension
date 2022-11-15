@@ -1,6 +1,7 @@
 import { ThemeProvider } from 'styled-components';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import SnackbarProvider from 'react-simple-snackbar';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import configureStore from '@stores/index';
@@ -14,7 +15,7 @@ function App(): JSX.Element {
   const { store, persistedStore } = configureStore();
   const queryClient = new QueryClient();
   return (
-    <>
+    <SnackbarProvider>
       <GlobalStyle />
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>
@@ -25,7 +26,7 @@ function App(): JSX.Element {
           </PersistGate>
         </Provider>
       </QueryClientProvider>
-    </>
+    </SnackbarProvider>
   );
 }
 

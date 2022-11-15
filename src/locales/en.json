@@ -206,10 +206,12 @@
     "CANCEL": "Cancel",
     "NODE": "STX Node",
     "BACKUP_WALLET_UNLOCK_SEED": "Enter your password to reveal your seedphrase",
-    "REVEAL": "Reveal",
-    "BACK": "Back",
-    "PASSWORD": "Password",
     "SAVE": "Save",
-    "INVALID_URL": "Invalid URL"
+    "INVALID_URL": "Invalid URL",
+    "ENTER_PASSWORD": "Enter your password to reset your wallet",
+    "PASSWORD": "Password",
+    "RESET": "Reset",
+    "BACK": "Back",
+    "INCORRECT_PASSWORD_ERROR":"Incorrect password"
   }
 }
