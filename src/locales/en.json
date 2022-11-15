@@ -161,5 +161,21 @@
     "SEED_INPUT_LABEL": "Selected Words",
     "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
     "CONTINUE_BUTTON": "Continue"
+  },
+  "STACKING_SCREEN": {
+    "STACK_AND_EARN": "Stack STX, earn BTC",
+    "STACKING_INFO": "Pool your STX with other stackers to earn real BTC with low minimums. Rewards are distributed after the end of every 2-week cycle.",
+    "APY": "Estimated APY",
+    "POOL_FEE": "Pool fee",
+   "MINIMUM_AMOUNT": "Minimum amount",
+   "REWARD_CYCLES": "Reward Cycles",
+   "START_STACKNG": "Start stacking",
+   "STACK_FOR_REWARD": "Stack your coins to earn rewards",
+   "XVERSE_POOL": "Xverse delegated pooling allows everyone to participate in Stacking and earn rewards. ",
+   "STACK_STX": "Stack STX",
+   "EARN_BTC":"Earn BTC",
+   "PENDING_DELEGATION": "Pending delegation",
+   "DELEGATED": "Delegated",
+   "IN_PROGRESS": "In progress"
   }
 }

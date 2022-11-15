@@ -42,7 +42,7 @@ function BottomTabBar({ tab }:Props) {
   };
 
   const handleStackingButtonClick = () => {
-
+    if (tab !== 'stacking') { navigate('/stacking'); }
   };
 
   const handleSettingButtonClick = () => {

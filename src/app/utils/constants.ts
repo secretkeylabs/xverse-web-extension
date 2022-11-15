@@ -7,6 +7,7 @@ export const TERMS_LINK = 'https://xverse.app/terms';
 export const PRIVACY_POLICY_LINK = 'https://xverse.app/privacy';
 export const BTC_TRANSACTION_STATUS_URL = 'https://www.blockchain.com/btc/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
+export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
 
 export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT';
 export enum LoaderSize {
