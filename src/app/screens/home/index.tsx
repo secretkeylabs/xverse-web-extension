@@ -118,7 +118,7 @@ const TestnetText = styled.h1((props) => ({
   color: props.theme.colors.white['200'],
 }));
 
-function Home(): JSX.Element {
+function Home() {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();

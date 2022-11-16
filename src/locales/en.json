@@ -182,6 +182,27 @@
    "DELEGATED": "Delegated",
    "IN_PROGRESS": "In progress"
   },
+  "NFT_DASHBOARD_SCREEN": {
+    "COLLECTIBLES": "Number of collectibles",
+    "NO_COLLECTIBLES": "No collectibles yet",
+    "ITEMS": "items",
+    "WEB_GALLERY": "Open web gallery",
+    "RECEIVE": "Receive",
+    "SEND": "Send",
+    "SHARE": "Share collection",
+    "FACEBOOK": "Share on Facebook",
+    "TWITTER": "Share on Twitter",
+    "MAIL": "Share by Mail",
+    "COPY": "Copy link",
+    "NFT_DETAIL":"Item detail"
+  },
+  "RESET_WALLET_SCREEN": {
+    "ENTER_PASSWORD": "Enter your password to reset your wallet",
+    "PASSWORD": "Password",
+    "RESET": "Reset",
+    "BACK": "Back",
+    "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+  },
   "SETTING_SCREEN": {
     "GENERAL": "General",
     "CURRENCY": "Fiat Currency",
@@ -201,7 +222,6 @@
     "CANCEL": "Cancel",
     "NODE": "STX Node",
     "BACKUP_WALLET_UNLOCK_SEED": "Enter your password to reveal your seedphrase",
-    "REVEAL": "Reveal",
     "SAVE": "Save",
     "INVALID_URL": "Invalid URL",
     "ENTER_PASSWORD": "Enter your password to reset your wallet",

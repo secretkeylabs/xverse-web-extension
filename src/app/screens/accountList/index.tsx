@@ -11,8 +11,6 @@ import { StoreState } from '@stores/index';
 import { Account } from '@stores/wallet/actions/types';
 import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { getBnsName } from '@secretkeylabs/xverse-core/api';
-import { SettingsNetwork } from '@secretkeylabs/xverse-core';
-import { initialNetworksList } from '@utils/constants';
 
 const Container = styled.div`
   display: flex;

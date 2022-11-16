@@ -38,7 +38,7 @@ function BottomTabBar({ tab }:Props) {
   };
 
   const handleNftButtonClick = () => {
-
+    if (tab !== 'nft') { navigate('/nft-dashboard'); }
   };
 
   const handleStackingButtonClick = () => {
