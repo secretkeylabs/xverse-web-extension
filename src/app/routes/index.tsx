@@ -24,6 +24,11 @@ import NftDashboard from '@screens/nftDashboard';
 import NftDetailScreen from '@screens/nftDetail';
 import SendNft from '@screens/sendNft';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
+import Setting from '@screens/settings';
+import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
+import ChangePasswordScreen from '@screens/settings/changePassword';
+import ChangeNetworkScreen from '@screens/settings/changeNetwork';
+import BackupWalletScreen from '@screens/settings/backupWallet';
 
 const router = createHashRouter([
   {
@@ -125,6 +130,26 @@ const router = createHashRouter([
       {
         path: 'confirm-nft-tx/:id',
         element: <ConfirmNftTransaction />,
+      },
+      {
+        path: 'settings',
+        element: <Setting />,
+      },
+      {
+        path: 'fiat-currency',
+        element: <FiatCurrencyScreen />,
+      },
+      {
+        path: 'change-password',
+        element: <ChangePasswordScreen />,
+      },
+      {
+        path: 'change-network',
+        element: <ChangeNetworkScreen />,
+      },
+      {
+        path: 'backup-wallet',
+        element: <BackupWalletScreen />,
       },
     ],
   },

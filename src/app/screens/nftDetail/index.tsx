@@ -1,8 +1,8 @@
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import NftImage from '@screens/nftDashboard/nftImage';
-import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
+import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import TopRow from '@components/topRow';
 import BottomTabBar from '@components/tabBar';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
@@ -40,8 +40,15 @@ const ButtonContainer = styled.div((props) => ({
   position: 'relative',
   flexDirection: 'row',
   maxWidth: 400,
+  marginTop: props.theme.spacing(6),
   marginBottom: props.theme.spacing(12),
 }));
+
+const ShareDialogeContainer = styled.div({
+  position: 'absolute',
+  bottom: 0,
+  right: 0,
+});
 
 const ExtensionContainer = styled.div({
   display: 'flex',
@@ -51,19 +58,13 @@ const ExtensionContainer = styled.div({
   flex: 1,
 });
 
-const ShareDialogeContainerContainer = styled.div({
-  position: 'absolute',
-  bottom: 0,
-  right: 0,
-});
-
 const NFtContainer = styled.div((props) => ({
   maxWidth: 450,
   width: '60%',
   display: 'flex',
   aspectRatio: 1,
   justifyContent: 'center',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   borderRadius: 8,
   padding: props.theme.spacing(5),
   marginTop: props.theme.spacing(15),
@@ -121,6 +122,11 @@ const GridContainer = styled.div((props) => ({
   borderBottom: `1px solid ${props.theme.colors.white['400']}`,
 }));
 
+const ShareButtonContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(2),
+  width: '100%',
+}));
+
 const DescriptionContainer = styled.h1((props) => ({
   display: 'flex',
   marginLeft: props.theme.spacing(20),
@@ -134,6 +140,36 @@ const AttributeText = styled.h1((props) => ({
   marginBottom: props.theme.spacing(2),
   letterSpacing: '0.02em',
   textTransform: 'uppercase',
+}));
+
+const WebGalleryButton = styled.button((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
+  width: '100%',
+  marginTop: props.theme.spacing(5),
+}));
+
+const WebGalleryButtonText = styled.div((props) => ({
+  ...props.theme.body_xs,
+  fontWeight: 700,
+  color: props.theme.colors.white['0'],
+  textAlign: 'center',
+}));
+
+const ButtonImage = styled.img((props) => ({
+  marginRight: props.theme.spacing(3),
+  alignSelf: 'center',
+  transform: 'all',
+}));
+
+const WebGalleryButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginTop: props.theme.spacing(4),
 }));
 
 const Button = styled.button((props) => ({
@@ -168,7 +204,6 @@ function NftDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
   const { stxAddress } = useWalletSelector();
-  const theme = useTheme();
   const { id } = useParams();
   const nftIdDetails = id!.split('::');
   const { nftData } = useNftDataSelector();
@@ -237,6 +272,14 @@ function NftDetailScreen() {
     });
   };
 
+  const handleOnSendClick = () => {
+    navigate('send-nft', {
+      state: {
+        nft,
+      },
+    });
+  };
+
   const nftImage = (
     <NFtContainer>
       <NftImage
@@ -257,29 +300,20 @@ function NftDetailScreen() {
     </RowContainer>
   );
 
-  const handleOnSendClick = () => {
-    navigate('send-nft', {
-      state: {
-        nft,
-      },
-    });
-  };
-
   const buttons = (
     <ButtonContainer>
       <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
-      <ActionButton
-        src={ShareNetwork}
-        text={t('SHARE')}
-        onPress={onSharePress}
-        buttonColor="transparent"
-        margin={3}
-        buttonBorderColor={theme.colors.background.elevation2}
-      />
-      <ShareDialogeContainerContainer>
+      <ShareButtonContainer>
+        <ActionButton
+          src={ShareNetwork}
+          text={t('SHARE')}
+          onPress={onSharePress}
+          transparent
+        />
+      </ShareButtonContainer>
+      <ShareDialogeContainer>
         {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`} onCrossClick={onCrossPress} />}
-      </ShareDialogeContainerContainer>
-
+      </ShareDialogeContainer>
     </ButtonContainer>
   );
 
@@ -289,7 +323,15 @@ function NftDetailScreen() {
         {nftImage}
         <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
         {ownedByView}
-        <ActionButton src={SquaresFour} text={t('WEB_GALLERY')} onPress={openInGalleryView} buttonColor="transparent" />
+
+        <WebGalleryButtonContainer>
+          <WebGalleryButton onClick={openInGalleryView}>
+            <>
+              <ButtonImage src={SquaresFour} />
+              <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
+            </>
+          </WebGalleryButton>
+        </WebGalleryButtonContainer>
       </ExtensionContainer>
       {buttons}
     </>
@@ -344,6 +386,7 @@ function NftDetailScreen() {
       <Container>
         {isGalleryOpen ? galleryView : extensionView}
       </Container>
+
       <BottomBarContainer>
         <BottomTabBar tab="nft" />
       </BottomBarContainer>

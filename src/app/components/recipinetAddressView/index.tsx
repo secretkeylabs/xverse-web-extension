@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import ArrowSquareOut from '@assets/img/send/arrow_square_out.svg';
+import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import { getExplorerUrl } from '@utils/helper';
 import { useBnsName } from '@hooks/useBnsName';
 import useWalletSelector from '@hooks/useWalletSelector';

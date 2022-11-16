@@ -2,11 +2,10 @@ import * as bip39 from 'bip39';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import ConfirmPassword from '@screens/createPassword/confirmPassword';
-import NewPassword from '@screens/createPassword/newPassword';
 import { useTranslation } from 'react-i18next';
 import useWalletReducer from '@hooks/useWalletReducer';
 import Steps from '@components/steps';
+import PasswordInput from '@components/passwordInput';
 import EnterSeedPhrase from './enterSeedphrase';
 
 const Container = styled.div((props) => ({
@@ -17,18 +16,24 @@ const Container = styled.div((props) => ({
   padding: `${props.theme.spacing(12)}px ${props.theme.spacing(8)}px 0 ${props.theme.spacing(8)}px`,
 }));
 
+const PasswordContainer = styled.div((props) => ({
+  display: 'flex',
+  height: '100%',
+  marginBottom: props.theme.spacing(15),
+}));
+
 function RestoreWallet(): JSX.Element {
-  const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
+  const { t } = useTranslation('translation');
   const { restoreWallet } = useWalletReducer();
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [seedError, setSeedError] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  const cleanMnemonic = (rawSeed: string): string =>
-    rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
+  const cleanMnemonic = (rawSeed: string): string => rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
   const handleNewPasswordBack = () => {
     setCurrentStepIndex(0);
@@ -51,7 +56,7 @@ function RestoreWallet(): JSX.Element {
       setSeedError('');
       setCurrentStepIndex(1);
     } else {
-      setSeedError(t('SEED_INPUT_ERROR'));
+      setSeedError(t('RESTORE_WALLET_SCREEN.SEED_INPUT_ERROR'));
     }
   };
 
@@ -60,12 +65,13 @@ function RestoreWallet(): JSX.Element {
   };
 
   const handleConfirmPassword = async () => {
-    try {
+    if (confirmPassword === password) {
+      setError('');
       const seed = cleanMnemonic(seedPhrase);
       await restoreWallet(seed, password);
       navigate('/create-wallet-success');
-    } catch (err) {
-      console.log(err);
+    } else {
+      setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));
     }
   };
 
@@ -77,19 +83,29 @@ function RestoreWallet(): JSX.Element {
       seedError={seedError}
       setSeedError={setSeedError}
     />,
-    <NewPassword
-      password={password}
-      setPassword={setPassword}
-      handleContinue={handleContinuePasswordCreation}
-      handleBack={handleNewPasswordBack}
-    />,
-    <ConfirmPassword
-      password={password}
-      confirmPassword={confirmPassword}
-      setConfirmPassword={setConfirmPassword}
-      handleContinue={handleConfirmPassword}
-      handleBack={handleConfirmPasswordBack}
-    />,
+    <PasswordContainer>
+      <PasswordInput
+        title={t('CREATE_PASSWORD_SCREEN.CREATE_PASSWORD_TITLE')}
+        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
+        enteredPassword={password}
+        setEnteredPassword={setPassword}
+        handleContinue={handleContinuePasswordCreation}
+        handleBack={handleNewPasswordBack}
+        checkPasswordStrength
+      />
+    </PasswordContainer>,
+    <PasswordContainer>
+      <PasswordInput
+        title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
+        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
+        enteredPassword={confirmPassword}
+        setEnteredPassword={setConfirmPassword}
+        handleContinue={handleConfirmPassword}
+        handleBack={handleConfirmPasswordBack}
+        passwordError={error}
+      />
+    </PasswordContainer>,
+
   ];
   return (
     <Container>

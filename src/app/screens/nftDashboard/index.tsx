@@ -1,4 +1,4 @@
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
@@ -11,9 +11,8 @@ import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
 import ActionButton from '@components/button';
 import { getNftsData } from '@secretkeylabs/xverse-core/api';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { NonFungibleToken } from '@secretkeylabs/xverse-core/types';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
@@ -39,6 +38,18 @@ const GridContainer = styled.div((props) => ({
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
 }));
 
+const ShareDialogeContainer = styled.div({
+  position: 'absolute',
+  top: 0,
+  right: 0,
+});
+
+const WebGalleryButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginTop: props.theme.spacing(4),
+}));
+
 const SelectedAccountContainer = styled.div({
   marginLeft: '5%',
   marginRight: '5%',
@@ -60,18 +71,43 @@ const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   position: 'relative',
   flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
   maxWidth: 400,
   marginBottom: props.theme.spacing(20),
 }));
 
+const ShareButtonContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(2),
+  width: '100%',
+}));
+
+const Button = styled.button((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
+  width: '100%',
+  marginTop: props.theme.spacing(5),
+}));
+
+const ButtonText = styled.div((props) => ({
+  ...props.theme.body_xs,
+  fontWeight: 700,
+  color: props.theme.colors.white['0'],
+  textAlign: 'center',
+}));
+
+const ButtonImage = styled.img((props) => ({
+  marginRight: props.theme.spacing(3),
+  alignSelf: 'center',
+  transform: 'all',
+}));
+
 const BottomBarContainer = styled.div({
   marginTop: 'auto',
-});
-
-const ShareDialogeContainerContainer = styled.div({
-  position: 'absolute',
-  top: 0,
-  right: 0,
 });
 
 const CollectiblesHeadingText = styled.h1((props) => ({
@@ -102,24 +138,16 @@ const BarLoaderContainer = styled.div((props) => ({
 function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const theme = useTheme();
   const offset = useRef(0);
   const { selectedAccount, stxAddress, network } = useWalletSelector();
-  const [nftList, setNftList] = useState<NonFungibleToken[]>([]);
-  const [nftTotal, setNftTotal] = useState<number>(0);
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
-
-  const { isLoading, data } = useQuery(
+  const {
+    isLoading, data,
+  } = useQuery(
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
     async () => getNftsData(stxAddress, network, offset.current),
   );
 
-  useEffect(() => {
-    if (data) {
-      setNftList(data.nftsList);
-      setNftTotal(data.total);
-    }
-  }, [data]);
   const handleAccountSelect = () => {
     navigate('/account-list');
   };
@@ -130,14 +158,18 @@ function NftDashboard() {
     });
   };
 
-  const nftListView = nftTotal === 0 ? (
-    <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>
-  ) : (
-    <GridContainer>
-      {nftList.map((nft) => (
-        <Nft asset={nft} />
-      ))}
-    </GridContainer>
+  const nftListView = (
+    data?.total === 0 ? (
+      <NoCollectiblesText>
+        {t('NO_COLLECTIBLES')}
+      </NoCollectiblesText>
+    ) : (
+      <GridContainer>
+        { data?.nftsList?.map((nft) => (
+          <Nft asset={nft} />
+        ))}
+      </GridContainer>
+    )
   );
 
   const onSharePress = () => {
@@ -165,41 +197,36 @@ function NftDashboard() {
             <BarLoaderContainer>
               <BarLoader loaderSize={LoaderSize.LARGE} />
             </BarLoaderContainer>
-          ) : (
-            <CollectiblesValueText>{`${nftTotal} ${t('ITEMS')}`}</CollectiblesValueText>
-          )}
-          <ActionButton
-            src={SquaresFour}
-            text={t('WEB_GALLERY')}
-            onPress={openInGalleryView}
-            buttonColor="transparent"
-            buttonAlignment="flex-start"
-          />
+          )
+            : <CollectiblesValueText>{`${data?.total} ${t('ITEMS')}`}</CollectiblesValueText>}
+          <WebGalleryButtonContainer>
+            <Button onClick={openInGalleryView}>
+              <>
+                <ButtonImage src={SquaresFour} />
+                <ButtonText>{t('WEB_GALLERY')}</ButtonText>
+              </>
+            </Button>
+          </WebGalleryButtonContainer>
         </CollectibleContainer>
         <ButtonContainer>
           <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
-          <ActionButton
-            src={ShareNetwork}
-            text={t('SHARE')}
-            onPress={onSharePress}
-            buttonColor="transparent"
-            margin={3}
-            buttonBorderColor={theme.colors.background.elevation2}
-          />
-          {showShareNftOptions && (
-            <ShareDialogeContainerContainer>
-              <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />
-            </ShareDialogeContainerContainer>
-
-          )}
+          <ShareButtonContainer>
+            <ActionButton
+              src={ShareNetwork}
+              text={t('SHARE')}
+              onPress={onSharePress}
+              transparent
+            />
+          </ShareButtonContainer>
+          <ShareDialogeContainer>
+            {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />}
+          </ShareDialogeContainer>
         </ButtonContainer>
         {isLoading ? (
           <LoaderContainer>
             <Ring color="white" size={30} />
           </LoaderContainer>
-        ) : (
-          nftListView
-        )}
+        ) : nftListView}
       </Container>
 
       <BottomBarContainer>
