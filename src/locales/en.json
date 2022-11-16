@@ -213,5 +213,10 @@
     "RESET": "Reset",
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+  },
+  "OPTIONS_DIALOG":{
+    "SWITCH_ACCOUNT": "Switch Account",
+    "LOCK": "LOCK",
+    "RESET_WALLET": "Reset Wallet"
   }
 }

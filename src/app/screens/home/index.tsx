@@ -12,7 +12,6 @@ import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import TokenTile from '@components/tokenTile';
-import AccountRow from '@components/accountRow';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
@@ -28,6 +27,7 @@ import BottomBar from '@components/tabBar';
 import { StoreState } from '@stores/index';
 import { Account } from '@stores/wallet/actions/types';
 import Seperator from '@components/seperator';
+import AccountHeaderComponent from '@components/accountHeader';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -91,11 +91,6 @@ const RowButtonContainer = styled.div((props) => ({
 const ButtonContainer = styled.div({
   flex: 0.31,
 });
-
-const SelectedAccountContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
 
 const TokenListButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -206,10 +201,6 @@ function Home() {
     setOpenSendModal(false);
   };
 
-  const handleAccountSelect = () => {
-    navigate('/account-list');
-  };
-
   function getCoinsList() {
     return coinsList ? coinsList?.filter((ft) => ft.visible) : [];
   }
@@ -244,11 +235,8 @@ function Home() {
       </TestnetText>
     </TestnetContainer>
     )}
-      <SelectedAccountContainer>
-        <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
-      </SelectedAccountContainer>
+      <AccountHeaderComponent />
       <Seperator />
-
       <Container>
         <BalanceCard />
         <RowButtonContainer>
