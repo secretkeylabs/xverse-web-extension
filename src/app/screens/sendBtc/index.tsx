@@ -48,7 +48,7 @@ function SendBtcScreen() {
     index: selectedAccount?.id ?? 0,
     fee: undefined,
     seedPhrase,
-    network,
+    network: network.type,
   }));
 
   const handleBackButtonClick = () => {
@@ -90,7 +90,7 @@ function SendBtcScreen() {
       return false;
     }
 
-    if (!validateBtcAddress({ btcAddress: address, network })) {
+    if (!validateBtcAddress({ btcAddress: address, network: network.type })) {
       setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }

@@ -22,6 +22,11 @@ import ForgotPassword from '@screens/forgotPassword';
 import BackupWalletSteps from '@screens/backupWalletSteps';
 import NftDashboard from '@screens/nftDashboard';
 import NftDetailScreen from '@screens/nftDetail';
+import Setting from '@screens/settings';
+import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
+import ChangePasswordScreen from '@screens/settings/changePassword';
+import ChangeNetworkScreen from '@screens/settings/changeNetwork';
+import BackupWalletScreen from '@screens/settings/backupWallet';
 
 const router = createHashRouter([
   {
@@ -115,6 +120,26 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/nft-detail/:id',
         element: <NftDetailScreen />,
+      },
+      {
+        path: 'settings',
+        element: <Setting />,
+      },
+      {
+        path: 'fiat-currency',
+        element: <FiatCurrencyScreen />,
+      },
+      {
+        path: 'change-password',
+        element: <ChangePasswordScreen />,
+      },
+      {
+        path: 'change-network',
+        element: <ChangeNetworkScreen />,
+      },
+      {
+        path: 'backup-wallet',
+        element: <BackupWalletScreen />,
       },
     ],
   },

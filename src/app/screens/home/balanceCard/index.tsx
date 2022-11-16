@@ -50,7 +50,7 @@ const CurrencyCard = styled.div((props) => ({
   marginLeft: props.theme.spacing(4),
 }));
 
-function BalanceCard(): JSX.Element {
+function BalanceCard() {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const {
     fiatCurrency,

@@ -37,7 +37,7 @@ function SendStxScreen() {
       memo!,
       stxPendingTxData?.pendingTransactions ?? [],
       stxPublicKey,
-      network,
+      network.type,
     );
     // increasing the fees with multiplication factor
     const fee: bigint = BigInt(unsignedSendStxTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
@@ -71,7 +71,7 @@ function SendStxScreen() {
       setError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
-    if (!validateStxAddress({ stxAddress: associatedAddress, network })) {
+    if (!validateStxAddress({ stxAddress: associatedAddress, network: network.type })) {
       setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }

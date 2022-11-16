@@ -84,13 +84,6 @@ function ConfirmBtcTransaction() {
     }
   }, [txError]);
 
-  const networkInfoSection = (
-    <InfoContainer>
-      <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network.type}</ValueText>
-    </InfoContainer>
-  );
-
   const handleOnConfirmClick = (txHex: string) => {
     mutate({ signedTx: txHex });
   };
@@ -111,7 +104,10 @@ function ConfirmBtcTransaction() {
         onBackButtonClick={goBackToScreen}
       >
         <RecipientAddressView recipient={recipientAddress} />
-        {networkInfoSection}
+        <InfoContainer>
+          <TitleText>{t('NETWORK')}</TitleText>
+          <ValueText>{network.type}</ValueText>
+        </InfoContainer>
         <Seperator />
       </ConfirmBtcTransactionComponent>
       <BottomBar tab="dashboard" />
