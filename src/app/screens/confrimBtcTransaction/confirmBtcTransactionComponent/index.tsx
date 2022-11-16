@@ -84,7 +84,7 @@ function ConfirmBtcTransactionComponent({
     index: selectedAccount?.id ?? 0,
     fee: new BigNumber(txFee),
     seedPhrase,
-    network,
+    network: network.type,
   }));
 
   useEffect(() => {

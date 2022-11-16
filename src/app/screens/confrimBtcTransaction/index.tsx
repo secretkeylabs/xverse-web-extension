@@ -43,14 +43,13 @@ function ConfirmBtcTransaction() {
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
   const { fee, amount, signedTxHex } = location.state;
-
   const {
     isLoading,
     error: txError,
     data: btcTxBroadcastData,
     mutate,
   } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network),
+    async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network.type),
   );
 
   useEffect(() => {
@@ -84,13 +83,6 @@ function ConfirmBtcTransaction() {
     }
   }, [txError]);
 
-  const networkInfoSection = (
-    <InfoContainer>
-      <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network.type}</ValueText>
-    </InfoContainer>
-  );
-
   const handleOnConfirmClick = (txHex: string) => {
     mutate({ signedTx: txHex });
   };
@@ -111,7 +103,10 @@ function ConfirmBtcTransaction() {
         onBackButtonClick={goBackToScreen}
       >
         <RecipientAddressView recipient={recipientAddress} />
-        {networkInfoSection}
+        <InfoContainer>
+          <TitleText>{t('NETWORK')}</TitleText>
+          <ValueText>{network.type}</ValueText>
+        </InfoContainer>
         <Seperator />
       </ConfirmBtcTransactionComponent>
       <BottomBar tab="dashboard" />

@@ -2,9 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
-import { StacksTransaction, cvToHex, uintCV } from '@secretkeylabs/xverse-core/types';
+import {
+  StacksTransaction, cvToHex, uintCV, UnsignedStacksTransation,
+} from '@secretkeylabs/xverse-core/types';
 import { useMutation } from '@tanstack/react-query';
-import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/api';
+import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { validateStxAddress } from '@secretkeylabs/xverse-core';
 import SendForm from '@components/sendForm';
 import useStxPendingTxData from '@hooks/useStxPendingTxData';
@@ -75,18 +77,22 @@ function SendNft() {
     const principal = nft?.fully_qualified_token_id?.split('::')!;
     const name = principal[1].split(':')[0];
     const contractInfo: string[] = principal[0].split('.');
-    const unsignedTx: StacksTransaction = await generateUnsignedTransaction(
-      tokenId,
-      stxAddress,
-      associatedAddress,
-      contractInfo[0],
-      contractInfo[1],
-      name,
-      stxPublicKey,
+    const unsginedTx: UnsignedStacksTransation = {
+      amount: tokenId,
+      senderAddress: stxAddress,
+      recipientAddress: associatedAddress,
+      contractAddress: contractInfo[0],
+      contractName: contractInfo[1],
+      assetName: name,
+      publicKey: stxPublicKey,
       network,
-      stxPendingTxData?.pendingTransactions ?? [],
-      '',
-      true,
+      pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
+      memo: '',
+      isNFT: true,
+
+    };
+    const unsignedTx: StacksTransaction = await generateUnsignedTransaction(
+      unsginedTx,
     );
     if (feeMultipliers?.stxSendTxMultiplier) {
       unsignedTx.setFee(

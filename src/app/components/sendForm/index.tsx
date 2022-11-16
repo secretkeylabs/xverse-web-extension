@@ -285,7 +285,7 @@ function SendForm({
             />
           </InputFieldContainer>
         </AmountInputContainer>
-        {associatedAddress && (
+        {associatedAddress && currencyType !== 'BTC' && (
         <>
           <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
           <AssociatedText>{associatedAddress}</AssociatedText>
