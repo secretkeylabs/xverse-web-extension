@@ -105,7 +105,7 @@ function NftDashboard() {
 
   const { isLoading, data } = useQuery(
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNftsData('SP2VC4CXTWYRZEV7MSGXPNHE739N14ECQWX8JP2BF', network, offset.current),
+    async () => getNftsData(stxAddress, network, offset.current),
   );
 
   useEffect(() => {

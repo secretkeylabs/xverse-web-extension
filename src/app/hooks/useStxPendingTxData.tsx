@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
-import { fetchStxPendingTxData } from '@secretkeylabs/xverse-core/api';
+import { fetchStxPendingTxData } from '@secretkeylabs/xverse-core/transactions';
 import { StoreState } from '@stores/index';
 
 const useStxPendingTxData = () => {
