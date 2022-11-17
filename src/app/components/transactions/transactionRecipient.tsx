@@ -19,10 +19,10 @@ function formatAddress(addr: string): string {
 }
 
 export default function TransactionRecipient(props: TransactionRecipientProps): JSX.Element | null {
-  const {
-    transaction,
-  } = props;
-  if (isBtcTransaction(transaction)) { return (<RecipientAddress>{formatAddress(transaction.addresses[1])}</RecipientAddress>); }
+  const { transaction } = props;
+  if (isBtcTransaction(transaction)) {
+    return <RecipientAddress>{formatAddress(transaction.addresses[1])}</RecipientAddress>;
+  }
   if (transaction.txType === 'token_transfer' || transaction.txType === 'coinbase') {
     return (
       <RecipientAddress>

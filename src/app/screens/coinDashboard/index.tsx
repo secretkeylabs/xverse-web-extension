@@ -1,11 +1,11 @@
 import TopRow from '@components/topRow';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';
 import styled from 'styled-components';
 import { CurrencyTypes } from '@utils/constants';
+import { getFtTicker } from '@utils/tokens';
 import CoinHeader from './coinHeader';
-import TransactionsHistoryList from './transactionsHitstoryList';
+import TransactionsHistoryList from './transactionsHistoryList';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -20,22 +20,21 @@ const Container = styled.div((props) => ({
 }));
 
 export default function CoinDashboard() {
-  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const { coin } = useParams();
   const [searchParams] = useSearchParams();
   const { coinsList } = useWalletSelector();
-  const ftTicker = searchParams.get('ticker');
+  const ftAddress = searchParams.get('ft');
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  const ft = coinsList?.find((ftCoin) => ftCoin.ticker === ftTicker);
+  const ft = coinsList?.find((ftCoin) => ftCoin.principal === ftAddress);
 
   const getDashboardTitle = () => {
-    if (ftTicker && ftTicker !== 'undefined') {
-      return ftTicker;
+    if (ft) {
+      return getFtTicker(ft);
     }
     if (coin) {
       return coin;
@@ -48,7 +47,7 @@ export default function CoinDashboard() {
       <TopRow title={getDashboardTitle()} onClick={handleBack} />
       <Container>
         <CoinHeader coin={coin as CurrencyTypes} fungibleToken={ft} />
-        <TransactionsHistoryList coin={coin as CurrencyTypes} fungibleToken={ft} />
+        <TransactionsHistoryList coin={coin as CurrencyTypes} txFilter={`${ft?.principal}::${ft?.assetName}`} />
       </Container>
     </>
   );

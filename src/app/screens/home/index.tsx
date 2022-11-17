@@ -252,8 +252,8 @@ function Home() {
     navigate('/buy-stx/BTC');
   };
 
-  const handleTokenPressed = (token: { coin: CurrencyTypes, ticker: string | undefined }) => {
-    navigate(`/coinDashboard/${token.coin}?ticker=${token.ticker}`);
+  const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined }) => {
+    navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
   };
 
   return (

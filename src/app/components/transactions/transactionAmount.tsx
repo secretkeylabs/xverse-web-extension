@@ -1,6 +1,10 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  BtcTransactionData, FungibleToken, microstacksToStx, satsToBtc, StxTransactionData,
+  BtcTransactionData,
+  FungibleToken,
+  microstacksToStx,
+  satsToBtc,
+  StxTransactionData,
 } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
@@ -8,8 +12,8 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 interface TransactionAmountProps {
-  transaction: StxTransactionData | BtcTransactionData
-  coin: CurrencyTypes,
+  transaction: StxTransactionData | BtcTransactionData;
+  coin: CurrencyTypes;
 }
 
 const TransactionValue = styled.p((props) => ({
@@ -18,13 +22,8 @@ const TransactionValue = styled.p((props) => ({
 }));
 
 export default function TransactionAmount(props: TransactionAmountProps): JSX.Element | null {
-  const {
-    transaction,
-    coin,
-  } = props;
-  const {
-    coinsList,
-  } = useWalletSelector();
+  const { transaction, coin } = props;
+  const { coinsList } = useWalletSelector();
   if (coin === 'STX' || coin === 'FT') {
     if (transaction.txType === 'token_transfer') {
       const prefix = transaction.incoming ? '' : '-';
@@ -40,7 +39,9 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
     }
     if (transaction.txType === 'contract_call') {
       if (transaction.tokenType === 'fungible') {
-        const token = coinsList?.find((cn) => cn.principal === transaction.contractCall?.contract_id);
+        const token = coinsList?.find(
+          (cn) => cn.principal === transaction.contractCall?.contract_id
+        );
         const prefix = transaction.incoming ? '' : '-';
         return (
           <NumericFormat
@@ -63,7 +64,9 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
         displayType="text"
         thousandSeparator
         prefix=""
-        renderText={(value: string) => <TransactionValue>{`${prefix}${value} BTC`}</TransactionValue>}
+        renderText={(value: string) => (
+          <TransactionValue>{`${prefix}${value} BTC`}</TransactionValue>
+        )}
       />
     );
   }

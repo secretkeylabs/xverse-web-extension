@@ -11,10 +11,7 @@ interface TransactionStatusIconPros {
 }
 
 function TransactionStatusIcon(props: TransactionStatusIconPros) {
-  const {
-    currency,
-    transaction,
-  } = props;
+  const { currency, transaction } = props;
   if (currency === 'STX' || currency === 'FT') {
     const tx = transaction as StxTransactionData;
     if (tx.txType === 'token_transfer' || tx.tokenType === 'fungible') {

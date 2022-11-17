@@ -1,12 +1,16 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BtcTransactionData, StxTransactionData, TransactionData } from '@secretkeylabs/xverse-core';
+import {
+  BtcTransactionData,
+  StxTransactionData,
+  TransactionData,
+} from '@secretkeylabs/xverse-core';
 import { SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL } from '@utils/constants';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 interface TransactionTitleProps {
-  transaction: StxTransactionData | BtcTransactionData
+  transaction: StxTransactionData | BtcTransactionData;
 }
 
 const TransactionTitleText = styled.p((props) => ({
@@ -15,26 +19,20 @@ const TransactionTitleText = styled.p((props) => ({
 }));
 
 export default function TransactionTitle(props: TransactionTitleProps) {
-  const {
-    transaction,
-  } = props;
+  const { transaction } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const {
-    coins,
-  } = useWalletSelector();
+  const { coins } = useWalletSelector();
 
   const getTokenTransferTitle = (tx: TransactionData): string => {
     if (tx.txStatus === 'pending') {
-      return tx.incoming
-        ? t('TRANSACTION_PENDING_RECEIVING')
-        : t('TRANSACTION_PENDING_SENDING');
+      return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
     return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
   };
 
   const getFtName = (tx: TransactionData): string => {
     const coinDisplayName = coins?.find(
-      (coin) => coin.contract === tx.contractCall?.contract_id,
+      (coin) => coin.contract === tx.contractCall?.contract_id
     )?.name;
 
     return coinDisplayName ?? '';
@@ -81,7 +79,5 @@ export default function TransactionTitle(props: TransactionTitleProps) {
         return t('TRANSACTION_STATUS_UNKNOWN');
     }
   };
-  return (
-    <TransactionTitleText>{getTransactionTitle(transaction)}</TransactionTitleText>
-  );
+  return <TransactionTitleText>{getTransactionTitle(transaction)}</TransactionTitleText>;
 }
