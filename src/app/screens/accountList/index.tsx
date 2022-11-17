@@ -20,10 +20,11 @@ const Container = styled.div`
     display: none;
   }
 `;
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
+  background: 'transparent',
   marginTop: props.theme.spacing(8),
 }));
 
@@ -35,7 +36,7 @@ const AccountContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(11),
 }));
 
-const AddAccountContainer = styled.button((props) => ({
+const AddAccountContainer = styled.div((props) => ({
   display: 'flex',
   height: 48,
   width: 48,
@@ -54,6 +55,7 @@ const ButtonImage = styled.img({
 const AddAccountText = styled.h1((props) => ({
   ...props.theme.body_m,
   opacity: 0.8,
+  color: props.theme.colors.white['0'],
 }));
 
 function AccountList(): JSX.Element {
@@ -128,8 +130,8 @@ function AccountList(): JSX.Element {
             <Seperator />
           </>
         ))}
-        <RowContainer>
-          <AddAccountContainer onClick={async () => onCreateAccount()}>
+        <RowContainer onClick={async () => onCreateAccount()}>
+          <AddAccountContainer>
             <ButtonImage src={Plus} />
           </AddAccountContainer>
           <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>

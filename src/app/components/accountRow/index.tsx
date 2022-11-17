@@ -3,6 +3,8 @@ import { Account } from '@stores/wallet/actions/types';
 import { getAccountGradient } from '@utils/gradient';
 import { useTranslation } from 'react-i18next';
 import { getAddressDetail } from '@utils/helper';
+import BarLoader from '@components/barLoader';
+import { LoaderSize } from '@utils/constants';
 
 interface GradientCircleProps {
   firstGradient: string;
@@ -11,8 +13,8 @@ interface GradientCircleProps {
 }
 
 const GradientCircle = styled.div<GradientCircleProps>((props) => ({
-  height: 47,
-  width: 47,
+  height: 40,
+  width: 40,
   borderRadius: 25,
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
@@ -27,8 +29,8 @@ const TopSectionContainer = styled.button((props) => ({
 const CurrentAcountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(2),
+  paddingLeft: props.theme.spacing(6),
+
 }));
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
@@ -47,6 +49,12 @@ const CurrentAccountDetailText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['400'],
   marginTop: props.theme.spacing(1),
+}));
+
+const BarLoaderContainer = styled.div((props) => ({
+  width: 200,
+  paddingTop: props.theme.spacing(2),
+  backgroundColor: 'transparent',
 }));
 
 interface Props {
@@ -75,12 +83,17 @@ function AccountRow({ account, isSelected, onAccountSelected }: Props) {
         thirdGradient={gradient[2]}
       />
       <CurrentAcountContainer>
-        {isSelected ? (
+        { account && (isSelected ? (
           <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
         ) : (
           <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
-        )}
-        <CurrentAccountDetailText>{getAddressDetail(account!)}</CurrentAccountDetailText>
+        ))}
+        {!account ? (
+          <BarLoaderContainer>
+            <BarLoader loaderSize={LoaderSize.LARGE} />
+            <BarLoader loaderSize={LoaderSize.MEDIUM} />
+          </BarLoaderContainer>
+        ) : <CurrentAccountDetailText>{getAddressDetail(account!)}</CurrentAccountDetailText>}
       </CurrentAcountContainer>
     </TopSectionContainer>
   );

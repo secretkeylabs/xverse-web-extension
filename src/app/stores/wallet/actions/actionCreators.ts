@@ -26,6 +26,12 @@ export function unlockWalletAction(seed: string) {
   };
 }
 
+export function lockWalletAction() {
+  return {
+    type: actions.LockWalletKey,
+  };
+}
+
 export function storeEncryptedSeedAction(encryptedSeed: string): actions.StoreEncryptedSeed {
   return {
     type: actions.StoreEncryptedSeedKey,
@@ -234,5 +240,14 @@ export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNet
   return {
     type: actions.ChangeNetworkKey,
     network,
+  };
+}
+
+export function getActiveAccountsAction(
+  accountsList: Account[],
+): actions.GetActiveAccounts {
+  return {
+    type: actions.GetActiveAccountsKey,
+    accountsList,
   };
 }

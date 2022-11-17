@@ -20,12 +20,11 @@ const TileContainer = styled.div<TileProps>((props) => ({
   alignItems: 'flex-start',
   justifyContent: 'space-between',
   backgroundColor: props.color,
-  paddingLeft: props.theme.spacing(9),
-  paddingRight: props.theme.spacing(9),
-  paddingTop: props.theme.spacing(9),
-  paddingBottom: props.margin ?? props.theme.spacing(9),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(6),
+  paddingBottom: props.margin ?? props.theme.spacing(6),
   borderRadius: props.theme.radius(2),
-  marginHorizontal: props.theme.spacing(7),
   marginBottom: props.theme.spacing(6),
 }));
 

@@ -1,6 +1,7 @@
 import { Account } from '@stores/wallet/actions/types';
-import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
+import { fetchBtcTransactionsData, getConfirmedTransactions, getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BigNumber from 'bignumber.js';
+import { BtcAddressData, SettingsNetwork, StxTransactionListData } from '@secretkeylabs/xverse-core';
 
 const validUrl = require('valid-url');
 
@@ -74,4 +75,23 @@ export async function isValidURL(str: string): Promise<boolean> {
     }
   }
   return false;
+}
+
+export async function checkAccountActivity(
+  stxAddress: string,
+  btcAddress: string,
+  selectedNetwork: SettingsNetwork,
+) {
+  const stxTxHistory: StxTransactionListData = await getConfirmedTransactions(
+    {
+      stxAddress,
+      network: selectedNetwork,
+    },
+  );
+  if (stxTxHistory.totalCount !== 0) return true;
+  const btcTxHistory: BtcAddressData = await fetchBtcTransactionsData(
+    btcAddress,
+    selectedNetwork?.type,
+  );
+  return btcTxHistory.transactions.length !== 0;
 }

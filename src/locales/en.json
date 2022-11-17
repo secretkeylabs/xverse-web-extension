@@ -216,7 +216,7 @@
   },
   "OPTIONS_DIALOG":{
     "SWITCH_ACCOUNT": "Switch Account",
-    "LOCK": "LOCK",
+    "LOCK": "Lock",
     "RESET_WALLET": "Reset Wallet"
   }
 }

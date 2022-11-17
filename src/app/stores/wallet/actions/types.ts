@@ -22,6 +22,7 @@ export const AddAccountKey = 'AddAccount';
 export const FetchFeeMultiplierKey = 'FetchFeeMultiplier';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
+export const GetActiveAccountsKey = 'GetActiveAccounts';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
@@ -222,6 +223,11 @@ export interface ChangeNetwork {
   network: SettingsNetwork;
 }
 
+export interface GetActiveAccounts {
+  type: typeof GetActiveAccountsKey;
+  accountsList: Account[];
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -246,4 +252,5 @@ export type WalletActions =
   | FetchCoinDataFailure
   | UpdateVisibleCoinList
   | ChangeFiatCurrency
-  | ChangeNetwork;
+  | ChangeNetwork
+  | GetActiveAccounts;
