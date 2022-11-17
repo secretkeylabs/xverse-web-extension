@@ -51,6 +51,8 @@
     "MEMO_PLACEHOLDER": "Memo",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
+    "NO_FUNDS":"You don’t have any fund to send.",
+    "BUY_CRYPTO": "Buy crypto →",
     "ERRORS": {
       "ADDRESS_REQUIRED": "Recipient address is required",
       "AMOUNT_REQUIRED": "Amount is required",
@@ -213,5 +215,14 @@
     "RESET": "Reset",
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+  },
+  "BUY_SCREEN":{
+    "BUY": "Buy",
+    "PURCHASE_CRYPTO": "Purchase crypto quickly and deposit directly into your Xverse wallet.",
+    "MOONPAY": "Buy on Moonpay",
+    "BINANCE": "Buy on Binance",
+    "TRANSAK": "Buy on Transak",
+    "DISCLAIMER": "Disclaimer",
+    "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider."
   }
 }
