@@ -82,7 +82,7 @@ const ShareButtonContainer = styled.div((props) => ({
   width: '100%',
 }));
 
-const Button = styled.button((props) => ({
+const WebGalleryButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'flex-start',
@@ -93,7 +93,7 @@ const Button = styled.button((props) => ({
   marginTop: props.theme.spacing(5),
 }));
 
-const ButtonText = styled.div((props) => ({
+const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
   color: props.theme.colors.white['0'],
@@ -200,12 +200,12 @@ function NftDashboard() {
           )
             : <CollectiblesValueText>{`${data?.total} ${t('ITEMS')}`}</CollectiblesValueText>}
           <WebGalleryButtonContainer>
-            <Button onClick={openInGalleryView}>
+            <WebGalleryButton onClick={openInGalleryView}>
               <>
                 <ButtonImage src={SquaresFour} />
-                <ButtonText>{t('WEB_GALLERY')}</ButtonText>
+                <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
               </>
-            </Button>
+            </WebGalleryButton>
           </WebGalleryButtonContainer>
         </CollectibleContainer>
         <ButtonContainer>

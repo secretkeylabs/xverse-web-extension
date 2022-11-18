@@ -22,13 +22,13 @@ import ForgotPassword from '@screens/forgotPassword';
 import BackupWalletSteps from '@screens/backupWalletSteps';
 import NftDashboard from '@screens/nftDashboard';
 import NftDetailScreen from '@screens/nftDetail';
-import SendNft from '@screens/sendNft';
-import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import Setting from '@screens/settings';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import ChangePasswordScreen from '@screens/settings/changePassword';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import BackupWalletScreen from '@screens/settings/backupWallet';
+import SendNft from '@screens/sendNft';
+import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 
 const router = createHashRouter([
   {
