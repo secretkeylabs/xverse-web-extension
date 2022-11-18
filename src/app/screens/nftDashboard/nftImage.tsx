@@ -48,7 +48,7 @@ function NftImage({ metadata }: Props) {
 
   if (metadata?.asset_protocol) {
     return (
-      <Video src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')} autoPlay loop playsInline controls preload="auto" poster="" />
+      <Video src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')} loop playsInline controls preload="auto" />
     );
   }
 
