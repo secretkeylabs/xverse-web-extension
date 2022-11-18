@@ -17,15 +17,6 @@ import { checkNftExists } from '@utils/helper';
 import NftImage from '@screens/nftDashboard/nftImage';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 
-const OuterContainer = styled.div`
-display: flex;
-flex-direction: column;
-flex: 1;
-overflow-y: auto;
-&::-webkit-scrollbar {
-  display: none;
-}`;
-
 const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -154,25 +145,26 @@ function SendNft() {
     }
   };
   return (
-    <OuterContainer>
+    <>
       <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />
-      <Container>
-        <NFtContainer>
-          <NftImage
-            metadata={nft?.token_metadata!}
-          />
-        </NFtContainer>
-        <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
-      </Container>
       <SendForm
         processing={isLoading}
         currencyType="NFT"
         disableAmountInput
         error={error}
         onPressSend={onPressSendNFT}
-      />
+      >
+        <Container>
+          <NFtContainer>
+            <NftImage
+              metadata={nft?.token_metadata!}
+            />
+          </NFtContainer>
+          <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+        </Container>
+      </SendForm>
       <BottomBar tab="dashboard" />
-    </OuterContainer>
+    </>
   );
 }
 

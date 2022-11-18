@@ -11,7 +11,7 @@ import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
-import ConfirmStxTransationComponent from '@screens/confirmStxTransaxtion/confirmStxTransactionComponent';
+import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
 

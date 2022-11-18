@@ -10,7 +10,7 @@ import styled from 'styled-components';
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginTop: props.theme.spacing(6),
+  marginTop: props.theme.spacing(8),
 }));
 
 const FeeText = styled.h1((props) => ({

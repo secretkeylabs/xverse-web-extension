@@ -13,7 +13,7 @@ import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
-import ConfirmStxTransationComponent from './confirmStxTransactionComponent';
+import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',

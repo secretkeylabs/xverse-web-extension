@@ -2,7 +2,9 @@ import { CurrencyTypes } from '@utils/constants';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { SetStateAction, useState } from 'react';
+import {
+  ReactNode, SetStateAction, useEffect, useState,
+} from 'react';
 import BigNumber from 'bignumber.js';
 import IconBitcoin from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
@@ -146,6 +148,7 @@ interface Props {
   hideMemo?: boolean;
   buttonText?: string;
   processing?: boolean;
+  children?: ReactNode;
 }
 
 function SendForm({
@@ -158,11 +161,13 @@ function SendForm({
   hideMemo = false,
   buttonText,
   processing,
+  children,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const [amount, setAmount] = useState('');
   const [memo, setMemo] = useState('');
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
+  const [showError, setShowError] = useState<string | undefined>(error);
   const [recipientAddress, setRecipientAddress] = useState('');
   const {
     stxBtcRate, btcFiatRate, fiatCurrency, stxAddress,
@@ -175,6 +180,16 @@ function SendForm({
     stxAddress,
     currencyType,
   );
+
+  useEffect(() => {
+    if (error) {
+      if (associatedAddress !== '' && error.includes(t('ERRORS.ADDRESS_INVALID'))) {
+        setShowError('');
+      } else {
+        setShowError(error);
+      }
+    }
+  }, [error, associatedAddress]);
 
   function getFiatEquivalent(value: number) {
     if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
@@ -296,13 +311,14 @@ function SendForm({
   }
 
   const handleOnPress = () => {
-    onPressSend(associatedAddress !== '' ? associatedAddress : recipientAddress, amount, memo);
+    onPressSend(associatedAddress !== '' ? associatedAddress : debouncedSearchTerm, amount, memo);
   };
 
   return (
     <ScrollContainer>
       <OuterContainer>
         {!disableAmountInput && renderEnterAmountSection()}
+        {children}
         {renderEnterRecepientSection()}
         {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
           <>
@@ -328,7 +344,7 @@ function SendForm({
         )}
       </OuterContainer>
       <ErrorContainer>
-        <ErrorText>{error}</ErrorText>
+        <ErrorText>{showError}</ErrorText>
       </ErrorContainer>
 
       <SendButtonContainer>

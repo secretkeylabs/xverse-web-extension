@@ -35,9 +35,8 @@ const Container = styled.div`
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(20),
+  marginTop: props.theme.spacing(24),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -49,12 +48,10 @@ const TransparentButtonContainer = styled.div((props) => ({
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(5),
+  marginTop: props.theme.spacing(10),
 }));
 
 const ButtonText = styled.div((props) => ({
@@ -100,7 +97,7 @@ function ConfirmStxTransationComponent({
   const [buttonLoading, setButtonLoading] = useState(loading);
 
   const handleBackButtonClick = () => {
-    navigate('/send-stx');
+    navigate(-1);
   };
 
   useEffect(() => {
@@ -191,24 +188,25 @@ function ConfirmStxTransationComponent({
           onApplyClick={applyTxSettings}
           onCrossClick={closeTransactionSettingAlert}
         />
-      </Container>
-      <ButtonContainer>
-        <TransparentButtonContainer>
-          <ActionButton
-            text={t('CANCEL')}
-            transparent
-            disabled={buttonLoading}
-            onPress={onCancelClick}
-          />
-        </TransparentButtonContainer>
+        <ButtonContainer>
+          <TransparentButtonContainer>
+            <ActionButton
+              text={t('CANCEL')}
+              transparent
+              disabled={buttonLoading}
+              onPress={onCancelClick}
+            />
+          </TransparentButtonContainer>
 
-        <ActionButton
-          text={t('CONFIRM')}
-          disabled={buttonLoading}
-          processing={buttonLoading}
-          onPress={onConfirmButtonClick}
-        />
-      </ButtonContainer>
+          <ActionButton
+            text={t('CONFIRM')}
+            disabled={buttonLoading}
+            processing={buttonLoading}
+            onPress={onConfirmButtonClick}
+          />
+        </ButtonContainer>
+      </Container>
+
     </>
   );
 }
