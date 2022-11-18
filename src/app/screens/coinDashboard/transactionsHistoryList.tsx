@@ -8,11 +8,13 @@ import { formatDate } from '@utils/date';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
-  Transaction,
 } from '@stacks/stacks-blockchain-api-types';
 import { useMemo } from 'react';
 import {
-  isAddressTransactionWithTransfers, isBtcTransaction, isBtcTransactionArr, Tx,
+  isAddressTransactionWithTransfers,
+  isBtcTransaction,
+  isBtcTransactionArr,
+  Tx,
 } from '@utils/transactions/transactions';
 import BtcTransactionHistoryItem from '@components/transactions/btcTransaction';
 import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
@@ -62,17 +64,14 @@ const SectionTitle = styled.p((props) => ({
 }));
 
 interface TransactionsHistoryListProps {
-  coin: CurrencyTypes,
-  txFilter: string | null,
+  coin: CurrencyTypes;
+  txFilter: string | null;
 }
 
 const groupBtcTxsByDate = (
   transactions: BtcTransactionData[],
 ): { [x: string]: BtcTransactionData[] } => transactions.reduce(
-  (
-    all: { [x: string]: BtcTransactionData[] },
-    transaction: BtcTransactionData,
-  ) => {
+  (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
     const txDate = formatDate(transaction.seenTime);
     if (!all[txDate]) {
       if (transaction.txStatus === 'pending') {
@@ -100,13 +99,11 @@ const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTran
       } else {
         all[date].push(transaction);
       }
+    }
+    if (!all.pending) {
+      all.pending = [transaction];
     } else {
-      // const date = formatDate(new Date(transaction.));
-      // if (!all[date]) {
-        // all[date] = [transaction];
-      // } else {
-        // all[date].push(transaction);
-      // }
+      all.pending.push(transaction);
     }
     return all;
   },
@@ -115,53 +112,46 @@ const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTran
 
 const filterTxs = (
   txs: (AddressTransactionWithTransfers | MempoolTransaction)[],
-  filter: string,
-): (AddressTransactionWithTransfers | MempoolTransaction)[] => txs.filter((atx) => {
-  const tx = isAddressTransactionWithTransfers(atx) ? atx.tx : atx;
-  const acceptedTypes = tx.tx_type === 'contract_call';
-  return (
-    acceptedTypes
-        && ((atx?.ft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
-          .length > 0
-          || (atx?.nft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter)).length > 0
-          || tx?.contract_call?.contract_id === filter)
-  );
-});
+  filter: string
+): (AddressTransactionWithTransfers | MempoolTransaction)[] =>
+  txs.filter((atx) => {
+    const tx = isAddressTransactionWithTransfers(atx) ? atx.tx : atx;
+    const acceptedTypes = tx.tx_type === 'contract_call';
+    return (
+      acceptedTypes &&
+      ((atx?.ft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
+        .length > 0 ||
+        (atx?.nft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
+          .length > 0 ||
+        tx?.contract_call?.contract_id === filter)
+    );
+  });
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
-  const {
-    coin,
-    txFilter,
-  } = props;
-  const {
-    data,
-    isLoading,
-  } = useTransactions(coin as CurrencyTypes || 'STX');
+  const { coin, txFilter } = props;
+  const { data, isLoading } = useTransactions((coin as CurrencyTypes) || 'STX');
 
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
-  const groupedTxs = useMemo(
-    () => {
-      if (data) {
-        if (isBtcTransactionArr(data)) {
-          return groupBtcTxsByDate(data);
-        }
-        if (txFilter && coin === 'FT') {
-          const filteredTxs = filterTxs(data, txFilter);
-          return groupedTxsByDateMap(filteredTxs);
-        }
-        return groupedTxsByDateMap(data);
+  const groupedTxs = useMemo(() => {
+    if (data && data.length > 0) {
+      if (isBtcTransactionArr(data)) {
+        return groupBtcTxsByDate(data);
       }
-    },
-    [data, isLoading],
-  );
+      if (txFilter && coin === 'FT') {
+        const filteredTxs = filterTxs(data, txFilter);
+        return groupedTxsByDateMap(filteredTxs);
+      }
+      return groupedTxsByDateMap(data);
+    }
+  }, [data, isLoading]);
 
   return (
     <ListItemsContainer>
       <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>
-      {groupedTxs
-        && !isLoading
-        && Object.keys(groupedTxs).map((group) => (
+      {groupedTxs &&
+        !isLoading &&
+        Object.keys(groupedTxs).map((group) => (
           <>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
@@ -170,11 +160,15 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
             {groupedTxs[group].map((transaction) => {
               if (isBtcTransaction(transaction)) {
                 return (
-                  <BtcTransactionHistoryItem transaction={transaction} />
+                  <BtcTransactionHistoryItem transaction={transaction} key={transaction.txid} />
                 );
               }
               return (
-                <StxTransactionHistoryItem transaction={transaction} transactionCoin={coin} />
+                <StxTransactionHistoryItem
+                  transaction={transaction}
+                  transactionCoin={coin}
+                  key={transaction.tx_id}
+                />
               );
             })}
           </>

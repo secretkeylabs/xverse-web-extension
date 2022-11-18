@@ -8,7 +8,7 @@ import {
   MempoolTransaction,
 } from '@stacks/stacks-blockchain-api-types';
 import { useQuery } from '@tanstack/react-query';
-import { CurrencyTypes, initialNetworksList, PAGINATION_LIMIT } from '@utils/constants';
+import { CurrencyTypes, PAGINATION_LIMIT } from '@utils/constants';
 import { getStxAddressTransactions } from '@utils/transactions/transactions';
 
 export default function useTransactions(coinType: CurrencyTypes) {
@@ -18,21 +18,13 @@ export default function useTransactions(coinType: CurrencyTypes) {
   > => {
     try {
       if (coinType === 'STX' || coinType === 'FT' || coinType === 'NFT') {
-        return await getStxAddressTransactions(
-          stxAddress,
-          network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1],
-          0,
-          PAGINATION_LIMIT,
-        );
+        return await getStxAddressTransactions(stxAddress, network, 0, PAGINATION_LIMIT);
       }
       if (coinType === 'BTC') {
-        const btcData = await fetchBtcTransactionsData(
-          btcAddress,
-          network === 'Mainnet' ? initialNetworksList[0] : initialNetworksList[1],
-        );
+        const btcData = await fetchBtcTransactionsData(btcAddress, network);
         return btcData.transactions;
       }
-      throw new Error('Invalid Coin');
+      return [];
     } catch (err) {
       return Promise.reject(err);
     }

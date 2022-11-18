@@ -127,7 +127,7 @@
     "SEED_PHRASE_VIEW_CONTINUE": "Continue",
     "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
     "SEED_PHRASE_VERIFY_BUTTON": "Verify",
-    "SEED_PHRASE_BACK_BUTTON": "Back"  
+    "SEED_PHRASE_BACK_BUTTON": "Back"
   },
   "CREATE_PASSWORD_SCREEN": {
     "CREATE_PASSWORD_TITLE": "Enter your new password",
@@ -291,6 +291,13 @@
     "TRANSACTION_STACKING_DELEGATION": "Stacking Delegation",
     "TRANSACTION_STACKING_CONTRACT_AUTHORIZE": "Stacking Contract Authorize",
     "TRANSACTION_STACKING_REVOKE_DELEGATION": "Stacking Revoke Delegation",
-    "TRANSACTION_FUNGIBLE_TOKEN_TRANSFER": "transfer"
+    "TRANSACTION_FUNGIBLE_TOKEN_TRANSFER": "transfer",
+    "STX_AVAILABLE_BALANCE_PREFIX": "Available",
+    "STX_LOCKED_BALANCE_PREFIX": "Locked",
+    "SHOW_FT_INFO_BUTTON": "Show more info",
+    "LESS_FT_INFO_BUTTON": "Show less info",
+    "FT_CONTRACT_PREFIX": "Token Contract",
+    "OPEN_FT_CONTRACT_DEPLOYMENT": "View the contract on",
+    "STACKS_EXPLORER": "Stacks Explorer"
   }
 }

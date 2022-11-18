@@ -3,10 +3,8 @@ import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-t
 import styled from 'styled-components';
 import { isAddressTransactionWithTransfers, Tx } from '@utils/transactions/transactions';
 import { StxTransactionData } from '@secretkeylabs/xverse-core';
-import { mapTransferTransactionData, parseStxTransactionData } from '@secretkeylabs/xverse-core/api/helper';
+import { parseStxTransactionData } from '@secretkeylabs/xverse-core/api/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Transfer } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
-import { nanoid } from 'nanoid';
 import TransactionAmount from './transactionAmount';
 import TransactionRecipient from './transactionRecipient';
 import TransactionStatusIcon from './transactionStatusIcon';

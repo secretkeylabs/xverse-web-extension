@@ -1,10 +1,9 @@
-import { SettingsNetwork, BtcTransactionData } from '@secretkeylabs/xverse-core';
-import { mapTransferTransactionData } from '@secretkeylabs/xverse-core/api/helper';
+import { BtcTransactionData, SettingsNetwork } from '@secretkeylabs/xverse-core';
 import { API_TIMEOUT_MILLI } from '@secretkeylabs/xverse-core/constant';
 import {
   AddressTransactionWithTransfers,
-  MempoolTransactionListResponse,
   MempoolTransaction,
+  MempoolTransactionListResponse,
   Transaction,
 } from '@stacks/stacks-blockchain-api-types';
 import axios from 'axios';
@@ -76,8 +75,7 @@ export async function getStxAddressTransactions(
     offset,
     network,
   });
-  const all = [...mempoolTransactions.results, ...transactionsWithTransfers];
-  return all;
+  return [...mempoolTransactions.results, ...transactionsWithTransfers];
 }
 
 export type Tx = MempoolTransaction | Transaction;
