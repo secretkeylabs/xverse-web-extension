@@ -22,11 +22,14 @@ import ForgotPassword from '@screens/forgotPassword';
 import BackupWalletSteps from '@screens/backupWalletSteps';
 import Stacking from '@screens/stacking';
 import NftDashboard from '@screens/nftDashboard';
+import NftDetailScreen from '@screens/nftDetail';
 import Setting from '@screens/settings';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import ChangePasswordScreen from '@screens/settings/changePassword';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import BackupWalletScreen from '@screens/settings/backupWallet';
+import SendNft from '@screens/sendNft';
+import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 
 const router = createHashRouter([
   {
@@ -72,6 +75,10 @@ const router = createHashRouter([
       {
         path: 'send-btc',
         element: <SendBtcScreen />,
+      },
+      {
+        path: 'nft-dashboard/nft-detail/:id/send-nft',
+        element: <SendNft />,
       },
       {
         path: 'confirm-stx-tx',
@@ -120,6 +127,14 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard',
         element: <NftDashboard />,
+      },
+      {
+        path: 'nft-dashboard/nft-detail/:id',
+        element: <NftDetailScreen />,
+      },
+      {
+        path: 'confirm-nft-tx/:id',
+        element: <ConfirmNftTransaction />,
       },
       {
         path: 'settings',
