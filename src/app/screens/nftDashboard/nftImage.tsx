@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
+import Img from 'react-image';
 import { TokenMetaData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getFetchableUrl } from '@utils/helper';
 import NftPlaceholderImage from '@assets/img/nftDashboard/ic_nft_diamond.svg';
-import Img from 'react-image';
 
 const ImageContainer = styled.div((props) => ({
   padding: props.theme.spacing(10),
@@ -39,7 +39,7 @@ function NftImage({ metadata }: Props) {
             <ImageContainer>
               <Ring color="white" size={30} />
             </ImageContainer>
-)}
+          )}
           unloader={showNftImagePlaceholder}
         />
       </Suspense>
@@ -48,9 +48,7 @@ function NftImage({ metadata }: Props) {
 
   if (metadata?.asset_protocol) {
     return (
-      <ImageContainer>
-        <Video src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')} />
-      </ImageContainer>
+      <Video src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')} loop playsInline controls preload="auto" />
     );
   }
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { generateUnsignedStxTokenTransferTransaction } from '@secretkeylabs/xverse-core/api';
+import { generateUnsignedStxTokenTransferTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { validateStxAddress } from '@secretkeylabs/xverse-core/wallet';
