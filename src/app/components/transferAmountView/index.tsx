@@ -24,7 +24,7 @@ const AmountText = styled.h1((props) => ({
 
 interface Props {
   amount: BigNumber;
-  currency : 'BTC' | 'STX';
+  currency : string;
 }
 
 function TransferAmountView({ amount, currency }: Props) {

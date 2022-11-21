@@ -234,6 +234,14 @@ function Home() {
     navigate('/receive/STX');
   };
 
+  const onSendFtSelect = (coin: FungibleToken) => {
+    navigate('send-ft', {
+      state: {
+        fungibleToken: coin,
+      },
+    });
+  };
+
   return (
     <>
       { network.type === 'Testnet'
@@ -315,7 +323,7 @@ function Home() {
           onSelectBitcoin={onBtcSendClick}
           onSelectStacks={onStxSendClick}
           onClose={onSendModalClose}
-          onSelectCoin={onStxSendClick}
+          onSelectCoin={onSendFtSelect}
           visible={openSendModal}
           coins={getCoinsList()}
           title={t('SEND')}

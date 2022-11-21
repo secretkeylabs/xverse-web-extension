@@ -10,10 +10,9 @@ import TransactionSettingAlert from '@components/transactionSetting';
 import {
   microstacksToStx, stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
-import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
+import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
-import TransferAmountView from '@components/transferAmountView';
 import TransferFeeView from '@components/transferFeeView';
 import {
   setFee, setNonce, getNonce, signMultiStxTransactions, signTransaction,
@@ -38,6 +37,7 @@ const ButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(8),
+  marginTop: props.theme.spacing(14),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -49,7 +49,6 @@ const TransparentButtonContainer = styled.div((props) => ({
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'flex-end',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
@@ -72,6 +71,7 @@ const ButtonImage = styled.img((props) => ({
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
+  token: string;
   onCancelClick: () => void;
   onConfirmClick: (transactions: StacksTransaction[]) => void;
   children: ReactNode;
@@ -85,6 +85,7 @@ function ConfirmStxTransationComponent({
   children,
   onConfirmClick,
   onCancelClick,
+  token,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const {
@@ -98,7 +99,7 @@ function ConfirmStxTransationComponent({
   const [buttonLoading, setButtonLoading] = useState(loading);
 
   const handleBackButtonClick = () => {
-    navigate('/send-stx');
+    if (token === 'STX') navigate('/send-stx'); else { navigate('/send-ft'); }
   };
 
   useEffect(() => {
@@ -117,12 +118,6 @@ function ConfirmStxTransationComponent({
   const getTxNonce = (): string => {
     const nonce = getNonce(stateTx[0]);
     return nonce.toString();
-  };
-
-  const getAmount = () => {
-    const txPayload = stateTx[0].payload as TokenTransferPayload;
-    const amount = new BigNumber(txPayload.amount.toString(10));
-    return microstacksToStx(amount);
   };
 
   const onAdvancedSettingClick = () => {
@@ -167,7 +162,7 @@ function ConfirmStxTransationComponent({
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
       <Container>
-        <TransferAmountView currency="STX" amount={getAmount()} />
+
         {children}
         <TransferFeeView
           fee={microstacksToStx(getFee())}

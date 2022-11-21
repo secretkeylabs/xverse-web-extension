@@ -13,6 +13,14 @@ export function ftDecimals(value: number | string | BigNumber, decimals: number)
   return amount.shiftedBy(-decimals).toNumber().toString();
 }
 
+export function convertToDecimals(
+  value: number | string | BigNumber,
+  decimals: number,
+): number {
+  const amount = initBigNumber(value);
+  return amount.shiftedBy(+decimals).toNumber();
+}
+
 export function replaceCommaByDot(amount: string) {
   return amount.replace(/,/g, '.');
 }

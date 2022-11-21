@@ -14,6 +14,10 @@ import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency
 interface TileProps {
   margin?: number;
 }
+
+interface TickerProps {
+  enlargeTicker? : boolean;
+}
 const TileContainer = styled.div<TileProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -29,20 +33,20 @@ const TileContainer = styled.div<TileProps>((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
-const TickerImage = styled.img((props) => ({
+const TickerImage = styled.img<TickerProps>((props) => ({
   marginRight: props.theme.spacing(3),
   alignSelf: 'center',
   transform: 'all',
-  height: 32,
-  width: 32,
+  height: props.enlargeTicker ? 40 : 32,
+  width: props.enlargeTicker ? 40 : 32,
 }));
 
-const TickerIconContainer = styled.div((props) => ({
+const TickerIconContainer = styled.div<TickerProps>((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: 32,
-  width: 32,
+  height: props.enlargeTicker ? 40 : 32,
+  width: props.enlargeTicker ? 40 : 32,
   marginRight: props.theme.spacing(3),
   borderRadius: props.theme.radius(2),
   backgroundColor: props.color,
@@ -120,6 +124,7 @@ interface Props {
   currency?: CurrencyTypes;
   onPress?: (event: any) => void;
   fungibleToken?: FungibleToken;
+  enlargeTicker?: boolean;
 }
 
 function TokenTile({
@@ -131,6 +136,7 @@ function TokenTile({
   currency,
   onPress,
   fungibleToken,
+  enlargeTicker = false,
 }: Props) {
   const {
     fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate,
@@ -279,7 +285,7 @@ function TokenTile({
   function renderFTIcon() {
     if (!loading) {
       if (fungibleToken?.image) {
-        return <TickerImage src={fungibleToken.image} />;
+        return <TickerImage src={fungibleToken.image} enlargeTicker={enlargeTicker} />;
       }
       // render ticker icon
       let ticker = fungibleToken?.ticker;
@@ -289,7 +295,7 @@ function TokenTile({
       const background = stc(ticker);
       ticker = ticker && ticker.substring(0, 4);
       return (
-        <TickerIconContainer color={background}>
+        <TickerIconContainer color={background} enlargeTicker={enlargeTicker}>
           <TickerIconText>{ticker}</TickerIconText>
         </TickerIconContainer>
       );
@@ -302,7 +308,7 @@ function TokenTile({
   }
 
   function renderIcon() {
-    if (currency === 'STX' || currency === 'BTC') return <TickerImage src={icon} />;
+    if (currency === 'STX' || currency === 'BTC') return <TickerImage src={icon} enlargeTicker={enlargeTicker} />;
     return renderFTIcon();
   }
 

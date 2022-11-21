@@ -4,9 +4,14 @@ import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
+
+const Container = styled.div((props) => ({
+  marginTop: props.theme.spacing(3),
+  marginBottom: props.theme.spacing(20),
+}));
 
 interface Props {
   visible: boolean;
@@ -44,11 +49,6 @@ function CoinSelectModal({
     onClose();
   };
 
-  const handleOnCoinPress = (coin:FungibleToken) => {
-    onSelectCoin(coin);
-    onClose();
-  };
-
   function renderFixedCoins() {
     return (
       <>
@@ -59,6 +59,7 @@ function CoinSelectModal({
           loading={loadingBtcData}
           underlayColor={theme.colors.background.elevation2}
           margin={2}
+          enlargeTicker
           onPress={handleOnBitcoinPress}
         />
 
@@ -69,6 +70,7 @@ function CoinSelectModal({
           loading={loadingWalletData}
           underlayColor={theme.colors.background.elevation2}
           margin={2}
+          enlargeTicker
           onPress={handleOnStackPress}
         />
       </>
@@ -77,7 +79,7 @@ function CoinSelectModal({
 
   function renderToken() {
     return (
-      <>
+      <Container>
         {renderFixedCoins()}
         {coins.map((coin) => (
           <TokenTile
@@ -88,11 +90,15 @@ function CoinSelectModal({
             loading={loadingWalletData}
             underlayColor={theme.colors.background.elevation2}
             margin={2}
-            onPress={handleOnCoinPress}
+            enlargeTicker
+            onPress={() => {
+              onSelectCoin(coin);
+              onClose();
+            }}
             fungibleToken={coin}
           />
         ))}
-      </>
+      </Container>
     );
   }
   return (

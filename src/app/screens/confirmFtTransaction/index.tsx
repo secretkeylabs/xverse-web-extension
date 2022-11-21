@@ -1,24 +1,25 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
-import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getStxFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
-import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
-import { addressToString, broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import Seperator from '@components/seperator';
+import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
+import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
-import ConfirmStxTransationComponent from './confirmStxTransactionComponent';
+import TransferAmountView from '@components/transferAmountView';
+import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import { getTicker } from '@utils/helper';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   marginTop: props.theme.spacing(12),
+  paddingBottom: props.theme.spacing(12),
+  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
 }));
 
 const TitleText = styled.h1((props) => ({
@@ -33,21 +34,17 @@ const ValueText = styled.h1((props) => ({
   wordBreak: 'break-all',
 }));
 
-function ConfirmStxTransaction() {
+function ConfirmFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const [fee, setStateFee] = useState(new BigNumber(0));
-  const [amount, setAmount] = useState(new BigNumber(0));
-  const [fiatAmount, setFiatAmount] = useState(new BigNumber(0));
-  const [total, setTotal] = useState(new BigNumber(0));
-  const [fiatTotal, setFiatTotal] = useState(new BigNumber(0));
-  const [recipient, setRecipient] = useState('');
-  const [memo, setMemo] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { unsignedTx } = location.state;
   const {
-    stxBtcRate, btcFiatRate, network, stxAddress, fiatCurrency,
+    unsignedTx, amount, fungibleToken, memo, recepientAddress,
+  } = location.state;
+
+  const {
+    stxBtcRate, network, stxAddress, fiatCurrency,
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
@@ -89,73 +86,47 @@ function ConfirmStxTransaction() {
     }
   }, [txError]);
 
-  function updateUI() {
-    const txPayload = unsignedTx.payload as TokenTransferPayload;
-
-    if (txPayload.recipient.address) {
-      setRecipient(addressToString(txPayload.recipient.address));
-    }
-
-    const txAmount = new BigNumber(txPayload.amount.toString(10));
-    const txFee = new BigNumber(unsignedTx.auth.spendingCondition.fee.toString());
-    const txTotal = amount.plus(fee);
-    const txFiatAmount = getStxFiatEquivalent(amount, stxBtcRate, btcFiatRate);
-    const txFiatTotal = getStxFiatEquivalent(amount, stxBtcRate, btcFiatRate);
-    const { memo: txMemo } = txPayload;
-
-    setAmount(txAmount);
-    setStateFee(txFee);
-    setFiatAmount(txFiatAmount);
-    setTotal(txTotal);
-    setFiatTotal(txFiatTotal);
-    setMemo(txMemo.content);
-  }
-
-  useEffect(() => {
-    if (recipient === '' || !fee || !amount || !fiatAmount || !total || !fiatTotal) {
-      updateUI();
-    }
-  });
-
-  const networkInfoSection = (
-    <InfoContainer>
-      <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network.type}</ValueText>
-    </InfoContainer>
-  );
-
-  const memoInfoSection = !!memo && (
-    <>
-      <InfoContainer>
-        <TitleText>{t('MEMO')}</TitleText>
-        <ValueText>{memo}</ValueText>
-      </InfoContainer>
-      <Seperator />
-    </>
-  );
-
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     mutate({ signedTx: txs[0] });
   };
 
   const handleOnCancelClick = () => {
-    navigate('/send-stx');
+    navigate(-1);
   };
+
+  function getFtTicker() {
+    if (fungibleToken.ticker) {
+      return fungibleToken.ticker.toUpperCase();
+    } if (fungibleToken?.name) {
+      return getTicker(fungibleToken.name).toUpperCase();
+    } return '';
+  }
+
   return (
     <>
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
+        token="STX"
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
       >
-        <RecipientAddressView recipient={recipient} />
-        {networkInfoSection}
-        <Seperator />
-        {memoInfoSection}
+        <TransferAmountView currency={getFtTicker()} amount={amount} />
+        <RecipientAddressView recipient={recepientAddress} />
+        <InfoContainer>
+          <TitleText>{t('NETWORK')}</TitleText>
+          <ValueText>{network.type}</ValueText>
+        </InfoContainer>
+        {!!memo && (
+        <InfoContainer>
+          <TitleText>{t('MEMO')}</TitleText>
+          <ValueText>{memo}</ValueText>
+        </InfoContainer>
+        )}
+
       </ConfirmStxTransationComponent>
       <BottomBar tab="dashboard" />
     </>
   );
 }
-export default ConfirmStxTransaction;
+export default ConfirmFtTransaction;
