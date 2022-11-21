@@ -41,6 +41,7 @@ const LoadingContainer = styled.div({
 const NoTransactionsContainer = styled.div((props) => ({
   ...props.theme.body_m,
   display: 'flex',
+  flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
   color: props.theme.colors.white[400],
@@ -69,46 +70,45 @@ interface TransactionsHistoryListProps {
 }
 
 const groupBtcTxsByDate = (
-  transactions: BtcTransactionData[],
-): { [x: string]: BtcTransactionData[] } => transactions.reduce(
-  (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
-    const txDate = formatDate(transaction.seenTime);
-    if (!all[txDate]) {
-      if (transaction.txStatus === 'pending') {
-        all.Pending = [transaction];
+  transactions: BtcTransactionData[]
+): { [x: string]: BtcTransactionData[] } =>
+  transactions.reduce(
+    (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
+      const txDate = formatDate(transaction.seenTime);
+      if (!all[txDate]) {
+        if (transaction.txStatus === 'pending') {
+          all.Pending = [transaction];
+        } else {
+          all[txDate] = [transaction];
+        }
       } else {
-        all[txDate] = [transaction];
+        all[txDate].push(transaction);
       }
-    } else {
-      all[txDate].push(transaction);
-    }
-    return all;
-  },
-  {},
-);
+      return all;
+    },
+    {}
+  );
 
-const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) => txs.reduce(
-  (
-    all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
-    transaction: AddressTransactionWithTransfers | Tx,
-  ) => {
-    if (isAddressTransactionWithTransfers(transaction)) {
-      const date = formatDate(new Date(transaction.tx.burn_block_time_iso));
+const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) =>
+  txs.reduce(
+    (
+      all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
+      transaction: AddressTransactionWithTransfers | Tx
+    ) => {
+      const date = formatDate(
+        new Date(
+          transaction.tx?.burn_block_time_iso ? transaction.tx.burn_block_time_iso : Date.now()
+        )
+      );
       if (!all[date]) {
         all[date] = [transaction];
       } else {
         all[date].push(transaction);
       }
-    }
-    if (!all.pending) {
-      all.pending = [transaction];
-    } else {
-      all.pending.push(transaction);
-    }
-    return all;
-  },
-  {},
-);
+      return all;
+    },
+    {}
+  );
 
 const filterTxs = (
   txs: (AddressTransactionWithTransfers | MempoolTransaction)[],
@@ -129,7 +129,7 @@ const filterTxs = (
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, txFilter } = props;
-  const { data, isLoading } = useTransactions((coin as CurrencyTypes) || 'STX');
+  const { data, isLoading, isFetching } = useTransactions((coin as CurrencyTypes) || 'STX');
 
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
@@ -144,7 +144,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       }
       return groupedTxsByDateMap(data);
     }
-  }, [data, isLoading]);
+  }, [data, isLoading, isFetching]);
 
   return (
     <ListItemsContainer>

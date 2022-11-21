@@ -33,5 +33,6 @@ export default function useTransactions(coinType: CurrencyTypes) {
   return useQuery({
     queryKey: [`transactions-${coinType}`],
     queryFn: fetchTransactions,
+    refetchInterval: 10000,
   });
 }

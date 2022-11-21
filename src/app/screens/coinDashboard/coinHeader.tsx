@@ -19,6 +19,7 @@ import { getFtBalance, getFtTicker } from '@utils/tokens';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { getExplorerUrl } from '@utils/helper';
 
 interface CoinBalanceProps {
   coin: CurrencyTypes;
@@ -172,6 +173,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
     btcFiatRate,
     stxLockedBalance,
     stxAvailableBalance,
+    loadingWalletData,
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
@@ -228,10 +230,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   }
 
   const openContractDeployment = () => {
-    window.open(
-      `https://explorer.stacks.co/txid/${fungibleToken?.principal}?chain=mainnet`,
-      '_blank'
-    );
+    window.open(getExplorerUrl(fungibleToken?.principal as string), '_blank');
   };
 
   const handleCopyContractAddress = () => {
@@ -252,7 +251,9 @@ export default function CoinHeader(props: CoinBalanceProps) {
         <TokenContractContainer>
           <h1>{t('FT_CONTRACT_PREFIX')}</h1>
           <ContractAddressCopyButton onClick={handleCopyContractAddress}>
-            <TokenContractAddress>{formatAddress(fungibleToken?.principal as string)}</TokenContractAddress>
+            <TokenContractAddress>
+              {formatAddress(fungibleToken?.principal as string)}
+            </TokenContractAddress>
             <img src={CopyIcon} alt="copy" />
           </ContractAddressCopyButton>
           <ContractDeploymentButton onClick={openContractDeployment}>
@@ -265,29 +266,36 @@ export default function CoinHeader(props: CoinBalanceProps) {
     </>
   );
 
-  const renderStackingBalances = () => (
-    <Container>
-      <LockedStxContainer>
-        <img src={Lock} alt="locked" />
-        <span>{t('STX_LOCKED_BALANCE_PREFIX')}</span>
-        <NumericFormat
-          value={microstacksToStx(stxLockedBalance).toString()}
-          displayType="text"
-          thousandSeparator
-          renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
-        />
-      </LockedStxContainer>
-      <AvailableStxContainer>
-        <span>{t('STX_AVAILABLE_BALANCE_PREFIX')}</span>
-        <NumericFormat
-          value={microstacksToStx(stxAvailableBalance).toString()}
-          displayType="text"
-          thousandSeparator
-          renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
-        />
-      </AvailableStxContainer>
-    </Container>
-  );
+  const renderStackingBalances = () => {
+    if (!loadingWalletData && !stxLockedBalance.eq(0, 10) && coin === 'STX') {
+      return (
+        <>
+          <HeaderSeparator />
+          <Container>
+            <LockedStxContainer>
+              <img src={Lock} alt="locked" />
+              <span>{t('STX_LOCKED_BALANCE_PREFIX')}</span>
+              <NumericFormat
+                value={microstacksToStx(stxLockedBalance).toString()}
+                displayType="text"
+                thousandSeparator
+                renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
+              />
+            </LockedStxContainer>
+            <AvailableStxContainer>
+              <span>{t('STX_AVAILABLE_BALANCE_PREFIX')}</span>
+              <NumericFormat
+                value={microstacksToStx(stxAvailableBalance).toString()}
+                displayType="text"
+                thousandSeparator
+                renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
+              />
+            </AvailableStxContainer>
+          </Container>
+        </>
+      );
+    }
+  };
 
   return (
     <Container>
@@ -317,12 +325,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
         </BalanceValuesContainer>
       </BalanceInfoContainer>
       {fungibleToken ? renderFtInfo() : null}
-      {stxLockedBalance && coin === 'STX' && (
-        <>
-          <HeaderSeparator />
-          {renderStackingBalances()}
-        </>
-      )}
+      {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
           <ActionButton src={ArrowUpRight} text="Send" onPress={() => navigate(`/send-${coin}`)} />

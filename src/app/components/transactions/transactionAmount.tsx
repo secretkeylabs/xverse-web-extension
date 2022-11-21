@@ -50,7 +50,7 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
             thousandSeparator
             prefix={prefix}
             renderText={(value: string) => (
-              <p>{`${value} ${getFtTicker(token as FungibleToken)?.toUpperCase()}`}</p>
+              <TransactionValue>{`${value} ${getFtTicker(token as FungibleToken)?.toUpperCase()}`}</TransactionValue>
             )}
           />
         );

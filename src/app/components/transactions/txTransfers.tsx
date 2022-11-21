@@ -1,5 +1,4 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Transfer } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
 import ReceiveIcon from '@assets/img/transactions/received.svg';
 import SendIcon from '@assets/img/transactions/sent.svg';
@@ -38,6 +37,7 @@ const TransactionTitleText = styled.p((props) => ({
 const RecipientAddress = styled.p((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white[400],
+  textAlign: 'left',
 }));
 
 const TransactionValue = styled.p((props) => ({
@@ -52,15 +52,8 @@ interface TxTransfersProps {
 
 export default function TxTransfers(props: TxTransfersProps) {
   const { transaction, coin } = props;
-  const { selectedAccount, coins } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-
-  const getFtName = (tx: any): string => {
-    const coinDisplayName = coins?.find(
-      (ftCoins) => `${ftCoins.contract}::${ftCoins.name}` === tx.asset_identifier,
-    )?.name;
-    return coinDisplayName ?? '';
-  };
 
   function formatAddress(addr: string): string {
     return `${addr.substring(0, 4)}...${addr.substring(addr.length - 4, addr.length)}`;

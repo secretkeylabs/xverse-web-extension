@@ -298,6 +298,7 @@
     "LESS_FT_INFO_BUTTON": "Show less info",
     "FT_CONTRACT_PREFIX": "Token Contract",
     "OPEN_FT_CONTRACT_DEPLOYMENT": "View the contract on",
-    "STACKS_EXPLORER": "Stacks Explorer"
+    "STACKS_EXPLORER": "Stacks Explorer",
+    "INCREASE_FEE_BUTTON": "Increase fee"
   }
 }
