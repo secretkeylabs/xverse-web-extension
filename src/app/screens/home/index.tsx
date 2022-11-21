@@ -34,8 +34,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-left: 16px;
-  margin-right: 16px;
+  margin-left: 5%;
+  margin-right: 5%;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
@@ -92,10 +92,10 @@ const ButtonContainer = styled.div({
   flex: 0.31,
 });
 
-const SelectedAccountContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
+const SelectedAccountContainer = styled.div({
+  marginLeft: '5%',
+  marginRight: '5%',
+});
 
 const TokenListButtonContainer = styled.div((props) => ({
   display: 'flex',

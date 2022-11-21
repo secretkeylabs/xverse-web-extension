@@ -20,16 +20,3 @@ header h2 {
   letter-spacing: 0em;
   text-align: right;
 }
-#app-container {
-  height: 90vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-#app {
-  width: 360px;
-  height: 600px;
-}

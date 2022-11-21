@@ -15,7 +15,10 @@ const Container = styled.div((props) => ({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  padding: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(8),
+  paddingBottom: props.theme.spacing(8),
+  paddingLeft: '5%',
+  paddingRight: '5%',
 }));
 
 const StepsContainer = styled.div((props) => ({

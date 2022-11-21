@@ -19,8 +19,9 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+  margin-left: 5%;
+  margin-right: 5%;
   overflow-y: auto;
-  padding-bottom: 16px;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -30,8 +31,8 @@ const ResetWalletContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   marginTop: props.theme.spacing(30),
-  marginLeft: props.theme.spacing(13),
-  marginRight: props.theme.spacing(13),
+  marginLeft: '5%',
+  marginRight: '5%',
 
 }));
 

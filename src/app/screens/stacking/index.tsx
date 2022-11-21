@@ -9,10 +9,10 @@ import BottomBar from '@components/tabBar';
 import StackingProgress from './stackingProgress';
 import StartStacking from './startStacking';
 
-const SelectedAccountContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
+const SelectedAccountContainer = styled.div({
+  marginLeft: '5%',
+  marginRight: '5%',
+});
 
 const LoaderContainer = styled.div((props) => ({
   display: 'flex',

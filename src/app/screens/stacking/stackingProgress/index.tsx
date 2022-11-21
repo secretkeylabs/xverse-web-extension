@@ -6,7 +6,10 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'column',
-  margin: props.theme.spacing(8),
+  marginTop: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(8),
+  marginLeft: '5%',
+  marginRight: '5%',
   borderTop: `1px solid ${props.theme.colors.background.elevation3}`,
 }));
 

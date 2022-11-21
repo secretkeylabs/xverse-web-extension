@@ -11,8 +11,8 @@ import { FetchUpdatedVisibleCoinListAction } from '@stores/wallet/actions/action
 const TokenContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding-left: 22px;
-  padding-right: 22px;
+  padding-left: 5%;
+  padding-right: 5%;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;

@@ -68,6 +68,7 @@ const AmountContainer = styled.div({
 
 const LoaderMainContainer = styled.div((props) => ({
   flex: 1,
+  maxWidth: 200,
   flexDirection: 'column',
   alignItems: 'flex-end',
   justifyContent: 'flex-end',

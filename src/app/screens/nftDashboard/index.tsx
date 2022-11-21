@@ -24,7 +24,6 @@ const Container = styled.div`
   flex: 1;
   margin-left: 5%;
   margin-right: 5%;
-  margin-bottom: 5%;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
@@ -145,7 +144,7 @@ function NftDashboard() {
     isLoading, data,
   } = useQuery(
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNftsData(stxAddress, network, offset.current),
+    async () => getNftsData('SP2VC4CXTWYRZEV7MSGXPNHE739N14ECQWX8JP2BF', network, offset.current),
   );
 
   const handleAccountSelect = () => {
