@@ -20,6 +20,7 @@ import Login from '@screens/login';
 import RestoreWallet from '@screens/restoreWallet';
 import ForgotPassword from '@screens/forgotPassword';
 import BackupWalletSteps from '@screens/backupWalletSteps';
+import Stacking from '@screens/stacking';
 import NftDashboard from '@screens/nftDashboard';
 import NftDetailScreen from '@screens/nftDetail';
 import Setting from '@screens/settings';
@@ -118,6 +119,10 @@ const router = createHashRouter([
       {
         path: 'backupWalletSteps',
         element: <BackupWalletSteps />,
+      },
+      {
+        path: 'stacking',
+        element: <Stacking />,
       },
       {
         path: 'nft-dashboard',
