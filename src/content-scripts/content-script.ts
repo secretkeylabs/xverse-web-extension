@@ -1,9 +1,3 @@
-/**
- Extensions that read or write to web pages utilize a content script. The content script
- contains JavaScript that executes in the contexts of a page that has been loaded into
- the browser. Content scripts read and modify the DOM of web pages the browser visits.
- https://developer.chrome.com/docs/extensions/mv3/architecture-overview/#contentScripts
- */
 import {
   CONTENT_SCRIPT_PORT,
   ExternalMethods,
@@ -18,7 +12,7 @@ import {
   TransactionRequestEvent,
 } from './inpage-types';
 import { RouteUrls } from './route-urls';
-import { getEventSourceWindow } from './get-event-source-window';
+import getEventSourceWindow from './get-event-source-window';
 
 // Legacy messaging to work with older versions of Connect
 window.addEventListener('message', (event) => {
@@ -34,9 +28,8 @@ window.addEventListener('message', (event) => {
           method: 'getURLResponse',
           source: 'xverse-extension',
         },
-        event.origin
+        event.origin,
       );
-      return;
     }
   }
 });
@@ -75,7 +68,7 @@ function forwardDomEventToBackground({ payload, method }: ForwardDomEventToBackg
 
 // Listen for a CustomEvent (auth request) coming from the web app
 document.addEventListener(DomEventName.authenticationRequest, ((
-  event: AuthenticationRequestEvent
+  event: AuthenticationRequestEvent,
 ) => {
   forwardDomEventToBackground({
     path: RouteUrls.Onboarding,
@@ -107,7 +100,7 @@ document.addEventListener(DomEventName.signatureRequest, ((event: SignatureReque
 
 // Listen for a CustomEvent (structured data signature request) coming from the web app
 document.addEventListener(DomEventName.structuredDataSignatureRequest, ((
-  event: SignatureRequestEvent
+  event: SignatureRequestEvent,
 ) => {
   forwardDomEventToBackground({
     path: RouteUrls.SignatureRequest,

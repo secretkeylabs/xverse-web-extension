@@ -1,4 +1,3 @@
-//
 // This file is the entrypoint to the extension's background script
 // https://developer.chrome.com/docs/extensions/mv3/architecture-overview/#background_script
 

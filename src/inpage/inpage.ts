@@ -1,5 +1,4 @@
 import { StacksProvider } from '@stacks/connect';
-
 import {
   AuthenticationRequestEventDetails,
   DomEventName,
@@ -26,33 +25,31 @@ interface ExtensionResponse {
 
 const callAndReceive = async (
   methodName: CallableMethods | 'getURL',
-  opts: any = {}
-): Promise<ExtensionResponse> => {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject('Unable to get response from xverse extension');
-    }, 1000);
-    const waitForResponse = (event: MessageEvent) => {
-      if (
-        event.data.source === 'xverse-extension' &&
-        event.data.method === `${methodName}Response`
-      ) {
-        clearTimeout(timeout);
-        window.removeEventListener('message', waitForResponse);
-        resolve(event.data);
-      }
-    };
-    window.addEventListener('message', waitForResponse);
-    window.postMessage(
-      {
-        method: methodName,
-        source: 'xverse-app',
-        ...opts,
-      },
-      window.location.origin
-    );
-  });
-};
+  opts: any = {},
+): Promise<ExtensionResponse> => new Promise((resolve, reject) => {
+  const timeout = setTimeout(() => {
+    reject(new Error('Unable to get response from xverse extension'));
+  }, 1000);
+  const waitForResponse = (event: MessageEvent) => {
+    if (
+      event.data.source === 'xverse-extension'
+        && event.data.method === `${methodName}Response`
+    ) {
+      clearTimeout(timeout);
+      window.removeEventListener('message', waitForResponse);
+      resolve(event.data);
+    }
+  };
+  window.addEventListener('message', waitForResponse);
+  window.postMessage(
+    {
+      method: methodName,
+      source: 'xverse-app',
+      ...opts,
+    },
+    window.location.origin,
+  );
+});
 
 const isValidEvent = (event: MessageEvent, method: LegacyMessageToContentScript['method']) => {
   const { data } = event;
@@ -71,20 +68,20 @@ const provider: StacksProvider = {
       DomEventName.structuredDataSignatureRequest,
       {
         detail: { signatureRequest },
-      }
+      },
     );
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
-      const handleMessage = (event: MessageEvent<SignatureResponseMessage>) => {
-        if (!isValidEvent(event, ExternalMethods.signatureResponse)) return;
-        if (event.data.payload?.signatureRequest !== signatureRequest) return;
+      const handleMessage = (eventMessage: MessageEvent<SignatureResponseMessage>) => {
+        if (!isValidEvent(eventMessage, ExternalMethods.signatureResponse)) return;
+        if (eventMessage.data.payload?.signatureRequest !== signatureRequest) return;
         window.removeEventListener('message', handleMessage);
-        if (event.data.payload.signatureResponse === 'cancel') {
-          reject(event.data.payload.signatureResponse);
+        if (eventMessage.data.payload.signatureResponse === 'cancel') {
+          reject(eventMessage.data.payload.signatureResponse);
           return;
         }
-        if (typeof event.data.payload.signatureResponse !== 'string') {
-          resolve(event.data.payload.signatureResponse);
+        if (typeof eventMessage.data.payload.signatureResponse !== 'string') {
+          resolve(eventMessage.data.payload.signatureResponse);
         }
       };
       window.addEventListener('message', handleMessage);
@@ -96,16 +93,16 @@ const provider: StacksProvider = {
     });
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
-      const handleMessage = (event: MessageEvent<SignatureResponseMessage>) => {
-        if (!isValidEvent(event, ExternalMethods.signatureResponse)) return;
-        if (event.data.payload?.signatureRequest !== signatureRequest) return;
+      const handleMessage = (eventMessage: MessageEvent<SignatureResponseMessage>) => {
+        if (!isValidEvent(eventMessage, ExternalMethods.signatureResponse)) return;
+        if (eventMessage.data.payload?.signatureRequest !== signatureRequest) return;
         window.removeEventListener('message', handleMessage);
-        if (event.data.payload.signatureResponse === 'cancel') {
-          reject(event.data.payload.signatureResponse);
+        if (eventMessage.data.payload.signatureResponse === 'cancel') {
+          reject(eventMessage.data.payload.signatureResponse);
           return;
         }
-        if (typeof event.data.payload.signatureResponse !== 'string') {
-          resolve(event.data.payload.signatureResponse);
+        if (typeof eventMessage.data.payload.signatureResponse !== 'string') {
+          resolve(eventMessage.data.payload.signatureResponse);
         }
       };
       window.addEventListener('message', handleMessage);
@@ -116,19 +113,19 @@ const provider: StacksProvider = {
       DomEventName.authenticationRequest,
       {
         detail: { authenticationRequest },
-      }
+      },
     );
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
-      const handleMessage = (event: MessageEvent<AuthenticationResponseMessage>) => {
-        if (!isValidEvent(event, ExternalMethods.authenticationResponse)) return;
-        if (event.data.payload?.authenticationRequest !== authenticationRequest) return;
+      const handleMessage = (eventMessage: MessageEvent<AuthenticationResponseMessage>) => {
+        if (!isValidEvent(eventMessage, ExternalMethods.authenticationResponse)) return;
+        if (eventMessage.data.payload?.authenticationRequest !== authenticationRequest) return;
         window.removeEventListener('message', handleMessage);
-        if (event.data.payload.authenticationResponse === 'cancel') {
-          reject(event.data.payload.authenticationResponse);
+        if (eventMessage.data.payload.authenticationResponse === 'cancel') {
+          reject(eventMessage.data.payload.authenticationResponse);
           return;
         }
-        resolve(event.data.payload.authenticationResponse);
+        resolve(eventMessage.data.payload.authenticationResponse);
       };
       window.addEventListener('message', handleMessage);
     });
@@ -139,16 +136,16 @@ const provider: StacksProvider = {
     });
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
-      const handleMessage = (event: MessageEvent<TransactionResponseMessage>) => {
-        if (!isValidEvent(event, ExternalMethods.transactionResponse)) return;
-        if (event.data.payload?.transactionRequest !== transactionRequest) return;
+      const handleMessage = (eventMessage: MessageEvent<TransactionResponseMessage>) => {
+        if (!isValidEvent(eventMessage, ExternalMethods.transactionResponse)) return;
+        if (eventMessage.data.payload?.transactionRequest !== transactionRequest) return;
         window.removeEventListener('message', handleMessage);
-        if (event.data.payload.transactionResponse === 'cancel') {
-          reject(event.data.payload.transactionResponse);
+        if (eventMessage.data.payload.transactionResponse === 'cancel') {
+          reject(eventMessage.data.payload.transactionResponse);
           return;
         }
-        if (typeof event.data.payload.transactionResponse !== 'string') {
-          resolve(event.data.payload.transactionResponse);
+        if (typeof eventMessage.data.payload.transactionResponse !== 'string') {
+          resolve(eventMessage.data.payload.transactionResponse);
         }
       };
       window.addEventListener('message', handleMessage);
@@ -160,7 +157,7 @@ const provider: StacksProvider = {
       name: 'Hiro Wallet for Web',
     };
   },
-  request: function (_method: string): Promise<Record<string, any>> {
+  request(): Promise<Record<string, any>> {
     throw new Error('`request` function is not implemented');
   },
 };

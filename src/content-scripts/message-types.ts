@@ -2,7 +2,7 @@ import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@s
 
 export const MESSAGE_SOURCE = 'xverse-wallet' as const;
 
-export const CONTENT_SCRIPT_PORT = 'content-script' as const;
+export const CONTENT_SCRIPT_PORT = 'xverse-content-script' as const;
 
 export enum ExternalMethods {
   transactionRequest = 'transactionRequest',
@@ -42,26 +42,26 @@ export interface Message<Methods extends ExtensionMethods, Payload = undefined>
 type AuthenticationRequestMessage = Message<ExternalMethods.authenticationRequest, string>;
 
 export type AuthenticationResponseMessage = Message<
-  ExternalMethods.authenticationResponse,
-  {
-    authenticationRequest: string;
-    authenticationResponse: string;
-  }
+ExternalMethods.authenticationResponse,
+{
+  authenticationRequest: string;
+  authenticationResponse: string;
+}
 >;
 
 type SignatureRequestMessage = Message<ExternalMethods.signatureRequest, string>;
 
 export type SignatureResponseMessage = Message<
-  ExternalMethods.signatureResponse,
-  {
-    signatureRequest: string;
-    signatureResponse: SignatureData | string;
-  }
+ExternalMethods.signatureResponse,
+{
+  signatureRequest: string;
+  signatureResponse: SignatureData | string;
+}
 >;
 
 type StructuredDataSignatureRequestMessage = Message<
-  ExternalMethods.structuredDataSignatureRequest,
-  string
+ExternalMethods.structuredDataSignatureRequest,
+string
 >;
 
 type TransactionRequestMessage = Message<ExternalMethods.transactionRequest, string>;
@@ -69,11 +69,11 @@ type TransactionRequestMessage = Message<ExternalMethods.transactionRequest, str
 export type TxResult = SponsoredFinishedTxPayload | FinishedTxPayload;
 
 export type TransactionResponseMessage = Message<
-  ExternalMethods.transactionResponse,
-  {
-    transactionRequest: string;
-    transactionResponse: TxResult | string;
-  }
+ExternalMethods.transactionResponse,
+{
+  transactionRequest: string;
+  transactionResponse: TxResult | string;
+}
 >;
 
 export type LegacyMessageFromContentScript =

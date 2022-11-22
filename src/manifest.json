@@ -25,7 +25,7 @@
   },
   "content_scripts": [
     {
-      "js": ["content-script.js"],
+      "js": ["browser-polyfill.js", "content-script.js"],
       "matches": ["*://*/*"],
       "all_frames": true
     }

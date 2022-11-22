@@ -7,7 +7,7 @@ import {
 } from '../content-scripts/message-types';
 import { sendMessage } from '../content-scripts/messages';
 import { RouteUrls } from '../content-scripts/route-urls';
-import { popupCenter } from './popup-center';
+import popupCenter from './popup-center';
 
 export function inferLegacyMessage(message: any): message is LegacyMessageFromContentScript {
   // Now that we use a RPC communication style, we can infer
@@ -27,7 +27,7 @@ function getOriginFromPort(port: chrome.runtime.Port) {
 
 function makeSearchParamsWithDefaults(
   port: chrome.runtime.Port,
-  otherParams: [string, string][] = []
+  otherParams: [string, string][] = [],
 ) {
   const urlParams = new URLSearchParams();
   // All actions must have a corresponding `origin` and `tabId`
@@ -72,7 +72,7 @@ async function triggerRequstWindowOpen(path: RouteUrls, urlParams: URLSearchPara
 
 export async function handleLegacyExternalMethodFormat(
   message: LegacyMessageFromContentScript,
-  port: chrome.runtime.Port
+  port: chrome.runtime.Port,
 ) {
   const { payload } = message;
 
@@ -146,6 +146,9 @@ export async function handleLegacyExternalMethodFormat(
       //   response: formatMessageSigningResponse({ request: payload, response: 'cancel' }),
       // });
       // listenForOriginTabClose({ tabId });
+      break;
+    }
+    default: {
       break;
     }
   }
