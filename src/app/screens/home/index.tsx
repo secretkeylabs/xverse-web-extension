@@ -55,6 +55,7 @@ const CoinContainer = styled.div({
   flexDirection: 'column',
   alignItems: 'space-between',
   justifyContent: 'space-between',
+  marginBottom: 35,
 });
 
 const Button = styled.button((props) => ({
@@ -84,13 +85,13 @@ const ButtonImage = styled.img((props) => ({
 const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'space-between',
   marginTop: props.theme.spacing(11),
 }));
 
-const ButtonContainer = styled.div({
-  flex: 0.31,
-});
+const ButtonContainer = styled.div((props) => ({
+  width: '100%',
+  marginRight: props.theme.spacing(5),
+}));
 
 const SelectedAccountContainer = styled.div({
   marginLeft: '5%',

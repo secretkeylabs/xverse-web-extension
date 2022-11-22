@@ -77,6 +77,7 @@ const LoaderMainContainer = styled.div((props) => ({
 
 const LoaderImageContainer = styled.div({
   flex: 0.5,
+  maxWidth: 40,
 });
 
 const CoinTickerText = styled.h1((props) => ({

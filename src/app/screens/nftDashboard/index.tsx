@@ -106,11 +106,19 @@ const ButtonImage = styled.img((props) => ({
 }));
 
 const BottomBarContainer = styled.div({
-  marginTop: 'auto',
+  marginTop: '5%',
 });
 
 const CollectiblesHeadingText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
+  color: props.theme.colors.white['200'],
+  textTransform: 'uppercase',
+  letterSpacing: '0.02em',
+  opacity: 0.7,
+}));
+
+const GalleryCollectiblesHeadingText = styled.h1((props) => ({
+  ...props.theme.headline_category_m,
   color: props.theme.colors.white['200'],
   textTransform: 'uppercase',
   letterSpacing: '0.02em',
@@ -144,9 +152,9 @@ function NftDashboard() {
     isLoading, data,
   } = useQuery(
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNftsData('SP2VC4CXTWYRZEV7MSGXPNHE739N14ECQWX8JP2BF', network, offset.current),
+    async () => getNftsData(stxAddress, network, offset.current),
   );
-
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const handleAccountSelect = () => {
     navigate('/account-list');
   };
@@ -191,13 +199,14 @@ function NftDashboard() {
       <Seperator />
       <Container>
         <CollectibleContainer>
-          <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>
+          {isGalleryOpen ? <GalleryCollectiblesHeadingText>{t('COLLECTIBLES')}</GalleryCollectiblesHeadingText> : <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>}
           {isLoading ? (
             <BarLoaderContainer>
               <BarLoader loaderSize={LoaderSize.LARGE} />
             </BarLoaderContainer>
           )
             : <CollectiblesValueText>{`${data?.total} ${t('ITEMS')}`}</CollectiblesValueText>}
+          {!isGalleryOpen && (
           <WebGalleryButtonContainer>
             <WebGalleryButton onClick={openInGalleryView}>
               <>
@@ -206,6 +215,7 @@ function NftDashboard() {
               </>
             </WebGalleryButton>
           </WebGalleryButtonContainer>
+          )}
         </CollectibleContainer>
         <ButtonContainer>
           <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
@@ -228,9 +238,11 @@ function NftDashboard() {
         ) : nftListView}
       </Container>
 
+      {!isGalleryOpen && (
       <BottomBarContainer>
         <BottomTabBar tab="nft" />
       </BottomBarContainer>
+      )}
     </>
   );
 }

@@ -9,13 +9,11 @@ import { getIsTermsAccepted, saveHasFinishedOnboarding } from '@utils/localStora
 import Steps from '@components/steps';
 
 const Container = styled.div`
-display: flex;
-margin-left: auto;
-margin-right: auto;
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
   flex-direction: column;
   flex: 1;
- height: 600px;
- width: 360px;
   &::-webkit-scrollbar {
     display: none;
   }

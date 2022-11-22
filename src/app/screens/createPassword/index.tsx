@@ -12,13 +12,10 @@ interface StepDotProps {
   active: boolean;
 }
 const Container = styled.div((props) => ({
-  flex: 1,
   display: 'flex',
+  flex: 1,
   flexDirection: 'column',
-  paddingTop: props.theme.spacing(8),
-  paddingBottom: props.theme.spacing(8),
-  paddingLeft: '5%',
-  paddingRight: '5%',
+  padding: props.theme.spacing(8),
 }));
 
 const StepsContainer = styled.div((props) => ({

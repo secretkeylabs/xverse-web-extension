@@ -9,6 +9,18 @@ import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
 
+const OuterContainer = styled.div`
+  display: flex;
+  flex:1 ;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
 const TopTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
   textAlign: 'center',
@@ -26,13 +38,13 @@ const BnsNameText = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
-const Container = styled.div((props) => ({
+const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  marginTop: props.theme.spacing(8),
-}));
+  flex: 1,
+});
 
 const InfoContainer = styled.div((props) => ({
   width: 220,
@@ -43,15 +55,12 @@ const CopyContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
+  width: 328,
   justifyContent: 'center',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
   marginTop: props.theme.spacing(11),
 }));
 
 const QRCodeContainer = styled.div((props) => ({
-  maxWidth: 200,
-  width: '60%',
   display: 'flex',
   aspectRatio: 1,
   backgroundColor: props.theme.colors.white['0'],
@@ -71,7 +80,7 @@ const AddressText = styled.h1((props) => ({
 }));
 
 const BottomBarContainer = styled.div({
-  marginTop: 'auto',
+  marginTop: '5%',
 });
 
 function Receive(): JSX.Element {
@@ -99,7 +108,7 @@ function Receive(): JSX.Element {
     }
   };
   const handleBackButtonClick = () => {
-    navigate('/');
+    navigate(-1);
   };
 
   const renderHeading = () => (currency === 'BTC' ? (
@@ -117,37 +126,40 @@ function Receive(): JSX.Element {
   return (
     <>
       <TopRow title={t('RECEIVE')} onClick={handleBackButtonClick} />
-      <Container>
-        {renderHeading()}
-        {currency !== 'BTC' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
+      <OuterContainer>
 
-        <QRCodeContainer>
-          <QRCode value={getAddress()} size={180} />
-        </QRCodeContainer>
+        <Container>
+          {renderHeading()}
+          {currency !== 'BTC' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
 
-        {currency !== 'BTC' && !!selectedAccount?.bnsName && (
+          <QRCodeContainer>
+            <QRCode value={getAddress()} size={180} />
+          </QRCodeContainer>
+
+          {currency !== 'BTC' && !!selectedAccount?.bnsName && (
           <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
+          )}
+          <InfoContainer>
+            <AddressText>
+              { getAddress() }
+            </AddressText>
+          </InfoContainer>
+        </Container>
+        {addressCopied ? (
+          <CopyContainer>
+            <ActionButton
+              src={Copy}
+              text={t('COPIED_ADDRESS')}
+              onPress={handleOnClick}
+              transparent
+            />
+          </CopyContainer>
+        ) : (
+          <CopyContainer>
+            <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
+          </CopyContainer>
         )}
-        <InfoContainer>
-          <AddressText>
-            { getAddress() }
-          </AddressText>
-        </InfoContainer>
-      </Container>
-      {addressCopied ? (
-        <CopyContainer>
-          <ActionButton
-            src={Copy}
-            text={t('COPIED_ADDRESS')}
-            onPress={handleOnClick}
-            transparent
-          />
-        </CopyContainer>
-      ) : (
-        <CopyContainer>
-          <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
-        </CopyContainer>
-      )}
+      </OuterContainer>
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />
       </BottomBarContainer>

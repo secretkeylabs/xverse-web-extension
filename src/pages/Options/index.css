@@ -20,3 +20,11 @@ header h2 {
   letter-spacing: 0em;
   text-align: right;
 }
+#app-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
