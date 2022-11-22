@@ -1,4 +1,8 @@
+import useWalletSelector from '@hooks/useWalletSelector';
+import { FungibleToken } from '@secretkeylabs/xverse-core';
+import { getFiatEquivalent } from '@utils/helper';
 import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -22,13 +26,29 @@ const AmountText = styled.h1((props) => ({
   fontSize: 28,
 }));
 
+const FiatAmountText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white['400'],
+}));
+
 interface Props {
   amount: BigNumber;
-  currency : 'BTC' | 'STX';
+  currency : string;
+  fungibleToken?: FungibleToken
 }
 
-function TransferAmountView({ amount, currency }: Props) {
+function TransferAmountView({ amount, currency, fungibleToken }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
+  const {
+    stxBtcRate, btcFiatRate, fiatCurrency,
+  } = useWalletSelector();
+
+  useEffect(() => {
+    const amountInCurrency = getFiatEquivalent(Number(amount), currency, stxBtcRate, btcFiatRate, fungibleToken);
+    setFiatAmount(amountInCurrency);
+  }, [amount]);
+
   return (
     <SendAmountContainer>
       <TitleText>{t('INDICATION')}</TitleText>
@@ -39,6 +59,7 @@ function TransferAmountView({ amount, currency }: Props) {
         suffix={` ${currency}`}
         renderText={(value) => <AmountText>{value}</AmountText>}
       />
+      <FiatAmountText>{`~ $ ${fiatAmount} ${fiatCurrency}`}</FiatAmountText>
     </SendAmountContainer>
   );
 }

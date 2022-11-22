@@ -5,17 +5,13 @@ import styled from 'styled-components';
 import {
   ReactNode, SetStateAction, useEffect, useState,
 } from 'react';
-import BigNumber from 'bignumber.js';
 import IconBitcoin from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import InfoIcon from '@assets/img/send/info.svg';
-import { getTicker } from '@utils/helper';
+import { getFiatEquivalent, getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
 import ActionButton from '@components/button';
-import {
-  btcToSats, getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
-} from '@secretkeylabs/xverse-core/currency';
 import { useBNSResolver, useDebounce } from '@hooks/useBnsName';
 
 const ScrollContainer = styled.div`
@@ -191,37 +187,6 @@ function SendForm({
     }
   }, [error, associatedAddress]);
 
-  function getFiatEquivalent(value: number) {
-    if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
-      return '';
-    }
-    if (!value) return '0';
-    switch (currencyType) {
-      case 'STX':
-        return getStxFiatEquivalent(
-          stxToMicrostacks(new BigNumber(value)),
-          new BigNumber(stxBtcRate),
-          new BigNumber(btcFiatRate),
-        )
-          .toFixed(2)
-          .toString();
-      case 'BTC':
-        return getBtcFiatEquivalent(btcToSats(new BigNumber(value)), new BigNumber(btcFiatRate))
-          .toFixed(2)
-          .toString();
-      case 'FT':
-        if (fungibleToken?.tokenFiatRate) {
-          return new BigNumber(value)
-            .multipliedBy(fungibleToken.tokenFiatRate)
-            .toFixed(2)
-            .toString();
-        }
-        break;
-      default:
-        return '';
-    }
-  }
-
   function getTokenIcon() {
     if (currencyType === 'STX') {
       return <TickerImage src={IconStacks} />;
@@ -255,7 +220,7 @@ function SendForm({
       setAmount(newValue);
     }
 
-    const amountInCurrency = getFiatEquivalent(Number(newValue));
+    const amountInCurrency = getFiatEquivalent(Number(newValue), currencyType, stxBtcRate, btcFiatRate, fungibleToken);
     setFiatAmount(amountInCurrency);
   };
 

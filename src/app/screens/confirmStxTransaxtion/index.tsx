@@ -19,6 +19,7 @@ const InfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   marginTop: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(4),
 }));
 
 const TitleText = styled.h1((props) => ({

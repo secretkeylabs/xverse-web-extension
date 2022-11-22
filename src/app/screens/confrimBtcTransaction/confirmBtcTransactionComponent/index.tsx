@@ -40,12 +40,11 @@ const TransparentButtonContainer = styled.div((props) => ({
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'flex-end',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(5),
+  marginTop: props.theme.spacing(10),
 }));
 
 const ButtonText = styled.div((props) => ({
