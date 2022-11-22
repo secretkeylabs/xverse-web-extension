@@ -34,8 +34,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-left: 5%;
-  margin-right: 5%;
+  margin-left: 16px;
+  margin-right: 16px;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;

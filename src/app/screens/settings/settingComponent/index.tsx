@@ -17,10 +17,12 @@ const Button = styled.button<ButtonProps>((props) => ({
   borderBottom: props.border,
 }));
 
-const ColumnContainer = styled.div({
+const ColumnContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-});
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+}));
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_bold_l,
