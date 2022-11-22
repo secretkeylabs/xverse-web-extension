@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@secretkeylabs/xverse-core": "file:../xverse-core",
+    "@secretkeylabs/xverse-core": "github:secretkeylabs/xverse-core",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
     "@stacks/transactions": "^5.0.2",
