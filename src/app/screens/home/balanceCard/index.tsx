@@ -50,7 +50,7 @@ const CurrencyCard = styled.div((props) => ({
   marginLeft: props.theme.spacing(4),
 }));
 
-function BalanceCard(): JSX.Element {
+function BalanceCard() {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const {
     fiatCurrency,
@@ -59,6 +59,7 @@ function BalanceCard(): JSX.Element {
     stxBalance,
     btcBalance,
     loadingWalletData,
+    loadingBtcData,
   } = useSelector((state: StoreState) => state.walletState);
 
   function calculateTotalBalance() {
@@ -80,7 +81,7 @@ function BalanceCard(): JSX.Element {
           <CurrencyText>{fiatCurrency}</CurrencyText>
         </CurrencyCard>
       </RowContainer>
-      {loadingWalletData ? (
+      {loadingWalletData && loadingBtcData ? (
         <BarLoaderContainer>
           <BarLoader loaderSize={LoaderSize.LARGE} />
         </BarLoaderContainer>

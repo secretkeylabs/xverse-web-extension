@@ -2,24 +2,26 @@ import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
 
 interface ButtonProps {
-  alignment?: string;
-  border?: string;
-  margin: number;
+  disabled?: boolean;
+  warning?: boolean;
 }
 
 const Button = styled.button<ButtonProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: props.alignment ?? 'center',
+  justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
-  backgroundColor: props.color ?? props.theme.colors.action.classic,
+  backgroundColor: props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classic,
   width: '100%',
   padding: '12px 16px 12px 10px',
-  border: `1px solid ${props.border}`,
-  marginRight: props.theme.spacing(props.margin),
-  marginLeft: props.theme.spacing(props.margin),
+  opacity: props.disabled ? 0.6 : 1,
 }));
+
+const TransparentButton = styled(Button)`
+  background-color: transparent;
+  border: 1px solid ${(props) => props.theme.colors.white['600']};
+`;
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
@@ -38,30 +40,47 @@ interface Props {
   src?: string;
   text: string;
   onPress: () => void;
-  buttonBorderColor?: string;
   processing?: boolean;
-  buttonColor?: string;
-  buttonAlignment?: string;
-  margin?: number;
+  disabled?: boolean;
+  transparent?: boolean;
+  warning?: boolean;
 }
 
 function ActionButton({
   src,
   text,
   onPress,
-  buttonBorderColor,
   processing = false,
-  buttonColor,
-  buttonAlignment,
-  margin,
+  disabled = false,
+  transparent,
+  warning,
 }: Props) {
+  const handleOnPress = () => {
+    if (!disabled) { onPress(); }
+  };
+  if (transparent) {
+    return (
+      <TransparentButton
+        onClick={handleOnPress}
+        disabled={disabled}
+      >
+        {processing ? (
+          <Ring color="white" size={20} />
+        ) : (
+          <>
+            <ButtonImage src={src} />
+            <ButtonText>{text}</ButtonText>
+          </>
+        )}
+      </TransparentButton>
+    );
+  }
+
   return (
     <Button
-      onClick={onPress}
-      color={buttonColor}
-      alignment={buttonAlignment}
-      border={buttonBorderColor}
-      margin={margin ?? 0}
+      onClick={handleOnPress}
+      disabled={disabled}
+      warning={warning}
     >
       {processing ? (
         <Ring color="white" size={20} />

@@ -1,5 +1,10 @@
+import { StxMempoolTransactionData } from '@secretkeylabs/xverse-core/types';
+import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { Account } from '@stores/wallet/actions/types';
+import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BigNumber from 'bignumber.js';
+
+const validUrl = require('valid-url');
 
 export function initBigNumber(num: string | number | BigNumber) {
   return BigNumber.isBigNumber(num) ? num : new BigNumber(num);
@@ -47,4 +52,47 @@ export function getAddressDetail(account:Account) {
     )}`;
   }
   return '';
+}
+
+export function getExplorerUrl(stxAddress: string): string {
+  return `https://explorer.stacks.co/address/${stxAddress}?chain=mainnet`;
+}
+
+export function getFetchableUrl(uri: string, protocol: string): string | undefined {
+  const publicIpfs = 'https://ipfs.io/ipfs';
+  if (protocol === 'http') return uri;
+  if (protocol === 'ipfs') {
+    const url = uri.split('//');
+    return `${publicIpfs}/${url[1]}`;
+  }
+  return undefined;
+}
+/**
+ * check if nft transaction exists in pending transactions
+ * @param pendingTransactions
+ * @param nft
+ * @returns true if nft exists, false otherwise
+ */
+export function checkNftExists(
+  pendingTransactions: StxMempoolTransactionData[],
+  nft: NftData,
+): boolean {
+  const principal: string[] = nft?.fully_qualified_token_id?.split('::');
+  const transaction = pendingTransactions.find(
+    (tx) => tx.contractCall?.contract_id === principal[0]
+      && tx.contractCall.function_args[0].repr.substring(1)
+        === nft.token_id.toString(),
+  );
+  if (transaction) return true;
+  return false;
+}
+
+export async function isValidURL(str: string): Promise<boolean> {
+  if (validUrl.isUri(str)) {
+    const response = await getStacksInfo(str);
+    if (response) {
+      return true;
+    }
+  }
+  return false;
 }

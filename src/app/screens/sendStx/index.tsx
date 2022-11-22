@@ -1,20 +1,62 @@
+import { useMutation } from '@tanstack/react-query';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { generateUnsignedStxTokenTransferTransaction } from '@secretkeylabs/xverse-core/transactions';
+import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
+import { validateStxAddress } from '@secretkeylabs/xverse-core/wallet';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
-import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { validateStxAddress } from '@secretkeylabs/xverse-core/wallet';
+import useStxPendingTxData from '@hooks/useStxPendingTxData';
+import { StoreState } from '@stores/index';
 import { replaceCommaByDot } from '@utils/helper';
-import BigNumber from 'bignumber.js';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import BottomBar from '@components/tabBar';
 
 function SendStxScreen() {
-  const [error, setError] = useState('');
-  const stxAddress = 'SP1TWMXZB83X6KJAYEHNYVPAGX60Q9C2NVXBQCJMY';
-  const stxAvailableBalance = 120;
-  const network = 'Mainnet';
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
+  const {
+    stxAddress, stxAvailableBalance, stxPublicKey, network, feeMultipliers,
+  } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
+  const [error, setError] = useState('');
+  const { data: stxPendingTxData } = useStxPendingTxData();
+
+  const { isLoading, data, mutate } = useMutation<
+  StacksTransaction,
+  Error,
+  { associatedAddress: string; amount: string; memo?: string }
+  >(async ({ associatedAddress, amount, memo }) => {
+    const unsignedSendStxTx: StacksTransaction = await generateUnsignedStxTokenTransferTransaction(
+      associatedAddress,
+      stxToMicrostacks(new BigNumber(amount)).toString(),
+      memo!,
+      stxPendingTxData?.pendingTransactions ?? [],
+      stxPublicKey,
+      network.type,
+    );
+    // increasing the fees with multiplication factor
+    const fee: bigint = BigInt(unsignedSendStxTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
+    if (feeMultipliers?.stxSendTxMultiplier) {
+      unsignedSendStxTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
+    }
+    return unsignedSendStxTx;
+  });
+
+  useEffect(() => {
+    if (data) {
+      navigate('/confirm-stx-tx', {
+        state: {
+          unsignedTx: data,
+        },
+      });
+    }
+  }, [data]);
+
   const handleBackButtonClick = () => {
     navigate('/');
   };
@@ -29,7 +71,7 @@ function SendStxScreen() {
       setError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
-    if (!validateStxAddress({ stxAddress: associatedAddress, network })) {
+    if (!validateStxAddress({ stxAddress: associatedAddress, network: network.type })) {
       setError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
@@ -40,7 +82,6 @@ function SendStxScreen() {
     }
 
     let parsedAmount = new BigNumber(0);
-
     try {
       if (!Number.isNaN(Number(amount))) {
         parsedAmount = new BigNumber(amount);
@@ -72,19 +113,26 @@ function SendStxScreen() {
     return true;
   }
 
-  const onPressSendSTX = async (associatedAddress: string, amount: string, memo: string) => {
+  const onPressSendSTX = async (associatedAddress: string, amount: string, memo?: string) => {
     const modifyAmount = replaceCommaByDot(amount);
-    if (validateFields(associatedAddress.trim(), modifyAmount, memo)) {
+    const addMemo = memo ?? '';
+    if (validateFields(associatedAddress.trim(), modifyAmount, memo!)) {
       setError('');
-      navigate('/confirm-stx-tx');
-      // generateStxTx(amount, associatedAddress, memo);
+      mutate({ amount, associatedAddress, memo: addMemo });
     }
-    navigate('/confirm-stx-tx');
   };
+
   return (
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
-      <SendForm currencyType="STX" error={error} balance={10000} onPressSend={onPressSendSTX} />
+      <SendForm
+        processing={isLoading}
+        currencyType="STX"
+        error={error}
+        balance={Number(microstacksToStx(new BigNumber(stxAvailableBalance)))}
+        onPressSend={onPressSendSTX}
+      />
+      <BottomBar tab="dashboard" />
     </>
   );
 }

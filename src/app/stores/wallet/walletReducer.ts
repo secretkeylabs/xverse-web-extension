@@ -21,6 +21,9 @@ import {
   FetchCoinDataFailureKey,
   AddAccountKey,
   UpdateVisibleCoinListKey,
+  FetchFeeMultiplierKey,
+  ChangeFiatCurrencyKey,
+  ChangeNetworkKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -29,12 +32,16 @@ const initialWalletState: WalletState = {
   masterPubKey: '',
   stxPublicKey: '',
   btcPublicKey: '',
-  network: 'Mainnet',
+  network: {
+    type: 'Mainnet',
+    address: 'https://stacks-node-api.mainnet.stacks.co',
+  },
   accountsList: [],
   selectedAccount: null,
   seedPhrase: '',
   encryptedSeed: '',
   loadingWalletData: false,
+  loadingBtcData: false,
   fiatCurrency: 'USD',
   btcFiatRate: new BigNumber(0),
   stxBtcRate: new BigNumber(0),
@@ -47,6 +54,7 @@ const initialWalletState: WalletState = {
   btcTransactions: [],
   coinsList: null,
   coins: [],
+  feeMultipliers: null,
 };
 
 const walletReducer = (
@@ -130,16 +138,19 @@ const walletReducer = (
     case FetchBtcWalletDataRequestKey:
       return {
         ...state,
+        loadingBtcData: true,
       };
     case FetchBtcWalletDataSuccessKey:
       return {
         ...state,
         btcBalance: action.balance,
         btcTransactions: action.btctransactions,
+        loadingBtcData: false,
       };
     case FetchBtcWalletDataFailureKey:
       return {
         ...state,
+        loadingBtcData: false,
       };
     case FetchCoinDataRequestKey:
       return {
@@ -162,6 +173,23 @@ const walletReducer = (
       return {
         ...state,
         coinsList: action.coinsList,
+      };
+    case FetchFeeMultiplierKey:
+      return {
+        ...state,
+        feeMultipliers: action.feeMultipliers,
+      };
+    case ChangeFiatCurrencyKey:
+      return {
+        ...state,
+        fiatCurrency: action.fiatCurrency,
+      };
+    case ChangeNetworkKey:
+      return {
+        ...state,
+        network: action.network,
+        selectedAccount: null,
+        accountsList: [],
       };
     default:
       return state;

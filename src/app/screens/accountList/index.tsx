@@ -10,6 +10,7 @@ import Seperator from '@components/seperator';
 import { StoreState } from '@stores/index';
 import { Account } from '@stores/wallet/actions/types';
 import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
+import { getBnsName } from '@secretkeylabs/xverse-core/api';
 
 const Container = styled.div`
   display: flex;
@@ -87,14 +88,16 @@ function AccountList(): JSX.Element {
   };
 
   async function onCreateAccount() {
+    const selectedNetwork = network.type;
     const index = accountsList.length > 0 ? accountsList.length : 1;
     const {
       stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey,
     } = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
       index: BigInt(index),
-      network,
+      network: selectedNetwork,
     });
+    const bnsName = await getBnsName(stxAddress, selectedNetwork);
 
     const account: Account = {
       id: index,
@@ -103,6 +106,7 @@ function AccountList(): JSX.Element {
       masterPubKey,
       stxPublicKey,
       btcPublicKey,
+      bnsName,
     };
     const modifiedAccountList = [...accountsList];
     modifiedAccountList.push(account);
@@ -116,7 +120,7 @@ function AccountList(): JSX.Element {
         {accountsList.map((account) => (
           <>
             <AccountRow
-              key={account.id}
+              key={account.id.toString()}
               account={account}
               isSelected={isAccountSelected(account)}
               onAccountSelected={handleAccountSelect}

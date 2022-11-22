@@ -18,6 +18,7 @@ const aliases = {
   '@stacks/storage': '@stacks/storage/dist/esm',
   '@stacks/transactions': '@stacks/transactions/dist/esm',
   '@stacks/keychain': '@stacks/keychain/dist/esm',
+  '@secretkeylabs/xverse-core': '@secretkeylabs/xverse-core/dist',
 };
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
@@ -76,7 +77,7 @@ var options = {
                   Boolean
                 ),
               }),
-              transpileOnly: env.NODE_ENV === 'development',
+              transpileOnly: true,
             },
           },
         ],
@@ -134,8 +135,8 @@ var options = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.join(SRC_ROOT_PATH, 'assets'),
-          to: path.join(BUILD_ROOT_PATH, 'assets'),
+          from: path.join(SRC_ROOT_PATH, 'assets/img/xverse_icon.png'),
+          to: BUILD_ROOT_PATH,
         },
       ],
     }),
@@ -154,6 +155,9 @@ var options = {
     new webpack.ProvidePlugin({
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
+    }),
+    new webpack.DefinePlugin({
+      VERSION: JSON.stringify(require("../package.json").version),
     }),
   ],
 

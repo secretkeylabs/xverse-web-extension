@@ -23,7 +23,8 @@
     "RECEIVE": "Receive",
     "SEND": "Send",
     "BUY":"Buy",
-    "MANAGE_TOKEN":"Manage token list"
+    "MANAGE_TOKEN":"Manage token list",
+    "TESTNET": "Testnet"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -48,6 +49,7 @@
     "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
+    "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
     "ERRORS": {
@@ -60,8 +62,10 @@
       "MINIMUM_AMOUNT": "Minimum amount is 0.000001 STX",
       "INSUFFICIENT_BALANCE": "Insufficient balance",
       "MEMO_LENGTH": "Memo exceeds allowed length",
-      "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees"
-    }
+      "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
+      "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
+    },
+    "SEND_NFT":"Send NFT"
   },
   "CONFIRM_TRANSACTION": {
     "SEND":"Send",
@@ -73,10 +77,12 @@
     "ADVANCED_SETTING":"Advanced Settings",
     "EDIT_FEES":"Edit Fees",
     "CONFIRM":"Confirm",
-    "CANCEL":"Cancel"
+    "CANCEL":"Cancel",
+    "SATS":"SATS"
   },
   "TRANSACTION_SETTING":{
     "ADVANCED_SETTING":"Advanced Settings",
+    "EDIT_FEE":"Edit Fees",
     "FEE":"Fee",
     "STANDARD":"Standard",
     "HIGH":"High",
@@ -85,7 +91,10 @@
     "FEE_INFO":"Apply a higher fee to help your transaction confirm quickly, especially when the network is congested.",
     "NONCE":"Nonce",
     "APPLY":"Apply",
-    "NONCE_INFO":"You can use a custom nonce to replace a pending transaction with the same nonce."
+    "NONCE_INFO":"You can use a custom nonce to replace a pending transaction with the same nonce.",
+    "SAME_FEE_ERROR": "New fee must be greater than current fee",
+    "GREATER_FEE_ERROR": "Fee is more than available balance",
+    "LOWER_THAN_MINIMUM": "Set fee is below minimum"
   },
   "TRANSACTION_STATUS":{
     "BROADCASTED":"Transaction Broadcasted",
@@ -120,7 +129,9 @@
   "CREATE_PASSWORD_SCREEN": {
     "CREATE_PASSWORD_TITLE": "Enter your new password",
     "CONFIRM_PASSWORD_TITLE": "Confirm your new password",
+    "ENTER_PASSWORD": "Enter your current password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
+    "TEXT_INPUT_ENTER_PASSWORD_LABEL": "Enter your current password",
     "TEXT_INPUT_CONFIRM_PASSWORD_LABEL": "Confirm Password",
     "CONTINUE_BUTTON": "Continue",
     "BACK_BUTTON": "Back",
@@ -129,7 +140,8 @@
     "PASSWORD_STRENGTH_MEDIUM": "Medium",
     "PASSWORD_STRENGTH_STRONG": "Strong",
     "PASSWORD_STRENGTH_ERROR": "You need to enter a stronger password",
-    "CONFIRM_PASSWORD_MATCH_ERROR": "please make sure your passwords match"
+    "CONFIRM_PASSWORD_MATCH_ERROR": "Please make sure your passwords match",
+    "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
   "WALLET_SUCCESS_SCREEN": {
     "SCREEN_TITLE": "Wallet created successfully",
@@ -166,5 +178,88 @@
     "SEED_INPUT_LABEL": "Selected Words",
     "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
     "CONTINUE_BUTTON": "Continue"
+  },
+  "STACKING_SCREEN": {
+    "STACK_AND_EARN": "Stack STX, earn BTC",
+    "STACKING_INFO": "Pool your STX with other stackers to earn real BTC with low minimums. Rewards are distributed after the end of every 2-week cycle.",
+    "APY": "Estimated APY",
+    "POOL_FEE": "Pool fee",
+   "MINIMUM_AMOUNT": "Minimum amount",
+   "REWARD_CYCLES": "Reward Cycles",
+   "START_STACKNG": "Start stacking",
+   "STACK_FOR_REWARD": "Stack your coins to earn rewards",
+   "XVERSE_POOL": "Xverse delegated pooling allows everyone to participate in Stacking and earn rewards. ",
+   "STACK_STX": "Stack STX",
+   "EARN_BTC":"Earn BTC",
+   "PENDING_DELEGATION": "Pending delegation",
+   "DELEGATED": "Delegated",
+   "IN_PROGRESS": "In progress"
+  },
+  "NFT_DASHBOARD_SCREEN": {
+    "COLLECTIBLES": "Number of collectibles",
+    "NO_COLLECTIBLES": "No collectibles yet",
+    "ITEMS": "items",
+    "WEB_GALLERY": "Open web gallery",
+    "RECEIVE": "Receive",
+    "SEND": "Send",
+    "SHARE": "Share collection",
+    "FACEBOOK": "Share on Facebook",
+    "TWITTER": "Share on Twitter",
+    "MAIL": "Share by Mail",
+    "COPY": "Copy link",
+    "NFT_DETAIL":"Item detail"
+  },
+  "NFT_DETAIL_SCREEN": {
+    "NFT_DETAIL":"Item detail",
+    "WEB_GALLERY": "Open web gallery",
+    "SEND": "Send",
+    "SHARE": "Share",
+    "OWNED_BY": "Owned By",
+    "DESCRIPTION": "Description",
+    "NAME": "Name",
+    "CREATOR": "Creator",
+    "LAST_SOLD": "Last sold",
+    "STATUS": "Status",
+    "RARITY": "Overall rarity",
+    "CONTRACT_ID": "Contract ID",
+    "ATTRIBUTES": "Attributes",
+    "VIEW_CONTRACT": "View the contract on",
+    "STACKS_EXPLORER":"Stacks Explorer",
+    "DETAILS": "See detail on",
+    "GAMMA": "Gamma.io"
+  },
+  "RESET_WALLET_SCREEN": {
+    "ENTER_PASSWORD": "Enter your password to reset your wallet",
+    "PASSWORD": "Password",
+    "RESET": "Reset",
+    "BACK": "Back",
+    "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+  },
+  "SETTING_SCREEN": {
+    "GENERAL": "General",
+    "CURRENCY": "Fiat Currency",
+    "NETWORK": "Network",
+    "SECURITY": "Security",
+    "UPDATE_PASSWORD": "Update Password",
+    "BACKUP_WALLET": "Backup Wallet",
+    "RESET_WALLET": "Reset Wallet",
+    "ABOUT": "About",
+    "TERMS_OF_SERVICE": "Terms of Service",
+    "PRIVACY_POLICY": "Privacy Policy",
+    "SUPPORT_CENTER": "Support Center",
+    "VERSION": "Version",
+    "UPDATE_PASSWORD_SUCCESS": "Password successfully updated",
+    "OK": "OK",
+    "RESET_WALLET_DESCRIPTION": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
+    "CANCEL": "Cancel",
+    "NODE": "STX Node",
+    "BACKUP_WALLET_UNLOCK_SEED": "Enter your password to reveal your seedphrase",
+    "SAVE": "Save",
+    "INVALID_URL": "Invalid URL",
+    "ENTER_PASSWORD": "Enter your password to reset your wallet",
+    "PASSWORD": "Password",
+    "RESET": "Reset",
+    "BACK": "Back",
+    "INCORRECT_PASSWORD_ERROR":"Incorrect password"
   }
 }

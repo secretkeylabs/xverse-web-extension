@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import TopRow from '@components/topRow';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 import Copy from '@assets/img/dashboard/Copy.svg';
 import { useState } from 'react';
 import ActionButton from '@components/button';
-import Theme from 'theme';
-import { CurrencyTypes } from '@utils/constants';
+import useWalletSelector from '@hooks/useWalletSelector';
+import BottomTabBar from '@components/tabBar';
 
 const TopTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
@@ -70,26 +70,22 @@ const AddressText = styled.h1((props) => ({
   wordBreak: 'break-all',
 }));
 
-interface Props {
-  currency: CurrencyTypes;
-}
+const BottomBarContainer = styled.div({
+  marginTop: 'auto',
+});
 
-function Receive({ currency }: Props) {
-  currency = 'STX';
+function Receive(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
   const [addressCopied, setAddressCopied] = useState(false);
   const navigate = useNavigate();
-  const stxAddress = 'SP1TWMXZB83X6KJAYEHNYVPAGX60Q9C2NVXBQCJMY';
-  const btcAddress = '3QAmUHT9jbsjewuAAjta6mtpH8M4tgQJcE';
-  const selectedAccount = {
-    bnsName: 'johndoe.btc',
-    btcAddress: '3QAmUHT9jbsjewuAAjta6mtpH8M4tgQJcE',
-    btcPublicKey: '039137ce06037cd553b3fd3297fc9da72902ab56da1dae90bae21118c7c79e9144',
-    id: 0,
-    masterPubKey: '03306da4bddabf83dd0da13f8116179c1406487172380961236f89ebf7212de4fd',
-    stxAddress: 'SP1TWMXZB83X6KJAYEHNYVPAGX60Q9C2NVXBQCJMY',
-    stxPublicKey: '02d9e3e83034232ab495ca71c43e1ff7fab1413da3b9c05abf4b6925a3642d47cb',
-  };
+  const {
+    stxAddress,
+    btcAddress,
+    selectedAccount,
+  } = useWalletSelector();
+
+  const { currency } = useParams();
+
   const getAddress = () => {
     switch (currency) {
       case 'STX':
@@ -106,12 +102,13 @@ function Receive({ currency }: Props) {
     navigate('/');
   };
 
-  const renderHeading = () =>
-    currency === 'BTC' ? (
-      <TopTitleText>{t('BTC_ADDRESS')} </TopTitleText>
-    ) : (
-      <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>
-    );
+  const renderHeading = () => (currency === 'BTC' ? (
+    <TopTitleText>
+      {t('BTC_ADDRESS')}
+    </TopTitleText>
+  ) : (
+    <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>
+  ));
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
@@ -132,7 +129,9 @@ function Receive({ currency }: Props) {
           <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
         )}
         <InfoContainer>
-          <AddressText>{getAddress()} </AddressText>
+          <AddressText>
+            { getAddress() }
+          </AddressText>
         </InfoContainer>
       </Container>
       {addressCopied ? (
@@ -141,8 +140,7 @@ function Receive({ currency }: Props) {
             src={Copy}
             text={t('COPIED_ADDRESS')}
             onPress={handleOnClick}
-            buttonColor="transparent"
-            buttonBorderColor={Theme.colors.background.elevation6}
+            transparent
           />
         </CopyContainer>
       ) : (
@@ -150,6 +148,9 @@ function Receive({ currency }: Props) {
           <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
         </CopyContainer>
       )}
+      <BottomBarContainer>
+        <BottomTabBar tab="dashboard" />
+      </BottomBarContainer>
     </>
   );
 }

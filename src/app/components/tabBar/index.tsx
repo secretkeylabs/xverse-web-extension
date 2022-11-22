@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import NftTab from '@assets/img/bottomTabBar/nft_tab.svg';
 import SettingsTab from '@assets/img/bottomTabBar/setting_tab.svg';
 import StackingTab from '@assets/img/bottomTabBar/stacking_tab.svg';
@@ -9,69 +8,62 @@ import UnselectedNftTab from '@assets/img/bottomTabBar/unselected_nft_tab.svg';
 import UnselectedSettingsTab from '@assets/img/bottomTabBar/unselected_setting_tab.svg';
 import UnselectedStackingTab from '@assets/img/bottomTabBar/unselected_stacking_tab.svg';
 import UnselectedWalletTab from '@assets/img/bottomTabBar/unselected_wallet_tab.svg';
-import Seperator from '@components/seperator';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'space-between',
+  alignItems: 'center',
+  width: '100%',
+  height: 64,
   justifyContent: 'space-between',
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
-  marginLeft: props.theme.spacing(30),
-  marginRight: props.theme.spacing(30),
+  paddingLeft: props.theme.spacing(30),
+  paddingRight: props.theme.spacing(30),
+  borderTop: `1px solid ${props.theme.colors.background.elevation3}`,
 }));
 
 const Button = styled.button({
   backgroundColor: 'transparent',
 });
 
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
+type Tab = 'dashboard' | 'nft' | 'stacking' | 'settings';
 
-type Tab = 'home' | 'nft' | 'stacking' | 'settings';
-
-function BottomTabBar() {
+interface Props {
+  tab: Tab
+}
+function BottomTabBar({ tab }:Props) {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<Tab>('home');
 
-  useEffect(() => {
-    switch (activeTab) {
-      case 'home':
-        navigate('/');
-        break;
-      case 'nft':
-        break;
-      case 'stacking':
-        break;
-      case 'settings':
-        break;
-      default:
-        break;
-    }
-  }, [activeTab, navigate]);
+  const handleDashboardButtonClick = () => {
+    if (tab !== 'dashboard') { navigate('/'); }
+  };
+
+  const handleNftButtonClick = () => {
+    if (tab !== 'nft') { navigate('/nft-dashboard'); }
+  };
+
+  const handleStackingButtonClick = () => {
+    if (tab !== 'stacking') { navigate('/stacking'); }
+  };
+
+  const handleSettingButtonClick = () => {
+    if (tab !== 'settings') { navigate('/settings'); }
+  };
 
   return (
-    <>
-      <Seperator />
-      <RowContainer>
-        <Button onClick={() => setActiveTab('home')}>
-          <ButtonImage src={activeTab === 'home' ? WalletTab : UnselectedWalletTab} />
-        </Button>
-        <Button onClick={() => setActiveTab('nft')}>
-          <ButtonImage src={activeTab === 'nft' ? NftTab : UnselectedNftTab} />
-        </Button>
-        <Button onClick={() => setActiveTab('stacking')}>
-          <ButtonImage src={activeTab === 'stacking' ? StackingTab : UnselectedStackingTab} />
-        </Button>
-        <Button onClick={() => setActiveTab('settings')}>
-          <ButtonImage src={activeTab === 'settings' ? SettingsTab : UnselectedSettingsTab} />
-        </Button>
-      </RowContainer>
-    </>
+    <RowContainer>
+      <Button onClick={handleDashboardButtonClick}>
+        <img src={tab === 'dashboard' ? WalletTab : UnselectedWalletTab} alt="dashboard" />
+      </Button>
+      <Button onClick={handleNftButtonClick}>
+        <img src={tab === 'nft' ? NftTab : UnselectedNftTab} alt="nft" />
+      </Button>
+      <Button onClick={handleStackingButtonClick}>
+        <img src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} alt="stacking" />
+      </Button>
+      <Button onClick={handleSettingButtonClick}>
+        <img src={tab === 'settings' ? SettingsTab : UnselectedSettingsTab} alt="settings" />
+      </Button>
+    </RowContainer>
   );
 }
 

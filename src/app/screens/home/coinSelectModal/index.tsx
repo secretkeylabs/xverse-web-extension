@@ -5,6 +5,8 @@ import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
+import { useSelector } from 'react-redux';
+import { StoreState } from '@stores/index';
 
 interface Props {
   visible: boolean;
@@ -26,6 +28,10 @@ function CoinSelectModal({
   onClose,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const {
+    loadingWalletData,
+    loadingBtcData,
+  } = useSelector((state: StoreState) => state.walletState);
   const theme = useTheme();
 
   const handleOnBitcoinPress = () => {
@@ -50,6 +56,7 @@ function CoinSelectModal({
           title={t('BITCOIN')}
           currency="BTC"
           icon={IconBitcoin}
+          loading={loadingBtcData}
           underlayColor={theme.colors.background.elevation2}
           margin={2}
           onPress={handleOnBitcoinPress}
@@ -59,6 +66,7 @@ function CoinSelectModal({
           title={t('STACKS')}
           currency="STX"
           icon={IconStacks}
+          loading={loadingWalletData}
           underlayColor={theme.colors.background.elevation2}
           margin={2}
           onPress={handleOnStackPress}
@@ -77,6 +85,7 @@ function CoinSelectModal({
             title={coin.name}
             currency="FT"
             icon={IconStacks}
+            loading={loadingWalletData}
             underlayColor={theme.colors.background.elevation2}
             margin={2}
             onPress={handleOnCoinPress}

@@ -1,8 +1,10 @@
 import {
   BtcTransactionData,
   Coin,
+  FeesMultipliers,
   FungibleToken,
   NetworkType,
+  SettingsNetwork,
   SupportedCurrency,
   TransactionData,
 } from '@secretkeylabs/xverse-core/types';
@@ -17,6 +19,9 @@ export const LockWalletKey = 'LockWallet';
 export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
 export const UpdateVisibleCoinListKey = 'UpdateVisibleCoinList';
 export const AddAccountKey = 'AddAccount';
+export const FetchFeeMultiplierKey = 'FetchFeeMultiplier';
+export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
+export const ChangeNetworkKey = 'ChangeNetwork';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
@@ -52,10 +57,11 @@ export interface WalletState {
   btcPublicKey: string;
   accountsList: Account[];
   selectedAccount: Account | null;
-  network: NetworkType;
+  network: SettingsNetwork;
   seedPhrase: string;
   encryptedSeed: string;
   loadingWalletData: boolean;
+  loadingBtcData: boolean;
   fiatCurrency: SupportedCurrency;
   btcFiatRate: BigNumber;
   stxBtcRate: BigNumber;
@@ -68,6 +74,7 @@ export interface WalletState {
   btcTransactions: BtcTransactionData[];
   coinsList: FungibleToken[] | null;
   coins: Coin[];
+  feeMultipliers: FeesMultipliers | null;
 }
 
 export interface WalletData {
@@ -91,6 +98,11 @@ export interface StoreEncryptedSeed {
 export interface UnlockWallet {
   type: typeof UnlockWalletKey;
   seed: string;
+}
+
+export interface FetchFeeMultiplier {
+  type: typeof FetchFeeMultiplierKey;
+  feeMultipliers: FeesMultipliers;
 }
 
 export interface LockWallet {
@@ -119,7 +131,7 @@ export interface SelectAccount {
   stxPublicKey: string;
   btcPublicKey: string;
   bnsName?: string;
-  network: NetworkType;
+  network: SettingsNetwork;
   // stackingState: StackingStateData;
 }
 
@@ -142,7 +154,7 @@ export interface FetchRatesFail {
 export interface FetchStxWalletDataRequest {
   type: typeof FetchStxWalletDataRequestKey;
   stxAddress: string;
-  network: NetworkType;
+  network: SettingsNetwork;
   fiatCurrency: string;
   stxBtcRate: BigNumber;
 }
@@ -181,7 +193,7 @@ export interface FetchBtcWalletDataFail {
 export interface FetchCoinDataRequest {
   type: typeof FetchCoinDataRequestKey;
   stxAddress: string;
-  network: NetworkType;
+  network: SettingsNetwork;
   fiatCurrency: string;
   coinsList: FungibleToken[] | null;
 }
@@ -201,6 +213,15 @@ export interface UpdateVisibleCoinList {
   coinsList: FungibleToken[];
 }
 
+export interface ChangeFiatCurrency {
+  type: typeof ChangeFiatCurrencyKey;
+  fiatCurrency: SupportedCurrency;
+}
+export interface ChangeNetwork {
+  type: typeof ChangeNetworkKey;
+  network: SettingsNetwork;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -210,6 +231,7 @@ export type WalletActions =
   | StoreEncryptedSeed
   | UnlockWallet
   | LockWallet
+  | FetchFeeMultiplier
   | FetchRates
   | FetchRatesSuccess
   | FetchRatesFail
@@ -222,4 +244,6 @@ export type WalletActions =
   | FetchCoinDataRequest
   | FetchCoinDataSuccess
   | FetchCoinDataFailure
-  | UpdateVisibleCoinList;
+  | UpdateVisibleCoinList
+  | ChangeFiatCurrency
+  | ChangeNetwork;
