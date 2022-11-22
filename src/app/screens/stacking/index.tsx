@@ -6,6 +6,7 @@ import useStackingData from '@hooks/useStackingData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import AccountRow from '@components/accountRow';
 import BottomBar from '@components/tabBar';
+import Seperator from '@components/seperator';
 import StackingProgress from './stackingProgress';
 import StartStacking from './startStacking';
 
@@ -48,6 +49,7 @@ function Stacking() {
       <SelectedAccountContainer>
         <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
       </SelectedAccountContainer>
+      <Seperator />
       {isStackingLoading && (
         <LoaderContainer>
           <Ring color="white" size={30} />

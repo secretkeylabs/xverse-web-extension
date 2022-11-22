@@ -50,10 +50,10 @@ const WebGalleryButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(4),
 }));
 
-const SelectedAccountContainer = styled.div({
-  marginLeft: '5%',
-  marginRight: '5%',
-});
+const SelectedAccountContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
+}));
 
 const CollectibleContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
