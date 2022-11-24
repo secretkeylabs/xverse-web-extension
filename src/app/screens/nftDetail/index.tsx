@@ -50,6 +50,12 @@ const ShareDialogeContainer = styled.div({
   right: 0,
 });
 
+const GalleryShareDialogeContainer = styled.div({
+  position: 'absolute',
+  top: 0,
+  right: 0,
+});
+
 const ExtensionContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -300,23 +306,6 @@ function NftDetailScreen() {
     </RowContainer>
   );
 
-  const buttons = (
-    <ButtonContainer>
-      <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
-      <ShareButtonContainer>
-        <ActionButton
-          src={ShareNetwork}
-          text={t('SHARE')}
-          onPress={onSharePress}
-          transparent
-        />
-      </ShareButtonContainer>
-      <ShareDialogeContainer>
-        {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`} onCrossClick={onCrossPress} />}
-      </ShareDialogeContainer>
-    </ButtonContainer>
-  );
-
   const extensionView = (
     <>
       <ExtensionContainer>
@@ -333,7 +322,20 @@ function NftDetailScreen() {
           </WebGalleryButton>
         </WebGalleryButtonContainer>
       </ExtensionContainer>
-      {buttons}
+      <ButtonContainer>
+        <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+        <ShareButtonContainer>
+          <ActionButton
+            src={ShareNetwork}
+            text={t('SHARE')}
+            onPress={onSharePress}
+            transparent
+          />
+        </ShareButtonContainer>
+        <ShareDialogeContainer>
+          {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`} onCrossClick={onCrossPress} />}
+        </ShareDialogeContainer>
+      </ButtonContainer>
     </>
   );
 
@@ -345,7 +347,20 @@ function NftDetailScreen() {
     ) : (
       <Container>
         <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
-        {buttons}
+        <ButtonContainer>
+          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+          <ShareButtonContainer>
+            <ActionButton
+              src={ShareNetwork}
+              text={t('SHARE')}
+              onPress={onSharePress}
+              transparent
+            />
+          </ShareButtonContainer>
+          <GalleryShareDialogeContainer>
+            {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`} onCrossClick={onCrossPress} />}
+          </GalleryShareDialogeContainer>
+        </ButtonContainer>
         <RowContainer>
           {nftImage}
           <DescriptionContainer>
@@ -387,9 +402,11 @@ function NftDetailScreen() {
         {isGalleryOpen ? galleryView : extensionView}
       </Container>
 
+      {!isGalleryOpen && (
       <BottomBarContainer>
         <BottomTabBar tab="nft" />
       </BottomBarContainer>
+      )}
     </>
 
   );

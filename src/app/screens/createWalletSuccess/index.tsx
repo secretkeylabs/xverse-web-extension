@@ -1,7 +1,39 @@
 import CheckCircle from '@assets/img/createWalletSuccess/CheckCircle.svg';
+import Extension from '@assets/img/createWalletSuccess/extension.svg';
+import Pin from '@assets/img/createWalletSuccess/pin.svg';
+import Logo from '@assets/img/createWalletSuccess/logo.svg';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+
+const InstructionsContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  flexDirection: 'column',
+  position: 'absolute',
+  top: 20,
+  right: 30,
+  height: 100,
+  width: 277,
+  backgroundColor: 'rgba(39, 42, 68, 0.4)',
+  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  borderRadius: 12,
+  padding: `${props.theme.spacing(10.5)}px ${props.theme.spacing(10.5)}px ${props.theme.spacing(10.5)}px ${props.theme.spacing(10.5)}px`,
+}));
+
+const RowContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+});
+
+const InstructionsText = styled.h1((props) => ({
+  ...props.theme.body_medium_l,
+  color: 'rgba(255, 255, 255, 0.7)',
+}));
+
+const Image = styled.img((props) => ({
+  marginLeft: props.theme.spacing(3.5),
+  marginRight: props.theme.spacing(3.5),
+}));
 
 const ContentContainer = styled.div((props) => ({
   display: 'flex',
@@ -40,10 +72,9 @@ const ContinueButton = styled.button((props) => ({
 
 function CreateWalletSuccess(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'WALLET_SUCCESS_SCREEN' });
-  const navigate = useNavigate();
 
   const handleOpenWallet = () => {
-    navigate('/');
+    window.close();
   };
 
   return (
@@ -53,7 +84,22 @@ function CreateWalletSuccess(): JSX.Element {
         <Title>{t('SCREEN_TITLE')}</Title>
         <Subtitle>{t('SCREEN_SUBTITLE')}</Subtitle>
       </ContentContainer>
-      <ContinueButton onClick={handleOpenWallet}>{t('OPEN_WALLET_BUTTON')}</ContinueButton>
+      <ContinueButton onClick={handleOpenWallet}>{t('CLOSE_TAB')}</ContinueButton>
+      <InstructionsContainer>
+        <RowContainer>
+          <InstructionsText>{`1. ${t('CLICK')}`}</InstructionsText>
+          <Image src={Extension} />
+          <InstructionsText>{t('THEN')}</InstructionsText>
+          <Image src={Pin} />
+        </RowContainer>
+        <RowContainer>
+          <InstructionsText>{`2. ${t('CLICK')}`}</InstructionsText>
+          <Image src={Logo} />
+          <InstructionsText>{t('OPEN_WALLET')}</InstructionsText>
+        </RowContainer>
+
+      </InstructionsContainer>
+
     </>
   );
 }

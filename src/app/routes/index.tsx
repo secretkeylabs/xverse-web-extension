@@ -31,6 +31,7 @@ import BackupWalletScreen from '@screens/settings/backupWallet';
 import Buy from '@screens/buy';
 import SendNft from '@screens/sendNft';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
+import ExtendedScreenContainer from '@components/extendedScreenContainer';
 
 const router = createHashRouter([
   {
@@ -126,18 +127,6 @@ const router = createHashRouter([
         element: <Stacking />,
       },
       {
-        path: 'nft-dashboard',
-        element: <NftDashboard />,
-      },
-      {
-        path: 'nft-dashboard/nft-detail/:id',
-        element: <NftDetailScreen />,
-      },
-      {
-        path: 'confirm-nft-tx/:id',
-        element: <ConfirmNftTransaction />,
-      },
-      {
         path: 'settings',
         element: <Setting />,
       },
@@ -160,6 +149,24 @@ const router = createHashRouter([
       {
         path: 'buy-stx/:currency',
         element: <Buy />,
+      },
+      {
+        path: 'confirm-nft-tx/:id',
+        element: <ConfirmNftTransaction />,
+      },
+    ],
+  },
+  {
+    path: '/',
+    element: <ExtendedScreenContainer />,
+    children: [
+      {
+        path: 'nft-dashboard',
+        element: <NftDashboard />,
+      },
+      {
+        path: 'nft-dashboard/nft-detail/:id',
+        element: <NftDetailScreen />,
       },
     ],
   },
