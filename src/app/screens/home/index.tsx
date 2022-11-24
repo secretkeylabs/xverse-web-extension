@@ -125,6 +125,7 @@ function Home() {
   const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
+  const [openBuyModal, setOpenBuyModal] = useState(false);
   const [list, setList] = useState<FungibleToken[]>([]);
   const {
     stxAddress,
@@ -207,6 +208,14 @@ function Home() {
     setOpenSendModal(false);
   };
 
+  const onBuyModalOpen = () => {
+    setOpenBuyModal(true);
+  };
+
+  const onBuyModalClose = () => {
+    setOpenBuyModal(false);
+  };
+
   const handleAccountSelect = () => {
     navigate('/account-list');
   };
@@ -235,6 +244,14 @@ function Home() {
     navigate('/receive/STX');
   };
 
+  const onBuyStxClick = () => {
+    navigate('/buy-stx/STX');
+  };
+
+  const onBuyBtcClick = () => {
+    navigate('/buy-stx/BTC');
+  };
+
   return (
     <>
       { network.type === 'Testnet'
@@ -260,7 +277,7 @@ function Home() {
             <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ButtonContainer>
           <ButtonContainer>
-            <ActionButton src={CreditCard} text={t('BUY')} onPress={onReceiveModalOpen} />
+            <ActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
           </ButtonContainer>
         </RowButtonContainer>
 
@@ -320,6 +337,16 @@ function Home() {
           visible={openSendModal}
           coins={getCoinsList()}
           title={t('SEND')}
+        />
+
+        <CoinSelectModal
+          onSelectBitcoin={onBuyBtcClick}
+          onSelectStacks={onBuyStxClick}
+          onClose={onBuyModalClose}
+          onSelectCoin={(onBuyModalClose)}
+          visible={openBuyModal}
+          coins={[]}
+          title={t('BUY')}
         />
       </Container>
       <BottomBar tab="dashboard" />

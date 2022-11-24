@@ -28,6 +28,7 @@ import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import ChangePasswordScreen from '@screens/settings/changePassword';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import BackupWalletScreen from '@screens/settings/backupWallet';
+import Buy from '@screens/buy';
 import SendNft from '@screens/sendNft';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
@@ -144,6 +145,10 @@ const router = createHashRouter([
       {
         path: 'backup-wallet',
         element: <BackupWalletScreen />,
+      },
+      {
+        path: 'buy-stx/:currency',
+        element: <Buy />,
       },
       {
         path: 'confirm-nft-tx/:id',
