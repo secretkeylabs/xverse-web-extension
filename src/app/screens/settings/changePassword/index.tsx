@@ -16,6 +16,8 @@ const PasswordContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
+  marginTop: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(16),
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
 }));

@@ -20,7 +20,7 @@ const Button = styled.button<ButtonProps>((props) => ({
 
 const TransparentButton = styled(Button)`
   background-color: transparent;
-  border: 1px solid ${(props) => props.theme.colors.white['600']};
+  border: 1px solid #4C5187;
 `;
 
 const ButtonText = styled.div((props) => ({

@@ -19,7 +19,8 @@ const Container = styled.div((props) => ({
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
   height: '100%',
-  marginBottom: props.theme.spacing(15),
+  marginBottom: props.theme.spacing(32),
+  marginTop: props.theme.spacing(32),
 }));
 
 function RestoreWallet(): JSX.Element {

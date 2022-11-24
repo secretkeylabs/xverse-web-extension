@@ -13,9 +13,7 @@ interface ButtonProps {
 const Button = styled.button<ButtonProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'center',
   background: 'transparent',
-  justifyContent: 'flex-start',
   paddingBottom: props.theme.spacing(10),
   paddingTop: props.theme.spacing(10),
   borderBottom: props.border,
@@ -26,7 +24,7 @@ const Text = styled.h1<TitleProps>((props) => ({
   color: props.color,
   flex: 1,
   textAlign: 'left',
-  marginLeft: props.theme.spacing(6),
+
 }));
 
 interface Props {
@@ -47,7 +45,7 @@ function NetworkRow({
   return (
     <Button
       onClick={onClick}
-      border={showDivider ? `1px solid ${theme.colors.background.elevation3}` : 'transparent'}
+      border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}
     >
       <Text color={isSelected ? theme.colors.white['0'] : theme.colors.white['200']}>
         {network.type}

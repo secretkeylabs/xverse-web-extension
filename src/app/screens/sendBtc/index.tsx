@@ -120,7 +120,7 @@ function SendBtcScreen() {
     }
 
     if (btcToSats(parsedAmount).lt(BITCOIN_DUST_AMOUNT_SATS)) {
-      setError(t('ERRORS.MINIMUM_AMOUNT'));
+      setError(t('ERRORS.BELOW_MINIMUM_AMOUNT'));
       return false;
     }
 

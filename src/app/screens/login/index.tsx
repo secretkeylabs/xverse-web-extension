@@ -35,6 +35,7 @@ const TopSectionContainer = styled.div((props) => ({
 const PasswordInputLabel = styled.h2((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
+  marginTop: props.theme.spacing(15.5),
 }));
 
 const PasswordInputContainer = styled.div((props) => ({
