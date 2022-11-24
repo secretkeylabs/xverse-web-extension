@@ -43,14 +43,13 @@ function ConfirmBtcTransaction() {
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
   const { fee, amount, signedTxHex } = location.state;
-
   const {
     isLoading,
     error: txError,
     data: btcTxBroadcastData,
     mutate,
   } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network),
+    async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network.type),
   );
 
   useEffect(() => {

@@ -7,6 +7,7 @@ export const PRIVACY_POLICY_LINK = 'https://xverse.app/privacy';
 export const SUPPORT_LINK = 'https://support.xverse.app/hc/en-us';
 export const BTC_TRANSACTION_STATUS_URL = 'https://www.blockchain.com/btc/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
+export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
 
 export const TRANSAC_URL = 'https://global.transak.com';
 export const TRANSAC_API_KEY = '8636faeb-2dd7-41e3-986e-b99db6f63903';

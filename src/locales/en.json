@@ -49,6 +49,7 @@
     "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
+    "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
     "NO_FUNDS":"You don’t have any fund to send.",
@@ -63,8 +64,10 @@
       "MINIMUM_AMOUNT": "Minimum amount is 0.000001 STX",
       "INSUFFICIENT_BALANCE": "Insufficient balance",
       "MEMO_LENGTH": "Memo exceeds allowed length",
-      "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees"
-    }
+      "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
+      "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
+    },
+    "SEND_NFT":"Send NFT"
   },
   "CONFIRM_TRANSACTION": {
     "SEND":"Send",
@@ -168,6 +171,22 @@
     "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
     "CONTINUE_BUTTON": "Continue"
   },
+  "STACKING_SCREEN": {
+    "STACK_AND_EARN": "Stack STX, earn BTC",
+    "STACKING_INFO": "Pool your STX with other stackers to earn real BTC with low minimums. Rewards are distributed after the end of every 2-week cycle.",
+    "APY": "Estimated APY",
+    "POOL_FEE": "Pool fee",
+   "MINIMUM_AMOUNT": "Minimum amount",
+   "REWARD_CYCLES": "Reward Cycles",
+   "START_STACKNG": "Start stacking",
+   "STACK_FOR_REWARD": "Stack your coins to earn rewards",
+   "XVERSE_POOL": "Xverse delegated pooling allows everyone to participate in Stacking and earn rewards. ",
+   "STACK_STX": "Stack STX",
+   "EARN_BTC":"Earn BTC",
+   "PENDING_DELEGATION": "Pending delegation",
+   "DELEGATED": "Delegated",
+   "IN_PROGRESS": "In progress"
+  },
   "NFT_DASHBOARD_SCREEN": {
     "COLLECTIBLES": "Number of collectibles",
     "NO_COLLECTIBLES": "No collectibles yet",
@@ -181,6 +200,25 @@
     "MAIL": "Share by Mail",
     "COPY": "Copy link",
     "NFT_DETAIL":"Item detail"
+  },
+  "NFT_DETAIL_SCREEN": {
+    "NFT_DETAIL":"Item detail",
+    "WEB_GALLERY": "Open web gallery",
+    "SEND": "Send",
+    "SHARE": "Share",
+    "OWNED_BY": "Owned By",
+    "DESCRIPTION": "Description",
+    "NAME": "Name",
+    "CREATOR": "Creator",
+    "LAST_SOLD": "Last sold",
+    "STATUS": "Status",
+    "RARITY": "Overall rarity",
+    "CONTRACT_ID": "Contract ID",
+    "ATTRIBUTES": "Attributes",
+    "VIEW_CONTRACT": "View the contract on",
+    "STACKS_EXPLORER":"Stacks Explorer",
+    "DETAILS": "See detail on",
+    "GAMMA": "Gamma.io"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",

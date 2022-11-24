@@ -27,8 +27,8 @@ const RowContainer = styled.div((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   paddingTop: props.theme.spacing(11),
-  paddingLeft: props.theme.spacing(11),
-  paddingRight: props.theme.spacing(11),
+  paddingLeft: '5%',
+  paddingRight: '5%',
 }));
 
 interface Props {
