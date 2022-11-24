@@ -19,16 +19,15 @@ import AccountHeaderComponent from '@components/accountHeader';
 import Nft from './nft';
 
 const Container = styled.div`
-display: flex;
-flex-direction: column;
-flex: 1;
-margin-left: 5%;
-margin-right: 5%;
-margin-bottom: 5%;
-overflow-y: auto;
-&::-webkit-scrollbar {
-  display: none;
-}
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-left: 5%;
+  margin-right: 5%;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const GridContainer = styled.div((props) => ({
@@ -37,6 +36,12 @@ const GridContainer = styled.div((props) => ({
   rowGap: props.theme.spacing(6),
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
 }));
+
+const ShareDialogeContainer = styled.div({
+  position: 'absolute',
+  top: 0,
+  right: 0,
+});
 
 const WebGalleryButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -71,7 +76,7 @@ const ShareButtonContainer = styled.div((props) => ({
   width: '100%',
 }));
 
-const Button = styled.button((props) => ({
+const WebGalleryButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'flex-start',
@@ -82,7 +87,7 @@ const Button = styled.button((props) => ({
   marginTop: props.theme.spacing(5),
 }));
 
-const ButtonText = styled.div((props) => ({
+const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
   color: props.theme.colors.white['0'],
@@ -96,11 +101,19 @@ const ButtonImage = styled.img((props) => ({
 }));
 
 const BottomBarContainer = styled.div({
-  marginTop: 'auto',
+  marginTop: '5%',
 });
 
 const CollectiblesHeadingText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
+  color: props.theme.colors.white['200'],
+  textTransform: 'uppercase',
+  letterSpacing: '0.02em',
+  opacity: 0.7,
+}));
+
+const GalleryCollectiblesHeadingText = styled.h1((props) => ({
+  ...props.theme.headline_category_m,
   color: props.theme.colors.white['200'],
   textTransform: 'uppercase',
   letterSpacing: '0.02em',
@@ -120,8 +133,8 @@ const NoCollectiblesText = styled.h1((props) => ({
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
-  display: 'flex',
   marginTop: props.theme.spacing(5),
+  maxWidth: 300,
 }));
 
 function NftDashboard() {
@@ -136,12 +149,7 @@ function NftDashboard() {
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
     async () => getNftsData(stxAddress, network, offset.current),
   );
-
-  const loader = (
-    <BarLoaderContainer>
-      <BarLoader loaderSize={LoaderSize.LARGE} />
-    </BarLoaderContainer>
-  );
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
@@ -181,17 +189,23 @@ function NftDashboard() {
       <Seperator />
       <Container>
         <CollectibleContainer>
-          <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>
-          {isLoading ? loader
+          {isGalleryOpen ? <GalleryCollectiblesHeadingText>{t('COLLECTIBLES')}</GalleryCollectiblesHeadingText> : <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>}
+          {isLoading ? (
+            <BarLoaderContainer>
+              <BarLoader loaderSize={LoaderSize.LARGE} />
+            </BarLoaderContainer>
+          )
             : <CollectiblesValueText>{`${data?.total} ${t('ITEMS')}`}</CollectiblesValueText>}
+          {!isGalleryOpen && (
           <WebGalleryButtonContainer>
-            <Button onClick={openInGalleryView}>
+            <WebGalleryButton onClick={openInGalleryView}>
               <>
                 <ButtonImage src={SquaresFour} />
-                <ButtonText>{t('WEB_GALLERY')}</ButtonText>
+                <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
               </>
-            </Button>
+            </WebGalleryButton>
           </WebGalleryButtonContainer>
+          )}
         </CollectibleContainer>
         <ButtonContainer>
           <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
@@ -203,8 +217,9 @@ function NftDashboard() {
               transparent
             />
           </ShareButtonContainer>
-
-          {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />}
+          <ShareDialogeContainer>
+            {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />}
+          </ShareDialogeContainer>
         </ButtonContainer>
         {isLoading ? (
           <LoaderContainer>
@@ -213,9 +228,11 @@ function NftDashboard() {
         ) : nftListView}
       </Container>
 
+      {!isGalleryOpen && (
       <BottomBarContainer>
         <BottomTabBar tab="nft" />
       </BottomBarContainer>
+      )}
     </>
   );
 }

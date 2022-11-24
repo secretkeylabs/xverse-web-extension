@@ -86,7 +86,7 @@ function AccountList(): JSX.Element {
   const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;
 
   const handleBackButtonClick = () => {
-    navigate('/');
+    navigate(-1);
   };
 
   async function onCreateAccount() {

@@ -34,10 +34,14 @@ function BottomModal({
   const customStyles = {
     overlay: {
       backgroundColor: theme.colors.background.modalBackdrop,
+      height: 600,
+      width: 360,
+      margin: 'auto',
     },
     content: {
       inset: 'auto auto 0px auto',
       width: '100%',
+      maxWidth: 360,
       maxHeight: '90%',
       border: 'transparent',
       background: theme.colors.background.elevation2,
@@ -51,10 +55,7 @@ function BottomModal({
   return (
     <Modal
       isOpen={visible}
-      parentSelector={() => {
-        const parent = (document.querySelector('#app') as HTMLElement) ?? document.body;
-        return parent;
-      }}
+      parentSelector={() => (document.getElementById('app') as HTMLElement)}
       ariaHideApp={false}
       style={customStyles}
       contentLabel="Example Modal"

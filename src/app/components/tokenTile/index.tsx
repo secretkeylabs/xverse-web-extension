@@ -67,6 +67,7 @@ const AmountContainer = styled.div({
 
 const LoaderMainContainer = styled.div((props) => ({
   flex: 1,
+  maxWidth: 200,
   flexDirection: 'column',
   alignItems: 'flex-end',
   justifyContent: 'flex-end',
@@ -75,6 +76,7 @@ const LoaderMainContainer = styled.div((props) => ({
 
 const LoaderImageContainer = styled.div({
   flex: 0.5,
+  maxWidth: 40,
 });
 
 const CoinTickerText = styled.h1((props) => ({

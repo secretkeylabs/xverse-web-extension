@@ -13,7 +13,7 @@ import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
-import ConfirmStxTransationComponent from './confirmStxTransactionComponent';
+import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -51,7 +51,6 @@ function ConfirmStxTransaction() {
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
-
   const {
     isLoading,
     error: txError,
@@ -60,7 +59,7 @@ function ConfirmStxTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network));
+  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network.type));
 
   useEffect(() => {
     if (stxTxBroadcastData) {

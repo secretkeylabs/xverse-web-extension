@@ -22,15 +22,16 @@ const SeedContainer = styled.div<SeedContainerProps>((props) => ({
   border: `1px solid ${props.theme.colors.background.elevation2}`,
   borderRadius: props.theme.radius(1),
   paddingBottom: props.theme.spacing(17),
+  paddingLeft: props.theme.spacing(5),
   filter: `blur(${props.isVisible ? 0 : '3px'})`,
 }));
 
 const SeedWord = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  width: '23%',
+  width: '25%',
   marginTop: props.theme.spacing(17),
-  marginRight: props.theme.spacing(8),
-  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(4),
+  marginLeft: props.theme.spacing(9),
 }));
 
 const ShowSeedButton = styled.button((props) => ({

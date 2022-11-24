@@ -5,6 +5,7 @@ import { NonFungibleToken, getBnsNftName } from '@secretkeylabs/xverse-core/type
 import { BNS_CONTRACT } from '@utils/constants';
 import NftUser from '@assets/img/nftDashboard/nft_user.svg';
 import { useNavigate } from 'react-router-dom';
+import useNftDataReducer from '@hooks/useNftReducer';
 import NftImage from './nftImage';
 
 interface Props {
@@ -42,6 +43,8 @@ const GridItemContainer = styled.button((props) => ({
 
 function Nft({ asset }: Props) {
   const navigate = useNavigate();
+  const { storeNftData } = useNftDataReducer();
+  const url = `${asset.asset_identifier}::${asset.value.repr}`;
   const { data } = useQuery(
     ['nft-meta-data', asset.asset_identifier],
     async () => {
@@ -64,7 +67,10 @@ function Nft({ asset }: Props) {
   }
 
   const handleOnClick = () => {
-
+    storeNftData(data);
+    if (asset.asset_identifier !== BNS_CONTRACT) {
+      navigate(`nft-detail/${url}`);
+    }
   };
 
   return (
@@ -80,7 +86,6 @@ function Nft({ asset }: Props) {
       )}
       <NftNameText>{getName()}</NftNameText>
     </GridItemContainer>
-
   );
 }
 export default Nft;
