@@ -1,10 +1,10 @@
 import styled from 'styled-components';
-import { Account } from '@stores/wallet/actions/types';
 import { getAccountGradient } from '@utils/gradient';
 import { useTranslation } from 'react-i18next';
 import { getAddressDetail } from '@utils/helper';
 import BarLoader from '@components/barLoader';
 import { LoaderSize } from '@utils/constants';
+import { Account } from '@secretkeylabs/xverse-core';
 
 interface GradientCircleProps {
   firstGradient: string;

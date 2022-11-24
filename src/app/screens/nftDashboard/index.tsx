@@ -185,7 +185,7 @@ function NftDashboard() {
 
   return (
     <>
-      <AccountHeaderComponent />
+      <AccountHeaderComponent isNftGalleryOpen />
       <Seperator />
       <Container>
         <CollectibleContainer>

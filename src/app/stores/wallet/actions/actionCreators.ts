@@ -1,4 +1,5 @@
 import {
+  Account,
   BtcTransactionData,
   Coin,
   FeesMultipliers,
@@ -10,7 +11,6 @@ import {
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
-import { Account } from './types';
 
 export function setWalletAction(wallet: actions.WalletData): actions.SetWallet {
   return {

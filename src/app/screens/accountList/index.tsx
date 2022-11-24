@@ -8,9 +8,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addAccoutAction, selectAccount } from '@stores/wallet/actions/actionCreators';
 import Seperator from '@components/seperator';
 import { StoreState } from '@stores/index';
-import { Account } from '@stores/wallet/actions/types';
 import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { getBnsName } from '@secretkeylabs/xverse-core/api';
+import { Account } from '@secretkeylabs/xverse-core/types';
 
 const Container = styled.div`
   display: flex;
@@ -80,7 +80,7 @@ function AccountList(): JSX.Element {
         network,
       ),
     );
-    navigate('/');
+    navigate(-1);
   };
 
   const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;

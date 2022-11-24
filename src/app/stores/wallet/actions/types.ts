@@ -7,6 +7,7 @@ import {
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
+  Account,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 
@@ -39,17 +40,6 @@ export const FetchRatesFailureKey = 'FetchRatesFailure';
 export const FetchCoinDataRequestKey = 'FetchCoinDataRequest';
 export const FetchCoinDataSuccessKey = 'FetchCoinDataSuccess';
 export const FetchCoinDataFailureKey = 'FetchCoinDataFailure';
-
-export interface Account {
-  id: number;
-  stxAddress: string;
-  btcAddress: string;
-  masterPubKey: string;
-  stxPublicKey: string;
-  btcPublicKey: string;
-  bnsName?: string;
-}
-
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;

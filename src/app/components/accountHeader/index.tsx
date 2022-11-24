@@ -12,8 +12,8 @@ import { useTranslation } from 'react-i18next';
 import OptionsDialog from './optionsDialog';
 
 const SelectedAccountContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  marginLeft: '5%',
+  marginRight: '5%',
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
@@ -46,7 +46,11 @@ const OptionsButton = styled.button((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
-function AccountHeaderComponent() {
+interface AccountHeaderComponentProps {
+  isNftGalleryOpen?: boolean;
+}
+
+function AccountHeaderComponent({ isNftGalleryOpen }:AccountHeaderComponentProps) {
   const navigate = useNavigate();
   const {
     selectedAccount,
@@ -124,9 +128,11 @@ function AccountHeaderComponent() {
 
       <SelectedAccountContainer>
         <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
+        {!isNftGalleryOpen && (
         <OptionsButton onClick={handleOptionsSelect}>
           <img src={ThreeDots} alt="Options" />
         </OptionsButton>
+        )}
         {showOptionsDialog && <OptionsDialog closeDialog={closeDialog} showResetWalletPrompt={onResetWalletPromptOpen} />}
       </SelectedAccountContainer>
       <ResetWalletPrompt
