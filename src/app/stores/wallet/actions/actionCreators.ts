@@ -1,4 +1,5 @@
 import {
+  Account,
   BtcTransactionData,
   Coin,
   FeesMultipliers,
@@ -10,7 +11,6 @@ import {
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
-import { Account } from './types';
 
 export function setWalletAction(wallet: actions.WalletData): actions.SetWallet {
   return {
@@ -23,6 +23,12 @@ export function unlockWalletAction(seed: string) {
   return {
     type: actions.UnlockWalletKey,
     seed,
+  };
+}
+
+export function lockWalletAction() {
+  return {
+    type: actions.LockWalletKey,
   };
 }
 
@@ -234,5 +240,14 @@ export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNet
   return {
     type: actions.ChangeNetworkKey,
     network,
+  };
+}
+
+export function getActiveAccountsAction(
+  accountsList: Account[],
+): actions.GetActiveAccounts {
+  return {
+    type: actions.GetActiveAccountsKey,
+    accountsList,
   };
 }

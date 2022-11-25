@@ -47,6 +47,7 @@
     "BALANCE": "Balance",
     "RECEPIENT": "Recepient",
     "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
+    "BTC_RECEPIENT_PLACEHOLDER": "Address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
@@ -256,6 +257,11 @@
     "RESET": "Reset",
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+  },
+  "OPTIONS_DIALOG":{
+    "SWITCH_ACCOUNT": "Switch Account",
+    "LOCK": "Lock",
+    "RESET_WALLET": "Reset Wallet"
   },
   "BUY_SCREEN":{
     "BUY": "Buy",

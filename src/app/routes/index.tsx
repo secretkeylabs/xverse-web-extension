@@ -124,7 +124,11 @@ const router = createHashRouter([
       },
       {
         path: 'stacking',
-        element: <Stacking />,
+        element: (
+          <AuthGuard>
+            <Stacking />
+          </AuthGuard>
+        ),
       },
       {
         path: 'settings',
@@ -162,7 +166,11 @@ const router = createHashRouter([
     children: [
       {
         path: 'nft-dashboard',
-        element: <NftDashboard />,
+        element: (
+          <AuthGuard>
+            <NftDashboard />
+          </AuthGuard>
+        ),
       },
       {
         path: 'nft-dashboard/nft-detail/:id',

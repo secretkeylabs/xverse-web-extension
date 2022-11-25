@@ -1,6 +1,5 @@
-import { StxMempoolTransactionData } from '@secretkeylabs/xverse-core/types';
+import { Account, StxMempoolTransactionData } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
-import { Account } from '@stores/wallet/actions/types';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BigNumber from 'bignumber.js';
 

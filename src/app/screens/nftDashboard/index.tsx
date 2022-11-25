@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
-import AccountRow from '@components/accountRow';
 import Seperator from '@components/seperator';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
+import AccountHeaderComponent from '@components/accountHeader';
 import Nft from './nft';
 
 const Container = styled.div`
@@ -48,11 +48,6 @@ const WebGalleryButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   marginTop: props.theme.spacing(4),
 }));
-
-const SelectedAccountContainer = styled.div({
-  marginLeft: '5%',
-  marginRight: '5%',
-});
 
 const CollectibleContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
@@ -146,7 +141,7 @@ function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const offset = useRef(0);
-  const { selectedAccount, stxAddress, network } = useWalletSelector();
+  const { stxAddress, network } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const {
     isLoading, data,
@@ -155,9 +150,6 @@ function NftDashboard() {
     async () => getNftsData(stxAddress, network, offset.current),
   );
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const handleAccountSelect = () => {
-    navigate('/account-list');
-  };
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
@@ -193,9 +185,7 @@ function NftDashboard() {
 
   return (
     <>
-      <SelectedAccountContainer>
-        <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
-      </SelectedAccountContainer>
+      <AccountHeaderComponent isNftGalleryOpen={isGalleryOpen} />
       <Seperator />
       <Container>
         <CollectibleContainer>

@@ -24,6 +24,7 @@ import {
   FetchFeeMultiplierKey,
   ChangeFiatCurrencyKey,
   ChangeNetworkKey,
+  GetActiveAccountsKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -190,6 +191,11 @@ const walletReducer = (
         network: action.network,
         selectedAccount: null,
         accountsList: [],
+      };
+    case GetActiveAccountsKey:
+      return {
+        ...state,
+        accountsList: action.accountsList,
       };
     default:
       return state;
