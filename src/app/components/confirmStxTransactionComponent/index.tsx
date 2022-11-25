@@ -10,10 +10,9 @@ import TransactionSettingAlert from '@components/transactionSetting';
 import {
   microstacksToStx, stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
-import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
+import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
-import TransferAmountView from '@components/transferAmountView';
 import TransferFeeView from '@components/transferFeeView';
 import {
   setFee, setNonce, getNonce, signMultiStxTransactions, signTransaction,
@@ -48,6 +47,7 @@ const TransparentButtonContainer = styled.div((props) => ({
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
+  alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
@@ -72,7 +72,6 @@ interface Props {
   onConfirmClick: (transactions: StacksTransaction[]) => void;
   children: ReactNode;
   isSponsored?: boolean;
-  isNft?: boolean;
 }
 
 function ConfirmStxTransationComponent({
@@ -82,7 +81,6 @@ function ConfirmStxTransationComponent({
   children,
   onConfirmClick,
   onCancelClick,
-  isNft,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const {
@@ -115,12 +113,6 @@ function ConfirmStxTransationComponent({
   const getTxNonce = (): string => {
     const nonce = getNonce(stateTx[0]);
     return nonce.toString();
-  };
-
-  const getAmount = () => {
-    const txPayload = stateTx[0].payload as TokenTransferPayload;
-    const amount = new BigNumber(txPayload.amount.toString(10));
-    return microstacksToStx(amount);
   };
 
   const onAdvancedSettingClick = () => {
@@ -165,7 +157,6 @@ function ConfirmStxTransationComponent({
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
       <Container>
-        {!isNft && <TransferAmountView currency="STX" amount={getAmount()} />}
         {children}
         <TransferFeeView
           fee={microstacksToStx(getFee())}

@@ -241,6 +241,14 @@ function Home() {
     navigate('/receive/STX');
   };
 
+  const onSendFtSelect = (coin: FungibleToken) => {
+    navigate('send-ft', {
+      state: {
+        fungibleToken: coin,
+      },
+    });
+  };
+
   const onBuyStxClick = () => {
     navigate('/buy-stx/STX');
   };
@@ -301,7 +309,6 @@ function Home() {
         <CoinContainer>
           {list.map((coin) => (
             <TokenTile
-              key={coin.name.toString()}
               title={coin.name}
               currency="FT"
               loading={loadingWalletData}
@@ -324,7 +331,7 @@ function Home() {
           onSelectBitcoin={onBtcSendClick}
           onSelectStacks={onStxSendClick}
           onClose={onSendModalClose}
-          onSelectCoin={onStxSendClick}
+          onSelectCoin={onSendFtSelect}
           visible={openSendModal}
           coins={getCoinsList()}
           title={t('SEND')}

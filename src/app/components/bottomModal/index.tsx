@@ -15,9 +15,8 @@ const RowContainer = styled.div({
   margin: '24px 24px 20px 24px',
 });
 
-const ButtonImage = styled.img({
-  alignSelf: 'center',
-  transform: 'all',
+const ButtonImage = styled.button({
+  backgroundColor: 'transparent',
 });
 
 interface Props {
@@ -26,6 +25,15 @@ interface Props {
   children: React.ReactNode;
   onClose: () => void;
 }
+
+const CustomisedModal = styled(Modal)`
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  bottom: 0;
+  position: absolute;
+`;
 
 function BottomModal({
   header, children, visible, onClose,
@@ -53,7 +61,7 @@ function BottomModal({
   };
 
   return (
-    <Modal
+    <CustomisedModal
       isOpen={visible}
       parentSelector={() => (document.getElementById('app') as HTMLElement)}
       ariaHideApp={false}
@@ -62,12 +70,14 @@ function BottomModal({
     >
       <RowContainer>
         <BottomModalHeaderText>{header}</BottomModalHeaderText>
-        <ButtonImage src={Cross} onClick={onClose} />
+        <ButtonImage onClick={onClose}>
+          <img src={Cross} alt="cross" />
+        </ButtonImage>
       </RowContainer>
       <Seperator />
 
       {children}
-    </Modal>
+    </CustomisedModal>
   );
 }
 

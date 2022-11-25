@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getStxFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
 import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
 import { addressToString, broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import Seperator from '@components/seperator';
@@ -13,6 +13,7 @@ import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
+import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const InfoContainer = styled.div((props) => ({
@@ -47,6 +48,7 @@ function ConfirmStxTransaction() {
   const dispatch = useDispatch();
   const location = useLocation();
   const { unsignedTx } = location.state;
+
   const {
     stxBtcRate, btcFiatRate, network, stxAddress, fiatCurrency,
   } = useSelector(
@@ -134,12 +136,18 @@ function ConfirmStxTransaction() {
     </>
   );
 
+  const getAmount = () => {
+    const txPayload = unsignedTx?.payload as TokenTransferPayload;
+    const amountToTransfer = new BigNumber(txPayload?.amount?.toString(10));
+    return microstacksToStx(amountToTransfer);
+  };
+
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     mutate({ signedTx: txs[0] });
   };
 
   const handleOnCancelClick = () => {
-    navigate('/send-stx');
+    navigate(-1);
   };
   return (
     <>
@@ -149,6 +157,7 @@ function ConfirmStxTransaction() {
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
       >
+        <TransferAmountView currency="STX" amount={getAmount()} />
         <RecipientAddressView recipient={recipient} />
         {networkInfoSection}
         <Seperator />

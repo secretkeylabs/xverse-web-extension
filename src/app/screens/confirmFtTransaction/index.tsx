@@ -3,22 +3,23 @@ import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import Seperator from '@components/seperator';
 import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
+import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
-import useNftDataSelector from '@hooks/useNftDataSelector';
-import NftImage from '@screens/nftDashboard/nftImage';
+import { getTicker } from '@utils/helper';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   marginTop: props.theme.spacing(12),
+  paddingBottom: props.theme.spacing(12),
+  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
 }));
 
 const TitleText = styled.h1((props) => ({
@@ -33,41 +34,15 @@ const ValueText = styled.h1((props) => ({
   wordBreak: 'break-all',
 }));
 
-const Container = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
-const NFtContainer = styled.div((props) => ({
-  maxWidth: 450,
-  width: '60%',
-  display: 'flex',
-  aspectRatio: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: 8,
-  padding: props.theme.spacing(5),
-  marginBottom: props.theme.spacing(6),
-}));
-
-const NftTitleText = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
-function ConfirmNftTransaction() {
+function ConfirmFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { id } = useParams();
-  const { nftData } = useNftDataSelector();
-  const nftIdDetails = id!.split('::');
-  const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
-  const { unsignedTx, recipientAddress } = location.state;
+  const {
+    unsignedTx, amount, fungibleToken, memo, recepientAddress,
+  } = location.state;
+
   const {
     stxBtcRate, network, stxAddress, fiatCurrency,
   } = useSelector(
@@ -82,7 +57,7 @@ function ConfirmNftTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network.type));
+  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network));
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -111,13 +86,6 @@ function ConfirmNftTransaction() {
     }
   }, [txError]);
 
-  const networkInfoSection = (
-    <InfoContainer>
-      <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network.type}</ValueText>
-    </InfoContainer>
-  );
-
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     mutate({ signedTx: txs[0] });
   };
@@ -125,6 +93,14 @@ function ConfirmNftTransaction() {
   const handleOnCancelClick = () => {
     navigate(-1);
   };
+
+  function getFtTicker() {
+    if (fungibleToken.ticker) {
+      return fungibleToken.ticker.toUpperCase();
+    } if (fungibleToken?.name) {
+      return getTicker(fungibleToken.name).toUpperCase();
+    } return '';
+  }
 
   return (
     <>
@@ -134,20 +110,22 @@ function ConfirmNftTransaction() {
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
       >
-        <Container>
-          <NFtContainer>
-            <NftImage
-              metadata={nft?.token_metadata!}
-            />
-          </NFtContainer>
-          <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
-        </Container>
-        <RecipientAddressView recipient={recipientAddress} />
-        {networkInfoSection}
-        <Seperator />
+        <TransferAmountView currency={getFtTicker()} amount={amount} />
+        <RecipientAddressView recipient={recepientAddress} />
+        <InfoContainer>
+          <TitleText>{t('NETWORK')}</TitleText>
+          <ValueText>{network.type}</ValueText>
+        </InfoContainer>
+        {!!memo && (
+        <InfoContainer>
+          <TitleText>{t('MEMO')}</TitleText>
+          <ValueText>{memo}</ValueText>
+        </InfoContainer>
+        )}
+
       </ConfirmStxTransationComponent>
-      <BottomBar tab="nft" />
+      <BottomBar tab="dashboard" />
     </>
   );
 }
-export default ConfirmNftTransaction;
+export default ConfirmFtTransaction;
