@@ -47,6 +47,7 @@
     "BALANCE": "Balance",
     "RECEPIENT": "Recepient",
     "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
+    "BTC_RECEPIENT_PLACEHOLDER": "Address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",

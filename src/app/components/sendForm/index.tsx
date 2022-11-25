@@ -332,7 +332,7 @@ function SendForm({
       <AmountInputContainer>
         <InputFieldContainer>
           <InputField
-            placeholder={t('RECEPIENT_PLACEHOLDER')}
+            placeholder={currencyType === 'BTC' ? t('BTC_RECEPIENT_PLACEHOLDER') : t('RECEPIENT_PLACEHOLDER')}
             onChange={onAddressInputChange}
           />
         </InputFieldContainer>
