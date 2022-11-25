@@ -13,9 +13,6 @@ import ShareLinkRow from './shareLinkRow';
 const Container = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  position: 'absolute',
-  top: 0,
-  right: 0,
   justifyContent: 'center',
   paddingLeft: props.theme.spacing(6),
   paddingRight: props.theme.spacing(8),

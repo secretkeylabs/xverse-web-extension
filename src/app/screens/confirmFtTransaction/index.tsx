@@ -107,7 +107,6 @@ function ConfirmFtTransaction() {
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
-        token="STX"
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
       >

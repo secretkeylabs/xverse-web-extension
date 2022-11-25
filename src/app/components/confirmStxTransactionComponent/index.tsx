@@ -34,10 +34,8 @@ const Container = styled.div`
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
-  marginTop: props.theme.spacing(14),
+  marginBottom: props.theme.spacing(20),
+  marginTop: props.theme.spacing(24),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -53,7 +51,7 @@ const Button = styled.button((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(5),
+  marginTop: props.theme.spacing(10),
 }));
 
 const ButtonText = styled.div((props) => ({
@@ -71,7 +69,6 @@ const ButtonImage = styled.img((props) => ({
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
-  token: string;
   onCancelClick: () => void;
   onConfirmClick: (transactions: StacksTransaction[]) => void;
   children: ReactNode;
@@ -85,7 +82,6 @@ function ConfirmStxTransationComponent({
   children,
   onConfirmClick,
   onCancelClick,
-  token,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const {
@@ -99,7 +95,7 @@ function ConfirmStxTransationComponent({
   const [buttonLoading, setButtonLoading] = useState(loading);
 
   const handleBackButtonClick = () => {
-    if (token === 'STX') navigate('/send-stx'); else { navigate('/send-ft'); }
+    navigate(-1);
   };
 
   useEffect(() => {
@@ -162,7 +158,6 @@ function ConfirmStxTransationComponent({
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
       <Container>
-
         {children}
         <TransferFeeView
           fee={microstacksToStx(getFee())}
@@ -184,24 +179,25 @@ function ConfirmStxTransationComponent({
           onApplyClick={applyTxSettings}
           onCrossClick={closeTransactionSettingAlert}
         />
-      </Container>
-      <ButtonContainer>
-        <TransparentButtonContainer>
-          <ActionButton
-            text={t('CANCEL')}
-            transparent
-            disabled={buttonLoading}
-            onPress={onCancelClick}
-          />
-        </TransparentButtonContainer>
+        <ButtonContainer>
+          <TransparentButtonContainer>
+            <ActionButton
+              text={t('CANCEL')}
+              transparent
+              disabled={buttonLoading}
+              onPress={onCancelClick}
+            />
+          </TransparentButtonContainer>
 
-        <ActionButton
-          text={t('CONFIRM')}
-          disabled={buttonLoading}
-          processing={buttonLoading}
-          onPress={onConfirmButtonClick}
-        />
-      </ButtonContainer>
+          <ActionButton
+            text={t('CONFIRM')}
+            disabled={buttonLoading}
+            processing={buttonLoading}
+            onPress={onConfirmButtonClick}
+          />
+        </ButtonContainer>
+      </Container>
+
     </>
   );
 }

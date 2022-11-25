@@ -27,17 +27,16 @@ const CurrencyText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['0'],
   fontSize: 13,
-  padding: props.theme.spacing(1),
 }));
 
 const BalanceAmountText = styled.h1((props) => ({
   ...props.theme.headline_l,
   color: props.theme.colors.white['0'],
-  marginTop: props.theme.spacing(4),
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
   display: 'flex',
+  maxWidth: 300,
   marginTop: props.theme.spacing(5),
 }));
 

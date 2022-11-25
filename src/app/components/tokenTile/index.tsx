@@ -24,12 +24,11 @@ const TileContainer = styled.div<TileProps>((props) => ({
   alignItems: 'flex-start',
   justifyContent: 'space-between',
   backgroundColor: props.color,
-  paddingLeft: props.theme.spacing(9),
-  paddingRight: props.theme.spacing(9),
-  paddingTop: props.theme.spacing(9),
-  paddingBottom: props.margin ?? props.theme.spacing(9),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(6),
+  paddingBottom: props.margin ?? props.theme.spacing(6),
   borderRadius: props.theme.radius(2),
-  marginHorizontal: props.theme.spacing(7),
   marginBottom: props.theme.spacing(6),
 }));
 
@@ -72,6 +71,7 @@ const AmountContainer = styled.div({
 
 const LoaderMainContainer = styled.div((props) => ({
   flex: 1,
+  maxWidth: 200,
   flexDirection: 'column',
   alignItems: 'flex-end',
   justifyContent: 'flex-end',
@@ -80,6 +80,7 @@ const LoaderMainContainer = styled.div((props) => ({
 
 const LoaderImageContainer = styled.div({
   flex: 0.5,
+  maxWidth: 40,
 });
 
 const CoinTickerText = styled.h1((props) => ({

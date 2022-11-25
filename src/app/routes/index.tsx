@@ -20,7 +20,9 @@ import Login from '@screens/login';
 import RestoreWallet from '@screens/restoreWallet';
 import ForgotPassword from '@screens/forgotPassword';
 import BackupWalletSteps from '@screens/backupWalletSteps';
+import Stacking from '@screens/stacking';
 import NftDashboard from '@screens/nftDashboard';
+import NftDetailScreen from '@screens/nftDetail';
 import Setting from '@screens/settings';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import ChangePasswordScreen from '@screens/settings/changePassword';
@@ -28,6 +30,10 @@ import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import BackupWalletScreen from '@screens/settings/backupWallet';
 import SendFtScreen from '@screens/sendFt';
 import ConfirmFtTransaction from '@screens/confirmFtTransaction';
+import Buy from '@screens/buy';
+import SendNft from '@screens/sendNft';
+import ConfirmNftTransaction from '@screens/confirmNftTransaction';
+import ExtendedScreenContainer from '@components/extendedScreenContainer';
 
 const router = createHashRouter([
   {
@@ -79,6 +85,10 @@ const router = createHashRouter([
         element: <SendBtcScreen />,
       },
       {
+        path: 'nft-dashboard/nft-detail/:id/send-nft',
+        element: <SendNft />,
+      },
+      {
         path: 'confirm-stx-tx',
         element: <ConfirmStxTransaction />,
       },
@@ -123,8 +133,12 @@ const router = createHashRouter([
         element: <BackupWalletSteps />,
       },
       {
-        path: 'nft-dashboard',
-        element: <NftDashboard />,
+        path: 'stacking',
+        element: (
+          <AuthGuard>
+            <Stacking />
+          </AuthGuard>
+        ),
       },
       {
         path: 'settings',
@@ -145,6 +159,32 @@ const router = createHashRouter([
       {
         path: 'backup-wallet',
         element: <BackupWalletScreen />,
+      },
+      {
+        path: 'buy-stx/:currency',
+        element: <Buy />,
+      },
+      {
+        path: 'confirm-nft-tx/:id',
+        element: <ConfirmNftTransaction />,
+      },
+    ],
+  },
+  {
+    path: '/',
+    element: <ExtendedScreenContainer />,
+    children: [
+      {
+        path: 'nft-dashboard',
+        element: (
+          <AuthGuard>
+            <NftDashboard />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'nft-dashboard/nft-detail/:id',
+        element: <NftDetailScreen />,
       },
     ],
   },

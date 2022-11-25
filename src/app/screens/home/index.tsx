@@ -1,10 +1,11 @@
+/* eslint-disable no-await-in-loop */
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { fetchAppInfo, getBnsName } from '@secretkeylabs/xverse-core/api';
-import { FeesMultipliers, FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { Account, FeesMultipliers, FungibleToken } from '@secretkeylabs/xverse-core/types';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
@@ -12,7 +13,6 @@ import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import TokenTile from '@components/tokenTile';
-import AccountRow from '@components/accountRow';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
@@ -23,11 +23,13 @@ import {
   FetchFeeMultiplierAction,
   fetchRatesAction,
   fetchStxWalletDataRequestAction,
+  getActiveAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
 import BottomBar from '@components/tabBar';
 import { StoreState } from '@stores/index';
-import { Account } from '@stores/wallet/actions/types';
 import Seperator from '@components/seperator';
+import AccountHeaderComponent from '@components/accountHeader';
+import { getActiveAccountList } from '@secretkeylabs/xverse-core/account';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -47,7 +49,7 @@ const ColumnContainer = styled.div((props) => ({
   flexDirection: 'column',
   alignItems: 'space-between',
   justifyContent: 'space-between',
-  marginTop: props.theme.spacing(11),
+  marginTop: props.theme.spacing(12),
 }));
 
 const CoinContainer = styled.div({
@@ -55,6 +57,7 @@ const CoinContainer = styled.div({
   flexDirection: 'column',
   alignItems: 'space-between',
   justifyContent: 'space-between',
+  marginBottom: 35,
 });
 
 const Button = styled.button((props) => ({
@@ -64,7 +67,7 @@ const Button = styled.button((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
-  width: '100%',
+  opacity: 0.8,
   marginTop: props.theme.spacing(5),
 }));
 
@@ -84,23 +87,19 @@ const ButtonImage = styled.img((props) => ({
 const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'space-between',
   marginTop: props.theme.spacing(11),
 }));
 
-const ButtonContainer = styled.div({
-  flex: 0.31,
-});
-
-const SelectedAccountContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+const ButtonContainer = styled.div((props) => ({
+  width: '100%',
+  marginRight: props.theme.spacing(5),
 }));
 
 const TokenListButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginTop: props.theme.spacing(4),
+  justifyContent: 'flex-end',
+  marginTop: props.theme.spacing(12),
 }));
 
 const TestnetContainer = styled.div((props) => ({
@@ -124,6 +123,7 @@ function Home() {
   const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
+  const [openBuyModal, setOpenBuyModal] = useState(false);
   const [list, setList] = useState<FungibleToken[]>([]);
   const {
     stxAddress,
@@ -140,6 +140,7 @@ function Home() {
     coinsList,
     loadingWalletData,
     loadingBtcData,
+    seedPhrase,
   } = useSelector((state: StoreState) => state.walletState);
 
   const fetchFeeMultiplierData = async () => {
@@ -162,6 +163,8 @@ function Home() {
         },
       ];
       dispatch(fetchAccountAction(accounts[0], accounts));
+      const response = await getActiveAccountList(seedPhrase, network, accounts[0]);
+      dispatch(getActiveAccountsAction(response));
     } else {
       selectedAccount!.bnsName = bnsName;
       const account = accountsList.find((accountInArray) => accountInArray.stxAddress === selectedAccount?.stxAddress);
@@ -206,8 +209,12 @@ function Home() {
     setOpenSendModal(false);
   };
 
-  const handleAccountSelect = () => {
-    navigate('/account-list');
+  const onBuyModalOpen = () => {
+    setOpenBuyModal(true);
+  };
+
+  const onBuyModalClose = () => {
+    setOpenBuyModal(false);
   };
 
   function getCoinsList() {
@@ -242,21 +249,23 @@ function Home() {
     });
   };
 
+  const onBuyStxClick = () => {
+    navigate('/buy-stx/STX');
+  };
+
+  const onBuyBtcClick = () => {
+    navigate('/buy-stx/BTC');
+  };
+
   return (
     <>
-      { network.type === 'Testnet'
-    && (
-    <TestnetContainer>
-      <TestnetText>
-        {t('TESTNET')}
-      </TestnetText>
-    </TestnetContainer>
-    )}
-      <SelectedAccountContainer>
-        <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
-      </SelectedAccountContainer>
+      {network.type === 'Testnet' && (
+        <TestnetContainer>
+          <TestnetText>{t('TESTNET')}</TestnetText>
+        </TestnetContainer>
+      )}
+      <AccountHeaderComponent />
       <Seperator />
-
       <Container>
         <BalanceCard />
         <RowButtonContainer>
@@ -267,7 +276,7 @@ function Home() {
             <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ButtonContainer>
           <ButtonContainer>
-            <ActionButton src={CreditCard} text={t('BUY')} onPress={onReceiveModalOpen} />
+            <ActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
           </ButtonContainer>
         </RowButtonContainer>
 
@@ -300,7 +309,6 @@ function Home() {
         <CoinContainer>
           {list.map((coin) => (
             <TokenTile
-              key={coin.name.toString()}
               title={coin.name}
               currency="FT"
               loading={loadingWalletData}
@@ -327,6 +335,16 @@ function Home() {
           visible={openSendModal}
           coins={getCoinsList()}
           title={t('SEND')}
+        />
+
+        <CoinSelectModal
+          onSelectBitcoin={onBuyBtcClick}
+          onSelectStacks={onBuyStxClick}
+          onClose={onBuyModalClose}
+          onSelectCoin={(onBuyModalClose)}
+          visible={openBuyModal}
+          coins={[]}
+          title={t('BUY')}
         />
       </Container>
       <BottomBar tab="dashboard" />

@@ -53,7 +53,6 @@ function ConfirmStxTransaction() {
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
-
   const {
     isLoading,
     error: txError,
@@ -62,7 +61,7 @@ function ConfirmStxTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network));
+  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network.type));
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -154,7 +153,6 @@ function ConfirmStxTransaction() {
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
-        token="STX"
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
       >
