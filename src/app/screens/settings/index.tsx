@@ -36,8 +36,9 @@ const ResetWalletContainer = styled.div((props) => ({
   zIndex: 10,
   background: 'rgba(25, 25, 48, 0.5)',
   backdropFilter: 'blur(16px)',
-  padding: 16,
-  paddingTop: props.theme.spacing(30),
+  paddingLeft: 16,
+  paddingRight: 16,
+  paddingTop: props.theme.spacing(50),
 }));
 
 const LogoContainer = styled.div((props) => ({
@@ -117,8 +118,8 @@ function Setting() {
   };
 
   return (
-
-    showResetWalletDisplay ? (
+    <>
+      { showResetWalletDisplay && (
       <ResetWalletContainer>
         <PasswordInput
           title={t('ENTER_PASSWORD')}
@@ -131,67 +132,65 @@ function Setting() {
           stackButtonAlignment
         />
       </ResetWalletContainer>
-    ) : (
-      <>
-        <LogoContainer>
-          <img src={XverseLogo} alt="xverse logo" />
-        </LogoContainer>
-        <Container>
-          <SettingComponent
-            title={t('GENERAL')}
-            text={t('CURRENCY')}
-            onClick={openFiatCurrencyScreen}
-            textDetail={fiatCurrency}
-            showDivider
-          />
-          <SettingComponent
-            text={t('NETWORK')}
-            onClick={openChangeNetworkScreen}
-            textDetail={network.type}
-          />
-          <SettingComponent
-            title={t('SECURITY')}
-            text={t('UPDATE_PASSWORD')}
-            onClick={openUpdatePasswordScreen}
-            icon={ArrowIcon}
-            showDivider
-          />
-          <SettingComponent
-            text={t('BACKUP_WALLET')}
-            onClick={openBackUpWalletScreen}
-            icon={ArrowIcon}
-            showDivider
-          />
-          <SettingComponent
-            text={t('RESET_WALLET')}
-            onClick={openResetWalletPrompt}
-            showWarningTitle
-          />
-          <SettingComponent
-            title={t('ABOUT')}
-            text={t('TERMS_OF_SERVICE')}
-            onClick={openTermsOfService}
-            icon={ArrowSquareOut}
-            showDivider
-          />
-          <SettingComponent
-            text={t('PRIVACY_POLICY')}
-            onClick={openPrivacyPolicy}
-            icon={ArrowSquareOut}
-            showDivider
-          />
-          <SettingComponent
-            text={t('SUPPORT_CENTER')}
-            onClick={openSupport}
-            icon={ArrowSquareOut}
-            showDivider
-          />
-          <SettingComponent text={t('VERSION')} textDetail={VERSION} />
-          <ResetWalletPrompt showResetWalletPrompt={showResetWalletPrompt} onResetWalletPromptClose={onResetWalletPromptClose} openResetWalletScreen={openResetWalletScreen} />
-        </Container>
-        <BottomBar tab="settings" />
-      </>
-    )
+      )}
+      <LogoContainer>
+        <img src={XverseLogo} alt="xverse logo" />
+      </LogoContainer>
+      <Container>
+        <SettingComponent
+          title={t('GENERAL')}
+          text={t('CURRENCY')}
+          onClick={openFiatCurrencyScreen}
+          textDetail={fiatCurrency}
+          showDivider
+        />
+        <SettingComponent
+          text={t('NETWORK')}
+          onClick={openChangeNetworkScreen}
+          textDetail={network.type}
+        />
+        <SettingComponent
+          title={t('SECURITY')}
+          text={t('UPDATE_PASSWORD')}
+          onClick={openUpdatePasswordScreen}
+          icon={ArrowIcon}
+          showDivider
+        />
+        <SettingComponent
+          text={t('BACKUP_WALLET')}
+          onClick={openBackUpWalletScreen}
+          icon={ArrowIcon}
+          showDivider
+        />
+        <SettingComponent
+          text={t('RESET_WALLET')}
+          onClick={openResetWalletPrompt}
+          showWarningTitle
+        />
+        <SettingComponent
+          title={t('ABOUT')}
+          text={t('TERMS_OF_SERVICE')}
+          onClick={openTermsOfService}
+          icon={ArrowSquareOut}
+          showDivider
+        />
+        <SettingComponent
+          text={t('PRIVACY_POLICY')}
+          onClick={openPrivacyPolicy}
+          icon={ArrowSquareOut}
+          showDivider
+        />
+        <SettingComponent
+          text={t('SUPPORT_CENTER')}
+          onClick={openSupport}
+          icon={ArrowSquareOut}
+          showDivider
+        />
+        <SettingComponent text={t('VERSION')} textDetail={VERSION} />
+        <ResetWalletPrompt showResetWalletPrompt={showResetWalletPrompt} onResetWalletPromptClose={onResetWalletPromptClose} openResetWalletScreen={openResetWalletScreen} />
+      </Container>
+      <BottomBar tab="settings" />
+    </>
   );
 }
 

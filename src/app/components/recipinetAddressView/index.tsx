@@ -14,8 +14,6 @@ const InfoContainer = styled.div((props) => ({
 const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
 });
 
 const TitleText = styled.h1((props) => ({
@@ -30,17 +28,21 @@ const ValueText = styled.h1((props) => ({
   wordBreak: 'break-all',
 }));
 
+const AssociatedAddressText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  marginTop: props.theme.spacing(2),
+  wordBreak: 'break-all',
+  color: props.theme.colors.white['400'],
+}));
+
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
+  marginTop: props.theme.spacing(1),
 }));
 
 const ActionButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
   backgroundColor: 'transparent',
   marginLeft: props.theme.spacing(12),
 }));
@@ -61,7 +63,7 @@ function RecipientAddressView({ recipient }: Props) {
       <TitleText>{t('RECEPIENT_ADDRESS')}</TitleText>
       <ValueText>{bnsName}</ValueText>
       <RowContainer>
-        <ValueText>{recipient}</ValueText>
+        {bnsName ? <AssociatedAddressText>{recipient}</AssociatedAddressText> : <ValueText>{recipient}</ValueText>}
         <ActionButton onClick={handleOnPress}>
           <ButtonImage src={ArrowSquareOut} />
         </ActionButton>

@@ -10,32 +10,37 @@ import useStackingData from '@hooks/useStackingData';
 import { XVERSE_WEB_POOL_URL } from '@utils/constants';
 import StackingInfoTile from './stackInfoTile';
 
+const OuterContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+});
+
 const Container = styled.div((props) => ({
-  margin: props.theme.spacing(8),
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(12),
   borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
-  borderTop: `1px solid ${props.theme.colors.background.elevation3}`,
 }));
 
 const StackingInfoContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(30),
   display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
+  flexDirection: 'row',
+  alignItems: 'space-between',
 }));
 
 const ButtonContainer = styled.div((props) => ({
-  margin: props.theme.spacing(8),
-
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(16),
 }));
 
-const RowContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(12),
+const ColumnContainer = styled.div({
   display: 'flex',
-  flexDirection: 'row',
+  flexDirection: 'column',
   flex: 1,
-  justifyContent: 'space-between',
-}));
+});
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
@@ -84,20 +89,23 @@ function StartStacking() {
 
   return (
     <>
-      <Container>
-        <TitleText>{t('STACK_AND_EARN')}</TitleText>
-        <StackingDescriptionText>{t('STACKING_INFO')}</StackingDescriptionText>
-      </Container>
-      <StackingInfoContainer>
-        <RowContainer>
-          <StackingInfoTile title={t('APY')} value={pool ? `${pool?.estimated_yield}%` : undefined} />
-          <StackingInfoTile title={t('POOL_FEE')} value={pool ? `${pool?.fee_percent}%` : undefined} color={theme.colors.feedback.success} />
-        </RowContainer>
-        <RowContainer>
-          <StackingInfoTile title={t('MINIMUM_AMOUNT')} value={`${getMinimum()} STX`} />
-          <StackingInfoTile title={t('REWARD_CYCLES')} value={`${getCycles()}`} />
-        </RowContainer>
-      </StackingInfoContainer>
+      <OuterContainer>
+        <Container>
+          <TitleText>{t('STACK_AND_EARN')}</TitleText>
+          <StackingDescriptionText>{t('STACKING_INFO')}</StackingDescriptionText>
+        </Container>
+        <StackingInfoContainer>
+          <ColumnContainer>
+            <StackingInfoTile title={t('APY')} value={pool ? `${pool?.estimated_yield}%` : undefined} />
+            <StackingInfoTile title={t('MINIMUM_AMOUNT')} value={`${getMinimum()} STX`} />
+          </ColumnContainer>
+          <ColumnContainer>
+            <StackingInfoTile title={t('POOL_FEE')} value={pool ? `${pool?.fee_percent}%` : undefined} color={theme.colors.feedback.success} />
+            <StackingInfoTile title={t('REWARD_CYCLES')} value={`${getCycles()}`} />
+          </ColumnContainer>
+        </StackingInfoContainer>
+      </OuterContainer>
+
       <ButtonContainer>
         <ActionButton src={ArrowSquareOut} text={t('START_STACKNG')} onPress={handleOnClick} />
       </ButtonContainer>
