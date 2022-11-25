@@ -11,7 +11,7 @@ import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/useStxPendingTxData';
 import { StoreState } from '@stores/index';
 import {
-  convertToDecimals, ftDecimals, replaceCommaByDot,
+  convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot,
 } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 
@@ -37,10 +37,7 @@ function SendFtScreen() {
   >(async ({ associatedAddress, amount, memo }) => {
     let convertedAmount = amount;
     if (fungibleToken?.decimals) {
-      convertedAmount = convertToDecimals(
-        amount,
-        fungibleToken.decimals,
-      ).toString();
+      convertedAmount = convertAmountToFtDecimalPlaces(amount, fungibleToken.decimals).toString();
     }
     setAmountToSend(convertedAmount);
     setTxMemo(memo);
@@ -59,9 +56,7 @@ function SendFtScreen() {
       pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
       memo,
     };
-    const unsignedTx: StacksTransaction = await generateUnsignedTransaction(
-      unsginedTx,
-    );
+    const unsignedTx: StacksTransaction = await generateUnsignedTransaction(unsginedTx);
 
     const fee: bigint = BigInt(unsignedTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
     if (feeMultipliers?.stxSendTxMultiplier) {
