@@ -98,34 +98,3 @@ export async function isValidURL(str: string): Promise<boolean> {
   }
   return false;
 }
-
-export function getFiatEquivalent(value: number, currencyType:string, stxBtcRate: BigNumber, btcFiatRate: BigNumber, fungibleToken?: FungibleToken) {
-  if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
-    return '';
-  }
-  if (!value) return '0';
-  switch (currencyType) {
-    case 'STX':
-      return getStxFiatEquivalent(
-        stxToMicrostacks(new BigNumber(value)),
-        new BigNumber(stxBtcRate),
-        new BigNumber(btcFiatRate),
-      )
-        .toFixed(2)
-        .toString();
-    case 'BTC':
-      return getBtcFiatEquivalent(btcToSats(new BigNumber(value)), new BigNumber(btcFiatRate))
-        .toFixed(2)
-        .toString();
-    case 'FT':
-      if (fungibleToken?.tokenFiatRate) {
-        return new BigNumber(value)
-          .multipliedBy(fungibleToken.tokenFiatRate)
-          .toFixed(2)
-          .toString();
-      }
-      break;
-    default:
-      return '';
-  }
-}

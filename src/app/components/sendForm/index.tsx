@@ -8,16 +8,14 @@ import {
 import IconBitcoin from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import InfoIcon from '@assets/img/send/info.svg';
-import { getFiatEquivalent, getTicker } from '@utils/helper';
+import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
 import Info from '@assets/img/info.svg';
 import ActionButton from '@components/button';
-import {
-  btcToSats, getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
-} from '@secretkeylabs/xverse-core/currency';
 import { useNavigate } from 'react-router-dom';
 import { useBNSResolver, useDebounce } from '@hooks/useBnsName';
+import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 
 const ScrollContainer = styled.div`
   display: flex;
