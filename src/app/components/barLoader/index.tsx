@@ -41,7 +41,7 @@ function BarLoader({ loaderSize }: Props) {
       case LoaderSize.SMALL:
         return 5;
       case LoaderSize.MEDIUM:
-        return 5;
+        return 10;
       case LoaderSize.LARGE:
         return 15;
       default:

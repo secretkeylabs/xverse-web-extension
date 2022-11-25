@@ -38,6 +38,10 @@ const NFtContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
+const SendFormContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(10.5),
+}));
+
 const NftTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white['0'],
@@ -52,6 +56,7 @@ function SendNft() {
   const nftIdDetails = id!.split('::');
   const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
   const { data: stxPendingTxData } = useStxPendingTxData();
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const {
     stxAddress,
     stxPublicKey,
@@ -147,23 +152,26 @@ function SendNft() {
   return (
     <>
       <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />
-      <SendForm
-        processing={isLoading}
-        currencyType="NFT"
-        disableAmountInput
-        error={error}
-        onPressSend={onPressSendNFT}
-      >
-        <Container>
-          <NFtContainer>
-            <NftImage
-              metadata={nft?.token_metadata!}
-            />
-          </NFtContainer>
-          <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
-        </Container>
-      </SendForm>
-      <BottomBar tab="dashboard" />
+      <SendFormContainer>
+        <SendForm
+          processing={isLoading}
+          currencyType="NFT"
+          disableAmountInput
+          error={error}
+          onPressSend={onPressSendNFT}
+        >
+          <Container>
+            <NFtContainer>
+              <NftImage
+                metadata={nft?.token_metadata!}
+              />
+            </NFtContainer>
+            <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+          </Container>
+        </SendForm>
+      </SendFormContainer>
+
+      {!isGalleryOpen && <BottomBar tab="nft" />}
     </>
   );
 }

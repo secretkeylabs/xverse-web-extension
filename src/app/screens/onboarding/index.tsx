@@ -8,6 +8,16 @@ import { useNavigate } from 'react-router-dom';
 import { getIsTermsAccepted, saveHasFinishedOnboarding } from '@utils/localStorage';
 import Steps from '@components/steps';
 
+const Container = styled.div`
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  flex-direction: column;
+  flex: 1;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 const StepsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(10),
 }));
@@ -132,10 +142,11 @@ function Onboarding(): JSX.Element {
   };
 
   return (
-    <>
+    <Container>
       <StepsContainer>
         <Steps data={onboardingViews} activeIndex={currentStepIndex} />
       </StepsContainer>
+
       <OnBoardingImage
         src={onboardingViews[currentStepIndex].image}
         alt="onboarding"
@@ -159,7 +170,7 @@ function Onboarding(): JSX.Element {
           </OnBoardingNextButton>
         </OnBoardingActionsContainer>
       )}
-    </>
+    </Container>
   );
 }
 

@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
-import AccountRow from '@components/accountRow';
 import Seperator from '@components/seperator';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
+import AccountHeaderComponent from '@components/accountHeader';
 import Nft from './nft';
 
 const Container = styled.div`
@@ -24,7 +24,6 @@ const Container = styled.div`
   flex: 1;
   margin-left: 5%;
   margin-right: 5%;
-  margin-bottom: 5%;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
@@ -48,11 +47,6 @@ const WebGalleryButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.spacing(4),
-}));
-
-const SelectedAccountContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
 }));
 
 const CollectibleContainer = styled.div((props) => ({
@@ -107,11 +101,19 @@ const ButtonImage = styled.img((props) => ({
 }));
 
 const BottomBarContainer = styled.div({
-  marginTop: 'auto',
+  marginTop: '5%',
 });
 
 const CollectiblesHeadingText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
+  color: props.theme.colors.white['200'],
+  textTransform: 'uppercase',
+  letterSpacing: '0.02em',
+  opacity: 0.7,
+}));
+
+const GalleryCollectiblesHeadingText = styled.h1((props) => ({
+  ...props.theme.headline_category_m,
   color: props.theme.colors.white['200'],
   textTransform: 'uppercase',
   letterSpacing: '0.02em',
@@ -139,7 +141,7 @@ function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const offset = useRef(0);
-  const { selectedAccount, stxAddress, network } = useWalletSelector();
+  const { stxAddress, network } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const {
     isLoading, data,
@@ -147,10 +149,7 @@ function NftDashboard() {
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
     async () => getNftsData(stxAddress, network, offset.current),
   );
-
-  const handleAccountSelect = () => {
-    navigate('/account-list');
-  };
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
@@ -186,19 +185,18 @@ function NftDashboard() {
 
   return (
     <>
-      <SelectedAccountContainer>
-        <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
-      </SelectedAccountContainer>
+      <AccountHeaderComponent isNftGalleryOpen={isGalleryOpen} />
       <Seperator />
       <Container>
         <CollectibleContainer>
-          <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>
+          {isGalleryOpen ? <GalleryCollectiblesHeadingText>{t('COLLECTIBLES')}</GalleryCollectiblesHeadingText> : <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>}
           {isLoading ? (
             <BarLoaderContainer>
               <BarLoader loaderSize={LoaderSize.LARGE} />
             </BarLoaderContainer>
           )
             : <CollectiblesValueText>{`${data?.total} ${t('ITEMS')}`}</CollectiblesValueText>}
+          {!isGalleryOpen && (
           <WebGalleryButtonContainer>
             <WebGalleryButton onClick={openInGalleryView}>
               <>
@@ -207,6 +205,7 @@ function NftDashboard() {
               </>
             </WebGalleryButton>
           </WebGalleryButtonContainer>
+          )}
         </CollectibleContainer>
         <ButtonContainer>
           <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
@@ -229,9 +228,11 @@ function NftDashboard() {
         ) : nftListView}
       </Container>
 
+      {!isGalleryOpen && (
       <BottomBarContainer>
         <BottomTabBar tab="nft" />
       </BottomBarContainer>
+      )}
     </>
   );
 }

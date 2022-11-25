@@ -47,11 +47,14 @@
     "BALANCE": "Balance",
     "RECEPIENT": "Recipient",
     "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
+    "BTC_RECEPIENT_PLACEHOLDER": "Address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
+    "NO_FUNDS":"You don’t have any fund to send.",
+    "BUY_CRYPTO": "Buy crypto →",
     "ERRORS": {
       "ADDRESS_REQUIRED": "Recipient address is required",
       "AMOUNT_REQUIRED": "Amount is required",
@@ -146,7 +149,10 @@
   "WALLET_SUCCESS_SCREEN": {
     "SCREEN_TITLE": "Wallet created successfully",
     "SCREEN_SUBTITLE": "Your new wallet has been created successfully, you can now connect to your wallet.",
-    "OPEN_WALLET_BUTTON": "Open Wallet"
+    "CLOSE_TAB": "Close this tab",
+    "CLICK": "Click",
+    "THEN": "then",
+    "OPEN_WALLET":"to open your wallet"
   },
   "LOGIN_SCREEN": {
     "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",
@@ -251,5 +257,19 @@
     "RESET": "Reset",
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+  },
+  "OPTIONS_DIALOG":{
+    "SWITCH_ACCOUNT": "Switch Account",
+    "LOCK": "Lock",
+    "RESET_WALLET": "Reset Wallet"
+  },
+  "BUY_SCREEN":{
+    "BUY": "Buy",
+    "PURCHASE_CRYPTO": "Purchase crypto quickly and deposit directly into your Xverse wallet.",
+    "MOONPAY": "Buy on Moonpay",
+    "BINANCE": "Buy on Binance",
+    "TRANSAK": "Buy on Transak",
+    "DISCLAIMER": "Disclaimer",
+    "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider."
   }
 }

@@ -24,6 +24,7 @@ const SeedContainer = styled.div<SeedContainerProps>((props) => ({
   margin: 0,
   columnGap: props.theme.spacing(3),
   paddingBottom: props.theme.spacing(17),
+  paddingLeft: props.theme.spacing(5),
   filter: `blur(${props.isVisible ? 0 : '3px'})`,
 }));
 

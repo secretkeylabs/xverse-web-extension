@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { Ring } from 'react-spinners-css';
 import useWalletReducer from '@hooks/useWalletReducer';
 
+declare const VERSION: string;
+
 const ScreenContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -132,7 +134,7 @@ function Login(): JSX.Element {
 
   return (
     <ScreenContainer>
-      <AppVersion>V 1.0.0</AppVersion>
+      <AppVersion>{VERSION}</AppVersion>
       <TopSectionContainer>
         <img src={logo} width={100} alt="logo" />
         <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>

@@ -9,6 +9,13 @@ export const BTC_TRANSACTION_STATUS_URL = 'https://www.blockchain.com/btc/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
 
+export const TRANSAC_URL = 'https://global.transak.com';
+export const TRANSAC_API_KEY = '8636faeb-2dd7-41e3-986e-b99db6f63903';
+export const MOON_PAY_URL = 'https://buy.moonpay.com';
+export const MOON_PAY_API_KEY = 'pk_live_8YeOjOzFqHUG1qi2G6NPA4N1tZAWFihK';
+export const BINANCE_URL = 'https://www.binancecnt.com/en/pre-connect';
+export const BINANCE_MERCHANT_CODE = 'secret_key_labs';
+
 export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT';
 export enum LoaderSize {
   SMALLEST,

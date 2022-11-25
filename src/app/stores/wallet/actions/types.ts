@@ -7,6 +7,7 @@ import {
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
+  Account,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 
@@ -22,6 +23,7 @@ export const AddAccountKey = 'AddAccount';
 export const FetchFeeMultiplierKey = 'FetchFeeMultiplier';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
+export const GetActiveAccountsKey = 'GetActiveAccounts';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
@@ -38,17 +40,6 @@ export const FetchRatesFailureKey = 'FetchRatesFailure';
 export const FetchCoinDataRequestKey = 'FetchCoinDataRequest';
 export const FetchCoinDataSuccessKey = 'FetchCoinDataSuccess';
 export const FetchCoinDataFailureKey = 'FetchCoinDataFailure';
-
-export interface Account {
-  id: number;
-  stxAddress: string;
-  btcAddress: string;
-  masterPubKey: string;
-  stxPublicKey: string;
-  btcPublicKey: string;
-  bnsName?: string;
-}
-
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
@@ -222,6 +213,11 @@ export interface ChangeNetwork {
   network: SettingsNetwork;
 }
 
+export interface GetActiveAccounts {
+  type: typeof GetActiveAccountsKey;
+  accountsList: Account[];
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -246,4 +242,5 @@ export type WalletActions =
   | FetchCoinDataFailure
   | UpdateVisibleCoinList
   | ChangeFiatCurrency
-  | ChangeNetwork;
+  | ChangeNetwork
+  | GetActiveAccounts;

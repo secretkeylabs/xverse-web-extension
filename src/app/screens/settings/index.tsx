@@ -11,7 +11,7 @@ import { useState } from 'react';
 import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
 import SettingComponent from './settingComponent';
-import ResetWalletPrompt from './resetWallet';
+import ResetWalletPrompt from '../../components/resetWallet';
 
 declare const VERSION: string;
 
@@ -20,15 +20,12 @@ const Container = styled.div`
   flex-direction: column;
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 16px;
   &::-webkit-scrollbar {
     display: none;
   }
 `;
 
 const ResetWalletContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
   width: '100%',
   height: '100%',
   top: 0,
@@ -39,11 +36,9 @@ const ResetWalletContainer = styled.div((props) => ({
   zIndex: 10,
   background: 'rgba(25, 25, 48, 0.5)',
   backdropFilter: 'blur(16px)',
+  paddingLeft: 16,
+  paddingRight: 16,
   paddingTop: props.theme.spacing(50),
-  paddingBottom: props.theme.spacing(20),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-
 }));
 
 const LogoContainer = styled.div((props) => ({
