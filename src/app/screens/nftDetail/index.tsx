@@ -35,6 +35,11 @@ margin-right: 5%;
   display: none;
 }`;
 
+const ReceiveButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(3),
+  width: '100%',
+}));
+
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   position: 'relative',
@@ -72,8 +77,6 @@ const NFtContainer = styled.div((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
-  padding: props.theme.spacing(5),
-  marginTop: props.theme.spacing(15),
   marginBottom: props.theme.spacing(12),
 }));
 
@@ -129,7 +132,7 @@ const GridContainer = styled.div((props) => ({
 }));
 
 const ShareButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(2),
+  marginLeft: props.theme.spacing(3),
   width: '100%',
 }));
 
@@ -151,31 +154,26 @@ const AttributeText = styled.h1((props) => ({
 const WebGalleryButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'flex-start',
+  justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(5),
+  marginTop: props.theme.spacing(8),
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white['200'],
   textAlign: 'center',
+
 }));
 
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
   alignSelf: 'center',
   transform: 'all',
-}));
-
-const WebGalleryButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginTop: props.theme.spacing(4),
 }));
 
 const Button = styled.button((props) => ({
@@ -215,7 +213,6 @@ function NftDetailScreen() {
   const { nftData } = useNftDataSelector();
   const { storeNftData } = useNftDataReducer();
   const [nft, setNft] = useState<NftData | undefined>(undefined);
-
   const {
     isLoading,
     data: nftDetailsData,
@@ -236,7 +233,7 @@ function NftDetailScreen() {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   useEffect(() => {
-    const data = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
+    const data = nftData.find((nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)));
     if (!data) {
       mutate({ principal: nftIdDetails[0] });
     } else {
@@ -246,7 +243,7 @@ function NftDetailScreen() {
 
   useEffect(() => {
     if (nftDetailsData) {
-      storeNftData(nftDetailsData);
+      storeNftData(nftDetailsData.data);
       setNft(nftDetailsData?.data);
     }
   }, [nftDetailsData]);
@@ -312,18 +309,17 @@ function NftDetailScreen() {
         {nftImage}
         <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
         {ownedByView}
-
-        <WebGalleryButtonContainer>
-          <WebGalleryButton onClick={openInGalleryView}>
-            <>
-              <ButtonImage src={SquaresFour} />
-              <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
-            </>
-          </WebGalleryButton>
-        </WebGalleryButtonContainer>
+        <WebGalleryButton onClick={openInGalleryView}>
+          <>
+            <ButtonImage src={SquaresFour} />
+            <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
+          </>
+        </WebGalleryButton>
       </ExtensionContainer>
       <ButtonContainer>
-        <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+        <ReceiveButtonContainer>
+          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+        </ReceiveButtonContainer>
         <ShareButtonContainer>
           <ActionButton
             src={ShareNetwork}
@@ -348,7 +344,10 @@ function NftDetailScreen() {
       <Container>
         <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
         <ButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+          <ReceiveButtonContainer>
+            <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+          </ReceiveButtonContainer>
+
           <ShareButtonContainer>
             <ActionButton
               src={ShareNetwork}

@@ -16,6 +16,17 @@ import BottomBar from '@components/tabBar';
 import { checkNftExists } from '@utils/helper';
 import NftImage from '@screens/nftDashboard/nftImage';
 import useNftDataSelector from '@hooks/useNftDataSelector';
+import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+
+const ScrollContainer = styled.div`
+  display: flex;
+  flex:1;
+  flex-direction: column;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 const Container = styled.div({
   display: 'flex',
@@ -54,7 +65,15 @@ function SendNft() {
   const { id } = useParams();
   const { nftData } = useNftDataSelector();
   const nftIdDetails = id!.split('::');
-  const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
+  const [nft, setNft] = useState<NftData | undefined>(undefined);
+
+  useEffect(() => {
+    const data = nftData.find((nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)));
+    if (data) {
+      setNft(data);
+    }
+  }, []);
+
   const { data: stxPendingTxData } = useStxPendingTxData();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const {
@@ -150,7 +169,7 @@ function SendNft() {
     }
   };
   return (
-    <>
+    <ScrollContainer>
       <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />
       <SendFormContainer>
         <SendForm
@@ -166,13 +185,13 @@ function SendNft() {
                 metadata={nft?.token_metadata!}
               />
             </NFtContainer>
-            <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+            <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
           </Container>
         </SendForm>
       </SendFormContainer>
 
       {!isGalleryOpen && <BottomBar tab="nft" />}
-    </>
+    </ScrollContainer>
   );
 }
 

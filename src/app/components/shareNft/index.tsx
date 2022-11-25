@@ -18,7 +18,7 @@ const Container = styled.button((props) => ({
   paddingRight: props.theme.spacing(8),
   paddingTop: props.theme.spacing(8),
   paddingBottom: props.theme.spacing(8),
-  borderRadius: props.theme.radius(6),
+  borderRadius: 12,
   width: 260,
   background: props.theme.colors.background.elevation2,
 }));

@@ -1,6 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { getNftDetail } from '@secretkeylabs/xverse-core/api';
 import { NonFungibleToken, getBnsNftName } from '@secretkeylabs/xverse-core/types/index';
 import { BNS_CONTRACT } from '@utils/constants';
 import NftUser from '@assets/img/nftDashboard/nft_user.svg';
@@ -14,52 +12,49 @@ interface Props {
 
 const NftNameText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  marginTop: 'auto',
+  textAlign: 'flex-start',
 }));
 
-const GradientContainer = styled.div((props) => ({
-  objectFit: 'cover',
+const NftNameTextContainer = styled.h1((props) => ({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'flex-start',
+  marginTop: props.theme.spacing(4),
+}));
+
+const GradientContainer = styled.div({
   display: 'flex',
   width: '100%',
   height: '100%',
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
-  marginBottom: props.theme.spacing(4),
   background: 'linear-gradient(to bottom,#E5A78E, #EA603E, #4D52EF)',
-}));
+});
 
-const GridItemContainer = styled.button((props) => ({
+interface GridContainerProps {
+  showBorder: boolean;
+}
+
+const GridItemContainer = styled.button<GridContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
   color: props.theme.colors.white['0'],
-  padding: props.theme.spacing(7),
+  padding: props.showBorder ? props.theme.spacing(7) : 0,
+  marginBottom: props.theme.spacing(16),
   borderRadius: props.theme.radius(3),
-  background: 'linear-gradient(27.88deg, #1D2032 0%, rgba(29, 32, 50, 0) 100%)',
-  border: ` 1px solid ${props.theme.colors.background.elevation2}`,
+  background: props.showBorder ? 'linear-gradient(27.88deg, #1D2032 0%, rgba(29, 32, 50, 0) 100%)' : 'transparent',
+  border: props.showBorder ? ` 1px solid ${props.theme.colors.background.elevation2}` : 'transparent',
 }));
 
 function Nft({ asset }: Props) {
   const navigate = useNavigate();
   const { storeNftData } = useNftDataReducer();
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const url = `${asset.asset_identifier}::${asset.value.repr}`;
-  const { data } = useQuery(
-    ['nft-meta-data', asset.asset_identifier],
-    async () => {
-      const principal: string[] = asset.asset_identifier.split('::');
-      const contractInfo: string[] = principal[0].split('.');
-      return getNftDetail(
-        asset.value.repr.replace('u', ''),
-        contractInfo[0],
-        contractInfo[1],
-      );
-    },
-  );
 
   function getName() {
-    if (data?.data.token_metadata) return `${data?.data.token_metadata.name} `;
+    if (asset?.data?.token_metadata) return `${asset?.data.token_metadata.name} `;
 
     if (asset.asset_identifier === BNS_CONTRACT) {
       return getBnsNftName(asset);
@@ -67,24 +62,28 @@ function Nft({ asset }: Props) {
   }
 
   const handleOnClick = () => {
-    storeNftData(data);
+    storeNftData(asset?.data!);
     if (asset.asset_identifier !== BNS_CONTRACT) {
       navigate(`nft-detail/${url}`);
     }
   };
 
   return (
-    <GridItemContainer onClick={handleOnClick}>
+    <GridItemContainer onClick={handleOnClick} showBorder={isGalleryOpen}>
       {asset.asset_identifier === BNS_CONTRACT ? (
         <GradientContainer>
           <img src={NftUser} alt="user" />
         </GradientContainer>
+
       ) : (
         <NftImage
-          metadata={data?.data.token_metadata}
+          metadata={asset?.data?.token_metadata!}
         />
       )}
-      <NftNameText>{getName()}</NftNameText>
+      <NftNameTextContainer>
+        <NftNameText>{getName()}</NftNameText>
+      </NftNameTextContainer>
+
     </GridItemContainer>
   );
 }
