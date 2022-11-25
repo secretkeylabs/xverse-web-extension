@@ -28,7 +28,8 @@ const ButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(20),
+  marginTop: props.theme.spacing(24),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -40,17 +41,15 @@ const TransparentButtonContainer = styled.div((props) => ({
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'flex-end',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(5),
+  marginTop: props.theme.spacing(10),
 }));
 
 const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 700,
+  ...props.theme.body_medium_m,
   color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));

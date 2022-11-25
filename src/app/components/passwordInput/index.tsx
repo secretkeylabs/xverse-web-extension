@@ -34,18 +34,18 @@ const HeaderText = styled.h1((props) => ({
   marginTop: props.theme.spacing(15),
 }));
 
-const HeaderContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(32),
+const HeaderContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-}));
+});
 
 const PasswordInputContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  border: '1px solid #303354;',
+  border: '1px solid #303354',
+  backgroundColor: props.theme.colors.background.elevation0,
   borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(4),
   paddingRight: props.theme.spacing(4),
@@ -76,7 +76,6 @@ const ButtonsContainer = styled.div<ButtonContainerProps>((props) => ({
   display: 'flex',
   flexDirection: props.stackButtonAlignment ? 'column-reverse' : 'row',
   alignItems: props.stackButtonAlignment ? 'center' : 'flex-end',
-  justifyContent: 'space-between',
   flex: 1,
   marginTop: props.ifError ? props.theme.spacing(30) : props.theme.spacing(40),
   marginBottom: props.theme.spacing(8),

@@ -8,14 +8,12 @@ const BottomModalHeaderText = styled.h1((props) => ({
   flex: 1,
 }));
 
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'space-between',
-  marginLeft: props.theme.spacing(12),
-  marginRight: props.theme.spacing(12),
-  marginTop: props.theme.spacing(12),
-}));
+  margin: '24px 24px 20px 24px',
+});
 
 const ButtonImage = styled.button({
   backgroundColor: 'transparent',

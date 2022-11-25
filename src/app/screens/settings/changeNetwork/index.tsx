@@ -49,7 +49,7 @@ const InputContainer = styled.div((props) => ({
 const ButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(10),
+  marginBottom: props.theme.spacing(16),
 }));
 
 const ErrorMessage = styled.h2((props) => ({
@@ -116,7 +116,7 @@ function ChangeNetworkScreen() {
 
   return (
     <>
-      <TopRow title={t('CURRENCY')} onClick={handleBackButtonClick} />
+      <TopRow title={t('NETWORK')} onClick={handleBackButtonClick} />
       <Container>
         <NetworkRow
           network={initialNetworksList[0]}
@@ -134,7 +134,7 @@ function ChangeNetworkScreen() {
         <InputContainer>
           <Input onChange={onChange} value={url} />
           <Button onClick={onCrossClick}>
-            <img width={15} height={15} src={Cross} alt="cross" />
+            <img width={22} height={22} src={Cross} alt="cross" />
           </Button>
         </InputContainer>
         <ErrorMessage>

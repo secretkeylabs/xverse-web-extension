@@ -5,7 +5,6 @@ import styled from 'styled-components';
 
 const ResetWalletText = styled.h1((props) => ({
   ...props.theme.body_l,
-  textAlign: 'center',
   color: props.theme.colors.white['200'],
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
@@ -25,7 +24,7 @@ const ButtonContainer = styled.div((props) => ({
 
 const TransparentButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(2),
-  marginRight: props.theme.spacing(2),
+  marginRight: props.theme.spacing(6),
   width: '100%',
 }));
 

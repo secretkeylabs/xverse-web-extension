@@ -45,7 +45,7 @@
     "SEND": "Send",
     "AMOUNT": "Amount",
     "BALANCE": "Balance",
-    "RECEPIENT": "Recepient",
+    "RECEPIENT": "Recipient",
     "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
     "BTC_RECEPIENT_PLACEHOLDER": "Address",
     "MEMO": "Add a memo (optional)",

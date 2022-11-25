@@ -41,15 +41,14 @@ const SubText = styled.h1((props) => ({
 const DetailText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['200'],
-  fontSize: 12,
   marginTop: props.theme.spacing(8),
 }));
 
 const TickerImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
+  marginLeft: props.theme.spacing(5),
   alignSelf: 'center',
-  height: 23,
-  width: 26,
+  height: 24,
+  width: 24,
 }));
 
 const RowContainer = styled.div({
@@ -58,18 +57,25 @@ const RowContainer = styled.div({
   alignItems: 'center',
 });
 
-const SelectorContainer = styled.div((props) => ({
+const SelectorContainer = styled.div({
   display: 'flex',
   alignItems: 'flex-end',
+  width: 148,
   justifyContent: 'flex-end',
-  flex: 1,
-  marginLeft: props.theme.spacing(4),
-}));
+});
 
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(6),
+  marginTop: props.theme.spacing(8),
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
+}));
+
+const NonceContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  marginTop: props.theme.spacing(16),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
 }));
@@ -77,8 +83,8 @@ const Container = styled.div((props) => ({
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(10),
-  marginBottom: props.theme.spacing(10),
+  marginTop: props.theme.spacing(22),
+  marginBottom: props.theme.spacing(20),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
 }));
@@ -94,10 +100,6 @@ const InputField = styled.input((props) => ({
   color: props.theme.colors.white['400'],
   width: '100%',
   border: 'transparent',
-}));
-
-const InputFieldContainer = styled.div(() => ({
-  flex: 1,
 }));
 
 const InputContainer = styled.div((props) => ({
@@ -171,11 +173,12 @@ function TransactionSettingAlert({
   } = useSelector((state: StoreState) => state.walletState);
   const inputRef = useRef(null);
   const customStyles = {
-    control: (base: any, state: { isFocused: any }) => ({
+    control: (base: any, state: { isFocused: boolean, isSelected: boolean }) => ({
       ...base,
+      ...theme.body_medium_m,
       background: theme.colors.background.elevation1,
       borderRadius: 8,
-      color: theme.colors.white['0'],
+      color: theme.colors.white['400'],
       borderColor: theme.colors.background.elevation6,
       boxShadow: state.isFocused ? null : null,
       '&:hover': {
@@ -183,19 +186,25 @@ function TransactionSettingAlert({
       },
       height: 45,
     }),
+    option: (base: any, state: { isFocused: boolean, isSelected: boolean }) => ({
+      ...base,
+      background: state.isFocused ? 'rgba(255, 255, 255, 0.09)' : '#3C3F60',
+    }),
     menuList: (base: any) => ({
       ...base,
       padding: 0,
+      ...theme.body_medium_m,
       color: theme.colors.white['0'],
-      background: theme.colors.background.elevation1,
+      background: '#3C3F60',
       '&:hover': {
-        color: theme.colors.background.elevation1,
+        color: theme.colors.white['0'],
       },
     }),
     singleValue: (provided: any) => ({
       ...provided,
+      ...theme.body_medium_m,
       height: '100%',
-      color: theme.colors.white['0'],
+      color: theme.colors.white['200'],
       paddingTop: '3px',
     }),
   };
@@ -359,12 +368,10 @@ function TransactionSettingAlert({
         <FeeContainer>
           <RowContainer>
             <InputContainer>
-              <InputFieldContainer>
-                <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
-              </InputFieldContainer>
+              <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
               <TickerContainer>
-                <Text>{type === 'STX' ? 'STX' : 'SATS'}</Text>
                 {getTokenIcon()}
+                <Text>{type === 'STX' ? 'STX' : 'SATS'}</Text>
               </TickerContainer>
             </InputContainer>
             <SelectorContainer>
@@ -395,15 +402,13 @@ function TransactionSettingAlert({
   };
 
   const editNonceSection = (
-    <Container>
+    <NonceContainer>
       <Text>{t('NONCE')}</Text>
       <InputContainer>
-        <InputFieldContainer>
-          <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
-        </InputFieldContainer>
+        <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
       </InputContainer>
       <DetailText>{t('NONCE_INFO')}</DetailText>
-    </Container>
+    </NonceContainer>
   );
 
   return (

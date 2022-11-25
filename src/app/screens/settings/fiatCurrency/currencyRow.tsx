@@ -47,10 +47,10 @@ function CurrencyRow({
   return (
     <Button
       onClick={onClick}
-      border={showDivider ? `1px solid ${theme.colors.background.elevation3}` : 'transparent'}
+      border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}
     >
       <img src={currency.flag} alt="flag" />
-      <Text color={isSelected ? theme.colors.white['0'] : theme.colors.white['200']}>
+      <Text color={isSelected ? theme.colors.white['0'] : 'rgb(255,255,255,0.6)'}>
         {currency.name}
       </Text>
       {isSelected && <img src={TickIcon} alt="tick" />}
