@@ -52,7 +52,7 @@ function SendBtcScreen() {
   }));
 
   const handleBackButtonClick = () => {
-    navigate('/');
+    navigate(-1);
   };
 
   useEffect(() => {

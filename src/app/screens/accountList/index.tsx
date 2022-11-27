@@ -122,7 +122,7 @@ function AccountList(): JSX.Element {
         {accountsList.map((account) => (
           <>
             <AccountRow
-              key={account.id.toString()}
+              key={account.stxAddress}
               account={account}
               isSelected={isAccountSelected(account)}
               onAccountSelected={handleAccountSelect}

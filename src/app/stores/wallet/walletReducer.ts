@@ -49,10 +49,8 @@ const initialWalletState: WalletState = {
   stxBalance: new BigNumber(0),
   stxAvailableBalance: new BigNumber(0),
   stxLockedBalance: new BigNumber(0),
-  stxTransactions: [],
   stxNonce: 0,
   btcBalance: new BigNumber(0),
-  btcTransactions: [],
   coinsList: null,
   coins: [],
   feeMultipliers: null,
@@ -127,7 +125,6 @@ const walletReducer = (
         stxBalance: action.stxBalance,
         stxAvailableBalance: action.stxAvailableBalance,
         stxLockedBalance: action.stxLockedBalance,
-        stxTransactions: action.stxTransactions,
         stxNonce: action.stxNonce,
         loadingWalletData: false,
       };
@@ -145,7 +142,6 @@ const walletReducer = (
       return {
         ...state,
         btcBalance: action.balance,
-        btcTransactions: action.btctransactions,
         loadingBtcData: false,
       };
     case FetchBtcWalletDataFailureKey:

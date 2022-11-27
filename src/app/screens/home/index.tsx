@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -26,10 +26,11 @@ import {
   getActiveAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
 import BottomBar from '@components/tabBar';
-import { StoreState } from '@stores/index';
 import Seperator from '@components/seperator';
 import AccountHeaderComponent from '@components/accountHeader';
 import { getActiveAccountList } from '@secretkeylabs/xverse-core/account';
+import { CurrencyTypes } from '@utils/constants';
+import useWalletSelector from '@hooks/useWalletSelector';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -124,7 +125,6 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const [list, setList] = useState<FungibleToken[]>([]);
   const {
     stxAddress,
     btcAddress,
@@ -141,7 +141,7 @@ function Home() {
     loadingWalletData,
     loadingBtcData,
     seedPhrase,
-  } = useSelector((state: StoreState) => state.walletState);
+  } = useWalletSelector();
 
   const fetchFeeMultiplierData = async () => {
     const response: FeesMultipliers = await fetchAppInfo();
@@ -187,11 +187,6 @@ function Home() {
   useEffect(() => {
     loadInitialData();
   }, [masterPubKey, stxAddress, btcAddress, loadInitialData]);
-
-  useEffect(() => {
-    const userCoinList: FungibleToken[] = coinsList ? coinsList?.filter((ft) => ft.visible) : [];
-    setList(userCoinList);
-  }, [coinsList]);
 
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -257,6 +252,10 @@ function Home() {
     navigate('/buy-stx/BTC');
   };
 
+  const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined }) => {
+    navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
+  };
+
   return (
     <>
       {network.type === 'Testnet' && (
@@ -296,6 +295,7 @@ function Home() {
             icon={IconBitcoin}
             loading={loadingBtcData}
             underlayColor={Theme.colors.background.elevation1}
+            onPress={handleTokenPressed}
           />
           <TokenTile
             title={t('STACKS')}
@@ -303,17 +303,19 @@ function Home() {
             icon={IconStacks}
             loading={loadingWalletData}
             underlayColor={Theme.colors.background.elevation1}
+            onPress={handleTokenPressed}
           />
         </ColumnContainer>
 
         <CoinContainer>
-          {list.map((coin) => (
+          {coinsList?.filter((ft) => ft.visible).map((coin) => (
             <TokenTile
               title={coin.name}
               currency="FT"
               loading={loadingWalletData}
               underlayColor={Theme.colors.background.elevation1}
               fungibleToken={coin}
+              onPress={handleTokenPressed}
             />
           ))}
         </CoinContainer>

@@ -126,3 +126,8 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+#editors
+.idea
+.vscode
