@@ -5,18 +5,17 @@ import styled from 'styled-components';
 import {
   ReactNode, SetStateAction, useEffect, useState,
 } from 'react';
-import BigNumber from 'bignumber.js';
 import IconBitcoin from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import InfoIcon from '@assets/img/send/info.svg';
 import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
+import Info from '@assets/img/info.svg';
 import ActionButton from '@components/button';
-import {
-  btcToSats, getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
-} from '@secretkeylabs/xverse-core/currency';
+import { useNavigate } from 'react-router-dom';
 import { useBNSResolver, useDebounce } from '@hooks/useBnsName';
+import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -45,6 +44,8 @@ const InfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   padding: props.theme.spacing(8),
+  marginTop: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(32.5),
   border: `1px solid ${props.theme.colors.background.elevation3}`,
   borderRadius: 8,
 }));
@@ -52,11 +53,13 @@ const InfoContainer = styled.div((props) => ({
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(11),
+  marginTop: props.theme.spacing(16),
 }));
 
 const ErrorContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
+  marginLeft: '5%',
+  marginRight: '5%',
 }));
 
 const ErrorText = styled.h1((props) => ({
@@ -101,7 +104,7 @@ const AssociatedText = styled.h1((props) => ({
 const BalanceText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white['400'],
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.spacing(2),
 }));
 
 const InputField = styled.input((props) => ({
@@ -123,8 +126,19 @@ const AmountInputContainer = styled.div((props) => ({
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
-  paddingTop: props.theme.spacing(8),
-  paddingBottom: props.theme.spacing(7),
+  height: 44,
+}));
+
+const MemoInputContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(4),
+  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  backgroundColor: props.theme.colors.background['elevation-1'],
+  borderRadius: 8,
+  padding: props.theme.spacing(7),
+  height: 76,
 }));
 
 const TickerImage = styled.img((props) => ({
@@ -134,9 +148,52 @@ const TickerImage = styled.img((props) => ({
   width: 26,
 }));
 
-const SendButtonContainer = styled.div((props) => ({
-  paddingBottom: props.theme.spacing(8),
+interface ButtonProps {
+  enabled: boolean;
+}
+
+const SendButtonContainer = styled.div<ButtonProps>((props) => ({
+  paddingBottom: props.theme.spacing(12),
   paddingTop: props.theme.spacing(4),
+  marginLeft: '5%',
+  marginRight: '5%',
+  opacity: props.enabled ? 1 : 0.6,
+}));
+
+const BuyCryptoContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  borderRadius: 12,
+  alignItems: 'flex-start',
+  backgroundColor: 'transparent',
+  padding: props.theme.spacing(8),
+  marginTop: props.theme.spacing(11),
+  border: '1px solid rgba(255, 255, 255, 0.2)',
+}));
+
+const BuyCryptoText = styled.h1((props) => ({
+  ...props.theme.body_xs,
+  marginBottom: props.theme.spacing(2),
+  color: props.theme.colors.white['400'],
+}));
+
+const BuyCryptoRedirectText = styled.h1((props) => ({
+  ...props.theme.tile_text,
+  fontSize: 12,
+}));
+
+const BuyCryptoRedirectButton = styled.button((props) => ({
+  backgroundColor: 'transparent',
+  color: props.theme.colors.white['0'],
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'flex-start',
+}));
+
+const ColumnContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  marginLeft: props.theme.spacing(8),
 }));
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
@@ -169,6 +226,8 @@ function SendForm({
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
   const [showError, setShowError] = useState<string | undefined>(error);
   const [recipientAddress, setRecipientAddress] = useState('');
+  const navigate = useNavigate();
+
   const {
     stxBtcRate, btcFiatRate, fiatCurrency, stxAddress,
   } = useSelector(
@@ -190,37 +249,6 @@ function SendForm({
       }
     }
   }, [error, associatedAddress]);
-
-  function getFiatEquivalent(value: number) {
-    if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
-      return '';
-    }
-    if (!value) return '0';
-    switch (currencyType) {
-      case 'STX':
-        return getStxFiatEquivalent(
-          stxToMicrostacks(new BigNumber(value)),
-          new BigNumber(stxBtcRate),
-          new BigNumber(btcFiatRate),
-        )
-          .toFixed(2)
-          .toString();
-      case 'BTC':
-        return getBtcFiatEquivalent(btcToSats(new BigNumber(value)), new BigNumber(btcFiatRate))
-          .toFixed(2)
-          .toString();
-      case 'FT':
-        if (fungibleToken?.tokenFiatRate) {
-          return new BigNumber(value)
-            .multipliedBy(fungibleToken.tokenFiatRate)
-            .toFixed(2)
-            .toString();
-        }
-        break;
-      default:
-        return '';
-    }
-  }
 
   function getTokenIcon() {
     if (currencyType === 'STX') {
@@ -255,83 +283,98 @@ function SendForm({
       setAmount(newValue);
     }
 
-    const amountInCurrency = getFiatEquivalent(Number(newValue));
+    const amountInCurrency = getFiatEquivalent(Number(newValue), currencyType, stxBtcRate, btcFiatRate, fungibleToken);
     setFiatAmount(amountInCurrency);
   };
 
-  function renderEnterAmountSection() {
-    return (
-      <Container>
-        <RowContainer>
-          <TitleText>{t('AMOUNT')}</TitleText>
-          <BalanceText>
-            {t('BALANCE')}
-            :
-          </BalanceText>
-          <Text>{balance}</Text>
-        </RowContainer>
-        <AmountInputContainer>
-          <InputFieldContainer>
-            <InputField value={amount} placeholder="0" onChange={onInputChange} />
-          </InputFieldContainer>
-          <TickerContainer>
-            <Text>{getTokenCurrency()}</Text>
-            {getTokenIcon()}
-          </TickerContainer>
-        </AmountInputContainer>
-        <SubText>{`~ $ ${fiatAmount} ${fiatCurrency}`}</SubText>
-      </Container>
-    );
-  }
+  const renderEnterAmountSection = (
+    <Container>
+      <RowContainer>
+        <TitleText>{t('AMOUNT')}</TitleText>
+        <BalanceText>
+          {t('BALANCE')}
+          :
+        </BalanceText>
+        <Text>{balance}</Text>
+      </RowContainer>
+      <AmountInputContainer>
+        <InputFieldContainer>
+          <InputField value={amount} placeholder="0" onChange={onInputChange} />
+        </InputFieldContainer>
+        <TickerContainer>
+          <Text>{getTokenCurrency()}</Text>
+          {getTokenIcon()}
+        </TickerContainer>
+      </AmountInputContainer>
+      <SubText>{`~ $ ${fiatAmount} ${fiatCurrency}`}</SubText>
+    </Container>
+  );
 
   const onAddressInputChange = (e: { target: { value: SetStateAction<string> } }) => {
     setRecipientAddress(e.target.value);
   };
 
-  function renderEnterRecepientSection() {
-    return (
-      <Container>
-        <TitleText>{t('RECEPIENT')}</TitleText>
-        <AmountInputContainer>
-          <InputFieldContainer>
-            <InputField
-              placeholder={t('RECEPIENT_PLACEHOLDER')}
-              onChange={onAddressInputChange}
-            />
-          </InputFieldContainer>
-        </AmountInputContainer>
-        {associatedAddress && currencyType !== 'BTC' && (
+  const renderEnterRecepientSection = (
+    <Container>
+      <TitleText>{t('RECEPIENT')}</TitleText>
+      <AmountInputContainer>
+        <InputFieldContainer>
+          <InputField
+            placeholder={currencyType === 'BTC' ? t('BTC_RECEPIENT_PLACEHOLDER') : t('RECEPIENT_PLACEHOLDER')}
+            onChange={onAddressInputChange}
+          />
+        </InputFieldContainer>
+      </AmountInputContainer>
+      {associatedAddress && currencyType !== 'BTC' && (
         <>
           <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
           <AssociatedText>{associatedAddress}</AssociatedText>
         </>
-        )}
-      </Container>
-    );
-  }
+      )}
+    </Container>
+  );
 
   const handleOnPress = () => {
     onPressSend(associatedAddress !== '' ? associatedAddress : debouncedSearchTerm, amount, memo);
   };
 
+  const onBuyClick = () => {
+    navigate(`/buy-stx/${currencyType}`);
+  };
+
+  const buyCryptoMessage = balance === 0 && (currencyType === 'STX' || currencyType === 'BTC') && (
+    <BuyCryptoContainer>
+      <img src={Info} alt="alert" />
+      <ColumnContainer>
+        <BuyCryptoText>{t('NO_FUNDS')}</BuyCryptoText>
+        <BuyCryptoRedirectButton onClick={onBuyClick}>
+          <BuyCryptoRedirectText>{t('BUY_CRYPTO')}</BuyCryptoRedirectText>
+        </BuyCryptoRedirectButton>
+
+      </ColumnContainer>
+    </BuyCryptoContainer>
+  );
+
   return (
-    <ScrollContainer>
-      <OuterContainer>
-        {!disableAmountInput && renderEnterAmountSection()}
-        {children}
-        {renderEnterRecepientSection()}
-        {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
+    <>
+      <ScrollContainer>
+        <OuterContainer>
+          {!disableAmountInput && renderEnterAmountSection}
+          {buyCryptoMessage}
+          {children}
+          {renderEnterRecepientSection}
+          {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
-              <AmountInputContainer>
+              <MemoInputContainer>
                 <InputFieldContainer>
                   <InputField
                     placeholder={t('MEMO_PLACEHOLDER')}
-                    onChange={(e: { target: { value: SetStateAction<string> } }) => setMemo(e.target.value)}
+                    onChange={(e: { target: { value: SetStateAction<string>; }; }) => setMemo(e.target.value)}
                   />
                 </InputFieldContainer>
-              </AmountInputContainer>
+              </MemoInputContainer>
             </Container>
             <InfoContainer>
               <TickerImage src={InfoIcon} />
@@ -340,21 +383,22 @@ function SendForm({
               </TextContainer>
             </InfoContainer>
           </>
+          )}
+        </OuterContainer>
 
-        )}
-      </OuterContainer>
+      </ScrollContainer>
       <ErrorContainer>
         <ErrorText>{showError}</ErrorText>
       </ErrorContainer>
-
-      <SendButtonContainer>
+      <SendButtonContainer enabled={amount !== '' && recipientAddress !== ''}>
         <ActionButton
           text={buttonText ?? t('NEXT')}
           processing={processing}
           onPress={handleOnPress}
         />
       </SendButtonContainer>
-    </ScrollContainer>
+
+    </>
   );
 }
 

@@ -12,8 +12,8 @@ interface StepDotProps {
   active: boolean;
 }
 const Container = styled.div((props) => ({
-  flex: 1,
   display: 'flex',
+  flex: 1,
   flexDirection: 'column',
   padding: props.theme.spacing(8),
 }));
@@ -29,6 +29,7 @@ const PasswordContainer = styled.div((props) => ({
   display: 'flex',
   height: '100%',
   marginBottom: props.theme.spacing(15),
+  marginTop: props.theme.spacing(32),
 }));
 
 const StepDot = styled.div<StepDotProps>((props) => ({

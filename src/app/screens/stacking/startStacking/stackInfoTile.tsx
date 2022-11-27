@@ -9,10 +9,11 @@ const TitleText = styled.h1((props) => ({
   color: props.theme.colors.white['400'],
 }));
 
-const Container = styled.div({
+const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-});
+  marginBottom: props.theme.spacing(16),
+}));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_bold_l,

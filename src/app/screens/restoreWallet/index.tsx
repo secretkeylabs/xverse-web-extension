@@ -11,15 +11,20 @@ import EnterSeedPhrase from './enterSeedphrase';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: '100%',
+  marginLeft: 'auto',
+  marginRight: 'auto',
+  height: 600,
+  width: 360,
   backgroundColor: props.theme.colors.background.elevation0,
   padding: `${props.theme.spacing(12)}px ${props.theme.spacing(8)}px 0 ${props.theme.spacing(8)}px`,
+
 }));
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
   height: '100%',
-  marginBottom: props.theme.spacing(15),
+  marginBottom: props.theme.spacing(32),
+  marginTop: props.theme.spacing(32),
 }));
 
 function RestoreWallet(): JSX.Element {

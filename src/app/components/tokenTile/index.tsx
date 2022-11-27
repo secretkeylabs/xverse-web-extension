@@ -3,16 +3,21 @@ import styled from 'styled-components';
 import { NumericFormat } from 'react-number-format';
 import { CurrencyTypes, LoaderSize } from '@utils/constants';
 import BarLoader from '@components/barLoader';
-import { ftDecimals, getTicker } from '@utils/helper';
+import { getTicker } from '@utils/helper';
 import stc from 'string-to-color';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
 import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { getFtBalance, getFtTicker } from '@utils/tokens';
 
 interface TileProps {
   margin?: number;
+}
+
+interface TickerProps {
+  enlargeTicker? : boolean;
 }
 const TileContainer = styled.div<TileProps>((props) => ({
   display: 'flex',
@@ -20,29 +25,28 @@ const TileContainer = styled.div<TileProps>((props) => ({
   alignItems: 'flex-start',
   justifyContent: 'space-between',
   backgroundColor: props.color,
-  paddingLeft: props.theme.spacing(9),
-  paddingRight: props.theme.spacing(9),
-  paddingTop: props.theme.spacing(9),
-  paddingBottom: props.margin ?? props.theme.spacing(9),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(6),
+  paddingBottom: props.margin ?? props.theme.spacing(6),
   borderRadius: props.theme.radius(2),
-  marginHorizontal: props.theme.spacing(7),
   marginBottom: props.theme.spacing(6),
 }));
 
-const TickerImage = styled.img((props) => ({
+const TickerImage = styled.img<TickerProps>((props) => ({
   marginRight: props.theme.spacing(3),
   alignSelf: 'center',
   transform: 'all',
-  height: 32,
-  width: 32,
+  height: props.enlargeTicker ? 40 : 32,
+  width: props.enlargeTicker ? 40 : 32,
 }));
 
-const TickerIconContainer = styled.div((props) => ({
+const TickerIconContainer = styled.div<TickerProps>((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: 32,
-  width: 32,
+  height: props.enlargeTicker ? 40 : 32,
+  width: props.enlargeTicker ? 40 : 32,
   marginRight: props.theme.spacing(3),
   borderRadius: props.theme.radius(2),
   backgroundColor: props.color,
@@ -68,6 +72,7 @@ const AmountContainer = styled.div({
 
 const LoaderMainContainer = styled.div((props) => ({
   flex: 1,
+  maxWidth: 200,
   flexDirection: 'column',
   alignItems: 'flex-end',
   justifyContent: 'flex-end',
@@ -76,6 +81,7 @@ const LoaderMainContainer = styled.div((props) => ({
 
 const LoaderImageContainer = styled.div({
   flex: 0.5,
+  maxWidth: 40,
 });
 
 const CoinTickerText = styled.h1((props) => ({
@@ -118,8 +124,12 @@ interface Props {
   loading: boolean;
   margin?: number;
   currency?: CurrencyTypes;
-  onPress?: (event: any) => void;
+  onPress: (token: {
+    coin: CurrencyTypes;
+    ft: string | undefined;
+  }) => void;
   fungibleToken?: FungibleToken;
+  enlargeTicker?: boolean;
 }
 
 function TokenTile({
@@ -131,6 +141,7 @@ function TokenTile({
   currency,
   onPress,
   fungibleToken,
+  enlargeTicker = false,
 }: Props) {
   const {
     fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate,
@@ -138,26 +149,9 @@ function TokenTile({
     (state: StoreState) => state.walletState,
   );
 
-  function getFtTicker() {
-    if (fungibleToken?.ticker) {
-      return fungibleToken.ticker.toUpperCase();
-    }
-    if (fungibleToken?.name) {
-      return getTicker(fungibleToken.name).toUpperCase();
-    }
-    return '';
-  }
-
   function getTickerTitle() {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
-    return `${getFtTicker()}`;
-  }
-
-  function getFtBalance(ft: FungibleToken) {
-    if (ft.decimals) {
-      return ftDecimals(ft.balance, ft.decimals);
-    }
-    return ft.balance;
+    return `${getFtTicker(fungibleToken as FungibleToken)}`;
   }
 
   function getBalanceAmount() {
@@ -279,7 +273,7 @@ function TokenTile({
   function renderFTIcon() {
     if (!loading) {
       if (fungibleToken?.image) {
-        return <TickerImage src={fungibleToken.image} />;
+        return <TickerImage src={fungibleToken.image} enlargeTicker={enlargeTicker} />;
       }
       // render ticker icon
       let ticker = fungibleToken?.ticker;
@@ -289,7 +283,7 @@ function TokenTile({
       const background = stc(ticker);
       ticker = ticker && ticker.substring(0, 4);
       return (
-        <TickerIconContainer color={background}>
+        <TickerIconContainer color={background} enlargeTicker={enlargeTicker}>
           <TickerIconText>{ticker}</TickerIconText>
         </TickerIconContainer>
       );
@@ -302,12 +296,19 @@ function TokenTile({
   }
 
   function renderIcon() {
-    if (currency === 'STX' || currency === 'BTC') return <TickerImage src={icon} />;
+    if (currency === 'STX' || currency === 'BTC') return <TickerImage src={icon} enlargeTicker={enlargeTicker} />;
     return renderFTIcon();
   }
 
+  const handleTokenPressed = () => {
+    onPress({
+      coin: currency as CurrencyTypes,
+      ft: fungibleToken && fungibleToken.principal,
+    });
+  };
+
   return (
-    <TileContainer color={underlayColor} margin={margin} onClick={onPress}>
+    <TileContainer color={underlayColor} margin={margin} onClick={handleTokenPressed}>
       {renderIcon()}
       <TextContainer>
         <CoinTickerText>{getTickerTitle()}</CoinTickerText>

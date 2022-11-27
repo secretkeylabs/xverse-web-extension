@@ -8,16 +8,15 @@ const BottomModalHeaderText = styled.h1((props) => ({
   flex: 1,
 }));
 
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'space-between',
-  margin: props.theme.spacing(12),
-}));
+  margin: '24px 24px 20px 24px',
+});
 
-const ButtonImage = styled.img({
-  alignSelf: 'center',
-  transform: 'all',
+const ButtonImage = styled.button({
+  backgroundColor: 'transparent',
 });
 
 interface Props {
@@ -27,6 +26,15 @@ interface Props {
   onClose: () => void;
 }
 
+const CustomisedModal = styled(Modal)`
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  bottom: 0;
+  position: absolute;
+`;
+
 function BottomModal({
   header, children, visible, onClose,
 }: Props) {
@@ -34,10 +42,14 @@ function BottomModal({
   const customStyles = {
     overlay: {
       backgroundColor: theme.colors.background.modalBackdrop,
+      height: 600,
+      width: 360,
+      margin: 'auto',
     },
     content: {
       inset: 'auto auto 0px auto',
       width: '100%',
+      maxWidth: 360,
       maxHeight: '90%',
       border: 'transparent',
       background: theme.colors.background.elevation2,
@@ -49,24 +61,23 @@ function BottomModal({
   };
 
   return (
-    <Modal
+    <CustomisedModal
       isOpen={visible}
-      parentSelector={() => {
-        const parent = (document.querySelector('#app') as HTMLElement) ?? document.body;
-        return parent;
-      }}
+      parentSelector={() => (document.getElementById('app') as HTMLElement)}
       ariaHideApp={false}
       style={customStyles}
       contentLabel="Example Modal"
     >
       <RowContainer>
         <BottomModalHeaderText>{header}</BottomModalHeaderText>
-        <ButtonImage src={Cross} onClick={onClose} />
+        <ButtonImage onClick={onClose}>
+          <img src={Cross} alt="cross" />
+        </ButtonImage>
       </RowContainer>
       <Seperator />
 
       {children}
-    </Modal>
+    </CustomisedModal>
   );
 }
 

@@ -131,7 +131,6 @@ function ConfirmNftTransaction() {
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
-        isNft
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
       >

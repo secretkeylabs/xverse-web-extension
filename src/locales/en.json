@@ -45,13 +45,16 @@
     "SEND": "Send",
     "AMOUNT": "Amount",
     "BALANCE": "Balance",
-    "RECEPIENT": "Recepient",
+    "RECEPIENT": "Recipient",
     "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
+    "BTC_RECEPIENT_PLACEHOLDER": "Address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
+    "NO_FUNDS":"You don’t have any fund to send.",
+    "BUY_CRYPTO": "Buy crypto →",
     "ERRORS": {
       "ADDRESS_REQUIRED": "Recipient address is required",
       "AMOUNT_REQUIRED": "Amount is required",
@@ -124,7 +127,7 @@
     "SEED_PHRASE_VIEW_CONTINUE": "Continue",
     "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
     "SEED_PHRASE_VERIFY_BUTTON": "Verify",
-    "SEED_PHRASE_BACK_BUTTON": "Back"  
+    "SEED_PHRASE_BACK_BUTTON": "Back"
   },
   "CREATE_PASSWORD_SCREEN": {
     "CREATE_PASSWORD_TITLE": "Enter your new password",
@@ -146,7 +149,10 @@
   "WALLET_SUCCESS_SCREEN": {
     "SCREEN_TITLE": "Wallet created successfully",
     "SCREEN_SUBTITLE": "Your new wallet has been created successfully, you can now connect to your wallet.",
-    "OPEN_WALLET_BUTTON": "Open Wallet"
+    "CLOSE_TAB": "Close this tab",
+    "CLICK": "Click",
+    "THEN": "then",
+    "OPEN_WALLET":"to open your wallet"
   },
   "CONFIRM_TRANSACTION_SCREEN": {
     "CONFIRM_BUTTON": "Confirm",
@@ -261,5 +267,48 @@
     "RESET": "Reset",
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+  },
+  "OPTIONS_DIALOG":{
+    "SWITCH_ACCOUNT": "Switch Account",
+    "LOCK": "Lock",
+    "RESET_WALLET": "Reset Wallet"
+  },
+  "BUY_SCREEN":{
+    "BUY": "Buy",
+    "PURCHASE_CRYPTO": "Purchase crypto quickly and deposit directly into your Xverse wallet.",
+    "MOONPAY": "Buy on Moonpay",
+    "BINANCE": "Buy on Binance",
+    "TRANSAK": "Buy on Transak",
+    "DISCLAIMER": "Disclaimer",
+    "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider."
+  },
+  "COIN_DASHBOARD_SCREEN": {
+    "SEND_COIN_BUTTON": "SEND",
+    "RECEIVE_COIN_BUTTON": "Receive",
+    "BUY_COIN_BUTTON": "Buy",
+    "TRANSACTION_HISTORY_TITLE": "Transaction History",
+    "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
+    "TRANSACTION_SENT": "Sent",
+    "TRANSACTION_RECEIVED": "Received",
+    "TRANSACTION_PENDING_RECEIVING": "Receiving",
+    "TRANSACTION_PENDING_SENDING": "Sending",
+    "TRANSACTION_STATUS_UNKNOWN": "Unknown",
+    "TRANSACTION_COINBASE": "Coinbase",
+    "TRANSACTION_CONTRACT_CALL": "Smart Contract Call",
+    "TRANSACTION_CONTRACT_DEPLOY": "Smart Contract Deploy",
+    "TRANSACTION_POISON_MICRO_BLOCK": "Poison Microblock",
+    "TRANSACTION_CONTRACT_TOKEN_TRANSFER": "Contract Token Transfer",
+    "TRANSACTION_STACKING_DELEGATION": "Stacking Delegation",
+    "TRANSACTION_STACKING_CONTRACT_AUTHORIZE": "Stacking Contract Authorize",
+    "TRANSACTION_STACKING_REVOKE_DELEGATION": "Stacking Revoke Delegation",
+    "TRANSACTION_FUNGIBLE_TOKEN_TRANSFER": "transfer",
+    "STX_AVAILABLE_BALANCE_PREFIX": "Available",
+    "STX_LOCKED_BALANCE_PREFIX": "Locked",
+    "SHOW_FT_INFO_BUTTON": "Show more info",
+    "LESS_FT_INFO_BUTTON": "Show less info",
+    "FT_CONTRACT_PREFIX": "Token Contract",
+    "OPEN_FT_CONTRACT_DEPLOYMENT": "View the contract on",
+    "STACKS_EXPLORER": "Stacks Explorer",
+    "INCREASE_FEE_BUTTON": "Increase fee"
   }
 }

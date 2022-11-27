@@ -20,6 +20,17 @@ const Container = styled.div((props) => ({
   paddingTop: props.theme.spacing(12),
 }));
 
+const SeedContainer = styled.div((props) => ({
+  paddingTop: props.theme.spacing(21),
+}));
+
+const PasswordContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(32),
+  marginBottom: props.theme.spacing(32),
+  display: 'flex',
+  flex: 1,
+}));
+
 export default function BackupWalletSteps(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const [currentActiveIndex, setCurrentActiveIndex] = useState<number>(0);
@@ -69,30 +80,36 @@ export default function BackupWalletSteps(): JSX.Element {
   };
 
   const backupSteps = [
-    <SeedCheck seedPhrase={seedPhrase} onContinue={handleSeedCheckContinue} />,
+    <SeedContainer>
+      <SeedCheck seedPhrase={seedPhrase} onContinue={handleSeedCheckContinue} />
+    </SeedContainer>,
     <VerifySeed
       onBack={handleVerifySeedBack}
       onVerifySuccess={handleVerifySeedSuccess}
       seedPhrase={seedPhrase}
     />,
-    <PasswordInput
-      title={t('CREATE_PASSWORD_TITLE')}
-      inputLabel={t('TEXT_INPUT_NEW_PASSWORD_LABEL')}
-      enteredPassword={password}
-      setEnteredPassword={setPassword}
-      handleContinue={handleNewPasswordContinue}
-      handleBack={handleNewPasswordBack}
-      checkPasswordStrength
-    />,
-    <PasswordInput
-      title={t('CONFIRM_PASSWORD_TITLE')}
-      inputLabel={t('TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
-      enteredPassword={confirmPassword}
-      setEnteredPassword={setConfirmPassword}
-      handleContinue={handleConfirmPasswordContinue}
-      handleBack={handleConfirmPasswordBack}
-      passwordError={error}
-    />,
+    <PasswordContainer>
+      <PasswordInput
+        title={t('CREATE_PASSWORD_TITLE')}
+        inputLabel={t('TEXT_INPUT_NEW_PASSWORD_LABEL')}
+        enteredPassword={password}
+        setEnteredPassword={setPassword}
+        handleContinue={handleNewPasswordContinue}
+        handleBack={handleNewPasswordBack}
+        checkPasswordStrength
+      />
+    </PasswordContainer>,
+    <PasswordContainer>
+      <PasswordInput
+        title={t('CONFIRM_PASSWORD_TITLE')}
+        inputLabel={t('TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
+        enteredPassword={confirmPassword}
+        setEnteredPassword={setConfirmPassword}
+        handleContinue={handleConfirmPasswordContinue}
+        handleBack={handleConfirmPasswordBack}
+        passwordError={error}
+      />
+    </PasswordContainer>,
   ];
 
   return (

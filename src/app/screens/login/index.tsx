@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { Ring } from 'react-spinners-css';
 import useWalletReducer from '@hooks/useWalletReducer';
 
+declare const VERSION: string;
+
 const ScreenContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -35,6 +37,7 @@ const TopSectionContainer = styled.div((props) => ({
 const PasswordInputLabel = styled.h2((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
+  marginTop: props.theme.spacing(15.5),
 }));
 
 const PasswordInputContainer = styled.div((props) => ({
@@ -131,7 +134,7 @@ function Login(): JSX.Element {
 
   return (
     <ScreenContainer>
-      <AppVersion>V 1.0.0</AppVersion>
+      <AppVersion>{VERSION}</AppVersion>
       <TopSectionContainer>
         <img src={logo} width={100} alt="logo" />
         <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>

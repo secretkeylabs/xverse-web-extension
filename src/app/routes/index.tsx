@@ -7,7 +7,7 @@ import LegalLinks from '@screens/legalLinks';
 import ManageTokens from '@screens/manageTokens';
 import AccountList from '@screens/accountList';
 import Receive from '@screens/receive';
-import ConfirmStxTransaction from '@screens/confirmStxTransaxtion';
+import ConfirmStxTransaction from '@screens/confirmStxTransaction';
 import SendStxScreen from '@screens/sendStx';
 import TransactionStatus from '@screens/transactionStatus';
 import SendBtcScreen from '@screens/sendBtc';
@@ -30,8 +30,13 @@ import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import ChangePasswordScreen from '@screens/settings/changePassword';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import BackupWalletScreen from '@screens/settings/backupWallet';
+import SendFtScreen from '@screens/sendFt';
+import ConfirmFtTransaction from '@screens/confirmFtTransaction';
+import Buy from '@screens/buy';
 import SendNft from '@screens/sendNft';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
+import CoinDashboard from '@screens/coinDashboard';
+import ExtendedScreenContainer from '@components/extendedScreenContainer';
 
 const router = createHashRouter([
   {
@@ -75,6 +80,10 @@ const router = createHashRouter([
         element: <SendStxScreen />,
       },
       {
+        path: 'send-ft',
+        element: <SendFtScreen />,
+      },
+      {
         path: 'send-btc',
         element: <SendBtcScreen />,
       },
@@ -85,6 +94,10 @@ const router = createHashRouter([
       {
         path: 'confirm-stx-tx',
         element: <ConfirmStxTransaction />,
+      },
+      {
+        path: 'confirm-ft-tx',
+        element: <ConfirmFtTransaction />,
       },
       {
         path: 'confirm-btc-tx',
@@ -132,19 +145,11 @@ const router = createHashRouter([
       },
       {
         path: 'stacking',
-        element: <Stacking />,
-      },
-      {
-        path: 'nft-dashboard',
-        element: <NftDashboard />,
-      },
-      {
-        path: 'nft-dashboard/nft-detail/:id',
-        element: <NftDetailScreen />,
-      },
-      {
-        path: 'confirm-nft-tx/:id',
-        element: <ConfirmNftTransaction />,
+        element: (
+          <AuthGuard>
+            <Stacking />
+          </AuthGuard>
+        ),
       },
       {
         path: 'settings',
@@ -165,6 +170,36 @@ const router = createHashRouter([
       {
         path: 'backup-wallet',
         element: <BackupWalletScreen />,
+      },
+      {
+        path: 'buy-stx/:currency',
+        element: <Buy />,
+      },
+      {
+        path: 'confirm-nft-tx/:id',
+        element: <ConfirmNftTransaction />,
+      },
+      {
+        path: 'coinDashboard/:coin',
+        element: <CoinDashboard />,
+      },
+    ],
+  },
+  {
+    path: '/',
+    element: <ExtendedScreenContainer />,
+    children: [
+      {
+        path: 'nft-dashboard',
+        element: (
+          <AuthGuard>
+            <NftDashboard />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'nft-dashboard/nft-detail/:id',
+        element: <NftDetailScreen />,
       },
     ],
   },

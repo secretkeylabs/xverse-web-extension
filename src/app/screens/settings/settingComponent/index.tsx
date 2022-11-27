@@ -14,6 +14,7 @@ const Button = styled.button<ButtonProps>((props) => ({
   background: 'transparent',
   justifyContent: 'flex-start',
   marginTop: props.theme.spacing(6),
+  paddingBottom: props.theme.spacing(8),
   borderBottom: props.border,
 }));
 
@@ -27,13 +28,13 @@ const ColumnContainer = styled.div((props) => ({
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_bold_l,
   fontSize: 18,
-  paddingTop: props.theme.spacing(12),
+  paddingBottom: props.theme.spacing(6),
+  paddingTop: props.theme.spacing(16),
 }));
 
 const ComponentText = styled.h1<TitleProps>((props) => ({
   ...props.theme.body_m,
   paddingTop: props.theme.spacing(8),
-  paddingBottom: props.theme.spacing(8),
   color: props.textColor,
   flex: 1,
   textAlign: 'left',
@@ -42,7 +43,6 @@ const ComponentText = styled.h1<TitleProps>((props) => ({
 const ComponentDescriptionText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   paddingTop: props.theme.spacing(8),
-  paddingBottom: props.theme.spacing(8),
   color: props.theme.colors.white['0'],
 }));
 
@@ -72,7 +72,7 @@ function SettingComponent({
       {title && <TitleText>{title}</TitleText>}
       <Button
         onClick={onClick}
-        border={showDivider ? `1px solid ${theme.colors.background.elevation3}` : 'transparent'}
+        border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}
       >
         <ComponentText
           textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white['200']}
