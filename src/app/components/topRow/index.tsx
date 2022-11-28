@@ -10,6 +10,7 @@ const TopSectionContainer = styled.div({
 
 const HeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
+  paddingRight: props.theme.spacing(10),
 }));
 
 const BackButton = styled.button({

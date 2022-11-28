@@ -29,6 +29,7 @@ const PasswordContainer = styled.div((props) => ({
   display: 'flex',
   height: '100%',
   marginBottom: props.theme.spacing(15),
+  marginTop: props.theme.spacing(32),
 }));
 
 const StepDot = styled.div<StepDotProps>((props) => ({

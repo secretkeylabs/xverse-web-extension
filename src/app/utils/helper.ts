@@ -1,7 +1,10 @@
-import { Account, StxMempoolTransactionData } from '@secretkeylabs/xverse-core/types';
+import { FungibleToken, Account, StxMempoolTransactionData } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BigNumber from 'bignumber.js';
+import {
+  btcToSats, getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
+} from '@secretkeylabs/xverse-core';
 
 const validUrl = require('valid-url');
 
@@ -12,6 +15,14 @@ export function initBigNumber(num: string | number | BigNumber) {
 export function ftDecimals(value: number | string | BigNumber, decimals: number): string {
   const amount = initBigNumber(value);
   return amount.shiftedBy(-decimals).toNumber().toString();
+}
+
+export function convertAmountToFtDecimalPlaces(
+  value: number | string | BigNumber,
+  decimals: number,
+): number {
+  const amount = initBigNumber(value);
+  return amount.shiftedBy(+decimals).toNumber();
 }
 
 export function replaceCommaByDot(amount: string) {

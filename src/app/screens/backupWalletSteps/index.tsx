@@ -20,10 +20,15 @@ const Container = styled.div((props) => ({
   paddingTop: props.theme.spacing(12),
 }));
 
+const SeedContainer = styled.div((props) => ({
+  paddingTop: props.theme.spacing(21),
+}));
+
 const PasswordContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(32),
+  marginBottom: props.theme.spacing(32),
   display: 'flex',
-  height: '100%',
-  marginBottom: props.theme.spacing(20),
+  flex: 1,
 }));
 
 export default function BackupWalletSteps(): JSX.Element {
@@ -75,7 +80,9 @@ export default function BackupWalletSteps(): JSX.Element {
   };
 
   const backupSteps = [
-    <SeedCheck seedPhrase={seedPhrase} onContinue={handleSeedCheckContinue} />,
+    <SeedContainer>
+      <SeedCheck seedPhrase={seedPhrase} onContinue={handleSeedCheckContinue} />
+    </SeedContainer>,
     <VerifySeed
       onBack={handleVerifySeedBack}
       onVerifySuccess={handleVerifySeedSuccess}

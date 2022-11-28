@@ -151,7 +151,7 @@ var options = {
       cache: false,
     }),
     new webpack.ProvidePlugin({
-      process: 'process/browser',
+      process: 'process/browser.js',
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.DefinePlugin({

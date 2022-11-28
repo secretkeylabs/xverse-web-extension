@@ -6,8 +6,8 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'column',
-  margin: props.theme.spacing(8),
-  borderTop: `1px solid ${props.theme.colors.background.elevation3}`,
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
 }));
 
 const TitleText = styled.h1((props) => ({

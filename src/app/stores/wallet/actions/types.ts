@@ -5,6 +5,7 @@ import {
   FungibleToken,
   NetworkType,
   SettingsNetwork,
+  StxTransactionData,
   SupportedCurrency,
   TransactionData,
   Account,
@@ -59,10 +60,8 @@ export interface WalletState {
   stxBalance: BigNumber;
   stxAvailableBalance: BigNumber;
   stxLockedBalance: BigNumber;
-  stxTransactions: TransactionData[];
   stxNonce: number;
   btcBalance: BigNumber;
-  btcTransactions: BtcTransactionData[];
   coinsList: FungibleToken[] | null;
   coins: Coin[];
   feeMultipliers: FeesMultipliers | null;

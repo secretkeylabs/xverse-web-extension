@@ -29,10 +29,10 @@ const StatusContainer = styled.div((props) => ({
   alignItems: 'center',
   background: 'rgba(81, 214, 166, 0.15)',
   borderRadius: props.theme.radius(7),
-  paddingLeft: props.theme.spacing(6),
-  paddingRight: props.theme.spacing(6),
-  paddingTop: props.theme.spacing(2),
-  paddingBottom: props.theme.spacing(2),
+  paddingLeft: props.theme.spacing(7),
+  paddingRight: props.theme.spacing(7),
+  paddingTop: props.theme.spacing(4),
+  paddingBottom: props.theme.spacing(4),
 }));
 
 const Dot = styled.div((props) => ({
