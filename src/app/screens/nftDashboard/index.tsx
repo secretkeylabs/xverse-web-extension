@@ -151,7 +151,7 @@ function NftDashboard() {
     isLoading, data,
   } = useQuery(
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNfts('SP2VC4CXTWYRZEV7MSGXPNHE739N14ECQWX8JP2BF', network, offset.current),
+    async () => getNfts(stxAddress, network, offset.current),
   );
 
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
