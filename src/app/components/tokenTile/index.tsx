@@ -19,16 +19,15 @@ interface TileProps {
 interface TickerProps {
   enlargeTicker? : boolean;
 }
-const TileContainer = styled.div<TileProps>((props) => ({
+const TileContainer = styled.button<TileProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
   backgroundColor: props.color,
+  width: '100%',
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(6),
-  paddingBottom: props.margin ?? props.theme.spacing(6),
+  paddingTop: props.theme.spacing(7.25),
+  paddingBottom: props.margin ?? props.theme.spacing(7.25),
   borderRadius: props.theme.radius(2),
   marginBottom: props.theme.spacing(6),
 }));
@@ -60,14 +59,20 @@ const TickerIconText = styled.h1((props) => ({
   fontSize: 10,
 }));
 
+const RowContainer = styled.div({
+  flex: 1,
+  display: 'flex',
+});
+
 const TextContainer = styled.div((props) => ({
-  flex: 2,
   marginLeft: props.theme.spacing(6),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
 }));
 
 const AmountContainer = styled.div({
   alignContent: 'flex-end',
-  flex: 1,
 });
 
 const LoaderMainContainer = styled.div((props) => ({
@@ -309,11 +314,13 @@ function TokenTile({
 
   return (
     <TileContainer color={underlayColor} margin={margin} onClick={handleTokenPressed}>
-      {renderIcon()}
-      <TextContainer>
-        <CoinTickerText>{getTickerTitle()}</CoinTickerText>
-        <SubText>{title}</SubText>
-      </TextContainer>
+      <RowContainer>
+        {renderIcon()}
+        <TextContainer>
+          <CoinTickerText>{getTickerTitle()}</CoinTickerText>
+          <SubText>{title}</SubText>
+        </TextContainer>
+      </RowContainer>
       {loading ? (
         <TokenLoader />
       ) : (
