@@ -297,6 +297,18 @@ export default function CoinHeader(props: CoinBalanceProps) {
     }
   };
 
+  const goToSendScreen = () => {
+    if (coin === 'STX' || coin === 'BTC') {
+      navigate(`/send-${coin}`);
+    } else {
+      navigate('/send-ft', {
+        state: {
+          fungibleToken,
+        },
+      });
+    }
+  };
+
   return (
     <Container>
       <BalanceInfoContainer>
@@ -328,7 +340,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <ActionButton src={ArrowUpRight} text="Send" onPress={() => navigate(`/send-${coin}`)} />
+          <ActionButton src={ArrowUpRight} text="Send" onPress={() => goToSendScreen()} />
         </ButtonContainer>
         <ButtonContainer>
           <ActionButton
@@ -339,7 +351,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
         </ButtonContainer>
         {!fungibleToken && (
           <ButtonContainer>
-            <ActionButton src={CreditCard} text="Buy" onPress={() => null} />
+            <ActionButton src={CreditCard} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
           </ButtonContainer>
         )}
       </RowButtonContainer>

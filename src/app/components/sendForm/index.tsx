@@ -339,7 +339,7 @@ function SendForm({
   };
 
   const onBuyClick = () => {
-    navigate(`/buy-stx/${currencyType}`);
+    navigate(`/buy/${currencyType}`);
   };
 
   const buyCryptoMessage = balance === 0 && (currencyType === 'STX' || currencyType === 'BTC') && (

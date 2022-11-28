@@ -158,7 +158,7 @@ const router = createHashRouter([
         element: <TransactionStatus />,
       },
       {
-        path: 'buy-stx/:currency',
+        path: 'buy/:currency',
         element: <Buy />,
       },
 
