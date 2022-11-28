@@ -8,6 +8,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { validateStxAddress } from '@secretkeylabs/xverse-core';
+import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import SendForm from '@components/sendForm';
 import useStxPendingTxData from '@hooks/useStxPendingTxData';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -17,15 +18,19 @@ import { checkNftExists } from '@utils/helper';
 import NftImage from '@screens/nftDashboard/nftImage';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+import AccountHeaderComponent from '@components/accountHeader';
+import Seperator from '@components/seperator';
 
 const ScrollContainer = styled.div`
   display: flex;
-  flex:1;
+  flex: 1;
   flex-direction: column;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
-  }
+  };
+  width: 360px;
+  margin: auto;
 `;
 
 const Container = styled.div({
@@ -38,7 +43,7 @@ const Container = styled.div({
 
 const NFtContainer = styled.div((props) => ({
   maxHeight: 148,
-  maxWidth: 148,
+  width: 148,
   display: 'flex',
   aspectRatio: 1,
   justifyContent: 'center',
@@ -61,6 +66,38 @@ const NftTitleText = styled.h1((props) => ({
 const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
+
+const ButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginLeft: '15%',
+  marginTop: props.theme.spacing(40),
+}));
+
+const Button = styled.button((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
+  opacity: 0.8,
+  marginTop: props.theme.spacing(5),
+}));
+
+const ButtonText = styled.div((props) => ({
+  ...props.theme.body_xs,
+  fontWeight: 400,
+  fontSize: 14,
+  color: props.theme.colors.white['0'],
+  textAlign: 'center',
+}));
+
+const ButtonImage = styled.img((props) => ({
+  marginRight: props.theme.spacing(3),
+  alignSelf: 'center',
+  transform: 'all',
+}));
 
 function SendNft() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
@@ -172,31 +209,47 @@ function SendNft() {
     }
   };
   return (
-    <ScrollContainer>
-      <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />
-      <SendFormContainer>
-        <SendForm
-          processing={isLoading}
-          currencyType="NFT"
-          disableAmountInput
-          error={error}
-          onPressSend={onPressSendNFT}
-        >
-          <Container>
-            <NFtContainer>
-              <NftImage
-                metadata={nft?.token_metadata!}
-              />
-            </NFtContainer>
-            <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
-          </Container>
-        </SendForm>
-      </SendFormContainer>
-      <BottomBarContainer>
-        {!isGalleryOpen && <BottomBar tab="nft" />}
-      </BottomBarContainer>
+    <>
+      {isGalleryOpen && (
+      <>
+        <AccountHeaderComponent isNftGalleryOpen={isGalleryOpen} />
+        <Seperator />
+        <ButtonContainer>
+          <Button onClick={handleBackButtonClick}>
+            <>
+              <ButtonImage src={ArrowLeft} />
+              <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
+            </>
+          </Button>
+        </ButtonContainer>
+      </>
+      )}
+      <ScrollContainer>
+        {!isGalleryOpen && <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />}
+        <SendFormContainer>
+          <SendForm
+            processing={isLoading}
+            currencyType="NFT"
+            disableAmountInput
+            error={error}
+            onPressSend={onPressSendNFT}
+          >
+            <Container>
+              <NFtContainer>
+                <NftImage
+                  metadata={nft?.token_metadata!}
+                />
+              </NFtContainer>
+              <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
+            </Container>
+          </SendForm>
+        </SendFormContainer>
+        <BottomBarContainer>
+          {!isGalleryOpen && <BottomBar tab="nft" />}
+        </BottomBarContainer>
 
-    </ScrollContainer>
+      </ScrollContainer>
+    </>
   );
 }
 

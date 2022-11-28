@@ -18,7 +18,7 @@ const NftNameTextContainer = styled.h1((props) => ({
   width: '100%',
   display: 'flex',
   justifyContent: 'flex-start',
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.spacing(6),
 }));
 
 interface ContainerProps {

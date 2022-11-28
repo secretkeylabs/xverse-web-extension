@@ -41,7 +41,6 @@ function NftImage({ metadata }: Props) {
       <Suspense>
         <StyledImg
           width="100%"
-          maxHeight="50px"
           src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
           loader={(
             <ImageContainer>

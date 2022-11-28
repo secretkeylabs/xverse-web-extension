@@ -12,16 +12,8 @@ import {
 } from '@utils/constants';
 
 const TxStatusContainer = styled.div({
-  width: '100%',
-  height: '100%',
-  top: 0,
-  left: 0,
-  bottom: 0,
-  right: 0,
-  position: 'fixed',
-  zIndex: 10,
   background: 'rgba(25, 25, 48, 0.5)',
-  backdropFilter: 'blur(16px)',
+  height: '100%',
 });
 
 const Container = styled.div({
@@ -90,7 +82,7 @@ const BodyText = styled.h1((props) => ({
 }));
 
 const TxIDText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.headline_category_s,
   color: props.theme.colors.white['400'],
   marginTop: props.theme.spacing(8),
   textTransform: 'uppercase',
@@ -161,7 +153,7 @@ function TransactionStatus() {
   };
 
   const onCloseClick = () => {
-    navigate('/');
+    navigate(-1);
   };
 
   const onCopyClick = () => {

@@ -38,8 +38,8 @@ const GridContainer = styled.div<GridContainerProps>((props) => ({
   display: 'grid',
   columnGap: props.theme.spacing(8),
   rowGap: props.theme.spacing(6),
-  gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
-  gridTemplateRows: props.isGalleryOpen ? 'minmax(150px,300px)' : 'minmax(150px,220px)',
+  gridTemplateColumns: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'repeat(auto-fill,minmax(150px,1fr))',
+  gridTemplateRows: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'minmax(150px,220px)',
 }));
 
 const ShareDialogeContainer = styled.div({

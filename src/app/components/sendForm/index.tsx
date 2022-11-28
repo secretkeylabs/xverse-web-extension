@@ -355,6 +355,13 @@ function SendForm({
     </BuyCryptoContainer>
   );
 
+  const checkIfEnableButton = () => {
+    if (disableAmountInput) {
+      if (recipientAddress !== '' || associatedAddress !== '') { return true; }
+    } else if ((amount !== '' && recipientAddress !== '') || associatedAddress !== '') return true;
+    return false;
+  };
+
   return (
     <>
       <ScrollContainer>
@@ -390,7 +397,7 @@ function SendForm({
       <ErrorContainer>
         <ErrorText>{showError}</ErrorText>
       </ErrorContainer>
-      <SendButtonContainer enabled={(amount !== '' && recipientAddress !== '') || associatedAddress !== ''}>
+      <SendButtonContainer enabled={checkIfEnableButton()}>
         <ActionButton
           text={buttonText ?? t('NEXT')}
           processing={processing}

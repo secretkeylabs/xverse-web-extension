@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
+import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import Seperator from '@components/seperator';
 import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
@@ -14,6 +15,21 @@ import RecipientAddressView from '@components/recipinetAddressView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
+import AccountHeaderComponent from '@components/accountHeader';
+import TopRow from '@components/topRow';
+
+const ScrollContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  };
+  height: 600px;
+  width: 360px;
+  margin: auto;
+`;
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -25,6 +41,38 @@ const TitleText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['400'],
   textTransform: 'uppercase',
+}));
+
+const ButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginLeft: '15%',
+  marginTop: props.theme.spacing(20),
+}));
+
+const Button = styled.button((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
+  opacity: 0.8,
+  marginTop: props.theme.spacing(5),
+}));
+
+const ButtonText = styled.div((props) => ({
+  ...props.theme.body_xs,
+  fontWeight: 400,
+  fontSize: 14,
+  color: props.theme.colors.white['0'],
+  textAlign: 'center',
+}));
+
+const ButtonImage = styled.img((props) => ({
+  marginRight: props.theme.spacing(3),
+  alignSelf: 'center',
+  transform: 'all',
 }));
 
 const IndicationText = styled.h1((props) => ({
@@ -68,6 +116,7 @@ const NftTitleText = styled.h1((props) => ({
 
 function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -136,28 +185,46 @@ function ConfirmNftTransaction() {
 
   return (
     <>
-      <ConfirmStxTransationComponent
-        initialStxTransactions={[unsignedTx]}
-        loading={isLoading}
-        onConfirmClick={handleOnConfirmClick}
-        onCancelClick={handleOnCancelClick}
-      >
-        <Container>
-          <IndicationText>{t('INDICATION')}</IndicationText>
-          <NFtContainer>
-
-            <NftImage
-              metadata={nft?.token_metadata!}
-            />
-          </NFtContainer>
-          <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
-        </Container>
-        <RecipientAddressView recipient={recipientAddress} />
-        {networkInfoSection}
+      {isGalleryOpen && (
+      <>
+        <AccountHeaderComponent isNftGalleryOpen={isGalleryOpen} />
         <Seperator />
-      </ConfirmStxTransationComponent>
-      <BottomBar tab="nft" />
+        <ButtonContainer>
+          <Button onClick={handleOnCancelClick}>
+            <>
+              <ButtonImage src={ArrowLeft} />
+              <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
+            </>
+          </Button>
+        </ButtonContainer>
+      </>
+      )}
+      <ScrollContainer>
+        {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
+        <ConfirmStxTransationComponent
+          initialStxTransactions={[unsignedTx]}
+          loading={isLoading}
+          onConfirmClick={handleOnConfirmClick}
+          onCancelClick={handleOnCancelClick}
+        >
+          <Container>
+            <IndicationText>{t('INDICATION')}</IndicationText>
+            <NFtContainer>
+
+              <NftImage
+                metadata={nft?.token_metadata!}
+              />
+            </NFtContainer>
+            <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+          </Container>
+          <RecipientAddressView recipient={recipientAddress} />
+          {networkInfoSection}
+          <Seperator />
+        </ConfirmStxTransationComponent>
+        {!isGalleryOpen && <BottomBar tab="nft" />}
+      </ScrollContainer>
     </>
+
   );
 }
 export default ConfirmNftTransaction;
