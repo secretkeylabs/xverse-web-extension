@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useStackingData from '@hooks/useStackingData';
 import BottomBar from '@components/tabBar';
-import Seperator from '@components/seperator';
 import AccountHeaderComponent from '@components/accountHeader';
 import StackingProgress from './stackingProgress';
 import StartStacking from './startStacking';
@@ -35,7 +34,6 @@ function Stacking() {
   return (
     <>
       <AccountHeaderComponent />
-      <Seperator />
       {isStackingLoading && (
         <LoaderContainer>
           <Ring color="white" size={30} />

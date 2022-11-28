@@ -121,11 +121,19 @@ const router = createHashRouter([
       },
       {
         path: 'transaction-request',
-        element: <TransactionRequest />,
+        element: (
+          <AuthGuard>
+            <TransactionRequest />
+          </AuthGuard>
+        ),
       },
       {
         path: 'authentication-request',
-        element: <AuthenticationRequest />,
+        element: (
+          <AuthGuard>
+            <AuthenticationRequest />
+          </AuthGuard>
+        ),
       },
       {
         path: 'login',

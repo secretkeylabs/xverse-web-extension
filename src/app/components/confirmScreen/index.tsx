@@ -1,20 +1,21 @@
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import styled from 'styled-components';
+import { Ring } from 'react-spinners-css';
 
-const MainContainer = styled.div((props) => ({
+const MainContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
   height: '100%',
-}));
+});
 
-const ControlsContainer = styled.div((props) => ({
+const ControlsContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-end',
   width: '100%',
   marginTop: 'auto',
-}));
+});
 
 const ButtonsContainer = styled.div((props) => ({
   display: 'flex',
@@ -55,21 +56,26 @@ const CancelButton = styled.button((props) => ({
 }));
 
 type Props = {
-  children: ReactElement;
+  children: ReactNode;
   confirmText: string;
   cancelText: string;
   onConfirm: () => void;
   onCancel: () => void;
+  loading: boolean;
 };
 
-function ConfirmScreen({ children, onConfirm, onCancel, confirmText, cancelText }: Props) {
+function ConfirmScreen({
+  children, onConfirm, onCancel, confirmText, cancelText, loading,
+}: Props) {
   return (
     <MainContainer>
       {children}
       <ControlsContainer>
         <ButtonsContainer>
           <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
-          <ConfirmButton onClick={onConfirm}>{confirmText}</ConfirmButton>
+          <ConfirmButton onClick={onConfirm}>
+            {loading ? <Ring color="white" size={20} /> : confirmText}
+          </ConfirmButton>
         </ButtonsContainer>
       </ControlsContainer>
     </MainContainer>

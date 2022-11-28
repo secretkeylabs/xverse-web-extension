@@ -154,7 +154,7 @@ const provider: StacksProvider = {
   getProductInfo() {
     return {
       version: '0.0.1',
-      name: 'Hiro Wallet for Web',
+      name: 'Xverse Wallet',
     };
   },
   request(): Promise<Record<string, any>> {

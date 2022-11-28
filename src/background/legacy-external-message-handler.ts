@@ -6,7 +6,7 @@ import {
   MESSAGE_SOURCE,
 } from '../content-scripts/message-types';
 import { sendMessage } from '../content-scripts/messages';
-import { RouteUrls } from '../content-scripts/route-urls';
+import RequestsRoutes from '../content-scripts/route-urls';
 import popupCenter from './popup-center';
 
 export function inferLegacyMessage(message: any): message is LegacyMessageFromContentScript {
@@ -64,7 +64,7 @@ function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) {
   });
 }
 
-async function triggerRequstWindowOpen(path: RouteUrls, urlParams: URLSearchParams) {
+async function triggerRequstWindowOpen(path: RequestsRoutes, urlParams: URLSearchParams) {
   // if (IS_TEST_ENV) return openRequestInFullPage(path, urlParams);
   console.log(`/options.html#${path}?${urlParams.toString()}`);
   return popupCenter({ url: `/options.html#${path}?${urlParams.toString()}` });
@@ -80,7 +80,7 @@ export async function handleLegacyExternalMethodFormat(
     case ExternalMethods.authenticationRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['authRequest', payload]]);
 
-      const { id } = await triggerRequstWindowOpen(RouteUrls.AuthenticationRequest, urlParams);
+      const { id } = await triggerRequstWindowOpen(RequestsRoutes.AuthenticationRequest, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -100,7 +100,7 @@ export async function handleLegacyExternalMethodFormat(
     case ExternalMethods.transactionRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['request', payload]]);
 
-      const { id } = await triggerRequstWindowOpen(RouteUrls.TransactionRequest, urlParams);
+      const { id } = await triggerRequstWindowOpen(RequestsRoutes.TransactionRequest, urlParams);
       listenForPopupClose({
         id,
         tabId,

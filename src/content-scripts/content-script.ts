@@ -11,7 +11,7 @@ import {
   SignatureRequestEvent,
   TransactionRequestEvent,
 } from './inpage-types';
-import { RouteUrls } from './route-urls';
+import RequestsRoutes from './route-urls';
 import getEventSourceWindow from './get-event-source-window';
 
 // Legacy messaging to work with older versions of Connect
@@ -55,7 +55,7 @@ interface ForwardDomEventToBackgroundArgs {
   payload: string;
   method: LegacyMessageFromContentScript['method'];
   urlParam: string;
-  path: RouteUrls;
+  path: RequestsRoutes;
 }
 
 function forwardDomEventToBackground({ payload, method }: ForwardDomEventToBackgroundArgs) {
@@ -71,7 +71,7 @@ document.addEventListener(DomEventName.authenticationRequest, ((
   event: AuthenticationRequestEvent,
 ) => {
   forwardDomEventToBackground({
-    path: RouteUrls.Onboarding,
+    path: RequestsRoutes.AuthenticationRequest,
     payload: event.detail.authenticationRequest,
     urlParam: 'authRequest',
     method: ExternalMethods.authenticationRequest,
@@ -81,7 +81,7 @@ document.addEventListener(DomEventName.authenticationRequest, ((
 // Listen for a CustomEvent (transaction request) coming from the web app
 document.addEventListener(DomEventName.transactionRequest, ((event: TransactionRequestEvent) => {
   forwardDomEventToBackground({
-    path: RouteUrls.TransactionRequest,
+    path: RequestsRoutes.TransactionRequest,
     payload: event.detail.transactionRequest,
     urlParam: 'request',
     method: ExternalMethods.transactionRequest,
@@ -91,7 +91,7 @@ document.addEventListener(DomEventName.transactionRequest, ((event: TransactionR
 // Listen for a CustomEvent (signature request) coming from the web app
 document.addEventListener(DomEventName.signatureRequest, ((event: SignatureRequestEvent) => {
   forwardDomEventToBackground({
-    path: RouteUrls.SignatureRequest,
+    path: RequestsRoutes.SignatureRequest,
     payload: event.detail.signatureRequest,
     urlParam: 'request',
     method: ExternalMethods.signatureRequest,
@@ -103,7 +103,7 @@ document.addEventListener(DomEventName.structuredDataSignatureRequest, ((
   event: SignatureRequestEvent,
 ) => {
   forwardDomEventToBackground({
-    path: RouteUrls.SignatureRequest,
+    path: RequestsRoutes.SignatureRequest,
     payload: event.detail.signatureRequest,
     urlParam: 'request',
     method: ExternalMethods.structuredDataSignatureRequest,
