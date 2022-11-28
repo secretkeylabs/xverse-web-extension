@@ -27,6 +27,13 @@ const TitleText = styled.h1((props) => ({
   textTransform: 'uppercase',
 }));
 
+const IndicationText = styled.h1((props) => ({
+  ...props.theme.headline_category_s,
+  color: props.theme.colors.white['400'],
+  textTransform: 'uppercase',
+  fontSize: 14,
+}));
+
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginTop: props.theme.spacing(2),
@@ -41,7 +48,8 @@ const Container = styled.div({
 });
 
 const NFtContainer = styled.div((props) => ({
-  maxWidth: 450,
+  maxWidth: 120,
+  maxHeight: 120,
   width: '60%',
   display: 'flex',
   aspectRatio: 1,
@@ -135,7 +143,9 @@ function ConfirmNftTransaction() {
         onCancelClick={handleOnCancelClick}
       >
         <Container>
+          <IndicationText>{t('INDICATION')}</IndicationText>
           <NFtContainer>
+
             <NftImage
               metadata={nft?.token_metadata!}
             />

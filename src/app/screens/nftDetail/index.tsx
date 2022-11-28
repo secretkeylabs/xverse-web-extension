@@ -46,7 +46,7 @@ const ButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   maxWidth: 400,
   marginTop: props.theme.spacing(6),
-  marginBottom: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(16),
 }));
 
 const ShareDialogeContainer = styled.div({
@@ -64,7 +64,7 @@ const GalleryShareDialogeContainer = styled.div({
 const ExtensionContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
+  marginTop: 32,
   alignItems: 'center',
   flex: 1,
 });
@@ -72,6 +72,17 @@ const ExtensionContainer = styled.div({
 const NFtContainer = styled.div((props) => ({
   maxWidth: 450,
   width: '60%',
+  display: 'flex',
+  aspectRatio: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 8,
+  marginBottom: props.theme.spacing(12),
+}));
+
+const ExtensionNFtContainer = styled.div((props) => ({
+  maxHeight: 148,
+  maxWidth: 148,
   display: 'flex',
   aspectRatio: 1,
   justifyContent: 'center',
@@ -283,14 +294,6 @@ function NftDetailScreen() {
     });
   };
 
-  const nftImage = (
-    <NFtContainer>
-      <NftImage
-        metadata={nft?.token_metadata!}
-      />
-    </NFtContainer>
-  );
-
   const ownedByView = (
     <RowContainer>
       <NftOwnedByText>{t('OWNED_BY')}</NftOwnedByText>
@@ -306,7 +309,11 @@ function NftDetailScreen() {
   const extensionView = (
     <>
       <ExtensionContainer>
-        {nftImage}
+        <ExtensionNFtContainer>
+          <NftImage
+            metadata={nft?.token_metadata!}
+          />
+        </ExtensionNFtContainer>
         <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
         {ownedByView}
         <WebGalleryButton onClick={openInGalleryView}>
@@ -361,7 +368,11 @@ function NftDetailScreen() {
           </GalleryShareDialogeContainer>
         </ButtonContainer>
         <RowContainer>
-          {nftImage}
+          <NFtContainer>
+            <NftImage
+              metadata={nft?.token_metadata!}
+            />
+          </NFtContainer>
           <DescriptionContainer>
             <DescriptionText>
               {t('DESCRIPTION')}

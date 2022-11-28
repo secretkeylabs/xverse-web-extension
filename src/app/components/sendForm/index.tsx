@@ -390,7 +390,7 @@ function SendForm({
       <ErrorContainer>
         <ErrorText>{showError}</ErrorText>
       </ErrorContainer>
-      <SendButtonContainer enabled={amount !== '' && recipientAddress !== ''}>
+      <SendButtonContainer enabled={(amount !== '' && recipientAddress !== '') || associatedAddress !== ''}>
         <ActionButton
           text={buttonText ?? t('NEXT')}
           processing={processing}

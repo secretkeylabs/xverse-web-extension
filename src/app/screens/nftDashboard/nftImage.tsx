@@ -11,8 +11,8 @@ const ImageContainer = styled.div({
   justifyContent: 'center',
   alignItems: 'center',
   width: '100%',
-  overflow: 'hidden',
   flex: 1,
+  overflow: 'hidden',
 });
 
 const Video = styled.video({
@@ -23,7 +23,7 @@ const Video = styled.video({
 
 const StyledImg = styled(Img)`
   border-radius: 8px;
-  object-fit: contAIN;
+  object-fit: contain;
 `;
 interface Props {
   metadata: TokenMetaData;
@@ -39,19 +39,17 @@ function NftImage({ metadata }: Props) {
   if (metadata?.image_protocol) {
     return (
       <Suspense>
-        <ImageContainer>
-          <StyledImg
-            width="100%"
-            maxHeight="50px"
-            src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
-            loader={(
-              <ImageContainer>
-                <Ring color="white" size={30} />
-              </ImageContainer>
+        <StyledImg
+          width="100%"
+          maxHeight="50px"
+          src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
+          loader={(
+            <ImageContainer>
+              <Ring color="white" size={30} />
+            </ImageContainer>
           )}
-            unloader={showNftImagePlaceholder}
-          />
-        </ImageContainer>
+          unloader={showNftImagePlaceholder}
+        />
 
       </Suspense>
     );

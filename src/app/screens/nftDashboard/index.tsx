@@ -39,7 +39,7 @@ const GridContainer = styled.div<GridContainerProps>((props) => ({
   columnGap: props.theme.spacing(8),
   rowGap: props.theme.spacing(6),
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
-  gridTemplateRows: props.isGalleryOpen ? 'minmax(150px,300px)' : 'minmax(150px,190px)',
+  gridTemplateRows: props.isGalleryOpen ? 'minmax(150px,300px)' : 'minmax(150px,220px)',
 }));
 
 const ShareDialogeContainer = styled.div({
@@ -151,7 +151,7 @@ function NftDashboard() {
     isLoading, data,
   } = useQuery(
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNfts(stxAddress, network, offset.current),
+    async () => getNfts('SP2VC4CXTWYRZEV7MSGXPNHE739N14ECQWX8JP2BF', network, offset.current),
   );
 
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;

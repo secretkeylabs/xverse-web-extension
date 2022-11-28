@@ -37,20 +37,19 @@ const Container = styled.div({
 });
 
 const NFtContainer = styled.div((props) => ({
-  maxWidth: 450,
-  width: '60%',
+  maxHeight: 148,
+  maxWidth: 148,
   display: 'flex',
   aspectRatio: 1,
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
-  padding: props.theme.spacing(5),
-  marginTop: props.theme.spacing(15),
-  marginBottom: props.theme.spacing(6),
+  marginTop: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(12),
 }));
 
 const SendFormContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(10.5),
+  marginBottom: props.theme.spacing(5),
 }));
 
 const NftTitleText = styled.h1((props) => ({
@@ -58,6 +57,10 @@ const NftTitleText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));
+
+const BottomBarContainer = styled.div({
+  marginTop: 'auto',
+});
 
 function SendNft() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
@@ -189,8 +192,10 @@ function SendNft() {
           </Container>
         </SendForm>
       </SendFormContainer>
+      <BottomBarContainer>
+        {!isGalleryOpen && <BottomBar tab="nft" />}
+      </BottomBarContainer>
 
-      {!isGalleryOpen && <BottomBar tab="nft" />}
     </ScrollContainer>
   );
 }

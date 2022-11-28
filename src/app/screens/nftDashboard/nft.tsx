@@ -12,7 +12,6 @@ interface Props {
 
 const NftNameText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  textAlign: 'flex-start',
 }));
 
 const NftNameTextContainer = styled.h1((props) => ({
@@ -22,14 +21,27 @@ const NftNameTextContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(4),
 }));
 
-const GradientContainer = styled.div({
+interface ContainerProps {
+  isGalleryView: boolean;
+}
+
+const GradientContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
-  width: '100%',
-  height: '100%',
+  width: props.isGalleryView ? '100%' : 150,
+  height: props.isGalleryView ? '100%' : 150,
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
   background: 'linear-gradient(to bottom,#E5A78E, #EA603E, #4D52EF)',
+}));
+
+const NftImageContainer = styled.div({
+  flex: 1,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  overflow: 'hidden',
 });
 
 interface GridContainerProps {
@@ -67,23 +79,26 @@ function Nft({ asset }: Props) {
       navigate(`nft-detail/${url}`);
     }
   };
+  const showNftImg = isGalleryOpen ? (
+    <NftImageContainer>
+      <NftImage metadata={asset?.data?.token_metadata!} />
+    </NftImageContainer>
+  ) : (
+    <NftImage metadata={asset?.data?.token_metadata!} />
+  );
 
   return (
     <GridItemContainer onClick={handleOnClick} showBorder={isGalleryOpen}>
       {asset.asset_identifier === BNS_CONTRACT ? (
-        <GradientContainer>
+        <GradientContainer isGalleryView={isGalleryOpen}>
           <img src={NftUser} alt="user" />
         </GradientContainer>
-
       ) : (
-        <NftImage
-          metadata={asset?.data?.token_metadata!}
-        />
+        showNftImg
       )}
       <NftNameTextContainer>
         <NftNameText>{getName()}</NftNameText>
       </NftNameTextContainer>
-
     </GridItemContainer>
   );
 }
