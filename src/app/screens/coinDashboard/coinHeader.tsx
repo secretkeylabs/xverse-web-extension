@@ -267,7 +267,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   );
 
   const renderStackingBalances = () => {
-    if (!loadingWalletData && !stxLockedBalance.eq(0, 10) && coin === 'STX') {
+    if (!loadingWalletData && !new BigNumber(stxLockedBalance).eq(0, 10) && coin === 'STX') {
       return (
         <>
           <HeaderSeparator />
@@ -276,7 +276,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
               <img src={Lock} alt="locked" />
               <span>{t('STX_LOCKED_BALANCE_PREFIX')}</span>
               <NumericFormat
-                value={microstacksToStx(stxLockedBalance).toString()}
+                value={microstacksToStx(new BigNumber(stxLockedBalance)).toString()}
                 displayType="text"
                 thousandSeparator
                 renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
@@ -285,7 +285,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <AvailableStxContainer>
               <span>{t('STX_AVAILABLE_BALANCE_PREFIX')}</span>
               <NumericFormat
-                value={microstacksToStx(stxAvailableBalance).toString()}
+                value={microstacksToStx(new BigNumber(stxAvailableBalance)).toString()}
                 displayType="text"
                 thousandSeparator
                 renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
