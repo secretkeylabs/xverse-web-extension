@@ -3,7 +3,7 @@ import SwapImage from '@assets/img/swap-illustration.svg';
 import BNSImage from '@assets/img/bns-illustration.svg';
 import NFTImage from '@assets/img/nft-illustration.svg';
 import styled from 'styled-components';
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const headerImageMapping = {
@@ -29,7 +29,7 @@ const AdvanceSettingsButton = styled.button((props) => ({
 
 const FeesContainer = styled.div(() => ({}));
 
-type Props = { children: ReactElement; onConfirm: () => void; onCancel: () => void };
+type Props = { children: ReactNode; onConfirm: () => void; onCancel: () => void };
 
 function ConfirmTransaction({ children, onConfirm, onCancel }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION_SCREEN' });
@@ -40,6 +40,7 @@ function ConfirmTransaction({ children, onConfirm, onCancel }: Props) {
       cancelText={t('CANCEL_BUTTON')}
       onConfirm={onConfirm}
       onCancel={onCancel}
+      loading={false}
     >
       <>
         {children}
@@ -48,7 +49,7 @@ function ConfirmTransaction({ children, onConfirm, onCancel }: Props) {
           <Fees />
           <FiatFees /> */}
         </FeesContainer>
-        <AdvanceSettingsButton>{'Advance settings'}</AdvanceSettingsButton>
+        <AdvanceSettingsButton>Advance settings</AdvanceSettingsButton>
       </>
     </ConfirmScreen>
   );

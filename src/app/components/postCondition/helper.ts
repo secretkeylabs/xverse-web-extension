@@ -10,18 +10,19 @@ import {
 } from '@stacks/transactions';
 
 export const getIconStringFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition
+  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
 ) => {
-  if (pc.conditionType === PostConditionType.Fungible)
+  if (pc.conditionType === PostConditionType.Fungible) {
     return `${addressToString(pc.assetInfo.address)}.${pc.assetInfo.contractName}.${
       pc.assetInfo.assetName.content
     }`;
+  }
   if (pc.conditionType === PostConditionType.STX) return 'STX';
   return pc.assetInfo.assetName.content;
 };
 
 export const getSymbolFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition
+  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
 ) => {
   if ('assetInfo' in pc) {
     return pc.assetInfo.assetName.content.slice(0, 3).toUpperCase();
@@ -30,7 +31,7 @@ export const getSymbolFromPostCondition = (
 };
 
 export const getNameFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition
+  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
 ) => {
   if ('assetInfo' in pc) {
     return pc.assetInfo.assetName.content;
@@ -40,7 +41,7 @@ export const getNameFromPostCondition = (
 
 export function getPostConditionCodeMessage(
   code: FungibleConditionCode | NonFungibleConditionCode,
-  isSender: boolean
+  isSender: boolean,
 ) {
   const sender = isSender
     ? i18n.t('post_condition_message.you')
@@ -61,11 +62,13 @@ export function getPostConditionCodeMessage(
     case FungibleConditionCode.LessEqual:
       return `${sender} ${i18n.t('post_condition_message.post_condition_less_equal')}`;
 
-    case NonFungibleConditionCode.DoesNotSend:
+    case NonFungibleConditionCode.DoesNotOwn:
       return `${sender} ${i18n.t('post_condition_message.post_condition_does_not_own')}`;
 
-    case NonFungibleConditionCode.Sends:
+    case NonFungibleConditionCode.Owns:
       return `${sender} ${i18n.t('post_condition_message.post_condition_own')}`;
+    default:
+      return '';
   }
 }
 
@@ -91,7 +94,5 @@ const getTitleFromConditionCode = (code: FungibleConditionCode | NonFungibleCond
 };
 
 export const getPostConditionTitle = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition
-) => {
-  return getTitleFromConditionCode(pc.conditionCode) || '';
-};
+  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
+) => getTitleFromConditionCode(pc.conditionCode) || '';

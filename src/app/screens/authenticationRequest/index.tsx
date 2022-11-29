@@ -18,6 +18,7 @@ const MainContainer = styled.div({
   justifyContent: 'center',
   width: '100%',
   height: '100%',
+  overflow: 'hidden',
 });
 
 const TopImage = styled.img({

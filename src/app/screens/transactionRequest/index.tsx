@@ -1,20 +1,8 @@
-import SwapImage from '@assets/img/swap-illustration.svg';
-import BNSImage from '@assets/img/bns-illustration.svg';
-import NFTImage from '@assets/img/nft-illustration.svg';
 import styled from 'styled-components';
-import ConfirmTransaction from '@components/confirmTransactionScreen';
-import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
 import PostCondition from '@components/postCondition';
-
-const headerImageMapping = {
-  'purchase-asset': NFTImage,
-  'buy-item': NFTImage,
-  'buy-in-ustx': NFTImage,
-  'name-preorder': BNSImage,
-  'swap-x-for-y': SwapImage,
-  'swap-helper': SwapImage,
-};
+import useDappRequest from '@hooks/useTransationRequest';
+import ConfirmScreen from '@components/confirmScreen';
+import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
 
 const MainContainer = styled.div((props) => ({
   display: 'flex',
@@ -24,41 +12,23 @@ const MainContainer = styled.div((props) => ({
   height: '100%',
 }));
 
-const TopImage = styled.img((props) => ({
-  marginTop: 40,
-}));
-
-const FunctionTitle = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
-  marginTop: 16,
-}));
-
-const DappTitle = styled.h2((props) => ({
-  ...props.theme.body_l,
-  color: props.theme.colors.white['400'],
-  marginTop: 4,
-}));
-
 function TransactionRequest() {
-  const appName = 'gamma.io';
-  const functionName = 'purchase-asset';
-
   const confirmCallback = () => {};
   const cancelCallback = () => {};
-
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
-
+  const { payload } = useDappRequest();
   return (
-    <ConfirmTransaction onConfirm={confirmCallback} onCancel={cancelCallback}>
+    <ConfirmScreen
+      onConfirm={confirmCallback}
+      onCancel={cancelCallback}
+      cancelText="cancel"
+      confirmText="confirm"
+      loading={false}
+    >
       <MainContainer>
-        <TopImage src={headerImageMapping['buy-in-ustx']} alt="" />
-        <FunctionTitle>{functionName}</FunctionTitle>
-        <DappTitle>{`Requested by ${appName}`} </DappTitle>
-        {/* <PostCondition postCondition={} showMore={false} /> */}
+        {payload.txType === 'contract_call' && <ContractCallRequest request={payload} />}
+        {/* <PostCondition postCondition={payload.postConditions} showMore={false} /> */}
       </MainContainer>
-    </ConfirmTransaction>
+    </ConfirmScreen>
   );
 }
 
