@@ -11,7 +11,7 @@ const DescriptionHeadingText = styled.h1((props) => ({
 const DescriptionValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['0'],
-  marginBottom: props.theme.spacing(21),
+  marginBottom: props.theme.spacing(16),
 }));
 
 const ColumnContainer = styled.h1({

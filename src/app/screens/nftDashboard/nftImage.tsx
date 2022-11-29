@@ -6,11 +6,14 @@ import { TokenMetaData } from '@secretkeylabs/xverse-core/types/api/stacks/asset
 import { getFetchableUrl } from '@utils/helper';
 import NftPlaceholderImage from '@assets/img/nftDashboard/ic_nft_diamond.svg';
 
-const ImageContainer = styled.div((props) => ({
-  padding: props.theme.spacing(10),
-  borderRadius: props.theme.radius(2),
-  marginBottom: props.theme.spacing(4),
-}));
+const ImageContainer = styled.div({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  flex: 1,
+  overflow: 'hidden',
+});
 
 const Video = styled.video({
   width: '100%',
@@ -18,6 +21,10 @@ const Video = styled.video({
   objectFit: 'cover',
 });
 
+const StyledImg = styled(Img)`
+  border-radius: 8px;
+  object-fit: contain;
+`;
 interface Props {
   metadata: TokenMetaData;
 }
@@ -32,7 +39,7 @@ function NftImage({ metadata }: Props) {
   if (metadata?.image_protocol) {
     return (
       <Suspense>
-        <Img
+        <StyledImg
           width="100%"
           src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
           loader={(
@@ -42,6 +49,7 @@ function NftImage({ metadata }: Props) {
           )}
           unloader={showNftImagePlaceholder}
         />
+
       </Suspense>
     );
   }

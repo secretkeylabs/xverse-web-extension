@@ -18,6 +18,7 @@ const TypeText = styled.h1((props) => ({
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white['0'],
+  wordBreak: 'break-all',
   marginLeft: props.theme.spacing(3),
 }));
 

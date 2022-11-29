@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 
 const Container = styled.div((props) => ({
-  marginTop: props.theme.spacing(3),
+  marginTop: props.theme.spacing(6),
   marginBottom: props.theme.spacing(20),
 }));
 

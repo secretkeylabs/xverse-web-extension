@@ -13,6 +13,7 @@ import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import { getTicker } from '@utils/helper';
+import TopRow from '@components/topRow';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -102,8 +103,13 @@ function ConfirmFtTransaction() {
     } return '';
   }
 
+  const handleBackButtonClick = () => {
+    navigate(-1);
+  };
+
   return (
     <>
+      <TopRow title={t('CONFIRM_TX')} onClick={handleBackButtonClick} />
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
