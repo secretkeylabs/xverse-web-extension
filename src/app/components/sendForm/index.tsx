@@ -339,7 +339,7 @@ function SendForm({
   };
 
   const onBuyClick = () => {
-    navigate(`/buy-stx/${currencyType}`);
+    navigate(`/buy/${currencyType}`);
   };
 
   const buyCryptoMessage = balance === 0 && (currencyType === 'STX' || currencyType === 'BTC') && (
@@ -354,6 +354,13 @@ function SendForm({
       </ColumnContainer>
     </BuyCryptoContainer>
   );
+
+  const checkIfEnableButton = () => {
+    if (disableAmountInput) {
+      if (recipientAddress !== '' || associatedAddress !== '') { return true; }
+    } else if ((amount !== '' && recipientAddress !== '') || associatedAddress !== '') return true;
+    return false;
+  };
 
   return (
     <>
@@ -390,7 +397,7 @@ function SendForm({
       <ErrorContainer>
         <ErrorText>{showError}</ErrorText>
       </ErrorContainer>
-      <SendButtonContainer enabled={amount !== '' && recipientAddress !== ''}>
+      <SendButtonContainer enabled={checkIfEnableButton()}>
         <ActionButton
           text={buttonText ?? t('NEXT')}
           processing={processing}

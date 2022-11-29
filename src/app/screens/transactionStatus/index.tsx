@@ -11,6 +11,11 @@ import {
   TRANSACTION_STATUS_URL,
 } from '@utils/constants';
 
+const TxStatusContainer = styled.div({
+  background: 'rgba(25, 25, 48, 0.5)',
+  height: '100%',
+});
+
 const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -21,7 +26,7 @@ const OuterContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  marginTop: props.theme.spacing(50),
+  marginTop: props.theme.spacing(46),
   flex: 1,
 }));
 
@@ -37,7 +42,7 @@ const TransactionIDContainer = styled.div((props) => ({
 
 const ButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(15),
-  marginBottom: props.theme.spacing(15),
+  marginBottom: props.theme.spacing(32),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
 }));
@@ -53,7 +58,6 @@ const RowContainer = styled.div((props) => ({
 const TxIDContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'center',
 });
 
 const Image = styled.img({
@@ -73,8 +77,15 @@ const BodyText = styled.h1((props) => ({
   color: props.theme.colors.white['400'],
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
-  marginLeft: props.theme.spacing(3),
-  marginRight: props.theme.spacing(3),
+  marginLeft: props.theme.spacing(5),
+  marginRight: props.theme.spacing(5),
+}));
+
+const TxIDText = styled.h1((props) => ({
+  ...props.theme.headline_category_s,
+  color: props.theme.colors.white['400'],
+  marginTop: props.theme.spacing(8),
+  textTransform: 'uppercase',
 }));
 
 const BeforeButtonText = styled.h1((props) => ({
@@ -85,12 +96,13 @@ const BeforeButtonText = styled.h1((props) => ({
 const IDText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['0'],
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.spacing(2),
   wordBreak: 'break-all',
 }));
 
 const ButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
+  marginRight: props.theme.spacing(2),
   color: props.theme.colors.white['0'],
 }));
 
@@ -103,9 +115,8 @@ const ButtonImage = styled.img((props) => ({
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
   backgroundColor: 'transparent',
+  marginTop: props.theme.spacing(2),
   marginLeft: props.theme.spacing(3),
 }));
 
@@ -142,7 +153,7 @@ function TransactionStatus() {
   };
 
   const onCloseClick = () => {
-    navigate('/');
+    navigate(-1);
   };
 
   const onCopyClick = () => {
@@ -163,18 +174,18 @@ function TransactionStatus() {
 
   const renderTransactionID = (
     <TransactionIDContainer>
-      <BodyText>{t('TRANSACTION_ID')}</BodyText>
+      <TxIDText>{t('TRANSACTION_ID')}</TxIDText>
       <TxIDContainer>
         <IDText>{txid}</IDText>
         <Button onClick={onCopyClick}>
-          <ButtonImage src={Copy} />
+          <img src={Copy} alt="copy" />
         </Button>
       </TxIDContainer>
     </TransactionIDContainer>
   );
 
   return (
-    <>
+    <TxStatusContainer>
       <OuterContainer>
         {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
         {txid && renderLink}
@@ -183,7 +194,7 @@ function TransactionStatus() {
       <ButtonContainer>
         <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
       </ButtonContainer>
-    </>
+    </TxStatusContainer>
   );
 }
 

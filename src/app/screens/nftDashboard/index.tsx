@@ -9,7 +9,7 @@ import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
 import ActionButton from '@components/button';
-import { getNftsData } from '@secretkeylabs/xverse-core/api';
+import { getNfts } from '@secretkeylabs/xverse-core/api';
 import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
@@ -30,11 +30,16 @@ const Container = styled.div`
   }
 `;
 
-const GridContainer = styled.div((props) => ({
+interface GridContainerProps {
+  isGalleryOpen: boolean;
+}
+
+const GridContainer = styled.div<GridContainerProps>((props) => ({
   display: 'grid',
   columnGap: props.theme.spacing(8),
   rowGap: props.theme.spacing(6),
-  gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
+  gridTemplateColumns: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'repeat(auto-fill,minmax(150px,1fr))',
+  gridTemplateRows: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'minmax(150px,220px)',
 }));
 
 const ShareDialogeContainer = styled.div({
@@ -42,12 +47,6 @@ const ShareDialogeContainer = styled.div({
   top: 0,
   right: 0,
 });
-
-const WebGalleryButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginTop: props.theme.spacing(4),
-}));
 
 const CollectibleContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
@@ -72,7 +71,12 @@ const ButtonContainer = styled.div((props) => ({
 }));
 
 const ShareButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(2),
+  marginLeft: props.theme.spacing(3),
+  width: '100%',
+}));
+
+const ReceiveButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(3),
   width: '100%',
 }));
 
@@ -84,13 +88,13 @@ const WebGalleryButton = styled.button((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(5),
+  marginTop: props.theme.spacing(8),
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white['200'],
   textAlign: 'center',
 }));
 
@@ -147,8 +151,9 @@ function NftDashboard() {
     isLoading, data,
   } = useQuery(
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNftsData(stxAddress, network, offset.current),
+    async () => getNfts(stxAddress, network, offset.current),
   );
+
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   const openInGalleryView = async () => {
@@ -163,7 +168,7 @@ function NftDashboard() {
         {t('NO_COLLECTIBLES')}
       </NoCollectiblesText>
     ) : (
-      <GridContainer>
+      <GridContainer isGalleryOpen={isGalleryOpen}>
         { data?.nftsList?.map((nft) => (
           <Nft asset={nft} />
         ))}
@@ -197,18 +202,20 @@ function NftDashboard() {
           )
             : <CollectiblesValueText>{`${data?.total} ${t('ITEMS')}`}</CollectiblesValueText>}
           {!isGalleryOpen && (
-          <WebGalleryButtonContainer>
+
             <WebGalleryButton onClick={openInGalleryView}>
               <>
                 <ButtonImage src={SquaresFour} />
                 <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
               </>
             </WebGalleryButton>
-          </WebGalleryButtonContainer>
+
           )}
         </CollectibleContainer>
         <ButtonContainer>
-          <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
+          <ReceiveButtonContainer>
+            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
+          </ReceiveButtonContainer>
           <ShareButtonContainer>
             <ActionButton
               src={ShareNetwork}

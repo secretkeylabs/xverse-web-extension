@@ -14,6 +14,7 @@ import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
+import TopRow from '@components/topRow';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const InfoContainer = styled.div((props) => ({
@@ -151,6 +152,7 @@ function ConfirmStxTransaction() {
   };
   return (
     <>
+      <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
