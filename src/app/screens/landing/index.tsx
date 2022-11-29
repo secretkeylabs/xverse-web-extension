@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 import logo from '@assets/img/full_logo_vertical.svg';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { setWalletAction } from '@stores/wallet/actions/actionCreators';
-import { newWallet } from '@secretkeylabs/xverse-core/wallet';
+import useWalletReducer from '@hooks/useWalletReducer';
 
 const TopSectionContainer = styled.div({
   display: 'flex',
@@ -65,7 +63,9 @@ const RestoreButton = styled.button((props) => ({
 
 function Landing(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LANDING_SCREEN' });
-  const dispatch = useDispatch();
+  const {
+    createWallet,
+  } = useWalletReducer();
 
   const openInNewTab = async () => {
     await chrome.tabs.create({
@@ -75,12 +75,11 @@ function Landing(): JSX.Element {
 
   const handlePressCreate = async () => {
     try {
-      const wallet = await newWallet();
-      dispatch(setWalletAction(wallet));
+      await createWallet();
     } catch (err) {
       return await Promise.reject(err);
     } finally {
-      await openInNewTab();
+      setTimeout(async () => openInNewTab(), 500);
     }
   };
 

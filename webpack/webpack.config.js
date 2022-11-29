@@ -105,7 +105,6 @@ var options = {
       stream: require.resolve('stream-browserify'),
       crypto: require.resolve('crypto-browserify'),
       fs: false,
-      // util: require.resolve('util/'),
     },
   },
   plugins: [
@@ -139,6 +138,11 @@ var options = {
           to: BUILD_ROOT_PATH,
         },
       ],
+    }),
+    new CopyWebpackPlugin({
+      patterns: [{
+        from: 'node_modules/webextension-polyfill/dist/browser-polyfill.js',
+      }],
     }),
     new HtmlWebpackPlugin({
       template: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.html'),

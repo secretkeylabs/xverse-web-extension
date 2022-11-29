@@ -8,14 +8,9 @@ Message<Msg, Payload>,
 'source'
 >;
 
-export type RequestDerivedStxAccounts = BackgroundMessage<
-InternalMethods.RequestDerivedStxAccounts,
-{ secretKey: string; highestAccountIndex: number }
->;
-
 type ShareInMemoryKeyToBackground = BackgroundMessage<
 InternalMethods.ShareInMemoryKeyToBackground,
-{ secretKey: string; keyId: string }
+{ secretKey: string; }
 >;
 
 type RequestInMemoryKeys = BackgroundMessage<InternalMethods.RequestInMemoryKeys>;
@@ -28,7 +23,6 @@ InternalMethods.OriginatingTabClosed,
 >;
 
 export type BackgroundMessages =
-  | RequestDerivedStxAccounts
   | ShareInMemoryKeyToBackground
   | RequestInMemoryKeys
   | RemoveInMemoryKeys

@@ -39,6 +39,13 @@ export function storeEncryptedSeedAction(encryptedSeed: string): actions.StoreEn
   };
 }
 
+export function setWalletSeedPhraseAction(seedPhrase: string) : actions.SetWalletSeedPhrase {
+  return {
+    type: actions.SetWalletSeedPhraseKey,
+    seedPhrase,
+  };
+}
+
 export function resetWalletAction(): actions.ResetWallet {
   return {
     type: actions.ResetWalletKey,
