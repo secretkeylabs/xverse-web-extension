@@ -238,7 +238,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   };
 
   function formatAddress(addr: string): string {
-    return `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}`;
+    return addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
   }
 
   const renderFtInfo = () => (

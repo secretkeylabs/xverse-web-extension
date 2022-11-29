@@ -16,7 +16,7 @@ function isBtcTransaction(tx: StxTransactionData | BtcTransactionData): tx is Bt
 }
 
 function formatAddress(addr: string): string {
-  return `${addr.substring(0, 4)}...${addr.substring(addr.length - 4, addr.length)}`;
+  return addr ? `${addr.substring(0, 4)}...${addr.substring(addr.length - 4, addr.length)}` : '';
 }
 
 export default function TransactionRecipient(props: TransactionRecipientProps): JSX.Element | null {
