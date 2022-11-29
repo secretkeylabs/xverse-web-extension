@@ -148,7 +148,13 @@ function ConfirmStxTransaction() {
   };
 
   const handleOnCancelClick = () => {
-    navigate(-1);
+    navigate('/send-stx', {
+      state: {
+        recipientAddress: recipient,
+        amountToSend: getAmount().toString(),
+        stxMemo: memo,
+      },
+    });
   };
   return (
     <>

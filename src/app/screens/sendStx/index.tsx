@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { generateUnsignedStxTokenTransferTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
@@ -25,7 +25,16 @@ function SendStxScreen() {
   );
   const [error, setError] = useState('');
   const { data: stxPendingTxData } = useStxPendingTxData();
+  const location = useLocation();
+  let recipientAddress: string | undefined;
+  let amountToSend: string | undefined;
+  let stxMemo: string | undefined;
 
+  if (location.state) {
+    recipientAddress = location.state.recipientAddress;
+    amountToSend = location.state.amountToSend;
+    stxMemo = location.state.stxMemo;
+  }
   const { isLoading, data, mutate } = useMutation<
   StacksTransaction,
   Error,
@@ -131,6 +140,9 @@ function SendStxScreen() {
         error={error}
         balance={Number(microstacksToStx(new BigNumber(stxAvailableBalance)))}
         onPressSend={onPressSendSTX}
+        recipient={recipientAddress!}
+        amountToSend={amountToSend!}
+        stxMemo={stxMemo!}
       />
       <BottomBar tab="dashboard" />
     </>

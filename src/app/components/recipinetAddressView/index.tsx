@@ -16,6 +16,11 @@ const RowContainer = styled.div({
   flexDirection: 'row',
 });
 
+const AddressContainer = styled.div({
+  display: 'flex',
+  flex: 1,
+});
+
 const TitleText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['400'],
@@ -63,7 +68,9 @@ function RecipientAddressView({ recipient }: Props) {
       <TitleText>{t('RECEPIENT_ADDRESS')}</TitleText>
       <ValueText>{bnsName}</ValueText>
       <RowContainer>
-        {bnsName ? <AssociatedAddressText>{recipient}</AssociatedAddressText> : <ValueText>{recipient}</ValueText>}
+        <AddressContainer>
+          {bnsName ? <AssociatedAddressText>{recipient}</AssociatedAddressText> : <ValueText>{recipient}</ValueText>}
+        </AddressContainer>
         <ActionButton onClick={handleOnPress}>
           <ButtonImage src={ArrowSquareOut} />
         </ActionButton>

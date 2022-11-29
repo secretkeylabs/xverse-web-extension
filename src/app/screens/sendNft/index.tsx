@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   StacksTransaction, cvToHex, uintCV, UnsignedStacksTransation,
 } from '@secretkeylabs/xverse-core/types';
@@ -103,6 +103,12 @@ function SendNft() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
+  let address: string | undefined;
+
+  if (location.state) {
+    address = location.state.recipientAddress;
+  }
   const { nftData } = useNftDataSelector();
   const nftIdDetails = id!.split('::');
   const [nft, setNft] = useState<NftData | undefined>(undefined);
@@ -232,6 +238,7 @@ function SendNft() {
             currencyType="NFT"
             disableAmountInput
             error={error}
+            recipient={address}
             onPressSend={onPressSendNFT}
           >
             <Container>
