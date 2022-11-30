@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import LinkIcon from '@assets/img/linkIcon.svg';
 import { useNavigate } from 'react-router-dom';
 import { saveIsTermsAccepted } from '@utils/localStorage';
+import Seperator from '@components/seperator';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 
 const Container = styled.div((props) => ({
@@ -15,7 +16,7 @@ const Container = styled.div((props) => ({
 }));
 
 const Title = styled.h1((props) => ({
-  ...props.theme.tile_text,
+  ...props.theme.bold_tile_text,
   color: props.theme.colors.white['0'],
   marginTop: props.theme.spacing(20),
 }));
@@ -33,6 +34,15 @@ const ActionButton = styled.a((props) => ({
   marginTop: props.theme.spacing(8),
   color: props.theme.colors.white['0'],
 }));
+
+const CustomisedActionButton = styled(ActionButton)`
+  :hover {
+    opacity: 0.8;
+  }
+  :active {
+    opacity: 1;
+  }
+`;
 
 const ActionButtonsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(20),
@@ -71,14 +81,15 @@ function LegalLinks() {
       <Title>{t('SCREEN_TITLE')}</Title>
       <SubTitle>{t('SCREEN_SUBTITLE')}</SubTitle>
       <ActionButtonsContainer>
-        <ActionButton href={TERMS_LINK} target="_blank">
+        <CustomisedActionButton href={TERMS_LINK} target="_blank">
           {t('TERMS_SERVICES_LINK_BUTTON')}
           <img src={LinkIcon} alt="terms" />
-        </ActionButton>
-        <ActionButton href={PRIVACY_POLICY_LINK} target="_blank">
+        </CustomisedActionButton>
+        <Seperator />
+        <CustomisedActionButton href={PRIVACY_POLICY_LINK} target="_blank">
           {t('PRIVACY_POLICY_LINK_BUTTON')}
           <img src={LinkIcon} alt="privacy" />
-        </ActionButton>
+        </CustomisedActionButton>
       </ActionButtonsContainer>
       <AcceptButton onClick={handleLegalAccept}>{t('ACCEPT_LEGAL_BUTTON')}</AcceptButton>
     </Container>

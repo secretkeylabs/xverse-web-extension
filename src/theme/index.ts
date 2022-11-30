@@ -97,6 +97,13 @@ const Theme = {
     fontSize: 18,
     letterSpacing: 0.02,
   },
+  bold_tile_text: {
+    fontFamily: 'Satoshi-Bold',
+    fontStyle: 'normal',
+    fontWeight: '700',
+    fontSize: 18,
+    letterSpacing: 0.02,
+  },
   headline_l: {
     fontFamily: 'Satoshi-Bold',
     fontStyle: 'normal',

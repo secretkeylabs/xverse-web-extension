@@ -155,7 +155,9 @@
     "CLOSE_TAB": "Close this tab",
     "CLICK": "Click",
     "THEN": "then",
-    "OPEN_WALLET":"to open your wallet"
+    "OPEN_WALLET":"to open your wallet",
+    "RESTORE_SCREEN_TITLE": "Wallet restored",
+    "RESTORE_SCREEN_SUBTITLE": "Your wallet has been successfully restored, you can now log in to it."
   },
   "LOGIN_SCREEN": {
     "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",

@@ -4,6 +4,7 @@ import Pin from '@assets/img/createWalletSuccess/pin.svg';
 import Logo from '@assets/img/createWalletSuccess/logo.svg';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { useParams } from 'react-router-dom';
 
 const InstructionsContainer = styled.div((props) => ({
   display: 'flex',
@@ -72,7 +73,7 @@ const ContinueButton = styled.button((props) => ({
 
 function CreateWalletSuccess(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'WALLET_SUCCESS_SCREEN' });
-
+  const { action } = useParams();
   const handleOpenWallet = () => {
     window.close();
   };
@@ -81,8 +82,8 @@ function CreateWalletSuccess(): JSX.Element {
     <>
       <ContentContainer>
         <img src={CheckCircle} alt="success" />
-        <Title>{t('SCREEN_TITLE')}</Title>
-        <Subtitle>{t('SCREEN_SUBTITLE')}</Subtitle>
+        <Title>{action === 'restore' ? t('RESTORE_SCREEN_TITLE') : t('SCREEN_TITLE')}</Title>
+        <Subtitle>{action === 'restore' ? t('RESTORE_SCREEN_SUBTITLE') : t('SCREEN_SUBTITLE')}</Subtitle>
       </ContentContainer>
       <ContinueButton onClick={handleOpenWallet}>{t('CLOSE_TAB')}</ContinueButton>
       <InstructionsContainer>

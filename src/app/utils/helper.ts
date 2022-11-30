@@ -1,10 +1,7 @@
-import { FungibleToken, Account, StxMempoolTransactionData } from '@secretkeylabs/xverse-core/types';
+import { Account, StxMempoolTransactionData } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BigNumber from 'bignumber.js';
-import {
-  btcToSats, getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
-} from '@secretkeylabs/xverse-core';
 
 const validUrl = require('valid-url');
 
@@ -69,7 +66,7 @@ export function getExplorerUrl(stxAddress: string): string {
 }
 
 export function getFetchableUrl(uri: string, protocol: string): string | undefined {
-  const publicIpfs = 'https://ipfs.io/ipfs';
+  const publicIpfs = 'https:/cf-ipfs.com/ipfs';
   if (protocol === 'http') return uri;
   if (protocol === 'ipfs') {
     const url = uri.split('//');
