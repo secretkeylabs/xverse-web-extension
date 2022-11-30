@@ -244,11 +244,11 @@ function Home() {
   };
 
   const onBuyStxClick = () => {
-    navigate('/buy-stx/STX');
+    navigate('/buy/STX');
   };
 
   const onBuyBtcClick = () => {
-    navigate('/buy-stx/BTC');
+    navigate('/buy/BTC');
   };
 
   const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined }) => {

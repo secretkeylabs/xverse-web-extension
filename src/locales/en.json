@@ -55,6 +55,7 @@
     "NEXT": "Next",
     "NO_FUNDS":"You don’t have any fund to send.",
     "BUY_CRYPTO": "Buy crypto →",
+    "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {
       "ADDRESS_REQUIRED": "Recipient address is required",
       "AMOUNT_REQUIRED": "Amount is required",
@@ -81,7 +82,9 @@
     "EDIT_FEES":"Edit Fees",
     "CONFIRM":"Confirm",
     "CANCEL":"Cancel",
-    "SATS":"SATS"
+    "SATS":"SATS",
+    "CONFIRM_TX": "Confirm Transaction",
+    "MOVE_TO_ASSET_DETAIL": "Back to asset detail"
   },
   "TRANSACTION_SETTING":{
     "ADVANCED_SETTING":"Advanced Settings",
@@ -220,7 +223,7 @@
     "WEB_GALLERY": "Open web gallery",
     "SEND": "Send",
     "SHARE": "Share",
-    "OWNED_BY": "Owned By",
+    "OWNED_BY": "Owned by",
     "DESCRIPTION": "Description",
     "NAME": "Name",
     "CREATOR": "Creator",
@@ -232,7 +235,8 @@
     "VIEW_CONTRACT": "View the contract on",
     "STACKS_EXPLORER":"Stacks Explorer",
     "DETAILS": "See detail on",
-    "GAMMA": "Gamma.io"
+    "GAMMA": "Gamma.io",
+    "MOVE_TO_ASSET_DETAIL": "Back to gallery"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",

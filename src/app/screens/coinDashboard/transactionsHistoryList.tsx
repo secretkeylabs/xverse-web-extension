@@ -70,62 +70,59 @@ interface TransactionsHistoryListProps {
 }
 
 const groupBtcTxsByDate = (
-  transactions: BtcTransactionData[]
-): { [x: string]: BtcTransactionData[] } =>
-  transactions.reduce(
-    (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
-      const txDate = formatDate(transaction.seenTime);
-      if (!all[txDate]) {
-        if (transaction.txStatus === 'pending') {
-          all.Pending = [transaction];
-        } else {
-          all[txDate] = [transaction];
-        }
+  transactions: BtcTransactionData[],
+): { [x: string]: BtcTransactionData[] } => transactions.reduce(
+  (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
+    const txDate = formatDate(transaction.seenTime);
+    if (!all[txDate]) {
+      if (transaction.txStatus === 'pending') {
+        all.Pending = [transaction];
       } else {
-        all[txDate].push(transaction);
+        all[txDate] = [transaction];
       }
-      return all;
-    },
-    {}
-  );
+    } else {
+      all[txDate].push(transaction);
+    }
+    return all;
+  },
+  {},
+);
 
-const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) =>
-  txs.reduce(
-    (
-      all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
-      transaction: AddressTransactionWithTransfers | Tx
-    ) => {
-      const date = formatDate(
-        new Date(
-          transaction.tx?.burn_block_time_iso ? transaction.tx.burn_block_time_iso : Date.now()
-        )
-      );
-      if (!all[date]) {
-        all[date] = [transaction];
-      } else {
-        all[date].push(transaction);
-      }
-      return all;
-    },
-    {}
-  );
+const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) => txs.reduce(
+  (
+    all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
+    transaction: AddressTransactionWithTransfers | Tx,
+  ) => {
+    const date = formatDate(
+      new Date(
+        transaction.tx?.burn_block_time_iso ? transaction.tx.burn_block_time_iso : Date.now(),
+      ),
+    );
+    if (!all[date]) {
+      all[date] = [transaction];
+    } else {
+      all[date].push(transaction);
+    }
+    return all;
+  },
+  {},
+);
 
 const filterTxs = (
   txs: (AddressTransactionWithTransfers | MempoolTransaction)[],
-  filter: string
-): (AddressTransactionWithTransfers | MempoolTransaction)[] =>
-  txs.filter((atx) => {
-    const tx = isAddressTransactionWithTransfers(atx) ? atx.tx : atx;
-    const acceptedTypes = tx.tx_type === 'contract_call';
-    return (
-      acceptedTypes &&
-      ((atx?.ft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
-        .length > 0 ||
-        (atx?.nft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
-          .length > 0 ||
-        tx?.contract_call?.contract_id === filter)
-    );
-  });
+  filter: string,
+): (AddressTransactionWithTransfers | MempoolTransaction)[] => txs.filter((atx) => {
+  const tx = isAddressTransactionWithTransfers(atx) ? atx.tx : atx;
+  const acceptedTypes = tx.tx_type === 'contract_call';
+  return (
+    acceptedTypes
+      && ((atx?.ft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
+        .length > 0
+        || (atx?.nft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
+          .length > 0
+        || tx?.contract_call?.contract_id === filter)
+  );
+});
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, txFilter } = props;
@@ -149,9 +146,9 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
   return (
     <ListItemsContainer>
       <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>
-      {groupedTxs &&
-        !isLoading &&
-        Object.keys(groupedTxs).map((group) => (
+      {groupedTxs
+        && !isLoading
+        && Object.keys(groupedTxs).map((group) => (
           <>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
