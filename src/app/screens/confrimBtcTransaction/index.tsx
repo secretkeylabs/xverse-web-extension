@@ -89,7 +89,12 @@ function ConfirmBtcTransaction() {
   };
 
   const goBackToScreen = () => {
-    navigate('/send-btc');
+    navigate('/send-btc', {
+      state: {
+        amount,
+        recipientAddress,
+      },
+    });
   };
   return (
     <>

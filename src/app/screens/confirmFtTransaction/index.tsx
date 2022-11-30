@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,8 +13,8 @@ import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCr
 import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
-import { getTicker } from '@utils/helper';
 import TopRow from '@components/topRow';
+import BigNumber from 'bignumber.js';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -91,20 +92,15 @@ function ConfirmFtTransaction() {
     mutate({ signedTx: txs[0] });
   };
 
-  const handleOnCancelClick = () => {
-    navigate(-1);
-  };
-
-  function getFtTicker() {
-    if (fungibleToken.ticker) {
-      return fungibleToken.ticker.toUpperCase();
-    } if (fungibleToken?.name) {
-      return getTicker(fungibleToken.name).toUpperCase();
-    } return '';
-  }
-
   const handleBackButtonClick = () => {
-    navigate(-1);
+    navigate('/send-ft', {
+      state: {
+        recipientAddress: recepientAddress,
+        amountToSend: amount.toString(),
+        stxMemo: memo,
+        fungibleToken,
+      },
+    });
   };
 
   return (
@@ -114,9 +110,9 @@ function ConfirmFtTransaction() {
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
         onConfirmClick={handleOnConfirmClick}
-        onCancelClick={handleOnCancelClick}
+        onCancelClick={handleBackButtonClick}
       >
-        <TransferAmountView currency={getFtTicker()} amount={amount} />
+        <TransferAmountView currency="FT" amount={new BigNumber(amount)} fungibleToken={fungibleToken} />
         <RecipientAddressView recipient={recepientAddress} />
         <InfoContainer>
           <TitleText>{t('NETWORK')}</TitleText>
