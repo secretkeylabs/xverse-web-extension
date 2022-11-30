@@ -56,7 +56,7 @@ export default function TxTransfers(props: TxTransfersProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   function formatAddress(addr: string): string {
-    return `${addr.substring(0, 4)}...${addr.substring(addr.length - 4, addr.length)}`;
+    return addr ? `${addr.substring(0, 4)}...${addr.substring(addr.length - 4, addr.length)}` : '';
   }
 
   const renderTransactionIcon = (transfer: any) => {
