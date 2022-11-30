@@ -206,6 +206,9 @@ interface Props {
   buttonText?: string;
   processing?: boolean;
   children?: ReactNode;
+  recipient?: string;
+  amountToSend? : string;
+  stxMemo? : string;
 }
 
 function SendForm({
@@ -219,13 +222,16 @@ function SendForm({
   buttonText,
   processing,
   children,
+  recipient,
+  amountToSend,
+  stxMemo,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const [amount, setAmount] = useState('');
-  const [memo, setMemo] = useState('');
+  const [amount, setAmount] = useState(amountToSend ?? '');
+  const [memo, setMemo] = useState(stxMemo ?? '');
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
   const [showError, setShowError] = useState<string | undefined>(error);
-  const [recipientAddress, setRecipientAddress] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState(recipient ?? '');
   const navigate = useNavigate();
 
   const {
@@ -320,6 +326,7 @@ function SendForm({
       <AmountInputContainer>
         <InputFieldContainer>
           <InputField
+            value={recipientAddress}
             placeholder={currencyType === 'BTC' ? t('BTC_RECEPIENT_PLACEHOLDER') : t('RECEPIENT_PLACEHOLDER')}
             onChange={onAddressInputChange}
           />
@@ -377,6 +384,7 @@ function SendForm({
               <MemoInputContainer>
                 <InputFieldContainer>
                   <InputField
+                    value={memo}
                     placeholder={t('MEMO_PLACEHOLDER')}
                     onChange={(e: { target: { value: SetStateAction<string>; }; }) => setMemo(e.target.value)}
                   />

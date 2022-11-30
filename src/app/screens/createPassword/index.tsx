@@ -59,13 +59,11 @@ function CreatePassword(): JSX.Element {
   };
 
   const handleConfirmPassword = async () => {
-    try {
-      if (confirmPassword === password) {
-        const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
-        dispatch(storeEncryptedSeedAction(encryptedSeed));
-        navigate('/wallet-success/create');
-      }
-    } catch (err) {
+    if (confirmPassword === password) {
+      const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
+      dispatch(storeEncryptedSeedAction(encryptedSeed));
+      navigate('/create-wallet-success');
+    } else {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));
     }
   };
