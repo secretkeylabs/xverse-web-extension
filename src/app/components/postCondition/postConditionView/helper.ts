@@ -4,8 +4,6 @@ import {
   FungiblePostCondition,
   NonFungiblePostCondition,
   PostConditionType,
-  FungibleConditionCode,
-  NonFungibleConditionCode,
 } from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
 import { initBigNumber } from '@utils/helper';
@@ -72,7 +70,7 @@ export const getSymbolFromPostCondition = (
   pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
 ) => {
   if ('assetInfo' in pc) {
-    return pc.assetInfo.assetName.content.slice(0, 3).toUpperCase();
+    return pc?.assetInfo?.assetName?.content?.slice(0, 3).toUpperCase();
   }
   return 'STX';
 };

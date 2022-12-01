@@ -14,7 +14,6 @@ import Seperator from '@components/seperator';
 import { useContext } from 'react';
 import { ShowMoreContext } from '@components/transactionsRequests/ContractCallRequest';
 import {
-  getAmountFromPostCondition,
   getNameFromPostCondition,
   getSymbolFromPostCondition,
 } from './helper';
@@ -46,9 +45,10 @@ const TickerText = styled.h1((props) => ({
 
 type Props = {
   postCondition: PostCondition;
+  amount: string;
 };
 
-function PostConditionsView({ postCondition }: Props) {
+function PostConditionsView({ postCondition, amount }: Props) {
   const { stxAddress } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
@@ -77,43 +77,11 @@ function PostConditionsView({ postCondition }: Props) {
   const title = getTitleFromConditionCode(postCondition.conditionCode) || '';
   const ticker = getSymbolFromPostCondition(postCondition);
   const name = getNameFromPostCondition(postCondition);
-  const amount = getAmountFromPostCondition(postCondition) ?? '';
   const contractName = 'contractName' in postCondition.principal && postCondition.principal.contractName.content;
-  const address = addressToString(postCondition.principal.address);
+  const address = addressToString(postCondition?.principal?.address!);
   const isSending = address === stxAddress;
   const isContractPrincipal = !!contractName || address.includes('.');
   const { showMore } = useContext(ShowMoreContext);
-
-  function getPostConditionCodeMessage(
-    code: FungibleConditionCode | NonFungibleConditionCode,
-    isSender: boolean,
-  ) {
-    const sender = isSender ? t('YOU') : t('CONTRACT"');
-    switch (code) {
-      case FungibleConditionCode.Equal:
-        return `${sender} ${t('EQUAL')}`;
-
-      case FungibleConditionCode.Greater:
-        return `${sender} ${t('GREATER')}`;
-
-      case FungibleConditionCode.GreaterEqual:
-        return `${sender} ${t('GREATER_EQUAL')}`;
-
-      case FungibleConditionCode.Less:
-        return `${sender} ${t('LESS')}`;
-
-      case FungibleConditionCode.LessEqual:
-        return `${sender} ${t('LESS_EQUAL')}`;
-
-      case NonFungibleConditionCode.DoesNotOwn:
-        return `${sender} ${t('DOES_NOT_OWN')}`;
-
-      case NonFungibleConditionCode.Owns:
-        return `${sender} ${t('OWN')}`;
-      default:
-        return '';
-    }
-  }
 
   return (
     <MainContainer>

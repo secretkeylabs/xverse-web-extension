@@ -1,15 +1,18 @@
 import SwapImage from '@assets/img/webInteractions/swapCall.svg';
 import BNSImage from '@assets/img/webInteractions/bnsCall.svg';
 import NFTImage from '@assets/img/webInteractions/nftCall.svg';
-import Plus from '@assets/img/webInteractions/Plus.svg';
 import ContractCall from '@assets/img/webInteractions/contractCall.svg';
 import { ContractCallPayload } from '@stacks/connect';
 import styled from 'styled-components';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
-import StxPostConditionCard from '@components/postCondition/stxPostCondition';
+import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
 import { createContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RecipientAddressView from '@components/recipinetAddressView';
+import { addressToString, PostCondition, PostConditionType } from '@stacks/transactions';
+import { Coin } from '@secretkeylabs/xverse-core';
+import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
+import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
 
 const TopImage = styled.img({
   width: 88,
@@ -206,7 +209,6 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
       </InfoContainer>
       {renderContractAddress}
       {showMoreButton}
-
     </ConfirmStxTransationComponent>
   );
 }
