@@ -1,6 +1,4 @@
-import TopRow from '@components/topRow';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { ReactNode, useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
@@ -90,12 +88,7 @@ function ConfirmStxTransationComponent({
   } = useSelector((state: StoreState) => state.walletState);
   const [stateTx] = useState(initialStxTransactions);
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
-  const navigate = useNavigate();
   const [buttonLoading, setButtonLoading] = useState(loading);
-
-  const handleBackButtonClick = () => {
-    navigate(-1);
-  };
 
   useEffect(() => {
     setButtonLoading(loading);
@@ -154,50 +147,46 @@ function ConfirmStxTransationComponent({
   };
 
   return (
-    <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
-      <Container>
-        {children}
-        <TransferFeeView
-          fee={microstacksToStx(getFee())}
-          currency="STX"
-        />
-        {!isSponsored && (
+    <Container>
+      {children}
+      <TransferFeeView
+        fee={microstacksToStx(getFee())}
+        currency="STX"
+      />
+      {!isSponsored && (
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
             <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
           </>
         </Button>
-        )}
-        <TransactionSettingAlert
-          visible={openTransactionSettingModal}
-          fee={microstacksToStx(getFee()).toString()}
-          type="STX"
-          nonce={getTxNonce()}
-          onApplyClick={applyTxSettings}
-          onCrossClick={closeTransactionSettingAlert}
-        />
-        <ButtonContainer>
-          <TransparentButtonContainer>
-            <ActionButton
-              text={t('CANCEL')}
-              transparent
-              disabled={buttonLoading}
-              onPress={onCancelClick}
-            />
-          </TransparentButtonContainer>
-
+      )}
+      <TransactionSettingAlert
+        visible={openTransactionSettingModal}
+        fee={microstacksToStx(getFee()).toString()}
+        type="STX"
+        nonce={getTxNonce()}
+        onApplyClick={applyTxSettings}
+        onCrossClick={closeTransactionSettingAlert}
+      />
+      <ButtonContainer>
+        <TransparentButtonContainer>
           <ActionButton
-            text={t('CONFIRM')}
+            text={t('CANCEL')}
+            transparent
             disabled={buttonLoading}
-            processing={buttonLoading}
-            onPress={onConfirmButtonClick}
+            onPress={onCancelClick}
           />
-        </ButtonContainer>
-      </Container>
+        </TransparentButtonContainer>
 
-    </>
+        <ActionButton
+          text={t('CONFIRM')}
+          disabled={buttonLoading}
+          processing={buttonLoading}
+          onPress={onConfirmButtonClick}
+        />
+      </ButtonContainer>
+    </Container>
   );
 }
 

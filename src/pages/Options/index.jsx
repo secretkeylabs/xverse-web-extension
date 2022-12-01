@@ -18,7 +18,7 @@ const renderApp = async () => {
   await checkForInMemoryKeys();
   const container = document.getElementById('app');
   const root = createRoot(container);
-  root.render(<App />);
+  return root.render(<App />);
 };
 
 renderApp();

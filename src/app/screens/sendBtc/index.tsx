@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
@@ -15,9 +15,16 @@ import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { SignedBtcTxResponse } from '@secretkeylabs/xverse-core/transactions/btc';
 
 function SendBtcScreen() {
+  const location = useLocation();
+  let enteredAddress: string | undefined;
+  let enteredAmountToSend: string | undefined;
+  if (location.state) {
+    enteredAddress = location.state.recipientAddress;
+    enteredAmountToSend = location.state.amount;
+  }
   const [error, setError] = useState('');
-  const [recipientAddress, setRecipientAddress] = useState('');
-  const [amount, setAmount] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
+  const [amount, setAmount] = useState(enteredAmountToSend ?? '');
   const {
     btcAddress,
     network,
@@ -52,7 +59,7 @@ function SendBtcScreen() {
   }));
 
   const handleBackButtonClick = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   useEffect(() => {
@@ -149,6 +156,8 @@ function SendBtcScreen() {
         error={error}
         balance={getBalance()}
         onPressSend={handleNextClick}
+        recipient={recipientAddress}
+        amountToSend={amount}
         processing={recipientAddress !== '' && amount !== '' && isLoading}
       />
       <BottomBar tab="dashboard" />

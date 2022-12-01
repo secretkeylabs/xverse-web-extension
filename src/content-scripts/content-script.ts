@@ -36,7 +36,13 @@ window.addEventListener('message', (event) => {
 
 // Connection to background script - fires onConnect event in background script
 // and establishes two-way communication
-const backgroundPort = chrome.runtime.connect({ name: CONTENT_SCRIPT_PORT });
+let backgroundPort;
+function connect() {
+  backgroundPort = chrome.runtime.connect({ name: CONTENT_SCRIPT_PORT });
+  backgroundPort.onDisconnect.addListener(connect);
+}
+
+connect();
 
 // Sends message to background script that an event has fired
 function sendMessageToBackground(message: LegacyMessageFromContentScript) {

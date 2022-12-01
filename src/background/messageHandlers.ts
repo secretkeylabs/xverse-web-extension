@@ -6,7 +6,6 @@ function validateMessagesAreFromExtension(sender: chrome.runtime.MessageSender) 
   return sender.url?.startsWith(chrome.runtime.getURL(''));
 }
 
-// Persists key in memory for the duration of the background scripts life
 let inMemoryKey = '';
 
 async function internalBackgroundMessageHandler(
@@ -37,6 +36,7 @@ async function internalBackgroundMessageHandler(
       break;
     }
     default:
+      sendResponse();
   }
 }
 

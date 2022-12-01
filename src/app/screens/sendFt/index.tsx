@@ -30,6 +30,15 @@ function SendFtScreen() {
   const { data: stxPendingTxData } = useStxPendingTxData();
   const location = useLocation();
   const { fungibleToken } = location.state;
+  let recipientAddress: string | undefined;
+  let ftAmountToSend: string | undefined;
+  let stxMemo: string | undefined;
+
+  if (location.state) {
+    recipientAddress = location.state.recipientAddress;
+    ftAmountToSend = location.state.amountToSend;
+    stxMemo = location.state.stxMemo;
+  }
   const { isLoading, data, mutate } = useMutation<
   StacksTransaction,
   Error,
@@ -71,7 +80,7 @@ function SendFtScreen() {
       navigate('/confirm-ft-tx', {
         state: {
           unsignedTx: data,
-          amount: amountToSend,
+          amount: amountToSend.toString(),
           fungibleToken,
           memo: txMemo,
           recepientAddress,
@@ -176,6 +185,9 @@ function SendFtScreen() {
         fungibleToken={fungibleToken}
         balance={getBalance()}
         onPressSend={onPressSendSTX}
+        recipient={recipientAddress!}
+        amountToSend={ftAmountToSend!}
+        stxMemo={stxMemo!}
       />
       <BottomBar tab="dashboard" />
     </>
