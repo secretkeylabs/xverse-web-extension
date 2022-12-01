@@ -106,7 +106,7 @@ const router = createHashRouter([
         element: <CreatePassword />,
       },
       {
-        path: 'create-wallet-success',
+        path: 'wallet-success/:action',
         element: <CreateWalletSuccess />,
       },
       {
