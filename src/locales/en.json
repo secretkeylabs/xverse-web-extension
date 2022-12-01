@@ -310,5 +310,35 @@
     "OPEN_FT_CONTRACT_DEPLOYMENT": "View the contract on",
     "STACKS_EXPLORER": "Stacks Explorer",
     "INCREASE_FEE_BUTTON": "Increase fee"
+  },
+  "POST_CONDITION_MESSAGE": {
+    "YOU": "You",
+    "CONTRACT": "The contract",
+    "ANOTHER_ADDRESS": "Another address",
+    "CONTRACT_ADDRESS": "Contract Address",
+    "MY_ADDRESS": "My Address",
+    "RECEPIENT_ADDRESS": "Recipient address",
+    "EQUAL": "will transfer exactly",
+    "GREATER": " will transfer more than",
+    "GREATER_EQUAL": "will transfer at least",
+    "LESS": "will transfer less than",
+    "LESS_EQUAL": "will transfer at most",
+    "DOES_NOT_OWN": "will transfer",
+    "OWN": "will keep or receive",
+    "TRANSFER_EQUAL": "will transfer exactly",
+    "TRANSFER_GREATER": " will transfer more than",
+    "TRANSFER_GREATER_EQUAL": "will transfer equal to or greater than",
+    "TRANSFER_LESS": "will transfer less than",
+    "TRANSFER_LESS_EQUAL": "will transfer less than or equal to",
+    "TRANSFER_DOES_NOT_OWN": "will transfer",
+    "TRANSFER_OWN": "will keep"
+  },
+  "CONTRACT_CALL_REQUEST":{
+    "FUNCTION": "Function",
+    "SHOW_MORE": "Show more ",
+    "SHOW_LESS": "Show less",
+    "PLUS": "+",
+    "MINUS": "-",
+    "CONTRACT_ADDRESS": "Contract ADDRESS"
   }
 }

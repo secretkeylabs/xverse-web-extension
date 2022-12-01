@@ -49,8 +49,9 @@ const ActionButton = styled.button((props) => ({
 
 interface Props {
   recipient: string;
+  title?: string;
 }
-function RecipientAddressView({ recipient }: Props) {
+function RecipientAddressView({ recipient, title }: Props) {
   const { network } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const bnsName = useBnsName(recipient, network);
@@ -60,7 +61,7 @@ function RecipientAddressView({ recipient }: Props) {
 
   return (
     <InfoContainer>
-      <TitleText>{t('RECEPIENT_ADDRESS')}</TitleText>
+      <TitleText>{title ?? t('RECEPIENT_ADDRESS')}</TitleText>
       <ValueText>{bnsName}</ValueText>
       <RowContainer>
         {bnsName ? <AssociatedAddressText>{recipient}</AssociatedAddressText> : <ValueText>{recipient}</ValueText>}

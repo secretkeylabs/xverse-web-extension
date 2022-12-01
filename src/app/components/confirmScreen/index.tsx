@@ -2,19 +2,21 @@ import { ReactNode } from 'react';
 import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
 
-const MainContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  height: '100%',
-});
+const MainContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
-const ControlsContainer = styled.div({
+const ContentContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'flex-end',
-  width: '100%',
-  marginTop: 'auto',
+  flex: 1,
 });
 
 const ButtonsContainer = styled.div((props) => ({
@@ -69,15 +71,16 @@ function ConfirmScreen({
 }: Props) {
   return (
     <MainContainer>
-      {children}
-      <ControlsContainer>
-        <ButtonsContainer>
-          <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
-          <ConfirmButton onClick={onConfirm}>
-            {loading ? <Ring color="white" size={20} /> : confirmText}
-          </ConfirmButton>
-        </ButtonsContainer>
-      </ControlsContainer>
+      <ContentContainer>
+        {children}
+      </ContentContainer>
+      <ButtonsContainer>
+        <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
+        <ConfirmButton onClick={onConfirm}>
+          {loading ? <Ring color="white" size={20} /> : confirmText}
+        </ConfirmButton>
+      </ButtonsContainer>
+
     </MainContainer>
   );
 }
