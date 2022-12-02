@@ -7,6 +7,7 @@ import {
   getNewNonce,
   setNonce,
 } from '@secretkeylabs/xverse-core';
+import { TransactionPayload } from '@stacks/connect';
 import { ContractInterfaceResponse } from '@stacks/stacks-blockchain-api-types';
 import {
   deserializeCV,
@@ -39,37 +40,40 @@ export const extractFromPayload = (payload: any) => {
 
   const postConds = Array.isArray(postConditions)
     ? (postConditions?.map(
-      (arg: string) => deserializeStacksMessage(
-        new BufferReader(hexStringToBuffer(arg)),
-        StacksMessageType.PostCondition,
-      ) as PostCondition,
-    ) as PostCondition[])
+        (arg: string) =>
+          deserializeStacksMessage(
+            new BufferReader(hexStringToBuffer(arg)),
+            StacksMessageType.PostCondition
+          ) as PostCondition
+      ) as PostCondition[])
     : [];
 
   return { funcArgs, postConds };
 };
 
-export const getFTInfoFromPostConditions = (postConds: PostCondition[]) => (
-  postConds?.filter(
-    (postCond) => postCond.conditionType === PostConditionType.Fungible,
-  ) as FungiblePostCondition[]
-)?.map(
-  (postCond: FungiblePostCondition) => `${addressToString(postCond.assetInfo.address)}.${postCond.assetInfo.contractName.content}`,
-);
+export const getFTInfoFromPostConditions = (postConds: PostCondition[]) =>
+  (
+    postConds?.filter(
+      (postCond) => postCond.conditionType === PostConditionType.Fungible
+    ) as FungiblePostCondition[]
+  )?.map(
+    (postCond: FungiblePostCondition) =>
+      `${addressToString(postCond.assetInfo.address)}.${postCond.assetInfo.contractName.content}`
+  );
 
 export const ShowMoreContext = createContext({ showMore: false });
 
 export async function getContractInterface(
   contractAddress: string,
   contractName: string,
-  network: SettingsNetwork,
+  network: SettingsNetwork
 ): Promise<ContractInterfaceResponse | null> {
   const apiUrl = `${network.address}/v2/contracts/interface/${contractAddress}/${contractName}`;
 
   return axios
     .get<ContractInterfaceResponse>(apiUrl, {
-    timeout: 30000,
-  })
+      timeout: 30000,
+    })
     .then((response) => response.data)
     .catch((error) => null);
 }
@@ -78,7 +82,7 @@ export const createContractCallPromises = async (
   payload: any,
   stxAddress: string,
   network: SettingsNetwork,
-  stxPublicKey: string,
+  stxPublicKey: string
 ) => {
   const sponsored = payload?.sponsored;
   const { pendingTransactions } = await fetchStxPendingTxData(stxAddress, network);
@@ -104,7 +108,8 @@ export const createContractCallPromises = async (
   const unSignedContractCall = await generateUnsignedContractCall(tx);
   const { fee } = unSignedContractCall.auth.spendingCondition;
 
-  const checkForPostConditionMessage = payload?.postConditionMode === 2 && payload?.postConditions?.values.length <= 0;
+  const checkForPostConditionMessage =
+    payload?.postConditionMode === 2 && payload?.postConditions?.values.length <= 0;
   const showPostConditionMessage = !!checkForPostConditionMessage;
 
   const newNonce = getNewNonce(pendingTransactions, getNonce(unSignedContractCall));
@@ -113,7 +118,7 @@ export const createContractCallPromises = async (
   const contractInterfacePromise = getContractInterface(
     payload.contractAddress,
     payload.contractName,
-    network,
+    network
   );
 
   return Promise.all([
@@ -123,3 +128,19 @@ export const createContractCallPromises = async (
     showPostConditionMessage,
   ]);
 };
+
+export async function getContractCallPromises(
+  payload: TransactionPayload,
+  stxAddress: string,
+  network: SettingsNetwork,
+  stxPublicKey: string
+) {
+  const [unSignedContractCall, contractInterface, coinsMetaData, showPostConditionMessage] =
+    await createContractCallPromises(payload, stxAddress, network, stxPublicKey);
+  return {
+    unSignedContractCall,
+    contractInterface,
+    coinsMetaData,
+    showPostConditionMessage,
+  };
+}
