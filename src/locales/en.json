@@ -343,9 +343,16 @@
     "SHOW_LESS": "Show less",
     "PLUS": "+",
     "MINUS": "-",
-    "CONTRACT_ADDRESS": "Contract ADDRESS"
+    "CONTRACT_ADDRESS": "Contract ADDRESS",
+    "SPONSORED": "Sponsored",
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
   },
   "DEPLOY_CONTRACT_REQUEST":{
-    "DEPLOY_CONTRACT":"deploy-contract"
+    "DEPLOY_CONTRACT":"deploy-contract",
+    "CONTRACT_NAME": "Contract name",
+    "SOURCE_CODE": "Source code",
+    "VIEW_SOURCE_CODE": "View contract code",
+    "SPONSORED": "Sponsored",
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
   }
 }
