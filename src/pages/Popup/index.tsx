@@ -1,9 +1,9 @@
 import { InternalMethods } from 'content-scripts/message-types';
 import rootStore from '@stores/index';
+import { setWalletSeedPhraseAction } from '@stores/wallet/actions/actionCreators';
 import { createRoot } from 'react-dom/client';
 import App from '../../app/App';
 import './index.css';
-import { setWalletSeedPhraseAction } from '@stores/wallet/actions/actionCreators';
 
 async function checkForInMemoryKeys() {
   // eslint-disable-next-line no-promise-executor-return
@@ -13,7 +13,6 @@ async function checkForInMemoryKeys() {
     resolve(true);
   }));
 }
-
 const renderApp = async () => {
   await checkForInMemoryKeys();
   const container = document.getElementById('app');
