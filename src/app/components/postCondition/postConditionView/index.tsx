@@ -9,10 +9,10 @@ import {
 } from '@stacks/transactions';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import RecipientAddressView from '@components/recipinetAddressView';
 import Seperator from '@components/seperator';
 import { useContext } from 'react';
 import { ShowMoreContext } from '@components/transactionsRequests/ContractCallRequest';
+import RedirectAddressView from '@components/redirectAddressView';
 import {
   getNameFromPostCondition,
   getSymbolFromPostCondition,
@@ -95,7 +95,7 @@ function PostConditionsView({ postCondition, amount }: Props) {
         {name !== 'STX' && <TickerText>{name}</TickerText>}
         {showMore && (
         <>
-          <RecipientAddressView
+          <RedirectAddressView
             recipient={`${address}${contractName ? `.${contractName}` : ''}`}
             title={`${isContractPrincipal
               ? t('CONTRACT_ADDRESS')

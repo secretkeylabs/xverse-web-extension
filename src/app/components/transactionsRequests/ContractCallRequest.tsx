@@ -8,11 +8,11 @@ import ConfirmStxTransationComponent from '@components/confirmStxTransactionComp
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
 import { createContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import RecipientAddressView from '@components/recipinetAddressView';
 import { addressToString, PostCondition, PostConditionType } from '@stacks/transactions';
 import { Coin } from '@secretkeylabs/xverse-core';
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
 import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
+import RedirectAddressView from '@components/redirectAddressView';
 
 const TopImage = styled.img({
   width: 88,
@@ -176,7 +176,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
 
   const renderContractAddress = (
     isShowMore && (
-    <RecipientAddressView
+    <RedirectAddressView
       recipient={request.contractAddress}
       title={t('CONTRACT_ADDRESS')}
     />
