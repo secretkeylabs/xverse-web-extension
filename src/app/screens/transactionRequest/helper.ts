@@ -8,15 +8,16 @@ import {
   setNonce,
   FeesMultipliers,
   generateContractDeployTransaction,
-  addressToString,
 } from '@secretkeylabs/xverse-core';
+import { TransactionPayload } from '@stacks/connect';
 import { ContractInterfaceResponse } from '@stacks/stacks-blockchain-api-types';
 import {
-  PostCondition,
   deserializeCV,
-  deserializeStacksMessage,
   BufferReader,
+  deserializeStacksMessage,
   StacksMessageType,
+  PostCondition,
+  addressToString,
   PostConditionType,
   FungiblePostCondition,
 } from '@stacks/transactions';
@@ -165,3 +166,18 @@ export const createDeployContractRequest = async (
     sponsored,
   };
 };
+
+export async function getContractCallPromises(
+  payload: TransactionPayload,
+  stxAddress: string,
+  network: SettingsNetwork,
+  stxPublicKey: string,
+) {
+  const [unSignedContractCall, contractInterface, coinsMetaData, showPostConditionMessage] = await createContractCallPromises(payload, stxAddress, network, stxPublicKey);
+  return {
+    unSignedContractCall,
+    contractInterface,
+    coinsMetaData,
+    showPostConditionMessage,
+  };
+}

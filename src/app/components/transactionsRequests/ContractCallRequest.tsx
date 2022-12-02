@@ -8,11 +8,45 @@ import ConfirmStxTransationComponent from '@components/confirmStxTransactionComp
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
 import { createContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { addressToString, PostCondition, PostConditionType } from '@stacks/transactions';
-import { Coin } from '@secretkeylabs/xverse-core';
-import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
-import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
+import {
+  StacksTransaction,
+} from '@stacks/transactions';
+import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
 import RedirectAddressView from '@components/redirectAddressView';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { useNavigate } from 'react-router-dom';
+
+const PostConditionContainer = styled.div((props) => ({
+  display: 'flex',
+  marginTop: props.theme.spacing(12),
+  paddingTop: props.theme.spacing(12),
+  paddingBottom: props.theme.spacing(12),
+  borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  flexDirection: 'column',
+}));
+const SponsoredContainer = styled.div({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+const SponsoredTag = styled.div((props) => ({
+  background: props.theme.colors.background.elevation3,
+  marginTop: props.theme.spacing(7.5),
+  paddingTop: props.theme.spacing(4),
+  paddingBottom: props.theme.spacing(4),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  borderRadius: 30,
+}));
+const SponosredText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white['0'],
+}));
+const PostConditionAlertText = styled.h1((props) => ({
+  ...props.theme.body_l,
+  color: props.theme.colors.white['0'],
+}));
 
 const TopImage = styled.img({
   width: 88,
@@ -120,72 +154,90 @@ const headerImageMapping = {
 
 interface ContractCallRequestProps {
   request: ContractCallPayload;
+  unsignedTx: StacksTransaction;
 }
 
 export const ShowMoreContext = createContext({ showMore: false });
 
 export default function ContractCallRequest(props: ContractCallRequestProps) {
-  const { request } = props;
+  const { request, unsignedTx } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'CONTRACT_CALL_REQUEST' });
   const [isShowMore, setIsShowMore] = useState(false);
   const Illustration = headerImageMapping[request.functionName ?? ''];
-  const confirmCallback = () => {};
-  const cancelCallback = () => {};
-  const tx = {
-    anchorMode: 3,
-    auth: {
-      authType: 4,
-      spendingCondition: {
-        fee: 113000n, hashMode: 0, keyEncoding: 0, nonce: 38n, signature: [Object], signer: 'e00d5ce47fd13be5ee872adffa698fce190ea15f',
-      },
-    },
-    chainId: 1,
-    payload: {
-      contractAddress: { hash160: '0000000000000000000000000000000000000000', type: 0, version: 22 },
-      contractName: {
-        content: 'pox', lengthPrefixBytes: 1, maxLengthBytes: 128, type: 2,
-      },
-      functionArgs: [[Object], [Object]],
-      functionName: {
-        content: 'allow-contract-caller', lengthPrefixBytes: 1, maxLengthBytes: 128, type: 2,
-      },
-      payloadType: 2,
-      type: 8,
-    },
-    postConditionMode: 1,
-    postConditions: { lengthPrefixBytes: 4, type: 7, values: [[Object]] },
-    version: 0,
-  };
 
   const showMoreButton = (
     <ShowMoreButtonContainer>
       <Line />
       <ButtonContainer>
         <ShowMoreButton onClick={() => setIsShowMore(!isShowMore)}>
-          <ButtonText>
-            {isShowMore ? t('SHOW_LESS') : t('SHOW_MORE')}
-          </ButtonText>
-          <ButtonSymbolText>
-            {isShowMore ? t('MINUS') : t('PLUS')}
-          </ButtonSymbolText>
+          <ButtonText>{isShowMore ? t('SHOW_LESS') : t('SHOW_MORE')}</ButtonText>
+          <ButtonSymbolText>{isShowMore ? t('MINUS') : t('PLUS')}</ButtonSymbolText>
         </ShowMoreButton>
       </ButtonContainer>
     </ShowMoreButtonContainer>
-
   );
 
-  const renderContractAddress = (
-    isShowMore && (
-    <RedirectAddressView
-      recipient={request.contractAddress}
-      title={t('CONTRACT_ADDRESS')}
-    />
-    )
+  const renderContractAddress = isShowMore && (
+    <RedirectAddressView recipient={request.contractAddress} title={t('CONTRACT_ADDRESS')} />
   );
+
+  const showSponsoredTransactionTag = (
+    <SponsoredContainer>
+      <SponsoredTag>
+        <SponosredText>{t('SPONSORED')}</SponosredText>
+      </SponsoredTag>
+    </SponsoredContainer>
+  );
+
+  const postConditionAlert = unsignedTx?.postConditionMode === 2
+    && unsignedTx?.postConditions.values.length <= 0 && (
+      <PostConditionContainer>
+        <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
+      </PostConditionContainer>
+  );
+  const { network } = useWalletSelector();
+  const navigate = useNavigate();
+  const broadcastTx = async (tx: StacksTransaction) => {
+    try {
+      // setIsLoading(true);
+      const networkType = network?.type ?? 'Mainnet';
+
+      const broadcastResult: string = await broadcastSignedTransaction(tx, networkType);
+      if (broadcastResult) {
+        navigate('/tx-status', {
+          state: {
+            txid: broadcastResult,
+            currency: 'STX',
+            error: '',
+          },
+        });
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'STX',
+            error: e,
+          },
+        });
+        console.error(e.message);
+        console.error(e.stack);
+      }
+    } finally {
+      // setIsLoading(false);
+    }
+  };
+
+  const confirmCallback = (transactions: StacksTransaction[]) => {
+    const tx: StacksTransaction = transactions[0];
+    broadcastTx(tx);
+  };
+  const cancelCallback = () => {};
 
   return (
     <ConfirmStxTransationComponent
-      initialStxTransactions={[tx]}
+      initialStxTransactions={[unsignedTx]}
       onConfirmClick={confirmCallback}
       onCancelClick={cancelCallback}
       loading={false}
@@ -195,12 +247,12 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         <FunctionTitle>{request.functionName}</FunctionTitle>
         <DappTitle>{`Requested by ${request.appDetails?.name}`}</DappTitle>
       </Container>
-      {tx?.postConditions?.values?.map((postCondition, i) => (
+      {postConditionAlert}
+      {request.sponsored && showSponsoredTransactionTag}
+      {unsignedTx?.postConditions?.values?.map((postCondition, i) => (
         <StxPostConditionCard
           key={i}
-          postCondition={{
-            amount: 1n, conditionCode: 4, conditionType: 0, principal: { address: { hash160: '1853f9fcad12d7e678576ff5df4644691e2d77e7', type: 0, version: 22 }, prefix: 2, type: 1 }, type: 5,
-          }}
+          postCondition={postCondition}
         />
       ))}
       <InfoContainer>
