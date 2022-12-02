@@ -344,5 +344,8 @@
     "PLUS": "+",
     "MINUS": "-",
     "CONTRACT_ADDRESS": "Contract ADDRESS"
+  },
+  "DEPLOY_CONTRACT_REQUEST":{
+    "DEPLOY_CONTRACT":"deploy-contract"
   }
 }
