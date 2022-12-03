@@ -233,7 +233,9 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
     const tx: StacksTransaction = transactions[0];
     broadcastTx(tx);
   };
-  const cancelCallback = () => {};
+  const cancelCallback = () => {
+    window.close();
+  };
 
   return (
     <ConfirmStxTransationComponent
