@@ -22,16 +22,16 @@
     "ACCOUNT_NAME": "Account",
     "RECEIVE": "Receive",
     "SEND": "Send",
-    "BUY":"Buy",
-    "MANAGE_TOKEN":"Manage token list",
+    "BUY": "Buy",
+    "MANAGE_TOKEN": "Manage token list",
     "TESTNET": "Testnet"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
   },
-  "ACCOUNT_SCREEN":{
+  "ACCOUNT_SCREEN": {
     "CHANGE_ACCOUNT": "Change account",
-    "NEW_ACCOUNT":"Create a new account"
+    "NEW_ACCOUNT": "Create a new account"
   },
   "RECEIVE": {
     "RECEIVE": "Receive",
@@ -53,7 +53,7 @@
     "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
-    "NO_FUNDS":"You don’t have any fund to send.",
+    "NO_FUNDS": "You don’t have any fund to send.",
     "BUY_CRYPTO": "Buy crypto →",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {
@@ -69,49 +69,49 @@
       "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
       "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
     },
-    "SEND_NFT":"Send NFT"
+    "SEND_NFT": "Send NFT"
   },
   "CONFIRM_TRANSACTION": {
-    "SEND":"Send",
+    "SEND": "Send",
     "INDICATION": "You will send",
     "RECEPIENT_ADDRESS": "recipient address",
     "MEMO": "Attached memo",
     "NETWORK": "Network",
     "FEES": "Fees",
-    "ADVANCED_SETTING":"Advanced Settings",
-    "EDIT_FEES":"Edit Fees",
-    "CONFIRM":"Confirm",
-    "CANCEL":"Cancel",
-    "SATS":"SATS",
+    "ADVANCED_SETTING": "Advanced Settings",
+    "EDIT_FEES": "Edit Fees",
+    "CONFIRM": "Confirm",
+    "CANCEL": "Cancel",
+    "SATS": "SATS",
     "CONFIRM_TX": "Confirm Transaction",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail"
   },
-  "TRANSACTION_SETTING":{
-    "ADVANCED_SETTING":"Advanced Settings",
-    "EDIT_FEE":"Edit Fees",
-    "FEE":"Fee",
-    "STANDARD":"Standard",
-    "HIGH":"High",
-    "CUSTOM":"Custom",
-    "LOW":"Low",
-    "FEE_INFO":"Apply a higher fee to help your transaction confirm quickly, especially when the network is congested.",
-    "NONCE":"Nonce",
-    "APPLY":"Apply",
-    "NONCE_INFO":"You can use a custom nonce to replace a pending transaction with the same nonce.",
+  "TRANSACTION_SETTING": {
+    "ADVANCED_SETTING": "Advanced Settings",
+    "EDIT_FEE": "Edit Fees",
+    "FEE": "Fee",
+    "STANDARD": "Standard",
+    "HIGH": "High",
+    "CUSTOM": "Custom",
+    "LOW": "Low",
+    "FEE_INFO": "Apply a higher fee to help your transaction confirm quickly, especially when the network is congested.",
+    "NONCE": "Nonce",
+    "APPLY": "Apply",
+    "NONCE_INFO": "You can use a custom nonce to replace a pending transaction with the same nonce.",
     "SAME_FEE_ERROR": "New fee must be greater than current fee",
     "GREATER_FEE_ERROR": "Fee is more than available balance",
     "LOWER_THAN_MINIMUM": "Set fee is below minimum"
   },
-  "TRANSACTION_STATUS":{
-    "BROADCASTED":"Transaction Broadcasted",
-    "SUCCESS_MSG":"Your transaction have been successfully submitted and should appear in a few minutes.",
-    "SEE_ON":"See on",
-    "STACKS_EXPLORER":"Stacks Explorer",
-    "BITCOIN_EXPLORER":"Explorer",
-    "TRANSACTION_ID":"Transaction ID",
-    "CLOSE":"Close",
-    "FAILED":"Transaction Failed",
-    "RETRY":"Try again"
+  "TRANSACTION_STATUS": {
+    "BROADCASTED": "Transaction Broadcasted",
+    "SUCCESS_MSG": "Your transaction have been successfully submitted and should appear in a few minutes.",
+    "SEE_ON": "See on",
+    "STACKS_EXPLORER": "Stacks Explorer",
+    "BITCOIN_EXPLORER": "Explorer",
+    "TRANSACTION_ID": "Transaction ID",
+    "CLOSE": "Close",
+    "FAILED": "Transaction Failed",
+    "RETRY": "Try again"
   },
   "LEGAL_SCREEN": {
     "SCREEN_TITLE": "Legal",
@@ -155,7 +155,7 @@
     "CLOSE_TAB": "Close this tab",
     "CLICK": "Click",
     "THEN": "then",
-    "OPEN_WALLET":"to open your wallet"
+    "OPEN_WALLET": "to open your wallet"
   },
   "CONFIRM_TRANSACTION_SCREEN": {
     "CONFIRM_BUTTON": "Confirm",
@@ -193,16 +193,16 @@
     "STACKING_INFO": "Pool your STX with other stackers to earn real BTC with low minimums. Rewards are distributed after the end of every 2-week cycle.",
     "APY": "Estimated APY",
     "POOL_FEE": "Pool fee",
-   "MINIMUM_AMOUNT": "Minimum amount",
-   "REWARD_CYCLES": "Reward Cycles",
-   "START_STACKNG": "Start stacking",
-   "STACK_FOR_REWARD": "Stack your coins to earn rewards",
-   "XVERSE_POOL": "Xverse delegated pooling allows everyone to participate in Stacking and earn rewards. ",
-   "STACK_STX": "Stack STX",
-   "EARN_BTC":"Earn BTC",
-   "PENDING_DELEGATION": "Pending delegation",
-   "DELEGATED": "Delegated",
-   "IN_PROGRESS": "In progress"
+    "MINIMUM_AMOUNT": "Minimum amount",
+    "REWARD_CYCLES": "Reward Cycles",
+    "START_STACKNG": "Start stacking",
+    "STACK_FOR_REWARD": "Stack your coins to earn rewards",
+    "XVERSE_POOL": "Xverse delegated pooling allows everyone to participate in Stacking and earn rewards. ",
+    "STACK_STX": "Stack STX",
+    "EARN_BTC": "Earn BTC",
+    "PENDING_DELEGATION": "Pending delegation",
+    "DELEGATED": "Delegated",
+    "IN_PROGRESS": "In progress"
   },
   "NFT_DASHBOARD_SCREEN": {
     "COLLECTIBLES": "Number of collectibles",
@@ -216,10 +216,10 @@
     "TWITTER": "Share on Twitter",
     "MAIL": "Share by Mail",
     "COPY": "Copy link",
-    "NFT_DETAIL":"Item detail"
+    "NFT_DETAIL": "Item detail"
   },
   "NFT_DETAIL_SCREEN": {
-    "NFT_DETAIL":"Item detail",
+    "NFT_DETAIL": "Item detail",
     "WEB_GALLERY": "Open web gallery",
     "SEND": "Send",
     "SHARE": "Share",
@@ -233,7 +233,7 @@
     "CONTRACT_ID": "Contract ID",
     "ATTRIBUTES": "Attributes",
     "VIEW_CONTRACT": "View the contract on",
-    "STACKS_EXPLORER":"Stacks Explorer",
+    "STACKS_EXPLORER": "Stacks Explorer",
     "DETAILS": "See detail on",
     "GAMMA": "Gamma.io",
     "MOVE_TO_ASSET_DETAIL": "Back to gallery"
@@ -243,7 +243,7 @@
     "PASSWORD": "Password",
     "RESET": "Reset",
     "BACK": "Back",
-    "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+    "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
   "SETTING_SCREEN": {
     "GENERAL": "General",
@@ -270,14 +270,14 @@
     "PASSWORD": "Password",
     "RESET": "Reset",
     "BACK": "Back",
-    "INCORRECT_PASSWORD_ERROR":"Incorrect password"
+    "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
-  "OPTIONS_DIALOG":{
+  "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
     "LOCK": "Lock",
     "RESET_WALLET": "Reset Wallet"
   },
-  "BUY_SCREEN":{
+  "BUY_SCREEN": {
     "BUY": "Buy",
     "PURCHASE_CRYPTO": "Purchase crypto quickly and deposit directly into your Xverse wallet.",
     "MOONPAY": "Buy on Moonpay",
@@ -314,5 +314,45 @@
     "OPEN_FT_CONTRACT_DEPLOYMENT": "View the contract on",
     "STACKS_EXPLORER": "Stacks Explorer",
     "INCREASE_FEE_BUTTON": "Increase fee"
+  },
+  "POST_CONDITION_MESSAGE": {
+    "YOU": "You",
+    "CONTRACT": "The contract",
+    "ANOTHER_ADDRESS": "Another address",
+    "CONTRACT_ADDRESS": "Contract Address",
+    "MY_ADDRESS": "My Address",
+    "RECEPIENT_ADDRESS": "Recipient address",
+    "EQUAL": "will transfer exactly",
+    "GREATER": " will transfer more than",
+    "GREATER_EQUAL": "will transfer at least",
+    "LESS": "will transfer less than",
+    "LESS_EQUAL": "will transfer at most",
+    "DOES_NOT_OWN": "will transfer",
+    "OWN": "will keep or receive",
+    "TRANSFER_EQUAL": "will transfer exactly",
+    "TRANSFER_GREATER": " will transfer more than",
+    "TRANSFER_GREATER_EQUAL": "will transfer equal to or greater than",
+    "TRANSFER_LESS": "will transfer less than",
+    "TRANSFER_LESS_EQUAL": "will transfer less than or equal to",
+    "TRANSFER_DOES_NOT_OWN": "will transfer",
+    "TRANSFER_OWN": "will keep"
+  },
+  "CONTRACT_CALL_REQUEST": {
+    "FUNCTION": "Function",
+    "SHOW_MORE": "Show more ",
+    "SHOW_LESS": "Show less",
+    "PLUS": "+",
+    "MINUS": "-",
+    "CONTRACT_ADDRESS": "Contract ADDRESS",
+    "SPONSORED": "Sponsored",
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
+  },
+  "DEPLOY_CONTRACT_REQUEST":{
+    "DEPLOY_CONTRACT":"deploy-contract",
+    "CONTRACT_NAME": "Contract name",
+    "SOURCE_CODE": "Source code",
+    "VIEW_SOURCE_CODE": "View contract code",
+    "SPONSORED": "Sponsored",
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
   }
 }

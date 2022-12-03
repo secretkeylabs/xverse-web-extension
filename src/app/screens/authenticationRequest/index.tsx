@@ -13,6 +13,7 @@ import AccountHeaderComponent from '@components/accountHeader';
 
 const MainContainer = styled.div({
   display: 'flex',
+  flex: 1,
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
@@ -85,9 +86,7 @@ function AuthenticationRequest() {
     window.close();
   };
 
-  const getDappLogo = () => (validUrl.isWebUri(authRequest.payload.appDetails?.icon)
-    ? authRequest.payload.appDetails?.icon
-    : DappPlaceholderIcon);
+  const getDappLogo = () => (validUrl.isWebUri(authRequest?.payload?.appDetails?.icon) ? authRequest?.payload?.appDetails?.icon : DappPlaceholderIcon);
 
   return (
     <ConfirmScreen

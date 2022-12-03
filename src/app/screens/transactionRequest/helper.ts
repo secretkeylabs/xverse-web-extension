@@ -1,4 +1,15 @@
-import { SettingsNetwork } from '@secretkeylabs/xverse-core';
+import {
+  SettingsNetwork,
+  fetchStxPendingTxData,
+  getCoinsInfo,
+  generateUnsignedContractCall,
+  getNonce,
+  getNewNonce,
+  setNonce,
+  FeesMultipliers,
+  generateContractDeployTransaction,
+} from '@secretkeylabs/xverse-core';
+import { TransactionPayload } from '@stacks/connect';
 import { ContractInterfaceResponse } from '@stacks/stacks-blockchain-api-types';
 import {
   deserializeCV,
@@ -45,9 +56,9 @@ export const getFTInfoFromPostConditions = (postConds: PostCondition[]) => (
   postConds?.filter(
     (postCond) => postCond.conditionType === PostConditionType.Fungible,
   ) as FungiblePostCondition[]
-)?.map((postCond: FungiblePostCondition) => `${addressToString(postCond.assetInfo.address)}.${
-  postCond.assetInfo.contractName.content
-}`);
+)?.map(
+  (postCond: FungiblePostCondition) => `${addressToString(postCond.assetInfo.address)}.${postCond.assetInfo.contractName.content}`,
+);
 
 export const ShowMoreContext = createContext({ showMore: false });
 
@@ -64,4 +75,109 @@ export async function getContractInterface(
   })
     .then((response) => response.data)
     .catch((error) => null);
+}
+
+export const createContractCallPromises = async (
+  payload: any,
+  stxAddress: string,
+  network: SettingsNetwork,
+  stxPublicKey: string,
+) => {
+  const sponsored = payload?.sponsored;
+  const { pendingTransactions } = await fetchStxPendingTxData(stxAddress, network);
+  const { funcArgs, postConds } = extractFromPayload(payload);
+
+  const ftContactAddresses = getFTInfoFromPostConditions(postConds);
+
+  const coinsMetaDataPromise = getCoinsInfo(ftContactAddresses, 'USD');
+
+  const tx = {
+    publicKey: stxPublicKey,
+    contractAddress: payload.contractAddress,
+    contractName: payload.contractName,
+    functionName: payload.functionName,
+    functionArgs: funcArgs,
+    network,
+    nonce: undefined,
+    postConditions: postConds,
+    sponsored,
+    postConditionMode: payload.postConditionMode,
+  };
+
+  const unSignedContractCall = await generateUnsignedContractCall(tx);
+  const { fee } = unSignedContractCall.auth.spendingCondition;
+
+  const checkForPostConditionMessage = payload?.postConditionMode === 2 && payload?.postConditions?.values.length <= 0;
+  const showPostConditionMessage = !!checkForPostConditionMessage;
+
+  const newNonce = getNewNonce(pendingTransactions, getNonce(unSignedContractCall));
+  setNonce(unSignedContractCall, newNonce);
+
+  const contractInterfacePromise = getContractInterface(
+    payload.contractAddress,
+    payload.contractName,
+    network,
+  );
+
+  return Promise.all([
+    unSignedContractCall,
+    contractInterfacePromise,
+    coinsMetaDataPromise,
+    showPostConditionMessage,
+  ]);
+};
+
+export const createDeployContractRequest = async (
+  payload: any,
+  network: SettingsNetwork,
+  stxPublicKey: string,
+  feeMultipliers: FeesMultipliers,
+  walletAddress: string,
+) => {
+  const { codeBody, contractName, postConditionMode } = payload;
+  const { postConds } = extractFromPayload(payload);
+  const postConditions = postConds;
+  const sponsored = payload?.sponsored;
+  const { pendingTransactions } = await fetchStxPendingTxData(
+    walletAddress,
+    network,
+  );
+  const contractDeployTx = await generateContractDeployTransaction({
+    codeBody,
+    contractName,
+    postConditions,
+    postConditionMode,
+    pendingTxs: pendingTransactions,
+    publicKey: stxPublicKey,
+    network: network.type,
+    sponsored,
+  });
+  const { fee } = contractDeployTx.auth.spendingCondition;
+  if (feeMultipliers) {
+    contractDeployTx.setFee(
+      fee * BigInt(feeMultipliers.otherTxMultiplier),
+    );
+  }
+
+  return {
+    contractDeployTx,
+    codeBody,
+    contractName,
+    sponsored,
+  };
+};
+
+export async function getContractCallPromises(
+  payload: TransactionPayload,
+  stxAddress: string,
+  network: SettingsNetwork,
+  stxPublicKey: string,
+) {
+  const [unSignedContractCall, contractInterface, coinsMetaData, showPostConditionMessage] = await createContractCallPromises(payload, stxAddress, network, stxPublicKey);
+  return {
+    unSignedContractCall,
+    contractInterface,
+    coinsMetaData,
+    showPostConditionMessage,
+  };
 }

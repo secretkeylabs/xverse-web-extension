@@ -1,35 +1,30 @@
-import styled from 'styled-components';
-import PostCondition from '@components/postCondition';
 import useDappRequest from '@hooks/useTransationRequest';
-import ConfirmScreen from '@components/confirmScreen';
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
-
-const MainContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  width: '100%',
-  height: '100%',
-}));
+import useWalletSelector from '@hooks/useWalletSelector';
+import { useEffect, useState } from 'react';
+import { StacksTransaction } from '@stacks/transactions';
+import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
+import { getContractCallPromises } from './helper';
 
 function TransactionRequest() {
-  const confirmCallback = () => {};
-  const cancelCallback = () => {};
   const { payload } = useDappRequest();
-  return (
-    <ConfirmScreen
-      onConfirm={confirmCallback}
-      onCancel={cancelCallback}
-      cancelText="cancel"
-      confirmText="confirm"
-      loading={false}
-    >
-      <MainContainer>
-        {payload.txType === 'contract_call' && <ContractCallRequest request={payload} />}
-        {/* <PostCondition postCondition={payload.postConditions} showMore={false} /> */}
-      </MainContainer>
-    </ConfirmScreen>
-  );
+  const { stxAddress, network, stxPublicKey } = useWalletSelector();
+  const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const {
+          unSignedContractCall, contractInterface, coinsMetaData, showPostConditionMessage,
+        } = await getContractCallPromises(payload, stxAddress, network, stxPublicKey);
+        setUnsignedTx(unSignedContractCall);
+      } catch (e: unknown) {}
+    })();
+  }, [stxAddress, network, stxPublicKey, payload]);
+
+  if (payload.txType === 'contract_call'
+  && unsignedTx) return <ContractCallRequest request={payload} unsignedTx={unsignedTx} />;
+  if (payload.txType === 'smart_contract') return <ContractDeployRequest request={payload} />;
 }
 
 export default TransactionRequest;

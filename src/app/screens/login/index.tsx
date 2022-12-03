@@ -10,13 +10,17 @@ import useWalletReducer from '@hooks/useWalletReducer';
 
 declare const VERSION: string;
 
-const ScreenContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  paddingLeft: props.theme.spacing(9),
-  paddingRight: props.theme.spacing(9),
-}));
+const ScreenContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-left: 18px;
+  padding-right: 18px;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 const AppVersion = styled.p((props) => ({
   ...props.theme.body_xs,

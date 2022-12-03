@@ -15,7 +15,6 @@ import ConfirmBtcTransaction from '@screens/confrimBtcTransaction';
 import BackupWallet from '@screens/backupWallet';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import CreatePassword from '@screens/createPassword';
-import TransactionRequest from '@screens/transactionRequest';
 import AuthenticationRequest from '@screens/authenticationRequest';
 import AuthGuard from '@components/guards/auth';
 import Login from '@screens/login';
@@ -37,6 +36,7 @@ import SendNft from '@screens/sendNft';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import CoinDashboard from '@screens/coinDashboard';
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
+import TransactionRequest from '@screens/transactionRequest';
 
 const router = createHashRouter([
   {
