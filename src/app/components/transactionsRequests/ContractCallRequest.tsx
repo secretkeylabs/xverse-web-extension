@@ -9,14 +9,9 @@ import StxPostConditionCard from '@components/postCondition/stxPostConditionCard
 import { createContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  addressToString,
-  PostCondition,
-  PostConditionType,
   StacksTransaction,
 } from '@stacks/transactions';
-import { broadcastSignedTransaction, Coin } from '@secretkeylabs/xverse-core';
-import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
-import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
+import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
 import RedirectAddressView from '@components/redirectAddressView';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useNavigate } from 'react-router-dom';
@@ -169,11 +164,6 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONTRACT_CALL_REQUEST' });
   const [isShowMore, setIsShowMore] = useState(false);
   const Illustration = headerImageMapping[request.functionName ?? ''];
-  const confirmCallback = (transactions: StacksTransaction[]) => {
-    const tx: StacksTransaction = transactions[0];
-    broadcastTx(tx);
-  };
-  const cancelCallback = () => {};
 
   const showMoreButton = (
     <ShowMoreButtonContainer>
@@ -199,18 +189,17 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
     </SponsoredContainer>
   );
 
-  const postConditionAlert = unsignedTx?.postConditionMode === 2 &&
-    unsignedTx?.postConditions.values.length <= 0 && (
+  const postConditionAlert = unsignedTx?.postConditionMode === 2
+    && unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
         <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
       </PostConditionContainer>
-    );
-
+  );
   const { network } = useWalletSelector();
   const navigate = useNavigate();
   const broadcastTx = async (tx: StacksTransaction) => {
     try {
-      //setIsLoading(true);
+      // setIsLoading(true);
       const networkType = network?.type ?? 'Mainnet';
 
       const broadcastResult: string = await broadcastSignedTransaction(tx, networkType);
@@ -236,9 +225,15 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         console.error(e.stack);
       }
     } finally {
-      //setIsLoading(false);
+      // setIsLoading(false);
     }
   };
+
+  const confirmCallback = (transactions: StacksTransaction[]) => {
+    const tx: StacksTransaction = transactions[0];
+    broadcastTx(tx);
+  };
+  const cancelCallback = () => {};
 
   return (
     <ConfirmStxTransationComponent
@@ -257,21 +252,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
       {unsignedTx?.postConditions?.values?.map((postCondition, i) => (
         <StxPostConditionCard
           key={i}
-          postCondition={{
-            amount: 1n,
-            conditionCode: 4,
-            conditionType: 0,
-            principal: {
-              address: {
-                hash160: '1853f9fcad12d7e678576ff5df4644691e2d77e7',
-                type: 0,
-                version: 22,
-              },
-              prefix: 2,
-              type: 1,
-            },
-            type: 5,
-          }}
+          postCondition={postCondition}
         />
       ))}
       <InfoContainer>

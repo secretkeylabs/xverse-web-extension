@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { CONTENT_SCRIPT_PORT } from '../content-scripts/message-types';
 import type { LegacyMessageFromContentScript } from '../content-scripts/message-types';
 import {
@@ -6,10 +7,21 @@ import {
 } from './legacy-external-message-handler';
 import internalBackgroundMessageHandler from './messageHandlers';
 
+function deleteTimer(port) {
+  if (port._timer) {
+    clearTimeout(port._timer);
+    delete port._timer;
+  }
+}
+function forceReconnect(port) {
+  deleteTimer(port);
+  port.disconnect();
+}
+
 // Listen for connection to the content-script - port for two-way communication
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== CONTENT_SCRIPT_PORT) return;
-
+  port._timer = setTimeout(forceReconnect, 250e3, port);
   port.onMessage.addListener((message: LegacyMessageFromContentScript, port) => {
     if (inferLegacyMessage(message)) {
       void handleLegacyExternalMethodFormat(message, port);
@@ -17,6 +29,7 @@ chrome.runtime.onConnect.addListener((port) => {
       return;
     }
   });
+  port.onDisconnect.addListener(deleteTimer);
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

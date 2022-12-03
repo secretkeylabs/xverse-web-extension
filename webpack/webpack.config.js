@@ -32,8 +32,8 @@ var options = {
     background: path.join(SRC_ROOT_PATH, 'background', 'background.ts'),
     inpage: path.join(SRC_ROOT_PATH, 'inpage', 'inpage.ts'),
     'content-script': path.join(SRC_ROOT_PATH, 'content-scripts', 'content-script.ts'),
-    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.jsx'),
-    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.jsx'),
+    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.tsx'),
+    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.tsx'),
   },
   output: {
     filename: '[name].js',

@@ -26,7 +26,6 @@ async function internalBackgroundMessageHandler(
 
     case InternalMethods.RequestInMemoryKeys: {
       sendResponse(inMemoryKey);
-      sendResponse();
       break;
     }
 
@@ -38,6 +37,7 @@ async function internalBackgroundMessageHandler(
     default:
       sendResponse();
   }
+  sendResponse();
 }
 
 export default internalBackgroundMessageHandler;

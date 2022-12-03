@@ -66,10 +66,10 @@ function PostConditionsView({ postCondition, amount }: Props) {
         return t('TRANSFER_LESS');
       case FungibleConditionCode.LessEqual:
         return t('TRANSFER_LESS_EQUAL');
-      case NonFungibleConditionCode.DoesNotSend:
+      case NonFungibleConditionCode.DoesNotOwn:
         return t('TRANSFER_DOES_NOT_OWN');
-      case NonFungibleConditionCode.Sends:
-        return t('will keep');
+      case NonFungibleConditionCode.Owns:
+        return t('TRANSFER_OWN');
       default:
         return '';
     }
