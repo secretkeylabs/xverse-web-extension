@@ -125,6 +125,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
             txid: broadcastResult,
             currency: 'STX',
             error: '',
+            browserTx: true,
           },
         });
       }
@@ -135,6 +136,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
           txid: '',
           currency: 'STX',
           error: error.toString(),
+          browserTx: true,
         },
       });
     } finally {
@@ -155,7 +157,14 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   }, []);
 
   const confirmCallback = (txs: StacksTransaction[]) => {
-    broadcastTx(txs[0]);
+    if (sponsored) {
+      navigate('/tx-status', {
+        state: {
+          sponsored: true,
+          browserTx: true,
+        },
+      });
+    } else { broadcastTx(txs[0]); }
   };
 
   const cancelCallback = () => { window.close(); };
@@ -184,6 +193,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         onConfirmClick={confirmCallback}
         onCancelClick={cancelCallback}
         loading={loaderForBroadcastingTx}
+        isSponsored={sponsored}
       >
         <Container>
           <TopImage src={DeployContractImage} alt="deploy_contract" />

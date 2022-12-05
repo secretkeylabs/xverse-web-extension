@@ -33,7 +33,7 @@ const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginBottom: props.theme.spacing(20),
-  marginTop: props.theme.spacing(24),
+  marginTop: props.theme.spacing(12),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -58,11 +58,21 @@ const ButtonText = styled.div((props) => ({
   textAlign: 'center',
 }));
 
+const TransferFeeContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(12),
+}));
+
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
   alignSelf: 'center',
   transform: 'all',
 }));
+
+const SponsoredInfoText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white['400'],
+}));
+
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
@@ -149,10 +159,13 @@ function ConfirmStxTransationComponent({
   return (
     <Container>
       {children}
-      <TransferFeeView
-        fee={microstacksToStx(getFee())}
-        currency="STX"
-      />
+      <TransferFeeContainer>
+        <TransferFeeView
+          fee={microstacksToStx(getFee())}
+          currency="STX"
+        />
+      </TransferFeeContainer>
+
       {!isSponsored && (
         <Button onClick={onAdvancedSettingClick}>
           <>
@@ -161,6 +174,7 @@ function ConfirmStxTransationComponent({
           </>
         </Button>
       )}
+      {isSponsored && <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>}
       <TransactionSettingAlert
         visible={openTransactionSettingModal}
         fee={microstacksToStx(getFee()).toString()}
@@ -178,7 +192,6 @@ function ConfirmStxTransationComponent({
             onPress={onCancelClick}
           />
         </TransparentButtonContainer>
-
         <ActionButton
           text={t('CONFIRM')}
           disabled={buttonLoading}
