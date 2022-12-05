@@ -189,7 +189,7 @@ function NftDashboard() {
 
   return (
     <>
-      <AccountHeaderComponent isNftGalleryOpen={isGalleryOpen} />
+      <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
         <CollectibleContainer>
           {isGalleryOpen ? <GalleryCollectiblesHeadingText>{t('COLLECTIBLES')}</GalleryCollectiblesHeadingText> : <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>}

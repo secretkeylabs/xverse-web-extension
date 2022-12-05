@@ -158,7 +158,7 @@ function SignatureRequest(): JSX.Element {
       confirmText={t('SIGN_BUTTON')}
       loading={isSigning}
     >
-      <AccountHeaderComponent />
+      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
         <RequestImage src={SignatureIcon} alt="Signature" width={80} />
         <RequestType>{t('TITLE')}</RequestType>

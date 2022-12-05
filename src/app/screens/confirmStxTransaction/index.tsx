@@ -48,7 +48,7 @@ function ConfirmStxTransaction() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { unsignedTx } = location.state;
+  const { unsignedTx, sponsored, isBrowserTx } = location.state;
 
   const {
     stxBtcRate, btcFiatRate, network, stxAddress, fiatCurrency,
@@ -148,13 +148,17 @@ function ConfirmStxTransaction() {
   };
 
   const handleOnCancelClick = () => {
-    navigate('/send-stx', {
-      state: {
-        recipientAddress: recipient,
-        amountToSend: getAmount().toString(),
-        stxMemo: memo,
-      },
-    });
+    if (isBrowserTx) {
+      window.close();
+    } else {
+      navigate('/send-stx', {
+        state: {
+          recipientAddress: recipient,
+          amountToSend: getAmount().toString(),
+          stxMemo: memo,
+        },
+      });
+    }
   };
   return (
     <>
@@ -164,6 +168,7 @@ function ConfirmStxTransaction() {
         loading={isLoading}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
+        isSponsored={sponsored}
       >
         <TransferAmountView currency="STX" amount={getAmount()} />
         <RecipientAddressView recipient={recipient} />
