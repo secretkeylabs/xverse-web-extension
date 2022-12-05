@@ -25,6 +25,7 @@ import {
   ChangeFiatCurrencyKey,
   ChangeNetworkKey,
   GetActiveAccountsKey,
+  SetWalletSeedPhraseKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -54,6 +55,7 @@ const initialWalletState: WalletState = {
   coinsList: null,
   coins: [],
   feeMultipliers: null,
+  hasRestoredMemoryKey: false,
 };
 
 const walletReducer = (
@@ -98,6 +100,12 @@ const walletReducer = (
         ...state,
         encryptedSeed: action.encryptedSeed,
       };
+    case SetWalletSeedPhraseKey:
+      return {
+        ...state,
+        seedPhrase: action.seedPhrase,
+        hasRestoredMemoryKey: true,
+      };
     case UnlockWalletKey:
       return {
         ...state,
@@ -107,6 +115,7 @@ const walletReducer = (
       return {
         ...state,
         seedPhrase: '',
+        hasRestoredMemoryKey: false,
       };
     case FetchRatesSuccessKey:
       return {

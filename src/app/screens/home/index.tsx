@@ -26,7 +26,6 @@ import {
   getActiveAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
 import BottomBar from '@components/tabBar';
-import Seperator from '@components/seperator';
 import AccountHeaderComponent from '@components/accountHeader';
 import { getActiveAccountList } from '@secretkeylabs/xverse-core/account';
 import { CurrencyTypes } from '@utils/constants';
@@ -264,7 +263,6 @@ function Home() {
         </TestnetContainer>
       )}
       <AccountHeaderComponent />
-      <Seperator />
       <Container>
         <BalanceCard />
         <RowButtonContainer>

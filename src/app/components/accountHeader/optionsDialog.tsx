@@ -1,6 +1,6 @@
+import useWalletReducer from '@hooks/useWalletReducer';
 import { lockWalletAction } from '@stores/wallet/actions/actionCreators';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -59,14 +59,16 @@ interface Props {
 function OptionsDialog({ closeDialog, showResetWalletPrompt }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'OPTIONS_DIALOG' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const {
+    lockWallet,
+  } = useWalletReducer();
 
   const handleAccountSelect = () => {
     navigate('/account-list');
   };
 
   const onLockPress = () => {
-    dispatch(lockWalletAction());
+    lockWallet();
   };
 
   return (

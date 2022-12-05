@@ -11,11 +11,17 @@ export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
 const rootPersistConfig = {
   key: 'root',
   storage,
-  blacklist: ['nftDataState'],
+  blacklist: ['nftDataState', 'walletState'],
+};
+
+const WalletPersistConfig = {
+  key: 'walletState',
+  storage,
+  blacklist: ['seedPhrase', 'hasRestoredMemoryKey'],
 };
 
 const appReducer = combineReducers({
-  walletState: walletReducer,
+  walletState: persistReducer(WalletPersistConfig, walletReducer),
   nftDataState: NftDataStateReducer,
 });
 
@@ -25,12 +31,12 @@ const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
 
 export type StoreState = ReturnType<typeof rootReducer>;
 
-const configureStore = () => {
+const rootStore = (() => {
   const sagaMiddleware = createSagaMiddleware();
   const store = createStore(persistedReducer, applyMiddleware(sagaMiddleware));
   sagaMiddleware.run(rootSaga);
   const persistedStore = persistStore(store);
   return { store, persistedStore };
-};
+})();
 
-export default configureStore;
+export default rootStore;

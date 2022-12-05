@@ -12,15 +12,16 @@ import { useTranslation } from 'react-i18next';
 import OptionsDialog from './optionsDialog';
 
 const SelectedAccountContainer = styled.div((props) => ({
-  marginLeft: '5%',
-  marginRight: '5%',
+  paddingLeft: '5%',
+  paddingRight: '5%',
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'space-between',
-  paddingTop: props.theme.spacing(2),
-  paddingBottom: props.theme.spacing(2),
+  paddingTop: props.theme.spacing(5),
+  paddingBottom: props.theme.spacing(10),
+  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
 }));
 
 const ResetWalletContainer = styled.div((props) => ({

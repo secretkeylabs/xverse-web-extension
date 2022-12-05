@@ -20,7 +20,6 @@ const aliases = {
   '@stacks/keychain': '@stacks/keychain/dist/esm',
   '@secretkeylabs/xverse-core': '@secretkeylabs/xverse-core/dist',
 };
-
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
 const BUILD_ROOT_PATH = path.join(__dirname, '../', 'build');
@@ -30,11 +29,14 @@ var options = {
   mode: env.NODE_ENV || 'development',
 
   entry: {
-    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.jsx'),
-    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.jsx'),
+    background: path.join(SRC_ROOT_PATH, 'background', 'background.ts'),
+    inpage: path.join(SRC_ROOT_PATH, 'inpage', 'inpage.ts'),
+    'content-script': path.join(SRC_ROOT_PATH, 'content-scripts', 'content-script.ts'),
+    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.tsx'),
+    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.tsx'),
   },
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].js',
     path: BUILD_ROOT_PATH,
     clean: true,
     publicPath: ASSET_PATH,
@@ -103,7 +105,6 @@ var options = {
       stream: require.resolve('stream-browserify'),
       crypto: require.resolve('crypto-browserify'),
       fs: false,
-      util: require.resolve('util/'),
     },
   },
   plugins: [
@@ -137,6 +138,11 @@ var options = {
           to: BUILD_ROOT_PATH,
         },
       ],
+    }),
+    new CopyWebpackPlugin({
+      patterns: [{
+        from: 'node_modules/webextension-polyfill/dist/browser-polyfill.js',
+      }],
     }),
     new HtmlWebpackPlugin({
       template: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.html'),

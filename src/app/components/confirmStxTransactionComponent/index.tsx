@@ -98,7 +98,7 @@ function ConfirmStxTransationComponent({
     ? new BigNumber(0)
     : new BigNumber(
       stateTx
-        .map((tx) => tx.auth.spendingCondition?.fee ?? BigInt(0))
+        .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
         .reduce((prev, curr) => prev + curr, BigInt(0))
         .toString(10),
     ));

@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { Ring } from 'react-spinners-css';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
-import Seperator from '@components/seperator';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
@@ -191,7 +190,6 @@ function NftDashboard() {
   return (
     <>
       <AccountHeaderComponent isNftGalleryOpen={isGalleryOpen} />
-      <Seperator />
       <Container>
         <CollectibleContainer>
           {isGalleryOpen ? <GalleryCollectiblesHeadingText>{t('COLLECTIBLES')}</GalleryCollectiblesHeadingText> : <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>}

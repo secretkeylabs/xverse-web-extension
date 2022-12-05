@@ -5,7 +5,6 @@ import {
   FungibleToken,
   NetworkType,
   SettingsNetwork,
-  StxTransactionData,
   SupportedCurrency,
   TransactionData,
   Account,
@@ -25,6 +24,7 @@ export const FetchFeeMultiplierKey = 'FetchFeeMultiplier';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
 export const GetActiveAccountsKey = 'GetActiveAccounts';
+export const SetWalletSeedPhraseKey = 'SetWalletSeed';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
@@ -49,6 +49,7 @@ export interface WalletState {
   btcPublicKey: string;
   accountsList: Account[];
   selectedAccount: Account | null;
+  hasRestoredMemoryKey: boolean;
   network: SettingsNetwork;
   seedPhrase: string;
   encryptedSeed: string;
@@ -84,6 +85,11 @@ export interface SetWallet {
 export interface StoreEncryptedSeed {
   type: typeof StoreEncryptedSeedKey;
   encryptedSeed: string;
+}
+
+export interface SetWalletSeedPhrase {
+  type: typeof SetWalletSeedPhraseKey;
+  seedPhrase: string;
 }
 export interface UnlockWallet {
   type: typeof UnlockWalletKey;
@@ -224,6 +230,7 @@ export type WalletActions =
   | AddAccount
   | SelectAccount
   | StoreEncryptedSeed
+  | SetWalletSeedPhrase
   | UnlockWallet
   | LockWallet
   | FetchFeeMultiplier

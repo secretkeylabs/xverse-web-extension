@@ -24,8 +24,10 @@
       "@hooks/*": ["app/hooks/*"],
       "@assets/*": ["assets/*"],
       "@screens/*": ["app/screens/*"],
+      "@shared/*": ["shared/*"],
       "@stores/*": ["app/stores/*"],
       "@utils/*": ["app/utils/*"],
+      "@core/*": ["app/core/*"]
     }
   },
   "include": ["src", "styled.d.ts"]
