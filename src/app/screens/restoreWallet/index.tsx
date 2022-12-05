@@ -74,7 +74,7 @@ function RestoreWallet(): JSX.Element {
       setError('');
       const seed = cleanMnemonic(seedPhrase);
       await restoreWallet(seed, password);
-      navigate('/create-wallet-success');
+      navigate('/wallet-success/restore');
     } else {
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));
     }

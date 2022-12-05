@@ -66,7 +66,7 @@ export function getExplorerUrl(stxAddress: string): string {
 }
 
 export function getFetchableUrl(uri: string, protocol: string): string | undefined {
-  const publicIpfs = 'https://ipfs.io/ipfs';
+  const publicIpfs = 'https://cf-ipfs.com/ipfs';
   if (protocol === 'http') return uri;
   if (protocol === 'ipfs') {
     const url = uri.split('//');
