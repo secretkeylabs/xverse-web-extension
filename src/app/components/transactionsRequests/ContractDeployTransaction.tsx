@@ -1,6 +1,7 @@
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import { PostCondition, StacksTransaction } from '@stacks/transactions';
 import styled from 'styled-components';
+import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
 import DeployContractImage from '@assets/img/webInteractions/deploy_contract.svg';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
@@ -50,6 +51,12 @@ const InfoContainer = styled.div((props) => ({
   flexDirection: 'column',
 }));
 
+const DownloadContainer = styled.div((props) => ({
+  display: 'flex',
+  marginTop: props.theme.spacing(13.5),
+  flexDirection: 'row',
+}));
+
 const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
   marginTop: props.theme.spacing(12),
@@ -59,6 +66,25 @@ const PostConditionContainer = styled.div((props) => ({
   borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
   flexDirection: 'column',
 }));
+
+const DownloadButtonContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  flex: 1,
+  justifyContent: 'flex-end',
+});
+
+const ButtonText = styled.div((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white['0'],
+  marginRight: props.theme.spacing(2),
+  textAlign: 'center',
+}));
+
+const ButtonImage = styled.img({
+  alignSelf: 'center',
+  transform: 'all',
+});
 
 const SponsoredContainer = styled.div({
   display: 'flex',
@@ -84,6 +110,15 @@ const SponosredText = styled.h1((props) => ({
 const PostConditionAlertText = styled.h1((props) => ({
   ...props.theme.body_l,
   color: props.theme.colors.white['0'],
+}));
+
+const Button = styled.button((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
 }));
 
 interface ContractDeployRequestProps {
@@ -134,6 +169,15 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
     broadcastTx(txs[0]);
   };
 
+  const downloadCode = () => {
+    const element = document.createElement('a');
+    const file = new Blob([codeBody], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'code.clar';
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  };
+
   const cancelCallback = () => { window.close(); };
 
   const showSponsoredTransactionTag = (
@@ -175,6 +219,19 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         <InfoContainer>
           <Title>{t('CONTRACT_NAME')}</Title>
           <Value>{contractName}</Value>
+
+          <DownloadContainer>
+            <Title>{t('FUNCTION')}</Title>
+            <DownloadButtonContainer>
+              <Button onClick={downloadCode}>
+                <>
+                  <ButtonText>{t('DOWNLOAD')}</ButtonText>
+                  <ButtonImage src={DownloadImage} />
+                </>
+              </Button>
+            </DownloadButtonContainer>
+
+          </DownloadContainer>
         </InfoContainer>
       </ConfirmStxTransationComponent>
     </>
