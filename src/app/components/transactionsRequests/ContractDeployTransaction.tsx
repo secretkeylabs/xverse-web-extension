@@ -3,11 +3,13 @@ import { ContractCallPayload, PostCondition, StacksTransaction } from '@stacks/t
 import styled from 'styled-components';
 import DeployContractImage from '@assets/img/webInteractions/deploy_contract.svg';
 import { useTranslation } from 'react-i18next';
-import { createDeployContractRequest } from '@screens/transactionRequest/helper';
 import { useEffect, useState } from 'react';
 import useWalletSelector from '@hooks/useWalletSelector';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
+import {
+  broadcastSignedTransaction,
+  createDeployContractRequest,
+} from '@secretkeylabs/xverse-core';
 import { useNavigate } from 'react-router-dom';
 import { Ring } from 'react-spinners-css';
 
@@ -101,11 +103,11 @@ interface ContractDeployRequestProps {
 
 export default function ContractDeployRequest(props: ContractDeployRequestProps) {
   const { request } = props;
-  const {
-    stxAddress, network, stxPublicKey, feeMultipliers,
-  } = useWalletSelector();
+  const { stxAddress, network, stxPublicKey, feeMultipliers } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'DEPLOY_CONTRACT_REQUEST' });
-  const [contractDeployTx, setContractDeployTx] = useState<StacksTransaction | undefined>(undefined);
+  const [contractDeployTx, setContractDeployTx] = useState<StacksTransaction | undefined>(
+    undefined
+  );
   const [codeBody, setCodeBody] = useState(undefined);
   const [contractName, setContractName] = useState(undefined);
   const [sponsored, setSponsored] = useState<boolean>(false);
@@ -144,7 +146,13 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
 
   useEffect(() => {
     async function fetchRequest() {
-      const response = await createDeployContractRequest(request, network, stxPublicKey, feeMultipliers!, stxAddress);
+      const response = await createDeployContractRequest(
+        request,
+        network,
+        stxPublicKey,
+        feeMultipliers!,
+        stxAddress
+      );
       setContractDeployTx(response.contractDeployTx);
       setSponsored(response.sponsored);
       setCodeBody(response.codeBody);
@@ -158,53 +166,49 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
     broadcastTx(txs[0]);
   };
 
-  const cancelCallback = () => { window.close(); };
+  const cancelCallback = () => {
+    window.close();
+  };
 
   const showSponsoredTransactionTag = (
     <SponsoredContainer>
       <SponsoredTag>
         <SponosredText>{t('SPONSORED')}</SponosredText>
       </SponsoredTag>
-
     </SponsoredContainer>
   );
 
-  const postConditionAlert = contractDeployTx?.postConditionMode === 2
-  && contractDeployTx?.postConditions.values.length <= 0 && (
-    <PostConditionContainer>
-      <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
-    </PostConditionContainer>
-  );
+  const postConditionAlert = contractDeployTx?.postConditionMode === 2 &&
+    contractDeployTx?.postConditions.values.length <= 0 && (
+      <PostConditionContainer>
+        <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
+      </PostConditionContainer>
+    );
 
-  return (
-
-    !loading ? (
-      <ConfirmStxTransationComponent
-        initialStxTransactions={[contractDeployTx!]}
-        onConfirmClick={confirmCallback}
-        onCancelClick={cancelCallback}
-        loading={loaderForBroadcastingTx}
-      >
-        <Container>
-          <TopImage src={DeployContractImage} alt="deploy_contract" />
-          <FunctionTitle>{t('DEPLOY_CONTRACT')}</FunctionTitle>
-        </Container>
-        {postConditionAlert}
-        {sponsored && showSponsoredTransactionTag}
-        {contractDeployTx?.postConditions?.values?.map((postCondition) => (
-          <StxPostConditionCard
-            postCondition={postCondition as PostCondition}
-          />
-        ))}
-        <InfoContainer>
-          <Title>{t('CONTRACT_NAME')}</Title>
-          <Value>{contractName}</Value>
-        </InfoContainer>
-      </ConfirmStxTransationComponent>
-    ) : (
-      <LoaderContainer>
-        <Ring color="white" size={50} />
-      </LoaderContainer>
-    )
+  return !loading ? (
+    <ConfirmStxTransationComponent
+      initialStxTransactions={[contractDeployTx!]}
+      onConfirmClick={confirmCallback}
+      onCancelClick={cancelCallback}
+      loading={loaderForBroadcastingTx}
+    >
+      <Container>
+        <TopImage src={DeployContractImage} alt="deploy_contract" />
+        <FunctionTitle>{t('DEPLOY_CONTRACT')}</FunctionTitle>
+      </Container>
+      {postConditionAlert}
+      {sponsored && showSponsoredTransactionTag}
+      {contractDeployTx?.postConditions?.values?.map((postCondition) => (
+        <StxPostConditionCard postCondition={postCondition as PostCondition} />
+      ))}
+      <InfoContainer>
+        <Title>{t('CONTRACT_NAME')}</Title>
+        <Value>{contractName}</Value>
+      </InfoContainer>
+    </ConfirmStxTransationComponent>
+  ) : (
+    <LoaderContainer>
+      <Ring color="white" size={50} />
+    </LoaderContainer>
   );
 }

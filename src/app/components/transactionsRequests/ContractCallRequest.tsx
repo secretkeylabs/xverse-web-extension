@@ -17,12 +17,16 @@ import {
   SomeCV,
   StacksTransaction,
 } from '@stacks/transactions';
-import { addressToString, broadcastSignedTransaction, Coin } from '@secretkeylabs/xverse-core';
+import {
+  addressToString,
+  broadcastSignedTransaction,
+  Coin,
+  extractFromPayload,
+} from '@secretkeylabs/xverse-core';
 import RedirectAddressView from '@components/redirectAddressView';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useNavigate } from 'react-router-dom';
 import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
-import { extractFromPayload } from '@screens/transactionRequest/helper';
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
 import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
 
