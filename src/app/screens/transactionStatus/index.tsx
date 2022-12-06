@@ -124,13 +124,15 @@ function TransactionStatus() {
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_STATUS' });
   const navigate = useNavigate();
   const location = useLocation();
-  const { txid, currency, error } = location.state;
+  const {
+    txid, currency, error, sponsored, browserTx,
+  } = location.state;
 
   const renderTransactionSuccessStatus = (
     <Container>
       <Image src={Success} />
-      <HeadingText>{t('BROADCASTED')}</HeadingText>
-      <BodyText>{t('SUCCESS_MSG')}</BodyText>
+      <HeadingText>{sponsored ? t('SPONSORED_SUCCESS_MSG') : t('BROADCASTED')}</HeadingText>
+      <BodyText>{sponsored ? t('SPONSORED_MSG') : t('SUCCESS_MSG')}</BodyText>
     </Container>
   );
 
@@ -153,7 +155,8 @@ function TransactionStatus() {
   };
 
   const onCloseClick = () => {
-    navigate(-1);
+    if (browserTx) window.close();
+    else navigate(-1);
   };
 
   const onCopyClick = () => {
@@ -186,11 +189,14 @@ function TransactionStatus() {
 
   return (
     <TxStatusContainer>
-      <OuterContainer>
-        {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
-        {txid && renderLink}
-        {txid && renderTransactionID}
-      </OuterContainer>
+      {sponsored ? <OuterContainer>{renderTransactionSuccessStatus}</OuterContainer>
+        : (
+          <OuterContainer>
+            {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
+            {txid && renderLink}
+            {txid && renderTransactionID}
+          </OuterContainer>
+        )}
       <ButtonContainer>
         <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
       </ButtonContainer>
