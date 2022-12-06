@@ -55,6 +55,8 @@ const DownloadContainer = styled.div((props) => ({
   display: 'flex',
   marginTop: props.theme.spacing(13.5),
   flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
 }));
 
 const PostConditionContainer = styled.div((props) => ({
@@ -219,7 +221,6 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         <InfoContainer>
           <Title>{t('CONTRACT_NAME')}</Title>
           <Value>{contractName}</Value>
-
           <DownloadContainer>
             <Title>{t('FUNCTION')}</Title>
             <DownloadButtonContainer>
