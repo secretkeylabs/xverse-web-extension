@@ -6,9 +6,9 @@ const useDappRequest = () => {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('request') ?? '';
-  const request = decodeToken(requestToken);
+  const request = decodeToken(requestToken) as any;
   return {
-    payload: request.payload as unknown as TransactionPayload,
+    payload: request.payload,
   };
 };
 
