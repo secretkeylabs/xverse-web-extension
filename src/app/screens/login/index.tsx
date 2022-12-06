@@ -125,7 +125,7 @@ function Login(): JSX.Element {
     try {
       await unlockWallet(password);
       setIsVerifying(false);
-      navigate('/');
+      navigate(-1);
     } catch (err) {
       setIsVerifying(false);
       setError(t('VERIFY_PASSWORD_ERROR'));
@@ -138,7 +138,7 @@ function Login(): JSX.Element {
 
   return (
     <ScreenContainer>
-      <AppVersion>{VERSION}</AppVersion>
+      <AppVersion>Beta version</AppVersion>
       <TopSectionContainer>
         <img src={logo} width={100} alt="logo" />
         <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
