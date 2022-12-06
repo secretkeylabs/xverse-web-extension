@@ -15,6 +15,7 @@ import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCr
 import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
+import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const InfoContainer = styled.div((props) => ({
@@ -72,6 +73,7 @@ function ConfirmStxTransaction() {
           txid: stxTxBroadcastData,
           currency: 'STX',
           error: '',
+          browserTx: isBrowserTx,
         },
       });
       setTimeout(() => {
@@ -87,6 +89,7 @@ function ConfirmStxTransaction() {
           txid: '',
           currency: 'STX',
           error: txError.toString(),
+          browserTx: isBrowserTx,
         },
       });
     }
@@ -162,7 +165,8 @@ function ConfirmStxTransaction() {
   };
   return (
     <>
-      <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />
+      {isBrowserTx ? <AccountHeaderComponent disableMenuOption disableAccountSwitch />
+        : <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
@@ -176,7 +180,7 @@ function ConfirmStxTransaction() {
         <Seperator />
         {memoInfoSection}
       </ConfirmStxTransationComponent>
-      <BottomBar tab="dashboard" />
+      {!isBrowserTx && <BottomBar tab="dashboard" />}
     </>
   );
 }

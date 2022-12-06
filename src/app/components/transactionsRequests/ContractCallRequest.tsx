@@ -210,6 +210,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
             txid: broadcastResult,
             currency: 'STX',
             error: '',
+            browserTx: true,
           },
         });
       }
@@ -220,6 +221,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
             txid: '',
             currency: 'STX',
             error: e,
+            browserTx: true,
           },
         });
         console.error(e.message);
@@ -231,8 +233,17 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   };
 
   const confirmCallback = (transactions: StacksTransaction[]) => {
-    const tx: StacksTransaction = transactions[0];
-    broadcastTx(tx);
+    if (request?.sponsored) {
+      navigate('/tx-status', {
+        state: {
+          sponsored: true,
+          browserTx: true,
+        },
+      });
+    } else {
+      const tx: StacksTransaction = transactions[0];
+      broadcastTx(tx);
+    }
   };
   const cancelCallback = () => {
     window.close();

@@ -84,7 +84,8 @@
     "CANCEL": "Cancel",
     "SATS": "SATS",
     "CONFIRM_TX": "Confirm Transaction",
-    "MOVE_TO_ASSET_DETAIL": "Back to asset detail"
+    "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
+    "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account."
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
@@ -111,7 +112,9 @@
     "TRANSACTION_ID": "Transaction ID",
     "CLOSE": "Close",
     "FAILED": "Transaction Failed",
-    "RETRY": "Try again"
+    "RETRY": "Try again",
+    "SPONSORED_SUCCESS_MSG": "Transaction signed",
+    "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor"
   },
   "LEGAL_SCREEN": {
     "SCREEN_TITLE": "Legal",
