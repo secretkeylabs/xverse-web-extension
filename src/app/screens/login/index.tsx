@@ -125,7 +125,7 @@ function Login(): JSX.Element {
     try {
       await unlockWallet(password);
       setIsVerifying(false);
-      navigate('/');
+      navigate(-1);
     } catch (err) {
       setIsVerifying(false);
       setError(t('VERIFY_PASSWORD_ERROR'));

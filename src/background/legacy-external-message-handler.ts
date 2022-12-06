@@ -83,8 +83,8 @@ function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) {
 
 async function triggerRequstWindowOpen(path: RequestsRoutes, urlParams: URLSearchParams) {
   // if (IS_TEST_ENV) return openRequestInFullPage(path, urlParams);
-  console.log(`/options.html#${path}?${urlParams.toString()}`);
-  return popupCenter({ url: `/options.html#${path}?${urlParams.toString()}` });
+  console.log(`/popup.html#${path}?${urlParams.toString()}`);
+  return popupCenter({ url: `/popup.html#${path}?${urlParams.toString()}` });
 }
 
 export async function handleLegacyExternalMethodFormat(
