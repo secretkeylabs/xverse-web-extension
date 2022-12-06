@@ -358,7 +358,7 @@
     "SOURCE_CODE": "Source code",
     "VIEW_SOURCE_CODE": "View contract code",
     "SPONSORED": "Sponsored",
-    "FUNCTION": "Function",
+    "FUNCTION": "Source Code",
     "DOWNLOAD": "Download contract code",
     "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
   },
