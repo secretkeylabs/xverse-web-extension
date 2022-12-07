@@ -15,6 +15,7 @@ import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCr
 import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
+import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const InfoContainer = styled.div((props) => ({
@@ -48,7 +49,7 @@ function ConfirmStxTransaction() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { unsignedTx } = location.state;
+  const { unsignedTx, sponsored, isBrowserTx } = location.state;
 
   const {
     stxBtcRate, btcFiatRate, network, stxAddress, fiatCurrency,
@@ -72,6 +73,7 @@ function ConfirmStxTransaction() {
           txid: stxTxBroadcastData,
           currency: 'STX',
           error: '',
+          browserTx: isBrowserTx,
         },
       });
       setTimeout(() => {
@@ -87,6 +89,7 @@ function ConfirmStxTransaction() {
           txid: '',
           currency: 'STX',
           error: txError.toString(),
+          browserTx: isBrowserTx,
         },
       });
     }
@@ -148,22 +151,28 @@ function ConfirmStxTransaction() {
   };
 
   const handleOnCancelClick = () => {
-    navigate('/send-stx', {
-      state: {
-        recipientAddress: recipient,
-        amountToSend: getAmount().toString(),
-        stxMemo: memo,
-      },
-    });
+    if (isBrowserTx) {
+      window.close();
+    } else {
+      navigate('/send-stx', {
+        state: {
+          recipientAddress: recipient,
+          amountToSend: getAmount().toString(),
+          stxMemo: memo,
+        },
+      });
+    }
   };
   return (
     <>
-      <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />
+      {isBrowserTx ? <AccountHeaderComponent disableMenuOption disableAccountSwitch />
+        : <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
+        isSponsored={sponsored}
       >
         <TransferAmountView currency="STX" amount={getAmount()} />
         <RecipientAddressView recipient={recipient} />
@@ -171,7 +180,7 @@ function ConfirmStxTransaction() {
         <Seperator />
         {memoInfoSection}
       </ConfirmStxTransationComponent>
-      <BottomBar tab="dashboard" />
+      {!isBrowserTx && <BottomBar tab="dashboard" />}
     </>
   );
 }

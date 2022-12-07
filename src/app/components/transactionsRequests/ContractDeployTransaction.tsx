@@ -1,15 +1,15 @@
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
-import { ContractCallPayload, PostCondition, StacksTransaction } from '@stacks/transactions';
+import { PostCondition, StacksTransaction } from '@stacks/transactions';
 import styled from 'styled-components';
+import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
 import DeployContractImage from '@assets/img/webInteractions/deploy_contract.svg';
 import { useTranslation } from 'react-i18next';
-import { createDeployContractRequest } from '@screens/transactionRequest/helper';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import useWalletSelector from '@hooks/useWalletSelector';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
 import { useNavigate } from 'react-router-dom';
-import { Ring } from 'react-spinners-css';
+import AccountHeaderComponent from '@components/accountHeader';
 
 const Container = styled.div({
   display: 'flex',
@@ -51,6 +51,14 @@ const InfoContainer = styled.div((props) => ({
   flexDirection: 'column',
 }));
 
+const DownloadContainer = styled.div((props) => ({
+  display: 'flex',
+  marginTop: props.theme.spacing(13.5),
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+}));
+
 const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
   marginTop: props.theme.spacing(12),
@@ -60,6 +68,25 @@ const PostConditionContainer = styled.div((props) => ({
   borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
   flexDirection: 'column',
 }));
+
+const DownloadButtonContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  flex: 1,
+  justifyContent: 'flex-end',
+});
+
+const ButtonText = styled.div((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white['0'],
+  marginRight: props.theme.spacing(2),
+  textAlign: 'center',
+}));
+
+const ButtonImage = styled.img({
+  alignSelf: 'center',
+  transform: 'all',
+});
 
 const SponsoredContainer = styled.div({
   display: 'flex',
@@ -87,29 +114,28 @@ const PostConditionAlertText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
-const LoaderContainer = styled.div((props) => ({
+const Button = styled.button((props) => ({
   display: 'flex',
-  flex: 1,
-  justifyContent: 'center',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
   alignItems: 'center',
-  marginTop: props.theme.spacing(12),
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
 }));
 
 interface ContractDeployRequestProps {
-  request: ContractCallPayload;
+  unsignedTx: StacksTransaction;
+  codeBody: string;
+  contractName: string;
+  sponsored: boolean;
 }
 
 export default function ContractDeployRequest(props: ContractDeployRequestProps) {
-  const { request } = props;
   const {
-    stxAddress, network, stxPublicKey, feeMultipliers,
-  } = useWalletSelector();
+    unsignedTx, codeBody, contractName, sponsored,
+  } = props;
+  const { network } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'DEPLOY_CONTRACT_REQUEST' });
-  const [contractDeployTx, setContractDeployTx] = useState<StacksTransaction | undefined>(undefined);
-  const [codeBody, setCodeBody] = useState(undefined);
-  const [contractName, setContractName] = useState(undefined);
-  const [sponsored, setSponsored] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
   const [loaderForBroadcastingTx, setLoaderForBroadcastingTx] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -117,7 +143,6 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
     try {
       setLoaderForBroadcastingTx(true);
       const networkType = network?.type ?? 'Mainnet';
-
       const broadcastResult: string = await broadcastSignedTransaction(tx, networkType);
       if (broadcastResult) {
         navigate('/tx-status', {
@@ -144,18 +169,6 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
     }
   };
 
-  useEffect(() => {
-    async function fetchRequest() {
-      const response = await createDeployContractRequest(request, network, stxPublicKey, feeMultipliers!, stxAddress);
-      setContractDeployTx(response.contractDeployTx);
-      setSponsored(response.sponsored);
-      setCodeBody(response.codeBody);
-      setContractName(response.contractName);
-      setLoading(false);
-    }
-    fetchRequest();
-  }, []);
-
   const confirmCallback = (txs: StacksTransaction[]) => {
     if (sponsored) {
       navigate('/tx-status', {
@@ -165,6 +178,15 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         },
       });
     } else { broadcastTx(txs[0]); }
+  };
+
+  const downloadCode = () => {
+    const element = document.createElement('a');
+    const file = new Blob([codeBody], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'code.clar';
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
   };
 
   const cancelCallback = () => { window.close(); };
@@ -178,18 +200,18 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
     </SponsoredContainer>
   );
 
-  const postConditionAlert = contractDeployTx?.postConditionMode === 2
-  && contractDeployTx?.postConditions.values.length <= 0 && (
+  const postConditionAlert = unsignedTx?.postConditionMode === 2
+  && unsignedTx?.postConditions.values.length <= 0 && (
     <PostConditionContainer>
       <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
     </PostConditionContainer>
   );
 
   return (
-
-    !loading ? (
+    <>
+      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <ConfirmStxTransationComponent
-        initialStxTransactions={[contractDeployTx!]}
+        initialStxTransactions={[unsignedTx!]}
         onConfirmClick={confirmCallback}
         onCancelClick={cancelCallback}
         loading={loaderForBroadcastingTx}
@@ -201,7 +223,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         </Container>
         {postConditionAlert}
         {sponsored && showSponsoredTransactionTag}
-        {contractDeployTx?.postConditions?.values?.map((postCondition) => (
+        {unsignedTx?.postConditions?.values?.map((postCondition) => (
           <StxPostConditionCard
             postCondition={postCondition as PostCondition}
           />
@@ -209,12 +231,20 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         <InfoContainer>
           <Title>{t('CONTRACT_NAME')}</Title>
           <Value>{contractName}</Value>
+          <DownloadContainer>
+            <Title>{t('FUNCTION')}</Title>
+            <DownloadButtonContainer>
+              <Button onClick={downloadCode}>
+                <>
+                  <ButtonText>{t('DOWNLOAD')}</ButtonText>
+                  <ButtonImage src={DownloadImage} />
+                </>
+              </Button>
+            </DownloadButtonContainer>
+
+          </DownloadContainer>
         </InfoContainer>
       </ConfirmStxTransationComponent>
-    ) : (
-      <LoaderContainer>
-        <Ring color="white" size={50} />
-      </LoaderContainer>
-    )
+    </>
   );
 }

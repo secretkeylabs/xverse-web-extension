@@ -15,6 +15,7 @@ import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
 import RedirectAddressView from '@components/redirectAddressView';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useNavigate } from 'react-router-dom';
+import AccountHeaderComponent from '@components/accountHeader';
 
 const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
@@ -249,32 +250,34 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   };
 
   return (
-    <ConfirmStxTransationComponent
-      initialStxTransactions={[unsignedTx]}
-      onConfirmClick={confirmCallback}
-      onCancelClick={cancelCallback}
-      loading={false}
-      isSponsored={request?.sponsored}
-    >
-      <Container>
-        <TopImage src={Illustration || ContractCall} alt="contract-call" />
-        <FunctionTitle>{request.functionName}</FunctionTitle>
-        <DappTitle>{`Requested by ${request.appDetails?.name}`}</DappTitle>
-      </Container>
-      {postConditionAlert}
-      {request.sponsored && showSponsoredTransactionTag}
-      {unsignedTx?.postConditions?.values?.map((postCondition, i) => (
-        <StxPostConditionCard
-          key={i}
-          postCondition={postCondition}
-        />
-      ))}
-      <InfoContainer>
-        <Title>{t('FUNCTION')}</Title>
-        <Value>{request?.functionName}</Value>
-      </InfoContainer>
-      {renderContractAddress}
-      {showMoreButton}
-    </ConfirmStxTransationComponent>
+    <>
+      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
+      <ConfirmStxTransationComponent
+        initialStxTransactions={[unsignedTx]}
+        onConfirmClick={confirmCallback}
+        onCancelClick={cancelCallback}
+        loading={false}
+      >
+        <Container>
+          <TopImage src={Illustration || ContractCall} alt="contract-call" />
+          <FunctionTitle>{request.functionName}</FunctionTitle>
+          <DappTitle>{`Requested by ${request.appDetails?.name}`}</DappTitle>
+        </Container>
+        {postConditionAlert}
+        {request.sponsored && showSponsoredTransactionTag}
+        {unsignedTx?.postConditions?.values?.map((postCondition, i) => (
+          <StxPostConditionCard
+            postCondition={postCondition}
+          />
+        ))}
+        <InfoContainer>
+          <Title>{t('FUNCTION')}</Title>
+          <Value>{request?.functionName}</Value>
+        </InfoContainer>
+        {renderContractAddress}
+        {showMoreButton}
+      </ConfirmStxTransationComponent>
+
+    </>
   );
 }

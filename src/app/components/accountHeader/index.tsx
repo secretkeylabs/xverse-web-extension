@@ -48,10 +48,11 @@ const OptionsButton = styled.button((props) => ({
 }));
 
 interface AccountHeaderComponentProps {
-  isNftGalleryOpen?: boolean;
+  disableMenuOption?: boolean;
+  disableAccountSwitch?: boolean;
 }
 
-function AccountHeaderComponent({ isNftGalleryOpen }:AccountHeaderComponentProps) {
+function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = false }:AccountHeaderComponentProps) {
   const navigate = useNavigate();
   const {
     selectedAccount,
@@ -98,7 +99,7 @@ function AccountHeaderComponent({ isNftGalleryOpen }:AccountHeaderComponentProps
   };
 
   const handleAccountSelect = () => {
-    navigate('/account-list');
+    if (!disableAccountSwitch) { navigate('/account-list'); }
   };
 
   const handleOptionsSelect = () => {
@@ -129,7 +130,7 @@ function AccountHeaderComponent({ isNftGalleryOpen }:AccountHeaderComponentProps
 
       <SelectedAccountContainer>
         <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
-        {!isNftGalleryOpen && (
+        {!disableMenuOption && (
         <OptionsButton onClick={handleOptionsSelect}>
           <img src={ThreeDots} alt="Options" />
         </OptionsButton>
