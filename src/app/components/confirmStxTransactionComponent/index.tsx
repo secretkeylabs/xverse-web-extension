@@ -34,6 +34,8 @@ const ButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   marginBottom: props.theme.spacing(20),
   marginTop: props.theme.spacing(12),
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -157,32 +159,34 @@ function ConfirmStxTransationComponent({
   };
 
   return (
-    <Container>
-      {children}
-      <TransferFeeContainer>
-        <TransferFeeView
-          fee={microstacksToStx(getFee())}
-          currency="STX"
-        />
-      </TransferFeeContainer>
+    <>
+      <Container>
+        {children}
+        <TransferFeeContainer>
+          <TransferFeeView
+            fee={microstacksToStx(getFee())}
+            currency="STX"
+          />
+        </TransferFeeContainer>
 
-      {!isSponsored && (
+        {!isSponsored && (
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
             <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
           </>
         </Button>
-      )}
-      {isSponsored && <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>}
-      <TransactionSettingAlert
-        visible={openTransactionSettingModal}
-        fee={microstacksToStx(getFee()).toString()}
-        type="STX"
-        nonce={getTxNonce()}
-        onApplyClick={applyTxSettings}
-        onCrossClick={closeTransactionSettingAlert}
-      />
+        )}
+        {isSponsored && <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>}
+        <TransactionSettingAlert
+          visible={openTransactionSettingModal}
+          fee={microstacksToStx(getFee()).toString()}
+          type="STX"
+          nonce={getTxNonce()}
+          onApplyClick={applyTxSettings}
+          onCrossClick={closeTransactionSettingAlert}
+        />
+      </Container>
       <ButtonContainer>
         <TransparentButtonContainer>
           <ActionButton
@@ -199,7 +203,7 @@ function ConfirmStxTransationComponent({
           onPress={onConfirmButtonClick}
         />
       </ButtonContainer>
-    </Container>
+    </>
   );
 }
 
