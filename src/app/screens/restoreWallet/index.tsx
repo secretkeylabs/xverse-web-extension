@@ -30,6 +30,7 @@ const PasswordContainer = styled.div((props) => ({
 function RestoreWallet(): JSX.Element {
   const { t } = useTranslation('translation');
   const { restoreWallet } = useWalletReducer();
+  const [isRestoring, setIsRestoring] = useState<boolean>(false);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -70,12 +71,16 @@ function RestoreWallet(): JSX.Element {
   };
 
   const handleConfirmPassword = async () => {
+    setIsRestoring(true);
     if (confirmPassword === password) {
       setError('');
       const seed = cleanMnemonic(seedPhrase);
       await restoreWallet(seed, password);
+      setIsRestoring(false);
+
       navigate('/wallet-success/restore');
     } else {
+      setIsRestoring(false);
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));
     }
   };
@@ -108,9 +113,9 @@ function RestoreWallet(): JSX.Element {
         handleContinue={handleConfirmPassword}
         handleBack={handleConfirmPasswordBack}
         passwordError={error}
+        loading={isRestoring}
       />
     </PasswordContainer>,
-
   ];
   return (
     <Container>

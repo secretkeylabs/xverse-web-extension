@@ -16,6 +16,7 @@ interface PasswordInputProps {
   passwordError?: string;
   checkPasswordStrength? : boolean;
   stackButtonAlignment? : boolean;
+  loading?: boolean;
 }
 
 interface StrengthBarProps {
@@ -127,7 +128,16 @@ const ButtonContainer = styled.div<TransparentButtonContainerProps>((props) => (
 
 function PasswordInput(props: PasswordInputProps): JSX.Element {
   const {
-    title, inputLabel, enteredPassword, passwordError, setEnteredPassword, handleContinue, handleBack, checkPasswordStrength, stackButtonAlignment = false,
+    title,
+    inputLabel,
+    enteredPassword,
+    passwordError,
+    setEnteredPassword,
+    handleContinue,
+    handleBack,
+    checkPasswordStrength,
+    stackButtonAlignment = false,
+    loading,
   } = props;
 
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
@@ -239,6 +249,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         </ButtonContainer>
 
         <ActionButton
+          processing={loading}
           text={t('CONTINUE_BUTTON')}
           onPress={checkPasswordStrength ? checkStrengthAndContinue : handleContinue}
         />

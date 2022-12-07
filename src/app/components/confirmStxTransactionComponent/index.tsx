@@ -33,7 +33,9 @@ const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginBottom: props.theme.spacing(20),
-  marginTop: props.theme.spacing(24),
+  marginTop: props.theme.spacing(12),
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -58,11 +60,21 @@ const ButtonText = styled.div((props) => ({
   textAlign: 'center',
 }));
 
+const TransferFeeContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(12),
+}));
+
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
   alignSelf: 'center',
   transform: 'all',
 }));
+
+const SponsoredInfoText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white['400'],
+}));
+
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
@@ -147,28 +159,34 @@ function ConfirmStxTransationComponent({
   };
 
   return (
-    <Container>
-      {children}
-      <TransferFeeView
-        fee={microstacksToStx(getFee())}
-        currency="STX"
-      />
-      {!isSponsored && (
+    <>
+      <Container>
+        {children}
+        <TransferFeeContainer>
+          <TransferFeeView
+            fee={microstacksToStx(getFee())}
+            currency="STX"
+          />
+        </TransferFeeContainer>
+
+        {!isSponsored && (
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
             <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
           </>
         </Button>
-      )}
-      <TransactionSettingAlert
-        visible={openTransactionSettingModal}
-        fee={microstacksToStx(getFee()).toString()}
-        type="STX"
-        nonce={getTxNonce()}
-        onApplyClick={applyTxSettings}
-        onCrossClick={closeTransactionSettingAlert}
-      />
+        )}
+        {isSponsored && <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>}
+        <TransactionSettingAlert
+          visible={openTransactionSettingModal}
+          fee={microstacksToStx(getFee()).toString()}
+          type="STX"
+          nonce={getTxNonce()}
+          onApplyClick={applyTxSettings}
+          onCrossClick={closeTransactionSettingAlert}
+        />
+      </Container>
       <ButtonContainer>
         <TransparentButtonContainer>
           <ActionButton
@@ -178,7 +196,6 @@ function ConfirmStxTransationComponent({
             onPress={onCancelClick}
           />
         </TransparentButtonContainer>
-
         <ActionButton
           text={t('CONFIRM')}
           disabled={buttonLoading}
@@ -186,7 +203,7 @@ function ConfirmStxTransationComponent({
           onPress={onConfirmButtonClick}
         />
       </ButtonContainer>
-    </Container>
+    </>
   );
 }
 

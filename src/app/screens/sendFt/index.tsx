@@ -48,7 +48,7 @@ function SendFtScreen() {
     if (fungibleToken?.decimals) {
       convertedAmount = convertAmountToFtDecimalPlaces(amount, fungibleToken.decimals).toString();
     }
-    setAmountToSend(convertedAmount);
+    setAmountToSend(amount);
     setTxMemo(memo);
     setRecepientAddress(associatedAddress);
     const { principal } = fungibleToken;

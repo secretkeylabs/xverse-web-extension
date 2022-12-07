@@ -70,18 +70,19 @@ function ConfirmScreen({
   children, onConfirm, onCancel, confirmText, cancelText, loading,
 }: Props) {
   return (
-    <MainContainer>
-      <ContentContainer>
-        {children}
-      </ContentContainer>
+    <>
+      <MainContainer>
+        <ContentContainer>
+          {children}
+        </ContentContainer>
+      </MainContainer>
       <ButtonsContainer>
         <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
         <ConfirmButton onClick={onConfirm}>
           {loading ? <Ring color="white" size={20} /> : confirmText}
         </ConfirmButton>
       </ButtonsContainer>
-
-    </MainContainer>
+    </>
   );
 }
 

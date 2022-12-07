@@ -3,29 +3,29 @@ import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-t
 import { isAddressTransactionWithTransfers, Tx } from '@utils/transactions/transactions';
 import { parseStxTransactionData } from '@secretkeylabs/xverse-core/api/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
-import IncreaseFeeIcon from '@assets/img/transactions/increaseFee.svg';
+// import IncreaseFeeIcon from '@assets/img/transactions/increaseFee.svg';
+// import styled from 'styled-components';
+// import { useTranslation } from 'react-i18next';
 import TxTransfers from './txTransfers';
 import StxTransferTransaction from './stxTransferTransaction';
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
 
-const IncreaseFeeButton = styled.button((props) => ({
-  ...props.theme.body_xs,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  alignSelf: 'flex-start',
-  background: 'none',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  color: props.theme.colors.white[0],
-  border: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  height: 34,
-  borderRadius: props.theme.radius(3),
-  img: {
-    marginRight: props.theme.spacing(3),
-  },
-}));
+// const IncreaseFeeButton = styled.button((props) => ({
+//   ...props.theme.body_xs,
+//   display: 'flex',
+//   justifyContent: 'center',
+//   alignItems: 'center',
+//   alignSelf: 'flex-start',
+//   background: 'none',
+//   paddingLeft: props.theme.spacing(8),
+//   paddingRight: props.theme.spacing(8),
+//   color: props.theme.colors.white[0],
+//   border: `0.5px solid ${props.theme.colors.background.elevation3}`,
+//   height: 34,
+//   borderRadius: props.theme.radius(3),
+//   img: {
+//     marginRight: props.theme.spacing(3),
+//   },
+// }));
 
 interface TransactionHistoryItemProps {
   transaction: AddressTransactionWithTransfers | Tx;
@@ -35,7 +35,7 @@ interface TransactionHistoryItemProps {
 export default function StxTransactionHistoryItem(props: TransactionHistoryItemProps) {
   const { transaction, transactionCoin } = props;
   const { selectedAccount } = useWalletSelector();
-  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+  // const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   if (!isAddressTransactionWithTransfers(transaction)) {
     return (
       <>
@@ -46,10 +46,10 @@ export default function StxTransactionHistoryItem(props: TransactionHistoryItemP
           })}
           transactionCoin={transactionCoin}
         />
-        <IncreaseFeeButton>
+        {/* <IncreaseFeeButton>
           <img src={IncreaseFeeIcon} alt="fee" />
           {t('INCREASE_FEE_BUTTON')}
-        </IncreaseFeeButton>
+        </IncreaseFeeButton> */}
       </>
     );
   } // This is a normal Transaction or MempoolTransaction
@@ -57,13 +57,13 @@ export default function StxTransactionHistoryItem(props: TransactionHistoryItemP
   // Show transfer only for contract calls
   if (transaction.tx.tx_type !== 'contract_call') {
     return (
-        <StxTransferTransaction
-          transaction={parseStxTransactionData({
-            responseTx: transaction.tx,
-            stxAddress: selectedAccount?.stxAddress as string,
-          })}
-          transactionCoin={transactionCoin}
-        />
+      <StxTransferTransaction
+        transaction={parseStxTransactionData({
+          responseTx: transaction.tx,
+          stxAddress: selectedAccount?.stxAddress as string,
+        })}
+        transactionCoin={transactionCoin}
+      />
     );
   }
   return (

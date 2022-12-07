@@ -29,6 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
 import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
+import AccountHeaderComponent from '@components/accountHeader';
 
 const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
@@ -283,6 +284,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
             txid: broadcastResult,
             currency: 'STX',
             error: '',
+            browserTx: true,
           },
         });
       }
@@ -293,6 +295,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
             txid: '',
             currency: 'STX',
             error: e,
+            browserTx: true,
           },
         });
         console.error(e.message);
@@ -304,8 +307,17 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   };
 
   const confirmCallback = (transactions: StacksTransaction[]) => {
-    const tx: StacksTransaction = transactions[0];
-    broadcastTx(tx);
+    if (request?.sponsored) {
+      navigate('/tx-status', {
+        state: {
+          sponsored: true,
+          browserTx: true,
+        },
+      });
+    } else {
+      const tx: StacksTransaction = transactions[0];
+      broadcastTx(tx);
+    }
   };
   const cancelCallback = () => {
     window.close();
@@ -335,29 +347,32 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   };
 
   return (
-    <ConfirmStxTransationComponent
-      initialStxTransactions={[unsignedTx]}
-      onConfirmClick={confirmCallback}
-      onCancelClick={cancelCallback}
-      loading={false}
-    >
-      <>
-        <Container>
-          <TopImage src={Illustration || ContractCall} alt="contract-call" />
-          <FunctionTitle>{request.functionName}</FunctionTitle>
-          <DappTitle>{`Requested by ${request.appDetails?.name}`}</DappTitle>
-        </Container>
-        {postConditionAlert}
-        {request.sponsored && showSponsoredTransactionTag}
-        {renderPostConditionsCard()}
-        <InfoContainer>
-          <Title>{t('FUNCTION')}</Title>
-          <Value>{request?.functionName}</Value>
-        </InfoContainer>
-        {functionArgsView()}
-        {renderContractAddress}
-        {showMoreButton}
-      </>
-    </ConfirmStxTransationComponent>
+    <>
+      <AccountHeaderComponent disableMenuOption={false} disableAccountSwitch={false} />
+      <ConfirmStxTransationComponent
+        initialStxTransactions={[unsignedTx]}
+        onConfirmClick={confirmCallback}
+        onCancelClick={cancelCallback}
+        loading={false}
+      >
+        <>
+          <Container>
+            <TopImage src={Illustration || ContractCall} alt="contract-call" />
+            <FunctionTitle>{request.functionName}</FunctionTitle>
+            <DappTitle>{`Requested by ${request.appDetails?.name}`}</DappTitle>
+          </Container>
+          {postConditionAlert}
+          {request.sponsored && showSponsoredTransactionTag}
+          {renderPostConditionsCard()}
+          <InfoContainer>
+            <Title>{t('FUNCTION')}</Title>
+            <Value>{request?.functionName}</Value>
+          </InfoContainer>
+          {functionArgsView()}
+          {renderContractAddress}
+          {showMoreButton}
+        </>
+      </ConfirmStxTransationComponent>
+    </>
   );
 }

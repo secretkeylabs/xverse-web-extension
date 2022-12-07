@@ -46,6 +46,14 @@ const CreateButton = styled.button((props) => ({
   height: 44,
 }));
 
+const AppVersion = styled.p((props) => ({
+  ...props.theme.body_xs,
+  color: props.theme.colors.white['0'],
+  textAlign: 'right',
+  marginRight: props.theme.spacing(9),
+  marginTop: props.theme.spacing(8),
+}));
+
 const RestoreButton = styled.button((props) => ({
   display: 'flex',
   ...props.theme.body_xs,
@@ -94,6 +102,7 @@ function Landing(): JSX.Element {
   };
   return (
     <>
+      <AppVersion>Beta version</AppVersion>
       <TopSectionContainer>
         <img src={logo} width={100} alt="logo" />
         <LandingTitle>{t('SCREEN_TITLE')}</LandingTitle>

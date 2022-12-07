@@ -1,6 +1,10 @@
+import { Account } from '@secretkeylabs/xverse-core';
+import { getActiveAccountList } from '@secretkeylabs/xverse-core/account';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { StoreState } from '@stores/index';
 import {
+  fetchAccountAction,
+  getActiveAccountsAction,
   lockWalletAction,
   resetWalletAction,
   setWalletAction,
@@ -13,10 +17,16 @@ import { sendMessage } from 'content-scripts/messages';
 import { useSelector, useDispatch } from 'react-redux';
 
 const useWalletReducer = () => {
-  const { encryptedSeed } = useSelector((state: StoreState) => ({
+  const { encryptedSeed, network } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
   const dispatch = useDispatch();
+
+  const loadActiveAccounts = async (secretKey: string, firstAccount: Account) => {
+    const walletAccounts = await getActiveAccountList(secretKey, network, firstAccount);
+    dispatch(fetchAccountAction(walletAccounts[0], walletAccounts));
+    dispatch(getActiveAccountsAction(walletAccounts));
+  };
 
   const unlockWallet = async (password: string) => {
     try {
@@ -66,6 +76,7 @@ const useWalletReducer = () => {
     });
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
+    await loadActiveAccounts(wallet.seedPhrase, { ...wallet, id: 0 });
   };
 
   const createWallet = async () => {
