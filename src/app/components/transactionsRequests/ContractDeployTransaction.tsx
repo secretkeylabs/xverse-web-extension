@@ -4,10 +4,13 @@ import styled from 'styled-components';
 import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
 import DeployContractImage from '@assets/img/webInteractions/deploy_contract.svg';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useWalletSelector from '@hooks/useWalletSelector';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
+import {
+  broadcastSignedTransaction,
+  createDeployContractRequest,
+} from '@secretkeylabs/xverse-core';
 import { useNavigate } from 'react-router-dom';
 import AccountHeaderComponent from '@components/accountHeader';
 
@@ -131,9 +134,7 @@ interface ContractDeployRequestProps {
 }
 
 export default function ContractDeployRequest(props: ContractDeployRequestProps) {
-  const {
-    unsignedTx, codeBody, contractName, sponsored,
-  } = props;
+  const { unsignedTx, codeBody, contractName, sponsored } = props;
   const { network } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'DEPLOY_CONTRACT_REQUEST' });
   const [loaderForBroadcastingTx, setLoaderForBroadcastingTx] = useState<boolean>(false);
@@ -177,7 +178,9 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
           browserTx: true,
         },
       });
-    } else { broadcastTx(txs[0]); }
+    } else {
+      broadcastTx(txs[0]);
+    }
   };
 
   const downloadCode = () => {
@@ -189,23 +192,24 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
     element.click();
   };
 
-  const cancelCallback = () => { window.close(); };
+  const cancelCallback = () => {
+    window.close();
+  };
 
   const showSponsoredTransactionTag = (
     <SponsoredContainer>
       <SponsoredTag>
         <SponosredText>{t('SPONSORED')}</SponosredText>
       </SponsoredTag>
-
     </SponsoredContainer>
   );
 
-  const postConditionAlert = unsignedTx?.postConditionMode === 2
-  && unsignedTx?.postConditions.values.length <= 0 && (
-    <PostConditionContainer>
-      <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
-    </PostConditionContainer>
-  );
+  const postConditionAlert = unsignedTx?.postConditionMode === 2 &&
+    unsignedTx?.postConditions.values.length <= 0 && (
+      <PostConditionContainer>
+        <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
+      </PostConditionContainer>
+    );
 
   return (
     <>
@@ -224,9 +228,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         {postConditionAlert}
         {sponsored && showSponsoredTransactionTag}
         {unsignedTx?.postConditions?.values?.map((postCondition) => (
-          <StxPostConditionCard
-            postCondition={postCondition as PostCondition}
-          />
+          <StxPostConditionCard postCondition={postCondition as PostCondition} />
         ))}
         <InfoContainer>
           <Title>{t('CONTRACT_NAME')}</Title>
@@ -241,7 +243,6 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
                 </>
               </Button>
             </DownloadButtonContainer>
-
           </DownloadContainer>
         </InfoContainer>
       </ConfirmStxTransationComponent>
