@@ -348,7 +348,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
 
   return (
     <>
-      <AccountHeaderComponent disableMenuOption={false} disableAccountSwitch={false} />
+      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         onConfirmClick={confirmCallback}
