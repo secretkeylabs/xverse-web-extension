@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { fetchAppInfo } from '@secretkeylabs/xverse-core/api';
-import { FeesMultipliers, FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { Account, FeesMultipliers, FungibleToken } from '@secretkeylabs/xverse-core/types';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
@@ -17,16 +17,19 @@ import CoinSelectModal from '@screens/home/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
 import {
+  fetchAccountAction,
   fetchBtcWalletDataRequestAction,
   fetchCoinDataRequestAction,
   FetchFeeMultiplierAction,
   fetchRatesAction,
   fetchStxWalletDataRequestAction,
+  getActiveAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
 import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
 import { CurrencyTypes } from '@utils/constants';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { getActiveAccountList, getBnsName } from '@secretkeylabs/xverse-core';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -125,6 +128,8 @@ function Home() {
     stxAddress,
     btcAddress,
     masterPubKey,
+    stxPublicKey,
+    btcPublicKey,
     fiatCurrency,
     btcFiatRate,
     stxBtcRate,
@@ -132,6 +137,9 @@ function Home() {
     coinsList,
     loadingWalletData,
     loadingBtcData,
+    selectedAccount,
+    accountsList,
+    seedPhrase,
   } = useWalletSelector();
 
   const fetchFeeMultiplierData = async () => {
@@ -139,8 +147,36 @@ function Home() {
     dispatch(FetchFeeMultiplierAction(response));
   };
 
+  const fetchAccount = async () => {
+    const bnsName = await getBnsName(stxAddress, network);
+    if (accountsList.length === 0) {
+      const accounts: Account[] = [
+        {
+          id: 0,
+          stxAddress,
+          btcAddress,
+          masterPubKey,
+          stxPublicKey,
+          btcPublicKey,
+          bnsName,
+        },
+      ];
+      dispatch(fetchAccountAction(accounts[0], accounts));
+      const response = await getActiveAccountList(seedPhrase, network, accounts[0]);
+      dispatch(getActiveAccountsAction(response));
+    } else {
+      selectedAccount!.bnsName = bnsName;
+      const account = accountsList.find(
+        (accountInArray) => accountInArray.stxAddress === selectedAccount?.stxAddress,
+      );
+      account!.bnsName = bnsName;
+      dispatch(fetchAccountAction(selectedAccount!, accountsList));
+    }
+  };
+
   const loadInitialData = useCallback(() => {
     if (stxAddress && btcAddress) {
+      fetchAccount();
       fetchFeeMultiplierData();
       dispatch(fetchRatesAction(fiatCurrency));
       dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
