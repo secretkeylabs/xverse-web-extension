@@ -45,6 +45,7 @@ const ShareDialogeContainer = styled.div({
   position: 'absolute',
   top: 0,
   right: 0,
+  zIndex: 2000,
 });
 
 const CollectibleContainer = styled.div((props) => ({

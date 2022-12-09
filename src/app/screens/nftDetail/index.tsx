@@ -67,6 +67,7 @@ const GalleryShareDialogeContainer = styled.div({
   position: 'absolute',
   top: 0,
   right: 0,
+  zIndex: 2000,
 });
 
 const ExtensionContainer = styled.div({
@@ -431,10 +432,7 @@ function NftDetailScreen() {
   return (
     <>
       {isGalleryOpen ? (
-        <>
-          <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
-          <Seperator />
-        </>
+        <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       ) : <TopRow title={t('NFT_DETAIL')} onClick={handleBackButtonClick} />}
       <Container>
         {isGalleryOpen ? galleryView : extensionView}
