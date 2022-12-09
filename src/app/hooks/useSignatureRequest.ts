@@ -46,7 +46,6 @@ function useSignatureRequest() {
     messageType: messageType as SignatureMessageType,
     tabId,
   };
-  c
 }
 export function useSignMessage(messageType: SignatureMessageType) {
   const {

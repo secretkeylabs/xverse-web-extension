@@ -4,15 +4,15 @@ import styled from 'styled-components';
 import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
 import DeployContractImage from '@assets/img/webInteractions/deploy_contract.svg';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import useWalletSelector from '@hooks/useWalletSelector';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
 import {
   broadcastSignedTransaction,
-  createDeployContractRequest,
 } from '@secretkeylabs/xverse-core';
 import { useNavigate } from 'react-router-dom';
 import AccountHeaderComponent from '@components/accountHeader';
+import finalizeTxSignature from './utils';
 
 const Container = styled.div({
   display: 'flex',
@@ -131,27 +131,34 @@ interface ContractDeployRequestProps {
   codeBody: string;
   contractName: string;
   sponsored: boolean;
+  tabId: number;
+  requestToken: string;
 }
 
 export default function ContractDeployRequest(props: ContractDeployRequestProps) {
-  const { unsignedTx, codeBody, contractName, sponsored } = props;
+  const {
+    unsignedTx, codeBody, contractName, sponsored, tabId, requestToken,
+  } = props;
   const { network } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'DEPLOY_CONTRACT_REQUEST' });
   const [loaderForBroadcastingTx, setLoaderForBroadcastingTx] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const broadcastTx = async (tx: StacksTransaction) => {
+  const broadcastTx = async (tx: StacksTransaction[]) => {
     try {
       setLoaderForBroadcastingTx(true);
       const networkType = network?.type ?? 'Mainnet';
-      const broadcastResult: string = await broadcastSignedTransaction(tx, networkType);
+      const broadcastResult = await broadcastSignedTransaction(tx[0], networkType);
       if (broadcastResult) {
+        finalizeTxSignature({ requestPayload: requestToken, tabId, data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') } });
         navigate('/tx-status', {
           state: {
             txid: broadcastResult,
             currency: 'STX',
             error: '',
             browserTx: true,
+            tabId,
+            requestToken,
           },
         });
       }
@@ -179,7 +186,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         },
       });
     } else {
-      broadcastTx(txs[0]);
+      broadcastTx(txs);
     }
   };
 
@@ -193,6 +200,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   };
 
   const cancelCallback = () => {
+    finalizeTxSignature({ requestPayload: requestToken, tabId, data: 'cancel' });
     window.close();
   };
 
@@ -204,12 +212,12 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
     </SponsoredContainer>
   );
 
-  const postConditionAlert = unsignedTx?.postConditionMode === 2 &&
-    unsignedTx?.postConditions.values.length <= 0 && (
+  const postConditionAlert = unsignedTx?.postConditionMode === 2
+    && unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
         <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
       </PostConditionContainer>
-    );
+  );
 
   return (
     <>
