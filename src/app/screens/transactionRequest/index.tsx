@@ -8,9 +8,9 @@ import useStxPendingTxData from '@hooks/useStxPendingTxData';
 import { useNavigate } from 'react-router-dom';
 import { Ring } from 'react-spinners-css';
 import styled from 'styled-components';
-import { getContractCallPromises, getTokenTransferRequest } from './helper';
 import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import { Coin, createDeployContractRequest } from '@secretkeylabs/xverse-core';
+import { getContractCallPromises, getTokenTransferRequest } from './helper';
 
 const LoaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -21,9 +21,13 @@ const LoaderContainer = styled.div((props) => ({
 }));
 
 function TransactionRequest() {
-  const { payload } = useDappRequest();
+  const {
+    payload, tabId, requestToken,
+  } = useDappRequest();
   const navigate = useNavigate();
-  const { stxAddress, network, stxPublicKey, feeMultipliers } = useWalletSelector();
+  const {
+    stxAddress, network, stxPublicKey, feeMultipliers,
+  } = useWalletSelector();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>();
   const [funcMetaData, setFuncMetaData] = useState<ContractFunction | undefined>(undefined);
   const [coinsMetaData, setCoinsMetaData] = useState<Coin[] | null>(null);
@@ -42,7 +46,7 @@ function TransactionRequest() {
             stxPublicKey,
             feeMultipliers!,
             network,
-            stxPendingTxData
+            stxPendingTxData,
           );
           setUnsignedTx(unsignedSendStxTx);
           navigate('/confirm-stx-tx', {
@@ -50,6 +54,8 @@ function TransactionRequest() {
               unsignedTx: unsignedSendStxTx,
               sponosred: payload.sponsored,
               isBrowserTx: true,
+              tabId,
+              requestToken,
             },
           });
         } else if (payload.txType === 'contract_call') {
@@ -61,8 +67,7 @@ function TransactionRequest() {
           } = await getContractCallPromises(payload, stxAddress, network, stxPublicKey);
           setUnsignedTx(unSignedContractCall);
           setCoinsMetaData(coinsMetaData);
-          const invokedFuncMetaData: ContractFunction | undefined =
-            contractInterface?.functions?.find((func) => func.name === payload.functionName);
+          const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find((func) => func.name === payload.functionName);
           if (invokedFuncMetaData) {
             setFuncMetaData(invokedFuncMetaData);
           }
@@ -72,7 +77,7 @@ function TransactionRequest() {
             network,
             stxPublicKey,
             feeMultipliers!,
-            stxAddress
+            stxAddress,
           );
           setUnsignedTx(response.contractDeployTx);
           setCodeBody(response.codeBody);
@@ -92,24 +97,30 @@ function TransactionRequest() {
     );
   }
 
-  if (payload.txType === 'contract_call' && unsignedTx)
+  if (payload.txType === 'contract_call' && unsignedTx) {
     return (
       <ContractCallRequest
         request={payload}
         unsignedTx={unsignedTx}
         funcMetaData={funcMetaData}
         coinsMetaData={coinsMetaData}
+        tabId={Number(tabId)}
+        requestToken={requestToken}
       />
     );
-  if (payload.txType === 'smart_contract')
+  }
+  if (payload.txType === 'smart_contract') {
     return (
       <ContractDeployRequest
         unsignedTx={unsignedTx!}
         codeBody={codeBody!}
         contractName={contractName!}
         sponsored={payload?.sponsored!}
+        tabId={Number(tabId)}
+        requestToken={requestToken}
       />
     );
+  }
 }
 
 export default TransactionRequest;

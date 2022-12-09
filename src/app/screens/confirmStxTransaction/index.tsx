@@ -16,6 +16,7 @@ import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
 import AccountHeaderComponent from '@components/accountHeader';
+import finalizeTxSignature from '@components/transactionsRequests/utils';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const InfoContainer = styled.div((props) => ({
@@ -45,11 +46,14 @@ function ConfirmStxTransaction() {
   const [total, setTotal] = useState(new BigNumber(0));
   const [fiatTotal, setFiatTotal] = useState(new BigNumber(0));
   const [recipient, setRecipient] = useState('');
+  const [txRaw, setTxRaw] = useState('');
   const [memo, setMemo] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { unsignedTx, sponsored, isBrowserTx } = location.state;
+  const {
+    unsignedTx, sponsored, isBrowserTx, tabId, requestToken,
+  } = location.state;
 
   const {
     stxBtcRate, btcFiatRate, network, stxAddress, fiatCurrency,
@@ -68,6 +72,9 @@ function ConfirmStxTransaction() {
 
   useEffect(() => {
     if (stxTxBroadcastData) {
+      if (isBrowserTx) {
+        finalizeTxSignature({ requestPayload: requestToken, tabId: Number(tabId), data: { txId: stxTxBroadcastData, txRaw } });
+      }
       navigate('/tx-status', {
         state: {
           txid: stxTxBroadcastData,
@@ -147,11 +154,13 @@ function ConfirmStxTransaction() {
   };
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+    setTxRaw(txs[0].serialize().toString('hex'));
     mutate({ signedTx: txs[0] });
   };
 
   const handleOnCancelClick = () => {
     if (isBrowserTx) {
+      finalizeTxSignature({ requestPayload: requestToken, tabId: Number(tabId), data: 'cancel' });
       window.close();
     } else {
       navigate('/send-stx', {

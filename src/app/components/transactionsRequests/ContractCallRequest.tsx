@@ -30,6 +30,7 @@ import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/sta
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
 import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
 import AccountHeaderComponent from '@components/accountHeader';
+import finalizeTxSignature from './utils';
 
 const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
@@ -179,12 +180,16 @@ interface ContractCallRequestProps {
   unsignedTx: StacksTransaction;
   funcMetaData: ContractFunction | undefined;
   coinsMetaData: Coin[] | null;
+  tabId: number;
+  requestToken: string;
 }
 
 export const ShowMoreContext = createContext({ showMore: false });
 
 export default function ContractCallRequest(props: ContractCallRequestProps) {
-  const { request, unsignedTx, funcMetaData, coinsMetaData } = props;
+  const {
+    request, unsignedTx, funcMetaData, coinsMetaData, tabId, requestToken,
+  } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'CONTRACT_CALL_REQUEST' });
   const [isShowMore, setIsShowMore] = useState(false);
   const Illustration = headerImageMapping[request.functionName ?? ''];
@@ -244,15 +249,13 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const functionArgsView = () => {
     const args = getFunctionArgs();
     if (isShowMore) {
-      return args.map((arg, index) => {
-        return (
-          <InfoContainer>
-            <Title>{arg.name}</Title>
-            <Value>{arg.value}</Value>
-            <Detail>{arg.type}</Detail>
-          </InfoContainer>
-        );
-      });
+      return args.map((arg, index) => (
+        <InfoContainer>
+          <Title>{arg.name}</Title>
+          <Value>{arg.value}</Value>
+          <Detail>{arg.type}</Detail>
+        </InfoContainer>
+      ));
     }
   };
 
@@ -264,21 +267,21 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
     </SponsoredContainer>
   );
 
-  const postConditionAlert = unsignedTx?.postConditionMode === 2 &&
-    unsignedTx?.postConditions.values.length <= 0 && (
+  const postConditionAlert = unsignedTx?.postConditionMode === 2
+    && unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
         <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
       </PostConditionContainer>
-    );
+  );
   const { network } = useWalletSelector();
   const navigate = useNavigate();
-  const broadcastTx = async (tx: StacksTransaction) => {
+  const broadcastTx = async (tx: StacksTransaction[]) => {
     try {
-      // setIsLoading(true);
       const networkType = network?.type ?? 'Mainnet';
 
-      const broadcastResult: string = await broadcastSignedTransaction(tx, networkType);
+      const broadcastResult: string = await broadcastSignedTransaction(tx[0], networkType);
       if (broadcastResult) {
+        finalizeTxSignature({ requestPayload: requestToken, tabId, data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') } });
         navigate('/tx-status', {
           state: {
             txid: broadcastResult,
@@ -301,8 +304,6 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         console.error(e.message);
         console.error(e.stack);
       }
-    } finally {
-      // setIsLoading(false);
     }
   };
 
@@ -315,11 +316,11 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         },
       });
     } else {
-      const tx: StacksTransaction = transactions[0];
-      broadcastTx(tx);
+      broadcastTx(transactions);
     }
   };
   const cancelCallback = () => {
+    finalizeTxSignature({ requestPayload: requestToken, tabId, data: 'cancel' });
     window.close();
   };
 
@@ -331,17 +332,18 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
           return <StxPostConditionCard key={i} postCondition={postCondition} />;
         case PostConditionType.Fungible:
           const coinInfo = coinsMetaData?.find(
-            (coin: Coin) =>
-              coin.contract ===
-              `${addressToString(postCondition.assetInfo.address)}.${
+            (coin: Coin) => coin.contract
+              === `${addressToString(postCondition.assetInfo.address)}.${
                 postCondition.assetInfo.contractName.content
-              }`
+              }`,
           );
           return (
             <FtPostConditionCard key={i} postCondition={postCondition} ftMetaData={coinInfo} />
           );
         case PostConditionType.NonFungible:
           return <NftPostConditionCard key={i} postCondition={postCondition} />;
+        default:
+          return '';
       }
     });
   };
