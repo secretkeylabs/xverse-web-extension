@@ -14,20 +14,29 @@ const HeaderText = styled.h1((props) => ({
 }));
 
 const BackButton = styled.button({
+  display: 'flex',
+  justifyContent: 'flex-start',
   backgroundColor: 'transparent',
-  height: 44,
+  padding: 5,
 });
 
-const ButtonImage = styled.img({
-  alignSelf: 'center',
-  transform: 'all',
-});
+const AnimatedBackButton = styled(BackButton)`
+:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+}
+:focus {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+}
+`;
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'center',
+  justifyContent: 'center',
   paddingTop: props.theme.spacing(11),
+  alignItems: 'center',
   paddingLeft: '5%',
   paddingRight: '5%',
 }));
@@ -40,9 +49,9 @@ interface Props {
 function TopRow({ title, onClick }: Props) {
   return (
     <RowContainer>
-      <BackButton onClick={onClick}>
-        <ButtonImage src={ArrowLeft} />
-      </BackButton>
+      <AnimatedBackButton onClick={onClick}>
+        <img src={ArrowLeft} alt="back button" />
+      </AnimatedBackButton>
       <TopSectionContainer>
         <HeaderText>{title}</HeaderText>
       </TopSectionContainer>

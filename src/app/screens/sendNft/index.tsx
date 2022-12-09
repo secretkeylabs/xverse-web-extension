@@ -218,8 +218,7 @@ function SendNft() {
     <>
       {isGalleryOpen && (
       <>
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
-        <Seperator />
+        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
         <ButtonContainer>
           <Button onClick={handleBackButtonClick}>
             <>

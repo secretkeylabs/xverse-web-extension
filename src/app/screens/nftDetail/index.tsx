@@ -432,7 +432,7 @@ function NftDetailScreen() {
   return (
     <>
       {isGalleryOpen ? (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
+        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : <TopRow title={t('NFT_DETAIL')} onClick={handleBackButtonClick} />}
       <Container>
         {isGalleryOpen ? galleryView : extensionView}
