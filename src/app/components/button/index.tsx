@@ -7,6 +7,7 @@ interface ButtonProps {
 }
 
 const Button = styled.button<ButtonProps>((props) => ({
+
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -16,11 +17,31 @@ const Button = styled.button<ButtonProps>((props) => ({
   width: '100%',
   padding: '12px 16px 12px 10px',
   opacity: props.disabled ? 0.6 : 1,
+  transition: 'all 0.2s ease',
 }));
+
+const AnimatedButton = styled(Button)`
+:hover {
+  background: #6977F8;
+}
+:focus {
+  background: #6977F8;
+  opacity:0.6;
+}
+`;
 
 const TransparentButton = styled(Button)`
   background-color: transparent;
   border: 1px solid #4C5187;
+`;
+
+const AnimatedTransparentButton = styled(TransparentButton)`
+:hover {
+  background: rgba(76, 81, 135, 0.2);
+}
+:focus {
+  background: rgba(85, 101, 247, 0.2);
+}
 `;
 
 const ButtonText = styled.div((props) => ({
@@ -60,7 +81,7 @@ function ActionButton({
   };
   if (transparent) {
     return (
-      <TransparentButton
+      <AnimatedTransparentButton
         onClick={handleOnPress}
         disabled={disabled}
       >
@@ -72,12 +93,12 @@ function ActionButton({
             <ButtonText>{text}</ButtonText>
           </>
         )}
-      </TransparentButton>
+      </AnimatedTransparentButton>
     );
   }
 
   return (
-    <Button
+    <AnimatedButton
       onClick={handleOnPress}
       disabled={disabled}
       warning={warning}
@@ -90,7 +111,7 @@ function ActionButton({
           <ButtonText>{text}</ButtonText>
         </>
       )}
-    </Button>
+    </AnimatedButton>
   );
 }
 export default ActionButton;

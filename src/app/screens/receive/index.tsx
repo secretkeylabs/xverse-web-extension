@@ -4,6 +4,7 @@ import TopRow from '@components/topRow';
 import { useNavigate, useParams } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 import Copy from '@assets/img/dashboard/Copy.svg';
+import Tick from '@assets/img/dashboard/tick.svg';
 import { useState } from 'react';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -42,13 +43,14 @@ const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
+  marginTop: 16,
   flex: 1,
 });
 
 const InfoContainer = styled.div((props) => ({
-  width: 220,
   marginTop: props.theme.spacing(8),
+  marginLeft: props.theme.spacing(24),
+  marginRight: props.theme.spacing(24),
 }));
 
 const CopyContainer = styled.div((props) => ({
@@ -80,7 +82,7 @@ const AddressText = styled.h1((props) => ({
 }));
 
 const BottomBarContainer = styled.div({
-  marginTop: '5%',
+  marginTop: 32,
 });
 
 function Receive(): JSX.Element {
@@ -127,13 +129,11 @@ function Receive(): JSX.Element {
     <>
       <TopRow title={t('RECEIVE')} onClick={handleBackButtonClick} />
       <OuterContainer>
-
         <Container>
           {renderHeading()}
           {currency !== 'BTC' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
-
           <QRCodeContainer>
-            <QRCode value={getAddress()} size={180} />
+            <QRCode value={getAddress()} size={150} />
           </QRCodeContainer>
 
           {currency !== 'BTC' && !!selectedAccount?.bnsName && (
@@ -148,7 +148,7 @@ function Receive(): JSX.Element {
         {addressCopied ? (
           <CopyContainer>
             <ActionButton
-              src={Copy}
+              src={Tick}
               text={t('COPIED_ADDRESS')}
               onPress={handleOnClick}
               transparent
