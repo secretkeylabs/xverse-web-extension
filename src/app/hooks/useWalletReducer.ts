@@ -7,6 +7,7 @@ import {
   getActiveAccountsAction,
   lockWalletAction,
   resetWalletAction,
+  selectAccount,
   setWalletAction,
   storeEncryptedSeedAction,
   unlockWalletAction,
@@ -17,7 +18,7 @@ import { sendMessage } from 'content-scripts/messages';
 import { useSelector, useDispatch } from 'react-redux';
 
 const useWalletReducer = () => {
-  const { encryptedSeed, network } = useSelector((state: StoreState) => ({
+  const { encryptedSeed, network, accountsList } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
   const dispatch = useDispatch();
@@ -81,7 +82,12 @@ const useWalletReducer = () => {
 
   const createWallet = async () => {
     const wallet = await newWallet();
+    const account: Account = {
+      ...wallet,
+      id: 0,
+    };
     dispatch(setWalletAction(wallet));
+    dispatch(fetchAccountAction(account, [account]));
     sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
@@ -90,12 +96,28 @@ const useWalletReducer = () => {
     });
   };
 
+  const switchAccount = (account: Account) => {
+    dispatch(
+      selectAccount(
+        account,
+        account.stxAddress,
+        account.btcAddress,
+        account.masterPubKey,
+        account.stxPublicKey,
+        account.btcPublicKey,
+        network,
+      ),
+    );
+    dispatch(fetchAccountAction(account, accountsList));
+  };
+
   return {
     unlockWallet,
     lockWallet,
     resetWallet,
     restoreWallet,
     createWallet,
+    switchAccount,
   };
 };
 

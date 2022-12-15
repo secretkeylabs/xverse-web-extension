@@ -1,20 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { ReactNode, useEffect, useState } from 'react';
+import {
+  ReactNode, useEffect, useState,
+} from 'react';
 import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
-import {
-  microstacksToStx, stxToMicrostacks,
-} from '@secretkeylabs/xverse-core/currency';
+import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
-import { useSelector } from 'react-redux';
-import { StoreState } from '@stores/index';
 import TransferFeeView from '@components/transferFeeView';
 import {
   setFee, setNonce, getNonce, signMultiStxTransactions, signTransaction,
 } from '@secretkeylabs/xverse-core';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const Container = styled.div`
   display: flex;
@@ -97,8 +96,7 @@ function ConfirmStxTransationComponent({
     selectedAccount,
     seedPhrase,
     network,
-  } = useSelector((state: StoreState) => state.walletState);
-  const [stateTx] = useState(initialStxTransactions);
+  } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
 
@@ -109,14 +107,14 @@ function ConfirmStxTransationComponent({
   const getFee = () => (isSponsored
     ? new BigNumber(0)
     : new BigNumber(
-      stateTx
+      initialStxTransactions
         .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
         .reduce((prev, curr) => prev + curr, BigInt(0))
         .toString(10),
     ));
 
   const getTxNonce = (): string => {
-    const nonce = getNonce(stateTx[0]);
+    const nonce = getNonce(initialStxTransactions[0]);
     return nonce.toString();
   };
 
@@ -130,17 +128,17 @@ function ConfirmStxTransationComponent({
 
   const onConfirmButtonClick = async () => {
     let signedTxs: StacksTransaction[] = [];
-    if (stateTx.length === 1) {
+    if (initialStxTransactions.length === 1) {
       const signedContractCall = await signTransaction(
-        stateTx[0],
+        initialStxTransactions[0],
         seedPhrase,
         selectedAccount?.id ?? 0,
         network,
       );
       signedTxs.push(signedContractCall);
-    } else if (stateTx.length === 2) {
+    } else if (initialStxTransactions.length === 2) {
       signedTxs = await signMultiStxTransactions(
-        stateTx,
+        initialStxTransactions,
         selectedAccount?.id ?? 0,
         'Testnet',
         seedPhrase,
@@ -151,9 +149,9 @@ function ConfirmStxTransationComponent({
 
   const applyTxSettings = (settingFee: string, nonce?: string) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
-    setFee(stateTx[0], BigInt(fee.toString()));
+    setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {
-      setNonce(stateTx[0], BigInt(nonce));
+      setNonce(initialStxTransactions[0], BigInt(nonce));
     }
     setOpenTransactionSettingModal(false);
   };
