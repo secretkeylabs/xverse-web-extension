@@ -12,7 +12,6 @@ import {
   ClarityType,
   cvToJSON,
   cvToString,
-  PostCondition,
   PostConditionType,
   SomeCV,
   StacksTransaction,
@@ -297,12 +296,10 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
           state: {
             txid: '',
             currency: 'STX',
-            error: e,
+            error: e.message,
             browserTx: true,
           },
         });
-        console.error(e.message);
-        console.error(e.stack);
       }
     }
   };
