@@ -156,7 +156,7 @@ function TransactionStatus() {
 
   const onCloseClick = () => {
     if (browserTx) window.close();
-    else navigate('/');
+    else navigate(-3);
   };
 
   const onCopyClick = () => {
