@@ -18,6 +18,8 @@ import { bytesToHex } from '@stacks/transactions';
 import { hashMessage } from '@stacks/encryption';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
+import { getNetworkType } from '@utils/helper';
+import { useNavigate } from 'react-router-dom';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
@@ -120,17 +122,40 @@ function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
   const [isSigning, setIsSigning] = useState<boolean>(false);
   const [showHash, setShowHash] = useState(false);
-  const { selectedAccount, accountsList } = useWalletSelector();
+  const { selectedAccount, accountsList, network } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
   const {
     messageType, request, payload, tabId, domain,
   } = useSignatureRequest();
+  const navigate = useNavigate();
 
   const switchAccountBasedOnRequest = () => {
+    if (getNetworkType(payload.network) !== network.type) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'STX',
+          error:
+            'There’s a mismatch between your active network and the Network you’re logged with.',
+          browserTx: true,
+        },
+      });
+      return;
+    }
     if (payload.stxAddress !== selectedAccount?.stxAddress) {
       const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
       if (account) {
         switchAccount(account);
+      } else {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'STX',
+            error:
+              'There’s a mismatch between your active  address and the address you’re logged with.',
+            browserTx: true,
+          },
+        });
       }
     }
   };
