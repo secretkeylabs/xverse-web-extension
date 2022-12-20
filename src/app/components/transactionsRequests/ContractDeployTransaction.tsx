@@ -168,7 +168,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         state: {
           txid: '',
           currency: 'STX',
-          error: error.toString(),
+          error: error.message,
           browserTx: true,
         },
       });

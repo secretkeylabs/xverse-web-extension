@@ -12,10 +12,12 @@ import AccountHeaderComponent from '@components/accountHeader';
 import Info from '@assets/img/send/info.svg';
 import { useTranslation } from 'react-i18next';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Seperator from '@components/seperator';
 import { bytesToHex } from '@stacks/transactions';
 import { hashMessage } from '@stacks/encryption';
+import useWalletSelector from '@hooks/useWalletSelector';
+import useWalletReducer from '@hooks/useWalletReducer';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
@@ -118,9 +120,24 @@ function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
   const [isSigning, setIsSigning] = useState<boolean>(false);
   const [showHash, setShowHash] = useState(false);
+  const { selectedAccount, accountsList } = useWalletSelector();
+  const { switchAccount } = useWalletReducer();
   const {
     messageType, request, payload, tabId, domain,
   } = useSignatureRequest();
+
+  const switchAccountBasedOnRequest = () => {
+    if (payload.stxAddress !== selectedAccount?.stxAddress) {
+      const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
+      if (account) {
+        switchAccount(account);
+      }
+    }
+  };
+
+  useEffect(() => {
+    switchAccountBasedOnRequest();
+  }, []);
 
   const handleMessageSigning = useSignMessage(messageType);
 
