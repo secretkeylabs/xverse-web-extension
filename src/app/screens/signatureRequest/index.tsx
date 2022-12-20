@@ -136,7 +136,7 @@ function SignatureRequest(): JSX.Element {
           txid: '',
           currency: 'STX',
           error:
-            'There’s a mismatch between your active network and the Network you’re logged with.',
+            'There’s a mismatch between your active network and the network you’re logged with.',
           browserTx: true,
         },
       });
