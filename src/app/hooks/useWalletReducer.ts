@@ -1,8 +1,10 @@
+import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 import { Account } from '@secretkeylabs/xverse-core';
 import { getActiveAccountList } from '@secretkeylabs/xverse-core/account';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { StoreState } from '@stores/index';
 import {
+  ChangeNetworkAction,
   fetchAccountAction,
   getActiveAccountsAction,
   lockWalletAction,
@@ -18,13 +20,18 @@ import { sendMessage } from 'content-scripts/messages';
 import { useSelector, useDispatch } from 'react-redux';
 
 const useWalletReducer = () => {
-  const { encryptedSeed, network, accountsList } = useSelector((state: StoreState) => ({
+  const {
+    encryptedSeed,
+    network,
+    accountsList,
+    seedPhrase,
+  } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
   const dispatch = useDispatch();
 
-  const loadActiveAccounts = async (secretKey: string, firstAccount: Account) => {
-    const walletAccounts = await getActiveAccountList(secretKey, network, firstAccount);
+  const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, firstAccount: Account) => {
+    const walletAccounts = await getActiveAccountList(secretKey, currentNetwork, firstAccount);
     dispatch(fetchAccountAction(walletAccounts[0], walletAccounts));
     dispatch(getActiveAccountsAction(walletAccounts));
   };
@@ -77,7 +84,7 @@ const useWalletReducer = () => {
     });
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
-    await loadActiveAccounts(wallet.seedPhrase, { ...wallet, id: 0 });
+    await loadActiveAccounts(wallet.seedPhrase, network, { ...wallet, id: 0 });
   };
 
   const createWallet = async () => {
@@ -111,6 +118,17 @@ const useWalletReducer = () => {
     dispatch(fetchAccountAction(account, accountsList));
   };
 
+  const changeNetwork = async (changedNetwork: SettingsNetwork) => {
+    dispatch(ChangeNetworkAction(changedNetwork));
+    const wallet = await walletFromSeedPhrase({
+      mnemonic: seedPhrase,
+      index: 0n,
+      network: changedNetwork.type,
+    });
+    dispatch(setWalletAction(wallet));
+    await loadActiveAccounts(wallet.seedPhrase, changedNetwork, { ...wallet, id: 0 });
+  };
+
   return {
     unlockWallet,
     lockWallet,
@@ -118,6 +136,7 @@ const useWalletReducer = () => {
     restoreWallet,
     createWallet,
     switchAccount,
+    changeNetwork,
   };
 };
 

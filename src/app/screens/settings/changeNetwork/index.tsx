@@ -4,15 +4,13 @@ import TopRow from '@components/topRow';
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { initialNetworksList } from '@utils/constants';
 import Cross from '@assets/img/settings/x.svg';
 import { useState } from 'react';
 import ActionButton from '@components/button';
 import { isValidURL } from '@utils/helper';
-import { ChangeNetworkAction, setWalletAction } from '@stores/wallet/actions/actionCreators';
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
-import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core';
+import useWalletReducer from '@hooks/useWalletReducer';
 import NetworkRow from './networkRow';
 
 const Container = styled.div`
@@ -74,12 +72,13 @@ const Button = styled.button({
 
 function ChangeNetworkScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
-  const { network, seedPhrase } = useWalletSelector();
-  const [changeNetwork, setChangeNetwork] = useState<SettingsNetwork>(network);
+  const { network } = useWalletSelector();
+  const [changedNetwork, setChangedNetwork] = useState<SettingsNetwork>(network);
   const [error, setError] = useState<string>('');
   const [url, setUrl] = useState<string>(network.address);
+  const [isChangingNetwork, setIsChangingNetwork] = useState<boolean>(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { changeNetwork } = useWalletReducer();
 
   const handleBackButtonClick = () => {
     navigate('/settings');
@@ -87,7 +86,7 @@ function ChangeNetworkScreen() {
 
   const onNetworkSelected = (selectedNetwork: SettingsNetwork) => {
     setUrl(selectedNetwork.address);
-    setChangeNetwork(selectedNetwork);
+    setChangedNetwork(selectedNetwork);
   };
 
   const onChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -99,19 +98,15 @@ function ChangeNetworkScreen() {
   };
 
   const onSubmit = async () => {
+    setIsChangingNetwork(true);
     const response = await isValidURL(url);
     if (response) {
-      dispatch(ChangeNetworkAction(changeNetwork));
-      const wallet = await walletFromSeedPhrase({
-        mnemonic: seedPhrase,
-        index: 0n,
-        network: changeNetwork.type,
-      });
-      dispatch(setWalletAction(wallet));
+      await changeNetwork(changedNetwork);
       navigate('/settings');
     } else {
       setError(t('INVALID_URL'));
     }
+    setIsChangingNetwork(false);
   };
 
   return (
@@ -120,13 +115,13 @@ function ChangeNetworkScreen() {
       <Container>
         <NetworkRow
           network={initialNetworksList[0]}
-          isSelected={changeNetwork.type === 'Mainnet'}
+          isSelected={changedNetwork.type === 'Mainnet'}
           onNetworkSelected={onNetworkSelected}
           showDivider
         />
         <NetworkRow
           network={initialNetworksList[1]}
-          isSelected={changeNetwork.type === 'Testnet'}
+          isSelected={changedNetwork.type === 'Testnet'}
           onNetworkSelected={onNetworkSelected}
           showDivider={false}
         />
@@ -137,15 +132,10 @@ function ChangeNetworkScreen() {
             <img width={22} height={22} src={Cross} alt="cross" />
           </Button>
         </InputContainer>
-        <ErrorMessage>
-          {error}
-        </ErrorMessage>
+        <ErrorMessage>{error}</ErrorMessage>
       </Container>
       <ButtonContainer>
-        <ActionButton
-          text={t('SAVE')}
-          onPress={onSubmit}
-        />
+        <ActionButton text={t('SAVE')} onPress={onSubmit} processing={isChangingNetwork} disabled={isChangingNetwork} />
       </ButtonContainer>
 
       <BottomBar tab="settings" />
