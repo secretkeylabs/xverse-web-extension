@@ -10,6 +10,8 @@ import {
   BTC_TRANSACTION_STATUS_URL,
   TRANSACTION_STATUS_URL,
 } from '@utils/constants';
+import { getStxTxStatusUrl } from '@utils/helper';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const TxStatusContainer = styled.div({
   background: 'rgba(25, 25, 48, 0.5)',
@@ -124,6 +126,7 @@ function TransactionStatus() {
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_STATUS' });
   const navigate = useNavigate();
   const location = useLocation();
+  const { network } = useWalletSelector();
   const {
     txid, currency, error, sponsored, browserTx,
   } = location.state;
@@ -149,7 +152,7 @@ function TransactionStatus() {
       if (currency === 'BTC') {
         window.open(`${BTC_TRANSACTION_STATUS_URL}${txid}`, '_blank', 'noopener,noreferrer');
       } else {
-        window.open(`${TRANSACTION_STATUS_URL}${txid}`, '_blank', 'noopener,noreferrer');
+        window.open(`${getStxTxStatusUrl(txid, network)}`, '_blank', 'noopener,noreferrer');
       }
     }
   };

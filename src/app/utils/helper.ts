@@ -1,7 +1,9 @@
-import { Account, StxMempoolTransactionData } from '@secretkeylabs/xverse-core/types';
+import { Account, StxMempoolTransactionData, SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BigNumber from 'bignumber.js';
+import { ChainID } from '@stacks/transactions';
+import { TRANSACTION_STATUS_URL } from './constants';
 
 const validUrl = require('valid-url');
 
@@ -48,7 +50,7 @@ export function getTicker(name: string) {
   return name;
 }
 
-export function getAddressDetail(account:Account) {
+export function getAddressDetail(account: Account) {
   if (account) {
     return `${account.btcAddress.substring(0, 4)}...${account.btcAddress.substring(
       account.btcAddress.length - 4,
@@ -63,6 +65,10 @@ export function getAddressDetail(account:Account) {
 
 export function getExplorerUrl(stxAddress: string): string {
   return `https://explorer.stacks.co/address/${stxAddress}?chain=mainnet`;
+}
+
+export function getStxTxStatusUrl(transactionId: string, currentNetwork: SettingsNetwork): string {
+  return `${TRANSACTION_STATUS_URL}${transactionId}?chain=${currentNetwork.type.toLowerCase()}`;
 }
 
 export function getFetchableUrl(uri: string, protocol: string): string | undefined {
@@ -88,7 +94,7 @@ export function checkNftExists(
   const transaction = pendingTransactions.find(
     (tx) => tx.contractCall?.contract_id === principal[0]
       && tx.contractCall.function_args[0].repr.substring(1)
-        === nft.token_id.toString(),
+      === nft.token_id.toString(),
   );
   if (transaction) return true;
   return false;
@@ -103,3 +109,5 @@ export async function isValidURL(str: string): Promise<boolean> {
   }
   return false;
 }
+
+export const getNetworkType = (stxNetwork) => (stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet');
