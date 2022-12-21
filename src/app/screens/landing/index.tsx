@@ -102,7 +102,7 @@ function Landing(): JSX.Element {
   };
   return (
     <>
-      <AppVersion>Beta version</AppVersion>
+      <AppVersion>Beta</AppVersion>
       <TopSectionContainer>
         <img src={logo} width={100} alt="logo" />
         <LandingTitle>{t('SCREEN_TITLE')}</LandingTitle>

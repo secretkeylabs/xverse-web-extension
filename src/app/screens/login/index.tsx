@@ -138,7 +138,7 @@ function Login(): JSX.Element {
 
   return (
     <ScreenContainer>
-      <AppVersion>Beta version</AppVersion>
+      <AppVersion>Beta</AppVersion>
       <TopSectionContainer>
         <img src={logo} width={100} alt="logo" />
         <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>

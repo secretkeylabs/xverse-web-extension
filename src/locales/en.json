@@ -177,7 +177,7 @@
     "WELCOME_MESSAGE": "Welcome back!",
     "PASSWORD_INPUT_LABEL": "Password",
     "PASSWORD_INPUT_PLACEHOLDER": "Enter your password",
-    "VERIFY_PASSWORD_BUTTON": "Verify",
+    "VERIFY_PASSWORD_BUTTON": "Unlock",
     "VERIFY_PASSWORD_ERROR": "Incorrect Password",
     "FORGOT_PASSWORD_BUTTON": "Forgot your password?"
   },
