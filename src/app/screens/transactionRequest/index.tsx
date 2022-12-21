@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import { Coin, createDeployContractRequest } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
+import { getNetworkType } from '@utils/helper';
 import { getContractCallPromises, getTokenTransferRequest } from './helper';
 
 const LoaderContainer = styled.div((props) => ({
@@ -93,6 +94,18 @@ function TransactionRequest() {
   };
 
   const switchAccountBasedOnRequest = () => {
+    if (getNetworkType(payload.network) !== network.type) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'STX',
+          error:
+            'There’s a mismatch between your active network and the network you’re logged with.',
+          browserTx: true,
+        },
+      });
+      return;
+    }
     if (payload.stxAddress !== selectedAccount?.stxAddress) {
       const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
       if (account) {
