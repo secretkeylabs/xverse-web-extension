@@ -165,7 +165,7 @@ function Login(): JSX.Element {
 
   return (
     <ScreenContainer>
-      <AppVersion>Beta version</AppVersion>
+      <AppVersion>Beta</AppVersion>
       <ContentContainer style={styles}>
         <TopSectionContainer>
           <img src={logo} width={100} alt="logo" />

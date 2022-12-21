@@ -117,7 +117,7 @@ function Landing(): JSX.Element {
   };
   return (
     <>
-      <AppVersion>Beta version</AppVersion>
+      <AppVersion>Beta</AppVersion>
       <ContentContainer style={styles}>
         <TopSectionContainer>
           <img src={logo} width={100} alt="logo" />
