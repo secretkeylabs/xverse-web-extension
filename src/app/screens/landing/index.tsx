@@ -2,13 +2,20 @@ import styled from 'styled-components';
 import logo from '@assets/img/full_logo_vertical.svg';
 import { useTranslation } from 'react-i18next';
 import useWalletReducer from '@hooks/useWalletReducer';
+import { animated, useSpring } from '@react-spring/web';
+
+const ContentContainer = styled(animated.div)({
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  marginTop: 130,
+});
 
 const TopSectionContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'flex-end',
   alignItems: 'center',
-  flex: 0.5,
 });
 
 const LandingTitle = styled.h1((props) => ({
@@ -22,13 +29,12 @@ const LandingTitle = styled.h1((props) => ({
 
 const ActionButtonsContainer = styled.div((props) => ({
   display: 'flex',
-  flex: 0.5,
   flexDirection: 'column',
-  justifyContent: 'flex-end',
   alignItems: 'center',
+  marginTop: 'auto',
   paddingLeft: props.theme.spacing(10),
   paddingRight: props.theme.spacing(10),
-  marginBottom: props.theme.spacing(30),
+  marginBottom: props.theme.spacing(32),
 }));
 
 const CreateButton = styled.button((props) => ({
@@ -71,9 +77,18 @@ const RestoreButton = styled.button((props) => ({
 
 function Landing(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LANDING_SCREEN' });
-  const {
-    createWallet,
-  } = useWalletReducer();
+  const { createWallet } = useWalletReducer();
+  const styles = useSpring({
+    from: {
+      opacity: 0,
+      y: 24,
+    },
+    to: {
+      y: 0,
+      opacity: 1,
+    },
+    delay: 100,
+  });
 
   const openInNewTab = async () => {
     await chrome.tabs.create({
@@ -103,14 +118,16 @@ function Landing(): JSX.Element {
   return (
     <>
       <AppVersion>Beta version</AppVersion>
-      <TopSectionContainer>
-        <img src={logo} width={100} alt="logo" />
-        <LandingTitle>{t('SCREEN_TITLE')}</LandingTitle>
-      </TopSectionContainer>
-      <ActionButtonsContainer>
-        <CreateButton onClick={handlePressCreate}>{t('CREATE_WALLET_BUTTON')}</CreateButton>
-        <RestoreButton onClick={handlePressRestore}>{t('RESTORE_WALLET_BUTTON')}</RestoreButton>
-      </ActionButtonsContainer>
+      <ContentContainer style={styles}>
+        <TopSectionContainer>
+          <img src={logo} width={100} alt="logo" />
+          <LandingTitle>{t('SCREEN_TITLE')}</LandingTitle>
+        </TopSectionContainer>
+        <ActionButtonsContainer>
+          <CreateButton onClick={handlePressCreate}>{t('CREATE_WALLET_BUTTON')}</CreateButton>
+          <RestoreButton onClick={handlePressRestore}>{t('RESTORE_WALLET_BUTTON')}</RestoreButton>
+        </ActionButtonsContainer>
+      </ContentContainer>
     </>
   );
 }
