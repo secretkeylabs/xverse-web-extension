@@ -4,6 +4,40 @@ import Landing from '@screens/landing';
 import Onboarding from '@screens/onboarding';
 import ScreenContainer from '@components/screenContainer';
 import LegalLinks from '@screens/legalLinks';
+import ManageTokens from '@screens/manageTokens';
+import AccountList from '@screens/accountList';
+import Receive from '@screens/receive';
+import ConfirmStxTransaction from '@screens/confirmStxTransaction';
+import SendStxScreen from '@screens/sendStx';
+import TransactionStatus from '@screens/transactionStatus';
+import SendBtcScreen from '@screens/sendBtc';
+import ConfirmBtcTransaction from '@screens/confrimBtcTransaction';
+import BackupWallet from '@screens/backupWallet';
+import CreateWalletSuccess from '@screens/createWalletSuccess';
+import CreatePassword from '@screens/createPassword';
+import AuthenticationRequest from '@screens/authenticationRequest';
+import AuthGuard from '@components/guards/auth';
+import Login from '@screens/login';
+import RestoreWallet from '@screens/restoreWallet';
+import ForgotPassword from '@screens/forgotPassword';
+import BackupWalletSteps from '@screens/backupWalletSteps';
+import Stacking from '@screens/stacking';
+import NftDashboard from '@screens/nftDashboard';
+import NftDetailScreen from '@screens/nftDetail';
+import Setting from '@screens/settings';
+import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
+import ChangePasswordScreen from '@screens/settings/changePassword';
+import ChangeNetworkScreen from '@screens/settings/changeNetwork';
+import BackupWalletScreen from '@screens/settings/backupWallet';
+import SendFtScreen from '@screens/sendFt';
+import ConfirmFtTransaction from '@screens/confirmFtTransaction';
+import Buy from '@screens/buy';
+import SendNft from '@screens/sendNft';
+import ConfirmNftTransaction from '@screens/confirmNftTransaction';
+import CoinDashboard from '@screens/coinDashboard';
+import ExtendedScreenContainer from '@components/extendedScreenContainer';
+import SignatureRequest from '@screens/signatureRequest';
+import TransactionRequest from '@screens/transactionRequest';
 
 const router = createHashRouter([
   {
@@ -11,7 +45,7 @@ const router = createHashRouter([
     element: <ScreenContainer />,
     children: [
       {
-        index: true,
+        path: 'landing',
         element: <Landing />,
       },
       {
@@ -19,12 +53,170 @@ const router = createHashRouter([
         element: <Onboarding />,
       },
       {
-        path: 'home',
-        element: <Home />,
+        index: true,
+        element: (
+          <AuthGuard>
+            <Home />
+          </AuthGuard>
+        ),
       },
       {
         path: 'legal',
         element: <LegalLinks />,
+      },
+      {
+        path: 'manage-tokens',
+        element: <ManageTokens />,
+      },
+      {
+        path: 'account-list',
+        element: <AccountList />,
+      },
+      {
+        path: 'receive/:currency',
+        element: <Receive />,
+      },
+      {
+        path: 'send-stx',
+        element: <SendStxScreen />,
+      },
+      {
+        path: 'send-ft',
+        element: <SendFtScreen />,
+      },
+      {
+        path: 'send-btc',
+        element: <SendBtcScreen />,
+      },
+      {
+        path: 'confirm-stx-tx',
+        element: <ConfirmStxTransaction />,
+      },
+      {
+        path: 'confirm-ft-tx',
+        element: <ConfirmFtTransaction />,
+      },
+      {
+        path: 'confirm-btc-tx',
+        element: <ConfirmBtcTransaction />,
+      },
+      {
+        path: 'backup',
+        element: <BackupWallet />,
+      },
+      {
+        path: 'create-password',
+        element: <CreatePassword />,
+      },
+      {
+        path: 'wallet-success/:action',
+        element: <CreateWalletSuccess />,
+      },
+      {
+        path: 'transaction-request',
+        element: (
+          <AuthGuard>
+            <TransactionRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'authentication-request',
+        element: (
+          <AuthGuard>
+            <AuthenticationRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'login',
+        element: <Login />,
+      },
+      {
+        path: 'restoreWallet',
+        element: <RestoreWallet />,
+      },
+      {
+        path: 'forgotPassword',
+        element: <ForgotPassword />,
+      },
+      {
+        path: 'backupWalletSteps',
+        element: <BackupWalletSteps />,
+      },
+      {
+        path: 'stacking',
+        element: (
+          <AuthGuard>
+            <Stacking />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'settings',
+        element: <Setting />,
+      },
+      {
+        path: 'fiat-currency',
+        element: <FiatCurrencyScreen />,
+      },
+      {
+        path: 'change-password',
+        element: <ChangePasswordScreen />,
+      },
+      {
+        path: 'change-network',
+        element: <ChangeNetworkScreen />,
+      },
+      {
+        path: 'backup-wallet',
+        element: <BackupWalletScreen />,
+      },
+      {
+        path: 'tx-status',
+        element: <TransactionStatus />,
+      },
+      {
+        path: 'buy/:currency',
+        element: <Buy />,
+      },
+      {
+        path: 'coinDashboard/:coin',
+        element: <CoinDashboard />,
+      },
+      {
+        path: 'signature-request',
+        element: (
+          <AuthGuard>
+            <SignatureRequest />
+          </AuthGuard>
+        ),
+      },
+    ],
+  },
+  {
+    path: '/',
+    element: <ExtendedScreenContainer />,
+    children: [
+      {
+        path: 'nft-dashboard',
+        element: (
+          <AuthGuard>
+            <NftDashboard />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'nft-dashboard/nft-detail/:id',
+        element: <NftDetailScreen />,
+      },
+      {
+        path: 'nft-dashboard/nft-detail/:id/send-nft',
+        element: <SendNft />,
+      },
+      {
+        path: 'confirm-nft-tx/:id',
+        element: <ConfirmNftTransaction />,
       },
     ],
   },

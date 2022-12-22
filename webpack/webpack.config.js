@@ -8,7 +8,18 @@ var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
-
+const aliases = {
+  // alias stacks.js packages to their esm (default prefers /dist/polyfill)
+  '@stacks/auth': '@stacks/auth/dist/esm',
+  '@stacks/common': '@stacks/common/dist/esm',
+  '@stacks/encryption': '@stacks/encryption/dist/esm',
+  '@stacks/network': '@stacks/network/dist/esm',
+  '@stacks/profile': '@stacks/profile/dist/esm',
+  '@stacks/storage': '@stacks/storage/dist/esm',
+  '@stacks/transactions': '@stacks/transactions/dist/esm',
+  '@stacks/keychain': '@stacks/keychain/dist/esm',
+  '@secretkeylabs/xverse-core': '@secretkeylabs/xverse-core/dist',
+};
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
 const BUILD_ROOT_PATH = path.join(__dirname, '../', 'build');
@@ -18,16 +29,20 @@ var options = {
   mode: env.NODE_ENV || 'development',
 
   entry: {
-    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.jsx'),
-    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.jsx'),
+    background: path.join(SRC_ROOT_PATH, 'background', 'background.ts'),
+    inpage: path.join(SRC_ROOT_PATH, 'inpage', 'inpage.ts'),
+    'content-script': path.join(SRC_ROOT_PATH, 'content-scripts', 'content-script.ts'),
+    options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.tsx'),
+    popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.tsx'),
   },
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].js',
     path: BUILD_ROOT_PATH,
     clean: true,
     publicPath: ASSET_PATH,
   },
   module: {
+    noParse: /\.wasm$/,
     rules: [
       {
         test: /\.(css)$/,
@@ -58,13 +73,26 @@ var options = {
             loader: require.resolve('ts-loader'),
             options: {
               getCustomTransformers: () => ({
-                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(Boolean),
+                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(
+                  Boolean
+                ),
               }),
-              transpileOnly: env.NODE_ENV === 'development',
+              transpileOnly: true,
             },
           },
         ],
-      }
+      },
+      {
+        test: /\.wasm$/,
+        // Tells WebPack that this module should be included as
+        // base64-encoded binary file and not as code
+        loader: 'base64-loader',
+        // Disables WebPack's opinion where WebAssembly should be,
+        // makes it think that it's not WebAssembly
+        //
+        // Error: WebAssembly module is included in initial chunk.
+        type: 'javascript/auto',
+      },
     ],
   },
   resolve: {
@@ -72,6 +100,12 @@ var options = {
     extensions: fileExtensions
       .map((extension) => '.' + extension)
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
+    alias: aliases,
+    fallback: {
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      fs: false,
+    },
   },
   plugins: [
     new CleanWebpackPlugin({ verbose: false }),
@@ -100,10 +134,15 @@ var options = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.join(SRC_ROOT_PATH, 'assets'),
-          to: path.join(BUILD_ROOT_PATH, 'assets'),
+          from: path.join(SRC_ROOT_PATH, 'assets/img/xverse_icon.png'),
+          to: BUILD_ROOT_PATH,
         },
       ],
+    }),
+    new CopyWebpackPlugin({
+      patterns: [{
+        from: 'node_modules/webextension-polyfill/dist/browser-polyfill.js',
+      }],
     }),
     new HtmlWebpackPlugin({
       template: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.html'),
@@ -117,7 +156,15 @@ var options = {
       chunks: ['popup'],
       cache: false,
     }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser.js',
+      Buffer: ['buffer', 'Buffer'],
+    }),
+    new webpack.DefinePlugin({
+      VERSION: JSON.stringify(require("../package.json").version),
+    }),
   ],
+
   infrastructureLogging: {
     level: 'info',
   },

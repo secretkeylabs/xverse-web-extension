@@ -11,18 +11,16 @@ var WebpackDevServer = require('webpack-dev-server'),
 
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
+const excludeEntriesFromHotModuleReload = ['content-script', 'inpage', 'background'];
 
-// Add Stuff Here to exclude from hot reloading
-var excludeEntriesToHotReload = [];
-
-for (var entryName in config.entry) {
-  if (excludeEntriesToHotReload.indexOf(entryName) === -1) {
+Object.keys(config.entry).forEach(entryName => {
+  if (!excludeEntriesFromHotModuleReload.includes(entryName) && config.entry) {
     config.entry[entryName] = [
+      `webpack-dev-server/client?hot=true&live-reload=true&hostname=localhost&port=${env.PORT}`,
       'webpack/hot/dev-server',
-      `webpack-dev-server/client?hot=true&hostname=localhost&port=${env.PORT}`,
     ].concat(config.entry[entryName]);
   }
-}
+});
 
 config.plugins = [
   new webpack.HotModuleReplacementPlugin(),
@@ -34,6 +32,7 @@ var compiler = webpack(config);
 var server = new WebpackDevServer(
   {
     https: false,
+    webSocketServer: 'ws',
     hot: false,
     client: false,
     host: 'localhost',

@@ -9,16 +9,19 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Satoshi-Bold';
     src: url(${SatoshiBold});
     font-display: block;
+
   }
     @font-face{
     font-family: 'Satoshi-Medium';
     src: url(${SatoshiMedium});
     font-display: block;
+
   }
     @font-face{
     font-family: 'Satoshi-Regular';
     src: url(${SatoshiRegular});
     font-display: block;
+
   }
     @font-face{
     font-family: 'Satoshi-Black';
@@ -42,12 +45,20 @@ const GlobalStyle = createGlobalStyle`
   * p {
     margin: 0;
   }
+  * a {
+    text-decoration: none;
+  }
+  * a:hover {
+    text-decoration:none; 
+    cursor:pointer;  
+}
 *,
 *::after,
 *::before {
   box-sizing: inherit;
   cursor: inherit;
   line-height: normal;
+  -webkit-font-smoothing: antialiased;
 }
 `;
 export default GlobalStyle;

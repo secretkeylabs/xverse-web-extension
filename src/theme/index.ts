@@ -7,6 +7,7 @@ const Theme = {
       0: '#FFFFFF',
       200: 'rgba(255, 255, 255, 0.8)',
       400: 'rgba(255, 255, 255, 0.6)',
+      600: 'rgba(255, 255, 255, 0.2)',
     },
     background: {
       'elevation-1': '#070A13',
@@ -16,12 +17,14 @@ const Theme = {
       elevation3: '#303354',
       elevation6: '#4C5187',
       elevation8: '#7E89AB',
+      modalBackdrop: 'rgba(18,21,30,0.6)',
     },
     feedback: {
       success: '#51D6A6',
       caution: '#F2A900',
       error: '#D33C3C',
     },
+    grey: '#24252C',
   },
   headline_category_m: {
     fontFamily: 'Satoshi-Medium',
@@ -89,6 +92,13 @@ const Theme = {
   },
   tile_text: {
     fontFamily: 'Satoshi-Regular',
+    fontStyle: 'normal',
+    fontWeight: '700',
+    fontSize: 18,
+    letterSpacing: 0.02,
+  },
+  bold_tile_text: {
+    fontFamily: 'Satoshi-Bold',
     fontStyle: 'normal',
     fontWeight: '700',
     fontSize: 18,

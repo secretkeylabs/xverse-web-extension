@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
+    "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -23,7 +24,11 @@
       "@hooks/*": ["app/hooks/*"],
       "@assets/*": ["assets/*"],
       "@screens/*": ["app/screens/*"],
+      "@shared/*": ["shared/*"],
+      "@stores/*": ["app/stores/*"],
+      "@utils/*": ["app/utils/*"],
+      "@core/*": ["app/core/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "styled.d.ts"]
 }
