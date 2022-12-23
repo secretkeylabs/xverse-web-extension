@@ -1,4 +1,7 @@
+import useWalletSelector from '@hooks/useWalletSelector';
 import { BtcTransactionData } from '@secretkeylabs/xverse-core';
+import { getBtcTxStatusUrl } from '@utils/helper';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import TransactionAmount from './transactionAmount';
 import TransactionRecipient from './transactionRecipient';
@@ -9,9 +12,10 @@ interface TransactionHistoryItemProps {
   transaction: BtcTransactionData;
 }
 
-const TransactionContainer = styled.div((props) => ({
+const TransactionContainer = styled.button((props) => ({
   display: 'flex',
   marginBottom: props.theme.spacing(10),
+  background: 'none',
 }));
 
 const TransactionInfoContainer = styled.div((props) => ({
@@ -30,9 +34,14 @@ const TransactionRow = styled.div((props) => ({
 
 export default function BtcTransactionHistoryItem(props: TransactionHistoryItemProps) {
   const { transaction } = props;
+  const { network } = useWalletSelector();
+
+  const openBtcTxStatusLink = useCallback(() => {
+    window.open(getBtcTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
+  }, []);
 
   return (
-    <TransactionContainer>
+    <TransactionContainer onClick={openBtcTxStatusLink}>
       <TransactionStatusIcon transaction={transaction} currency="BTC" />
       <TransactionInfoContainer>
         <TransactionRow>
