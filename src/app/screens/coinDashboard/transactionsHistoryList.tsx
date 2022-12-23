@@ -73,7 +73,7 @@ const groupBtcTxsByDate = (
   transactions: BtcTransactionData[],
 ): { [x: string]: BtcTransactionData[] } => transactions.reduce(
   (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
-    const txDate = formatDate(transaction.seenTime);
+    const txDate = formatDate(new Date(transaction.seenTime));
     if (!all[txDate]) {
       if (transaction.txStatus === 'pending') {
         all.Pending = [transaction];
