@@ -6,11 +6,7 @@ import Copy from '@assets/img/dashboard/Copy.svg';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
-import {
-  BTC_TRANSACTION_STATUS_URL,
-  TRANSACTION_STATUS_URL,
-} from '@utils/constants';
-import { getStxTxStatusUrl } from '@utils/helper';
+import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
 
 const TxStatusContainer = styled.div({
@@ -150,7 +146,7 @@ function TransactionStatus() {
   const openTransactionInBrowser = () => {
     if (txid) {
       if (currency === 'BTC') {
-        window.open(`${BTC_TRANSACTION_STATUS_URL}${txid}`, '_blank', 'noopener,noreferrer');
+        window.open(getBtcTxStatusUrl(txid, network), '_blank', 'noopener,noreferrer');
       } else {
         window.open(`${getStxTxStatusUrl(txid, network)}`, '_blank', 'noopener,noreferrer');
       }

@@ -5,6 +5,8 @@ import TransactionStatusIcon from '@components/transactions/transactionStatusIco
 import TransactionTitle from '@components/transactions/transactionTitle';
 import TransactionAmount from '@components/transactions/transactionAmount';
 import TransactionRecipient from '@components/transactions/transactionRecipient';
+import { getStxTxStatusUrl } from '@utils/helper';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
@@ -33,12 +35,15 @@ interface StxTransferTransactionProps {
 
 export default function StxTransferTransaction(props: StxTransferTransactionProps) {
   const { transaction, transactionCoin } = props;
+  const {
+    network,
+  } = useWalletSelector();
 
-  const openContractDeployment = () => {
-    window.open(`https://explorer.stacks.co/txid/${transaction.txid}?chain=mainnet`, '_blank');
+  const openTxStatusUrl = () => {
+    window.open(getStxTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
   };
   return (
-    <TransactionContainer onClick={openContractDeployment}>
+    <TransactionContainer onClick={openTxStatusUrl}>
       <TransactionStatusIcon transaction={transaction} currency="STX" />
       <TransactionInfoContainer>
         <TransactionRow>

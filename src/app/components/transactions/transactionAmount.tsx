@@ -8,6 +8,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
@@ -60,7 +61,7 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
     const prefix = transaction.incoming ? '' : '-';
     return (
       <NumericFormat
-        value={satsToBtc(transaction.amount).toString()}
+        value={satsToBtc(BigNumber(transaction.amount)).toString()}
         displayType="text"
         thousandSeparator
         prefix=""
