@@ -23,7 +23,7 @@ const ScreenTitle = styled.h1((props) => ({
   marginTop: props.theme.spacing(10),
 }));
 
-const ErrorContent = styled.p((props) => ({
+const ErrorDescription = styled.p((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
@@ -40,6 +40,13 @@ const SupportText = styled.p((props) => ({
   },
 }));
 
+const ErrorContent = styled.p((props) => ({
+  ...props.theme.body_medium_m,
+  marginTop: props.theme.spacing(20),
+  textAlign: 'center',
+  color: props.theme.colors.white[200],
+}));
+
 function ErrorBoundary() {
   const error = useRouteError();
   const { t } = useTranslation('translation', { keyPrefix: 'ERROR_SCREEN' });
@@ -47,16 +54,17 @@ function ErrorBoundary() {
     <ScreenContainer>
       <img src={Error} alt="Error" width={88} />
       <ScreenTitle>{t('TITLE')}</ScreenTitle>
-      <ErrorContent>
-        {`${t('ERROR_PREFIX')}${' '}${error.message}${' '}${t(
-          'ERROR_ACTION',
-        )}`}
-      </ErrorContent>
+      <ErrorDescription>
+        {t('ERROR_DESCRIPTION')}
+      </ErrorDescription>
       <SupportText>
         {t('SUPPORT')}
         {' '}
         <span>{SUPPORT_EMAIL}</span>
       </SupportText>
+      <ErrorContent>
+        {`${t('ERROR_PREFIX')}${' '}${error.message}`}
+      </ErrorContent>
     </ScreenContainer>
   );
 }

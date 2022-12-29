@@ -376,8 +376,8 @@
   },
   "ERROR_SCREEN": {
     "TITLE": "Xverse crashed unexpectedly",
-    "ERROR_PREFIX": " Xverse crashed unexpectedly due to",
-    "ERROR_ACTION": "you need to restart your Xverse wallet to do XYZ.",
+    "ERROR_DESCRIPTION": "Xverse encountered a fatal error and crashed. You need to relaunch your wallet.",
+    "ERROR_PREFIX": "Error:",
     "SUPPORT": "If the issue persists, you can contact the support at"
   }
 }
