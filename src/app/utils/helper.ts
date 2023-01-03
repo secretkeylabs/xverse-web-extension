@@ -3,7 +3,7 @@ import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BigNumber from 'bignumber.js';
 import { ChainID } from '@stacks/transactions';
-import { TRANSACTION_STATUS_URL } from './constants';
+import { BTC_TRANSACTION_STATUS_URL, TRANSACTION_STATUS_URL, BTC_TRANSACTION_TESTNET_STATUS_URL } from './constants';
 
 const validUrl = require('valid-url');
 
@@ -69,6 +69,13 @@ export function getExplorerUrl(stxAddress: string): string {
 
 export function getStxTxStatusUrl(transactionId: string, currentNetwork: SettingsNetwork): string {
   return `${TRANSACTION_STATUS_URL}${transactionId}?chain=${currentNetwork.type.toLowerCase()}`;
+}
+
+export function getBtcTxStatusUrl(txId: string, network: SettingsNetwork) {
+  if (network.type === 'Testnet') {
+    return `${BTC_TRANSACTION_TESTNET_STATUS_URL}${txId}`;
+  }
+  return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
 }
 
 export function getFetchableUrl(uri: string, protocol: string): string | undefined {

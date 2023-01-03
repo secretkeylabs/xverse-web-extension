@@ -38,11 +38,13 @@ import CoinDashboard from '@screens/coinDashboard';
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import SignatureRequest from '@screens/signatureRequest';
 import TransactionRequest from '@screens/transactionRequest';
+import ErrorBoundary from '@screens/error';
 
 const router = createHashRouter([
   {
     path: '/',
     element: <ScreenContainer />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         path: 'landing',
@@ -197,6 +199,7 @@ const router = createHashRouter([
   {
     path: '/',
     element: <ExtendedScreenContainer />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         path: 'nft-dashboard',

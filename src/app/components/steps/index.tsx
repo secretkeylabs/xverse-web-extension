@@ -31,7 +31,7 @@ export default function Steps(props: StepsProps): JSX.Element {
   return (
     <StepsContainer>
       {data.map((view, index) => (
-        <StepsDot active={index === activeIndex} key={nanoid()} />
+        <StepsDot active={index <= activeIndex} key={nanoid()} />
       ))}
     </StepsContainer>
   );

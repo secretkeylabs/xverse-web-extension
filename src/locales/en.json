@@ -373,5 +373,11 @@
     "SIGNING_WARNING": "By signing this message, you prove that you are the owner of an account without broadcasting any on chain transactions. This signature cannot be used to send transactions on your behalf. You should only sign messages you trust.",
     "SIGN_BUTTON": "Sign",
     "CANCEL_BUTTON": "Cancel"
+  },
+  "ERROR_SCREEN": {
+    "TITLE": "Xverse crashed unexpectedly",
+    "ERROR_DESCRIPTION": "Xverse encountered a fatal error and crashed. You need to relaunch your wallet.",
+    "ERROR_PREFIX": "Error:",
+    "SUPPORT": "If the issue persists, you can contact the support at"
   }
 }

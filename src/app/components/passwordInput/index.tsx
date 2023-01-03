@@ -5,6 +5,7 @@ import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import { useEffect, useState } from 'react';
 import ActionButton from '@components/button';
+import { animated, useTransition } from '@react-spring/web';
 
 interface PasswordInputProps {
   title: string;
@@ -21,6 +22,7 @@ interface PasswordInputProps {
 
 interface StrengthBarProps {
   strengthColor:string
+  strengthWidth: string
 }
 
 const Container = styled.div({
@@ -41,12 +43,18 @@ const HeaderContainer = styled.div({
   alignItems: 'center',
 });
 
-const PasswordInputContainer = styled.div((props) => ({
+interface PasswordInputContainerProps {
+  hasError: boolean;
+}
+
+const PasswordInputContainer = styled.div<PasswordInputContainerProps>((props) => ({
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  border: '1px solid #303354',
-  backgroundColor: props.theme.colors.background.elevation0,
+  border: `1px solid ${
+    props.hasError ? 'rgba(211, 60, 60, 0.3)' : props.theme.colors.background.elevation3
+  }`,
+  backgroundColor: props.theme.colors.background['elevation-1'],
   borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(4),
   paddingRight: props.theme.spacing(4),
@@ -63,7 +71,7 @@ const PasswordInputLabel = styled.h2((props) => ({
 const Input = styled.input((props) => ({
   ...props.theme.body_medium_m,
   height: 44,
-  backgroundColor: props.theme.colors.background.elevation0,
+  backgroundColor: props.theme.colors.background['elevation-1'],
   color: props.theme.colors.white['0'],
   width: '100%',
   border: 'none',
@@ -84,10 +92,11 @@ const ButtonsContainer = styled.div<ButtonContainerProps>((props) => ({
 
 const Button = styled.button({
   background: 'none',
+  display: 'flex',
 });
 
 const ErrorMessage = styled.h2((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.body_xs,
   textAlign: 'left',
   color: props.theme.colors.feedback.error,
 }));
@@ -98,16 +107,28 @@ const PasswordStrengthContainer = styled.div((props) => ({
   alignItems: 'center',
   width: '100%',
   marginTop: props.theme.spacing(8),
-  justifyContent: 'space-between',
+  span: {
+    opacity: 0.6,
+  },
+  p: {
+    justifySelf: 'flex-end',
+  },
 }));
 
-const StrengthBar = styled.div<StrengthBarProps>((props) => ({
+const StrengthBar = styled(animated.div)<StrengthBarProps>((props) => ({
   display: 'flex',
   alignItems: 'center',
-  height: 4,
-  backgroundColor: props.strengthColor,
-  color: props.strengthColor,
+  backgroundColor: props.theme.colors.white[600],
+  marginLeft: props.theme.spacing(6),
+  marginRight: props.theme.spacing(9),
+  borderRadius: props.theme.radius(1),
   width: '50%',
+  div: {
+    width: props.strengthWidth,
+    height: 4,
+    backgroundColor: props.strengthColor,
+    borderRadius: props.theme.radius(1),
+  },
 }));
 
 export enum PasswordStrength {
@@ -116,6 +137,7 @@ export enum PasswordStrength {
   STRONG = 12,
   EMPTY = 0,
 }
+
 interface TransparentButtonContainerProps {
   stackButtonAlignment: boolean;
 }
@@ -147,6 +169,14 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
     PasswordStrength.EMPTY,
   );
   const [error, setError] = useState<string>(passwordError ?? '');
+  const transition = useTransition(passwordStrength, {
+    from: {
+      opacity: 0,
+    },
+    enter: {
+      opacity: 1,
+    },
+  });
 
   useEffect(() => {
     if (passwordError) { setError(passwordError); }
@@ -174,6 +204,9 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   const handlePasswordChange = (event: React.FormEvent<HTMLInputElement>) => {
     setEnteredPassword(event.currentTarget.value);
+    if (error) {
+      setError('');
+    }
   };
 
   function renderStrengthBar() {
@@ -181,33 +214,49 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
       if (enteredPassword.length <= PasswordStrength.WEAK) {
         return (
           <PasswordStrengthContainer>
-            {t('PASSWORD_STRENGTH_LABEL')}
-            <StrengthBar strengthColor={theme.colors.feedback.error} />
-            {t('PASSWORD_STRENGTH_WEAK')}
+            <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
+            <StrengthBar strengthColor={theme.colors.feedback.error} strengthWidth="20%">
+              {transition((style) => (
+                <animated.div style={style} />
+              ))}
+            </StrengthBar>
+            <p style={{ color: theme.colors.feedback.error }}>{t('PASSWORD_STRENGTH_WEAK')}</p>
           </PasswordStrengthContainer>
         );
       }
       if (enteredPassword.length <= PasswordStrength.MEDIUM) {
         return (
           <PasswordStrengthContainer>
-            {t('PASSWORD_STRENGTH_LABEL')}
-            <StrengthBar strengthColor={theme.colors.feedback.caution} />
-            {t('PASSWORD_STRENGTH_MEDIUM')}
+            <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
+            {transition((style) => (
+              <StrengthBar strengthColor={theme.colors.feedback.caution} strengthWidth="50%">
+                <animated.div style={style} />
+              </StrengthBar>
+            ))}
+            <p>{t('PASSWORD_STRENGTH_MEDIUM')}</p>
           </PasswordStrengthContainer>
         );
       }
       return (
         <PasswordStrengthContainer>
-          {t('PASSWORD_STRENGTH_LABEL')}
-          <StrengthBar strengthColor={theme.colors.feedback.success} />
-          {t('PASSWORD_STRENGTH_STRONG')}
+          <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
+          {transition((style) => (
+            <StrengthBar strengthColor={theme.colors.feedback.success} strengthWidth="100%">
+              <animated.div style={style} />
+            </StrengthBar>
+          ))}
+          <p>{t('PASSWORD_STRENGTH_STRONG')}</p>
         </PasswordStrengthContainer>
       );
     }
     return (
       <PasswordStrengthContainer>
-        {t('PASSWORD_STRENGTH_LABEL')}
-        <StrengthBar strengthColor={theme.colors.background.elevation2} />
+        <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
+        <StrengthBar strengthColor={theme.colors.white[600]} strengthWidth="0">
+          {transition((style) => (
+            <animated.div style={style} />
+          ))}
+        </StrengthBar>
       </PasswordStrengthContainer>
     );
   }
@@ -223,22 +272,23 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
   return (
     <Container>
       <HeaderContainer>
-        <img src={PasswordIcon} alt="passoword" />
+        <img src={PasswordIcon} alt="password" />
         <HeaderText>{title}</HeaderText>
       </HeaderContainer>
       <PasswordInputLabel>{inputLabel}</PasswordInputLabel>
-      <PasswordInputContainer>
+      <PasswordInputContainer hasError={!!error}>
         <Input
           type={isPasswordVisible ? 'text' : 'password'}
           value={enteredPassword}
           onChange={handlePasswordChange}
+
         />
         <Button onClick={handleTogglePasswordView}>
           <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
         </Button>
       </PasswordInputContainer>
       {error && <ErrorMessage>{error}</ErrorMessage>}
-      {checkPasswordStrength && (enteredPassword.length > 0 ? renderStrengthBar() : null)}
+      {checkPasswordStrength ? renderStrengthBar() : null}
       <ButtonsContainer stackButtonAlignment={stackButtonAlignment} ifError={error !== ''}>
         <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
           <ActionButton
@@ -250,6 +300,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
         <ActionButton
           processing={loading}
+          disabled={!enteredPassword}
           text={t('CONTINUE_BUTTON')}
           onPress={checkPasswordStrength ? checkStrengthAndContinue : handleContinue}
         />

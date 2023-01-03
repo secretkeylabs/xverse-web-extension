@@ -21,7 +21,7 @@ export default function useTransactions(coinType: CurrencyTypes) {
         return await getStxAddressTransactions(stxAddress, network, 0, PAGINATION_LIMIT);
       }
       if (coinType === 'BTC') {
-        const btcData = await fetchBtcTransactionsData(btcAddress, network);
+        const btcData = await fetchBtcTransactionsData(btcAddress, network.type);
         return btcData.transactions;
       }
       return [];
