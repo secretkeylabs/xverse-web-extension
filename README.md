@@ -9,9 +9,9 @@
 3. Make sure you're logged in to the @secretkeylabs scope on the GitHub NPM package registry. See the [Guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-with-a-personal-access-token)
    1. Create a GitHub personal access token (classic) 
    2. Run `npm login --scope=@secretkeylabs --registry=https://npm.pkg.github.com`
-   3. > Username: USERNAME
-      > Password: PERSONAL_ACCESS_TOKEN
-      > Email: PUBLIC-EMAIL-ADDRESS
+   3. Username: GITHUB USERNAME
+      Password: PERSONAL_ACCESS_TOKEN
+      Email: PUBLIC-EMAIL-ADDRESS
 4. Run `npm install` to install the dependencies.
 5. Run `npm start`
 6. Load your extension on Chrome following:
