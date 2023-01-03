@@ -1,0 +1,27 @@
+name: Node.js CI
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 
+        uses: actions/setup-node@v3
+        with:
+	  always-auth: true
+          node-version: '16.x'
+  	  registry-url: https://npm.pkg.github.com
+	  scope: '@secretkeylabs'
+      - name: Install dependencies
+      - run: npm ci
+	env:
+	  NODE_AUTH_TOKEN: ${{ GH_PACKAGE_REGISTRY_TOKEN }}
+      - run: npm run build --if-present
+      - run: npm test
+
