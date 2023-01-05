@@ -1,7 +1,6 @@
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
-import { Account } from '@secretkeylabs/xverse-core';
-import { getActiveAccountList } from '@secretkeylabs/xverse-core/account';
-import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
+import { Account, getBnsName } from '@secretkeylabs/xverse-core';
+import { newWallet, restoreWalletWithAccounts, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { StoreState } from '@stores/index';
 import {
   ChangeNetworkAction,
@@ -31,7 +30,7 @@ const useWalletReducer = () => {
   const dispatch = useDispatch();
 
   const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, firstAccount: Account) => {
-    const walletAccounts = await getActiveAccountList(secretKey, currentNetwork, firstAccount);
+    const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, [{ ...firstAccount, seedPhrase: undefined }]);
     dispatch(fetchAccountAction(walletAccounts[0], walletAccounts));
     dispatch(getActiveAccountsAction(walletAccounts));
   };
@@ -82,9 +81,10 @@ const useWalletReducer = () => {
         secretKey: wallet.seedPhrase,
       },
     });
+    const bnsName = await getBnsName(wallet.stxAddress, network);
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
-    await loadActiveAccounts(wallet.seedPhrase, network, { ...wallet, id: 0 });
+    await loadActiveAccounts(wallet.seedPhrase, network, { id: 0, bnsName, ...wallet });
   };
 
   const createWallet = async () => {
