@@ -1,12 +1,11 @@
 name: Node.js CI
 
 on:
-  pull_request:
-    branches: [ main, develop ]
+  workflow_call:
 
 jobs:
   build:
-
+  
     runs-on: ubuntu-latest
 
     steps:
