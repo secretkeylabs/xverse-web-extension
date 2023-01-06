@@ -1,8 +1,7 @@
-name: Build
+name: Release
 
 on:
-  pull_request:
-    branches: [ develop ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -26,3 +25,10 @@ jobs:
         run: npm run build --if-present
       # - name: Test
         # run: npm test --passWithNoTests
+      - name: Create Archive
+        run: zip -r release.zip build
+      - name: Upload Archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-build
+          path: release.zip
