@@ -86,7 +86,7 @@ function ActionButton({
         disabled={disabled}
       >
         {processing ? (
-          <MoonLoader color="white" size={20} />
+          <MoonLoader color="white" size={10} />
         ) : (
           <>
             <ButtonImage src={src} />
@@ -104,7 +104,7 @@ function ActionButton({
       warning={warning}
     >
       {processing ? (
-        <MoonLoader color="white" size={20} />
+        <MoonLoader color="white" size={12} />
       ) : (
         <>
           <ButtonImage src={src} />

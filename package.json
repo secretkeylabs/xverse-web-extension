@@ -4,6 +4,7 @@
   "version": "0.1.4",
   "private": true,
   "dependencies": {
+    "@emotion/styled": "^11.10.5",
     "@react-spring/web": "^9.6.1",
     "@secretkeylabs/xverse-core": "^0.2.1",
     "@stacks/connect": "^6.10.2",
@@ -28,6 +29,7 @@
     "jsontokens": "^4.0.1",
     "moment": "^2.29.4",
     "nanoid": "^4.0.0",
+    "notistack": "^2.0.8",
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-content-loader": "^6.2.0",
@@ -41,7 +43,6 @@
     "react-router-dom": "^6.4.0",
     "react-select": "^5.4.0",
     "react-share": "^4.4.1",
-    "react-simple-snackbar": "^1.1.11",
     "react-spinners": "^0.13.7",
     "react-switch": "^7.0.0",
     "redux": "^4.0.5",

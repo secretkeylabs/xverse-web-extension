@@ -1,7 +1,7 @@
 import { ThemeProvider } from 'styled-components';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
-import SnackbarProvider from 'react-simple-snackbar';
+import { SnackbarProvider } from 'notistack';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import rootStore from '@stores/index';
@@ -14,7 +14,7 @@ import router from './routes';
 
 function App(): JSX.Element {
   return (
-    <SnackbarProvider>
+    <SnackbarProvider variant="success">
       <GlobalStyle />
       <QueryClientProvider client={queryClient}>
         <Provider store={rootStore.store}>
