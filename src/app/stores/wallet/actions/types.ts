@@ -8,6 +8,7 @@ import {
   SupportedCurrency,
   TransactionData,
   Account,
+  BaseWallet,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 
@@ -47,6 +48,7 @@ export interface WalletState {
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
+  configPrivateKey: string;
   accountsList: Account[];
   selectedAccount: Account | null;
   hasRestoredMemoryKey: boolean;
@@ -68,18 +70,9 @@ export interface WalletState {
   feeMultipliers: FeesMultipliers | null;
 }
 
-export interface WalletData {
-  stxAddress: string;
-  btcAddress: string;
-  masterPubKey: string;
-  stxPublicKey: string;
-  btcPublicKey: string;
-  seedPhrase: string;
-}
-
 export interface SetWallet {
   type: typeof SetWalletKey;
-  wallet: WalletData;
+  wallet: BaseWallet;
 }
 
 export interface StoreEncryptedSeed {

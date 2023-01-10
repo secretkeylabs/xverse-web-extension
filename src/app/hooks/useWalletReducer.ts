@@ -1,8 +1,10 @@
-import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
-import { Account, getBnsName } from '@secretkeylabs/xverse-core';
-import { newWallet, restoreWalletWithAccounts, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
+import { SettingsNetwork, Account } from '@secretkeylabs/xverse-core/types';
+import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
+import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/xverse-core/account';
+import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
 import { StoreState } from '@stores/index';
 import {
+  addAccoutAction,
   ChangeNetworkAction,
   fetchAccountAction,
   getActiveAccountsAction,
@@ -20,43 +22,18 @@ import { useSelector, useDispatch } from 'react-redux';
 
 const useWalletReducer = () => {
   const {
-    encryptedSeed,
-    network,
-    accountsList,
-    seedPhrase,
-  } = useSelector((state: StoreState) => ({
-    ...state.walletState,
-  }));
+    encryptedSeed, network, accountsList, seedPhrase, configPrivateKey,
+  } = useSelector(
+    (state: StoreState) => ({
+      ...state.walletState,
+    }),
+  );
   const dispatch = useDispatch();
 
   const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, firstAccount: Account) => {
-    const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, [{ ...firstAccount, seedPhrase: undefined }]);
+    const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, [{ ...firstAccount }]);
     dispatch(fetchAccountAction(walletAccounts[0], walletAccounts));
     dispatch(getActiveAccountsAction(walletAccounts));
-  };
-
-  const unlockWallet = async (password: string) => {
-    try {
-      const decrypted = await decryptSeedPhrase(encryptedSeed, password);
-      sendMessage({
-        method: InternalMethods.ShareInMemoryKeyToBackground,
-        payload: {
-          secretKey: decrypted,
-        },
-      });
-      dispatch(unlockWalletAction(decrypted));
-      return decrypted;
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  const lockWallet = () => {
-    dispatch(lockWalletAction());
-    sendMessage({
-      method: InternalMethods.RemoveInMemoryKeys,
-      payload: undefined,
-    });
   };
 
   const resetWallet = () => {
@@ -103,6 +80,20 @@ const useWalletReducer = () => {
     });
   };
 
+  const createAccount = async () => {
+    try {
+      const newAccountsList = await createWalletAccount(
+        seedPhrase,
+        network,
+        accountsList,
+        configPrivateKey,
+      );
+      dispatch(addAccoutAction(newAccountsList));
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
   const switchAccount = (account: Account) => {
     dispatch(
       selectAccount(
@@ -129,6 +120,31 @@ const useWalletReducer = () => {
     await loadActiveAccounts(wallet.seedPhrase, changedNetwork, { ...wallet, id: 0 });
   };
 
+  const unlockWallet = async (password: string) => {
+    try {
+      const decrypted = await decryptSeedPhrase(encryptedSeed, password);
+      await restoreWallet(decrypted, password);
+      sendMessage({
+        method: InternalMethods.ShareInMemoryKeyToBackground,
+        payload: {
+          secretKey: decrypted,
+        },
+      });
+      dispatch(unlockWalletAction(decrypted));
+      return decrypted;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const lockWallet = () => {
+    dispatch(lockWalletAction());
+    sendMessage({
+      method: InternalMethods.RemoveInMemoryKeys,
+      payload: undefined,
+    });
+  };
+
   return {
     unlockWallet,
     lockWallet,
@@ -137,6 +153,7 @@ const useWalletReducer = () => {
     createWallet,
     switchAccount,
     changeNetwork,
+    createAccount,
   };
 };
 
