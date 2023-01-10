@@ -48,7 +48,6 @@ export interface WalletState {
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
-  configPrivateKey: string;
   accountsList: Account[];
   selectedAccount: Account | null;
   hasRestoredMemoryKey: boolean;
