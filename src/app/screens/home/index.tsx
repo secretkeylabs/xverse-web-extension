@@ -102,21 +102,6 @@ const TokenListButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-const TestnetContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
-  paddingTop: props.theme.spacing(3),
-  paddingBottom: props.theme.spacing(3),
-}));
-
-const TestnetText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  textAlign: 'center',
-  color: props.theme.colors.white['200'],
-}));
-
 function Home() {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const navigate = useNavigate();
@@ -259,12 +244,7 @@ function Home() {
 
   return (
     <>
-      {network.type === 'Testnet' && (
-        <TestnetContainer>
-          <TestnetText>{t('TESTNET')}</TestnetText>
-        </TestnetContainer>
-      )}
-      <AccountHeaderComponent />
+      <AccountHeaderComponent disableAccountSwitch />
       <Container>
         <BalanceCard />
         <RowButtonContainer>

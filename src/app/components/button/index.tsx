@@ -15,7 +15,7 @@ const Button = styled.button<ButtonProps>((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classic,
   width: '100%',
-  padding: '12px 16px 12px 10px',
+  height: 44,
   opacity: props.disabled ? 0.6 : 1,
   transition: 'all 0.2s ease',
 }));
