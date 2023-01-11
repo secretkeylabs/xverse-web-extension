@@ -20,13 +20,19 @@ const TextContainer = styled.div((props) => ({
 
 const BoldText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['400'],
- marginBottom: props.theme.spacing(3)
+  color: props.theme.colors.white['0'],
 }));
 
 const SubText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
+  marginTop: props.theme.spacing(2),
+  color: props.theme.colors.white['200'],
+}));
+
+const Text = styled.h1((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white['200'],
+  lineHeight: 1.4,
 }));
 
 interface Props {
@@ -39,8 +45,13 @@ function InfoContainer({ titleText, bodyText }: Props) {
     <Container>
       <img src={InfoIcon} alt="alert" />
       <TextContainer>
-        {titleText ?? <BoldText>{titleText}</BoldText>}
-        <SubText>{bodyText}</SubText>
+        {titleText ? (
+          <>
+            <BoldText>{titleText}</BoldText>
+            <SubText>{bodyText}</SubText>
+          </>
+        )
+          : <Text>{bodyText}</Text>}
       </TextContainer>
     </Container>
   );

@@ -18,7 +18,6 @@ import TopRow from '@components/topRow';
 import AccountHeaderComponent from '@components/accountHeader';
 import finalizeTxSignature from '@components/transactionsRequests/utils';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
-import InfoContainer from '@components/infoContainer';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const Container = styled.div((props) => ({
@@ -190,8 +189,7 @@ function ConfirmStxTransaction() {
         onCancelClick={handleOnCancelClick}
         isSponsored={sponsored}
       >
-        {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
-        <TransferAmountView currency="STX" amount={getAmount()} />
+         <TransferAmountView currency="STX" amount={getAmount()} />
         <RecipientAddressView recipient={recipient} />
         {networkInfoSection}
         <Seperator />

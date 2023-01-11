@@ -20,6 +20,8 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
+import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import InfoContainer from '@components/infoContainer';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
@@ -119,16 +121,20 @@ const WarningMessageContainer = styled.div((props) => ({
 }));
 
 function SignatureRequest(): JSX.Element {
-  const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
+  const { t } = useTranslation('translation');
   const [isSigning, setIsSigning] = useState<boolean>(false);
   const [showHash, setShowHash] = useState(false);
+  const [hasTabClosed, setHasTabClosed] = useState(false);
   const { selectedAccount, accountsList, network } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
   const {
     messageType, request, payload, tabId, domain,
   } = useSignatureRequest();
   const navigate = useNavigate();
-
+  useOnOriginTabClose(() => {
+    setHasTabClosed(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
   const switchAccountBasedOnRequest = () => {
     if (getNetworkType(payload.network) !== network.type) {
       navigate('/tx-status', {
@@ -196,15 +202,16 @@ function SignatureRequest(): JSX.Element {
     <ConfirmScreen
       onConfirm={confirmCallback}
       onCancel={cancelCallback}
-      cancelText={t('CANCEL_BUTTON')}
-      confirmText={t('SIGN_BUTTON')}
+      cancelText={t('SIGNATURE_REQUEST.CANCEL_BUTTON')}
+      confirmText={t('SIGNATURE_REQUEST.SIGN_BUTTON')}
       loading={isSigning}
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
         <RequestImage src={SignatureIcon} alt="Signature" width={80} />
-        <RequestType>{t('TITLE')}</RequestType>
-        <RequestSource>{`${t('DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
+        <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
+        <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
+        {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
         {isUtf8Message(messageType) && (
           <SignatureRequestMessage
             request={payload as SignaturePayload}
@@ -218,21 +225,22 @@ function SignatureRequest(): JSX.Element {
         <ShowHashButtonContainer>
           <Seperator />
           <ShowHashButton onClick={handleShowHash}>
-            {showHash ? t('HIDE_HASH_BUTTON') : t('SHOW_HASH_BUTTON')}
+            {showHash ? t('SIGNATURE_REQUEST.HIDE_HASH_BUTTON') : t('SIGNATURE_REQUEST.SHOW_HASH_BUTTON')}
             <img src={showHash ? Minus : Plus} alt="Show" />
           </ShowHashButton>
           <Seperator />
         </ShowHashButtonContainer>
         {showHash ? (
           <>
-            <MessageHashTitle>{t('MESSAGE_HASH_HEADER')}</MessageHashTitle>
+            <MessageHashTitle>{t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}</MessageHashTitle>
             <MessageHash>{bytesToHex(hashMessage(payload.message))}</MessageHash>
           </>
         ) : null}
-        <ActionDisclaimer>{t('ACTION_DISCLAIMER')}</ActionDisclaimer>
+        <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
+        <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
         <WarningMessageContainer>
           <img src={Info} alt="warning" />
-          <p>{t('SIGNING_WARNING')}</p>
+          <p>{t('SIGNATURE_REQUEST.SIGNING_WARNING')}</p>
         </WarningMessageContainer>
       </MainContainer>
     </ConfirmScreen>
