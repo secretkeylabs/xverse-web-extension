@@ -9,7 +9,6 @@ import SignatureIcon from '@assets/img/webInteractions/signatureIcon.svg';
 import Plus from '@assets/img/transactions/Plus.svg';
 import Minus from '@assets/img/transactions/Minus.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import Info from '@assets/img/send/info.svg';
 import { useTranslation } from 'react-i18next';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { useEffect, useState } from 'react';
@@ -106,20 +105,6 @@ const ActionDisclaimer = styled.p((props) => ({
   marginBottom: props.theme.spacing(8),
 }));
 
-const WarningMessageContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  border: `2px solid ${props.theme.colors.grey}`,
-  borderRadius: props.theme.radius(2),
-  padding: props.theme.spacing(6),
-  p: {
-    ...props.theme.body_m,
-    color: props.theme.colors.white[200],
-    marginLeft: props.theme.spacing(9),
-    lineHeight: 1.4,
-  },
-}));
-
 function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation');
   const [isSigning, setIsSigning] = useState<boolean>(false);
@@ -131,7 +116,7 @@ function SignatureRequest(): JSX.Element {
     messageType, request, payload, tabId, domain,
   } = useSignatureRequest();
   const navigate = useNavigate();
-  useOnOriginTabClose(() => {
+  useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
@@ -238,10 +223,6 @@ function SignatureRequest(): JSX.Element {
         ) : null}
         <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
         <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
-        <WarningMessageContainer>
-          <img src={Info} alt="warning" />
-          <p>{t('SIGNATURE_REQUEST.SIGNING_WARNING')}</p>
-        </WarningMessageContainer>
       </MainContainer>
     </ConfirmScreen>
   );

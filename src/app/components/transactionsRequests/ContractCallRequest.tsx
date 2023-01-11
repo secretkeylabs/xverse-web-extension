@@ -196,10 +196,13 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const [isShowMore, setIsShowMore] = useState(false);
   const Illustration = headerImageMapping[request.functionName ?? ''];
 
-  useOnOriginTabClose(() => {
-    setHasTabClosed(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  useOnOriginTabClose(
+    tabId,
+    () => {
+      setHasTabClosed(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+  );
 
   const showMoreButton = (
     <ShowMoreButtonContainer>

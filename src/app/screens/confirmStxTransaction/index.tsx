@@ -18,6 +18,7 @@ import TopRow from '@components/topRow';
 import AccountHeaderComponent from '@components/accountHeader';
 import finalizeTxSignature from '@components/transactionsRequests/utils';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import InfoContainer from '@components/infoContainer';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const Container = styled.div((props) => ({
@@ -25,6 +26,10 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   marginTop: props.theme.spacing(12),
   marginBottom: props.theme.spacing(4),
+}));
+
+const AlertContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(12),
 }));
 
 const TitleText = styled.h1((props) => ({
@@ -56,7 +61,10 @@ function ConfirmStxTransaction() {
   const {
     unsignedTx, sponsored, isBrowserTx, tabId, requestToken,
   } = location.state;
-
+  useOnOriginTabClose(Number(tabId), () => {
+    setHasTabClosed(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
   const {
     stxBtcRate, btcFiatRate, network, stxAddress, fiatCurrency,
   } = useSelector(
@@ -71,10 +79,6 @@ function ConfirmStxTransaction() {
   string,
   Error,
   { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network.type));
-  useOnOriginTabClose(() => {
-    setHasTabClosed(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -189,7 +193,12 @@ function ConfirmStxTransaction() {
         onCancelClick={handleOnCancelClick}
         isSponsored={sponsored}
       >
-         <TransferAmountView currency="STX" amount={getAmount()} />
+        <TransferAmountView currency="STX" amount={getAmount()} />
+        {hasTabClosed && (
+        <AlertContainer>
+          <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />
+        </AlertContainer>
+        )}
         <RecipientAddressView recipient={recipient} />
         {networkInfoSection}
         <Seperator />

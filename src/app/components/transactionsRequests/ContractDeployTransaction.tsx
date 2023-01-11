@@ -147,7 +147,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   const [loaderForBroadcastingTx, setLoaderForBroadcastingTx] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  useOnOriginTabClose(() => {
+  useOnOriginTabClose(tabId, () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
