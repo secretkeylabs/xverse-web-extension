@@ -29,11 +29,12 @@ import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/sta
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
 import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
 import AccountHeaderComponent from '@components/accountHeader';
+import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import InfoContainer from '@components/infoContainer';
 import finalizeTxSignature from './utils';
 
 const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
-  marginTop: props.theme.spacing(12),
   paddingTop: props.theme.spacing(12),
   paddingBottom: props.theme.spacing(12),
   borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
@@ -137,17 +138,18 @@ const Detail = styled.h1((props) => ({
   marginTop: props.theme.spacing(2),
 }));
 
-const InfoContainer = styled.div({
+const FuncArgContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
 });
 
-const Container = styled.div({
+const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-});
+  marginBottom: props.theme.spacing(12),
+}));
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
@@ -189,24 +191,30 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const {
     request, unsignedTx, funcMetaData, coinsMetaData, tabId, requestToken,
   } = props;
-  const { t } = useTranslation('translation', { keyPrefix: 'CONTRACT_CALL_REQUEST' });
+  const [hasTabClosed, setHasTabClosed] = useState(false);
+  const { t } = useTranslation('translation');
   const [isShowMore, setIsShowMore] = useState(false);
   const Illustration = headerImageMapping[request.functionName ?? ''];
+
+  useOnOriginTabClose(() => {
+    setHasTabClosed(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   const showMoreButton = (
     <ShowMoreButtonContainer>
       <Line />
       <ButtonContainer>
         <ShowMoreButton onClick={() => setIsShowMore(!isShowMore)}>
-          <ButtonText>{isShowMore ? t('SHOW_LESS') : t('SHOW_MORE')}</ButtonText>
-          <ButtonSymbolText>{isShowMore ? t('MINUS') : t('PLUS')}</ButtonSymbolText>
+          <ButtonText>{isShowMore ? t('CONTRACT_CALL_REQUEST.SHOW_LESS') : t('CONTRACT_CALL_REQUEST.SHOW_MORE')}</ButtonText>
+          <ButtonSymbolText>{isShowMore ? t('CONTRACT_CALL_REQUEST.MINUS') : t('CONTRACT_CALL_REQUEST.PLUS')}</ButtonSymbolText>
         </ShowMoreButton>
       </ButtonContainer>
     </ShowMoreButtonContainer>
   );
 
   const renderContractAddress = isShowMore && (
-    <RedirectAddressView recipient={request.contractAddress} title={t('CONTRACT_ADDRESS')} />
+    <RedirectAddressView recipient={request.contractAddress} title={t('CONTRACT_CALL_REQUEST.CONTRACT_ADDRESS')} />
   );
   type ArgToView = { name: string; value: string; type: any };
   const getFunctionArgs = (): Array<ArgToView> => {
@@ -249,11 +257,11 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
     const args = getFunctionArgs();
     if (isShowMore) {
       return args.map((arg, index) => (
-        <InfoContainer>
+        <FuncArgContainer>
           <Title>{arg.name}</Title>
           <Value>{arg.value}</Value>
           <Detail>{arg.type}</Detail>
-        </InfoContainer>
+        </FuncArgContainer>
       ));
     }
   };
@@ -261,7 +269,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const showSponsoredTransactionTag = (
     <SponsoredContainer>
       <SponsoredTag>
-        <SponosredText>{t('SPONSORED')}</SponosredText>
+        <SponosredText>{t('CONTRACT_CALL_REQUEST.SPONSORED')}</SponosredText>
       </SponsoredTag>
     </SponsoredContainer>
   );
@@ -269,7 +277,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const postConditionAlert = unsignedTx?.postConditionMode === 2
     && unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
-        <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
+        <PostConditionAlertText>{t('CONTRACT_CALL_REQUEST.POST_CONDITION_ALERT')}</PostConditionAlertText>
       </PostConditionContainer>
   );
   const { network } = useWalletSelector();
@@ -360,13 +368,15 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
             <FunctionTitle>{request.functionName}</FunctionTitle>
             <DappTitle>{`Requested by ${request.appDetails?.name}`}</DappTitle>
           </Container>
+          {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
+
           {postConditionAlert}
           {request.sponsored && showSponsoredTransactionTag}
           {renderPostConditionsCard()}
-          <InfoContainer>
-            <Title>{t('FUNCTION')}</Title>
+          <FuncArgContainer>
+            <Title>{t('CONTRACT_CALL_REQUEST.FUNCTION')}</Title>
             <Value>{request?.functionName}</Value>
-          </InfoContainer>
+          </FuncArgContainer>
           {functionArgsView()}
           {renderContractAddress}
           {showMoreButton}

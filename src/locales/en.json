@@ -379,5 +379,9 @@
     "ERROR_DESCRIPTION": "Xverse encountered a fatal error and crashed. You need to relaunch your wallet.",
     "ERROR_PREFIX": "Error:",
     "SUPPORT": "If the issue persists, you can contact the support at"
+  },
+  "WINDOW_CLOSED_ALERT": {
+    "TITLE": "Requesting window closed",
+    "BODY": "The window that initiated the request is closed, but you can still broadcast the transaction"
   }
 }

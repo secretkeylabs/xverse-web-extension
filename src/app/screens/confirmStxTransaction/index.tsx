@@ -17,9 +17,11 @@ import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
 import AccountHeaderComponent from '@components/accountHeader';
 import finalizeTxSignature from '@components/transactionsRequests/utils';
+import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import InfoContainer from '@components/infoContainer';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
-const InfoContainer = styled.div((props) => ({
+const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   marginTop: props.theme.spacing(12),
@@ -39,12 +41,13 @@ const ValueText = styled.h1((props) => ({
 }));
 
 function ConfirmStxTransaction() {
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t } = useTranslation('translation');
   const [fee, setStateFee] = useState(new BigNumber(0));
   const [amount, setAmount] = useState(new BigNumber(0));
   const [fiatAmount, setFiatAmount] = useState(new BigNumber(0));
   const [total, setTotal] = useState(new BigNumber(0));
   const [fiatTotal, setFiatTotal] = useState(new BigNumber(0));
+  const [hasTabClosed, setHasTabClosed] = useState(false);
   const [recipient, setRecipient] = useState('');
   const [txRaw, setTxRaw] = useState('');
   const [memo, setMemo] = useState('');
@@ -69,6 +72,10 @@ function ConfirmStxTransaction() {
   string,
   Error,
   { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network.type));
+  useOnOriginTabClose(() => {
+    setHasTabClosed(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -131,18 +138,18 @@ function ConfirmStxTransaction() {
   });
 
   const networkInfoSection = (
-    <InfoContainer>
-      <TitleText>{t('NETWORK')}</TitleText>
+    <Container>
+      <TitleText>{t('CONFIRM_TRANSACTION.NETWORK')}</TitleText>
       <ValueText>{network.type}</ValueText>
-    </InfoContainer>
+    </Container>
   );
 
   const memoInfoSection = !!memo && (
     <>
-      <InfoContainer>
-        <TitleText>{t('MEMO')}</TitleText>
+      <Container>
+        <TitleText>{t('CONFIRM_TRANSACTION.MEMO')}</TitleText>
         <ValueText>{memo}</ValueText>
-      </InfoContainer>
+      </Container>
       <Seperator />
     </>
   );
@@ -175,7 +182,7 @@ function ConfirmStxTransaction() {
   return (
     <>
       {isBrowserTx ? <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-        : <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
+        : <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleOnCancelClick} />}
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
@@ -183,6 +190,7 @@ function ConfirmStxTransaction() {
         onCancelClick={handleOnCancelClick}
         isSponsored={sponsored}
       >
+        {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
         <TransferAmountView currency="STX" amount={getAmount()} />
         <RecipientAddressView recipient={recipient} />
         {networkInfoSection}
