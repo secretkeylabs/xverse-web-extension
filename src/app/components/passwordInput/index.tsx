@@ -179,8 +179,10 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
   });
 
   useEffect(() => {
-    if (passwordError) { setError(passwordError); }
-  }, [passwordError]);
+    if (passwordError) { setError(passwordError); return; }
+    if (enteredPassword && enteredPassword.length <= PasswordStrength.WEAK) { setError(t('PASSWORD_STRENGTH_ERROR')); return; }
+    setError('');
+  }, [passwordError, enteredPassword]);
 
   useEffect(() => {
     if (enteredPassword !== '') {
@@ -204,9 +206,6 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   const handlePasswordChange = (event: React.FormEvent<HTMLInputElement>) => {
     setEnteredPassword(event.currentTarget.value);
-    if (error) {
-      setError('');
-    }
   };
 
   function renderStrengthBar() {
@@ -261,14 +260,6 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
     );
   }
 
-  const checkStrengthAndContinue = () => {
-    if (enteredPassword && passwordStrength !== PasswordStrength.WEAK) {
-      handleContinue();
-    } else {
-      setError(t('PASSWORD_STRENGTH_ERROR'));
-    }
-  };
-
   return (
     <Container>
       <HeaderContainer>
@@ -276,7 +267,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         <HeaderText>{title}</HeaderText>
       </HeaderContainer>
       <PasswordInputLabel>{inputLabel}</PasswordInputLabel>
-      <PasswordInputContainer hasError={!!error}>
+      <PasswordInputContainer hasError={!!error || (enteredPassword !== '' && enteredPassword.length <= PasswordStrength.WEAK)}>
         <Input
           type={isPasswordVisible ? 'text' : 'password'}
           value={enteredPassword}
@@ -300,9 +291,9 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
         <ActionButton
           processing={loading}
-          disabled={!enteredPassword}
+          disabled={!enteredPassword || enteredPassword.length <= PasswordStrength.WEAK}
           text={t('CONTINUE_BUTTON')}
-          onPress={checkPasswordStrength ? checkStrengthAndContinue : handleContinue}
+          onPress={handleContinue}
         />
       </ButtonsContainer>
     </Container>
