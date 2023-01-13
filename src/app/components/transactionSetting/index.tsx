@@ -17,6 +17,7 @@ import {
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import { getBtcFees, isCustomFeesAllowed } from '@secretkeylabs/xverse-core/transactions/btc';
+import { ErrorCodes } from '@secretkeylabs/xverse-core';
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,
@@ -286,7 +287,7 @@ function TransactionSettingAlert({
         setFeeInput(btcFee.toString());
       }
     } catch (err: any) {
-      setError(err.toString());
+      if (Number(error) === ErrorCodes.InSufficientBalance) { setError(t('ERRORS.INSUFFICIENT_BALANCE')); } else setError(error.toString());
     }
   };
 

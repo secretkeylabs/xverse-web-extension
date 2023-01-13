@@ -85,7 +85,11 @@
     "SATS": "SATS",
     "CONFIRM_TX": "Confirm Transaction",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
-    "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account."
+    "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
+    "ERRORS": {
+      "INSUFFICIENT_BALANCE": "Insufficient balance",
+      "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees"
+    }
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
