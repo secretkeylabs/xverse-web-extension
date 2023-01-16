@@ -19,7 +19,6 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
-import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import InfoContainer from '@components/infoContainer';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
@@ -109,17 +108,12 @@ function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation');
   const [isSigning, setIsSigning] = useState<boolean>(false);
   const [showHash, setShowHash] = useState(false);
-  const [hasTabClosed, setHasTabClosed] = useState(false);
   const { selectedAccount, accountsList, network } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
   const {
     messageType, request, payload, tabId, domain,
   } = useSignatureRequest();
   const navigate = useNavigate();
-  useOnOriginTabClose(Number(tabId), () => {
-    setHasTabClosed(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
   const switchAccountBasedOnRequest = () => {
     if (getNetworkType(payload.network) !== network.type) {
       navigate('/tx-status', {
@@ -196,7 +190,6 @@ function SignatureRequest(): JSX.Element {
         <RequestImage src={SignatureIcon} alt="Signature" width={80} />
         <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
         <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
-        {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
         {isUtf8Message(messageType) && (
           <SignatureRequestMessage
             request={payload as SignaturePayload}
