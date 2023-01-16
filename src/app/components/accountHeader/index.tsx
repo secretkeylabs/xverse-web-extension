@@ -46,22 +46,6 @@ const OptionsButton = styled.button((props) => ({
   background: 'transparent',
   marginTop: props.theme.spacing(8),
 }));
-
-const TestnetContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
-  paddingTop: props.theme.spacing(3),
-  paddingBottom: props.theme.spacing(3),
-}));
-
-const TestnetText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  textAlign: 'center',
-  color: props.theme.colors.white['200'],
-}));
-
 interface AccountHeaderComponentProps {
   disableMenuOption?: boolean;
   disableAccountSwitch?: boolean;
@@ -70,7 +54,7 @@ interface AccountHeaderComponentProps {
 function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = false }:AccountHeaderComponentProps) {
   const navigate = useNavigate();
   const {
-    selectedAccount, network,
+    selectedAccount,
   } = useWalletSelector();
 
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
@@ -142,11 +126,6 @@ function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = fals
           stackButtonAlignment
         />
       </ResetWalletContainer>
-      )}
-      {network.type === 'Testnet' && (
-        <TestnetContainer>
-          <TestnetText>{t('TESTNET')}</TestnetText>
-        </TestnetContainer>
       )}
       <SelectedAccountContainer>
         <AccountRow account={selectedAccount!} isSelected allowCopyAddress onAccountSelected={handleAccountSelect} />

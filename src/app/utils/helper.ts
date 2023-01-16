@@ -51,10 +51,12 @@ export function getTicker(name: string) {
 }
 
 export function getTruncatedAddress(address: string) {
-  return `${address.substring(0, 4)}...${address.substring(
-    address.length - 4,
-    address.length,
-  )}`;
+  if (address) {
+    return `${address.substring(0, 4)}...${address.substring(
+      address.length - 4,
+      address.length,
+    )}`;
+  }
 }
 
 export function getAddressDetail(account: Account) {
