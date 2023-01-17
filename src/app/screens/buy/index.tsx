@@ -13,7 +13,7 @@ import {
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
 import { getMoonPaySignedUrl, getBinaceSignature } from '@secretkeylabs/xverse-core/api';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 import RedirectButton from './redirectButton';
 
 const Container = styled.div`
@@ -170,7 +170,7 @@ function Buy() {
       <Container>
         {loading && (
         <LoaderContainer>
-          <Ring color="white" size={20} />
+          <MoonLoader color="white" size={20} />
         </LoaderContainer>
         )}
         <Text>{t('PURCHASE_CRYPTO')}</Text>
