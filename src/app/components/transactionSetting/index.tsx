@@ -159,13 +159,13 @@ function TransactionSettingAlert({
   btcRecepientAddress,
   amount,
 }:Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
+  const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
   const theme = useTheme();
   const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const [error, setError] = useState('');
   const [selectedOption, setSelectedOption] = useState({
-    label: t('STANDARD'),
+    label: t('TRANSACTION_SETTING.STANDARD'),
     value: 'standard',
   });
   const {
@@ -212,33 +212,33 @@ function TransactionSettingAlert({
 
   const StxFeeModes: { label: string; value: FeeModeType }[] = [
     {
-      label: t('LOW'),
+      label: t('TRANSACTION_SETTING.LOW'),
       value: 'low',
     },
     {
-      label: t('STANDARD'),
+      label: t('TRANSACTION_SETTING.STANDARD'),
       value: 'standard',
     },
     {
-      label: t('HIGH'),
+      label: t('TRANSACTION_SETTING.HIGH'),
       value: 'high',
     },
     {
-      label: t('CUSTOM'),
+      label: t('TRANSACTION_SETTING.CUSTOM'),
       value: 'custom',
     },
   ];
   const BtcFeeModes = [
     {
-      label: t('STANDARD'),
+      label: t('TRANSACTION_SETTING.STANDARD'),
       value: 'standard',
     },
     {
-      label: t('HIGH'),
+      label: t('TRANSACTION_SETTING.HIGH'),
       value: 'high',
     },
     {
-      label: t('CUSTOM'),
+      label: t('TRANSACTION_SETTING.CUSTOM'),
       value: 'custom',
     },
   ];
@@ -287,7 +287,7 @@ function TransactionSettingAlert({
         setFeeInput(btcFee.toString());
       }
     } catch (err: any) {
-      if (Number(error) === ErrorCodes.InSufficientBalance) { setError(t('ERRORS.INSUFFICIENT_BALANCE')); } else setError(error.toString());
+      if (Number(error) === ErrorCodes.InSufficientBalance) { setError(t('TX_ERRORS.INSUFFICIENT_BALANCE')); } else setError(error.toString());
     }
   };
 
@@ -327,10 +327,10 @@ function TransactionSettingAlert({
       const prevFee = stxToMicrostacks(new BigNumber(previousFee));
       const currentFee = stxToMicrostacks(new BigNumber(feeInput));
       if (currentFee.isEqualTo(prevFee)) {
-        setError(t('SAME_FEE_ERROR'));
+        setError(t('TRANSACTION_SETTING.SAME_FEE_ERROR'));
         return;
       } if (currentFee.gt(availableBalance)) {
-        setError(t('GREATER_FEE_ERROR'));
+        setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
         return;
       }
     }
@@ -342,13 +342,13 @@ function TransactionSettingAlert({
     const currentFee = new BigNumber(feeInput);
     if (btcBalance && currentFee.gt(btcBalance)) {
       // show fee exceeds total balance error
-      setError(t('GREATER_FEE_ERROR'));
+      setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
       return;
     }
     if (selectedOption.value === 'custom') {
       const response = await isCustomFeesAllowed(feeInput.toString());
       if (!response) {
-        setError(t('LOWER_THAN_MINIMUM'));
+        setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
         return;
       }
     }
@@ -364,7 +364,7 @@ function TransactionSettingAlert({
 
   const editFeesSection = (
     <Container>
-      <Text>{t('FEE')}</Text>
+      <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
       <RowContainer>
         <FeeContainer>
           <RowContainer>
@@ -388,7 +388,7 @@ function TransactionSettingAlert({
           <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
         </FeeContainer>
       </RowContainer>
-      <DetailText>{t('FEE_INFO')}</DetailText>
+      <DetailText>{t('TRANSACTION_SETTING.FEE_INFO')}</DetailText>
     </Container>
   );
 
@@ -404,22 +404,22 @@ function TransactionSettingAlert({
 
   const editNonceSection = (
     <NonceContainer>
-      <Text>{t('NONCE')}</Text>
+      <Text>{t('TRANSACTION_SETTING.NONCE')}</Text>
       <InputContainer>
         <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
       </InputContainer>
-      <DetailText>{t('NONCE_INFO')}</DetailText>
+      <DetailText>{t('TRANSACTION_SETTING.NONCE_INFO')}</DetailText>
     </NonceContainer>
   );
 
   return (
-    <BottomModal visible={visible} header={type === 'STX' ? t('ADVANCED_SETTING') : t('EDIT_FEE')} onClose={onCrossClick}>
+    <BottomModal visible={visible} header={type === 'STX' ? t('TRANSACTION_SETTING.ADVANCED_SETTING') : t('TRANSACTION_SETTING.EDIT_FEE')} onClose={onCrossClick}>
       {editFeesSection}
       {errorText}
       {allowEditNonce && type === 'STX' && editNonceSection}
       <ButtonContainer>
         <ActionButton
-          text={t('APPLY')}
+          text={t('TRANSACTION_SETTING.APPLY')}
           processing={loading}
           disabled={loading}
           onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}

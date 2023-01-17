@@ -95,7 +95,7 @@ function ConfirmBtcTransactionComponent({
   onCancelClick,
   onBackButtonClick,
 }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t } = useTranslation('translation');
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
     btcAddress, selectedAccount, seedPhrase, network,
@@ -154,13 +154,17 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {
-      if (Number(txError) === ErrorCodes.InSufficientBalance) { setError(t('ERRORS.INSUFFICIENT_BALANCE')); } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) { setError(t('ERRORS.INSUFFICIENT_BALANCE_FEES')); } else setError(txError.toString());
+      if (Number(txError) === ErrorCodes.InSufficientBalance) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setError(txError.toString());
     }
   }, [txError]);
 
   return (
     <>
-      <TopRow title={t('SEND')} onClick={onBackButtonClick} />
+      <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
       <Container>
         <TransferAmountView currency="BTC" amount={amount} />
         {children}
@@ -168,7 +172,7 @@ function ConfirmBtcTransactionComponent({
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
-            <ButtonText>{t('EDIT_FEES')}</ButtonText>
+            <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
           </>
         </Button>
         <TransactionSettingAlert
@@ -187,14 +191,14 @@ function ConfirmBtcTransactionComponent({
       <ButtonContainer>
         <TransparentButtonContainer>
           <ActionButton
-            text={t('CANCEL')}
+            text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={onCancelClick}
             disabled={loadingBroadcastedTx || isLoading}
           />
         </TransparentButtonContainer>
         <ActionButton
-          text={t('CONFIRM')}
+          text={t('CONFIRM_TRANSACTION.CONFIRM')}
           disabled={loadingBroadcastedTx || isLoading}
           processing={loadingBroadcastedTx || isLoading}
           onPress={handleOnConfirmClick}

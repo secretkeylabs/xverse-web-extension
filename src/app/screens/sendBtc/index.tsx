@@ -83,7 +83,11 @@ function SendBtcScreen() {
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {
-      if (Number(txError) === ErrorCodes.InSufficientBalance) { setError(t('ERRORS.INSUFFICIENT_BALANCE')); } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) { setError(t('ERRORS.INSUFFICIENT_BALANCE_FEES')); } else setError(txError.toString());
+      if (Number(txError) === ErrorCodes.InSufficientBalance) {
+        setError(t('ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setError(txError.toString());
     }
   }, [txError]);
 
