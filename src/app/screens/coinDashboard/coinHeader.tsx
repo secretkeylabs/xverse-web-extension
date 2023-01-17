@@ -1,5 +1,6 @@
 import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
+import { animated, useSpring, useTransition } from '@react-spring/web';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
@@ -44,7 +45,8 @@ const BalanceValuesContainer = styled.div((props) => ({
 }));
 
 const CoinBalanceText = styled.h1((props) => ({
-  ...props.theme.headline_m,
+  ...props.theme.headline_l,
+  fontSize: 24,
   color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));
@@ -52,7 +54,7 @@ const CoinBalanceText = styled.h1((props) => ({
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['400'],
-  fontSize: 12,
+  fontSize: 14,
   marginTop: props.theme.spacing(2),
   textAlign: 'center',
 }));
@@ -115,7 +117,7 @@ const ShowMoreButton = styled.button((props) => ({
   width: 144,
   background: 'none',
   color: props.theme.colors.white[0],
-  border: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  border: `1px solid ${props.theme.colors.background.elevation3}`,
   height: 34,
   borderRadius: props.theme.radius(3),
   img: {
@@ -123,9 +125,10 @@ const ShowMoreButton = styled.button((props) => ({
   },
 }));
 
-const TokenContractContainer = styled.div((props) => ({
+const TokenContractContainer = styled(animated.div)((props) => ({
   display: 'flex',
   flexDirection: 'column',
+  background: 'red',
   marginTop: props.theme.spacing(8),
   h1: {
     ...props.theme.headline_category_s,
@@ -144,6 +147,12 @@ const ContractAddressCopyButton = styled.button((props) => ({
 const TokenContractAddress = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[0],
+  textAlign: 'left',
+}));
+
+const StacksLockedInfoText = styled.span((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[400],
   textAlign: 'left',
 }));
 
@@ -177,7 +186,18 @@ export default function CoinHeader(props: CoinBalanceProps) {
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+  const styles = useSpring({
+    config: { duration: 1250 },
+    opacity: 1,
+    from: { opacity: 0 },
+  });
   const [ftInfoShown, setInfoShown] = useState<boolean>(false);
+  const transitions = useTransition(ftInfoShown, {
+    key: ftInfoShown,
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 1 },
+  });
 
   function getBalanceAmount() {
     switch (coin) {
@@ -247,8 +267,8 @@ export default function CoinHeader(props: CoinBalanceProps) {
         {ftInfoShown ? t('LESS_FT_INFO_BUTTON') : t('SHOW_FT_INFO_BUTTON')}
         <img src={ftInfoShown ? MinusIcon : PlusIcon} alt="show" />
       </ShowMoreButton>
-      {ftInfoShown ? (
-        <TokenContractContainer>
+      {ftInfoShown ? transitions((style) => ((
+        <TokenContractContainer style={style}>
           <h1>{t('FT_CONTRACT_PREFIX')}</h1>
           <ContractAddressCopyButton onClick={handleCopyContractAddress}>
             <TokenContractAddress>
@@ -262,7 +282,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <img src={linkIcon} alt="link" />
           </ContractDeploymentButton>
         </TokenContractContainer>
-      ) : null}
+      ))) : null }
     </>
   );
 
@@ -274,7 +294,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
           <Container>
             <LockedStxContainer>
               <img src={Lock} alt="locked" />
-              <span>{t('STX_LOCKED_BALANCE_PREFIX')}</span>
+              <StacksLockedInfoText>{t('STX_LOCKED_BALANCE_PREFIX')}</StacksLockedInfoText>
               <NumericFormat
                 value={microstacksToStx(new BigNumber(stxLockedBalance)).toString()}
                 displayType="text"
@@ -283,7 +303,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
               />
             </LockedStxContainer>
             <AvailableStxContainer>
-              <span>{t('STX_AVAILABLE_BALANCE_PREFIX')}</span>
+              <StacksLockedInfoText>{t('STX_AVAILABLE_BALANCE_PREFIX')}</StacksLockedInfoText>
               <NumericFormat
                 value={microstacksToStx(new BigNumber(stxAvailableBalance)).toString()}
                 displayType="text"

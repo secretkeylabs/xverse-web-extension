@@ -46,6 +46,11 @@ const NoTransactionsContainer = styled.div((props) => ({
   alignItems: 'center',
   color: props.theme.colors.white[400],
 }));
+
+const GroupContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(8),
+}));
+
 const SectionHeader = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -53,10 +58,11 @@ const SectionHeader = styled.div((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const SectionSeparator = styled.div((props) => ({
-  border: `1px solid ${props.theme.colors.white[400]}`,
+const SectionSeparator = styled.div({
+  border: '0.5px solid  rgba(255, 255, 255, 0.6)',
+  opacity: 0.2,
   flexGrow: 1,
-}));
+});
 
 const SectionTitle = styled.p((props) => ({
   ...props.theme.body_xs,
@@ -149,7 +155,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       {groupedTxs
         && !isLoading
         && Object.keys(groupedTxs).map((group) => (
-          <>
+          <GroupContainer>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
               <SectionSeparator />
@@ -168,7 +174,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
                 />
               );
             })}
-          </>
+          </GroupContainer>
         ))}
       {isLoading && (
         <LoadingContainer>
