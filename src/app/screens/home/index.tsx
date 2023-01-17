@@ -244,7 +244,7 @@ function Home() {
 
   return (
     <>
-      <AccountHeaderComponent disableAccountSwitch />
+      <AccountHeaderComponent />
       <Container>
         <BalanceCard />
         <RowButtonContainer>

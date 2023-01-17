@@ -21,7 +21,7 @@ const RowContainer = styled.div({
   flexDirection: 'row',
 });
 
-const GradientCircle = styled.div<GradientCircleProps>((props) => ({
+const GradientCircle = styled.button<GradientCircleProps>((props) => ({
   height: 40,
   width: 40,
   borderRadius: 25,
@@ -76,6 +76,10 @@ const StyledToolTip = styled(Tooltip)`
   padding: 7px;
 `;
 
+const Button = styled.button`
+  background: transparent;
+`;
+
 const CopyButton = styled.button`
   opacity: 0.6;
   color: #FFFFFF;
@@ -126,6 +130,10 @@ function AccountRow({
     setOnBtcCopied(false);
   };
 
+  const onRowClick = () => {
+    if (!allowCopyAddress) { onAccountSelected(account!); }
+  };
+
   const onClick = () => {
     onAccountSelected(account!);
   };
@@ -165,16 +173,19 @@ function AccountRow({
   );
 
   return (
-    <TopSectionContainer onClick={onClick}>
+    <TopSectionContainer onClick={onRowClick}>
       <GradientCircle
         firstGradient={gradient[0]}
         secondGradient={gradient[1]}
         thirdGradient={gradient[2]}
+        onClick={onClick}
       />
       <CurrentAcountContainer>
         {account
           && (isSelected ? (
-            <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+            <Button onClick={onClick}>
+              <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+            </Button>
           ) : (
             <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
           ))}
