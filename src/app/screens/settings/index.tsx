@@ -35,7 +35,7 @@ const ResetWalletContainer = styled.div((props) => ({
   position: 'fixed',
   zIndex: 10,
   background: 'rgba(25, 25, 48, 0.5)',
-  backdropFilter: 'blur(16px)',
+  backdropFilter: 'blur(10px)',
   paddingLeft: 16,
   paddingRight: 16,
   paddingTop: props.theme.spacing(50),

@@ -41,7 +41,7 @@ const DisclaimerContainer = styled.div((props) => ({
   alignItems: 'flex-start',
   backgroundColor: 'transparent',
   padding: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(6),
+  marginBottom: props.theme.spacing(15),
   border: '1px solid rgba(255, 255, 255, 0.2)',
 }));
 
