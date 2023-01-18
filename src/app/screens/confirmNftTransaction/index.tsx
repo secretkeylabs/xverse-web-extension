@@ -47,7 +47,7 @@ const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginLeft: '15%',
-  marginTop: props.theme.spacing(20),
+  marginTop: props.theme.spacing(40),
 }));
 
 const Button = styled.button((props) => ({
