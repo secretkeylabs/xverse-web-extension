@@ -11,6 +11,9 @@ import {
 } from '@stacks/stacks-blockchain-api-types';
 import { useMemo } from 'react';
 import {
+  animated, config, useSpring,
+} from '@react-spring/web';
+import {
   isAddressTransactionWithTransfers,
   isBtcTransaction,
   isBtcTransactionArr,
@@ -47,7 +50,7 @@ const NoTransactionsContainer = styled.div((props) => ({
   color: props.theme.colors.white[400],
 }));
 
-const GroupContainer = styled.div((props) => ({
+const GroupContainer = styled(animated.div)((props) => ({
   marginBottom: props.theme.spacing(8),
 }));
 
@@ -133,7 +136,13 @@ const filterTxs = (
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, txFilter } = props;
   const { data, isLoading, isFetching } = useTransactions((coin as CurrencyTypes) || 'STX');
-
+  const styles = useSpring({
+    config: { ...config.stiff },
+    from: { opacity: 0 },
+    to: {
+      opacity: 1,
+    },
+  });
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   const groupedTxs = useMemo(() => {
@@ -155,7 +164,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       {groupedTxs
         && !isLoading
         && Object.keys(groupedTxs).map((group) => (
-          <GroupContainer>
+          <GroupContainer style={styles}>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
               <SectionSeparator />

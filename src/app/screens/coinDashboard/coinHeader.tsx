@@ -1,6 +1,8 @@
 import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
-import { animated, useSpring, useTransition } from '@react-spring/web';
+import {
+  animated, config, useSpring,
+} from '@react-spring/web';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
@@ -128,7 +130,6 @@ const ShowMoreButton = styled.button((props) => ({
 const TokenContractContainer = styled(animated.div)((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  background: 'red',
   marginTop: props.theme.spacing(8),
   h1: {
     ...props.theme.headline_category_s,
@@ -148,6 +149,7 @@ const TokenContractAddress = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[0],
   textAlign: 'left',
+  marginRight: props.theme.spacing(1.5),
 }));
 
 const StacksLockedInfoText = styled.span((props) => ({
@@ -172,6 +174,12 @@ const ContractDeploymentButton = styled.button((props) => ({
   },
 }));
 
+const CopyImage = styled.img({
+  width: 23,
+  height: 23,
+  border: 1.5,
+});
+
 export default function CoinHeader(props: CoinBalanceProps) {
   const { coin, fungibleToken } = props;
   const {
@@ -186,17 +194,14 @@ export default function CoinHeader(props: CoinBalanceProps) {
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const styles = useSpring({
-    config: { duration: 1250 },
-    opacity: 1,
-    from: { opacity: 0 },
-  });
   const [ftInfoShown, setInfoShown] = useState<boolean>(false);
-  const transitions = useTransition(ftInfoShown, {
-    key: ftInfoShown,
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 1 },
+  const slideInStyles = useSpring({
+    config: { ...config.stiff },
+    from: { opacity: 0, height: 0 },
+    to: {
+      opacity: ftInfoShown ? 1 : 0,
+      height: ftInfoShown ? 80 : 0,
+    },
   });
 
   function getBalanceAmount() {
@@ -267,14 +272,14 @@ export default function CoinHeader(props: CoinBalanceProps) {
         {ftInfoShown ? t('LESS_FT_INFO_BUTTON') : t('SHOW_FT_INFO_BUTTON')}
         <img src={ftInfoShown ? MinusIcon : PlusIcon} alt="show" />
       </ShowMoreButton>
-      {ftInfoShown ? transitions((style) => ((
-        <TokenContractContainer style={style}>
+      {ftInfoShown ? (
+        <TokenContractContainer style={slideInStyles}>
           <h1>{t('FT_CONTRACT_PREFIX')}</h1>
           <ContractAddressCopyButton onClick={handleCopyContractAddress}>
             <TokenContractAddress>
               {formatAddress(fungibleToken?.principal as string)}
             </TokenContractAddress>
-            <img src={CopyIcon} alt="copy" />
+            <CopyImage src={CopyIcon} />
           </ContractAddressCopyButton>
           <ContractDeploymentButton onClick={openContractDeployment}>
             {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
@@ -282,7 +287,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <img src={linkIcon} alt="link" />
           </ContractDeploymentButton>
         </TokenContractContainer>
-      ))) : null }
+      ) : null }
     </>
   );
 
