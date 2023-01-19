@@ -17,7 +17,7 @@ const rootPersistConfig = {
 const WalletPersistConfig = {
   key: 'walletState',
   storage,
-  blacklist: ['seedPhrase', 'hasRestoredMemoryKey'],
+  blacklist: ['seedPhrase', 'hasRestoredMemoryKey', 'configPrivateKey'],
 };
 
 const appReducer = combineReducers({
