@@ -27,7 +27,7 @@ jobs:
       # - name: Test
         # run: npm test --passWithNoTests
       - name: Create Archive
-        run: zip -r release.zip build
+        run: zip -r xverse-extension-${{ github.ref_name }}.zip build
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
