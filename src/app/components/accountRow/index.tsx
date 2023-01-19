@@ -1,10 +1,14 @@
 import styled from 'styled-components';
 import { getAccountGradient } from '@utils/gradient';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 import { useTranslation } from 'react-i18next';
-import { getAddressDetail } from '@utils/helper';
+import { getTruncatedAddress, getAddressDetail } from '@utils/helper';
 import BarLoader from '@components/barLoader';
+import Copy from '@assets/img/Copy.svg';
 import { LoaderSize } from '@utils/constants';
 import { Account } from '@secretkeylabs/xverse-core';
+import { useState } from 'react';
 
 interface GradientCircleProps {
   firstGradient: string;
@@ -12,7 +16,12 @@ interface GradientCircleProps {
   thirdGradient: string;
 }
 
-const GradientCircle = styled.div<GradientCircleProps>((props) => ({
+const RowContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+});
+
+const GradientCircle = styled.button<GradientCircleProps>((props) => ({
   height: 40,
   width: 40,
   borderRadius: 25,
@@ -30,7 +39,6 @@ const CurrentAcountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(6),
-
 }));
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
@@ -40,7 +48,7 @@ const CurrentSelectedAccountText = styled.h1((props) => ({
 }));
 
 const CurrentUnSelectedAccountText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.body_m,
   color: props.theme.colors.white['400'],
   textAlign: 'start',
 }));
@@ -57,43 +65,138 @@ const BarLoaderContainer = styled.div((props) => ({
   backgroundColor: 'transparent',
 }));
 
+const CopyImage = styled.img`
+  margin-right: 4px;
+`;
+
+const StyledToolTip = styled(Tooltip)`
+  background-color: #ffffff;
+  color: #12151e;
+  border-radius: 8px;
+  padding: 7px;
+`;
+
+const Button = styled.button`
+  background: transparent;
+`;
+
+const CopyButton = styled.button`
+  opacity: 0.6;
+  color: #FFFFFF;
+  margin-top: 3px;
+  margin-right: 10px;
+  display: flex;
+  title: Bitcoin;
+  flexdirection: row;
+  alignitems: center;
+  justifycontent: center;
+  background: transparent;
+  :hover {
+    opacity: 1;
+  }
+  :focus {
+    opacity: 1;
+  }
+`;
+
 interface Props {
   account: Account | null;
   isSelected: boolean;
+  allowCopyAddress?: boolean;
   onAccountSelected: (account: Account) => void;
 }
 
-function AccountRow({ account, isSelected, onAccountSelected }: Props) {
+function AccountRow({
+  account, isSelected, onAccountSelected, allowCopyAddress,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const gradient = getAccountGradient(account?.stxAddress!);
+  const [onStxCopied, setOnStxCopied] = useState(false);
+  const [onBtcCopied, setOnBtcCopied] = useState(false);
 
   function getName() {
     return account?.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
   }
 
+  const handleOnBtcAddressClick = () => {
+    navigator.clipboard.writeText(account?.btcAddress!);
+    setOnBtcCopied(true);
+    setOnStxCopied(false);
+  };
+
+  const handleOnStxAddressClick = () => {
+    navigator.clipboard.writeText(account?.stxAddress!);
+    setOnStxCopied(true);
+    setOnBtcCopied(false);
+  };
+
+  const onRowClick = () => {
+    if (!allowCopyAddress) { onAccountSelected(account!); }
+  };
+
   const onClick = () => {
     onAccountSelected(account!);
   };
 
+  const displayAddress = allowCopyAddress ? (
+    <RowContainer>
+      <CopyButton id="bitcoin-address" onClick={handleOnBtcAddressClick}>
+        <CopyImage src={Copy} alt="copy" />
+        <CurrentUnSelectedAccountText>
+          {getTruncatedAddress(account?.btcAddress!)}
+        </CurrentUnSelectedAccountText>
+      </CopyButton>
+      <StyledToolTip
+        anchorId="bitcoin-address"
+        variant="light"
+        content={onBtcCopied ? 'Copied' : 'Bitcoin address'}
+        events={['hover']}
+        place="bottom"
+      />
+
+      <CopyButton id="stacks-address" onClick={handleOnStxAddressClick}>
+        <CopyImage src={Copy} alt="copy" />
+        <CurrentUnSelectedAccountText>
+          {getTruncatedAddress(account?.stxAddress!)}
+        </CurrentUnSelectedAccountText>
+      </CopyButton>
+      <StyledToolTip
+        anchorId="stacks-address"
+        variant="light"
+        content={onStxCopied ? 'Copied' : 'Stacks address'}
+        events={['hover']}
+        place="bottom"
+      />
+    </RowContainer>
+  ) : (
+    <CurrentAccountDetailText>{getAddressDetail(account!)}</CurrentAccountDetailText>
+  );
+
   return (
-    <TopSectionContainer onClick={onClick}>
+    <TopSectionContainer onClick={onRowClick}>
       <GradientCircle
         firstGradient={gradient[0]}
         secondGradient={gradient[1]}
         thirdGradient={gradient[2]}
+        onClick={onClick}
       />
       <CurrentAcountContainer>
-        { account && (isSelected ? (
-          <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
-        ) : (
-          <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
-        ))}
+        {account
+          && (isSelected ? (
+            <Button onClick={onClick}>
+              <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+            </Button>
+          ) : (
+            <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
+          ))}
         {!account ? (
           <BarLoaderContainer>
             <BarLoader loaderSize={LoaderSize.LARGE} />
             <BarLoader loaderSize={LoaderSize.MEDIUM} />
           </BarLoaderContainer>
-        ) : <CurrentAccountDetailText>{getAddressDetail(account!)}</CurrentAccountDetailText>}
+        ) : (
+          displayAddress
+        )}
       </CurrentAcountContainer>
     </TopSectionContainer>
   );

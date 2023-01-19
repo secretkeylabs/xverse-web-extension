@@ -1,14 +1,14 @@
-import AccountRow from '@components/accountRow';
-import { StoreState } from '@stores/index';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import ThreeDots from '@assets/img/dots_three_vertical.svg';
 import { useState } from 'react';
+import ThreeDots from '@assets/img/dots_three_vertical.svg';
 import ResetWalletPrompt from '@components/resetWallet';
 import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { useTranslation } from 'react-i18next';
+import AccountRow from '@components/accountRow';
+
+import useWalletSelector from '@hooks/useWalletSelector';
 import OptionsDialog from './optionsDialog';
 
 const SelectedAccountContainer = styled.div((props) => ({
@@ -46,7 +46,6 @@ const OptionsButton = styled.button((props) => ({
   background: 'transparent',
   marginTop: props.theme.spacing(8),
 }));
-
 interface AccountHeaderComponentProps {
   disableMenuOption?: boolean;
   disableAccountSwitch?: boolean;
@@ -56,7 +55,8 @@ function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = fals
   const navigate = useNavigate();
   const {
     selectedAccount,
-  } = useSelector((state: StoreState) => state.walletState);
+  } = useWalletSelector();
+
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const [showOptionsDialog, setShowOptionsDialog] = useState<boolean>(false);
   const [showResetWalletPrompt, setShowResetWalletPrompt] = useState<boolean>(false);
@@ -127,9 +127,8 @@ function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = fals
         />
       </ResetWalletContainer>
       )}
-
       <SelectedAccountContainer>
-        <AccountRow account={selectedAccount!} isSelected onAccountSelected={handleAccountSelect} />
+        <AccountRow account={selectedAccount!} isSelected allowCopyAddress onAccountSelected={handleAccountSelect} />
         {!disableMenuOption && (
         <OptionsButton onClick={handleOptionsSelect}>
           <img src={ThreeDots} alt="Options" />

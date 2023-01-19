@@ -23,8 +23,7 @@
     "RECEIVE": "Receive",
     "SEND": "Send",
     "BUY": "Buy",
-    "MANAGE_TOKEN": "Manage token list",
-    "TESTNET": "Testnet"
+    "MANAGE_TOKEN": "Manage token list"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -275,7 +274,8 @@
     "PASSWORD": "Password",
     "RESET": "Reset",
     "BACK": "Back",
-    "INCORRECT_PASSWORD_ERROR": "Incorrect password"
+    "INCORRECT_PASSWORD_ERROR": "Incorrect password",
+    "TESTNET": "Testnet"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
