@@ -128,8 +128,6 @@ function Home() {
     stxAddress,
     btcAddress,
     masterPubKey,
-    stxPublicKey,
-    btcPublicKey,
     fiatCurrency,
     btcFiatRate,
     stxBtcRate,
@@ -139,7 +137,6 @@ function Home() {
     loadingBtcData,
     selectedAccount,
     accountsList,
-    seedPhrase,
   } = useWalletSelector();
 
   const fetchFeeMultiplierData = async () => {
@@ -147,37 +144,10 @@ function Home() {
     dispatch(FetchFeeMultiplierAction(response));
   };
 
-  const fetchAccount = async () => {
-    const bnsName = await getBnsName(stxAddress, network);
-    if (accountsList.length === 0) {
-      const accounts: Account[] = [
-        {
-          id: 0,
-          stxAddress,
-          btcAddress,
-          masterPubKey,
-          stxPublicKey,
-          btcPublicKey,
-          bnsName,
-        },
-      ];
-      dispatch(fetchAccountAction(accounts[0], accounts));
-      const response = await getActiveAccountList(seedPhrase, network, accounts[0]);
-      dispatch(getActiveAccountsAction(response));
-    } else {
-      selectedAccount!.bnsName = bnsName;
-      const account = accountsList.find(
-        (accountInArray) => accountInArray.stxAddress === selectedAccount?.stxAddress,
-      );
-      account!.bnsName = bnsName;
-      dispatch(fetchAccountAction(selectedAccount!, accountsList));
-    }
-  };
-
   const loadInitialData = useCallback(() => {
     if (stxAddress && btcAddress) {
-      fetchAccount();
       fetchFeeMultiplierData();
+      dispatch(fetchAccountAction(selectedAccount!, accountsList));
       dispatch(fetchRatesAction(fiatCurrency));
       dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
       dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
