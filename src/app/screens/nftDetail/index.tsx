@@ -21,7 +21,7 @@ import { useMutation } from '@tanstack/react-query';
 import { getNftDetail } from '@secretkeylabs/xverse-core/api';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 import AccountHeaderComponent from '@components/accountHeader';
 import Seperator from '@components/seperator';
 import NftAttribute from './nftAttribute';
@@ -362,7 +362,7 @@ function NftDetailScreen() {
 
   const galleryView = isLoading || !nft ? (
     <LoaderContainer>
-      <Ring color="white" size={30} />
+      <MoonLoader color="white" size={30} />
     </LoaderContainer>
   ) : (
     <Container>
