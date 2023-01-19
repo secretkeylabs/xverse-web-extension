@@ -19,7 +19,6 @@ import NftImage from '@screens/nftDashboard/nftImage';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import AccountHeaderComponent from '@components/accountHeader';
-import Seperator from '@components/seperator';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -236,7 +235,7 @@ function SendNft() {
             processing={isLoading}
             currencyType="NFT"
             disableAmountInput
-            error={error}
+            recepientError={error}
             recipient={address}
             onPressSend={onPressSendNFT}
           >

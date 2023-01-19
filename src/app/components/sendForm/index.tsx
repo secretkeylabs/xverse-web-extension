@@ -28,11 +28,13 @@ const ScrollContainer = styled.div`
   margin-left: 5%;
   margin-right: 5%;
 `;
-const OuterContainer = styled.div({
+
+const OuterContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
+  marginBottom: props.theme.spacing(32.5),
   flex: 1,
-});
+}));
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -45,7 +47,7 @@ const InfoContainer = styled.div((props) => ({
   flexDirection: 'row',
   padding: props.theme.spacing(8),
   marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(32.5),
+  marginBottom: props.theme.spacing(3),
   border: `1px solid ${props.theme.colors.background.elevation3}`,
   borderRadius: 8,
 }));
@@ -57,9 +59,7 @@ const Container = styled.div((props) => ({
 }));
 
 const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
-  marginLeft: '5%',
-  marginRight: '5%',
+  marginTop: props.theme.spacing(3),
 }));
 
 const ErrorText = styled.h1((props) => ({
@@ -127,6 +127,9 @@ const AmountInputContainer = styled.div((props) => ({
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   height: 44,
+  ':focus-within': {
+    border: `1px solid ${props.theme.colors.background.elevation6}`,
+  },
 }));
 
 const MemoInputContainer = styled.div((props) => ({
@@ -139,6 +142,9 @@ const MemoInputContainer = styled.div((props) => ({
   borderRadius: 8,
   padding: props.theme.spacing(7),
   height: 76,
+  ':focus-within': {
+    border: `1px solid ${props.theme.colors.background.elevation6}`,
+  },
 }));
 
 const TickerImage = styled.img((props) => ({
@@ -198,7 +204,9 @@ const ColumnContainer = styled.div((props) => ({
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
-  error?: string;
+  amountError?: string;
+  recepientError?: string;
+  memoError?: string;
   fungibleToken?: FungibleToken;
   disableAmountInput?: boolean;
   balance?: number;
@@ -214,7 +222,9 @@ interface Props {
 function SendForm({
   onPressSend,
   currencyType,
-  error,
+  amountError,
+  recepientError,
+  memoError,
   fungibleToken,
   disableAmountInput,
   balance,
@@ -230,7 +240,7 @@ function SendForm({
   const [amount, setAmount] = useState(amountToSend ?? '');
   const [memo, setMemo] = useState(stxMemo ?? '');
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
-  const [showError, setShowError] = useState<string | undefined>(error);
+  const [addressError, setAddressError] = useState<string | undefined>(recepientError);
   const [recipientAddress, setRecipientAddress] = useState(recipient ?? '');
   const navigate = useNavigate();
 
@@ -247,14 +257,14 @@ function SendForm({
   );
 
   useEffect(() => {
-    if (error) {
-      if (associatedAddress !== '' && error.includes(t('ERRORS.ADDRESS_INVALID'))) {
-        setShowError('');
+    if (recepientError) {
+      if (associatedAddress !== '' && recepientError.includes(t('ERRORS.ADDRESS_INVALID'))) {
+        setAddressError('');
       } else {
-        setShowError(error);
+        setAddressError(recepientError);
       }
     }
-  }, [error, associatedAddress]);
+  }, [recepientError, associatedAddress]);
 
   function getTokenIcon() {
     if (currencyType === 'STX') {
@@ -368,15 +378,20 @@ function SendForm({
     } else if ((amount !== '' && recipientAddress !== '') || associatedAddress !== '') return true;
     return false;
   };
-
   return (
     <>
       <ScrollContainer>
         <OuterContainer>
           {!disableAmountInput && renderEnterAmountSection}
+          <ErrorContainer>
+            <ErrorText>{amountError}</ErrorText>
+          </ErrorContainer>
           {buyCryptoMessage}
           {children}
           {renderEnterRecepientSection}
+          <ErrorContainer>
+            <ErrorText>{addressError}</ErrorText>
+          </ErrorContainer>
           {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
           <>
             <Container>
@@ -397,14 +412,14 @@ function SendForm({
                 <SubText>{t('MEMO_INFO')}</SubText>
               </TextContainer>
             </InfoContainer>
+            <ErrorContainer>
+              <ErrorText>{memoError}</ErrorText>
+            </ErrorContainer>
           </>
           )}
         </OuterContainer>
 
       </ScrollContainer>
-      <ErrorContainer>
-        <ErrorText>{showError}</ErrorText>
-      </ErrorContainer>
       <SendButtonContainer enabled={checkIfEnableButton()}>
         <ActionButton
           text={buttonText ?? t('NEXT')}
