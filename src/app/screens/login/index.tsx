@@ -5,7 +5,7 @@ import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
 
@@ -186,7 +186,7 @@ function Login(): JSX.Element {
         </PasswordInputContainer>
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <VerifyButton onClick={handleVerifyPassword}>
-          {!isVerifying ? t('VERIFY_PASSWORD_BUTTON') : <Ring color="white" size={20} />}
+          {!isVerifying ? t('VERIFY_PASSWORD_BUTTON') : <MoonLoader color="white" size={20} />}
         </VerifyButton>
         <ForgotPasswordButton onClick={handleForgotPassword}>
           {t('FORGOT_PASSWORD_BUTTON')}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSnackbar } from 'react-simple-snackbar';
-import styled, { useTheme } from 'styled-components';
+import toast from 'react-hot-toast';
+import styled from 'styled-components';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { encryptSeedPhrase } from '@utils/encryptionUtils';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
+import Check from '@assets/img/settings/check_circle.svg';
 import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
 
@@ -17,9 +18,31 @@ const PasswordContainer = styled.div((props) => ({
   flexDirection: 'column',
   flex: 1,
   marginTop: props.theme.spacing(20),
-  marginBottom: props.theme.spacing(16),
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
+}));
+
+const ToastContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  background: props.theme.colors.feedback.success,
+  borderRadius: 12,
+  boxShadow: '0px 7px 16px -4px rgba(25, 25, 48, 0.25)',
+  height: 44,
+  padding: '12px 20px 12px 16px',
+  width: 306,
+  flex: 1,
+}));
+
+const ToastMessage = styled.h1((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.background.elevation0,
+  marginLeft: props.theme.spacing(7),
+}));
+
+const ToastDismissButton = styled.button((props) => ({
+  background: 'transparent',
+  marginLeft: props.theme.spacing(12),
 }));
 
 function ChangePasswordScreen() {
@@ -33,27 +56,13 @@ function ChangePasswordScreen() {
   const { unlockWallet } = useWalletReducer();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const theme = useTheme();
 
-  const options = {
-    position: 'bottom-right',
-    style: {
-      background: theme.colors.feedback.success,
-      borderRadius: theme.radius(2),
-      boxShadow: '0px 7px 16px -4px rgba(25, 25, 48, 0.25)',
-      color: theme.colors.background.elevation0,
-      fontStyle: theme.body_medium_m,
-      textAlign: 'center',
-    },
-    closeStyle: {
-      color: theme.colors.background.elevation0,
-      fontSize: '16px',
-    },
-  };
-
-  const [openSnackbar] = useSnackbar(options);
   const handleBackButtonClick = () => {
     navigate('/settings');
+  };
+
+  const dismissToast = () => {
+    toast.dismiss();
   };
 
   const handleConfirmCurrentPasswordNextClick = async () => {
@@ -67,6 +76,14 @@ function ChangePasswordScreen() {
     }
   };
 
+  const ToastContent = (
+    <ToastContainer>
+      <img src={Check} alt="Check" />
+      <ToastMessage>{t('SETTING_SCREEN.UPDATE_PASSWORD_SUCCESS')}</ToastMessage>
+      <ToastDismissButton onClick={dismissToast}>{t('OK')}</ToastDismissButton>
+    </ToastContainer>
+  );
+
   const handleEnterNewPasswordNextClick = () => {
     setCurrentStepIndex(2);
   };
@@ -76,10 +93,7 @@ function ChangePasswordScreen() {
       setError('');
       const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
       dispatch(storeEncryptedSeedAction(encryptedSeed));
-      openSnackbar(
-        t('SETTING_SCREEN.UPDATE_PASSWORD_SUCCESS'),
-        10000,
-      );
+      toast.custom(ToastContent);
       navigate('/settings');
     } else {
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));
@@ -133,7 +147,6 @@ function ChangePasswordScreen() {
       </PasswordContainer>
       <BottomBar tab="settings" />
     </>
-
   );
 }
 

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import styled from 'styled-components';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 
 const MainContainer = styled.div`
   display: flex;
@@ -79,7 +79,7 @@ function ConfirmScreen({
       <ButtonsContainer>
         <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
         <ConfirmButton onClick={onConfirm}>
-          {loading ? <Ring color="white" size={20} /> : confirmText}
+          {loading ? <MoonLoader color="white" size={20} /> : confirmText}
         </ConfirmButton>
       </ButtonsContainer>
     </>

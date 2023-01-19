@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import styled from 'styled-components';
-import { Ring } from 'react-spinners-css';
-import Img from 'react-image';
+import { MoonLoader } from 'react-spinners';
+import { Img } from 'react-image';
 import { TokenMetaData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getFetchableUrl } from '@utils/helper';
 import NftPlaceholderImage from '@assets/img/nftDashboard/ic_nft_diamond.svg';
@@ -44,7 +44,7 @@ function NftImage({ metadata }: Props) {
           src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
           loader={(
             <ImageContainer>
-              <Ring color="white" size={30} />
+              <MoonLoader color="white" size={30} />
             </ImageContainer>
           )}
           unloader={showNftImagePlaceholder}
@@ -62,7 +62,7 @@ function NftImage({ metadata }: Props) {
 
   return (
     <ImageContainer>
-      <Ring color="white" size={30} />
+      <MoonLoader color="white" size={30} />
     </ImageContainer>
   );
 }
