@@ -19,7 +19,7 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
       - name: Build
