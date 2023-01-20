@@ -1,3 +1,4 @@
+import ActionButton from '@components/button';
 import SeedPhraseInput from '@components/seedPhraseInput';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,33 +23,18 @@ const ButtonsContainer = styled.div((props) => ({
   justifyContent: 'space-between',
   flex: 1,
   alignItems: 'flex-end',
-  marginBottom: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(30),
   width: '100%',
 }));
 
-const VerifyButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
-  width: '48%',
-  height: 44,
+const TransparentButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(2),
+  width: '100%',
 }));
 
-const BackButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: '1px solid #272A44',
-  color: props.theme.colors.white['0'],
-  width: '48%',
-  height: 44,
+const ButtonContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(2),
+  width: '100%',
 }));
 
 interface VerifySeedProps {
@@ -63,8 +49,7 @@ export default function VerifySeed(props: VerifySeedProps): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const { onBack, onVerifySuccess, seedPhrase } = props;
 
-  const cleanMnemonic = (rawSeed: string): string =>
-    rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
+  const cleanMnemonic = (rawSeed: string): string => rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
   const handleVerify = () => {
     if (seedPhrase === cleanMnemonic(seedInput)) {
@@ -84,8 +69,20 @@ export default function VerifySeed(props: VerifySeedProps): JSX.Element {
         setSeedError={setErr}
       />
       <ButtonsContainer>
-        <BackButton onClick={onBack}>{t('SEED_PHRASE_BACK_BUTTON')}</BackButton>
-        <VerifyButton onClick={handleVerify}>{t('SEED_PHRASE_VERIFY_BUTTON')}</VerifyButton>
+        <TransparentButtonContainer>
+          <ActionButton
+            onPress={onBack}
+            transparent
+            text={t('SEED_PHRASE_BACK_BUTTON')}
+          />
+        </TransparentButtonContainer>
+        <ButtonContainer>
+          <ActionButton
+            text={t('SEED_PHRASE_VERIFY_BUTTON')}
+            onPress={handleVerify}
+            disabled={seedInput === ''}
+          />
+        </ButtonContainer>
       </ButtonsContainer>
     </Container>
   );

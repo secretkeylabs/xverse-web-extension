@@ -8,11 +8,16 @@ const InputContainer = styled.div({
 });
 
 const SeedPhraseInputLabel = styled.p((props) => ({
+  ...props.theme.body_bold_m,
   textAlign: 'left',
   marginBottom: props.theme.spacing(8),
 }));
 
-const SeedphraseInput = styled.textarea((props) => ({
+interface ContainerProps {
+  error: boolean;
+}
+
+const SeedphraseInput = styled.textarea<ContainerProps>((props) => ({
   ...props.theme.body_medium_m,
   backgroundColor: props.theme.colors.background.elevation0,
   color: props.theme.colors.white['0'],
@@ -20,8 +25,12 @@ const SeedphraseInput = styled.textarea((props) => ({
   resize: 'none',
   minHeight: 140,
   padding: props.theme.spacing(8),
-  border: '1px solid #272A44',
+  border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : '1px solid #303354',
+  outline: 'none',
   borderRadius: props.theme.radius(1),
+  ':focus-within': {
+    border: `1px solid ${props.theme.colors.background.elevation6}`,
+  },
 }));
 const ErrorMessage = styled.h2((props) => ({
   ...props.theme.body_medium_m,
@@ -54,6 +63,7 @@ export default function SeedPhraseInput(props: SeedPhraseInputProps): JSX.Elemen
     <InputContainer>
       <SeedPhraseInputLabel>{t('SEED_INPUT_LABEL')}</SeedPhraseInputLabel>
       <SeedphraseInput
+        error={seedError !== ''}
         value={seed}
         name="secretKey"
         placeholder={t('SEED_INPUT_PLACEHOLDER')}
