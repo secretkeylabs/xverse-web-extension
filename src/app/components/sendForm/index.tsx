@@ -17,6 +17,9 @@ import { useNavigate } from 'react-router-dom';
 import { useBNSResolver, useDebounce } from '@hooks/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 
+interface ContainerProps {
+  error: boolean;
+}
 const ScrollContainer = styled.div`
   display: flex;
   flex:1;
@@ -115,13 +118,13 @@ const InputField = styled.input((props) => ({
   border: 'transparent',
 }));
 
-const AmountInputContainer = styled.div((props) => ({
+const AmountInputContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : `1px solid ${props.theme.colors.background.elevation3}`,
   backgroundColor: props.theme.colors.background['elevation-1'],
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
@@ -132,12 +135,12 @@ const AmountInputContainer = styled.div((props) => ({
   },
 }));
 
-const MemoInputContainer = styled.div((props) => ({
+const MemoInputContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : `1px solid ${props.theme.colors.background.elevation3}`,
   backgroundColor: props.theme.colors.background['elevation-1'],
   borderRadius: 8,
   padding: props.theme.spacing(7),
@@ -313,7 +316,7 @@ function SendForm({
         </BalanceText>
         <Text>{balance}</Text>
       </RowContainer>
-      <AmountInputContainer>
+      <AmountInputContainer error={amountError !== ''}>
         <InputFieldContainer>
           <InputField value={amount} placeholder="0" onChange={onInputChange} />
         </InputFieldContainer>
@@ -333,7 +336,7 @@ function SendForm({
   const renderEnterRecepientSection = (
     <Container>
       <TitleText>{t('RECEPIENT')}</TitleText>
-      <AmountInputContainer>
+      <AmountInputContainer error={addressError !== ''}>
         <InputFieldContainer>
           <InputField
             value={recipientAddress}
@@ -396,7 +399,7 @@ function SendForm({
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
-              <MemoInputContainer>
+              <MemoInputContainer error={memoError !== ''}>
                 <InputFieldContainer>
                   <InputField
                     value={memo}
