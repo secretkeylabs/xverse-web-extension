@@ -4,13 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Plus from '@assets/img/dashboard/plus.svg';
-import { useDispatch, useSelector } from 'react-redux';
-import { addAccoutAction, selectAccount } from '@stores/wallet/actions/actionCreators';
+import { useDispatch } from 'react-redux';
+import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import Seperator from '@components/seperator';
-import { StoreState } from '@stores/index';
-import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
-import { getBnsName } from '@secretkeylabs/xverse-core/api';
 import { Account } from '@secretkeylabs/xverse-core/types';
+import useWalletSelector from '@hooks/useWalletSelector';
+import useWalletReducer from '@hooks/useWalletReducer';
 
 const Container = styled.div`
   display: flex;
@@ -63,10 +62,9 @@ function AccountList(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
-    network, accountsList, seedPhrase, selectedAccount,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+    network, accountsList, selectedAccount,
+  } = useWalletSelector();
+  const { createAccount } = useWalletReducer();
 
   const handleAccountSelect = (account: Account) => {
     dispatch(
@@ -90,29 +88,7 @@ function AccountList(): JSX.Element {
   };
 
   async function onCreateAccount() {
-    const selectedNetwork = network.type;
-    const index = accountsList.length > 0 ? accountsList.length : 1;
-    const {
-      stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey,
-    } = await walletFromSeedPhrase({
-      mnemonic: seedPhrase,
-      index: BigInt(index),
-      network: selectedNetwork,
-    });
-    const bnsName = await getBnsName(stxAddress, selectedNetwork);
-
-    const account: Account = {
-      id: index,
-      stxAddress,
-      btcAddress,
-      masterPubKey,
-      stxPublicKey,
-      btcPublicKey,
-      bnsName,
-    };
-    const modifiedAccountList = [...accountsList];
-    modifiedAccountList.push(account);
-    dispatch(addAccoutAction(modifiedAccountList));
+    await createAccount();
   }
 
   return (

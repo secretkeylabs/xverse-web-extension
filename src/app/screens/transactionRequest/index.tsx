@@ -6,7 +6,7 @@ import { StacksTransaction } from '@stacks/transactions';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
 import useStxPendingTxData from '@hooks/useStxPendingTxData';
 import { useNavigate } from 'react-router-dom';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import { Coin, createDeployContractRequest } from '@secretkeylabs/xverse-core';
@@ -150,7 +150,7 @@ function TransactionRequest() {
     <>
       {!unsignedTx ? (
         <LoaderContainer>
-          <Ring color="white" size={50} />
+          <MoonLoader color="white" size={50} />
         </LoaderContainer>
       ) : null}
       {payload.txType === 'contract_call' && unsignedTx ? (

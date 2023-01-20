@@ -7,7 +7,6 @@ import {
 } from 'react';
 import IconBitcoin from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import InfoIcon from '@assets/img/send/info.svg';
 import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
@@ -16,6 +15,7 @@ import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
 import { useBNSResolver, useDebounce } from '@hooks/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
+import InfoContainer from '@components/infoContainer';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -40,16 +40,6 @@ const RowContainer = styled.div({
   alignItems: 'center',
 });
 
-const InfoContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  padding: props.theme.spacing(8),
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(32.5),
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  borderRadius: 8,
-}));
-
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -65,10 +55,6 @@ const ErrorContainer = styled.div((props) => ({
 const ErrorText = styled.h1((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.feedback.error,
-}));
-
-const TextContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(5),
 }));
 
 const InputFieldContainer = styled.div(() => ({
@@ -391,12 +377,7 @@ function SendForm({
                 </InputFieldContainer>
               </MemoInputContainer>
             </Container>
-            <InfoContainer>
-              <TickerImage src={InfoIcon} />
-              <TextContainer>
-                <SubText>{t('MEMO_INFO')}</SubText>
-              </TextContainer>
-            </InfoContainer>
+            <InfoContainer bodyText={t('MEMO_INFO')} />
           </>
           )}
         </OuterContainer>

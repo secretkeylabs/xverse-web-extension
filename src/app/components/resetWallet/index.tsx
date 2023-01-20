@@ -23,8 +23,12 @@ const ButtonContainer = styled.div((props) => ({
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(2),
+  width: '100%',
+}));
+
+const ResetButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(2),
-  marginRight: props.theme.spacing(6),
   width: '100%',
 }));
 
@@ -50,12 +54,13 @@ function ResetWalletPrompt({ showResetWalletPrompt, onResetWalletPromptClose, op
             onPress={onResetWalletPromptClose}
           />
         </TransparentButtonContainer>
-
-        <ActionButton
-          text={t('RESET_WALLET')}
-          warning
-          onPress={openResetWalletScreen}
-        />
+        <ResetButtonContainer>
+          <ActionButton
+            text={t('RESET_WALLET')}
+            warning
+            onPress={openResetWalletScreen}
+          />
+        </ResetButtonContainer>
       </ButtonContainer>
     </BottomModal>
   );

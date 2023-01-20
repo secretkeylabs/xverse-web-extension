@@ -189,6 +189,7 @@ function Setting() {
         <SettingComponent text={`${t('VERSION')}`} textDetail={`${VERSION} (Beta)`} />
         <ResetWalletPrompt showResetWalletPrompt={showResetWalletPrompt} onResetWalletPromptClose={onResetWalletPromptClose} openResetWalletScreen={openResetWalletScreen} />
       </Container>
+
       <BottomBar tab="settings" />
     </>
   );

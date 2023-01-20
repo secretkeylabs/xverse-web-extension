@@ -1,5 +1,6 @@
 import {
   Account,
+  BaseWallet,
   BtcTransactionData,
   Coin,
   FeesMultipliers,
@@ -12,7 +13,7 @@ import {
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
 
-export function setWalletAction(wallet: actions.WalletData): actions.SetWallet {
+export function setWalletAction(wallet: BaseWallet): actions.SetWallet {
   return {
     type: actions.SetWalletKey,
     wallet,

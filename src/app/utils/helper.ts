@@ -50,15 +50,18 @@ export function getTicker(name: string) {
   return name;
 }
 
+export function getTruncatedAddress(address: string) {
+  if (address) {
+    return `${address.substring(0, 4)}...${address.substring(
+      address.length - 4,
+      address.length,
+    )}`;
+  }
+}
+
 export function getAddressDetail(account: Account) {
   if (account) {
-    return `${account.btcAddress.substring(0, 4)}...${account.btcAddress.substring(
-      account.btcAddress.length - 4,
-      account.btcAddress.length,
-    )} / ${account.stxAddress.substring(0, 4)}...${account.stxAddress.substring(
-      account.stxAddress.length - 4,
-      account.stxAddress.length,
-    )}`;
+    return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(account.stxAddress)}`;
   }
   return '';
 }
