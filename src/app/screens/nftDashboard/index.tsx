@@ -9,8 +9,8 @@ import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
 import ActionButton from '@components/button';
 import { getNfts } from '@secretkeylabs/xverse-core/api';
-import { useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
@@ -147,12 +147,32 @@ function NftDashboard() {
   const offset = useRef(0);
   const { stxAddress, network } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
+
+  function fetchNfts({ pageParam = 0 }) {
+    return getNfts(stxAddress, network, pageParam);
+  }
   const {
-    isLoading, data,
-  } = useQuery(
-    ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNfts(stxAddress, network, offset.current),
+    isLoading, error, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
+  } = useInfiniteQuery(
+    [`nft-meta-data${stxAddress}`],
+    fetchNfts,
+    {
+      keepPreviousData: false,
+      getNextPageParam: (lastpage, pages) => {
+        const currentLength = pages.map(((page) => page.nftsList)).flat().length;
+        if (currentLength < lastpage.total) {
+          return currentLength;
+        }
+        return false;
+      },
+    },
   );
+  useEffect(() => {
+    refetch();
+  }, [stxAddress]);
+
+  const nfts = data?.pages.map((page) => page.nftsList).flat();
+  const totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
 
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
@@ -163,16 +183,27 @@ function NftDashboard() {
   };
 
   const nftListView = (
-    data?.total === 0 ? (
+    totalNfts === 0 ? (
       <NoCollectiblesText>
         {t('NO_COLLECTIBLES')}
       </NoCollectiblesText>
     ) : (
-      <GridContainer isGalleryOpen={isGalleryOpen}>
-        { data?.nftsList?.map((nft) => (
-          <Nft asset={nft} />
-        ))}
-      </GridContainer>
+      <>
+        <GridContainer isGalleryOpen={isGalleryOpen}>
+          { nfts?.map((nft) => (
+            <Nft asset={nft} />
+          ))}
+        </GridContainer>
+        {hasNextPage && (
+        <ActionButton
+          text="load"
+          onPress={fetchNextPage}
+          processing={isFetchingNextPage}
+          disabled={isFetchingNextPage}
+        />
+        )}
+      </>
+
     )
   );
 
@@ -199,7 +230,7 @@ function NftDashboard() {
               <BarLoader loaderSize={LoaderSize.LARGE} />
             </BarLoaderContainer>
           )
-            : <CollectiblesValueText>{`${data?.total} ${t('ITEMS')}`}</CollectiblesValueText>}
+            : <CollectiblesValueText>{`${totalNfts} ${t('ITEMS')}`}</CollectiblesValueText>}
           {!isGalleryOpen && (
 
             <WebGalleryButton onClick={openInGalleryView}>
