@@ -288,13 +288,14 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
             transparent
           />
         </ButtonContainer>
-
-        <ActionButton
-          processing={loading}
-          disabled={!enteredPassword || enteredPassword.length <= PasswordStrength.WEAK}
-          text={t('CONTINUE_BUTTON')}
-          onPress={handleContinue}
-        />
+        <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
+          <ActionButton
+            processing={loading}
+            disabled={!enteredPassword || enteredPassword.length <= PasswordStrength.WEAK}
+            text={t('CONTINUE_BUTTON')}
+            onPress={handleContinue}
+          />
+        </ButtonContainer>
       </ButtonsContainer>
     </Container>
   );

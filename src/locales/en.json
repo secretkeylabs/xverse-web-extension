@@ -23,8 +23,7 @@
     "RECEIVE": "Receive",
     "SEND": "Send",
     "BUY": "Buy",
-    "MANAGE_TOKEN": "Manage token list",
-    "TESTNET": "Testnet"
+    "MANAGE_TOKEN": "Manage token list"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -264,7 +263,7 @@
     "SUPPORT_CENTER": "Support Center",
     "VERSION": "Version",
     "UPDATE_PASSWORD_SUCCESS": "Password successfully updated",
-    "OK": "OK",
+    "OK": "Ok",
     "RESET_WALLET_DESCRIPTION": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
     "CANCEL": "Cancel",
     "NODE": "STX Node",
@@ -275,7 +274,8 @@
     "PASSWORD": "Password",
     "RESET": "Reset",
     "BACK": "Back",
-    "INCORRECT_PASSWORD_ERROR": "Incorrect password"
+    "INCORRECT_PASSWORD_ERROR": "Incorrect password",
+    "TESTNET": "Testnet"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
@@ -379,5 +379,9 @@
     "ERROR_DESCRIPTION": "Xverse encountered a fatal error and crashed. You need to relaunch your wallet.",
     "ERROR_PREFIX": "Error:",
     "SUPPORT": "If the issue persists, you can contact the support at"
+  },
+  "WINDOW_CLOSED_ALERT": {
+    "TITLE": "Requesting window closed",
+    "BODY": "The window that initiated the request is closed, but you can still broadcast the transaction"
   }
 }

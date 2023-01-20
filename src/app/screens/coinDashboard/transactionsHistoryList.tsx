@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
 import { CurrencyTypes } from '@utils/constants';
 import useTransactions from '@hooks/useTransactions';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@utils/date';
 import {
@@ -187,7 +187,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
         ))}
       {isLoading && (
         <LoadingContainer>
-          <Ring color="white" size={20} />
+          <MoonLoader color="white" size={20} />
         </LoadingContainer>
       )}
       {!isLoading && data?.length === 0 && (

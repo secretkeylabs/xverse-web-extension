@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
 import { useTranslation } from 'react-i18next';
@@ -229,7 +229,7 @@ function NftDashboard() {
         </ButtonContainer>
         {isLoading ? (
           <LoaderContainer>
-            <Ring color="white" size={30} />
+            <MoonLoader color="white" size={30} />
           </LoaderContainer>
         ) : nftListView}
       </Container>

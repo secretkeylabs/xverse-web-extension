@@ -12,14 +12,17 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { useNavigate } from 'react-router-dom';
 import AccountHeaderComponent from '@components/accountHeader';
+import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import InfoContainer from '@components/infoContainer';
 import finalizeTxSignature from './utils';
 
-const Container = styled.div({
+const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-});
+  marginBottom: props.theme.spacing(12),
+}));
 
 const TopImage = styled.img({
   width: 88,
@@ -44,7 +47,7 @@ const Value = styled.h1((props) => ({
   marginTop: props.theme.spacing(2),
 }));
 
-const InfoContainer = styled.div((props) => ({
+const ColumnContainer = styled.div((props) => ({
   display: 'flex',
   marginTop: props.theme.spacing(6),
   paddingTop: props.theme.spacing(12),
@@ -64,7 +67,6 @@ const DownloadContainer = styled.div((props) => ({
 
 const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
-  marginTop: props.theme.spacing(12),
   paddingTop: props.theme.spacing(12),
   paddingBottom: props.theme.spacing(12),
   borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
@@ -140,9 +142,15 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
     unsignedTx, codeBody, contractName, sponsored, tabId, requestToken,
   } = props;
   const { network } = useWalletSelector();
-  const { t } = useTranslation('translation', { keyPrefix: 'DEPLOY_CONTRACT_REQUEST' });
+  const [hasTabClosed, setHasTabClosed] = useState(false);
+  const { t } = useTranslation('translation');
   const [loaderForBroadcastingTx, setLoaderForBroadcastingTx] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  useOnOriginTabClose(tabId, () => {
+    setHasTabClosed(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   const broadcastTx = async (tx: StacksTransaction[]) => {
     try {
@@ -207,7 +215,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   const showSponsoredTransactionTag = (
     <SponsoredContainer>
       <SponsoredTag>
-        <SponosredText>{t('SPONSORED')}</SponosredText>
+        <SponosredText>{t('DEPLOY_CONTRACT_REQUEST.SPONSORED')}</SponosredText>
       </SponsoredTag>
     </SponsoredContainer>
   );
@@ -215,7 +223,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   const postConditionAlert = unsignedTx?.postConditionMode === 2
     && unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
-        <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
+        <PostConditionAlertText>{t('DEPLOY_CONTRACT_REQUEST.POST_CONDITION_ALERT')}</PostConditionAlertText>
       </PostConditionContainer>
   );
 
@@ -231,28 +239,29 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
       >
         <Container>
           <TopImage src={DeployContractImage} alt="deploy_contract" />
-          <FunctionTitle>{t('DEPLOY_CONTRACT')}</FunctionTitle>
+          <FunctionTitle>{t('DEPLOY_CONTRACT_REQUEST.DEPLOY_CONTRACT')}</FunctionTitle>
         </Container>
+        {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
         {postConditionAlert}
         {sponsored && showSponsoredTransactionTag}
         {unsignedTx?.postConditions?.values?.map((postCondition) => (
           <StxPostConditionCard postCondition={postCondition as PostCondition} />
         ))}
-        <InfoContainer>
-          <Title>{t('CONTRACT_NAME')}</Title>
+        <ColumnContainer>
+          <Title>{t('DEPLOY_CONTRACT_REQUEST.CONTRACT_NAME')}</Title>
           <Value>{contractName}</Value>
           <DownloadContainer>
-            <Title>{t('FUNCTION')}</Title>
+            <Title>{t('DEPLOY_CONTRACT_REQUEST.FUNCTION')}</Title>
             <DownloadButtonContainer>
               <Button onClick={downloadCode}>
                 <>
-                  <ButtonText>{t('DOWNLOAD')}</ButtonText>
+                  <ButtonText>{t('DEPLOY_CONTRACT_REQUEST.DOWNLOAD')}</ButtonText>
                   <ButtonImage src={DownloadImage} />
                 </>
               </Button>
             </DownloadButtonContainer>
           </DownloadContainer>
-        </InfoContainer>
+        </ColumnContainer>
       </ConfirmStxTransationComponent>
     </>
   );

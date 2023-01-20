@@ -102,21 +102,6 @@ const TokenListButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-const TestnetContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
-  paddingTop: props.theme.spacing(3),
-  paddingBottom: props.theme.spacing(3),
-}));
-
-const TestnetText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  textAlign: 'center',
-  color: props.theme.colors.white['200'],
-}));
-
 function Home() {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const navigate = useNavigate();
@@ -128,8 +113,6 @@ function Home() {
     stxAddress,
     btcAddress,
     masterPubKey,
-    stxPublicKey,
-    btcPublicKey,
     fiatCurrency,
     btcFiatRate,
     stxBtcRate,
@@ -139,7 +122,6 @@ function Home() {
     loadingBtcData,
     selectedAccount,
     accountsList,
-    seedPhrase,
   } = useWalletSelector();
 
   const fetchFeeMultiplierData = async () => {
@@ -147,37 +129,10 @@ function Home() {
     dispatch(FetchFeeMultiplierAction(response));
   };
 
-  const fetchAccount = async () => {
-    const bnsName = await getBnsName(stxAddress, network);
-    if (accountsList.length === 0) {
-      const accounts: Account[] = [
-        {
-          id: 0,
-          stxAddress,
-          btcAddress,
-          masterPubKey,
-          stxPublicKey,
-          btcPublicKey,
-          bnsName,
-        },
-      ];
-      dispatch(fetchAccountAction(accounts[0], accounts));
-      const response = await getActiveAccountList(seedPhrase, network, accounts[0]);
-      dispatch(getActiveAccountsAction(response));
-    } else {
-      selectedAccount!.bnsName = bnsName;
-      const account = accountsList.find(
-        (accountInArray) => accountInArray.stxAddress === selectedAccount?.stxAddress,
-      );
-      account!.bnsName = bnsName;
-      dispatch(fetchAccountAction(selectedAccount!, accountsList));
-    }
-  };
-
   const loadInitialData = useCallback(() => {
     if (stxAddress && btcAddress) {
-      fetchAccount();
       fetchFeeMultiplierData();
+      dispatch(fetchAccountAction(selectedAccount!, accountsList));
       dispatch(fetchRatesAction(fiatCurrency));
       dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
       dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
@@ -259,11 +214,6 @@ function Home() {
 
   return (
     <>
-      {network.type === 'Testnet' && (
-        <TestnetContainer>
-          <TestnetText>{t('TESTNET')}</TestnetText>
-        </TestnetContainer>
-      )}
       <AccountHeaderComponent />
       <Container>
         <BalanceCard />
