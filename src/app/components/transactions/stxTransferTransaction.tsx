@@ -10,8 +10,15 @@ import useWalletSelector from '@hooks/useWalletSelector';
 
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
-  marginBottom: props.theme.spacing(10),
+  paddingTop: props.theme.spacing(5),
+  paddingBottom: props.theme.spacing(5),
   background: 'none',
+  ':hover': {
+    background: 'rgba(255, 255, 255, 0.08)',
+  },
+  ':focus': {
+    background: 'rgba(255, 255, 255, 0.12)',
+  },
 }));
 
 const TransactionInfoContainer = styled.div((props) => ({

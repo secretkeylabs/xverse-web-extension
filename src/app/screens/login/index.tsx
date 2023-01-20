@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
+import ActionButton from '@components/button';
 
 declare const VERSION: string;
 
@@ -74,6 +75,11 @@ const LandingTitle = styled.h1((props) => ({
   paddingRight: props.theme.spacing(34),
   color: props.theme.colors.white['200'],
   textAlign: 'center',
+}));
+
+const ButtonContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(8),
+  width: '100%',
 }));
 
 const VerifyButton = styled.button((props) => ({
@@ -185,9 +191,9 @@ function Login(): JSX.Element {
           </button>
         </PasswordInputContainer>
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <VerifyButton onClick={handleVerifyPassword}>
-          {!isVerifying ? t('VERIFY_PASSWORD_BUTTON') : <MoonLoader color="white" size={20} />}
-        </VerifyButton>
+        <ButtonContainer>
+          <ActionButton onPress={handleVerifyPassword} text={t('VERIFY_PASSWORD_BUTTON')} processing={isVerifying} />
+        </ButtonContainer>
         <ForgotPasswordButton onClick={handleForgotPassword}>
           {t('FORGOT_PASSWORD_BUTTON')}
         </ForgotPasswordButton>

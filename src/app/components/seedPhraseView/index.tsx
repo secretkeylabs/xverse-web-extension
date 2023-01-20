@@ -38,9 +38,10 @@ const ShowSeedButton = styled.button((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white[0],
   backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  border: '1px solid rgba(255, 255, 255, 0.2)',
   height: 36,
   width: 110,
-  borderRadius: props.theme.radius(3),
+  borderRadius: 48,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -50,6 +51,14 @@ const ShowSeedButton = styled.button((props) => ({
   transform: 'translate(-50%, -50%)',
   img: {
     marginRight: props.theme.spacing(4),
+  },
+  ':hover': {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    border: '1px solid rgba(255, 255, 255, 0.24)',
+  },
+  ':focus': {
+    backgroundColor: 'rgba(255, 255, 255, 0.2);',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
   },
 }));
 

@@ -89,12 +89,16 @@ const WebGalleryButton = styled.button((props) => ({
   backgroundColor: 'transparent',
   width: '100%',
   marginTop: props.theme.spacing(8),
+  opacity: 0.8,
+  ':hover': {
+    opacity: 1,
+  },
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));
 

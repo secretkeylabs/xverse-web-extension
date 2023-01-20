@@ -69,6 +69,13 @@ const ContinueButton = styled.button((props) => ({
   marginBottom: props.theme.spacing(30),
   height: 44,
   textAlign: 'center',
+  ':hover': {
+    background: '#6977F8',
+  },
+  ':focus': {
+    background: '#6977F8',
+    opacity: 0.6,
+  },
 }));
 
 function CreateWalletSuccess(): JSX.Element {
