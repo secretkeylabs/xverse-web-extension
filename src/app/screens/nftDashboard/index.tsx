@@ -9,7 +9,7 @@ import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
 import ActionButton from '@components/button';
 import { getNfts } from '@secretkeylabs/xverse-core/api';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
@@ -38,7 +38,7 @@ const GridContainer = styled.div<GridContainerProps>((props) => ({
   columnGap: props.theme.spacing(8),
   rowGap: props.theme.spacing(6),
   gridTemplateColumns: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'repeat(auto-fill,minmax(150px,1fr))',
-  gridTemplateRows: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'minmax(150px,220px)',
+  gridTemplateRows: props.isGalleryOpen ? 'repeat(minmax(300px,1fr))' : 'minmax(150px,220px)',
 }));
 
 const ShareDialogeContainer = styled.div({
@@ -129,6 +129,31 @@ const CollectiblesValueText = styled.h1((props) => ({
   marginTop: props.theme.spacing(4),
 }));
 
+const LoadMoreButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: props.theme.spacing(30),
+}));
+
+const LoadMoreButton = styled.button((props) => ({
+  ...props.theme.body_medium_l,
+  fontSize: 13,
+  width: 98,
+  height: 34,
+  color: props.theme.colors.white['0'],
+  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  background: props.theme.colors.background.elevation0,
+  borderRadius: 24,
+  padding: '8px, 16px, 8px, 16px',
+  ':hover': {
+    background: props.theme.colors.background.elevation9,
+  },
+  ':focus': {
+    background: props.theme.colors.background.elevation10,
+  },
+}));
+
 const NoCollectiblesText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['200'],
@@ -144,7 +169,6 @@ const BarLoaderContainer = styled.div((props) => ({
 function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const offset = useRef(0);
   const { stxAddress, network } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
 
@@ -152,7 +176,7 @@ function NftDashboard() {
     return getNfts(stxAddress, network, pageParam);
   }
   const {
-    isLoading, error, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
+    isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
   } = useInfiniteQuery(
     [`nft-meta-data${stxAddress}`],
     fetchNfts,
@@ -167,6 +191,7 @@ function NftDashboard() {
       },
     },
   );
+
   useEffect(() => {
     refetch();
   }, [stxAddress]);
@@ -175,6 +200,9 @@ function NftDashboard() {
   const totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
 
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const onLoadMoreButtonClick = () => {
+    fetchNextPage();
+  };
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
@@ -194,13 +222,19 @@ function NftDashboard() {
             <Nft asset={nft} />
           ))}
         </GridContainer>
-        {hasNextPage && (
-        <ActionButton
-          text="load"
-          onPress={fetchNextPage}
-          processing={isFetchingNextPage}
-          disabled={isFetchingNextPage}
-        />
+        {hasNextPage && (isFetchingNextPage
+          ? (
+            <LoadMoreButtonContainer>
+              <MoonLoader color="white" size={30} />
+            </LoadMoreButtonContainer>
+          )
+          : (
+            <LoadMoreButtonContainer>
+              <LoadMoreButton onClick={onLoadMoreButtonClick}>
+                {t('LOAD_MORE')}
+              </LoadMoreButton>
+            </LoadMoreButtonContainer>
+          )
         )}
       </>
 
