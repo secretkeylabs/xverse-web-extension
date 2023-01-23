@@ -40,7 +40,7 @@ export const useBNSResolver = (
           setAssociatedAddress('');
         }
       } else {
-        setAssociatedAddress(recipientAddress);
+        setAssociatedAddress('');
       }
     })();
   }, [recipientAddress]);
