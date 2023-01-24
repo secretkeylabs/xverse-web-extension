@@ -21,6 +21,10 @@ const CoinContainer = styled.div({
   alignItems: 'center',
 });
 
+const BottomContainer = styled.div({
+  marginBottom: 30,
+});
+
 const CoinIcon = styled.img((props) => ({
   marginRight: props.theme.spacing(7),
   width: 32,
@@ -64,10 +68,11 @@ interface Props {
   disabled: boolean;
   toggled(enabled: boolean, coin: Coin): void;
   enabled?: boolean;
+  showDivider: boolean;
 }
 
 function CoinItem({
-  coin, disabled, toggled, enabled,
+  coin, disabled, toggled, enabled, showDivider,
 }: Props) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const toggleSwitch = () => {
@@ -107,7 +112,7 @@ function CoinItem({
           disabled={disabled}
         />
       </RowContainer>
-      <Seperator />
+      {showDivider ? <Seperator /> : <BottomContainer />}
     </>
   );
 }

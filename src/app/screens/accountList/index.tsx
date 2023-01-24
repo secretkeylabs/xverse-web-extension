@@ -37,9 +37,9 @@ const AccountContainer = styled.div((props) => ({
 
 const AddAccountContainer = styled.div((props) => ({
   display: 'flex',
-  height: 48,
-  width: 48,
-  borderRadius: props.theme.radius(5),
+  height: 40,
+  width: 40,
+  borderRadius: 25,
   justifyContent: 'center',
   alignItems: 'center',
   backgroundColor: props.theme.colors.background.elevation1,
