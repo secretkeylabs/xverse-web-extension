@@ -15,6 +15,7 @@ import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
 import AccountHeaderComponent from '@components/accountHeader';
+import useNetworkSelector from '@hooks/useNetwork';
 import Nft from './nft';
 
 const Container = styled.div`
@@ -145,13 +146,14 @@ function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const offset = useRef(0);
+  const selectedNetwork = useNetworkSelector();
   const { stxAddress, network } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const {
     isLoading, data,
   } = useQuery(
     ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNfts(stxAddress, network, offset.current),
+    async () => getNfts(stxAddress, selectedNetwork, offset.current),
   );
 
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;

@@ -23,7 +23,6 @@ import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
 import { MoonLoader } from 'react-spinners';
 import AccountHeaderComponent from '@components/accountHeader';
-import Seperator from '@components/seperator';
 import NftAttribute from './nftAttribute';
 import DescriptionTile from './descriptionTile';
 

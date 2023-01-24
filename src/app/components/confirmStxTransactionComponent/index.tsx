@@ -14,6 +14,7 @@ import {
   setFee, setNonce, getNonce, signMultiStxTransactions, signTransaction,
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
+import useNetworkSelector from '@hooks/useNetwork';
 
 const Container = styled.div`
   display: flex;
@@ -92,10 +93,10 @@ function ConfirmStxTransationComponent({
   onCancelClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const selectedNetwork = useNetworkSelector();
   const {
     selectedAccount,
     seedPhrase,
-    network,
   } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
@@ -133,14 +134,14 @@ function ConfirmStxTransationComponent({
         initialStxTransactions[0],
         seedPhrase,
         selectedAccount?.id ?? 0,
-        network,
+        selectedNetwork,
       );
       signedTxs.push(signedContractCall);
     } else if (initialStxTransactions.length === 2) {
       signedTxs = await signMultiStxTransactions(
         initialStxTransactions,
         selectedAccount?.id ?? 0,
-        'Testnet',
+        selectedNetwork,
         seedPhrase,
       );
     }

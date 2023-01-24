@@ -5,7 +5,6 @@ import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
 import DeployContractImage from '@assets/img/webInteractions/deploy_contract.svg';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import useWalletSelector from '@hooks/useWalletSelector';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
 import {
   broadcastSignedTransaction,
@@ -14,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import AccountHeaderComponent from '@components/accountHeader';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import InfoContainer from '@components/infoContainer';
+import useNetworkSelector from '@hooks/useNetwork';
 import finalizeTxSignature from './utils';
 
 const Container = styled.div((props) => ({
@@ -141,7 +141,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   const {
     unsignedTx, codeBody, contractName, sponsored, tabId, requestToken,
   } = props;
-  const { network } = useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
   const [loaderForBroadcastingTx, setLoaderForBroadcastingTx] = useState<boolean>(false);
@@ -155,8 +155,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   const broadcastTx = async (tx: StacksTransaction[]) => {
     try {
       setLoaderForBroadcastingTx(true);
-      const networkType = network?.type ?? 'Mainnet';
-      const broadcastResult = await broadcastSignedTransaction(tx[0], networkType);
+      const broadcastResult = await broadcastSignedTransaction(tx[0], selectedNetwork);
       if (broadcastResult) {
         finalizeTxSignature({ requestPayload: requestToken, tabId, data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') } });
         navigate('/tx-status', {

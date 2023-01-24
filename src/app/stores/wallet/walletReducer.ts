@@ -56,6 +56,7 @@ const initialWalletState: WalletState = {
   coins: [],
   feeMultipliers: null,
   hasRestoredMemoryKey: false,
+  networkAddress: undefined,
 };
 
 const walletReducer = (
@@ -194,6 +195,7 @@ const walletReducer = (
       return {
         ...state,
         network: action.network,
+        networkAddress: action.networkAddress,
         selectedAccount: null,
         accountsList: [],
       };
