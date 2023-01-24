@@ -131,3 +131,6 @@ yarn-error.log*
 #editors
 .idea
 .vscode
+/test-results/
+/playwright-report/
+/playwright/.cache/
