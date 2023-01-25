@@ -14,10 +14,10 @@ const TransactionContainer = styled.button((props) => ({
   paddingBottom: props.theme.spacing(5),
   background: 'none',
   ':hover': {
-    background: 'rgba(255, 255, 255, 0.08)',
+    background: props.theme.colors.white[900],
   },
   ':focus': {
-    background: 'rgba(255, 255, 255, 0.12)',
+    background: props.theme.colors.white[850],
   },
 }));
 

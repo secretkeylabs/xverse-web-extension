@@ -21,26 +21,27 @@ const Button = styled.button<ButtonProps>((props) => ({
 }));
 
 const AnimatedButton = styled(Button)`
-:hover {
-  background: #6977F8;
-}
-:focus {
-  background: #6977F8;
-  opacity:0.6;
-}
+  :hover {
+    background: ${(props) => (props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classicLight)};
+    opacity: 0.6;
+  }
+  :focus {
+    background: ${(props) => (props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classicLight)};
+    opacity: 0.6;
+  }
 `;
 
 const TransparentButton = styled(Button)`
   background-color: transparent;
-  border: 1px solid #4C5187;
+  border: ${(props) => `1px solid ${props.theme.colors.background.elevation6}`}
 `;
 
 const AnimatedTransparentButton = styled(TransparentButton)`
 :hover {
-  background: rgba(76, 81, 135, 0.2);
+  background: ${(props) => props.theme.colors.background.elevation6_800};
 }
 :focus {
-  background: rgba(85, 101, 247, 0.2);
+  background: ${(props) => props.theme.colors.action.classic800};
 }
 `;
 

@@ -37,7 +37,7 @@ const OuterSeedContainer = styled.div((props) => ({
 const ShowSeedButton = styled.button((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white[0],
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  backgroundColor: props.theme.colors.white[900],
   border: `1px solid ${props.theme.colors.white[600]}`,
   height: 36,
   width: 110,
@@ -53,12 +53,12 @@ const ShowSeedButton = styled.button((props) => ({
     marginRight: props.theme.spacing(4),
   },
   ':hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    border: '1px solid rgba(255, 255, 255, 0.24)',
+    backgroundColor: props.theme.colors.white[850],
+    border: `1px solid ${props.theme.colors.white[800]}`,
   },
   ':focus': {
     backgroundColor: props.theme.colors.white[600],
-    border: '1px solid rgba(255, 255, 255, 0.3)',
+    border: `1px solid ${props.theme.colors.white[800]}`,
   },
 }));
 

@@ -70,10 +70,10 @@ const ContinueButton = styled.button((props) => ({
   height: 44,
   textAlign: 'center',
   ':hover': {
-    background: '#6977F8',
+    background: props.theme.colors.action.classicLight,
   },
   ':focus': {
-    background: '#6977F8',
+    background: props.theme.colors.action.classicLight,
     opacity: 0.6,
   },
 }));

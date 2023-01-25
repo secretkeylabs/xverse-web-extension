@@ -52,10 +52,10 @@ const CreateButton = styled.button((props) => ({
   width: '100%',
   height: 44,
   ':hover': {
-    background: '#6977F8',
+    background: props.theme.colors.action.classicLight,
   },
   ':focus': {
-    background: '#6977F8',
+    background: props.theme.colors.action.classicLight,
     opacity: 0.6,
   },
 }));
@@ -83,10 +83,10 @@ const RestoreButton = styled.button((props) => ({
   width: '100%',
   height: 44,
   ':hover': {
-    background: 'rgba(76, 81, 135, 0.2)',
+    background: props.theme.colors.background.elevation6_800,
   },
   ':focus': {
-    background: 'rgba(85, 101, 247, 0.2)',
+    background: props.theme.colors.action.classic800,
   },
 }));
 
