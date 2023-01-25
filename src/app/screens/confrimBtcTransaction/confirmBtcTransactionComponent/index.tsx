@@ -13,6 +13,7 @@ import { useMutation } from '@tanstack/react-query';
 import { SignedBtcTxResponse } from '@secretkeylabs/xverse-core/transactions/btc';
 import TransferAmountView from '@components/transferAmountView';
 import TransferFeeView from '@components/transferFeeView';
+import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -29,7 +30,7 @@ const ButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(20),
-  marginTop: props.theme.spacing(24),
+  marginTop: props.theme.spacing(5),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -60,6 +61,17 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
+const ErrorContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(24),
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
+}));
+
+const ErrorText = styled.h1((props) => ({
+  ...props.theme.body_xs,
+  color: props.theme.colors.feedback.error,
+}));
+
 interface Props {
   fee: BigNumber;
   children: ReactNode;
@@ -83,37 +95,37 @@ function ConfirmBtcTransactionComponent({
   onCancelClick,
   onBackButtonClick,
 }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t } = useTranslation('translation');
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
-    btcAddress,
-    selectedAccount,
-    seedPhrase,
-    network,
-  } = useSelector((state: StoreState) => state.walletState);
+    btcAddress, selectedAccount, seedPhrase, network,
+  } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
   const [currentFee, setCurrentFee] = useState(fee);
+  const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const {
-    isLoading,
-    data,
-    mutate,
+    isLoading, data, error: txError, mutate,
   } = useMutation<
   SignedBtcTxResponse,
-  Error,
+  ResponseError,
   {
     address: string;
     amountToSend: string;
-    txFee : string;
+    txFee: string;
   }
-  >(async ({ address, amountToSend, txFee }) => signBtcTransaction({
-    recipientAddress: address,
-    btcAddress,
-    amount: amountToSend,
-    index: selectedAccount?.id ?? 0,
-    fee: new BigNumber(txFee),
-    seedPhrase,
-    network: network.type,
-  }));
+  >(
+    async ({ address, amountToSend, txFee }) => signBtcTransaction({
+      recipientAddress: address,
+      btcAddress,
+      amount: amountToSend,
+      index: selectedAccount?.id ?? 0,
+      fee: new BigNumber(txFee),
+      seedPhrase,
+      network: network.type,
+    }),
+  );
 
   useEffect(() => {
     if (data) {
@@ -140,9 +152,19 @@ function ConfirmBtcTransactionComponent({
     onConfirmClick(signedTx);
   };
 
+  useEffect(() => {
+    if (recipientAddress && amount && txError) {
+      if (Number(txError) === ErrorCodes.InSufficientBalance) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setError(txError.toString());
+    }
+  }, [txError]);
+
   return (
     <>
-      <TopRow title={t('SEND')} onClick={onBackButtonClick} />
+      <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
       <Container>
         <TransferAmountView currency="BTC" amount={amount} />
         {children}
@@ -150,7 +172,7 @@ function ConfirmBtcTransactionComponent({
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
-            <ButtonText>{t('EDIT_FEES')}</ButtonText>
+            <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
           </>
         </Button>
         <TransactionSettingAlert
@@ -163,17 +185,20 @@ function ConfirmBtcTransactionComponent({
           btcRecepientAddress={recipientAddress}
         />
       </Container>
+      <ErrorContainer>
+        <ErrorText>{error}</ErrorText>
+      </ErrorContainer>
       <ButtonContainer>
         <TransparentButtonContainer>
           <ActionButton
-            text={t('CANCEL')}
+            text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={onCancelClick}
             disabled={loadingBroadcastedTx || isLoading}
           />
         </TransparentButtonContainer>
         <ActionButton
-          text={t('CONFIRM')}
+          text={t('CONFIRM_TRANSACTION.CONFIRM')}
           disabled={loadingBroadcastedTx || isLoading}
           processing={loadingBroadcastedTx || isLoading}
           onPress={handleOnConfirmClick}
