@@ -37,7 +37,7 @@ const TileContainer = styled.button<TileProps>((props) => ({
     backgroundColor: props.inModel ? `1px solid ${props.theme.colors.background.elevation3}` : props.color,
   },
   ':focus': {
-    backgroundColor: props.inModel ? '#3A3D5E' : props.theme.colors.background.elevation2,
+    backgroundColor: props.inModel ? props.theme.colors.background.elevation3 : props.theme.colors.background.elevation2,
   },
 }));
 

@@ -32,7 +32,7 @@ const ButtonRow = styled.button`
     background: ${(props) => props.theme.colors.background.elevation3};
   }
   :active {
-    background: #3A3D5E;
+    background: ${(props) => props.theme.colors.background.elevation3};
   }
 `;
 
