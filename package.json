@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "dependencies": {
     "@react-spring/web": "^9.6.1",
@@ -44,6 +44,7 @@
     "react-share": "^4.4.1",
     "react-spinners": "^0.13.7",
     "react-switch": "^7.0.0",
+    "react-tooltip": "^5.4.0",
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
     "redux-saga": "^1.1.3",
