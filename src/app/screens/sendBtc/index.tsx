@@ -13,6 +13,7 @@ import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xvers
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { SignedBtcTxResponse } from '@secretkeylabs/xverse-core/transactions/btc';
+import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
 
 function SendBtcScreen() {
   const location = useLocation();
@@ -44,7 +45,7 @@ function SendBtcScreen() {
     mutate,
   } = useMutation<
   SignedBtcTxResponse,
-  Error,
+  ResponseError,
   {
     address: string;
     amountToSend: string;
@@ -83,7 +84,11 @@ function SendBtcScreen() {
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {
-      setAmountError(txError.toString());
+      if (Number(txError) === ErrorCodes.InSufficientBalance) {
+        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setAmountError(txError.toString());
     }
   }, [txError]);
 
