@@ -34,10 +34,10 @@ const TileContainer = styled.button<TileProps>((props) => ({
   ':hover': {
     ':-webkit-transform': props.inModel ? 'translateY(0px)' : 'translateY(-1px)',
     transform: props.inModel ? 'translateY(0px)' : 'translateY(-1px)',
-    backgroundColor: props.inModel ? '#303354' : props.color,
+    backgroundColor: props.inModel ? `1px solid ${props.theme.colors.background.elevation3}` : props.color,
   },
   ':focus': {
-    backgroundColor: props.inModel ? '#3A3D5E' : '#272A44',
+    backgroundColor: props.inModel ? '#3A3D5E' : props.theme.colors.background.elevation2,
   },
 }));
 

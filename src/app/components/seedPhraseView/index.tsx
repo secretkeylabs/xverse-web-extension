@@ -38,7 +38,7 @@ const ShowSeedButton = styled.button((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white[0],
   backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  border: '1px solid rgba(255, 255, 255, 0.2)',
+  border: `1px solid ${props.theme.colors.white[600]}`,
   height: 36,
   width: 110,
   borderRadius: 48,
@@ -57,7 +57,7 @@ const ShowSeedButton = styled.button((props) => ({
     border: '1px solid rgba(255, 255, 255, 0.24)',
   },
   ':focus': {
-    backgroundColor: 'rgba(255, 255, 255, 0.2);',
+    backgroundColor: props.theme.colors.white[600],
     border: '1px solid rgba(255, 255, 255, 0.3)',
   },
 }));

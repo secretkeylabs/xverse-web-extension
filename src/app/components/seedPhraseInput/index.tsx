@@ -25,7 +25,7 @@ const SeedphraseInput = styled.textarea<ContainerProps>((props) => ({
   resize: 'none',
   minHeight: 140,
   padding: props.theme.spacing(8),
-  border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : '1px solid #303354',
+  border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : `1px solid ${props.theme.colors.background.elevation3}`,
   outline: 'none',
   borderRadius: props.theme.radius(1),
   ':focus-within': {

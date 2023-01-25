@@ -29,7 +29,7 @@ const ButtonRow = styled.button`
   font: ${(props) => props.theme.body_medium_m};
   color: ${(props) => props.theme.colors.white['0']};
   :hover {
-    background: #303354;
+    background: ${(props) => props.theme.colors.background.elevation3};
   }
   :active {
     background: #3A3D5E;
