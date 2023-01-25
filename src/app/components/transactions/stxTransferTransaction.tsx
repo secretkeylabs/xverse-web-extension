@@ -10,6 +10,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
+  width: '100%',
   marginBottom: props.theme.spacing(10),
   background: 'none',
 }));
@@ -21,8 +22,16 @@ const TransactionInfoContainer = styled.div((props) => ({
   flex: 1,
 }));
 
+const TransactionAmountContainer = styled.div({
+  display: 'flex',
+  flex: 1,
+  width: '100%',
+  justifyContent: 'flex-end',
+});
+
 const TransactionRow = styled.div((props) => ({
   display: 'flex',
+  width: '100%',
   alignItems: 'center',
   justifyContent: 'space-between',
   ...props.theme.body_bold_m,
@@ -48,7 +57,10 @@ export default function StxTransferTransaction(props: StxTransferTransactionProp
       <TransactionInfoContainer>
         <TransactionRow>
           <TransactionTitle transaction={transaction} />
-          <TransactionAmount transaction={transaction} coin={transactionCoin} />
+          <TransactionAmountContainer>
+            <TransactionAmount transaction={transaction} coin={transactionCoin} />
+          </TransactionAmountContainer>
+
         </TransactionRow>
         <TransactionRecipient transaction={transaction} />
       </TransactionInfoContainer>
