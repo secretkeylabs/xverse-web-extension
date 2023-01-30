@@ -24,6 +24,8 @@ const Theme = {
       elevation6_600: 'rgba(76, 81, 135, 0.4)',
       elevation6_800: 'rgba(76, 81, 135, 0.2)',
       elevation8: '#7E89AB',
+      elevation9: 'rgba(76, 81, 135, 0.2)',
+      elevation10: 'rgba(76, 81, 135, 0.35)',
       modalBackdrop: 'rgba(18,21,30,0.6)',
     },
     feedback: {
