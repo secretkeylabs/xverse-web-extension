@@ -161,6 +161,7 @@ function SendNft() {
           * BigInt(feeMultipliers.stxSendTxMultiplier),
       );
     }
+    setRecipientAddress(associatedAddress);
     return unsignedTx;
   });
 
@@ -170,7 +171,6 @@ function SendNft() {
         state: {
           unsignedTx: data,
           recipientAddress,
-          nft,
         },
       });
     }
@@ -206,11 +206,9 @@ function SendNft() {
         return;
       }
     }
-    setRecipientAddress(associatedAddress);
     if (validateFields(associatedAddress.trim()) && nft) {
       setError('');
-      const tokenId = nft?.value?.hex
-        ?? cvToHex(uintCV(nft.token_id.toString()));
+      const tokenId = cvToHex(uintCV(nft?.token_id.toString()!));
       mutate({ tokenId, associatedAddress });
     }
   };
@@ -253,7 +251,6 @@ function SendNft() {
         <BottomBarContainer>
           {!isGalleryOpen && <BottomBar tab="nft" />}
         </BottomBarContainer>
-
       </ScrollContainer>
     </>
   );

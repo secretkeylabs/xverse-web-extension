@@ -10,9 +10,9 @@ const Container = styled.div((props) => ({
   position: 'absolute',
   top: 30,
   right: 20,
-  paddingTop: props.theme.spacing(12.5),
-  paddingBottom: props.theme.spacing(1),
   borderRadius: 12,
+  paddingTop: 11,
+  paddingBottom: 11,
   width: 179,
   background: props.theme.colors.background.elevation2,
 }));
@@ -22,16 +22,17 @@ const ButtonRow = styled.button`
   align-items: center;
   background: transparent;
   justify-content: flex-start;
-  margin-left: 24px;
-  margin-right: 24px;
-  margin-bottom: 24px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 11px;
+  padding-bottom: 11px;
   font: ${(props) => props.theme.body_medium_m};
   color: ${(props) => props.theme.colors.white['0']};
   :hover {
-    opacity: 0.8;
+    background: ${(props) => props.theme.colors.background.elevation3};
   }
   :active {
-    opacity: 0.6;
+    background: ${(props) => props.theme.colors.background.elevation3};
   }
 `;
 

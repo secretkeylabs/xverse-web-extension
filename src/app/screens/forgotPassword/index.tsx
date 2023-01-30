@@ -54,7 +54,7 @@ const CancelButton = styled.button((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: props.theme.colors.background.elevation0,
-  border: '1px solid #272A44',
+  border: `1px solid ${props.theme.colors.background.elevation2}`,
   color: props.theme.colors.white['0'],
   width: '48%',
   height: 44,

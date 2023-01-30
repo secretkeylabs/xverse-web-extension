@@ -148,7 +148,7 @@ const GridContainer = styled.div((props) => ({
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
   paddingBottom: props.theme.spacing(16),
   marginBottom: props.theme.spacing(12),
-  borderBottom: '1px solid #272A44',
+  borderBottom: `1px solid ${props.theme.colors.background.elevation2}`,
 }));
 
 const ShareButtonContainer = styled.div((props) => ({
