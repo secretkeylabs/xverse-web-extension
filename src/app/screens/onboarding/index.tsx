@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { animated, useTransition } from '@react-spring/web';
 import { getIsTermsAccepted, saveHasFinishedOnboarding } from '@utils/localStorage';
 import Steps from '@components/steps';
+import ActionButton from '@components/button';
 
 const Container = styled.div`
   display: flex;
@@ -55,45 +56,9 @@ const OnBoardingActionsContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(30),
 }));
 
-const OnBoardingNextButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  marginLeft: props.theme.spacing(8),
-  color: props.theme.colors.white['0'],
-  flex: 1,
-  height: 44,
-}));
-
-const OnBoardingSkipButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: '1px solid #272A44',
-  color: props.theme.colors.white['0'],
-  flex: 1,
-  height: 44,
-}));
-
-const OnBoardingContinueButton = styled(animated.button)((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  marginLeft: props.theme.spacing(8),
+const TransparentButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(30),
-  color: props.theme.colors.white['0'],
-  width: '90%',
-  height: 44,
+  width: '100%',
 }));
 
 function Onboarding(): JSX.Element {
@@ -170,17 +135,18 @@ function Onboarding(): JSX.Element {
             <OnboardingSubTitle>{onboardingViews[index].subtitle}</OnboardingSubTitle>
           </OnBoardingContentContainer>
           {index === onboardingViews.length - 1 ? (
-            <OnBoardingContinueButton onClick={handleSkip} style={style}>
-              {t('ONBOARDING_CONTINUE_BUTTON')}
-            </OnBoardingContinueButton>
+            <OnBoardingActionsContainer>
+              <ActionButton
+                onPress={handleSkip}
+                text={t('ONBOARDING_CONTINUE_BUTTON')}
+              />
+            </OnBoardingActionsContainer>
           ) : (
             <OnBoardingActionsContainer>
-              <OnBoardingSkipButton onClick={handleSkip}>
-                {t('ONBOARDING_SKIP_BUTTON')}
-              </OnBoardingSkipButton>
-              <OnBoardingNextButton onClick={handleClickNext}>
-                {t('ONBOARDING_NEXT_BUTTON')}
-              </OnBoardingNextButton>
+              <TransparentButtonContainer>
+                <ActionButton onPress={handleSkip} transparent text={t('ONBOARDING_SKIP_BUTTON')} />
+              </TransparentButtonContainer>
+              <ActionButton onPress={handleClickNext} text={t('ONBOARDING_NEXT_BUTTON')} />
             </OnBoardingActionsContainer>
           )}
         </>
