@@ -2,6 +2,7 @@ import backup from '@assets/img/backupWallet/backup.svg';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import ActionButton from '@components/button';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -45,29 +46,9 @@ const BackupActionsContainer = styled.div((props) => ({
   width: '100%',
 }));
 
-const BackupButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
-  width: '48%',
-  height: 44,
-}));
-
-const SkipBackupButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: '1px solid #272A44',
-  color: props.theme.colors.white['0'],
-  width: '48%',
-  height: 44,
+const TransparentButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(8),
+  width: '100%',
 }));
 
 function BackupWallet(): JSX.Element {
@@ -91,8 +72,10 @@ function BackupWallet(): JSX.Element {
         <Title>{t('SCREEN_TITLE')}</Title>
         <SubTitle>{t('SCREEN_SUBTITLE')}</SubTitle>
         <BackupActionsContainer>
-          <SkipBackupButton onClick={handleSkip}>{t('BACKUP_SKIP_BUTTON')}</SkipBackupButton>
-          <BackupButton onClick={handleBackup}>{t('BACKUP_BUTTON')}</BackupButton>
+          <TransparentButtonContainer>
+            <ActionButton onPress={handleSkip} transparent text={t('BACKUP_SKIP_BUTTON')} />
+          </TransparentButtonContainer>
+          <ActionButton onPress={handleBackup} text={t('BACKUP_BUTTON')} />
         </BackupActionsContainer>
       </ContentContainer>
     </Container>

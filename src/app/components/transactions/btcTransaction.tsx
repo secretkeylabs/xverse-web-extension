@@ -15,8 +15,15 @@ interface TransactionHistoryItemProps {
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
   width: '100%',
-  marginBottom: props.theme.spacing(10),
+  paddingTop: props.theme.spacing(5),
+  paddingBottom: props.theme.spacing(5),
   background: 'none',
+  ':hover': {
+    background: props.theme.colors.white[900],
+  },
+  ':focus': {
+    background: props.theme.colors.white[850],
+  },
 }));
 
 const TransactionAmountContainer = styled.div({

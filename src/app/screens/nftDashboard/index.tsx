@@ -9,8 +9,8 @@ import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
 import ActionButton from '@components/button';
 import { getNfts } from '@secretkeylabs/xverse-core/api';
-import { useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
@@ -38,7 +38,7 @@ const GridContainer = styled.div<GridContainerProps>((props) => ({
   columnGap: props.theme.spacing(8),
   rowGap: props.theme.spacing(6),
   gridTemplateColumns: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'repeat(auto-fill,minmax(150px,1fr))',
-  gridTemplateRows: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'minmax(150px,220px)',
+  gridTemplateRows: props.isGalleryOpen ? 'repeat(minmax(300px,1fr))' : 'minmax(150px,220px)',
 }));
 
 const ShareDialogeContainer = styled.div({
@@ -89,12 +89,16 @@ const WebGalleryButton = styled.button((props) => ({
   backgroundColor: 'transparent',
   width: '100%',
   marginTop: props.theme.spacing(8),
+  opacity: 0.8,
+  ':hover': {
+    opacity: 1,
+  },
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));
 
@@ -129,6 +133,31 @@ const CollectiblesValueText = styled.h1((props) => ({
   marginTop: props.theme.spacing(4),
 }));
 
+const LoadMoreButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: props.theme.spacing(30),
+}));
+
+const LoadMoreButton = styled.button((props) => ({
+  ...props.theme.body_medium_l,
+  fontSize: 13,
+  width: 98,
+  height: 34,
+  color: props.theme.colors.white['0'],
+  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  background: props.theme.colors.background.elevation0,
+  borderRadius: 24,
+  padding: '8px, 16px, 8px, 16px',
+  ':hover': {
+    background: props.theme.colors.background.elevation9,
+  },
+  ':focus': {
+    background: props.theme.colors.background.elevation10,
+  },
+}));
+
 const NoCollectiblesText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['200'],
@@ -144,17 +173,40 @@ const BarLoaderContainer = styled.div((props) => ({
 function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const offset = useRef(0);
   const { stxAddress, network } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
+
+  function fetchNfts({ pageParam = 0 }) {
+    return getNfts(stxAddress, network, pageParam);
+  }
   const {
-    isLoading, data,
-  } = useQuery(
-    ['nft-meta-data', { stxAddress, network, offset: offset.current }],
-    async () => getNfts(stxAddress, network, offset.current),
+    isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
+  } = useInfiniteQuery(
+    [`nft-meta-data${stxAddress}`],
+    fetchNfts,
+    {
+      keepPreviousData: false,
+      getNextPageParam: (lastpage, pages) => {
+        const currentLength = pages.map(((page) => page.nftsList)).flat().length;
+        if (currentLength < lastpage.total) {
+          return currentLength;
+        }
+        return false;
+      },
+    },
   );
 
+  useEffect(() => {
+    refetch();
+  }, [stxAddress]);
+
+  const nfts = data?.pages.map((page) => page.nftsList).flat();
+  const totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
+
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const onLoadMoreButtonClick = () => {
+    fetchNextPage();
+  };
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
@@ -163,16 +215,33 @@ function NftDashboard() {
   };
 
   const nftListView = (
-    data?.total === 0 ? (
+    totalNfts === 0 ? (
       <NoCollectiblesText>
         {t('NO_COLLECTIBLES')}
       </NoCollectiblesText>
     ) : (
-      <GridContainer isGalleryOpen={isGalleryOpen}>
-        { data?.nftsList?.map((nft) => (
-          <Nft asset={nft} />
-        ))}
-      </GridContainer>
+      <>
+        <GridContainer isGalleryOpen={isGalleryOpen}>
+          { nfts?.map((nft) => (
+            <Nft asset={nft} />
+          ))}
+        </GridContainer>
+        {hasNextPage && (isFetchingNextPage
+          ? (
+            <LoadMoreButtonContainer>
+              <MoonLoader color="white" size={30} />
+            </LoadMoreButtonContainer>
+          )
+          : (
+            <LoadMoreButtonContainer>
+              <LoadMoreButton onClick={onLoadMoreButtonClick}>
+                {t('LOAD_MORE')}
+              </LoadMoreButton>
+            </LoadMoreButtonContainer>
+          )
+        )}
+      </>
+
     )
   );
 
@@ -199,7 +268,7 @@ function NftDashboard() {
               <BarLoader loaderSize={LoaderSize.LARGE} />
             </BarLoaderContainer>
           )
-            : <CollectiblesValueText>{`${data?.total} ${t('ITEMS')}`}</CollectiblesValueText>}
+            : <CollectiblesValueText>{`${totalNfts} ${t('ITEMS')}`}</CollectiblesValueText>}
           {!isGalleryOpen && (
 
             <WebGalleryButton onClick={openInGalleryView}>

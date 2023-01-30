@@ -39,8 +39,9 @@ const ActionButtonsContainer = styled.div((props) => ({
 
 const CreateButton = styled.button((props) => ({
   display: 'flex',
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['200'],
+  ...props.theme.tile_text,
+  fontSize: 12,
+  color: props.theme.colors.white['0'],
   textAlign: 'center',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -50,6 +51,13 @@ const CreateButton = styled.button((props) => ({
   marginBottom: props.theme.spacing(8),
   width: '100%',
   height: 44,
+  ':hover': {
+    background: props.theme.colors.action.classicLight,
+  },
+  ':focus': {
+    background: props.theme.colors.action.classicLight,
+    opacity: 0.6,
+  },
 }));
 
 const AppVersion = styled.p((props) => ({
@@ -62,8 +70,9 @@ const AppVersion = styled.p((props) => ({
 
 const RestoreButton = styled.button((props) => ({
   display: 'flex',
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['200'],
+  ...props.theme.tile_text,
+  fontSize: 12,
+  color: props.theme.colors.white['0'],
   textAlign: 'center',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -73,6 +82,12 @@ const RestoreButton = styled.button((props) => ({
   border: `0.5px solid ${props.theme.colors.background.elevation2}`,
   width: '100%',
   height: 44,
+  ':hover': {
+    background: props.theme.colors.background.elevation6_800,
+  },
+  ':focus': {
+    background: props.theme.colors.action.classic800,
+  },
 }));
 
 function Landing(): JSX.Element {

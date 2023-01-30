@@ -58,7 +58,7 @@ const SectionHeader = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  marginBottom: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(7),
 }));
 
 const SectionSeparator = styled.div({

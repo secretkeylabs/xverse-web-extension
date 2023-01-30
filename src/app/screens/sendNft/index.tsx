@@ -19,7 +19,6 @@ import NftImage from '@screens/nftDashboard/nftImage';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import AccountHeaderComponent from '@components/accountHeader';
-import Seperator from '@components/seperator';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -161,6 +160,7 @@ function SendNft() {
           * BigInt(feeMultipliers.stxSendTxMultiplier),
       );
     }
+    setRecipientAddress(associatedAddress);
     return unsignedTx;
   });
 
@@ -170,7 +170,6 @@ function SendNft() {
         state: {
           unsignedTx: data,
           recipientAddress,
-          nft,
         },
       });
     }
@@ -206,11 +205,9 @@ function SendNft() {
         return;
       }
     }
-    setRecipientAddress(associatedAddress);
     if (validateFields(associatedAddress.trim()) && nft) {
       setError('');
-      const tokenId = nft?.value?.hex
-        ?? cvToHex(uintCV(nft.token_id.toString()));
+      const tokenId = cvToHex(uintCV(nft?.token_id.toString()!));
       mutate({ tokenId, associatedAddress });
     }
   };
@@ -253,7 +250,6 @@ function SendNft() {
         <BottomBarContainer>
           {!isGalleryOpen && <BottomBar tab="nft" />}
         </BottomBarContainer>
-
       </ScrollContainer>
     </>
   );

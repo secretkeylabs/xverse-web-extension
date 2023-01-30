@@ -22,11 +22,11 @@ const BackButton = styled.button({
 
 const AnimatedBackButton = styled(BackButton)`
 :hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: ${(props) => props.theme.colors.white[900]};
   border-radius: 24px;
 }
 :focus {
-  background: rgba(255, 255, 255, 0.12);
+  background: ${(props) => props.theme.colors.white[850]};
   border-radius: 24px;
 }
 `;
