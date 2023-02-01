@@ -19,6 +19,7 @@ import NftImage from '@screens/nftDashboard/nftImage';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import AccountHeaderComponent from '@components/accountHeader';
+import useNetworkSelector from '@hooks/useNetwork';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -118,7 +119,7 @@ function SendNft() {
       setNft(data);
     }
   }, []);
-
+  const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const {
@@ -145,7 +146,7 @@ function SendNft() {
       contractName: contractInfo[1],
       assetName: name,
       publicKey: stxPublicKey,
-      network,
+      network: selectedNetwork,
       pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
       memo: '',
       isNFT: true,

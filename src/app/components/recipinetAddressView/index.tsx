@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import { getExplorerUrl } from '@utils/helper';
 import { useBnsName } from '@hooks/useBnsName';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useNetworkSelector from '@hooks/useNetwork';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -56,9 +56,9 @@ interface Props {
   recipient: string;
 }
 function RecipientAddressView({ recipient }: Props) {
-  const { network } = useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const bnsName = useBnsName(recipient, network);
+  const bnsName = useBnsName(recipient, selectedNetwork);
   const handleOnPress = () => {
     window.open(getExplorerUrl(recipient));
   };

@@ -14,6 +14,7 @@ import {
   convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot,
 } from '@utils/helper';
 import BottomBar from '@components/tabBar';
+import useNetworkSelector from '@hooks/useNetwork';
 
 function SendFtScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
@@ -29,6 +30,7 @@ function SendFtScreen() {
   const [txMemo, setTxMemo] = useState<string | undefined>(undefined);
   const { data: stxPendingTxData } = useStxPendingTxData();
   const location = useLocation();
+  const selectedNetwork = useNetworkSelector();
   const { fungibleToken } = location.state;
   let recipientAddress: string | undefined;
   let ftAmountToSend: string | undefined;
@@ -61,7 +63,7 @@ function SendFtScreen() {
       contractName: contractInfo[1],
       assetName: fungibleToken?.assetName ?? '',
       publicKey: stxPublicKey,
-      network,
+      network: selectedNetwork,
       pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
       memo,
     };

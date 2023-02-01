@@ -15,6 +15,7 @@ import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
 import AccountHeaderComponent from '@components/accountHeader';
+import useNetworkSelector from '@hooks/useNetwork';
 import Nft from './nft';
 
 const Container = styled.div`
@@ -173,11 +174,12 @@ const BarLoaderContainer = styled.div((props) => ({
 function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress, network } = useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
+  const { stxAddress } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
 
   function fetchNfts({ pageParam = 0 }) {
-    return getNfts(stxAddress, network, pageParam);
+    return getNfts(stxAddress, selectedNetwork, pageParam);
   }
   const {
     isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,

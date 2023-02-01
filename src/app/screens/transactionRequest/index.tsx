@@ -12,6 +12,7 @@ import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/tr
 import { Coin, createDeployContractRequest } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType } from '@utils/helper';
+import useNetworkSelector from '@hooks/useNetwork';
 import { getContractCallPromises, getTokenTransferRequest } from './helper';
 
 const LoaderContainer = styled.div((props) => ({
@@ -33,6 +34,7 @@ function TransactionRequest() {
     accountsList,
     selectedAccount,
   } = useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
   const {
     switchAccount,
   } = useWalletReducer();
@@ -51,7 +53,7 @@ function TransactionRequest() {
       payload.memo!,
       stxPublicKey,
       feeMultipliers!,
-      network,
+      selectedNetwork,
       stxPendingTxData,
     );
     setUnsignedTx(unsignedSendStxTx);
@@ -71,7 +73,7 @@ function TransactionRequest() {
       unSignedContractCall,
       contractInterface,
       coinsMetaData: coinMeta,
-    } = await getContractCallPromises(payload, stxAddress, network, stxPublicKey);
+    } = await getContractCallPromises(payload, stxAddress, selectedNetwork, stxPublicKey);
     setUnsignedTx(unSignedContractCall);
     setCoinsMetaData(coinMeta);
     const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find((func) => func.name === payload.functionName);
@@ -83,7 +85,7 @@ function TransactionRequest() {
   const handleContractDeployRequest = async () => {
     const response = await createDeployContractRequest(
       payload,
-      network,
+      selectedNetwork,
       stxPublicKey,
       feeMultipliers!,
       stxAddress,

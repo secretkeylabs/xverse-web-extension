@@ -1,4 +1,4 @@
-import { BtcTransactionData, SettingsNetwork } from '@secretkeylabs/xverse-core';
+import { BtcTransactionData, StacksNetwork } from '@secretkeylabs/xverse-core';
 import { API_TIMEOUT_MILLI } from '@secretkeylabs/xverse-core/constant';
 import {
   AddressTransactionWithTransfers,
@@ -17,14 +17,14 @@ export interface PaginatedResults<T> {
 
 export async function getTransferTransactions(reqParams: {
   stxAddress: string;
-  network: SettingsNetwork;
+  network: StacksNetwork;
   limit: number;
   offset: number;
 }): Promise<AddressTransactionWithTransfers[]> {
   const {
     stxAddress, limit, network, offset,
   } = reqParams;
-  const apiUrl = `${network.address}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
+  const apiUrl = `${network.coreApiUrl}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
   const response = await axios.get<PaginatedResults<AddressTransactionWithTransfers>>(apiUrl, {
     params: {
       limit,
@@ -42,11 +42,11 @@ async function getMempoolTransactions({
   limit,
 }: {
   stxAddress: string;
-  network: SettingsNetwork;
+  network: StacksNetwork;
   offset: number;
   limit: number;
 }): Promise<MempoolTransactionListResponse> {
-  const apiUrl = `${network.address}/extended/v1/tx/mempool?address=${stxAddress}`;
+  const apiUrl = `${network.coreApiUrl}/extended/v1/tx/mempool?address=${stxAddress}`;
   const results = await axios.get<MempoolTransactionListResponse>(apiUrl, {
     timeout: API_TIMEOUT_MILLI,
     params: {
@@ -59,7 +59,7 @@ async function getMempoolTransactions({
 
 export async function getStxAddressTransactions(
   address: string,
-  network: SettingsNetwork,
+  network: StacksNetwork,
   offset: number,
   limit: number,
 ) {

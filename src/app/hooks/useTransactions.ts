@@ -10,15 +10,19 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { CurrencyTypes, PAGINATION_LIMIT } from '@utils/constants';
 import { getStxAddressTransactions } from '@utils/transactions/transactions';
+import useNetworkSelector from './useNetwork';
 
 export default function useTransactions(coinType: CurrencyTypes) {
-  const { network, stxAddress, btcAddress } = useWalletSelector();
+  const {
+    network, stxAddress, btcAddress,
+  } = useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
   const fetchTransactions = async (): Promise<
   BtcTransactionData[] | (AddressTransactionWithTransfers | MempoolTransaction)[]
   > => {
     try {
       if (coinType === 'STX' || coinType === 'FT' || coinType === 'NFT') {
-        return await getStxAddressTransactions(stxAddress, network, 0, PAGINATION_LIMIT);
+        return await getStxAddressTransactions(stxAddress, selectedNetwork, 0, PAGINATION_LIMIT);
       }
       if (coinType === 'BTC') {
         const btcData = await fetchBtcTransactionsData(btcAddress, network.type);

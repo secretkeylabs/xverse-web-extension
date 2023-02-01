@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { fetchAppInfo } from '@secretkeylabs/xverse-core/api';
-import { Account, FeesMultipliers, FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { FeesMultipliers, FungibleToken } from '@secretkeylabs/xverse-core/types';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
@@ -23,13 +23,12 @@ import {
   FetchFeeMultiplierAction,
   fetchRatesAction,
   fetchStxWalletDataRequestAction,
-  getActiveAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
 import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
 import { CurrencyTypes } from '@utils/constants';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getActiveAccountList, getBnsName } from '@secretkeylabs/xverse-core';
+import useNetworkSelector from '@hooks/useNetwork';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -123,7 +122,7 @@ function Home() {
     selectedAccount,
     accountsList,
   } = useWalletSelector();
-
+  const selectedNetwork = useNetworkSelector();
   const fetchFeeMultiplierData = async () => {
     const response: FeesMultipliers = await fetchAppInfo();
     dispatch(FetchFeeMultiplierAction(response));
@@ -134,9 +133,9 @@ function Home() {
       fetchFeeMultiplierData();
       dispatch(fetchAccountAction(selectedAccount!, accountsList));
       dispatch(fetchRatesAction(fiatCurrency));
-      dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
+      dispatch(fetchStxWalletDataRequestAction(stxAddress, selectedNetwork, fiatCurrency, stxBtcRate));
       dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
-      dispatch(fetchCoinDataRequestAction(stxAddress, network, fiatCurrency, coinsList));
+      dispatch(fetchCoinDataRequestAction(stxAddress, selectedNetwork, fiatCurrency, coinsList));
     }
   }, [stxAddress]);
 
