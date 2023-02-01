@@ -4,9 +4,11 @@ import {
   fetchDelegationState, fetchPoolStackerInfo, fetchStackingPoolInfo, getStacksInfo, StackingData,
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from './useWalletSelector';
+import useNetworkSelector from './useNetwork';
 
 const useStackingData = () => {
   const { stxAddress, network } = useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
 
   const results = useQueries({
     queries: [
@@ -16,7 +18,7 @@ const useStackingData = () => {
       },
       {
         queryKey: ['stacking-delegation-state', stxAddress, network],
-        queryFn: () => fetchDelegationState(stxAddress, network),
+        queryFn: () => fetchDelegationState(stxAddress, selectedNetwork),
       },
       {
         queryKey: ['stacking-pool-info'],

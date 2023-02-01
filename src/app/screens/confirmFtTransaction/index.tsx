@@ -15,6 +15,7 @@ import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import TopRow from '@components/topRow';
 import BigNumber from 'bignumber.js';
+import useNetworkSelector from '@hooks/useNetwork';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -40,6 +41,7 @@ function ConfirmFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const selectedNetwork = useNetworkSelector();
   const location = useLocation();
   const {
     unsignedTx, amount, fungibleToken, memo, recepientAddress,
@@ -59,7 +61,7 @@ function ConfirmFtTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network));
+  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -71,7 +73,7 @@ function ConfirmFtTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
+        dispatch(fetchStxWalletDataRequestAction(stxAddress, selectedNetwork, fiatCurrency, stxBtcRate));
       }, 1000);
     }
   }, [stxTxBroadcastData]);

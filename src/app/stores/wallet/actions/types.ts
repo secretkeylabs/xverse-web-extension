@@ -4,11 +4,12 @@ import {
   FeesMultipliers,
   FungibleToken,
   NetworkType,
-  SettingsNetwork,
   SupportedCurrency,
   TransactionData,
   Account,
   BaseWallet,
+  StacksNetwork,
+  SettingsNetwork,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 
@@ -67,6 +68,7 @@ export interface WalletState {
   coinsList: FungibleToken[] | null;
   coins: Coin[];
   feeMultipliers: FeesMultipliers | null;
+  networkAddress: string | undefined;
 }
 
 export interface SetWallet {
@@ -142,7 +144,7 @@ export interface FetchRatesFail {
 export interface FetchStxWalletDataRequest {
   type: typeof FetchStxWalletDataRequestKey;
   stxAddress: string;
-  network: SettingsNetwork;
+  network: StacksNetwork;
   fiatCurrency: string;
   stxBtcRate: BigNumber;
 }
@@ -181,7 +183,7 @@ export interface FetchBtcWalletDataFail {
 export interface FetchCoinDataRequest {
   type: typeof FetchCoinDataRequestKey;
   stxAddress: string;
-  network: SettingsNetwork;
+  network: StacksNetwork;
   fiatCurrency: string;
   coinsList: FungibleToken[] | null;
 }
@@ -208,6 +210,7 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
+  networkAddress: string;
 }
 
 export interface GetActiveAccounts {

@@ -58,7 +58,7 @@ function CoinSelectModal({
           icon={IconBitcoin}
           loading={loadingBtcData}
           underlayColor={theme.colors.background.elevation2}
-          margin={2}
+          margin={14}
           enlargeTicker
           onPress={handleOnBitcoinPress}
         />
@@ -69,7 +69,7 @@ function CoinSelectModal({
           icon={IconStacks}
           loading={loadingWalletData}
           underlayColor={theme.colors.background.elevation2}
-          margin={2}
+          margin={14}
           enlargeTicker
           onPress={handleOnStackPress}
         />
@@ -89,7 +89,7 @@ function CoinSelectModal({
             icon={IconStacks}
             loading={loadingWalletData}
             underlayColor={theme.colors.background.elevation2}
-            margin={2}
+            margin={14}
             enlargeTicker
             onPress={() => {
               onSelectCoin(coin);
