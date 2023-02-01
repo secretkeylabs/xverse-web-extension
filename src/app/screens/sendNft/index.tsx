@@ -234,7 +234,7 @@ function SendNft() {
             processing={isLoading}
             currencyType="NFT"
             disableAmountInput
-            error={error}
+            recepientError={error}
             recipient={address}
             onPressSend={onPressSendNFT}
           >

@@ -24,7 +24,9 @@ function SendFtScreen() {
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
-  const [error, setError] = useState('');
+  const [amountError, setAmountError] = useState('');
+  const [addressError, setAddressError] = useState('');
+  const [memoError, setMemoError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
   const [recepientAddress, setRecepientAddress] = useState('');
   const [txMemo, setTxMemo] = useState<string | undefined>(undefined);
@@ -104,26 +106,26 @@ function SendFtScreen() {
 
   function validateFields(associatedAddress: string, amount: string, memo: string): boolean {
     if (!associatedAddress) {
-      setError(t('ERRORS.ADDRESS_REQUIRED'));
+      setAddressError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
     }
 
     if (!amount) {
-      setError(t('ERRORS.AMOUNT_REQUIRED'));
+      setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
     if (!validateStxAddress({ stxAddress: associatedAddress, network: network.type })) {
-      setError(t('ERRORS.ADDRESS_INVALID'));
+      setAddressError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
 
     if (associatedAddress === stxAddress) {
-      setError(t('ERRORS.SEND_TO_SELF'));
+      setAddressError(t('ERRORS.SEND_TO_SELF'));
       return false;
     }
 
     if (Number(amount) <= 0) {
-      setError(t('ERRORS.INVALID_AMOUNT'));
+      setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
 
@@ -131,12 +133,12 @@ function SendFtScreen() {
       fungibleToken?.decimals
         && amount.split('.')[1]?.length > fungibleToken.decimals
     ) {
-      setError(t('ERRORS.INVALID_AMOUNT'));
+      setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
 
     if (fungibleToken?.decimals === 0 && amount.indexOf('.') !== -1) {
-      setError(t('ERRORS.INVALID_AMOUNT'));
+      setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
 
@@ -146,21 +148,21 @@ function SendFtScreen() {
 
     try {
       if (Number.isNaN(Number(amount))) {
-        setError(t('ERRORS.INVALID_AMOUNT'));
+        setAmountError(t('ERRORS.INVALID_AMOUNT'));
         return false;
       }
       if (Number(amount) > Number(ftBalance)) {
-        setError(t('ERRORS.INSUFFICIENT_BALANCE'));
+        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
         return false;
       }
     } catch (e) {
-      setError(t('ERRORS.INVALID_AMOUNT'));
+      setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
 
     if (memo) {
       if (Buffer.from(memo).byteLength >= 34) {
-        setError(t('ERRORS.MEMO_LENGTH'));
+        setMemoError(t('ERRORS.MEMO_LENGTH'));
         return false;
       }
     }
@@ -172,7 +174,9 @@ function SendFtScreen() {
     const modifyAmount = replaceCommaByDot(amount);
     const addMemo = memo ?? '';
     if (validateFields(associatedAddress.trim(), modifyAmount, memo!)) {
-      setError('');
+      setAddressError('');
+      setMemoError('');
+      setAmountError('');
       mutate({ amount, associatedAddress, memo: addMemo });
     }
   };
@@ -183,7 +187,9 @@ function SendFtScreen() {
       <SendForm
         processing={isLoading}
         currencyType="FT"
-        error={error}
+        amountError={amountError}
+        recepientError={addressError}
+        memoError={memoError}
         fungibleToken={fungibleToken}
         balance={getBalance()}
         onPressSend={onPressSendSTX}

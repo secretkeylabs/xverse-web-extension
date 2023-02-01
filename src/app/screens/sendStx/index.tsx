@@ -24,8 +24,10 @@ function SendStxScreen() {
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
+  const [amountError, setAmountError] = useState('');
+  const [addressError, setAddressError] = useState('');
+  const [memoError, setMemoError] = useState('');
   const selectedNetwork = useNetworkSelector();
-  const [error, setError] = useState('');
   const { data: stxPendingTxData } = useStxPendingTxData();
   const location = useLocation();
   let recipientAddress: string | undefined;
@@ -76,21 +78,21 @@ function SendStxScreen() {
 
   function validateFields(associatedAddress: string, amount: string, memo: string): boolean {
     if (!associatedAddress) {
-      setError(t('ERRORS.ADDRESS_REQUIRED'));
+      setAddressError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
     }
 
     if (!amount) {
-      setError(t('ERRORS.AMOUNT_REQUIRED'));
+      setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
     if (!validateStxAddress({ stxAddress: associatedAddress, network: network.type })) {
-      setError(t('ERRORS.ADDRESS_INVALID'));
+      setAddressError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
 
     if (associatedAddress === stxAddress) {
-      setError(t('ERRORS.SEND_TO_SELF'));
+      setAddressError(t('ERRORS.SEND_TO_SELF'));
       return false;
     }
 
@@ -99,27 +101,27 @@ function SendStxScreen() {
       if (!Number.isNaN(Number(amount))) {
         parsedAmount = new BigNumber(amount);
       } else {
-        setError(t('ERRORS.INVALID_AMOUNT'));
+        setAmountError(t('ERRORS.INVALID_AMOUNT'));
         return false;
       }
     } catch (e) {
-      setError(t('ERRORS.INVALID_AMOUNT'));
+      setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
 
     if (stxToMicrostacks(parsedAmount).lt(1)) {
-      setError(t('ERRORS.MINIMUM_AMOUNT'));
+      setAmountError(t('ERRORS.MINIMUM_AMOUNT'));
       return false;
     }
 
     if (stxToMicrostacks(parsedAmount).gt(stxAvailableBalance)) {
-      setError(t('ERRORS.INSUFFICIENT_BALANCE'));
+      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
       return false;
     }
 
     if (memo) {
       if (Buffer.from(memo).byteLength >= 34) {
-        setError(t('ERRORS.MEMO_LENGTH'));
+        setMemoError(t('ERRORS.MEMO_LENGTH'));
         return false;
       }
     }
@@ -130,7 +132,9 @@ function SendStxScreen() {
     const modifyAmount = replaceCommaByDot(amount);
     const addMemo = memo ?? '';
     if (validateFields(associatedAddress.trim(), modifyAmount, memo!)) {
-      setError('');
+      setAddressError('');
+      setMemoError('');
+      setAmountError('');
       mutate({ amount, associatedAddress, memo: addMemo });
     }
   };
@@ -141,7 +145,9 @@ function SendStxScreen() {
       <SendForm
         processing={isLoading}
         currencyType="STX"
-        error={error}
+        amountError={amountError}
+        recepientError={addressError}
+        memoError={memoError}
         balance={Number(microstacksToStx(new BigNumber(stxAvailableBalance)))}
         onPressSend={onPressSendSTX}
         recipient={recipientAddress!}
