@@ -55,6 +55,11 @@ const ErrorContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(3),
 }));
 
+const MemoContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(3),
+  marginBottom: props.theme.spacing(6),
+}));
+
 const ErrorText = styled.h1((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.feedback.error,
@@ -395,6 +400,9 @@ function SendForm({
                 </InputFieldContainer>
               </MemoInputContainer>
             </Container>
+            <MemoContainer>
+              <ErrorText>{memoError}</ErrorText>
+            </MemoContainer>
             <InfoContainer bodyText={t('MEMO_INFO')} />
           </>
           )}
