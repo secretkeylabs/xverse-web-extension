@@ -13,9 +13,10 @@ import { useSelector } from 'react-redux';
 import Info from '@assets/img/info.svg';
 import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
-import { useBNSResolver, useDebounce } from '@hooks/useBnsName';
+import { useBnsName, useBNSResolver, useDebounce } from '@hooks/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
+import useNetworkSelector from '@hooks/useNetwork';
 
 interface ContainerProps {
   error: boolean;
@@ -243,7 +244,9 @@ function SendForm({
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
+  const network = useNetworkSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
+  const associatedBnsName = useBnsName(recipientAddress, network);
   const associatedAddress = useBNSResolver(
     debouncedSearchTerm,
     stxAddress,
@@ -341,6 +344,12 @@ function SendForm({
           <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
           <AssociatedText>{associatedAddress}</AssociatedText>
         </>
+      )}
+      {associatedBnsName && currencyType !== 'BTC' && (
+      <>
+        <SubText>{t('ASSOCIATED_BNS_DOMAIN')}</SubText>
+        <AssociatedText>{associatedBnsName}</AssociatedText>
+      </>
       )}
     </Container>
   );

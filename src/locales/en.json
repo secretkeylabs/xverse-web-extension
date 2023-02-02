@@ -68,7 +68,8 @@
       "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
       "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
     },
-    "SEND_NFT": "Send NFT"
+    "SEND_NFT": "Send NFT",
+    "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Send",
