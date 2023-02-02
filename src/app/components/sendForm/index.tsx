@@ -17,6 +17,7 @@ import { useBnsName, useBNSResolver, useDebounce } from '@hooks/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
+import TokenImage from '@components/tokenImage';
 
 interface ContainerProps {
   error: boolean;
@@ -196,6 +197,13 @@ const ColumnContainer = styled.div((props) => ({
   flexDirection: 'column',
   marginLeft: props.theme.spacing(8),
 }));
+
+const TokenContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(8),
+}));
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
@@ -263,16 +271,6 @@ function SendForm({
     }
   }, [recepientError, associatedAddress]);
 
-  function getTokenIcon() {
-    if (currencyType === 'STX') {
-      return <TickerImage src={IconStacks} />;
-    }
-    if (currencyType === 'BTC') {
-      return <TickerImage src={IconBitcoin} />;
-    }
-    return null;
-  }
-
   function getTokenCurrency() {
     if (fungibleToken) {
       if (fungibleToken?.ticker) {
@@ -314,10 +312,7 @@ function SendForm({
         <InputFieldContainer>
           <InputField value={amount} placeholder="0" onChange={onInputChange} />
         </InputFieldContainer>
-        <TickerContainer>
-          <Text>{getTokenCurrency()}</Text>
-          {getTokenIcon()}
-        </TickerContainer>
+        <Text>{getTokenCurrency()}</Text>
       </AmountInputContainer>
       <SubText>{`~ $ ${fiatAmount} ${fiatCurrency}`}</SubText>
     </Container>
@@ -384,6 +379,13 @@ function SendForm({
   return (
     <>
       <ScrollContainer>
+        <TokenContainer>
+          <TokenImage
+            token={currencyType || undefined}
+            loading={false}
+            fungibleToken={fungibleToken || undefined}
+          />
+        </TokenContainer>
         <OuterContainer>
           {!disableAmountInput && renderEnterAmountSection}
           <ErrorContainer>
