@@ -379,6 +379,7 @@ function SendForm({
   return (
     <>
       <ScrollContainer>
+        {currencyType !== 'NFT' && (
         <TokenContainer>
           <TokenImage
             token={currencyType || undefined}
@@ -386,6 +387,7 @@ function SendForm({
             fungibleToken={fungibleToken || undefined}
           />
         </TokenContainer>
+        )}
         <OuterContainer>
           {!disableAmountInput && renderEnterAmountSection}
           <ErrorContainer>
