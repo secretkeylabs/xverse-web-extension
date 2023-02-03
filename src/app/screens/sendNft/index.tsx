@@ -53,10 +53,6 @@ const NFtContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const SendFormContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(5),
-}));
-
 const NftTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white['0'],
@@ -229,25 +225,23 @@ function SendNft() {
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />}
-        <SendFormContainer>
-          <SendForm
-            processing={isLoading}
-            currencyType="NFT"
-            disableAmountInput
-            recepientError={error}
-            recipient={address}
-            onPressSend={onPressSendNFT}
-          >
-            <Container>
-              <NFtContainer>
-                <NftImage
-                  metadata={nft?.token_metadata!}
-                />
-              </NFtContainer>
-              <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
-            </Container>
-          </SendForm>
-        </SendFormContainer>
+        <SendForm
+          processing={isLoading}
+          currencyType="NFT"
+          disableAmountInput
+          recepientError={error}
+          recipient={address}
+          onPressSend={onPressSendNFT}
+        >
+          <Container>
+            <NFtContainer>
+              <NftImage
+                metadata={nft?.token_metadata!}
+              />
+            </NFtContainer>
+            <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
+          </Container>
+        </SendForm>
         <BottomBarContainer>
           {!isGalleryOpen && <BottomBar tab="nft" />}
         </BottomBarContainer>
