@@ -6,15 +6,19 @@ import { TokenMetaData } from '@secretkeylabs/xverse-core/types/api/stacks/asset
 import { getFetchableUrl } from '@utils/helper';
 import NftPlaceholderImage from '@assets/img/nftDashboard/ic_nft_diamond.svg';
 
-const ImageContainer = styled.div({
+interface ContainerProps {
+  isGalleryOpen: boolean;
+}
+
+const ImageContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   width: '100%',
   flex: 1,
-  height: 156,
+  height: props.isGalleryOpen ? '100%' : 156,
   overflow: 'hidden',
-});
+}));
 
 const LoaderContainer = styled.div({
   display: 'flex',
@@ -37,9 +41,10 @@ interface Props {
 }
 
 function NftImage({ metadata }: Props) {
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   if (metadata?.image_protocol) {
     return (
-      <ImageContainer>
+      <ImageContainer isGalleryOpen={isGalleryOpen}>
         <Suspense>
           <StyledImg
             width="100%"
@@ -63,7 +68,7 @@ function NftImage({ metadata }: Props) {
   }
 
   return (
-    <ImageContainer>
+    <ImageContainer isGalleryOpen>
       <MoonLoader color="white" size={30} />
     </ImageContainer>
   );
