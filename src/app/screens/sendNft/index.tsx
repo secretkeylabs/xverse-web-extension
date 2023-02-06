@@ -242,7 +242,6 @@ function SendNft() {
             <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
           </Container>
         </SendForm>
-
         <BottomBarContainer>
           {!isGalleryOpen && <BottomBar tab="nft" />}
         </BottomBarContainer>
