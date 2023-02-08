@@ -44,7 +44,7 @@ const useWalletReducer = () => {
     try {
       const decrypted = await decryptSeedPhrase(encryptedSeed, password);
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
-      sendMessage({
+      await sendMessage({
         method: InternalMethods.ShareInMemoryKeyToBackground,
         payload: {
           secretKey: decrypted,
@@ -81,7 +81,7 @@ const useWalletReducer = () => {
       network: 'Mainnet',
     });
     const encryptSeed = await encryptSeedPhrase(seed, password);
-    sendMessage({
+    await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
         secretKey: wallet.seedPhrase,
@@ -101,7 +101,7 @@ const useWalletReducer = () => {
     };
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
-    sendMessage({
+    await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
         secretKey: wallet.seedPhrase,
