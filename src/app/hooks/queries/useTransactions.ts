@@ -10,7 +10,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { CurrencyTypes, PAGINATION_LIMIT } from '@utils/constants';
 import { getStxAddressTransactions } from '@utils/transactions/transactions';
-import useNetworkSelector from './useNetwork';
+import useNetworkSelector from '../useNetwork';
 
 export default function useTransactions(coinType: CurrencyTypes) {
   const {

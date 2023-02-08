@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
 import { CurrencyTypes } from '@utils/constants';
-import useTransactions from '@hooks/useTransactions';
+import useTransactions from '@hooks/queries/useTransactions';
 import { MoonLoader } from 'react-spinners';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@utils/date';

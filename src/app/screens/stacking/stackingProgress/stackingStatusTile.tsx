@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import TokenTicker from '@assets/img/stacking/token_ticker.svg';
 import { useTranslation } from 'react-i18next';
-import useStackingData from '@hooks/useStackingData';
+import useStackingData from '@hooks/queries/useStackingData';
 import { StackingState } from '@secretkeylabs/xverse-core/stacking';
 import { useEffect, useState } from 'react';
 import { XVERSE_WEB_POOL_URL } from '@utils/constants';

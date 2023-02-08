@@ -3,8 +3,8 @@ import { StacksNetwork, validateStxAddress } from '@secretkeylabs/xverse-core';
 import {
   fetchAddressOfBnsName, getBnsName,
 } from '@secretkeylabs/xverse-core/api';
-import useWalletSelector from './useWalletSelector';
-import useNetworkSelector from './useNetwork';
+import useWalletSelector from '../useWalletSelector';
+import useNetworkSelector from '../useNetwork';
 
 export const useBnsName = (walletAddress: string, network: StacksNetwork) => {
   const [bnsName, setBnsName] = useState('');
