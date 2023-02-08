@@ -1,17 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { broadcastRawBtcTransaction } from '@secretkeylabs/xverse-core/api';
 import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
-import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import Seperator from '@components/seperator';
-import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import RecipientAddressView from '@components/recipinetAddressView';
 import ConfirmBtcTransactionComponent from '@screens/confrimBtcTransaction/confirmBtcTransactionComponent';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -35,15 +34,12 @@ const ValueText = styled.h1((props) => ({
 function ConfirmBtcTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const {
-    network, btcAddress, stxBtcRate, btcFiatRate,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { network } = useWalletSelector();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
+  const { refetch } = useBtcWalletData();
   const { fee, amount, signedTxHex } = location.state;
+
   const {
     isLoading,
     error: txError,
@@ -67,7 +63,7 @@ function ConfirmBtcTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
+        refetch();
       }, 1000);
     }
   }, [btcTxBroadcastData]);

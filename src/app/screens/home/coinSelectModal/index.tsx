@@ -5,8 +5,6 @@ import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
-import { useSelector } from 'react-redux';
-import { StoreState } from '@stores/index';
 
 const Container = styled.div((props) => ({
   marginTop: props.theme.spacing(6),
@@ -21,6 +19,7 @@ interface Props {
   onSelectStacks: () => void;
   onSelectCoin: (coin: FungibleToken) => void;
   onClose: () => void;
+  loadingWalletData: boolean;
 }
 
 function CoinSelectModal({
@@ -31,12 +30,9 @@ function CoinSelectModal({
   onSelectStacks,
   onSelectCoin,
   onClose,
+  loadingWalletData,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const {
-    loadingWalletData,
-    loadingBtcData,
-  } = useSelector((state: StoreState) => state.walletState);
   const theme = useTheme();
 
   const handleOnBitcoinPress = () => {
@@ -56,7 +52,7 @@ function CoinSelectModal({
           title={t('BITCOIN')}
           currency="BTC"
           icon={IconBitcoin}
-          loading={loadingBtcData}
+          loading={loadingWalletData}
           underlayColor={theme.colors.background.elevation2}
           margin={14}
           enlargeTicker

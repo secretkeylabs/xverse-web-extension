@@ -3,23 +3,22 @@ import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
 import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
 import { addressToString, broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import Seperator from '@components/seperator';
-import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
-import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
 import AccountHeaderComponent from '@components/accountHeader';
 import finalizeTxSignature from '@components/transactionsRequests/utils';
-import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import InfoContainer from '@components/infoContainer';
+import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useNetworkSelector from '@hooks/useNetwork';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useWalletSelector from '@hooks/useWalletSelector';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const Container = styled.div((props) => ({
@@ -57,7 +56,6 @@ function ConfirmStxTransaction() {
   const [txRaw, setTxRaw] = useState('');
   const [memo, setMemo] = useState('');
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
   const {
@@ -68,10 +66,11 @@ function ConfirmStxTransaction() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
   const {
-    stxBtcRate, btcFiatRate, network, stxAddress, fiatCurrency,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+    stxBtcRate, btcFiatRate, network,
+  } = useWalletSelector();
+  const {
+    refetch,
+  } = useStxWalletData();
   const {
     isLoading,
     error: txError,
@@ -96,7 +95,7 @@ function ConfirmStxTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchStxWalletDataRequestAction(stxAddress, selectedNetwork, fiatCurrency, stxBtcRate));
+        refetch();
       }, 1000);
     }
   }, [stxTxBroadcastData]);

@@ -190,7 +190,6 @@ export default function CoinHeader(props: CoinBalanceProps) {
     btcFiatRate,
     stxLockedBalance,
     stxAvailableBalance,
-    loadingWalletData,
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
@@ -292,7 +291,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   );
 
   const renderStackingBalances = () => {
-    if (!loadingWalletData && !new BigNumber(stxLockedBalance).eq(0, 10) && coin === 'STX') {
+    if (stxLockedBalance && !new BigNumber(stxLockedBalance).eq(0, 10) && coin === 'STX') {
       return (
         <>
           <HeaderSeparator />
