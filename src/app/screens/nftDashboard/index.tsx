@@ -50,6 +50,13 @@ const ShareDialogeContainer = styled.div({
   zIndex: 2000,
 });
 
+const ReciveNftContainer = styled.div({
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  zIndex: 2000,
+});
+
 const CollectibleContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
   marginBottom: props.theme.spacing(12),
@@ -207,7 +214,7 @@ function NftDashboard() {
   const nfts = data?.pages.map((page) => page.nftsList).flat();
   const totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
 
-  const isGalleryOpen: boolean = false;
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const onLoadMoreButtonClick = () => {
     fetchNextPage();
   };
@@ -265,11 +272,7 @@ function NftDashboard() {
     setShowNftOptions(false);
   };
 
-  const onReceivePress = () => {
-    navigate('/receive/STX');
-  };
-
-  return (
+  return(
     <>
       <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
@@ -282,7 +285,6 @@ function NftDashboard() {
           )
             : <CollectiblesValueText>{`${totalNfts} ${t('ITEMS')}`}</CollectiblesValueText>}
           {!isGalleryOpen && (
-
             <WebGalleryButton onClick={openInGalleryView}>
               <>
                 <ButtonImage src={SquaresFour} />
@@ -296,6 +298,7 @@ function NftDashboard() {
           <ReceiveButtonContainer>
             <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ReceiveButtonContainer>
+          {isGalleryOpen ?<ReciveNftContainer>{openReceiveModal && }</ReciveNftContainer>:<ReceiveNftModal visible={openReceiveModal} onClose={onReceiveModalClose} />}
           <ShareButtonContainer>
             <ActionButton
               src={ShareNetwork}
@@ -313,7 +316,7 @@ function NftDashboard() {
             <MoonLoader color="white" size={30} />
           </LoaderContainer>
         ) : nftListView}
-        <ReceiveNftModal visible={openReceiveModal} onClose={onReceiveModalClose} />
+
       </Container>
 
       {!isGalleryOpen && (
