@@ -14,12 +14,12 @@ import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connec
 import { useEffect, useState } from 'react';
 import Seperator from '@components/seperator';
 import { bytesToHex } from '@stacks/transactions';
-import { hashMessage } from '@stacks/encryption';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
+import { hashMessage } from '@secretkeylabs/xverse-core';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
