@@ -225,7 +225,10 @@
     "TWITTER": "Share on Twitter",
     "MAIL": "Share by Mail",
     "COPY": "Copy link",
-    "NFT_DETAIL": "Item detail"
+    "NFT_DETAIL": "Item detail",
+    "RECEIVE_NFT": "Receive NFT",
+    "STACKS_NFT": "Stacks NFT",
+    "ORDINALS": "Ordinals"
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",

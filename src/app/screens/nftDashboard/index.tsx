@@ -17,6 +17,7 @@ import ShareDialog from '@components/shareNft';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';
 import Nft from './nft';
+import ReceiveNftModal from './receiveNft';
 
 const Container = styled.div`
   display: flex;
@@ -177,6 +178,7 @@ function NftDashboard() {
   const selectedNetwork = useNetworkSelector();
   const { stxAddress } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
+  const [openReceiveModal, setOpenReceiveModal] = useState(false);
 
   function fetchNfts({ pageParam = 0 }) {
     return getNfts(stxAddress, selectedNetwork, pageParam);
@@ -205,7 +207,7 @@ function NftDashboard() {
   const nfts = data?.pages.map((page) => page.nftsList).flat();
   const totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
 
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const isGalleryOpen: boolean = false;
   const onLoadMoreButtonClick = () => {
     fetchNextPage();
   };
@@ -214,6 +216,14 @@ function NftDashboard() {
     await chrome.tabs.create({
       url: chrome.runtime.getURL('options.html#/nft-dashboard'),
     });
+  };
+
+  const onReceiveModalOpen = () => {
+    setOpenReceiveModal(true);
+  };
+
+  const onReceiveModalClose = () => {
+    setOpenReceiveModal(false);
   };
 
   const nftListView = (
@@ -284,7 +294,7 @@ function NftDashboard() {
         </CollectibleContainer>
         <ButtonContainer>
           <ReceiveButtonContainer>
-            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
+            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ReceiveButtonContainer>
           <ShareButtonContainer>
             <ActionButton
@@ -303,6 +313,7 @@ function NftDashboard() {
             <MoonLoader color="white" size={30} />
           </LoaderContainer>
         ) : nftListView}
+        <ReceiveNftModal visible={openReceiveModal} onClose={onReceiveModalClose} />
       </Container>
 
       {!isGalleryOpen && (

@@ -59,6 +59,15 @@ export function getTruncatedAddress(address: string) {
   }
 }
 
+export function getShortTruncatedAddress(address: string) {
+  if (address) {
+    return `${address.substring(0, 8)}...${address.substring(
+      address.length - 8,
+      address.length,
+    )}`;
+  }
+}
+
 export function getAddressDetail(account: Account) {
   if (account) {
     return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(account.stxAddress)}`;
