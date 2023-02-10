@@ -12,7 +12,7 @@ import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
-import { SignedBtcTxResponse } from '@secretkeylabs/xverse-core/transactions/btc';
+import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
 
 function SendBtcScreen() {
@@ -44,21 +44,18 @@ function SendBtcScreen() {
     error: txError,
     mutate,
   } = useMutation<
-  SignedBtcTxResponse,
+  SignedBtcTx,
   ResponseError,
   {
-    address: string;
-    amountToSend: string;
+    recipients: Recipient[];
   }
-  >(async ({ address, amountToSend }) => signBtcTransaction({
-    recipientAddress: address,
+  >(async ({ recipients }) => signBtcTransaction(
+    recipients,
     btcAddress,
-    amount: amountToSend,
-    index: selectedAccount?.id ?? 0,
-    fee: undefined,
+    selectedAccount?.id ?? 0,
     seedPhrase,
-    network: network.type,
-  }));
+    network.type,
+  ));
 
   const handleBackButtonClick = () => {
     navigate('/');
@@ -147,7 +144,13 @@ function SendBtcScreen() {
   const handleNextClick = async (address: string, amountToSend: string) => {
     setRecipientAddress(address);
     setAmount(amountToSend);
-    if (validateFields(address, amountToSend)) { mutate({ address, amountToSend }); }
+    const recipients: Recipient[] = [
+      {
+        address,
+        amountSats: btcToSats(new BigNumber(amountToSend)),
+      },
+    ];
+    if (validateFields(address, amountToSend)) { mutate({ recipients }); }
   };
 
   function getBalance() {
