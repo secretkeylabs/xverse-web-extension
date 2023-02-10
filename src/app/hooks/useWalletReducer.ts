@@ -21,7 +21,9 @@ import { decryptSeedPhrase, encryptSeedPhrase } from '@utils/encryptionUtils';
 import { InternalMethods } from 'content-scripts/message-types';
 import { sendMessage } from 'content-scripts/messages';
 import { useSelector, useDispatch } from 'react-redux';
-import useNetworkSelector from './useNetwork';
+import useNetworkSelector from '@hooks/useNetwork';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 
 const useWalletReducer = () => {
   const {
@@ -33,6 +35,8 @@ const useWalletReducer = () => {
   );
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
+  const { refetch: refetchStxData } = useStxWalletData();
+  const { refetch: refetchBtcData } = useBtcWalletData();
 
   const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, currentNetworkObject: StacksNetwork, currentAccounts: Account[]) => {
     const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, currentNetworkObject, currentAccounts);
@@ -147,6 +151,8 @@ const useWalletReducer = () => {
     });
     dispatch(setWalletAction(wallet));
     await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, { ...wallet, id: 0 });
+    await refetchStxData();
+    await refetchBtcData();
   };
 
   return {
