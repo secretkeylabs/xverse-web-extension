@@ -92,6 +92,7 @@ function Receive(): JSX.Element {
   const {
     stxAddress,
     btcAddress,
+    ordinalsAddress,
     selectedAccount,
   } = useWalletSelector();
 
@@ -105,6 +106,8 @@ function Receive(): JSX.Element {
         return btcAddress;
       case 'FT':
         return stxAddress;
+      case 'ORD':
+        return ordinalsAddress;
       default:
         return '';
     }

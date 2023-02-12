@@ -32,6 +32,7 @@ const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',
   masterPubKey: '',
+  ordinalsAddress: '',
   stxPublicKey: '',
   btcPublicKey: '',
   network: {
@@ -91,6 +92,7 @@ const walletReducer = (
         selectedAccount: action.selectedAccount,
         stxAddress: action.stxAddress,
         btcAddress: action.btcAddress,
+        ordinalsAddress: action.ordinalsAddress,
         masterPubKey: action.masterPubKey,
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,
