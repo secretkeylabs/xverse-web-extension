@@ -43,6 +43,7 @@ const ColumnContainer = styled.div({
 const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
+  justifyContent: 'flex-end',
   flex: 2,
 });
 

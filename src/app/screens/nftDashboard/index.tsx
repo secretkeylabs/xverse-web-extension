@@ -50,12 +50,14 @@ const ShareDialogeContainer = styled.div({
   zIndex: 2000,
 });
 
-const ReciveNftContainer = styled.div({
+const ReciveNftContainer = styled.div((props) => ({
   position: 'absolute',
   top: 0,
   right: 0,
   zIndex: 2000,
-});
+  background: props.theme.colors.background.elevation2,
+  borderRadius: 16,
+}));
 
 const CollectibleContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
@@ -181,7 +183,6 @@ const BarLoaderContainer = styled.div((props) => ({
 
 function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
-  const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const { stxAddress } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
@@ -272,7 +273,7 @@ function NftDashboard() {
     setShowNftOptions(false);
   };
 
-  return(
+  return (
     <>
       <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
@@ -298,7 +299,7 @@ function NftDashboard() {
           <ReceiveButtonContainer>
             <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ReceiveButtonContainer>
-          {isGalleryOpen ?<ReciveNftContainer>{openReceiveModal && }</ReciveNftContainer>:<ReceiveNftModal visible={openReceiveModal} onClose={onReceiveModalClose} />}
+          {openReceiveModal && <ReciveNftContainer><ReceiveNftModal visible={openReceiveModal} isGalleryOpen={isGalleryOpen} onClose={onReceiveModalClose} /></ReciveNftContainer>}
           <ShareButtonContainer>
             <ActionButton
               src={ShareNetwork}

@@ -81,10 +81,10 @@ function Nft({ asset }: Props) {
   };
   const showNftImg = isGalleryOpen ? (
     <NftImageContainer>
-      <NftImage metadata={asset?.data?.token_metadata!} />
+      <NftImage isNftDashboard metadata={asset?.data?.token_metadata!} />
     </NftImageContainer>
   ) : (
-    <NftImage metadata={asset?.data?.token_metadata!} />
+    <NftImage isNftDashboard metadata={asset?.data?.token_metadata!} />
   );
 
   return (
