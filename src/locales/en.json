@@ -217,7 +217,7 @@
     "NO_COLLECTIBLES": "No collectibles yet",
     "LOAD_MORE": "Load more",
     "ITEMS": "items",
-    "WEB_GALLERY": "Open web gallery",
+    "WEB_GALLERY": "Open gallery",
     "RECEIVE": "Receive",
     "SEND": "Send",
     "SHARE": "Share collection",
@@ -233,7 +233,7 @@
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",
-    "WEB_GALLERY": "Open web gallery",
+    "WEB_GALLERY": "Open gallery",
     "SEND": "Send",
     "SHARE": "Share",
     "OWNED_BY": "Owned by",

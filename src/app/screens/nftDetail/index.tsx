@@ -159,7 +159,7 @@ interface ButtonProps {
 }
 const ShareButtonContainer = styled.div<ButtonProps>((props) => ({
   marginLeft: props.theme.spacing(3),
-  width: props.isOrdinal ? 182 : '100%',
+  width: '100%',
 }));
 
 const DescriptionContainer = styled.h1((props) => ({
@@ -381,12 +381,11 @@ function NftDetailScreen() {
           </>
         </WebGalleryButton>
       </ExtensionContainer>
+      { !isOrdinal && (
       <ButtonContainer>
-        { !isOrdinal && (
         <ReceiveButtonContainer>
           <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
         </ReceiveButtonContainer>
-        )}
         <ShareButtonContainer>
           <ActionButton
             src={ShareNetwork}
@@ -399,6 +398,7 @@ function NftDetailScreen() {
           {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`} onCrossClick={onCrossPress} />}
         </ShareDialogeContainer>
       </ButtonContainer>
+      )}
     </>
   );
 
@@ -417,14 +417,12 @@ function NftDetailScreen() {
         </Button>
       </BackButtonContainer>
       <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
+      {!isOrdinal && (
       <ButtonContainer>
-        {!isOrdinal && (
         <ReceiveButtonContainer>
           <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
         </ReceiveButtonContainer>
-        )}
-
-        <ShareButtonContainer isOrdinal={isOrdinal}>
+        <ShareButtonContainer>
           <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />
         </ShareButtonContainer>
         <GalleryShareDialogeContainer>
@@ -436,6 +434,7 @@ function NftDetailScreen() {
           )}
         </GalleryShareDialogeContainer>
       </ButtonContainer>
+      )}
       <RowContainer>
         <NFtContainer>
           <NftImage metadata={nft?.token_metadata!} />
