@@ -10,10 +10,10 @@ import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { useMutation } from '@tanstack/react-query';
-import { SignedBtcTxResponse } from '@secretkeylabs/xverse-core/transactions/btc';
+import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import TransferAmountView from '@components/transferAmountView';
 import TransferFeeView from '@components/transferFeeView';
-import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
+import { btcToSats, ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -108,23 +108,21 @@ function ConfirmBtcTransactionComponent({
   const {
     isLoading, data, error: txError, mutate,
   } = useMutation<
-  SignedBtcTxResponse,
+  SignedBtcTx,
   ResponseError,
   {
-    address: string;
-    amountToSend: string;
+    recipients: Recipient[];
     txFee: string;
   }
   >(
-    async ({ address, amountToSend, txFee }) => signBtcTransaction({
-      recipientAddress: address,
+    async ({ recipients, txFee }) => signBtcTransaction(
+      recipients,
       btcAddress,
-      amount: amountToSend,
-      index: selectedAccount?.id ?? 0,
-      fee: new BigNumber(txFee),
+      selectedAccount?.id ?? 0,
       seedPhrase,
-      network: network.type,
-    }),
+      network.type,
+      new BigNumber(txFee),
+    ),
   );
 
   useEffect(() => {
@@ -145,7 +143,13 @@ function ConfirmBtcTransactionComponent({
   const onApplyClick = (modifiedFee: string) => {
     setOpenTransactionSettingModal(false);
     setCurrentFee(new BigNumber(modifiedFee));
-    mutate({ address: recipientAddress, amountToSend: amount.toString(), txFee: modifiedFee });
+    const recipients: Recipient[] = [
+      {
+        address: recipientAddress,
+        amountSats: btcToSats(new BigNumber(amount)),
+      },
+    ];
+    mutate({ recipients, txFee: modifiedFee });
   };
 
   const handleOnConfirmClick = () => {
