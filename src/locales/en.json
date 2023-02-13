@@ -228,7 +228,8 @@
     "NFT_DETAIL": "Item detail",
     "RECEIVE_NFT": "Receive NFT",
     "STACKS_NFT": "Stacks NFT",
-    "ORDINALS": "Ordinals"
+    "ORDINALS": "Ordinals",
+    "ORDINAL": "Ordinal"
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",
@@ -249,7 +250,7 @@
     "DETAILS": "See detail on",
     "GAMMA": "Gamma.io",
     "MOVE_TO_ASSET_DETAIL": "Back to gallery",
-    "ORDINALS": "Ordinals"
+    "ORDINALS": "Ordinal"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",

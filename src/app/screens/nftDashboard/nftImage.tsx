@@ -38,7 +38,7 @@ const OrdinalsTag = styled.div({
   width: 79,
   height: 22,
   left: 10,
-  bottom: 20,
+  bottom: 10,
   zIndex: 1000,
   position: 'absolute',
   padding: '3px 6px',
@@ -96,7 +96,7 @@ function NftImage({ metadata, isNftDashboard = false }: Props) {
         {isOrdinal && isNftDashboard && (
         <OrdinalsTag>
           <ButtonIcon src={OrdinalsIcon} />
-          <Text>{t('ORDINALS')}</Text>
+          <Text>{t('ORDINAL')}</Text>
         </OrdinalsTag>
         )}
       </ImageContainer>
