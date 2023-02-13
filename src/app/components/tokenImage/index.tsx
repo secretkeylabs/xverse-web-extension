@@ -27,8 +27,8 @@ const TickerIconContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: 32,
-  width: 32,
+  height: 44,
+  width: 44,
   marginRight: props.theme.spacing(3),
   borderRadius: props.theme.radius(2),
   backgroundColor: props.color,
@@ -39,7 +39,7 @@ const TickerIconText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
   textAlign: 'center',
   wordBreak: 'break-all',
-  fontSize: 10,
+  fontSize: 13,
 }));
 
 export default function TokenImage(props: TokenImageProps) {
