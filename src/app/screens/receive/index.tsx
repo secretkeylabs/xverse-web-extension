@@ -116,13 +116,23 @@ function Receive(): JSX.Element {
     navigate(-1);
   };
 
-  const renderHeading = () => (currency === 'BTC' || currency === 'ORD' ? (
-    <TopTitleText>
-      {t('BTC_ADDRESS')}
-    </TopTitleText>
-  ) : (
-    <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>
-  ));
+  const renderHeading = () => {
+    if (currency === 'BTC') {
+      return (
+        <TopTitleText>
+          {t('BTC_ADDRESS')}
+        </TopTitleText>
+      );
+    }
+    if (currency === 'ORD') {
+      return (
+        <TopTitleText>
+          {t('TAPROOT_ADDRESS')}
+        </TopTitleText>
+      );
+    }
+    return <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>;
+  };
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
