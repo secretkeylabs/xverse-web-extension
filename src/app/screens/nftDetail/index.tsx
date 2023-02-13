@@ -267,7 +267,7 @@ const Text = styled.h1((props) => ({
 function NftDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress, btcAddress } = useWalletSelector();
+  const { stxAddress, ordinalsAddress } = useWalletSelector();
   const { id } = useParams();
   const nftIdDetails = id!.split('::');
   const { nftData } = useNftDataSelector();
@@ -288,7 +288,7 @@ function NftDetailScreen() {
   const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   // check for ordianls
-  const isOrdinal = false;
+  const isOrdinal = true;
   useEffect(() => {
     const data = nftData.find(
       (nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)),
@@ -355,9 +355,9 @@ function NftDetailScreen() {
       <NftOwnedByText>{t('OWNED_BY')}</NftOwnedByText>
       <OwnerAddressText>
         {isOrdinal
-          ? `${btcAddress.substring(0, 4)}...${btcAddress.substring(
-            btcAddress.length - 4,
-            btcAddress.length,
+          ? `${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+            ordinalsAddress.length - 4,
+            ordinalsAddress.length,
           )}`
           : `${stxAddress.substring(0, 4)}...${stxAddress.substring(
             stxAddress.length - 4,

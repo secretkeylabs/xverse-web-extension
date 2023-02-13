@@ -42,13 +42,13 @@ const Text = styled.h1((props) => ({
 function ReceiveNftModal({ visible, onClose, isGalleryOpen }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress, btcAddress } = useWalletSelector();
+  const { stxAddress, ordinalsAddress } = useWalletSelector();
   const onReceivePress = () => {
     navigate('/receive/STX');
   };
 
   const onOrdinalsReceivePress = () => {
-    navigate('/receive/BTC');
+    navigate('/receive/ORD');
   };
 
   const receiveContent = (
@@ -56,7 +56,7 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen }: Props) {
       <ReceiveCardComponent
         icon={OrdinalsIcon}
         title={t('ORDINALS')}
-        address={btcAddress}
+        address={ordinalsAddress}
         onQrAddressClick={onOrdinalsReceivePress}
       />
       <ReceiveCardComponent

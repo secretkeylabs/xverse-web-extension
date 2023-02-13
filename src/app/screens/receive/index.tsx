@@ -116,7 +116,7 @@ function Receive(): JSX.Element {
     navigate(-1);
   };
 
-  const renderHeading = () => (currency === 'BTC' ? (
+  const renderHeading = () => (currency === 'BTC' || currency === 'ORD' ? (
     <TopTitleText>
       {t('BTC_ADDRESS')}
     </TopTitleText>
@@ -134,12 +134,12 @@ function Receive(): JSX.Element {
       <OuterContainer>
         <Container>
           {renderHeading()}
-          {currency !== 'BTC' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
+          {currency !== 'BTC' && currency !== 'ORD' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
           <QRCodeContainer>
             <QRCode value={getAddress()} size={150} />
           </QRCodeContainer>
 
-          {currency !== 'BTC' && !!selectedAccount?.bnsName && (
+          {currency !== 'BTC' && currency !== 'ORD' && !!selectedAccount?.bnsName && (
           <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
           )}
           <InfoContainer>
