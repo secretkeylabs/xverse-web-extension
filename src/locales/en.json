@@ -250,7 +250,10 @@
     "DETAILS": "See detail on",
     "GAMMA": "Gamma.io",
     "MOVE_TO_ASSET_DETAIL": "Back to gallery",
-    "ORDINALS": "Ordinal"
+    "ORDINALS": "Ordinal",
+    "ORDINAL_SEND_TITLE": "Transfers are coming soon!",
+    "ORDINAL_SEND_DESCRIPTION": "We are working hard to enable transfers for Ordinals."
+ 
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",

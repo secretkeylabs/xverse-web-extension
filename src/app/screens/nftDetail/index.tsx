@@ -24,23 +24,28 @@ import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
 import { MoonLoader } from 'react-spinners';
 import AccountHeaderComponent from '@components/accountHeader';
+import AlertMessage from '@components/AlertMessage';
 import NftAttribute from './nftAttribute';
 import DescriptionTile from './descriptionTile';
 
 const Container = styled.div`
-display: flex;
-flex-direction: column;
-flex: 1;
-overflow-y: auto;
-margin-left: 5%;
-margin-right: 5%;
-&::-webkit-scrollbar {
-  display: none;
-}`;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  margin-left: 5%;
+  margin-right: 5%;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
-const ReceiveButtonContainer = styled.div((props) => ({
+interface ButtonProps {
+  isOrdinal?: boolean;
+}
+const SendButtonContainer = styled.div<ButtonProps>((props) => ({
   marginRight: props.theme.spacing(3),
-  width: '100%',
+  width: props.isOrdinal ? 182 : '100%',
 }));
 
 const BackButtonContainer = styled.div((props) => ({
@@ -154,10 +159,7 @@ const GridContainer = styled.div((props) => ({
   borderBottom: `1px solid ${props.theme.colors.background.elevation2}`,
 }));
 
-interface ButtonProps {
-  isOrdinal?: boolean;
-}
-const ShareButtonContainer = styled.div<ButtonProps>((props) => ({
+const ShareButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(3),
   width: '100%',
 }));
@@ -193,7 +195,6 @@ const WebGalleryButtonText = styled.div((props) => ({
   fontWeight: 700,
   color: props.theme.colors.white['200'],
   textAlign: 'center',
-
 }));
 
 const ButtonImage = styled.img((props) => ({
@@ -276,24 +277,22 @@ function NftDetailScreen() {
     isLoading,
     data: nftDetailsData,
     mutate,
-  } = useMutation<
-  NftDetailResponse | undefined,
-  Error,
-  { principal: string }>(async ({ principal }) => {
-    const contractInfo: string[] = principal.split('.');
-    return getNftDetail(
-      nftIdDetails[2].replace('u', ''),
-      contractInfo[0],
-      contractInfo[1],
-    );
-  });
+  } = useMutation<NftDetailResponse | undefined, Error, { principal: string }>(
+    async ({ principal }) => {
+      const contractInfo: string[] = principal.split('.');
+      return getNftDetail(nftIdDetails[2].replace('u', ''), contractInfo[0], contractInfo[1]);
+    },
+  );
 
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
+  const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   // check for ordianls
   const isOrdinal = false;
   useEffect(() => {
-    const data = nftData.find((nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)));
+    const data = nftData.find(
+      (nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)),
+    );
     if (!data) {
       mutate({ principal: nftIdDetails[0] });
     } else {
@@ -314,6 +313,10 @@ function NftDetailScreen() {
 
   const onSharePress = () => {
     setShowNftOptions(true);
+  };
+
+  const onCloseAlert = () => {
+    setshowSendOridnalsAlert(false);
   };
 
   const onCrossPress = () => {
@@ -343,23 +346,29 @@ function NftDetailScreen() {
     });
   };
 
+  const showAlert = () => {
+    setshowSendOridnalsAlert(true);
+  };
+
   const ownedByView = (
     <RowContainer>
       <NftOwnedByText>{t('OWNED_BY')}</NftOwnedByText>
       <OwnerAddressText>
-        { isOrdinal ? `${btcAddress.substring(0, 4)}...${btcAddress.substring(
-          btcAddress.length - 4,
-          btcAddress.length,
-        )}` : `${stxAddress.substring(0, 4)}...${stxAddress.substring(
-          stxAddress.length - 4,
-          stxAddress.length,
-        )}`}
+        {isOrdinal
+          ? `${btcAddress.substring(0, 4)}...${btcAddress.substring(
+            btcAddress.length - 4,
+            btcAddress.length,
+          )}`
+          : `${stxAddress.substring(0, 4)}...${stxAddress.substring(
+            stxAddress.length - 4,
+            stxAddress.length,
+          )}`}
       </OwnerAddressText>
       {isOrdinal && (
-      <OrdinalsTag>
-        <ButtonIcon src={OrdinalsIcon} />
-        <Text>{t('ORDINALS')}</Text>
-      </OrdinalsTag>
+        <OrdinalsTag>
+          <ButtonIcon src={OrdinalsIcon} />
+          <Text>{t('ORDINALS')}</Text>
+        </OrdinalsTag>
       )}
     </RowContainer>
   );
@@ -368,9 +377,7 @@ function NftDetailScreen() {
     <>
       <ExtensionContainer>
         <ExtensionNFtContainer>
-          <NftImage
-            metadata={nft?.token_metadata!}
-          />
+          <NftImage metadata={nft?.token_metadata!} />
         </ExtensionNFtContainer>
         <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
         {ownedByView}
@@ -381,24 +388,35 @@ function NftDetailScreen() {
           </>
         </WebGalleryButton>
       </ExtensionContainer>
-      { !isOrdinal && (
       <ButtonContainer>
-        <ReceiveButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
-        </ReceiveButtonContainer>
-        <ShareButtonContainer>
+        <SendButtonContainer>
           <ActionButton
-            src={ShareNetwork}
-            text={t('SHARE')}
-            onPress={onSharePress}
-            transparent
+            src={ArrowUpRight}
+            text={t('SEND')}
+            onPress={isOrdinal ? showAlert : handleOnSendClick}
           />
-        </ShareButtonContainer>
-        <ShareDialogeContainer>
-          {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`} onCrossClick={onCrossPress} />}
-        </ShareDialogeContainer>
+        </SendButtonContainer>
+        {!isOrdinal && (
+          <>
+            <ShareButtonContainer>
+              <ActionButton
+                src={ShareNetwork}
+                text={t('SHARE')}
+                onPress={onSharePress}
+                transparent
+              />
+            </ShareButtonContainer>
+            <ShareDialogeContainer>
+              {showShareNftOptions && (
+                <ShareDialog
+                  url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`}
+                  onCrossClick={onCrossPress}
+                />
+              )}
+            </ShareDialogeContainer>
+          </>
+        )}
       </ButtonContainer>
-      )}
     </>
   );
 
@@ -417,14 +435,25 @@ function NftDetailScreen() {
         </Button>
       </BackButtonContainer>
       <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
-      {!isOrdinal && (
       <ButtonContainer>
-        <ReceiveButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
-        </ReceiveButtonContainer>
+        <SendButtonContainer isOrdinal={isOrdinal}>
+          <ActionButton
+            src={ArrowUpRight}
+            text={t('SEND')}
+            onPress={isOrdinal ? showAlert : handleOnSendClick}
+          />
+        </SendButtonContainer>
+
+        {!isOrdinal && (
         <ShareButtonContainer>
-          <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />
+          <ActionButton
+            src={ShareNetwork}
+            text={t('SHARE')}
+            onPress={onSharePress}
+            transparent
+          />
         </ShareButtonContainer>
+        )}
         <GalleryShareDialogeContainer>
           {showShareNftOptions && (
           <ShareDialog
@@ -434,11 +463,10 @@ function NftDetailScreen() {
           )}
         </GalleryShareDialogeContainer>
       </ButtonContainer>
-      )}
       <RowContainer>
         <NFtContainer>
           <NftImage metadata={nft?.token_metadata!} />
-          { isOrdinal && ownedByView}
+          {isOrdinal && ownedByView}
         </NFtContainer>
         <DescriptionContainer>
           <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
@@ -477,17 +505,25 @@ function NftDetailScreen() {
     <>
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      ) : <TopRow title={t('NFT_DETAIL')} onClick={handleBackButtonClick} />}
+      ) : (
+        <TopRow title={t('NFT_DETAIL')} onClick={handleBackButtonClick} />
+      )}
       <Container>
+        {showSendOridnalsAlert && (
+          <AlertMessage
+            title={t('ORDINAL_SEND_TITLE')}
+            onClose={onCloseAlert}
+            description={t('ORDINAL_SEND_DESCRIPTION')}
+          />
+        )}
         {isGalleryOpen ? galleryView : extensionView}
       </Container>
       {!isGalleryOpen && (
-      <BottomBarContainer>
-        <BottomTabBar tab="nft" />
-      </BottomBarContainer>
+        <BottomBarContainer>
+          <BottomTabBar tab="nft" />
+        </BottomBarContainer>
       )}
     </>
-
   );
 }
 
