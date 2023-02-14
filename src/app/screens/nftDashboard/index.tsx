@@ -214,12 +214,15 @@ function NftDashboard() {
 
   useEffect(() => {
     refetch();
-  }, [stxAddress]);
+  }, [stxAddress, ordinalsAddress]);
 
   const nfts = data?.pages.map((page) => page.nftsList).flat();
   const ordinals = data?.pages.map((page) => page.ordinals).flat();
   const ordinalsLength = ordinals?.length;
-  const totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
+  let totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
+  if (hasActivatedOrdinalsKey) {
+    totalNfts = ordinalsLength + totalNfts;
+  }
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   useEffect(() => {
@@ -296,7 +299,7 @@ function NftDashboard() {
   };
 
   const onActivateOrdinalsAlertActivatePress = () => {
-    setShowActivateOrdinalsAlert(false);
+    setShowActivateOrdinalsAlert(true);
     dispatch(ChangeActivateOrdinalsAction(true));
   };
 
@@ -326,7 +329,7 @@ function NftDashboard() {
               <BarLoader loaderSize={LoaderSize.LARGE} />
             </BarLoaderContainer>
           ) : (
-            <CollectiblesValueText>{`${hasActivatedOrdinalsKey ? totalNfts + ordinalsLength : totalNfts} ${t('ITEMS')}`}</CollectiblesValueText>
+            <CollectiblesValueText>{`${totalNfts} ${t('ITEMS')}`}</CollectiblesValueText>
           )}
           {!isGalleryOpen && (
             <WebGalleryButton onClick={openInGalleryView}>
