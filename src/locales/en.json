@@ -235,7 +235,7 @@
     "ORDINAL": "Ordinal",
     "INSCRIPTION": "Inscription",
     "ACTIVATE_ORDINALS": "Activate ordinals?",
-    "ACTIVATE_ORDINALS_INFO":"Do you want to activate ordinals for Xverse? This is still an experimental feature. You can change this setting anytime in the parameters of your extension.",
+    "ACTIVATE_ORDINALS_INFO":"Do you want to activate ordinals for Xverse? This is still an experimental feature. You can change this setting anytime.",
     "ACTIVATE": "Activate",
     "DENY": "Deny"
   },
