@@ -12,7 +12,7 @@ const useTextOrdinalContent = (ordinal: OrdinalInfo) => {
         const response = await getTextOrdinalContent(url); setTextContent(response ?? '');
       }
     })();
-  }, []);
+  }, [ordinal]);
 
   return textContent.toString();
 };
