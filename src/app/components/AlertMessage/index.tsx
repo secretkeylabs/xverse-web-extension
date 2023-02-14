@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Cross from '@assets/img/dashboard/X.svg';
+import ActionButton from '@components/button';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -9,9 +10,8 @@ const Container = styled.div((props) => ({
   top: '50%',
   transform: 'translate(-50%, -50%)',
   width: 312,
-  height: 137,
   borderRadius: 12,
-  zIndex: 1000,
+  zIndex: 2000,
   background: props.theme.colors.background.elevation2,
   filter: 'drop-shadow(0px 16px 36px rgba(0, 0, 0, 0.5))',
 }));
@@ -35,9 +35,23 @@ const RowContainer = styled.div((props) => ({
   borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
 }));
 
+const TransparentButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(6),
+  width: '100%',
+}));
+
 const ButtonImage = styled.button({
   backgroundColor: 'transparent',
 });
+
+const ButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginBottom: props.theme.spacing(12),
+  marginTop: props.theme.spacing(4),
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
+}));
 
 const OuterContainer = styled.div((props) => ({
   margin: 'auto',
@@ -55,9 +69,15 @@ interface Props {
   onClose: () => void;
   title: string;
   description: string;
+  buttonText?: string;
+  secondButtonText?: string;
+  onButtonClick?: () => void;
+  onSecondButtonClick?: () => void;
 }
 
-function AlertMessage({ onClose, title, description }: Props) {
+function AlertMessage({
+  onClose, title, description, buttonText, secondButtonText, onButtonClick, onSecondButtonClick,
+}: Props) {
   return (
     <>
       <OuterContainer />
@@ -69,6 +89,21 @@ function AlertMessage({ onClose, title, description }: Props) {
           </ButtonImage>
         </RowContainer>
         <DescriptionText>{description}</DescriptionText>
+        {onSecondButtonClick && onButtonClick && (
+        <ButtonContainer>
+          <TransparentButtonContainer>
+            <ActionButton
+              text={buttonText ?? 'No'}
+              transparent
+              onPress={onButtonClick}
+            />
+          </TransparentButtonContainer>
+          <ActionButton
+            text={secondButtonText ?? 'Yes'}
+            onPress={onSecondButtonClick}
+          />
+        </ButtonContainer>
+        )}
       </Container>
 
     </>

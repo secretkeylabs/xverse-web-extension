@@ -9,6 +9,7 @@ import { useState } from 'react';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
+import InfoContainer from '@components/infoContainer';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -37,6 +38,7 @@ const ReceiveScreenText = styled.h1((props) => ({
 const BnsNameText = styled.h1((props) => ({
   ...props.theme.body_bold_l,
   textAlign: 'center',
+  marginBottom: 2,
 }));
 
 const Container = styled.div({
@@ -47,8 +49,7 @@ const Container = styled.div({
   flex: 1,
 });
 
-const InfoContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
+const AddressContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(24),
   marginRight: props.theme.spacing(24),
 }));
@@ -83,6 +84,10 @@ const AddressText = styled.h1((props) => ({
 
 const BottomBarContainer = styled.div({
   marginTop: 32,
+});
+
+const InfoAlertContainer = styled.div({
+  width: '100%',
 });
 
 function Receive(): JSX.Element {
@@ -127,7 +132,7 @@ function Receive(): JSX.Element {
     if (currency === 'ORD') {
       return (
         <TopTitleText>
-          {t('TAPROOT_ADDRESS')}
+          {t('ORDINAL_ADDRESS')}
         </TopTitleText>
       );
     }
@@ -152,26 +157,35 @@ function Receive(): JSX.Element {
           {currency !== 'BTC' && currency !== 'ORD' && !!selectedAccount?.bnsName && (
           <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
           )}
-          <InfoContainer>
+          <AddressContainer>
             <AddressText>
               { getAddress() }
             </AddressText>
-          </InfoContainer>
+          </AddressContainer>
         </Container>
-        {addressCopied ? (
-          <CopyContainer>
+        <CopyContainer>
+          { currency === 'ORD' && (
+          <InfoAlertContainer>
+            <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
+          </InfoAlertContainer>
+          )}
+          { currency === 'BTC' && (
+          <InfoAlertContainer>
+            <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
+          </InfoAlertContainer>
+          )}
+          {addressCopied ? (
             <ActionButton
               src={Tick}
               text={t('COPIED_ADDRESS')}
               onPress={handleOnClick}
               transparent
             />
-          </CopyContainer>
-        ) : (
-          <CopyContainer>
+          ) : (
             <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
-          </CopyContainer>
-        )}
+          )}
+        </CopyContainer>
+
       </OuterContainer>
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />

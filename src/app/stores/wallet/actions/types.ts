@@ -43,6 +43,9 @@ export const FetchRatesFailureKey = 'FetchRatesFailure';
 export const FetchCoinDataRequestKey = 'FetchCoinDataRequest';
 export const FetchCoinDataSuccessKey = 'FetchCoinDataSuccess';
 export const FetchCoinDataFailureKey = 'FetchCoinDataFailure';
+
+export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
+
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
@@ -70,6 +73,7 @@ export interface WalletState {
   coins: Coin[];
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
+  hasActivatedOrdinalsKey: boolean | undefined;
 }
 
 export interface SetWallet {
@@ -220,6 +224,11 @@ export interface GetActiveAccounts {
   accountsList: Account[];
 }
 
+export interface ChangeActivateOrdinals {
+  type: typeof ChangeHasActivatedOrdinalsKey;
+  hasActivatedOrdinalsKey: boolean;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -246,4 +255,5 @@ export type WalletActions =
   | UpdateVisibleCoinList
   | ChangeFiatCurrency
   | ChangeNetwork
-  | GetActiveAccounts;
+  | GetActiveAccounts
+  | ChangeActivateOrdinals;
