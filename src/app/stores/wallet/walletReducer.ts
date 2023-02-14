@@ -26,12 +26,14 @@ import {
   ChangeNetworkKey,
   GetActiveAccountsKey,
   SetWalletSeedPhraseKey,
+  ChangeHasActivatedOrdinalsKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',
   masterPubKey: '',
+  ordinalsAddress: '',
   stxPublicKey: '',
   btcPublicKey: '',
   network: {
@@ -57,6 +59,7 @@ const initialWalletState: WalletState = {
   feeMultipliers: null,
   hasRestoredMemoryKey: false,
   networkAddress: undefined,
+  hasActivatedOrdinalsKey: undefined,
 };
 
 const walletReducer = (
@@ -91,6 +94,7 @@ const walletReducer = (
         selectedAccount: action.selectedAccount,
         stxAddress: action.stxAddress,
         btcAddress: action.btcAddress,
+        ordinalsAddress: action.ordinalsAddress,
         masterPubKey: action.masterPubKey,
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,
@@ -203,6 +207,11 @@ const walletReducer = (
       return {
         ...state,
         accountsList: action.accountsList,
+      };
+    case ChangeHasActivatedOrdinalsKey:
+      return {
+        ...state,
+        hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
       };
     default:
       return state;
