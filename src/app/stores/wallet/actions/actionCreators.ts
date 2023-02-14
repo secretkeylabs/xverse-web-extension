@@ -263,3 +263,10 @@ export function getActiveAccountsAction(
     accountsList,
   };
 }
+
+export function ChangeActivateOrdinalsAction(hasActivatedOrdinalsKey: boolean): actions.ChangeActivateOrdinals {
+  return {
+    type: actions.ChangeHasActivatedOrdinalsKey,
+    hasActivatedOrdinalsKey,
+  };
+}

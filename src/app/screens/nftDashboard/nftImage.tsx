@@ -18,6 +18,7 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   flex: 1,
   height: props.isGalleryOpen ? '100%' : 156,
   overflow: 'hidden',
+  position: 'relative',
 }));
 
 const LoaderContainer = styled.div({

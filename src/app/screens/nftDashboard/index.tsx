@@ -3,7 +3,6 @@ import { MoonLoader } from 'react-spinners';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
@@ -16,7 +15,12 @@ import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';
+import Ordinal from '@screens/ordinals';
+import AlertMessage from '@components/alertMessage';
+import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
+import { useDispatch } from 'react-redux';
 import Nft from './nft';
+import ReceiveNftModal from './receiveNft';
 
 const Container = styled.div`
   display: flex;
@@ -48,6 +52,15 @@ const ShareDialogeContainer = styled.div({
   right: 0,
   zIndex: 2000,
 });
+
+const ReciveNftContainer = styled.div((props) => ({
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  zIndex: 2000,
+  background: props.theme.colors.background.elevation2,
+  borderRadius: 16,
+}));
 
 const CollectibleContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
@@ -173,13 +186,14 @@ const BarLoaderContainer = styled.div((props) => ({
 
 function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
-  const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
-  const { stxAddress } = useWalletSelector();
+  const { stxAddress, ordinalsAddress, hasActivatedOrdinalsKey } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
-
+  const [openReceiveModal, setOpenReceiveModal] = useState(false);
+  const [showActivateOrdinalsAlert, setShowActivateOrdinalsAlert] = useState(false);
+  const dispatch = useDispatch();
   function fetchNfts({ pageParam = 0 }) {
-    return getNfts(stxAddress, selectedNetwork, pageParam);
+    return getNfts(stxAddress, ordinalsAddress, selectedNetwork, pageParam);
   }
   const {
     isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
@@ -200,12 +214,23 @@ function NftDashboard() {
 
   useEffect(() => {
     refetch();
-  }, [stxAddress]);
+  }, [stxAddress, ordinalsAddress]);
 
   const nfts = data?.pages.map((page) => page.nftsList).flat();
-  const totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
-
+  const ordinals = data?.pages.map((page) => page.ordinals).flat();
+  const ordinalsLength = ordinals?.length;
+  let totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
+  if (hasActivatedOrdinalsKey) {
+    totalNfts = ordinalsLength + totalNfts;
+  }
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+
+  useEffect(() => {
+    if (hasActivatedOrdinalsKey === undefined && ordinals && ordinals?.length > 0) {
+      setShowActivateOrdinalsAlert(true);
+    }
+  }, [hasActivatedOrdinalsKey, ordinalsLength]);
+
   const onLoadMoreButtonClick = () => {
     fetchNextPage();
   };
@@ -216,6 +241,14 @@ function NftDashboard() {
     });
   };
 
+  const onReceiveModalOpen = () => {
+    setOpenReceiveModal(true);
+  };
+
+  const onReceiveModalClose = () => {
+    setOpenReceiveModal(false);
+  };
+
   const nftListView = (
     totalNfts === 0 ? (
       <NoCollectiblesText>
@@ -224,6 +257,9 @@ function NftDashboard() {
     ) : (
       <>
         <GridContainer isGalleryOpen={isGalleryOpen}>
+          { hasActivatedOrdinalsKey && ordinals?.map((ordinal) => (
+            <Ordinal asset={ordinal} />
+          ))}
           { nfts?.map((nft) => (
             <Nft asset={nft} />
           ))}
@@ -255,60 +291,92 @@ function NftDashboard() {
     setShowNftOptions(false);
   };
 
-  const onReceivePress = () => {
-    navigate('/receive/STX');
+  const onActivateOrdinalsAlertCrossPress = () => {
+    setShowActivateOrdinalsAlert(false);
+  };
+
+  const onActivateOrdinalsAlertDenyPress = () => {
+    setShowActivateOrdinalsAlert(false);
+    dispatch(ChangeActivateOrdinalsAction(false));
+  };
+
+  const onActivateOrdinalsAlertActivatePress = () => {
+    setShowActivateOrdinalsAlert(false);
+    dispatch(ChangeActivateOrdinalsAction(true));
   };
 
   return (
     <>
+      {showActivateOrdinalsAlert && (
+      <AlertMessage
+        title={t('ACTIVATE_ORDINALS')}
+        description={t('ACTIVATE_ORDINALS_INFO')}
+        buttonText={t('DENY')}
+        onClose={onActivateOrdinalsAlertCrossPress}
+        secondButtonText={t('ACTIVATE')}
+        onButtonClick={onActivateOrdinalsAlertDenyPress}
+        onSecondButtonClick={onActivateOrdinalsAlertActivatePress}
+      />
+      )}
       <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
         <CollectibleContainer>
-          {isGalleryOpen ? <GalleryCollectiblesHeadingText>{t('COLLECTIBLES')}</GalleryCollectiblesHeadingText> : <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>}
+          {isGalleryOpen ? (
+            <GalleryCollectiblesHeadingText>{t('COLLECTIBLES')}</GalleryCollectiblesHeadingText>
+          ) : (
+            <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>
+          )}
           {isLoading ? (
             <BarLoaderContainer>
               <BarLoader loaderSize={LoaderSize.LARGE} />
             </BarLoaderContainer>
-          )
-            : <CollectiblesValueText>{`${totalNfts} ${t('ITEMS')}`}</CollectiblesValueText>}
+          ) : (
+            <CollectiblesValueText>{`${totalNfts} ${t('ITEMS')}`}</CollectiblesValueText>
+          )}
           {!isGalleryOpen && (
-
             <WebGalleryButton onClick={openInGalleryView}>
               <>
                 <ButtonImage src={SquaresFour} />
                 <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
               </>
             </WebGalleryButton>
-
           )}
         </CollectibleContainer>
         <ButtonContainer>
           <ReceiveButtonContainer>
-            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceivePress} />
+            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ReceiveButtonContainer>
-          <ShareButtonContainer>
-            <ActionButton
-              src={ShareNetwork}
-              text={t('SHARE')}
-              onPress={onSharePress}
-              transparent
-            />
-          </ShareButtonContainer>
+          {openReceiveModal && (
+            <ReciveNftContainer>
+              <ReceiveNftModal
+                visible={openReceiveModal}
+                isGalleryOpen={isGalleryOpen}
+                onClose={onReceiveModalClose}
+              />
+            </ReciveNftContainer>
+          )}
+          {/* <ShareButtonContainer>
+            <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />
+          </ShareButtonContainer> */}
           <ShareDialogeContainer>
-            {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />}
+            {showShareNftOptions && (
+              <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />
+            )}
           </ShareDialogeContainer>
         </ButtonContainer>
         {isLoading ? (
           <LoaderContainer>
             <MoonLoader color="white" size={30} />
           </LoaderContainer>
-        ) : nftListView}
+        ) : (
+          nftListView
+        )}
       </Container>
 
       {!isGalleryOpen && (
-      <BottomBarContainer>
-        <BottomTabBar tab="nft" />
-      </BottomBarContainer>
+        <BottomBarContainer>
+          <BottomTabBar tab="nft" />
+        </BottomBarContainer>
       )}
     </>
   );

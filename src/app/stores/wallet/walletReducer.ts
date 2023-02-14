@@ -26,6 +26,7 @@ import {
   ChangeNetworkKey,
   GetActiveAccountsKey,
   SetWalletSeedPhraseKey,
+  ChangeHasActivatedOrdinalsKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -58,6 +59,7 @@ const initialWalletState: WalletState = {
   feeMultipliers: null,
   hasRestoredMemoryKey: false,
   networkAddress: undefined,
+  hasActivatedOrdinalsKey: undefined,
 };
 
 const walletReducer = (
@@ -205,6 +207,11 @@ const walletReducer = (
       return {
         ...state,
         accountsList: action.accountsList,
+      };
+    case ChangeHasActivatedOrdinalsKey:
+      return {
+        ...state,
+        hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
       };
     default:
       return state;
