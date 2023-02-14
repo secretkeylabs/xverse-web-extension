@@ -355,9 +355,9 @@ function NftDashboard() {
               />
             </ReciveNftContainer>
           )}
-          <ShareButtonContainer>
+          {/* <ShareButtonContainer>
             <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />
-          </ShareButtonContainer>
+          </ShareButtonContainer> */}
           <ShareDialogeContainer>
             {showShareNftOptions && (
               <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />
