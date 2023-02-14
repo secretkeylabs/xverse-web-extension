@@ -226,8 +226,10 @@ function NftDashboard() {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   useEffect(() => {
-    if (hasActivatedOrdinalsKey === undefined && ordinals && ordinals?.length > 0) { setShowActivateOrdinalsAlert(true); }
-  }, [hasActivatedOrdinalsKey]);
+    if (hasActivatedOrdinalsKey === undefined && ordinals && ordinals?.length > 0) {
+      setShowActivateOrdinalsAlert(true);
+    }
+  }, [hasActivatedOrdinalsKey, ordinalsLength]);
 
   const onLoadMoreButtonClick = () => {
     fetchNextPage();
@@ -299,7 +301,7 @@ function NftDashboard() {
   };
 
   const onActivateOrdinalsAlertActivatePress = () => {
-    setShowActivateOrdinalsAlert(true);
+    setShowActivateOrdinalsAlert(false);
     dispatch(ChangeActivateOrdinalsAction(true));
   };
 
