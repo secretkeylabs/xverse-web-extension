@@ -179,6 +179,19 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
   });
 
   useEffect(() => {
+    const keyDownHandler = (event) => {
+      if (event.key === 'Enter' && enteredPassword && enteredPassword.length > PasswordStrength.WEAK) {
+        event.preventDefault();
+        handleContinue();
+      }
+    };
+    document.addEventListener('keydown', keyDownHandler);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, [enteredPassword]);
+
+  useEffect(() => {
     if (passwordError) { setError(passwordError); return; }
     if (enteredPassword && enteredPassword.length <= PasswordStrength.WEAK) { setError(t('PASSWORD_STRENGTH_ERROR')); return; }
     setError('');

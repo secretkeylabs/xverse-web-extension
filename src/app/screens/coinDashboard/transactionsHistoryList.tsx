@@ -31,6 +31,8 @@ const ListItemsContainer = styled.div({
 const ListHeader = styled.h1((props) => ({
   marginTop: props.theme.spacing(20),
   marginBottom: props.theme.spacing(12),
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
   ...props.theme.headline_s,
 }));
 
@@ -59,6 +61,8 @@ const SectionHeader = styled.div((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   marginBottom: props.theme.spacing(7),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
 }));
 
 const SectionSeparator = styled.div({

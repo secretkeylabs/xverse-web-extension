@@ -234,10 +234,11 @@
     "ORDINALS": "Ordinals",
     "ORDINAL": "Ordinal",
     "INSCRIPTION": "Inscription",
-    "ACTIVATE_ORDINALS": "Activate ordinals?",
-    "ACTIVATE_ORDINALS_INFO":"Do you want to activate ordinals for Xverse? This is still an experimental feature. You can change this setting anytime.",
+    "ACTIVATE_ORDINALS": "Activate Ordinals",
+    "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Do you want to display them in your wallet? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
-    "DENY": "Deny"
+    "DENY": "No",
+    "COPIED": "Copied!"
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",
