@@ -235,7 +235,7 @@
     "ORDINAL": "Ordinal",
     "INSCRIPTION": "Inscription",
     "ACTIVATE_ORDINALS": "Activate Ordinals",
-    "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Do you want to display them in your wallet? This is an experimental feature. You can change this setting at anytime.",
+    "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
     "COPIED": "Copied!"
