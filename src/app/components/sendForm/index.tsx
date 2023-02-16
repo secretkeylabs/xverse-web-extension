@@ -13,9 +13,11 @@ import { useSelector } from 'react-redux';
 import Info from '@assets/img/info.svg';
 import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
-import { useBNSResolver, useDebounce } from '@hooks/useBnsName';
+import { useBnsName, useBNSResolver, useDebounce } from '@hooks/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
+import useNetworkSelector from '@hooks/useNetwork';
+import TokenImage from '@components/tokenImage';
 
 interface ContainerProps {
   error: boolean;
@@ -195,6 +197,13 @@ const ColumnContainer = styled.div((props) => ({
   flexDirection: 'column',
   marginLeft: props.theme.spacing(8),
 }));
+
+const TokenContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(8),
+}));
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
@@ -243,7 +252,9 @@ function SendForm({
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
+  const network = useNetworkSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
+  const associatedBnsName = useBnsName(recipientAddress, network);
   const associatedAddress = useBNSResolver(
     debouncedSearchTerm,
     stxAddress,
@@ -259,16 +270,6 @@ function SendForm({
       }
     }
   }, [recepientError, associatedAddress]);
-
-  function getTokenIcon() {
-    if (currencyType === 'STX') {
-      return <TickerImage src={IconStacks} />;
-    }
-    if (currencyType === 'BTC') {
-      return <TickerImage src={IconBitcoin} />;
-    }
-    return null;
-  }
 
   function getTokenCurrency() {
     if (fungibleToken) {
@@ -311,10 +312,7 @@ function SendForm({
         <InputFieldContainer>
           <InputField value={amount} placeholder="0" onChange={onInputChange} />
         </InputFieldContainer>
-        <TickerContainer>
-          <Text>{getTokenCurrency()}</Text>
-          {getTokenIcon()}
-        </TickerContainer>
+        <Text>{getTokenCurrency()}</Text>
       </AmountInputContainer>
       <SubText>{`~ $ ${fiatAmount} ${fiatCurrency}`}</SubText>
     </Container>
@@ -341,6 +339,12 @@ function SendForm({
           <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
           <AssociatedText>{associatedAddress}</AssociatedText>
         </>
+      )}
+      {associatedBnsName && currencyType !== 'BTC' && (
+      <>
+        <SubText>{t('ASSOCIATED_BNS_DOMAIN')}</SubText>
+        <AssociatedText>{associatedBnsName}</AssociatedText>
+      </>
       )}
     </Container>
   );
@@ -375,6 +379,15 @@ function SendForm({
   return (
     <>
       <ScrollContainer>
+        {currencyType !== 'NFT' && (
+        <TokenContainer>
+          <TokenImage
+            token={currencyType || undefined}
+            loading={false}
+            fungibleToken={fungibleToken || undefined}
+          />
+        </TokenContainer>
+        )}
         <OuterContainer>
           {!disableAmountInput && renderEnterAmountSection}
           <ErrorContainer>
