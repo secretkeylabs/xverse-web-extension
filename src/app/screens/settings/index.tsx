@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
+import { useDispatch } from 'react-redux';
+import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
 import SettingComponent from './settingComponent';
 import ResetWalletPrompt from '../../components/resetWallet';
 
@@ -52,8 +54,9 @@ function Setting() {
   const [showResetWalletDisplay, setShowResetWalletDisplay] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const { fiatCurrency, network } = useWalletSelector();
+  const { fiatCurrency, network, hasActivatedOrdinalsKey } = useWalletSelector();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { unlockWallet, resetWallet } = useWalletReducer();
 
   const openTermsOfService = () => {
@@ -78,6 +81,10 @@ function Setting() {
 
   const openBackUpWalletScreen = () => {
     navigate('/backup-wallet');
+  };
+
+  const switchActivateOrdinalState = () => {
+    dispatch(ChangeActivateOrdinalsAction(!hasActivatedOrdinalsKey));
   };
 
   const openUpdatePasswordScreen = () => {
@@ -167,6 +174,15 @@ function Setting() {
           onClick={openResetWalletPrompt}
           showWarningTitle
         />
+        <SettingComponent
+          title={t('EXPERIMENTAL')}
+          text={t('ACTIVATE_ORDINAL_NFTS')}
+          toggle
+          toggleFunction={switchActivateOrdinalState}
+          toggleValue={hasActivatedOrdinalsKey}
+          showDivider
+        />
+
         <SettingComponent
           title={t('ABOUT')}
           text={t('TERMS_OF_SERVICE')}

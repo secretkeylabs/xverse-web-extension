@@ -39,6 +39,7 @@ import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import SignatureRequest from '@screens/signatureRequest';
 import TransactionRequest from '@screens/transactionRequest';
 import ErrorBoundary from '@screens/error';
+import OrdinalDetailScreen from '@screens/ordinalDetail';
 
 const router = createHashRouter([
   {
@@ -212,6 +213,10 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/nft-detail/:id',
         element: <NftDetailScreen />,
+      },
+      {
+        path: 'nft-dashboard/ordinal-detail/:id',
+        element: <OrdinalDetailScreen />,
       },
       {
         path: 'nft-dashboard/nft-detail/:id/send-nft',

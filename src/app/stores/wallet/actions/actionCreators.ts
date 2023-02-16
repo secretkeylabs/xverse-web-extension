@@ -76,6 +76,7 @@ export function selectAccount(
   selectedAccount: Account,
   stxAddress: string,
   btcAddress: string,
+  ordinalsAddress: string,
   masterPubKey: string,
   stxPublicKey: string,
   btcPublicKey: string,
@@ -88,6 +89,7 @@ export function selectAccount(
     selectedAccount,
     stxAddress,
     btcAddress,
+    ordinalsAddress,
     masterPubKey,
     stxPublicKey,
     btcPublicKey,
@@ -259,5 +261,12 @@ export function getActiveAccountsAction(
   return {
     type: actions.GetActiveAccountsKey,
     accountsList,
+  };
+}
+
+export function ChangeActivateOrdinalsAction(hasActivatedOrdinalsKey: boolean): actions.ChangeActivateOrdinals {
+  return {
+    type: actions.ChangeHasActivatedOrdinalsKey,
+    hasActivatedOrdinalsKey,
   };
 }

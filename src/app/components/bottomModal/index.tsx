@@ -46,6 +46,7 @@ function BottomModal({
       height: '100%',
       width: 360,
       margin: 'auto',
+      zIndex: 15000,
     },
     content: {
       inset: 'auto auto 0px auto',
@@ -56,7 +57,6 @@ function BottomModal({
       background: theme.colors.background.elevation2,
       margin: 0,
       padding: 0,
-
       borderTopLeftRadius: isGalleryOpen ? 12 : 20,
       borderTopRightRadius: isGalleryOpen ? 12 : 20,
       borderBottomRightRadius: isGalleryOpen ? 12 : 0,

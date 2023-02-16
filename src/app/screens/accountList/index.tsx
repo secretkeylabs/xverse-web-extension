@@ -72,6 +72,7 @@ function AccountList(): JSX.Element {
         account,
         account.stxAddress,
         account.btcAddress,
+        account.ordinalsAddress,
         account.masterPubKey,
         account.stxPublicKey,
         account.btcPublicKey,
