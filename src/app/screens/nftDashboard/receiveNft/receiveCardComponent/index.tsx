@@ -1,7 +1,10 @@
 import styled from 'styled-components';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 import { getShortTruncatedAddress } from '@utils/helper';
 import Copy from '@assets/img/nftDashboard/Copy.svg';
 import QrCode from '@assets/img/nftDashboard/QrCode.svg';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   icon: string;
@@ -69,9 +72,17 @@ const AddressText = styled.h1((props) => ({
   color: props.theme.colors.white[400],
 }));
 
+const StyledToolTip = styled(Tooltip)`
+  background-color: #ffffff;
+  color: #12151e;
+  border-radius: 8px;
+  padding: 7px;
+`;
+
 function ReceiveCardComponent({
   icon, title, address, onQrAddressClick,
 }: Props) {
+  const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const onCopyClick = () => {
     navigator.clipboard.writeText(address);
   };
@@ -84,9 +95,16 @@ function ReceiveCardComponent({
         <AddressText>{getShortTruncatedAddress(address)}</AddressText>
       </ColumnContainer>
       <RowContainer>
-        <Button onClick={onCopyClick}>
+        <Button id={`copy-address-${title}`} onClick={onCopyClick}>
           <ButtonIcon src={Copy} />
         </Button>
+        <StyledToolTip
+          anchorId={`copy-address-${title}`}
+          variant="light"
+          content={t('COPIED')}
+          events={['click']}
+          place="top"
+        />
         <Button onClick={onQrAddressClick}>
           <ButtonIcon src={QrCode} />
         </Button>

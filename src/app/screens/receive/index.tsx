@@ -26,12 +26,12 @@ const OuterContainer = styled.div`
 const TopTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
   textAlign: 'center',
-  marginBottom: props.theme.spacing(4),
 }));
 
 const ReceiveScreenText = styled.h1((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
+  marginTop: props.theme.spacing(3),
   color: props.theme.colors.white['200'],
 }));
 
@@ -83,7 +83,7 @@ const AddressText = styled.h1((props) => ({
 }));
 
 const BottomBarContainer = styled.div({
-  marginTop: 32,
+  marginTop: 22,
 });
 
 const InfoAlertContainer = styled.div({

@@ -29,10 +29,12 @@ interface CoinBalanceProps {
   fungibleToken?: FungibleToken;
 }
 
-const Container = styled.div({
+const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-});
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+}));
 
 const BalanceInfoContainer = styled.div({
   display: 'flex',
