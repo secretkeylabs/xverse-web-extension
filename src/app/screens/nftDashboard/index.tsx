@@ -199,7 +199,7 @@ function NftDashboard() {
   }
 
   function fetchOrdinals(): Promise<BtcOrdinal[]> {
-    return getOrdinalsByAddress('bc1p60h0xp5c69qxvjarv09xa5r7f0pk5pzsfreytcxrurnuz37vxq9qz6nyrp');
+    return getOrdinalsByAddress(ordinalsAddress);
   }
 
   const {
