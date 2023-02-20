@@ -23,7 +23,8 @@
     "RECEIVE": "Receive",
     "SEND": "Send",
     "BUY": "Buy",
-    "MANAGE_TOKEN": "Manage token list"
+    "MANAGE_TOKEN": "Manage token list",
+    "STACKS_AND_TOKEN": "Stacks and tokens"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"

@@ -5,12 +5,13 @@ import { getShortTruncatedAddress } from '@utils/helper';
 import Copy from '@assets/img/nftDashboard/Copy.svg';
 import QrCode from '@assets/img/nftDashboard/QrCode.svg';
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
 interface Props {
-  icon: string;
   title: string;
   address: string;
   onQrAddressClick: () => void;
+  children: ReactNode;
 }
 
 const ReceiveCard = styled.div((props) => ({
@@ -80,7 +81,7 @@ const StyledToolTip = styled(Tooltip)`
 `;
 
 function ReceiveCardComponent({
-  icon, title, address, onQrAddressClick,
+  children, title, address, onQrAddressClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const onCopyClick = () => {
@@ -90,7 +91,7 @@ function ReceiveCardComponent({
   return (
     <ReceiveCard>
       <ColumnContainer>
-        <Icon src={icon} />
+        {children}
         <TitleText>{title}</TitleText>
         <AddressText>{getShortTruncatedAddress(address)}</AddressText>
       </ColumnContainer>
