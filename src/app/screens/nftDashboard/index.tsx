@@ -16,10 +16,10 @@ import ShareDialog from '@components/shareNft';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';
 import Ordinal from '@screens/ordinals';
-import AlertMessage from '@components/alertMessage';
 import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
 import { BtcOrdinal, NftsListData } from '@secretkeylabs/xverse-core/types';
+import AlertMessage from '@components/alertMessage';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
 

@@ -72,7 +72,8 @@
       "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
     },
     "SEND_NFT": "Send NFT",
-    "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name"
+    "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
+    "SWITCH_TO": "Switch to"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Send",

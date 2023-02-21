@@ -22,6 +22,7 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   width: '100%',
   flex: 1,
   height: props.isGalleryOpen ? '100%' : 156,
+  minHeight: props.inNftDetail ? 0 : 156,
   overflow: 'hidden',
   position: 'relative',
   fontSize: '3em',
