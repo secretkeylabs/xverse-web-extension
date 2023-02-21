@@ -418,5 +418,13 @@
   "WINDOW_CLOSED_ALERT": {
     "TITLE": "Requesting window closed",
     "BODY": "The window that initiated the request is closed, but you can still broadcast the transaction"
+  },
+  "ADDRESS_RECEIVE_ALERT_MESSAGE": {
+    "RECEIVING_ORDINALS": "Receiving Ordinals",
+    "RECEIVING_ORDINAL_INFO": "If you want to receive Bitcoin, do not use your Ordinal address ; go to the main tab and use your Bitcoin receive address instead.",
+    "RECEIVING_BTC": "Receiving Bitcoin",
+    "RECEIVING_BTC_INFO": "If you want to receive Ordinal, do not use your BTC address ; go to the NFT tab and use your Ordinal receive address instead.",
+    "I_UNDERSTAND": "I understand",
+    "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
   }
 }

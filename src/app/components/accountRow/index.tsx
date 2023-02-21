@@ -9,6 +9,9 @@ import Copy from '@assets/img/Copy.svg';
 import { LoaderSize } from '@utils/constants';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 interface GradientCircleProps {
   firstGradient: string;
@@ -107,12 +110,19 @@ interface Props {
 }
 
 function AccountRow({
-  account, isSelected, onAccountSelected, allowCopyAddress,
+  account,
+  isSelected,
+  onAccountSelected,
+  allowCopyAddress,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const {
+    showBtcReceiveAlert,
+  } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress!);
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
+  const dispatch = useDispatch();
 
   function getName() {
     return account?.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
@@ -122,6 +132,7 @@ function AccountRow({
     navigator.clipboard.writeText(account?.btcAddress!);
     setOnBtcCopied(true);
     setOnStxCopied(false);
+    if (showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
   };
 
   const handleOnStxAddressClick = () => {
@@ -131,7 +142,9 @@ function AccountRow({
   };
 
   const onRowClick = () => {
-    if (!allowCopyAddress) { onAccountSelected(account!); }
+    if (!allowCopyAddress) {
+      onAccountSelected(account!);
+    }
   };
 
   const onClick = () => {

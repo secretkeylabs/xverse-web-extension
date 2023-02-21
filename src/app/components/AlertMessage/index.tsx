@@ -35,6 +35,21 @@ const RowContainer = styled.div((props) => ({
   borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
 }));
 
+const TickMarkButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(18),
+}));
+
+const TickMarkButtonText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white[0],
+  marginLeft: props.theme.spacing(4.25),
+}));
+
 const TransparentButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(6),
   width: '100%',
@@ -43,6 +58,30 @@ const TransparentButtonContainer = styled.div((props) => ({
 const ButtonImage = styled.button({
   backgroundColor: 'transparent',
 });
+
+const TickButton = styled.input.attrs({ type: 'checkbox' })`
+  appearance: none;
+  border: 1.3px solid #ffffff;
+  width: 12px;
+  height: 12px;
+
+  &:checked {
+    position: relative;
+    &::before {
+      content: '\\2713';
+      font-size: 10px;
+      color: #fff;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &:hover {
+    background-color: #303354;
+  }
+`;
 
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -71,12 +110,15 @@ interface Props {
   description: string;
   buttonText?: string;
   secondButtonText?: string;
+  tickMarkButtonText?: string;
   onButtonClick?: () => void;
   onSecondButtonClick?: () => void;
+  tickMarkButtonClick?:() => void;
+
 }
 
 function AlertMessage({
-  onClose, title, description, buttonText, secondButtonText, onButtonClick, onSecondButtonClick,
+  onClose, title, description, buttonText, secondButtonText, tickMarkButtonText, onButtonClick, onSecondButtonClick, tickMarkButtonClick,
 }: Props) {
   return (
     <>
@@ -103,6 +145,26 @@ function AlertMessage({
             onPress={onSecondButtonClick}
           />
         </ButtonContainer>
+        )}
+        {!onSecondButtonClick && onButtonClick && (
+        <ButtonContainer>
+          <ActionButton
+            text={buttonText ?? 'Yes'}
+            onPress={onButtonClick}
+          />
+        </ButtonContainer>
+        )}
+        { tickMarkButtonText && tickMarkButtonClick && (
+        <TickMarkButtonContainer>
+          <TickButton
+            type="checkbox"
+            defaultChecked={false}
+            onChange={() => {
+              tickMarkButtonClick();
+            }}
+          />
+          <TickMarkButtonText>{tickMarkButtonText}</TickMarkButtonText>
+        </TickMarkButtonContainer>
         )}
       </Container>
 
