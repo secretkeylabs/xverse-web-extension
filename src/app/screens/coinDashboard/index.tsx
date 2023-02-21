@@ -10,6 +10,7 @@ import TransactionsHistoryList from './transactionsHistoryList';
 const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
+  marginTop: props.theme.spacing(12),
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
@@ -34,10 +35,10 @@ export default function CoinDashboard() {
 
   const getDashboardTitle = () => {
     if (ft) {
-      return getFtTicker(ft);
+      return `${getFtTicker(ft)} Dashboard`;
     }
     if (coin) {
-      return coin;
+      return `${coin} Dashboard`;
     }
     return '';
   };

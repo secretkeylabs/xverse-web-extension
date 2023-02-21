@@ -11,6 +11,9 @@ import {
 } from '@stacks/stacks-blockchain-api-types';
 import { useMemo } from 'react';
 import {
+  animated, config, useSpring,
+} from '@react-spring/web';
+import {
   isAddressTransactionWithTransfers,
   isBtcTransaction,
   isBtcTransactionArr,
@@ -46,17 +49,23 @@ const NoTransactionsContainer = styled.div((props) => ({
   alignItems: 'center',
   color: props.theme.colors.white[400],
 }));
+
+const GroupContainer = styled(animated.div)((props) => ({
+  marginBottom: props.theme.spacing(8),
+}));
+
 const SectionHeader = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  marginBottom: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(7),
 }));
 
-const SectionSeparator = styled.div((props) => ({
-  border: `1px solid ${props.theme.colors.white[400]}`,
+const SectionSeparator = styled.div({
+  border: '0.5px solid  rgba(255, 255, 255, 0.6)',
+  opacity: 0.2,
   flexGrow: 1,
-}));
+});
 
 const SectionTitle = styled.p((props) => ({
   ...props.theme.body_xs,
@@ -127,7 +136,13 @@ const filterTxs = (
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, txFilter } = props;
   const { data, isLoading, isFetching } = useTransactions((coin as CurrencyTypes) || 'STX');
-
+  const styles = useSpring({
+    config: { ...config.stiff },
+    from: { opacity: 0 },
+    to: {
+      opacity: 1,
+    },
+  });
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   const groupedTxs = useMemo(() => {
@@ -149,7 +164,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       {groupedTxs
         && !isLoading
         && Object.keys(groupedTxs).map((group) => (
-          <>
+          <GroupContainer style={styles}>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
               <SectionSeparator />
@@ -168,7 +183,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
                 />
               );
             })}
-          </>
+          </GroupContainer>
         ))}
       {isLoading && (
         <LoadingContainer>

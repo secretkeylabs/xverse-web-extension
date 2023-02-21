@@ -2,12 +2,17 @@ const Theme = {
   colors: {
     action: {
       classic: '#5565F7',
+      classicLight: '#7383FF',
+      classic800: 'rgba(85, 101, 247, 0.2)',
     },
     white: {
       0: '#FFFFFF',
       200: 'rgba(255, 255, 255, 0.8)',
       400: 'rgba(255, 255, 255, 0.6)',
       600: 'rgba(255, 255, 255, 0.2)',
+      800: 'rgba(255, 255, 255, 0.20)',
+      850: 'rgba(255, 255, 255, 0.15)',
+      900: 'rgba(255, 255, 255, 0.1)',
     },
     background: {
       'elevation-1': '#070A13',
@@ -16,13 +21,18 @@ const Theme = {
       elevation2: '#272A44',
       elevation3: '#303354',
       elevation6: '#4C5187',
+      elevation6_600: 'rgba(76, 81, 135, 0.4)',
+      elevation6_800: 'rgba(76, 81, 135, 0.2)',
       elevation8: '#7E89AB',
+      elevation9: 'rgba(76, 81, 135, 0.2)',
+      elevation10: 'rgba(76, 81, 135, 0.35)',
       modalBackdrop: 'rgba(18,21,30,0.6)',
     },
     feedback: {
       success: '#51D6A6',
       caution: '#F2A900',
       error: '#D33C3C',
+      error_700: 'rgba(211, 60, 60, 0.3)',
     },
     grey: '#24252C',
   },

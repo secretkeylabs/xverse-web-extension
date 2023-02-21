@@ -13,6 +13,7 @@ import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xvers
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { SignedBtcTxResponse } from '@secretkeylabs/xverse-core/transactions/btc';
+import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
 
 function SendBtcScreen() {
   const location = useLocation();
@@ -22,7 +23,8 @@ function SendBtcScreen() {
     enteredAddress = location.state.recipientAddress;
     enteredAmountToSend = location.state.amount;
   }
-  const [error, setError] = useState('');
+  const [amountError, setAmountError] = useState('');
+  const [addressError, setAddressError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
   const {
@@ -43,7 +45,7 @@ function SendBtcScreen() {
     mutate,
   } = useMutation<
   SignedBtcTxResponse,
-  Error,
+  ResponseError,
   {
     address: string;
     amountToSend: string;
@@ -82,28 +84,32 @@ function SendBtcScreen() {
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {
-      setError(txError.toString());
+      if (Number(txError) === ErrorCodes.InSufficientBalance) {
+        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setAmountError(txError.toString());
     }
   }, [txError]);
 
   function validateFields(address: string, amountToSend: string): boolean {
     if (!address) {
-      setError(t('ERRORS.ADDRESS_REQUIRED'));
+      setAddressError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
     }
 
     if (!amountToSend) {
-      setError(t('ERRORS.AMOUNT_REQUIRED'));
+      setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
 
     if (!validateBtcAddress({ btcAddress: address, network: network.type })) {
-      setError(t('ERRORS.ADDRESS_INVALID'));
+      setAddressError(t('ERRORS.ADDRESS_INVALID'));
       return false;
     }
 
     if (address === btcAddress) {
-      setError(t('ERRORS.SEND_TO_SELF'));
+      setAddressError(t('ERRORS.SEND_TO_SELF'));
       return false;
     }
 
@@ -113,26 +119,26 @@ function SendBtcScreen() {
       if (!Number.isNaN(Number(amountToSend))) {
         parsedAmount = new BigNumber(amountToSend);
       } else {
-        setError(t('ERRORS.INVALID_AMOUNT'));
+        setAmountError(t('ERRORS.INVALID_AMOUNT'));
         return false;
       }
     } catch (e) {
-      setError(t('ERRORS.INVALID_AMOUNT'));
+      setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
 
     if (parsedAmount.isZero()) {
-      setError(t('ERRORS.INVALID_AMOUNT'));
+      setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
 
     if (btcToSats(parsedAmount).lt(BITCOIN_DUST_AMOUNT_SATS)) {
-      setError(t('ERRORS.BELOW_MINIMUM_AMOUNT'));
+      setAmountError(t('ERRORS.BELOW_MINIMUM_AMOUNT'));
       return false;
     }
 
     if (btcToSats(parsedAmount).gt(btcBalance)) {
-      setError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
       return false;
     }
     return true;
@@ -153,7 +159,8 @@ function SendBtcScreen() {
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
       <SendForm
         currencyType="BTC"
-        error={error}
+        amountError={amountError}
+        recepientError={addressError}
         balance={getBalance()}
         onPressSend={handleNextClick}
         recipient={recipientAddress}

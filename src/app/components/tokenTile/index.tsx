@@ -14,6 +14,7 @@ import { getFtBalance, getFtTicker } from '@utils/tokens';
 
 interface TileProps {
   margin?: number;
+  inModel: boolean;
 }
 
 interface TickerProps {
@@ -29,7 +30,15 @@ const TileContainer = styled.button<TileProps>((props) => ({
   paddingTop: props.theme.spacing(7.25),
   paddingBottom: props.margin ?? props.theme.spacing(7.25),
   borderRadius: props.theme.radius(2),
-  marginBottom: props.theme.spacing(6),
+  marginBottom: props.inModel ? props.theme.spacing(0) : props.theme.spacing(6),
+  ':hover': {
+    ':-webkit-transform': props.inModel ? 'translateY(0px)' : 'translateY(-1px)',
+    transform: props.inModel ? 'translateY(0px)' : 'translateY(-1px)',
+    backgroundColor: props.inModel ? `1px solid ${props.theme.colors.background.elevation3}` : props.color,
+  },
+  ':focus': {
+    backgroundColor: props.inModel ? props.theme.colors.background.elevation3 : props.theme.colors.background.elevation2,
+  },
 }));
 
 const TickerImage = styled.img<TickerProps>((props) => ({
@@ -313,7 +322,7 @@ function TokenTile({
   };
 
   return (
-    <TileContainer color={underlayColor} margin={margin} onClick={handleTokenPressed}>
+    <TileContainer inModel={enlargeTicker} color={underlayColor} margin={margin} onClick={handleTokenPressed}>
       <RowContainer>
         {renderIcon()}
         <TextContainer>

@@ -17,6 +17,7 @@ import useNftDataSelector from '@hooks/useNftDataSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
 import AccountHeaderComponent from '@components/accountHeader';
 import TopRow from '@components/topRow';
+import useNetworkSelector from '@hooks/useNetwork';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -47,7 +48,7 @@ const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginLeft: '15%',
-  marginTop: props.theme.spacing(20),
+  marginTop: props.theme.spacing(40),
 }));
 
 const Button = styled.button((props) => ({
@@ -130,7 +131,7 @@ function ConfirmNftTransaction() {
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
-
+  const selectedNetwork = useNetworkSelector();
   const {
     isLoading,
     error: txError,
@@ -139,7 +140,7 @@ function ConfirmNftTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network.type));
+  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -151,7 +152,7 @@ function ConfirmNftTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
+        dispatch(fetchStxWalletDataRequestAction(stxAddress, selectedNetwork, fiatCurrency, stxBtcRate));
       }, 1000);
     }
   }, [stxTxBroadcastData]);

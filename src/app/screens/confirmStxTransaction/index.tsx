@@ -19,6 +19,7 @@ import AccountHeaderComponent from '@components/accountHeader';
 import finalizeTxSignature from '@components/transactionsRequests/utils';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import InfoContainer from '@components/infoContainer';
+import useNetworkSelector from '@hooks/useNetwork';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const Container = styled.div((props) => ({
@@ -58,6 +59,7 @@ function ConfirmStxTransaction() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const selectedNetwork = useNetworkSelector();
   const {
     unsignedTx, sponsored, isBrowserTx, tabId, requestToken,
   } = location.state;
@@ -78,7 +80,7 @@ function ConfirmStxTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network.type));
+  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -94,7 +96,7 @@ function ConfirmStxTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
+        dispatch(fetchStxWalletDataRequestAction(stxAddress, selectedNetwork, fiatCurrency, stxBtcRate));
       }, 1000);
     }
   }, [stxTxBroadcastData]);

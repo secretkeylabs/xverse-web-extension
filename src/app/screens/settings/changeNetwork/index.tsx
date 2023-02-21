@@ -9,8 +9,9 @@ import Cross from '@assets/img/settings/x.svg';
 import { useState } from 'react';
 import ActionButton from '@components/button';
 import { isValidURL } from '@utils/helper';
-import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
+import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core/types';
 import useWalletReducer from '@hooks/useWalletReducer';
+import useNetworkSelector from '@hooks/useNetwork';
 import NetworkRow from './networkRow';
 
 const Container = styled.div`
@@ -73,9 +74,10 @@ const Button = styled.button({
 function ChangeNetworkScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const { network } = useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
   const [changedNetwork, setChangedNetwork] = useState<SettingsNetwork>(network);
   const [error, setError] = useState<string>('');
-  const [url, setUrl] = useState<string>(network.address);
+  const [url, setUrl] = useState<string>(selectedNetwork.coreApiUrl);
   const [isChangingNetwork, setIsChangingNetwork] = useState<boolean>(false);
   const navigate = useNavigate();
   const { changeNetwork } = useWalletReducer();
@@ -84,9 +86,9 @@ function ChangeNetworkScreen() {
     navigate('/settings');
   };
 
-  const onNetworkSelected = (selectedNetwork: SettingsNetwork) => {
-    setUrl(selectedNetwork.address);
-    setChangedNetwork(selectedNetwork);
+  const onNetworkSelected = (networkSelected: SettingsNetwork) => {
+    setUrl(networkSelected.address);
+    setChangedNetwork(networkSelected);
   };
 
   const onChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -101,7 +103,8 @@ function ChangeNetworkScreen() {
     setIsChangingNetwork(true);
     const response = await isValidURL(url);
     if (response) {
-      await changeNetwork(changedNetwork);
+      const networkObject = changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
+      await changeNetwork(changedNetwork, networkObject, url);
       navigate('/settings');
     } else {
       setError(t('INVALID_URL'));

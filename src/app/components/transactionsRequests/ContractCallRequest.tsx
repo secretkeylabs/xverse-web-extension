@@ -23,7 +23,6 @@ import {
   extractFromPayload,
 } from '@secretkeylabs/xverse-core';
 import RedirectAddressView from '@components/redirectAddressView';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { useNavigate } from 'react-router-dom';
 import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
@@ -31,6 +30,7 @@ import NftPostConditionCard from '@components/postCondition/nftPostConditionCard
 import AccountHeaderComponent from '@components/accountHeader';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import InfoContainer from '@components/infoContainer';
+import useNetworkSelector from '@hooks/useNetwork';
 import finalizeTxSignature from './utils';
 
 const PostConditionContainer = styled.div((props) => ({
@@ -191,6 +191,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const {
     request, unsignedTx, funcMetaData, coinsMetaData, tabId, requestToken,
   } = props;
+  const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
   const [isShowMore, setIsShowMore] = useState(false);
@@ -283,13 +284,10 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         <PostConditionAlertText>{t('CONTRACT_CALL_REQUEST.POST_CONDITION_ALERT')}</PostConditionAlertText>
       </PostConditionContainer>
   );
-  const { network } = useWalletSelector();
   const navigate = useNavigate();
   const broadcastTx = async (tx: StacksTransaction[]) => {
     try {
-      const networkType = network?.type ?? 'Mainnet';
-
-      const broadcastResult: string = await broadcastSignedTransaction(tx[0], networkType);
+      const broadcastResult: string = await broadcastSignedTransaction(tx[0], selectedNetwork);
       if (broadcastResult) {
         finalizeTxSignature({ requestPayload: requestToken, tabId, data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') } });
         navigate('/tx-status', {

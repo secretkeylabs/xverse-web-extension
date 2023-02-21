@@ -17,6 +17,9 @@ import { useBNSResolver, useDebounce } from '@hooks/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
 
+interface ContainerProps {
+  error: boolean;
+}
 const ScrollContainer = styled.div`
   display: flex;
   flex:1;
@@ -28,11 +31,13 @@ const ScrollContainer = styled.div`
   margin-left: 5%;
   margin-right: 5%;
 `;
-const OuterContainer = styled.div({
+
+const OuterContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
+  marginBottom: props.theme.spacing(32.5),
   flex: 1,
-});
+}));
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -47,9 +52,12 @@ const Container = styled.div((props) => ({
 }));
 
 const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
-  marginLeft: '5%',
-  marginRight: '5%',
+  marginTop: props.theme.spacing(3),
+}));
+
+const MemoContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(3),
+  marginBottom: props.theme.spacing(6),
 }));
 
 const ErrorText = styled.h1((props) => ({
@@ -101,30 +109,36 @@ const InputField = styled.input((props) => ({
   border: 'transparent',
 }));
 
-const AmountInputContainer = styled.div((props) => ({
+const AmountInputContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : `1px solid ${props.theme.colors.background.elevation3}`,
   backgroundColor: props.theme.colors.background['elevation-1'],
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   height: 44,
+  ':focus-within': {
+    border: `1px solid ${props.theme.colors.background.elevation6}`,
+  },
 }));
 
-const MemoInputContainer = styled.div((props) => ({
+const MemoInputContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : `1px solid ${props.theme.colors.background.elevation3}`,
   backgroundColor: props.theme.colors.background['elevation-1'],
   borderRadius: 8,
   padding: props.theme.spacing(7),
   height: 76,
+  ':focus-within': {
+    border: `1px solid ${props.theme.colors.background.elevation6}`,
+  },
 }));
 
 const TickerImage = styled.img((props) => ({
@@ -184,7 +198,9 @@ const ColumnContainer = styled.div((props) => ({
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
-  error?: string;
+  amountError?: string;
+  recepientError?: string;
+  memoError?: string;
   fungibleToken?: FungibleToken;
   disableAmountInput?: boolean;
   balance?: number;
@@ -200,7 +216,9 @@ interface Props {
 function SendForm({
   onPressSend,
   currencyType,
-  error,
+  amountError,
+  recepientError,
+  memoError,
   fungibleToken,
   disableAmountInput,
   balance,
@@ -216,7 +234,7 @@ function SendForm({
   const [amount, setAmount] = useState(amountToSend ?? '');
   const [memo, setMemo] = useState(stxMemo ?? '');
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
-  const [showError, setShowError] = useState<string | undefined>(error);
+  const [addressError, setAddressError] = useState<string | undefined>(recepientError);
   const [recipientAddress, setRecipientAddress] = useState(recipient ?? '');
   const navigate = useNavigate();
 
@@ -233,14 +251,14 @@ function SendForm({
   );
 
   useEffect(() => {
-    if (error) {
-      if (associatedAddress !== '' && error.includes(t('ERRORS.ADDRESS_INVALID'))) {
-        setShowError('');
+    if (recepientError) {
+      if (associatedAddress !== '' && recepientError.includes(t('ERRORS.ADDRESS_INVALID'))) {
+        setAddressError('');
       } else {
-        setShowError(error);
+        setAddressError(recepientError);
       }
     }
-  }, [error, associatedAddress]);
+  }, [recepientError, associatedAddress]);
 
   function getTokenIcon() {
     if (currencyType === 'STX') {
@@ -289,7 +307,7 @@ function SendForm({
         </BalanceText>
         <Text>{balance}</Text>
       </RowContainer>
-      <AmountInputContainer>
+      <AmountInputContainer error={amountError !== ''}>
         <InputFieldContainer>
           <InputField value={amount} placeholder="0" onChange={onInputChange} />
         </InputFieldContainer>
@@ -309,7 +327,7 @@ function SendForm({
   const renderEnterRecepientSection = (
     <Container>
       <TitleText>{t('RECEPIENT')}</TitleText>
-      <AmountInputContainer>
+      <AmountInputContainer error={addressError !== ''}>
         <InputFieldContainer>
           <InputField
             value={recipientAddress}
@@ -354,20 +372,25 @@ function SendForm({
     } else if ((amount !== '' && recipientAddress !== '') || associatedAddress !== '') return true;
     return false;
   };
-
   return (
     <>
       <ScrollContainer>
         <OuterContainer>
           {!disableAmountInput && renderEnterAmountSection}
+          <ErrorContainer>
+            <ErrorText>{amountError}</ErrorText>
+          </ErrorContainer>
           {buyCryptoMessage}
           {children}
           {renderEnterRecepientSection}
+          <ErrorContainer>
+            <ErrorText>{addressError}</ErrorText>
+          </ErrorContainer>
           {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
-              <MemoInputContainer>
+              <MemoInputContainer error={memoError !== ''}>
                 <InputFieldContainer>
                   <InputField
                     value={memo}
@@ -377,15 +400,15 @@ function SendForm({
                 </InputFieldContainer>
               </MemoInputContainer>
             </Container>
+            <MemoContainer>
+              <ErrorText>{memoError}</ErrorText>
+            </MemoContainer>
             <InfoContainer bodyText={t('MEMO_INFO')} />
           </>
           )}
         </OuterContainer>
 
       </ScrollContainer>
-      <ErrorContainer>
-        <ErrorText>{showError}</ErrorText>
-      </ErrorContainer>
       <SendButtonContainer enabled={checkIfEnableButton()}>
         <ActionButton
           text={buttonText ?? t('NEXT')}
