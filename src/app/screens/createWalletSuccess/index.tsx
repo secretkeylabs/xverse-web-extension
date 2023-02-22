@@ -13,8 +13,8 @@ const InstructionsContainer = styled.div((props) => ({
   position: 'absolute',
   top: 20,
   right: 30,
-  height: 100,
-  width: 277,
+  height: 127,
+  width: 278,
   backgroundColor: 'rgba(39, 42, 68, 0.4)',
   border: `1px solid ${props.theme.colors.background.elevation3}`,
   borderRadius: 12,
@@ -97,15 +97,16 @@ function CreateWalletSuccess(): JSX.Element {
         <RowContainer>
           <InstructionsText>{`1. ${t('CLICK')}`}</InstructionsText>
           <Image src={Extension} />
-          <InstructionsText>{t('THEN')}</InstructionsText>
+        </RowContainer>
+        <RowContainer>
+          <InstructionsText>{`2. ${t('SEARCH_XVERSE')}`}</InstructionsText>
           <Image src={Pin} />
         </RowContainer>
         <RowContainer>
-          <InstructionsText>{`2. ${t('CLICK')}`}</InstructionsText>
+          <InstructionsText>{`3. ${t('CLICK')}`}</InstructionsText>
           <Image src={Logo} />
           <InstructionsText>{t('OPEN_WALLET')}</InstructionsText>
         </RowContainer>
-
       </InstructionsContainer>
 
     </>

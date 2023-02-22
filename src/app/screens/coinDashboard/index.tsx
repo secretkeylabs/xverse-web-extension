@@ -12,8 +12,6 @@ const Container = styled.div((props) => ({
   flex: 1,
   marginTop: props.theme.spacing(12),
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
     display: 'none',

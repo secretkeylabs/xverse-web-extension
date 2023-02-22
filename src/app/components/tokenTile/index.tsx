@@ -31,14 +31,6 @@ const TileContainer = styled.button<TileProps>((props) => ({
   paddingBottom: props.margin ?? props.theme.spacing(7.25),
   borderRadius: props.theme.radius(2),
   marginBottom: props.inModel ? props.theme.spacing(0) : props.theme.spacing(6),
-  ':hover': {
-    ':-webkit-transform': props.inModel ? 'translateY(0px)' : 'translateY(-1px)',
-    transform: props.inModel ? 'translateY(0px)' : 'translateY(-1px)',
-    backgroundColor: props.inModel ? `1px solid ${props.theme.colors.background.elevation3}` : props.color,
-  },
-  ':focus': {
-    backgroundColor: props.inModel ? props.theme.colors.background.elevation3 : props.theme.colors.background.elevation2,
-  },
 }));
 
 const TickerImage = styled.img<TickerProps>((props) => ({

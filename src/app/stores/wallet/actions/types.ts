@@ -35,9 +35,12 @@ export const SetCoinRatesKey = 'SetCoinRatesKey';
 
 export const SetCoinDataKey = 'SetCoinDataKey';
 
+export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
+
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
+  ordinalsAddress: string;
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
@@ -58,6 +61,7 @@ export interface WalletState {
   coins: Coin[];
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
+  hasActivatedOrdinalsKey: boolean | undefined;
 }
 
 export interface SetWallet {
@@ -106,6 +110,7 @@ export interface SelectAccount {
   selectedAccount: Account | null;
   stxAddress: string;
   btcAddress: string;
+  ordinalsAddress: string;
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
@@ -159,6 +164,11 @@ export interface GetActiveAccounts {
   accountsList: Account[];
 }
 
+export interface ChangeActivateOrdinals {
+  type: typeof ChangeHasActivatedOrdinalsKey;
+  hasActivatedOrdinalsKey: boolean;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -177,4 +187,5 @@ export type WalletActions =
   | UpdateVisibleCoinList
   | ChangeFiatCurrency
   | ChangeNetwork
-  | GetActiveAccounts;
+  | GetActiveAccounts
+  | ChangeActivateOrdinals;

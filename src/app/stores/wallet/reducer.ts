@@ -20,11 +20,13 @@ import {
   SetWalletSeedPhraseKey,
   SetStxWalletDataKey,
   SetCoinRatesKey,
+  ChangeHasActivatedOrdinalsKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',
+  ordinalsAddress: '',
   masterPubKey: '',
   stxPublicKey: '',
   btcPublicKey: '',
@@ -48,6 +50,7 @@ const initialWalletState: WalletState = {
   coins: [],
   feeMultipliers: null,
   networkAddress: undefined,
+  hasActivatedOrdinalsKey: undefined,
 };
 
 const walletReducer = (
@@ -81,6 +84,7 @@ const walletReducer = (
         ...state,
         selectedAccount: action.selectedAccount,
         stxAddress: action.stxAddress,
+        ordinalsAddress: action.ordinalsAddress,
         btcAddress: action.btcAddress,
         masterPubKey: action.masterPubKey,
         stxPublicKey: action.stxPublicKey,
@@ -159,6 +163,11 @@ const walletReducer = (
       return {
         ...state,
         accountsList: action.accountsList,
+      };
+    case ChangeHasActivatedOrdinalsKey:
+      return {
+        ...state,
+        hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
       };
     default:
       return state;

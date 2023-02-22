@@ -17,7 +17,7 @@ import {
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import { getBtcFees, isCustomFeesAllowed } from '@secretkeylabs/xverse-core/transactions/btc';
-import { ErrorCodes } from '@secretkeylabs/xverse-core';
+import { btcToSats, ErrorCodes } from '@secretkeylabs/xverse-core';
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,
@@ -274,14 +274,16 @@ function TransactionSettingAlert({
     try {
       setSelectedOption(mode!);
       if (mode?.value === 'custom') inputRef?.current?.focus();
-      else {
+      else if (amount && selectedAccount && btcRecepientAddress) {
         const btcFee = await getBtcFees(
-          btcRecepientAddress!,
+          [
+            {
+              address: btcRecepientAddress,
+              amountSats: btcToSats(new BigNumber(amount)),
+            },
+          ],
           btcAddress,
-          amount?.toString()!,
-          selectedAccount?.id ?? 0,
           network.type,
-          seedPhrase,
           mode?.value,
         );
         setFeeInput(btcFee.toString());

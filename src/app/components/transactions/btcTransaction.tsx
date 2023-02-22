@@ -17,6 +17,8 @@ const TransactionContainer = styled.button((props) => ({
   width: '100%',
   paddingTop: props.theme.spacing(5),
   paddingBottom: props.theme.spacing(5),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
   background: 'none',
   ':hover': {
     background: props.theme.colors.white[900],

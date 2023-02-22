@@ -9,6 +9,7 @@ import { useState } from 'react';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
+import InfoContainer from '@components/infoContainer';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -25,18 +26,19 @@ const OuterContainer = styled.div`
 const TopTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
   textAlign: 'center',
-  marginBottom: props.theme.spacing(4),
 }));
 
 const ReceiveScreenText = styled.h1((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
+  marginTop: props.theme.spacing(3),
   color: props.theme.colors.white['200'],
 }));
 
 const BnsNameText = styled.h1((props) => ({
   ...props.theme.body_bold_l,
   textAlign: 'center',
+  marginBottom: 2,
 }));
 
 const Container = styled.div({
@@ -47,8 +49,7 @@ const Container = styled.div({
   flex: 1,
 });
 
-const InfoContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
+const AddressContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(24),
   marginRight: props.theme.spacing(24),
 }));
@@ -82,7 +83,11 @@ const AddressText = styled.h1((props) => ({
 }));
 
 const BottomBarContainer = styled.div({
-  marginTop: 32,
+  marginTop: 22,
+});
+
+const InfoAlertContainer = styled.div({
+  width: '100%',
 });
 
 function Receive(): JSX.Element {
@@ -92,6 +97,7 @@ function Receive(): JSX.Element {
   const {
     stxAddress,
     btcAddress,
+    ordinalsAddress,
     selectedAccount,
   } = useWalletSelector();
 
@@ -105,6 +111,8 @@ function Receive(): JSX.Element {
         return btcAddress;
       case 'FT':
         return stxAddress;
+      case 'ORD':
+        return ordinalsAddress;
       default:
         return '';
     }
@@ -113,13 +121,23 @@ function Receive(): JSX.Element {
     navigate(-1);
   };
 
-  const renderHeading = () => (currency === 'BTC' ? (
-    <TopTitleText>
-      {t('BTC_ADDRESS')}
-    </TopTitleText>
-  ) : (
-    <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>
-  ));
+  const renderHeading = () => {
+    if (currency === 'BTC') {
+      return (
+        <TopTitleText>
+          {t('BTC_ADDRESS')}
+        </TopTitleText>
+      );
+    }
+    if (currency === 'ORD') {
+      return (
+        <TopTitleText>
+          {t('ORDINAL_ADDRESS')}
+        </TopTitleText>
+      );
+    }
+    return <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>;
+  };
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
@@ -131,34 +149,43 @@ function Receive(): JSX.Element {
       <OuterContainer>
         <Container>
           {renderHeading()}
-          {currency !== 'BTC' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
+          {currency !== 'BTC' && currency !== 'ORD' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
           <QRCodeContainer>
             <QRCode value={getAddress()} size={150} />
           </QRCodeContainer>
 
-          {currency !== 'BTC' && !!selectedAccount?.bnsName && (
+          {currency !== 'BTC' && currency !== 'ORD' && !!selectedAccount?.bnsName && (
           <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
           )}
-          <InfoContainer>
+          <AddressContainer>
             <AddressText>
               { getAddress() }
             </AddressText>
-          </InfoContainer>
+          </AddressContainer>
         </Container>
-        {addressCopied ? (
-          <CopyContainer>
+        <CopyContainer>
+          { currency === 'ORD' && (
+          <InfoAlertContainer>
+            <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
+          </InfoAlertContainer>
+          )}
+          { currency === 'BTC' && (
+          <InfoAlertContainer>
+            <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
+          </InfoAlertContainer>
+          )}
+          {addressCopied ? (
             <ActionButton
               src={Tick}
               text={t('COPIED_ADDRESS')}
               onPress={handleOnClick}
               transparent
             />
-          </CopyContainer>
-        ) : (
-          <CopyContainer>
+          ) : (
             <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
-          </CopyContainer>
-        )}
+          )}
+        </CopyContainer>
+
       </OuterContainer>
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />

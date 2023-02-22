@@ -7,7 +7,6 @@ interface ButtonProps {
 }
 
 const Button = styled.button<ButtonProps>((props) => ({
-
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -25,10 +24,6 @@ const AnimatedButton = styled(Button)`
     background: ${(props) => (props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classicLight)};
     opacity: 0.6;
   }
-  :focus {
-    background: ${(props) => (props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classicLight)};
-    opacity: 0.6;
-  }
 `;
 
 const TransparentButton = styled(Button)`
@@ -39,9 +34,6 @@ const TransparentButton = styled(Button)`
 const AnimatedTransparentButton = styled(TransparentButton)`
 :hover {
   background: ${(props) => props.theme.colors.background.elevation6_800};
-}
-:focus {
-  background: ${(props) => props.theme.colors.action.classic800};
 }
 `;
 
@@ -90,7 +82,7 @@ function ActionButton({
           <MoonLoader color="white" size={10} />
         ) : (
           <>
-            <ButtonImage src={src} />
+            {src && <ButtonImage src={src} />}
             <ButtonText>{text}</ButtonText>
           </>
         )}
@@ -108,7 +100,7 @@ function ActionButton({
         <MoonLoader color="white" size={12} />
       ) : (
         <>
-          <ButtonImage src={src} />
+          { src && <ButtonImage src={src} />}
           <ButtonText>{text}</ButtonText>
         </>
       )}
