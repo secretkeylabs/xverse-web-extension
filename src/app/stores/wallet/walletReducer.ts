@@ -27,6 +27,8 @@ import {
   GetActiveAccountsKey,
   SetWalletSeedPhraseKey,
   ChangeHasActivatedOrdinalsKey,
+  ChangeShowBtcReceiveAlertKey,
+  ChangeShowOrdinalReceiveAlertKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -60,6 +62,8 @@ const initialWalletState: WalletState = {
   hasRestoredMemoryKey: false,
   networkAddress: undefined,
   hasActivatedOrdinalsKey: undefined,
+  showBtcReceiveAlert: false,
+  showOrdinalReceiveAlert: false,
 };
 
 const walletReducer = (
@@ -212,6 +216,16 @@ const walletReducer = (
       return {
         ...state,
         hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
+      };
+    case ChangeShowBtcReceiveAlertKey:
+      return {
+        ...state,
+        showBtcReceiveAlert: action.showBtcReceiveAlert,
+      };
+    case ChangeShowOrdinalReceiveAlertKey:
+      return {
+        ...state,
+        showOrdinalReceiveAlert: action.showOrdinalReceiveAlert,
       };
     default:
       return state;

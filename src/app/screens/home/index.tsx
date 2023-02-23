@@ -111,7 +111,6 @@ function Home() {
   const {
     stxAddress,
     btcAddress,
-    ordinalsAddress,
     masterPubKey,
     fiatCurrency,
     btcFiatRate,
