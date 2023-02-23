@@ -30,5 +30,5 @@
       "@core/*": ["app/core/*"]
     }
   },
-  "include": ["src", "styled.d.ts", "tests"]
+  "include": ["src", "styled.d.ts", "tests", "e2e", "fixtures"]
 }

@@ -1,4 +1,5 @@
-import { test, expect } from 'src/fixtures/fixtures';
+// to-do fix the Missing file extension for "../fixtures" eslint import/extensions
+import { test, expect } from '../fixtures';
 
 test('example test', async ({ page }) => {
   await page.goto('https://example.com');

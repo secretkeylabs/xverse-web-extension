@@ -1,12 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { test as base, expect, chromium, type BrowserContext } from '@playwright/test';
+import { test as base, chromium, type BrowserContext } from '@playwright/test';
 import path from 'path';
 
 export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
 }>({
-  context: async ({ }, use) => {
+  context: async ({}, use) => {
     const pathToExtension = path.join(__dirname, 'my-extension');
     const context = await chromium.launchPersistentContext('', {
       headless: false,
@@ -27,4 +27,4 @@ export const test = base.extend<{
     await use(extensionId);
   },
 });
-export const {expect} = test;
+export const { expect } = test;
