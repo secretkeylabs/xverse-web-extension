@@ -421,9 +421,9 @@
   },
   "ADDRESS_RECEIVE_ALERT_MESSAGE": {
     "RECEIVING_ORDINALS": "Receiving Ordinals",
-    "RECEIVING_ORDINAL_INFO": "If you want to receive Bitcoin, do not use your Ordinal address ; go to the main tab and use your Bitcoin receive address instead.",
+    "RECEIVING_ORDINAL_INFO": "Use this address to receive Ordinals only. Do not use this address to receive Bitcoin payments.",
     "RECEIVING_BTC": "Receiving Bitcoin",
-    "RECEIVING_BTC_INFO": "If you want to receive Ordinal, do not use your BTC address ; go to the NFT tab and use your Ordinal receive address instead.",
+    "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
   }
