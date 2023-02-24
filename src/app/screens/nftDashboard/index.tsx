@@ -7,9 +7,9 @@ import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
 import ActionButton from '@components/button';
-import { getNfts } from '@secretkeylabs/xverse-core/api';
+import { getNfts, getOrdinalsByAddress } from '@secretkeylabs/xverse-core/api';
 import { useEffect, useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
@@ -19,6 +19,7 @@ import Ordinal from '@screens/ordinals';
 import AlertMessage from '@components/alertMessage';
 import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
+import { BtcOrdinal, NftsListData } from '@secretkeylabs/xverse-core/types';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
 
@@ -192,9 +193,15 @@ function NftDashboard() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [showActivateOrdinalsAlert, setShowActivateOrdinalsAlert] = useState(false);
   const dispatch = useDispatch();
-  function fetchNfts({ pageParam = 0 }) {
-    return getNfts(stxAddress, ordinalsAddress, selectedNetwork, pageParam);
+
+  function fetchNfts({ pageParam = 0 }): Promise<NftsListData> {
+    return getNfts(stxAddress, selectedNetwork, pageParam);
   }
+
+  function fetchOrdinals(): Promise<BtcOrdinal[]> {
+    return getOrdinalsByAddress(ordinalsAddress);
+  }
+
   const {
     isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
   } = useInfiniteQuery(
@@ -212,15 +219,20 @@ function NftDashboard() {
     },
   );
 
+  const { data: ordinals } = useQuery({
+    queryKey: [`ordinals-${ordinalsAddress}`],
+    queryFn: fetchOrdinals,
+  });
+
   useEffect(() => {
     refetch();
   }, [stxAddress, ordinalsAddress]);
 
   const nfts = data?.pages.map((page) => page.nftsList).flat();
-  const ordinals = data?.pages.map((page) => page.ordinals).flat();
   const ordinalsLength = ordinals?.length;
   let totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
-  if (hasActivatedOrdinalsKey) {
+
+  if (hasActivatedOrdinalsKey && ordinalsLength) {
     totalNfts = ordinalsLength + totalNfts;
   }
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
@@ -250,7 +262,7 @@ function NftDashboard() {
   };
 
   const nftListView = (
-    totalNfts === 0 ? (
+    totalNfts === 0 && ordinalsLength === 0 ? (
       <NoCollectiblesText>
         {t('NO_COLLECTIBLES')}
       </NoCollectiblesText>
@@ -258,10 +270,10 @@ function NftDashboard() {
       <>
         <GridContainer isGalleryOpen={isGalleryOpen}>
           { hasActivatedOrdinalsKey && ordinals?.map((ordinal) => (
-            <Ordinal asset={ordinal} />
+            <Ordinal asset={ordinal} key={ordinal.id} />
           ))}
           { nfts?.map((nft) => (
-            <Nft asset={nft} />
+            <Nft asset={nft} key={nft.asset_identifier} />
           ))}
         </GridContainer>
         {hasNextPage && (isFetchingNextPage

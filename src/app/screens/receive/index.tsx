@@ -10,6 +10,8 @@ import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
 import InfoContainer from '@components/infoContainer';
+import { useDispatch } from 'react-redux';
+import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -94,11 +96,14 @@ function Receive(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
   const [addressCopied, setAddressCopied] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     stxAddress,
     btcAddress,
     ordinalsAddress,
     selectedAccount,
+    showBtcReceiveAlert,
+    showOrdinalReceiveAlert,
   } = useWalletSelector();
 
   const { currency } = useParams();
@@ -142,6 +147,8 @@ function Receive(): JSX.Element {
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
     setAddressCopied(true);
+    if (currency === 'BTC' && showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
+    if (currency === 'ORD' && showOrdinalReceiveAlert !== null) { dispatch(ChangeShowOrdinalReceiveAlertAction(true)); }
   };
   return (
     <>
