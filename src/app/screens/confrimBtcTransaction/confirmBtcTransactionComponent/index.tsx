@@ -100,6 +100,7 @@ function ConfirmBtcTransactionComponent({
 }: Props) {
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const [loading, setLoading] = useState(false);
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
     btcAddress, selectedAccount, seedPhrase, network,
@@ -133,6 +134,7 @@ function ConfirmBtcTransactionComponent({
     if (data) {
       setCurrentFee(data.fee);
       setSignedTx(data.signedTx);
+      setOpenTransactionSettingModal(false);
     }
   }, [data]);
 
@@ -145,7 +147,6 @@ function ConfirmBtcTransactionComponent({
   };
 
   const onApplyClick = (modifiedFee: string) => {
-    setOpenTransactionSettingModal(false);
     setCurrentFee(new BigNumber(modifiedFee));
     const recipients: Recipient[] = [
       {
@@ -154,6 +155,7 @@ function ConfirmBtcTransactionComponent({
       },
     ];
     mutate({ recipients, txFee: modifiedFee });
+    setLoading(true);
   };
 
   const handleOnConfirmClick = () => {
@@ -162,6 +164,7 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {
+      setOpenTransactionSettingModal(false);
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
       } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
@@ -192,6 +195,7 @@ function ConfirmBtcTransactionComponent({
           onCrossClick={closeTransactionSettingAlert}
           btcRecepientAddress={recipientAddress}
           ordinalTxUtxo={ordinalTxUtxo}
+          loading={loading}
         />
       </Container>
       <ErrorContainer>
