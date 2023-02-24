@@ -170,7 +170,7 @@ function ConfirmBtcTransactionComponent({
     <>
       <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
       <Container>
-        <TransferAmountView currency="BTC" amount={amount} />
+        {amount && <TransferAmountView currency="BTC" amount={amount} />}
         {children}
         <TransferFeeView fee={currentFee} currency={t('SATS')} />
         <Button onClick={onAdvancedSettingClick}>
