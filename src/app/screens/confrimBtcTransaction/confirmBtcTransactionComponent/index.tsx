@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { useMutation } from '@tanstack/react-query';
-import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
+import { Recipient, SignedBtcTx, signOrdinalSendTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
 import TransferAmountView from '@components/transferAmountView';
 import TransferFeeView from '@components/transferFeeView';
 import {
@@ -130,6 +130,24 @@ function ConfirmBtcTransactionComponent({
     ),
   );
 
+  const {
+    isLoading: isLoadingOrdData,
+    data: ordinalData,
+    error: ordinalError,
+    mutate: ordinalMutate,
+  } = useMutation<SignedBtcTx, ResponseError, string>(async (txFee) => {
+    const signedTx = await signOrdinalSendTransaction(
+      recipientAddress,
+      ordinalTxUtxo!,
+      btcAddress,
+      Number(selectedAccount?.id),
+      seedPhrase,
+      network.type,
+      new BigNumber(txFee),
+    );
+    return signedTx;
+  });
+
   useEffect(() => {
     if (data) {
       setCurrentFee(data.fee);
@@ -137,6 +155,14 @@ function ConfirmBtcTransactionComponent({
       setOpenTransactionSettingModal(false);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (ordinalData) {
+      setCurrentFee(ordinalData.fee);
+      setSignedTx(ordinalData.signedTx);
+      setOpenTransactionSettingModal(false);
+    }
+  }, [ordinalData]);
 
   const onAdvancedSettingClick = () => {
     setOpenTransactionSettingModal(true);
@@ -154,7 +180,9 @@ function ConfirmBtcTransactionComponent({
         amountSats: btcToSats(new BigNumber(amount)),
       },
     ];
-    mutate({ recipients, txFee: modifiedFee });
+
+    if (ordinalTxUtxo) ordinalMutate(modifiedFee);
+    else mutate({ recipients, txFee: modifiedFee });
     setLoading(true);
   };
 
@@ -172,6 +200,17 @@ function ConfirmBtcTransactionComponent({
       } else setError(txError.toString());
     }
   }, [txError]);
+
+  useEffect(() => {
+    if (recipientAddress && amount && ordinalError) {
+      setOpenTransactionSettingModal(false);
+      if (Number(txError) === ErrorCodes.InSufficientBalance) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setError(ordinalError.toString());
+    }
+  }, [ordinalError]);
 
   return (
     <>
@@ -207,13 +246,13 @@ function ConfirmBtcTransactionComponent({
             text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={onCancelClick}
-            disabled={loadingBroadcastedTx || isLoading}
+            disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData}
           />
         </TransparentButtonContainer>
         <ActionButton
           text={t('CONFIRM_TRANSACTION.CONFIRM')}
-          disabled={loadingBroadcastedTx || isLoading}
-          processing={loadingBroadcastedTx || isLoading}
+          disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData}
+          processing={loadingBroadcastedTx || isLoading || isLoadingOrdData}
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>
