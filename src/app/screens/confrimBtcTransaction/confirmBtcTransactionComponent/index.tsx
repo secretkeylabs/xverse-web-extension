@@ -31,8 +31,7 @@ const ButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(20),
-  marginTop: props.theme.spacing(5),
+  marginBottom: props.theme.spacing(5),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -100,6 +99,7 @@ function ConfirmBtcTransactionComponent({
   onBackButtonClick,
 }: Props) {
   const { t } = useTranslation('translation');
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
     btcAddress, selectedAccount, seedPhrase, network,
@@ -172,7 +172,7 @@ function ConfirmBtcTransactionComponent({
 
   return (
     <>
-      <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
+      {!isGalleryOpen && <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />}
       <Container>
         {amount && <TransferAmountView currency="BTC" amount={amount} />}
         {children}

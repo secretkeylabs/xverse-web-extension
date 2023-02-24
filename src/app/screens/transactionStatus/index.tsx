@@ -124,7 +124,7 @@ function TransactionStatus() {
   const location = useLocation();
   const { network } = useWalletSelector();
   const {
-    txid, currency, error, sponsored, browserTx,
+    txid, currency, error, sponsored, browserTx, isOrdinal, isNft,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -155,6 +155,8 @@ function TransactionStatus() {
 
   const onCloseClick = () => {
     if (browserTx) window.close();
+    else if (isOrdinal) navigate(-4);
+    else if (isNft) navigate(-3);
     else navigate(-2);
   };
 

@@ -11,7 +11,7 @@ const Container = styled.div((props) => ({
   transform: 'translate(-50%, -50%)',
   width: 312,
   borderRadius: 12,
-  zIndex: 2000,
+  zIndex: 16000,
   background: props.theme.colors.background.elevation2,
   filter: 'drop-shadow(0px 16px 36px rgba(0, 0, 0, 0.5))',
 }));

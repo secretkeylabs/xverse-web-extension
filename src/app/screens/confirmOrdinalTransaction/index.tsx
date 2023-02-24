@@ -87,6 +87,10 @@ const ValueText = styled.h1((props) => ({
   wordBreak: 'break-all',
 }));
 
+const BottomBarContainer = styled.h1((props) => ({
+  marginTop: props.theme.spacing(3),
+}));
+
 const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -152,6 +156,7 @@ function ConfirmOrdinalTransaction() {
           txid: btcTxBroadcastData,
           currency: 'BTC',
           error: '',
+          isOrdinal: true,
         },
       });
       setTimeout(() => {
@@ -169,6 +174,7 @@ function ConfirmOrdinalTransaction() {
           txid: '',
           currency: 'BTC',
           error: txError.toString(),
+          isOrdinal: true,
         },
       });
     }
@@ -205,7 +211,6 @@ function ConfirmOrdinalTransaction() {
         </>
       )}
       <ScrollContainer>
-        {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
         <ConfirmBtcTransactionComponent
           fee={fee}
           amount={amount}
@@ -227,7 +232,14 @@ function ConfirmOrdinalTransaction() {
           {networkInfoSection}
           <Seperator />
         </ConfirmBtcTransactionComponent>
-        {!isGalleryOpen && <BottomBar tab="nft" />}
+
+        {!isGalleryOpen
+         && (
+         <BottomBarContainer>
+           <BottomBar tab="nft" />
+         </BottomBarContainer>
+         )}
+
       </ScrollContainer>
     </>
   );
