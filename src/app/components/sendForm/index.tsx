@@ -329,7 +329,7 @@ function SendForm({
         <InputFieldContainer>
           <InputField
             value={recipientAddress}
-            placeholder={currencyType === 'BTC' ? t('BTC_RECEPIENT_PLACEHOLDER') : t('RECEPIENT_PLACEHOLDER')}
+            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' ? t('BTC_RECEPIENT_PLACEHOLDER') : t('RECEPIENT_PLACEHOLDER')}
             onChange={onAddressInputChange}
           />
         </InputFieldContainer>
@@ -379,7 +379,7 @@ function SendForm({
   return (
     <>
       <ScrollContainer>
-        {currencyType !== 'NFT' && (
+        {currencyType !== 'NFT' && currencyType !== 'Ordinal' && (
         <TokenContainer>
           <TokenImage
             token={currencyType || undefined}
@@ -399,7 +399,7 @@ function SendForm({
           <ErrorContainer>
             <ErrorText>{addressError}</ErrorText>
           </ErrorContainer>
-          {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
+          {currencyType !== 'BTC' && currencyType !== 'NFT' && currencyType !== 'Ordinal' && !hideMemo && (
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
@@ -419,6 +419,11 @@ function SendForm({
             <InfoContainer bodyText={t('MEMO_INFO')} />
           </>
           )}
+          {
+            currencyType === 'Ordinal' && (
+              <InfoContainer bodyText={t('SEND_ORDINAL_WALLET_WARNING')} type="Warning" />
+            )
+          }
         </OuterContainer>
 
       </ScrollContainer>
