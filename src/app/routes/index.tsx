@@ -40,6 +40,8 @@ import SignatureRequest from '@screens/signatureRequest';
 import TransactionRequest from '@screens/transactionRequest';
 import ErrorBoundary from '@screens/error';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
+import SendOrdinal from '@screens/sendOrdinal';
+import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 
 const router = createHashRouter([
   {
@@ -195,6 +197,14 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
+      {
+        path: 'send-ordinal',
+        element: (
+          <AuthGuard>
+            <SendOrdinal />
+          </AuthGuard>
+        ),
+      },
     ],
   },
   {
@@ -225,6 +235,18 @@ const router = createHashRouter([
       {
         path: 'confirm-nft-tx/:id',
         element: <ConfirmNftTransaction />,
+      },
+      {
+        path: 'confirm-ordinal-tx/:id',
+        element: <ConfirmOrdinalTransaction />,
+      },
+      {
+        path: 'nft-dashboard/ordinal-detail/:id/send-ordinal',
+        element: (
+          <AuthGuard>
+            <SendOrdinal />
+          </AuthGuard>
+        ),
       },
     ],
   },
