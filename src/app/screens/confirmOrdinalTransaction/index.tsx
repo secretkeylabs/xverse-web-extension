@@ -14,7 +14,7 @@ import useNftDataSelector from '@hooks/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
 import TopRow from '@components/topRow';
 import ConfirmBtcTransactionComponent from '@screens/confrimBtcTransaction/confirmBtcTransactionComponent';
-import { BtcTransactionBroadcastResponse, broadcastRawBtcTransaction } from '@secretkeylabs/xverse-core';
+import { broadcastRawBtcOrdinalTransaction } from '@secretkeylabs/xverse-core';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 
 const ScrollContainer = styled.div`
@@ -133,8 +133,8 @@ function ConfirmOrdinalTransaction() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network.type),
+  } = useMutation<string, Error, { signedTx: string }>(
+    async ({ signedTx }) => broadcastRawBtcOrdinalTransaction(signedTx, network.type),
   );
   const { id } = useParams();
   const { ordinalsData } = useNftDataSelector();
@@ -149,7 +149,7 @@ function ConfirmOrdinalTransaction() {
     if (btcTxBroadcastData) {
       navigate('/tx-status', {
         state: {
-          txid: btcTxBroadcastData.tx.hash,
+          txid: btcTxBroadcastData,
           currency: 'BTC',
           error: '',
         },

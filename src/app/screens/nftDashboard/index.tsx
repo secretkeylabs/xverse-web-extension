@@ -223,7 +223,7 @@ function NftDashboard() {
     queryKey: [`ordinals-${ordinalsAddress}`],
     queryFn: fetchOrdinals,
   });
-console.log(ordinals)
+
   useEffect(() => {
     refetch();
   }, [stxAddress, ordinalsAddress]);
