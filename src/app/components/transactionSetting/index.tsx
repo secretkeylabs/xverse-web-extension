@@ -166,6 +166,7 @@ function TransactionSettingAlert({
   const theme = useTheme();
   const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(loading);
   const [selectedOption, setSelectedOption] = useState({
     label: t('TRANSACTION_SETTING.STANDARD'),
     value: 'standard',
@@ -275,6 +276,7 @@ function TransactionSettingAlert({
   const modifyFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
     try {
       setSelectedOption(mode!);
+      setIsLoading(true);
       if (mode?.value === 'custom') inputRef?.current?.focus();
       else if (type === 'BTC') {
         if (amount && selectedAccount && btcRecepientAddress) {
@@ -303,6 +305,7 @@ function TransactionSettingAlert({
           setFeeInput(txFees.toString());
         }
       }
+      setIsLoading(false);
     } catch (err: any) {
       if (Number(error) === ErrorCodes.InSufficientBalance) { setError(t('TX_ERRORS.INSUFFICIENT_BALANCE')); } else setError(error.toString());
     }
@@ -437,8 +440,8 @@ function TransactionSettingAlert({
       <ButtonContainer>
         <ActionButton
           text={t('TRANSACTION_SETTING.APPLY')}
-          processing={loading}
-          disabled={loading}
+          processing={isLoading}
+          disabled={isLoading}
           onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
         />
       </ButtonContainer>

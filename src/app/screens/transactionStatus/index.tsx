@@ -106,15 +106,12 @@ const ButtonText = styled.h1((props) => ({
 
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
 }));
 
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   backgroundColor: 'transparent',
-  marginTop: props.theme.spacing(2),
   marginLeft: props.theme.spacing(3),
 }));
 

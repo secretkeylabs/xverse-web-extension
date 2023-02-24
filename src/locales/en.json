@@ -114,7 +114,7 @@
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",
-    "SUCCESS_MSG": "Your transaction have been successfully submitted and should appear in a few minutes.",
+    "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
     "STACKS_EXPLORER": "Stacks Explorer",
     "BITCOIN_EXPLORER": "Explorer",
