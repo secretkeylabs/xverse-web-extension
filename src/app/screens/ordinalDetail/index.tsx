@@ -12,7 +12,6 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
 import { MoonLoader } from 'react-spinners';
 import AccountHeaderComponent from '@components/accountHeader';
-import AlertMessage from '@components/alertMessage';
 import useOrdinalDataReducer from '@hooks/useOrdinalReducer';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { getOrdinalInfo, OrdinalInfo } from '@secretkeylabs/xverse-core';

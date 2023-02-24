@@ -334,13 +334,13 @@ function SendForm({
           />
         </InputFieldContainer>
       </AmountInputContainer>
-      {associatedAddress && currencyType !== 'BTC' && (
+      {associatedAddress && currencyType !== 'BTC' && currencyType !== 'Ordinal' && (
         <>
           <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
           <AssociatedText>{associatedAddress}</AssociatedText>
         </>
       )}
-      {associatedBnsName && currencyType !== 'BTC' && (
+      {associatedBnsName && currencyType !== 'BTC' && currencyType !== 'Ordinal' && (
       <>
         <SubText>{t('ASSOCIATED_BNS_DOMAIN')}</SubText>
         <AssociatedText>{associatedBnsName}</AssociatedText>

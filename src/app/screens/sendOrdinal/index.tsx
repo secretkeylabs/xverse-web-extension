@@ -21,7 +21,7 @@ import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { BtcUtxoDataResponse, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -107,6 +107,7 @@ function SendOrdinal() {
   } = useWalletSelector();
   const { ordinalsData } = useNftDataSelector();
   const [ordinal, setOrdinal] = useState<OrdinalInfo | undefined>(undefined);
+  const [ordinalUtxo, setOrdinalUtxo] = useState<BtcUtxoDataResponse | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
 
@@ -145,6 +146,7 @@ function SendOrdinal() {
     mutate,
   } = useMutation<SignedBtcTx, ResponseError, string>(async (recepient) => {
     const ordinalUtx = ordinals?.find((inscription) => inscription.id === ordinalIdDetails[0])?.utxo;
+    setOrdinalUtxo(ordinalUtx);
     if (ordinalUtx) {
       const txFees = await getBtcFeesForOrdinalSend(
         recepient,
@@ -185,6 +187,7 @@ function SendOrdinal() {
           fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
           total: data.total,
           fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),
+          ordinalUtxo,
         },
       });
     }

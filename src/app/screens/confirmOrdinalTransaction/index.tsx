@@ -125,7 +125,9 @@ function ConfirmOrdinalTransaction() {
   );
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const { fee, amount, signedTxHex } = location.state;
+  const {
+    fee, amount, signedTxHex, ordinalUtxo,
+  } = location.state;
   const {
     isLoading,
     error: txError,
@@ -213,6 +215,7 @@ function ConfirmOrdinalTransaction() {
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
           onBackButtonClick={handleOnCancelClick}
+          ordinalTxUtxo={ordinalUtxo}
         >
           <Container>
             <NFtContainer>

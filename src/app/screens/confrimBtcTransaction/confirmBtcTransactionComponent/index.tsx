@@ -13,7 +13,9 @@ import { useMutation } from '@tanstack/react-query';
 import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import TransferAmountView from '@components/transferAmountView';
 import TransferFeeView from '@components/transferFeeView';
-import { btcToSats, ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
+import {
+  btcToSats, BtcUtxoDataResponse, ErrorCodes, ResponseError,
+} from '@secretkeylabs/xverse-core';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -79,6 +81,7 @@ interface Props {
   amount: BigNumber;
   recipientAddress: string;
   signedTxHex: string;
+  ordinalTxUtxo?: BtcUtxoDataResponse;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -91,6 +94,7 @@ function ConfirmBtcTransactionComponent({
   amount,
   recipientAddress,
   signedTxHex,
+  ordinalTxUtxo,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -182,11 +186,12 @@ function ConfirmBtcTransactionComponent({
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
           fee={currentFee.toString()}
-          type="BTC"
+          type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
           amount={amount}
           onApplyClick={onApplyClick}
           onCrossClick={closeTransactionSettingAlert}
           btcRecepientAddress={recipientAddress}
+          ordinalTxUtxo={ordinalTxUtxo}
         />
       </Container>
       <ErrorContainer>
