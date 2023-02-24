@@ -53,6 +53,10 @@ const Container = styled.div((props) => ({
   marginTop: props.theme.spacing(16),
 }));
 
+const OrdinalInfoContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(6),
+}));
+
 const ErrorContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(3),
 }));
@@ -421,7 +425,9 @@ function SendForm({
           )}
           {
             currencyType === 'Ordinal' && (
-              <InfoContainer bodyText={t('SEND_ORDINAL_WALLET_WARNING')} type="Warning" />
+              <OrdinalInfoContainer>
+                <InfoContainer bodyText={t('SEND_ORDINAL_WALLET_WARNING')} type="Warning" />
+              </OrdinalInfoContainer>
             )
           }
         </OuterContainer>
