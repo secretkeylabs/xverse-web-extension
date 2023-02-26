@@ -49,7 +49,7 @@
     "BALANCE": "Balance",
     "RECEPIENT": "Recipient",
     "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
-    "BTC_RECEPIENT_PLACEHOLDER": "Address",
+    "BTC_RECEPIENT_PLACEHOLDER": "Enter Bitcoin address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
@@ -72,10 +72,12 @@
       "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
     },
     "SEND_NFT": "Send NFT",
-    "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name"
+    "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
+    "SEND_ORDINAL_TITLE": "Send Ordinal",
+    "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals."
   },
   "CONFIRM_TRANSACTION": {
-    "SEND": "Send",
+    "SEND": "Confirm Transaction",
     "INDICATION": "You will send",
     "RECEPIENT_ADDRESS": "recipient address",
     "MEMO": "Attached memo",
@@ -112,7 +114,7 @@
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",
-    "SUCCESS_MSG": "Your transaction have been successfully submitted and should appear in a few minutes.",
+    "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
     "STACKS_EXPLORER": "Stacks Explorer",
     "BITCOIN_EXPLORER": "Explorer",

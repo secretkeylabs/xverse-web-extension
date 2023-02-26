@@ -1,23 +1,21 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import Seperator from '@components/seperator';
 import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
-import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
+import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import useNftDataSelector from '@hooks/useNftDataSelector';
-import NftImage from '@screens/nftDashboard/nftImage';
 import AccountHeaderComponent from '@components/accountHeader';
 import TopRow from '@components/topRow';
-import useNetworkSelector from '@hooks/useNetwork';
+import ConfirmBtcTransactionComponent from '@screens/confrimBtcTransaction/confirmBtcTransactionComponent';
+import { broadcastRawBtcOrdinalTransaction } from '@secretkeylabs/xverse-core';
+import OrdinalImage from '@screens/ordinals/ordinalImage';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -26,7 +24,7 @@ const ScrollContainer = styled.div`
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
-  };
+  }
   height: 600px;
   width: 360px;
   margin: auto;
@@ -89,6 +87,10 @@ const ValueText = styled.h1((props) => ({
   wordBreak: 'break-all',
 }));
 
+const BottomBarContainer = styled.h1((props) => ({
+  marginTop: props.theme.spacing(3),
+}));
+
 const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -109,63 +111,70 @@ const NFtContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
-const NftTitleText = styled.h1((props) => ({
+const OrdinalInscriptionNumber = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));
 
-function ConfirmNftTransaction() {
+function ConfirmOrdinalTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation();
-  const { id } = useParams();
-  const { nftData } = useNftDataSelector();
-  const nftIdDetails = id!.split('::');
-  const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
-  const { unsignedTx, recipientAddress } = location.state;
   const {
-    stxBtcRate, network, stxAddress, fiatCurrency,
+    network, btcAddress, stxBtcRate, btcFiatRate,
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
-  const selectedNetwork = useNetworkSelector();
+  const [recipientAddress, setRecipientAddress] = useState('');
+  const location = useLocation();
+  const {
+    fee, amount, signedTxHex, ordinalUtxo,
+  } = location.state;
   const {
     isLoading,
     error: txError,
-    data: stxTxBroadcastData,
+    data: btcTxBroadcastData,
     mutate,
-  } = useMutation<
-  string,
-  Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
+  } = useMutation<string, Error, { signedTx: string }>(
+    async ({ signedTx }) => broadcastRawBtcOrdinalTransaction(signedTx, network.type),
+  );
+  const { id } = useParams();
+  const { ordinalsData } = useNftDataSelector();
+  const ordinalId = id!.split('::');
+  const ordinal = ordinalsData.find((inscription) => inscription?.metadata?.id === ordinalId[0]);
 
   useEffect(() => {
-    if (stxTxBroadcastData) {
+    setRecipientAddress(location.state.recipientAddress);
+  }, [location]);
+
+  useEffect(() => {
+    if (btcTxBroadcastData) {
       navigate('/tx-status', {
         state: {
-          txid: stxTxBroadcastData,
-          currency: 'STX',
+          txid: btcTxBroadcastData,
+          currency: 'BTC',
           error: '',
-          isNft: true,
+          isOrdinal: true,
         },
       });
       setTimeout(() => {
-        dispatch(fetchStxWalletDataRequestAction(stxAddress, selectedNetwork, fiatCurrency, stxBtcRate));
+        dispatch(
+          fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate),
+        );
       }, 1000);
     }
-  }, [stxTxBroadcastData]);
+  }, [btcTxBroadcastData]);
 
   useEffect(() => {
     if (txError) {
       navigate('/tx-status', {
         state: {
           txid: '',
-          currency: 'STX',
+          currency: 'BTC',
           error: txError.toString(),
-          isNft: true,
+          isOrdinal: true,
         },
       });
     }
@@ -178,8 +187,8 @@ function ConfirmNftTransaction() {
     </InfoContainer>
   );
 
-  const handleOnConfirmClick = (txs: StacksTransaction[]) => {
-    mutate({ signedTx: txs[0] });
+  const handleOnConfirmClick = (txHex: string) => {
+    mutate({ signedTx: txHex });
   };
 
   const handleOnCancelClick = () => {
@@ -189,44 +198,50 @@ function ConfirmNftTransaction() {
   return (
     <>
       {isGalleryOpen && (
-      <>
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-        <ButtonContainer>
-          <Button onClick={handleOnCancelClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-            </>
-          </Button>
-        </ButtonContainer>
-      </>
+        <>
+          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
+          <ButtonContainer>
+            <Button onClick={handleOnCancelClick}>
+              <>
+                <ButtonImage src={ArrowLeft} />
+                <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
+              </>
+            </Button>
+          </ButtonContainer>
+        </>
       )}
       <ScrollContainer>
-        {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
-        <ConfirmStxTransationComponent
-          initialStxTransactions={[unsignedTx]}
-          loading={isLoading}
+        <ConfirmBtcTransactionComponent
+          fee={fee}
+          amount={amount}
+          recipientAddress={recipientAddress}
+          loadingBroadcastedTx={isLoading}
+          signedTxHex={signedTxHex}
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
+          onBackButtonClick={handleOnCancelClick}
+          ordinalTxUtxo={ordinalUtxo}
         >
           <Container>
-            <IndicationText>{t('INDICATION')}</IndicationText>
             <NFtContainer>
-
-              <NftImage
-                metadata={nft?.token_metadata!}
-              />
+              <OrdinalImage ordinal={ordinal!} />
             </NFtContainer>
-            <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+            <OrdinalInscriptionNumber>{ordinal?.inscriptionNumber}</OrdinalInscriptionNumber>
           </Container>
           <RecipientAddressView recipient={recipientAddress} />
           {networkInfoSection}
           <Seperator />
-        </ConfirmStxTransationComponent>
-        {!isGalleryOpen && <BottomBar tab="nft" />}
+        </ConfirmBtcTransactionComponent>
+
+        {!isGalleryOpen
+         && (
+         <BottomBarContainer>
+           <BottomBar tab="nft" />
+         </BottomBarContainer>
+         )}
+
       </ScrollContainer>
     </>
-
   );
 }
-export default ConfirmNftTransaction;
+export default ConfirmOrdinalTransaction;

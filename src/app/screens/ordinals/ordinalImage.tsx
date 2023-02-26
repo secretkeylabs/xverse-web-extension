@@ -21,11 +21,15 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   alignItems: 'center',
   width: '100%',
   flex: 1,
-  height: props.isGalleryOpen ? '100%' : 156,
+  height: props.isGalleryOpen ? 300 : 150,
+  minHeight: props.isGalleryOpen ? 300 : 150,
+  maxHeight: props.isGalleryOpen ? 300 : 150,
   overflow: 'hidden',
   position: 'relative',
   fontSize: '3em',
   wordWrap: 'break-word',
+  backgroundColor: props.isGalleryOpen ? 'transparent' : '#1b1e2b',
+  borderRadius: 8
 }));
 
 const ButtonIcon = styled.img({
@@ -93,7 +97,7 @@ function OrdinalImage({ ordinal, isNftDashboard = false, inNftDetail = false }: 
             width="100%"
             placeholder={(
               <LoaderContainer>
-                <MoonLoader color="white" size={25} />
+                <MoonLoader color="white" size={20} />
               </LoaderContainer>
             )}
             src={getFetchableUrl(`https://gammaordinals.com${ordinal?.metadata.content}`, 'http')}
