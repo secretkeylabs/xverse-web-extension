@@ -18,7 +18,7 @@ export const MOON_PAY_API_KEY = 'pk_live_8YeOjOzFqHUG1qi2G6NPA4N1tZAWFihK';
 export const BINANCE_URL = 'https://www.binancecnt.com/en/pre-connect';
 export const BINANCE_MERCHANT_CODE = 'secret_key_labs';
 
-export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT';
+export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal';
 export enum LoaderSize {
   SMALLEST,
   SMALL,

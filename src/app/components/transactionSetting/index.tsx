@@ -16,8 +16,8 @@ import {
 } from '@secretkeylabs/xverse-core/currency';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
-import { getBtcFees, isCustomFeesAllowed } from '@secretkeylabs/xverse-core/transactions/btc';
-import { btcToSats, ErrorCodes } from '@secretkeylabs/xverse-core';
+import { getBtcFees, getBtcFeesForOrdinalSend, isCustomFeesAllowed } from '@secretkeylabs/xverse-core/transactions/btc';
+import { btcToSats, BtcUtxoDataResponse, ErrorCodes } from '@secretkeylabs/xverse-core';
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,
@@ -141,8 +141,9 @@ interface Props {
   type?: TxType;
   btcRecepientAddress?: string;
   amount?: BigNumber;
+  ordinalTxUtxo?: BtcUtxoDataResponse;
 }
-type TxType = 'STX' | 'BTC';
+type TxType = 'STX' | 'BTC' | 'Ordinals';
 type FeeModeType = 'low' | 'standard' | 'high' | 'custom';
 
 function TransactionSettingAlert({
@@ -158,12 +159,14 @@ function TransactionSettingAlert({
   type = 'STX',
   btcRecepientAddress,
   amount,
+  ordinalTxUtxo,
 }:Props) {
   const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
   const theme = useTheme();
   const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(loading);
   const [selectedOption, setSelectedOption] = useState({
     label: t('TRANSACTION_SETTING.STANDARD'),
     value: 'standard',
@@ -270,24 +273,39 @@ function TransactionSettingAlert({
     }
   }, [selectedOption]);
 
-  const modifyBtcFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
+  const modifyFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
     try {
       setSelectedOption(mode!);
+      setIsLoading(true);
       if (mode?.value === 'custom') inputRef?.current?.focus();
-      else if (amount && selectedAccount && btcRecepientAddress) {
-        const btcFee = await getBtcFees(
-          [
-            {
-              address: btcRecepientAddress,
-              amountSats: btcToSats(new BigNumber(amount)),
-            },
-          ],
-          btcAddress,
-          network.type,
-          mode?.value,
-        );
-        setFeeInput(btcFee.toString());
+      else if (type === 'BTC') {
+        if (amount && selectedAccount && btcRecepientAddress) {
+          const btcFee = await getBtcFees(
+            [
+              {
+                address: btcRecepientAddress,
+                amountSats: btcToSats(new BigNumber(amount)),
+              },
+            ],
+            btcAddress,
+            network.type,
+            mode?.value,
+          );
+          setFeeInput(btcFee.toString());
+        }
+      } else if (type === 'Ordinals') {
+        if (btcRecepientAddress && ordinalTxUtxo) {
+          const txFees = await getBtcFeesForOrdinalSend(
+            btcRecepientAddress,
+            ordinalTxUtxo,
+            btcAddress,
+            network.type,
+            mode?.value,
+          );
+          setFeeInput(txFees.toString());
+        }
       }
+      setIsLoading(false);
     } catch (err: any) {
       if (Number(error) === ErrorCodes.InSufficientBalance) { setError(t('TX_ERRORS.INSUFFICIENT_BALANCE')); } else setError(error.toString());
     }
@@ -362,7 +380,7 @@ function TransactionSettingAlert({
     setFeeInput(e.target.value);
   };
 
-  const onFeeOptionChange = (value: { label: string; value: string } | null) => (type === 'STX' ? modifyStxFees(value) : modifyBtcFees(value));
+  const onFeeOptionChange = (value: { label: string; value: string } | null) => (type === 'STX' ? modifyStxFees(value) : modifyFees(value));
 
   const editFeesSection = (
     <Container>
@@ -422,8 +440,8 @@ function TransactionSettingAlert({
       <ButtonContainer>
         <ActionButton
           text={t('TRANSACTION_SETTING.APPLY')}
-          processing={loading}
-          disabled={loading}
+          processing={isLoading}
+          disabled={isLoading}
           onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
         />
       </ButtonContainer>

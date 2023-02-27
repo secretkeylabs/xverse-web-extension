@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import InfoIcon from '@assets/img/info.svg';
+import WarningIcon from '@assets/img/Warning.svg';
 
-const Container = styled.div((props) => ({
+const Container = styled.div<{ type: 'Info' | 'Warning' | undefined }>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   borderRadius: 12,
@@ -9,7 +10,9 @@ const Container = styled.div((props) => ({
   backgroundColor: 'transparent',
   padding: props.theme.spacing(8),
   marginBottom: props.theme.spacing(6),
-  border: '1px solid rgba(255, 255, 255, 0.2)',
+  border: `1px solid ${
+    props.type === 'Warning' ? props.theme.colors.feedback.error_700 : 'rgba(255, 255, 255, 0.2)'
+  }`,
 }));
 
 const TextContainer = styled.div((props) => ({
@@ -38,20 +41,22 @@ const Text = styled.h1((props) => ({
 interface Props {
   titleText?: string;
   bodyText: string;
+  type?: 'Info' | 'Warning';
 }
 
-function InfoContainer({ titleText, bodyText }: Props) {
+function InfoContainer({ titleText, bodyText, type }: Props) {
   return (
-    <Container>
-      <img src={InfoIcon} alt="alert" />
+    <Container type={type}>
+      <img src={type === 'Warning' ? WarningIcon : InfoIcon} alt="alert" />
       <TextContainer>
         {titleText ? (
           <>
             <BoldText>{titleText}</BoldText>
             <SubText>{bodyText}</SubText>
           </>
-        )
-          : <Text>{bodyText}</Text>}
+        ) : (
+          <Text>{bodyText}</Text>
+        )}
       </TextContainer>
     </Container>
   );

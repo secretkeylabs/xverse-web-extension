@@ -5,6 +5,9 @@ import { getShortTruncatedAddress } from '@utils/helper';
 import Copy from '@assets/img/nftDashboard/Copy.svg';
 import QrCode from '@assets/img/nftDashboard/QrCode.svg';
 import { useTranslation } from 'react-i18next';
+import { ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import { useDispatch } from 'react-redux';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 interface Props {
   icon: string;
@@ -83,7 +86,13 @@ function ReceiveCardComponent({
   icon, title, address, onQrAddressClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+  const dispatch = useDispatch();
+  const {
+    ordinalsAddress,
+    showOrdinalReceiveAlert,
+  } = useWalletSelector();
   const onCopyClick = () => {
+    if (ordinalsAddress === address && showOrdinalReceiveAlert !== null) { dispatch(ChangeShowOrdinalReceiveAlertAction(true)); }
     navigator.clipboard.writeText(address);
   };
 

@@ -270,3 +270,17 @@ export function ChangeActivateOrdinalsAction(hasActivatedOrdinalsKey: boolean): 
     hasActivatedOrdinalsKey,
   };
 }
+
+export function ChangeShowBtcReceiveAlertAction(showBtcReceiveAlert: boolean | null): actions.ChangeShowBtcReceiveAlert {
+  return {
+    type: actions.ChangeShowBtcReceiveAlertKey,
+    showBtcReceiveAlert,
+  };
+}
+
+export function ChangeShowOrdinalReceiveAlertAction(showOrdinalReceiveAlert: boolean | null): actions.ChangeShowOrdinalReceiveAlert {
+  return {
+    type: actions.ChangeShowOrdinalReceiveAlertKey,
+    showOrdinalReceiveAlert,
+  };
+}

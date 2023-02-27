@@ -4,14 +4,18 @@ import { useEffect, useState } from 'react';
 
 const useTextOrdinalContent = (ordinal: OrdinalInfo) => {
   const [textContent, setTextContent] = useState('');
-  const url = `https://gammaordinals.com${ordinal?.metadata.content}`;
 
   useEffect(() => {
-    (async () => {
-      if (ordinal?.metadata['content type'].includes('text')) {
-        const response = await getTextOrdinalContent(url); setTextContent(response ?? '');
-      }
-    })();
+    if(ordinal) {
+      const url = `https://gammaordinals.com${ordinal?.metadata.content}`;
+  
+      (async () => {
+        if (ordinal?.metadata['content type'].startsWith('text/plain')) {
+          const response: string = await getTextOrdinalContent(url); 
+          setTextContent(response ?? '');
+        }
+      })();
+    }
   }, [ordinal]);
 
   return textContent.toString();

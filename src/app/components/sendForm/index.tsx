@@ -56,6 +56,10 @@ const Container = styled.div((props) => ({
   marginTop: props.theme.spacing(16),
 }));
 
+const OrdinalInfoContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(6),
+}));
+
 const ErrorContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(3),
 }));
@@ -405,18 +409,18 @@ function SendForm({
         <InputFieldContainer>
           <InputField
             value={recipientAddress}
-            placeholder={currencyType === 'BTC' ? t('BTC_RECEPIENT_PLACEHOLDER') : t('RECEPIENT_PLACEHOLDER')}
+            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' ? t('BTC_RECEPIENT_PLACEHOLDER') : t('RECEPIENT_PLACEHOLDER')}
             onChange={onAddressInputChange}
           />
         </InputFieldContainer>
       </AmountInputContainer>
-      {associatedAddress && currencyType !== 'BTC' && (
+      {associatedAddress && currencyType !== 'BTC' && currencyType !== 'Ordinal' && (
         <>
           <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
           <AssociatedText>{associatedAddress}</AssociatedText>
         </>
       )}
-      {associatedBnsName && currencyType !== 'BTC' && (
+      {associatedBnsName && currencyType !== 'BTC' && currencyType !== 'Ordinal' && (
       <>
         <SubText>{t('ASSOCIATED_BNS_DOMAIN')}</SubText>
         <AssociatedText>{associatedBnsName}</AssociatedText>
@@ -455,7 +459,7 @@ function SendForm({
   return (
     <>
       <ScrollContainer>
-        {currencyType !== 'NFT' && (
+        {currencyType !== 'NFT' && currencyType !== 'Ordinal' && (
         <TokenContainer>
           <TokenImage
             token={currencyType || undefined}
@@ -475,7 +479,7 @@ function SendForm({
           <ErrorContainer>
             <ErrorText>{addressError}</ErrorText>
           </ErrorContainer>
-          {currencyType !== 'BTC' && currencyType !== 'NFT' && !hideMemo && (
+          {currencyType !== 'BTC' && currencyType !== 'NFT' && currencyType !== 'Ordinal' && !hideMemo && (
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
@@ -495,6 +499,13 @@ function SendForm({
             <InfoContainer bodyText={t('MEMO_INFO')} />
           </>
           )}
+          {
+            currencyType === 'Ordinal' && (
+              <OrdinalInfoContainer>
+                <InfoContainer bodyText={t('SEND_ORDINAL_WALLET_WARNING')} type="Warning" />
+              </OrdinalInfoContainer>
+            )
+          }
         </OuterContainer>
 
       </ScrollContainer>

@@ -46,6 +46,9 @@ export const FetchCoinDataFailureKey = 'FetchCoinDataFailure';
 
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 
+export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
+export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
+
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
@@ -74,6 +77,8 @@ export interface WalletState {
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
+  showBtcReceiveAlert: boolean | null;
+  showOrdinalReceiveAlert: boolean | null;
 }
 
 export interface SetWallet {
@@ -229,6 +234,16 @@ export interface ChangeActivateOrdinals {
   hasActivatedOrdinalsKey: boolean;
 }
 
+export interface ChangeShowBtcReceiveAlert {
+  type: typeof ChangeShowBtcReceiveAlertKey;
+  showBtcReceiveAlert: boolean | null;
+}
+
+export interface ChangeShowOrdinalReceiveAlert {
+  type: typeof ChangeShowOrdinalReceiveAlertKey;
+  showOrdinalReceiveAlert: boolean | null;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -256,4 +271,6 @@ export type WalletActions =
   | ChangeFiatCurrency
   | ChangeNetwork
   | GetActiveAccounts
-  | ChangeActivateOrdinals;
+  | ChangeActivateOrdinals
+  | ChangeShowBtcReceiveAlert
+  | ChangeShowOrdinalReceiveAlert;
