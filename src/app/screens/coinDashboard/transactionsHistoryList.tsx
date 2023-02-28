@@ -161,6 +161,10 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       return groupedTxsByDateMap(data);
     }
   }, [data, isLoading, isFetching]);
+  console.log(
+    '🚀 ~ file: transactionsHistoryList.tsx:153 ~ groupedTxs ~ groupedTxs:',
+    groupedTxs,
+  );
 
   return (
     <ListItemsContainer>

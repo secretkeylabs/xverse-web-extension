@@ -184,11 +184,10 @@ export function fetchBtcWalletDataRequestAction(
   };
 }
 
-export function fetchBtcWalletDataSuccess(balance: BigNumber, btctransactions: BtcTransactionData[]): actions.FetchBtcWalletDataSuccess {
+export function fetchBtcWalletDataSuccess(balance: BigNumber): actions.FetchBtcWalletDataSuccess {
   return {
     type: actions.FetchBtcWalletDataSuccessKey,
     balance,
-    btctransactions,
   };
 }
 
