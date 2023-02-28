@@ -225,7 +225,7 @@ const router = createHashRouter([
         element: <NftDetailScreen />,
       },
       {
-        path: 'nft-dashboard/ordinal-detail/:id',
+        path: 'nft-dashboard/ordinal-detail/:id/:txHash',
         element: <OrdinalDetailScreen />,
       },
       {
@@ -241,7 +241,7 @@ const router = createHashRouter([
         element: <ConfirmOrdinalTransaction />,
       },
       {
-        path: 'nft-dashboard/ordinal-detail/:id/send-ordinal',
+        path: 'nft-dashboard/ordinal-detail/:id/:txHash/send-ordinal',
         element: (
           <AuthGuard>
             <SendOrdinal />

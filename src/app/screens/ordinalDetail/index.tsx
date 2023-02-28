@@ -19,6 +19,9 @@ import DescriptionTile from '@screens/nftDetail/descriptionTile';
 import { useMutation } from '@tanstack/react-query';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import InfoContainer from '@components/infoContainer';
+import usePendingOrdinalTxs from '@hooks/usePendingOrdinalTx';
+import AlertMessage from '@components/alertMessage';
+import { getBtcTxStatusUrl } from '@utils/helper';
 
 const Container = styled.div`
   display: flex;
@@ -207,12 +210,14 @@ const Text = styled.h1((props) => ({
 function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { ordinalsAddress } = useWalletSelector();
+  const { ordinalsAddress, network } = useWalletSelector();
   const { ordinalsData } = useNftDataSelector();
   const { storeOrdinalsMetaData } = useOrdinalDataReducer();
-  const { id } = useParams();
+  const { id, txHash } = useParams();
+  const { isPending, pendingTxHash } = usePendingOrdinalTxs(txHash);
   const [ordinalData, setOrdinalData] = useState<OrdinalInfo>();
   const [notSupportedOrdinal, setNotSupportedOrdinal] = useState<boolean>(false);
+  const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const {
     isLoading,
@@ -250,16 +255,34 @@ function OrdinalDetailScreen() {
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
-      url: chrome.runtime.getURL(`options.html#/nft-dashboard/ordinal-detail/${id}`),
+      url: chrome.runtime.getURL(`options.html#/nft-dashboard/ordinal-detail/${id}/${txHash}`),
     });
   };
 
+  const showAlert = () => {
+    setshowSendOridnalsAlert(true);
+  };
+
+  const onCloseAlert = () => {
+    setshowSendOridnalsAlert(false);
+  };
+
   const handleSendOrdinal = () => {
-    navigate('send-ordinal', {
-      state: {
-        ordinal: ordinalData,
-      },
-    });
+    if (isPending) {
+      showAlert();
+    } else {
+      navigate('send-ordinal', {
+        state: {
+          ordinal: ordinalData,
+        },
+      });
+    }
+  };
+
+  const handleRedirectToTx = () => {
+    if (pendingTxHash) {
+      window.open(getBtcTxStatusUrl(pendingTxHash, network), '_blank', 'noopener,noreferrer');
+    }
   };
 
   const ownedByView = (
@@ -373,6 +396,15 @@ function OrdinalDetailScreen() {
         <TopRow title={t('NFT_DETAIL')} onClick={handleBackButtonClick} />
       )}
       <Container>
+        {showSendOridnalsAlert && (
+          <AlertMessage
+            title={t('ORDINAL_PENDING_SEND_TITLE')}
+            onClose={onCloseAlert}
+            buttonText={t('ORDINAL_PENDING_SEND_BUTTON')}
+            onButtonClick={handleRedirectToTx}
+            description={t('ORDINAL_PENDING_SEND_DESCRIPTION')}
+          />
+        )}
         {isGalleryOpen ? galleryView : extensionView}
       </Container>
       {!isGalleryOpen && (

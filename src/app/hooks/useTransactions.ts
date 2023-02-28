@@ -14,7 +14,7 @@ import useNetworkSelector from './useNetwork';
 
 export default function useTransactions(coinType: CurrencyTypes) {
   const {
-    network, stxAddress, btcAddress, ordinalsAddress,
+    network, stxAddress, btcAddress, ordinalsAddress, hasActivatedOrdinalsKey
   } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const fetchTransactions = async (): Promise<
@@ -25,7 +25,12 @@ export default function useTransactions(coinType: CurrencyTypes) {
         return await getStxAddressTransactions(stxAddress, selectedNetwork, 0, PAGINATION_LIMIT);
       }
       if (coinType === 'BTC') {
-        const btcData = await fetchBtcTransactionsData(btcAddress, ordinalsAddress, network.type);
+        const btcData = await fetchBtcTransactionsData(
+          btcAddress,
+          ordinalsAddress,
+          network.type,
+          hasActivatedOrdinalsKey as boolean,
+        );
         return btcData;
       }
       return [];

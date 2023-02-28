@@ -59,7 +59,7 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
     }
   } else if (coin === 'BTC') {
     const prefix = transaction.incoming ? '' : '-';
-    if (!transaction.amount.isEqualTo(0)) {
+    if (!new BigNumber(transaction.amount).isEqualTo(0)) {
       return (
         <NumericFormat
           value={satsToBtc(BigNumber(transaction.amount)).toString()}
