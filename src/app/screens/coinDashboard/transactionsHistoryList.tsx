@@ -95,6 +95,11 @@ const groupBtcTxsByDate = (
       }
     } else {
       all[txDate].push(transaction);
+      all[txDate].sort((txA, txB) => {
+        if (txB.blockHeight > txA.blockHeight) {
+          return 1;
+        } return -1;
+      });
     }
     return all;
   },
@@ -161,11 +166,6 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       return groupedTxsByDateMap(data);
     }
   }, [data, isLoading, isFetching]);
-  console.log(
-    '🚀 ~ file: transactionsHistoryList.tsx:153 ~ groupedTxs ~ groupedTxs:',
-    groupedTxs,
-  );
-
   return (
     <ListItemsContainer>
       <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>
