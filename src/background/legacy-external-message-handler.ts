@@ -163,6 +163,20 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
+    case ExternalMethods.dlcOfferRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['request', payload]]);
+      const { id } = await triggerRequstWindowOpen(RequestsRoutes.DlcGetOfferRequest, urlParams);
+      console.log(urlParams)
+      console.log(tabId)
+      console.log(payload)
+      listenForPopupClose({
+        id,
+        tabId,
+        response: formatMessageSigningResponse({ request: payload, response: 'cancel' }),
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
     default: {
       break;
     }

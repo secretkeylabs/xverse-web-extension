@@ -25,4 +25,9 @@ export class XverseBitcoinJSWallet extends BitcoinJSWallet {
     const btcPrivateKey = getBtcPrivateKey({ seedPhrase, index, network });
     return btcPrivateKey;
   }
+
+  async getBalance(): Promise<number> {
+    const { btcBalance } = useSelector((state: StoreState) => state.walletState);
+    return btcBalance.toNumber();
+  }
 }

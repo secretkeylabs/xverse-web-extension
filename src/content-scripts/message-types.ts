@@ -13,6 +13,8 @@ export enum ExternalMethods {
   signatureResponse = 'signatureResponse',
   structuredDataSignatureRequest = 'structuredDataSignatureRequest',
   structuredDataSignatureResponse = 'structuredDataSignatureResponse',
+  dlcOfferRequest = 'dlcOfferRequest',
+  dlcOfferResponse = 'dlcOfferResponse',
 }
 
 export enum InternalMethods {
@@ -42,26 +44,27 @@ export interface Message<Methods extends ExtensionMethods, Payload = undefined>
 type AuthenticationRequestMessage = Message<ExternalMethods.authenticationRequest, string>;
 
 export type AuthenticationResponseMessage = Message<
-ExternalMethods.authenticationResponse,
-{
-  authenticationRequest: string;
-  authenticationResponse: string;
-}
+  ExternalMethods.authenticationResponse,
+  {
+    authenticationRequest: string;
+    authenticationResponse: string;
+  }
 >;
+
 
 type SignatureRequestMessage = Message<ExternalMethods.signatureRequest, string>;
 
 export type SignatureResponseMessage = Message<
-ExternalMethods.signatureResponse,
-{
-  signatureRequest: string;
-  signatureResponse: SignatureData | string;
-}
+  ExternalMethods.signatureResponse,
+  {
+    signatureRequest: string;
+    signatureResponse: SignatureData | string;
+  }
 >;
 
 type StructuredDataSignatureRequestMessage = Message<
-ExternalMethods.structuredDataSignatureRequest,
-string
+  ExternalMethods.structuredDataSignatureRequest,
+  string
 >;
 
 type TransactionRequestMessage = Message<ExternalMethods.transactionRequest, string>;
@@ -69,20 +72,32 @@ type TransactionRequestMessage = Message<ExternalMethods.transactionRequest, str
 export type TxResult = SponsoredFinishedTxPayload | FinishedTxPayload;
 
 export type TransactionResponseMessage = Message<
-ExternalMethods.transactionResponse,
-{
-  transactionRequest: string;
-  transactionResponse: TxResult | string;
-}
+  ExternalMethods.transactionResponse,
+  {
+    transactionRequest: string;
+    transactionResponse: TxResult | string;
+  }
+>;
+
+type DlcOfferRequestMessage = Message<ExternalMethods.dlcOfferRequest, string>;
+
+export type DlcOfferResponseMessage = Message<
+  ExternalMethods.dlcOfferResponse,
+  {
+    dlcOfferRequest: string;
+    dlcOfferResponse: string;
+  }
 >;
 
 export type LegacyMessageFromContentScript =
   | AuthenticationRequestMessage
   | TransactionRequestMessage
   | SignatureRequestMessage
-  | StructuredDataSignatureRequestMessage;
+  | StructuredDataSignatureRequestMessage
+  | DlcOfferRequestMessage;
 
 export type LegacyMessageToContentScript =
   | AuthenticationResponseMessage
   | TransactionResponseMessage
-  | SignatureResponseMessage;
+  | SignatureResponseMessage
+  | DlcOfferResponseMessage;

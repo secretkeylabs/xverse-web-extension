@@ -5,6 +5,13 @@ import {
   fetchRatesSaga,
   fetchStxWalletSaga,
 } from '@stores/wallet/saga';
+import {
+  handleAcceptSaga,
+  handleContractsSaga,
+  handleOfferSaga,
+  handleRejectSaga,
+  handleSignSaga,
+} from '@stores/dlc/saga';
 
 function* rootSaga() {
   const sagasList = [
@@ -12,8 +19,12 @@ function* rootSaga() {
     fetchStxWalletSaga(),
     fetchBtcWalletSaga(),
     fetchCoinDataSaga(),
+    handleContractsSaga(),
+    handleAcceptSaga(),
+    handleOfferSaga(),
+    handleRejectSaga(),
+    handleSignSaga(),
   ];
-
   yield all(sagasList);
 }
 
