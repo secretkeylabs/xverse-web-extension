@@ -1,9 +1,9 @@
 import { takeEvery, put, call } from 'redux-saga/effects';
 import {
   fetchBtcToCurrencyRate,
-  fetchBtcTransactionsData,
   fetchStxAddressData,
   fetchStxToBtcRate,
+  getBtcWalletData,
   getCoinsInfo,
   getFtData,
 } from '@secretkeylabs/xverse-core/api';
@@ -77,13 +77,12 @@ function* fetchStxWalletData(action: FetchStxWalletDataRequest) {
 
 function* fetchBtcWalletData(action: FetchBtcWalletDataRequest) {
   try {
-    const btcData: BtcAddressData = yield fetchBtcTransactionsData(
+    const btcData: BtcAddressData = yield getBtcWalletData(
       action.btcAddress,
       action.network,
     );
     const btcBalance = new BigNumber(btcData.finalBalance);
-    const btcTransactions = btcData.transactions;
-    yield put(fetchBtcWalletDataSuccess(btcBalance, btcTransactions));
+    yield put(fetchBtcWalletDataSuccess(btcBalance));
   } catch (error) {
     yield put(fetchBtcWalletDataFail());
   }

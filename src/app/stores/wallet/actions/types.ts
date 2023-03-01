@@ -184,7 +184,6 @@ export interface FetchBtcWalletDataRequest {
 export interface FetchBtcWalletDataSuccess {
   type: typeof FetchBtcWalletDataSuccessKey;
   balance: BigNumber;
-  btctransactions: BtcTransactionData[];
 }
 
 export interface FetchBtcWalletDataFail {
