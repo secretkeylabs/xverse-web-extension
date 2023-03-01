@@ -15,6 +15,7 @@ interface Props {
 
 const NftNameText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
+  textAlign: 'left',
 }));
 
 const NftNameTextContainer = styled.h1((props) => ({
