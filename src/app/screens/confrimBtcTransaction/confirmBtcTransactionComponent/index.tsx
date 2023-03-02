@@ -10,12 +10,32 @@ import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { useMutation } from '@tanstack/react-query';
-import { Recipient, SignedBtcTx, signOrdinalSendTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
-import TransferAmountView from '@components/transferAmountView';
-import TransferFeeView from '@components/transferFeeView';
 import {
-  btcToSats, BtcUtxoDataResponse, ErrorCodes, ResponseError,
+  Recipient,
+  SignedBtcTx,
+  signOrdinalSendTransaction,
+} from '@secretkeylabs/xverse-core/transactions/btc';
+import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
+import {
+  btcToSats,
+  BtcUtxoDataResponse,
+  ErrorCodes,
+  getBtcFiatEquivalent,
+  ResponseError,
+  satsToBtc,
 } from '@secretkeylabs/xverse-core';
+import TransactionDetailComponent from './transactionDetailComponent';
+import TransferAmountComponent from './transferAmountComponent';
+import InputOutputComponent from './inputOutputComponent';
+
+const OuterContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -73,6 +93,12 @@ const ErrorText = styled.h1((props) => ({
   color: props.theme.colors.feedback.error,
 }));
 
+const ReviewTransactionText = styled.h1((props) => ({
+  ...props.theme.headline_m,
+  color: props.theme.colors.white[0],
+  marginBottom: props.theme.spacing(16),
+}));
+
 interface Props {
   fee: BigNumber;
   children: ReactNode;
@@ -101,17 +127,20 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
+  const [expandTransferAmountView, setExpandTransferAmountView] = useState(false);
+  const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
-    btcAddress, selectedAccount, seedPhrase, network,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+    btcAddress, selectedAccount, seedPhrase, network, btcFiatRate,
+  } = useSelector((state: StoreState) => state.walletState);
   const [currentFee, setCurrentFee] = useState(fee);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const {
-    isLoading, data, error: txError, mutate,
+    isLoading,
+    data,
+    error: txError,
+    mutate,
   } = useMutation<
   SignedBtcTx,
   ResponseError,
@@ -119,16 +148,14 @@ function ConfirmBtcTransactionComponent({
     recipients: Recipient[];
     txFee: string;
   }
-  >(
-    async ({ recipients, txFee }) => signBtcTransaction(
-      recipients,
-      btcAddress,
-      selectedAccount?.id ?? 0,
-      seedPhrase,
-      network.type,
-      new BigNumber(txFee),
-    ),
-  );
+  >(async ({ recipients, txFee }) => signBtcTransaction(
+    recipients,
+    btcAddress,
+    selectedAccount?.id ?? 0,
+    seedPhrase,
+    network.type,
+    new BigNumber(txFee),
+  ));
 
   const {
     isLoading: isLoadingOrdData,
@@ -190,6 +217,14 @@ function ConfirmBtcTransactionComponent({
     onConfirmClick(signedTx);
   };
 
+  const expandTransferAmountSection = () => {
+    setExpandTransferAmountView(!expandTransferAmountView);
+  };
+
+  const expandInputOutputSection = () => {
+    setExpandInputOutputView(!expandInputOutputView);
+  };
+
   useEffect(() => {
     if (recipientAddress && amount && txError) {
       setOpenTransactionSettingModal(false);
@@ -213,12 +248,47 @@ function ConfirmBtcTransactionComponent({
   }, [ordinalError]);
 
   return (
-    <>
-      {!isGalleryOpen && <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />}
+    <OuterContainer>
+      {!isGalleryOpen && (
+        <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
+      )}
       <Container>
-        {amount && <TransferAmountView currency="BTC" amount={amount} />}
+        <ReviewTransactionText>{t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}</ReviewTransactionText>
+        {amount && (
+          <TransferAmountComponent
+            title={t('CONFIRM_TRANSACTION.INDICATION')}
+            icon={IconBitcoin}
+            value={`${amount.toString()} BTC`}
+            subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
+            description="Less than or equal to"
+            isExpanded={expandTransferAmountView}
+            address={btcAddress}
+            onArrowClick={expandTransferAmountSection}
+          />
+        )}
+        <InputOutputComponent
+          value={`${amount.toString()} BTC`}
+          subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
+          isExpanded={expandInputOutputView}
+          address={btcAddress}
+          onArrowClick={expandInputOutputSection}
+        />
+        <TransactionDetailComponent
+          title={t('CONFIRM_TRANSACTION.NETWORK')}
+          value={network.type}
+        />
+        <TransactionDetailComponent
+          title={t('CONFIRM_TRANSACTION.FEES')}
+          value={`${currentFee.toString()} ${t('SATS')}`}
+          subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
+        />
+        <TransactionDetailComponent
+          title={t('CONFIRM_TRANSACTION.TOTAL')}
+          subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
+          value={`${satsToBtc(currentFee).plus(amount).toString()} BTC`}
+          subValue={getBtcFiatEquivalent(new BigNumber(satsToBtc(currentFee).plus(amount)), btcFiatRate)}
+        />
         {children}
-        <TransferFeeView fee={currentFee} currency={t('SATS')} />
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
@@ -256,7 +326,7 @@ function ConfirmBtcTransactionComponent({
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>
-    </>
+    </OuterContainer>
   );
 }
 

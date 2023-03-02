@@ -90,7 +90,16 @@
     "SATS": "SATS",
     "CONFIRM_TX": "Confirm Transaction",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
-    "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account."
+    "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
+    "TOTAL": "Total",
+    "AMOUNT_PLUS_FEES": "Amount + fees",
+    "REVIEW_TRNSACTION": "Review transaction",
+    "AMOUNT": "Amount",
+    "YOUR_ADDRESS": "Your address",
+    "FROM": "From",
+    "INPUT": "Inputs",
+    "INPUT_AND_OUTPUT": "Inputs & Outputs",
+    "OUTPUT": "Output"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
