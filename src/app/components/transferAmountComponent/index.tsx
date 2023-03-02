@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import AddressIcon from '@assets/img/transactions/address.svg';
-import Copy from '@assets/img/nftDashboard/Copy.svg';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
@@ -157,9 +156,6 @@ function TransferAmountComponent({
     </>
   );
 
-  const onCopyClick = () => {
-    navigator.clipboard.writeText(address);
-  };
   return (
     <Container>
       <RowContainer>

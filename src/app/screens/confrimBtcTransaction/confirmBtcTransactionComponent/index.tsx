@@ -1,7 +1,7 @@
 import TopRow from '@components/topRow';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
@@ -24,8 +24,8 @@ import {
   ResponseError,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
-import TransactionDetailComponent from './transactionDetailComponent';
-import TransferAmountComponent from './transferAmountComponent';
+import TransactionDetailComponent from '../../../components/transactionDetailComponent';
+import TransferAmountComponent from '../../../components/transferAmountComponent';
 import InputOutputComponent from './inputOutputComponent';
 
 const OuterContainer = styled.div`
@@ -101,7 +101,6 @@ const ReviewTransactionText = styled.h1((props) => ({
 
 interface Props {
   fee: BigNumber;
-  children: ReactNode;
   loadingBroadcastedTx: boolean;
   amount: BigNumber;
   recipientAddress: string;
@@ -114,7 +113,6 @@ interface Props {
 
 function ConfirmBtcTransactionComponent({
   fee,
-  children,
   loadingBroadcastedTx,
   amount,
   recipientAddress,
@@ -288,7 +286,6 @@ function ConfirmBtcTransactionComponent({
           value={`${satsToBtc(currentFee).plus(amount).toString()} BTC`}
           subValue={getBtcFiatEquivalent(new BigNumber(satsToBtc(currentFee).plus(amount)), btcFiatRate)}
         />
-        {children}
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
