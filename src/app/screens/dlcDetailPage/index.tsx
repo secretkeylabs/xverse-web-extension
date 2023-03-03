@@ -10,9 +10,9 @@ import {
 } from '@stores/dlc/actions/actionCreators';
 import { StoreState } from '@stores/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { ContractView } from '@components/contractView';
+import { DlcView } from '@components/dlcView';
 
-const ContractDetailPage: FC = () => {
+const DlcDetailPage: FC = () => {
   const dispatch = useDispatch();
   const { processing, actionSuccess, error, contracts, selectedContract } = useSelector(
     (state: StoreState) => state.dlcState
@@ -117,7 +117,7 @@ const ContractDetailPage: FC = () => {
   return (
     <>
       {contract !== undefined && (
-        <ContractView
+        <DlcView
           contract={contract}
           acceptContract={handleAccept}
           rejectContract={handleReject}
@@ -129,4 +129,4 @@ const ContractDetailPage: FC = () => {
   );
 };
 
-export default ContractDetailPage;
+export default DlcDetailPage;

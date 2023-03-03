@@ -17,7 +17,7 @@ import {
   actionError,
 } from './actions/actionCreators';
 import { AnyContract } from 'dlc-lib';
-import { DlcAPI } from '../../dlclib/dlcApi'
+import { DlcAPI } from '../../dlclib/DlcAPI'
 
 function* handleContracts() {
   try {

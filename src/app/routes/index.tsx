@@ -39,7 +39,7 @@ import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import SignatureRequest from '@screens/signatureRequest';
 import TransactionRequest from '@screens/transactionRequest';
 import ErrorBoundary from '@screens/error';
-import ContractDetailPage from '@screens/contractDetailPage';
+import DlcDetailPage from '@screens/dlcDetailPage';
 
 const router = createHashRouter([
   {
@@ -197,7 +197,7 @@ const router = createHashRouter([
       },
       {
         path: 'dlc-offer-request/:contractId',
-        element: <ContractDetailPage />,
+        element: <DlcDetailPage />,
       },
     ],
   },

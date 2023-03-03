@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import { getBtcPrivateKey, NetworkType } from '@secretkeylabs/xverse-core';
 
-export class XverseBitcoinJSWallet extends BitcoinJSWallet {
+export class DlcBitcoinJSWallet extends BitcoinJSWallet {
   constructor(storage: WalletStorage, network: Network, blockchain: Blockchain) {
     super(storage, network, blockchain);
   }

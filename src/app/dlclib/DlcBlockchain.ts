@@ -7,7 +7,7 @@ import { Blockchain, Utxo } from 'dlc-lib';
 import axios from 'axios';
 import { BtcTransactionData } from '@secretkeylabs/xverse-core';
 
-export class XverseBitcoinBlockchain implements Blockchain {
+export class DlcBitcoinBlockchain implements Blockchain {
   constructor() {}
 
   async getTransaction(txid: string): Promise<string> {

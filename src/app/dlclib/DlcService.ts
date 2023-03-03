@@ -1,4 +1,4 @@
-import { DlcAPI }  from './DlcApi'
+import { DlcAPI }  from './DlcAPI'
 import { DlcManager } from 'dlc-lib'
 import { AnyContract } from 'dlc-lib'
 import { ContractRepository } from 'dlc-lib'

@@ -3,7 +3,7 @@ import { ContractState } from 'dlc-lib';
 import { AnyContract } from 'dlc-lib';
 import { Transaction } from 'bitcoinjs-lib';
 
-export type ContractViewProps = {
+export type DlcViewProps = {
   contract: AnyContract;
   acceptContract: () => void;
   rejectContract: () => void;
@@ -82,7 +82,7 @@ function calculateCanAccept(availableAmount: number, totalCollateral: number, co
   return canAccept;
 }
 
-export const ContractView: FC<ContractViewProps> = (props: ContractViewProps) => {
+export const DlcView: FC<DlcViewProps> = (props: DlcViewProps) => {
   const [contract, setContract] = useState(props.contract);
   const [isLoading, setLoading] = useState(true);
   const [isProposal, setIsProposal] = useState(false);
