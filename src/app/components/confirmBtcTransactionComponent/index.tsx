@@ -1,12 +1,15 @@
 import TopRow from '@components/topRow';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
+import OutputIcon from '@assets/img/transactions/output.svg';
+import AssetIcon from '@assets/img/transactions/Assets.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
 import { useSelector } from 'react-redux';
+import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { useMutation } from '@tanstack/react-query';
@@ -15,18 +18,18 @@ import {
   SignedBtcTx,
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import {
-  btcToSats,
   BtcUtxoDataResponse,
   ErrorCodes,
   getBtcFiatEquivalent,
   ResponseError,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
-import TransactionDetailComponent from '../../../components/transactionDetailComponent';
-import TransferAmountComponent from '../../../components/transferAmountComponent';
+import TransferDetailView from '@components/transferDetailView';
+import TransactionDetailComponent from '../transactionDetailComponent';
+import TransferAmountComponent from '../transferAmountComponent';
 import InputOutputComponent from './inputOutputComponent';
+import BtcRecipientComponent from './btcRecipientComponent';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -93,19 +96,24 @@ const ErrorText = styled.h1((props) => ({
   color: props.theme.colors.feedback.error,
 }));
 
-const ReviewTransactionText = styled.h1((props) => ({
-  ...props.theme.headline_m,
+interface ReviewTransactionTitleProps {
+  isOridnalTx: boolean;
+}
+const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
+  ...props.theme.headline_s,
   color: props.theme.colors.white[0],
   marginBottom: props.theme.spacing(16),
+  textAlign: props.isOridnalTx ? 'center' : 'left',
 }));
 
 interface Props {
   fee: BigNumber;
   loadingBroadcastedTx: boolean;
-  amount: BigNumber;
-  recipientAddress: string;
   signedTxHex: string;
   ordinalTxUtxo?: BtcUtxoDataResponse;
+  recipients: Recipient[];
+  children?: ReactNode;
+  assetDetail?: string;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -114,10 +122,11 @@ interface Props {
 function ConfirmBtcTransactionComponent({
   fee,
   loadingBroadcastedTx,
-  amount,
-  recipientAddress,
   signedTxHex,
   ordinalTxUtxo,
+  recipients,
+  children,
+  assetDetail,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -130,7 +139,9 @@ function ConfirmBtcTransactionComponent({
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
     btcAddress, selectedAccount, seedPhrase, network, btcFiatRate,
-  } = useSelector((state: StoreState) => state.walletState);
+  } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
   const [currentFee, setCurrentFee] = useState(fee);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
@@ -162,7 +173,7 @@ function ConfirmBtcTransactionComponent({
     mutate: ordinalMutate,
   } = useMutation<SignedBtcTx, ResponseError, string>(async (txFee) => {
     const signedTx = await signOrdinalSendTransaction(
-      recipientAddress,
+      recipients[0]?.address,
       ordinalTxUtxo!,
       btcAddress,
       Number(selectedAccount?.id),
@@ -199,13 +210,6 @@ function ConfirmBtcTransactionComponent({
 
   const onApplyClick = (modifiedFee: string) => {
     setCurrentFee(new BigNumber(modifiedFee));
-    const recipients: Recipient[] = [
-      {
-        address: recipientAddress,
-        amountSats: btcToSats(new BigNumber(amount)),
-      },
-    ];
-
     if (ordinalTxUtxo) ordinalMutate(modifiedFee);
     else mutate({ recipients, txFee: modifiedFee });
     setLoading(true);
@@ -224,7 +228,7 @@ function ConfirmBtcTransactionComponent({
   };
 
   useEffect(() => {
-    if (recipientAddress && amount && txError) {
+    if (recipients && txError) {
       setOpenTransactionSettingModal(false);
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
@@ -235,7 +239,7 @@ function ConfirmBtcTransactionComponent({
   }, [txError]);
 
   useEffect(() => {
-    if (recipientAddress && amount && ordinalError) {
+    if (recipients && ordinalError) {
       setOpenTransactionSettingModal(false);
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
@@ -251,40 +255,58 @@ function ConfirmBtcTransactionComponent({
         <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
       )}
       <Container>
-        <ReviewTransactionText>{t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}</ReviewTransactionText>
-        {amount && (
-          <TransferAmountComponent
-            title={t('CONFIRM_TRANSACTION.INDICATION')}
-            icon={IconBitcoin}
-            value={`${amount.toString()} BTC`}
-            subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
-            description="Less than or equal to"
-            isExpanded={expandTransferAmountView}
-            address={btcAddress}
-            onArrowClick={expandTransferAmountSection}
+        {children}
+        <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
+          {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
+        </ReviewTransactionText>
+
+        {ordinalTxUtxo ? (
+          <BtcRecipientComponent
+            address={recipients[0]?.address}
+            value={assetDetail!}
+            icon={AssetIcon}
+            title={t('CONFIRM_TRANSACTION.ASSET')}
           />
+        ) : (
+          recipients?.map((recipient, index) => (
+            <BtcRecipientComponent
+              recipientIndex={index + 1}
+              address={recipient?.address}
+              value={satsToBtc(recipient?.amountSats).toString()}
+              totalRecipient={recipients?.length}
+              icon={IconBitcoin}
+              title={t('CONFIRM_TRANSACTION.AMOUNT')}
+              subValue={getBtcFiatEquivalent(
+                recipient?.amountSats,
+                btcFiatRate,
+              )}
+            />
+          ))
         )}
+        {/* <TransferAmountComponent
+          title={t('CONFIRM_TRANSACTION.INDICATION')}
+          icon={IconBitcoin}
+          value={`${recipients[0]?.amountSats.toString()} BTC`}
+          subValue={getBtcFiatEquivalent(new BigNumber(recipients[0]?.amountSats), btcFiatRate)}
+          description="Less than or equal to"
+          isExpanded={expandTransferAmountView}
+          address={btcAddress}
+          onArrowClick={expandTransferAmountSection}
+        />
+
         <InputOutputComponent
-          value={`${amount.toString()} BTC`}
-          subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
+          value={`${recipients[0]?.amountSats.toString()} BTC`}
+          subValue={getBtcFiatEquivalent(new BigNumber(recipients[0]?.amountSats), btcFiatRate)}
           isExpanded={expandInputOutputView}
           address={btcAddress}
           onArrowClick={expandInputOutputSection}
-        />
-        <TransactionDetailComponent
-          title={t('CONFIRM_TRANSACTION.NETWORK')}
-          value={network.type}
-        />
+          /> */}
+
+        <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         <TransactionDetailComponent
           title={t('CONFIRM_TRANSACTION.FEES')}
           value={`${currentFee.toString()} ${t('SATS')}`}
           subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
-        />
-        <TransactionDetailComponent
-          title={t('CONFIRM_TRANSACTION.TOTAL')}
-          subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
-          value={`${satsToBtc(currentFee).plus(amount).toString()} BTC`}
-          subValue={getBtcFiatEquivalent(new BigNumber(satsToBtc(currentFee).plus(amount)), btcFiatRate)}
         />
         <Button onClick={onAdvancedSettingClick}>
           <>
@@ -296,10 +318,9 @@ function ConfirmBtcTransactionComponent({
           visible={openTransactionSettingModal}
           fee={currentFee.toString()}
           type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
-          amount={amount}
+          btcRecipients={recipients}
           onApplyClick={onApplyClick}
           onCrossClick={closeTransactionSettingAlert}
-          btcRecepientAddress={recipientAddress}
           ordinalTxUtxo={ordinalTxUtxo}
           loading={loading}
         />

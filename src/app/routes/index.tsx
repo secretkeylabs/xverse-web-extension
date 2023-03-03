@@ -42,7 +42,7 @@ import ErrorBoundary from '@screens/error';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
 import SendOrdinal from '@screens/sendOrdinal';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
-import BtcSelectAddressScreen from '@screens/btcAuthenticationRequest';
+import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
 
 const router = createHashRouter([
   {
@@ -139,7 +139,6 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <BtcSelectAddressScreen />
-            ,
           </AuthGuard>
         ),
       },

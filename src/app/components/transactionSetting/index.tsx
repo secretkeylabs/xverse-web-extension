@@ -16,7 +16,7 @@ import {
 } from '@secretkeylabs/xverse-core/currency';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
-import { getBtcFees, getBtcFeesForOrdinalSend, isCustomFeesAllowed } from '@secretkeylabs/xverse-core/transactions/btc';
+import { getBtcFees, getBtcFeesForOrdinalSend, isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import { btcToSats, BtcUtxoDataResponse, ErrorCodes } from '@secretkeylabs/xverse-core';
 
 const Text = styled.h1((props) => ({
@@ -139,8 +139,7 @@ interface Props {
   availableBalance?: BigNumber;
   allowEditNonce?: boolean;
   type?: TxType;
-  btcRecepientAddress?: string;
-  amount?: BigNumber;
+  btcRecipients: Recipient[];
   ordinalTxUtxo?: BtcUtxoDataResponse;
 }
 type TxType = 'STX' | 'BTC' | 'Ordinals';
@@ -157,8 +156,7 @@ function TransactionSettingAlert({
   availableBalance,
   allowEditNonce = true,
   type = 'STX',
-  btcRecepientAddress,
-  amount,
+  btcRecipients,
   ordinalTxUtxo,
 }:Props) {
   const { t } = useTranslation('translation');
@@ -279,14 +277,9 @@ function TransactionSettingAlert({
       setIsLoading(true);
       if (mode?.value === 'custom') inputRef?.current?.focus();
       else if (type === 'BTC') {
-        if (amount && selectedAccount && btcRecepientAddress) {
+        if (btcRecipients && selectedAccount) {
           const btcFee = await getBtcFees(
-            [
-              {
-                address: btcRecepientAddress,
-                amountSats: btcToSats(new BigNumber(amount)),
-              },
-            ],
+            btcRecipients,
             btcAddress,
             network.type,
             mode?.value,
@@ -294,9 +287,9 @@ function TransactionSettingAlert({
           setFeeInput(btcFee.toString());
         }
       } else if (type === 'Ordinals') {
-        if (btcRecepientAddress && ordinalTxUtxo) {
+        if (btcRecipients && ordinalTxUtxo) {
           const txFees = await getBtcFeesForOrdinalSend(
-            btcRecepientAddress,
+            btcRecipients[0].address,
             ordinalTxUtxo,
             btcAddress,
             network.type,

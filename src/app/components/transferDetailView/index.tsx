@@ -21,6 +21,7 @@ const AddressContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   flex: 1,
+  alignItems: 'center',
   justifyContent: 'flex-end',
 });
 

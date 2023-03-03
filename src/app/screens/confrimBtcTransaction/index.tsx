@@ -7,7 +7,7 @@ import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/type
 import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
-import ConfirmBtcTransactionComponent from '@screens/confrimBtcTransaction/confirmBtcTransactionComponent';
+import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import styled from 'styled-components';
 
 const BottomBarContainer = styled.h1((props) => ({
@@ -24,7 +24,9 @@ function ConfirmBtcTransaction() {
   );
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const { fee, amount, signedTxHex } = location.state;
+  const {
+    fee, amount, signedTxHex, recipient,
+  } = location.state;
   const {
     isLoading,
     error: txError,
@@ -81,8 +83,7 @@ function ConfirmBtcTransaction() {
     <>
       <ConfirmBtcTransactionComponent
         fee={fee}
-        amount={amount}
-        recipientAddress={recipientAddress}
+        recipients={recipient}
         loadingBroadcastedTx={isLoading}
         signedTxHex={signedTxHex}
         onConfirmClick={handleOnConfirmClick}

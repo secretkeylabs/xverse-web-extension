@@ -75,13 +75,6 @@ const RowContainer = styled.div({
   alignItems: 'center',
 });
 
-const AddressContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  flex: 1,
-  justifyContent: 'flex-end',
-});
-
 const ExpandedContainer = styled(animated.div)({
   display: 'flex',
   flexDirection: 'column',

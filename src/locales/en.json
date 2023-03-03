@@ -99,7 +99,9 @@
     "FROM": "From",
     "INPUT": "Inputs",
     "INPUT_AND_OUTPUT": "Inputs & Outputs",
-    "OUTPUT": "Output"
+    "OUTPUT": "Output",
+    "RECIPIENT": "Recipient",
+    "ASSET": "Asset"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
