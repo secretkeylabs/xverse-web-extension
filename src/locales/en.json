@@ -438,5 +438,14 @@
     "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
+  },
+  "SELECT_BTC_ADDRESS_SCREEN": {
+    "TITLE": "Connection",
+    "ACCOUNT": "Account",
+    "CONNECT_BUTTON": "Approve",
+    "CANCEL_BUTTON": "Dismiss",
+    "BITCOIN_ADDRESS": "Bitcoin address",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "DESCRIPTION": "Gamma.io is requesting a connection to your Ordinal Bitcoin address"
   }
 }
