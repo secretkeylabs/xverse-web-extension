@@ -1,18 +1,18 @@
+import RequestsRoutes from '@common/utils/route-urls';
+import getEventSourceWindow from '@common/utils/get-event-source-window';
 import {
   CONTENT_SCRIPT_PORT,
   ExternalMethods,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
   MESSAGE_SOURCE,
-} from './message-types';
+} from '@common/types/message-types';
 import {
   AuthenticationRequestEvent,
   DomEventName,
   SignatureRequestEvent,
   TransactionRequestEvent,
-} from './inpage-types';
-import RequestsRoutes from './route-urls';
-import getEventSourceWindow from './get-event-source-window';
+} from '@common/types/inpage-types';
 
 // Legacy messaging to work with older versions of Connect
 window.addEventListener('message', (event) => {

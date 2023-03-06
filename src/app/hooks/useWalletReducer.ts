@@ -18,8 +18,8 @@ import {
   unlockWalletAction,
 } from '@stores/wallet/actions/actionCreators';
 import { decryptSeedPhrase, encryptSeedPhrase } from '@utils/encryptionUtils';
-import { InternalMethods } from 'content-scripts/message-types';
-import { sendMessage } from 'content-scripts/messages';
+import { InternalMethods } from '@common/types/message-types';
+import { sendMessage } from '@common/types/messages';
 import { useSelector, useDispatch } from 'react-redux';
 import useNetworkSelector from './useNetwork';
 

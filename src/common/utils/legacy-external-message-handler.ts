@@ -6,9 +6,9 @@ import {
   LegacyMessageToContentScript,
   MESSAGE_SOURCE,
   SignatureResponseMessage,
-} from '../content-scripts/message-types';
-import { sendMessage } from '../content-scripts/messages';
-import RequestsRoutes from '../content-scripts/route-urls';
+} from '../types/message-types';
+import { sendMessage } from '../types/messages';
+import RequestsRoutes from './route-urls';
 import popupCenter from './popup-center';
 
 export function inferLegacyMessage(message: any): message is LegacyMessageFromContentScript {
@@ -82,8 +82,6 @@ function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) {
 }
 
 async function triggerRequstWindowOpen(path: RequestsRoutes, urlParams: URLSearchParams) {
-  // if (IS_TEST_ENV) return openRequestInFullPage(path, urlParams);
-  console.log(`/popup.html#${path}?${urlParams.toString()}`);
   return popupCenter({ url: `/popup.html#${path}?${urlParams.toString()}` });
 }
 

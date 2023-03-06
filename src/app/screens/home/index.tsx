@@ -30,6 +30,7 @@ import { CurrencyTypes } from '@utils/constants';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
 import BalanceCard from './balanceCard';
+import useBtcMethods from '@hooks/useBtcMethods';
 
 const Container = styled.div`
   display: flex;
@@ -127,7 +128,7 @@ function Home() {
     const response: FeesMultipliers = await fetchAppInfo();
     dispatch(FetchFeeMultiplierAction(response));
   };
-
+  useBtcMethods();
   const loadInitialData = useCallback(() => {
     if (stxAddress && btcAddress) {
       fetchFeeMultiplierData();
