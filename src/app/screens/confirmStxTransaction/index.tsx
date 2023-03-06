@@ -12,6 +12,7 @@ import Seperator from '@components/seperator';
 import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
+import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
@@ -20,6 +21,8 @@ import finalizeTxSignature from '@components/transactionsRequests/utils';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import BtcRecipientComponent from '@components/confirmBtcTransactionComponent/btcRecipientComponent';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const Container = styled.div((props) => ({
@@ -195,16 +198,19 @@ function ConfirmStxTransaction() {
         onCancelClick={handleOnCancelClick}
         isSponsored={sponsored}
       >
-        <TransferAmountView currency="STX" amount={getAmount()} />
+        <BtcRecipientComponent
+          address={recipient}
+          value={`${getAmount().toString()} STX`}
+          icon={IconStacks}
+          title={t('CONFIRM_TRANSACTION.AMOUNT')}
+        />
+        <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         {hasTabClosed && (
         <AlertContainer>
           <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />
         </AlertContainer>
         )}
-        <RecipientAddressView recipient={recipient} />
-        {networkInfoSection}
-        <Seperator />
-        {memoInfoSection}
+
       </ConfirmStxTransationComponent>
       {!isBrowserTx && <BottomBar tab="dashboard" />}
     </>

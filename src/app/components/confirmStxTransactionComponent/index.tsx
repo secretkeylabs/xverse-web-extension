@@ -15,6 +15,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
 
 const Container = styled.div`
   display: flex;
@@ -97,6 +98,7 @@ function ConfirmStxTransationComponent({
   const {
     selectedAccount,
     seedPhrase,
+    network,
   } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
@@ -161,13 +163,7 @@ function ConfirmStxTransationComponent({
     <>
       <Container>
         {children}
-        <TransferFeeContainer>
-          <TransferFeeView
-            fee={microstacksToStx(getFee())}
-            currency="STX"
-          />
-        </TransferFeeContainer>
-
+   
         {!isSponsored && (
         <Button onClick={onAdvancedSettingClick}>
           <>

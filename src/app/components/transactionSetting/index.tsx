@@ -139,7 +139,7 @@ interface Props {
   availableBalance?: BigNumber;
   allowEditNonce?: boolean;
   type?: TxType;
-  btcRecipients: Recipient[];
+  btcRecipients?: Recipient[];
   ordinalTxUtxo?: BtcUtxoDataResponse;
 }
 type TxType = 'STX' | 'BTC' | 'Ordinals';
