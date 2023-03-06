@@ -326,14 +326,14 @@ function SendForm({
     setRecipientAddress(e.target.value);
   };
 
-  const renderEnterRecepientSection = (
+  const renderEnterRecipientSection = (
     <Container>
-      <TitleText>{t('RECEPIENT')}</TitleText>
+      <TitleText>{t('RECIPIENT')}</TitleText>
       <AmountInputContainer error={addressError !== ''}>
         <InputFieldContainer>
           <InputField
             value={recipientAddress}
-            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' ? t('BTC_RECEPIENT_PLACEHOLDER') : t('RECEPIENT_PLACEHOLDER')}
+            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' ? t('BTC_RECIPIENT_PLACEHOLDER') : t('RECIPIENT_PLACEHOLDER')}
             onChange={onAddressInputChange}
           />
         </InputFieldContainer>
@@ -399,7 +399,7 @@ function SendForm({
           </ErrorContainer>
           {buyCryptoMessage}
           {children}
-          {renderEnterRecepientSection}
+          {renderEnterRecipientSection}
           <ErrorContainer>
             <ErrorText>{addressError}</ErrorText>
           </ErrorContainer>
