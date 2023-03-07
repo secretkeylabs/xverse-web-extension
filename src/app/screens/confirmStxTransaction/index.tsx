@@ -8,13 +8,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
 import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
 import { addressToString, broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import Seperator from '@components/seperator';
 import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import RecipientAddressView from '@components/recipinetAddressView';
-import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
 import AccountHeaderComponent from '@components/accountHeader';
 import finalizeTxSignature from '@components/transactionsRequests/utils';
@@ -22,7 +19,8 @@ import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
-import BtcRecipientComponent from '@components/confirmBtcTransactionComponent/btcRecipientComponent';
+import RecipientComponent from '@components/recipientComponent';
+import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const Container = styled.div((props) => ({
@@ -56,6 +54,7 @@ function ConfirmStxTransaction() {
   const [total, setTotal] = useState(new BigNumber(0));
   const [fiatTotal, setFiatTotal] = useState(new BigNumber(0));
   const [hasTabClosed, setHasTabClosed] = useState(false);
+  const [expandTransferMemoView, setExpandTransferMemoView] = useState(false);
   const [recipient, setRecipient] = useState('');
   const [txRaw, setTxRaw] = useState('');
   const [memo, setMemo] = useState('');
@@ -145,27 +144,14 @@ function ConfirmStxTransaction() {
     }
   });
 
-  const networkInfoSection = (
-    <Container>
-      <TitleText>{t('CONFIRM_TRANSACTION.NETWORK')}</TitleText>
-      <ValueText>{network.type}</ValueText>
-    </Container>
-  );
-
-  const memoInfoSection = !!memo && (
-    <>
-      <Container>
-        <TitleText>{t('CONFIRM_TRANSACTION.MEMO')}</TitleText>
-        <ValueText>{memo}</ValueText>
-      </Container>
-      <Seperator />
-    </>
-  );
-
   const getAmount = () => {
     const txPayload = unsignedTx?.payload as TokenTransferPayload;
     const amountToTransfer = new BigNumber(txPayload?.amount?.toString(10));
     return microstacksToStx(amountToTransfer);
+  };
+
+  const expandTransferMemoSection = () => {
+    setExpandTransferMemoView(!expandTransferMemoView);
   };
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
@@ -187,6 +173,7 @@ function ConfirmStxTransaction() {
       });
     }
   };
+
   return (
     <>
       {isBrowserTx ? <AccountHeaderComponent disableMenuOption disableAccountSwitch />
@@ -198,13 +185,15 @@ function ConfirmStxTransaction() {
         onCancelClick={handleOnCancelClick}
         isSponsored={sponsored}
       >
-        <BtcRecipientComponent
+        <RecipientComponent
           address={recipient}
           value={`${getAmount().toString()} STX`}
           icon={IconStacks}
+          subValue={fiatAmount}
           title={t('CONFIRM_TRANSACTION.AMOUNT')}
         />
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
+        <TransferMemoView memo={memo} />
         {hasTabClosed && (
         <AlertContainer>
           <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />

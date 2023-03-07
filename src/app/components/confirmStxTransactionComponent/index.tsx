@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import {
-  ReactNode, useEffect, useState,
-} from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
@@ -11,11 +9,14 @@ import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/c
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import TransferFeeView from '@components/transferFeeView';
 import {
-  setFee, setNonce, getNonce, signMultiStxTransactions, signTransaction,
+  setFee,
+  setNonce,
+  getNonce,
+  signMultiStxTransactions,
+  signTransaction,
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
-import TransactionDetailComponent from '@components/transactionDetailComponent';
 
 const Container = styled.div`
   display: flex;
@@ -33,7 +34,7 @@ const Container = styled.div`
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginBottom: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(12),
   marginTop: props.theme.spacing(12),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
@@ -61,10 +62,6 @@ const ButtonText = styled.div((props) => ({
   textAlign: 'center',
 }));
 
-const TransferFeeContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(12),
-}));
-
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
   alignSelf: 'center',
@@ -74,6 +71,17 @@ const ButtonImage = styled.img((props) => ({
 const SponsoredInfoText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['400'],
+}));
+
+interface ReviewTransactionTitleProps {
+  isAsset: boolean;
+}
+
+const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
+  ...props.theme.headline_s,
+  color: props.theme.colors.white[0],
+  marginBottom: props.theme.spacing(16),
+  textAlign: props.isAsset ? 'center' : 'left',
 }));
 
 interface Props {
@@ -95,11 +103,7 @@ function ConfirmStxTransationComponent({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const selectedNetwork = useNetworkSelector();
-  const {
-    selectedAccount,
-    seedPhrase,
-    network,
-  } = useWalletSelector();
+  const { selectedAccount, seedPhrase } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
 
@@ -107,14 +111,15 @@ function ConfirmStxTransationComponent({
     setButtonLoading(loading);
   }, [loading]);
 
-  const getFee = () => (isSponsored
-    ? new BigNumber(0)
-    : new BigNumber(
-      initialStxTransactions
-        .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
-        .reduce((prev, curr) => prev + curr, BigInt(0))
-        .toString(10),
-    ));
+  const getFee = () =>
+    isSponsored
+      ? new BigNumber(0)
+      : new BigNumber(
+          initialStxTransactions
+            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+            .reduce((prev, curr) => prev + curr, BigInt(0))
+            .toString(10)
+        );
 
   const getTxNonce = (): string => {
     const nonce = getNonce(initialStxTransactions[0]);
@@ -136,7 +141,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions[0],
         seedPhrase,
         selectedAccount?.id ?? 0,
-        selectedNetwork,
+        selectedNetwork
       );
       signedTxs.push(signedContractCall);
     } else if (initialStxTransactions.length === 2) {
@@ -144,7 +149,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase,
+        seedPhrase
       );
     }
     onConfirmClick(signedTxs);
@@ -162,15 +167,25 @@ function ConfirmStxTransationComponent({
   return (
     <>
       <Container>
+        <ReviewTransactionText isAsset={false}>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>
         {children}
-   
+        <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
+        {initialStxTransactions[0]?.payload?.amount && (
+          <TransferFeeView
+            fee={microstacksToStx(
+              getFee().plus(new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10)))
+            )}
+            currency="STX"
+            title={t('TOTAL')}
+          />
+        )}
         {!isSponsored && (
-        <Button onClick={onAdvancedSettingClick}>
-          <>
-            <ButtonImage src={SettingIcon} />
-            <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
-          </>
-        </Button>
+          <Button onClick={onAdvancedSettingClick}>
+            <>
+              <ButtonImage src={SettingIcon} />
+              <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
+            </>
+          </Button>
         )}
         {isSponsored && <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>}
         <TransactionSettingAlert

@@ -74,7 +74,7 @@ interface Props {
   title: string;
 
 }
-function BtcRecipientComponent({
+function RecipientComponent({
   recipientIndex, address, value, totalRecipient, subValue, icon, title,
 } : Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -117,4 +117,4 @@ function BtcRecipientComponent({
   );
 }
 
-export default BtcRecipientComponent;
+export default RecipientComponent;

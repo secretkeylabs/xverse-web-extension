@@ -29,7 +29,8 @@ import TransferDetailView from '@components/transferDetailView';
 import TransactionDetailComponent from '../transactionDetailComponent';
 import TransferAmountComponent from '../transferAmountComponent';
 import InputOutputComponent from './inputOutputComponent';
-import BtcRecipientComponent from './btcRecipientComponent';
+import RecipientComponent from '../recipientComponent';
+import TransferFeeView from '@components/transferFeeView';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -261,7 +262,7 @@ function ConfirmBtcTransactionComponent({
         </ReviewTransactionText>
 
         {ordinalTxUtxo ? (
-          <BtcRecipientComponent
+          <RecipientComponent
             address={recipients[0]?.address}
             value={assetDetail!}
             icon={AssetIcon}
@@ -269,7 +270,7 @@ function ConfirmBtcTransactionComponent({
           />
         ) : (
           recipients?.map((recipient, index) => (
-            <BtcRecipientComponent
+            <RecipientComponent
               recipientIndex={index + 1}
               address={recipient?.address}
               value={satsToBtc(recipient?.amountSats).toString()}
@@ -303,11 +304,7 @@ function ConfirmBtcTransactionComponent({
           /> */}
 
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-        <TransactionDetailComponent
-          title={t('CONFIRM_TRANSACTION.FEES')}
-          value={`${currentFee.toString()} ${t('SATS')}`}
-          subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
-        />
+        <TransferFeeView fee={currentFee} currency={t('SATS')} />
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
