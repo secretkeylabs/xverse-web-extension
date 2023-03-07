@@ -193,7 +193,7 @@ function ConfirmStxTransaction() {
           title={t('CONFIRM_TRANSACTION.AMOUNT')}
         />
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-        <TransferMemoView memo={memo} />
+        {memo && <TransferMemoView memo={memo} />}
         {hasTabClosed && (
         <AlertContainer>
           <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />
