@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import Copy from '@assets/img/nftDashboard/Copy.svg';
 import Tick from '@assets/img/tick.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Tooltip } from 'react-tooltip';
 import { useTranslation } from 'react-i18next';
 
@@ -10,8 +10,19 @@ const Button = styled.button((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   background: 'transparent',
-  marginLeft: props.theme.spacing(4),
+  marginLeft: props.theme.spacing(3),
+  padding: 3,
+  ':hover': {
+    background: props.theme.colors.white[900],
+    borderRadius: 24,
+  },
 }));
+
+const Img = styled.img({
+  width: 20,
+  height: 20,
+
+});
 
 const StyledToolTip = styled(Tooltip)`
   background-color: #ffffff;
@@ -31,10 +42,19 @@ function CopyButton({ text }: Props) {
     navigator.clipboard.writeText(text);
     setIsCopied(true);
   };
+
+  useEffect(() => {
+    if (isCopied) {
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 5000);
+    }
+  }, [isCopied]);
+
   return (
     <>
       <Button id={`copy-${text}`} onClick={onCopyClick}>
-        {isCopied ? <img src={Tick} alt="Copy" /> : <img src={Copy} alt="Copy" />}
+        {isCopied ? <Img src={Tick} /> : <Img src={Copy} />}
       </Button>
       <StyledToolTip
         anchorId={`copy-${text}`}
@@ -43,7 +63,6 @@ function CopyButton({ text }: Props) {
         events={['click']}
         place="top"
       />
-
     </>
   );
 }
