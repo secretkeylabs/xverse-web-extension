@@ -11,13 +11,15 @@ import Seperator from '@components/seperator';
 import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
 import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
-import RecipientAddressView from '@components/recipinetAddressView';
+import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
 import AccountHeaderComponent from '@components/accountHeader';
 import TopRow from '@components/topRow';
 import useNetworkSelector from '@hooks/useNetwork';
+import RecipientComponent from '@components/recipientComponent';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -109,10 +111,11 @@ const NFtContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
-const NftTitleText = styled.h1((props) => ({
+const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
+  color: props.theme.colors.white[0],
+  marginBottom: props.theme.spacing(16),
+  textAlign:  'center' 
 }));
 
 function ConfirmNftTransaction() {
@@ -171,13 +174,6 @@ function ConfirmNftTransaction() {
     }
   }, [txError]);
 
-  const networkInfoSection = (
-    <InfoContainer>
-      <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network.type}</ValueText>
-    </InfoContainer>
-  );
-
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     mutate({ signedTx: txs[0] });
   };
@@ -208,20 +204,24 @@ function ConfirmNftTransaction() {
           loading={isLoading}
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
+          isAsset
         >
           <Container>
-            <IndicationText>{t('INDICATION')}</IndicationText>
             <NFtContainer>
-
               <NftImage
                 metadata={nft?.token_metadata!}
               />
             </NFtContainer>
-            <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+            <ReviewTransactionText>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>
           </Container>
-          <RecipientAddressView recipient={recipientAddress} />
-          {networkInfoSection}
-          <Seperator />
+          <RecipientComponent
+            address={recipientAddress}
+            value={nft?.token_metadata.name!}
+            icon={AssetIcon}
+            currencyType="NFT"
+            title={t('ASSET')}
+          />
+          <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
         </ConfirmStxTransationComponent>
         {!isGalleryOpen && <BottomBar tab="nft" />}
       </ScrollContainer>

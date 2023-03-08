@@ -18,8 +18,7 @@ const TitleText = styled.h1((props) => ({
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  marginTop: props.theme.spacing(6),
-  marginBottom: props.theme.spacing(4),
+  marginTop: props.theme.spacing(2),
   color: props.theme.colors.white[0],
 }));
 

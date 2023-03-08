@@ -73,15 +73,11 @@ const SponsoredInfoText = styled.h1((props) => ({
   color: props.theme.colors.white['400'],
 }));
 
-interface ReviewTransactionTitleProps {
-  isAsset: boolean;
-}
-
-const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
+const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white[0],
   marginBottom: props.theme.spacing(16),
-  textAlign: props.isAsset ? 'center' : 'left',
+  textAlign: 'left',
 }));
 
 interface Props {
@@ -91,6 +87,7 @@ interface Props {
   onConfirmClick: (transactions: StacksTransaction[]) => void;
   children: ReactNode;
   isSponsored?: boolean;
+  isAsset?: boolean;
 }
 
 function ConfirmStxTransationComponent({
@@ -98,6 +95,7 @@ function ConfirmStxTransationComponent({
   loading,
   isSponsored,
   children,
+  isAsset,
   onConfirmClick,
   onCancelClick,
 }: Props) {
@@ -111,15 +109,14 @@ function ConfirmStxTransationComponent({
     setButtonLoading(loading);
   }, [loading]);
 
-  const getFee = () =>
-    isSponsored
-      ? new BigNumber(0)
-      : new BigNumber(
-          initialStxTransactions
-            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
-            .reduce((prev, curr) => prev + curr, BigInt(0))
-            .toString(10)
-        );
+  const getFee = () => (isSponsored
+    ? new BigNumber(0)
+    : new BigNumber(
+      initialStxTransactions
+        .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+        .reduce((prev, curr) => prev + curr, BigInt(0))
+        .toString(10),
+    ));
 
   const getTxNonce = (): string => {
     const nonce = getNonce(initialStxTransactions[0]);
@@ -141,7 +138,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions[0],
         seedPhrase,
         selectedAccount?.id ?? 0,
-        selectedNetwork
+        selectedNetwork,
       );
       signedTxs.push(signedContractCall);
     } else if (initialStxTransactions.length === 2) {
@@ -149,7 +146,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase
+        seedPhrase,
       );
     }
     onConfirmClick(signedTxs);
@@ -167,13 +164,13 @@ function ConfirmStxTransationComponent({
   return (
     <>
       <Container>
-        <ReviewTransactionText isAsset={false}>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>
+        {!isAsset && <ReviewTransactionText>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>}
         {children}
         <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
         {initialStxTransactions[0]?.payload?.amount && (
           <TransferFeeView
             fee={microstacksToStx(
-              getFee().plus(new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10)))
+              getFee().plus(new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10))),
             )}
             currency="STX"
             title={t('TOTAL')}

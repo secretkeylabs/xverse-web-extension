@@ -4,12 +4,10 @@ import styled from 'styled-components';
 import { ReactNode, useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
-import OutputIcon from '@assets/img/transactions/output.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
 import { useSelector } from 'react-redux';
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { useMutation } from '@tanstack/react-query';
@@ -21,16 +19,15 @@ import {
 import {
   BtcUtxoDataResponse,
   ErrorCodes,
-  getBtcFiatEquivalent,
   ResponseError,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import TransferDetailView from '@components/transferDetailView';
+import TransferFeeView from '@components/transferFeeView';
 import TransactionDetailComponent from '../transactionDetailComponent';
 import TransferAmountComponent from '../transferAmountComponent';
 import InputOutputComponent from './inputOutputComponent';
 import RecipientComponent from '../recipientComponent';
-import TransferFeeView from '@components/transferFeeView';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -266,6 +263,7 @@ function ConfirmBtcTransactionComponent({
             address={recipients[0]?.address}
             value={assetDetail!}
             icon={AssetIcon}
+            currencyType="Ordinal"
             title={t('CONFIRM_TRANSACTION.ASSET')}
           />
         ) : (
@@ -275,12 +273,8 @@ function ConfirmBtcTransactionComponent({
               address={recipient?.address}
               value={satsToBtc(recipient?.amountSats).toString()}
               totalRecipient={recipients?.length}
-              icon={IconBitcoin}
+              currencyType="BTC"
               title={t('CONFIRM_TRANSACTION.AMOUNT')}
-              subValue={getBtcFiatEquivalent(
-                recipient?.amountSats,
-                btcFiatRate,
-              )}
             />
           ))
         )}

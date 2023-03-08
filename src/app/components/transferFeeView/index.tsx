@@ -1,4 +1,4 @@
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import { getBtcFiatEquivalent, getFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
 import BigNumber from 'bignumber.js';
@@ -48,12 +48,14 @@ const FiatAmountText = styled.h1((props) => ({
 interface Props {
   fee: BigNumber;
   currency: string;
-  title? : string;
+  title?: string;
 }
-function TransferFeeView({ fee, currency, title}: Props) {
+function TransferFeeView({ fee, currency, title }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { btcFiatRate, fiatCurrency } = useSelector((state: StoreState) => state.walletState);
-
+  const { btcFiatRate, stxBtcRate, fiatCurrency } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
+  const fiatRate = getFiatEquivalent(Number(fee), currency, stxBtcRate, btcFiatRate);
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (fiatAmount) {
       if (fiatAmount.isLessThan(0.01)) {
@@ -81,7 +83,11 @@ function TransferFeeView({ fee, currency, title}: Props) {
       <FeeContainer>
         <FeeText>{`${fee.toString()} ${currency}`}</FeeText>
         <FiatAmountText>
-          {getFiatAmountString(getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate))}
+          {getFiatAmountString(
+            currency === 'SATS'
+              ? getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)
+              : new BigNumber(fiatRate!)
+          )}
         </FiatAmountText>
       </FeeContainer>
     </RowContainer>

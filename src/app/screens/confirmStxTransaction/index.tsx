@@ -23,27 +23,8 @@ import RecipientComponent from '@components/recipientComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(4),
-}));
-
 const AlertContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
-}));
-
-const TitleText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-}));
-
-const ValueText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(2),
-  wordBreak: 'break-all',
 }));
 
 function ConfirmStxTransaction() {
@@ -54,7 +35,6 @@ function ConfirmStxTransaction() {
   const [total, setTotal] = useState(new BigNumber(0));
   const [fiatTotal, setFiatTotal] = useState(new BigNumber(0));
   const [hasTabClosed, setHasTabClosed] = useState(false);
-  const [expandTransferMemoView, setExpandTransferMemoView] = useState(false);
   const [recipient, setRecipient] = useState('');
   const [txRaw, setTxRaw] = useState('');
   const [memo, setMemo] = useState('');
@@ -150,10 +130,6 @@ function ConfirmStxTransaction() {
     return microstacksToStx(amountToTransfer);
   };
 
-  const expandTransferMemoSection = () => {
-    setExpandTransferMemoView(!expandTransferMemoView);
-  };
-
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     setTxRaw(txs[0].serialize().toString('hex'));
     mutate({ signedTx: txs[0] });
@@ -187,9 +163,9 @@ function ConfirmStxTransaction() {
       >
         <RecipientComponent
           address={recipient}
-          value={`${getAmount().toString()} STX`}
+          value={getAmount().toString()}
           icon={IconStacks}
-          subValue={fiatAmount}
+          currencyType="STX"
           title={t('CONFIRM_TRANSACTION.AMOUNT')}
         />
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />

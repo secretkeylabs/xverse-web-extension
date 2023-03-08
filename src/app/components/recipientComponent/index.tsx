@@ -1,12 +1,16 @@
 import TransferDetailView from '@components/transferDetailView';
 import OutputIcon from '@assets/img/transactions/output.svg';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import { StoreState } from '@stores/index';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
+import TokenImage from '@components/tokenImage';
+import { CurrencyTypes } from '@utils/constants';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { useEffect, useState } from 'react';
+import { getTicker } from '@utils/helper';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -64,23 +68,48 @@ const ColumnContainer = styled.div({
   alignItems: 'flex-end',
 });
 
+const TokenContainer = styled.div({
+  marginRight: 10,
+});
+
 interface Props {
-  recipientIndex?: number;
   address: string;
   value: string;
-  subValue?: BigNumber;
-  totalRecipient?: number;
-  icon: string;
   title: string;
+  currencyType: CurrencyTypes;
+  recipientIndex?: number;
+  totalRecipient?: number;
+  icon?: string;
+  fungibleToken?: FungibleToken;
 
 }
 function RecipientComponent({
-  recipientIndex, address, value, totalRecipient, subValue, icon, title,
+  recipientIndex, address, value, totalRecipient, title, fungibleToken, icon, currencyType,
 } : Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
   const {
-    fiatCurrency,
-  } = useSelector((state: StoreState) => state.walletState);
+    stxBtcRate, btcFiatRate, fiatCurrency,
+  } = useWalletSelector();
+
+  useEffect(() => {
+    let amountInCurrency;
+    if (currencyType === 'FT') {
+      amountInCurrency = new BigNumber(value).multipliedBy(fungibleToken?.tokenFiatRate!);
+      if (amountInCurrency.isLessThan(0.01)) {
+        amountInCurrency = '0.01';
+      }
+    } else { amountInCurrency = getFiatEquivalent(Number(value), currencyType, stxBtcRate, btcFiatRate, fungibleToken); }
+    setFiatAmount(amountInCurrency);
+  }, [value]);
+
+  function getFtTicker() {
+    if (fungibleToken?.ticker) {
+      return fungibleToken?.ticker.toUpperCase();
+    } if (fungibleToken?.name) {
+      return getTicker(fungibleToken.name).toUpperCase();
+    } return '';
+  }
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (fiatAmount) {
@@ -105,12 +134,34 @@ function RecipientComponent({
     <Container>
       {recipientIndex && totalRecipient && <RecipientTitleText>{`${t('RECIPIENT')} ${recipientIndex}/${totalRecipient}`}</RecipientTitleText>}
       <RowContainer>
-        <Icon src={icon} />
+        {icon ? <Icon src={icon} />
+          : (
+            <TokenContainer>
+              <TokenImage
+                token={currencyType}
+                loading={false}
+                isSmallSize
+                fungibleToken={fungibleToken}
+              />
+            </TokenContainer>
+          )}
         <TitleText>{title}</TitleText>
-        <ColumnContainer>
-          <ValueText>{value}</ValueText>
-          {subValue && <SubValueText>{getFiatAmountString(subValue)}</SubValueText>}
-        </ColumnContainer>
+        { currencyType === 'NFT' || currencyType === 'Ordinal' ? (
+          <ColumnContainer>
+            <ValueText>{value}</ValueText>
+          </ColumnContainer>
+        ) : (
+          <ColumnContainer>
+            <NumericFormat
+              value={Number(value)}
+              displayType="text"
+              thousandSeparator
+              suffix={currencyType === 'FT' ? ` ${getFtTicker()} ` : ` ${currencyType}`}
+              renderText={(amount) => <ValueText>{amount}</ValueText>}
+            />
+            <SubValueText>{getFiatAmountString(new BigNumber(fiatAmount))}</SubValueText>
+          </ColumnContainer>
+        )}
       </RowContainer>
       <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
     </Container>
