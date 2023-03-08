@@ -165,6 +165,7 @@ function InputOutputComponent({
             <TransferDetailContainer>
               <TransferDetailView
                 icon={IconBitcoin}
+                hideAddress
                 amount={satsToBtc(new BigNumber(input.value)).toString()}
                 fiatAmount={renderSubValue(input)}
                 address={input.userSigns ? address : input.txid}
@@ -177,6 +178,7 @@ function InputOutputComponent({
             <TransferDetailContainer>
               <TransferDetailView
                 icon={OutputIcon}
+                hideAddress
                 amount={`${satsToBtc(new BigNumber(output.amount)).toString()} BTC`}
                 fiatAmount={<SubValueText>{getTruncatedAddress(output.address)}</SubValueText>}
                 address={output.address}

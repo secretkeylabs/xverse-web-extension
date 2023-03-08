@@ -262,6 +262,7 @@ function ConfirmBtcTransactionComponent({
     psbt,
   );
 
+
   return (
     <OuterContainer>
       {!isGalleryOpen && (

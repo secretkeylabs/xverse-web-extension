@@ -51,10 +51,11 @@ interface Props {
   amount?: string;
   fiatAmount?: ReactNode;
   address: string;
+  hideAddress?: boolean;
 }
 
 function TransferDetailView({
-  icon, title, amount, fiatAmount, address,
+  icon, title, amount, fiatAmount, address, hideAddress
 }: Props) {
   return (
     <RowContainer>
@@ -67,6 +68,7 @@ function TransferDetailView({
       )
         : <TitleText>{title}</TitleText>}
       <AddressContainer>
+        {!hideAddress && <ValueText>{getTruncatedAddress(address)}</ValueText>}
         <CopyButton text={address} />
       </AddressContainer>
     </RowContainer>
