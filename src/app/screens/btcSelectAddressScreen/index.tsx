@@ -13,9 +13,9 @@ import { useDispatch } from 'react-redux';
 import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
-import AccountView from './accountView';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import { AddressPurposes } from 'sats-connect';
+import AccountView from './accountView';
 
 const TitleContainer = styled.div({
   display: 'flex',
@@ -52,6 +52,7 @@ const AddressContainer = styled.div((props) => ({
   justifyContent: 'center',
   padding: '3px 10px 3px 6px',
   marginTop: props.theme.spacing(4),
+  marginRight: props.theme.spacing(2),
 }));
 
 const AccountListContainer = styled(animated.div)((props) => ({
@@ -257,19 +258,19 @@ function BtcSelectAddressScreen() {
         <TitleContainer>
           <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
-          <AddressContainer>
-            {payload.purpose.purpose === AddressPurposes.PAYMENT ? (
-              <>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {payload.purposes.map((purpose) => (purpose.purpose === AddressPurposes.PAYMENT ? (
+              <AddressContainer>
                 <BitcoinDot />
                 <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
-              </>
+              </AddressContainer>
             ) : (
-              <>
+              <AddressContainer>
                 <OrdinalImage src={OrdinalsIcon} />
                 <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
-              </>
-            )}
-          </AddressContainer>
+              </AddressContainer>
+            )))}
+          </div>
           <DappTitle>{payload.message}</DappTitle>
         </TitleContainer>
         {showAccountList ? (
@@ -290,10 +291,7 @@ function BtcSelectAddressScreen() {
           <>
             <AccountText>{t('ACCOUNT')}</AccountText>
             <AccountContainer onClick={onChangeAccount}>
-              <AccountView
-                account={selectedAccount!}
-                isBitcoinTx={payload.purpose.purpose === AddressPurposes.PAYMENT}
-              />
+              <AccountView account={selectedAccount!} isBitcoinTx />
               <DropDownContainer>
                 <img src={DropDownIcon} alt="Drop Down" />
               </DropDownContainer>
