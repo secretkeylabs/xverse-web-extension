@@ -1,16 +1,17 @@
-import { BitcoinProvider } from 'sats-connect';
+import { SignPsbtRequestEventDetails } from './../common/types/inpage-types';
+import { BitcoinProvider, GetAddressResponse } from 'sats-connect';
 import {
-  AuthenticationRequestEventDetails,
   DomEventName,
   GetAddressRequestEventDetails,
 } from '@common/types/inpage-types';
 import {
-  AuthenticationResponseMessage,
   ExternalSatsMethods,
   GetAddressResponseMessage,
   MESSAGE_SOURCE,
   SatsConnectMessageToContentScript,
+  SignPsbtResponseMessage,
 } from '@common/types/message-types';
+import { SignPsbtResponse } from 'sats-connect/src/transactions/signPsbt';
 
 const isValidEvent = (event: MessageEvent, method: SatsConnectMessageToContentScript['method']) => {
   const { data } = event;
@@ -20,24 +21,17 @@ const isValidEvent = (event: MessageEvent, method: SatsConnectMessageToContentSc
 };
 
 const SatsMethodsProvider: BitcoinProvider = {
-  getAddress: async (purpose, message, network) => {
+  connect: async (btcAddressRequest): Promise<GetAddressResponse> => {
     const event = new CustomEvent<GetAddressRequestEventDetails>(DomEventName.getAddressRequest, {
-      detail: {
-        message,
-        network: network || {
-          address: '',
-          type: 'Mainnet',
-        },
-        purpose,
-      },
+      detail: { btcAddressRequest },
     });
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<GetAddressResponseMessage>) => {
         if (!isValidEvent(eventMessage, ExternalSatsMethods.getAddressResponse)) return;
-        if (eventMessage.data.payload?.addressRequest.purpose.purpose !== purpose.purpose) return;
+        if (eventMessage.data.payload?.addressRequest !== btcAddressRequest) return;
         window.removeEventListener('message', handleMessage);
-        if (eventMessage.data.payload.addressResponse.address === 'cancel') {
+        if (eventMessage.data.payload.addressResponse === 'cancel') {
           reject(eventMessage.data.payload.addressResponse);
           return;
         }
@@ -48,27 +42,29 @@ const SatsMethodsProvider: BitcoinProvider = {
       window.addEventListener('message', handleMessage);
     });
   },
-  authenticationRequest: async (authenticationRequest) => {
-    const event = new CustomEvent<AuthenticationRequestEventDetails>(
-      DomEventName.authenticationRequest,
-      {
-        detail: { authenticationRequest },
-      },
-    );
+  signPsbt: async (signPsbtRequest: string): Promise<SignPsbtResponse> => {
+    const event = new CustomEvent<SignPsbtRequestEventDetails>(DomEventName.signPsbtRequest, {
+      detail: { signPsbtRequest },
+    });
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
-      const handleMessage = (eventMessage: MessageEvent<AuthenticationResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.authenticationResponse)) return;
-        if (eventMessage.data.payload?.authenticationRequest !== authenticationRequest) return;
+      const handleMessage = (eventMessage: MessageEvent<SignPsbtResponseMessage>) => {
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.signPsbtResponse)) return;
+        if (eventMessage.data.payload?.signPsbtRequest !== signPsbtRequest) return;
         window.removeEventListener('message', handleMessage);
-        if (eventMessage.data.payload.authenticationResponse === 'cancel') {
-          reject(eventMessage.data.payload.authenticationResponse);
+        if (eventMessage.data.payload.signPsbtResponse === 'cancel') {
+          reject(eventMessage.data.payload.signPsbtResponse);
           return;
         }
-        resolve(eventMessage.data.payload.authenticationResponse);
+        if (typeof eventMessage.data.payload.signPsbtResponse !== 'string') {
+          resolve(eventMessage.data.payload.signPsbtResponse);
+        }
       };
       window.addEventListener('message', handleMessage);
     });
+  },
+  call(request: string): Promise<Record<string, any>> {
+    throw new Error('`call` function is not implemented');
   },
 };
 export default SatsMethodsProvider;

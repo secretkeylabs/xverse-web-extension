@@ -3,15 +3,19 @@ import getEventSourceWindow from '@common/utils/get-event-source-window';
 import {
   CONTENT_SCRIPT_PORT,
   ExternalMethods,
+  ExternalSatsMethods,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
   MESSAGE_SOURCE,
+  SatsConnectMessageFromContentScript,
 } from '@common/types/message-types';
 import {
   AuthenticationRequestEvent,
   DomEventName,
   SignatureRequestEvent,
   TransactionRequestEvent,
+  GetAddressRequestEvent,
+  SignPsbtRequestEvent,
 } from '@common/types/inpage-types';
 
 // Legacy messaging to work with older versions of Connect
@@ -45,7 +49,9 @@ function connect() {
 connect();
 
 // Sends message to background script that an event has fired
-function sendMessageToBackground(message: LegacyMessageFromContentScript) {
+function sendMessageToBackground(
+  message: LegacyMessageFromContentScript | SatsConnectMessageFromContentScript,
+) {
   backgroundPort.postMessage(message);
 }
 
@@ -59,7 +65,7 @@ chrome.runtime.onMessage.addListener((message: LegacyMessageToContentScript) => 
 
 interface ForwardDomEventToBackgroundArgs {
   payload: string;
-  method: LegacyMessageFromContentScript['method'];
+  method: LegacyMessageFromContentScript['method'] | SatsConnectMessageFromContentScript['method'];
   urlParam: string;
   path: RequestsRoutes;
 }
@@ -113,6 +119,30 @@ document.addEventListener(DomEventName.structuredDataSignatureRequest, ((
     payload: event.detail.signatureRequest,
     urlParam: 'request',
     method: ExternalMethods.structuredDataSignatureRequest,
+  });
+}) as EventListener);
+
+// Listen for a CustomEvent (BTC Address request) coming from the web app
+document.addEventListener(DomEventName.getAddressRequest, ((
+  event: GetAddressRequestEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.AddressRequest,
+    payload: event.detail.btcAddressRequest,
+    urlParam: 'addressRequest',
+    method: ExternalSatsMethods.getAddressRequest,
+  });
+}) as EventListener);
+
+// Listen for a CustomEvent (PSBT Signing request) coming from the web app
+document.addEventListener(DomEventName.signPsbtRequest, ((
+  event: SignPsbtRequestEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.SignBtcTx,
+    payload: event.detail.signPsbtRequest,
+    urlParam: 'signPsbtRequest',
+    method: ExternalSatsMethods.signPsbtRequest,
   });
 }) as EventListener);
 

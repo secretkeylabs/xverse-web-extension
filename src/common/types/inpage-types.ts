@@ -1,5 +1,3 @@
-import { Purpose, BitcoinNetwork } from 'sats-connect';
-
 /**
  * Inpage Script (Stacks Provider) <-> Content Script
  */
@@ -9,6 +7,7 @@ export enum DomEventName {
   structuredDataSignatureRequest = 'structuredDataSignatureRequest',
   transactionRequest = 'stacksTransactionRequest',
   getAddressRequest = 'SatsAddressRequest',
+  signPsbtRequest = 'SatsPsbtRequest',
 }
 
 export interface AuthenticationRequestEventDetails {
@@ -30,9 +29,13 @@ export interface TransactionRequestEventDetails {
 export type TransactionRequestEvent = CustomEvent<TransactionRequestEventDetails>;
 
 export interface GetAddressRequestEventDetails {
-  purpose: Purpose,
-  message: string,
-  network: BitcoinNetwork,
+  btcAddressRequest: string,
 }
 
 export type GetAddressRequestEvent = CustomEvent<GetAddressRequestEventDetails>;
+
+export interface SignPsbtRequestEventDetails {
+  signPsbtRequest: string;
+}
+
+export type SignPsbtRequestEvent = CustomEvent<SignPsbtRequestEventDetails>;

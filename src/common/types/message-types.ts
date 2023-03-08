@@ -1,5 +1,5 @@
 import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
-import { BitcoinNetwork, Purpose, GetAddressResponse } from 'sats-connect';
+import { GetAddressResponse, SignPsbtResponse } from 'sats-connect';
 
 export const MESSAGE_SOURCE = 'xverse-wallet' as const;
 
@@ -44,10 +44,10 @@ export interface Message<Methods extends ExtensionMethods, Payload = undefined>
   payload: Payload;
 }
 
-type AuthenticationRequestMessage = Message<ExternalMethods.authenticationRequest | ExternalSatsMethods.authenticationRequest, string>;
+type AuthenticationRequestMessage = Message<ExternalMethods.authenticationRequest, string>;
 
 export type AuthenticationResponseMessage = Message<
-ExternalMethods.authenticationResponse | ExternalSatsMethods.authenticationResponse,
+ExternalMethods.authenticationResponse,
 {
   authenticationRequest: string;
   authenticationResponse: string;
@@ -99,8 +99,8 @@ export type LegacyMessageToContentScript =
 export enum ExternalSatsMethods {
   getAddressRequest = 'getAddressRequest',
   getAddressResponse = 'getAddressResponse',
-  authenticationRequest = 'satsAuthenticationRequest',
-  authenticationResponse = 'satsAuthenticationResponse',
+  signPsbtRequest = 'signPsbtRequest',
+  signPsbtResponse = 'signPsbtResponse',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -108,15 +108,21 @@ type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, s
 export type GetAddressResponseMessage = Message<
 ExternalSatsMethods.getAddressResponse,
 {
-  addressRequest: {
-    purpose: Purpose;
-    message: string;
-    network: BitcoinNetwork;
-  };
-  addressResponse: GetAddressResponse;
+  addressRequest: string
+  addressResponse: GetAddressResponse | string;
 }
 >;
 
-export type SatsConnectMessageFromContentScript = GetAddressRequestMessage | AuthenticationRequestMessage;
+type SignPsbtRequestMessage = Message<ExternalSatsMethods.signPsbtRequest, string>;
 
-export type SatsConnectMessageToContentScript = GetAddressResponseMessage | AuthenticationResponseMessage;
+export type SignPsbtResponseMessage = Message<
+ExternalSatsMethods.signPsbtResponse,
+{
+  signPsbtRequest: string;
+  signPsbtResponse: SignPsbtResponse | string;
+}
+>;
+
+export type SatsConnectMessageFromContentScript = GetAddressRequestMessage | SignPsbtRequestMessage;
+
+export type SatsConnectMessageToContentScript = GetAddressResponseMessage | SignPsbtResponseMessage;
