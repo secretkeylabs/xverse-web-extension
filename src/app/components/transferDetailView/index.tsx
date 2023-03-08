@@ -67,7 +67,6 @@ function TransferDetailView({
       )
         : <TitleText>{title}</TitleText>}
       <AddressContainer>
-        <ValueText>{getTruncatedAddress(address)}</ValueText>
         <CopyButton text={address} />
       </AddressContainer>
     </RowContainer>

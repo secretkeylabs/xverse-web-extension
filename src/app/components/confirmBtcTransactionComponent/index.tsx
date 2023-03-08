@@ -249,6 +249,8 @@ function ConfirmBtcTransactionComponent({
       } else setError(ordinalError.toString());
     }
   }, [ordinalError]);
+
+  //need to be passed as param
   const psbt = 'cHNidP8BAP06AQIAAAAEfu91pxspg76DXX6E4xn7G+xIRcs08a5BtCb8yrojdLsAAAAAAP////+RL6fJJtQjQQwSLGIIJ4kfzb1FAwQ2+lnLg9QzkLCT1AAAAAAA/////+asBG9KABjsAJwEeTi3li2Hekv0kd7A/1+wmxP3v64aAAAAAAD/////Owf7+swlYuHmydpwRKKRQ7M5vtq8zGiMwi3ho7zwgpgBAAAAAP////8EiBMAAAAAAAAWABRJ5yvtU5VOYtvrMzePMJ8uAeH3lrgLAAAAAAAAIlEgG8uZpiTFY4EcF/Gd3sOMiYX0JWto4um8CmkKkdrjC1fQBwAAAAAAABl2qRQDNedLYQaXPtwb3FpGrvOIfyCbyIisECcAAAAAAAAXqRR56d3WxMYYLIcoj9CLRchXeb3IVocAAAAAAAEBK4gTAAAAAAAAIlEgnjWijE+5J4kIzUJyDb2pukZ68zCrXIBX46+EH6xMzaEBAwSDAAAAARcgOARHxBVG5zbz1L+dwHXSMB9SUvMxVuNWT9OT7v/ao0cAAQEfiBMAAAAAAAAWABRJ5yvtU5VOYtvrMzePMJ8uAeH3lgEDBIMAAAAAAQEfcBcAAAAAAAAWABRJ5yvtU5VOYtvrMzePMJ8uAeH3lgEDBIMAAAAAAQEghlEAAAAAAAAXqRR56d3WxMYYLIcoj9CLRchXeb3IVociAgNeBLD75I/wHu1erKiH/ylZa/gcMw1Iw1JhosNNPY9q/UcwRAIgYorqTvmQ6iEek5iBhDkOGl+d9o8vuqrfFzoHlpHPewkCIDZrG7w97HH6f1xa8OuXPDp8TsBKFd1qcNmfeZuxcyEtAQEEFgAU3C+5D/OehWUYSgrkDn1pDc3IIqwAAAAAAA==';
 
   const parsedPsbt = parsePsbt(
@@ -271,7 +273,7 @@ function ConfirmBtcTransactionComponent({
           {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
         </ReviewTransactionText>
 
-        {ordinalTxUtxo ? (
+        { !parsedPsbt && (ordinalTxUtxo ? (
           <BtcRecipientComponent
             address={recipients[0]?.address}
             value={assetDetail!}
@@ -293,17 +295,19 @@ function ConfirmBtcTransactionComponent({
               )}
             />
           ))
-        )}
-        {/* <TransferAmountComponent
+        ))}
+        {parsedPsbt && (
+        <TransferAmountComponent
           title={t('CONFIRM_TRANSACTION.INDICATION')}
           icon={IconBitcoin}
-          value={`${recipients[0]?.amountSats.toString()} BTC`}
-          subValue={getBtcFiatEquivalent(new BigNumber(recipients[0]?.amountSats), btcFiatRate)}
+          value={`${satsToBtc(new BigNumber(parsedPsbt.netAmount)).toString()} BTC`}
+          subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt.netAmount), btcFiatRate)}
           description="Less than or equal to"
           isExpanded={expandTransferAmountView}
           address={btcAddress}
           onArrowClick={expandTransferAmountSection}
-              /> */}
+        />
+        )}
 
         {parsedPsbt && (
         <InputOutputComponent

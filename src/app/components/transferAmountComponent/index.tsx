@@ -114,7 +114,7 @@ function TransferAmountComponent({
     from: { opacity: 0, height: 0 },
     to: {
       opacity: isExpanded ? 1 : 0,
-      height: isExpanded ? 180 : 0,
+      height: isExpanded ? 80 : 0,
     },
   });
 
@@ -172,10 +172,10 @@ function TransferAmountComponent({
             {renderAmount}
           </ColumnContainer>
         </RowContainer>
-        <FromContainer>
+        {/* <FromContainer>
           <DescriptionText>{t('FROM')}</DescriptionText>
           <TransferDetailView icon={AddressIcon} title={t('YOUR_ADDRESS')} address={address} />
-        </FromContainer>
+      </FromContainer> */}
       </ExpandedContainer>
       )}
     </Container>

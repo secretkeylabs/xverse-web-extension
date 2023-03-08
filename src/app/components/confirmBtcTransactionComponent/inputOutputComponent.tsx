@@ -167,7 +167,7 @@ function InputOutputComponent({
                 icon={IconBitcoin}
                 amount={satsToBtc(new BigNumber(input.value)).toString()}
                 fiatAmount={renderSubValue(input)}
-                address=""
+                address={input.userSigns ? address : input.txid}
               />
             </TransferDetailContainer>
           ))}
@@ -178,9 +178,7 @@ function InputOutputComponent({
               <TransferDetailView
                 icon={OutputIcon}
                 amount={`${satsToBtc(new BigNumber(output.amount)).toString()} BTC`}
-                fiatAmount={getFiatAmountString(
-                  getBtcFiatEquivalent(satsToBtc(new BigNumber(output.amount)), btcFiatRate),
-                )}
+                fiatAmount={<SubValueText>{getTruncatedAddress(output.address)}</SubValueText>}
                 address={output.address}
               />
             </TransferDetailContainer>
