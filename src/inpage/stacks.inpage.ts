@@ -4,7 +4,7 @@ import {
   DomEventName,
   SignatureRequestEventDetails,
   TransactionRequestEventDetails,
-} from '../content-scripts/inpage-types';
+} from '@common/types/inpage-types';
 import {
   AuthenticationResponseMessage,
   ExternalMethods,
@@ -12,8 +12,9 @@ import {
   MESSAGE_SOURCE,
   SignatureResponseMessage,
   TransactionResponseMessage,
-} from '../content-scripts/message-types';
+} from '@common/types/message-types';
 
+declare const VERSION: string;
 type CallableMethods = keyof typeof ExternalMethods;
 
 interface ExtensionResponse {
@@ -58,7 +59,7 @@ const isValidEvent = (event: MessageEvent, method: LegacyMessageToContentScript[
   return correctSource && correctMethod && !!data.payload;
 };
 
-const provider: StacksProvider = {
+const StacksMethodsProvider: StacksProvider = {
   getURL: async () => {
     const { url } = await callAndReceive('getURL');
     return url;
@@ -153,7 +154,7 @@ const provider: StacksProvider = {
   },
   getProductInfo() {
     return {
-      version: '0.0.1',
+      version: VERSION,
       name: 'Xverse Wallet',
     };
   },
@@ -162,4 +163,4 @@ const provider: StacksProvider = {
   },
 };
 
-window.StacksProvider = provider;
+export default StacksMethodsProvider;

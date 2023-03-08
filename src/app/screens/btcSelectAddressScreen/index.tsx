@@ -14,6 +14,8 @@ import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
 import AccountView from './accountView';
+import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
+import { AddressPurposes } from 'sats-connect';
 
 const TitleContainer = styled.div({
   display: 'flex',
@@ -185,7 +187,6 @@ const CancelButton = styled.button((props) => ({
 }));
 
 function BtcSelectAddressScreen() {
-  const isBitcoin = true; // will be updated
   const [loading, setLoading] = useState(false);
   const [showAccountList, setShowAccountList] = useState(false);
   const dispatch = useDispatch();
@@ -195,7 +196,7 @@ function BtcSelectAddressScreen() {
     accountsList,
     network,
   } = useWalletSelector();
-
+  const { payload, approveBtcAddressRequest, cancelAddressRequest } = useBtcAddressRequest();
   const springProps = useSpring({
     transform: showAccountList ? 'translateY(0%)' : 'translateY(100%)',
     opacity: showAccountList ? 1 : 0,
@@ -217,9 +218,12 @@ function BtcSelectAddressScreen() {
 
   const confirmCallback = async () => {
     setLoading(true);
+    approveBtcAddressRequest();
+    window.close();
   };
 
   const cancelCallback = () => {
+    cancelAddressRequest();
     window.close();
   };
 
@@ -254,21 +258,19 @@ function BtcSelectAddressScreen() {
           <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
           <AddressContainer>
-            {isBitcoin
-              ? (
-                <>
-                  <BitcoinDot />
-                  <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
-                </>
-              )
-              : (
-                <>
-                  <OrdinalImage src={OrdinalsIcon} />
-                  <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
-                </>
-              )}
+            {payload.purpose.purpose === AddressPurposes.PAYMENT ? (
+              <>
+                <BitcoinDot />
+                <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
+              </>
+            ) : (
+              <>
+                <OrdinalImage src={OrdinalsIcon} />
+                <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
+              </>
+            )}
           </AddressContainer>
-          <DappTitle>{t('DESCRIPTION')}</DappTitle>
+          <DappTitle>{payload.message}</DappTitle>
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
@@ -288,18 +290,17 @@ function BtcSelectAddressScreen() {
           <>
             <AccountText>{t('ACCOUNT')}</AccountText>
             <AccountContainer onClick={onChangeAccount}>
-              <AccountView account={selectedAccount!} isBitcoinTx={isBitcoin} />
+              <AccountView
+                account={selectedAccount!}
+                isBitcoinTx={payload.purpose.purpose === AddressPurposes.PAYMENT}
+              />
               <DropDownContainer>
                 <img src={DropDownIcon} alt="Drop Down" />
               </DropDownContainer>
             </AccountContainer>
             <ButtonsContainer>
               <TransparentButtonContainer>
-                <ActionButton
-                  text={t('CANCEL_BUTTON')}
-                  transparent
-                  onPress={cancelCallback}
-                />
+                <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
               </TransparentButtonContainer>
               <ActionButton
                 text={t('CONNECT_BUTTON')}
@@ -310,7 +311,6 @@ function BtcSelectAddressScreen() {
           </>
         )}
       </OuterContainer>
-
     </>
   );
 }

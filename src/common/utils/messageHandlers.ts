@@ -1,5 +1,5 @@
-import { InternalMethods } from 'content-scripts/message-types';
-import { BackgroundMessages } from 'content-scripts/messages';
+import { InternalMethods } from '@common/types/message-types';
+import { BackgroundMessages } from 'common/types/messages';
 
 function validateMessagesAreFromExtension(sender: chrome.runtime.MessageSender) {
   // Only respond to internal messages from our UI, not content scripts in other applications
