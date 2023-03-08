@@ -1,7 +1,6 @@
 import {
   Account,
   BaseWallet,
-  BtcTransactionData,
   Coin,
   FeesMultipliers,
   FungibleToken,

@@ -440,9 +440,9 @@
     "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
-  },
+},
   "SELECT_BTC_ADDRESS_SCREEN": {
-    "TITLE": "Connection",
+    "TITLE": "Bitcoin Address Request",
     "ACCOUNT": "Account",
     "CONNECT_BUTTON": "Approve",
     "CANCEL_BUTTON": "Dismiss",

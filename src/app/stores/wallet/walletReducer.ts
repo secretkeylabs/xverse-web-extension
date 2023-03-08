@@ -38,6 +38,7 @@ const initialWalletState: WalletState = {
   ordinalsAddress: '',
   stxPublicKey: '',
   btcPublicKey: '',
+  ordinalsPublicKey: '',
   network: {
     type: 'Mainnet',
     address: 'https://stacks-node-api.mainnet.stacks.co',

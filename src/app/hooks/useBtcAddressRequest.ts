@@ -11,7 +11,9 @@ import {
 } from 'sats-connect';
 
 const useBtcAddressRequest = () => {
-  const { btcAddress, ordinalsAddress, btcPublicKey } = useWalletSelector();
+  const {
+    btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey,
+  } = useWalletSelector();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('addressRequest') ?? '';
@@ -29,7 +31,7 @@ const useBtcAddressRequest = () => {
       }
       return {
         address: btcAddress,
-        publicKey: btcPublicKey,
+        publicKey: ordinalsPublicKey,
         purpose: { purpose: AddressPurposes.PAYMENT },
       };
     });
