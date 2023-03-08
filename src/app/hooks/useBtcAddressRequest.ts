@@ -6,14 +6,12 @@ import {
   GetAddressOptions,
   AddressPurposes,
   GetAddressResponse,
+  Purpose,
+  Address,
 } from 'sats-connect';
-import {
-  BTC_PATH_WITHOUT_INDEX,
-  BTC_TAPROOT_PATH_WITHOUT_INDEX,
-} from '@secretkeylabs/xverse-core/constant';
 
 const useBtcAddressRequest = () => {
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, btcPublicKey } = useWalletSelector();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('addressRequest') ?? '';
@@ -21,37 +19,29 @@ const useBtcAddressRequest = () => {
   const tabId = params.get('tabId') ?? '0';
 
   const approveBtcAddressRequest = () => {
-    let response: GetAddressResponse;
-    if (request.payload.purpose.purpose === AddressPurposes.PAYMENT) {
-      response = {
+    const addressesResponse: Address[] = request.payload.purposes.map((purpose: Purpose) => {
+      if (purpose.purpose === AddressPurposes.ORDINALS) {
+        return {
+          address: ordinalsAddress,
+          publicKey: btcPublicKey,
+          purpose: { purpose: AddressPurposes.ORDINALS },
+        };
+      }
+      return {
         address: btcAddress,
-        purpose: {
-          purpose: AddressPurposes.PAYMENT,
-          derivation_path: BTC_PATH_WITHOUT_INDEX,
-        },
+        publicKey: btcPublicKey,
+        purpose: { purpose: AddressPurposes.PAYMENT },
       };
-      const addressMessage = {
-        source: MESSAGE_SOURCE,
-        method: ExternalSatsMethods.getAddressResponse,
-        payload: { addressRequest: requestToken, addressResponse: response },
-      };
-      chrome.tabs.sendMessage(+tabId, addressMessage);
-    }
-    if (request.payload.purpose.purpose === AddressPurposes.ORDINALS) {
-      response = {
-        address: ordinalsAddress,
-        purpose: {
-          purpose: AddressPurposes.ORDINALS,
-          derivation_path: BTC_TAPROOT_PATH_WITHOUT_INDEX,
-        },
-      };
-      const addressMessage = {
-        source: MESSAGE_SOURCE,
-        method: ExternalSatsMethods.getAddressResponse,
-        payload: { addressRequest: requestToken, addressResponse: response },
-      };
-      chrome.tabs.sendMessage(+tabId, addressMessage);
-    }
+    });
+    const response: GetAddressResponse = {
+      addresses: addressesResponse,
+    };
+    const addressMessage = {
+      source: MESSAGE_SOURCE,
+      method: ExternalSatsMethods.getAddressResponse,
+      payload: { addressRequest: requestToken, addressResponse: response },
+    };
+    chrome.tabs.sendMessage(+tabId, addressMessage);
   };
 
   const cancelAddressRequest = () => {
