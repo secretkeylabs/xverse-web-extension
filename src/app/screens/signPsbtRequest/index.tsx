@@ -120,7 +120,7 @@ function SignPsbtRequest() {
             {t('REVIEW_TRNSACTION')}
           </ReviewTransactionText>
           <BtcRecipientComponent
-            value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount)).toString()} BTC`}
+            value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount)).toString().replace('-', '')} BTC`}
             subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt.netAmount), btcFiatRate)}
             icon={IconBitcoin}
             title={t('AMOUNT')}

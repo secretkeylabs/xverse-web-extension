@@ -302,6 +302,7 @@ function BtcSelectAddressScreen() {
                   account={account}
                   isSelected={isAccountSelected(account)}
                   onAccountSelected={handleAccountSelect}
+                  showOrdinalAddress
                 />
                 <Seperator />
               </AccountListRow>
