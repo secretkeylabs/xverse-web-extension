@@ -61,7 +61,7 @@ function SignPsbtRequest() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const { payload, confirmSignPsbt } = useSignPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt } = useSignPsbtTx();
   const parsedPsbt = parsePsbt(
     selectedAccount!,
     payload.inputsToSign,
@@ -104,6 +104,7 @@ function SignPsbtRequest() {
   };
 
   const onCancelClick = async () => {
+    cancelSignPsbt();
     window.close();
   };
 
