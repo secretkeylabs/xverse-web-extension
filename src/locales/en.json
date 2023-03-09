@@ -101,7 +101,9 @@
     "INPUT_AND_OUTPUT": "Inputs & Outputs",
     "OUTPUT": "Output",
     "RECIPIENT": "Recipient",
-    "ASSET": "Asset"
+    "ASSET": "Asset",
+    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
+    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with."
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
@@ -448,6 +450,7 @@
     "CANCEL_BUTTON": "Dismiss",
     "BITCOIN_ADDRESS": "Bitcoin address",
     "ORDINAL_ADDRESS": "Ordinal address",
-    "DESCRIPTION": "Gamma.io is requesting a connection to your Ordinal Bitcoin address"
+    "DESCRIPTION": "Gamma.io is requesting a connection to your Ordinal Bitcoin address",
+    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with."
   }
 }

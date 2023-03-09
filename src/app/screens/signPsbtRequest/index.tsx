@@ -7,11 +7,12 @@ import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import styled from 'styled-components';
 import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import AccountHeaderComponent from '@components/accountHeader';
 import BtcRecipientComponent from '@components/confirmBtcTransactionComponent/btcRecipientComponent';
+import { useNavigate } from 'react-router-dom';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -55,8 +56,9 @@ const ReviewTransactionText = styled.h1((props) => ({
 
 function SignPsbtRequest() {
   const {
-    btcAddress, selectedAccount, network, btcFiatRate,
+    btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate,
   } = useWalletSelector();
+  const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const { payload, confirmSignPsbt } = useSignPsbtTx();
@@ -65,6 +67,36 @@ function SignPsbtRequest() {
     payload.inputsToSign,
     payload.psbtBase64,
   );
+  const checkIfMismatch = () => {
+    if (payload.network.type !== network.type) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'STX',
+          error: t('NETWORK_MISMATCH'),
+          browserTx: true,
+        },
+      });
+    }
+    if (payload.inputsToSign) {
+      payload.inputsToSign.forEach((input) => {
+        if (input.address !== btcAddress && input.address !== ordinalsAddress) {
+          navigate('/tx-status', {
+            state: {
+              txid: '',
+              currency: 'STX',
+              error: t('ADDRESS_MISMATCH'),
+              browserTx: true,
+            },
+          });
+        }
+      });
+    }
+  };
+
+  useEffect(() => {
+    checkIfMismatch();
+  }, []);
 
   const onSignPsbtConfirmed = async () => {
     await confirmSignPsbt();

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import XverseLogo from '@assets/img/settings/logo.svg';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
 import useWalletSelector from '@hooks/useWalletSelector';
 import AccountRow from '@components/accountRow';
@@ -15,6 +15,7 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import { AddressPurposes } from 'sats-connect';
+import { useNavigate } from 'react-router-dom';
 import AccountView from './accountView';
 
 const TitleContainer = styled.div({
@@ -191,6 +192,7 @@ function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const [showAccountList, setShowAccountList] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const {
     selectedAccount,
@@ -249,6 +251,24 @@ function BtcSelectAddressScreen() {
     );
     setShowAccountList(false);
   };
+
+  const switchAccountBasedOnRequest = () => {
+    if (payload.network.type !== network.type) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'STX',
+          error: t('NETWORK_MISMATCH'),
+          browserTx: true,
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    switchAccountBasedOnRequest();
+  }, []);
+
   return (
     <>
       <LogoContainer>
