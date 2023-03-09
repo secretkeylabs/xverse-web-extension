@@ -7,7 +7,7 @@ import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import styled from 'styled-components';
 import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -62,11 +62,14 @@ function SignPsbtRequest() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const { payload, confirmSignPsbt, cancelSignPsbt } = useSignPsbtTx();
-  const parsedPsbt = parsePsbt(
+  const [isSigning, setIsSigning] = useState(false);
+
+  const parsedPsbt = useMemo(() => parsePsbt(
     selectedAccount!,
     payload.inputsToSign,
     payload.psbtBase64,
-  );
+  ), [selectedAccount, payload.psbtBase64]);
+
   const checkIfMismatch = () => {
     if (payload.network.type !== network.type) {
       navigate('/tx-status', {
@@ -99,8 +102,34 @@ function SignPsbtRequest() {
   }, []);
 
   const onSignPsbtConfirmed = async () => {
-    await confirmSignPsbt();
-    window.close();
+    try {
+      setIsSigning(true);
+      const response = await confirmSignPsbt();
+      setIsSigning(false);
+      if (payload.broadcast) {
+        navigate('/tx-status', {
+          state: {
+            txid: response.txId,
+            currency: 'BTC',
+            error: '',
+            browserTx: true,
+          },
+        });
+      } else {
+        window.close();
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'BTC',
+            error: err.message,
+            browserTx: true,
+          },
+        });
+      }
+    }
   };
 
   const onCancelClick = async () => {
@@ -117,11 +146,11 @@ function SignPsbtRequest() {
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <OuterContainer>
         <Container>
-          <ReviewTransactionText>
-            {t('REVIEW_TRNSACTION')}
-          </ReviewTransactionText>
+          <ReviewTransactionText>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>
           <BtcRecipientComponent
-            value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount)).toString().replace('-', '')} BTC`}
+            value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
+              .toString()
+              .replace('-', '')} BTC`}
             subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt.netAmount), btcFiatRate)}
             icon={IconBitcoin}
             title={t('AMOUNT')}
@@ -141,20 +170,12 @@ function SignPsbtRequest() {
             subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
           />
         </Container>
-
       </OuterContainer>
       <ButtonContainer>
         <TransparentButtonContainer>
-          <ActionButton
-            text={t('CANCEL')}
-            transparent
-            onPress={onCancelClick}
-          />
+          <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
         </TransparentButtonContainer>
-        <ActionButton
-          text={t('CONFIRM')}
-          onPress={onSignPsbtConfirmed}
-        />
+        <ActionButton text={t('CONFIRM')} onPress={onSignPsbtConfirmed} processing={isSigning} />
       </ButtonContainer>
     </>
   );

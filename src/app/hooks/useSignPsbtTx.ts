@@ -35,6 +35,10 @@ const useSignPsbtTx = () => {
       },
     };
     chrome.tabs.sendMessage(+tabId, signingMessage);
+    return {
+      txId,
+      signingResponse,
+    };
   };
 
   const cancelSignPsbt = () => {
