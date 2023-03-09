@@ -81,7 +81,7 @@ function SignPsbtRequest() {
 
   return (
     <>
-      <AccountHeaderComponent />
+      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <OuterContainer>
         <Container>
           <ReviewTransactionText>
