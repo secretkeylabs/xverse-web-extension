@@ -27,9 +27,6 @@ const Container = styled.div((props) => ({
   justifyContent: 'center',
   marginBottom: 12,
   overflowY: 'auto',
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
 }));
 
 const TransferDetailContainer = styled.div((props) => ({
@@ -58,6 +55,13 @@ const TxIdText = styled.h1((props) => ({
   fontSize: 12,
   color: props.theme.colors.white[0],
   marginLeft: 4,
+}));
+
+const YourAddressText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  fontSize: 12,
+  color: props.theme.colors.white[0],
+  marginRight: 4,
 }));
 
 const RowContainer = styled.div({
@@ -106,7 +110,7 @@ function InputOutputComponent({
   address, parsedPsbt, isExpanded, onArrowClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { fiatCurrency, btcFiatRate } = useSelector((state: StoreState) => state.walletState);
+  const { fiatCurrency, btcAddress, ordinalsAddress } = useSelector((state: StoreState) => state.walletState);
 
   const slideInStyles = useSpring({
     config: { ...config.gentle, duration: 400 },
@@ -122,26 +126,16 @@ function InputOutputComponent({
     config: { ...config.stiff },
   });
 
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (fiatAmount) {
-      if (fiatAmount.isLessThan(0.01)) {
-        return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      }
-      return (
-        <NumericFormat
-          value={fiatAmount.toFixed(2).toString()}
-          displayType="text"
-          thousandSeparator
-          prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
-          suffix={` ${fiatCurrency}`}
-          renderText={(text) => <SubValueText>{text}</SubValueText>}
-        />
-      );
-    }
-    return '';
-  };
-
-  const renderSubValue = (input: PSBTInput) => (input.userSigns ? <SubValueText>{getTruncatedAddress(address)}</SubValueText> : (
+  const renderAddress = (
+    address === btcAddress || address === ordinalsAddress
+      ? (
+        <TxIdContainer>
+          <YourAddressText>(Your Address)</YourAddressText>
+          <SubValueText>{getTruncatedAddress(address)}</SubValueText>
+        </TxIdContainer>
+      ) : <SubValueText>{getTruncatedAddress(address)}</SubValueText>
+  );
+  const renderSubValue = (input: PSBTInput) => (input.userSigns ? renderAddress : (
     <TxIdContainer>
       <SubValueText>{getTruncatedAddress(input.txid)}</SubValueText>
       <TxIdText>(txid)</TxIdText>
@@ -167,9 +161,10 @@ function InputOutputComponent({
                 icon={IconBitcoin}
                 hideAddress
                 amount={satsToBtc(new BigNumber(input.value)).toString()}
-                fiatAmount={renderSubValue(input)}
                 address={input.userSigns ? address : input.txid}
-              />
+              >
+                {renderSubValue(input)}
+              </TransferDetailView>
             </TransferDetailContainer>
           ))}
 
@@ -180,9 +175,20 @@ function InputOutputComponent({
                 icon={OutputIcon}
                 hideAddress
                 amount={`${satsToBtc(new BigNumber(output.amount)).toString()} BTC`}
-                fiatAmount={<SubValueText>{getTruncatedAddress(output.address)}</SubValueText>}
                 address={output.address}
-              />
+              >
+                {
+                  output.address === btcAddress || output.address === ordinalsAddress
+                    ? (
+                      <TxIdContainer>
+                        <YourAddressText>(Your Address)</YourAddressText>
+                        <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
+                      </TxIdContainer>
+                    )
+                    : <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
+                }
+
+              </TransferDetailView>
             </TransferDetailContainer>
           ))}
         </ExpandedContainer>
