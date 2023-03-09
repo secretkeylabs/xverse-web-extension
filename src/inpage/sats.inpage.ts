@@ -11,7 +11,7 @@ import {
   SatsConnectMessageToContentScript,
   SignPsbtResponseMessage,
 } from '@common/types/message-types';
-import { SignPsbtResponse } from 'sats-connect/src/transactions/signPsbt';
+import { SignTransactionResponse } from 'sats-connect/src/transactions/signTransaction';
 
 const isValidEvent = (event: MessageEvent, method: SatsConnectMessageToContentScript['method']) => {
   const { data } = event;
@@ -42,7 +42,7 @@ const SatsMethodsProvider: BitcoinProvider = {
       window.addEventListener('message', handleMessage);
     });
   },
-  signPsbt: async (signPsbtRequest: string): Promise<SignPsbtResponse> => {
+  signTransaction: async (signPsbtRequest: string): Promise<SignTransactionResponse> => {
     const event = new CustomEvent<SignPsbtRequestEventDetails>(DomEventName.signPsbtRequest, {
       detail: { signPsbtRequest },
     });
