@@ -6,7 +6,6 @@ import {
   GetAddressOptions,
   AddressPurposes,
   GetAddressResponse,
-  Purpose,
   Address,
 } from 'sats-connect';
 
@@ -21,8 +20,8 @@ const useBtcAddressRequest = () => {
   const tabId = params.get('tabId') ?? '0';
 
   const approveBtcAddressRequest = () => {
-    const addressesResponse: Address[] = request.payload.purposes.map((purpose: Purpose) => {
-      if (purpose.purpose === AddressPurposes.ORDINALS) {
+    const addressesResponse: Address[] = request.payload.purposes.map((purpose: AddressPurposes) => {
+      if (purpose === AddressPurposes.ORDINALS) {
         return {
           address: ordinalsAddress,
           publicKey: ordinalsPublicKey,

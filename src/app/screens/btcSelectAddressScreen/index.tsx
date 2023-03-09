@@ -279,7 +279,7 @@ function BtcSelectAddressScreen() {
           <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            {payload.purposes.map((purpose) => (purpose.purpose === AddressPurposes.PAYMENT ? (
+            {payload.purposes.map((purpose) => (purpose === AddressPurposes.PAYMENT ? (
               <AddressContainer>
                 <BitcoinDot />
                 <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
