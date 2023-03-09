@@ -25,13 +25,13 @@ const useBtcAddressRequest = () => {
       if (purpose.purpose === AddressPurposes.ORDINALS) {
         return {
           address: ordinalsAddress,
-          publicKey: btcPublicKey,
+          publicKey: ordinalsPublicKey,
           purpose: { purpose: AddressPurposes.ORDINALS },
         };
       }
       return {
         address: btcAddress,
-        publicKey: ordinalsPublicKey,
+        publicKey: btcPublicKey,
         purpose: { purpose: AddressPurposes.PAYMENT },
       };
     });
