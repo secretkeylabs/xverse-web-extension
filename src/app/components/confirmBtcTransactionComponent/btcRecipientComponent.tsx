@@ -19,9 +19,9 @@ const Container = styled.div((props) => ({
 }));
 
 const RecipientTitleText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
+  ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
-  marginBottom: 22,
+  marginBottom: 16,
 }));
 
 const RowContainer = styled.div({
@@ -29,8 +29,10 @@ const RowContainer = styled.div({
   flexDirection: 'row',
   width: '100%',
   alignItems: 'center',
+});
 
-  marginBottom: 22,
+const AddressContainer = styled.div({
+  marginTop: 22,
 });
 
 const Icon = styled.img((props) => ({
@@ -66,21 +68,26 @@ const ColumnContainer = styled.div({
 
 interface Props {
   recipientIndex?: number;
-  address: string;
+  address?: string;
   value: string;
   subValue?: BigNumber;
   totalRecipient?: number;
   icon: string;
   title: string;
-
+  heading?: string;
 }
 function BtcRecipientComponent({
-  recipientIndex, address, value, totalRecipient, subValue, icon, title,
-} : Props) {
+  recipientIndex,
+  address,
+  value,
+  totalRecipient,
+  subValue,
+  icon,
+  title,
+  heading,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const {
-    fiatCurrency,
-  } = useSelector((state: StoreState) => state.walletState);
+  const { fiatCurrency } = useSelector((state: StoreState) => state.walletState);
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (fiatAmount) {
@@ -103,7 +110,12 @@ function BtcRecipientComponent({
 
   return (
     <Container>
-      {recipientIndex && totalRecipient && <RecipientTitleText>{`${t('RECIPIENT')} ${recipientIndex}/${totalRecipient}`}</RecipientTitleText>}
+      {recipientIndex && totalRecipient && (
+        <RecipientTitleText>{`${t(
+          'RECIPIENT'
+        )} ${recipientIndex}/${totalRecipient}`}</RecipientTitleText>
+      )}
+      {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       <RowContainer>
         <Icon src={icon} />
         <TitleText>{title}</TitleText>
@@ -112,7 +124,11 @@ function BtcRecipientComponent({
           {subValue && <SubValueText>{getFiatAmountString(subValue)}</SubValueText>}
         </ColumnContainer>
       </RowContainer>
-      <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
+      {address && (
+        <AddressContainer>
+          <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
+        </AddressContainer>
+      )}
     </Container>
   );
 }

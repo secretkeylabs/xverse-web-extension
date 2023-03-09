@@ -96,13 +96,13 @@ interface Props {
   value: string;
   subValue: string;
   icon: string;
-  isExpanded: boolean;
+  isExpanded?: boolean;
   onArrowClick: () => void;
 
 }
 
 function TransferAmountComponent({
-  title, address, value, subValue, description, icon, isExpanded, onArrowClick,
+  title, address, value, subValue, description, icon, isExpanded = false, onArrowClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const {
