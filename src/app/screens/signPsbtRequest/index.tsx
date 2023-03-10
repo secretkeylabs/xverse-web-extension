@@ -61,7 +61,7 @@ function SignPsbtRequest() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const { payload, confirmSignPsbt, cancelSignPsbt } = useSignPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
 
   const parsedPsbt = useMemo(() => parsePsbt(
@@ -69,6 +69,11 @@ function SignPsbtRequest() {
     payload.inputsToSign,
     payload.psbtBase64,
   ), [selectedAccount, payload.psbtBase64]);
+
+  const signingAddresses = useMemo(
+    () => getSigningAddresses(payload.inputsToSign),
+    [payload.inputsToSign],
+  );
 
   const checkIfMismatch = () => {
     if (payload.network.type !== network.type) {
@@ -159,7 +164,7 @@ function SignPsbtRequest() {
           <InputOutputComponent
             parsedPsbt={parsedPsbt}
             isExpanded={expandInputOutputView}
-            address={btcAddress}
+            address={signingAddresses}
             onArrowClick={expandInputOutputSection}
           />
 

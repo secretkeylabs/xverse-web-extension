@@ -3,15 +3,13 @@ import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import OutputIcon from '@assets/img/transactions/output.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { useSelector } from 'react-redux';
 import BigNumber from 'bignumber.js';
 import { animated, config, useSpring } from '@react-spring/web';
 import { StoreState } from '@stores/index';
 import TransferDetailView from '@components/transferDetailView';
 import {
-  getBtcFiatEquivalent, ParsedPSBT, PSBTInput, satsToBtc,
+  ParsedPSBT, PSBTInput, satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import { getTruncatedAddress } from '@utils/helper';
 
@@ -100,7 +98,7 @@ const Button = styled.button((props) => ({
 }));
 
 interface Props {
-  address: string;
+  address: string[];
   parsedPsbt: ParsedPSBT;
   isExpanded: boolean;
   onArrowClick: () => void;
@@ -110,7 +108,7 @@ function InputOutputComponent({
   address, parsedPsbt, isExpanded, onArrowClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { fiatCurrency, btcAddress, ordinalsAddress } = useSelector((state: StoreState) => state.walletState);
+  const { btcAddress, ordinalsAddress } = useSelector((state: StoreState) => state.walletState);
 
   const slideInStyles = useSpring({
     config: { ...config.gentle, duration: 400 },
@@ -126,16 +124,16 @@ function InputOutputComponent({
     config: { ...config.stiff },
   });
 
-  const renderAddress = (
-    address === btcAddress || address === ordinalsAddress
+  const renderAddress = (addressToBeDisplayed: string) => (
+    addressToBeDisplayed === btcAddress || addressToBeDisplayed === ordinalsAddress
       ? (
         <TxIdContainer>
           <YourAddressText>(Your Address)</YourAddressText>
-          <SubValueText>{getTruncatedAddress(address)}</SubValueText>
+          <SubValueText>{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
         </TxIdContainer>
-      ) : <SubValueText>{getTruncatedAddress(address)}</SubValueText>
+      ) : <SubValueText>{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
   );
-  const renderSubValue = (input: PSBTInput) => (input.userSigns ? renderAddress : (
+  const renderSubValue = (input: PSBTInput, address: string) => (input.userSigns ? renderAddress(address) : (
     <TxIdContainer>
       <SubValueText>{getTruncatedAddress(input.txid)}</SubValueText>
       <TxIdText>(txid)</TxIdText>
@@ -155,15 +153,15 @@ function InputOutputComponent({
 
       {isExpanded && (
         <ExpandedContainer style={slideInStyles}>
-          {parsedPsbt?.inputs.map((input) => (
+          {parsedPsbt?.inputs.map((input, index) => (
             <TransferDetailContainer>
               <TransferDetailView
                 icon={IconBitcoin}
                 hideAddress
                 amount={satsToBtc(new BigNumber(input.value)).toString()}
-                address={input.userSigns ? address : input.txid}
+                address={input.userSigns ? address[index] : input.txid}
               >
-                {renderSubValue(input)}
+                {renderSubValue(input, address[index])}
               </TransferDetailView>
             </TransferDetailContainer>
           ))}
