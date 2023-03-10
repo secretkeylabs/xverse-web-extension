@@ -450,7 +450,6 @@
     "CANCEL_BUTTON": "Dismiss",
     "BITCOIN_ADDRESS": "Bitcoin address",
     "ORDINAL_ADDRESS": "Ordinal address",
-    "DESCRIPTION": "Gamma.io is requesting a connection to your Ordinal Bitcoin address",
     "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with."
   }
 }

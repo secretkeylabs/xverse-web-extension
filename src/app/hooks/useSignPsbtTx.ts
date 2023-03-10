@@ -2,7 +2,7 @@ import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SignPsbtOptions } from 'sats-connect';
-import { signPsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
+import { InputToSign, signPsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { broadcastRawBtcOrdinalTransaction } from '@secretkeylabs/xverse-core/api';
 
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
@@ -50,10 +50,21 @@ const useSignPsbtTx = () => {
     chrome.tabs.sendMessage(+tabId, signingMessage);
   };
 
+  const getSigningAddresses = (inputsToSign: Array<InputToSign>) => {
+    const signingAddresses : Array<string> = [];
+    inputsToSign.forEach((inputToSign) => {
+      inputToSign.signingIndexes.forEach((signingIndex) => {
+        signingAddresses[signingIndex] = inputToSign.address;
+      });
+    });
+    return signingAddresses;
+  };
+
   return {
     payload: request.payload,
     tabId,
     requestToken,
+    getSigningAddresses,
     confirmSignPsbt,
     cancelSignPsbt,
   };
