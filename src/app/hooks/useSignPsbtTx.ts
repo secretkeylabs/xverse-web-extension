@@ -1,8 +1,8 @@
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { SignPsbtOptions } from 'sats-connect';
-import { signPsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
+import { SignTransactionOptions } from 'sats-connect';
+import { signPsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { broadcastRawBtcOrdinalTransaction } from '@secretkeylabs/xverse-core/api';
 
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
@@ -14,14 +14,22 @@ const useSignPsbtTx = () => {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('signPsbtRequest') ?? '';
-  const request = decodeToken(requestToken) as any as SignPsbtOptions;
+  const request = decodeToken(requestToken) as any as SignTransactionOptions;
   const tabId = params.get('tabId') ?? '0';
 
   const confirmSignPsbt = async () => {
-    const signingResponse = await signPsbt(seedPhrase, accountsList, request.payload.inputsToSign, request.payload.psbtBase64, request.payload.broadcast);
+    const signingResponse = await signPsbt(
+      seedPhrase, 
+      accountsList, 
+      request.payload.inputsToSign, 
+      request.payload.psbtBase64, 
+      request.payload.broadcast,
+      network.type
+    );
     let txId: string = '';
     if (request.payload.broadcast) {
-      txId = await broadcastRawBtcOrdinalTransaction(signingResponse, network.type);
+      const txHex = psbtBase64ToHex(signingResponse)
+      txId = await broadcastRawBtcOrdinalTransaction(txHex, network.type);
     }
     const signingMessage = {
       source: MESSAGE_SOURCE,
