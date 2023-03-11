@@ -172,7 +172,7 @@ function InputOutputComponent({
               <TransferDetailView
                 icon={OutputIcon}
                 hideAddress
-                amount={`${satsToBtc(new BigNumber(output.amount)).toString()} BTC`}
+                amount={`${satsToBtc(new BigNumber(output ? output.amount : 0n)).toString()} BTC`}
                 address={output.address}
               >
                 {
