@@ -23,7 +23,8 @@
     "RECEIVE": "Receive",
     "SEND": "Send",
     "BUY": "Buy",
-    "MANAGE_TOKEN": "Manage token list"
+    "MANAGE_TOKEN": "Manage token list",
+    "STACKS_AND_TOKEN": "Stacks and tokens"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -55,7 +56,7 @@
     "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
-    "NO_FUNDS": "You don’t have any fund to send.",
+    "NO_FUNDS": "You don’t have any funds to send.",
     "BUY_CRYPTO": "Buy crypto →",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {
