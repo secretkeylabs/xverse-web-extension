@@ -132,6 +132,7 @@ export interface SelectAccount {
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
+  ordinalsPublicKey: string;
   bnsName?: string;
   network: SettingsNetwork;
   // stackingState: StackingStateData;

@@ -103,6 +103,7 @@ const walletReducer = (
         masterPubKey: action.masterPubKey,
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,
+        ordinalsPublicKey: action.ordinalsPublicKey,
         network: action.network,
       };
     case StoreEncryptedSeedKey:

@@ -246,6 +246,7 @@ function BtcSelectAddressScreen() {
         account.masterPubKey,
         account.stxPublicKey,
         account.btcPublicKey,
+        account.ordinalsPublicKey,
         network,
       ),
     );

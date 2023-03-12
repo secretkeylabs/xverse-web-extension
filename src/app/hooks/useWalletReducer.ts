@@ -140,6 +140,7 @@ const useWalletReducer = () => {
         account.masterPubKey,
         account.stxPublicKey,
         account.btcPublicKey,
+        account.ordinalsPublicKey,
         network,
       ),
     );
