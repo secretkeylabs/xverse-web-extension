@@ -13,9 +13,10 @@ import RecipientAddressView from '@components/recipinetAddressView';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
 import TopRow from '@components/topRow';
-import ConfirmBtcTransactionComponent from '@screens/confrimBtcTransaction/confirmBtcTransactionComponent';
+import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import { broadcastRawBtcOrdinalTransaction } from '@secretkeylabs/xverse-core';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
+import BigNumber from 'bignumber.js';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -74,19 +75,6 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
-const IndicationText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-  fontSize: 14,
-}));
-
-const ValueText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(2),
-  wordBreak: 'break-all',
-}));
-
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(3),
 }));
@@ -99,8 +87,8 @@ const Container = styled.div({
 });
 
 const NFtContainer = styled.div((props) => ({
-  maxWidth: 120,
-  maxHeight: 120,
+  maxWidth: 150,
+  maxHeight: 150,
   width: '60%',
   display: 'flex',
   aspectRatio: 1,
@@ -109,12 +97,6 @@ const NFtContainer = styled.div((props) => ({
   borderRadius: 8,
   padding: props.theme.spacing(5),
   marginBottom: props.theme.spacing(6),
-}));
-
-const OrdinalInscriptionNumber = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
 }));
 
 function ConfirmOrdinalTransaction() {
@@ -180,13 +162,6 @@ function ConfirmOrdinalTransaction() {
     }
   }, [txError]);
 
-  const networkInfoSection = (
-    <InfoContainer>
-      <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network.type}</ValueText>
-    </InfoContainer>
-  );
-
   const handleOnConfirmClick = (txHex: string) => {
     mutate({ signedTx: txHex });
   };
@@ -213,24 +188,20 @@ function ConfirmOrdinalTransaction() {
       <ScrollContainer>
         <ConfirmBtcTransactionComponent
           fee={fee}
-          amount={amount}
-          recipientAddress={recipientAddress}
+          recipients={[{ address: recipientAddress, amountSats: new BigNumber(0) }]}
           loadingBroadcastedTx={isLoading}
           signedTxHex={signedTxHex}
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
           onBackButtonClick={handleOnCancelClick}
           ordinalTxUtxo={ordinalUtxo}
+          assetDetail={ordinal?.inscriptionNumber}
         >
           <Container>
             <NFtContainer>
-              <OrdinalImage ordinal={ordinal!} />
+              <OrdinalImage inNftSend ordinal={ordinal!} />
             </NFtContainer>
-            <OrdinalInscriptionNumber>{ordinal?.inscriptionNumber}</OrdinalInscriptionNumber>
           </Container>
-          <RecipientAddressView recipient={recipientAddress} />
-          {networkInfoSection}
-          <Seperator />
         </ConfirmBtcTransactionComponent>
 
         {!isGalleryOpen

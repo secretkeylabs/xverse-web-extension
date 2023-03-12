@@ -156,7 +156,6 @@ function Home() {
     const response: FeesMultipliers = await fetchAppInfo();
     dispatch(FetchFeeMultiplierAction(response));
   };
-
   const loadInitialData = useCallback(() => {
     if (stxAddress && btcAddress) {
       fetchFeeMultiplierData();

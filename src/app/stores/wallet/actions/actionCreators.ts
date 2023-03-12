@@ -1,7 +1,6 @@
 import {
   Account,
   BaseWallet,
-  BtcTransactionData,
   Coin,
   FeesMultipliers,
   FungibleToken,
@@ -80,6 +79,7 @@ export function selectAccount(
   masterPubKey: string,
   stxPublicKey: string,
   btcPublicKey: string,
+  ordinalsPublicKey: string,
   network: SettingsNetwork,
   // stackingState: StackingStateData,
   bnsName?: string,
@@ -93,6 +93,7 @@ export function selectAccount(
     masterPubKey,
     stxPublicKey,
     btcPublicKey,
+    ordinalsPublicKey,
     network,
     // stackingState,
     bnsName,

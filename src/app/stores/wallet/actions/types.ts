@@ -56,6 +56,7 @@ export interface WalletState {
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
+  ordinalsPublicKey: string;
   accountsList: Account[];
   selectedAccount: Account | null;
   hasRestoredMemoryKey: boolean;
@@ -131,6 +132,7 @@ export interface SelectAccount {
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
+  ordinalsPublicKey: string;
   bnsName?: string;
   network: SettingsNetwork;
   // stackingState: StackingStateData;

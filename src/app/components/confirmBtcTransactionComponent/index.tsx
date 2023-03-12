@@ -4,18 +4,37 @@ import styled from 'styled-components';
 import { ReactNode, useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
+import AssetIcon from '@assets/img/transactions/Assets.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
 import { useSelector } from 'react-redux';
+import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { useMutation } from '@tanstack/react-query';
-import { Recipient, SignedBtcTx, signOrdinalSendTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
-import TransferAmountView from '@components/transferAmountView';
-import TransferFeeView from '@components/transferFeeView';
 import {
-  btcToSats, BtcUtxoDataResponse, ErrorCodes, ResponseError,
+  Recipient,
+  SignedBtcTx,
+  signOrdinalSendTransaction,
+} from '@secretkeylabs/xverse-core/transactions/btc';
+import {
+  BtcUtxoDataResponse,
+  ErrorCodes,
+  getBtcFiatEquivalent,
+  ResponseError,
+  satsToBtc,
 } from '@secretkeylabs/xverse-core';
+import TransactionDetailComponent from '../transactionDetailComponent';
+import BtcRecipientComponent from './btcRecipientComponent';
+
+const OuterContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -73,14 +92,24 @@ const ErrorText = styled.h1((props) => ({
   color: props.theme.colors.feedback.error,
 }));
 
+interface ReviewTransactionTitleProps {
+  isOridnalTx: boolean;
+}
+const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
+  ...props.theme.headline_s,
+  color: props.theme.colors.white[0],
+  marginBottom: props.theme.spacing(16),
+  textAlign: props.isOridnalTx ? 'center' : 'left',
+}));
+
 interface Props {
   fee: BigNumber;
-  children: ReactNode;
   loadingBroadcastedTx: boolean;
-  amount: BigNumber;
-  recipientAddress: string;
   signedTxHex: string;
   ordinalTxUtxo?: BtcUtxoDataResponse;
+  recipients: Recipient[];
+  children?: ReactNode;
+  assetDetail?: string;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -88,12 +117,12 @@ interface Props {
 
 function ConfirmBtcTransactionComponent({
   fee,
-  children,
   loadingBroadcastedTx,
-  amount,
-  recipientAddress,
   signedTxHex,
   ordinalTxUtxo,
+  recipients,
+  children,
+  assetDetail,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -103,7 +132,7 @@ function ConfirmBtcTransactionComponent({
   const [loading, setLoading] = useState(false);
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
-    btcAddress, selectedAccount, seedPhrase, network,
+    btcAddress, selectedAccount, seedPhrase, network, btcFiatRate,
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
@@ -111,7 +140,10 @@ function ConfirmBtcTransactionComponent({
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const {
-    isLoading, data, error: txError, mutate,
+    isLoading,
+    data,
+    error: txError,
+    mutate,
   } = useMutation<
   SignedBtcTx,
   ResponseError,
@@ -119,16 +151,14 @@ function ConfirmBtcTransactionComponent({
     recipients: Recipient[];
     txFee: string;
   }
-  >(
-    async ({ recipients, txFee }) => signBtcTransaction(
-      recipients,
-      btcAddress,
-      selectedAccount?.id ?? 0,
-      seedPhrase,
-      network.type,
-      new BigNumber(txFee),
-    ),
-  );
+  >(async ({ recipients, txFee }) => signBtcTransaction(
+    recipients,
+    btcAddress,
+    selectedAccount?.id ?? 0,
+    seedPhrase,
+    network.type,
+    new BigNumber(txFee),
+  ));
 
   const {
     isLoading: isLoadingOrdData,
@@ -137,7 +167,7 @@ function ConfirmBtcTransactionComponent({
     mutate: ordinalMutate,
   } = useMutation<SignedBtcTx, ResponseError, string>(async (txFee) => {
     const signedTx = await signOrdinalSendTransaction(
-      recipientAddress,
+      recipients[0]?.address,
       ordinalTxUtxo!,
       btcAddress,
       Number(selectedAccount?.id),
@@ -174,13 +204,6 @@ function ConfirmBtcTransactionComponent({
 
   const onApplyClick = (modifiedFee: string) => {
     setCurrentFee(new BigNumber(modifiedFee));
-    const recipients: Recipient[] = [
-      {
-        address: recipientAddress,
-        amountSats: btcToSats(new BigNumber(amount)),
-      },
-    ];
-
     if (ordinalTxUtxo) ordinalMutate(modifiedFee);
     else mutate({ recipients, txFee: modifiedFee });
     setLoading(true);
@@ -191,7 +214,7 @@ function ConfirmBtcTransactionComponent({
   };
 
   useEffect(() => {
-    if (recipientAddress && amount && txError) {
+    if (recipients && txError) {
       setOpenTransactionSettingModal(false);
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
@@ -202,7 +225,7 @@ function ConfirmBtcTransactionComponent({
   }, [txError]);
 
   useEffect(() => {
-    if (recipientAddress && amount && ordinalError) {
+    if (recipients && ordinalError) {
       setOpenTransactionSettingModal(false);
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
@@ -213,12 +236,46 @@ function ConfirmBtcTransactionComponent({
   }, [ordinalError]);
 
   return (
-    <>
-      {!isGalleryOpen && <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />}
+    <OuterContainer>
+      {!isGalleryOpen && (
+        <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
+      )}
       <Container>
-        {amount && <TransferAmountView currency="BTC" amount={amount} />}
         {children}
-        <TransferFeeView fee={currentFee} currency={t('SATS')} />
+        <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
+          {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
+        </ReviewTransactionText>
+
+        {ordinalTxUtxo ? (
+          <BtcRecipientComponent
+            address={recipients[0]?.address}
+            value={assetDetail!}
+            icon={AssetIcon}
+            title={t('CONFIRM_TRANSACTION.ASSET')}
+          />
+        ) : (
+          recipients?.map((recipient, index) => (
+            <BtcRecipientComponent
+              recipientIndex={index + 1}
+              address={recipient?.address}
+              value={satsToBtc(recipient?.amountSats).toString()}
+              totalRecipient={recipients?.length}
+              icon={IconBitcoin}
+              title={t('CONFIRM_TRANSACTION.AMOUNT')}
+              subValue={getBtcFiatEquivalent(
+                recipient?.amountSats,
+                btcFiatRate,
+              )}
+            />
+          ))
+        )}
+
+        <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
+        <TransactionDetailComponent
+          title={t('CONFIRM_TRANSACTION.FEES')}
+          value={`${currentFee.toString()} ${t('SATS')}`}
+          subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
+        />
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
@@ -229,10 +286,9 @@ function ConfirmBtcTransactionComponent({
           visible={openTransactionSettingModal}
           fee={currentFee.toString()}
           type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
-          amount={amount}
+          btcRecipients={recipients}
           onApplyClick={onApplyClick}
           onCrossClick={closeTransactionSettingAlert}
-          btcRecepientAddress={recipientAddress}
           ordinalTxUtxo={ordinalTxUtxo}
           loading={loading}
         />
@@ -256,7 +312,7 @@ function ConfirmBtcTransactionComponent({
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>
-    </>
+    </OuterContainer>
   );
 }
 
