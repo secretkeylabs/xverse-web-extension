@@ -1,7 +1,6 @@
 import {
   Account,
   BaseWallet,
-  BtcTransactionData,
   Coin,
   FeesMultipliers,
   FungibleToken,
@@ -78,6 +77,7 @@ export function selectAccount(
   masterPubKey: string,
   stxPublicKey: string,
   btcPublicKey: string,
+  ordinalsPublicKey: string,
   network: SettingsNetwork,
   // stackingState: StackingStateData,
   bnsName?: string,
@@ -91,6 +91,7 @@ export function selectAccount(
     masterPubKey,
     stxPublicKey,
     btcPublicKey,
+    ordinalsPublicKey,
     network,
     // stackingState,
     bnsName,
@@ -132,11 +133,10 @@ export function setStxWalletDataAction(
   };
 }
 
-export function SetBtcWalletDataAction(balance: BigNumber, btctransactions: BtcTransactionData[]): actions.SetBtcWalletData {
+export function SetBtcWalletDataAction(balance: BigNumber): actions.SetBtcWalletData {
   return {
     type: actions.SetBtcWalletDataKey,
     balance,
-    btctransactions,
   };
 }
 
@@ -188,5 +188,19 @@ export function ChangeActivateOrdinalsAction(hasActivatedOrdinalsKey: boolean): 
   return {
     type: actions.ChangeHasActivatedOrdinalsKey,
     hasActivatedOrdinalsKey,
+  };
+}
+
+export function ChangeShowBtcReceiveAlertAction(showBtcReceiveAlert: boolean | null): actions.ChangeShowBtcReceiveAlert {
+  return {
+    type: actions.ChangeShowBtcReceiveAlertKey,
+    showBtcReceiveAlert,
+  };
+}
+
+export function ChangeShowOrdinalReceiveAlertAction(showOrdinalReceiveAlert: boolean | null): actions.ChangeShowOrdinalReceiveAlert {
+  return {
+    type: actions.ChangeShowOrdinalReceiveAlertKey,
+    showOrdinalReceiveAlert,
   };
 }

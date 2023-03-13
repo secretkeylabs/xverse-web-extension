@@ -41,7 +41,7 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
     if (transaction.txType === 'contract_call') {
       if (transaction.tokenType === 'fungible') {
         const token = coinsList?.find(
-          (cn) => cn.principal === transaction.contractCall?.contract_id
+          (cn) => cn.principal === transaction.contractCall?.contract_id,
         );
         const prefix = transaction.incoming ? '' : '-';
         return (
@@ -59,17 +59,19 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
     }
   } else if (coin === 'BTC') {
     const prefix = transaction.incoming ? '' : '-';
-    return (
-      <NumericFormat
-        value={satsToBtc(BigNumber(transaction.amount)).toString()}
-        displayType="text"
-        thousandSeparator
-        prefix=""
-        renderText={(value: string) => (
-          <TransactionValue>{`${prefix}${value} BTC`}</TransactionValue>
-        )}
-      />
-    );
+    if (!new BigNumber(transaction.amount).isEqualTo(0)) {
+      return (
+        <NumericFormat
+          value={satsToBtc(BigNumber(transaction.amount)).toString()}
+          displayType="text"
+          thousandSeparator
+          prefix=""
+          renderText={(value: string) => (
+            <TransactionValue>{`${prefix}${value} BTC`}</TransactionValue>
+          )}
+        />
+      );
+    }
   }
   return null;
 }

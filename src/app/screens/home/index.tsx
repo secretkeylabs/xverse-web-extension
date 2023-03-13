@@ -3,6 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import AddToken from '@assets/img/dashboard/add_token.svg';
+import StacksToken from '@assets/img/dashboard/stacks_token.svg';
+import MiaToken from '@assets/img/dashboard/mia_token.svg';
+import NycToken from '@assets/img/dashboard/nyc_token.svg';
+import CoinToken from '@assets/img/dashboard/coin_token.svg';
+import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
@@ -23,6 +29,8 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useCoinsData from '@hooks/queries/useCoinData';
+import BottomModal from '@components/bottomModal';
+import ReceiveCardComponent from '@components/receiveCardComponent';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -43,6 +51,15 @@ const ColumnContainer = styled.div((props) => ({
   alignItems: 'space-between',
   justifyContent: 'space-between',
   marginTop: props.theme.spacing(12),
+}));
+
+const ReceiveContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  marginTop: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(16),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
 }));
 
 const CoinContainer = styled.div({
@@ -95,13 +112,25 @@ const TokenListButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
+const Icon = styled.img({
+  width: 24,
+  height: 24,
+});
+
+const IconRow = styled.div({
+  display: 'flex',
+  width: 140,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+});
+
 function Home() {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { coinsList } = useWalletSelector();
+  const { coinsList, stxAddress, btcAddress } = useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
@@ -176,6 +205,33 @@ function Home() {
     navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
   };
 
+  const receiveContent = (
+    <ReceiveContainer>
+      <ReceiveCardComponent
+        title={t('BITCOIN')}
+        address={btcAddress}
+        onQrAddressClick={onBTCReceiveSelect}
+      >
+        <Icon src={BitcoinToken} />
+      </ReceiveCardComponent>
+
+      <ReceiveCardComponent
+        title={t('STACKS_AND_TOKEN')}
+        address={stxAddress}
+        onQrAddressClick={onSTXReceiveSelect}
+      >
+        <IconRow>
+          <Icon src={StacksToken} />
+          <Icon src={CoinToken} />
+          <Icon src={NycToken} />
+          <Icon src={MiaToken} />
+          <Icon src={AddToken} />
+        </IconRow>
+
+      </ReceiveCardComponent>
+    </ReceiveContainer>
+  );
+
   return (
     <>
       <AccountHeaderComponent />
@@ -235,16 +291,9 @@ function Home() {
               />
             ))}
         </CoinContainer>
-        <CoinSelectModal
-          onSelectBitcoin={onBTCReceiveSelect}
-          onSelectStacks={onSTXReceiveSelect}
-          onClose={onReceiveModalClose}
-          onSelectCoin={onSTXReceiveSelect}
-          visible={openReceiveModal}
-          coins={getCoinsList()}
-          loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
-          title={t('RECEIVE')}
-        />
+        <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={onReceiveModalClose}>
+          {receiveContent}
+        </BottomModal>
 
         <CoinSelectModal
           onSelectBitcoin={onBtcSendClick}

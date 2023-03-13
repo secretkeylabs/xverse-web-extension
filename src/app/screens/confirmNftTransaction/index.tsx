@@ -149,6 +149,7 @@ function ConfirmNftTransaction() {
           txid: stxTxBroadcastData,
           currency: 'STX',
           error: '',
+          isNft: true,
         },
       });
       setTimeout(() => {
@@ -164,6 +165,7 @@ function ConfirmNftTransaction() {
           txid: '',
           currency: 'STX',
           error: txError.toString(),
+          isNft: true,
         },
       });
     }

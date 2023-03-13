@@ -5,12 +5,16 @@ import { getShortTruncatedAddress } from '@utils/helper';
 import Copy from '@assets/img/nftDashboard/Copy.svg';
 import QrCode from '@assets/img/nftDashboard/QrCode.svg';
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
+import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import { useDispatch } from 'react-redux';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 interface Props {
-  icon: string;
   title: string;
   address: string;
   onQrAddressClick: () => void;
+  children: ReactNode;
 }
 
 const ReceiveCard = styled.div((props) => ({
@@ -50,11 +54,6 @@ const RowContainer = styled.div({
   flex: 2,
 });
 
-const Icon = styled.img({
-  width: 24,
-  height: 24,
-});
-
 const ButtonIcon = styled.img({
   width: 22,
   height: 22,
@@ -80,17 +79,26 @@ const StyledToolTip = styled(Tooltip)`
 `;
 
 function ReceiveCardComponent({
-  icon, title, address, onQrAddressClick,
+  children, title, address, onQrAddressClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+  const dispatch = useDispatch();
+  const {
+    ordinalsAddress,
+    btcAddress,
+    showOrdinalReceiveAlert,
+    showBtcReceiveAlert,
+  } = useWalletSelector();
   const onCopyClick = () => {
+    if (ordinalsAddress === address && showOrdinalReceiveAlert !== null) { dispatch(ChangeShowOrdinalReceiveAlertAction(true)); }
+    if (btcAddress === address && showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
     navigator.clipboard.writeText(address);
   };
 
   return (
     <ReceiveCard>
       <ColumnContainer>
-        <Icon src={icon} />
+        {children}
         <TitleText>{title}</TitleText>
         <AddressText>{getShortTruncatedAddress(address)}</AddressText>
       </ColumnContainer>

@@ -106,15 +106,12 @@ const ButtonText = styled.h1((props) => ({
 
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
 }));
 
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   backgroundColor: 'transparent',
-  marginTop: props.theme.spacing(2),
   marginLeft: props.theme.spacing(3),
 }));
 
@@ -124,7 +121,7 @@ function TransactionStatus() {
   const location = useLocation();
   const { network } = useWalletSelector();
   const {
-    txid, currency, error, sponsored, browserTx,
+    txid, currency, error, sponsored, browserTx, isOrdinal, isNft,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -155,6 +152,8 @@ function TransactionStatus() {
 
   const onCloseClick = () => {
     if (browserTx) window.close();
+    else if (isOrdinal) navigate(-4);
+    else if (isNft) navigate(-3);
     else navigate(-2);
   };
 

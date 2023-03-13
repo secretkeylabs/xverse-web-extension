@@ -37,6 +37,9 @@ export const SetCoinDataKey = 'SetCoinDataKey';
 
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 
+export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
+export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
+
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
@@ -44,6 +47,7 @@ export interface WalletState {
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
+  ordinalsPublicKey: string;
   accountsList: Account[];
   selectedAccount: Account | null;
   network: SettingsNetwork;
@@ -62,6 +66,8 @@ export interface WalletState {
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
+  showBtcReceiveAlert: boolean | null;
+  showOrdinalReceiveAlert: boolean | null;
 }
 
 export interface SetWallet {
@@ -114,6 +120,7 @@ export interface SelectAccount {
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
+  ordinalsPublicKey: string;
   bnsName?: string;
   network: SettingsNetwork;
   // stackingState: StackingStateData;
@@ -136,7 +143,6 @@ export interface SetStxWalletData {
 export interface SetBtcWalletData {
   type: typeof SetBtcWalletDataKey;
   balance: BigNumber;
-  btctransactions: BtcTransactionData[];
 }
 
 export interface SetCoinData {
@@ -169,6 +175,16 @@ export interface ChangeActivateOrdinals {
   hasActivatedOrdinalsKey: boolean;
 }
 
+export interface ChangeShowBtcReceiveAlert {
+  type: typeof ChangeShowBtcReceiveAlertKey;
+  showBtcReceiveAlert: boolean | null;
+}
+
+export interface ChangeShowOrdinalReceiveAlert {
+  type: typeof ChangeShowOrdinalReceiveAlertKey;
+  showOrdinalReceiveAlert: boolean | null;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -188,4 +204,6 @@ export type WalletActions =
   | ChangeFiatCurrency
   | ChangeNetwork
   | GetActiveAccounts
-  | ChangeActivateOrdinals;
+  | ChangeActivateOrdinals
+  | ChangeShowBtcReceiveAlert
+  | ChangeShowOrdinalReceiveAlert;

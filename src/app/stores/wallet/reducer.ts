@@ -21,6 +21,8 @@ import {
   SetStxWalletDataKey,
   SetCoinRatesKey,
   ChangeHasActivatedOrdinalsKey,
+  ChangeShowBtcReceiveAlertKey,
+  ChangeShowOrdinalReceiveAlertKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -30,6 +32,7 @@ const initialWalletState: WalletState = {
   masterPubKey: '',
   stxPublicKey: '',
   btcPublicKey: '',
+  ordinalsPublicKey: '',
   network: {
     type: 'Mainnet',
     address: 'https://stacks-node-api.mainnet.stacks.co',
@@ -51,6 +54,8 @@ const initialWalletState: WalletState = {
   feeMultipliers: null,
   networkAddress: undefined,
   hasActivatedOrdinalsKey: undefined,
+  showBtcReceiveAlert: false,
+  showOrdinalReceiveAlert: false,
 };
 
 const walletReducer = (
@@ -89,6 +94,7 @@ const walletReducer = (
         masterPubKey: action.masterPubKey,
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,
+        ordinalsPublicKey: action.ordinalsPublicKey,
         network: action.network,
       };
     case StoreEncryptedSeedKey:
@@ -168,6 +174,16 @@ const walletReducer = (
       return {
         ...state,
         hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
+      };
+    case ChangeShowBtcReceiveAlertKey:
+      return {
+        ...state,
+        showBtcReceiveAlert: action.showBtcReceiveAlert,
+      };
+    case ChangeShowOrdinalReceiveAlertKey:
+      return {
+        ...state,
+        showOrdinalReceiveAlert: action.showOrdinalReceiveAlert,
       };
     default:
       return state;

@@ -65,7 +65,7 @@ function RecipientAddressView({ recipient }: Props) {
 
   return (
     <InfoContainer>
-      <TitleText>{t('RECEPIENT_ADDRESS')}</TitleText>
+      <TitleText>{t('RECIPIENT_ADDRESS')}</TitleText>
       <ValueText>{bnsName}</ValueText>
       <RowContainer>
         <AddressContainer>

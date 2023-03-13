@@ -23,7 +23,8 @@
     "RECEIVE": "Receive",
     "SEND": "Send",
     "BUY": "Buy",
-    "MANAGE_TOKEN": "Manage token list"
+    "MANAGE_TOKEN": "Manage token list",
+    "STACKS_AND_TOKEN": "Stacks and tokens"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -47,15 +48,15 @@
     "SEND": "Send",
     "AMOUNT": "Amount",
     "BALANCE": "Balance",
-    "RECEPIENT": "Recipient",
-    "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
-    "BTC_RECEPIENT_PLACEHOLDER": "Address",
+    "RECIPIENT": "Recipient",
+    "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
+    "BTC_RECIPIENT_PLACEHOLDER": "Enter Bitcoin address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
-    "NO_FUNDS": "You don’t have any fund to send.",
+    "NO_FUNDS": "You don’t have any funds to send.",
     "BUY_CRYPTO": "Buy crypto →",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {
@@ -72,12 +73,14 @@
       "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
     },
     "SEND_NFT": "Send NFT",
-    "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name"
+    "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
+    "SEND_ORDINAL_TITLE": "Send Ordinal",
+    "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals."
   },
   "CONFIRM_TRANSACTION": {
-    "SEND": "Send",
+    "SEND": "Confirm Transaction",
     "INDICATION": "You will send",
-    "RECEPIENT_ADDRESS": "recipient address",
+    "RECIPIENT_ADDRESS": "recipient address",
     "MEMO": "Attached memo",
     "NETWORK": "Network",
     "FEES": "Fees",
@@ -88,7 +91,20 @@
     "SATS": "SATS",
     "CONFIRM_TX": "Confirm Transaction",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
-    "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account."
+    "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
+    "TOTAL": "Total",
+    "AMOUNT_PLUS_FEES": "Amount + fees",
+    "REVIEW_TRNSACTION": "Review transaction",
+    "AMOUNT": "Amount",
+    "YOUR_ADDRESS": "Your address",
+    "FROM": "From",
+    "INPUT": "Inputs",
+    "INPUT_AND_OUTPUT": "Inputs & Outputs",
+    "OUTPUT": "Output",
+    "RECIPIENT": "Recipient",
+    "ASSET": "Asset",
+    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
+    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with."
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
@@ -112,7 +128,7 @@
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",
-    "SUCCESS_MSG": "Your transaction have been successfully submitted and should appear in a few minutes.",
+    "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
     "STACKS_EXPLORER": "Stacks Explorer",
     "BITCOIN_EXPLORER": "Explorer",
@@ -208,7 +224,7 @@
     "POOL_FEE": "Pool fee",
     "MINIMUM_AMOUNT": "Minimum amount",
     "REWARD_CYCLES": "Reward Cycles",
-    "START_STACKNG": "Start stacking",
+    "START_STACKING": "Start stacking",
     "STACK_FOR_REWARD": "Stack your coins to earn rewards",
     "XVERSE_POOL": "Xverse delegated pooling allows everyone to participate in Stacking and earn rewards. ",
     "STACK_STX": "Stack STX",
@@ -262,8 +278,9 @@
     "GAMMA": "Gamma.io",
     "MOVE_TO_ASSET_DETAIL": "Back to gallery",
     "ORDINALS": "Ordinal",
-    "ORDINAL_SEND_TITLE": "Transfers are coming soon!",
-    "ORDINAL_SEND_DESCRIPTION": "We are working hard to enable transfers for Ordinals.",
+    "ORDINAL_PENDING_SEND_TITLE": "Transfer Pending",
+    "ORDINAL_PENDING_SEND_DESCRIPTION": "This Ordinal is already in a pending transfer.",
+    "ORDINAL_PENDING_SEND_BUTTON": "View in Explorer",
     "INSCRIPTION": "Inscription",
     "ID": "Id",
     "CONTENT_LENGTH": "Content length",
@@ -361,7 +378,7 @@
     "ANOTHER_ADDRESS": "Another address",
     "CONTRACT_ADDRESS": "Contract Address",
     "MY_ADDRESS": "My Address",
-    "RECEPIENT_ADDRESS": "Recipient address",
+    "RECIPIENT_ADDRESS": "Recipient address",
     "EQUAL": "will transfer exactly",
     "GREATER": " will transfer more than",
     "GREATER_EQUAL": "will transfer at least",
@@ -418,5 +435,22 @@
   "WINDOW_CLOSED_ALERT": {
     "TITLE": "Requesting window closed",
     "BODY": "The window that initiated the request is closed, but you can still broadcast the transaction"
+  },
+  "ADDRESS_RECEIVE_ALERT_MESSAGE": {
+    "RECEIVING_ORDINALS": "Receiving Ordinals",
+    "RECEIVING_ORDINAL_INFO": "Use this address to receive Ordinals only. Do not use this address to receive Bitcoin payments.",
+    "RECEIVING_BTC": "Receiving Bitcoin",
+    "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
+    "I_UNDERSTAND": "I understand",
+    "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
+},
+  "SELECT_BTC_ADDRESS_SCREEN": {
+    "TITLE": "Bitcoin Address Request",
+    "ACCOUNT": "Account",
+    "CONNECT_BUTTON": "Approve",
+    "CANCEL_BUTTON": "Dismiss",
+    "BITCOIN_ADDRESS": "Bitcoin address",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with."
   }
 }

@@ -40,6 +40,10 @@ import SignatureRequest from '@screens/signatureRequest';
 import TransactionRequest from '@screens/transactionRequest';
 import ErrorBoundary from '@screens/error';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
+import SendOrdinal from '@screens/sendOrdinal';
+import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
+import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
+import SignPsbtRequest from '@screens/signPsbtRequest';
 
 const router = createHashRouter([
   {
@@ -132,6 +136,22 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'btc-select-address-request',
+        element: (
+          <AuthGuard>
+            <BtcSelectAddressScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'psbt-signing-request',
+        element: (
+          <AuthGuard>
+            <SignPsbtRequest />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'login',
         element: <Login />,
       },
@@ -195,6 +215,14 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
+      {
+        path: 'send-ordinal',
+        element: (
+          <AuthGuard>
+            <SendOrdinal />
+          </AuthGuard>
+        ),
+      },
     ],
   },
   {
@@ -215,7 +243,7 @@ const router = createHashRouter([
         element: <NftDetailScreen />,
       },
       {
-        path: 'nft-dashboard/ordinal-detail/:id',
+        path: 'nft-dashboard/ordinal-detail/:id/:txHash',
         element: <OrdinalDetailScreen />,
       },
       {
@@ -225,6 +253,18 @@ const router = createHashRouter([
       {
         path: 'confirm-nft-tx/:id',
         element: <ConfirmNftTransaction />,
+      },
+      {
+        path: 'confirm-ordinal-tx/:id',
+        element: <ConfirmOrdinalTransaction />,
+      },
+      {
+        path: 'nft-dashboard/ordinal-detail/:id/:txHash/send-ordinal',
+        element: (
+          <AuthGuard>
+            <SendOrdinal />
+          </AuthGuard>
+        ),
       },
     ],
   },

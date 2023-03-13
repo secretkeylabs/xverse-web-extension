@@ -107,7 +107,7 @@ function StartStacking() {
       </OuterContainer>
 
       <ButtonContainer>
-        <ActionButton src={ArrowSquareOut} text={t('START_STACKNG')} onPress={handleOnClick} />
+        <ActionButton src={ArrowSquareOut} text={t('START_STACKING')} onPress={handleOnClick} />
       </ButtonContainer>
     </>
 

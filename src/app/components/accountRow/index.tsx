@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { getAccountGradient } from '@utils/gradient';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { useTranslation } from 'react-i18next';
 import { getTruncatedAddress, getAddressDetail } from '@utils/helper';
 import BarLoader from '@components/barLoader';
@@ -9,6 +10,9 @@ import Copy from '@assets/img/Copy.svg';
 import { LoaderSize } from '@utils/constants';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 interface GradientCircleProps {
   firstGradient: string;
@@ -76,6 +80,13 @@ const StyledToolTip = styled(Tooltip)`
   padding: 7px;
 `;
 
+const AddressContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
 const Button = styled.button`
   background: transparent;
 `;
@@ -99,20 +110,49 @@ const CopyButton = styled.button`
   }
 `;
 
+const OrdinalImage = styled.img({
+  width: 12,
+  height: 12,
+  marginRight: 4,
+});
+
+const AddressText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  marginTop: props.theme.spacing(1),
+  color: props.theme.colors.white['400'],
+}));
+
+const BitcoinDot = styled.div((props) => ({
+  borderRadius: 20,
+  background: props.theme.colors.feedback.caution,
+  width: 10,
+  marginRight: 4,
+  marginLeft: 4,
+  height: 10,
+}));
 interface Props {
   account: Account | null;
   isSelected: boolean;
   allowCopyAddress?: boolean;
+  showOrdinalAddress?: boolean;
   onAccountSelected: (account: Account) => void;
 }
 
 function AccountRow({
-  account, isSelected, onAccountSelected, allowCopyAddress,
+  account,
+  isSelected,
+  onAccountSelected,
+  allowCopyAddress,
+  showOrdinalAddress,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const {
+    showBtcReceiveAlert,
+  } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress!);
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
+  const dispatch = useDispatch();
 
   function getName() {
     return account?.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
@@ -122,6 +162,7 @@ function AccountRow({
     navigator.clipboard.writeText(account?.btcAddress!);
     setOnBtcCopied(true);
     setOnStxCopied(false);
+    if (showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
   };
 
   const handleOnStxAddressClick = () => {
@@ -131,12 +172,27 @@ function AccountRow({
   };
 
   const onRowClick = () => {
-    if (!allowCopyAddress) { onAccountSelected(account!); }
+    if (!allowCopyAddress) {
+      onAccountSelected(account!);
+    }
   };
 
   const onClick = () => {
     onAccountSelected(account!);
   };
+
+  const showOrdinalBtcAddress = (
+    <RowContainer>
+      <AddressContainer>
+        <OrdinalImage src={OrdinalsIcon} />
+        <AddressText>{`${getTruncatedAddress(account?.ordinalsAddress!)} / `}</AddressText>
+      </AddressContainer>
+      <AddressContainer>
+        <BitcoinDot />
+        <AddressText>{`${getTruncatedAddress(account?.btcAddress!)}`}</AddressText>
+      </AddressContainer>
+    </RowContainer>
+  );
 
   const displayAddress = allowCopyAddress ? (
     <RowContainer>
@@ -169,7 +225,7 @@ function AccountRow({
       />
     </RowContainer>
   ) : (
-    <CurrentAccountDetailText>{getAddressDetail(account!)}</CurrentAccountDetailText>
+    <CurrentAccountDetailText>{showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}</CurrentAccountDetailText>
   );
 
   return (

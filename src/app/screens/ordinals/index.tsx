@@ -80,7 +80,7 @@ function Ordinal({ asset }: Props) {
 
   const handleOnClick = () => {
     storeOrdinalsMetaData(ordinalData!);
-    navigate(`ordinal-detail/${asset.id}`);
+    navigate(`ordinal-detail/${asset.id}/${asset.utxo.tx_hash}`);
   };
 
   return (
