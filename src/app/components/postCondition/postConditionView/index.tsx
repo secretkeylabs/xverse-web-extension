@@ -101,7 +101,7 @@ function PostConditionsView({ postCondition, amount }: Props) {
               ? t('CONTRACT_ADDRESS')
               : isSending
                 ? t('MY_ADDRESS')
-                : t('RECEPIENT_ADDRESS')}`}
+                : t('RECIPIENT_ADDRESS')}`}
           />
           <Seperator />
         </>
