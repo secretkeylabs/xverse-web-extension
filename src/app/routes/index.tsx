@@ -43,6 +43,7 @@ import OrdinalDetailScreen from '@screens/ordinalDetail';
 import SendOrdinal from '@screens/sendOrdinal';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
+import SignPsbtRequest from '@screens/signPsbtRequest';
 
 const router = createHashRouter([
   {
@@ -139,6 +140,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <BtcSelectAddressScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'psbt-signing-request',
+        element: (
+          <AuthGuard>
+            <SignPsbtRequest />
           </AuthGuard>
         ),
       },

@@ -30,7 +30,7 @@ var options = {
 
   entry: {
     background: path.join(SRC_ROOT_PATH, 'background', 'background.ts'),
-    inpage: path.join(SRC_ROOT_PATH, 'inpage', 'inpage.ts'),
+    inpage: path.join(SRC_ROOT_PATH, 'inpage', 'index.ts'),
     'content-script': path.join(SRC_ROOT_PATH, 'content-scripts', 'content-script.ts'),
     options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.tsx'),
     popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.tsx'),

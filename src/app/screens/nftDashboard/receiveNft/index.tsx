@@ -6,7 +6,7 @@ import OrdinalsIcon from '@assets/img/nftDashboard/oridinals_icon.svg';
 import StacksIcon from '@assets/img/nftDashboard/stacks_icon.svg';
 import { useNavigate } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';
-import ReceiveCardComponent from './receiveCardComponent';
+import ReceiveCardComponent from '../../../components/receiveCardComponent';
 
 interface Props {
   visible: boolean;
@@ -22,6 +22,11 @@ const ColumnContainer = styled.div((props) => ({
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
 }));
+
+const Icon = styled.img({
+  width: 24,
+  height: 24,
+});
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -54,17 +59,19 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen }: Props) {
   const receiveContent = (
     <ColumnContainer>
       <ReceiveCardComponent
-        icon={OrdinalsIcon}
         title={t('ORDINALS')}
         address={ordinalsAddress}
         onQrAddressClick={onOrdinalsReceivePress}
-      />
+      >
+        <Icon src={OrdinalsIcon} />
+      </ReceiveCardComponent>
       <ReceiveCardComponent
-        icon={StacksIcon}
         title={t('STACKS_NFT')}
         address={stxAddress}
         onQrAddressClick={onReceivePress}
-      />
+      >
+        <Icon src={StacksIcon} />
+      </ReceiveCardComponent>
     </ColumnContainer>
   );
 

@@ -38,6 +38,7 @@ const initialWalletState: WalletState = {
   ordinalsAddress: '',
   stxPublicKey: '',
   btcPublicKey: '',
+  ordinalsPublicKey: '',
   network: {
     type: 'Mainnet',
     address: 'https://stacks-node-api.mainnet.stacks.co',
@@ -102,6 +103,7 @@ const walletReducer = (
         masterPubKey: action.masterPubKey,
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,
+        ordinalsPublicKey: action.ordinalsPublicKey,
         network: action.network,
       };
     case StoreEncryptedSeedKey:

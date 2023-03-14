@@ -1,11 +1,11 @@
 /* eslint-disable no-underscore-dangle */
-import { CONTENT_SCRIPT_PORT } from '../content-scripts/message-types';
-import type { LegacyMessageFromContentScript } from '../content-scripts/message-types';
+import internalBackgroundMessageHandler from '@common/utils/messageHandlers';
 import {
   handleLegacyExternalMethodFormat,
   inferLegacyMessage,
-} from './legacy-external-message-handler';
-import internalBackgroundMessageHandler from './messageHandlers';
+} from '@common/utils/legacy-external-message-handler';
+import { CONTENT_SCRIPT_PORT } from '@common/types/message-types';
+import type { LegacyMessageFromContentScript } from '@common/types/message-types';
 
 function deleteTimer(port) {
   if (port._timer) {

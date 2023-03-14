@@ -1,14 +1,17 @@
 import { SignatureData } from '@stacks/connect';
 import {
   ExternalMethods,
+  ExternalSatsMethods,
   InternalMethods,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
   MESSAGE_SOURCE,
+  SatsConnectMessageFromContentScript,
+  SatsConnectMessageToContentScript,
   SignatureResponseMessage,
-} from '../content-scripts/message-types';
-import { sendMessage } from '../content-scripts/messages';
-import RequestsRoutes from '../content-scripts/route-urls';
+} from '../types/message-types';
+import { sendMessage } from '../types/messages';
+import RequestsRoutes from './route-urls';
 import popupCenter from './popup-center';
 
 export function inferLegacyMessage(message: any): message is LegacyMessageFromContentScript {
@@ -46,7 +49,7 @@ interface ListenForPopupCloseArgs {
   id?: number;
   // TabID from requesting tab, to which request should be returned
   tabId?: number;
-  response: LegacyMessageToContentScript;
+  response: LegacyMessageToContentScript | SatsConnectMessageToContentScript;
 }
 function listenForPopupClose({ id, tabId, response }: ListenForPopupCloseArgs) {
   chrome.windows.onRemoved.addListener((winId) => {
@@ -82,13 +85,12 @@ function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) {
 }
 
 async function triggerRequstWindowOpen(path: RequestsRoutes, urlParams: URLSearchParams) {
-  // if (IS_TEST_ENV) return openRequestInFullPage(path, urlParams);
   console.log(`/popup.html#${path}?${urlParams.toString()}`);
   return popupCenter({ url: `/popup.html#${path}?${urlParams.toString()}` });
 }
 
 export async function handleLegacyExternalMethodFormat(
-  message: LegacyMessageFromContentScript,
+  message: LegacyMessageFromContentScript | SatsConnectMessageFromContentScript,
   port: chrome.runtime.Port,
 ) {
   const { payload } = message;
@@ -159,6 +161,48 @@ export async function handleLegacyExternalMethodFormat(
         id,
         tabId,
         response: formatMessageSigningResponse({ request: payload, response: 'cancel' }),
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
+    case ExternalSatsMethods.getAddressRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['addressRequest', payload],
+      ]);
+
+      const { id } = await triggerRequstWindowOpen(RequestsRoutes.AddressRequest, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            addressRequest: payload,
+            addressResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.getAddressResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
+    case ExternalSatsMethods.signPsbtRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['signPsbtRequest', payload],
+      ]);
+
+      const { id } = await triggerRequstWindowOpen(RequestsRoutes.SignBtcTx, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            signPsbtRequest: payload,
+            signPsbtResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.signPsbtResponse,
+        },
       });
       listenForOriginTabClose({ tabId });
       break;

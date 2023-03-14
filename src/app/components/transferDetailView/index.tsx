@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { getTruncatedAddress } from '@utils/helper';
 import { ReactNode } from 'react';
 import CopyButton from '@components/copyButton';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -49,26 +50,29 @@ interface Props {
   icon: string;
   title?: string;
   amount?: string;
-  fiatAmount?: ReactNode;
+  children?: ReactNode;
   address: string;
+  hideAddress?: boolean;
 }
 
 function TransferDetailView({
-  icon, title, amount, fiatAmount, address,
+  icon, title, amount, children, address, hideAddress,
 }: Props) {
+  const { btcAddress, ordinalsAddress } = useWalletSelector();
+  const isWalletAddress = btcAddress === address || ordinalsAddress === address;
   return (
     <RowContainer>
       <Icon src={icon} />
       {amount ? (
         <ColumnContainer>
           <AmountText>{amount}</AmountText>
-          {fiatAmount}
+          {children}
         </ColumnContainer>
       )
         : <TitleText>{title}</TitleText>}
       <AddressContainer>
-        <ValueText>{getTruncatedAddress(address)}</ValueText>
-        <CopyButton text={address} />
+        {!hideAddress && <ValueText>{getTruncatedAddress(address)}</ValueText>}
+        {!isWalletAddress && <CopyButton text={address} /> }
       </AddressContainer>
     </RowContainer>
   );

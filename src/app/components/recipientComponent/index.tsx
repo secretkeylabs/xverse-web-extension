@@ -23,9 +23,9 @@ const Container = styled.div((props) => ({
 }));
 
 const RecipientTitleText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
+  ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
-  marginBottom: 22,
+  marginBottom: 16,
 }));
 
 const RowContainer = styled.div({
@@ -33,8 +33,10 @@ const RowContainer = styled.div({
   flexDirection: 'row',
   width: '100%',
   alignItems: 'center',
+});
 
-  marginBottom: 22,
+const AddressContainer = styled.div({
+  marginTop: 22,
 });
 
 const Icon = styled.img((props) => ({
@@ -73,7 +75,7 @@ const TokenContainer = styled.div({
 });
 
 interface Props {
-  address: string;
+  address?: string;
   value: string;
   title: string;
   currencyType: CurrencyTypes;
@@ -81,10 +83,11 @@ interface Props {
   totalRecipient?: number;
   icon?: string;
   fungibleToken?: FungibleToken;
+  heading?: string;
 
 }
 function RecipientComponent({
-  recipientIndex, address, value, totalRecipient, title, fungibleToken, icon, currencyType,
+  recipientIndex, address, value, totalRecipient, title, fungibleToken, icon, currencyType, heading,
 } : Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
@@ -132,7 +135,12 @@ function RecipientComponent({
 
   return (
     <Container>
-      {recipientIndex && totalRecipient && <RecipientTitleText>{`${t('RECIPIENT')} ${recipientIndex}/${totalRecipient}`}</RecipientTitleText>}
+      {recipientIndex && totalRecipient && (
+        <RecipientTitleText>{`${t(
+          'RECIPIENT'
+        )} ${recipientIndex}/${totalRecipient}`}</RecipientTitleText>
+      )}
+      {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       <RowContainer>
         {icon ? <Icon src={icon} />
           : (
@@ -159,11 +167,15 @@ function RecipientComponent({
               suffix={currencyType === 'FT' ? ` ${getFtTicker()} ` : ` ${currencyType}`}
               renderText={(amount) => <ValueText>{amount}</ValueText>}
             />
-            <SubValueText>{getFiatAmountString(new BigNumber(fiatAmount))}</SubValueText>
+            <SubValueText>{getFiatAmountString(new BigNumber(fiatAmount!))}</SubValueText>
           </ColumnContainer>
         )}
       </RowContainer>
-      <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
+      {address && (
+        <AddressContainer>
+          <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
+        </AddressContainer>
+      )}
     </Container>
   );
 }

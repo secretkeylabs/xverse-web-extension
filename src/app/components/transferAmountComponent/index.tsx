@@ -96,13 +96,13 @@ interface Props {
   value: string;
   subValue: string;
   icon: string;
-  isExpanded: boolean;
+  isExpanded?: boolean;
   onArrowClick: () => void;
 
 }
 
 function TransferAmountComponent({
-  title, address, value, subValue, description, icon, isExpanded, onArrowClick,
+  title, address, value, subValue, description, icon, isExpanded = false, onArrowClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const {
@@ -114,7 +114,7 @@ function TransferAmountComponent({
     from: { opacity: 0, height: 0 },
     to: {
       opacity: isExpanded ? 1 : 0,
-      height: isExpanded ? 180 : 0,
+      height: isExpanded ? 80 : 0,
     },
   });
 
@@ -172,10 +172,10 @@ function TransferAmountComponent({
             {renderAmount}
           </ColumnContainer>
         </RowContainer>
-        <FromContainer>
+        {/* <FromContainer>
           <DescriptionText>{t('FROM')}</DescriptionText>
           <TransferDetailView icon={AddressIcon} title={t('YOUR_ADDRESS')} address={address} />
-        </FromContainer>
+      </FromContainer> */}
       </ExpandedContainer>
       )}
     </Container>

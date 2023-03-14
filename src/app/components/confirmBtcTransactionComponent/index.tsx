@@ -22,12 +22,9 @@ import {
   ResponseError,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
-import TransferDetailView from '@components/transferDetailView';
+import RecipientComponent from '@components/recipientComponent';
 import TransferFeeView from '@components/transferFeeView';
 import TransactionDetailComponent from '../transactionDetailComponent';
-import TransferAmountComponent from '../transferAmountComponent';
-import InputOutputComponent from './inputOutputComponent';
-import RecipientComponent from '../recipientComponent';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -132,8 +129,6 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
-  const [expandTransferAmountView, setExpandTransferAmountView] = useState(false);
-  const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
     btcAddress, selectedAccount, seedPhrase, network, btcFiatRate,
@@ -217,14 +212,6 @@ function ConfirmBtcTransactionComponent({
     onConfirmClick(signedTx);
   };
 
-  const expandTransferAmountSection = () => {
-    setExpandTransferAmountView(!expandTransferAmountView);
-  };
-
-  const expandInputOutputSection = () => {
-    setExpandInputOutputView(!expandInputOutputView);
-  };
-
   useEffect(() => {
     if (recipients && txError) {
       setOpenTransactionSettingModal(false);
@@ -278,24 +265,6 @@ function ConfirmBtcTransactionComponent({
             />
           ))
         )}
-        {/* <TransferAmountComponent
-          title={t('CONFIRM_TRANSACTION.INDICATION')}
-          icon={IconBitcoin}
-          value={`${recipients[0]?.amountSats.toString()} BTC`}
-          subValue={getBtcFiatEquivalent(new BigNumber(recipients[0]?.amountSats), btcFiatRate)}
-          description="Less than or equal to"
-          isExpanded={expandTransferAmountView}
-          address={btcAddress}
-          onArrowClick={expandTransferAmountSection}
-        />
-
-        <InputOutputComponent
-          value={`${recipients[0]?.amountSats.toString()} BTC`}
-          subValue={getBtcFiatEquivalent(new BigNumber(recipients[0]?.amountSats), btcFiatRate)}
-          isExpanded={expandInputOutputView}
-          address={btcAddress}
-          onArrowClick={expandInputOutputSection}
-          /> */}
 
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         <TransferFeeView fee={currentFee} currency={t('SATS')} />
