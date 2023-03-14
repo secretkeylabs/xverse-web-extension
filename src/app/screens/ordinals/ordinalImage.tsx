@@ -11,7 +11,7 @@ import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 
 interface ContainerProps {
   isGalleryOpen: boolean;
-  inNftDetail? : boolean;
+  inNftDetail?: boolean;
 }
 
 const ImageContainer = styled.div<ContainerProps>((props) => ({
@@ -81,17 +81,21 @@ const OrdinalContentText = styled.h1<TextProps>((props) => ({
 const StyledImg = styled(Image)`
   border-radius: 8px;
   object-fit: contain;
+  image-rendering: pixelated;
 `;
 
 interface Props {
   ordinal: OrdinalInfo;
   isNftDashboard?: boolean;
-  inNftDetail? : boolean;
-  inNftSend? : boolean;
+  inNftDetail?: boolean;
+  inNftSend?: boolean;
 }
 
 function OrdinalImage({
-  ordinal, isNftDashboard = false, inNftDetail = false, inNftSend = false,
+  ordinal,
+  isNftDashboard = false,
+  inNftDetail = false,
+  inNftSend = false,
 }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const textContent = useTextOrdinalContent(ordinal);
@@ -102,11 +106,11 @@ function OrdinalImage({
         <Suspense>
           <StyledImg
             width="100%"
-            placeholder={(
+            placeholder={
               <LoaderContainer>
                 <MoonLoader color="white" size={20} />
               </LoaderContainer>
-            )}
+            }
             src={getFetchableUrl(`https://gammaordinals.com${ordinal?.metadata.content}`, 'http')}
             fallback={PlaceholderImage}
           />
@@ -132,10 +136,10 @@ function OrdinalImage({
       <ImageContainer inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
         <OrdinalContentText inNftSend={inNftSend}>{textContent}</OrdinalContentText>
         {isNftDashboard && (
-        <OrdinalsTag>
-          <ButtonIcon src={OrdinalsIcon} />
-          <Text>{t('ORDINAL')}</Text>
-        </OrdinalsTag>
+          <OrdinalsTag>
+            <ButtonIcon src={OrdinalsIcon} />
+            <Text>{t('ORDINAL')}</Text>
+          </OrdinalsTag>
         )}
       </ImageContainer>
     );
