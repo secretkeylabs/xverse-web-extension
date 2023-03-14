@@ -25,7 +25,7 @@ function ConfirmBtcTransaction() {
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
   const {
-    fee, amount, signedTxHex, recipient,
+    fee, amount, signedTxHex, recipient, isRestoreFundFlow,
   } = location.state;
   const {
     isLoading,
@@ -72,12 +72,16 @@ function ConfirmBtcTransaction() {
   };
 
   const goBackToScreen = () => {
-    navigate('/send-btc', {
-      state: {
-        amount,
-        recipientAddress,
-      },
-    });
+    if (isRestoreFundFlow) {
+      navigate(-1);
+    } else {
+      navigate('/send-btc', {
+        state: {
+          amount,
+          recipientAddress,
+        },
+      });
+    }
   };
   return (
     <>

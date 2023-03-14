@@ -256,7 +256,18 @@
     "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
-    "COPIED": "Copied!"
+    "COPIED": "Copied!",
+    "WITHDRAW_BTC_ALERT_TITLE": "You have Bitcoin stored in your ordinal address.",
+    "WITHDRAW_BTC_ALERT_DESCRIPTION": "Transfer it to my Bitcoin address →"
+  },
+  "RESTORE_FUNDS_SCREEN": {
+    "TITLE": "Restore funds",
+    "AMOUNT": "Amount",
+    "TRANSFER": "Transfer",
+    "BACK": "Back",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "NO_FUNDS": "You don’t have any funds stored on your ordinal address.",
+    "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",

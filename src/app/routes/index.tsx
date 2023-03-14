@@ -44,6 +44,7 @@ import SendOrdinal from '@screens/sendOrdinal';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
 import SignPsbtRequest from '@screens/signPsbtRequest';
+import RestoreFunds from '@screens/restoreFunds';
 
 const router = createHashRouter([
   {
@@ -178,6 +179,10 @@ const router = createHashRouter([
       {
         path: 'settings',
         element: <Setting />,
+      },
+      {
+        path: 'nft-dashboard/restore-funds',
+        element: <RestoreFunds />,
       },
       {
         path: 'fiat-currency',
