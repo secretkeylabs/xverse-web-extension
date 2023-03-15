@@ -188,7 +188,6 @@ const GalleryCollectiblesHeadingText = styled.h1((props) => ({
 
 const CollectiblesValueText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  marginTop: props.theme.spacing(4),
 }));
 
 const LoadMoreButtonContainer = styled.div((props) => ({
@@ -226,6 +225,7 @@ const NoCollectiblesText = styled.h1((props) => ({
 const BarLoaderContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(5),
   maxWidth: 300,
+  display: 'flex',
 }));
 
 function NftDashboard() {

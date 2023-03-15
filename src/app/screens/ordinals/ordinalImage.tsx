@@ -16,11 +16,10 @@ interface ContainerProps {
 
 const ImageContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
-  justifyContent: props.inNftDetail ? 'flex-start' : 'center',
+  justifyContent: 'center',
   marginBottom: props.inNftDetail ? props.theme.spacing(8) : 0,
   alignItems: 'center',
   width: '100%',
-  flex: 1,
   height: props.isGalleryOpen ? 300 : 150,
   minHeight: props.isGalleryOpen ? 300 : 150,
   maxHeight: props.isGalleryOpen ? 300 : 150,
@@ -53,11 +52,20 @@ const OrdinalsTag = styled.div({
   padding: '3px 6px',
 });
 
-const LoaderContainer = styled.div({
+const LoaderContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-});
+  position: 'absolute',
+  width: '100%',
+  height: props.isGalleryOpen ? 300 : 150,
+  minHeight: props.isGalleryOpen ? 300 : 150,
+  maxHeight: props.isGalleryOpen ? 300 : 150,
+  left: 0,
+  bottom: 0,
+  right: 0,
+  top: 0,
+}));
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -76,6 +84,7 @@ const OrdinalContentText = styled.h1<TextProps>((props) => ({
   color: props.theme.colors.white[0],
   fontSize: props.inNftSend ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
+  textAlign: 'center',
 }));
 
 const StyledImg = styled(Image)`
@@ -106,11 +115,11 @@ function OrdinalImage({
         <Suspense>
           <StyledImg
             width="100%"
-            placeholder={
-              <LoaderContainer>
+            placeholder={(
+              <LoaderContainer isGalleryOpen={isGalleryOpen}>
                 <MoonLoader color="white" size={20} />
               </LoaderContainer>
-            }
+              )}
             src={getFetchableUrl(`https://gammaordinals.com${ordinal?.metadata.content}`, 'http')}
             fallback={PlaceholderImage}
           />
@@ -127,7 +136,7 @@ function OrdinalImage({
   if (ordinal?.metadata['content type'].includes('text')) {
     if (!textContent) {
       return (
-        <ImageContainer isGalleryOpen>
+        <ImageContainer isGalleryOpen={isGalleryOpen}>
           <MoonLoader color="white" size={30} />
         </ImageContainer>
       );
