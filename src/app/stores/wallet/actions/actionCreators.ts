@@ -1,13 +1,10 @@
 import {
   Account,
   BaseWallet,
-  BtcTransactionData,
   Coin,
   FeesMultipliers,
   FungibleToken,
-  NetworkType,
   SettingsNetwork,
-  StacksNetwork,
   SupportedCurrency,
   TransactionData,
 } from '@secretkeylabs/xverse-core/types';
@@ -80,6 +77,7 @@ export function selectAccount(
   masterPubKey: string,
   stxPublicKey: string,
   btcPublicKey: string,
+  ordinalsPublicKey: string,
   network: SettingsNetwork,
   // stackingState: StackingStateData,
   bnsName?: string,
@@ -93,68 +91,40 @@ export function selectAccount(
     masterPubKey,
     stxPublicKey,
     btcPublicKey,
+    ordinalsPublicKey,
     network,
     // stackingState,
     bnsName,
   };
 }
 
-export function FetchFeeMultiplierAction(feeMultipliers: FeesMultipliers): actions.FetchFeeMultiplier {
+export function setFeeMultiplierAction(feeMultipliers: FeesMultipliers): actions.SetFeeMultiplier {
   return {
-    type: actions.FetchFeeMultiplierKey,
+    type: actions.SetFeeMultiplierKey,
     feeMultipliers,
   };
 }
 
-export function fetchRatesAction(fiatCurrency: SupportedCurrency): actions.FetchRates {
-  return {
-    type: actions.FetchRatesKey,
-    fiatCurrency,
-  };
-}
-
-export function fetchRatesSuccessAction(
+export function setCoinRatesAction(
   stxBtcRate: BigNumber,
   btcFiatRate: BigNumber,
-): actions.FetchRatesSuccess {
+): actions.SetCoinRates {
   return {
-    type: actions.FetchRatesSuccessKey,
+    type: actions.SetCoinRatesKey,
     stxBtcRate,
     btcFiatRate,
   };
 }
 
-export function fetchRatesFailAction(error: string): actions.FetchRatesFail {
-  return {
-    type: actions.FetchRatesFailureKey,
-    error,
-  };
-}
-
-export function fetchStxWalletDataRequestAction(
-  stxAddress: string,
-  network: StacksNetwork,
-  fiatCurrency: string,
-  stxBtcRate: BigNumber,
-): actions.FetchStxWalletDataRequest {
-  return {
-    type: actions.FetchStxWalletDataRequestKey,
-    stxAddress,
-    network,
-    fiatCurrency,
-    stxBtcRate,
-  };
-}
-
-export function fetchStxWalletDataSuccessAction(
+export function setStxWalletDataAction(
   stxBalance: BigNumber,
   stxAvailableBalance: BigNumber,
   stxLockedBalance: BigNumber,
   stxTransactions: TransactionData[],
   stxNonce: number,
-): actions.FetchStxWalletDataSuccess {
+): actions.SetStxWalletData {
   return {
-    type: actions.FetchStxWalletDataSuccessKey,
+    type: actions.SetStxWalletDataKey,
     stxBalance,
     stxAvailableBalance,
     stxLockedBalance,
@@ -163,71 +133,21 @@ export function fetchStxWalletDataSuccessAction(
   };
 }
 
-export function fetchStxWalletDataFailureAction() {
+export function SetBtcWalletDataAction(balance: BigNumber): actions.SetBtcWalletData {
   return {
-    type: actions.FetchStxWalletDataFailureKey,
-  };
-}
-
-export function fetchBtcWalletDataRequestAction(
-  btcAddress: string,
-  network: NetworkType,
-  stxBtcRate: BigNumber,
-  btcFiatRate: BigNumber,
-): actions.FetchBtcWalletDataRequest {
-  return {
-    type: actions.FetchBtcWalletDataRequestKey,
-    btcAddress,
-    network,
-    stxBtcRate,
-    btcFiatRate,
-  };
-}
-
-export function fetchBtcWalletDataSuccess(balance: BigNumber, btctransactions: BtcTransactionData[]): actions.FetchBtcWalletDataSuccess {
-  return {
-    type: actions.FetchBtcWalletDataSuccessKey,
+    type: actions.SetBtcWalletDataKey,
     balance,
-    btctransactions,
   };
 }
 
-export function fetchBtcWalletDataFail(): actions.FetchBtcWalletDataFail {
-  return {
-    type: actions.FetchBtcWalletDataFailureKey,
-  };
-}
-
-export function fetchCoinDataRequestAction(
-  stxAddress: string,
-  network: StacksNetwork,
-  fiatCurrency: string,
-  coinsList: FungibleToken[] | null,
-): actions.FetchCoinDataRequest {
-  return {
-    type: actions.FetchCoinDataRequestKey,
-    stxAddress,
-    network,
-    fiatCurrency,
-    coinsList,
-  };
-}
-
-export function FetchCoinDataSuccessAction(
+export function setCoinDataAction(
   coinsList: FungibleToken[],
   supportedCoins: Coin[],
-): actions.FetchCoinDataSuccess {
+): actions.SetCoinData {
   return {
-    type: actions.FetchCoinDataSuccessKey,
+    type: actions.SetCoinDataKey,
     coinsList,
     supportedCoins,
-  };
-}
-
-export function FetchCoinDataFailureAction(error: string): actions.FetchCoinDataFailure {
-  return {
-    type: actions.FetchCoinDataFailureKey,
-    error,
   };
 }
 

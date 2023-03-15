@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
 import { CurrencyTypes } from '@utils/constants';
-import useTransactions from '@hooks/useTransactions';
+import useTransactions from '@hooks/queries/useTransactions';
 import { MoonLoader } from 'react-spinners';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@utils/date';
@@ -95,6 +95,11 @@ const groupBtcTxsByDate = (
       }
     } else {
       all[txDate].push(transaction);
+      all[txDate].sort((txA, txB) => {
+        if (txB.blockHeight > txA.blockHeight) {
+          return 1;
+        } return -1;
+      });
     }
     return all;
   },
@@ -161,7 +166,6 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       return groupedTxsByDateMap(data);
     }
   }, [data, isLoading, isFetching]);
-
   return (
     <ListItemsContainer>
       <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>

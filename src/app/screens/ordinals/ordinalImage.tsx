@@ -11,7 +11,7 @@ import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 
 interface ContainerProps {
   isGalleryOpen: boolean;
-  inNftDetail? : boolean;
+  inNftDetail?: boolean;
 }
 
 const ImageContainer = styled.div<ContainerProps>((props) => ({
@@ -75,10 +75,14 @@ const Text = styled.h1((props) => ({
   marginLeft: props.theme.spacing(4),
 }));
 
-const OrdinalContentText = styled.h1((props) => ({
+interface TextProps {
+  inNftSend?: boolean;
+}
+
+const OrdinalContentText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[0],
-  fontSize: 'calc(0.8vw + 2vh)',
+  fontSize: props.inNftSend ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
   textAlign: 'center',
 }));
@@ -86,15 +90,22 @@ const OrdinalContentText = styled.h1((props) => ({
 const StyledImg = styled(Image)`
   border-radius: 8px;
   object-fit: contain;
+  image-rendering: pixelated;
 `;
 
 interface Props {
   ordinal: OrdinalInfo;
   isNftDashboard?: boolean;
-  inNftDetail? : boolean;
+  inNftDetail?: boolean;
+  inNftSend?: boolean;
 }
 
-function OrdinalImage({ ordinal, isNftDashboard = false, inNftDetail = false }: Props) {
+function OrdinalImage({
+  ordinal,
+  isNftDashboard = false,
+  inNftDetail = false,
+  inNftSend = false,
+}: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
@@ -132,12 +143,12 @@ function OrdinalImage({ ordinal, isNftDashboard = false, inNftDetail = false }: 
     }
     return (
       <ImageContainer inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
-        <OrdinalContentText>{textContent}</OrdinalContentText>
+        <OrdinalContentText inNftSend={inNftSend}>{textContent}</OrdinalContentText>
         {isNftDashboard && (
-        <OrdinalsTag>
-          <ButtonIcon src={OrdinalsIcon} />
-          <Text>{t('ORDINAL')}</Text>
-        </OrdinalsTag>
+          <OrdinalsTag>
+            <ButtonIcon src={OrdinalsIcon} />
+            <Text>{t('ORDINAL')}</Text>
+          </OrdinalsTag>
         )}
       </ImageContainer>
     );

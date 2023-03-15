@@ -49,9 +49,10 @@ const OptionsButton = styled.button((props) => ({
 interface AccountHeaderComponentProps {
   disableMenuOption?: boolean;
   disableAccountSwitch?: boolean;
+  disableCopy?: boolean;
 }
 
-function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = false }:AccountHeaderComponentProps) {
+function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = false, disableCopy = false }:AccountHeaderComponentProps) {
   const navigate = useNavigate();
   const {
     selectedAccount,
@@ -112,36 +113,44 @@ function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = fals
 
   return (
     <>
-      { showResetWalletDisplay
-      && (
-      <ResetWalletContainer>
-        <PasswordInput
-          title={t('ENTER_PASSWORD')}
-          inputLabel={t('PASSWORD')}
-          enteredPassword={password}
-          setEnteredPassword={setPassword}
-          handleContinue={handlePasswordNextClick}
-          handleBack={onGoBack}
-          passwordError={error}
-          stackButtonAlignment
-        />
-      </ResetWalletContainer>
+      {showResetWalletDisplay && (
+        <ResetWalletContainer>
+          <PasswordInput
+            title={t('ENTER_PASSWORD')}
+            inputLabel={t('PASSWORD')}
+            enteredPassword={password}
+            setEnteredPassword={setPassword}
+            handleContinue={handlePasswordNextClick}
+            handleBack={onGoBack}
+            passwordError={error}
+            stackButtonAlignment
+          />
+        </ResetWalletContainer>
       )}
       <SelectedAccountContainer>
-        <AccountRow account={selectedAccount!} isSelected allowCopyAddress onAccountSelected={handleAccountSelect} />
+        <AccountRow
+          account={selectedAccount!}
+          isSelected
+          allowCopyAddress={!disableCopy}
+          onAccountSelected={handleAccountSelect}
+        />
         {!disableMenuOption && (
-        <OptionsButton onClick={handleOptionsSelect}>
-          <img src={ThreeDots} alt="Options" />
-        </OptionsButton>
+          <OptionsButton onClick={handleOptionsSelect}>
+            <img src={ThreeDots} alt="Options" />
+          </OptionsButton>
         )}
-        {showOptionsDialog && <OptionsDialog closeDialog={closeDialog} showResetWalletPrompt={onResetWalletPromptOpen} />}
+        {showOptionsDialog && (
+          <OptionsDialog
+            closeDialog={closeDialog}
+            showResetWalletPrompt={onResetWalletPromptOpen}
+          />
+        )}
       </SelectedAccountContainer>
       <ResetWalletPrompt
         showResetWalletPrompt={showResetWalletPrompt}
         onResetWalletPromptClose={onResetWalletPromptClose}
         openResetWalletScreen={openResetWalletScreen}
       />
-
     </>
   );
 }

@@ -26,6 +26,7 @@ function SendBtcScreen() {
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
+  const [recipient, setRecipient] = useState<Recipient[]>();
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
   const {
     btcAddress,
@@ -69,6 +70,7 @@ function SendBtcScreen() {
           signedTxHex: data.signedTx,
           recipientAddress,
           amount,
+          recipient,
           fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
           fee: data.fee,
           fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
@@ -150,6 +152,7 @@ function SendBtcScreen() {
         amountSats: btcToSats(new BigNumber(amountToSend)),
       },
     ];
+    setRecipient(recipients);
     if (validateFields(address, amountToSend)) { mutate({ recipients }); }
   };
 

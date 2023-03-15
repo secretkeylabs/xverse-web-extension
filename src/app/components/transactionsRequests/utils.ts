@@ -1,6 +1,6 @@
 import {
   ExternalMethods, MESSAGE_SOURCE, TransactionResponseMessage, TxResult,
-} from 'content-scripts/message-types';
+} from '@common/types/message-types';
 
 interface FormatTxSignatureResponseArgs {
   payload: string;

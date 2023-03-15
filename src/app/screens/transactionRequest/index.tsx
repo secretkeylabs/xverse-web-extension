@@ -4,7 +4,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
 import { StacksTransaction } from '@stacks/transactions';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
-import useStxPendingTxData from '@hooks/useStxPendingTxData';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';

@@ -251,7 +251,7 @@ function SendOrdinal() {
         >
           <Container>
             <NFtContainer>
-              <OrdinalImage ordinal={ordinal!} />
+              <OrdinalImage inNftSend ordinal={ordinal!} />
             </NFtContainer>
             <OrdinalInscriptionNumber>{ordinal?.inscriptionNumber}</OrdinalInscriptionNumber>
           </Container>

@@ -10,7 +10,7 @@ import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transact
 import { validateStxAddress } from '@secretkeylabs/xverse-core';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import SendForm from '@components/sendForm';
-import useStxPendingTxData from '@hooks/useStxPendingTxData';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';

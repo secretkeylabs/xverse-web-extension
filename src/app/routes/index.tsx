@@ -42,6 +42,9 @@ import ErrorBoundary from '@screens/error';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
 import SendOrdinal from '@screens/sendOrdinal';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
+import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
+import SignPsbtRequest from '@screens/signPsbtRequest';
+import RestoreFunds from '@screens/restoreFunds';
 
 const router = createHashRouter([
   {
@@ -134,6 +137,22 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'btc-select-address-request',
+        element: (
+          <AuthGuard>
+            <BtcSelectAddressScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'psbt-signing-request',
+        element: (
+          <AuthGuard>
+            <SignPsbtRequest />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'login',
         element: <Login />,
       },
@@ -160,6 +179,10 @@ const router = createHashRouter([
       {
         path: 'settings',
         element: <Setting />,
+      },
+      {
+        path: 'nft-dashboard/restore-funds',
+        element: <RestoreFunds />,
       },
       {
         path: 'fiat-currency',
@@ -225,7 +248,7 @@ const router = createHashRouter([
         element: <NftDetailScreen />,
       },
       {
-        path: 'nft-dashboard/ordinal-detail/:id',
+        path: 'nft-dashboard/ordinal-detail/:id/:txHash',
         element: <OrdinalDetailScreen />,
       },
       {
@@ -241,7 +264,7 @@ const router = createHashRouter([
         element: <ConfirmOrdinalTransaction />,
       },
       {
-        path: 'nft-dashboard/ordinal-detail/:id/send-ordinal',
+        path: 'nft-dashboard/ordinal-detail/:id/:txHash/send-ordinal',
         element: (
           <AuthGuard>
             <SendOrdinal />
