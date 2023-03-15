@@ -53,13 +53,12 @@ interface Props {
   children?: ReactNode;
   address: string;
   hideAddress?: boolean;
+  hideCopyButton?: boolean;
 }
 
 function TransferDetailView({
-  icon, title, amount, children, address, hideAddress,
+  icon, title, amount, children, address, hideAddress, hideCopyButton,
 }: Props) {
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
-  const isWalletAddress = btcAddress === address || ordinalsAddress === address;
   return (
     <RowContainer>
       <Icon src={icon} />
@@ -72,7 +71,7 @@ function TransferDetailView({
         : <TitleText>{title}</TitleText>}
       <AddressContainer>
         {!hideAddress && <ValueText>{getTruncatedAddress(address)}</ValueText>}
-        {!isWalletAddress && <CopyButton text={address} /> }
+        {!hideCopyButton && <CopyButton text={address} /> }
       </AddressContainer>
     </RowContainer>
   );

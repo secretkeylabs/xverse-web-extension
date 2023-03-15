@@ -158,6 +158,7 @@ function InputOutputComponent({
               <TransferDetailView
                 icon={IconBitcoin}
                 hideAddress
+                hideCopyButton={btcAddress === address[index] || ordinalsAddress === address[index]}
                 amount={satsToBtc(new BigNumber(input.value)).toString()}
                 address={input.userSigns ? address[index] : input.txid}
               >
@@ -172,6 +173,7 @@ function InputOutputComponent({
               <TransferDetailView
                 icon={OutputIcon}
                 hideAddress
+                hideCopyButton={btcAddress === output.address || ordinalsAddress === output.address}
                 amount={`${satsToBtc(new BigNumber(output ? output.amount : 0n)).toString()} BTC`}
                 address={output.address}
               >
