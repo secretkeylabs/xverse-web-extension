@@ -3,8 +3,8 @@ import { useCallback } from 'react';
 import {
   fetchDelegationState, fetchPoolStackerInfo, fetchStackingPoolInfo, getStacksInfo, StackingData,
 } from '@secretkeylabs/xverse-core';
-import useWalletSelector from './useWalletSelector';
-import useNetworkSelector from './useNetwork';
+import useWalletSelector from '../useWalletSelector';
+import useNetworkSelector from '../useNetwork';
 
 const useStackingData = () => {
   const { stxAddress, network } = useWalletSelector();

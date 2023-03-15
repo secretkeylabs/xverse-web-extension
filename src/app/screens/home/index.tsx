@@ -1,7 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import AddToken from '@assets/img/dashboard/add_token.svg';
@@ -10,8 +9,7 @@ import MiaToken from '@assets/img/dashboard/mia_token.svg';
 import NycToken from '@assets/img/dashboard/nyc_token.svg';
 import CoinToken from '@assets/img/dashboard/coin_token.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
-import { fetchAppInfo } from '@secretkeylabs/xverse-core/api';
-import { FeesMultipliers, FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
@@ -22,21 +20,17 @@ import TokenTile from '@components/tokenTile';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import Theme from 'theme';
 import ActionButton from '@components/button';
-import {
-  fetchAccountAction,
-  fetchBtcWalletDataRequestAction,
-  fetchCoinDataRequestAction,
-  FetchFeeMultiplierAction,
-  fetchRatesAction,
-  fetchStxWalletDataRequestAction,
-} from '@stores/wallet/actions/actionCreators';
 import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
 import { CurrencyTypes } from '@utils/constants';
 import useWalletSelector from '@hooks/useWalletSelector';
-import useNetworkSelector from '@hooks/useNetwork';
-import ReceiveCardComponent from '@components/receiveCardComponent';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
+import useCoinRates from '@hooks/queries/useCoinRates';
+import useCoinsData from '@hooks/queries/useCoinData';
 import BottomModal from '@components/bottomModal';
+import ReceiveCardComponent from '@components/receiveCardComponent';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -133,43 +127,15 @@ const IconRow = styled.div({
 function Home() {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const {
-    stxAddress,
-    btcAddress,
-    masterPubKey,
-    fiatCurrency,
-    btcFiatRate,
-    stxBtcRate,
-    network,
-    coinsList,
-    loadingWalletData,
-    loadingBtcData,
-    selectedAccount,
-    accountsList,
-  } = useWalletSelector();
-  const selectedNetwork = useNetworkSelector();
-  const fetchFeeMultiplierData = async () => {
-    const response: FeesMultipliers = await fetchAppInfo();
-    dispatch(FetchFeeMultiplierAction(response));
-  };
-  const loadInitialData = useCallback(() => {
-    if (stxAddress && btcAddress) {
-      fetchFeeMultiplierData();
-      dispatch(fetchAccountAction(selectedAccount!, accountsList));
-      dispatch(fetchRatesAction(fiatCurrency));
-      dispatch(fetchStxWalletDataRequestAction(stxAddress, selectedNetwork, fiatCurrency, stxBtcRate));
-      dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
-      dispatch(fetchCoinDataRequestAction(stxAddress, selectedNetwork, fiatCurrency, coinsList));
-    }
-  }, [stxAddress]);
-
-  useEffect(() => {
-    loadInitialData();
-  }, [masterPubKey, stxAddress, btcAddress, loadInitialData]);
+  const { coinsList, stxAddress, btcAddress } = useWalletSelector();
+  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
+  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
+  const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
+  useFeeMultipliers();
+  useCoinRates();
 
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -270,7 +236,7 @@ function Home() {
     <>
       <AccountHeaderComponent />
       <Container>
-        <BalanceCard />
+        <BalanceCard isLoading={(loadingStxWalletData || loadingBtcWalletData) || (refetchingStxWalletData || refetchingBtcWalletData)} />
         <RowButtonContainer>
           <ButtonContainer>
             <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
@@ -297,7 +263,7 @@ function Home() {
             title={t('BITCOIN')}
             currency="BTC"
             icon={IconBitcoin}
-            loading={loadingBtcData}
+            loading={loadingBtcWalletData || refetchingBtcWalletData}
             underlayColor={Theme.colors.background.elevation1}
             onPress={handleTokenPressed}
           />
@@ -305,23 +271,25 @@ function Home() {
             title={t('STACKS')}
             currency="STX"
             icon={IconStacks}
-            loading={loadingWalletData}
+            loading={loadingStxWalletData || refetchingStxWalletData}
             underlayColor={Theme.colors.background.elevation1}
             onPress={handleTokenPressed}
           />
         </ColumnContainer>
 
         <CoinContainer>
-          {coinsList?.filter((ft) => ft.visible).map((coin) => (
-            <TokenTile
-              title={coin.name}
-              currency="FT"
-              loading={loadingWalletData}
-              underlayColor={Theme.colors.background.elevation1}
-              fungibleToken={coin}
-              onPress={handleTokenPressed}
-            />
-          ))}
+          {coinsList
+            ?.filter((ft) => ft.visible)
+            .map((coin) => (
+              <TokenTile
+                title={coin.name}
+                currency="FT"
+                loading={loadingCoinData || refetchingCoinData}
+                underlayColor={Theme.colors.background.elevation1}
+                fungibleToken={coin}
+                onPress={handleTokenPressed}
+              />
+            ))}
         </CoinContainer>
         <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={onReceiveModalClose}>
           {receiveContent}
@@ -335,16 +303,18 @@ function Home() {
           visible={openSendModal}
           coins={getCoinsList()}
           title={t('SEND')}
+          loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
 
         <CoinSelectModal
           onSelectBitcoin={onBuyBtcClick}
           onSelectStacks={onBuyStxClick}
           onClose={onBuyModalClose}
-          onSelectCoin={(onBuyModalClose)}
+          onSelectCoin={onBuyModalClose}
           visible={openBuyModal}
           coins={[]}
           title={t('BUY')}
+          loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
       </Container>
       <BottomBar tab="dashboard" />

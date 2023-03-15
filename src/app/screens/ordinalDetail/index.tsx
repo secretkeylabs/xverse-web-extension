@@ -19,7 +19,7 @@ import DescriptionTile from '@screens/nftDetail/descriptionTile';
 import { useMutation } from '@tanstack/react-query';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import InfoContainer from '@components/infoContainer';
-import usePendingOrdinalTxs from '@hooks/usePendingOrdinalTx';
+import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import AlertMessage from '@components/alertMessage';
 import { getBtcTxStatusUrl } from '@utils/helper';
 

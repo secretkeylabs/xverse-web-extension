@@ -1,12 +1,11 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { broadcastRawBtcOrdinalTransaction, broadcastRawBtcTransaction } from '@secretkeylabs/xverse-core/api';
 import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
-import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
-import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useWalletSelector from '@hooks/useWalletSelector';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import styled from 'styled-components';
 import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
@@ -17,14 +16,10 @@ const BottomBarContainer = styled.h1((props) => ({
 
 function ConfirmBtcTransaction() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const {
-    network, btcAddress, stxBtcRate, btcFiatRate, ordinalsAddress,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { network, ordinalsAddress } = useWalletSelector();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
+  const { refetch } = useBtcWalletData();
   const {
     fee, amount, signedTxHex, recipient, isRestoreFundFlow,
   } = location.state;
@@ -74,7 +69,7 @@ function ConfirmBtcTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
+        refetch();
       }, 1000);
     }
   }, [btcTxBroadcastData]);
@@ -90,7 +85,7 @@ function ConfirmBtcTransaction() {
           },
         });
         setTimeout(() => {
-          dispatch(fetchBtcWalletDataRequestAction(btcAddress, network.type, stxBtcRate, btcFiatRate));
+          refetch();
         }, 1000);
       });
     }

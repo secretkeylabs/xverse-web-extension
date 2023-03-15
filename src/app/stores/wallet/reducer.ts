@@ -9,23 +9,17 @@ import {
   LockWalletKey,
   FetchAccountKey,
   SelectAccountKey,
-  FetchRatesSuccessKey,
-  FetchStxWalletDataRequestKey,
-  FetchStxWalletDataSuccessKey,
-  FetchStxWalletDataFailureKey,
-  FetchBtcWalletDataRequestKey,
-  FetchBtcWalletDataSuccessKey,
-  FetchBtcWalletDataFailureKey,
-  FetchCoinDataRequestKey,
-  FetchCoinDataSuccessKey,
-  FetchCoinDataFailureKey,
+  SetBtcWalletDataKey,
+  SetCoinDataKey,
   AddAccountKey,
   UpdateVisibleCoinListKey,
-  FetchFeeMultiplierKey,
+  SetFeeMultiplierKey,
   ChangeFiatCurrencyKey,
   ChangeNetworkKey,
   GetActiveAccountsKey,
   SetWalletSeedPhraseKey,
+  SetStxWalletDataKey,
+  SetCoinRatesKey,
   ChangeHasActivatedOrdinalsKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
@@ -34,8 +28,8 @@ import {
 const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',
-  masterPubKey: '',
   ordinalsAddress: '',
+  masterPubKey: '',
   stxPublicKey: '',
   btcPublicKey: '',
   ordinalsPublicKey: '',
@@ -47,8 +41,6 @@ const initialWalletState: WalletState = {
   selectedAccount: null,
   seedPhrase: '',
   encryptedSeed: '',
-  loadingWalletData: false,
-  loadingBtcData: false,
   fiatCurrency: 'USD',
   btcFiatRate: new BigNumber(0),
   stxBtcRate: new BigNumber(0),
@@ -60,7 +52,6 @@ const initialWalletState: WalletState = {
   coinsList: null,
   coins: [],
   feeMultipliers: null,
-  hasRestoredMemoryKey: false,
   networkAddress: undefined,
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: false,
@@ -98,8 +89,8 @@ const walletReducer = (
         ...state,
         selectedAccount: action.selectedAccount,
         stxAddress: action.stxAddress,
-        btcAddress: action.btcAddress,
         ordinalsAddress: action.ordinalsAddress,
+        btcAddress: action.btcAddress,
         masterPubKey: action.masterPubKey,
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,
@@ -115,7 +106,6 @@ const walletReducer = (
       return {
         ...state,
         seedPhrase: action.seedPhrase,
-        hasRestoredMemoryKey: true,
       };
     case UnlockWalletKey:
       return {
@@ -126,72 +116,38 @@ const walletReducer = (
       return {
         ...state,
         seedPhrase: '',
-        hasRestoredMemoryKey: false,
       };
-    case FetchRatesSuccessKey:
+    case SetCoinRatesKey:
       return {
         ...state,
         btcFiatRate: action.btcFiatRate,
         stxBtcRate: action.stxBtcRate,
       };
-    case FetchStxWalletDataRequestKey:
-      return {
-        ...state,
-        loadingWalletData: true,
-      };
-    case FetchStxWalletDataSuccessKey:
+    case SetStxWalletDataKey:
       return {
         ...state,
         stxBalance: action.stxBalance,
         stxAvailableBalance: action.stxAvailableBalance,
         stxLockedBalance: action.stxLockedBalance,
         stxNonce: action.stxNonce,
-        loadingWalletData: false,
       };
-    case FetchStxWalletDataFailureKey:
-      return {
-        ...state,
-        loadingWalletData: false,
-      };
-    case FetchBtcWalletDataRequestKey:
-      return {
-        ...state,
-        loadingBtcData: true,
-      };
-    case FetchBtcWalletDataSuccessKey:
+    case SetBtcWalletDataKey:
       return {
         ...state,
         btcBalance: action.balance,
-        loadingBtcData: false,
       };
-    case FetchBtcWalletDataFailureKey:
-      return {
-        ...state,
-        loadingBtcData: false,
-      };
-    case FetchCoinDataRequestKey:
-      return {
-        ...state,
-        loadingWalletData: true,
-      };
-    case FetchCoinDataSuccessKey:
+    case SetCoinDataKey:
       return {
         ...state,
         coinsList: action.coinsList,
         coins: action.supportedCoins,
-        loadingWalletData: false,
-      };
-    case FetchCoinDataFailureKey:
-      return {
-        ...state,
-        loadingWalletData: false,
       };
     case UpdateVisibleCoinListKey:
       return {
         ...state,
         coinsList: action.coinsList,
       };
-    case FetchFeeMultiplierKey:
+    case SetFeeMultiplierKey:
       return {
         ...state,
         feeMultipliers: action.feeMultipliers,

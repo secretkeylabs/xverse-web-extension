@@ -21,7 +21,9 @@ import { decryptSeedPhrase, encryptSeedPhrase } from '@utils/encryptionUtils';
 import { InternalMethods } from '@common/types/message-types';
 import { sendMessage } from '@common/types/messages';
 import { useSelector, useDispatch } from 'react-redux';
-import useNetworkSelector from './useNetwork';
+import useNetworkSelector from '@hooks/useNetwork';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 
 const useWalletReducer = () => {
   const {
@@ -33,6 +35,8 @@ const useWalletReducer = () => {
   );
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
+  const { refetch: refetchStxData } = useStxWalletData();
+  const { refetch: refetchBtcData } = useBtcWalletData();
 
   const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, currentNetworkObject: StacksNetwork, currentAccounts: Account[]) => {
     const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, currentNetworkObject, currentAccounts);
@@ -51,7 +55,7 @@ const useWalletReducer = () => {
     try {
       const decrypted = await decryptSeedPhrase(encryptedSeed, password);
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
-      sendMessage({
+      await sendMessage({
         method: InternalMethods.ShareInMemoryKeyToBackground,
         payload: {
           secretKey: decrypted,
@@ -88,7 +92,7 @@ const useWalletReducer = () => {
       network: 'Mainnet',
     });
     const encryptSeed = await encryptSeedPhrase(seed, password);
-    sendMessage({
+    await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
         secretKey: wallet.seedPhrase,
@@ -108,7 +112,7 @@ const useWalletReducer = () => {
     };
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
-    sendMessage({
+    await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
         secretKey: wallet.seedPhrase,
@@ -156,6 +160,8 @@ const useWalletReducer = () => {
     });
     dispatch(setWalletAction(wallet));
     await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, { ...wallet, id: 0 });
+    await refetchStxData();
+    await refetchBtcData();
   };
 
   return {

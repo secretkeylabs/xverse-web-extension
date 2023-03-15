@@ -8,7 +8,7 @@ import { StacksTransaction, UnsignedStacksTransation } from '@secretkeylabs/xver
 import { validateStxAddress } from '@secretkeylabs/xverse-core/wallet';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
-import useStxPendingTxData from '@hooks/useStxPendingTxData';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import { StoreState } from '@stores/index';
 import {
   convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot,

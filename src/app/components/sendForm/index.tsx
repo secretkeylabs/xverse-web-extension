@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import Info from '@assets/img/info.svg';
 import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
-import { useBnsName, useBNSResolver, useDebounce } from '@hooks/useBnsName';
+import { useBnsName, useBNSResolver, useDebounce } from '@hooks/queries/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
