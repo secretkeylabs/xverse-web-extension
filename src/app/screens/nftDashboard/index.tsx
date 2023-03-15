@@ -9,10 +9,10 @@ import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
 import ActionButton from '@components/button';
 import { getNfts, getNonOrdinalUtxo, getOrdinalsByAddress } from '@secretkeylabs/xverse-core/api';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
-import { GAMMA_URL, LoaderSize } from '@utils/constants';
+import { GAMMA_URL, LoaderSize, REFETCH_UNSPENT_UTXO_TIME } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -21,9 +21,9 @@ import AlertMessage from '@components/alertMessage';
 import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
 import { BtcOrdinal, NftsListData } from '@secretkeylabs/xverse-core/types';
-import useWalletReducer from '@hooks/useWalletReducer';
-import InfoContainer from '@components/infoContainer';
 import { useNavigate } from 'react-router-dom';
+import { getTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
+import { UnspentOutput } from '@secretkeylabs/xverse-core/transactions/btc';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
 
@@ -243,13 +243,28 @@ function NftDashboard() {
     return getNfts(stxAddress, selectedNetwork, pageParam);
   }
 
-  function fetchOrdinals(): Promise<BtcOrdinal[]> {
-    return getOrdinalsByAddress(ordinalsAddress);
-  }
+  const fetchNonOrdinalUtxo = async () => {
+    const lastTransactionTime = await getTimeForNonOrdinalTransferTransaction(ordinalsAddress);
+    if (!lastTransactionTime) {
+      return getNonOrdinalUtxo(ordinalsAddress, network.type);
+    }
+    const diff = new Date().getTime() - Number(lastTransactionTime);
+    if (diff > REFETCH_UNSPENT_UTXO_TIME) {
+      return getNonOrdinalUtxo(ordinalsAddress, network.type);
+    }
+    return [] as UnspentOutput[];
+  };
 
-  const { data: unspentUtxos } = useQuery({
+  const fetchOrdinals = useCallback(async (): Promise<BtcOrdinal[]> => {
+    let response = await getOrdinalsByAddress(ordinalsAddress);
+    response = response.filter((ordinal) => ordinal.id !== undefined);
+    return response;
+  }, [ordinalsAddress]);
+
+  const { data: unspentUtxos, refetch: refetchNonOrdinalUtxos } = useQuery({
+    keepPreviousData: false,
     queryKey: [`getNonOrdinalsUtxo-${ordinalsAddress}`],
-    queryFn: () => getNonOrdinalUtxo(ordinalsAddress, network.type),
+    queryFn: fetchNonOrdinalUtxo,
   });
 
   const {
@@ -274,8 +289,14 @@ function NftDashboard() {
     queryFn: fetchOrdinals,
   });
 
+  const refetchCollectibles = useCallback(async () => {
+    await refetch();
+    await fetchOrdinals();
+    refetchNonOrdinalUtxos();
+  }, [refetch, fetchOrdinals]);
+
   useEffect(() => {
-    refetch();
+    refetchCollectibles();
   }, [stxAddress, ordinalsAddress]);
 
   const nfts = data?.pages.map((page) => page.nftsList).flat();
