@@ -28,6 +28,7 @@ export enum LoaderSize {
 
 export const BITCOIN_DUST_AMOUNT_SATS = 5500;
 export const PAGINATION_LIMIT = 50;
+export const REFETCH_UNSPENT_UTXO_TIME = 2 * 60 * 60 * 1000;
 
 export const initialNetworksList: SettingsNetwork[] = [
   {
