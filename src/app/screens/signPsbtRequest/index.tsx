@@ -50,8 +50,15 @@ const TransparentButtonContainer = styled.div((props) => ({
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white[0],
-  marginBottom: props.theme.spacing(16),
   textAlign: 'left',
+}));
+
+const DappTitle = styled.h2((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white['200'],
+  marginTop: 8,
+  textAlign: 'left',
+  marginBottom: props.theme.spacing(16),
 }));
 
 function SignPsbtRequest() {
@@ -76,7 +83,7 @@ function SignPsbtRequest() {
   );
 
   const checkIfMismatch = () => {
-    if (payload.network.type !== network.type) {
+    if (payload.network !== network.type) {
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -152,6 +159,7 @@ function SignPsbtRequest() {
       <OuterContainer>
         <Container>
           <ReviewTransactionText>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>
+          {payload.appDetails.name ? <DappTitle>{`Requested by ${payload.appDetails?.name}`}</DappTitle> : null}
           <BtcRecipientComponent
             value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
               .toString()

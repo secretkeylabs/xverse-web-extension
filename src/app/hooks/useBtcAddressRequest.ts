@@ -16,11 +16,11 @@ const useBtcAddressRequest = () => {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('addressRequest') ?? '';
-  const request = decodeToken(requestToken) as any as GetAddressOptions;
+  const { payload } = decodeToken(requestToken) as any as GetAddressOptions;
   const tabId = params.get('tabId') ?? '0';
 
   const approveBtcAddressRequest = () => {
-    const addressesResponse: Address[] = request.payload.purposes.map((purpose: AddressPurposes) => {
+    const addressesResponse: Address[] = payload.purposes.map((purpose: AddressPurposes) => {
       if (purpose === AddressPurposes.ORDINALS) {
         return {
           address: ordinalsAddress,
@@ -55,7 +55,7 @@ const useBtcAddressRequest = () => {
   };
 
   return {
-    payload: request.payload,
+    payload,
     tabId,
     requestToken,
     approveBtcAddressRequest,

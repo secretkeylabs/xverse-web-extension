@@ -16,6 +16,7 @@ import ActionButton from '@components/button';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import { AddressPurposes } from 'sats-connect';
 import { useNavigate } from 'react-router-dom';
+import validUrl from 'valid-url';
 import AccountView from './accountView';
 
 const TitleContainer = styled.div({
@@ -106,7 +107,14 @@ const AccountText = styled.h1((props) => ({
 const DappTitle = styled.h2((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['200'],
-  marginTop: 12,
+  marginTop: 4,
+  textAlign: 'center',
+}));
+
+const DappMessage = styled.p((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white['200'],
+  marginTop: 21,
   textAlign: 'center',
 }));
 
@@ -128,9 +136,7 @@ const ButtonsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
-  alignItems: 'flex-end',
-  marginBottom: props.theme.spacing(20),
-  marginTop: 82,
+  marginTop: props.theme.spacing(12),
 }));
 
 const BitcoinDot = styled.div((props) => ({
@@ -149,22 +155,9 @@ const AccountListRow = styled.div((props) => ({
   },
 }));
 
-const ConfirmButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
-  width: '50%',
-  height: 44,
-  marginLeft: 6,
-}));
-
 const TransparentButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(2),
-  marginRight: props.theme.spacing(2),
+  marginLeft: props.theme.spacing(1),
+  marginRight: props.theme.spacing(3),
   width: '100%',
 }));
 
@@ -173,20 +166,6 @@ const OrdinalImage = styled.img({
   height: 12,
   marginRight: 8,
 });
-
-const CancelButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: `1px solid ${props.theme.colors.background.elevation2}`,
-  color: props.theme.colors.white['0'],
-  width: '50%',
-  height: 44,
-  marginRight: 6,
-}));
 
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
@@ -254,11 +233,11 @@ function BtcSelectAddressScreen() {
   };
 
   const switchAccountBasedOnRequest = () => {
-    if (payload.network.type !== network.type) {
+    if (payload.network !== network.type) {
       navigate('/tx-status', {
         state: {
           txid: '',
-          currency: 'STX',
+          currency: 'BTC',
           error: t('NETWORK_MISMATCH'),
           browserTx: true,
         },
@@ -270,6 +249,10 @@ function BtcSelectAddressScreen() {
     switchAccountBasedOnRequest();
   }, []);
 
+  const getDappLogo = () => (validUrl.isWebUri(payload?.appDetails?.icon)
+    ? payload?.appDetails?.icon
+    : DappPlaceholderIcon);
+
   return (
     <>
       <LogoContainer>
@@ -277,11 +260,12 @@ function BtcSelectAddressScreen() {
       </LogoContainer>
       <OuterContainer style={styles}>
         <TitleContainer>
-          <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
+          <TopImage src={getDappLogo()} alt="Dapp Logo" />
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          {payload.appDetails?.name ? <DappTitle>{`From ${payload.appDetails?.name}`}</DappTitle> : null}
+          <div style={{ display: 'flex', alignItems: 'center', marginTop: 16 }}>
             {payload.purposes.map((purpose) => (purpose === AddressPurposes.PAYMENT ? (
-              <AddressContainer>
+              <AddressContainer key={purpose}>
                 <BitcoinDot />
                 <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
               </AddressContainer>
@@ -292,12 +276,12 @@ function BtcSelectAddressScreen() {
               </AddressContainer>
             )))}
           </div>
-          <DappTitle>{payload.message}</DappTitle>
+          <DappMessage>{payload.message}</DappMessage>
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
             {accountsList.map((account) => (
-              <AccountListRow>
+              <AccountListRow key={account.id}>
                 <AccountRow
                   key={account.stxAddress}
                   account={account}
