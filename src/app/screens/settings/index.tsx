@@ -5,7 +5,7 @@ import XverseLogo from '@assets/img/settings/logo.svg';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import BottomBar from '@components/tabBar';
-import { PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK } from '@utils/constants';
+import { PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK, XVERSE_EXTENSION_URL } from '@utils/constants';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import PasswordInput from '@components/passwordInput';
@@ -69,6 +69,11 @@ function Setting() {
 
   const openSupport = () => {
     window.open(SUPPORT_LINK);
+  };
+
+  // this supports chrome based browsers
+  const openToUpdate = async () => {
+    await chrome.tabs.create({ url: XVERSE_EXTENSION_URL });
   };
 
   const openFiatCurrencyScreen = () => {
@@ -202,7 +207,11 @@ function Setting() {
           icon={ArrowSquareOut}
           showDivider
         />
-        <SettingComponent text={`${t('VERSION')}`} textDetail={`${VERSION} (Beta)`} />
+        <SettingComponent
+          text={`${t('VERSION')}`}
+          textDetail={`${VERSION} (Beta)`}
+          onClick={openToUpdate}
+        />
         <ResetWalletPrompt showResetWalletPrompt={showResetWalletPrompt} onResetWalletPromptClose={onResetWalletPromptClose} openResetWalletScreen={openResetWalletScreen} />
       </Container>
 
