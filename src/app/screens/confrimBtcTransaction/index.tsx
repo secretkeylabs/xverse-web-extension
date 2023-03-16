@@ -49,6 +49,7 @@ function ConfirmBtcTransaction() {
         state: {
           txid: '',
           currency: 'BTC',
+          isNft: true,
           error: errorBtcOrdinalTransaction.toString(),
         },
       });
@@ -81,6 +82,7 @@ function ConfirmBtcTransaction() {
           state: {
             txid: btcOrdinalTxBroadcastData,
             currency: 'BTC',
+            isNft: true,
             error: '',
           },
         });
