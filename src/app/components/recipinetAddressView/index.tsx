@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import { getExplorerUrl } from '@utils/helper';
-import { useBnsName } from '@hooks/useBnsName';
+import { useBnsName } from '@hooks/queries/useBnsName';
 import useNetworkSelector from '@hooks/useNetwork';
 
 const InfoContainer = styled.div((props) => ({
@@ -65,7 +65,7 @@ function RecipientAddressView({ recipient }: Props) {
 
   return (
     <InfoContainer>
-      <TitleText>{t('RECEPIENT_ADDRESS')}</TitleText>
+      <TitleText>{t('RECIPIENT_ADDRESS')}</TitleText>
       <ValueText>{bnsName}</ValueText>
       <RowContainer>
         <AddressContainer>

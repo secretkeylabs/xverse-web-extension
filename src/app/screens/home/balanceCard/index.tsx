@@ -49,7 +49,11 @@ const CurrencyCard = styled.div((props) => ({
   marginLeft: props.theme.spacing(4),
 }));
 
-function BalanceCard() {
+interface BalanceCardProps {
+  isLoading: boolean,
+}
+
+function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const {
     fiatCurrency,
@@ -57,9 +61,8 @@ function BalanceCard() {
     stxBtcRate,
     stxBalance,
     btcBalance,
-    loadingWalletData,
-    loadingBtcData,
   } = useSelector((state: StoreState) => state.walletState);
+  const { isLoading } = props;
 
   function calculateTotalBalance() {
     const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
@@ -80,7 +83,7 @@ function BalanceCard() {
           <CurrencyText>{fiatCurrency}</CurrencyText>
         </CurrencyCard>
       </RowContainer>
-      {loadingWalletData && loadingBtcData ? (
+      {isLoading ? (
         <BarLoaderContainer>
           <BarLoader loaderSize={LoaderSize.LARGE} />
         </BarLoaderContainer>

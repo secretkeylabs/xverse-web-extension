@@ -15,6 +15,7 @@ interface Props {
 
 const NftNameText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
+  textAlign: 'left',
 }));
 
 const NftNameTextContainer = styled.h1((props) => ({
@@ -80,7 +81,7 @@ function Ordinal({ asset }: Props) {
 
   const handleOnClick = () => {
     storeOrdinalsMetaData(ordinalData!);
-    navigate(`ordinal-detail/${asset.id}`);
+    navigate(`ordinal-detail/${asset.id}/${asset.utxo.tx_hash}`);
   };
 
   return (

@@ -1,7 +1,7 @@
 import { MoonLoader } from 'react-spinners';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import useStackingData from '@hooks/useStackingData';
+import useStackingData from '@hooks/queries/useStackingData';
 import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
 import StackingProgress from './stackingProgress';

@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { getAccountGradient } from '@utils/gradient';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { useTranslation } from 'react-i18next';
 import { getTruncatedAddress, getAddressDetail } from '@utils/helper';
 import BarLoader from '@components/barLoader';
@@ -79,6 +80,13 @@ const StyledToolTip = styled(Tooltip)`
   padding: 7px;
 `;
 
+const AddressContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
 const Button = styled.button`
   background: transparent;
 `;
@@ -102,10 +110,31 @@ const CopyButton = styled.button`
   }
 `;
 
+const OrdinalImage = styled.img({
+  width: 12,
+  height: 12,
+  marginRight: 4,
+});
+
+const AddressText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  marginTop: props.theme.spacing(1),
+  color: props.theme.colors.white['400'],
+}));
+
+const BitcoinDot = styled.div((props) => ({
+  borderRadius: 20,
+  background: props.theme.colors.feedback.caution,
+  width: 10,
+  marginRight: 4,
+  marginLeft: 4,
+  height: 10,
+}));
 interface Props {
   account: Account | null;
   isSelected: boolean;
   allowCopyAddress?: boolean;
+  showOrdinalAddress?: boolean;
   onAccountSelected: (account: Account) => void;
 }
 
@@ -114,6 +143,7 @@ function AccountRow({
   isSelected,
   onAccountSelected,
   allowCopyAddress,
+  showOrdinalAddress,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const {
@@ -151,6 +181,19 @@ function AccountRow({
     onAccountSelected(account!);
   };
 
+  const showOrdinalBtcAddress = (
+    <RowContainer>
+      <AddressContainer>
+        <OrdinalImage src={OrdinalsIcon} />
+        <AddressText>{`${getTruncatedAddress(account?.ordinalsAddress!)} / `}</AddressText>
+      </AddressContainer>
+      <AddressContainer>
+        <BitcoinDot />
+        <AddressText>{`${getTruncatedAddress(account?.btcAddress!)}`}</AddressText>
+      </AddressContainer>
+    </RowContainer>
+  );
+
   const displayAddress = allowCopyAddress ? (
     <RowContainer>
       <CopyButton id="bitcoin-address" onClick={handleOnBtcAddressClick}>
@@ -182,7 +225,7 @@ function AccountRow({
       />
     </RowContainer>
   ) : (
-    <CurrentAccountDetailText>{getAddressDetail(account!)}</CurrentAccountDetailText>
+    <CurrentAccountDetailText>{showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}</CurrentAccountDetailText>
   );
 
   return (

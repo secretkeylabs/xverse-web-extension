@@ -12,7 +12,7 @@ import Info from '@assets/img/info.svg';
 import Switch from '@assets/img/send/switch.svg';
 import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
-import { useBnsName, useBNSResolver, useDebounce } from '@hooks/useBnsName';
+import { useBnsName, useBNSResolver, useDebounce } from '@hooks/queries/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -402,14 +402,14 @@ function SendForm({
     setRecipientAddress(e.target.value);
   };
 
-  const renderEnterRecepientSection = (
+  const renderEnterRecipientSection = (
     <Container>
-      <TitleText>{t('RECEPIENT')}</TitleText>
+      <TitleText>{t('RECIPIENT')}</TitleText>
       <AmountInputContainer error={addressError !== ''}>
         <InputFieldContainer>
           <InputField
             value={recipientAddress}
-            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' ? t('BTC_RECEPIENT_PLACEHOLDER') : t('RECEPIENT_PLACEHOLDER')}
+            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' ? t('BTC_RECIPIENT_PLACEHOLDER') : t('RECIPIENT_PLACEHOLDER')}
             onChange={onAddressInputChange}
           />
         </InputFieldContainer>
@@ -475,7 +475,7 @@ function SendForm({
           </ErrorContainer>
           {buyCryptoMessage}
           {children}
-          {renderEnterRecepientSection}
+          {renderEnterRecipientSection}
           <ErrorContainer>
             <ErrorText>{addressError}</ErrorText>
           </ErrorContainer>
