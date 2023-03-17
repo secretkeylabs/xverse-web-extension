@@ -59,7 +59,7 @@ const ShareDialogeContainer = styled.div({
   zIndex: 2000,
 });
 
-const ReciveNftContainer = styled.div((props) => ({
+const ReceiveNftContainer = styled.div((props) => ({
   position: 'absolute',
   top: 0,
   right: 0,
@@ -438,13 +438,13 @@ function NftDashboard() {
             <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ReceiveButtonContainer>
           {openReceiveModal && (
-            <ReciveNftContainer>
+            <ReceiveNftContainer>
               <ReceiveNftModal
                 visible={openReceiveModal}
                 isGalleryOpen={isGalleryOpen}
                 onClose={onReceiveModalClose}
               />
-            </ReciveNftContainer>
+            </ReceiveNftContainer>
           )}
           {/* <ShareButtonContainer>
             <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />
