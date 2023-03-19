@@ -159,7 +159,7 @@ const useWalletReducer = () => {
       network: changedNetwork.type,
     });
     dispatch(setWalletAction(wallet));
-    await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, { ...wallet, id: 0 });
+    await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [{ ...wallet, id: 0 }]);
     await refetchStxData();
     await refetchBtcData();
   };
