@@ -1,4 +1,6 @@
 import { AnyContract } from 'dlc-lib';
+import { Network } from 'bitcoinjs-lib/src/networks';
+import { NetworkType } from '@secretkeylabs/xverse-core';
 
 export const ContractRequestKey = 'ContractRequest';
 export const ContractSuccessKey = 'ContractSuccess';
@@ -44,11 +46,17 @@ export interface OfferRequest {
 export interface AcceptRequest {
   type: typeof AcceptRequestKey;
   contractId: string;
+  btcAddress: string;
+  btcPublicKey: string;
+  btcPrivateKey: string;
+  network: Network;
 }
 
 export interface SignRequest {
   type: typeof SignRequestKey;
   signMessage: string;
+  btcPrivateKey: string;
+  btcNetwork: NetworkType
 }
 
 export interface RejectRequest {

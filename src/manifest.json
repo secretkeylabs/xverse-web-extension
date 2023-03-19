@@ -16,16 +16,19 @@
   "icons": {
     "128": "xverse_icon.png"
   },
+  "externally_connectable": {
+    "matches": ["*://*/*"]
+  },
+  "permissions": ["storage", "management", "declarativeContent"],
   "devtools_page": "devtools.html",
   "web_accessible_resources": [{ "resources": ["inpage.js"], "matches": ["*://*/*"] }],
   "host_permissions": ["*://*/*"],
-  "permissions": ["storage"],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-src 'none'; frame-ancestors 'none';"
   },
   "content_scripts": [
     {
-      "js": ["browser-polyfill.js","content-script.js"],
+      "js": ["browser-polyfill.js", "content-script.js"],
       "matches": ["*://*/*"],
       "all_frames": true
     }

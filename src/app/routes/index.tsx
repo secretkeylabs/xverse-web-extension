@@ -196,7 +196,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'dlc-offer-request/:contractId',
+        path: 'dlc-offer-request/:offer',
         element: <DlcDetailPage />,
       },
     ],

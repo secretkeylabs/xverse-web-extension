@@ -17,12 +17,12 @@ import {
   actionError,
 } from './actions/actionCreators';
 import { AnyContract } from 'dlc-lib';
-import { DlcAPI } from '../../dlclib/DlcAPI'
+import { DlcAPI } from 'dlc-lib/src/interfaces';
 
 function* handleContracts() {
   try {
-    const dlcAPI: DlcAPI = yield getContext('dlcAPI');
-    const contracts = yield call([dlcAPI, dlcAPI.getAllContracts]);
+    const dlcService: DlcAPI = yield getContext('dlcService');
+    const contracts = yield call([dlcService, dlcService.getAllContracts]);
     yield put(contractSuccess(contracts));
   } catch (err) {
     yield put(contractError('HandleContracts Effect Failure.'));
@@ -31,8 +31,8 @@ function* handleContracts() {
 
 function* handleOffer(action: OfferRequest) {
   try {
-    const dlcAPI: DlcAPI = yield getContext('dlcAPI');
-    const answer = yield call([dlcAPI, dlcAPI.processContractOffer], action.offerMessage);
+    const dlcService: DlcAPI = yield getContext('dlcService');
+    const answer = yield call([dlcService, dlcService.processContractOffer], action.offerMessage);
     yield put(actionSuccess(answer));
   } catch {
     yield put(actionError({ error: 'HandleOffer Effect Failure.' }));
@@ -41,20 +41,27 @@ function* handleOffer(action: OfferRequest) {
 
 function* handleAccept(action: AcceptRequest) {
   try {
-    const dlcAPI: DlcAPI = yield getContext('dlcAPI');
-    const answer = yield call([dlcAPI, dlcAPI.acceptContract], action.contractId);
+    const dlcService: DlcAPI = yield getContext('dlcService');
+    const answer = yield call(
+      [dlcService, dlcService.acceptContract],
+      action.contractId,
+      action.btcAddress,
+      action.btcPublicKey,
+      action.btcPrivateKey,
+      action.network
+    );
     yield put(actionSuccess(answer));
   } catch (err) {
     yield put(
-      actionError({ error: 'HandleAccept Effect Failure.', contractID: action.contractId })
+      actionError({ error: `HandleAccept Effect Failure: ${err}`, contractID: action.contractId })
     );
   }
 }
 
 function* handleReject(action: RejectRequest) {
   try {
-    const dlcAPI: DlcAPI = yield getContext('dlcAPI');
-    const answer = yield call([dlcAPI, dlcAPI.rejectContract], action.contractId);
+    const dlcService: DlcAPI = yield getContext('dlcService');
+    const answer = yield call([dlcService, dlcService.rejectContract], action.contractId);
     yield put(actionSuccess(answer));
   } catch (err) {
     yield put(
@@ -65,10 +72,12 @@ function* handleReject(action: RejectRequest) {
 
 function* handleSign(action: SignRequest) {
   try {
-    const dlcAPI: DlcAPI = yield getContext('dlcAPI');
+    const dlcService: DlcAPI = yield getContext('dlcService');
     const answer = (yield call(
-      [dlcAPI, dlcAPI.processContractSign],
-      action.signMessage
+      [dlcService, dlcService.processContractSign],
+      action.signMessage,
+      action.btcPrivateKey,
+      action.btcNetwork
     )) as AnyContract;
     yield put(actionSuccess(answer));
   } catch (err) {

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import * as actions from './types';
 import { AnyContract } from 'dlc-lib';
+import { Network } from 'bitcoinjs-lib/src/networks';
+import { NetworkType } from '@secretkeylabs/xverse-core';
 
 export function handleContractRequest() {
   return {
@@ -29,17 +31,23 @@ export function offerRequest(offerMessage: string) {
   };
 }
 
-export function acceptRequest(contractId: string) {
+export function acceptRequest(contractId: string, btcAddress: string, btcPublicKey: string, btcPrivateKey: string, network: Network) {
   return {
-    type: actions.OfferRequestKey,
+    type: actions.AcceptRequestKey,
     contractId,
+    btcAddress,
+    btcPublicKey,
+    btcPrivateKey,
+    network
   };
 }
 
-export function signRequest(signMessage: string) {
+export function signRequest(signMessage: string, btcPrivateKey: string, btcNetwork: NetworkType) {
   return {
     type: actions.SignRequestKey,
     signMessage,
+    btcPrivateKey, 
+    btcNetwork
   };
 }
 

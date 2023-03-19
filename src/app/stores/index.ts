@@ -6,20 +6,19 @@ import walletReducer from './wallet/walletReducer';
 import rootSaga from './root/saga';
 import NftDataStateReducer from './nftData/reducer';
 import dlcReducer from './dlc/reducer';
-import { DlcBitcoinBlockchain } from 'app/dlclib/DlcBlockchain';
-import { LocalRepository } from 'app/dlclib/persistence/localRepository';
-import { DlcBitcoinJSWallet } from 'app/dlclib/DlcBitcoinJSWallet';
-import { regtest } from 'bitcoinjs-lib/src/networks'
+import { DlcBitcoinBlockchain } from 'app/dlcClasses/DlcBlockchain';
+import { LocalRepository } from 'app/dlcClasses/persistence/localRepository';
 import { ContractUpdater } from 'dlc-lib';
 import { DlcManager } from 'dlc-lib';
-import { DlcService } from 'app/dlclib/DlcService';
+import { DlcService } from 'app/dlcClasses/DlcService';
+import { DlcSigner } from 'dlc-lib';
 
 export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
-const dlcStorage = new LocalRepository()
+const dlcStorage = new LocalRepository();
 const blockchain = new DlcBitcoinBlockchain();
-const wallet = new DlcBitcoinJSWallet(dlcStorage, regtest, blockchain)
-const contractUpdater = new ContractUpdater(wallet, blockchain)
-const dlcManager = new DlcManager(contractUpdater, dlcStorage)
+const dlcSigner = new DlcSigner();
+const contractUpdater = new ContractUpdater(dlcSigner, blockchain);
+const dlcManager = new DlcManager(contractUpdater, dlcStorage);
 
 const rootPersistConfig = {
   key: 'root',
@@ -48,7 +47,7 @@ export type StoreState = ReturnType<typeof rootReducer>;
 const rootStore = (() => {
   const sagaMiddleware = createSagaMiddleware({
     context: {
-      dlcAPI: new DlcService(dlcManager, dlcStorage),
+      dlcService: new DlcService(dlcManager, dlcStorage),
     },
   });
   const store = createStore(persistedReducer, applyMiddleware(sagaMiddleware));

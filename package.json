@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "^0.2.1",
+    "@secretkeylabs/xverse-core": "file:../xverse-core",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
     "@stacks/stacks-blockchain-api-types": "^6.1.1",
@@ -24,7 +24,7 @@
     "c32check": "^2.0.0",
     "crypto-browserify": "^3.12.0",
     "date-fns": "^2.29.3",
-    "dlc-lib": "file:../prototype-wallet-dlc-lib",
+    "dlc-lib": "file:../dlc-lib",
     "i18next": "^21.9.1",
     "jsontokens": "^4.0.1",
     "moment": "^2.29.4",

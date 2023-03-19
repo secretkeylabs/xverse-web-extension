@@ -42,7 +42,7 @@ var options = {
     publicPath: ASSET_PATH,
   },
   module: {
-    noParse: /\.wasm$/,
+    noParse: /argon2\.wasm$/,
     rules: [
       {
         test: /\.(css)$/,
@@ -82,8 +82,9 @@ var options = {
           },
         ],
       },
+      /* This is a workaround for a bug in webpack. */
       {
-        test: /\.wasm$/,
+        test: /argon2\.wasm$/,
         // Tells WebPack that this module should be included as
         // base64-encoded binary file and not as code
         loader: 'base64-loader',
@@ -92,6 +93,13 @@ var options = {
         //
         // Error: WebAssembly module is included in initial chunk.
         type: 'javascript/auto',
+      },
+      {
+        test: /cfddlcjs_wasm\.wasm/,
+        type: 'asset/resource',
+        generator: {
+          filename: '[name].wasm',
+        },
       },
     ],
   },
@@ -105,6 +113,10 @@ var options = {
       stream: require.resolve('stream-browserify'),
       crypto: require.resolve('crypto-browserify'),
       fs: false,
+      buffer: require.resolve('buffer/'),
+      string_decoder: require.resolve('string_decoder/'),
+      events: require.resolve('events/'),
+      'process/browser': require.resolve('process/browser'),
     },
   },
   plugins: [
@@ -140,9 +152,11 @@ var options = {
       ],
     }),
     new CopyWebpackPlugin({
-      patterns: [{
-        from: 'node_modules/webextension-polyfill/dist/browser-polyfill.js',
-      }],
+      patterns: [
+        {
+          from: 'node_modules/webextension-polyfill/dist/browser-polyfill.js',
+        },
+      ],
     }),
     new HtmlWebpackPlugin({
       template: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.html'),
@@ -157,16 +171,19 @@ var options = {
       cache: false,
     }),
     new webpack.ProvidePlugin({
-      process: 'process/browser.js',
+      process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.DefinePlugin({
-      VERSION: JSON.stringify(require("../package.json").version),
+      VERSION: JSON.stringify(require('../package.json').version),
     }),
   ],
 
   infrastructureLogging: {
     level: 'info',
+  },
+  experiments: {
+    asyncWebAssembly: true,
   },
 };
 if (env.NODE_ENV === 'development') {

@@ -4,7 +4,6 @@ import {
   ContractRepository,
   Utxo,
   RepositoryError,
-  WalletStorage,
   ErrorCode,
   getId,
   ContractState,
@@ -19,7 +18,7 @@ const locationKey = 'locationKey'
 
 // This class implements the storage interfaces using the window's local storage.
 export class LocalRepository
-  implements ContractRepository, WalletStorage, LocationStore
+  implements ContractRepository, LocationStore
 {
   readonly _db: Storage
 
@@ -31,57 +30,6 @@ export class LocalRepository
   }
   getLocation(): Promise<string | null> {
     return Promise.resolve(this._db.getItem(locationKey))
-  }
-
-  upsertAddress(address: string, privkey: string): Promise<void> {
-    return this.upsertInBucket(address, privkey, addressBucketTag)
-  }
-
-  deleteAddress(address: string): Promise<void> {
-    return this.deleteInBucket(address, addressBucketTag)
-  }
-
-  getAddresses(): Promise<string[]> {
-    return this.getAllKeysInBucket(addressBucketTag)
-  }
-
-  getPrivKeyForAddress(address: string): Promise<string> {
-    return this.getValue(address)
-  }
-
-  upsertKeyPair(publicKey: string, privkey: string): Promise<void> {
-    return this.upsertInBucket(publicKey, privkey, keyPairBucketTag)
-  }
-
-  getPrivKeyForPubkey(publicKey: string): Promise<string> {
-    return this.getValue(publicKey)
-  }
-
-  upsertUtxo(utxo: Utxo): Promise<void> {
-    const key = this.getUtxoKey(utxo)
-    return this.upsertInBucket(key, JSON.stringify(utxo), utxoBucketTag)
-  }
-
-  deleteUtxo(utxo: Utxo): Promise<void> {
-    const key = this.getUtxoKey(utxo)
-    return this.deleteInBucket(key, utxoBucketTag)
-  }
-
-  getUtxos(): Promise<Utxo[]> {
-    return this.getAllValuesInBucketOfType(utxoBucketTag)
-  }
-
-  async unreserveUtxo(txid: string, vout: number): Promise<void> {
-    const key = this.getUtxoKey({ txid, vout })
-    const utxo: Utxo = await this.getValueOfType(key)
-    return this.upsertValueInBucket(
-      key,
-      {
-        ...utxo,
-        reserved: false,
-      },
-      utxoBucketTag
-    )
   }
 
   createContract(contract: AnyContract): Promise<void> {
@@ -126,9 +74,6 @@ export class LocalRepository
     return Promise.resolve(res != null)
   }
 
-  private getUtxoKey(utxo: { txid: string; vout: number }): string {
-    return utxo.txid + utxo.vout.toString(16).padStart(2, '0')
-  }
 
   private async getBucketKeys(bucketTag: string): Promise<string[]> {
     const res = this._db.getItem(bucketTag)

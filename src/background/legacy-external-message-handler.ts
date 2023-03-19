@@ -164,7 +164,7 @@ export async function handleLegacyExternalMethodFormat(
       break;
     }
     case ExternalMethods.dlcOfferRequest: {
-      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['request', payload]]);
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['get-offer', payload]]);
       const { id } = await triggerRequstWindowOpen(RequestsRoutes.DlcGetOfferRequest, urlParams);
       console.log(urlParams)
       console.log(tabId)

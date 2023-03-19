@@ -11,6 +11,7 @@ import Theme from '../theme';
 import GlobalStyle from '../theme/global';
 import '../locales';
 import router from './routes';
+import { PopupHandler } from 'background/popupHandler';
 
 function App(): JSX.Element {
   return (
@@ -20,6 +21,7 @@ function App(): JSX.Element {
         <Provider store={rootStore.store}>
           <PersistGate persistor={rootStore.persistedStore} loading={<LoadingScreen />}>
             <ThemeProvider theme={Theme}>
+              {/* <PopupHandler /> */}
               <RouterProvider router={router} />
             </ThemeProvider>
           </PersistGate>
