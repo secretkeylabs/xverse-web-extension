@@ -149,19 +149,6 @@ const AccountListRow = styled.div((props) => ({
   },
 }));
 
-const ConfirmButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
-  width: '50%',
-  height: 44,
-  marginLeft: 6,
-}));
-
 const TransparentButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(2),
   marginRight: props.theme.spacing(2),
@@ -173,20 +160,6 @@ const OrdinalImage = styled.img({
   height: 12,
   marginRight: 8,
 });
-
-const CancelButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: `1px solid ${props.theme.colors.background.elevation2}`,
-  color: props.theme.colors.white['0'],
-  width: '50%',
-  height: 44,
-  marginRight: 6,
-}));
 
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
@@ -258,8 +231,9 @@ function BtcSelectAddressScreen() {
       navigate('/tx-status', {
         state: {
           txid: '',
-          currency: 'STX',
-          error: t('NETWORK_MISMATCH'),
+          currency: 'BTC',
+          errorTitle: t('NETWORK_MISMATCH_ERROR_TITLE'),
+          error: t('NETWORK_MISMATCH_ERROR_DESCRIPTION'),
           browserTx: true,
         },
       });

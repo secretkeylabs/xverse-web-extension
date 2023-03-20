@@ -1,3 +1,6 @@
+import {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 import ActionButton from '@components/button';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -7,7 +10,6 @@ import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import styled from 'styled-components';
 import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
-import { useEffect, useMemo, useState } from 'react';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -56,34 +58,46 @@ const ReviewTransactionText = styled.h1((props) => ({
 }));
 
 function SignPsbtRequest() {
-  const {
-    btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate,
-  } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
+    useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const {
-    payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses,
-  } = useSignPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
 
-  const parsedPsbt = useMemo(() => parsePsbt(
-    selectedAccount!,
-    payload.inputsToSign,
-    payload.psbtBase64,
-  ), [selectedAccount, payload.psbtBase64]);
+  const handlePsbtParsing = useCallback(() => {
+    try {
+      return parsePsbt(selectedAccount!, payload.inputsToSign, payload.psbtBase64);
+    } catch (err) {
+      return '';
+    }
+  }, [selectedAccount, payload.psbtBase64]);
+
+  const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
 
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
-    [payload.inputsToSign],
+    [payload.inputsToSign]
   );
 
   const checkIfMismatch = () => {
+    if (!parsedPsbt) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
+          error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
+          browserTx: true,
+        },
+      });
+    }
     if (payload.network.type !== network.type) {
       navigate('/tx-status', {
         state: {
           txid: '',
-          currency: 'STX',
+          currency: 'BTC',
           error: t('NETWORK_MISMATCH'),
           browserTx: true,
         },
@@ -132,6 +146,7 @@ function SignPsbtRequest() {
           state: {
             txid: '',
             currency: 'BTC',
+            errorTitle: !payload.broadcast ? t('PSBT_CANT_SIGN_ERROR_TITLE') : '',
             error: err.message,
             browserTx: true,
           },

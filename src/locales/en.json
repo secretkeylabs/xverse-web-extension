@@ -106,7 +106,10 @@
     "ASSET": "Asset",
     "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
     "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
-    "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet."
+    "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet.",
+    "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
+    "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The PSBT is invalid and cannot be processed please contact the developer of the Dapp for support",
+    "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
@@ -464,6 +467,7 @@
     "CANCEL_BUTTON": "Dismiss",
     "BITCOIN_ADDRESS": "Bitcoin address",
     "ORDINAL_ADDRESS": "Ordinal address",
-    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with."
+    "NETWORK_MISMATCH_ERROR_TITLE": "Mismatched Network",
+    "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings."
   }
 }
