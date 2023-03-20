@@ -181,7 +181,7 @@ const router = createHashRouter([
         element: <Setting />,
       },
       {
-        path: 'nft-dashboard/restore-funds',
+        path: 'settings/restore-funds',
         element: <RestoreFunds />,
       },
       {

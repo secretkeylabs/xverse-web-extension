@@ -257,9 +257,7 @@
     "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
-    "COPIED": "Copied!",
-    "WITHDRAW_BTC_ALERT_TITLE": "You have Bitcoin stored in your ordinal address.",
-    "WITHDRAW_BTC_ALERT_DESCRIPTION": "Transfer it to my Bitcoin address →"
+    "COPIED": "Copied!"
   },
   "RESTORE_FUNDS_SCREEN": {
     "TITLE": "Restore funds",
@@ -338,8 +336,9 @@
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
     "TESTNET": "Testnet",
-    "EXPERIMENTAL":"Experimental",
-    "ACTIVATE_ORDINAL_NFTS": "Activate Ordinal NFTs"
+    "ORDINALS":"Ordinals",
+    "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
+    "RECOVER_BTC": "Recover BTC in ordinal address"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",

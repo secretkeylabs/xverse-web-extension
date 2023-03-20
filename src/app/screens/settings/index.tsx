@@ -5,15 +5,18 @@ import XverseLogo from '@assets/img/settings/logo.svg';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import BottomBar from '@components/tabBar';
-import { PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK } from '@utils/constants';
+import {
+  PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK,
+} from '@utils/constants';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useDispatch } from 'react-redux';
 import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
-import SettingComponent from './settingComponent';
+import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import ResetWalletPrompt from '../../components/resetWallet';
+import SettingComponent from './settingComponent';
 
 declare const VERSION: string;
 
@@ -54,10 +57,16 @@ function Setting() {
   const [showResetWalletDisplay, setShowResetWalletDisplay] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const { fiatCurrency, network, hasActivatedOrdinalsKey } = useWalletSelector();
+  const {
+    fiatCurrency, network, hasActivatedOrdinalsKey,
+  } = useWalletSelector();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { unlockWallet, resetWallet } = useWalletReducer();
+  const {
+    unspentUtxos,
+    isLoading,
+  } = useNonOrdinalUtxos();
 
   const openTermsOfService = () => {
     window.open(TERMS_LINK);
@@ -113,6 +122,13 @@ function Setting() {
     navigate('/');
   };
 
+  const onRestoreFundClick = () => {
+    navigate('restore-funds', {
+      state: {
+        unspentUtxos,
+      },
+    });
+  };
   const handlePasswordNextClick = async () => {
     try {
       await unlockWallet(password);
@@ -175,13 +191,21 @@ function Setting() {
           showWarningTitle
         />
         <SettingComponent
-          title={t('EXPERIMENTAL')}
+          title={t('ORDINALS')}
           text={t('ACTIVATE_ORDINAL_NFTS')}
           toggle
           toggleFunction={switchActivateOrdinalState}
           toggleValue={hasActivatedOrdinalsKey}
           showDivider
         />
+        {!isLoading && unspentUtxos && unspentUtxos?.length > 0 && (
+        <SettingComponent
+          text={t('RECOVER_BTC')}
+          onClick={onRestoreFundClick}
+          icon={ArrowIcon}
+          showDivider
+        />
+        )}
 
         <SettingComponent
           title={t('ABOUT')}

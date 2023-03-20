@@ -3,16 +3,14 @@ import { MoonLoader } from 'react-spinners';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
 import { useTranslation } from 'react-i18next';
-import InfoIcon from '@assets/img/info.svg';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
-import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
 import ActionButton from '@components/button';
-import { getNfts, getNonOrdinalUtxo, getOrdinalsByAddress } from '@secretkeylabs/xverse-core/api';
+import { getNfts, getOrdinalsByAddress } from '@secretkeylabs/xverse-core/api';
 import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
-import { GAMMA_URL, LoaderSize, REFETCH_UNSPENT_UTXO_TIME } from '@utils/constants';
+import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -21,9 +19,6 @@ import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreat
 import { useDispatch } from 'react-redux';
 import { BtcOrdinal, NftsListData } from '@secretkeylabs/xverse-core/types';
 import AlertMessage from '@components/alertMessage';
-import { useNavigate } from 'react-router-dom';
-import { getTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
-import { UnspentOutput } from '@secretkeylabs/xverse-core/transactions/btc';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
 
@@ -131,45 +126,6 @@ const BottomBarContainer = styled.div({
   marginTop: '5%',
 });
 
-const WithdrawAlertContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  borderRadius: 12,
-  alignItems: 'flex-start',
-  backgroundColor: 'transparent',
-  padding: props.theme.spacing(8),
-  border: '1px solid rgba(255, 255, 255, 0.2)',
-  marginTop: 24,
-}));
-
-const TextContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(5),
-  display: 'flex',
-  flexDirection: 'column',
-}));
-
-const RedirectButton = styled.button((props) => ({
-  ...props.theme.body_medium_m,
-  background: 'transparent',
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'flex-start',
-  marginTop: 4,
-  color: props.theme.colors.white['0'],
-}));
-
-const SubText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  marginTop: props.theme.spacing(2),
-  color: props.theme.colors.white['200'],
-}));
-
-const Text = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
-  lineHeight: 1.4,
-}));
-
 const CollectiblesHeadingText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['200'],
@@ -231,41 +187,21 @@ const BarLoaderContainer = styled.div((props) => ({
 function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const selectedNetwork = useNetworkSelector();
-  const { network } = useWalletSelector();
   const { stxAddress, ordinalsAddress, hasActivatedOrdinalsKey } = useWalletSelector();
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [showActivateOrdinalsAlert, setShowActivateOrdinalsAlert] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   function fetchNfts({ pageParam = 0 }): Promise<NftsListData> {
     return getNfts(stxAddress, selectedNetwork, pageParam);
   }
-
-  const fetchNonOrdinalUtxo = async () => {
-    const lastTransactionTime = await getTimeForNonOrdinalTransferTransaction(ordinalsAddress);
-    if (!lastTransactionTime) {
-      return getNonOrdinalUtxo(ordinalsAddress, network.type);
-    }
-    const diff = new Date().getTime() - Number(lastTransactionTime);
-    if (diff > REFETCH_UNSPENT_UTXO_TIME) {
-      return getNonOrdinalUtxo(ordinalsAddress, network.type);
-    }
-    return [] as UnspentOutput[];
-  };
 
   const fetchOrdinals = useCallback(async (): Promise<BtcOrdinal[]> => {
     let response = await getOrdinalsByAddress(ordinalsAddress);
     response = response.filter((ordinal) => ordinal.id !== undefined);
     return response;
   }, [ordinalsAddress]);
-
-  const { data: unspentUtxos, refetch: refetchNonOrdinalUtxos } = useQuery({
-    keepPreviousData: false,
-    queryKey: [`getNonOrdinalsUtxo-${ordinalsAddress}`],
-    queryFn: fetchNonOrdinalUtxo,
-  });
 
   const {
     isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
@@ -292,7 +228,6 @@ function NftDashboard() {
   const refetchCollectibles = useCallback(async () => {
     await refetch();
     await fetchOrdinals();
-    refetchNonOrdinalUtxos();
   }, [refetch, fetchOrdinals]);
 
   useEffect(() => {
@@ -374,14 +309,6 @@ function NftDashboard() {
     setShowNftOptions(false);
   };
 
-  const onRestoreFundClick = () => {
-    navigate('restore-funds', {
-      state: {
-        unspentUtxos,
-      },
-    });
-  };
-
   const onActivateOrdinalsAlertCrossPress = () => {
     setShowActivateOrdinalsAlert(false);
   };
@@ -455,15 +382,6 @@ function NftDashboard() {
             )}
           </ShareDialogeContainer>
         </ButtonContainer>
-        {!isGalleryOpen && unspentUtxos && unspentUtxos.length > 0 && (
-        <WithdrawAlertContainer>
-          <img src={InfoIcon} alt="alert" />
-          <TextContainer>
-            <SubText>{t('WITHDRAW_BTC_ALERT_TITLE')}</SubText>
-            <RedirectButton onClick={onRestoreFundClick}>{t('WITHDRAW_BTC_ALERT_DESCRIPTION')}</RedirectButton>
-          </TextContainer>
-        </WithdrawAlertContainer>
-        )}
         {isLoading ? (
           <LoaderContainer>
             <MoonLoader color="white" size={30} />
