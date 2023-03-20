@@ -13,6 +13,7 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import AccountHeaderComponent from '@components/accountHeader';
 import BtcRecipientComponent from '@components/confirmBtcTransactionComponent/btcRecipientComponent';
 import { useNavigate } from 'react-router-dom';
+import InfoContainer from '@components/infoContainer';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -50,7 +51,7 @@ const TransparentButtonContainer = styled.div((props) => ({
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white[0],
-  marginBottom: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(12),
   textAlign: 'left',
 }));
 
@@ -61,7 +62,9 @@ function SignPsbtRequest() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
+  const {
+    payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses,
+  } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
 
   const parsedPsbt = useMemo(() => parsePsbt(
@@ -152,6 +155,9 @@ function SignPsbtRequest() {
       <OuterContainer>
         <Container>
           <ReviewTransactionText>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>
+          {!payload.broadcast ? (
+            <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
+          ) : null}
           <BtcRecipientComponent
             value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
               .toString()
@@ -169,11 +175,13 @@ function SignPsbtRequest() {
           />
 
           <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-          <TransactionDetailComponent
-            title={t('FEES')}
-            value={`${parsedPsbt?.fees.toString()} ${t('SATS')}`}
-            subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
-          />
+          {payload.broadcast ? (
+            <TransactionDetailComponent
+              title={t('FEES')}
+              value={`${parsedPsbt?.fees.toString()} ${t('SATS')}`}
+              subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+            />
+          ) : null}
         </Container>
       </OuterContainer>
       <ButtonContainer>
