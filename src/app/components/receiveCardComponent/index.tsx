@@ -22,7 +22,7 @@ const ReceiveCard = styled.div((props) => ({
   borderRadius: 12,
   width: 328,
   height: 104,
-  padding: 16,
+  padding: 22,
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
