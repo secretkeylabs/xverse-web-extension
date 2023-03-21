@@ -58,12 +58,15 @@ const ReviewTransactionText = styled.h1((props) => ({
 }));
 
 function SignPsbtRequest() {
-  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
-    useWalletSelector();
+  const {
+    btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate,
+  } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
+  const {
+    payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses,
+  } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
 
   const handlePsbtParsing = useCallback(() => {
@@ -180,7 +183,11 @@ function SignPsbtRequest() {
             subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt.netAmount), btcFiatRate)}
             icon={IconBitcoin}
             title={t('AMOUNT')}
-            heading="You will transfer "
+            heading={
+              parsedPsbt?.netAmount < 0
+                ? t('YOU_WILL_TRANSFER')
+                : t('YOU_WILL_RECEIVE')
+            }
           />
           <InputOutputComponent
             parsedPsbt={parsedPsbt}
