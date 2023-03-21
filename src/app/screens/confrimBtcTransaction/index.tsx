@@ -132,6 +132,7 @@ function ConfirmBtcTransaction() {
         recipients={recipient}
         loadingBroadcastedTx={isLoading}
         signedTxHex={signedTxHex}
+        isRestoreFundFlow={isRestoreFundFlow}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={goBackToScreen}
         onBackButtonClick={goBackToScreen}

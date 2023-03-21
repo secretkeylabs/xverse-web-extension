@@ -110,6 +110,7 @@ interface Props {
   recipients: Recipient[];
   children?: ReactNode;
   assetDetail?: string;
+  isRestoreFundFlow?: string;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -123,6 +124,7 @@ function ConfirmBtcTransactionComponent({
   recipients,
   children,
   assetDetail,
+  isRestoreFundFlow,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -261,6 +263,7 @@ function ConfirmBtcTransactionComponent({
               value={satsToBtc(recipient?.amountSats).toString()}
               totalRecipient={recipients?.length}
               icon={IconBitcoin}
+              showSenderAddress={isRestoreFundFlow}
               title={t('CONFIRM_TRANSACTION.AMOUNT')}
               subValue={getBtcFiatEquivalent(
                 recipient?.amountSats,

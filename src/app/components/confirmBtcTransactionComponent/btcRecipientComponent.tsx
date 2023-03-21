@@ -1,5 +1,7 @@
 import TransferDetailView from '@components/transferDetailView';
 import OutputIcon from '@assets/img/transactions/output.svg';
+import ArrowIcon from '@assets/img/transactions/ArrowDown.svg';
+import WalletIcon from '@assets/img/transactions/wallet.svg';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
 import BigNumber from 'bignumber.js';
@@ -42,6 +44,14 @@ const Icon = styled.img((props) => ({
   borderRadius: 30,
 }));
 
+const DownArrowIcon = styled.img((props) => ({
+  width: 16,
+  height: 16,
+  marginTop: props.theme.spacing(4),
+  marginLeft: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(4),
+}));
+
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
@@ -66,6 +76,11 @@ const ColumnContainer = styled.div({
   alignItems: 'flex-end',
 });
 
+const MultipleAddressContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+});
+
 interface Props {
   recipientIndex?: number;
   address?: string;
@@ -75,6 +90,7 @@ interface Props {
   icon: string;
   title: string;
   heading?: string;
+  showSenderAddress?: string;
 }
 function BtcRecipientComponent({
   recipientIndex,
@@ -85,9 +101,10 @@ function BtcRecipientComponent({
   icon,
   title,
   heading,
+  showSenderAddress,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { fiatCurrency } = useSelector((state: StoreState) => state.walletState);
+  const { fiatCurrency, ordinalsAddress } = useSelector((state: StoreState) => state.walletState);
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (fiatAmount) {
@@ -110,10 +127,13 @@ function BtcRecipientComponent({
 
   return (
     <Container>
-      {recipientIndex && totalRecipient && (
-        <RecipientTitleText>{`${t(
-          'RECIPIENT'
-        )} ${recipientIndex}/${totalRecipient}`}</RecipientTitleText>
+      {recipientIndex && totalRecipient && totalRecipient !== 1 && (
+        <RecipientTitleText>
+          {`${t(
+            'RECIPIENT',
+          )} ${recipientIndex}/${totalRecipient}`}
+
+        </RecipientTitleText>
       )}
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       <RowContainer>
@@ -126,7 +146,15 @@ function BtcRecipientComponent({
       </RowContainer>
       {address && (
         <AddressContainer>
-          <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
+          {showSenderAddress
+            ? (
+              <MultipleAddressContainer>
+                <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
+                <DownArrowIcon src={ArrowIcon} />
+                <TransferDetailView icon={WalletIcon} title={t('To')} address={address} />
+              </MultipleAddressContainer>
+            )
+            : <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />}
         </AddressContainer>
       )}
     </Container>
