@@ -184,7 +184,7 @@ function SignPsbtRequest() {
             icon={IconBitcoin}
             title={t('AMOUNT')}
             heading={
-              parsedPsbt?.netAmount?.toString().includes('-')
+              parsedPsbt?.netAmount < 0
                 ? t('YOU_WILL_TRANSFER')
                 : t('YOU_WILL_RECEIVE')
             }
