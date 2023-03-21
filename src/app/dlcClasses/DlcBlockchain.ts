@@ -16,8 +16,9 @@ export class DlcBitcoinBlockchain implements Blockchain {
     return rawTx;
   }
   async sendRawTransaction(txHex: string, network: NetworkType): Promise<void> {
-    console.log('xverse-web-extension/DlcBlockchain.ts/sendRawTransaction');
-    await broadcastRawBtcTransaction(txHex, network);
+    console.log('Broadcasting!')
+    const response = await broadcastRawBtcTransaction(txHex, network);
+    console.log(response)
   }
 
   async getUtxosForAddress(address: string, network: NetworkType): Promise<Utxo[]> {
