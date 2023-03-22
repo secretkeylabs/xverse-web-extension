@@ -22,6 +22,8 @@ export interface DlcState {
   readonly currentId?: string;
   readonly acceptMsg?: string;
   readonly selectedContract?: AnyContract;
+  readonly signingRequested: boolean;
+  readonly acceptMessageSubmitted: boolean;
 }
 
 export interface ContractRequest {
@@ -54,9 +56,10 @@ export interface AcceptRequest {
 
 export interface SignRequest {
   type: typeof SignRequestKey;
-  signMessage: string;
+  contractId: string;
   btcPrivateKey: string;
-  btcNetwork: NetworkType
+  btcNetwork: NetworkType;
+  counterpartyWalletURL: string;
 }
 
 export interface RejectRequest {

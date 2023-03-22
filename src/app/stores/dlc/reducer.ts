@@ -1,4 +1,3 @@
-import { Reducer } from 'redux';
 import {
   DlcActions,
   DlcState,
@@ -14,13 +13,15 @@ import {
   UpdateKey,
   SelectKey,
 } from './actions/types';
-import { AnyContract, getId } from 'dlc-lib';
+import { getId } from 'dlc-lib';
 
 const initialDlcState: DlcState = {
   contracts: [],
   processing: false,
   actionSuccess: false,
   error: undefined,
+  signingRequested: false,
+  acceptMessageSubmitted: false,
 };
 
 const dlcReducer = (
@@ -40,10 +41,13 @@ const dlcReducer = (
         error: action.error,
       };
     case OfferRequestKey:
+      return { ...state, processing: true, acceptMessageSubmitted: false, signingRequested: false };
     case AcceptRequestKey:
-    case SignRequestKey:
+      return { ...state, processing: true, acceptMessageSubmitted: true };
     case RejectRequestKey:
       return { ...state, processing: true };
+    case SignRequestKey:
+      return { ...state, processing: true, signingRequested: true };
     case ActionSuccessKey: {
       const updatedContract = action.contract;
       const newContracts = [...state.contracts];

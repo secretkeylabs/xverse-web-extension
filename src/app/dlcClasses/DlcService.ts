@@ -3,7 +3,6 @@ import { AnyContract } from 'dlc-lib';
 import { ContractRepository } from 'dlc-lib';
 import { offerMessageFromJson } from 'dlc-lib';
 import { DlcAPI } from 'dlc-lib/src/interfaces';
-import { Network } from 'bitcoinjs-lib';
 import { NetworkType } from '@secretkeylabs/xverse-core';
 
 export class DlcService implements DlcAPI {
@@ -15,8 +14,8 @@ export class DlcService implements DlcAPI {
     const offerMessage = offerMessageFromJson(offer);
     return this.dlcManager.onOfferMessage(offerMessage);
   }
-  processContractSign(sign: string, btcPrivateKey: string, btcNetwork: NetworkType): Promise<AnyContract> {
-    return this.dlcManager.onSignMessage(JSON.parse(sign), btcPrivateKey, btcNetwork);
+  processContractSign(contractId: string, btcPrivateKey: string, btcNetwork: NetworkType, counterpartyWalletUrl: string): Promise<AnyContract> {
+    return this.dlcManager.onSignMessage(contractId, btcPrivateKey, btcNetwork, counterpartyWalletUrl);
   }
   getContract(contractId: string): Promise<AnyContract> {
     return this.contractRepository.getContract(contractId);

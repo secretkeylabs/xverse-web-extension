@@ -76,6 +76,8 @@ function* fetchStxWalletData(action: FetchStxWalletDataRequest) {
 }
 
 function* fetchBtcWalletData(action: FetchBtcWalletDataRequest) {
+  console.log('btcAddress in fetch: ', action.btcAddress)
+  console.log('network in fetch: ', action.network)
   try {
     const btcData: BtcAddressData = yield fetchBtcTransactionsData(
       action.btcAddress,

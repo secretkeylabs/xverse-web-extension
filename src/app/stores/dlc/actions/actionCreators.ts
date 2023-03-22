@@ -31,23 +31,36 @@ export function offerRequest(offerMessage: string) {
   };
 }
 
-export function acceptRequest(contractId: string, btcAddress: string, btcPublicKey: string, btcPrivateKey: string, network: Network) {
+export function acceptRequest(
+  contractId: string,
+  btcAddress: string,
+  btcPublicKey: string,
+  btcPrivateKey: string,
+  network: Network
+) {
   return {
     type: actions.AcceptRequestKey,
     contractId,
     btcAddress,
     btcPublicKey,
     btcPrivateKey,
-    network
+    network,
   };
 }
 
-export function signRequest(signMessage: string, btcPrivateKey: string, btcNetwork: NetworkType) {
+export function signRequest(
+  contractId: string,
+  btcPrivateKey: string,
+  btcNetwork: NetworkType,
+  counterpartyWalletURL: string
+) {
+  console.log(counterpartyWalletURL)
   return {
     type: actions.SignRequestKey,
-    signMessage,
-    btcPrivateKey, 
-    btcNetwork
+    contractId,
+    btcPrivateKey,
+    btcNetwork,
+    counterpartyWalletURL,
   };
 }
 

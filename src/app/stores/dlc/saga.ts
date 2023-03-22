@@ -73,16 +73,18 @@ function* handleReject(action: RejectRequest) {
 function* handleSign(action: SignRequest) {
   try {
     const dlcService: DlcAPI = yield getContext('dlcService');
+    console.log('handleSign', action.counterpartyWalletURL)
     const answer = (yield call(
       [dlcService, dlcService.processContractSign],
-      action.signMessage,
+      action.contractId,
       action.btcPrivateKey,
-      action.btcNetwork
+      action.btcNetwork,
+      action.counterpartyWalletURL
     )) as AnyContract;
     yield put(actionSuccess(answer));
   } catch (err) {
     yield put(
-      actionError({ error: `HandleSign Effect Failure. Message was: ${action.signMessage}` })
+      actionError({ error: `HandleSign Effect Failure.` })
     );
   }
 }

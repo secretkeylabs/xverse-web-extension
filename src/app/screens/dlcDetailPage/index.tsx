@@ -105,27 +105,30 @@ function DlcDetailPage() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   const { offer } = useParams();
-  const { seedPhrase, btcBalance, network, selectedAccount } = useSelector(
-    (state: StoreState) => state.walletState
-  );
+  const { btcAddress, btcPublicKey, seedPhrase, btcBalance, network, selectedAccount } =
+    useSelector((state: StoreState) => state.walletState);
 
   // //Mainnet
   // const btcAddress = 'bc1qltwm9hrwghs7d2cg63976stmwcqzksgs2a7lxu';
   // const btcPublicKey = '03f1ee404420880871192056d938973c9bb29ce44c07c8826ebfb129b63c21f155'
 
   // Testnet
-  const btcPublicKey = '0375ecef9b58e82f202c817ac2b466f4f15e04c4fc12a612ae68fb1664841faf3b';
-  const btcAddress = 'tb1q30hfy82s4259ugwjy76aj5xnu55quqcu0rr3d6';
+  // const btcPublicKey = '0375ecef9b58e82f202c817ac2b466f4f15e04c4fc12a612ae68fb1664841faf3b';
+  // const btcAddress = 'tb1q30hfy82s4259ugwjy76aj5xnu55quqcu0rr3d6';
 
-  const { processing, actionSuccess, error, contracts, currentId } = useSelector(
-    (state: StoreState) => state.dlcState
-  );
+  const {
+    processing,
+    actionSuccess,
+    error,
+    contracts,
+    currentId,
+    signingRequested,
+    acceptMessageSubmitted,
+  } = useSelector((state: StoreState) => state.dlcState);
 
   let contract = contracts.find((c) => getId(c) === currentId);
 
   const [canAccept, setCanAccept] = useState(false);
-  const [signingRequested, setSigningRequested] = useState(false);
-  const [acceptMessageSubmitted, setAcceptMessageSubmitted] = useState(false);
 
   const defaultCounterpartyWalletURL = 'http://localhost:8085';
 
@@ -137,7 +140,6 @@ function DlcDetailPage() {
     const btcPrivateKey = await handlePrivateKey();
 
     if (contract && currentId) {
-      setAcceptMessageSubmitted(true);
       dispatch(acceptRequest(currentId, btcAddress, btcPublicKey, btcPrivateKey, network.type));
     }
   }
@@ -158,48 +160,11 @@ function DlcDetailPage() {
     return btcPrivateKey;
   }
 
-  async function signAcceptMessage(message: string): Promise<void> {
-    const index = selectedAccount?.id ?? 0;
-    const btcPrivateKey = await getBtcPrivateKey({
-      seedPhrase,
-      index: BigInt(index),
-      network: network.type,
-    });
-    setSigningRequested(true);
-    dispatch(signRequest(message, btcPrivateKey, network.type));
-  }
-
-  async function writeAcceptMessage(): Promise<void> {
-    if (!contract || contract.state !== ContractState.Accepted) {
-      return;
-    }
-
-    const acceptMessage = toAcceptMessage(contract);
-    const stringifiedAcceptMessage = { acceptMessage: JSON.stringify(acceptMessage) };
-    console.log('xverse-web-extension/dlcDetailPage/acceptMessage: ', acceptMessage);
-
-    try {
-      const response = await fetch(`${defaultCounterpartyWalletURL}/offer/accept`, {
-        headers: { 'Content-Type': 'application/json' },
-        method: 'PUT',
-        mode: 'cors',
-        body: JSON.stringify(stringifiedAcceptMessage),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
-      }
-
-      const acceptMessageResponse = await response.json();
-      console.log(
-        'xverse-web-extension/dlcDetailPage/acceptMessageResponse: ',
-        acceptMessageResponse
-      );
-      signAcceptMessage(JSON.stringify(acceptMessageResponse));
-      setAcceptMessageSubmitted(false);
-    } catch (error) {
-      console.error(`Fetch Error: ${error}`);
-    }
+  async function writeAndSignAcceptMessage(): Promise<void> {
+    const btcPrivateKey = await handlePrivateKey();
+    dispatch(
+      signRequest(currentId as string, btcPrivateKey, network.type, defaultCounterpartyWalletURL)
+    );
   }
 
   useEffect(() => {
@@ -237,7 +202,7 @@ function DlcDetailPage() {
 
   useEffect(() => {
     if (acceptMessageSubmitted && actionSuccess && contract?.state === ContractState.Accepted) {
-      writeAcceptMessage();
+      writeAndSignAcceptMessage();
     }
   }, [acceptMessageSubmitted, actionSuccess, contract]);
 
