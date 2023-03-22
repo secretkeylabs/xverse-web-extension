@@ -16,6 +16,7 @@ import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import OrdinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import TokenTile from '@components/tokenTile';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import Theme from 'theme';
@@ -130,7 +131,7 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { coinsList, stxAddress, btcAddress } = useWalletSelector();
+  const { coinsList, stxAddress, btcAddress, ordinalsAddress } = useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
@@ -205,6 +206,10 @@ function Home() {
     navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
   };
 
+  const onOrdinalsReceivePress = () => {
+    navigate('/receive/ORD');
+  };
+
   const receiveContent = (
     <ReceiveContainer>
       <ReceiveCardComponent
@@ -213,6 +218,14 @@ function Home() {
         onQrAddressClick={onBTCReceiveSelect}
       >
         <Icon src={BitcoinToken} />
+      </ReceiveCardComponent>
+
+      <ReceiveCardComponent
+        title={t('ORDINALS')}
+        address={ordinalsAddress}
+        onQrAddressClick={onOrdinalsReceivePress}
+      >
+        <Icon src={OrdinalsIcon} />
       </ReceiveCardComponent>
 
       <ReceiveCardComponent

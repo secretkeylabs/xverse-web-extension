@@ -2,7 +2,7 @@ import BottomModal from '@components/bottomModal';
 import { useTranslation } from 'react-i18next';
 import Cross from '@assets/img/dashboard/X.svg';
 import styled from 'styled-components';
-import OrdinalsIcon from '@assets/img/nftDashboard/oridinals_icon.svg';
+import OrdinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import StacksIcon from '@assets/img/nftDashboard/stacks_icon.svg';
 import { useNavigate } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';

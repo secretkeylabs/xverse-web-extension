@@ -11,7 +11,7 @@ import ConfirmStxTransaction from '@screens/confirmStxTransaction';
 import SendStxScreen from '@screens/sendStx';
 import TransactionStatus from '@screens/transactionStatus';
 import SendBtcScreen from '@screens/sendBtc';
-import ConfirmBtcTransaction from '@screens/confrimBtcTransaction';
+import ConfirmBtcTransaction from '@screens/confirmBtcTransaction';
 import BackupWallet from '@screens/backupWallet';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import CreatePassword from '@screens/createPassword';
