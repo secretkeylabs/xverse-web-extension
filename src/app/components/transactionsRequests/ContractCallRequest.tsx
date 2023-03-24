@@ -333,15 +333,11 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         onConfirmClick={confirmCallback}
         onCancelClick={cancelCallback}
         loading={false}
+        title={request.functionName}
+        subTitle={`Requested by ${request.appDetails?.name}`}
       >
         <>
-          <Container>
-            <TopImage src={Illustration || ContractCall} alt="contract-call" />
-            <FunctionTitle>{request.functionName}</FunctionTitle>
-            <DappTitle>{`Requested by ${request.appDetails?.name}`}</DappTitle>
-          </Container>
           {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
-
           {postConditionAlert}
           {request.sponsored && showSponsoredTransactionTag}
           {renderPostConditionsCard()}

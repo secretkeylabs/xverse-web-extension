@@ -76,8 +76,18 @@ const SponsoredInfoText = styled.h1((props) => ({
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white[0],
-  marginBottom: props.theme.spacing(16),
   textAlign: 'left',
+}));
+
+const RequestedByText = styled.h1((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[400],
+  marginTop: props.theme.spacing(4),
+  textAlign: 'left',
+}));
+
+const TitleContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(16),
 }));
 
 interface Props {
@@ -88,6 +98,9 @@ interface Props {
   children: ReactNode;
   isSponsored?: boolean;
   isAsset?: boolean;
+  title?: string;
+  subTitle?: string;
+
 }
 
 function ConfirmStxTransationComponent({
@@ -96,6 +109,8 @@ function ConfirmStxTransationComponent({
   isSponsored,
   children,
   isAsset,
+  title,
+  subTitle,
   onConfirmClick,
   onCancelClick,
 }: Props) {
@@ -164,7 +179,10 @@ function ConfirmStxTransationComponent({
   return (
     <>
       <Container>
-        {!isAsset && <ReviewTransactionText>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>}
+        <TitleContainer>
+          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRNSACTION')}</ReviewTransactionText>}
+          {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
+        </TitleContainer>
         {children}
         <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
         {initialStxTransactions[0]?.payload?.amount && (
