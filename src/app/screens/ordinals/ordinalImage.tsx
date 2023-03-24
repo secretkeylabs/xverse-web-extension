@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { Suspense } from 'react';
 import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
@@ -12,6 +13,7 @@ import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 interface ContainerProps {
   isGalleryOpen: boolean;
   inNftDetail?: boolean;
+  isSmallImage?: boolean;
 }
 
 const ImageContainer = styled.div<ContainerProps>((props) => ({
@@ -20,9 +22,9 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   marginBottom: props.inNftDetail ? props.theme.spacing(8) : 0,
   alignItems: 'center',
   width: '100%',
-  height: props.isGalleryOpen ? 300 : 150,
-  minHeight: props.isGalleryOpen ? 300 : 150,
-  maxHeight: props.isGalleryOpen ? 300 : 150,
+  height: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
+  minHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
+  maxHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
   overflow: 'hidden',
   position: 'relative',
   fontSize: '3em',
@@ -98,6 +100,7 @@ interface Props {
   isNftDashboard?: boolean;
   inNftDetail?: boolean;
   inNftSend?: boolean;
+  isSmallImage?: boolean;
 }
 
 function OrdinalImage({
@@ -105,13 +108,15 @@ function OrdinalImage({
   isNftDashboard = false,
   inNftDetail = false,
   inNftSend = false,
+  isSmallImage = false,
 }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+
   if (ordinal?.metadata['content type'].includes('image')) {
     return (
-      <ImageContainer isGalleryOpen={isGalleryOpen}>
+      <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
         <Suspense>
           <StyledImg
             width="100%"
@@ -136,13 +141,13 @@ function OrdinalImage({
   if (ordinal?.metadata['content type'].includes('text')) {
     if (!textContent) {
       return (
-        <ImageContainer isGalleryOpen={isGalleryOpen}>
+        <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
           <MoonLoader color="white" size={30} />
         </ImageContainer>
       );
     }
     return (
-      <ImageContainer inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
+      <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
         <OrdinalContentText inNftSend={inNftSend}>{textContent}</OrdinalContentText>
         {isNftDashboard && (
           <OrdinalsTag>
@@ -155,7 +160,7 @@ function OrdinalImage({
   }
 
   return (
-    <ImageContainer isGalleryOpen={isGalleryOpen}>
+    <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
       <img src={PlaceholderImage} alt="ordinal" />
     </ImageContainer>
   );

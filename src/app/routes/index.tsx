@@ -45,6 +45,8 @@ import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import RestoreFunds from '@screens/restoreFunds';
+import RestoreBtc from '@screens/restoreFunds/restoreBtc';
+import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 
 const router = createHashRouter([
   {
@@ -183,6 +185,14 @@ const router = createHashRouter([
       {
         path: 'settings/restore-funds',
         element: <RestoreFunds />,
+      },
+      {
+        path: 'settings/restore-funds/btc',
+        element: <RestoreBtc />,
+      },
+      {
+        path: 'settings/restore-funds/ordinals',
+        element: <RestoreOrdinals />,
       },
       {
         path: 'fiat-currency',

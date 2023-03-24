@@ -8,7 +8,7 @@ import BottomBar from '@components/tabBar';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
-import { broadcastRawBtcOrdinalTransaction } from '@secretkeylabs/xverse-core';
+import { broadcastRawBtcOrdinalTransaction, getOrdinalInfo, OrdinalInfo } from '@secretkeylabs/xverse-core';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import BigNumber from 'bignumber.js';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -93,6 +93,7 @@ function ConfirmOrdinalTransaction() {
   const {
     fee, signedTxHex, ordinalUtxo,
   } = location.state;
+
   const {
     isLoading,
     error: txError,
@@ -106,6 +107,19 @@ function ConfirmOrdinalTransaction() {
   const ordinalId = id!.split('::');
   const ordinal = ordinalsData.find((inscription) => inscription?.metadata?.id === ordinalId[0]);
   const { refetch } = useBtcWalletData();
+
+  const {
+    data: ordinalInfoData,
+    mutate: ordinalInfoMutate,
+  } = useMutation<OrdinalInfo>(
+    async () => getOrdinalInfo(id),
+  );
+
+  useEffect(() => {
+    if (!ordinal) {
+      ordinalInfoMutate();
+    }
+  }, [ordinal]);
 
   useEffect(() => {
     setRecipientAddress(location.state.recipientAddress);
@@ -173,11 +187,11 @@ function ConfirmOrdinalTransaction() {
           onCancelClick={handleOnCancelClick}
           onBackButtonClick={handleOnCancelClick}
           ordinalTxUtxo={ordinalUtxo}
-          assetDetail={ordinal?.inscriptionNumber}
+          assetDetail={ordinal?.inscriptionNumber ?? ordinalInfoData?.inscriptionNumber}
         >
           <Container>
             <NFtContainer>
-              <OrdinalImage inNftSend ordinal={ordinal!} />
+              <OrdinalImage inNftSend ordinal={ordinal! ?? ordinalInfoData} />
             </NFtContainer>
           </Container>
         </ConfirmBtcTransactionComponent>
