@@ -90,7 +90,7 @@
     "EDIT_FEES": "Edit Fees",
     "CONFIRM": "Confirm",
     "CANCEL": "Cancel",
-    "SATS": "SATS",
+    "SATS": "sats",
     "CONFIRM_TX": "Confirm Transaction",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
