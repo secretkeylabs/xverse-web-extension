@@ -81,7 +81,7 @@ function SignPsbtRequest() {
 
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
-    [payload.inputsToSign]
+    [payload.inputsToSign],
   );
 
   const checkIfMismatch = () => {
@@ -180,14 +180,15 @@ function SignPsbtRequest() {
             value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
               .toString()
               .replace('-', '')} BTC`}
-            subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt.netAmount), btcFiatRate)}
+            subValue={getBtcFiatEquivalent(
+              new BigNumber(
+                parsedPsbt?.netAmount < 0 ? parsedPsbt?.netAmount * -1n : parsedPsbt?.netAmount
+              ),
+              btcFiatRate
+            )}
             icon={IconBitcoin}
             title={t('AMOUNT')}
-            heading={
-              parsedPsbt?.netAmount < 0
-                ? t('YOU_WILL_TRANSFER')
-                : t('YOU_WILL_RECEIVE')
-            }
+            heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
           />
           <InputOutputComponent
             parsedPsbt={parsedPsbt}
