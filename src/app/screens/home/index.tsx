@@ -127,6 +127,7 @@ function Home() {
   const {
     stxAddress,
     btcAddress,
+    dlcBtcAddress,
     masterPubKey,
     stxPublicKey,
     btcPublicKey,
@@ -155,6 +156,7 @@ function Home() {
           id: 0,
           stxAddress,
           btcAddress,
+          dlcBtcAddress,
           masterPubKey,
           stxPublicKey,
           btcPublicKey,

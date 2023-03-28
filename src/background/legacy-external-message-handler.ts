@@ -29,7 +29,7 @@ function getOriginFromPort(port: chrome.runtime.Port) {
 
 function makeSearchParamsWithDefaults(
   port: chrome.runtime.Port,
-  otherParams: [string, string][] = [],
+  otherParams: [string, string][] = []
 ) {
   const urlParams = new URLSearchParams();
   // All actions must have a corresponding `origin` and `tabId`
@@ -89,7 +89,7 @@ async function triggerRequstWindowOpen(path: RequestsRoutes, urlParams: URLSearc
 
 export async function handleLegacyExternalMethodFormat(
   message: LegacyMessageFromContentScript,
-  port: chrome.runtime.Port,
+  port: chrome.runtime.Port
 ) {
   const { payload } = message;
   switch (message.method) {
@@ -155,20 +155,6 @@ export async function handleLegacyExternalMethodFormat(
       ]);
 
       const { id } = await triggerRequstWindowOpen(RequestsRoutes.SignatureRequest, urlParams);
-      listenForPopupClose({
-        id,
-        tabId,
-        response: formatMessageSigningResponse({ request: payload, response: 'cancel' }),
-      });
-      listenForOriginTabClose({ tabId });
-      break;
-    }
-    case ExternalMethods.dlcOfferRequest: {
-      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['get-offer', payload]]);
-      const { id } = await triggerRequstWindowOpen(RequestsRoutes.DlcGetOfferRequest, urlParams);
-      console.log(urlParams)
-      console.log(tabId)
-      console.log(payload)
       listenForPopupClose({
         id,
         tabId,

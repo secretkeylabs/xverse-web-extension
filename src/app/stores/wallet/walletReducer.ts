@@ -31,6 +31,7 @@ import {
 const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',
+  dlcBtcAddress: '',
   masterPubKey: '',
   stxPublicKey: '',
   btcPublicKey: '',
@@ -90,6 +91,7 @@ const walletReducer = (
         selectedAccount: action.selectedAccount,
         stxAddress: action.stxAddress,
         btcAddress: action.btcAddress,
+        dlcBtcAddress: action.dlcBtcAddress,
         masterPubKey: action.masterPubKey,
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,

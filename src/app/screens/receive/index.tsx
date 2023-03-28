@@ -12,7 +12,7 @@ import BottomTabBar from '@components/tabBar';
 
 const OuterContainer = styled.div`
   display: flex;
-  flex:1 ;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -89,11 +89,7 @@ function Receive(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
   const [addressCopied, setAddressCopied] = useState(false);
   const navigate = useNavigate();
-  const {
-    stxAddress,
-    btcAddress,
-    selectedAccount,
-  } = useWalletSelector();
+  const { stxAddress, btcAddress, selectedAccount, dlcBtcAddress } = useWalletSelector();
 
   const { currency } = useParams();
 
@@ -105,6 +101,8 @@ function Receive(): JSX.Element {
         return btcAddress;
       case 'FT':
         return stxAddress;
+      case 'BTC-DLC':
+        return dlcBtcAddress;
       default:
         return '';
     }
@@ -113,13 +111,17 @@ function Receive(): JSX.Element {
     navigate(-1);
   };
 
-  const renderHeading = () => (currency === 'BTC' ? (
-    <TopTitleText>
-      {t('BTC_ADDRESS')}
-    </TopTitleText>
-  ) : (
-    <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>
-  ));
+  const renderHeading = () => {
+    switch (currency) {
+      case 'BTC':
+        return <TopTitleText>{t('BTC_ADDRESS')}</TopTitleText>;
+      case 'STX':
+      case 'FT':
+        return <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>;
+      case 'BTC-DLC':
+        return <TopTitleText>{'DLC BTC ADDRESS'}</TopTitleText>;
+    }
+  };
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
@@ -131,18 +133,18 @@ function Receive(): JSX.Element {
       <OuterContainer>
         <Container>
           {renderHeading()}
-          {currency !== 'BTC' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
+          {currency !== 'BTC' && currency !== 'BTC-DLC' && (
+            <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>
+          )}
           <QRCodeContainer>
             <QRCode value={getAddress()} size={150} />
           </QRCodeContainer>
 
-          {currency !== 'BTC' && !!selectedAccount?.bnsName && (
-          <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
+          {currency !== 'BTC' && currency !== 'BTC-DLC' && !!selectedAccount?.bnsName && (
+            <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
           )}
           <InfoContainer>
-            <AddressText>
-              { getAddress() }
-            </AddressText>
+            <AddressText>{getAddress()}</AddressText>
           </InfoContainer>
         </Container>
         {addressCopied ? (

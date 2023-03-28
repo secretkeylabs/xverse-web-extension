@@ -11,7 +11,6 @@ import Theme from '../theme';
 import GlobalStyle from '../theme/global';
 import '../locales';
 import router from './routes';
-import { PopupHandler } from 'background/popupHandler';
 
 function App(): JSX.Element {
   return (

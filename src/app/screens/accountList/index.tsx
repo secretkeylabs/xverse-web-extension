@@ -74,6 +74,7 @@ function AccountList(): JSX.Element {
         account,
         account.stxAddress,
         account.btcAddress,
+        account.dlcBtcAddress,
         account.masterPubKey,
         account.stxPublicKey,
         account.btcPublicKey,
@@ -93,7 +94,7 @@ function AccountList(): JSX.Element {
     const selectedNetwork = network.type;
     const index = accountsList.length > 0 ? accountsList.length : 1;
     const {
-      stxAddress, btcAddress, masterPubKey, stxPublicKey, btcPublicKey,
+      stxAddress, btcAddress, dlcBtcAddress, masterPubKey, stxPublicKey, btcPublicKey,
     } = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
       index: BigInt(index),
@@ -105,6 +106,7 @@ function AccountList(): JSX.Element {
       id: index,
       stxAddress,
       btcAddress,
+      dlcBtcAddress,
       masterPubKey,
       stxPublicKey,
       btcPublicKey,

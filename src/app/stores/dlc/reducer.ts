@@ -64,6 +64,7 @@ const dlcReducer = (
         contracts: newContracts,
         processing: false,
         actionSuccess: true,
+        selectedContract: updatedContract,
         currentId: getId(updatedContract),
       };
       return newState;

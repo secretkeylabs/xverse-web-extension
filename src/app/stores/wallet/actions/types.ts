@@ -44,6 +44,7 @@ export const FetchCoinDataFailureKey = 'FetchCoinDataFailure';
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
+  dlcBtcAddress: string;
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
@@ -71,6 +72,7 @@ export interface WalletState {
 export interface WalletData {
   stxAddress: string;
   btcAddress: string;
+  dlcBtcAddress: string;
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
@@ -123,6 +125,7 @@ export interface SelectAccount {
   selectedAccount: Account | null;
   stxAddress: string;
   btcAddress: string;
+  dlcBtcAddress: string;
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;

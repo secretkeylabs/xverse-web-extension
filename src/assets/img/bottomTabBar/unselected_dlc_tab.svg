@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><svg id="d" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+<g opacity="0.4">
+<g>
+<path d="m13.09,19.42h-7.02c-.85,0-1.54-.7-1.54-1.56v-6.07c0-.86.69-1.56,1.54-1.56h3.92" style="fill:none; stroke:#fff; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.5px;"/>
+<path d="m6.17,10.23v-3.04c0-1.78,1.52-3.23,3.41-3.23,1.17,0,2.2.56,2.81,1.4" style="fill:none; stroke:#fff; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.5px;"/>
+</g>
+<g>
+<path id="e" d="m21.21,9.63c-.13-1.46-1.39-1.95-2.97-2.1v-2.02s-1.22,0-1.22,0v1.96c-.33,0-.66,0-.99,0v-1.98s-1.22,0-1.22,0v2.02c-.28,0-.54,0-.79,0h0s-1.69-.01-1.69-.01v1.31s.9-.01.89,0c.5,0,.66.29.7.54l-.03,5.53c-.02.16-.12.41-.46.4.02.01-.89,0-.89,0l-.25,1.47h1.6c.3,0,.59.02.88.02v2.04s1.22,0,1.22,0v-2.02c.35,0,.67.01.99.01v2.01s1.22,0,1.22,0v-2.04c2.08-.11,3.52-.62,3.71-2.56.15-1.56-.58-2.26-1.75-2.55.71-.36,1.16-1,1.06-2.06h0Zm-1.74,4.36c0,1.53-2.62,1.34-3.45,1.34v-2.7c.85,0,3.46-.22,3.45,1.37Zm-.55-3.82c0,1.39-2.18,1.22-2.88,1.21v-2.45c.71,0,2.88-.21,2.88,1.24Z" style="fill:#fff;"/>
+</g>
+<g>
+<line x1="9.98" y1="12.86" x2="9.98" y2="13.75" style="fill:none; stroke:#fff; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.5px;"/><line x1="9.98" y1="15.86" x2="9.98" y2="15.86" style="fill:none; stroke:#fff; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.5px;"/>
+</g>
+</g>
+</svg>

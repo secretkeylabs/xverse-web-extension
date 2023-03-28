@@ -104,11 +104,14 @@ const useWalletReducer = () => {
   };
 
   const switchAccount = (account: Account) => {
+    console.log("switching")
+    console.log(account)
     dispatch(
       selectAccount(
         account,
         account.stxAddress,
         account.btcAddress,
+        account.dlcBtcAddress,
         account.masterPubKey,
         account.stxPublicKey,
         account.btcPublicKey,

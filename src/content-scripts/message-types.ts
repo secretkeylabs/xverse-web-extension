@@ -13,8 +13,6 @@ export enum ExternalMethods {
   signatureResponse = 'signatureResponse',
   structuredDataSignatureRequest = 'structuredDataSignatureRequest',
   structuredDataSignatureResponse = 'structuredDataSignatureResponse',
-  dlcOfferRequest = 'dlcOfferRequest',
-  dlcOfferResponse = 'dlcOfferResponse',
 }
 
 export enum InternalMethods {
@@ -79,25 +77,13 @@ export type TransactionResponseMessage = Message<
   }
 >;
 
-type DlcOfferRequestMessage = Message<ExternalMethods.dlcOfferRequest, string>;
-
-export type DlcOfferResponseMessage = Message<
-  ExternalMethods.dlcOfferResponse,
-  {
-    dlcOfferRequest: string;
-    dlcOfferResponse: string;
-  }
->;
-
 export type LegacyMessageFromContentScript =
   | AuthenticationRequestMessage
   | TransactionRequestMessage
   | SignatureRequestMessage
   | StructuredDataSignatureRequestMessage
-  | DlcOfferRequestMessage;
 
 export type LegacyMessageToContentScript =
   | AuthenticationResponseMessage
   | TransactionResponseMessage
   | SignatureResponseMessage
-  | DlcOfferResponseMessage;

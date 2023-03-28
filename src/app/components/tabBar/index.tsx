@@ -8,6 +8,9 @@ import UnselectedNftTab from '@assets/img/bottomTabBar/unselected_nft_tab.svg';
 import UnselectedSettingsTab from '@assets/img/bottomTabBar/unselected_setting_tab.svg';
 import UnselectedStackingTab from '@assets/img/bottomTabBar/unselected_stacking_tab.svg';
 import UnselectedWalletTab from '@assets/img/bottomTabBar/unselected_wallet_tab.svg';
+import UnselectedDlcTab from '@assets/img/bottomTabBar/unselected_dlc_tab.svg'
+import DlcTab from '@assets/img/bottomTabBar/dlc_tab.svg'
+
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -25,7 +28,7 @@ const Button = styled.button({
   backgroundColor: 'transparent',
 });
 
-type Tab = 'dashboard' | 'nft' | 'stacking' | 'settings';
+type Tab = 'dashboard' | 'nft' | 'dlc' | 'stacking' | 'settings';
 
 interface Props {
   tab: Tab
@@ -45,6 +48,10 @@ function BottomTabBar({ tab }:Props) {
     if (tab !== 'stacking') { navigate('/stacking'); }
   };
 
+  const handleDlcButtonClick = () => {
+    if (tab !== 'dlc') { navigate('/dlc-list'); }
+  };
+
   const handleSettingButtonClick = () => {
     if (tab !== 'settings') { navigate('/settings'); }
   };
@@ -56,6 +63,9 @@ function BottomTabBar({ tab }:Props) {
       </Button>
       <Button onClick={handleNftButtonClick}>
         <img src={tab === 'nft' ? NftTab : UnselectedNftTab} alt="nft" />
+      </Button>
+      <Button onClick={handleDlcButtonClick}>
+        <img src={tab === 'dlc' ? DlcTab : UnselectedDlcTab} alt="dlc" />
       </Button>
       <Button onClick={handleStackingButtonClick}>
         <img src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} alt="stacking" />

@@ -39,7 +39,10 @@ import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import SignatureRequest from '@screens/signatureRequest';
 import TransactionRequest from '@screens/transactionRequest';
 import ErrorBoundary from '@screens/error';
-import DlcDetailPage from '@screens/dlcDetailPage';
+import DlcList from '@screens/dlcList';
+import DlcOfferRequest from '@screens/dlcOffer';
+import DlcDetails from '@screens/dlcDetails';
+import SendBtcPrefilledScreen from '@screens/sendBtcPrefilled';
 
 const router = createHashRouter([
   {
@@ -90,6 +93,10 @@ const router = createHashRouter([
       {
         path: 'send-btc',
         element: <SendBtcScreen />,
+      },
+      {
+        path: 'send-btc-prefilled/:r',
+        element: <SendBtcPrefilledScreen />,
       },
       {
         path: 'confirm-stx-tx',
@@ -197,7 +204,15 @@ const router = createHashRouter([
       },
       {
         path: 'dlc-offer-request/:offer',
-        element: <DlcDetailPage />,
+        element: <DlcOfferRequest />,
+      },
+      {
+        path: 'dlc-details',
+        element: <DlcDetails />,
+      },
+      {
+        path: 'dlc-list',
+        element: <DlcList />,
       },
     ],
   },
