@@ -14,6 +14,7 @@ const TitleText = styled.h1((props) => ({
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_m,
+  textAlign: 'left',
   color: props.theme.colors.white[400],
 }));
 
