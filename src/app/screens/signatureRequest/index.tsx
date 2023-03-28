@@ -9,17 +9,17 @@ import SignatureIcon from '@assets/img/webInteractions/signatureIcon.svg';
 import Plus from '@assets/img/transactions/Plus.svg';
 import Minus from '@assets/img/transactions/Minus.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import Info from '@assets/img/send/info.svg';
 import { useTranslation } from 'react-i18next';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { useEffect, useState } from 'react';
 import Seperator from '@components/seperator';
 import { bytesToHex } from '@stacks/transactions';
-import { hashMessage } from '@stacks/encryption';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
+import InfoContainer from '@components/infoContainer';
+import { hashMessage } from '@secretkeylabs/xverse-core';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
@@ -104,22 +104,8 @@ const ActionDisclaimer = styled.p((props) => ({
   marginBottom: props.theme.spacing(8),
 }));
 
-const WarningMessageContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  border: `2px solid ${props.theme.colors.grey}`,
-  borderRadius: props.theme.radius(2),
-  padding: props.theme.spacing(6),
-  p: {
-    ...props.theme.body_m,
-    color: props.theme.colors.white[200],
-    marginLeft: props.theme.spacing(9),
-    lineHeight: 1.4,
-  },
-}));
-
 function SignatureRequest(): JSX.Element {
-  const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
+  const { t } = useTranslation('translation');
   const [isSigning, setIsSigning] = useState<boolean>(false);
   const [showHash, setShowHash] = useState(false);
   const { selectedAccount, accountsList, network } = useWalletSelector();
@@ -128,7 +114,6 @@ function SignatureRequest(): JSX.Element {
     messageType, request, payload, tabId, domain,
   } = useSignatureRequest();
   const navigate = useNavigate();
-
   const switchAccountBasedOnRequest = () => {
     if (getNetworkType(payload.network) !== network.type) {
       navigate('/tx-status', {
@@ -196,15 +181,15 @@ function SignatureRequest(): JSX.Element {
     <ConfirmScreen
       onConfirm={confirmCallback}
       onCancel={cancelCallback}
-      cancelText={t('CANCEL_BUTTON')}
-      confirmText={t('SIGN_BUTTON')}
+      cancelText={t('SIGNATURE_REQUEST.CANCEL_BUTTON')}
+      confirmText={t('SIGNATURE_REQUEST.SIGN_BUTTON')}
       loading={isSigning}
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
         <RequestImage src={SignatureIcon} alt="Signature" width={80} />
-        <RequestType>{t('TITLE')}</RequestType>
-        <RequestSource>{`${t('DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
+        <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
+        <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
         {isUtf8Message(messageType) && (
           <SignatureRequestMessage
             request={payload as SignaturePayload}
@@ -218,22 +203,19 @@ function SignatureRequest(): JSX.Element {
         <ShowHashButtonContainer>
           <Seperator />
           <ShowHashButton onClick={handleShowHash}>
-            {showHash ? t('HIDE_HASH_BUTTON') : t('SHOW_HASH_BUTTON')}
+            {showHash ? t('SIGNATURE_REQUEST.HIDE_HASH_BUTTON') : t('SIGNATURE_REQUEST.SHOW_HASH_BUTTON')}
             <img src={showHash ? Minus : Plus} alt="Show" />
           </ShowHashButton>
           <Seperator />
         </ShowHashButtonContainer>
         {showHash ? (
           <>
-            <MessageHashTitle>{t('MESSAGE_HASH_HEADER')}</MessageHashTitle>
+            <MessageHashTitle>{t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}</MessageHashTitle>
             <MessageHash>{bytesToHex(hashMessage(payload.message))}</MessageHash>
           </>
         ) : null}
-        <ActionDisclaimer>{t('ACTION_DISCLAIMER')}</ActionDisclaimer>
-        <WarningMessageContainer>
-          <img src={Info} alt="warning" />
-          <p>{t('SIGNING_WARNING')}</p>
-        </WarningMessageContainer>
+        <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
+        <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
       </MainContainer>
     </ConfirmScreen>
   );

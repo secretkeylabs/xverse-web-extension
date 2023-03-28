@@ -12,6 +12,7 @@ interface Props {
 
 const NftNameText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
+  textAlign: 'left',
 }));
 
 const NftNameTextContainer = styled.h1((props) => ({
@@ -66,7 +67,10 @@ function Nft({ asset }: Props) {
   const url = `${asset.asset_identifier}::${asset.value.repr}`;
 
   function getName() {
-    if (asset?.data?.token_metadata) return `${asset?.data.token_metadata.name} `;
+    if (asset?.data?.token_metadata) {
+      return asset?.data.token_metadata?.name.length <= 35 ? `${asset?.data.token_metadata?.name} `
+        : `${asset?.data.token_metadata?.name.substring(0, 35)}...`;
+    }
 
     if (asset.asset_identifier === BNS_CONTRACT) {
       return getBnsNftName(asset);

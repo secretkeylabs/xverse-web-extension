@@ -11,7 +11,7 @@ import ConfirmStxTransaction from '@screens/confirmStxTransaction';
 import SendStxScreen from '@screens/sendStx';
 import TransactionStatus from '@screens/transactionStatus';
 import SendBtcScreen from '@screens/sendBtc';
-import ConfirmBtcTransaction from '@screens/confrimBtcTransaction';
+import ConfirmBtcTransaction from '@screens/confirmBtcTransaction';
 import BackupWallet from '@screens/backupWallet';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import CreatePassword from '@screens/createPassword';
@@ -43,6 +43,12 @@ import DlcList from '@screens/dlcList';
 import DlcOfferRequest from '@screens/dlcOffer';
 import DlcDetails from '@screens/dlcDetails';
 import SendBtcPrefilledScreen from '@screens/sendBtcPrefilled';
+import OrdinalDetailScreen from '@screens/ordinalDetail';
+import SendOrdinal from '@screens/sendOrdinal';
+import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
+import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
+import SignPsbtRequest from '@screens/signPsbtRequest';
+import RestoreFunds from '@screens/restoreFunds';
 
 const router = createHashRouter([
   {
@@ -139,6 +145,22 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'btc-select-address-request',
+        element: (
+          <AuthGuard>
+            <BtcSelectAddressScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'psbt-signing-request',
+        element: (
+          <AuthGuard>
+            <SignPsbtRequest />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'login',
         element: <Login />,
       },
@@ -165,6 +187,10 @@ const router = createHashRouter([
       {
         path: 'settings',
         element: <Setting />,
+      },
+      {
+        path: 'settings/restore-funds',
+        element: <RestoreFunds />,
       },
       {
         path: 'fiat-currency',
@@ -214,6 +240,14 @@ const router = createHashRouter([
         path: 'dlc-list',
         element: <DlcList />,
       },
+      {
+        path: 'send-ordinal',
+        element: (
+          <AuthGuard>
+            <SendOrdinal />
+          </AuthGuard>
+        ),
+      },
     ],
   },
   {
@@ -234,12 +268,28 @@ const router = createHashRouter([
         element: <NftDetailScreen />,
       },
       {
+        path: 'nft-dashboard/ordinal-detail/:id/:txHash',
+        element: <OrdinalDetailScreen />,
+      },
+      {
         path: 'nft-dashboard/nft-detail/:id/send-nft',
         element: <SendNft />,
       },
       {
         path: 'confirm-nft-tx/:id',
         element: <ConfirmNftTransaction />,
+      },
+      {
+        path: 'confirm-ordinal-tx/:id',
+        element: <ConfirmOrdinalTransaction />,
+      },
+      {
+        path: 'nft-dashboard/ordinal-detail/:id/:txHash/send-ordinal',
+        element: (
+          <AuthGuard>
+            <SendOrdinal />
+          </AuthGuard>
+        ),
       },
     ],
   },

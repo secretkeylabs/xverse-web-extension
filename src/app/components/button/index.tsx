@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 
 interface ButtonProps {
   disabled?: boolean;
@@ -7,7 +7,6 @@ interface ButtonProps {
 }
 
 const Button = styled.button<ButtonProps>((props) => ({
-
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -15,32 +14,26 @@ const Button = styled.button<ButtonProps>((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classic,
   width: '100%',
-  padding: '12px 16px 12px 10px',
+  height: 44,
   opacity: props.disabled ? 0.6 : 1,
   transition: 'all 0.2s ease',
 }));
 
 const AnimatedButton = styled(Button)`
-:hover {
-  background: #6977F8;
-}
-:focus {
-  background: #6977F8;
-  opacity:0.6;
-}
+  :hover {
+    background: ${(props) => (props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classicLight)};
+    opacity: 0.6;
+  }
 `;
 
 const TransparentButton = styled(Button)`
   background-color: transparent;
-  border: 1px solid #4C5187;
+  border: ${(props) => `1px solid ${props.theme.colors.background.elevation6}`}
 `;
 
 const AnimatedTransparentButton = styled(TransparentButton)`
 :hover {
-  background: rgba(76, 81, 135, 0.2);
-}
-:focus {
-  background: rgba(85, 101, 247, 0.2);
+  background: ${(props) => props.theme.colors.background.elevation6_800};
 }
 `;
 
@@ -86,10 +79,10 @@ function ActionButton({
         disabled={disabled}
       >
         {processing ? (
-          <Ring color="white" size={20} />
+          <MoonLoader color="white" size={10} />
         ) : (
           <>
-            <ButtonImage src={src} />
+            {src && <ButtonImage src={src} />}
             <ButtonText>{text}</ButtonText>
           </>
         )}
@@ -104,10 +97,10 @@ function ActionButton({
       warning={warning}
     >
       {processing ? (
-        <Ring color="white" size={20} />
+        <MoonLoader color="white" size={12} />
       ) : (
         <>
-          <ButtonImage src={src} />
+          { src && <ButtonImage src={src} />}
           <ButtonText>{text}</ButtonText>
         </>
       )}

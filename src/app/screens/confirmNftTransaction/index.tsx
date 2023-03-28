@@ -2,21 +2,21 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import Seperator from '@components/seperator';
-import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
-import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
 import AccountHeaderComponent from '@components/accountHeader';
 import TopRow from '@components/topRow';
+import useNetworkSelector from '@hooks/useNetwork';
+import useWalletSelector from '@hooks/useWalletSelector';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -47,7 +47,7 @@ const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginLeft: '15%',
-  marginTop: props.theme.spacing(20),
+  marginTop: props.theme.spacing(40),
 }));
 
 const Button = styled.button((props) => ({
@@ -118,7 +118,6 @@ function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const location = useLocation();
   const { id } = useParams();
   const { nftData } = useNftDataSelector();
@@ -126,10 +125,12 @@ function ConfirmNftTransaction() {
   const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
   const { unsignedTx, recipientAddress } = location.state;
   const {
-    stxBtcRate, network, stxAddress, fiatCurrency,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+    network,
+  } = useWalletSelector();
+  const {
+    refetch,
+  } = useStxWalletData();
+  const selectedNetwork = useNetworkSelector();
 
   const {
     isLoading,
@@ -139,7 +140,7 @@ function ConfirmNftTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network.type));
+  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -148,10 +149,11 @@ function ConfirmNftTransaction() {
           txid: stxTxBroadcastData,
           currency: 'STX',
           error: '',
+          isNft: true,
         },
       });
       setTimeout(() => {
-        dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
+        refetch();
       }, 1000);
     }
   }, [stxTxBroadcastData]);
@@ -163,6 +165,7 @@ function ConfirmNftTransaction() {
           txid: '',
           currency: 'STX',
           error: txError.toString(),
+          isNft: true,
         },
       });
     }

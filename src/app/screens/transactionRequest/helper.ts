@@ -1,16 +1,16 @@
 import {
   createContractCallPromises,
-  SettingsNetwork,
   FeesMultipliers,
   StacksTransaction,
   generateUnsignedStxTokenTransferTransaction,
+  StacksNetwork,
 } from '@secretkeylabs/xverse-core';
 import { TransactionPayload } from '@stacks/connect';
 
 export async function getContractCallPromises(
   payload: TransactionPayload,
   stxAddress: string,
-  network: SettingsNetwork,
+  network: StacksNetwork,
   stxPublicKey: string,
 ) {
   const [unSignedContractCall, contractInterface, coinsMetaData, showPostConditionMessage] = await createContractCallPromises(payload, stxAddress, network, stxPublicKey);
@@ -28,7 +28,7 @@ export async function getTokenTransferRequest(
   memo: string,
   stxPublicKey: string,
   feeMultipliers: FeesMultipliers,
-  network: SettingsNetwork,
+  network: StacksNetwork,
   stxPendingTransactions,
 ) {
   const unsignedSendStxTx: StacksTransaction = await generateUnsignedStxTokenTransferTransaction(
@@ -37,7 +37,7 @@ export async function getTokenTransferRequest(
     memo!,
     stxPendingTransactions?.pendingTransactions ?? [],
     stxPublicKey,
-    network.type,
+    network,
   );
   // increasing the fees with multiplication factor
   const fee: bigint = BigInt(unsignedSendStxTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);

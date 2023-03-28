@@ -14,9 +14,26 @@ interface TransactionHistoryItemProps {
 
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
-  marginBottom: props.theme.spacing(10),
+  width: '100%',
+  paddingTop: props.theme.spacing(5),
+  paddingBottom: props.theme.spacing(5),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
   background: 'none',
+  ':hover': {
+    background: props.theme.colors.white[900],
+  },
+  ':focus': {
+    background: props.theme.colors.white[850],
+  },
 }));
+
+const TransactionAmountContainer = styled.div({
+  display: 'flex',
+  flex: 1,
+  width: '100%',
+  justifyContent: 'flex-end',
+});
 
 const TransactionInfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -46,7 +63,10 @@ export default function BtcTransactionHistoryItem(props: TransactionHistoryItemP
       <TransactionInfoContainer>
         <TransactionRow>
           <TransactionTitle transaction={transaction} />
-          <TransactionAmount transaction={transaction} coin="BTC" />
+          <TransactionAmountContainer>
+            <TransactionAmount transaction={transaction} coin="BTC" />
+          </TransactionAmountContainer>
+
         </TransactionRow>
         <TransactionRow>
           <TransactionRecipient transaction={transaction} />

@@ -12,7 +12,10 @@ import { useTranslation } from 'react-i18next';
 
 const TransactionContainer = styled.div((props) => ({
   display: 'flex',
-  marginBottom: props.theme.spacing(10),
+  paddingTop: props.theme.spacing(5),
+  paddingBottom: props.theme.spacing(5),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
 }));
 
 const TransactionInfoContainer = styled.div((props) => ({

@@ -21,9 +21,8 @@ import { useMutation } from '@tanstack/react-query';
 import { getNftDetail } from '@secretkeylabs/xverse-core/api';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 import AccountHeaderComponent from '@components/accountHeader';
-import Seperator from '@components/seperator';
 import NftAttribute from './nftAttribute';
 import DescriptionTile from './descriptionTile';
 
@@ -149,7 +148,7 @@ const GridContainer = styled.div((props) => ({
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
   paddingBottom: props.theme.spacing(16),
   marginBottom: props.theme.spacing(12),
-  borderBottom: '1px solid #272A44',
+  borderBottom: `1px solid ${props.theme.colors.background.elevation2}`,
 }));
 
 const ShareButtonContainer = styled.div((props) => ({
@@ -362,7 +361,7 @@ function NftDetailScreen() {
 
   const galleryView = isLoading || !nft ? (
     <LoaderContainer>
-      <Ring color="white" size={30} />
+      <MoonLoader color="white" size={30} />
     </LoaderContainer>
   ) : (
     <Container>

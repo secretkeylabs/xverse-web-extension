@@ -1,4 +1,4 @@
-import { InternalMethods } from 'content-scripts/message-types';
+import { InternalMethods } from '@common/types/message-types';
 import rootStore from '@stores/index';
 import { setWalletSeedPhraseAction } from '@stores/wallet/actions/actionCreators';
 import { createRoot } from 'react-dom/client';

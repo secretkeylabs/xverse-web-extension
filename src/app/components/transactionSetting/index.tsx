@@ -16,7 +16,8 @@ import {
 } from '@secretkeylabs/xverse-core/currency';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
-import { getBtcFees, isCustomFeesAllowed } from '@secretkeylabs/xverse-core/transactions/btc';
+import { getBtcFees, getBtcFeesForOrdinalSend, isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import { btcToSats, BtcUtxoDataResponse, ErrorCodes } from '@secretkeylabs/xverse-core';
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,
@@ -138,10 +139,10 @@ interface Props {
   availableBalance?: BigNumber;
   allowEditNonce?: boolean;
   type?: TxType;
-  btcRecepientAddress?: string;
-  amount?: BigNumber;
+  btcRecipients?: Recipient[];
+  ordinalTxUtxo?: BtcUtxoDataResponse;
 }
-type TxType = 'STX' | 'BTC';
+type TxType = 'STX' | 'BTC' | 'Ordinals';
 type FeeModeType = 'low' | 'standard' | 'high' | 'custom';
 
 function TransactionSettingAlert({
@@ -155,16 +156,17 @@ function TransactionSettingAlert({
   availableBalance,
   allowEditNonce = true,
   type = 'STX',
-  btcRecepientAddress,
-  amount,
+  btcRecipients,
+  ordinalTxUtxo,
 }:Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
+  const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
   const theme = useTheme();
   const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(loading);
   const [selectedOption, setSelectedOption] = useState({
-    label: t('STANDARD'),
+    label: t('TRANSACTION_SETTING.STANDARD'),
     value: 'standard',
   });
   const {
@@ -211,33 +213,33 @@ function TransactionSettingAlert({
 
   const StxFeeModes: { label: string; value: FeeModeType }[] = [
     {
-      label: t('LOW'),
+      label: t('TRANSACTION_SETTING.LOW'),
       value: 'low',
     },
     {
-      label: t('STANDARD'),
+      label: t('TRANSACTION_SETTING.STANDARD'),
       value: 'standard',
     },
     {
-      label: t('HIGH'),
+      label: t('TRANSACTION_SETTING.HIGH'),
       value: 'high',
     },
     {
-      label: t('CUSTOM'),
+      label: t('TRANSACTION_SETTING.CUSTOM'),
       value: 'custom',
     },
   ];
   const BtcFeeModes = [
     {
-      label: t('STANDARD'),
+      label: t('TRANSACTION_SETTING.STANDARD'),
       value: 'standard',
     },
     {
-      label: t('HIGH'),
+      label: t('TRANSACTION_SETTING.HIGH'),
       value: 'high',
     },
     {
-      label: t('CUSTOM'),
+      label: t('TRANSACTION_SETTING.CUSTOM'),
       value: 'custom',
     },
   ];
@@ -269,24 +271,36 @@ function TransactionSettingAlert({
     }
   }, [selectedOption]);
 
-  const modifyBtcFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
+  const modifyFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
     try {
       setSelectedOption(mode!);
+      setIsLoading(true);
       if (mode?.value === 'custom') inputRef?.current?.focus();
-      else {
-        const btcFee = await getBtcFees(
-          btcRecepientAddress!,
-          btcAddress,
-          amount?.toString()!,
-          selectedAccount?.id ?? 0,
-          network.type,
-          seedPhrase,
-          mode?.value,
-        );
-        setFeeInput(btcFee.toString());
+      else if (type === 'BTC') {
+        if (btcRecipients && selectedAccount) {
+          const btcFee = await getBtcFees(
+            btcRecipients,
+            btcAddress,
+            network.type,
+            mode?.value,
+          );
+          setFeeInput(btcFee.toString());
+        }
+      } else if (type === 'Ordinals') {
+        if (btcRecipients && ordinalTxUtxo) {
+          const txFees = await getBtcFeesForOrdinalSend(
+            btcRecipients[0].address,
+            ordinalTxUtxo,
+            btcAddress,
+            network.type,
+            mode?.value,
+          );
+          setFeeInput(txFees.toString());
+        }
       }
+      setIsLoading(false);
     } catch (err: any) {
-      setError(err.toString());
+      if (Number(error) === ErrorCodes.InSufficientBalance) { setError(t('TX_ERRORS.INSUFFICIENT_BALANCE')); } else setError(error.toString());
     }
   };
 
@@ -326,10 +340,10 @@ function TransactionSettingAlert({
       const prevFee = stxToMicrostacks(new BigNumber(previousFee));
       const currentFee = stxToMicrostacks(new BigNumber(feeInput));
       if (currentFee.isEqualTo(prevFee)) {
-        setError(t('SAME_FEE_ERROR'));
+        setError(t('TRANSACTION_SETTING.SAME_FEE_ERROR'));
         return;
       } if (currentFee.gt(availableBalance)) {
-        setError(t('GREATER_FEE_ERROR'));
+        setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
         return;
       }
     }
@@ -341,13 +355,13 @@ function TransactionSettingAlert({
     const currentFee = new BigNumber(feeInput);
     if (btcBalance && currentFee.gt(btcBalance)) {
       // show fee exceeds total balance error
-      setError(t('GREATER_FEE_ERROR'));
+      setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
       return;
     }
     if (selectedOption.value === 'custom') {
       const response = await isCustomFeesAllowed(feeInput.toString());
       if (!response) {
-        setError(t('LOWER_THAN_MINIMUM'));
+        setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
         return;
       }
     }
@@ -359,11 +373,11 @@ function TransactionSettingAlert({
     setFeeInput(e.target.value);
   };
 
-  const onFeeOptionChange = (value: { label: string; value: string } | null) => (type === 'STX' ? modifyStxFees(value) : modifyBtcFees(value));
+  const onFeeOptionChange = (value: { label: string; value: string } | null) => (type === 'STX' ? modifyStxFees(value) : modifyFees(value));
 
   const editFeesSection = (
     <Container>
-      <Text>{t('FEE')}</Text>
+      <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
       <RowContainer>
         <FeeContainer>
           <RowContainer>
@@ -387,7 +401,7 @@ function TransactionSettingAlert({
           <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
         </FeeContainer>
       </RowContainer>
-      <DetailText>{t('FEE_INFO')}</DetailText>
+      <DetailText>{t('TRANSACTION_SETTING.FEE_INFO')}</DetailText>
     </Container>
   );
 
@@ -403,24 +417,24 @@ function TransactionSettingAlert({
 
   const editNonceSection = (
     <NonceContainer>
-      <Text>{t('NONCE')}</Text>
+      <Text>{t('TRANSACTION_SETTING.NONCE')}</Text>
       <InputContainer>
         <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
       </InputContainer>
-      <DetailText>{t('NONCE_INFO')}</DetailText>
+      <DetailText>{t('TRANSACTION_SETTING.NONCE_INFO')}</DetailText>
     </NonceContainer>
   );
 
   return (
-    <BottomModal visible={visible} header={type === 'STX' ? t('ADVANCED_SETTING') : t('EDIT_FEE')} onClose={onCrossClick}>
+    <BottomModal visible={visible} header={type === 'STX' ? t('TRANSACTION_SETTING.ADVANCED_SETTING') : t('TRANSACTION_SETTING.EDIT_FEE')} onClose={onCrossClick}>
       {editFeesSection}
       {errorText}
       {allowEditNonce && type === 'STX' && editNonceSection}
       <ButtonContainer>
         <ActionButton
-          text={t('APPLY')}
-          processing={loading}
-          disabled={loading}
+          text={t('TRANSACTION_SETTING.APPLY')}
+          processing={isLoading}
+          disabled={isLoading}
           onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
         />
       </ButtonContainer>

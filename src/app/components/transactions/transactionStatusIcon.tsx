@@ -5,6 +5,7 @@ import SendIcon from '@assets/img/transactions/sent.svg';
 import PendingIcon from '@assets/img/transactions/pending.svg';
 import ContractIcon from '@assets/img/transactions/contract.svg';
 import FailedIcon from '@assets/img/transactions/failed.svg';
+import OrdinalsIcon from '@assets/img/transactions/ordinal.svg';
 
 interface TransactionStatusIconPros {
   transaction: StxTransactionData | BtcTransactionData;
@@ -34,6 +35,9 @@ function TransactionStatusIcon(props: TransactionStatusIconPros) {
   }
   if (currency === 'BTC') {
     const tx = transaction as BtcTransactionData;
+    if (tx.isOrdinal) {
+      return <img src={OrdinalsIcon} alt="ordinals-transfer" />;
+    }
     if (tx.txStatus === 'pending') {
       return <img src={PendingIcon} alt="pending" />;
     }

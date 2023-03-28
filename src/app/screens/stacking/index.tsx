@@ -1,7 +1,7 @@
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import useStackingData from '@hooks/useStackingData';
+import useStackingData from '@hooks/queries/useStackingData';
 import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
 import StackingProgress from './stackingProgress';
@@ -36,7 +36,7 @@ function Stacking() {
       <AccountHeaderComponent />
       {isStackingLoading && (
         <LoaderContainer>
-          <Ring color="white" size={30} />
+          <MoonLoader color="white" size={30} />
         </LoaderContainer>
       ) }
       {showStatus}

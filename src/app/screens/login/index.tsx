@@ -5,9 +5,9 @@ import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Ring } from 'react-spinners-css';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
+import ActionButton from '@components/button';
 
 declare const VERSION: string;
 
@@ -51,7 +51,7 @@ const PasswordInputContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  border: '1px solid #303354;',
+  border: `1px solid ${props.theme.colors.background.elevation3}`,
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   borderRadius: props.theme.radius(1),
@@ -76,17 +76,9 @@ const LandingTitle = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
-const VerifyButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
+const ButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
   width: '100%',
-  height: 44,
 }));
 
 const ErrorMessage = styled.h2((props) => ({
@@ -185,9 +177,9 @@ function Login(): JSX.Element {
           </button>
         </PasswordInputContainer>
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <VerifyButton onClick={handleVerifyPassword}>
-          {!isVerifying ? t('VERIFY_PASSWORD_BUTTON') : <Ring color="white" size={20} />}
-        </VerifyButton>
+        <ButtonContainer>
+          <ActionButton onPress={handleVerifyPassword} text={t('VERIFY_PASSWORD_BUTTON')} processing={isVerifying} />
+        </ButtonContainer>
         <ForgotPasswordButton onClick={handleForgotPassword}>
           {t('FORGOT_PASSWORD_BUTTON')}
         </ForgotPasswordButton>

@@ -10,7 +10,7 @@ import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transact
 import { validateStxAddress } from '@secretkeylabs/xverse-core';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import SendForm from '@components/sendForm';
-import useStxPendingTxData from '@hooks/useStxPendingTxData';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
@@ -19,7 +19,7 @@ import NftImage from '@screens/nftDashboard/nftImage';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import AccountHeaderComponent from '@components/accountHeader';
-import Seperator from '@components/seperator';
+import useNetworkSelector from '@hooks/useNetwork';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -51,10 +51,6 @@ const NFtContainer = styled.div((props) => ({
   borderRadius: 8,
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(12),
-}));
-
-const SendFormContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(5),
 }));
 
 const NftTitleText = styled.h1((props) => ({
@@ -119,7 +115,7 @@ function SendNft() {
       setNft(data);
     }
   }, []);
-
+  const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const {
@@ -146,7 +142,7 @@ function SendNft() {
       contractName: contractInfo[1],
       assetName: name,
       publicKey: stxPublicKey,
-      network,
+      network: selectedNetwork,
       pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
       memo: '',
       isNFT: true,
@@ -161,6 +157,7 @@ function SendNft() {
           * BigInt(feeMultipliers.stxSendTxMultiplier),
       );
     }
+    setRecipientAddress(associatedAddress);
     return unsignedTx;
   });
 
@@ -170,7 +167,6 @@ function SendNft() {
         state: {
           unsignedTx: data,
           recipientAddress,
-          nft,
         },
       });
     }
@@ -206,11 +202,9 @@ function SendNft() {
         return;
       }
     }
-    setRecipientAddress(associatedAddress);
     if (validateFields(associatedAddress.trim()) && nft) {
       setError('');
-      const tokenId = nft?.value?.hex
-        ?? cvToHex(uintCV(nft.token_id.toString()));
+      const tokenId = cvToHex(uintCV(nft?.token_id.toString()!));
       mutate({ tokenId, associatedAddress });
     }
   };
@@ -231,29 +225,26 @@ function SendNft() {
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />}
-        <SendFormContainer>
-          <SendForm
-            processing={isLoading}
-            currencyType="NFT"
-            disableAmountInput
-            error={error}
-            recipient={address}
-            onPressSend={onPressSendNFT}
-          >
-            <Container>
-              <NFtContainer>
-                <NftImage
-                  metadata={nft?.token_metadata!}
-                />
-              </NFtContainer>
-              <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
-            </Container>
-          </SendForm>
-        </SendFormContainer>
+        <SendForm
+          processing={isLoading}
+          currencyType="NFT"
+          disableAmountInput
+          recepientError={error}
+          recipient={address}
+          onPressSend={onPressSendNFT}
+        >
+          <Container>
+            <NFtContainer>
+              <NftImage
+                metadata={nft?.token_metadata!}
+              />
+            </NFtContainer>
+            <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
+          </Container>
+        </SendForm>
         <BottomBarContainer>
           {!isGalleryOpen && <BottomBar tab="nft" />}
         </BottomBarContainer>
-
       </ScrollContainer>
     </>
   );

@@ -1,9 +1,7 @@
 import ChromeStorage from '@utils/storage';
-import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { createStore, combineReducers } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
-import createSagaMiddleware from 'redux-saga';
-import walletReducer from './wallet/walletReducer';
-import rootSaga from './root/saga';
+import walletReducer from './wallet/reducer';
 import NftDataStateReducer from './nftData/reducer';
 import dlcReducer from './dlc/reducer';
 import { DlcBitcoinBlockchain } from 'app/dlcClasses/DlcBlockchain';
@@ -12,6 +10,9 @@ import { ContractUpdater } from 'dlc-lib';
 import { DlcManager } from 'dlc-lib';
 import { DlcService } from 'app/dlcClasses/DlcService';
 import { DlcSigner } from 'dlc-lib';
+import { applyMiddleware } from 'redux';
+import createSagaMiddleware from '@redux-saga/core';
+import rootSaga from './root/saga';
 
 export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
 const dlcStorage = new LocalRepository();
@@ -29,7 +30,7 @@ const rootPersistConfig = {
 const WalletPersistConfig = {
   key: 'walletState',
   storage,
-  blacklist: ['seedPhrase', 'hasRestoredMemoryKey'],
+  blacklist: ['seedPhrase'],
 };
 
 const appReducer = combineReducers({

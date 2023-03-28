@@ -4,7 +4,7 @@ import ConfirmScreen from '@components/confirmScreen';
 import { decodeToken } from 'jsontokens';
 import { useTranslation } from 'react-i18next';
 import { createAuthResponse } from '@secretkeylabs/xverse-core';
-import { MESSAGE_SOURCE } from 'content-scripts/message-types';
+import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { useState } from 'react';
 import useWalletSelector from '@hooks/useWalletSelector';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';

@@ -39,12 +39,14 @@ function BottomModal({
   header, children, visible, onClose,
 }: Props) {
   const theme = useTheme();
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const customStyles = {
     overlay: {
-      backgroundColor: theme.colors.background.modalBackdrop,
-      height: 600,
+      backgroundColor: isGalleryOpen ? 'transparent' : theme.colors.background.modalBackdrop,
+      height: '100%',
       width: 360,
       margin: 'auto',
+      zIndex: 15000,
     },
     content: {
       inset: 'auto auto 0px auto',
@@ -55,8 +57,10 @@ function BottomModal({
       background: theme.colors.background.elevation2,
       margin: 0,
       padding: 0,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
+      borderTopLeftRadius: isGalleryOpen ? 12 : 20,
+      borderTopRightRadius: isGalleryOpen ? 12 : 20,
+      borderBottomRightRadius: isGalleryOpen ? 12 : 0,
+      borderBottomLeftRadius: isGalleryOpen ? 12 : 0,
     },
   };
 

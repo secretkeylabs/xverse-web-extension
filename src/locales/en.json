@@ -24,7 +24,8 @@
     "SEND": "Send",
     "BUY": "Buy",
     "MANAGE_TOKEN": "Manage token list",
-    "TESTNET": "Testnet"
+    "STACKS_AND_TOKEN": "Stacks, tokens and NFTs",
+    "ORDINALS": "Ordinals"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -39,21 +40,24 @@
     "STX_ADDRESS_DESC": "Only send SIP-010 tokens to this address",
     "COPY_ADDRESS": "Copy address",
     "COPIED_ADDRESS": "Address copied to clipboard",
-    "BTC_ADDRESS": "Bitcoin address"
+    "BTC_ADDRESS": "Bitcoin address",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "ORDINALS_RECEIVE_MESSAGE": "Only send Ordinals to this address.",
+    "BTC_RECEIVE_MESSAGE": "Do not send Ordinals to this address, use your Ordinals NFT receive address."
   },
   "SEND": {
     "SEND": "Send",
     "AMOUNT": "Amount",
     "BALANCE": "Balance",
-    "RECEPIENT": "Recipient",
-    "RECEPIENT_PLACEHOLDER": "Address or .btc domain",
-    "BTC_RECEPIENT_PLACEHOLDER": "Address",
+    "RECIPIENT": "Recipient",
+    "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
+    "BTC_RECIPIENT_PLACEHOLDER": "Enter Bitcoin address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
-    "NO_FUNDS": "You don’t have any fund to send.",
+    "NO_FUNDS": "You don’t have any funds to send.",
     "BUY_CRYPTO": "Buy crypto →",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {
@@ -69,12 +73,16 @@
       "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
       "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
     },
-    "SEND_NFT": "Send NFT"
+    "SEND_NFT": "Send NFT",
+    "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
+    "SWITCH_TO": "Switch to",
+    "SEND_ORDINAL_TITLE": "Send Ordinal",
+    "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals."
   },
   "CONFIRM_TRANSACTION": {
-    "SEND": "Send",
+    "SEND": "Confirm Transaction",
     "INDICATION": "You will send",
-    "RECEPIENT_ADDRESS": "recipient address",
+    "RECIPIENT_ADDRESS": "recipient address",
     "MEMO": "Attached memo",
     "NETWORK": "Network",
     "FEES": "Fees",
@@ -85,7 +93,30 @@
     "SATS": "SATS",
     "CONFIRM_TX": "Confirm Transaction",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
-    "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account."
+    "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
+    "TOTAL": "Total",
+    "AMOUNT_PLUS_FEES": "Amount + fees",
+    "REVIEW_TRNSACTION": "Review transaction",
+    "AMOUNT": "Amount",
+    "YOUR_ADDRESS": "Your address",
+    "FROM": "From",
+    "INPUT": "Inputs",
+    "INPUT_AND_OUTPUT": "Inputs & Outputs",
+    "OUTPUT": "Output",
+    "RECIPIENT": "Recipient",
+    "ASSET": "Asset",
+    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
+    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
+    "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",
+    "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
+    "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed please contact the developer of the requesting app for support",
+    "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
+    "YOU_WILL_TRANSFER": "You will transfer",
+    "YOU_WILL_RECEIVE": "You will receive"
+  },
+  "TX_ERRORS": {
+    "INSUFFICIENT_BALANCE": "Insufficient balance",
+    "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees"
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
@@ -105,7 +136,7 @@
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",
-    "SUCCESS_MSG": "Your transaction have been successfully submitted and should appear in a few minutes.",
+    "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
     "STACKS_EXPLORER": "Stacks Explorer",
     "BITCOIN_EXPLORER": "Explorer",
@@ -160,7 +191,8 @@
     "THEN": "then",
     "OPEN_WALLET":"to open your wallet",
     "RESTORE_SCREEN_TITLE": "Wallet restored",
-    "RESTORE_SCREEN_SUBTITLE": "Your wallet has been successfully restored."
+    "RESTORE_SCREEN_SUBTITLE": "Your wallet has been successfully restored.",
+    "SEARCH_XVERSE": "Locate Xverse and click"
   },
   "CONFIRM_TRANSACTION_SCREEN": {
     "CONFIRM_BUTTON": "Confirm",
@@ -200,7 +232,7 @@
     "POOL_FEE": "Pool fee",
     "MINIMUM_AMOUNT": "Minimum amount",
     "REWARD_CYCLES": "Reward Cycles",
-    "START_STACKNG": "Start stacking",
+    "START_STACKING": "Start stacking",
     "STACK_FOR_REWARD": "Stack your coins to earn rewards",
     "XVERSE_POOL": "Xverse delegated pooling allows everyone to participate in Stacking and earn rewards. ",
     "STACK_STX": "Stack STX",
@@ -212,8 +244,9 @@
   "NFT_DASHBOARD_SCREEN": {
     "COLLECTIBLES": "Number of collectibles",
     "NO_COLLECTIBLES": "No collectibles yet",
+    "LOAD_MORE": "Load more",
     "ITEMS": "items",
-    "WEB_GALLERY": "Open web gallery",
+    "WEB_GALLERY": "Open gallery",
     "RECEIVE": "Receive",
     "SEND": "Send",
     "SHARE": "Share collection",
@@ -221,11 +254,30 @@
     "TWITTER": "Share on Twitter",
     "MAIL": "Share by Mail",
     "COPY": "Copy link",
-    "NFT_DETAIL": "Item detail"
+    "NFT_DETAIL": "Item detail",
+    "RECEIVE_NFT": "Receive NFT",
+    "STACKS_NFT": "Stacks NFT",
+    "ORDINALS": "Ordinals",
+    "ORDINAL": "Ordinal",
+    "INSCRIPTION": "Inscription",
+    "ACTIVATE_ORDINALS": "Activate Ordinals",
+    "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
+    "ACTIVATE": "Activate",
+    "DENY": "No",
+    "COPIED": "Copied!"
+  },
+  "RESTORE_FUNDS_SCREEN": {
+    "TITLE": "Restore funds",
+    "AMOUNT": "Amount",
+    "TRANSFER": "Transfer",
+    "BACK": "Back",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "NO_FUNDS": "You don’t have any funds stored on your ordinal address.",
+    "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",
-    "WEB_GALLERY": "Open web gallery",
+    "WEB_GALLERY": "Open gallery",
     "SEND": "Send",
     "SHARE": "Share",
     "OWNED_BY": "Owned by",
@@ -241,7 +293,21 @@
     "STACKS_EXPLORER": "Stacks Explorer",
     "DETAILS": "See detail on",
     "GAMMA": "Gamma.io",
-    "MOVE_TO_ASSET_DETAIL": "Back to gallery"
+    "MOVE_TO_ASSET_DETAIL": "Back to gallery",
+    "ORDINALS": "Ordinal",
+    "ORDINAL_PENDING_SEND_TITLE": "Transfer Pending",
+    "ORDINAL_PENDING_SEND_DESCRIPTION": "This Ordinal is already in a pending transfer.",
+    "ORDINAL_PENDING_SEND_BUTTON": "View in Explorer",
+    "INSCRIPTION": "Inscription",
+    "ID": "Id",
+    "CONTENT_LENGTH": "Content length",
+    "ADDRESS": "Address",
+    "CONTENT_TYPE": "Content type",
+    "OUTPUT_VALUE": "Output value",
+    "TIMESTAMP": "Timestamp",
+    "GENESIS_HEIGHT": "genesis height",
+    "LOCATION": "Location",
+    "ORDINAL_NOT_DISPLAYED": "This ordinal cannot be displayed."
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
@@ -264,7 +330,7 @@
     "SUPPORT_CENTER": "Support Center",
     "VERSION": "Version",
     "UPDATE_PASSWORD_SUCCESS": "Password successfully updated",
-    "OK": "OK",
+    "OK": "Ok",
     "RESET_WALLET_DESCRIPTION": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
     "CANCEL": "Cancel",
     "NODE": "STX Node",
@@ -275,7 +341,11 @@
     "PASSWORD": "Password",
     "RESET": "Reset",
     "BACK": "Back",
-    "INCORRECT_PASSWORD_ERROR": "Incorrect password"
+    "INCORRECT_PASSWORD_ERROR": "Incorrect password",
+    "TESTNET": "Testnet",
+    "ORDINALS":"Ordinals",
+    "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
+    "RECOVER_BTC": "Recover BTC in ordinal address"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
@@ -326,7 +396,7 @@
     "ANOTHER_ADDRESS": "Another address",
     "CONTRACT_ADDRESS": "Contract Address",
     "MY_ADDRESS": "My Address",
-    "RECEPIENT_ADDRESS": "Recipient address",
+    "RECIPIENT_ADDRESS": "Recipient address",
     "EQUAL": "will transfer exactly",
     "GREATER": " will transfer more than",
     "GREATER_EQUAL": "will transfer at least",
@@ -379,5 +449,27 @@
     "ERROR_DESCRIPTION": "Xverse encountered a fatal error and crashed. You need to relaunch your wallet.",
     "ERROR_PREFIX": "Error:",
     "SUPPORT": "If the issue persists, you can contact the support at"
+  },
+  "WINDOW_CLOSED_ALERT": {
+    "TITLE": "Requesting window closed",
+    "BODY": "The window that initiated the request is closed, but you can still broadcast the transaction"
+  },
+  "ADDRESS_RECEIVE_ALERT_MESSAGE": {
+    "RECEIVING_ORDINALS": "Receiving Ordinals",
+    "RECEIVING_ORDINAL_INFO": "Use this address to receive Ordinals only. Do not use this address to receive Bitcoin payments.",
+    "RECEIVING_BTC": "Receiving Bitcoin",
+    "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
+    "I_UNDERSTAND": "I understand",
+    "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
+},
+  "SELECT_BTC_ADDRESS_SCREEN": {
+    "TITLE": "Bitcoin Address Request",
+    "ACCOUNT": "Account",
+    "CONNECT_BUTTON": "Approve",
+    "CANCEL_BUTTON": "Dismiss",
+    "BITCOIN_ADDRESS": "Bitcoin address",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "NETWORK_MISMATCH_ERROR_TITLE": "Mismatched Network",
+    "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings."
   }
 }

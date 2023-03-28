@@ -9,6 +9,12 @@ import { useState } from 'react';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
+import InfoContainer from '@components/infoContainer';
+import { useDispatch } from 'react-redux';
+import {
+  ChangeShowBtcReceiveAlertAction,
+  ChangeShowOrdinalReceiveAlertAction,
+} from '@stores/wallet/actions/actionCreators';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -25,18 +31,19 @@ const OuterContainer = styled.div`
 const TopTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
   textAlign: 'center',
-  marginBottom: props.theme.spacing(4),
 }));
 
 const ReceiveScreenText = styled.h1((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
+  marginTop: props.theme.spacing(3),
   color: props.theme.colors.white['200'],
 }));
 
 const BnsNameText = styled.h1((props) => ({
   ...props.theme.body_bold_l,
   textAlign: 'center',
+  marginBottom: 2,
 }));
 
 const Container = styled.div({
@@ -47,8 +54,7 @@ const Container = styled.div({
   flex: 1,
 });
 
-const InfoContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
+const AddressContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(24),
   marginRight: props.theme.spacing(24),
 }));
@@ -82,14 +88,27 @@ const AddressText = styled.h1((props) => ({
 }));
 
 const BottomBarContainer = styled.div({
-  marginTop: 32,
+  marginTop: 22,
+});
+
+const InfoAlertContainer = styled.div({
+  width: '100%',
 });
 
 function Receive(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
   const [addressCopied, setAddressCopied] = useState(false);
   const navigate = useNavigate();
-  const { stxAddress, btcAddress, selectedAccount, dlcBtcAddress } = useWalletSelector();
+  const dispatch = useDispatch();
+  const {
+    stxAddress,
+    btcAddress,
+    dlcBtcAddress,
+    ordinalsAddress,
+    selectedAccount,
+    showBtcReceiveAlert,
+    showOrdinalReceiveAlert,
+  } = useWalletSelector();
 
   const { currency } = useParams();
 
@@ -103,10 +122,13 @@ function Receive(): JSX.Element {
         return stxAddress;
       case 'BTC-DLC':
         return dlcBtcAddress;
+      case 'ORD':
+        return ordinalsAddress;
       default:
         return '';
     }
   };
+
   const handleBackButtonClick = () => {
     navigate(-1);
   };
@@ -120,12 +142,20 @@ function Receive(): JSX.Element {
         return <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>;
       case 'BTC-DLC':
         return <TopTitleText>{'DLC BTC ADDRESS'}</TopTitleText>;
+      case 'ORD':
+        return <TopTitleText>{t('ORDINAL_ADDRESS')}</TopTitleText>;
     }
   };
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
     setAddressCopied(true);
+    if (currency === 'BTC' && showBtcReceiveAlert !== null) {
+      dispatch(ChangeShowBtcReceiveAlertAction(true));
+    }
+    if (currency === 'ORD' && showOrdinalReceiveAlert !== null) {
+      dispatch(ChangeShowOrdinalReceiveAlertAction(true));
+    }
   };
   return (
     <>
@@ -133,34 +163,41 @@ function Receive(): JSX.Element {
       <OuterContainer>
         <Container>
           {renderHeading()}
-          {currency !== 'BTC' && currency !== 'BTC-DLC' && (
+          {!['BTC', 'ORD', 'BTC-DLC'].includes(currency!) && (
             <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>
           )}
           <QRCodeContainer>
             <QRCode value={getAddress()} size={150} />
           </QRCodeContainer>
 
-          {currency !== 'BTC' && currency !== 'BTC-DLC' && !!selectedAccount?.bnsName && (
-            <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
-          )}
-          <InfoContainer>
+          {!['BTC', 'ORD', 'BTC-DLC'].includes(currency!) &&
+            !!selectedAccount?.bnsName && <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>}
+          <AddressContainer>
             <AddressText>{getAddress()}</AddressText>
-          </InfoContainer>
+          </AddressContainer>
         </Container>
-        {addressCopied ? (
-          <CopyContainer>
+        <CopyContainer>
+          {currency === 'ORD' && (
+            <InfoAlertContainer>
+              <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
+            </InfoAlertContainer>
+          )}
+          {currency === 'BTC' && (
+            <InfoAlertContainer>
+              <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
+            </InfoAlertContainer>
+          )}
+          {addressCopied ? (
             <ActionButton
               src={Tick}
               text={t('COPIED_ADDRESS')}
               onPress={handleOnClick}
               transparent
             />
-          </CopyContainer>
-        ) : (
-          <CopyContainer>
+          ) : (
             <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
-          </CopyContainer>
-        )}
+          )}
+        </CopyContainer>
       </OuterContainer>
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />

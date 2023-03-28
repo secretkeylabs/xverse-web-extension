@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import styled from 'styled-components';
-import { Ring } from 'react-spinners-css';
+import { MoonLoader } from 'react-spinners';
 
 const MainContainer = styled.div`
   display: flex;
@@ -50,7 +50,7 @@ const CancelButton = styled.button((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: props.theme.colors.background.elevation0,
-  border: '1px solid #272A44',
+  border: `1px solid ${props.theme.colors.background.elevation2}`,
   color: props.theme.colors.white['0'],
   width: '50%',
   height: 44,
@@ -79,7 +79,7 @@ function ConfirmScreen({
       <ButtonsContainer>
         <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
         <ConfirmButton onClick={onConfirm}>
-          {loading ? <Ring color="white" size={20} /> : confirmText}
+          {loading ? <MoonLoader color="white" size={20} /> : confirmText}
         </ConfirmButton>
       </ButtonsContainer>
     </>

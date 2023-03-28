@@ -1,20 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { StoreState } from '@stores/index';
 import BottomBar from '@components/tabBar';
-import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
 import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import TopRow from '@components/topRow';
 import BigNumber from 'bignumber.js';
+import useNetworkSelector from '@hooks/useNetwork';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -39,17 +38,18 @@ const ValueText = styled.h1((props) => ({
 function ConfirmFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const selectedNetwork = useNetworkSelector();
   const location = useLocation();
   const {
     unsignedTx, amount, fungibleToken, memo, recepientAddress,
   } = location.state;
+  const {
+    refetch,
+  } = useStxWalletData();
 
   const {
-    stxBtcRate, network, stxAddress, fiatCurrency,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+    network,
+  } = useWalletSelector();
 
   const {
     isLoading,
@@ -59,7 +59,7 @@ function ConfirmFtTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network));
+  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -71,7 +71,7 @@ function ConfirmFtTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
+        refetch();
       }, 1000);
     }
   }, [stxTxBroadcastData]);
