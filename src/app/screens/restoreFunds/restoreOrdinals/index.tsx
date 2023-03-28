@@ -24,9 +24,10 @@ const Container = styled.div({
 });
 
 const ButtonContainer = styled.div({
-  marginLeft: 16,
   marginBottom: 32,
-  marginRight: 16,
+  flex: 1,
+  display: 'flex',
+  alignItems: 'flex-end',
 });
 
 function RestoreOrdinals() {
