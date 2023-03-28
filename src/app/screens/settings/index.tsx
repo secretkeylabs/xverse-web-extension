@@ -198,15 +198,12 @@ function Setting() {
           toggleValue={hasActivatedOrdinalsKey}
           showDivider
         />
-        {!isLoading && unspentUtxos && unspentUtxos?.length > 0 && (
         <SettingComponent
-          text={t('RECOVER_BTC')}
+          text={t('RECOVER_ASSETS')}
           onClick={onRestoreFundClick}
           icon={ArrowIcon}
           showDivider
         />
-        )}
-
         <SettingComponent
           title={t('ABOUT')}
           text={t('TERMS_OF_SERVICE')}
