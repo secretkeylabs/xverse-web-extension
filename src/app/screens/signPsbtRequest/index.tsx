@@ -16,6 +16,7 @@ import AccountHeaderComponent from '@components/accountHeader';
 import BtcRecipientComponent from '@components/confirmBtcTransactionComponent/btcRecipientComponent';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
+import { NumericFormat } from 'react-number-format';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -167,6 +168,14 @@ function SignPsbtRequest() {
     setExpandInputOutputView(!expandInputOutputView);
   };
 
+  const getSatsAmountString = (sats: BigNumber) =>
+    <NumericFormat
+      value={sats.toString()}
+      displayType="text"
+      thousandSeparator
+      suffix={` ${t('SATS')}`}
+    />;
+
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
@@ -201,7 +210,7 @@ function SignPsbtRequest() {
           {payload.broadcast ? (
             <TransactionDetailComponent
               title={t('FEES')}
-              value={`${parsedPsbt?.fees.toString()} ${t('SATS')}`}
+              value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
               subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
             />
           ) : null}

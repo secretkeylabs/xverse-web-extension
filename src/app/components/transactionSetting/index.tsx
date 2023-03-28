@@ -385,7 +385,7 @@ function TransactionSettingAlert({
               <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
               <TickerContainer>
                 {getTokenIcon()}
-                <Text>{type === 'STX' ? 'STX' : 'SATS'}</Text>
+                <Text>{type === 'STX' ? 'STX' : 'sats'}</Text>
               </TickerContainer>
             </InputContainer>
             <SelectorContainer>
