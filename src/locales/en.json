@@ -268,11 +268,11 @@
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Restore assets",
-    "DESCRIPTION": "If you accidentally sent ordinals or BTC to the wrong address, you may be able to recover those and send it to the right recipient.",
+    "DESCRIPTION": "If you sent Ordinals to your Bitcoin payment address or Bitcoin to your ordinals address, you can recover it and send it to the correct address.",
     "RECOVER_BTC": "Recover BTC",
-    "RECOVER_BTC_DESC": "BTC stuck on Ordinals address",
+    "RECOVER_BTC_DESC": "If you sent Bitcoin to your Ordinals address.",
     "RECOVER_ORDINALS": "Recover Ordinals",
-    "RECOVER_ORDINALS_DESC": "Ordinals stuck on BTC address"
+    "RECOVER_ORDINALS_DESC": "If you sent Ordinals to your Bitcoin payment address."
   },
   "RESTORE_BTC_SCREEN": {
     "TITLE": "Restore BTC",
@@ -289,8 +289,8 @@
     "TRANSFER": "Transfer",
     "BACK": "Back",
     "ORDINAL_ADDRESS": "Ordinal address",
-    "NO_FUNDS": "You don’t have any ordinals stored on your Bitcoin payment address.",
-    "DESCRIPTION": "You have ordinals that are stored on your Bitcoin payment (legacy) address. You can transfer them to your ordinals address so that they show up in your dashboard and can be used."
+    "NO_FUNDS": "You don’t have any Ordinals stored on your Bitcoin payment address.",
+    "DESCRIPTION": "You have Ordinals stored in your Bitcoin payment address. You can transfer them to your Ordinals address so that they show up in your collection."
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",
