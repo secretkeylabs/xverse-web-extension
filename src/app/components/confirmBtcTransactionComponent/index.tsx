@@ -202,7 +202,6 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     if (data) {
-      console.log('in btc ');
       setCurrentFee(data.fee);
       setSignedTx(data.signedTx);
       setOpenTransactionSettingModal(false);
