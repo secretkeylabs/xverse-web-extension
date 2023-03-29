@@ -36,8 +36,11 @@ export function acceptRequest(
   btcAddress: string,
   btcPublicKey: string,
   btcPrivateKey: string,
-  network: Network
+  network: NetworkType
 ) {
+  console.log(btcAddress)
+  console.log(btcPrivateKey)
+  console.log(btcPublicKey)
   return {
     type: actions.AcceptRequestKey,
     contractId,

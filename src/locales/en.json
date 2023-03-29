@@ -114,6 +114,14 @@
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive"
   },
+  "DLC_SCREEN": {
+    "SEND_TO_MAIN": "Send to Main",
+    "RECEIVE_FROM_MAIN": "Receive from Main",
+    "NO_DLC": "There is no contract to show!",
+    "ACCEPT": "Lock BTC",
+    "REJECT": "Reject Offer",
+    "BACK": "Back"
+  },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
     "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees"

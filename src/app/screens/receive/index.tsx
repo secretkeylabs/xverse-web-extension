@@ -11,14 +11,11 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
 import InfoContainer from '@components/infoContainer';
 import { useDispatch } from 'react-redux';
-import {
-  ChangeShowBtcReceiveAlertAction,
-  ChangeShowOrdinalReceiveAlertAction,
-} from '@stores/wallet/actions/actionCreators';
+import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 
 const OuterContainer = styled.div`
   display: flex;
-  flex: 1;
+  flex:1 ;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -103,7 +100,6 @@ function Receive(): JSX.Element {
   const {
     stxAddress,
     btcAddress,
-    dlcBtcAddress,
     ordinalsAddress,
     selectedAccount,
     showBtcReceiveAlert,
@@ -120,42 +116,39 @@ function Receive(): JSX.Element {
         return btcAddress;
       case 'FT':
         return stxAddress;
-      case 'BTC-DLC':
-        return dlcBtcAddress;
       case 'ORD':
         return ordinalsAddress;
       default:
         return '';
     }
   };
-
   const handleBackButtonClick = () => {
     navigate(-1);
   };
 
   const renderHeading = () => {
-    switch (currency) {
-      case 'BTC':
-        return <TopTitleText>{t('BTC_ADDRESS')}</TopTitleText>;
-      case 'STX':
-      case 'FT':
-        return <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>;
-      case 'BTC-DLC':
-        return <TopTitleText>{'DLC BTC ADDRESS'}</TopTitleText>;
-      case 'ORD':
-        return <TopTitleText>{t('ORDINAL_ADDRESS')}</TopTitleText>;
+    if (currency === 'BTC') {
+      return (
+        <TopTitleText>
+          {t('BTC_ADDRESS')}
+        </TopTitleText>
+      );
     }
+    if (currency === 'ORD') {
+      return (
+        <TopTitleText>
+          {t('ORDINAL_ADDRESS')}
+        </TopTitleText>
+      );
+    }
+    return <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>;
   };
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
     setAddressCopied(true);
-    if (currency === 'BTC' && showBtcReceiveAlert !== null) {
-      dispatch(ChangeShowBtcReceiveAlertAction(true));
-    }
-    if (currency === 'ORD' && showOrdinalReceiveAlert !== null) {
-      dispatch(ChangeShowOrdinalReceiveAlertAction(true));
-    }
+    if (currency === 'BTC' && showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
+    if (currency === 'ORD' && showOrdinalReceiveAlert !== null) { dispatch(ChangeShowOrdinalReceiveAlertAction(true)); }
   };
   return (
     <>
@@ -163,29 +156,30 @@ function Receive(): JSX.Element {
       <OuterContainer>
         <Container>
           {renderHeading()}
-          {!['BTC', 'ORD', 'BTC-DLC'].includes(currency!) && (
-            <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>
-          )}
+          {currency !== 'BTC' && currency !== 'ORD' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
           <QRCodeContainer>
             <QRCode value={getAddress()} size={150} />
           </QRCodeContainer>
 
-          {!['BTC', 'ORD', 'BTC-DLC'].includes(currency!) &&
-            !!selectedAccount?.bnsName && <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>}
+          {currency !== 'BTC' && currency !== 'ORD' && !!selectedAccount?.bnsName && (
+          <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
+          )}
           <AddressContainer>
-            <AddressText>{getAddress()}</AddressText>
+            <AddressText>
+              { getAddress() }
+            </AddressText>
           </AddressContainer>
         </Container>
         <CopyContainer>
-          {currency === 'ORD' && (
-            <InfoAlertContainer>
-              <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
-            </InfoAlertContainer>
+          { currency === 'ORD' && (
+          <InfoAlertContainer>
+            <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
+          </InfoAlertContainer>
           )}
-          {currency === 'BTC' && (
-            <InfoAlertContainer>
-              <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
-            </InfoAlertContainer>
+          { currency === 'BTC' && (
+          <InfoAlertContainer>
+            <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
+          </InfoAlertContainer>
           )}
           {addressCopied ? (
             <ActionButton
@@ -198,6 +192,7 @@ function Receive(): JSX.Element {
             <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
           )}
         </CopyContainer>
+
       </OuterContainer>
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />

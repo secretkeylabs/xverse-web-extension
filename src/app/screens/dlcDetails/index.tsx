@@ -12,32 +12,19 @@ import { StoreState } from '@stores/index';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import ActionButton from '@components/button';
-import { getBtcPrivateKey } from '@secretkeylabs/xverse-core';
 import AccountHeaderComponent from '@components/accountHeader';
 import BalanceCard from '@screens/home/balanceCard';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import { getBtcNativeSegwitPrivateKey } from '@secretkeylabs/xverse-core';
+import { useTranslation } from 'react-i18next';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  fles: 1;
+  flex: 1;
   margin-left: 16px;
   margin-right: 16px;
 `;
-
-const TestnetContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
-  paddingTop: props.theme.spacing(3),
-  paddingBottom: props.theme.spacing(3),
-}));
-
-const TestnetText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  textAlign: 'center',
-  color: props.theme.colors.white['200'],
-}));
 
 const ContractIdContainer = styled.h1((props) => ({
   ...props.theme.body_medium_m,
@@ -55,6 +42,12 @@ const RowContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
   paddingBottom: props.theme.spacing(8),
   borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
+}));
+
+const RowButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginTop: props.theme.spacing(11),
 }));
 
 const KeyContainer = styled.div({
@@ -92,9 +85,14 @@ const truncateContractID = (contractID: string) => {
 function DlcDetails() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation('translation', { keyPrefix: 'DLC_SCREEN' });
 
-  const { dlcBtcAddress, btcPublicKey, seedPhrase, btcBalance, network, selectedAccount } =
+
+  const { dlcBtcAddress, dlcBtcPublicKey, seedPhrase, btcBalance, network, selectedAccount } =
     useSelector((state: StoreState) => state.walletState);
+
+  const { isLoading: loadingBtcWalletData, refetch, isRefetching: refetchingBtcWalletData} =
+    useBtcWalletData();
 
   const {
     processing,
@@ -107,6 +105,8 @@ function DlcDetails() {
   } = useSelector((state: StoreState) => state.dlcState);
 
   const [canAccept, setCanAccept] = useState(false);
+  const [contractMaturityBound, setContractMaturityBound] = useState<string>();
+
 
   const defaultCounterpartyWalletURL = 'http://localhost:8085';
 
@@ -114,7 +114,9 @@ function DlcDetails() {
     const btcPrivateKey = await handlePrivateKey();
 
     if (selectedContract && currentId) {
-      dispatch(acceptRequest(currentId, dlcBtcAddress, btcPublicKey, btcPrivateKey, network.type));
+      dispatch(
+        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type)
+      );
     }
   }
 
@@ -130,7 +132,7 @@ function DlcDetails() {
   }
 
   async function handlePrivateKey() {
-    const btcPrivateKey = await getBtcPrivateKey({
+    const btcPrivateKey = await getBtcNativeSegwitPrivateKey({
       seedPhrase,
       index: BigInt(selectedAccount?.id ?? 0),
       network,
@@ -144,6 +146,10 @@ function DlcDetails() {
       signRequest(currentId as string, btcPrivateKey, network.type, defaultCounterpartyWalletURL)
     );
   }
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   useEffect(() => {
     if (error) {
@@ -161,6 +167,9 @@ function DlcDetails() {
     if (!selectedContract || !btcBalance) {
       return;
     }
+
+    const contractMaturityBound = new Date(selectedContract.contractMaturityBound).toLocaleString();
+    setContractMaturityBound(contractMaturityBound);
 
     const btcCollateralAmount =
       selectedContract.contractInfo.totalCollateral - selectedContract.offerParams.collateral;
@@ -187,15 +196,15 @@ function DlcDetails() {
 
   return (
     <>
-      {network.type === 'Testnet' && (
-        <TestnetContainer>
-          <TestnetText>{'Testnet'}</TestnetText>
-        </TestnetContainer>
-      )}
       <AccountHeaderComponent />
       {selectedContract !== undefined && (
         <Container>
-          <BalanceCard />
+          <BalanceCard
+            isLoading={
+              loadingBtcWalletData ||
+              refetchingBtcWalletData
+            }
+          />
           <ContractIdContainer>
             {truncateContractID(
               'id' in selectedContract ? selectedContract.id : selectedContract.temporaryContractId
@@ -214,7 +223,7 @@ function DlcDetails() {
               <TitleText>Available Amount:</TitleText>
             </KeyContainer>
             <ValueContainer>
-              <ValueText>{btcBalance.toString()}</ValueText>
+              <ValueText>{btcBalance.toString()} sats</ValueText>
             </ValueContainer>
           </RowContainer>
           <RowContainer>
@@ -222,7 +231,7 @@ function DlcDetails() {
               <TitleText>Total Collateral:</TitleText>
             </KeyContainer>
             <ValueContainer>
-              <ValueText>{selectedContract.contractInfo.totalCollateral}</ValueText>
+              <ValueText>{selectedContract.contractInfo.totalCollateral} sats</ValueText>
             </ValueContainer>
           </RowContainer>
           <RowContainer>
@@ -230,7 +239,7 @@ function DlcDetails() {
               <TitleText>Offer Collateral: </TitleText>
             </KeyContainer>
             <ValueContainer>
-              <ValueText>{selectedContract.offerParams.collateral}</ValueText>
+              <ValueText>{selectedContract.offerParams.collateral} sats</ValueText>
             </ValueContainer>
           </RowContainer>
           <RowContainer>
@@ -238,29 +247,29 @@ function DlcDetails() {
               <TitleText>Maturity Bound: </TitleText>
             </KeyContainer>
             <ValueContainer>
-              <ValueText>{selectedContract.contractMaturityBound}</ValueText>
+              <ValueText>{contractMaturityBound}</ValueText>
             </ValueContainer>
           </RowContainer>
-          <RowContainer>
+          <RowButtonContainer>
             {ContractState[selectedContract.state] === ContractState[1] && (
               <>
                 <ButtonContainer>
                   <ActionButton
-                    text={'Confirm'}
+                    text={t('ACCEPT')}
                     disabled={!canAccept}
                     processing={processing}
                     onPress={handleAccept}
                   />
                 </ButtonContainer>
                 <ButtonContainer>
-                  <ActionButton text={'Cancel'} transparent onPress={handleReject} />
+                  <ActionButton text={t('REJECT')} transparent onPress={handleReject} />
                 </ButtonContainer>
               </>
             )}
             <ButtonContainer>
-              <ActionButton text={'Back'} onPress={handleBack} />
+              <ActionButton text={t('BACK')} onPress={handleBack} />
             </ButtonContainer>
-          </RowContainer>
+          </RowButtonContainer>
         </Container>
       )}
     </>

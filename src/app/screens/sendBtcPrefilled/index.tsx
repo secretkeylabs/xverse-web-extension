@@ -12,8 +12,10 @@ import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
-import { SignedBtcTxResponse } from '@secretkeylabs/xverse-core/transactions/btc';
-import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
+import { SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
+import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import { ErrorCodes } from '@secretkeylabs/xverse-core';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 
 function SendBtcPrefilledScreen() {
   const location = useLocation();
@@ -22,23 +24,25 @@ function SendBtcPrefilledScreen() {
   if (location.state) {
     enteredAmountToSend = location.state.amount;
   }
-  const [error, setError] = useState('');
-  const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const dispatch = useDispatch();
   const {
     btcAddress,
     network,
     btcBalance,
     selectedAccount,
-    stxBtcRate,
     seedPhrase,
     btcFiatRate,
     dlcBtcAddress,
   } = useSelector((state: StoreState) => state.walletState);
+  const [amountError, setAmountError] = useState('');
+  const [addressError, setAddressError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState(
     r === 'nested' ? btcAddress : dlcBtcAddress
   );
+  const senderAddress = r === 'nested' ? dlcBtcAddress : btcAddress;
+  const [recipient, setRecipient] = useState<Recipient[]>();
+  const [amount, setAmount] = useState(enteredAmountToSend ?? '');
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  const { refetch } = useBtcWalletData();
 
   const navigate = useNavigate();
   const {
@@ -47,31 +51,22 @@ function SendBtcPrefilledScreen() {
     error: txError,
     mutate,
   } = useMutation<
-    SignedBtcTxResponse,
+    SignedBtcTx,
     Error,
     {
-      address: string;
-      amountToSend: string;
+      recipients: Recipient[];
     }
-  >(async ({ address, amountToSend }) =>
-    signBtcTransaction({
-      recipientAddress: address,
-      btcAddress: r === 'nested' ? dlcBtcAddress : btcAddress,
-      amount: amountToSend,
-      index: selectedAccount?.id ?? 0,
-      fee: undefined,
-      seedPhrase,
-      network: network.type,
-    })
+  >(async ({ recipients }) =>
+    signBtcTransaction(recipients, senderAddress, selectedAccount?.id ?? 0, seedPhrase, network.type)
   );
-
-  useEffect(() => {
-    dispatch(fetchBtcWalletDataRequestAction(r === 'nested' ? dlcBtcAddress : btcAddress, network.type, stxBtcRate, btcFiatRate));
-  }, []);
 
   const handleBackButtonClick = () => {
     navigate('/dlc-list');
   };
+
+  useEffect(() => {
+    refetch()
+  }, [])
 
   useEffect(() => {
     if (data) {
@@ -81,6 +76,7 @@ function SendBtcPrefilledScreen() {
           signedTxHex: data.signedTx,
           recipientAddress,
           amount,
+          recipient,
           fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
           fee: data.fee,
           fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
@@ -93,23 +89,32 @@ function SendBtcPrefilledScreen() {
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {
-      setError(txError.toString());
+      if (Number(txError) === ErrorCodes.InSufficientBalance) {
+        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setAmountError(txError.toString());
     }
   }, [txError]);
 
   function validateFields(address: string, amountToSend: string): boolean {
     if (!address) {
-      setError(t('ERRORS.ADDRESS_REQUIRED'));
+      setAddressError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
     }
 
     if (!amountToSend) {
-      setError(t('ERRORS.AMOUNT_REQUIRED'));
+      setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
       return false;
     }
 
     if (!validateBtcAddress({ btcAddress: address, network: network.type })) {
-      setError(t('ERRORS.ADDRESS_INVALID'));
+      setAddressError(t('ERRORS.ADDRESS_INVALID'));
+      return false;
+    }
+
+    if (address === senderAddress) {
+      setAddressError(t('ERRORS.SEND_TO_SELF'));
       return false;
     }
 
@@ -119,26 +124,26 @@ function SendBtcPrefilledScreen() {
       if (!Number.isNaN(Number(amountToSend))) {
         parsedAmount = new BigNumber(amountToSend);
       } else {
-        setError(t('ERRORS.INVALID_AMOUNT'));
+        setAmountError(t('ERRORS.INVALID_AMOUNT'));
         return false;
       }
     } catch (e) {
-      setError(t('ERRORS.INVALID_AMOUNT'));
+      setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
 
     if (parsedAmount.isZero()) {
-      setError(t('ERRORS.INVALID_AMOUNT'));
+      setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }
 
     if (btcToSats(parsedAmount).lt(BITCOIN_DUST_AMOUNT_SATS)) {
-      setError(t('ERRORS.BELOW_MINIMUM_AMOUNT'));
+      setAmountError(t('ERRORS.BELOW_MINIMUM_AMOUNT'));
       return false;
     }
 
     if (btcToSats(parsedAmount).gt(btcBalance)) {
-      setError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
       return false;
     }
     return true;
@@ -147,8 +152,15 @@ function SendBtcPrefilledScreen() {
   const handleNextClick = async (address: string, amountToSend: string) => {
     setRecipientAddress(address);
     setAmount(amountToSend);
+    const recipients: Recipient[] = [
+      {
+        address,
+        amountSats: btcToSats(new BigNumber(amountToSend)),
+      },
+    ];
+    setRecipient(recipients);
     if (validateFields(address, amountToSend)) {
-      mutate({ address, amountToSend });
+      mutate({ recipients });
     }
   };
 
@@ -161,14 +173,15 @@ function SendBtcPrefilledScreen() {
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
       <SendForm
         currencyType="BTC"
-        error={error}
+        amountError={amountError}
+        recepientError={addressError}
         balance={getBalance()}
         onPressSend={handleNextClick}
         recipient={recipientAddress}
         amountToSend={amount}
         processing={recipientAddress !== '' && amount !== '' && isLoading}
       />
-      <BottomBar tab="dashboard" />
+      <BottomBar tab="dlc" />
     </>
   );
 }

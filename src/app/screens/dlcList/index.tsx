@@ -12,7 +12,7 @@ import { handleContractRequest } from '@stores/dlc/actions/actionCreators';
 import ActionButton from '@components/button';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
-import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 
 const HeaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -24,6 +24,7 @@ const HeaderContainer = styled.div((props) => ({
 
 const TableContainer = styled.div((props) => ({
   display: 'flex',
+  flex: '2',
   flexDirection: 'column',
   marginLeft: '16px',
   marginRight: '16px',
@@ -32,21 +33,6 @@ const TableContainer = styled.div((props) => ({
   '&::-webkit-scrollbar': {
     display: 'none',
   },
-}));
-
-const TestnetContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
-  paddingTop: props.theme.spacing(3),
-  paddingBottom: props.theme.spacing(3),
-}));
-
-const TestnetText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  textAlign: 'center',
-  color: props.theme.colors.white['200'],
 }));
 
 const DlcTable = styled.table((props) => ({}));
@@ -70,6 +56,13 @@ const DlcTableHeaderDataWide = styled.th((props) => ({
   color: 'white',
 }));
 
+const RowButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginTop: props.theme.spacing(11),
+  marginBottom: props.theme.spacing(8)
+}));
+
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -91,16 +84,19 @@ const DlcInfoText = styled.h1((props) => ({
 }));
 
 function DlcList(): JSX.Element {
-  const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const { t } = useTranslation('translation', { keyPrefix: 'DLC_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { contracts } = useSelector((state: StoreState) => state.dlcState);
-  const { network, dlcBtcAddress, stxBtcRate, btcFiatRate } = useSelector(
-    (state: StoreState) => state.walletState
-  );
+
+  const {
+    isLoading: loadingBtcWalletData,
+    isRefetching: refetchingBtcWalletData,
+    refetch,
+  } = useBtcWalletData();
 
   useEffect(() => {
-    dispatch(fetchBtcWalletDataRequestAction(dlcBtcAddress, network.type, stxBtcRate, btcFiatRate));
+    refetch();
   }, []);
 
   useEffect(() => {
@@ -117,22 +113,17 @@ function DlcList(): JSX.Element {
 
   return (
     <>
-      {network.type === 'Testnet' && (
-        <TestnetContainer>
-          <TestnetText>{t('TESTNET')}</TestnetText>
-        </TestnetContainer>
-      )}
       <AccountHeaderComponent />
       <HeaderContainer>
-        <BalanceCard />
-        <RowContainer>
+        <BalanceCard isLoading={loadingBtcWalletData || refetchingBtcWalletData} />
+        <RowButtonContainer>
           <ButtonContainer>
-            <ActionButton src={ArrowUpRight} text={'Send'} onPress={onBTCSendClick} />
+            <ActionButton src={ArrowUpRight} text={t('SEND_TO_MAIN')} onPress={onBTCSendClick} />
           </ButtonContainer>
           <ButtonContainer>
-            <ActionButton src={ArrowDownLeft} text={'Receive'} onPress={onBTCReceiveClick} />
+            <ActionButton src={ArrowDownLeft} text={t('RECEIVE_FROM_MAIN')} onPress={onBTCReceiveClick} />
           </ButtonContainer>
-        </RowContainer>
+        </RowButtonContainer>
       </HeaderContainer>
       <TableContainer>
         {contracts.length !== 0 ? (
@@ -151,7 +142,7 @@ function DlcList(): JSX.Element {
           </DlcTable>
         ) : (
           <RowContainer>
-            <DlcInfoText>No DLCs to show!</DlcInfoText>
+            <DlcInfoText>{t('NO_DLC')}</DlcInfoText>
           </RowContainer>
         )}
       </TableContainer>

@@ -9,14 +9,18 @@ import {
   rejectRequest,
   signRequest,
 } from '@stores/dlc/actions/actionCreators';
+import { satsToBtc } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import ActionButton from '@components/button';
-import { getBtcPrivateKey } from '@secretkeylabs/xverse-core';
+import { getBtcNativeSegwitPrivateKey, getBtcPrivateKey } from '@secretkeylabs/xverse-core';
 import AccountHeaderComponent from '@components/accountHeader';
-import { fetchBtcWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
+import TokenImage from '@components/tokenImage';
+import BigNumber from 'bignumber.js';
+import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { NumericFormat } from 'react-number-format';
 
 const Container = styled.div`
   display: flex;
@@ -24,67 +28,98 @@ const Container = styled.div`
   flex: 1;
   margin-left: 16px;
   margin-right: 16px;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
-
-const TestnetContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
-  paddingTop: props.theme.spacing(3),
-  paddingBottom: props.theme.spacing(3),
-}));
-
-const TestnetText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  textAlign: 'center',
-  color: props.theme.colors.white['200'],
-}));
 
 const FunctionTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white['0'],
-  marginTop: 16,
+  marginTop: props.theme.spacing(8),
 }));
 
-const ContractIdContainer = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+const DappTitle = styled.h2((props) => ({
+  ...props.theme.body_l,
+  color: props.theme.colors.white['400'],
+  marginTop: props.theme.spacing(4),
+}));
+
+const AmountContainer = styled.div((props) => ({
+  display: 'flex',
+  width: '100%',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
   color: props.theme.colors.white['0'],
-  textAlign: 'center',
-  margin: props.theme.spacing(4),
-  backgroundColor: props.theme.colors.background.elevation6,
-  padding: props.theme.spacing(4),
-  borderRadius: '50px',
+  marginTop: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(4),
+  paddingBottom: props.theme.spacing(4),
+  paddingLeft: props.theme.spacing(16),
+  paddingRight: props.theme.spacing(16),
+  border: 'solid 1px',
+  borderRadius: '15px',
+  borderColor: props.theme.colors.background.elevation6,
+}));
+
+const TokenImageContainer = styled.div((props) => ({
+  paddingLeft: props.theme.spacing(8),
+  borderLeft: 'solid 1px',
+  borderColor: props.theme.colors.background.elevation6,
 }));
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
   marginTop: props.theme.spacing(8),
   paddingBottom: props.theme.spacing(8),
   borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
 }));
 
-const KeyContainer = styled.div({
-  display: 'flex',
-  flex: 1,
-});
+const AmountText = styled.h1((props) => ({
+  ...props.theme.body_bold_l,
+  textAlign: 'center',
+}));
 
-const ValueContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-end',
-});
+const CurrencyText = styled.h1((props) => ({
+  ...props.theme.body_xs,
+  marginTop: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(8),
+  marginLeft: props.theme.spacing(16),
+  color: props.theme.colors.white['200'],
+}));
+
+const AlertText = styled.i((props) => ({
+  textAlign: 'justify',
+  ...props.theme.body_xs,
+  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(4),
+  color: props.theme.colors.feedback.caution,
+}));
 
 const TitleText = styled.h1((props) => ({
+  ...props.theme.body_bold_m,
+  marginTop: props.theme.spacing(8),
+  color: props.theme.colors.white[0],
+}));
+
+const KeyText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['0'],
-  textTransform: 'uppercase',
+  color: props.theme.colors.white['200'],
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white['200'],
+}));
+
+const RowButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginTop: props.theme.spacing(11),
 }));
 
 const ButtonContainer = styled.div((props) => ({
@@ -93,28 +128,20 @@ const ButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(5),
 }));
 
-const DappTitle = styled.h2((props) => ({
-  ...props.theme.body_l,
-  color: props.theme.colors.white['400'],
-  marginTop: 4,
-}));
-
-const truncateContractID = (contractID: string) => {
-  return (
-    contractID.substring(0, 4) +
-    '...' +
-    contractID.substring(contractID.length - 4, contractID.length)
-  );
-};
-
 function DlcOfferRequest() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-
+  const { t } = useTranslation('translation', { keyPrefix: 'DLC_SCREEN' });
   const { offer } = useParams();
-  const { dlcBtcAddress, btcPublicKey, seedPhrase, btcBalance, network, selectedAccount, stxBtcRate, btcFiatRate } =
-    useSelector((state: StoreState) => state.walletState);
+  const {
+    dlcBtcAddress,
+    dlcBtcPublicKey,
+    seedPhrase,
+    btcBalance,
+    network,
+    selectedAccount,
+    btcFiatRate,
+  } = useSelector((state: StoreState) => state.walletState);
 
   const {
     processing,
@@ -126,6 +153,8 @@ function DlcOfferRequest() {
     selectedContract,
   } = useSelector((state: StoreState) => state.dlcState);
 
+  const [contractMaturityBound, setContractMaturityBound] = useState<string>();
+  const [usdEquivalent, setUsdEquivalent] = useState<string>();
   const [canAccept, setCanAccept] = useState(false);
 
   const defaultCounterpartyWalletURL = 'http://localhost:8085';
@@ -138,7 +167,9 @@ function DlcOfferRequest() {
     const btcPrivateKey = await handlePrivateKey();
 
     if (selectedContract && currentId) {
-      dispatch(acceptRequest(currentId, dlcBtcAddress, btcPublicKey, btcPrivateKey, network.type));
+      dispatch(
+        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type)
+      );
     }
   }
 
@@ -150,7 +181,7 @@ function DlcOfferRequest() {
   }
 
   async function handlePrivateKey() {
-    const btcPrivateKey = await getBtcPrivateKey({
+    const btcPrivateKey = await getBtcNativeSegwitPrivateKey({
       seedPhrase,
       index: BigInt(selectedAccount?.id ?? 0),
       network,
@@ -166,14 +197,27 @@ function DlcOfferRequest() {
   }
 
   useEffect(() => {
-    dispatch(fetchBtcWalletDataRequestAction(dlcBtcAddress, network.type, stxBtcRate, btcFiatRate));
-  }, [dlcBtcAddress]);
-
-  useEffect(() => {
     if (offer) {
       handleOffer(offer);
     }
   }, [offer]);
+
+  useEffect(() => {
+    if (!selectedContract || !btcBalance) {
+      return;
+    }
+    const contractMaturityBound = new Date(selectedContract.contractMaturityBound).toLocaleString();
+    setContractMaturityBound(contractMaturityBound);
+
+    const satsAmount = new BigNumber(selectedContract.contractInfo.totalCollateral);
+    const usdEquivalent = getBtcFiatEquivalent(satsAmount, btcFiatRate).toFixed(2).toString();
+    setUsdEquivalent(usdEquivalent);
+
+    const btcCollateralAmount =
+      selectedContract.contractInfo.totalCollateral - selectedContract.offerParams.collateral;
+    const canAccept = Number(btcBalance) >= btcCollateralAmount;
+    setCanAccept(canAccept);
+  }, [selectedContract, btcBalance]);
 
   useEffect(() => {
     if (error) {
@@ -186,18 +230,6 @@ function DlcOfferRequest() {
       console.log('Processing...');
     }
   }, [processing]);
-
-  useEffect(() => {
-    if (!selectedContract || !btcBalance) {
-      return;
-    }
-
-    const btcCollateralAmount =
-      selectedContract.contractInfo.totalCollateral - selectedContract.offerParams.collateral;
-    const canAccept = Number(btcBalance) >= btcCollateralAmount;
-
-    setCanAccept(canAccept);
-  }, [selectedContract, btcBalance]);
 
   useEffect(() => {
     if (signingRequested && actionSuccess) {
@@ -217,80 +249,53 @@ function DlcOfferRequest() {
 
   return (
     <>
-      {network.type === 'Testnet' && (
-        <TestnetContainer>
-          <TestnetText>{'Testnet'}</TestnetText>
-        </TestnetContainer>
-      )}
       <AccountHeaderComponent />
       {selectedContract !== undefined && (
         <Container>
-          <FunctionTitle>
-            Lock BTC
-          </FunctionTitle>
+          <FunctionTitle>Lock BTC</FunctionTitle>
           <DappTitle>by DLC.Link</DappTitle>
-          <ContractIdContainer>
-            {truncateContractID(
-              'id' in selectedContract ? selectedContract.id : selectedContract.temporaryContractId
-            )}
-          </ContractIdContainer>
+          <TitleText>Amount</TitleText>
+          <AmountContainer>
+            <AmountText>
+              {satsToBtc(new BigNumber(selectedContract.contractInfo.totalCollateral)).toString()} BTC
+            </AmountText>
+            <TokenImageContainer>
+              <TokenImage token={'BTC'} loading={false}></TokenImage>
+            </TokenImageContainer>
+          </AmountContainer>
+          <CurrencyText>
+            <NumericFormat
+              value={usdEquivalent}
+              displayType="text"
+              thousandSeparator
+              renderText={(value) => `~ $ ${value} USD`}
+            ></NumericFormat>
+          </CurrencyText>
           <RowContainer>
-            <KeyContainer>
-              <TitleText>State: </TitleText>
-            </KeyContainer>
-            <ValueContainer>
-              <ValueText>{ContractState[selectedContract.state]}</ValueText>
-            </ValueContainer>
+            <KeyText>Contract Expires: </KeyText>
+            <ValueText>{contractMaturityBound}</ValueText>
           </RowContainer>
-          <RowContainer>
-            <KeyContainer>
-              <TitleText>Available Amount:</TitleText>
-            </KeyContainer>
-            <ValueContainer>
-              <ValueText>{btcBalance.toString()}</ValueText>
-            </ValueContainer>
-          </RowContainer>
-          <RowContainer>
-            <KeyContainer>
-              <TitleText>Total Collateral:</TitleText>
-            </KeyContainer>
-            <ValueContainer>
-              <ValueText>{selectedContract.contractInfo.totalCollateral}</ValueText>
-            </ValueContainer>
-          </RowContainer>
-          <RowContainer>
-            <KeyContainer>
-              <TitleText>Offer Collateral: </TitleText>
-            </KeyContainer>
-            <ValueContainer>
-              <ValueText>{selectedContract.offerParams.collateral}</ValueText>
-            </ValueContainer>
-          </RowContainer>
-          <RowContainer>
-            <KeyContainer>
-              <TitleText>Maturity Bound: </TitleText>
-            </KeyContainer>
-            <ValueContainer>
-              <ValueText>{selectedContract.contractMaturityBound}</ValueText>
-            </ValueContainer>
-          </RowContainer>
-          <RowContainer>
+          <AlertText>
+            By signing the contract YOU AGREE TO LOCK YOUR BITCOIN with the Other Party into a
+            contract where it will remain until a triggering event will release it.
+          </AlertText>
+          <RowButtonContainer>
             {ContractState[selectedContract.state] === ContractState[1] && (
               <>
                 <ButtonContainer>
                   <ActionButton
-                    text={'Confirm'}
+                    text={t('ACCEPT')}
                     disabled={!canAccept}
                     processing={processing}
                     onPress={handleAccept}
                   />
                 </ButtonContainer>
                 <ButtonContainer>
-                  <ActionButton text={'Cancel'} transparent onPress={handleReject} />
+                  <ActionButton text={t('REJECT')} transparent onPress={handleReject} />
                 </ButtonContainer>
               </>
             )}
-          </RowContainer>
+          </RowButtonContainer>
         </Container>
       )}
     </>

@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import AddToken from '@assets/img/dashboard/add_token.svg';
@@ -133,11 +133,15 @@ function Home() {
   const [openBuyModal, setOpenBuyModal] = useState(false);
   const { coinsList, stxAddress, btcAddress, ordinalsAddress } = useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
-  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
+  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData, refetch } = useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
   useFeeMultipliers();
   useCoinRates();
 
+  useEffect(() => {
+    refetch();
+  }, [])
+  
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
   };
