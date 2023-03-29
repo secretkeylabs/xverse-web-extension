@@ -146,6 +146,7 @@ function RestoreBtc() {
           fee: ordinalsFee,
           fiatFee: getBtcFiatEquivalent(ordinalsFee!, btcFiatRate),
           isRestoreFundFlow: true,
+          unspentUtxos,
         },
       });
     }
