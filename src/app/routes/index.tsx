@@ -229,7 +229,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'dlc-offer-request/:offer',
+        path: 'dlc-offer-request/:offer/:counterpartyWalletUrl?',
         element: <DlcOfferRequest />,
       },
       {

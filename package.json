@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@react-spring/web": "^9.6.1",
+    "@redux-saga/core": "^1.2.3",
     "@secretkeylabs/xverse-core": "file:../xverse-core",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",

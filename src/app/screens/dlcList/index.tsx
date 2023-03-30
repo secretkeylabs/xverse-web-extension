@@ -14,26 +14,26 @@ import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 
-const HeaderContainer = styled.div`
+const HeaderContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: '1',
-  marginLeft: '16px',
-  marginRight: '16px',
-`;
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
+}));
 
-const TableContainer = styled.div`
+const TableContainer = styled.div((props) => ({
   display: 'flex',
   flex: '2',
   flexDirection: 'column',
-  marginLeft: '16px',
-  marginRight: '16px',
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
   position: 'relative',
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
     display: 'none',
   },
-`;
+}));
 
 const DlcTable = styled.table(() => ({}));
 

@@ -134,7 +134,10 @@ function DlcOfferRequest() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'DLC_SCREEN' });
-  const { offer } = useParams();
+  const { offer, counterpartyWalletUrl } = useParams();
+  // counterpartyWalletUrl param is disabled for demo purposes
+  // const [currentCounterpartyWalletUrl, setCurrentCounterpartyWalletUrl] =
+  //   useState<string>();
   const {
     dlcBtcAddress,
     dlcBtcPublicKey,
@@ -158,7 +161,6 @@ function DlcOfferRequest() {
   const [contractMaturityBound, setContractMaturityBound] = useState<string>();
   const [usdEquivalent, setUsdEquivalent] = useState<string>();
   const [canAccept, setCanAccept] = useState(false);
-
   const defaultCounterpartyWalletURL = 'http://localhost:8085';
 
   async function handlePrivateKey() {
@@ -179,7 +181,7 @@ function DlcOfferRequest() {
 
     if (selectedContract && currentId) {
       dispatch(
-        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type),
+        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type)
       );
     }
   }
@@ -209,7 +211,7 @@ function DlcOfferRequest() {
       return;
     }
     const updatedContractMaturityBound = new Date(
-      selectedContract.contractMaturityBound,
+      selectedContract.contractMaturityBound
     ).toLocaleString();
     setContractMaturityBound(updatedContractMaturityBound);
 
@@ -219,7 +221,8 @@ function DlcOfferRequest() {
       .toString();
     setUsdEquivalent(updatedUsdEquivalent);
 
-    const btcCollateralAmount = selectedContract.contractInfo.totalCollateral - selectedContract.offerParams.collateral;
+    const btcCollateralAmount =
+      selectedContract.contractInfo.totalCollateral - selectedContract.offerParams.collateral;
     const updatedCanAccept = Number(btcBalance) >= btcCollateralAmount;
     setCanAccept(updatedCanAccept);
   }, [selectedContract, btcBalance]);
@@ -244,9 +247,9 @@ function DlcOfferRequest() {
 
   useEffect(() => {
     if (
-      acceptMessageSubmitted
-      && actionSuccess
-      && selectedContract?.state === ContractState.Accepted
+      acceptMessageSubmitted &&
+      actionSuccess &&
+      selectedContract?.state === ContractState.Accepted
     ) {
       writeAndSignAcceptMessage();
     }

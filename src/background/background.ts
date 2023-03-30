@@ -44,6 +44,7 @@ export interface RequestInterface {
   action: 'dlc.offerRequest';
   data: {
     offer: string;
+    counterpartyWalletUrl: string;
   };
 }
 
@@ -55,10 +56,13 @@ chrome.runtime.onMessageExternal.addListener(async function (
   switch (request.action) {
     case 'dlc.offerRequest': {
       console.log('[BG script]: request.data:', request.data);
+      const offerURI = encodeURIComponent(JSON.stringify(request.data.offer));
+      const counterpartyWalletUrlURI = encodeURIComponent(
+        JSON.stringify(request.data.counterpartyWalletUrl)
+      );
+      const url = `/popup.html#${RequestsRoutes.DlcGetOfferRequest}/${offerURI}/${counterpartyWalletUrlURI}`;
       await popupCenter({
-        url: `/popup.html#${RequestsRoutes.DlcGetOfferRequest}/${encodeURIComponent(
-          JSON.stringify(request.data.offer)
-        )}`,
+        url,
       });
       break;
     }

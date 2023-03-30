@@ -1,17 +1,14 @@
 import ChromeStorage from '@utils/storage';
-import { createStore, combineReducers } from 'redux';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
+import DlcBitcoinBlockchain from 'app/dlcClasses/DlcBlockchain';
+import LocalRepository from 'app/dlcClasses/persistence/localRepository';
+import { ContractUpdater, DlcManager, DlcSigner } from 'dlc-lib';
+import DlcService from 'app/dlcClasses/DlcService';
+import createSagaMiddleware from '@redux-saga/core';
+import dlcReducer from './dlc/reducer';
 import walletReducer from './wallet/reducer';
 import NftDataStateReducer from './nftData/reducer';
-import dlcReducer from './dlc/reducer';
-import { DlcBitcoinBlockchain } from 'app/dlcClasses/DlcBlockchain';
-import { LocalRepository } from 'app/dlcClasses/persistence/localRepository';
-import { ContractUpdater } from 'dlc-lib';
-import { DlcManager } from 'dlc-lib';
-import { DlcService } from 'app/dlcClasses/DlcService';
-import { DlcSigner } from 'dlc-lib';
-import { applyMiddleware } from 'redux';
-import createSagaMiddleware from '@redux-saga/core';
 import rootSaga from './root/saga';
 
 export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
