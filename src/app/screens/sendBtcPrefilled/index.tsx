@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
@@ -12,8 +12,7 @@ import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
-import { SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
-import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import { SignedBtcTx, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes } from '@secretkeylabs/xverse-core';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 
@@ -36,7 +35,7 @@ function SendBtcPrefilledScreen() {
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState(
-    r === 'nested' ? btcAddress : dlcBtcAddress
+    r === 'nested' ? btcAddress : dlcBtcAddress,
   );
   const senderAddress = r === 'nested' ? dlcBtcAddress : btcAddress;
   const [recipient, setRecipient] = useState<Recipient[]>();
@@ -51,22 +50,20 @@ function SendBtcPrefilledScreen() {
     error: txError,
     mutate,
   } = useMutation<
-    SignedBtcTx,
-    Error,
-    {
-      recipients: Recipient[];
-    }
-  >(async ({ recipients }) =>
-    signBtcTransaction(recipients, senderAddress, selectedAccount?.id ?? 0, seedPhrase, network.type)
-  );
+  SignedBtcTx,
+  Error,
+  {
+    recipients: Recipient[];
+  }
+  >(async ({ recipients }) => signBtcTransaction(recipients, senderAddress, selectedAccount?.id ?? 0, seedPhrase, network.type));
 
   const handleBackButtonClick = () => {
     navigate('/dlc-list');
   };
 
   useEffect(() => {
-    refetch()
-  }, [])
+    refetch();
+  }, []);
 
   useEffect(() => {
     if (data) {

@@ -14,15 +14,15 @@ import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 
-const HeaderContainer = styled.div((props) => ({
+const HeaderContainer = styled.div`
   display: 'flex',
   flexDirection: 'column',
   flex: '1',
   marginLeft: '16px',
   marginRight: '16px',
-}));
+`;
 
-const TableContainer = styled.div((props) => ({
+const TableContainer = styled.div`
   display: 'flex',
   flex: '2',
   flexDirection: 'column',
@@ -33,11 +33,11 @@ const TableContainer = styled.div((props) => ({
   '&::-webkit-scrollbar': {
     display: 'none',
   },
-}));
+`;
 
-const DlcTable = styled.table((props) => ({}));
+const DlcTable = styled.table(() => ({}));
 
-const DlcTableHeaderRow = styled.tr((props) => ({
+const DlcTableHeaderRow = styled.tr(() => ({
   width: '100%',
   height: 64,
 }));
@@ -60,7 +60,7 @@ const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.spacing(11),
-  marginBottom: props.theme.spacing(8)
+  marginBottom: props.theme.spacing(8),
 }));
 
 const RowContainer = styled.div((props) => ({
@@ -121,7 +121,11 @@ function DlcList(): JSX.Element {
             <ActionButton src={ArrowUpRight} text={t('SEND_TO_MAIN')} onPress={onBTCSendClick} />
           </ButtonContainer>
           <ButtonContainer>
-            <ActionButton src={ArrowDownLeft} text={t('RECEIVE_FROM_MAIN')} onPress={onBTCReceiveClick} />
+            <ActionButton
+              src={ArrowDownLeft}
+              text={t('RECEIVE_FROM_MAIN')}
+              onPress={onBTCReceiveClick}
+            />
           </ButtonContainer>
         </RowButtonContainer>
       </HeaderContainer>
@@ -135,9 +139,7 @@ function DlcList(): JSX.Element {
               <DlcTableHeaderDataNarrow>Funding TX</DlcTableHeaderDataNarrow>
             </DlcTableHeaderRow>
             {contracts.map((contract) => (
-              <>
-                <DlcTableElement key={contract.temporaryContractId} contract={contract} />
-              </>
+              <DlcTableElement key={contract.temporaryContractId} contract={contract} />
             ))}
           </DlcTable>
         ) : (

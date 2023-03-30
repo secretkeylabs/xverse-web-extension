@@ -1,3 +1,4 @@
+import { getId } from 'dlc-lib';
 import {
   DlcActions,
   DlcState,
@@ -13,7 +14,6 @@ import {
   UpdateKey,
   SelectKey,
 } from './actions/types';
-import { getId } from 'dlc-lib';
 
 const initialDlcState: DlcState = {
   contracts: [],
@@ -27,7 +27,7 @@ const initialDlcState: DlcState = {
 const dlcReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: DlcState = initialDlcState,
-  action: DlcActions
+  action: DlcActions,
 ): DlcState => {
   switch (action.type) {
     case ContractRequestKey:
@@ -41,7 +41,9 @@ const dlcReducer = (
         error: action.error,
       };
     case OfferRequestKey:
-      return { ...state, processing: true, acceptMessageSubmitted: false, signingRequested: false };
+      return {
+        ...state, processing: true, acceptMessageSubmitted: false, signingRequested: false,
+      };
     case AcceptRequestKey:
       return { ...state, processing: true, acceptMessageSubmitted: true };
     case RejectRequestKey:
@@ -53,9 +55,8 @@ const dlcReducer = (
       const newContracts = [...state.contracts];
       // NOTE: This is what fails. Contract ID is born in the dlcAPI.acceptContract call in the saga file. So our tempID is no longer found in the array so things break.
       const contractIndex = state.contracts.findIndex(
-        (c) =>
-          getId(c) === getId(updatedContract) ||
-          c.temporaryContractId === updatedContract.temporaryContractId
+        (c) => getId(c) === getId(updatedContract)
+        || c.temporaryContractId === updatedContract.temporaryContractId,
       );
       if (contractIndex >= 0) newContracts[contractIndex] = updatedContract;
       else newContracts.push(updatedContract);
@@ -70,7 +71,7 @@ const dlcReducer = (
       return newState;
     }
     case ActionErrorKey: {
-      const error = action.error;
+      const { error } = action;
       let newContracts = state.contracts;
       const updatedContract = error.contract;
       if (updatedContract) {
@@ -97,7 +98,7 @@ const dlcReducer = (
       return { ...state, contracts: newContracts };
     }
     case SelectKey: {
-      const contract = action.contract;
+      const { contract } = action;
       return {
         ...state,
         selectedContract: contract,

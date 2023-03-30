@@ -10,13 +10,13 @@ import {
 
 const contractBucketTag = 'contractBucket';
 
-
 // This class implements the storage interfaces using the window's local storage.
-export class LocalRepository implements ContractRepository {
+// eslint-disable-next-line
+class LocalRepository implements ContractRepository {
   readonly _db: Storage;
 
   constructor() {
-    this._db = window.localStorage;
+    this._db = window.localStorage; // eslint-disable-line no-underscore-dangle
   }
 
   createContract(contract: AnyContract): Promise<void> {
@@ -45,12 +45,12 @@ export class LocalRepository implements ContractRepository {
   }
 
   async hasContract(contractId: string): Promise<boolean> {
-    const res = this._db.getItem(contractId);
+    const res = this._db.getItem(contractId); // eslint-disable-line no-underscore-dangle
     return Promise.resolve(res != null);
   }
 
   private async getBucketKeys(bucketTag: string): Promise<string[]> {
-    const res = this._db.getItem(bucketTag);
+    const res = this._db.getItem(bucketTag); // eslint-disable-line no-underscore-dangle
     if (res != null) return res.split(',');
 
     return [];
@@ -63,10 +63,10 @@ export class LocalRepository implements ContractRepository {
 
     if (index === -1) {
       keyList.push(key);
-      this._db.setItem(bucketTag, keyList.join(','));
+      this._db.setItem(bucketTag, keyList.join(',')); // eslint-disable-line no-underscore-dangle
     }
 
-    this._db.setItem(key, value);
+    this._db.setItem(key, value); // eslint-disable-line no-underscore-dangle
     return Promise.resolve();
   }
 
@@ -84,11 +84,11 @@ export class LocalRepository implements ContractRepository {
     keyList.splice(index, 1);
 
     if (keyList.length === 0) {
-      this._db.removeItem(bucketTag);
+      this._db.removeItem(bucketTag); // eslint-disable-line no-underscore-dangle
     } else {
-      this._db.setItem(bucketTag, keyList.join(','));
+      this._db.setItem(bucketTag, keyList.join(',')); // eslint-disable-line no-underscore-dangle
     }
-    this._db.removeItem(key);
+    this._db.removeItem(key); // eslint-disable-line no-underscore-dangle
     return Promise.resolve();
   }
 
@@ -99,7 +99,7 @@ export class LocalRepository implements ContractRepository {
     const ret: {
       [key: string]: string;
     } = {};
-    for (const key of keyList) {
+    for (const key of keyList) { 
       ret[key] = this._db.getItem(key);
     }
     return Promise.resolve(ret);
@@ -130,7 +130,7 @@ export class LocalRepository implements ContractRepository {
   }
 
   private async getValue(key: string): Promise<string> {
-    const res = this._db.getItem(key);
+    const res = this._db.getItem(key); // eslint-disable-line no-underscore-dangle
     if (res != null) {
       return Promise.resolve(res);
     }
@@ -151,3 +151,5 @@ export class LocalRepository implements ContractRepository {
     return !states || states.includes(contract.state);
   }
 }
+
+export default LocalRepository;

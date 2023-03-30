@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 // import ContractDetailTemplate from '../../templates/ContractDetailTemplate';
 import { useNavigate } from 'react-router-dom';
 import { ContractState } from 'dlc-lib';
@@ -78,21 +78,20 @@ const ButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(5),
 }));
 
-const truncateContractID = (contractID: string) => {
-  return `${contractID.slice(0, 4)}...${contractID.slice(-4)}`;
-};
+const truncateContractID = (contractID: string) => `${contractID.slice(0, 4)}...${contractID.slice(-4)}`;
 
 function DlcDetails() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'DLC_SCREEN' });
 
+  const {
+    dlcBtcAddress, dlcBtcPublicKey, seedPhrase, btcBalance, network, selectedAccount,
+  } = useSelector((state: StoreState) => state.walletState);
 
-  const { dlcBtcAddress, dlcBtcPublicKey, seedPhrase, btcBalance, network, selectedAccount } =
-    useSelector((state: StoreState) => state.walletState);
-
-  const { isLoading: loadingBtcWalletData, refetch, isRefetching: refetchingBtcWalletData} =
-    useBtcWalletData();
+  const {
+    isLoading: loadingBtcWalletData, refetch, isRefetching: refetchingBtcWalletData,
+  } = useBtcWalletData();
 
   const {
     processing,
@@ -107,15 +106,23 @@ function DlcDetails() {
   const [canAccept, setCanAccept] = useState(false);
   const [contractMaturityBound, setContractMaturityBound] = useState<string>();
 
-
   const defaultCounterpartyWalletURL = 'http://localhost:8085';
+
+  async function handlePrivateKey() {
+    const btcPrivateKey = await getBtcNativeSegwitPrivateKey({
+      seedPhrase,
+      index: BigInt(selectedAccount?.id ?? 0),
+      network,
+    });
+    return btcPrivateKey;
+  }
 
   async function handleAccept(): Promise<void> {
     const btcPrivateKey = await handlePrivateKey();
 
     if (selectedContract && currentId) {
       dispatch(
-        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type)
+        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type),
       );
     }
   }
@@ -131,19 +138,10 @@ function DlcDetails() {
     navigate('/dlc-list');
   }
 
-  async function handlePrivateKey() {
-    const btcPrivateKey = await getBtcNativeSegwitPrivateKey({
-      seedPhrase,
-      index: BigInt(selectedAccount?.id ?? 0),
-      network,
-    });
-    return btcPrivateKey;
-  }
-
   async function writeAndSignAcceptMessage(): Promise<void> {
     const btcPrivateKey = await handlePrivateKey();
     dispatch(
-      signRequest(currentId as string, btcPrivateKey, network.type, defaultCounterpartyWalletURL)
+      signRequest(currentId as string, btcPrivateKey, network.type, defaultCounterpartyWalletURL),
     );
   }
 
@@ -168,27 +166,25 @@ function DlcDetails() {
       return;
     }
 
-    const contractMaturityBound = new Date(selectedContract.contractMaturityBound).toLocaleString();
-    setContractMaturityBound(contractMaturityBound);
+    const updatedContractMaturityBound = new Date(selectedContract.contractMaturityBound).toLocaleString();
+    setContractMaturityBound(updatedContractMaturityBound);
 
-    const btcCollateralAmount =
-      selectedContract.contractInfo.totalCollateral - selectedContract.offerParams.collateral;
-    const canAccept = Number(btcBalance) >= btcCollateralAmount;
-
-    setCanAccept(canAccept);
+    const btcCollateralAmount = selectedContract.contractInfo.totalCollateral - selectedContract.offerParams.collateral;
+    const updatedCanAccept = Number(btcBalance) >= btcCollateralAmount;
+    setCanAccept(updatedCanAccept);
   }, [selectedContract, btcBalance]);
 
   useEffect(() => {
     if (signingRequested && actionSuccess) {
-      navigate(`/`);
+      navigate('/');
     }
   }, [signingRequested, actionSuccess]);
 
   useEffect(() => {
     if (
-      acceptMessageSubmitted &&
-      actionSuccess &&
-      selectedContract?.state === ContractState.Accepted
+      acceptMessageSubmitted
+      && actionSuccess
+      && selectedContract?.state === ContractState.Accepted
     ) {
       writeAndSignAcceptMessage();
     }
@@ -201,13 +197,13 @@ function DlcDetails() {
         <Container>
           <BalanceCard
             isLoading={
-              loadingBtcWalletData ||
-              refetchingBtcWalletData
+              loadingBtcWalletData
+              || refetchingBtcWalletData
             }
           />
           <ContractIdContainer>
             {truncateContractID(
-              'id' in selectedContract ? selectedContract.id : selectedContract.temporaryContractId
+              'id' in selectedContract ? selectedContract.id : selectedContract.temporaryContractId,
             )}
           </ContractIdContainer>
           <RowContainer>
@@ -223,7 +219,10 @@ function DlcDetails() {
               <TitleText>Available Amount:</TitleText>
             </KeyContainer>
             <ValueContainer>
-              <ValueText>{btcBalance.toString()} sats</ValueText>
+              <ValueText>
+                {btcBalance.toString()}
+                sats
+              </ValueText>
             </ValueContainer>
           </RowContainer>
           <RowContainer>
@@ -231,7 +230,10 @@ function DlcDetails() {
               <TitleText>Total Collateral:</TitleText>
             </KeyContainer>
             <ValueContainer>
-              <ValueText>{selectedContract.contractInfo.totalCollateral} sats</ValueText>
+              <ValueText>
+                {selectedContract.contractInfo.totalCollateral}
+                sats
+              </ValueText>
             </ValueContainer>
           </RowContainer>
           <RowContainer>
@@ -239,7 +241,10 @@ function DlcDetails() {
               <TitleText>Offer Collateral: </TitleText>
             </KeyContainer>
             <ValueContainer>
-              <ValueText>{selectedContract.offerParams.collateral} sats</ValueText>
+              <ValueText>
+                {selectedContract.offerParams.collateral}
+                sats
+              </ValueText>
             </ValueContainer>
           </RowContainer>
           <RowContainer>
@@ -247,7 +252,9 @@ function DlcDetails() {
               <TitleText>Maturity Bound: </TitleText>
             </KeyContainer>
             <ValueContainer>
-              <ValueText>{contractMaturityBound}</ValueText>
+              <ValueText>
+                {contractMaturityBound}
+              </ValueText>
             </ValueContainer>
           </RowContainer>
           <RowButtonContainer>
@@ -258,16 +265,16 @@ function DlcDetails() {
                     text={t('ACCEPT')}
                     disabled={!canAccept}
                     processing={processing}
-                    onPress={handleAccept}
+                    onPress={() => handleAccept()}
                   />
                 </ButtonContainer>
                 <ButtonContainer>
-                  <ActionButton text={t('REJECT')} transparent onPress={handleReject} />
+                  <ActionButton text={t('REJECT')} transparent onPress={() => handleReject()} />
                 </ButtonContainer>
               </>
             )}
             <ButtonContainer>
-              <ActionButton text={t('BACK')} onPress={handleBack} />
+              <ActionButton text={t('BACK')} onPress={() => handleBack()} />
             </ButtonContainer>
           </RowButtonContainer>
         </Container>

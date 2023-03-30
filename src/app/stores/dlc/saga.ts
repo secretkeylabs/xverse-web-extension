@@ -1,4 +1,8 @@
-import { all, call, fork, put, takeEvery, getContext } from 'redux-saga/effects';
+import {
+  call, put, takeEvery, getContext,
+} from 'redux-saga/effects';
+import { AnyContract } from 'dlc-lib';
+import { DlcAPI } from 'dlc-lib/src/interfaces';
 import {
   AcceptRequest,
   AcceptRequestKey,
@@ -16,8 +20,6 @@ import {
   actionSuccess,
   actionError,
 } from './actions/actionCreators';
-import { AnyContract } from 'dlc-lib';
-import { DlcAPI } from 'dlc-lib/src/interfaces';
 
 function* handleContracts() {
   try {
@@ -42,18 +44,17 @@ function* handleOffer(action: OfferRequest) {
 function* handleAccept(action: AcceptRequest) {
   try {
     const dlcService: DlcAPI = yield getContext('dlcService');
-    const answer = yield call(
-      [dlcService, dlcService.acceptContract],
+    const answer = yield call([dlcService, dlcService.acceptContract],
       action.contractId,
       action.btcAddress,
       action.btcPublicKey,
       action.btcPrivateKey,
-      action.network
+      action.network,
     );
     yield put(actionSuccess(answer));
   } catch (err) {
     yield put(
-      actionError({ error: `HandleAccept Effect Failure: ${err}`, contractID: action.contractId })
+      actionError({ error: `HandleAccept Effect Failure: ${err}`, contractID: action.contractId }),
     );
   }
 }
@@ -65,7 +66,7 @@ function* handleReject(action: RejectRequest) {
     yield put(actionSuccess(answer));
   } catch (err) {
     yield put(
-      actionError({ error: 'HandleReject Effect Failure.', contractID: action.contractId })
+      actionError({ error: 'HandleReject Effect Failure.', contractID: action.contractId }),
     );
   }
 }
@@ -73,18 +74,17 @@ function* handleReject(action: RejectRequest) {
 function* handleSign(action: SignRequest) {
   try {
     const dlcService: DlcAPI = yield getContext('dlcService');
-    console.log('handleSign', action.counterpartyWalletURL)
     const answer = (yield call(
       [dlcService, dlcService.processContractSign],
       action.contractId,
       action.btcPrivateKey,
       action.btcNetwork,
-      action.counterpartyWalletURL
+      action.counterpartyWalletURL,
     )) as AnyContract;
     yield put(actionSuccess(answer));
   } catch (err) {
     yield put(
-      actionError({ error: `HandleSign Effect Failure.` })
+      actionError({ error: 'HandleSign Effect Failure.' }),
     );
   }
 }

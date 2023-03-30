@@ -111,9 +111,9 @@ function BtcRecipientComponent({
   return (
     <Container>
       {recipientIndex && totalRecipient && (
-        <RecipientTitleText>{`${t(
-          'RECIPIENT'
-        )} ${recipientIndex}/${totalRecipient}`}</RecipientTitleText>
+        <RecipientTitleText>
+          {`${t('RECIPIENT')} ${recipientIndex}/${totalRecipient}`}
+        </RecipientTitleText>
       )}
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       <RowContainer>
