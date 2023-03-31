@@ -11,13 +11,20 @@ export const useBtcWalletData = () => {
   const dispatch = useDispatch();
   const { btcAddress, dlcBtcAddress, network } = useWalletSelector();
   const location = useLocation();
-  const address = ['/dlc-list', '/dlc-offer-request', '/dlc-details', '/send-btc-prefilled/nested'].includes(location.pathname) ? dlcBtcAddress : btcAddress
+  const address = [
+    '/dlc-list',
+    '/dlc-offer-request',
+    '/dlc-details',
+    '/send-btc-prefilled/nested',
+  ].includes(location.pathname)
+    ? dlcBtcAddress
+    : btcAddress;
 
   const fetchBtcWalletData = async () => {
     try {
       const btcData: BtcAddressData = await getBtcWalletData(address, network.type);
-      console.log("🚀 ~ file: useBtcWalletData.ts:16 ~ fetchBtcWalletData ~ btcData:", btcData)
-      
+      console.log('🚀 ~ file: useBtcWalletData.ts:16 ~ fetchBtcWalletData ~ btcData:', btcData);
+
       const btcBalance = new BigNumber(btcData.finalBalance);
       dispatch(SetBtcWalletDataAction(btcBalance));
       return btcData;

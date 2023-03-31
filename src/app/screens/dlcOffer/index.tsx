@@ -161,8 +161,7 @@ function DlcOfferRequest() {
   const [contractMaturityBound, setContractMaturityBound] = useState<string>();
   const [usdEquivalent, setUsdEquivalent] = useState<string>();
   const [canAccept, setCanAccept] = useState(false);
-  const defaultCounterpartyWalletURL = 'http://localhost:8085';
-
+  
   async function handlePrivateKey() {
     const btcPrivateKey = await getBtcNativeSegwitPrivateKey({
       seedPhrase,
@@ -196,7 +195,7 @@ function DlcOfferRequest() {
   async function writeAndSignAcceptMessage(): Promise<void> {
     const btcPrivateKey = await handlePrivateKey();
     if (currentId) {
-      dispatch(signRequest(currentId, btcPrivateKey, network.type, defaultCounterpartyWalletURL));
+      dispatch(signRequest(currentId, btcPrivateKey, network.type, counterpartyWalletUrl!));
     }
   }
 
