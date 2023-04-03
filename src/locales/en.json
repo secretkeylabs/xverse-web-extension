@@ -22,6 +22,7 @@
     "ACCOUNT_NAME": "Account",
     "RECEIVE": "Receive",
     "SEND": "Send",
+    "SWAP": "Swap",
     "BUY": "Buy",
     "MANAGE_TOKEN": "Manage token list",
     "STACKS_AND_TOKEN": "Stacks, tokens and NFTs",

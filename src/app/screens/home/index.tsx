@@ -12,6 +12,7 @@ import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
+import Swap from '@assets/img/dashboard/swap.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
@@ -34,6 +35,7 @@ import useAppConfig from '@hooks/queries/useAppConfig';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import BalanceCard from './balanceCard';
+import SquareButton from './squareButton';
 
 const Container = styled.div`
   display: flex;
@@ -100,11 +102,7 @@ const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.spacing(11),
-}));
-
-const ButtonContainer = styled.div((props) => ({
-  width: '100%',
-  marginRight: props.theme.spacing(5),
+  columnGap: props.theme.spacing(11),
 }));
 
 const TokenListButtonContainer = styled.div((props) => ({
@@ -133,8 +131,10 @@ function Home() {
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
   const { coinsList, stxAddress, btcAddress, ordinalsAddress } = useWalletSelector();
-  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
-  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
+  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
+    useStxWalletData();
+  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
+    useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
   useFeeMultipliers();
   useCoinRates();
@@ -204,7 +204,7 @@ function Home() {
     navigate('/buy/BTC');
   };
 
-  const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined }) => {
+  const handleTokenPressed = (token: { coin: CurrencyTypes; ft: string | undefined }) => {
     navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
   };
 
@@ -242,7 +242,6 @@ function Home() {
           <Icon src={MiaToken} />
           <Icon src={AddToken} />
         </IconRow>
-
       </ReceiveCardComponent>
     </ReceiveContainer>
   );
@@ -251,17 +250,19 @@ function Home() {
     <>
       <AccountHeaderComponent />
       <Container>
-        <BalanceCard isLoading={(loadingStxWalletData || loadingBtcWalletData) || (refetchingStxWalletData || refetchingBtcWalletData)} />
+        <BalanceCard
+          isLoading={
+            loadingStxWalletData ||
+            loadingBtcWalletData ||
+            refetchingStxWalletData ||
+            refetchingBtcWalletData
+          }
+        />
         <RowButtonContainer>
-          <ButtonContainer>
-            <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
-          </ButtonContainer>
-          <ButtonContainer>
-            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
-          </ButtonContainer>
-          <ButtonContainer>
-            <ActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
-          </ButtonContainer>
+          <SquareButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
+          <SquareButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
+          <SquareButton src={Swap} text={t('SWAP')} onPress={() => alert('wip')} />
+          <SquareButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
         </RowButtonContainer>
 
         <TokenListButtonContainer>
