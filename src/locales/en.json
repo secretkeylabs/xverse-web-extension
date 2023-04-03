@@ -557,5 +557,8 @@
     "SKIP_BUTTON": "Do it later",
     "CONFIRM_BUTTON": "Confirm",
     "CLOSE_TAB": "Continue"
+  },
+  "SWAP_SCREEN": {
+    "SWAP": "Swap"
   }
 }

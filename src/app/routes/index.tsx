@@ -53,6 +53,7 @@ import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
 import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
+import SwapScreen from '@screens/swap';
 
 const router = createHashRouter([
   {
@@ -111,6 +112,10 @@ const router = createHashRouter([
       {
         path: 'send-btc',
         element: <SendBtcScreen />,
+      },
+      {
+        path: 'swap',
+        element: <SwapScreen />,
       },
       {
         path: 'confirm-stx-tx',

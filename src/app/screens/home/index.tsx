@@ -12,7 +12,6 @@ import Swap from '@assets/img/swap/swap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
-import SmallActionButton from '@components/smallActionButton';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import useAppConfig from '@hooks/queries/useAppConfig';
@@ -32,6 +31,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
 import BalanceCard from './balanceCard';
+import SquareButton from './squareButton';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 
@@ -253,6 +253,10 @@ function Home() {
     navigate('/receive/ORD');
   };
 
+  const onSwapPressed = () => {
+    navigate('/swap');
+  };
+
   const receiveContent = (
     <ReceiveContainer>
       <ReceiveCardComponent
@@ -297,22 +301,10 @@ function Home() {
           }
         />
         <RowButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
-          </ButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton
-              src={ArrowDownLeft}
-              text={t('RECEIVE')}
-              onPress={onReceiveModalOpen}
-            />
-          </ButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton src={Swap} text={t('SWAP')} onPress={() => alert('wip')} />
-          </ButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
-          </ButtonContainer>
+          <SquareButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
+          <SquareButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
+          <SquareButton src={Swap} text={t('SWAP')} onPress={onSwapPressed} />
+          <SquareButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
         </RowButtonContainer>
 
         <ColumnContainer>
