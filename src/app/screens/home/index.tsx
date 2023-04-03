@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
+import Swap from '@assets/img/dashboard/swap.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
@@ -11,7 +12,6 @@ import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
-import SmallActionButton from '@components/smallActionButton';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import useAppConfig from '@hooks/queries/useAppConfig';
@@ -36,6 +36,7 @@ import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } 
 import BalanceCard from './balanceCard';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
+import SquareButton from './squareButton';
 
 const Container = styled.div`
   display: flex;
@@ -101,6 +102,7 @@ const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.spacing(11),
+  columnGap: props.theme.spacing(11),
 }));
 
 const ButtonContainer = styled.div((props) => ({
@@ -299,19 +301,10 @@ function Home() {
           }
         />
         <RowButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
-          </ButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton
-              src={ArrowDownLeft}
-              text={t('RECEIVE')}
-              onPress={onReceiveModalOpen}
-            />
-          </ButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
-          </ButtonContainer>
+          <SquareButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
+          <SquareButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
+          <SquareButton src={Swap} text={t('SWAP')} onPress={() => alert('wip')} />
+          <SquareButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
         </RowButtonContainer>
 
         <ColumnContainer>
