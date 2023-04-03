@@ -8,6 +8,7 @@ import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import OrdinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import Swap from '@assets/img/swap/swap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
@@ -30,9 +31,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
-import AlertMessage from '@components/alertMessage';
-import { useDispatch } from 'react-redux';
-import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import BalanceCard from './balanceCard';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
@@ -105,6 +103,7 @@ const RowButtonContainer = styled.div((props) => ({
 
 const ButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(11),
+  columnGap: props.theme.spacing(11),
 }));
 
 const TokenListButtonContainer = styled.div((props) => ({
@@ -130,7 +129,6 @@ function Home() {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
@@ -308,6 +306,9 @@ function Home() {
               text={t('RECEIVE')}
               onPress={onReceiveModalOpen}
             />
+          </ButtonContainer>
+          <ButtonContainer>
+            <SmallActionButton src={Swap} text={t('SWAP')} onPress={() => alert('wip')} />
           </ButtonContainer>
           <ButtonContainer>
             <SmallActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
