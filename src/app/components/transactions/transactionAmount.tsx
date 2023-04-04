@@ -41,7 +41,7 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
     if (transaction.txType === 'contract_call') {
       if (transaction.tokenType === 'fungible') {
         const token = coinsList?.find(
-          (cn) => cn.principal === transaction.contractCall?.contract_id,
+          (cn) => cn.principal === transaction.contractCall?.contract_id
         );
         const prefix = transaction.incoming ? '' : '-';
         return (
@@ -51,7 +51,9 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
             thousandSeparator
             prefix={prefix}
             renderText={(value: string) => (
-              <TransactionValue>{`${value} ${getFtTicker(token as FungibleToken)?.toUpperCase()}`}</TransactionValue>
+              <TransactionValue>{`${value} ${getFtTicker(
+                token as FungibleToken
+              )?.toUpperCase()}`}</TransactionValue>
             )}
           />
         );

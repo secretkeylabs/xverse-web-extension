@@ -19,10 +19,8 @@ import useNetworkSelector from '@hooks/useNetwork';
 function SendStxScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const {
-    stxAddress, stxAvailableBalance, stxPublicKey, feeMultipliers, network,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
+  const { stxAddress, stxAvailableBalance, stxPublicKey, feeMultipliers, network } = useSelector(
+    (state: StoreState) => state.walletState
   );
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
@@ -39,12 +37,10 @@ function SendStxScreen() {
     amountToSend = location.state.amountToSend;
     stxMemo = location.state.stxMemo;
   }
-  const {
-    isLoading, data, mutate,
-  } = useMutation<
-  StacksTransaction,
-  Error,
-  { associatedAddress: string; amount: string; memo?: string }
+  const { isLoading, data, mutate } = useMutation<
+    StacksTransaction,
+    Error,
+    { associatedAddress: string; amount: string; memo?: string }
   >(async ({ associatedAddress, amount, memo }) => {
     const unsignedSendStxTx: StacksTransaction = await generateUnsignedStxTokenTransferTransaction(
       associatedAddress,
@@ -52,10 +48,11 @@ function SendStxScreen() {
       memo!,
       stxPendingTxData?.pendingTransactions ?? [],
       stxPublicKey,
-      selectedNetwork,
+      selectedNetwork
     );
     // increasing the fees with multiplication factor
-    const fee: bigint = BigInt(unsignedSendStxTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
+    const fee: bigint =
+      BigInt(unsignedSendStxTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
     if (feeMultipliers?.stxSendTxMultiplier) {
       unsignedSendStxTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
     }

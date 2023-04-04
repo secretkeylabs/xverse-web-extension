@@ -15,13 +15,13 @@ export const useCoinsData = () => {
     try {
       const fungibleTokenList: Array<FungibleToken> = await getFtData(
         stxAddress,
-        currentNetworkInstance,
+        currentNetworkInstance
       );
       const visibleCoins: FungibleToken[] | null = coinsList;
       if (visibleCoins) {
         visibleCoins.forEach((visibleCoin) => {
           const coinToBeUpdated = fungibleTokenList.find(
-            (ft) => ft.principal === visibleCoin.principal,
+            (ft) => ft.principal === visibleCoin.principal
           );
           if (coinToBeUpdated) coinToBeUpdated.visible = visibleCoin.visible;
           else if (visibleCoin.visible) {
@@ -71,7 +71,7 @@ export const useCoinsData = () => {
       });
       const sortedFtList: FungibleToken[] = [...supportedFts, ...unSupportedFts];
       dispatch(setCoinDataAction(sortedFtList, coinsReponse));
-      return { sortedFtList, coinsReponse};
+      return { sortedFtList, coinsReponse };
     } catch (error: any) {
       return Promise.reject(error);
     }

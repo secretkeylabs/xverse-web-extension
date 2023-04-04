@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StacksNetwork, validateStxAddress } from '@secretkeylabs/xverse-core';
-import {
-  fetchAddressOfBnsName, getBnsName,
-} from '@secretkeylabs/xverse-core/api';
+import { fetchAddressOfBnsName, getBnsName } from '@secretkeylabs/xverse-core/api';
 import useWalletSelector from '../useWalletSelector';
 import useNetworkSelector from '../useNetwork';
 
@@ -22,7 +20,7 @@ export const useBnsName = (walletAddress: string, network: StacksNetwork) => {
 export const useBNSResolver = (
   recipientAddress: string,
   walletAddress: string,
-  currencyType: string,
+  currencyType: string
 ) => {
   const { network } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
@@ -35,7 +33,7 @@ export const useBNSResolver = (
           const address = await fetchAddressOfBnsName(
             recipientAddress.toLocaleLowerCase(),
             walletAddress.toLocaleLowerCase(),
-            selectedNetwork,
+            selectedNetwork
           );
           setAssociatedAddress(address ?? '');
         } else {

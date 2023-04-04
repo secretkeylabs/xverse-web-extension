@@ -1,9 +1,6 @@
 import { SignPsbtRequestEventDetails } from './../common/types/inpage-types';
 import { BitcoinProvider, GetAddressResponse } from 'sats-connect';
-import {
-  DomEventName,
-  GetAddressRequestEventDetails,
-} from '@common/types/inpage-types';
+import { DomEventName, GetAddressRequestEventDetails } from '@common/types/inpage-types';
 import {
   ExternalSatsMethods,
   GetAddressResponseMessage,

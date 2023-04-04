@@ -7,12 +7,7 @@ interface Props {
 }
 function StxPostConditionCard({ postCondition }: Props) {
   const amount = getAmountFromPostCondition(postCondition) ?? '';
-  return (
-    <PostConditionsView
-      postCondition={postCondition}
-      amount={amount}
-    />
-  );
+  return <PostConditionsView postCondition={postCondition} amount={amount} />;
 }
 
 export default StxPostConditionCard;

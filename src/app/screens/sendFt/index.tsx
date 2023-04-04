@@ -10,19 +10,15 @@ import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import { StoreState } from '@stores/index';
-import {
-  convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot,
-} from '@utils/helper';
+import { convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 import useNetworkSelector from '@hooks/useNetwork';
 
 function SendFtScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const {
-    stxAddress, stxPublicKey, network, feeMultipliers,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
+  const { stxAddress, stxPublicKey, network, feeMultipliers } = useSelector(
+    (state: StoreState) => state.walletState
   );
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
@@ -44,9 +40,9 @@ function SendFtScreen() {
     stxMemo = location.state.stxMemo;
   }
   const { isLoading, data, mutate } = useMutation<
-  StacksTransaction,
-  Error,
-  { associatedAddress: string; amount: string; memo?: string }
+    StacksTransaction,
+    Error,
+    { associatedAddress: string; amount: string; memo?: string }
   >(async ({ associatedAddress, amount, memo }) => {
     let convertedAmount = amount;
     if (fungibleToken?.decimals) {
@@ -129,10 +125,7 @@ function SendFtScreen() {
       return false;
     }
 
-    if (
-      fungibleToken?.decimals
-        && amount.split('.')[1]?.length > fungibleToken.decimals
-    ) {
+    if (fungibleToken?.decimals && amount.split('.')[1]?.length > fungibleToken.decimals) {
       setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }

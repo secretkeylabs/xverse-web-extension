@@ -110,9 +110,7 @@ function SignatureRequest(): JSX.Element {
   const [showHash, setShowHash] = useState(false);
   const { selectedAccount, accountsList, network } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
-  const {
-    messageType, request, payload, tabId, domain,
-  } = useSignatureRequest();
+  const { messageType, request, payload, tabId, domain } = useSignatureRequest();
   const navigate = useNavigate();
   const switchAccountBasedOnRequest = () => {
     if (getNetworkType(payload.network) !== network.type) {
@@ -189,21 +187,21 @@ function SignatureRequest(): JSX.Element {
       <MainContainer>
         <RequestImage src={SignatureIcon} alt="Signature" width={80} />
         <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
-        <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
+        <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${
+          payload.appDetails?.name
+        }`}</RequestSource>
         {isUtf8Message(messageType) && (
-          <SignatureRequestMessage
-            request={payload as SignaturePayload}
-          />
+          <SignatureRequestMessage request={payload as SignaturePayload} />
         )}
         {isStructuredMessage(messageType) && (
-          <SignatureRequestStructuredData
-            payload={payload as StructuredDataSignaturePayload}
-          />
+          <SignatureRequestStructuredData payload={payload as StructuredDataSignaturePayload} />
         )}
         <ShowHashButtonContainer>
           <Seperator />
           <ShowHashButton onClick={handleShowHash}>
-            {showHash ? t('SIGNATURE_REQUEST.HIDE_HASH_BUTTON') : t('SIGNATURE_REQUEST.SHOW_HASH_BUTTON')}
+            {showHash
+              ? t('SIGNATURE_REQUEST.HIDE_HASH_BUTTON')
+              : t('SIGNATURE_REQUEST.SHOW_HASH_BUTTON')}
             <img src={showHash ? Minus : Plus} alt="Show" />
           </ShowHashButton>
           <Seperator />

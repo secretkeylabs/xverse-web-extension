@@ -103,7 +103,8 @@ function ChangeNetworkScreen() {
     setIsChangingNetwork(true);
     const response = await isValidURL(url);
     if (response) {
-      const networkObject = changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
+      const networkObject =
+        changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
       await changeNetwork(changedNetwork, networkObject, url);
       navigate('/settings');
     } else {
@@ -138,7 +139,12 @@ function ChangeNetworkScreen() {
         <ErrorMessage>{error}</ErrorMessage>
       </Container>
       <ButtonContainer>
-        <ActionButton text={t('SAVE')} onPress={onSubmit} processing={isChangingNetwork} disabled={isChangingNetwork} />
+        <ActionButton
+          text={t('SAVE')}
+          onPress={onSubmit}
+          processing={isChangingNetwork}
+          disabled={isChangingNetwork}
+        />
       </ButtonContainer>
 
       <BottomBar tab="settings" />

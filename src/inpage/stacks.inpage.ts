@@ -26,31 +26,32 @@ interface ExtensionResponse {
 
 const callAndReceive = async (
   methodName: CallableMethods | 'getURL',
-  opts: any = {},
-): Promise<ExtensionResponse> => new Promise((resolve, reject) => {
-  const timeout = setTimeout(() => {
-    reject(new Error('Unable to get response from xverse extension'));
-  }, 1000);
-  const waitForResponse = (event: MessageEvent) => {
-    if (
-      event.data.source === 'xverse-extension'
-        && event.data.method === `${methodName}Response`
-    ) {
-      clearTimeout(timeout);
-      window.removeEventListener('message', waitForResponse);
-      resolve(event.data);
-    }
-  };
-  window.addEventListener('message', waitForResponse);
-  window.postMessage(
-    {
-      method: methodName,
-      source: 'xverse-app',
-      ...opts,
-    },
-    window.location.origin,
-  );
-});
+  opts: any = {}
+): Promise<ExtensionResponse> =>
+  new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Unable to get response from xverse extension'));
+    }, 1000);
+    const waitForResponse = (event: MessageEvent) => {
+      if (
+        event.data.source === 'xverse-extension' &&
+        event.data.method === `${methodName}Response`
+      ) {
+        clearTimeout(timeout);
+        window.removeEventListener('message', waitForResponse);
+        resolve(event.data);
+      }
+    };
+    window.addEventListener('message', waitForResponse);
+    window.postMessage(
+      {
+        method: methodName,
+        source: 'xverse-app',
+        ...opts,
+      },
+      window.location.origin
+    );
+  });
 
 const isValidEvent = (event: MessageEvent, method: LegacyMessageToContentScript['method']) => {
   const { data } = event;
@@ -69,7 +70,7 @@ const StacksMethodsProvider: StacksProvider = {
       DomEventName.structuredDataSignatureRequest,
       {
         detail: { signatureRequest },
-      },
+      }
     );
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
@@ -114,7 +115,7 @@ const StacksMethodsProvider: StacksProvider = {
       DomEventName.authenticationRequest,
       {
         detail: { authenticationRequest },
-      },
+      }
     );
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {

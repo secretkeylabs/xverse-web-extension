@@ -6,9 +6,7 @@ import { NumericFormat } from 'react-number-format';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { useSelector } from 'react-redux';
 import BigNumber from 'bignumber.js';
-import {
-  animated, config, useSpring,
-} from '@react-spring/web';
+import { animated, config, useSpring } from '@react-spring/web';
 import { StoreState } from '@stores/index';
 import TransferDetailView from '@components/transferDetailView';
 
@@ -98,16 +96,20 @@ interface Props {
   icon: string;
   isExpanded?: boolean;
   onArrowClick: () => void;
-
 }
 
 function TransferAmountComponent({
-  title, address, value, subValue, description, icon, isExpanded = false, onArrowClick,
+  title,
+  address,
+  value,
+  subValue,
+  description,
+  icon,
+  isExpanded = false,
+  onArrowClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const {
-    fiatCurrency,
-  } = useSelector((state: StoreState) => state.walletState);
+  const { fiatCurrency } = useSelector((state: StoreState) => state.walletState);
 
   const slideInStyles = useSpring({
     config: { ...config.gentle, duration: 400 },
@@ -152,7 +154,7 @@ function TransferAmountComponent({
   return (
     <Container>
       <RowContainer>
-        {icon && !isExpanded && <Icon src={icon} /> }
+        {icon && !isExpanded && <Icon src={icon} />}
         <TitleText>{title}</TitleText>
         <ColumnContainer isExpanded={isExpanded}>
           {!isExpanded && renderAmount}
@@ -163,20 +165,18 @@ function TransferAmountComponent({
       </RowContainer>
 
       {isExpanded && (
-      <ExpandedContainer style={slideInStyles}>
-        <DescriptionText>{description}</DescriptionText>
-        <RowContainer>
-          <Icon src={icon} />
-          <TitleText>{t('AMOUNT')}</TitleText>
-          <ColumnContainer isExpanded={isExpanded}>
-            {renderAmount}
-          </ColumnContainer>
-        </RowContainer>
-        {/* <FromContainer>
+        <ExpandedContainer style={slideInStyles}>
+          <DescriptionText>{description}</DescriptionText>
+          <RowContainer>
+            <Icon src={icon} />
+            <TitleText>{t('AMOUNT')}</TitleText>
+            <ColumnContainer isExpanded={isExpanded}>{renderAmount}</ColumnContainer>
+          </RowContainer>
+          {/* <FromContainer>
           <DescriptionText>{t('FROM')}</DescriptionText>
           <TransferDetailView icon={AddressIcon} title={t('YOUR_ADDRESS')} address={address} />
       </FromContainer> */}
-      </ExpandedContainer>
+        </ExpandedContainer>
       )}
     </Container>
   );

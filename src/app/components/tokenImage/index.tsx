@@ -43,16 +43,13 @@ const TickerIconText = styled.h1((props) => ({
 }));
 
 export default function TokenImage(props: TokenImageProps) {
-  const {
-    token,
-    loading,
-    fungibleToken,
-  } = props;
+  const { token, loading, fungibleToken } = props;
 
   const getCoinIcon = useCallback(() => {
     if (token === 'STX') {
       return IconStacks;
-    } if (token === 'BTC') {
+    }
+    if (token === 'BTC') {
       return IconBitcoin;
     }
   }, [token]);
@@ -80,7 +77,5 @@ export default function TokenImage(props: TokenImageProps) {
       </LoaderImageContainer>
     );
   }
-  return (
-    <TickerImage src={getCoinIcon()} />
-  );
+  return <TickerImage src={getCoinIcon()} />;
 }

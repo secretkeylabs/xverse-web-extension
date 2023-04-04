@@ -96,11 +96,18 @@ function StartStacking() {
         </Container>
         <StackingInfoContainer>
           <ColumnContainer>
-            <StackingInfoTile title={t('APY')} value={pool ? `${pool?.estimated_yield}%` : undefined} />
+            <StackingInfoTile
+              title={t('APY')}
+              value={pool ? `${pool?.estimated_yield}%` : undefined}
+            />
             <StackingInfoTile title={t('MINIMUM_AMOUNT')} value={`${getMinimum()} STX`} />
           </ColumnContainer>
           <ColumnContainer>
-            <StackingInfoTile title={t('POOL_FEE')} value={pool ? `${pool?.fee_percent}%` : undefined} color={theme.colors.feedback.success} />
+            <StackingInfoTile
+              title={t('POOL_FEE')}
+              value={pool ? `${pool?.fee_percent}%` : undefined}
+              color={theme.colors.feedback.success}
+            />
             <StackingInfoTile title={t('REWARD_CYCLES')} value={`${getCycles()}`} />
           </ColumnContainer>
         </StackingInfoContainer>
@@ -110,7 +117,6 @@ function StartStacking() {
         <ActionButton src={ArrowSquareOut} text={t('START_STACKING')} onPress={handleOnClick} />
       </ButtonContainer>
     </>
-
   );
 }
 

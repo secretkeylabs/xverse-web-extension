@@ -178,7 +178,11 @@ function Login(): JSX.Element {
         </PasswordInputContainer>
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <ButtonContainer>
-          <ActionButton onPress={handleVerifyPassword} text={t('VERIFY_PASSWORD_BUTTON')} processing={isVerifying} />
+          <ActionButton
+            onPress={handleVerifyPassword}
+            text={t('VERIFY_PASSWORD_BUTTON')}
+            processing={isVerifying}
+          />
         </ButtonContainer>
         <ForgotPasswordButton onClick={handleForgotPassword}>
           {t('FORGOT_PASSWORD_BUTTON')}

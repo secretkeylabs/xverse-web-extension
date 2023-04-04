@@ -56,7 +56,7 @@ interface SettingComponentProps {
   showDivider?: boolean;
   showWarningTitle?: boolean;
   toggle?: boolean;
-  toggleValue? :boolean;
+  toggleValue?: boolean;
   toggleFunction?: () => void;
 }
 
@@ -89,14 +89,14 @@ function SettingComponent({
         {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
         {icon && <img src={icon} alt="arrow icon" />}
         {toggle && toggleFunction && (
-        <Switch
-          onColor={theme.colors.action.classic}
-          offColor={theme.colors.background.elevation3}
-          onChange={toggleFunction}
-          checked={toggleValue!}
-          uncheckedIcon={false}
-          checkedIcon={false}
-        />
+          <Switch
+            onColor={theme.colors.action.classic}
+            offColor={theme.colors.background.elevation3}
+            onChange={toggleFunction}
+            checked={toggleValue!}
+            uncheckedIcon={false}
+            checkedIcon={false}
+          />
         )}
       </Button>
     </ColumnContainer>

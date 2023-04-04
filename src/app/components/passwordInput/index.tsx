@@ -15,14 +15,14 @@ interface PasswordInputProps {
   handleContinue: () => void;
   handleBack: () => void;
   passwordError?: string;
-  checkPasswordStrength? : boolean;
-  stackButtonAlignment? : boolean;
+  checkPasswordStrength?: boolean;
+  stackButtonAlignment?: boolean;
   loading?: boolean;
 }
 
 interface StrengthBarProps {
-  strengthColor:string
-  strengthWidth: string
+  strengthColor: string;
+  strengthWidth: string;
 }
 
 const Container = styled.div({
@@ -166,7 +166,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
   const theme = useTheme();
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>(
-    PasswordStrength.EMPTY,
+    PasswordStrength.EMPTY
   );
   const [error, setError] = useState<string>(passwordError ?? '');
   const transition = useTransition(passwordStrength, {
@@ -180,7 +180,11 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   useEffect(() => {
     const keyDownHandler = (event) => {
-      if (event.key === 'Enter' && enteredPassword && enteredPassword.length > PasswordStrength.WEAK) {
+      if (
+        event.key === 'Enter' &&
+        enteredPassword &&
+        enteredPassword.length > PasswordStrength.WEAK
+      ) {
         event.preventDefault();
         handleContinue();
       }
@@ -192,8 +196,14 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
   }, [enteredPassword]);
 
   useEffect(() => {
-    if (passwordError) { setError(passwordError); return; }
-    if (enteredPassword && enteredPassword.length <= PasswordStrength.WEAK) { setError(t('PASSWORD_STRENGTH_ERROR')); return; }
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+    if (enteredPassword && enteredPassword.length <= PasswordStrength.WEAK) {
+      setError(t('PASSWORD_STRENGTH_ERROR'));
+      return;
+    }
     setError('');
   }, [passwordError, enteredPassword]);
 
@@ -280,12 +290,15 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         <HeaderText>{title}</HeaderText>
       </HeaderContainer>
       <PasswordInputLabel>{inputLabel}</PasswordInputLabel>
-      <PasswordInputContainer hasError={!!error || (enteredPassword !== '' && enteredPassword.length <= PasswordStrength.WEAK)}>
+      <PasswordInputContainer
+        hasError={
+          !!error || (enteredPassword !== '' && enteredPassword.length <= PasswordStrength.WEAK)
+        }
+      >
         <Input
           type={isPasswordVisible ? 'text' : 'password'}
           value={enteredPassword}
           onChange={handlePasswordChange}
-
         />
         <Button onClick={handleTogglePasswordView}>
           <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
@@ -295,11 +308,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
       {checkPasswordStrength ? renderStrengthBar() : null}
       <ButtonsContainer stackButtonAlignment={stackButtonAlignment} ifError={error !== ''}>
         <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
-          <ActionButton
-            text={t('BACK_BUTTON')}
-            onPress={handleBack}
-            transparent
-          />
+          <ActionButton text={t('BACK_BUTTON')} onPress={handleBack} transparent />
         </ButtonContainer>
         <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
           <ActionButton

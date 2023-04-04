@@ -13,10 +13,7 @@ import Seperator from '@components/seperator';
 import { useContext } from 'react';
 import { ShowMoreContext } from '@components/transactionsRequests/ContractCallRequest';
 import RedirectAddressView from '@components/redirectAddressView';
-import {
-  getNameFromPostCondition,
-  getSymbolFromPostCondition,
-} from './helper';
+import { getNameFromPostCondition, getSymbolFromPostCondition } from './helper';
 
 const MainContainer = styled.div({
   display: 'flex',
@@ -77,7 +74,8 @@ function PostConditionsView({ postCondition, amount }: Props) {
   const title = getTitleFromConditionCode(postCondition.conditionCode) || '';
   const ticker = getSymbolFromPostCondition(postCondition);
   const name = getNameFromPostCondition(postCondition);
-  const contractName = 'contractName' in postCondition.principal && postCondition.principal.contractName.content;
+  const contractName =
+    'contractName' in postCondition.principal && postCondition.principal.contractName.content;
   const address = addressToString(postCondition?.principal?.address!);
   const isSending = address === stxAddress;
   const isContractPrincipal = !!contractName || address.includes('.');
@@ -94,17 +92,19 @@ function PostConditionsView({ postCondition, amount }: Props) {
         <TickerText>{`${amount} ${ticker}`}</TickerText>
         {name !== 'STX' && <TickerText>{name}</TickerText>}
         {showMore && (
-        <>
-          <RedirectAddressView
-            recipient={`${address}${contractName ? `.${contractName}` : ''}`}
-            title={`${isContractPrincipal
-              ? t('CONTRACT_ADDRESS')
-              : isSending
-                ? t('MY_ADDRESS')
-                : t('RECIPIENT_ADDRESS')}`}
-          />
-          <Seperator />
-        </>
+          <>
+            <RedirectAddressView
+              recipient={`${address}${contractName ? `.${contractName}` : ''}`}
+              title={`${
+                isContractPrincipal
+                  ? t('CONTRACT_ADDRESS')
+                  : isSending
+                  ? t('MY_ADDRESS')
+                  : t('RECIPIENT_ADDRESS')
+              }`}
+            />
+            <Seperator />
+          </>
         )}
       </PostConditionContainer>
     </MainContainer>

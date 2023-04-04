@@ -32,7 +32,7 @@ function getOriginFromPort(port: chrome.runtime.Port) {
 
 function makeSearchParamsWithDefaults(
   port: chrome.runtime.Port,
-  otherParams: [string, string][] = [],
+  otherParams: [string, string][] = []
 ) {
   const urlParams = new URLSearchParams();
   // All actions must have a corresponding `origin` and `tabId`
@@ -91,7 +91,7 @@ async function triggerRequstWindowOpen(path: RequestsRoutes, urlParams: URLSearc
 
 export async function handleLegacyExternalMethodFormat(
   message: LegacyMessageFromContentScript | SatsConnectMessageFromContentScript,
-  port: chrome.runtime.Port,
+  port: chrome.runtime.Port
 ) {
   const { payload } = message;
   switch (message.method) {

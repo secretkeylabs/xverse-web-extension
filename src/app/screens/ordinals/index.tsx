@@ -45,8 +45,12 @@ const GridItemContainer = styled.button<GridContainerProps>((props) => ({
   padding: props.showBorder ? props.theme.spacing(7) : 0,
   marginBottom: props.theme.spacing(16),
   borderRadius: props.theme.radius(3),
-  background: props.showBorder ? 'linear-gradient(27.88deg, #1D2032 0%, rgba(29, 32, 50, 0) 100%)' : 'transparent',
-  border: props.showBorder ? ` 1px solid ${props.theme.colors.background.elevation2}` : 'transparent',
+  background: props.showBorder
+    ? 'linear-gradient(27.88deg, #1D2032 0%, rgba(29, 32, 50, 0) 100%)'
+    : 'transparent',
+  border: props.showBorder
+    ? ` 1px solid ${props.theme.colors.background.elevation2}`
+    : 'transparent',
 }));
 
 function Ordinal({ asset }: Props) {
@@ -56,13 +60,11 @@ function Ordinal({ asset }: Props) {
   const { ordinalsData } = useNftDataSelector();
   const [ordinalData, setOrdinalData] = useState<OrdinalInfo>();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const {
-    data: ordinalDetailsData,
-    mutate,
-  } = useMutation<
-  OrdinalInfo | undefined,
-  Error,
-  { ordinalId: string }>(async ({ ordinalId }) => getOrdinalInfo(ordinalId));
+  const { data: ordinalDetailsData, mutate } = useMutation<
+    OrdinalInfo | undefined,
+    Error,
+    { ordinalId: string }
+  >(async ({ ordinalId }) => getOrdinalInfo(ordinalId));
   useEffect(() => {
     const ordinalMetaData = ordinalsData.find((ordinal) => ordinal?.metadata?.id === asset?.id);
     if (!ordinalMetaData && asset?.id) {
@@ -86,7 +88,7 @@ function Ordinal({ asset }: Props) {
 
   return (
     <GridItemContainer onClick={handleOnClick} showBorder={isGalleryOpen}>
-      { isGalleryOpen ? (
+      {isGalleryOpen ? (
         <NftImageContainer>
           <OrdinalImage isNftDashboard ordinal={ordinalData!} />
         </NftImageContainer>

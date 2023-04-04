@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 
 interface SignatureRequestMessageProps {
-  request: SignaturePayload,
+  request: SignaturePayload;
 }
 
 const ContentContainer = styled.div({
@@ -31,9 +31,7 @@ const RequestMessage = styled.p((props) => ({
 
 export default function SignatureRequestMessage(props: SignatureRequestMessageProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
-  const {
-    request,
-  } = props;
+  const { request } = props;
 
   return (
     <ContentContainer>

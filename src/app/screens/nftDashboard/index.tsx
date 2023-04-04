@@ -43,7 +43,9 @@ const GridContainer = styled.div<GridContainerProps>((props) => ({
   columnGap: props.theme.spacing(8),
   rowGap: props.theme.spacing(6),
   marginTop: props.theme.spacing(14),
-  gridTemplateColumns: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'repeat(auto-fill,minmax(150px,1fr))',
+  gridTemplateColumns: props.isGalleryOpen
+    ? 'repeat(auto-fill,minmax(300px,1fr))'
+    : 'repeat(auto-fill,minmax(150px,1fr))',
   gridTemplateRows: props.isGalleryOpen ? 'repeat(minmax(300px,1fr))' : 'minmax(150px,220px)',
 }));
 
@@ -203,22 +205,17 @@ function NftDashboard() {
     return response;
   }, [ordinalsAddress]);
 
-  const {
-    isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
-  } = useInfiniteQuery(
-    [`nft-meta-data${stxAddress}`],
-    fetchNfts,
-    {
+  const { isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch } =
+    useInfiniteQuery([`nft-meta-data${stxAddress}`], fetchNfts, {
       keepPreviousData: false,
       getNextPageParam: (lastpage, pages) => {
-        const currentLength = pages.map(((page) => page.nftsList)).flat().length;
+        const currentLength = pages.map((page) => page.nftsList).flat().length;
         if (currentLength < lastpage.total) {
           return currentLength;
         }
         return false;
       },
-    },
-  );
+    });
 
   const { data: ordinals } = useQuery({
     queryKey: [`ordinals-${ordinalsAddress}`],
@@ -267,39 +264,30 @@ function NftDashboard() {
     setOpenReceiveModal(false);
   };
 
-  const nftListView = (
+  const nftListView =
     totalNfts === 0 && ordinalsLength === 0 ? (
-      <NoCollectiblesText>
-        {t('NO_COLLECTIBLES')}
-      </NoCollectiblesText>
+      <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>
     ) : (
       <>
         <GridContainer isGalleryOpen={isGalleryOpen}>
-          { hasActivatedOrdinalsKey && ordinals?.map((ordinal) => (
-            <Ordinal asset={ordinal} key={ordinal.id} />
-          ))}
-          { nfts?.map((nft) => (
+          {hasActivatedOrdinalsKey &&
+            ordinals?.map((ordinal) => <Ordinal asset={ordinal} key={ordinal.id} />)}
+          {nfts?.map((nft) => (
             <Nft asset={nft} key={nft.asset_identifier} />
           ))}
         </GridContainer>
-        {hasNextPage && (isFetchingNextPage
-          ? (
+        {hasNextPage &&
+          (isFetchingNextPage ? (
             <LoadMoreButtonContainer>
               <MoonLoader color="white" size={30} />
             </LoadMoreButtonContainer>
-          )
-          : (
+          ) : (
             <LoadMoreButtonContainer>
-              <LoadMoreButton onClick={onLoadMoreButtonClick}>
-                {t('LOAD_MORE')}
-              </LoadMoreButton>
+              <LoadMoreButton onClick={onLoadMoreButtonClick}>{t('LOAD_MORE')}</LoadMoreButton>
             </LoadMoreButtonContainer>
-          )
-        )}
+          ))}
       </>
-
-    )
-  );
+    );
 
   const onSharePress = () => {
     setShowNftOptions(true);
@@ -326,15 +314,15 @@ function NftDashboard() {
   return (
     <>
       {showActivateOrdinalsAlert && (
-      <AlertMessage
-        title={t('ACTIVATE_ORDINALS')}
-        description={t('ACTIVATE_ORDINALS_INFO')}
-        buttonText={t('DENY')}
-        onClose={onActivateOrdinalsAlertCrossPress}
-        secondButtonText={t('ACTIVATE')}
-        onButtonClick={onActivateOrdinalsAlertDenyPress}
-        onSecondButtonClick={onActivateOrdinalsAlertActivatePress}
-      />
+        <AlertMessage
+          title={t('ACTIVATE_ORDINALS')}
+          description={t('ACTIVATE_ORDINALS_INFO')}
+          buttonText={t('DENY')}
+          onClose={onActivateOrdinalsAlertCrossPress}
+          secondButtonText={t('ACTIVATE')}
+          onButtonClick={onActivateOrdinalsAlertDenyPress}
+          onSecondButtonClick={onActivateOrdinalsAlertActivatePress}
+        />
       )}
       <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>

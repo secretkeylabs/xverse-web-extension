@@ -136,10 +136,7 @@ function Onboarding(): JSX.Element {
           </OnBoardingContentContainer>
           {index === onboardingViews.length - 1 ? (
             <OnBoardingActionsContainer>
-              <ActionButton
-                onPress={handleSkip}
-                text={t('ONBOARDING_CONTINUE_BUTTON')}
-              />
+              <ActionButton onPress={handleSkip} text={t('ONBOARDING_CONTINUE_BUTTON')} />
             </OnBoardingActionsContainer>
           ) : (
             <OnBoardingActionsContainer>

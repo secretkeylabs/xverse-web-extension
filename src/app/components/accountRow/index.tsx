@@ -93,7 +93,7 @@ const Button = styled.button`
 
 const CopyButton = styled.button`
   opacity: 0.6;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-top: 3px;
   margin-right: 10px;
   display: flex;
@@ -146,9 +146,7 @@ function AccountRow({
   showOrdinalAddress,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const {
-    showBtcReceiveAlert,
-  } = useWalletSelector();
+  const { showBtcReceiveAlert } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress!);
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
@@ -162,7 +160,9 @@ function AccountRow({
     navigator.clipboard.writeText(account?.btcAddress!);
     setOnBtcCopied(true);
     setOnStxCopied(false);
-    if (showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
+    if (showBtcReceiveAlert !== null) {
+      dispatch(ChangeShowBtcReceiveAlertAction(true));
+    }
   };
 
   const handleOnStxAddressClick = () => {
@@ -225,7 +225,9 @@ function AccountRow({
       />
     </RowContainer>
   ) : (
-    <CurrentAccountDetailText>{showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}</CurrentAccountDetailText>
+    <CurrentAccountDetailText>
+      {showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}
+    </CurrentAccountDetailText>
   );
 
   return (
@@ -237,8 +239,8 @@ function AccountRow({
         onClick={onClick}
       />
       <CurrentAcountContainer>
-        {account
-          && (isSelected ? (
+        {account &&
+          (isSelected ? (
             <Button onClick={onClick}>
               <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
             </Button>

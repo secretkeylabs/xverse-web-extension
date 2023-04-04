@@ -18,7 +18,7 @@ export const useStxWalletData = () => {
         stxAddress,
         currentNetworkInstance,
         0,
-        PAGINATION_LIMIT,
+        PAGINATION_LIMIT
       );
       dispatch(
         setStxWalletDataAction(
@@ -26,8 +26,8 @@ export const useStxWalletData = () => {
           stxData.availableBalance,
           stxData.locked,
           stxData.transactions,
-          stxData.nonce,
-        ),
+          stxData.nonce
+        )
       );
       return stxData;
     } catch (error) {

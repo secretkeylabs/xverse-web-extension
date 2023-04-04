@@ -4,7 +4,10 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
-  BtcOrdinal, ErrorCodes, OrdinalInfo, ResponseError,
+  BtcOrdinal,
+  ErrorCodes,
+  OrdinalInfo,
+  ResponseError,
 } from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { getOrdinalsByAddress } from '@secretkeylabs/xverse-core/api';
@@ -102,9 +105,8 @@ function SendOrdinal() {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
-  const {
-    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
-  } = useWalletSelector();
+  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+    useWalletSelector();
   const { ordinalsData } = useNftDataSelector();
   const [ordinal, setOrdinal] = useState<OrdinalInfo | undefined>(undefined);
   const [ordinalUtxo, setOrdinalUtxo] = useState<BtcUtxoDataResponse | undefined>(undefined);
@@ -123,7 +125,7 @@ function SendOrdinal() {
 
   useEffect(() => {
     const data = ordinalsData.find(
-      (inscription) => inscription?.metadata?.id === ordinalIdDetails[0],
+      (inscription) => inscription?.metadata?.id === ordinalIdDetails[0]
     );
     if (data) {
       setOrdinal(data);
@@ -145,14 +147,16 @@ function SendOrdinal() {
     error: txError,
     mutate,
   } = useMutation<SignedBtcTx, ResponseError, string>(async (recepient) => {
-    const ordinalUtx = ordinals?.find((inscription) => inscription.id === ordinalIdDetails[0])?.utxo;
+    const ordinalUtx = ordinals?.find(
+      (inscription) => inscription.id === ordinalIdDetails[0]
+    )?.utxo;
     setOrdinalUtxo(ordinalUtx);
     if (ordinalUtx) {
       const txFees = await getBtcFeesForOrdinalSend(
         recepient,
         ordinalUtx,
         btcAddress,
-        network.type,
+        network.type
       );
       const signedTx = await signOrdinalSendTransaction(
         recepient,
@@ -161,7 +165,7 @@ function SendOrdinal() {
         Number(selectedAccount?.id),
         seedPhrase,
         network.type,
-        txFees,
+        txFees
       );
       return signedTx;
     }

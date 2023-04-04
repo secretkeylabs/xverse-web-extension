@@ -50,18 +50,14 @@ const CurrencyCard = styled.div((props) => ({
 }));
 
 interface BalanceCardProps {
-  isLoading: boolean,
+  isLoading: boolean;
 }
 
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const {
-    fiatCurrency,
-    btcFiatRate,
-    stxBtcRate,
-    stxBalance,
-    btcBalance,
-  } = useSelector((state: StoreState) => state.walletState);
+  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance } = useSelector(
+    (state: StoreState) => state.walletState
+  );
   const { isLoading } = props;
 
   function calculateTotalBalance() {
@@ -69,7 +65,7 @@ function BalanceCard(props: BalanceCardProps) {
       .multipliedBy(new BigNumber(stxBtcRate))
       .multipliedBy(new BigNumber(btcFiatRate));
     const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
-      new BigNumber(btcFiatRate),
+      new BigNumber(btcFiatRate)
     );
     const totalBalance = stxFiatEquiv.plus(btcFiatEquiv);
     return totalBalance.toNumber().toFixed(2);

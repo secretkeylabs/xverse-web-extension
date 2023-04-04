@@ -40,26 +40,19 @@ function ConfirmFtTransaction() {
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const location = useLocation();
-  const {
-    unsignedTx, amount, fungibleToken, memo, recepientAddress,
-  } = location.state;
-  const {
-    refetch,
-  } = useStxWalletData();
+  const { unsignedTx, amount, fungibleToken, memo, recepientAddress } = location.state;
+  const { refetch } = useStxWalletData();
 
-  const {
-    network,
-  } = useWalletSelector();
+  const { network } = useWalletSelector();
 
   const {
     isLoading,
     error: txError,
     data: stxTxBroadcastData,
     mutate,
-  } = useMutation<
-  string,
-  Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
+  } = useMutation<string, Error, { signedTx: StacksTransaction }>(async ({ signedTx }) =>
+    broadcastSignedTransaction(signedTx, selectedNetwork)
+  );
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -112,19 +105,22 @@ function ConfirmFtTransaction() {
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleBackButtonClick}
       >
-        <TransferAmountView currency="FT" amount={new BigNumber(amount)} fungibleToken={fungibleToken} />
+        <TransferAmountView
+          currency="FT"
+          amount={new BigNumber(amount)}
+          fungibleToken={fungibleToken}
+        />
         <RecipientAddressView recipient={recepientAddress} />
         <InfoContainer>
           <TitleText>{t('NETWORK')}</TitleText>
           <ValueText>{network.type}</ValueText>
         </InfoContainer>
         {!!memo && (
-        <InfoContainer>
-          <TitleText>{t('MEMO')}</TitleText>
-          <ValueText>{memo}</ValueText>
-        </InfoContainer>
+          <InfoContainer>
+            <TitleText>{t('MEMO')}</TitleText>
+            <ValueText>{memo}</ValueText>
+          </InfoContainer>
         )}
-
       </ConfirmStxTransationComponent>
       <BottomBar tab="dashboard" />
     </>

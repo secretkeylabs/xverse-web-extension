@@ -11,14 +11,9 @@ interface Props {
 function FtPostConditionCard({ postCondition, ftMetaData }: Props) {
   const amount = ftDecimals(
     getAmountFromPostCondition(postCondition) ?? 0,
-    ftMetaData?.decimals ?? 0,
+    ftMetaData?.decimals ?? 0
   );
-  return (
-    <PostConditionsView
-      postCondition={postCondition}
-      amount={amount}
-    />
-  );
+  return <PostConditionsView postCondition={postCondition} amount={amount} />;
 }
 
 export default FtPostConditionCard;

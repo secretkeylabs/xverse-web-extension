@@ -1,6 +1,4 @@
-import {
-  Account, SettingsNetwork, StacksNetwork,
-} from '@secretkeylabs/xverse-core/types';
+import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/xverse-core/account';
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
@@ -26,28 +24,41 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 
 const useWalletReducer = () => {
-  const {
-    encryptedSeed, accountsList, seedPhrase, selectedAccount, network,
-  } = useSelector(
+  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network } = useSelector(
     (state: StoreState) => ({
       ...state.walletState,
-    }),
+    })
   );
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
 
-  const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, currentNetworkObject: StacksNetwork, currentAccounts: Account[]) => {
-    const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, currentNetworkObject, currentAccounts);
+  const loadActiveAccounts = async (
+    secretKey: string,
+    currentNetwork: SettingsNetwork,
+    currentNetworkObject: StacksNetwork,
+    currentAccounts: Account[]
+  ) => {
+    const walletAccounts = await restoreWalletWithAccounts(
+      secretKey,
+      currentNetwork,
+      currentNetworkObject,
+      currentAccounts
+    );
     dispatch(
       setWalletAction(
         selectedAccount
           ? { ...walletAccounts[selectedAccount.id], seedPhrase: secretKey }
-          : { ...walletAccounts[0], seedPhrase: secretKey },
-      ),
+          : { ...walletAccounts[0], seedPhrase: secretKey }
+      )
     );
-    dispatch(fetchAccountAction(selectedAccount ? walletAccounts[selectedAccount.id] : walletAccounts[0], walletAccounts));
+    dispatch(
+      fetchAccountAction(
+        selectedAccount ? walletAccounts[selectedAccount.id] : walletAccounts[0],
+        walletAccounts
+      )
+    );
     dispatch(getActiveAccountsAction(walletAccounts));
   };
 
@@ -101,7 +112,9 @@ const useWalletReducer = () => {
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
-    await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [{ id: 0, bnsName, ...wallet }]);
+    await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [
+      { id: 0, bnsName, ...wallet },
+    ]);
   };
 
   const createWallet = async () => {
@@ -126,7 +139,7 @@ const useWalletReducer = () => {
         seedPhrase,
         network,
         selectedNetwork,
-        accountsList,
+        accountsList
       );
       dispatch(addAccoutAction(newAccountsList));
     } catch (err) {
@@ -145,13 +158,17 @@ const useWalletReducer = () => {
         account.stxPublicKey,
         account.btcPublicKey,
         account.ordinalsPublicKey,
-        network,
-      ),
+        network
+      )
     );
     dispatch(fetchAccountAction(account, accountsList));
   };
 
-  const changeNetwork = async (changedNetwork: SettingsNetwork, networkObject: StacksNetwork, networkAddress: string) => {
+  const changeNetwork = async (
+    changedNetwork: SettingsNetwork,
+    networkObject: StacksNetwork,
+    networkAddress: string
+  ) => {
     dispatch(ChangeNetworkAction(changedNetwork, networkAddress));
     const wallet = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
@@ -159,7 +176,9 @@ const useWalletReducer = () => {
       network: changedNetwork.type,
     });
     dispatch(setWalletAction(wallet));
-    await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [{ ...wallet, id: 0 }]);
+    await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [
+      { ...wallet, id: 0 },
+    ]);
     await refetchStxData();
     await refetchBtcData();
   };

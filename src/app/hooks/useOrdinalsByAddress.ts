@@ -4,11 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 const useOrdinalsByAddress = (address: string) => {
   const fetchOrdinals = async () => {
     const ordinals = await getOrdinalsByAddress(address);
-    return ordinals.filter((item) => (item.id !== undefined));
+    return ordinals.filter((item) => item.id !== undefined);
   };
 
   const {
-    data: ordinals, isLoading, refetch,
+    data: ordinals,
+    isLoading,
+    refetch,
   } = useQuery({
     queryKey: [`ordinals-${address}`],
     queryFn: fetchOrdinals,

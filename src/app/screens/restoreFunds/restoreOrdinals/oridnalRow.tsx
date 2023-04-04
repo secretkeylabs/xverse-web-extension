@@ -1,9 +1,11 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
+import { BtcOrdinal, getBtcFiatEquivalent, getOrdinalInfo } from '@secretkeylabs/xverse-core';
 import {
-  BtcOrdinal, getBtcFiatEquivalent, getOrdinalInfo,
-} from '@secretkeylabs/xverse-core';
-import { getBtcFeesForOrdinalSend, SignedBtcTx, signOrdinalSendTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
+  getBtcFeesForOrdinalSend,
+  SignedBtcTx,
+  signOrdinalSendTransaction,
+} from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,13 +70,10 @@ interface Props {
   ordinal: BtcOrdinal;
 }
 
-function OrdinalRow({
-  ordinal,
-}: Props) {
+function OrdinalRow({ ordinal }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_ORDINAL_SCREEN' });
-  const {
-    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
-  } = useWalletSelector();
+  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+    useWalletSelector();
   const navigate = useNavigate();
 
   function fetchOrdinalInfo() {
@@ -95,7 +94,7 @@ function OrdinalRow({
       ordinalsAddress,
       ordinal.utxo,
       btcAddress,
-      network.type,
+      network.type
     );
     const tx = await signOrdinalSendTransaction(
       ordinalsAddress,
@@ -104,7 +103,7 @@ function OrdinalRow({
       Number(selectedAccount?.id),
       seedPhrase,
       network.type,
-      txFees,
+      txFees
     );
     return tx;
   });
@@ -145,7 +144,9 @@ function OrdinalRow({
             <LoaderContainer>
               <MoonLoader color="white" size={15} />
             </LoaderContainer>
-          ) : t('TRANSFER')}
+          ) : (
+            t('TRANSFER')
+          )}
         </TransferButton>
       </ButtonContainer>
     </OrdinalCard>

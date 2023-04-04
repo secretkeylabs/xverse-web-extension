@@ -3,9 +3,10 @@ import useWalletSelector from './useWalletSelector';
 
 const useNetworkSelector = () => {
   const { network, networkAddress } = useWalletSelector();
-  const selectedNetwork = network.type === 'Mainnet'
-    ? new StacksMainnet({ url: networkAddress })
-    : new StacksTestnet({ url: networkAddress });
+  const selectedNetwork =
+    network.type === 'Mainnet'
+      ? new StacksMainnet({ url: networkAddress })
+      : new StacksTestnet({ url: networkAddress });
   return selectedNetwork;
 };
 

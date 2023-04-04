@@ -223,7 +223,9 @@ function OrdinalDetailScreen() {
     isLoading,
     data: ordinalDetailsData,
     mutate,
-  } = useMutation<OrdinalInfo | undefined, Error, { ordinalId: string }>(async ({ ordinalId }) => getOrdinalInfo(ordinalId));
+  } = useMutation<OrdinalInfo | undefined, Error, { ordinalId: string }>(async ({ ordinalId }) =>
+    getOrdinalInfo(ordinalId)
+  );
 
   useEffect(() => {
     const ordinalMetaData = ordinalsData.find((ordinal) => ordinal?.metadata?.id === id);
@@ -236,7 +238,10 @@ function OrdinalDetailScreen() {
 
   useEffect(() => {
     if (ordinalData) {
-      if (ordinalData?.metadata['content type'].includes('image') || ordinalData?.metadata['content type'].includes('text')) {
+      if (
+        ordinalData?.metadata['content type'].includes('image') ||
+        ordinalData?.metadata['content type'].includes('text')
+      ) {
         setNotSupportedOrdinal(false);
       } else setNotSupportedOrdinal(true);
     }
@@ -291,7 +296,7 @@ function OrdinalDetailScreen() {
       <OwnerAddressText>
         {`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
           ordinalsAddress.length - 4,
-          ordinalsAddress.length,
+          ordinalsAddress.length
         )}`}
       </OwnerAddressText>
       <OrdinalsTag>

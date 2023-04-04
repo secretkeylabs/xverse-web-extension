@@ -1,8 +1,6 @@
 import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
-import {
-  animated, config, useSpring,
-} from '@react-spring/web';
+import { animated, config, useSpring } from '@react-spring/web';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
@@ -264,7 +262,9 @@ export default function CoinHeader(props: CoinBalanceProps) {
   };
 
   function formatAddress(addr: string): string {
-    return addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
+    return addr
+      ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}`
+      : '';
   }
 
   const renderFtInfo = () => (
@@ -288,7 +288,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <img src={linkIcon} alt="link" />
           </ContractDeploymentButton>
         </TokenContractContainer>
-      ) : null }
+      ) : null}
     </>
   );
 

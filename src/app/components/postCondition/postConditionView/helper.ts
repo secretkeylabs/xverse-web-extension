@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js';
 import { initBigNumber } from '@utils/helper';
 
 export const getIconStringFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
+  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition
 ) => {
   if (pc.conditionType === PostConditionType.Fungible) {
     return `${addressToString(pc.assetInfo.address)}.${pc.assetInfo.contractName}.${
@@ -51,15 +51,17 @@ const stacksValue = ({
     abbreviate && stxAmount > 10000
       ? abbreviateNumber(stxAmount)
       : stxAmount.toLocaleString('en-US', {
-        maximumFractionDigits: fixedDecimals ? 6 : 3,
-      })
+          maximumFractionDigits: fixedDecimals ? 6 : 3,
+        })
   }${withTicker ? ' STX' : ''}`;
 };
 
 export const getAmountFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
+  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition
 ) => {
-  if (pc.conditionType === PostConditionType.Fungible) { return pc.amount.toString(); }
+  if (pc.conditionType === PostConditionType.Fungible) {
+    return pc.amount.toString();
+  }
   if (pc.conditionType === PostConditionType.STX) {
     return stacksValue({ value: pc.amount.toString(), withTicker: false });
   }
@@ -67,7 +69,7 @@ export const getAmountFromPostCondition = (
 };
 
 export const getSymbolFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
+  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition
 ) => {
   if ('assetInfo' in pc) {
     return pc?.assetInfo?.assetName?.content?.slice(0, 3).toUpperCase();
@@ -76,7 +78,7 @@ export const getSymbolFromPostCondition = (
 };
 
 export const getNameFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
+  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition
 ) => {
   if ('assetInfo' in pc) {
     return pc.assetInfo.assetName.content;

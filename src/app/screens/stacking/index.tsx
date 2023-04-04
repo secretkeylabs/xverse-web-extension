@@ -27,9 +27,7 @@ function Stacking() {
     }
   }, [stackingData]);
 
-  const showStatus = !isStackingLoading && (
-    isStacking ? <StackingProgress /> : <StartStacking />
-  );
+  const showStatus = !isStackingLoading && (isStacking ? <StackingProgress /> : <StartStacking />);
 
   return (
     <>
@@ -38,11 +36,10 @@ function Stacking() {
         <LoaderContainer>
           <MoonLoader color="white" size={30} />
         </LoaderContainer>
-      ) }
+      )}
       {showStatus}
       <BottomBar tab="stacking" />
     </>
-
   );
 }
 

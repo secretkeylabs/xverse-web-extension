@@ -71,9 +71,7 @@ interface Props {
   showDivider: boolean;
 }
 
-function CoinItem({
-  coin, disabled, toggled, enabled, showDivider,
-}: Props) {
+function CoinItem({ coin, disabled, toggled, enabled, showDivider }: Props) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const toggleSwitch = () => {
     setIsEnabled((previousState) => !previousState);
@@ -90,13 +88,14 @@ function CoinItem({
     <>
       <RowContainer>
         <CoinContainer>
-          {coin.image ? <CoinIcon src={coin.image} />
-            : (
-              <TickerIconContainer color={background}>
-                <TickerText>{getFtTicker()}</TickerText>
-              </TickerIconContainer>
-            )}
-          { isEnabled ? (
+          {coin.image ? (
+            <CoinIcon src={coin.image} />
+          ) : (
+            <TickerIconContainer color={background}>
+              <TickerText>{getFtTicker()}</TickerText>
+            </TickerIconContainer>
+          )}
+          {isEnabled ? (
             <SelectedCoinTitleText>{coin.name}</SelectedCoinTitleText>
           ) : (
             <UnSelectedCoinTitleText>{coin.name}</UnSelectedCoinTitleText>

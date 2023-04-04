@@ -13,8 +13,8 @@ export const useBtcWalletData = () => {
   const fetchBtcWalletData = async () => {
     try {
       const btcData: BtcAddressData = await getBtcWalletData(btcAddress, network.type);
-      console.log("🚀 ~ file: useBtcWalletData.ts:16 ~ fetchBtcWalletData ~ btcData:", btcData)
-      
+      console.log('🚀 ~ file: useBtcWalletData.ts:16 ~ fetchBtcWalletData ~ btcData:', btcData);
+
       const btcBalance = new BigNumber(btcData.finalBalance);
       dispatch(SetBtcWalletDataAction(btcBalance));
       return btcData;

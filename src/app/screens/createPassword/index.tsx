@@ -108,7 +108,6 @@ function CreatePassword(): JSX.Element {
           />
         )}
       </PasswordContainer>
-
     </Container>
   );
 }

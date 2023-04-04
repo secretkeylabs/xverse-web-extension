@@ -35,9 +35,7 @@ const CustomisedModal = styled(Modal)`
   position: absolute;
 `;
 
-function BottomModal({
-  header, children, visible, onClose,
-}: Props) {
+function BottomModal({ header, children, visible, onClose }: Props) {
   const theme = useTheme();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const customStyles = {
@@ -67,7 +65,7 @@ function BottomModal({
   return (
     <CustomisedModal
       isOpen={visible}
-      parentSelector={() => (document.getElementById('app') as HTMLElement)}
+      parentSelector={() => document.getElementById('app') as HTMLElement}
       ariaHideApp={false}
       style={customStyles}
       contentLabel="Example Modal"

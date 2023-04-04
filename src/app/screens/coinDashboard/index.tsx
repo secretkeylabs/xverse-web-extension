@@ -46,7 +46,10 @@ export default function CoinDashboard() {
       <TopRow title={getDashboardTitle()} onClick={handleBack} />
       <Container>
         <CoinHeader coin={coin as CurrencyTypes} fungibleToken={ft} />
-        <TransactionsHistoryList coin={coin as CurrencyTypes} txFilter={`${ft?.principal}::${ft?.assetName}`} />
+        <TransactionsHistoryList
+          coin={coin as CurrencyTypes}
+          txFilter={`${ft?.principal}::${ft?.assetName}`}
+        />
       </Container>
     </>
   );

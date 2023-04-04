@@ -38,7 +38,7 @@ export function storeEncryptedSeedAction(encryptedSeed: string): actions.StoreEn
   };
 }
 
-export function setWalletSeedPhraseAction(seedPhrase: string) : actions.SetWalletSeedPhrase {
+export function setWalletSeedPhraseAction(seedPhrase: string): actions.SetWalletSeedPhrase {
   return {
     type: actions.SetWalletSeedPhraseKey,
     seedPhrase,
@@ -53,7 +53,7 @@ export function resetWalletAction(): actions.ResetWallet {
 
 export function fetchAccountAction(
   selectedAccount: Account,
-  accountsList: Account[],
+  accountsList: Account[]
 ): actions.FetchAccount {
   return {
     type: actions.FetchAccountKey,
@@ -80,7 +80,7 @@ export function selectAccount(
   ordinalsPublicKey: string,
   network: SettingsNetwork,
   // stackingState: StackingStateData,
-  bnsName?: string,
+  bnsName?: string
 ): actions.SelectAccount {
   return {
     type: actions.SelectAccountKey,
@@ -107,7 +107,7 @@ export function setFeeMultiplierAction(feeMultipliers: FeesMultipliers): actions
 
 export function setCoinRatesAction(
   stxBtcRate: BigNumber,
-  btcFiatRate: BigNumber,
+  btcFiatRate: BigNumber
 ): actions.SetCoinRates {
   return {
     type: actions.SetCoinRatesKey,
@@ -121,7 +121,7 @@ export function setStxWalletDataAction(
   stxAvailableBalance: BigNumber,
   stxLockedBalance: BigNumber,
   stxTransactions: TransactionData[],
-  stxNonce: number,
+  stxNonce: number
 ): actions.SetStxWalletData {
   return {
     type: actions.SetStxWalletDataKey,
@@ -142,7 +142,7 @@ export function SetBtcWalletDataAction(balance: BigNumber): actions.SetBtcWallet
 
 export function setCoinDataAction(
   coinsList: FungibleToken[],
-  supportedCoins: Coin[],
+  supportedCoins: Coin[]
 ): actions.SetCoinData {
   return {
     type: actions.SetCoinDataKey,
@@ -152,7 +152,7 @@ export function setCoinDataAction(
 }
 
 export function FetchUpdatedVisibleCoinListAction(
-  coinsList: FungibleToken[],
+  coinsList: FungibleToken[]
 ): actions.UpdateVisibleCoinList {
   return {
     type: actions.UpdateVisibleCoinListKey,
@@ -160,14 +160,19 @@ export function FetchUpdatedVisibleCoinListAction(
   };
 }
 
-export function ChangeFiatCurrencyAction(fiatCurrency: SupportedCurrency): actions.ChangeFiatCurrency {
+export function ChangeFiatCurrencyAction(
+  fiatCurrency: SupportedCurrency
+): actions.ChangeFiatCurrency {
   return {
     type: actions.ChangeFiatCurrencyKey,
     fiatCurrency,
   };
 }
 
-export function ChangeNetworkAction(network: SettingsNetwork, networkAddress: string): actions.ChangeNetwork {
+export function ChangeNetworkAction(
+  network: SettingsNetwork,
+  networkAddress: string
+): actions.ChangeNetwork {
   return {
     type: actions.ChangeNetworkKey,
     network,
@@ -175,30 +180,34 @@ export function ChangeNetworkAction(network: SettingsNetwork, networkAddress: st
   };
 }
 
-export function getActiveAccountsAction(
-  accountsList: Account[],
-): actions.GetActiveAccounts {
+export function getActiveAccountsAction(accountsList: Account[]): actions.GetActiveAccounts {
   return {
     type: actions.GetActiveAccountsKey,
     accountsList,
   };
 }
 
-export function ChangeActivateOrdinalsAction(hasActivatedOrdinalsKey: boolean): actions.ChangeActivateOrdinals {
+export function ChangeActivateOrdinalsAction(
+  hasActivatedOrdinalsKey: boolean
+): actions.ChangeActivateOrdinals {
   return {
     type: actions.ChangeHasActivatedOrdinalsKey,
     hasActivatedOrdinalsKey,
   };
 }
 
-export function ChangeShowBtcReceiveAlertAction(showBtcReceiveAlert: boolean | null): actions.ChangeShowBtcReceiveAlert {
+export function ChangeShowBtcReceiveAlertAction(
+  showBtcReceiveAlert: boolean | null
+): actions.ChangeShowBtcReceiveAlert {
   return {
     type: actions.ChangeShowBtcReceiveAlertKey,
     showBtcReceiveAlert,
   };
 }
 
-export function ChangeShowOrdinalReceiveAlertAction(showOrdinalReceiveAlert: boolean | null): actions.ChangeShowOrdinalReceiveAlert {
+export function ChangeShowOrdinalReceiveAlertAction(
+  showOrdinalReceiveAlert: boolean | null
+): actions.ChangeShowOrdinalReceiveAlert {
   return {
     type: actions.ChangeShowOrdinalReceiveAlertKey,
     showOrdinalReceiveAlert,

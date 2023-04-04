@@ -7,8 +7,10 @@ const useOrdinalDataReducer = () => {
   const { ordinalsData } = useNftDataSelector();
   const dispatch = useDispatch();
 
-  const storeOrdinalsMetaData = (data:OrdinalInfo) => {
-    const ordinalExists = ordinalsData.find((ordinal) => ordinal?.metadata?.id === data?.metadata?.id);
+  const storeOrdinalsMetaData = (data: OrdinalInfo) => {
+    const ordinalExists = ordinalsData.find(
+      (ordinal) => ordinal?.metadata?.id === data?.metadata?.id
+    );
     if (data && !ordinalExists) {
       const modifiedList = [...ordinalsData];
       modifiedList.push(data);

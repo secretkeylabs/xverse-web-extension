@@ -1,7 +1,10 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { broadcastRawBtcOrdinalTransaction, broadcastRawBtcTransaction } from '@secretkeylabs/xverse-core/api';
+import {
+  broadcastRawBtcOrdinalTransaction,
+  broadcastRawBtcTransaction,
+} from '@secretkeylabs/xverse-core/api';
 import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
 import BottomBar from '@components/tabBar';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -20,27 +23,22 @@ function ConfirmBtcTransaction() {
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
   const { refetch } = useBtcWalletData();
-  const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos,
-  } = location.state;
+  const { fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos } = location.state;
   const {
     isLoading,
     error: txError,
     data: btcTxBroadcastData,
     mutate,
   } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network.type),
+    async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network.type)
   );
 
   const {
     error: errorBtcOrdinalTransaction,
     data: btcOrdinalTxBroadcastData,
     mutate: broadcastOrdinalTransaction,
-  } = useMutation<string, Error, { signedTx: string }>(
-    async ({ signedTx }) => broadcastRawBtcOrdinalTransaction(
-      signedTx,
-      network.type,
-    ),
+  } = useMutation<string, Error, { signedTx: string }>(async ({ signedTx }) =>
+    broadcastRawBtcOrdinalTransaction(signedTx, network.type)
   );
 
   useEffect(() => {
@@ -141,7 +139,6 @@ function ConfirmBtcTransaction() {
       <BottomBarContainer>
         <BottomBar tab="dashboard" />
       </BottomBarContainer>
-
     </>
   );
 }

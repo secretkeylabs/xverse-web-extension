@@ -113,12 +113,19 @@ interface Props {
   tickMarkButtonText?: string;
   onButtonClick?: () => void;
   onSecondButtonClick?: () => void;
-  tickMarkButtonClick?:() => void;
-
+  tickMarkButtonClick?: () => void;
 }
 
 function AlertMessage({
-  onClose, title, description, buttonText, secondButtonText, tickMarkButtonText, onButtonClick, onSecondButtonClick, tickMarkButtonClick,
+  onClose,
+  title,
+  description,
+  buttonText,
+  secondButtonText,
+  tickMarkButtonText,
+  onButtonClick,
+  onSecondButtonClick,
+  tickMarkButtonClick,
 }: Props) {
   return (
     <>
@@ -132,42 +139,31 @@ function AlertMessage({
         </RowContainer>
         <DescriptionText>{description}</DescriptionText>
         {onSecondButtonClick && onButtonClick && (
-        <ButtonContainer>
-          <TransparentButtonContainer>
-            <ActionButton
-              text={buttonText ?? 'No'}
-              transparent
-              onPress={onButtonClick}
-            />
-          </TransparentButtonContainer>
-          <ActionButton
-            text={secondButtonText ?? 'Yes'}
-            onPress={onSecondButtonClick}
-          />
-        </ButtonContainer>
+          <ButtonContainer>
+            <TransparentButtonContainer>
+              <ActionButton text={buttonText ?? 'No'} transparent onPress={onButtonClick} />
+            </TransparentButtonContainer>
+            <ActionButton text={secondButtonText ?? 'Yes'} onPress={onSecondButtonClick} />
+          </ButtonContainer>
         )}
         {!onSecondButtonClick && onButtonClick && (
-        <ButtonContainer>
-          <ActionButton
-            text={buttonText ?? 'Yes'}
-            onPress={onButtonClick}
-          />
-        </ButtonContainer>
+          <ButtonContainer>
+            <ActionButton text={buttonText ?? 'Yes'} onPress={onButtonClick} />
+          </ButtonContainer>
         )}
-        { tickMarkButtonText && tickMarkButtonClick && (
-        <TickMarkButtonContainer>
-          <TickButton
-            type="checkbox"
-            defaultChecked={false}
-            onChange={() => {
-              tickMarkButtonClick();
-            }}
-          />
-          <TickMarkButtonText>{tickMarkButtonText}</TickMarkButtonText>
-        </TickMarkButtonContainer>
+        {tickMarkButtonText && tickMarkButtonClick && (
+          <TickMarkButtonContainer>
+            <TickButton
+              type="checkbox"
+              defaultChecked={false}
+              onChange={() => {
+                tickMarkButtonClick();
+              }}
+            />
+            <TickMarkButtonText>{tickMarkButtonText}</TickMarkButtonText>
+          </TickMarkButtonContainer>
         )}
       </Container>
-
     </>
   );
 }

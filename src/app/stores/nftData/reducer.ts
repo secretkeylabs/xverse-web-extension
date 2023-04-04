@@ -1,8 +1,6 @@
-import {
-  NftDataAction, NftDataState, SetNftDataKey, SetOrdinalDataKey,
-} from './actions/types';
+import { NftDataAction, NftDataState, SetNftDataKey, SetOrdinalDataKey } from './actions/types';
 
-const initialNftDataState :NftDataState = {
+const initialNftDataState: NftDataState = {
   nftData: [],
   ordinalsData: [],
 };
@@ -10,7 +8,7 @@ const initialNftDataState :NftDataState = {
 const NftDataStateReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: NftDataState = initialNftDataState,
-  action: NftDataAction,
+  action: NftDataAction
 ): NftDataState => {
   switch (action.type) {
     case SetNftDataKey:

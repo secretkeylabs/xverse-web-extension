@@ -120,11 +120,11 @@ function OrdinalImage({
         <Suspense>
           <StyledImg
             width="100%"
-            placeholder={(
+            placeholder={
               <LoaderContainer isGalleryOpen={isGalleryOpen}>
                 <MoonLoader color="white" size={20} />
               </LoaderContainer>
-              )}
+            }
             src={getFetchableUrl(`https://gammaordinals.com${ordinal?.metadata.content}`, 'http')}
             fallback={PlaceholderImage}
           />
@@ -147,7 +147,11 @@ function OrdinalImage({
       );
     }
     return (
-      <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
+      <ImageContainer
+        isSmallImage={isSmallImage}
+        inNftDetail={inNftDetail}
+        isGalleryOpen={isGalleryOpen}
+      >
         <OrdinalContentText inNftSend={inNftSend}>{textContent}</OrdinalContentText>
         {isNftDashboard && (
           <OrdinalsTag>

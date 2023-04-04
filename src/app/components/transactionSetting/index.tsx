@@ -1,8 +1,6 @@
 import BottomModal from '@components/bottomModal';
 import BigNumber from 'bignumber.js';
-import {
-  SetStateAction, useEffect, useRef, useState,
-} from 'react';
+import { SetStateAction, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Select, { SingleValue } from 'react-select';
 import styled, { useTheme } from 'styled-components';
@@ -12,12 +10,18 @@ import { NumericFormat } from 'react-number-format';
 import ActionButton from '@components/button';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import {
-  getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
+  getBtcFiatEquivalent,
+  getStxFiatEquivalent,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import {
-  getBtcFees, getBtcFeesForNonOrdinalBtcSend, getBtcFeesForOrdinalSend, isCustomFeesAllowed, Recipient,
+  getBtcFees,
+  getBtcFeesForNonOrdinalBtcSend,
+  getBtcFeesForOrdinalSend,
+  isCustomFeesAllowed,
+  Recipient,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { btcToSats, BtcUtxoDataResponse, ErrorCodes } from '@secretkeylabs/xverse-core';
 
@@ -164,11 +168,11 @@ function TransactionSettingAlert({
   ordinalTxUtxo,
   isRestoreFlow,
   nonOrdinalUtxos,
-}:Props) {
+}: Props) {
   const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
   const theme = useTheme();
-  const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
+  const [nonceInput, setNonceInput] = useState<string | undefined>(nonce);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(loading);
   const [selectedOption, setSelectedOption] = useState({
@@ -177,11 +181,17 @@ function TransactionSettingAlert({
   });
   const {
     network,
-    btcAddress, stxBtcRate, btcFiatRate, fiatCurrency, btcBalance, selectedAccount, ordinalsAddress,
+    btcAddress,
+    stxBtcRate,
+    btcFiatRate,
+    fiatCurrency,
+    btcBalance,
+    selectedAccount,
+    ordinalsAddress,
   } = useSelector((state: StoreState) => state.walletState);
   const inputRef = useRef(null);
   const customStyles = {
-    control: (base: any, state: { isFocused: boolean, isSelected: boolean }) => ({
+    control: (base: any, state: { isFocused: boolean; isSelected: boolean }) => ({
       ...base,
       ...theme.body_medium_m,
       background: theme.colors.background.elevation1,
@@ -194,7 +204,7 @@ function TransactionSettingAlert({
       },
       height: 45,
     }),
-    option: (base: any, state: { isFocused: boolean, isSelected: boolean }) => ({
+    option: (base: any, state: { isFocused: boolean; isSelected: boolean }) => ({
       ...base,
       background: state.isFocused ? 'rgba(255, 255, 255, 0.09)' : '#3C3F60',
     }),
@@ -250,7 +260,7 @@ function TransactionSettingAlert({
     },
   ];
 
-  const modifyStxFees = (mode: SingleValue<{ label: string; value: string; }>) => {
+  const modifyStxFees = (mode: SingleValue<{ label: string; value: string }>) => {
     const currentFee = new BigNumber(fee);
 
     switch (mode?.value) {
@@ -277,22 +287,23 @@ function TransactionSettingAlert({
     }
   }, [selectedOption]);
 
-  const modifyFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
+  const modifyFees = async (mode: SingleValue<{ label: string; value: string }>) => {
     try {
       setSelectedOption(mode!);
       setIsLoading(true);
       if (mode?.value === 'custom') inputRef?.current?.focus();
       else if (type === 'BTC') {
         if (isRestoreFlow) {
-          const btcFee = await getBtcFeesForNonOrdinalBtcSend(btcAddress, nonOrdinalUtxos!, ordinalsAddress, 'Mainnet', mode?.value);
+          const btcFee = await getBtcFeesForNonOrdinalBtcSend(
+            btcAddress,
+            nonOrdinalUtxos!,
+            ordinalsAddress,
+            'Mainnet',
+            mode?.value
+          );
           setFeeInput(btcFee.toString());
         } else if (btcRecipients && selectedAccount) {
-          const btcFee = await getBtcFees(
-            btcRecipients,
-            btcAddress,
-            network.type,
-            mode?.value,
-          );
+          const btcFee = await getBtcFees(btcRecipients, btcAddress, network.type, mode?.value);
           setFeeInput(btcFee.toString());
         }
       } else if (type === 'Ordinals') {
@@ -302,14 +313,16 @@ function TransactionSettingAlert({
             ordinalTxUtxo,
             btcAddress,
             network.type,
-            mode?.value,
+            mode?.value
           );
           setFeeInput(txFees.toString());
         }
       }
       setIsLoading(false);
     } catch (err: any) {
-      if (Number(error) === ErrorCodes.InSufficientBalance) { setError(t('TX_ERRORS.INSUFFICIENT_BALANCE')); } else setError(error.toString());
+      if (Number(error) === ErrorCodes.InSufficientBalance) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+      } else setError(error.toString());
     }
   };
 
@@ -340,7 +353,8 @@ function TransactionSettingAlert({
   function getTokenIcon() {
     if (type === 'STX') {
       return <TickerImage src={IconStacks} />;
-    } if (type === 'BTC') {
+    }
+    if (type === 'BTC') {
       return <TickerImage src={IconSats} />;
     }
   }
@@ -351,7 +365,8 @@ function TransactionSettingAlert({
       if (currentFee.isEqualTo(prevFee)) {
         setError(t('TRANSACTION_SETTING.SAME_FEE_ERROR'));
         return;
-      } if (currentFee.gt(availableBalance)) {
+      }
+      if (currentFee.gt(availableBalance)) {
         setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
         return;
       }
@@ -382,7 +397,8 @@ function TransactionSettingAlert({
     setFeeInput(e.target.value);
   };
 
-  const onFeeOptionChange = (value: { label: string; value: string } | null) => (type === 'STX' ? modifyStxFees(value) : modifyFees(value));
+  const onFeeOptionChange = (value: { label: string; value: string } | null) =>
+    type === 'STX' ? modifyStxFees(value) : modifyFees(value);
 
   const editFeesSection = (
     <Container>
@@ -435,7 +451,15 @@ function TransactionSettingAlert({
   );
 
   return (
-    <BottomModal visible={visible} header={type === 'STX' ? t('TRANSACTION_SETTING.ADVANCED_SETTING') : t('TRANSACTION_SETTING.EDIT_FEE')} onClose={onCrossClick}>
+    <BottomModal
+      visible={visible}
+      header={
+        type === 'STX'
+          ? t('TRANSACTION_SETTING.ADVANCED_SETTING')
+          : t('TRANSACTION_SETTING.EDIT_FEE')
+      }
+      onClose={onCrossClick}
+    >
       {editFeesSection}
       {errorText}
       {allowEditNonce && type === 'STX' && editNonceSection}

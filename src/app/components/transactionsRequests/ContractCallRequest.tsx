@@ -188,37 +188,41 @@ interface ContractCallRequestProps {
 export const ShowMoreContext = createContext({ showMore: false });
 
 export default function ContractCallRequest(props: ContractCallRequestProps) {
-  const {
-    request, unsignedTx, funcMetaData, coinsMetaData, tabId, requestToken,
-  } = props;
+  const { request, unsignedTx, funcMetaData, coinsMetaData, tabId, requestToken } = props;
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
   const [isShowMore, setIsShowMore] = useState(false);
   const Illustration = headerImageMapping[request.functionName ?? ''];
 
-  useOnOriginTabClose(
-    tabId,
-    () => {
-      setHasTabClosed(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-  );
+  useOnOriginTabClose(tabId, () => {
+    setHasTabClosed(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   const showMoreButton = (
     <ShowMoreButtonContainer>
       <Line />
       <ButtonContainer>
         <ShowMoreButton onClick={() => setIsShowMore(!isShowMore)}>
-          <ButtonText>{isShowMore ? t('CONTRACT_CALL_REQUEST.SHOW_LESS') : t('CONTRACT_CALL_REQUEST.SHOW_MORE')}</ButtonText>
-          <ButtonSymbolText>{isShowMore ? t('CONTRACT_CALL_REQUEST.MINUS') : t('CONTRACT_CALL_REQUEST.PLUS')}</ButtonSymbolText>
+          <ButtonText>
+            {isShowMore
+              ? t('CONTRACT_CALL_REQUEST.SHOW_LESS')
+              : t('CONTRACT_CALL_REQUEST.SHOW_MORE')}
+          </ButtonText>
+          <ButtonSymbolText>
+            {isShowMore ? t('CONTRACT_CALL_REQUEST.MINUS') : t('CONTRACT_CALL_REQUEST.PLUS')}
+          </ButtonSymbolText>
         </ShowMoreButton>
       </ButtonContainer>
     </ShowMoreButtonContainer>
   );
 
   const renderContractAddress = isShowMore && (
-    <RedirectAddressView recipient={request.contractAddress} title={t('CONTRACT_CALL_REQUEST.CONTRACT_ADDRESS')} />
+    <RedirectAddressView
+      recipient={request.contractAddress}
+      title={t('CONTRACT_CALL_REQUEST.CONTRACT_ADDRESS')}
+    />
   );
   type ArgToView = { name: string; value: string; type: any };
   const getFunctionArgs = (): Array<ArgToView> => {
@@ -278,18 +282,24 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
     </SponsoredContainer>
   );
 
-  const postConditionAlert = unsignedTx?.postConditionMode === 2
-    && unsignedTx?.postConditions.values.length <= 0 && (
+  const postConditionAlert = unsignedTx?.postConditionMode === 2 &&
+    unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
-        <PostConditionAlertText>{t('CONTRACT_CALL_REQUEST.POST_CONDITION_ALERT')}</PostConditionAlertText>
+        <PostConditionAlertText>
+          {t('CONTRACT_CALL_REQUEST.POST_CONDITION_ALERT')}
+        </PostConditionAlertText>
       </PostConditionContainer>
-  );
+    );
   const navigate = useNavigate();
   const broadcastTx = async (tx: StacksTransaction[]) => {
     try {
       const broadcastResult: string = await broadcastSignedTransaction(tx[0], selectedNetwork);
       if (broadcastResult) {
-        finalizeTxSignature({ requestPayload: requestToken, tabId, data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') } });
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId,
+          data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') },
+        });
         navigate('/tx-status', {
           state: {
             txid: broadcastResult,
@@ -338,10 +348,11 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
           return <StxPostConditionCard key={i} postCondition={postCondition} />;
         case PostConditionType.Fungible:
           const coinInfo = coinsMetaData?.find(
-            (coin: Coin) => coin.contract
-              === `${addressToString(postCondition.assetInfo.address)}.${
+            (coin: Coin) =>
+              coin.contract ===
+              `${addressToString(postCondition.assetInfo.address)}.${
                 postCondition.assetInfo.contractName.content
-              }`,
+              }`
           );
           return (
             <FtPostConditionCard key={i} postCondition={postCondition} ftMetaData={coinInfo} />
@@ -369,7 +380,12 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
             <FunctionTitle>{request.functionName}</FunctionTitle>
             <DappTitle>{`Requested by ${request.appDetails?.name}`}</DappTitle>
           </Container>
-          {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
+          {hasTabClosed && (
+            <InfoContainer
+              titleText={t('WINDOW_CLOSED_ALERT.TITLE')}
+              bodyText={t('WINDOW_CLOSED_ALERT.BODY')}
+            />
+          )}
 
           {postConditionAlert}
           {request.sponsored && showSponsoredTransactionTag}

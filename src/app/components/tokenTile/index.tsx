@@ -18,7 +18,7 @@ interface TileProps {
 }
 
 interface TickerProps {
-  enlargeTicker? : boolean;
+  enlargeTicker?: boolean;
 }
 const TileContainer = styled.button<TileProps>((props) => ({
   display: 'flex',
@@ -130,10 +130,7 @@ interface Props {
   loading: boolean;
   margin?: number;
   currency?: CurrencyTypes;
-  onPress: (token: {
-    coin: CurrencyTypes;
-    ft: string | undefined;
-  }) => void;
+  onPress: (token: { coin: CurrencyTypes; ft: string | undefined }) => void;
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
 }
@@ -149,10 +146,8 @@ function TokenTile({
   fungibleToken,
   enlargeTicker = false,
 }: Props) {
-  const {
-    fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
+  const { fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate } = useSelector(
+    (state: StoreState) => state.walletState
   );
 
   function getTickerTitle() {
@@ -302,7 +297,8 @@ function TokenTile({
   }
 
   function renderIcon() {
-    if (currency === 'STX' || currency === 'BTC') return <TickerImage src={icon} enlargeTicker={enlargeTicker} />;
+    if (currency === 'STX' || currency === 'BTC')
+      return <TickerImage src={icon} enlargeTicker={enlargeTicker} />;
     return renderFTIcon();
   }
 
@@ -314,7 +310,12 @@ function TokenTile({
   };
 
   return (
-    <TileContainer inModel={enlargeTicker} color={underlayColor} margin={margin} onClick={handleTokenPressed}>
+    <TileContainer
+      inModel={enlargeTicker}
+      color={underlayColor}
+      margin={margin}
+      onClick={handleTokenPressed}
+    >
       <RowContainer>
         {renderIcon()}
         <TextContainer>

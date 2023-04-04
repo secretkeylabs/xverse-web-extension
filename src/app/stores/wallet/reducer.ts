@@ -61,7 +61,7 @@ const initialWalletState: WalletState = {
 const walletReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: WalletState = initialWalletState,
-  action: WalletActions,
+  action: WalletActions
 ): WalletState => {
   switch (action.type) {
     case SetWalletKey:

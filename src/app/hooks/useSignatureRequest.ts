@@ -3,9 +3,7 @@ import {
   signMessage,
   signStructuredDataMessage,
 } from '@secretkeylabs/xverse-core/connect/signature';
-import {
-  ChainID, ClarityValue, deserializeCV, TupleCV,
-} from '@stacks/transactions';
+import { ChainID, ClarityValue, deserializeCV, TupleCV } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -20,7 +18,7 @@ export interface SignatureMessage {
 }
 
 export function isStructuredMessage(
-  messageType: SignatureMessageType,
+  messageType: SignatureMessageType
 ): messageType is 'structured' {
   return messageType === 'structured';
 }
@@ -42,24 +40,22 @@ function useSignatureRequest() {
   return {
     payload: request.payload as any,
     request: requestToken,
-    domain: request.payload.domain ? deserializeCV(Buffer.from(request.payload.domain, 'hex')) : null,
+    domain: request.payload.domain
+      ? deserializeCV(Buffer.from(request.payload.domain, 'hex'))
+      : null,
     messageType: messageType as SignatureMessageType,
     tabId,
   };
 }
 export function useSignMessage(messageType: SignatureMessageType) {
-  const {
-    selectedAccount,
-    seedPhrase,
-    network,
-  } = useWalletSelector();
+  const { selectedAccount, seedPhrase, network } = useWalletSelector();
   return useCallback(
     async ({ message, domain }: { message: string | ClarityValue; domain?: TupleCV }) => {
       if (!selectedAccount) return null;
       const { privateKey } = await getStxAddressKeyChain(
         seedPhrase,
         network.type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet,
-        selectedAccount.id,
+        selectedAccount.id
       );
       if (messageType === 'utf8' && typeof message === 'string') {
         return signMessage(message, privateKey);
@@ -67,7 +63,7 @@ export function useSignMessage(messageType: SignatureMessageType) {
       if (!domain) throw new Error('Domain is required for structured messages');
       return signStructuredDataMessage(message as ClarityValue, domain, privateKey);
     },
-    [selectedAccount],
+    [selectedAccount]
   );
 }
 

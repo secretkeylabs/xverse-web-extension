@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import {
-  ReactNode, useEffect, useState,
-} from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
@@ -11,7 +9,11 @@ import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/c
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import TransferFeeView from '@components/transferFeeView';
 import {
-  setFee, setNonce, getNonce, signMultiStxTransactions, signTransaction,
+  setFee,
+  setNonce,
+  getNonce,
+  signMultiStxTransactions,
+  signTransaction,
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -94,10 +96,7 @@ function ConfirmStxTransationComponent({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const selectedNetwork = useNetworkSelector();
-  const {
-    selectedAccount,
-    seedPhrase,
-  } = useWalletSelector();
+  const { selectedAccount, seedPhrase } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
 
@@ -105,14 +104,15 @@ function ConfirmStxTransationComponent({
     setButtonLoading(loading);
   }, [loading]);
 
-  const getFee = () => (isSponsored
-    ? new BigNumber(0)
-    : new BigNumber(
-      initialStxTransactions
-        .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
-        .reduce((prev, curr) => prev + curr, BigInt(0))
-        .toString(10),
-    ));
+  const getFee = () =>
+    isSponsored
+      ? new BigNumber(0)
+      : new BigNumber(
+          initialStxTransactions
+            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+            .reduce((prev, curr) => prev + curr, BigInt(0))
+            .toString(10)
+        );
 
   const getTxNonce = (): string => {
     const nonce = getNonce(initialStxTransactions[0]);
@@ -134,7 +134,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions[0],
         seedPhrase,
         selectedAccount?.id ?? 0,
-        selectedNetwork,
+        selectedNetwork
       );
       signedTxs.push(signedContractCall);
     } else if (initialStxTransactions.length === 2) {
@@ -142,7 +142,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase,
+        seedPhrase
       );
     }
     onConfirmClick(signedTxs);
@@ -162,19 +162,16 @@ function ConfirmStxTransationComponent({
       <Container>
         {children}
         <TransferFeeContainer>
-          <TransferFeeView
-            fee={microstacksToStx(getFee())}
-            currency="STX"
-          />
+          <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
         </TransferFeeContainer>
 
         {!isSponsored && (
-        <Button onClick={onAdvancedSettingClick}>
-          <>
-            <ButtonImage src={SettingIcon} />
-            <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
-          </>
-        </Button>
+          <Button onClick={onAdvancedSettingClick}>
+            <>
+              <ButtonImage src={SettingIcon} />
+              <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
+            </>
+          </Button>
         )}
         {isSponsored && <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>}
         <TransactionSettingAlert

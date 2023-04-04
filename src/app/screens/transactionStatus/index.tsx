@@ -125,9 +125,8 @@ function TransactionStatus() {
   const navigate = useNavigate();
   const location = useLocation();
   const { network } = useWalletSelector();
-  const {
-    txid, currency, error, sponsored, browserTx, isOrdinal, isNft, errorTitle,
-  } = location.state;
+  const { txid, currency, error, sponsored, browserTx, isOrdinal, isNft, errorTitle } =
+    location.state;
 
   const renderTransactionSuccessStatus = (
     <Container>
@@ -170,9 +169,7 @@ function TransactionStatus() {
     <RowContainer>
       <BeforeButtonText>{t('SEE_ON')}</BeforeButtonText>
       <Button onClick={openTransactionInBrowser}>
-        <ButtonText>
-          {currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}
-        </ButtonText>
+        <ButtonText>{currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}</ButtonText>
         <ButtonImage src={ArrowSquareOut} />
       </Button>
     </RowContainer>
@@ -192,14 +189,15 @@ function TransactionStatus() {
 
   return (
     <TxStatusContainer>
-      {sponsored ? <OuterContainer>{renderTransactionSuccessStatus}</OuterContainer>
-        : (
-          <OuterContainer>
-            {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
-            {txid && renderLink}
-            {txid && renderTransactionID}
-          </OuterContainer>
-        )}
+      {sponsored ? (
+        <OuterContainer>{renderTransactionSuccessStatus}</OuterContainer>
+      ) : (
+        <OuterContainer>
+          {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
+          {txid && renderLink}
+          {txid && renderTransactionID}
+        </OuterContainer>
+      )}
       <ButtonContainer>
         <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
       </ButtonContainer>

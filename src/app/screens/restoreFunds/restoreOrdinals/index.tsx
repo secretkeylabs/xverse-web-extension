@@ -32,9 +32,7 @@ const ButtonContainer = styled.div({
 
 function RestoreOrdinals() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_ORDINAL_SCREEN' });
-  const {
-    btcAddress,
-  } = useWalletSelector();
+  const { btcAddress } = useWalletSelector();
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
 
@@ -53,15 +51,14 @@ function RestoreOrdinals() {
               <ActionButton text={t('BACK')} onPress={handleOnCancelClick} />
             </ButtonContainer>
           </>
-        )
-          : (
-            <>
-              <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
-              {ordinals?.map((ordinal) => (
-                <OrdinalRow ordinal={ordinal} />
-              ))}
-            </>
-          )}
+        ) : (
+          <>
+            <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
+            {ordinals?.map((ordinal) => (
+              <OrdinalRow ordinal={ordinal} />
+            ))}
+          </>
+        )}
       </Container>
       <BottomTabBar tab="nft" />
     </>

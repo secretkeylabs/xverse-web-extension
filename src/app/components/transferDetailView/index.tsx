@@ -57,7 +57,13 @@ interface Props {
 }
 
 function TransferDetailView({
-  icon, title, amount, children, address, hideAddress, hideCopyButton,
+  icon,
+  title,
+  amount,
+  children,
+  address,
+  hideAddress,
+  hideCopyButton,
 }: Props) {
   return (
     <RowContainer>
@@ -67,11 +73,12 @@ function TransferDetailView({
           <AmountText>{amount}</AmountText>
           {children}
         </ColumnContainer>
-      )
-        : <TitleText>{title}</TitleText>}
+      ) : (
+        <TitleText>{title}</TitleText>
+      )}
       <AddressContainer>
         {!hideAddress && <ValueText>{getTruncatedAddress(address)}</ValueText>}
-        {!hideCopyButton && <CopyButton text={address} /> }
+        {!hideCopyButton && <CopyButton text={address} />}
       </AddressContainer>
     </RowContainer>
   );

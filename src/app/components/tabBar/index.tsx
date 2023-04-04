@@ -28,25 +28,33 @@ const Button = styled.button({
 type Tab = 'dashboard' | 'nft' | 'stacking' | 'settings';
 
 interface Props {
-  tab: Tab
+  tab: Tab;
 }
-function BottomTabBar({ tab }:Props) {
+function BottomTabBar({ tab }: Props) {
   const navigate = useNavigate();
 
   const handleDashboardButtonClick = () => {
-    if (tab !== 'dashboard') { navigate('/'); }
+    if (tab !== 'dashboard') {
+      navigate('/');
+    }
   };
 
   const handleNftButtonClick = () => {
-    if (tab !== 'nft') { navigate('/nft-dashboard'); }
+    if (tab !== 'nft') {
+      navigate('/nft-dashboard');
+    }
   };
 
   const handleStackingButtonClick = () => {
-    if (tab !== 'stacking') { navigate('/stacking'); }
+    if (tab !== 'stacking') {
+      navigate('/stacking');
+    }
   };
 
   const handleSettingButtonClick = () => {
-    if (tab !== 'settings') { navigate('/settings'); }
+    if (tab !== 'settings') {
+      navigate('/settings');
+    }
   };
 
   return (

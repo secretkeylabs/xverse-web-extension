@@ -66,15 +66,11 @@ type Props = {
   loading: boolean;
 };
 
-function ConfirmScreen({
-  children, onConfirm, onCancel, confirmText, cancelText, loading,
-}: Props) {
+function ConfirmScreen({ children, onConfirm, onCancel, confirmText, cancelText, loading }: Props) {
   return (
     <>
       <MainContainer>
-        <ContentContainer>
-          {children}
-        </ContentContainer>
+        <ContentContainer>{children}</ContentContainer>
       </MainContainer>
       <ButtonsContainer>
         <CancelButton onClick={onCancel}>{cancelText}</CancelButton>

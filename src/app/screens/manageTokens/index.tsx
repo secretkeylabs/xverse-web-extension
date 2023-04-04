@@ -35,7 +35,7 @@ function ManageTokens() {
     /* if coins exists in list of fungible token, update the visible property otherwise
      add coin in list if coin is set to visible */
     const coinToBeUpdated: FungibleToken | undefined = coinsList?.find(
-      (ft) => ft.principal === coin.contract,
+      (ft) => ft.principal === coin.contract
     );
     if (coinToBeUpdated) coinToBeUpdated.visible = isEnabled;
     else if (!coinToBeUpdated && isEnabled) {
@@ -69,7 +69,13 @@ function ManageTokens() {
       <TopRow title={t('ADD_COINS')} onClick={handleBackButtonClick} />
       <TokenContainer>
         {coins.map((coin, index) => (
-          <CoinItem coin={coin} disabled={false} toggled={toggled} enabled={coin.visible} showDivider={showDivider(index)} />
+          <CoinItem
+            coin={coin}
+            disabled={false}
+            toggled={toggled}
+            enabled={coin.visible}
+            showDivider={showDivider(index)}
+          />
         ))}
       </TokenContainer>
     </Container>

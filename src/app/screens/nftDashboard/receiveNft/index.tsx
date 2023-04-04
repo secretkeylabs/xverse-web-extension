@@ -77,7 +77,6 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen }: Props) {
 
   return isGalleryOpen ? (
     <>
-
       <RowContainer>
         <Text>{t('RECEIVE_NFT')}</Text>
         <ButtonImage onClick={onClose}>

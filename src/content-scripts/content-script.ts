@@ -32,7 +32,7 @@ window.addEventListener('message', (event) => {
           method: 'getURLResponse',
           source: 'xverse-extension',
         },
-        event.origin,
+        event.origin
       );
     }
   }
@@ -50,7 +50,7 @@ connect();
 
 // Sends message to background script that an event has fired
 function sendMessageToBackground(
-  message: LegacyMessageFromContentScript | SatsConnectMessageFromContentScript,
+  message: LegacyMessageFromContentScript | SatsConnectMessageFromContentScript
 ) {
   backgroundPort.postMessage(message);
 }
@@ -80,7 +80,7 @@ function forwardDomEventToBackground({ payload, method }: ForwardDomEventToBackg
 
 // Listen for a CustomEvent (auth request) coming from the web app
 document.addEventListener(DomEventName.authenticationRequest, ((
-  event: AuthenticationRequestEvent,
+  event: AuthenticationRequestEvent
 ) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.AuthenticationRequest,
@@ -112,7 +112,7 @@ document.addEventListener(DomEventName.signatureRequest, ((event: SignatureReque
 
 // Listen for a CustomEvent (structured data signature request) coming from the web app
 document.addEventListener(DomEventName.structuredDataSignatureRequest, ((
-  event: SignatureRequestEvent,
+  event: SignatureRequestEvent
 ) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.SignatureRequest,
@@ -123,9 +123,7 @@ document.addEventListener(DomEventName.structuredDataSignatureRequest, ((
 }) as EventListener);
 
 // Listen for a CustomEvent (BTC Address request) coming from the web app
-document.addEventListener(DomEventName.getAddressRequest, ((
-  event: GetAddressRequestEvent,
-) => {
+document.addEventListener(DomEventName.getAddressRequest, ((event: GetAddressRequestEvent) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.AddressRequest,
     payload: event.detail.btcAddressRequest,
@@ -135,9 +133,7 @@ document.addEventListener(DomEventName.getAddressRequest, ((
 }) as EventListener);
 
 // Listen for a CustomEvent (PSBT Signing request) coming from the web app
-document.addEventListener(DomEventName.signPsbtRequest, ((
-  event: SignPsbtRequestEvent,
-) => {
+document.addEventListener(DomEventName.signPsbtRequest, ((event: SignPsbtRequestEvent) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.SignBtcTx,
     payload: event.detail.signPsbtRequest,

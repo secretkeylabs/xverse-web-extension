@@ -11,7 +11,7 @@ let inMemoryKey = '';
 async function internalBackgroundMessageHandler(
   message: BackgroundMessages,
   sender: chrome.runtime.MessageSender,
-  sendResponse: (response?: any) => void,
+  sendResponse: (response?: any) => void
 ) {
   if (!validateMessagesAreFromExtension(sender)) {
     return;

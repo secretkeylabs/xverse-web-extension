@@ -16,9 +16,7 @@ const CheckBoxWrapper = styled.div((props) => ({
 }));
 
 function CheckBox(props: CheckBoxProps): JSX.Element {
-  const {
-    isChecked, checkBoxId, checkBoxLabel, onCheck,
-  } = props;
+  const { isChecked, checkBoxId, checkBoxLabel, onCheck } = props;
   return (
     <CheckBoxWrapper>
       <input id={checkBoxId} type="checkbox" checked={isChecked} onChange={onCheck} />

@@ -6,7 +6,8 @@ import useWalletSelector from '../useWalletSelector';
 const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
   const { ordinalsAddress, network } = useWalletSelector();
 
-  const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> => fetchPendingOrdinalsTransactions(ordinalsAddress, network.type);
+  const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> =>
+    fetchPendingOrdinalsTransactions(ordinalsAddress, network.type);
 
   let isPending: boolean | undefined = false;
   let pendingTxHash: string | undefined;
@@ -15,7 +16,10 @@ const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
 
   if (response.data) {
     response.data.forEach((tx) => {
-      tx.vin.forEach((v) => { if (v.txid === ordinalUtxoHash) isPending = true; pendingTxHash = tx.txid; });
+      tx.vin.forEach((v) => {
+        if (v.txid === ordinalUtxoHash) isPending = true;
+        pendingTxHash = tx.txid;
+      });
     });
   }
 

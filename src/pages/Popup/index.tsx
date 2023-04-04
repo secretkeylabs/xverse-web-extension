@@ -11,11 +11,13 @@ declare const VERSION: string;
 
 async function checkForInMemoryKeys() {
   // eslint-disable-next-line no-promise-executor-return
-  return new Promise((resolve) => chrome.runtime.sendMessage({ method: InternalMethods.RequestInMemoryKeys }, (resp) => {
-    if (Object.keys(resp).length === 0) return resolve(true);
-    rootStore.store.dispatch(setWalletSeedPhraseAction(resp));
-    resolve(true);
-  }));
+  return new Promise((resolve) =>
+    chrome.runtime.sendMessage({ method: InternalMethods.RequestInMemoryKeys }, (resp) => {
+      if (Object.keys(resp).length === 0) return resolve(true);
+      rootStore.store.dispatch(setWalletSeedPhraseAction(resp));
+      resolve(true);
+    })
+  );
 }
 const renderApp = async () => {
   await checkForInMemoryKeys();

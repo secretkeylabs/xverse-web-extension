@@ -28,14 +28,16 @@ const BarLoaderContainer = styled.div((props) => ({
 interface Props {
   title: string;
   value: string | undefined;
-  color?:string;
+  color?: string;
 }
 
 function StackingInfoTile({ title, value, color }: Props) {
   return (
     <Container>
       <TitleText>{title}</TitleText>
-      {value ? <ValueText color={color}>{value}</ValueText> : (
+      {value ? (
+        <ValueText color={color}>{value}</ValueText>
+      ) : (
         <BarLoaderContainer>
           <BarLoader loaderSize={LoaderSize.LARGE} />
         </BarLoaderContainer>

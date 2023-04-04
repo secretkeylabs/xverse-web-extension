@@ -12,7 +12,9 @@ const Button = styled.button<ButtonProps>((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
-  backgroundColor: props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classic,
+  backgroundColor: props.warning
+    ? props.theme.colors.feedback.error
+    : props.theme.colors.action.classic,
   width: '100%',
   height: 44,
   opacity: props.disabled ? 0.6 : 1,
@@ -21,20 +23,21 @@ const Button = styled.button<ButtonProps>((props) => ({
 
 const AnimatedButton = styled(Button)`
   :hover {
-    background: ${(props) => (props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classicLight)};
+    background: ${(props) =>
+      props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classicLight};
     opacity: 0.6;
   }
 `;
 
 const TransparentButton = styled(Button)`
   background-color: transparent;
-  border: ${(props) => `1px solid ${props.theme.colors.background.elevation6}`}
+  border: ${(props) => `1px solid ${props.theme.colors.background.elevation6}`};
 `;
 
 const AnimatedTransparentButton = styled(TransparentButton)`
-:hover {
-  background: ${(props) => props.theme.colors.background.elevation6_800};
-}
+  :hover {
+    background: ${(props) => props.theme.colors.background.elevation6_800};
+  }
 `;
 
 const ButtonText = styled.div((props) => ({
@@ -70,14 +73,13 @@ function ActionButton({
   warning,
 }: Props) {
   const handleOnPress = () => {
-    if (!disabled) { onPress(); }
+    if (!disabled) {
+      onPress();
+    }
   };
   if (transparent) {
     return (
-      <AnimatedTransparentButton
-        onClick={handleOnPress}
-        disabled={disabled}
-      >
+      <AnimatedTransparentButton onClick={handleOnPress} disabled={disabled}>
         {processing ? (
           <MoonLoader color="white" size={10} />
         ) : (
@@ -91,16 +93,12 @@ function ActionButton({
   }
 
   return (
-    <AnimatedButton
-      onClick={handleOnPress}
-      disabled={disabled}
-      warning={warning}
-    >
+    <AnimatedButton onClick={handleOnPress} disabled={disabled} warning={warning}>
       {processing ? (
         <MoonLoader color="white" size={12} />
       ) : (
         <>
-          { src && <ButtonImage src={src} />}
+          {src && <ButtonImage src={src} />}
           <ButtonText>{text}</ButtonText>
         </>
       )}

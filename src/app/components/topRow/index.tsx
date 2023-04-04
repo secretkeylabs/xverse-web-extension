@@ -26,16 +26,15 @@ const BackButton = styled.button({
 });
 
 const AnimatedBackButton = styled(BackButton)`
-:hover {
-  background: ${(props) => props.theme.colors.white[900]};
-  border-radius: 24px;
-}
-:focus {
-  background: ${(props) => props.theme.colors.white[850]};
-  border-radius: 24px;
-}
+  :hover {
+    background: ${(props) => props.theme.colors.white[900]};
+    border-radius: 24px;
+  }
+  :focus {
+    background: ${(props) => props.theme.colors.white[850]};
+    border-radius: 24px;
+  }
 `;
-
 
 interface Props {
   title: string;
@@ -44,12 +43,12 @@ interface Props {
 
 function TopRow({ title, onClick }: Props) {
   return (
-      <TopSectionContainer>
-        <AnimatedBackButton onClick={onClick}>
-          <img src={ArrowLeft} alt="back button" />
-        </AnimatedBackButton>
-        <HeaderText>{title}</HeaderText>
-      </TopSectionContainer>
+    <TopSectionContainer>
+      <AnimatedBackButton onClick={onClick}>
+        <img src={ArrowLeft} alt="back button" />
+      </AnimatedBackButton>
+      <HeaderText>{title}</HeaderText>
+    </TopSectionContainer>
   );
 }
 

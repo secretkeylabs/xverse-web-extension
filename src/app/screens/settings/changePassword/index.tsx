@@ -109,40 +109,40 @@ function ChangePasswordScreen() {
       <TopRow title={t('SETTING_SCREEN.UPDATE_PASSWORD')} onClick={handleBackButtonClick} />
       <PasswordContainer>
         {currentStepIndex === 0 && (
-        <PasswordInput
-          title={t('CREATE_PASSWORD_SCREEN.ENTER_PASSWORD')}
-          inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_ENTER_PASSWORD_LABEL')}
-          enteredPassword={password}
-          setEnteredPassword={setPassword}
-          handleContinue={handleConfirmCurrentPasswordNextClick}
-          handleBack={handleBackButtonClick}
-          passwordError={error}
-          stackButtonAlignment
-        />
+          <PasswordInput
+            title={t('CREATE_PASSWORD_SCREEN.ENTER_PASSWORD')}
+            inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_ENTER_PASSWORD_LABEL')}
+            enteredPassword={password}
+            setEnteredPassword={setPassword}
+            handleContinue={handleConfirmCurrentPasswordNextClick}
+            handleBack={handleBackButtonClick}
+            passwordError={error}
+            stackButtonAlignment
+          />
         )}
         {currentStepIndex === 1 && (
-        <PasswordInput
-          title={t('CREATE_PASSWORD_SCREEN.CREATE_PASSWORD_TITLE')}
-          inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
-          enteredPassword={password}
-          setEnteredPassword={setPassword}
-          handleContinue={handleEnterNewPasswordNextClick}
-          handleBack={handleBackButtonClick}
-          checkPasswordStrength
-          stackButtonAlignment
-        />
+          <PasswordInput
+            title={t('CREATE_PASSWORD_SCREEN.CREATE_PASSWORD_TITLE')}
+            inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
+            enteredPassword={password}
+            setEnteredPassword={setPassword}
+            handleContinue={handleEnterNewPasswordNextClick}
+            handleBack={handleBackButtonClick}
+            checkPasswordStrength
+            stackButtonAlignment
+          />
         )}
         {currentStepIndex === 2 && (
-        <PasswordInput
-          title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
-          inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
-          enteredPassword={confirmPassword}
-          setEnteredPassword={setConfirmPassword}
-          handleContinue={handleConfirmNewPasswordNextClick}
-          handleBack={handleConfirmNewPasswordBackClick}
-          passwordError={error}
-          stackButtonAlignment
-        />
+          <PasswordInput
+            title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
+            inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
+            enteredPassword={confirmPassword}
+            setEnteredPassword={setConfirmPassword}
+            handleContinue={handleConfirmNewPasswordNextClick}
+            handleBack={handleConfirmNewPasswordBackClick}
+            passwordError={error}
+            stackButtonAlignment
+          />
         )}
       </PasswordContainer>
       <BottomBar tab="settings" />

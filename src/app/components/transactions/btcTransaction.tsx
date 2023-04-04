@@ -66,7 +66,6 @@ export default function BtcTransactionHistoryItem(props: TransactionHistoryItemP
           <TransactionAmountContainer>
             <TransactionAmount transaction={transaction} coin="BTC" />
           </TransactionAmountContainer>
-
         </TransactionRow>
         <TransactionRow>
           <TransactionRecipient transaction={transaction} />

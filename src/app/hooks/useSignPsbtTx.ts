@@ -2,15 +2,17 @@ import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SignTransactionOptions } from 'sats-connect';
-import { InputToSign, signPsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
+import {
+  InputToSign,
+  signPsbt,
+  psbtBase64ToHex,
+} from '@secretkeylabs/xverse-core/transactions/psbt';
 import { broadcastRawBtcOrdinalTransaction } from '@secretkeylabs/xverse-core/api';
 
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 
 const useSignPsbtTx = () => {
-  const {
-    seedPhrase, accountsList, network,
-  } = useWalletSelector();
+  const { seedPhrase, accountsList, network } = useWalletSelector();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('signPsbtRequest') ?? '';
@@ -19,16 +21,16 @@ const useSignPsbtTx = () => {
 
   const confirmSignPsbt = async () => {
     const signingResponse = await signPsbt(
-      seedPhrase, 
-      accountsList, 
-      request.payload.inputsToSign, 
-      request.payload.psbtBase64, 
+      seedPhrase,
+      accountsList,
+      request.payload.inputsToSign,
+      request.payload.psbtBase64,
       request.payload.broadcast,
       network.type
     );
     let txId: string = '';
     if (request.payload.broadcast) {
-      const txHex = psbtBase64ToHex(signingResponse)
+      const txHex = psbtBase64ToHex(signingResponse);
       txId = await broadcastRawBtcOrdinalTransaction(txHex, network.type);
     }
     const signingMessage = {
@@ -59,7 +61,7 @@ const useSignPsbtTx = () => {
   };
 
   const getSigningAddresses = (inputsToSign: Array<InputToSign>) => {
-    const signingAddresses : Array<string> = [];
+    const signingAddresses: Array<string> = [];
     inputsToSign.forEach((inputToSign) => {
       inputToSign.signingIndexes.forEach((signingIndex) => {
         signingAddresses[signingIndex] = inputToSign.address;

@@ -112,7 +112,7 @@ interface Props {
   children?: ReactNode;
   assetDetail?: string;
   isRestoreFundFlow?: boolean;
-  nonOrdinalUtxos?: BtcUtxoDataResponse [];
+  nonOrdinalUtxos?: BtcUtxoDataResponse[];
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -136,10 +136,8 @@ function ConfirmBtcTransactionComponent({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
-  const {
-    btcAddress, selectedAccount, seedPhrase, network, btcFiatRate,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
+  const { btcAddress, selectedAccount, seedPhrase, network, btcFiatRate } = useSelector(
+    (state: StoreState) => state.walletState
   );
   const [currentFee, setCurrentFee] = useState(fee);
   const [error, setError] = useState('');
@@ -150,20 +148,22 @@ function ConfirmBtcTransactionComponent({
     error: txError,
     mutate,
   } = useMutation<
-  SignedBtcTx,
-  ResponseError,
-  {
-    recipients: Recipient[];
-    txFee: string;
-  }
-  >(async ({ recipients, txFee }) => signBtcTransaction(
-    recipients,
-    btcAddress,
-    selectedAccount?.id ?? 0,
-    seedPhrase,
-    network.type,
-    new BigNumber(txFee),
-  ));
+    SignedBtcTx,
+    ResponseError,
+    {
+      recipients: Recipient[];
+      txFee: string;
+    }
+  >(async ({ recipients, txFee }) =>
+    signBtcTransaction(
+      recipients,
+      btcAddress,
+      selectedAccount?.id ?? 0,
+      seedPhrase,
+      network.type,
+      new BigNumber(txFee)
+    )
+  );
 
   const {
     isLoading: isLoadingNonOrdinalBtcSend,
@@ -177,7 +177,7 @@ function ConfirmBtcTransactionComponent({
       selectedAccount?.id ?? 0,
       seedPhrase,
       network.type,
-      new BigNumber(txFee),
+      new BigNumber(txFee)
     );
     return signedNonOrdinalBtcTx;
   });
@@ -188,14 +188,14 @@ function ConfirmBtcTransactionComponent({
     error: ordinalError,
     mutate: ordinalMutate,
   } = useMutation<SignedBtcTx, ResponseError, string>(async (txFee) => {
-    const signedTx = await signOrdinalSendTransaction(
+    const signedTxn = await signOrdinalSendTransaction(
       recipients[0]?.address,
       ordinalTxUtxo!,
       btcAddress,
       Number(selectedAccount?.id),
       seedPhrase,
       network.type,
-      new BigNumber(txFee),
+      new BigNumber(txFee)
     );
     return signedTx;
   });
@@ -288,9 +288,8 @@ function ConfirmBtcTransactionComponent({
       <Container>
         {children}
         <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
-          {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
+          {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
         </ReviewTransactionText>
-
         {ordinalTxUtxo ? (
           <BtcRecipientComponent
             address={recipients[0]?.address}
@@ -307,20 +306,17 @@ function ConfirmBtcTransactionComponent({
               totalRecipient={recipients?.length}
               icon={IconBitcoin}
               title={t('CONFIRM_TRANSACTION.AMOUNT')}
-              subValue={getBtcFiatEquivalent(
-                recipient?.amountSats,
-                btcFiatRate,
-              )}
+              subValue={getBtcFiatEquivalent(recipient?.amountSats, btcFiatRate)}
             />
           ))
         )}
-
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         <TransactionDetailComponent
           title={t('CONFIRM_TRANSACTION.FEES')}
           value={`${currentFee.toString()} ${t('SATS')}`}
           subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
         />
+        eqweq
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
@@ -348,13 +344,19 @@ function ConfirmBtcTransactionComponent({
             text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={onCancelClick}
-            disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+            disabled={
+              loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+            }
           />
         </TransparentButtonContainer>
         <ActionButton
           text={t('CONFIRM_TRANSACTION.CONFIRM')}
-          disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
-          processing={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+          disabled={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
+          processing={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>

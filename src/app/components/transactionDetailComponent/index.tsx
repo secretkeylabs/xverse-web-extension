@@ -51,12 +51,8 @@ interface Props {
   subValue?: BigNumber;
 }
 
-function TransactionDetailComponent({
-  title, subTitle, value, subValue,
-}: Props) {
-  const {
-    fiatCurrency,
-  } = useSelector((state: StoreState) => state.walletState);
+function TransactionDetailComponent({ title, subTitle, value, subValue }: Props) {
+  const { fiatCurrency } = useSelector((state: StoreState) => state.walletState);
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (fiatAmount) {

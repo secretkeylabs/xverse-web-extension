@@ -61,9 +61,7 @@ function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {
-    network, accountsList, selectedAccount,
-  } = useWalletSelector();
+  const { network, accountsList, selectedAccount } = useWalletSelector();
   const { createAccount } = useWalletReducer();
 
   const handleAccountSelect = (account: Account) => {
@@ -77,8 +75,8 @@ function AccountList(): JSX.Element {
         account.stxPublicKey,
         account.btcPublicKey,
         account.ordinalsPublicKey,
-        network,
-      ),
+        network
+      )
     );
     navigate(-1);
   };

@@ -11,9 +11,10 @@ export async function getContractCallPromises(
   payload: TransactionPayload,
   stxAddress: string,
   network: StacksNetwork,
-  stxPublicKey: string,
+  stxPublicKey: string
 ) {
-  const [unSignedContractCall, contractInterface, coinsMetaData, showPostConditionMessage] = await createContractCallPromises(payload, stxAddress, network, stxPublicKey);
+  const [unSignedContractCall, contractInterface, coinsMetaData, showPostConditionMessage] =
+    await createContractCallPromises(payload, stxAddress, network, stxPublicKey);
   return {
     unSignedContractCall,
     contractInterface,
@@ -29,7 +30,7 @@ export async function getTokenTransferRequest(
   stxPublicKey: string,
   feeMultipliers: FeesMultipliers,
   network: StacksNetwork,
-  stxPendingTransactions,
+  stxPendingTransactions
 ) {
   const unsignedSendStxTx: StacksTransaction = await generateUnsignedStxTokenTransferTransaction(
     recipient,
@@ -37,7 +38,7 @@ export async function getTokenTransferRequest(
     memo!,
     stxPendingTransactions?.pendingTransactions ?? [],
     stxPublicKey,
-    network,
+    network
   );
   // increasing the fees with multiplication factor
   const fee: bigint = BigInt(unsignedSendStxTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);

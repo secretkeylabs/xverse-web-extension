@@ -25,7 +25,7 @@ const ScrollContainer = styled.div`
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
-  };
+  }
   height: 600px;
   width: 360px;
   margin: auto;
@@ -124,12 +124,8 @@ function ConfirmNftTransaction() {
   const nftIdDetails = id!.split('::');
   const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
   const { unsignedTx, recipientAddress } = location.state;
-  const {
-    network,
-  } = useWalletSelector();
-  const {
-    refetch,
-  } = useStxWalletData();
+  const { network } = useWalletSelector();
+  const { refetch } = useStxWalletData();
   const selectedNetwork = useNetworkSelector();
 
   const {
@@ -137,10 +133,9 @@ function ConfirmNftTransaction() {
     error: txError,
     data: stxTxBroadcastData,
     mutate,
-  } = useMutation<
-  string,
-  Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
+  } = useMutation<string, Error, { signedTx: StacksTransaction }>(async ({ signedTx }) =>
+    broadcastSignedTransaction(signedTx, selectedNetwork)
+  );
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -189,17 +184,17 @@ function ConfirmNftTransaction() {
   return (
     <>
       {isGalleryOpen && (
-      <>
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-        <ButtonContainer>
-          <Button onClick={handleOnCancelClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-            </>
-          </Button>
-        </ButtonContainer>
-      </>
+        <>
+          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
+          <ButtonContainer>
+            <Button onClick={handleOnCancelClick}>
+              <>
+                <ButtonImage src={ArrowLeft} />
+                <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
+              </>
+            </Button>
+          </ButtonContainer>
+        </>
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
@@ -212,10 +207,7 @@ function ConfirmNftTransaction() {
           <Container>
             <IndicationText>{t('INDICATION')}</IndicationText>
             <NFtContainer>
-
-              <NftImage
-                metadata={nft?.token_metadata!}
-              />
+              <NftImage metadata={nft?.token_metadata!} />
             </NFtContainer>
             <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
           </Container>
@@ -226,7 +218,6 @@ function ConfirmNftTransaction() {
         {!isGalleryOpen && <BottomBar tab="nft" />}
       </ScrollContainer>
     </>
-
   );
 }
 export default ConfirmNftTransaction;

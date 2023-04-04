@@ -1,6 +1,4 @@
-import {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ActionButton from '@components/button';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -59,15 +57,12 @@ const ReviewTransactionText = styled.h1((props) => ({
 }));
 
 function SignPsbtRequest() {
-  const {
-    btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate,
-  } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
+    useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const {
-    payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses,
-  } = useSignPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
 
   const handlePsbtParsing = useCallback(() => {
@@ -82,7 +77,7 @@ function SignPsbtRequest() {
 
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
-    [payload.inputsToSign],
+    [payload.inputsToSign]
   );
 
   const checkIfMismatch = () => {
@@ -168,20 +163,21 @@ function SignPsbtRequest() {
     setExpandInputOutputView(!expandInputOutputView);
   };
 
-  const getSatsAmountString = (sats: BigNumber) =>
+  const getSatsAmountString = (sats: BigNumber) => (
     <NumericFormat
       value={sats.toString()}
       displayType="text"
       thousandSeparator
       suffix={` ${t('SATS')}`}
-    />;
+    />
+  );
 
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
       <OuterContainer>
         <Container>
-          <ReviewTransactionText>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>
+          <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
           {!payload.broadcast ? (
             <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
           ) : null}
