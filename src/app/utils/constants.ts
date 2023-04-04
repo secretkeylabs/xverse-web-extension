@@ -1,4 +1,5 @@
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
+import { HIRO_MAINNET_DEFAULT, HIRO_TESTNET_DEFAULT } from '@secretkeylabs/xverse-core/constant';
 
 export const BNS_CONTRACT = 'SP000000000000000000002Q6VF78.bns::names';
 export const GAMMA_URL = 'https://gamma.io/';
@@ -33,15 +34,16 @@ export const REFETCH_UNSPENT_UTXO_TIME = 2 * 60 * 60 * 1000;
 export const initialNetworksList: SettingsNetwork[] = [
   {
     type: 'Mainnet',
-    address: 'https://stacks-node-api.mainnet.stacks.co',
+    address: HIRO_MAINNET_DEFAULT,
   },
   {
     type: 'Testnet',
-    address: 'https://stacks-node-api.testnet.stacks.co',
+    address: HIRO_TESTNET_DEFAULT,
   },
 ];
 
 /**
  * contract id of send_many transaction type
  */
-export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
+export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
+  'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
