@@ -1,49 +1,57 @@
 import styled from 'styled-components';
 
 const Icon = styled.img((props) => ({
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.spacing(8),
   width: 32,
   height: 32,
   borderRadius: 30,
 }));
 
 const TitleText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  ...props.theme.body_bold_l,
+  color: props.theme.colors.white[0],
 }));
 
 const ValueText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  ...props.theme.body_m,
+  textAlign: 'left',
+  color: props.theme.colors.white[400],
 }));
 
 const Container = styled.div({
   display: 'flex',
-  flex: 1,
-  justifyContent: 'flex-end',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
 });
 
-const RowContainer = styled.div({
+const RowContainer = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginTop: 24,
   alignItems: 'center',
-  justifyContent: 'center',
-});
+  borderRadius: 8,
+  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  padding: 16,
+  background: 'transparent',
+  width: '100%',
+  marginBottom: 12,
+}));
 
 interface Props {
   image: string;
   title: string;
-  value: string;
+  description: string;
+  onClick: () => void;
 }
 
-function FundsRow({ image, title, value }: Props) {
+function FundsRow({
+  image, title, description, onClick,
+}: Props) {
   return (
-    <RowContainer>
+    <RowContainer onClick={onClick}>
       <Icon src={image} />
-      <TitleText>{title}</TitleText>
       <Container>
-        <ValueText>{value}</ValueText>
+        <TitleText>{title}</TitleText>
+        <ValueText>{description}</ValueText>
       </Container>
     </RowContainer>
 

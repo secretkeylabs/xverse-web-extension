@@ -16,6 +16,7 @@ import AccountHeaderComponent from '@components/accountHeader';
 import BtcRecipientComponent from '@components/confirmBtcTransactionComponent/btcRecipientComponent';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
+import { NumericFormat } from 'react-number-format';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -58,12 +59,15 @@ const ReviewTransactionText = styled.h1((props) => ({
 }));
 
 function SignPsbtRequest() {
-  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
-    useWalletSelector();
+  const {
+    btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate,
+  } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
+  const {
+    payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses,
+  } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
 
   const handlePsbtParsing = useCallback(() => {
@@ -78,7 +82,7 @@ function SignPsbtRequest() {
 
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
-    [payload.inputsToSign]
+    [payload.inputsToSign],
   );
 
   const checkIfMismatch = () => {
@@ -164,6 +168,14 @@ function SignPsbtRequest() {
     setExpandInputOutputView(!expandInputOutputView);
   };
 
+  const getSatsAmountString = (sats: BigNumber) =>
+    <NumericFormat
+      value={sats.toString()}
+      displayType="text"
+      thousandSeparator
+      suffix={` ${t('SATS')}`}
+    />;
+
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
@@ -177,10 +189,15 @@ function SignPsbtRequest() {
             value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
               .toString()
               .replace('-', '')} BTC`}
-            subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt.netAmount), btcFiatRate)}
+            subValue={getBtcFiatEquivalent(
+              new BigNumber(
+                parsedPsbt?.netAmount < 0 ? parsedPsbt?.netAmount * -1n : parsedPsbt?.netAmount
+              ),
+              btcFiatRate
+            )}
             icon={IconBitcoin}
             title={t('AMOUNT')}
-            heading="You will transfer "
+            heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
           />
           <InputOutputComponent
             parsedPsbt={parsedPsbt}
@@ -193,7 +210,7 @@ function SignPsbtRequest() {
           {payload.broadcast ? (
             <TransactionDetailComponent
               title={t('FEES')}
-              value={`${parsedPsbt?.fees.toString()} ${t('SATS')}`}
+              value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
               subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
             />
           ) : null}

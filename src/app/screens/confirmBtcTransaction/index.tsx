@@ -21,7 +21,7 @@ function ConfirmBtcTransaction() {
   const location = useLocation();
   const { refetch } = useBtcWalletData();
   const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow,
+    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos,
   } = location.state;
   const {
     isLoading,
@@ -136,6 +136,8 @@ function ConfirmBtcTransaction() {
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={goBackToScreen}
         onBackButtonClick={goBackToScreen}
+        isRestoreFundFlow={isRestoreFundFlow}
+        nonOrdinalUtxos={unspentUtxos}
       />
       <BottomBarContainer>
         <BottomBar tab="dashboard" />

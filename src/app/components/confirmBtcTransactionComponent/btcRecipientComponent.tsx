@@ -90,7 +90,7 @@ interface Props {
   icon: string;
   title: string;
   heading?: string;
-  showSenderAddress?: string;
+  showSenderAddress?: boolean;
 }
 function BtcRecipientComponent({
   recipientIndex,
