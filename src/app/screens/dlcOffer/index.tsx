@@ -23,6 +23,7 @@ import AccountHeaderComponent from '@components/accountHeader';
 import TokenImage from '@components/tokenImage';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
+import { useBtcWalletData } from '@hooks/queries/useBtcWalletData';
 
 const Container = styled.div`
   display: flex;
@@ -147,6 +148,7 @@ function DlcOfferRequest() {
     selectedAccount,
     btcFiatRate,
   } = useSelector((state: StoreState) => state.walletState);
+  const { refetch } = useBtcWalletData();
 
   const {
     processing,
@@ -161,7 +163,7 @@ function DlcOfferRequest() {
   const [contractMaturityBound, setContractMaturityBound] = useState<string>();
   const [usdEquivalent, setUsdEquivalent] = useState<string>();
   const [canAccept, setCanAccept] = useState(false);
-  
+
   async function handlePrivateKey() {
     const btcPrivateKey = await getBtcNativeSegwitPrivateKey({
       seedPhrase,
@@ -180,7 +182,7 @@ function DlcOfferRequest() {
 
     if (selectedContract && currentId) {
       dispatch(
-        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type)
+        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type),
       );
     }
   }
@@ -198,6 +200,10 @@ function DlcOfferRequest() {
       dispatch(signRequest(currentId, btcPrivateKey, network.type, counterpartyWalletUrl!));
     }
   }
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   useEffect(() => {
     if (offer) {
@@ -228,7 +234,7 @@ function DlcOfferRequest() {
 
   useEffect(() => {
     if (error) {
-      dispatch(actionError({ error: '' }));
+     console.error(error)
     }
   }, [error]);
 
@@ -250,6 +256,7 @@ function DlcOfferRequest() {
       actionSuccess &&
       selectedContract?.state === ContractState.Accepted
     ) {
+      console.log('writeandsingacceptmessage');
       writeAndSignAcceptMessage();
     }
   }, [acceptMessageSubmitted, actionSuccess, selectedContract]);
@@ -264,8 +271,7 @@ function DlcOfferRequest() {
           <TitleText>Amount</TitleText>
           <AmountContainer>
             <AmountText>
-              {satsToBtc(new BigNumber(selectedContract.contractInfo.totalCollateral)).toString()}
-              {' '}
+              {satsToBtc(new BigNumber(selectedContract.contractInfo.totalCollateral)).toString()}{' '}
               BTC
             </AmountText>
             <TokenImageContainer>

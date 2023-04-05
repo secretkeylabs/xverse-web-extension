@@ -45,12 +45,10 @@ const dlcReducer = (
         ...state, processing: true, acceptMessageSubmitted: false, signingRequested: false,
       };
     case AcceptRequestKey:
-      console.log('Accepting')
       return { ...state, processing: true, acceptMessageSubmitted: true };
     case RejectRequestKey:
       return { ...state, processing: true };
     case SignRequestKey:
-      console.log('Signing')
       return { ...state, processing: true, signingRequested: true };
     case ActionSuccessKey: {
       const updatedContract = action.contract;

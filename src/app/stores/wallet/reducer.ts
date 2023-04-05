@@ -21,6 +21,7 @@ import {
   SetStxWalletDataKey,
   SetCoinRatesKey,
   ChangeHasActivatedOrdinalsKey,
+  ChangeHasActivatedDLCsKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
 } from './actions/types';
@@ -56,6 +57,7 @@ const initialWalletState: WalletState = {
   feeMultipliers: null,
   networkAddress: undefined,
   hasActivatedOrdinalsKey: undefined,
+  hasActivatedDLCsKey: false,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
 };
@@ -178,6 +180,11 @@ const walletReducer = (
       return {
         ...state,
         hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
+      };
+    case ChangeHasActivatedDLCsKey:
+      return {
+        ...state,
+        hasActivatedDLCsKey: action.hasActivatedDLCsKey,
       };
     case ChangeShowBtcReceiveAlertKey:
       return {

@@ -195,6 +195,13 @@ export function ChangeActivateOrdinalsAction(hasActivatedOrdinalsKey: boolean): 
   };
 }
 
+export function ChangeActivateDLCsAction(hasActivatedDLCsKey: boolean): actions.ChangeActivateDLCs {
+  return {
+    type: actions.ChangeHasActivatedDLCsKey,
+    hasActivatedDLCsKey,
+  };
+}
+
 export function ChangeShowBtcReceiveAlertAction(showBtcReceiveAlert: boolean | null): actions.ChangeShowBtcReceiveAlert {
   return {
     type: actions.ChangeShowBtcReceiveAlertKey,

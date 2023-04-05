@@ -5,15 +5,13 @@ import XverseLogo from '@assets/img/settings/logo.svg';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import BottomBar from '@components/tabBar';
-import {
-  PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK,
-} from '@utils/constants';
+import { PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK } from '@utils/constants';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useDispatch } from 'react-redux';
-import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
+import { ChangeActivateOrdinalsAction, ChangeActivateDLCsAction } from '@stores/wallet/actions/actionCreators';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import ResetWalletPrompt from '../../components/resetWallet';
 import SettingComponent from './settingComponent';
@@ -57,16 +55,11 @@ function Setting() {
   const [showResetWalletDisplay, setShowResetWalletDisplay] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const {
-    fiatCurrency, network, hasActivatedOrdinalsKey,
-  } = useWalletSelector();
+  const { fiatCurrency, network, hasActivatedOrdinalsKey, hasActivatedDLCsKey } = useWalletSelector();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { unlockWallet, resetWallet } = useWalletReducer();
-  const {
-    unspentUtxos,
-    isLoading,
-  } = useNonOrdinalUtxos();
+  const { unspentUtxos, isLoading } = useNonOrdinalUtxos();
 
   const openTermsOfService = () => {
     window.open(TERMS_LINK);
@@ -94,6 +87,10 @@ function Setting() {
 
   const switchActivateOrdinalState = () => {
     dispatch(ChangeActivateOrdinalsAction(!hasActivatedOrdinalsKey));
+  };
+
+  const switchActivateDLCsState = () => {
+    dispatch(ChangeActivateDLCsAction(!hasActivatedDLCsKey));
   };
 
   const openUpdatePasswordScreen = () => {
@@ -142,19 +139,19 @@ function Setting() {
 
   return (
     <>
-      { showResetWalletDisplay && (
-      <ResetWalletContainer>
-        <PasswordInput
-          title={t('ENTER_PASSWORD')}
-          inputLabel={t('PASSWORD')}
-          enteredPassword={password}
-          setEnteredPassword={setPassword}
-          handleContinue={handlePasswordNextClick}
-          handleBack={goToSettingScreen}
-          passwordError={error}
-          stackButtonAlignment
-        />
-      </ResetWalletContainer>
+      {showResetWalletDisplay && (
+        <ResetWalletContainer>
+          <PasswordInput
+            title={t('ENTER_PASSWORD')}
+            inputLabel={t('PASSWORD')}
+            enteredPassword={password}
+            setEnteredPassword={setPassword}
+            handleContinue={handlePasswordNextClick}
+            handleBack={goToSettingScreen}
+            passwordError={error}
+            stackButtonAlignment
+          />
+        </ResetWalletContainer>
       )}
       <LogoContainer>
         <img src={XverseLogo} alt="xverse logo" />
@@ -198,13 +195,21 @@ function Setting() {
           toggleValue={hasActivatedOrdinalsKey}
           showDivider
         />
-        {!isLoading && unspentUtxos && unspentUtxos?.length > 0 && (
         <SettingComponent
-          text={t('RECOVER_BTC')}
-          onClick={onRestoreFundClick}
-          icon={ArrowIcon}
+          title={t('DLCS')}
+          text={t('ACTIVATE_DLCS')}
+          toggle
+          toggleFunction={switchActivateDLCsState}
+          toggleValue={hasActivatedDLCsKey}
           showDivider
         />
+        {!isLoading && unspentUtxos && unspentUtxos?.length > 0 && (
+          <SettingComponent
+            text={t('RECOVER_BTC')}
+            onClick={onRestoreFundClick}
+            icon={ArrowIcon}
+            showDivider
+          />
         )}
 
         <SettingComponent
@@ -227,7 +232,11 @@ function Setting() {
           showDivider
         />
         <SettingComponent text={`${t('VERSION')}`} textDetail={`${VERSION} (Beta)`} />
-        <ResetWalletPrompt showResetWalletPrompt={showResetWalletPrompt} onResetWalletPromptClose={onResetWalletPromptClose} openResetWalletScreen={openResetWalletScreen} />
+        <ResetWalletPrompt
+          showResetWalletPrompt={showResetWalletPrompt}
+          onResetWalletPromptClose={onResetWalletPromptClose}
+          openResetWalletScreen={openResetWalletScreen}
+        />
       </Container>
 
       <BottomBar tab="settings" />

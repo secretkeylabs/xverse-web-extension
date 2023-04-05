@@ -104,11 +104,11 @@ function DlcList(): JSX.Element {
   }, []);
 
   const onBTCSendClick = () => {
-    navigate('/send-btc-prefilled/nested');
+    navigate('/dlc/send-btc-prefilled/nested');
   };
 
   const onBTCReceiveClick = () => {
-    navigate('/send-btc-prefilled/native');
+    navigate('/dlc/send-btc-prefilled/native');
   };
 
   return (

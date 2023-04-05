@@ -51,7 +51,7 @@ export interface AcceptRequest {
   btcAddress: string;
   btcPublicKey: string;
   btcPrivateKey: string;
-  network: Network;
+  network: NetworkType;
 }
 
 export interface SignRequest {

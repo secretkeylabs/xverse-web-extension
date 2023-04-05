@@ -32,6 +32,8 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useCoinsData from '@hooks/queries/useCoinData';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
+import DLCActionButton from '@components/dlcButton';
+import DlcTab from '@assets/img/bottomTabBar/dlc_tab.svg';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -131,7 +133,14 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { coinsList, stxAddress, btcAddress, ordinalsAddress } = useWalletSelector();
+  const {
+    coinsList,
+    stxAddress,
+    btcAddress,
+    ordinalsAddress,
+    hasActivatedDLCsKey,
+    network,
+  } = useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData, refetch } = useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
@@ -140,8 +149,8 @@ function Home() {
 
   useEffect(() => {
     refetch();
-  }, [])
-  
+  }, []);
+
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
   };
@@ -208,6 +217,10 @@ function Home() {
 
   const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined }) => {
     navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
+  };
+
+  const handleDLCButtonClick = () => {
+    navigate('/dlc-list');
   };
 
   const onOrdinalsReceivePress = () => {
@@ -293,6 +306,10 @@ function Home() {
             onPress={handleTokenPressed}
           />
         </ColumnContainer>
+
+        {hasActivatedDLCsKey && network.type === 'Testnet' && (
+        <DLCActionButton src={DlcTab} text={t('DLCS')} onPress={handleDLCButtonClick} />
+        )}
 
         <CoinContainer>
           {coinsList

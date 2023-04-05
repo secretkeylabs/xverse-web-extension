@@ -1,5 +1,4 @@
 import {
-  BtcTransactionData,
   Coin,
   FeesMultipliers,
   FungibleToken,
@@ -37,6 +36,8 @@ export const SetCoinDataKey = 'SetCoinDataKey';
 
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 
+export const ChangeHasActivatedDLCsKey = 'ChangeHasActivatedDLCsKey';
+
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 
@@ -68,6 +69,7 @@ export interface WalletState {
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
+  hasActivatedDLCsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
 }
@@ -83,6 +85,7 @@ export interface WalletData {
   seedPhrase: string;
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
+  hasActivatedDLCsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
 }
@@ -194,6 +197,11 @@ export interface ChangeActivateOrdinals {
   hasActivatedOrdinalsKey: boolean;
 }
 
+export interface ChangeActivateDLCs {
+  type: typeof ChangeHasActivatedDLCsKey;
+  hasActivatedDLCsKey: boolean;
+}
+
 export interface ChangeShowBtcReceiveAlert {
   type: typeof ChangeShowBtcReceiveAlertKey;
   showBtcReceiveAlert: boolean | null;
@@ -224,5 +232,6 @@ export type WalletActions =
   | ChangeNetwork
   | GetActiveAccounts
   | ChangeActivateOrdinals
+  | ChangeActivateDLCs
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert;

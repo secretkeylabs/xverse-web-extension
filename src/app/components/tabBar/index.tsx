@@ -8,9 +8,6 @@ import UnselectedNftTab from '@assets/img/bottomTabBar/unselected_nft_tab.svg';
 import UnselectedSettingsTab from '@assets/img/bottomTabBar/unselected_setting_tab.svg';
 import UnselectedStackingTab from '@assets/img/bottomTabBar/unselected_stacking_tab.svg';
 import UnselectedWalletTab from '@assets/img/bottomTabBar/unselected_wallet_tab.svg';
-import UnselectedDlcTab from '@assets/img/bottomTabBar/unselected_dlc_tab.svg'
-import DlcTab from '@assets/img/bottomTabBar/dlc_tab.svg'
-
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -31,29 +28,33 @@ const Button = styled.button({
 type Tab = 'dashboard' | 'nft' | 'dlc' | 'stacking' | 'settings';
 
 interface Props {
-  tab: Tab
+  tab: Tab;
 }
-function BottomTabBar({ tab }:Props) {
+function BottomTabBar({ tab }: Props) {
   const navigate = useNavigate();
 
   const handleDashboardButtonClick = () => {
-    if (tab !== 'dashboard') { navigate('/'); }
+    if (tab !== 'dashboard') {
+      navigate('/');
+    }
   };
 
   const handleNftButtonClick = () => {
-    if (tab !== 'nft') { navigate('/nft-dashboard'); }
+    if (tab !== 'nft') {
+      navigate('/nft-dashboard');
+    }
   };
 
   const handleStackingButtonClick = () => {
-    if (tab !== 'stacking') { navigate('/stacking'); }
-  };
-
-  const handleDlcButtonClick = () => {
-    if (tab !== 'dlc') { navigate('/dlc-list'); }
+    if (tab !== 'stacking') {
+      navigate('/stacking');
+    }
   };
 
   const handleSettingButtonClick = () => {
-    if (tab !== 'settings') { navigate('/settings'); }
+    if (tab !== 'settings') {
+      navigate('/settings');
+    }
   };
 
   return (
@@ -63,9 +64,6 @@ function BottomTabBar({ tab }:Props) {
       </Button>
       <Button onClick={handleNftButtonClick}>
         <img src={tab === 'nft' ? NftTab : UnselectedNftTab} alt="nft" />
-      </Button>
-      <Button onClick={handleDlcButtonClick}>
-        <img src={tab === 'dlc' ? DlcTab : UnselectedDlcTab} alt="dlc" />
       </Button>
       <Button onClick={handleStackingButtonClick}>
         <img src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} alt="stacking" />
