@@ -28,7 +28,6 @@ class DlcService implements DlcAPI {
   }
 
   acceptContract(contractId: string, btcAddress: string, btcPublicKey: string, btcPrivateKey: string, btcNetwork: NetworkType): Promise<AnyContract> {
-    console.log(contractId, btcAddress, btcPublicKey, btcPrivateKey, btcNetwork)
     return this.dlcManager.acceptOffer(contractId, btcAddress, btcPublicKey, btcPrivateKey, btcNetwork);
   }
 

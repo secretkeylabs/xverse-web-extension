@@ -24,7 +24,7 @@ import TokenImage from '@components/tokenImage';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { useBtcWalletData } from '@hooks/queries/useBtcWalletData';
-
+import { Transaction } from 'bitcoinjs-lib';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -182,7 +182,7 @@ function DlcOfferRequest() {
 
     if (selectedContract && currentId) {
       dispatch(
-        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type),
+        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type)
       );
     }
   }
@@ -234,7 +234,7 @@ function DlcOfferRequest() {
 
   useEffect(() => {
     if (error) {
-     console.error(error)
+      console.error(error);
     }
   }, [error]);
 
@@ -245,21 +245,42 @@ function DlcOfferRequest() {
   }, [processing]);
 
   useEffect(() => {
-    if (signingRequested && actionSuccess) {
-      navigate('/');
-    }
-  }, [signingRequested, actionSuccess]);
-
-  useEffect(() => {
     if (
       acceptMessageSubmitted &&
       actionSuccess &&
       selectedContract?.state === ContractState.Accepted
     ) {
-      console.log('writeandsingacceptmessage');
       writeAndSignAcceptMessage();
     }
   }, [acceptMessageSubmitted, actionSuccess, selectedContract]);
+
+  useEffect(() => {
+    if (signingRequested && actionSuccess && selectedContract?.state === ContractState.Broadcast) {
+      const txID = Transaction.fromHex(selectedContract.dlcTransactions.fund).getId();
+      navigate('/tx-status', {
+        state: {
+          txid: txID,
+          currency: 'BTC',
+          error: '',
+        },
+      });
+      setTimeout(() => {
+        refetch();
+      }, 1000);
+    }
+  }, [signingRequested, actionSuccess, selectedContract]);
+
+  useEffect(() => {
+    if (error) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error: error,
+        },
+      });
+    }
+  }, [error]);
 
   return (
     <>

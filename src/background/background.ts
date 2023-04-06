@@ -59,7 +59,6 @@ chrome.runtime.onMessageExternal.addListener(async function (
       const offerURI = encodeURIComponent(JSON.stringify(request.data.offer));
       const counterpartyWalletUrlURI = encodeURIComponent(request.data.counterpartyWalletUrl);
       const url = `/popup.html#${RequestsRoutes.DlcGetOfferRequest}/${offerURI}/${counterpartyWalletUrlURI}`;
-      console.log(url);
       await popupCenter({
         url,
       });

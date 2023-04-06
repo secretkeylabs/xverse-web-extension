@@ -135,8 +135,6 @@ const useWalletReducer = () => {
   };
 
   const switchAccount = (account: Account) => {
-    console.log("switching")
-    console.log(account)
     dispatch(
       selectAccount(
         account,
