@@ -1,6 +1,4 @@
-import {
-  Account, SettingsNetwork, StacksNetwork,
-} from '@secretkeylabs/xverse-core/types';
+import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/xverse-core/account';
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
@@ -26,28 +24,41 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 
 const useWalletReducer = () => {
-  const {
-    encryptedSeed, accountsList, seedPhrase, selectedAccount, network,
-  } = useSelector(
+  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network } = useSelector(
     (state: StoreState) => ({
       ...state.walletState,
-    }),
+    })
   );
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
 
-  const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, currentNetworkObject: StacksNetwork, currentAccounts: Account[]) => {
-    const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, currentNetworkObject, currentAccounts);
+  const loadActiveAccounts = async (
+    secretKey: string,
+    currentNetwork: SettingsNetwork,
+    currentNetworkObject: StacksNetwork,
+    currentAccounts: Account[]
+  ) => {
+    const walletAccounts = await restoreWalletWithAccounts(
+      secretKey,
+      currentNetwork,
+      currentNetworkObject,
+      currentAccounts
+    );
     dispatch(
       setWalletAction(
         selectedAccount
           ? { ...walletAccounts[selectedAccount.id], seedPhrase: secretKey }
-          : { ...walletAccounts[0], seedPhrase: secretKey },
-      ),
+          : { ...walletAccounts[0], seedPhrase: secretKey }
+      )
     );
-    dispatch(fetchAccountAction(selectedAccount ? walletAccounts[selectedAccount.id] : walletAccounts[0], walletAccounts));
+    dispatch(
+      fetchAccountAction(
+        selectedAccount ? walletAccounts[selectedAccount.id] : walletAccounts[0],
+        walletAccounts
+      )
+    );
     dispatch(getActiveAccountsAction(walletAccounts));
   };
 
@@ -56,12 +67,7 @@ const useWalletReducer = () => {
     try {
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
     } catch (err) {
-      dispatch(
-        fetchAccountAction(
-          accountsList[0],
-          accountsList,
-        ),
-      );
+      dispatch(fetchAccountAction(accountsList[0], accountsList));
       dispatch(getActiveAccountsAction(accountsList));
     }
     sendMessage({
@@ -108,7 +114,9 @@ const useWalletReducer = () => {
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
     try {
-      await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [{ id: 0, bnsName, ...wallet }]);
+      await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [
+        { id: 0, bnsName, ...wallet },
+      ]);
     } catch (err) {
       dispatch(fetchAccountAction({ ...wallet, id: 0, bnsName }, [{ ...wallet, id: 0 }]));
       dispatch(getActiveAccountsAction([{ ...wallet, id: 0, bnsName }]));
@@ -137,7 +145,7 @@ const useWalletReducer = () => {
         seedPhrase,
         network,
         selectedNetwork,
-        accountsList,
+        accountsList
       );
       dispatch(addAccoutAction(newAccountsList));
     } catch (err) {
@@ -156,13 +164,17 @@ const useWalletReducer = () => {
         account.stxPublicKey,
         account.btcPublicKey,
         account.ordinalsPublicKey,
-        network,
-      ),
+        network
+      )
     );
     dispatch(fetchAccountAction(account, accountsList));
   };
 
-  const changeNetwork = async (changedNetwork: SettingsNetwork, networkObject: StacksNetwork, networkAddress: string) => {
+  const changeNetwork = async (
+    changedNetwork: SettingsNetwork,
+    networkObject: StacksNetwork,
+    networkAddress: string
+  ) => {
     dispatch(ChangeNetworkAction(changedNetwork, networkAddress));
     const wallet = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
@@ -183,6 +195,14 @@ const useWalletReducer = () => {
     await refetchBtcData();
   };
 
+  const addLedgerAccount = async (ledgerAccount: Account) => {
+    try {
+      dispatch(addAccoutAction([...accountsList, ledgerAccount]));
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
   return {
     unlockWallet,
     lockWallet,
@@ -192,6 +212,7 @@ const useWalletReducer = () => {
     switchAccount,
     changeNetwork,
     createAccount,
+    addLedgerAccount,
   };
 };
 

@@ -4,6 +4,7 @@
   "version": "0.6.3",
   "private": true,
   "dependencies": {
+    "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@react-spring/web": "^9.6.1",
     "@secretkeylabs/xverse-core": "0.15.0",
     "@stacks/connect": "^6.10.2",

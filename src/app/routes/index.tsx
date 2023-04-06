@@ -47,6 +47,7 @@ import SignPsbtRequest from '@screens/signPsbtRequest';
 import RestoreFunds from '@screens/restoreFunds';
 import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
+import ImportLedger from '@screens/importLedgerAccount';
 
 const router = createHashRouter([
   {
@@ -61,6 +62,10 @@ const router = createHashRouter([
       {
         path: 'onboarding',
         element: <Onboarding />,
+      },
+      {
+        path: 'importLedger',
+        element: <ImportLedger />,
       },
       {
         index: true,

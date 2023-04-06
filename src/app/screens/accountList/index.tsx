@@ -61,9 +61,7 @@ function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {
-    network, accountsList, selectedAccount,
-  } = useWalletSelector();
+  const { network, accountsList, selectedAccount } = useWalletSelector();
   const { createAccount } = useWalletReducer();
 
   const handleAccountSelect = (account: Account) => {
@@ -77,8 +75,8 @@ function AccountList(): JSX.Element {
         account.stxPublicKey,
         account.btcPublicKey,
         account.ordinalsPublicKey,
-        network,
-      ),
+        network
+      )
     );
     navigate(-1);
   };
@@ -91,6 +89,12 @@ function AccountList(): JSX.Element {
 
   async function onCreateAccount() {
     await createAccount();
+  }
+
+  async function onImportLedgerAccount() {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL('options.html#/importLedger'),
+    });
   }
 
   return (
@@ -113,6 +117,12 @@ function AccountList(): JSX.Element {
             <ButtonImage src={Plus} />
           </AddAccountContainer>
           <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
+        </RowContainer>
+        <RowContainer onClick={onImportLedgerAccount}>
+          <AddAccountContainer>
+            <ButtonImage src={Plus} />
+          </AddAccountContainer>
+          <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
         </RowContainer>
       </AccountContainer>
     </Container>
