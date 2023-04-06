@@ -35,6 +35,7 @@ function SendBtcScreen() {
     selectedAccount,
     seedPhrase,
     btcFiatRate,
+    isLedgerAccount,
   } = useSelector((state: StoreState) => state.walletState);
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 
@@ -45,18 +46,14 @@ function SendBtcScreen() {
     error: txError,
     mutate,
   } = useMutation<
-  SignedBtcTx,
-  ResponseError,
-  {
-    recipients: Recipient[];
-  }
-  >(async ({ recipients }) => signBtcTransaction(
-    recipients,
-    btcAddress,
-    selectedAccount?.id ?? 0,
-    seedPhrase,
-    network.type,
-  ));
+    SignedBtcTx,
+    ResponseError,
+    {
+      recipients: Recipient[];
+    }
+  >(async ({ recipients }) =>
+    signBtcTransaction(recipients, btcAddress, selectedAccount?.id ?? 0, seedPhrase, network.type)
+  );
 
   const handleBackButtonClick = () => {
     navigate('/');
@@ -144,6 +141,7 @@ function SendBtcScreen() {
   }
 
   const handleNextClick = async (address: string, amountToSend: string) => {
+    console.log('isledgeraccount:', isLedgerAccount);
     setRecipientAddress(address);
     setAmount(amountToSend);
     const recipients: Recipient[] = [
@@ -153,7 +151,22 @@ function SendBtcScreen() {
       },
     ];
     setRecipient(recipients);
-    if (validateFields(address, amountToSend)) { mutate({ recipients }); }
+    if (validateFields(address, amountToSend)) {
+      if (!isLedgerAccount) {
+        mutate({ recipients });
+        return;
+      }
+      // send tx with ledger
+      const parsedAmountSats = btcToSats(new BigNumber(amount));
+      navigate('/review-ledger-btc-tx', {
+        state: {
+          recipientAddress,
+          amount,
+          recipients,
+          fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
+        },
+      });
+    }
   };
 
   function getBalance() {

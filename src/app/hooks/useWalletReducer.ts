@@ -164,7 +164,10 @@ const useWalletReducer = () => {
         account.stxPublicKey,
         account.btcPublicKey,
         account.ordinalsPublicKey,
-        network
+        network,
+        undefined,
+        account.isLedgerAccount,
+        account.accountName
       )
     );
     dispatch(fetchAccountAction(account, accountsList));

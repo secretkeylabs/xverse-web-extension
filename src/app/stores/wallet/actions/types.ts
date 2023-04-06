@@ -68,6 +68,8 @@ export interface WalletState {
   hasActivatedOrdinalsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
+  isLedgerAccount: boolean | undefined;
+  accountName: string | undefined;
 }
 
 export interface SetWallet {
@@ -124,6 +126,8 @@ export interface SelectAccount {
   bnsName?: string;
   network: SettingsNetwork;
   // stackingState: StackingStateData;
+  isLedgerAccount: boolean | undefined;
+  accountName: string | undefined;
 }
 export interface SetCoinRates {
   type: typeof SetCoinRatesKey;

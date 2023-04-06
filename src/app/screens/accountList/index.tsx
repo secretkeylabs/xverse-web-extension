@@ -75,7 +75,10 @@ function AccountList(): JSX.Element {
         account.stxPublicKey,
         account.btcPublicKey,
         account.ordinalsPublicKey,
-        network
+        network,
+        undefined,
+        account.isLedgerAccount,
+        account.accountName
       )
     );
     navigate(-1);
@@ -93,7 +96,7 @@ function AccountList(): JSX.Element {
 
   async function onImportLedgerAccount() {
     await chrome.tabs.create({
-      url: chrome.runtime.getURL('options.html#/importLedger'),
+      url: chrome.runtime.getURL('options.html#/import-ledger'),
     });
   }
 

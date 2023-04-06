@@ -56,6 +56,8 @@ const initialWalletState: WalletState = {
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
+  isLedgerAccount: undefined,
+  accountName: undefined
 };
 
 const walletReducer = (
@@ -96,6 +98,8 @@ const walletReducer = (
         btcPublicKey: action.btcPublicKey,
         ordinalsPublicKey: action.ordinalsPublicKey,
         network: action.network,
+        isLedgerAccount: action.isLedgerAccount,
+        accountName: action.accountName
       };
     case StoreEncryptedSeedKey:
       return {

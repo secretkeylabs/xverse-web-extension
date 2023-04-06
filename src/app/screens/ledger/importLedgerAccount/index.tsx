@@ -46,8 +46,8 @@ interface Credential {
 
 function ImportLedger(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [isBitcoinSelected, setIsBitcoinSelected] = useState(false);
-  const [isOrdinalsSelected, setIsOrdinalsSelected] = useState(false);
+  const [isBitcoinSelected, setIsBitcoinSelected] = useState(true);
+  const [isOrdinalsSelected, setIsOrdinalsSelected] = useState(true);
   const [bitcoinCredentials, setBitcoinCredentials] = useState<Credential | undefined>(undefined);
   const [ordinalsCredentials, setOrdinalsCredentials] = useState<Credential | undefined>(undefined);
   const { t } = useTranslation('translation', { keyPrefix: 'ONBOARDING_SCREEN' });
@@ -86,6 +86,7 @@ function ImportLedger(): JSX.Element {
       );
       setOrdinalsCredentials({ address, publicKey });
     }
+    await transport.close();
   };
 
   const handleClickNext = async () => {

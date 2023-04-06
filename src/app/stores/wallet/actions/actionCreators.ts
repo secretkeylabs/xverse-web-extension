@@ -81,6 +81,8 @@ export function selectAccount(
   network: SettingsNetwork,
   // stackingState: StackingStateData,
   bnsName?: string,
+  isLedgerAccount?: boolean,
+  accountName?: string
 ): actions.SelectAccount {
   return {
     type: actions.SelectAccountKey,
@@ -95,6 +97,8 @@ export function selectAccount(
     network,
     // stackingState,
     bnsName,
+    isLedgerAccount,
+    accountName
   };
 }
 
