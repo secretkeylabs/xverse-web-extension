@@ -14,6 +14,7 @@ import { useMutation } from '@tanstack/react-query';
 import {
   Recipient,
   SignedBtcTx,
+  signNonOrdinalBtcSendTransaction,
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import {
@@ -109,6 +110,8 @@ interface Props {
   recipients: Recipient[];
   children?: ReactNode;
   assetDetail?: string;
+  isRestoreFundFlow?: boolean;
+  nonOrdinalUtxos?: BtcUtxoDataResponse [];
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -122,6 +125,8 @@ function ConfirmBtcTransactionComponent({
   recipients,
   children,
   assetDetail,
+  isRestoreFundFlow,
+  nonOrdinalUtxos,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -160,6 +165,23 @@ function ConfirmBtcTransactionComponent({
   ));
 
   const {
+    isLoading: isLoadingNonOrdinalBtcSend,
+    error: errorSigningNonOrdial,
+    data: signedNonOrdinalBtcSend,
+    mutate: mutateSignNonOrdinalBtcTransaction,
+  } = useMutation<SignedBtcTx, ResponseError, string>(async (txFee) => {
+    const signedNonOrdinalBtcTx = await signNonOrdinalBtcSendTransaction(
+      btcAddress,
+      nonOrdinalUtxos!,
+      selectedAccount?.id ?? 0,
+      seedPhrase,
+      network.type,
+      new BigNumber(txFee),
+    );
+    return signedNonOrdinalBtcTx;
+  });
+
+  const {
     isLoading: isLoadingOrdData,
     data: ordinalData,
     error: ordinalError,
@@ -193,6 +215,14 @@ function ConfirmBtcTransactionComponent({
     }
   }, [ordinalData]);
 
+  useEffect(() => {
+    if (signedNonOrdinalBtcSend) {
+      setCurrentFee(signedNonOrdinalBtcSend.fee);
+      setSignedTx(signedNonOrdinalBtcSend.signedTx);
+      setOpenTransactionSettingModal(false);
+    }
+  }, [signedNonOrdinalBtcSend]);
+
   const onAdvancedSettingClick = () => {
     setOpenTransactionSettingModal(true);
   };
@@ -204,7 +234,11 @@ function ConfirmBtcTransactionComponent({
   const onApplyClick = (modifiedFee: string) => {
     setCurrentFee(new BigNumber(modifiedFee));
     if (ordinalTxUtxo) ordinalMutate(modifiedFee);
-    else mutate({ recipients, txFee: modifiedFee });
+    else if (isRestoreFundFlow) {
+      mutateSignNonOrdinalBtcTransaction(modifiedFee);
+    } else {
+      mutate({ recipients, txFee: modifiedFee });
+    }
     setLoading(true);
   };
 
@@ -233,6 +267,17 @@ function ConfirmBtcTransactionComponent({
       } else setError(ordinalError.toString());
     }
   }, [ordinalError]);
+
+  useEffect(() => {
+    if (recipients && errorSigningNonOrdial) {
+      setOpenTransactionSettingModal(false);
+      if (Number(txError) === ErrorCodes.InSufficientBalance) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setError(errorSigningNonOrdial.toString());
+    }
+  }, [errorSigningNonOrdial]);
 
   return (
     <OuterContainer>
@@ -281,8 +326,9 @@ function ConfirmBtcTransactionComponent({
           btcRecipients={recipients}
           onApplyClick={onApplyClick}
           onCrossClick={closeTransactionSettingAlert}
-          ordinalTxUtxo={ordinalTxUtxo}
+          nonOrdinalUtxos={nonOrdinalUtxos}
           loading={loading}
+          isRestoreFlow={isRestoreFundFlow}
         />
       </Container>
       <ErrorContainer>
@@ -294,13 +340,13 @@ function ConfirmBtcTransactionComponent({
             text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={onCancelClick}
-            disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData}
+            disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
           />
         </TransparentButtonContainer>
         <ActionButton
           text={t('CONFIRM_TRANSACTION.CONFIRM')}
-          disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData}
-          processing={loadingBroadcastedTx || isLoading || isLoadingOrdData}
+          disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+          processing={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>

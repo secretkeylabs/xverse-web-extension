@@ -5,10 +5,9 @@ import BottomTabBar from '@components/tabBar';
 import { useTranslation } from 'react-i18next';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
-import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
 import ActionButton from '@components/button';
 import { getNfts, getOrdinalsByAddress } from '@secretkeylabs/xverse-core/api';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
@@ -16,10 +15,10 @@ import ShareDialog from '@components/shareNft';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';
 import Ordinal from '@screens/ordinals';
-import AlertMessage from '@components/alertMessage';
 import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
 import { BtcOrdinal, NftsListData } from '@secretkeylabs/xverse-core/types';
+import AlertMessage from '@components/alertMessage';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
 
@@ -43,6 +42,7 @@ const GridContainer = styled.div<GridContainerProps>((props) => ({
   display: 'grid',
   columnGap: props.theme.spacing(8),
   rowGap: props.theme.spacing(6),
+  marginTop: props.theme.spacing(14),
   gridTemplateColumns: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'repeat(auto-fill,minmax(150px,1fr))',
   gridTemplateRows: props.isGalleryOpen ? 'repeat(minmax(300px,1fr))' : 'minmax(150px,220px)',
 }));
@@ -54,7 +54,7 @@ const ShareDialogeContainer = styled.div({
   zIndex: 2000,
 });
 
-const ReciveNftContainer = styled.div((props) => ({
+const ReceiveNftContainer = styled.div((props) => ({
   position: 'absolute',
   top: 0,
   right: 0,
@@ -82,7 +82,6 @@ const ButtonContainer = styled.div((props) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   maxWidth: 400,
-  marginBottom: props.theme.spacing(20),
 }));
 
 const ShareButtonContainer = styled.div((props) => ({
@@ -145,7 +144,6 @@ const GalleryCollectiblesHeadingText = styled.h1((props) => ({
 
 const CollectiblesValueText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  marginTop: props.theme.spacing(4),
 }));
 
 const LoadMoreButtonContainer = styled.div((props) => ({
@@ -176,13 +174,14 @@ const LoadMoreButton = styled.button((props) => ({
 const NoCollectiblesText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['200'],
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.spacing(20),
   textAlign: 'center',
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(5),
   maxWidth: 300,
+  display: 'flex',
 }));
 
 function NftDashboard() {
@@ -198,9 +197,11 @@ function NftDashboard() {
     return getNfts(stxAddress, selectedNetwork, pageParam);
   }
 
-  function fetchOrdinals(): Promise<BtcOrdinal[]> {
-    return getOrdinalsByAddress(ordinalsAddress);
-  }
+  const fetchOrdinals = useCallback(async (): Promise<BtcOrdinal[]> => {
+    let response = await getOrdinalsByAddress(ordinalsAddress);
+    response = response.filter((ordinal) => ordinal.id !== undefined);
+    return response;
+  }, [ordinalsAddress]);
 
   const {
     isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
@@ -224,8 +225,13 @@ function NftDashboard() {
     queryFn: fetchOrdinals,
   });
 
+  const refetchCollectibles = useCallback(async () => {
+    await refetch();
+    await fetchOrdinals();
+  }, [refetch, fetchOrdinals]);
+
   useEffect(() => {
-    refetch();
+    refetchCollectibles();
   }, [stxAddress, ordinalsAddress]);
 
   const nfts = data?.pages.map((page) => page.nftsList).flat();
@@ -359,13 +365,13 @@ function NftDashboard() {
             <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ReceiveButtonContainer>
           {openReceiveModal && (
-            <ReciveNftContainer>
+            <ReceiveNftContainer>
               <ReceiveNftModal
                 visible={openReceiveModal}
                 isGalleryOpen={isGalleryOpen}
                 onClose={onReceiveModalClose}
               />
-            </ReciveNftContainer>
+            </ReceiveNftContainer>
           )}
           {/* <ShareButtonContainer>
             <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />

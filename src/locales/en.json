@@ -24,7 +24,8 @@
     "SEND": "Send",
     "BUY": "Buy",
     "MANAGE_TOKEN": "Manage token list",
-    "STACKS_AND_TOKEN": "Stacks and tokens"
+    "STACKS_AND_TOKEN": "Stacks, tokens and NFTs",
+    "ORDINALS": "Ordinals"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -74,6 +75,7 @@
     },
     "SEND_NFT": "Send NFT",
     "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
+    "SWITCH_TO": "Switch to",
     "SEND_ORDINAL_TITLE": "Send Ordinal",
     "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals."
   },
@@ -88,7 +90,7 @@
     "EDIT_FEES": "Edit Fees",
     "CONFIRM": "Confirm",
     "CANCEL": "Cancel",
-    "SATS": "SATS",
+    "SATS": "sats",
     "CONFIRM_TX": "Confirm Transaction",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
@@ -104,7 +106,13 @@
     "RECIPIENT": "Recipient",
     "ASSET": "Asset",
     "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
-    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with."
+    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
+    "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",
+    "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
+    "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed please contact the developer of the requesting app for support",
+    "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
+    "YOU_WILL_TRANSFER": "You will transfer",
+    "YOU_WILL_RECEIVE": "You will receive"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
@@ -258,6 +266,32 @@
     "DENY": "No",
     "COPIED": "Copied!"
   },
+  "RESTORE_FUND_SCREEN": {
+    "TITLE": "Restore assets",
+    "DESCRIPTION": "If you sent Ordinals to your Bitcoin payment address or Bitcoin to your ordinals address, you can recover it and send it to the correct address.",
+    "RECOVER_BTC": "Recover BTC",
+    "RECOVER_BTC_DESC": "If you sent Bitcoin to your Ordinals address.",
+    "RECOVER_ORDINALS": "Recover Ordinals",
+    "RECOVER_ORDINALS_DESC": "If you sent Ordinals to your Bitcoin payment address."
+  },
+  "RESTORE_BTC_SCREEN": {
+    "TITLE": "Restore BTC",
+    "BTC": "Bitcoin",
+    "TRANSFER": "Transfer",
+    "BACK": "Back",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "NO_FUNDS": "You don’t have any funds stored on your ordinal address.",
+    "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
+  },
+  "RESTORE_ORDINAL_SCREEN": {
+    "TITLE": "Restore Oridnals",
+    "BTC": "Bitcoin",
+    "TRANSFER": "Transfer",
+    "BACK": "Back",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "NO_FUNDS": "You don’t have any Ordinals stored on your Bitcoin payment address.",
+    "DESCRIPTION": "You have Ordinals stored in your Bitcoin payment address. You can transfer them to your Ordinals address so that they show up in your collection."
+  },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",
     "WEB_GALLERY": "Open gallery",
@@ -326,8 +360,9 @@
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
     "TESTNET": "Testnet",
-    "EXPERIMENTAL":"Experimental",
-    "ACTIVATE_ORDINAL_NFTS": "Activate Ordinal NFTs"
+    "ORDINALS":"Ordinals",
+    "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
+    "RECOVER_ASSETS": "Recover assets"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
@@ -451,6 +486,7 @@
     "CANCEL_BUTTON": "Dismiss",
     "BITCOIN_ADDRESS": "Bitcoin address",
     "ORDINAL_ADDRESS": "Ordinal address",
-    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with."
+    "NETWORK_MISMATCH_ERROR_TITLE": "Mismatched Network",
+    "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings."
   }
 }

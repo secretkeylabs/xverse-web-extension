@@ -13,29 +13,38 @@ interface ContainerProps {
 const ImageContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center',
+  alignItems: props.isGalleryOpen ? 'center' : 'flex-start',
   width: '100%',
-  flex: 1,
-  height: props.isGalleryOpen ? '100%' : 156,
+  height: props.isGalleryOpen ? '100%' : 150,
   overflow: 'hidden',
   position: 'relative',
+  borderRadius: 8,
 }));
 
-const LoaderContainer = styled.div({
+const LoaderContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-});
+  position: 'absolute',
+  width: '100%',
+  left: 0,
+  bottom: 0,
+  right: 0,
+  top: 0,
+  height: props.isGalleryOpen ? '100%' : 150,
+}));
 
 const Video = styled.video({
   width: '100%',
   height: '100%',
   objectFit: 'cover',
+  borderRadius: 8,
 });
 
 const StyledImg = styled(Image)`
   border-radius: 8px;
   object-fit: contain;
+  height: 150;
 `;
 interface Props {
   metadata: TokenMetaData;
@@ -49,19 +58,18 @@ function NftImage({ metadata }: Props) {
         <Suspense>
           <StyledImg
             width="100%"
+            src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
             placeholder={(
-              <LoaderContainer>
+              <LoaderContainer isGalleryOpen={isGalleryOpen}>
                 <MoonLoader color="white" size={25} />
               </LoaderContainer>
-            )}
-            src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
+              )}
             fallback={NftPlaceholderImage}
           />
         </Suspense>
       </ImageContainer>
     );
   }
-
   if (metadata?.asset_protocol) {
     return (
       <Video src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')} loop playsInline controls preload="auto" />
@@ -69,7 +77,7 @@ function NftImage({ metadata }: Props) {
   }
 
   return (
-    <ImageContainer isGalleryOpen>
+    <ImageContainer isGalleryOpen={isGalleryOpen}>
       <MoonLoader color="white" size={30} />
     </ImageContainer>
   );

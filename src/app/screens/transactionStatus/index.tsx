@@ -11,6 +11,8 @@ import useWalletSelector from '@hooks/useWalletSelector';
 
 const TxStatusContainer = styled.div({
   background: 'rgba(25, 25, 48, 0.5)',
+  display: 'flex',
+  flexDirection: 'column',
   height: '100%',
 });
 
@@ -39,6 +41,9 @@ const TransactionIDContainer = styled.div((props) => ({
 }));
 
 const ButtonContainer = styled.div((props) => ({
+  flex: 1,
+  display: 'flex',
+  alignItems: 'flex-end',
   marginTop: props.theme.spacing(15),
   marginBottom: props.theme.spacing(32),
   marginLeft: props.theme.spacing(8),
@@ -121,7 +126,7 @@ function TransactionStatus() {
   const location = useLocation();
   const { network } = useWalletSelector();
   const {
-    txid, currency, error, sponsored, browserTx, isOrdinal, isNft,
+    txid, currency, error, sponsored, browserTx, isOrdinal, isNft, errorTitle,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -135,7 +140,7 @@ function TransactionStatus() {
   const renderTransactionFailureStatus = (
     <Container>
       <Image src={Failure} />
-      <HeadingText>{t('FAILED')}</HeadingText>
+      <HeadingText>{errorTitle || t('FAILED')}</HeadingText>
       <BodyText>{error}</BodyText>
     </Container>
   );

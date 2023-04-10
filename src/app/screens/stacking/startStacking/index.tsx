@@ -6,7 +6,7 @@ import { Pool } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import ActionButton from '@components/button';
-import useStackingData from '@hooks/useStackingData';
+import useStackingData from '@hooks/queries/useStackingData';
 import { XVERSE_WEB_POOL_URL } from '@utils/constants';
 import StackingInfoTile from './stackInfoTile';
 
@@ -101,7 +101,7 @@ function StartStacking() {
           </ColumnContainer>
           <ColumnContainer>
             <StackingInfoTile title={t('POOL_FEE')} value={pool ? `${pool?.fee_percent}%` : undefined} color={theme.colors.feedback.success} />
-            <StackingInfoTile title={t('REWARD_CYCLES')} value={`${getCycles()}`} />
+            <StackingInfoTile title={t('REWARD_CYCLES')} value="Flexible" />
           </ColumnContainer>
         </StackingInfoContainer>
       </OuterContainer>

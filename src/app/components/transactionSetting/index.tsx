@@ -16,7 +16,9 @@ import {
 } from '@secretkeylabs/xverse-core/currency';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
-import { getBtcFees, getBtcFeesForOrdinalSend, isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import {
+  getBtcFees, getBtcFeesForNonOrdinalBtcSend, getBtcFeesForOrdinalSend, isCustomFeesAllowed, Recipient,
+} from '@secretkeylabs/xverse-core/transactions/btc';
 import { btcToSats, BtcUtxoDataResponse, ErrorCodes } from '@secretkeylabs/xverse-core';
 
 const Text = styled.h1((props) => ({
@@ -141,6 +143,8 @@ interface Props {
   type?: TxType;
   btcRecipients?: Recipient[];
   ordinalTxUtxo?: BtcUtxoDataResponse;
+  isRestoreFlow?: boolean;
+  nonOrdinalUtxos?: BtcUtxoDataResponse[];
 }
 type TxType = 'STX' | 'BTC' | 'Ordinals';
 type FeeModeType = 'low' | 'standard' | 'high' | 'custom';
@@ -158,6 +162,8 @@ function TransactionSettingAlert({
   type = 'STX',
   btcRecipients,
   ordinalTxUtxo,
+  isRestoreFlow,
+  nonOrdinalUtxos,
 }:Props) {
   const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
@@ -171,7 +177,7 @@ function TransactionSettingAlert({
   });
   const {
     network,
-    btcAddress, stxBtcRate, btcFiatRate, fiatCurrency, btcBalance, selectedAccount, seedPhrase,
+    btcAddress, stxBtcRate, btcFiatRate, fiatCurrency, btcBalance, selectedAccount, ordinalsAddress,
   } = useSelector((state: StoreState) => state.walletState);
   const inputRef = useRef(null);
   const customStyles = {
@@ -277,7 +283,10 @@ function TransactionSettingAlert({
       setIsLoading(true);
       if (mode?.value === 'custom') inputRef?.current?.focus();
       else if (type === 'BTC') {
-        if (btcRecipients && selectedAccount) {
+        if (isRestoreFlow) {
+          const btcFee = await getBtcFeesForNonOrdinalBtcSend(btcAddress, nonOrdinalUtxos!, ordinalsAddress, 'Mainnet', mode?.value);
+          setFeeInput(btcFee.toString());
+        } else if (btcRecipients && selectedAccount) {
           const btcFee = await getBtcFees(
             btcRecipients,
             btcAddress,
@@ -385,7 +394,7 @@ function TransactionSettingAlert({
               <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
               <TickerContainer>
                 {getTokenIcon()}
-                <Text>{type === 'STX' ? 'STX' : 'SATS'}</Text>
+                <Text>{type === 'STX' ? 'STX' : 'sats'}</Text>
               </TickerContainer>
             </InputContainer>
             <SelectorContainer>

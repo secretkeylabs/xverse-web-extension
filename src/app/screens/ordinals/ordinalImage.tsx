@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { Suspense } from 'react';
 import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
@@ -11,19 +12,19 @@ import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 
 interface ContainerProps {
   isGalleryOpen: boolean;
-  inNftDetail? : boolean;
+  inNftDetail?: boolean;
+  isSmallImage?: boolean;
 }
 
 const ImageContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
-  justifyContent: props.inNftDetail ? 'flex-start' : 'center',
+  justifyContent: 'center',
   marginBottom: props.inNftDetail ? props.theme.spacing(8) : 0,
   alignItems: 'center',
   width: '100%',
-  flex: 1,
-  height: props.isGalleryOpen ? 300 : 150,
-  minHeight: props.isGalleryOpen ? 300 : 150,
-  maxHeight: props.isGalleryOpen ? 300 : 150,
+  height: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
+  minHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
+  maxHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
   overflow: 'hidden',
   position: 'relative',
   fontSize: '3em',
@@ -53,11 +54,20 @@ const OrdinalsTag = styled.div({
   padding: '3px 6px',
 });
 
-const LoaderContainer = styled.div({
+const LoaderContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-});
+  position: 'absolute',
+  width: '100%',
+  height: props.isGalleryOpen ? 300 : 150,
+  minHeight: props.isGalleryOpen ? 300 : 150,
+  maxHeight: props.isGalleryOpen ? 300 : 150,
+  left: 0,
+  bottom: 0,
+  right: 0,
+  top: 0,
+}));
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -76,37 +86,45 @@ const OrdinalContentText = styled.h1<TextProps>((props) => ({
   color: props.theme.colors.white[0],
   fontSize: props.inNftSend ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
+  textAlign: 'center',
 }));
 
 const StyledImg = styled(Image)`
   border-radius: 8px;
   object-fit: contain;
+  image-rendering: pixelated;
 `;
 
 interface Props {
   ordinal: OrdinalInfo;
   isNftDashboard?: boolean;
-  inNftDetail? : boolean;
-  inNftSend? : boolean;
+  inNftDetail?: boolean;
+  inNftSend?: boolean;
+  isSmallImage?: boolean;
 }
 
 function OrdinalImage({
-  ordinal, isNftDashboard = false, inNftDetail = false, inNftSend = false,
+  ordinal,
+  isNftDashboard = false,
+  inNftDetail = false,
+  inNftSend = false,
+  isSmallImage = false,
 }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+
   if (ordinal?.metadata['content type'].includes('image')) {
     return (
-      <ImageContainer isGalleryOpen={isGalleryOpen}>
+      <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
         <Suspense>
           <StyledImg
             width="100%"
             placeholder={(
-              <LoaderContainer>
+              <LoaderContainer isGalleryOpen={isGalleryOpen}>
                 <MoonLoader color="white" size={20} />
               </LoaderContainer>
-            )}
+              )}
             src={getFetchableUrl(`https://gammaordinals.com${ordinal?.metadata.content}`, 'http')}
             fallback={PlaceholderImage}
           />
@@ -123,26 +141,26 @@ function OrdinalImage({
   if (ordinal?.metadata['content type'].includes('text')) {
     if (!textContent) {
       return (
-        <ImageContainer isGalleryOpen>
+        <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
           <MoonLoader color="white" size={30} />
         </ImageContainer>
       );
     }
     return (
-      <ImageContainer inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
+      <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
         <OrdinalContentText inNftSend={inNftSend}>{textContent}</OrdinalContentText>
         {isNftDashboard && (
-        <OrdinalsTag>
-          <ButtonIcon src={OrdinalsIcon} />
-          <Text>{t('ORDINAL')}</Text>
-        </OrdinalsTag>
+          <OrdinalsTag>
+            <ButtonIcon src={OrdinalsIcon} />
+            <Text>{t('ORDINAL')}</Text>
+          </OrdinalsTag>
         )}
       </ImageContainer>
     );
   }
 
   return (
-    <ImageContainer isGalleryOpen={isGalleryOpen}>
+    <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
       <img src={PlaceholderImage} alt="ordinal" />
     </ImageContainer>
   );
