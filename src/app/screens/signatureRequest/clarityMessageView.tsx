@@ -24,6 +24,7 @@ const ClarityValueKey = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
   marginRight: props.theme.spacing(4),
+  wordWrap: 'break-word',
 }));
 
 function wrapText(text: string): JSX.Element {

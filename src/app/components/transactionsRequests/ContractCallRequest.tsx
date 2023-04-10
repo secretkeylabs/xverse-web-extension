@@ -170,7 +170,6 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
   const [isShowMore, setIsShowMore] = useState(false);
-  const Illustration = headerImageMapping[request.functionName ?? ''];
 
   useOnOriginTabClose(
     tabId,
