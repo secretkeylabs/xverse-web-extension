@@ -183,13 +183,14 @@ interface ContractCallRequestProps {
   coinsMetaData: Coin[] | null;
   tabId: number;
   requestToken: string;
+  attachment: Buffer | undefined;
 }
 
 export const ShowMoreContext = createContext({ showMore: false });
 
 export default function ContractCallRequest(props: ContractCallRequestProps) {
   const {
-    request, unsignedTx, funcMetaData, coinsMetaData, tabId, requestToken,
+    request, unsignedTx, funcMetaData, coinsMetaData, tabId, requestToken, attachment,
   } = props;
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
@@ -285,9 +286,9 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
       </PostConditionContainer>
   );
   const navigate = useNavigate();
-  const broadcastTx = async (tx: StacksTransaction[]) => {
+  const broadcastTx = async (tx: StacksTransaction[], txAttachment: Buffer | undefined = undefined) => {
     try {
-      const broadcastResult: string = await broadcastSignedTransaction(tx[0], selectedNetwork);
+      const broadcastResult: string = await broadcastSignedTransaction(tx[0], selectedNetwork, txAttachment);
       if (broadcastResult) {
         finalizeTxSignature({ requestPayload: requestToken, tabId, data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') } });
         navigate('/tx-status', {
@@ -322,7 +323,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         },
       });
     } else {
-      broadcastTx(transactions);
+      broadcastTx(transactions, attachment);
     }
   };
   const cancelCallback = () => {
