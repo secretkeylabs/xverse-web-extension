@@ -3,6 +3,7 @@ body {
   padding: 0;
   color: #ffffff;
   position: relative;
+  background-color: #181b24;
 }
 #app {
   width: 360px;
