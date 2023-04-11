@@ -74,8 +74,9 @@ export default function CollapsableContainer(props: Props) {
       const concatenatedText = `${text.substring(0, 35)}...`;
       setInfoText(concatenatedText);
     } else {
-      setShowArrow(true);
+      setShowArrow(false);
     }
+    if (text === '') setShowArrow(true);
   });
 
   const slideInStyles = useSpring({

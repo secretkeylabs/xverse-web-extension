@@ -12,6 +12,7 @@ const Container = styled.div<{ isRoot: boolean }>((props) => ({
 const ContentContainer = styled.div({
   display: 'flex',
   alignItems: 'center',
+  overflow: 'hidden',
 });
 
 const ClarityValueText = styled.p((props) => ({

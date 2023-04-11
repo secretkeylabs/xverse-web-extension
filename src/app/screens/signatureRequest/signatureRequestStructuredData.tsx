@@ -26,7 +26,7 @@ export default function SignatureRequestStructuredData(props: SignatureRequestSt
   const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
   const { payload } = props;
   return (
-    <CollapsableContainer text='' title={t('MESSAGE_HEADER')}>
+    <CollapsableContainer text="" title={t('MESSAGE_HEADER')}>
       <ClarityMessageView
         val={deserializeCV(Buffer.from(payload.message, 'hex'))}
         encoding="tryAscii"

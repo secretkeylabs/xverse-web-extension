@@ -57,6 +57,7 @@ const MessageHash = styled.p((props) => ({
 const ActionDisclaimer = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[400],
+  marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(8),
 }));
 
