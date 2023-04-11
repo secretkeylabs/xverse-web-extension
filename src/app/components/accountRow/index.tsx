@@ -61,6 +61,8 @@ const CurrentAccountDetailText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['400'],
   marginTop: props.theme.spacing(1),
+  display: 'flex',
+  justifyContent: 'flex-start',
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
@@ -93,7 +95,7 @@ const Button = styled.button`
 
 const CopyButton = styled.button`
   opacity: 0.6;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-top: 3px;
   margin-right: 10px;
   display: flex;
@@ -146,23 +148,27 @@ function AccountRow({
   showOrdinalAddress,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const {
-    showBtcReceiveAlert,
-  } = useWalletSelector();
+  const { showBtcReceiveAlert } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress!);
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
   const dispatch = useDispatch();
 
   function getName() {
-    return account?.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
+    return (
+      account?.accountName ??
+      account?.bnsName ??
+      `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`
+    );
   }
 
   const handleOnBtcAddressClick = () => {
     navigator.clipboard.writeText(account?.btcAddress!);
     setOnBtcCopied(true);
     setOnStxCopied(false);
-    if (showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
+    if (showBtcReceiveAlert !== null) {
+      dispatch(ChangeShowBtcReceiveAlertAction(true));
+    }
   };
 
   const handleOnStxAddressClick = () => {
@@ -225,7 +231,9 @@ function AccountRow({
       />
     </RowContainer>
   ) : (
-    <CurrentAccountDetailText>{showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}</CurrentAccountDetailText>
+    <CurrentAccountDetailText>
+      {showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}
+    </CurrentAccountDetailText>
   );
 
   return (
@@ -237,8 +245,8 @@ function AccountRow({
         onClick={onClick}
       />
       <CurrentAcountContainer>
-        {account
-          && (isSelected ? (
+        {account &&
+          (isSelected ? (
             <Button onClick={onClick}>
               <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
             </Button>
