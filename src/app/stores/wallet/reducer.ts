@@ -23,6 +23,7 @@ import {
   ChangeHasActivatedOrdinalsKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
+  AddLedgerAccountKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -38,6 +39,7 @@ const initialWalletState: WalletState = {
     address: 'https://stacks-node-api.mainnet.stacks.co',
   },
   accountsList: [],
+  ledgerAccountsList: [],
   selectedAccount: null,
   seedPhrase: '',
   encryptedSeed: '',
@@ -57,13 +59,13 @@ const initialWalletState: WalletState = {
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
   isLedgerAccount: undefined,
-  accountName: undefined
+  accountName: undefined,
 };
 
 const walletReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: WalletState = initialWalletState,
-  action: WalletActions,
+  action: WalletActions
 ): WalletState => {
   switch (action.type) {
     case SetWalletKey:
@@ -86,6 +88,11 @@ const walletReducer = (
         ...state,
         accountsList: action.accountsList,
       };
+    case AddLedgerAccountKey:
+      return {
+        ...state,
+        ledgerAccountsList: action.ledgerAccountsList,
+      };
     case SelectAccountKey:
       return {
         ...state,
@@ -99,7 +106,7 @@ const walletReducer = (
         ordinalsPublicKey: action.ordinalsPublicKey,
         network: action.network,
         isLedgerAccount: action.isLedgerAccount,
-        accountName: action.accountName
+        accountName: action.accountName,
       };
     case StoreEncryptedSeedKey:
       return {

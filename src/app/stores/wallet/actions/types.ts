@@ -39,6 +39,7 @@ export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
+export const AddLedgerAccountKey = 'AddLedgerAccountKey';
 
 export interface WalletState {
   stxAddress: string;
@@ -49,6 +50,7 @@ export interface WalletState {
   btcPublicKey: string;
   ordinalsPublicKey: string;
   accountsList: Account[];
+  ledgerAccountsList: Account[];
   selectedAccount: Account | null;
   network: SettingsNetwork;
   seedPhrase: string;
@@ -112,6 +114,10 @@ export interface FetchAccount {
 export interface AddAccount {
   type: typeof AddAccountKey;
   accountsList: Account[];
+}
+export interface AddLedgerAccount {
+  type: typeof AddLedgerAccountKey;
+  ledgerAccountsList: Account[];
 }
 export interface SelectAccount {
   type: typeof SelectAccountKey;
@@ -194,6 +200,7 @@ export type WalletActions =
   | ResetWallet
   | FetchAccount
   | AddAccount
+  | AddLedgerAccount
   | SelectAccount
   | StoreEncryptedSeed
   | SetWalletSeedPhrase

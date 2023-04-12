@@ -50,28 +50,31 @@ const CurrencyCard = styled.div((props) => ({
 }));
 
 interface BalanceCardProps {
-  isLoading: boolean,
+  isLoading: boolean;
 }
 
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const {
-    fiatCurrency,
-    btcFiatRate,
-    stxBtcRate,
-    stxBalance,
-    btcBalance,
-  } = useSelector((state: StoreState) => state.walletState);
+  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } =
+    useSelector((state: StoreState) => state.walletState);
   const { isLoading } = props;
 
   function calculateTotalBalance() {
-    const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
-      .multipliedBy(new BigNumber(stxBtcRate))
-      .multipliedBy(new BigNumber(btcFiatRate));
-    const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
-      new BigNumber(btcFiatRate),
-    );
-    const totalBalance = stxFiatEquiv.plus(btcFiatEquiv);
+    let totalBalance = new BigNumber(0);
+    console.log(stxAddress);
+    console.log(btcAddress);
+    if (stxAddress) {
+      const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
+        .multipliedBy(new BigNumber(stxBtcRate))
+        .multipliedBy(new BigNumber(btcFiatRate));
+      totalBalance = totalBalance.plus(stxFiatEquiv);
+    }
+    if (btcAddress) {
+      const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
+        new BigNumber(btcFiatRate)
+      );
+      totalBalance = totalBalance.plus(btcFiatEquiv);
+    }
     return totalBalance.toNumber().toFixed(2);
   }
 

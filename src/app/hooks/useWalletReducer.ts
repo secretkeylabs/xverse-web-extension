@@ -5,6 +5,7 @@ import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
 import { StoreState } from '@stores/index';
 import {
   addAccoutAction,
+  addLedgerAcountAction,
   ChangeNetworkAction,
   fetchAccountAction,
   getActiveAccountsAction,
@@ -24,11 +25,17 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 
 const useWalletReducer = () => {
-  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network } = useSelector(
-    (state: StoreState) => ({
-      ...state.walletState,
-    })
-  );
+  const {
+    encryptedSeed,
+    accountsList,
+    seedPhrase,
+    selectedAccount,
+    network,
+    ledgerAccountsList,
+    isLedgerAccount,
+  } = useSelector((state: StoreState) => ({
+    ...state.walletState,
+  }));
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
@@ -46,16 +53,24 @@ const useWalletReducer = () => {
       currentNetworkObject,
       currentAccounts
     );
-    dispatch(
-      setWalletAction(
-        selectedAccount
-          ? { ...walletAccounts[selectedAccount.id], seedPhrase: secretKey }
-          : { ...walletAccounts[0], seedPhrase: secretKey }
-      )
-    );
+
+    if (!isLedgerAccount) {
+      dispatch(
+        setWalletAction(
+          selectedAccount
+            ? { ...walletAccounts[selectedAccount.id], seedPhrase: secretKey }
+            : { ...walletAccounts[0], seedPhrase: secretKey }
+        )
+      );
+    }
+
     dispatch(
       fetchAccountAction(
-        selectedAccount ? walletAccounts[selectedAccount.id] : walletAccounts[0],
+        selectedAccount
+          ? isLedgerAccount
+            ? ledgerAccountsList[selectedAccount.id]
+            : walletAccounts[selectedAccount.id]
+          : walletAccounts[0],
         walletAccounts
       )
     );
@@ -200,7 +215,7 @@ const useWalletReducer = () => {
 
   const addLedgerAccount = async (ledgerAccount: Account) => {
     try {
-      dispatch(addAccoutAction([...accountsList, ledgerAccount]));
+      dispatch(addLedgerAcountAction([...ledgerAccountsList, ledgerAccount]));
     } catch (err) {
       return Promise.reject(err);
     }

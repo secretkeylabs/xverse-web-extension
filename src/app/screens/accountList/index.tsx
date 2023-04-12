@@ -61,7 +61,7 @@ function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { network, accountsList, selectedAccount } = useWalletSelector();
+  const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
   const { createAccount } = useWalletReducer();
 
   const handleAccountSelect = (account: Account) => {
@@ -84,7 +84,9 @@ function AccountList(): JSX.Element {
     navigate(-1);
   };
 
-  const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;
+  const isAccountSelected = (account: Account) =>
+    account.btcAddress === selectedAccount?.btcAddress ||
+    account.stxAddress === selectedAccount?.stxAddress;
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -104,10 +106,10 @@ function AccountList(): JSX.Element {
     <Container>
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
-        {accountsList.map((account) => (
+        {[...accountsList, ...ledgerAccountsList].map((account) => (
           <>
             <AccountRow
-              key={account.stxAddress}
+              key={account.stxAddress + account.btcAddress}
               account={account}
               isSelected={isAccountSelected(account)}
               onAccountSelected={handleAccountSelect}

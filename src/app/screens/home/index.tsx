@@ -132,8 +132,10 @@ function Home() {
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
   const { coinsList, stxAddress, btcAddress, ordinalsAddress } = useWalletSelector();
-  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
-  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
+  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
+    useStxWalletData();
+  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
+    useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
   useFeeMultipliers();
   useCoinRates();
@@ -202,7 +204,7 @@ function Home() {
     navigate('/buy/BTC');
   };
 
-  const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined }) => {
+  const handleTokenPressed = (token: { coin: CurrencyTypes; ft: string | undefined }) => {
     navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
   };
 
@@ -240,7 +242,6 @@ function Home() {
           <Icon src={MiaToken} />
           <Icon src={AddToken} />
         </IconRow>
-
       </ReceiveCardComponent>
     </ReceiveContainer>
   );
@@ -249,7 +250,14 @@ function Home() {
     <>
       <AccountHeaderComponent />
       <Container>
-        <BalanceCard isLoading={(loadingStxWalletData || loadingBtcWalletData) || (refetchingStxWalletData || refetchingBtcWalletData)} />
+        <BalanceCard
+          isLoading={
+            (stxAddress && loadingStxWalletData) ||
+            (btcAddress && loadingBtcWalletData) ||
+            refetchingStxWalletData ||
+            refetchingBtcWalletData
+          }
+        />
         <RowButtonContainer>
           <ButtonContainer>
             <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
@@ -272,22 +280,26 @@ function Home() {
         </TokenListButtonContainer>
 
         <ColumnContainer>
-          <TokenTile
-            title={t('BITCOIN')}
-            currency="BTC"
-            icon={IconBitcoin}
-            loading={loadingBtcWalletData || refetchingBtcWalletData}
-            underlayColor={Theme.colors.background.elevation1}
-            onPress={handleTokenPressed}
-          />
-          <TokenTile
-            title={t('STACKS')}
-            currency="STX"
-            icon={IconStacks}
-            loading={loadingStxWalletData || refetchingStxWalletData}
-            underlayColor={Theme.colors.background.elevation1}
-            onPress={handleTokenPressed}
-          />
+          {btcAddress && (
+            <TokenTile
+              title={t('BITCOIN')}
+              currency="BTC"
+              icon={IconBitcoin}
+              loading={loadingBtcWalletData || refetchingBtcWalletData}
+              underlayColor={Theme.colors.background.elevation1}
+              onPress={handleTokenPressed}
+            />
+          )}
+          {stxAddress && (
+            <TokenTile
+              title={t('STACKS')}
+              currency="STX"
+              icon={IconStacks}
+              loading={loadingStxWalletData || refetchingStxWalletData}
+              underlayColor={Theme.colors.background.elevation1}
+              onPress={handleTokenPressed}
+            />
+          )}
         </ColumnContainer>
 
         <CoinContainer>

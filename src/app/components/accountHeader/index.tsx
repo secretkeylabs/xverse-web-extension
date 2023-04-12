@@ -58,7 +58,7 @@ function AccountHeaderComponent({
   disableCopy = false,
 }: AccountHeaderComponentProps) {
   const navigate = useNavigate();
-  const { selectedAccount } = useWalletSelector();
+  const { selectedAccount, isLedgerAccount } = useWalletSelector();
 
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const [showOptionsDialog, setShowOptionsDialog] = useState<boolean>(false);
@@ -135,7 +135,7 @@ function AccountHeaderComponent({
         <AccountRow
           account={selectedAccount!}
           isSelected
-          allowCopyAddress={!disableCopy && !selectedAccount?.isLedgerAccount}
+          allowCopyAddress={!disableCopy && !isLedgerAccount}
           onAccountSelected={handleAccountSelect}
         />
         {!disableMenuOption && (
