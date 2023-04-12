@@ -58,26 +58,29 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen }: Props) {
 
   const receiveContent = (
     <ColumnContainer>
-      <ReceiveCardComponent
-        title={t('ORDINALS')}
-        address={ordinalsAddress}
-        onQrAddressClick={onOrdinalsReceivePress}
-      >
-        <Icon src={OrdinalsIcon} />
-      </ReceiveCardComponent>
-      <ReceiveCardComponent
-        title={t('STACKS_NFT')}
-        address={stxAddress}
-        onQrAddressClick={onReceivePress}
-      >
-        <Icon src={StacksIcon} />
-      </ReceiveCardComponent>
+      {ordinalsAddress && (
+        <ReceiveCardComponent
+          title={t('ORDINALS')}
+          address={ordinalsAddress}
+          onQrAddressClick={onOrdinalsReceivePress}
+        >
+          <Icon src={OrdinalsIcon} />
+        </ReceiveCardComponent>
+      )}
+      {stxAddress && (
+        <ReceiveCardComponent
+          title={t('STACKS_NFT')}
+          address={stxAddress}
+          onQrAddressClick={onReceivePress}
+        >
+          <Icon src={StacksIcon} />
+        </ReceiveCardComponent>
+      )}
     </ColumnContainer>
   );
 
   return isGalleryOpen ? (
     <>
-
       <RowContainer>
         <Text>{t('RECEIVE_NFT')}</Text>
         <ButtonImage onClick={onClose}>

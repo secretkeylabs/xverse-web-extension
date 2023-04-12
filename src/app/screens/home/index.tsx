@@ -80,6 +80,7 @@ const Button = styled.button((props) => ({
   backgroundColor: 'transparent',
   opacity: 0.8,
   marginTop: props.theme.spacing(5),
+  cursor: props.disabled ? 'not-allowed' : 'pointer',
 }));
 
 const ButtonText = styled.div((props) => ({
@@ -214,35 +215,39 @@ function Home() {
 
   const receiveContent = (
     <ReceiveContainer>
-      <ReceiveCardComponent
-        title={t('BITCOIN')}
-        address={btcAddress}
-        onQrAddressClick={onBTCReceiveSelect}
-      >
-        <Icon src={BitcoinToken} />
-      </ReceiveCardComponent>
-
-      <ReceiveCardComponent
-        title={t('ORDINALS')}
-        address={ordinalsAddress}
-        onQrAddressClick={onOrdinalsReceivePress}
-      >
-        <Icon src={OrdinalsIcon} />
-      </ReceiveCardComponent>
-
-      <ReceiveCardComponent
-        title={t('STACKS_AND_TOKEN')}
-        address={stxAddress}
-        onQrAddressClick={onSTXReceiveSelect}
-      >
-        <IconRow>
-          <Icon src={StacksToken} />
-          <Icon src={CoinToken} />
-          <Icon src={NycToken} />
-          <Icon src={MiaToken} />
-          <Icon src={AddToken} />
-        </IconRow>
-      </ReceiveCardComponent>
+      {btcAddress && (
+        <ReceiveCardComponent
+          title={t('BITCOIN')}
+          address={btcAddress}
+          onQrAddressClick={onBTCReceiveSelect}
+        >
+          <Icon src={BitcoinToken} />
+        </ReceiveCardComponent>
+      )}
+      {ordinalsAddress && (
+        <ReceiveCardComponent
+          title={t('ORDINALS')}
+          address={ordinalsAddress}
+          onQrAddressClick={onOrdinalsReceivePress}
+        >
+          <Icon src={OrdinalsIcon} />
+        </ReceiveCardComponent>
+      )}
+      {stxAddress && (
+        <ReceiveCardComponent
+          title={t('STACKS_AND_TOKEN')}
+          address={stxAddress}
+          onQrAddressClick={onSTXReceiveSelect}
+        >
+          <IconRow>
+            <Icon src={StacksToken} />
+            <Icon src={CoinToken} />
+            <Icon src={NycToken} />
+            <Icon src={MiaToken} />
+            <Icon src={AddToken} />
+          </IconRow>
+        </ReceiveCardComponent>
+      )}
     </ReceiveContainer>
   );
 
@@ -271,7 +276,7 @@ function Home() {
         </RowButtonContainer>
 
         <TokenListButtonContainer>
-          <Button onClick={handleManageTokenListOnClick}>
+          <Button disabled={!stxAddress} onClick={handleManageTokenListOnClick}>
             <>
               <ButtonImage src={ListDashes} />
               <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
@@ -301,21 +306,22 @@ function Home() {
             />
           )}
         </ColumnContainer>
-
-        <CoinContainer>
-          {coinsList
-            ?.filter((ft) => ft.visible)
-            .map((coin) => (
-              <TokenTile
-                title={coin.name}
-                currency="FT"
-                loading={loadingCoinData || refetchingCoinData}
-                underlayColor={Theme.colors.background.elevation1}
-                fungibleToken={coin}
-                onPress={handleTokenPressed}
-              />
-            ))}
-        </CoinContainer>
+        {stxAddress && (
+          <CoinContainer>
+            {coinsList
+              ?.filter((ft) => ft.visible)
+              .map((coin) => (
+                <TokenTile
+                  title={coin.name}
+                  currency="FT"
+                  loading={loadingCoinData || refetchingCoinData}
+                  underlayColor={Theme.colors.background.elevation1}
+                  fungibleToken={coin}
+                  onPress={handleTokenPressed}
+                />
+              ))}
+          </CoinContainer>
+        )}
         <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={onReceiveModalClose}>
           {receiveContent}
         </BottomModal>
