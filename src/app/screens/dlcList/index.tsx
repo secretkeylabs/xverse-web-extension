@@ -13,6 +13,10 @@ import ActionButton from '@components/button';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import TokenTile from '@components/tokenTile';
+import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
+import { CurrencyTypes } from '@utils/constants';
+import Theme from 'theme';
 
 const HeaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -24,11 +28,10 @@ const HeaderContainer = styled.div((props) => ({
 
 const TableContainer = styled.div((props) => ({
   display: 'flex',
-  flex: '2',
+  flex: '1',
   flexDirection: 'column',
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  position: 'relative',
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
     display: 'none',
@@ -37,22 +40,25 @@ const TableContainer = styled.div((props) => ({
 
 const DlcTable = styled.table(() => ({}));
 
-const DlcTableHeaderRow = styled.tr(() => ({
+const DlcTableHeader = styled.thead((props) => ({
   width: '100%',
-  height: 64,
+  height: '32px',
+  backgroundColor: props.theme.colors.background.elevation3,
 }));
+
+const DlcTableHeaderRow = styled.tr((props) => ({}));
 
 const DlcTableHeaderDataNarrow = styled.th((props) => ({
   width: '20%',
   ...props.theme.body_xs,
-  textAlign: 'left',
+  textAlign: 'center',
   color: 'white',
 }));
 
 const DlcTableHeaderDataWide = styled.th((props) => ({
   width: '30%',
   ...props.theme.body_xs,
-  textAlign: 'left',
+  textAlign: 'center',
   color: 'white',
 }));
 
@@ -69,6 +75,16 @@ const RowContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
   paddingBottom: props.theme.spacing(8),
   borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
+}));
+
+const ColumnContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'space-between',
+  justifyContent: 'space-between',
+  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(4),
+  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
 }));
 
 const ButtonContainer = styled.div((props) => ({
@@ -103,12 +119,16 @@ function DlcList(): JSX.Element {
     dispatch(handleContractRequest());
   }, []);
 
+  const handleTokenPressed = (token: { coin: CurrencyTypes; ft: string | undefined }) => {
+    navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
+  };
+
   const onBTCSendClick = () => {
-    navigate('/dlc/send-btc-prefilled/nested');
+    navigate('/send-btc-prefilled/nested');
   };
 
   const onBTCReceiveClick = () => {
-    navigate('/dlc/send-btc-prefilled/native');
+    navigate('/send-btc-prefilled/native');
   };
 
   return (
@@ -118,7 +138,12 @@ function DlcList(): JSX.Element {
         <BalanceCard isLoading={loadingBtcWalletData || refetchingBtcWalletData} />
         <RowButtonContainer>
           <ButtonContainer>
-            <ActionButton src={ArrowUpRight} text={t('SEND_TO_MAIN')} onPress={onBTCSendClick} />
+            <ActionButton
+              disabled={true}
+              src={ArrowUpRight}
+              text={t('SEND_TO_MAIN')}
+              onPress={onBTCSendClick}
+            />
           </ButtonContainer>
           <ButtonContainer>
             <ActionButton
@@ -128,16 +153,28 @@ function DlcList(): JSX.Element {
             />
           </ButtonContainer>
         </RowButtonContainer>
+        <ColumnContainer>
+          <TokenTile
+            title={t('BITCOIN')}
+            currency="BTC"
+            icon={IconBitcoin}
+            loading={loadingBtcWalletData || refetchingBtcWalletData}
+            underlayColor={Theme.colors.background.elevation1}
+            onPress={handleTokenPressed}
+          />
+        </ColumnContainer>
       </HeaderContainer>
       <TableContainer>
         {contracts.length !== 0 ? (
           <DlcTable>
-            <DlcTableHeaderRow>
-              <DlcTableHeaderDataWide>Contract ID</DlcTableHeaderDataWide>
-              <DlcTableHeaderDataWide>Collateral</DlcTableHeaderDataWide>
-              <DlcTableHeaderDataNarrow>Details</DlcTableHeaderDataNarrow>
-              <DlcTableHeaderDataNarrow>Funding TX</DlcTableHeaderDataNarrow>
-            </DlcTableHeaderRow>
+            <DlcTableHeader>
+              <DlcTableHeaderRow>
+                <DlcTableHeaderDataWide>ID</DlcTableHeaderDataWide>
+                <DlcTableHeaderDataWide>Collateral</DlcTableHeaderDataWide>
+                <DlcTableHeaderDataNarrow>Details</DlcTableHeaderDataNarrow>
+                <DlcTableHeaderDataNarrow>TX</DlcTableHeaderDataNarrow>
+              </DlcTableHeaderRow>
+            </DlcTableHeader>
             {contracts.map((contract) => (
               <DlcTableElement key={contract.temporaryContractId} contract={contract} />
             ))}

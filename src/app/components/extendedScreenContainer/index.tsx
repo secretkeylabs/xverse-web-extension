@@ -1,6 +1,6 @@
 import AlertMessage from '@components/alertMessage';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction, ChangeShowDlcBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -41,6 +41,7 @@ function ExtendedScreenContainer(): JSX.Element {
   const { t } = useTranslation('translation');
   const [dontShowOrdinalReceiveAlert, setDontShowOrdinalReceiveAlert] = useState<boolean>(false);
   const [dontShowBtcReceiveAlert, setDontShowBtcReceiveAlert] = useState<boolean>(false);
+
   const dispatch = useDispatch();
 
   const onReceiveAlertClose = () => {

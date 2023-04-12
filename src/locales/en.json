@@ -119,6 +119,7 @@
     "SEND_TO_MAIN": "Send to Main",
     "RECEIVE_FROM_MAIN": "Receive from Main",
     "NO_DLC": "There is no contract to show!",
+    "BITCOIN": "Bitcoin",
     "ACCEPT": "Lock BTC",
     "REJECT": "Reject Offer",
     "BACK": "Back"
@@ -469,6 +470,8 @@
     "RECEIVING_ORDINALS": "Receiving Ordinals",
     "RECEIVING_ORDINAL_INFO": "Use this address to receive Ordinals only. Do not use this address to receive Bitcoin payments.",
     "RECEIVING_BTC": "Receiving Bitcoin",
+    "RECEIVING_DLC_BTC": "Receiving Bitcoin to DLC Address",
+    "RECEIVING_DLC_BTC_INFO": "Please only use this address to receive Bitcoin payments for DLC transactions. This address should not be used for receiving payments for Ordinals.",
     "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"

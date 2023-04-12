@@ -101,7 +101,7 @@ const router = createHashRouter([
         element: <SendBtcScreen />,
       },
       {
-        path: 'dlc/send-btc-prefilled/:r',
+        path: 'send-btc-prefilled/:r',
         element: <SendBtcPrefilledScreen />,
       },
       {

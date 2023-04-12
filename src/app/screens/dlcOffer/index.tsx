@@ -262,6 +262,7 @@ function DlcOfferRequest() {
           txid: txID,
           currency: 'BTC',
           error: '',
+          browserTx: true,
         },
       });
       setTimeout(() => {
@@ -277,6 +278,7 @@ function DlcOfferRequest() {
           txid: '',
           currency: 'BTC',
           error: error,
+          browserTx: true,
         },
       });
     }

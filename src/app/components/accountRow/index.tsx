@@ -11,7 +11,7 @@ import { LoaderSize } from '@utils/constants';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import { ChangeShowBtcReceiveAlertAction, ChangeShowDlcBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import useWalletSelector from '@hooks/useWalletSelector';
 
 interface GradientCircleProps {
@@ -93,7 +93,7 @@ const Button = styled.button`
 
 const CopyButton = styled.button`
   opacity: 0.6;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-top: 3px;
   margin-right: 10px;
   display: flex;
@@ -146,12 +146,11 @@ function AccountRow({
   showOrdinalAddress,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const {
-    showBtcReceiveAlert,
-  } = useWalletSelector();
+  const { showBtcReceiveAlert, showDlcBtcReceiveAlert, hasActivatedDLCsKey, network } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress!);
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
+  const [onDlcCopied, setOnDlcCopied] = useState(false);
   const dispatch = useDispatch();
 
   function getName() {
@@ -161,13 +160,27 @@ function AccountRow({
   const handleOnBtcAddressClick = () => {
     navigator.clipboard.writeText(account?.btcAddress!);
     setOnBtcCopied(true);
+    setOnDlcCopied(false);
     setOnStxCopied(false);
-    if (showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
+    if (showBtcReceiveAlert !== null) {
+      dispatch(ChangeShowBtcReceiveAlertAction(true));
+    }
+  };
+
+  const handleOnDlcAddressClick = () => {
+    navigator.clipboard.writeText(account?.dlcBtcAddress!);
+    setOnBtcCopied(false);
+    setOnDlcCopied(true);
+    setOnStxCopied(false);
+    if (showDlcBtcReceiveAlert !== null) {
+      dispatch(ChangeShowDlcBtcReceiveAlertAction(true));
+    }
   };
 
   const handleOnStxAddressClick = () => {
     navigator.clipboard.writeText(account?.stxAddress!);
     setOnStxCopied(true);
+    setOnDlcCopied(false);
     setOnBtcCopied(false);
   };
 
@@ -195,37 +208,58 @@ function AccountRow({
   );
 
   const displayAddress = allowCopyAddress ? (
-    <RowContainer>
-      <CopyButton id="bitcoin-address" onClick={handleOnBtcAddressClick}>
-        <CopyImage src={Copy} alt="copy" />
-        <CurrentUnSelectedAccountText>
-          {getTruncatedAddress(account?.btcAddress!)}
-        </CurrentUnSelectedAccountText>
-      </CopyButton>
-      <StyledToolTip
-        anchorId="bitcoin-address"
-        variant="light"
-        content={onBtcCopied ? 'Copied' : 'Bitcoin address'}
-        events={['hover']}
-        place="bottom"
-      />
+    <>
+      <RowContainer>
+        <CopyButton id="bitcoin-address" onClick={handleOnBtcAddressClick}>
+          <CopyImage src={Copy} alt="copy" />
+          <CurrentUnSelectedAccountText>
+            {getTruncatedAddress(account?.btcAddress!)}
+          </CurrentUnSelectedAccountText>
+        </CopyButton>
+        <StyledToolTip
+          anchorId="bitcoin-address"
+          variant="light"
+          content={onBtcCopied ? 'Copied' : 'Bitcoin address'}
+          events={['hover']}
+          place="bottom"
+        />
 
-      <CopyButton id="stacks-address" onClick={handleOnStxAddressClick}>
-        <CopyImage src={Copy} alt="copy" />
-        <CurrentUnSelectedAccountText>
-          {getTruncatedAddress(account?.stxAddress!)}
-        </CurrentUnSelectedAccountText>
-      </CopyButton>
-      <StyledToolTip
-        anchorId="stacks-address"
-        variant="light"
-        content={onStxCopied ? 'Copied' : 'Stacks address'}
-        events={['hover']}
-        place="bottom"
-      />
-    </RowContainer>
+        <CopyButton id="stacks-address" onClick={handleOnStxAddressClick}>
+          <CopyImage src={Copy} alt="copy" />
+          <CurrentUnSelectedAccountText>
+            {getTruncatedAddress(account?.stxAddress!)}
+          </CurrentUnSelectedAccountText>
+        </CopyButton>
+        <StyledToolTip
+          anchorId="stacks-address"
+          variant="light"
+          content={onStxCopied ? 'Copied' : 'Stacks address'}
+          events={['hover']}
+          place="bottom"
+        />
+      </RowContainer>
+      {hasActivatedDLCsKey && network.type === 'Testnet' && (
+        <RowContainer>
+          <CopyButton id="dlc-address" onClick={handleOnDlcAddressClick}>
+            <CopyImage src={Copy} alt="copy" />
+            <CurrentUnSelectedAccountText>
+              {getTruncatedAddress(account?.dlcBtcAddress!)}
+            </CurrentUnSelectedAccountText>
+          </CopyButton>
+          <StyledToolTip
+            anchorId="dlc-address"
+            variant="light"
+            content={onDlcCopied ? 'Copied' : 'DLC address'}
+            events={['hover']}
+            place="bottom"
+          />
+        </RowContainer>
+      )}
+    </>
   ) : (
-    <CurrentAccountDetailText>{showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}</CurrentAccountDetailText>
+    <CurrentAccountDetailText>
+      {showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}
+    </CurrentAccountDetailText>
   );
 
   return (
@@ -237,8 +271,8 @@ function AccountRow({
         onClick={onClick}
       />
       <CurrentAcountContainer>
-        {account
-          && (isSelected ? (
+        {account &&
+          (isSelected ? (
             <Button onClick={onClick}>
               <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
             </Button>

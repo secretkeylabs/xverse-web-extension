@@ -209,6 +209,13 @@ export function ChangeShowBtcReceiveAlertAction(showBtcReceiveAlert: boolean | n
   };
 }
 
+export function ChangeShowDlcBtcReceiveAlertAction(showDlcBtcReceiveAlert: boolean | null): actions.ChangeShowDlcBtcReceiveAlert {
+  return {
+    type: actions.ChangeShowDlcBtcReceiveAlertKey,
+    showDlcBtcReceiveAlert,
+  };
+}
+
 export function ChangeShowOrdinalReceiveAlertAction(showOrdinalReceiveAlert: boolean | null): actions.ChangeShowOrdinalReceiveAlert {
   return {
     type: actions.ChangeShowOrdinalReceiveAlertKey,

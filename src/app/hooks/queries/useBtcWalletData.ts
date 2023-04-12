@@ -11,7 +11,7 @@ export const useBtcWalletData = () => {
   const dispatch = useDispatch();
   const { btcAddress, dlcBtcAddress, network } = useWalletSelector();
   const location = useLocation();
-  const address = location.pathname.startsWith('/dlc')
+  const address = location.pathname.startsWith('/dlc') || location.pathname.endsWith('nested')
     ? dlcBtcAddress
     : btcAddress;
 

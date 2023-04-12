@@ -39,6 +39,7 @@ export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const ChangeHasActivatedDLCsKey = 'ChangeHasActivatedDLCsKey';
 
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
+export const ChangeShowDlcBtcReceiveAlertKey = 'ChangeShowDlcBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 
 export interface WalletState {
@@ -71,6 +72,7 @@ export interface WalletState {
   hasActivatedOrdinalsKey: boolean | undefined;
   hasActivatedDLCsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
+  showDlcBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
 }
 
@@ -87,6 +89,7 @@ export interface WalletData {
   hasActivatedOrdinalsKey: boolean | undefined;
   hasActivatedDLCsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
+  showDlcBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
 }
 
@@ -207,6 +210,10 @@ export interface ChangeShowBtcReceiveAlert {
   showBtcReceiveAlert: boolean | null;
 }
 
+export interface ChangeShowDlcBtcReceiveAlert {
+  type: typeof ChangeShowDlcBtcReceiveAlertKey;
+  showDlcBtcReceiveAlert: boolean | null;
+}
 export interface ChangeShowOrdinalReceiveAlert {
   type: typeof ChangeShowOrdinalReceiveAlertKey;
   showOrdinalReceiveAlert: boolean | null;
@@ -234,4 +241,5 @@ export type WalletActions =
   | ChangeActivateOrdinals
   | ChangeActivateDLCs
   | ChangeShowBtcReceiveAlert
+  | ChangeShowDlcBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert;

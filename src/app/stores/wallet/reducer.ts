@@ -24,6 +24,7 @@ import {
   ChangeHasActivatedDLCsKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
+  ChangeShowDlcBtcReceiveAlertKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -59,13 +60,14 @@ const initialWalletState: WalletState = {
   hasActivatedOrdinalsKey: undefined,
   hasActivatedDLCsKey: false,
   showBtcReceiveAlert: false,
+  showDlcBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
 };
 
 const walletReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: WalletState = initialWalletState,
-  action: WalletActions,
+  action: WalletActions
 ): WalletState => {
   switch (action.type) {
     case SetWalletKey:
@@ -195,6 +197,12 @@ const walletReducer = (
       return {
         ...state,
         showOrdinalReceiveAlert: action.showOrdinalReceiveAlert,
+      };
+    case ChangeShowDlcBtcReceiveAlertKey:
+      console.log('showDlcBtcReceiveAlert', action.showDlcBtcReceiveAlert)
+      return {
+        ...state,
+        showDlcBtcReceiveAlert: action.showDlcBtcReceiveAlert,
       };
     default:
       return state;
