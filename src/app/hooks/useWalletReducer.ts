@@ -221,6 +221,17 @@ const useWalletReducer = () => {
     }
   };
 
+  const updateLedgerAccounts = async (updatedLedgerAccount: Account) => {
+    const newLedgerAccountsList = ledgerAccountsList.map((account) =>
+      account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account
+    );
+    try {
+      dispatch(addLedgerAcountAction(newLedgerAccountsList));
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
   return {
     unlockWallet,
     lockWallet,
@@ -231,6 +242,7 @@ const useWalletReducer = () => {
     changeNetwork,
     createAccount,
     addLedgerAccount,
+    updateLedgerAccounts,
   };
 };
 
