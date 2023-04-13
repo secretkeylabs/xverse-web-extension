@@ -17,6 +17,7 @@ import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';
+import { useLocation } from 'react-router-dom';
 
 import LedgerImportStartSVG from '@assets/img/ledger/ledger_import_start.svg';
 import BtcIconSVG from '@assets/img/ledger/btc_icon.svg';
@@ -26,7 +27,8 @@ import LedgerConnectBtcSVG from '@assets/img/ledger/ledger_import_connect_btc.sv
 import InfoIconSVG from '@assets/img/ledger/info_icon.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import LedgerImportEndSVG from '@assets/img/ledger/ledger_import_end.svg';
-import { useLocation } from 'react-router-dom';
+import ArrowLeftIconSVG from '@assets/img/ledger/arrow_left_icon.svg';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 const Container = styled.div`
   display: flex;
@@ -175,6 +177,21 @@ const EndScreenTextContainer = styled.div((props) => ({
   textAlign: 'center',
   gap: props.theme.spacing(6),
   marginTop: props.theme.spacing(20),
+}));
+
+const AssetSelectionButton = styled.button((props) => ({
+  position: 'absolute',
+  left: props.theme.spacing(105),
+  top: props.theme.spacing(60),
+  backgroundColor: 'transparent',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: props.theme.spacing(3),
+}));
+const AssetSelectionButtonText = styled.p((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white[0],
 }));
 
 interface Credential {
@@ -349,8 +366,29 @@ function ImportLedger(): JSX.Element {
     setCurrentStepIndex(6);
   };
 
+  const backToAssetSelection = () => {
+    setIsBitcoinSelected(true);
+    setIsOrdinalsSelected(true);
+    setBitcoinCredentials(undefined);
+    setOrdinalsCredentials(undefined);
+    setIsButtonDisabled(false);
+    setIsConnectSuccess(false);
+    setIsConnectFailed(false);
+    setAddressIndex(0);
+    setAccountName('');
+
+    setCurrentStepIndex(1);
+  };
+
   return (
     <Container>
+      <FullScreenHeader />
+      {currentStepIndex > 1 && !isOrdinalsOnly && (
+        <AssetSelectionButton onClick={backToAssetSelection}>
+          <img src={ArrowLeftIconSVG} />
+          <AssetSelectionButtonText>{t('LEDGER_IMPORT_RETURN_BUTTON')}</AssetSelectionButtonText>
+        </AssetSelectionButton>
+      )}
       {transition((style) => (
         <>
           <OnBoardingContentContainer
