@@ -43,7 +43,9 @@ const GridContainer = styled.div<GridContainerProps>((props) => ({
   columnGap: props.theme.spacing(8),
   rowGap: props.theme.spacing(6),
   marginTop: props.theme.spacing(14),
-  gridTemplateColumns: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'repeat(auto-fill,minmax(150px,1fr))',
+  gridTemplateColumns: props.isGalleryOpen
+    ? 'repeat(auto-fill,minmax(300px,1fr))'
+    : 'repeat(auto-fill,minmax(150px,1fr))',
   gridTemplateRows: props.isGalleryOpen ? 'repeat(minmax(300px,1fr))' : 'minmax(150px,220px)',
 }));
 
@@ -184,6 +186,13 @@ const BarLoaderContainer = styled.div((props) => ({
   display: 'flex',
 }));
 
+const MissingOrdinalsAddresText = styled.p((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white['200'],
+  marginTop: props.theme.spacing(42),
+  textAlign: 'center',
+}));
+
 function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const selectedNetwork = useNetworkSelector();
@@ -203,22 +212,17 @@ function NftDashboard() {
     return response;
   }, [ordinalsAddress]);
 
-  const {
-    isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
-  } = useInfiniteQuery(
-    [`nft-meta-data${stxAddress}`],
-    fetchNfts,
-    {
+  const { isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch } =
+    useInfiniteQuery([`nft-meta-data${stxAddress}`], fetchNfts, {
       keepPreviousData: false,
       getNextPageParam: (lastpage, pages) => {
-        const currentLength = pages.map(((page) => page.nftsList)).flat().length;
+        const currentLength = pages.map((page) => page.nftsList).flat().length;
         if (currentLength < lastpage.total) {
           return currentLength;
         }
         return false;
       },
-    },
-  );
+    });
 
   const { data: ordinals } = useQuery({
     queryKey: [`ordinals-${ordinalsAddress}`],
@@ -267,39 +271,30 @@ function NftDashboard() {
     setOpenReceiveModal(false);
   };
 
-  const nftListView = (
+  const nftListView =
     totalNfts === 0 && ordinalsLength === 0 ? (
-      <NoCollectiblesText>
-        {t('NO_COLLECTIBLES')}
-      </NoCollectiblesText>
+      <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>
     ) : (
       <>
         <GridContainer isGalleryOpen={isGalleryOpen}>
-          { hasActivatedOrdinalsKey && ordinals?.map((ordinal) => (
-            <Ordinal asset={ordinal} key={ordinal.id} />
-          ))}
-          { nfts?.map((nft) => (
+          {hasActivatedOrdinalsKey &&
+            ordinals?.map((ordinal) => <Ordinal asset={ordinal} key={ordinal.id} />)}
+          {nfts?.map((nft) => (
             <Nft asset={nft} key={nft.asset_identifier} />
           ))}
         </GridContainer>
-        {hasNextPage && (isFetchingNextPage
-          ? (
+        {hasNextPage &&
+          (isFetchingNextPage ? (
             <LoadMoreButtonContainer>
               <MoonLoader color="white" size={30} />
             </LoadMoreButtonContainer>
-          )
-          : (
+          ) : (
             <LoadMoreButtonContainer>
-              <LoadMoreButton onClick={onLoadMoreButtonClick}>
-                {t('LOAD_MORE')}
-              </LoadMoreButton>
+              <LoadMoreButton onClick={onLoadMoreButtonClick}>{t('LOAD_MORE')}</LoadMoreButton>
             </LoadMoreButtonContainer>
-          )
-        )}
+          ))}
       </>
-
-    )
-  );
+    );
 
   const onSharePress = () => {
     setShowNftOptions(true);
@@ -323,18 +318,24 @@ function NftDashboard() {
     dispatch(ChangeActivateOrdinalsAction(true));
   };
 
+  const handleCreateAddressCLick = async () => {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL('options.html#/import-ledger?ordinals-only=true'),
+    });
+  };
+
   return (
     <>
       {showActivateOrdinalsAlert && (
-      <AlertMessage
-        title={t('ACTIVATE_ORDINALS')}
-        description={t('ACTIVATE_ORDINALS_INFO')}
-        buttonText={t('DENY')}
-        onClose={onActivateOrdinalsAlertCrossPress}
-        secondButtonText={t('ACTIVATE')}
-        onButtonClick={onActivateOrdinalsAlertDenyPress}
-        onSecondButtonClick={onActivateOrdinalsAlertActivatePress}
-      />
+        <AlertMessage
+          title={t('ACTIVATE_ORDINALS')}
+          description={t('ACTIVATE_ORDINALS_INFO')}
+          buttonText={t('DENY')}
+          onClose={onActivateOrdinalsAlertCrossPress}
+          secondButtonText={t('ACTIVATE')}
+          onButtonClick={onActivateOrdinalsAlertDenyPress}
+          onSecondButtonClick={onActivateOrdinalsAlertActivatePress}
+        />
       )}
       <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
@@ -344,7 +345,7 @@ function NftDashboard() {
           ) : (
             <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>
           )}
-          {isLoading ? (
+          {ordinalsAddress && isLoading ? (
             <BarLoaderContainer>
               <BarLoader loaderSize={LoaderSize.LARGE} />
             </BarLoaderContainer>
@@ -359,10 +360,19 @@ function NftDashboard() {
               </>
             </WebGalleryButton>
           )}
+          {!ordinalsAddress && (
+            <MissingOrdinalsAddresText>
+              You need to set an Ordinals address to receive collectibles.
+            </MissingOrdinalsAddresText>
+          )}
         </CollectibleContainer>
         <ButtonContainer>
           <ReceiveButtonContainer>
-            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
+            {ordinalsAddress ? (
+              <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
+            ) : (
+              <ActionButton text={'Create an address'} onPress={handleCreateAddressCLick} />
+            )}
           </ReceiveButtonContainer>
           {openReceiveModal && (
             <ReceiveNftContainer>
@@ -382,7 +392,7 @@ function NftDashboard() {
             )}
           </ShareDialogeContainer>
         </ButtonContainer>
-        {isLoading ? (
+        {ordinalsAddress && isLoading ? (
           <LoaderContainer>
             <MoonLoader color="white" size={30} />
           </LoaderContainer>
