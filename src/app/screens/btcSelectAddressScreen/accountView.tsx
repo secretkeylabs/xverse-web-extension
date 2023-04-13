@@ -79,8 +79,13 @@ function AccountView({ account, isBitcoinTx }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
 
   function getName() {
-    return account?.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
+    return (
+      account?.accountName ??
+      account?.bnsName ??
+      `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`
+    );
   }
+
   return (
     <Container>
       <GradientCircle

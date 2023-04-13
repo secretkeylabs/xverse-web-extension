@@ -167,7 +167,7 @@ function BtcSelectAddressScreen() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
-  const { selectedAccount, accountsList, network } = useWalletSelector();
+  const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
   const { payload, approveBtcAddressRequest, cancelAddressRequest } = useBtcAddressRequest();
   const springProps = useSpring({
     transform: showAccountList ? 'translateY(0%)' : 'translateY(100%)',
@@ -271,7 +271,7 @@ function BtcSelectAddressScreen() {
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
-            {accountsList.map((account) => (
+            {[...accountsList, ...ledgerAccountsList].map((account) => (
               <AccountListRow>
                 <AccountRow
                   key={account.stxAddress}
