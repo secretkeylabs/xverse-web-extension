@@ -7,6 +7,7 @@ import ActionButton from '@components/button';
 import {
   Account,
   importNestedSegwitAccountFromLedger,
+  importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
   NetworkType,
 } from '@secretkeylabs/xverse-core';
@@ -18,17 +19,19 @@ import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';
 import { useLocation } from 'react-router-dom';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 import LedgerImportStartSVG from '@assets/img/ledger/ledger_import_start.svg';
 import BtcIconSVG from '@assets/img/ledger/btc_icon.svg';
 import OdrinalsIconSVG from '@assets/img/ledger/ordinals_icon.svg';
 import BtcOdrinalsIconSVG from '@assets/img/ledger/btc_ordinals_icon.svg';
+import StxIconSVG from '@assets/img/ledger/stx_icon.svg';
 import LedgerConnectBtcSVG from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import LedgerConnectStxSVG from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import InfoIconSVG from '@assets/img/ledger/info_icon.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import LedgerImportEndSVG from '@assets/img/ledger/ledger_import_end.svg';
 import ArrowLeftIconSVG from '@assets/img/ledger/arrow_left_icon.svg';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 const Container = styled.div`
   display: flex;
@@ -104,7 +107,7 @@ const SelectAssetText = styled.p((props) => ({
 const SelectAssetFootNote = styled.p((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white[200],
-  marginBottom: props.theme.spacing(55),
+  marginBottom: props.theme.spacing(25),
   marginTop: props.theme.spacing(12),
 }));
 
@@ -203,8 +206,10 @@ function ImportLedger(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [isBitcoinSelected, setIsBitcoinSelected] = useState(true);
   const [isOrdinalsSelected, setIsOrdinalsSelected] = useState(true);
+  const [isStacksSelected, setIsStacksSelected] = useState(false);
   const [bitcoinCredentials, setBitcoinCredentials] = useState<Credential | undefined>(undefined);
   const [ordinalsCredentials, setOrdinalsCredentials] = useState<Credential | undefined>(undefined);
+  const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState<boolean>(false);
   const [isConnectFailed, setIsConnectFailed] = useState<boolean>(false);
@@ -241,11 +246,11 @@ function ImportLedger(): JSX.Element {
     }
   }, [isOrdinalsOnly]);
 
-  const importAccounts = async () => {
+  const importBtcAccounts = async () => {
     const transport = await Transport.create();
     const network: NetworkType = 'Testnet';
     const newAddressIndex = isBitcoinSelected
-      ? ledgerAccountsList.length
+      ? ledgerAccountsList.filter((account) => account.btcAddress !== '').length
       : ledgerAccountsList.filter((account) => account.ordinalsAddress !== '').length;
     setAddressIndex(newAddressIndex);
     if (isBitcoinSelected) {
@@ -271,11 +276,26 @@ function ImportLedger(): JSX.Element {
     await transport.close();
   };
 
+  const importStxAccounts = async () => {
+    const transport = await Transport.create();
+    const network: NetworkType = 'Testnet';
+    const newAddressIndex = ledgerAccountsList.filter((account) => !account.stxAddress).length;
+    setAddressIndex(newAddressIndex);
+    const { address, publicKey } = await importStacksAccountFromLedger(
+      transport,
+      network,
+      0,
+      newAddressIndex
+    );
+    setStacksCredentials({ address, publicKey });
+    await transport.close();
+  };
+
   const checkDeviceConnection = async () => {
     try {
       setIsConnectFailed(false);
       setIsButtonDisabled(true);
-      await importAccounts();
+      isStacksSelected ? await importStxAccounts() : await importBtcAccounts();
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
       handleClickNext();
@@ -290,21 +310,35 @@ function ImportLedger(): JSX.Element {
 
   const saveAddressToWallet = async () => {
     setIsButtonDisabled(true);
+    const currentAccount = ledgerAccountsList.find((account) => account.id === addressIndex);
     try {
-      if (isBitcoinSelected) {
+      if (!currentAccount) {
         const ledgerAccount: Account = {
           id: addressIndex,
-          stxAddress: '',
+          stxAddress: stacksCredentials?.address || '',
           btcAddress: bitcoinCredentials?.address || '',
           ordinalsAddress: ordinalsCredentials?.address || '',
           masterPubKey: '',
-          stxPublicKey: '',
+          stxPublicKey: stacksCredentials?.publicKey || '',
           btcPublicKey: bitcoinCredentials?.publicKey || '',
           ordinalsPublicKey: ordinalsCredentials?.publicKey || '',
           isLedgerAccount: true,
           accountName: `Ledger Account ${addressIndex + 1}`,
         };
         await addLedgerAccount(ledgerAccount);
+        await ledgerDelay(1000);
+        handleClickNext();
+        setIsButtonDisabled(false);
+        return;
+      }
+
+      if (currentAccount && isStacksSelected) {
+        const ledgerAccount: Account = {
+          ...currentAccount,
+          stxAddress: stacksCredentials?.address || '',
+          stxPublicKey: stacksCredentials?.publicKey || '',
+        };
+        await updateLedgerAccounts(ledgerAccount);
         await ledgerDelay(1000);
         handleClickNext();
         setIsButtonDisabled(false);
@@ -359,6 +393,14 @@ function ImportLedger(): JSX.Element {
   };
 
   const handleClickNext = () => {
+    // Only let user name NEW account
+    if (currentStepIndex === 4) {
+      const currentAccount = ledgerAccountsList.find((account) => account.id === addressIndex);
+      if (currentAccount && currentAccount.stxAddress && currentAccount.btcAddress) {
+        handleSkipToEnd();
+        return;
+      }
+    }
     setCurrentStepIndex(currentStepIndex + 1);
   };
 
@@ -369,8 +411,10 @@ function ImportLedger(): JSX.Element {
   const backToAssetSelection = () => {
     setIsBitcoinSelected(true);
     setIsOrdinalsSelected(true);
+    setIsStacksSelected(false);
     setBitcoinCredentials(undefined);
     setOrdinalsCredentials(undefined);
+    setStacksCredentials(undefined);
     setIsButtonDisabled(false);
     setIsConnectSuccess(false);
     setIsConnectFailed(false);
@@ -378,6 +422,46 @@ function ImportLedger(): JSX.Element {
     setAccountName('');
 
     setCurrentStepIndex(1);
+  };
+
+  const handleAssetSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.id);
+    switch (e.target.id) {
+      case 'stx_select_card': {
+        if (isStacksSelected) {
+          setIsStacksSelected(false);
+          return;
+        }
+        setIsStacksSelected(true);
+        setIsBitcoinSelected(false);
+        setIsOrdinalsSelected(false);
+        return;
+      }
+      case 'btc_select_card': {
+        if (isBitcoinSelected) {
+          setIsBitcoinSelected(false);
+          setIsOrdinalsSelected(false);
+          return;
+        }
+        setIsBitcoinSelected(true);
+        setIsStacksSelected(false);
+        setIsOrdinalsSelected(false);
+        return;
+      }
+      case 'ordinals_select_card': {
+        if (isOrdinalsSelected) {
+          setIsOrdinalsSelected(false);
+          return;
+        }
+        setIsStacksSelected(false);
+        setIsBitcoinSelected(true);
+        setIsOrdinalsSelected(true);
+        return;
+      }
+      default: {
+        return;
+      }
+    }
   };
 
   return (
@@ -414,8 +498,8 @@ function ImportLedger(): JSX.Element {
                     title={t('LEDGER_IMPORT_2_SELECT.BTC_TITLE')}
                     text={t('LEDGER_IMPORT_2_SELECT.BTC_SUBTITLE')}
                     id={'btc_select_card'}
-                    isChecked={true}
-                    onChange={() => {}}
+                    isChecked={isBitcoinSelected}
+                    onChange={handleAssetSelect}
                   />
                   <LedgerAssetSelectCard
                     icon={OdrinalsIconSVG}
@@ -423,7 +507,15 @@ function ImportLedger(): JSX.Element {
                     text={t('LEDGER_IMPORT_2_SELECT.ORDINALS_SUBTITLE')}
                     id={'ordinals_select_card'}
                     isChecked={isOrdinalsSelected}
-                    onChange={(e) => setIsOrdinalsSelected(e.target.checked)}
+                    onChange={handleAssetSelect}
+                  />
+                  <LedgerAssetSelectCard
+                    icon={StxIconSVG}
+                    title={t('LEDGER_IMPORT_2_SELECT.STACKS_TITLE')}
+                    text={t('LEDGER_IMPORT_2_SELECT.STACKS_SUBTITLE')}
+                    id={'stx_select_card'}
+                    isChecked={isStacksSelected}
+                    onChange={handleAssetSelect}
                   />
                   <SelectAssetFootNote>{t('LEDGER_IMPORT_2_FOOTNOTE')}</SelectAssetFootNote>
                 </ImportCardContainer>
@@ -431,11 +523,19 @@ function ImportLedger(): JSX.Element {
             )}
             {currentStepIndex === 2 && (
               <LedgerConnectionView
-                title={t('LEDGER_CONNECT.TITLE')}
-                text={t('LEDGER_CONNECT.SUBTITLE')}
+                title={t(
+                  isStacksSelected ? 'LEDGER_CONNECT.STX_TITLE' : 'LEDGER_CONNECT.BTC_TITLE'
+                )}
+                text={t(
+                  isStacksSelected ? 'LEDGER_CONNECT.STX_SUBTITLE' : 'LEDGER_CONNECT.BTC_SUBTITLE'
+                )}
                 titleFailed={t('LEDGER_CONNECT.TITLE_FAILED')}
-                textFailed={t('LEDGER_CONNECT.SUBTITLE_FAILED')}
-                imageDefault={LedgerConnectBtcSVG}
+                textFailed={t(
+                  isStacksSelected
+                    ? 'LEDGER_CONNECT.STX_SUBTITLE_FAILED'
+                    : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED'
+                )}
+                imageDefault={isStacksSelected ? LedgerConnectStxSVG : LedgerConnectBtcSVG}
                 isConnectSuccess={isConnectSuccess}
                 isConnectFailed={isConnectFailed}
               />
@@ -449,6 +549,8 @@ function ImportLedger(): JSX.Element {
                         ? isOrdinalsSelected
                           ? BtcOdrinalsIconSVG
                           : BtcIconSVG
+                        : isStacksSelected
+                        ? StxIconSVG
                         : OdrinalsIconSVG
                     }
                   />
@@ -456,6 +558,8 @@ function ImportLedger(): JSX.Element {
                     {t(
                       isBitcoinSelected
                         ? 'LEDGER_ADD_ADDRESS.TITLE_BTC'
+                        : isStacksSelected
+                        ? 'LEDGER_ADD_ADDRESS.TITLE_STX'
                         : 'LEDGER_ADD_ADDRESS.TITLE_ORDINALS'
                     )}
                   </SelectAssetTitle>
@@ -470,6 +574,10 @@ function ImportLedger(): JSX.Element {
                     title={t('LEDGER_ADD_ADDRESS.ORDINALS')}
                     address={ordinalsCredentials?.address}
                   />
+                  <LedgerAddressComponent
+                    title={t('LEDGER_ADD_ADDRESS.STX')}
+                    address={stacksCredentials?.address}
+                  />
                 </AddAddressDetailsContainer>
                 <AlertContainer>
                   <img src={InfoIconSVG} alt="info" />
@@ -482,7 +590,9 @@ function ImportLedger(): JSX.Element {
                 <img src={CheckCircleSVG} alt="Success" />
                 <SelectAssetTitle>
                   {t(
-                    isBitcoinSelected && isOrdinalsSelected
+                    isStacksSelected
+                      ? 'LEDGER_ADDRESS_ADDED.TITLE_STX'
+                      : isBitcoinSelected && isOrdinalsSelected
                       ? 'LEDGER_ADDRESS_ADDED.TITLE_BTC_ORDINALS'
                       : isOrdinalsSelected
                       ? 'LEDGER_ADDRESS_ADDED.TITLE_ORDINALS'
@@ -522,7 +632,11 @@ function ImportLedger(): JSX.Element {
               <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_1_BUTTON')} />
             )}
             {currentStepIndex === 1 && (
-              <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_CONTINUE_BUTTON')} />
+              <ActionButton
+                onPress={handleClickNext}
+                text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
+                disabled={!isBitcoinSelected && !isStacksSelected}
+              />
             )}
             {currentStepIndex === 2 && (
               <ActionButton
