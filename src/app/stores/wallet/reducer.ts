@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { BTC_BASE_URI_MAINNET } from '@secretkeylabs/xverse-core/constant';
 import {
   StoreEncryptedSeedKey,
   WalletActions,
@@ -36,6 +37,7 @@ const initialWalletState: WalletState = {
   network: {
     type: 'Mainnet',
     address: 'https://stacks-node-api.mainnet.stacks.co',
+    btcApiUrl: BTC_BASE_URI_MAINNET,
   },
   accountsList: [],
   selectedAccount: null,
@@ -53,6 +55,7 @@ const initialWalletState: WalletState = {
   coins: [],
   feeMultipliers: null,
   networkAddress: undefined,
+  btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
@@ -162,6 +165,7 @@ const walletReducer = (
         ...state,
         network: action.network,
         networkAddress: action.networkAddress,
+        btcApiUrl: action.btcApiUrl,
         selectedAccount: null,
         accountsList: [],
       };

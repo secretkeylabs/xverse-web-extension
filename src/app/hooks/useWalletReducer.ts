@@ -151,15 +151,22 @@ const useWalletReducer = () => {
     dispatch(fetchAccountAction(account, accountsList));
   };
 
-  const changeNetwork = async (changedNetwork: SettingsNetwork, networkObject: StacksNetwork, networkAddress: string) => {
-    dispatch(ChangeNetworkAction(changedNetwork, networkAddress));
+  const changeNetwork = async (
+    changedNetwork: SettingsNetwork,
+    networkObject: StacksNetwork,
+    networkAddress: string,
+    btcApiUrl: string,
+  ) => {
+    dispatch(ChangeNetworkAction(changedNetwork, networkAddress, btcApiUrl));
     const wallet = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
       index: 0n,
       network: changedNetwork.type,
     });
     dispatch(setWalletAction(wallet));
-    await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [{ ...wallet, id: 0 }]);
+    await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [
+      { ...wallet, id: 0 },
+    ]);
     await refetchStxData();
     await refetchBtcData();
   };

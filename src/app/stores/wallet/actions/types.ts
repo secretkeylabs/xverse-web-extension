@@ -1,5 +1,4 @@
 import {
-  BtcTransactionData,
   Coin,
   FeesMultipliers,
   FungibleToken,
@@ -68,6 +67,7 @@ export interface WalletState {
   hasActivatedOrdinalsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
+  btcApiUrl: string;
 }
 
 export interface SetWallet {
@@ -163,6 +163,7 @@ export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
   networkAddress: string;
+  btcApiUrl: string;
 }
 
 export interface GetActiveAccounts {

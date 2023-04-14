@@ -1,3 +1,4 @@
+import { BTC_BASE_URI_MAINNET, BTC_BASE_URI_TESTNET } from '@secretkeylabs/xverse-core/constant';
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 
 export const BNS_CONTRACT = 'SP000000000000000000002Q6VF78.bns::names';
@@ -34,10 +35,12 @@ export const initialNetworksList: SettingsNetwork[] = [
   {
     type: 'Mainnet',
     address: 'https://stacks-node-api.mainnet.stacks.co',
+    btcApiUrl: BTC_BASE_URI_MAINNET,
   },
   {
     type: 'Testnet',
     address: 'https://stacks-node-api.testnet.stacks.co',
+    btcApiUrl: BTC_BASE_URI_TESTNET,
   },
 ];
 
