@@ -85,7 +85,7 @@ function AccountList(): JSX.Element {
   };
 
   const isAccountSelected = (account: Account) =>
-    account.btcAddress === selectedAccount?.btcAddress ||
+    account.btcAddress === selectedAccount?.btcAddress &&
     account.stxAddress === selectedAccount?.stxAddress;
 
   const handleBackButtonClick = () => {
