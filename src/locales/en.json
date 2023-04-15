@@ -511,9 +511,12 @@
     "DETAILS": "Details",
     "MIN_RECEIVE": "Minimum received",
     "SLIPPAGE": "Slippage Tolerance",
+    "SLIPPAGE_TITLE": "Slippage",
     "LP_FEE": "Liquidity Provider Fee",
     "ROUTE": "Route",
     "POWERED_BY_ALEX": "Powered by ALEX",
-    "CONTINUE": "Continue"
+    "CONTINUE": "Continue",
+    "SLIPPAGE_DESC": "Your transaction will reverse if the price changes unfavorably by more of this percentage.",
+    "APPLY": "Apply"
   }
 }
