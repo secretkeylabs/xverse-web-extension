@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { FungibleToken, microstacksToStx } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -28,13 +28,13 @@ export type UseSwap = {
   onInputAmountChanged: (amount: string) => void;
   submitError?: string;
   swapInfo?: {
-    exchangeRate: string;
-    lpFee: string;
-    route: string;
+    exchangeRate?: string;
+    lpFee?: string;
+    route?: string;
   };
   slippage: number;
   onSlippageChanged: (slippage: number) => void;
-  minReceived?: string;
+  minReceived?: number;
 };
 
 export function useSwap(): UseSwap {
@@ -87,6 +87,19 @@ export function useSwap(): UseSwap {
     };
   }
 
+  function getCurrencyName(currency: Currency) {
+    if (currency === Currency.STX) {
+      return 'STX';
+    }
+    const token = acceptableCoinList.find(
+      (c) => alexSDK.getCurrencyFrom(c.principal) === currency
+    )!;
+    if (token == null) {
+      return currency;
+    }
+    return (token.ticker ?? token.name).toUpperCase();
+  }
+
   function onSelectToken(token: 'STX' | FungibleToken, side: 'from' | 'to') {
     (side === 'from' ? setFrom : setTo)(
       token === 'STX' ? Currency.STX : alexSDK.getCurrencyFrom(token.principal)!
@@ -98,17 +111,83 @@ export function useSwap(): UseSwap {
     (fromAmount != null &&
       (fromAmount < 0 || (fromToken?.balance != null && fromToken.balance < fromAmount)));
 
+  const [info, setInfo] = useState<{
+    route: Currency[];
+    feeRate: number;
+  }>();
+
+  useEffect(() => {
+    if (from == null || to == null) {
+      setInfo(undefined);
+    } else {
+      let cancelled = false;
+      Promise.all([alexSDK.getFeeRate(from, to), alexSDK.getRouter(from, to)]).then((a) => {
+        if (cancelled) {
+          return;
+        }
+        setInfo({
+          route: a[1],
+          feeRate: Number(a[0]) / 1e8,
+        });
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+  }, [from, to]);
+
+  const [exchangeRate, setExchangeRate] = useState<number>();
+
+  useEffect(() => {
+    if (from == null || to == null || fromAmount == null || fromAmount == 0) {
+      setExchangeRate(undefined);
+    } else {
+      let cancelled = false;
+      alexSDK.getAmountTo(from, BigInt(fromAmount * 1e8), to).then((result) => {
+        if (cancelled) {
+          return;
+        }
+        setExchangeRate(Number(result) / 1e8 / fromAmount);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+  }, [from, to]);
+
+  function roundForDisplay(input?: number) {
+    if (input == null) {
+      return undefined;
+    }
+    return Math.floor(input * 1000) / 1000;
+  }
+  const toAmount =
+    exchangeRate != null && fromAmount != null ? fromAmount * exchangeRate : undefined;
+
+  const toToken = currencyToToken(to, roundForDisplay(toAmount));
   return {
     coinsList: acceptableCoinList,
     isLoadingWalletData: false,
     inputAmount: inputAmount,
     onInputAmountChanged: setInputAmount,
     selectedFromToken: fromToken,
-    selectedToToken: currencyToToken(to),
+    selectedToToken: toToken,
     slippage: slippage,
     onSlippageChanged: setSlippage,
     onSelectToken,
     inputAmountInvalid,
+    minReceived: toAmount != null ? roundForDisplay(toAmount * (1 - slippage)) : undefined,
+    swapInfo: {
+      exchangeRate:
+        exchangeRate != null && fromToken != null && toToken != null
+          ? `1 ${fromToken.name} = ${roundForDisplay(exchangeRate)} ${toToken.name}`
+          : undefined,
+      route: info?.route.map(getCurrencyName).join(' -> '),
+      lpFee:
+        info?.feeRate != null && fromAmount != null && fromToken != null
+          ? `${info.feeRate * fromAmount} ${fromToken.name}`
+          : undefined,
+    },
   };
 }
 
