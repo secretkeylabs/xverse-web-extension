@@ -43,15 +43,16 @@ const DL = styled.dl((props) => ({
 const DT = styled.dt((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white['200'],
-  flex: '60%',
+  flex: '50%',
 }));
 
 const DD = styled.dd((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white['0'],
-  flex: '40%',
+  flex: '50%',
   display: 'flex',
   justifyContent: 'flex-end',
+  textAlign: 'right',
 }));
 
 export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
@@ -76,9 +77,9 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
             />
           </DetailButton>
         </DT>
+        <DD>{swap.swapInfo?.exchangeRate ?? '--'}</DD>
         {expandDetail && (
           <>
-            <DD>{swap.swapInfo?.exchangeRate ?? '--'}</DD>
             <DT>{t('MIN_RECEIVE')}</DT>
             <DD>{swap.minReceived ?? '--'}</DD>
             <DT>{t('SLIPPAGE')}</DT>
