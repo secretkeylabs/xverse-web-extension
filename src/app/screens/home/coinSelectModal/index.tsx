@@ -15,8 +15,8 @@ interface Props {
   visible: boolean;
   coins: FungibleToken[];
   title: string;
-  onSelectBitcoin: () => void;
-  onSelectStacks: () => void;
+  onSelectBitcoin?: () => void;
+  onSelectStacks?: () => void;
   onSelectCoin: (coin: FungibleToken) => void;
   onClose: () => void;
   loadingWalletData: boolean;
@@ -36,39 +36,43 @@ function CoinSelectModal({
   const theme = useTheme();
 
   const handleOnBitcoinPress = () => {
-    onSelectBitcoin();
+    onSelectBitcoin?.();
     onClose();
   };
 
   const handleOnStackPress = () => {
-    onSelectStacks();
+    onSelectStacks?.();
     onClose();
   };
 
   function renderFixedCoins() {
     return (
       <>
-        <TokenTile
-          title={t('BITCOIN')}
-          currency="BTC"
-          icon={IconBitcoin}
-          loading={loadingWalletData}
-          underlayColor={theme.colors.background.elevation2}
-          margin={14}
-          enlargeTicker
-          onPress={handleOnBitcoinPress}
-        />
+        {onSelectBitcoin != null && (
+          <TokenTile
+            title={t('BITCOIN')}
+            currency="BTC"
+            icon={IconBitcoin}
+            loading={loadingWalletData}
+            underlayColor={theme.colors.background.elevation2}
+            margin={14}
+            enlargeTicker
+            onPress={handleOnBitcoinPress}
+          />
+        )}
 
-        <TokenTile
-          title={t('STACKS')}
-          currency="STX"
-          icon={IconStacks}
-          loading={loadingWalletData}
-          underlayColor={theme.colors.background.elevation2}
-          margin={14}
-          enlargeTicker
-          onPress={handleOnStackPress}
-        />
+        {onSelectStacks != null && (
+          <TokenTile
+            title={t('STACKS')}
+            currency="STX"
+            icon={IconStacks}
+            loading={loadingWalletData}
+            underlayColor={theme.colors.background.elevation2}
+            margin={14}
+            enlargeTicker
+            onPress={handleOnStackPress}
+          />
+        )}
       </>
     );
   }
