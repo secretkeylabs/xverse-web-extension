@@ -113,13 +113,13 @@ function SwapTokenBlock(props: SwapTokenBlockProps) {
             error={props.error}
             placeholder="0"
             disabled={props.onAmountChange == null}
-            value={props.amount ?? props.selectedCoin?.amount.toString() ?? ''}
+            value={props.amount ?? props.selectedCoin?.amount?.toString() ?? ''}
             onChange={(e) => props.onAmountChange?.(e.target.value)}
           />
         </RowContainer>
         <RowContainer>
           <EstimateUSDText>
-            {props.selectedCoin ? `≈ $ ${props.selectedCoin.fiatAmount} USD` : '--'}
+            {props.selectedCoin?.fiatAmount ? `≈ $ ${props.selectedCoin.fiatAmount} USD` : '--'}
           </EstimateUSDText>
         </RowContainer>
       </CardContainer>
