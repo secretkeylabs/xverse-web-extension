@@ -1,33 +1,20 @@
-import { ReactNode } from 'react';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import { ReactNode, useState } from 'react';
+import { FungibleToken, microstacksToStx } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TokenImage from '@components/tokenImage';
 import { LoaderSize } from '@utils/constants';
-
-// function tokenName(coin: SelectedToken) {
-//   if (coin.type === 'STX') {
-//     return coin.type;
-//   }
-//   return coin.token.ticker?.toUpperCase() ?? coin.token.name.toUpperCase();
-// }
-//
-// function balance(coin: SelectedToken) {
-//   if (coin.type === 'STX') {
-//     return Number(microstacksToStx(coin.balance as any));
-//   }
-//   if (coin.token.decimals) {
-//     return ftDecimals(coin.token.balance, coin.token.decimals);
-//   }
-//   return coin.token.balance;
-// }
+import { AlexSDK, Currency } from 'alex-sdk';
+import { ftDecimals } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 
 export type SwapToken = {
   name: string;
   image: ReactNode;
-  balance: number;
-  amount: number;
-  fiatAmount: number;
+  balance?: number;
+  amount?: number;
+  fiatAmount?: number;
 };
 
 export type UseSwap = {
@@ -35,8 +22,7 @@ export type UseSwap = {
   isLoadingWalletData: boolean;
   selectedFromToken?: SwapToken;
   selectedToToken?: SwapToken;
-  onSelectFromToken: (token: 'STX' | FungibleToken) => void;
-  onSelectToToken: (token: 'STX' | FungibleToken) => void;
+  onSelectToken: (token: 'STX' | FungibleToken, side: 'from' | 'to') => void;
   inputAmount: string;
   inputAmountInvalid?: boolean;
   onInputAmountChanged: (amount: string) => void;
@@ -52,33 +38,77 @@ export type UseSwap = {
 };
 
 export function useSwap(): UseSwap {
+  const alexSDK = useState(() => new AlexSDK())[0];
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const { coinsList, stxAvailableBalance } = useWalletSelector();
+  const { coinsList, stxAvailableBalance, stxBtcRate, btcFiatRate, fiatCurrency } =
+    useWalletSelector();
+
+  const acceptableCoinList =
+    coinsList?.filter((c) => alexSDK.getCurrencyFrom(c.principal) != null) ?? [];
+
+  const [inputAmount, setInputAmount] = useState('');
+  const [slippage, setSlippage] = useState(0.04);
+  const [from, setFrom] = useState<Currency>();
+  const [to, setTo] = useState<Currency>();
+
+  const fromAmount = isNaN(Number(inputAmount)) ? undefined : Number(inputAmount);
+
+  function currencyToToken(currency?: Currency, amount?: number): SwapToken | undefined {
+    if (currency == null) {
+      return undefined;
+    }
+    if (currency === Currency.STX) {
+      return {
+        balance: Number(microstacksToStx(BigNumber(stxAvailableBalance) as any)),
+        image: <TokenImage token="STX" size={28} loaderSize={LoaderSize.SMALL} />,
+        name: 'STX',
+        amount,
+        fiatAmount:
+          amount != null
+            ? Number(getFiatEquivalent(amount, 'STX', stxBtcRate as any, btcFiatRate as any))
+            : undefined,
+      };
+    }
+    const token = acceptableCoinList.find(
+      (c) => alexSDK.getCurrencyFrom(c.principal) === currency
+    )!;
+    if (token == null) {
+      return undefined;
+    }
+    return {
+      amount,
+      image: <TokenImage fungibleToken={token} size={28} loaderSize={LoaderSize.SMALL} />,
+      name: (token.ticker ?? token.name).toUpperCase(),
+      balance: Number(ftDecimals(token.balance, token.decimals ?? 0)),
+      fiatAmount:
+        amount != null
+          ? Number(getFiatEquivalent(amount, 'FT', stxBtcRate as any, btcFiatRate as any, token))
+          : undefined,
+    };
+  }
+
+  function onSelectToken(token: 'STX' | FungibleToken, side: 'from' | 'to') {
+    (side === 'from' ? setFrom : setTo)(
+      token === 'STX' ? Currency.STX : alexSDK.getCurrencyFrom(token.principal)!
+    );
+  }
+  const fromToken = currencyToToken(from, fromAmount);
+  const inputAmountInvalid =
+    isNaN(Number(inputAmount)) ||
+    (fromAmount != null &&
+      (fromAmount < 0 || (fromToken?.balance != null && fromToken.balance < fromAmount)));
 
   return {
-    coinsList: coinsList ?? [],
+    coinsList: acceptableCoinList,
     isLoadingWalletData: false,
-    onInputAmountChanged: noop,
-    selectedFromToken: {
-      amount: 123,
-      fiatAmount: 12312,
-      balance: 321,
-      image: <TokenImage token="STX" size={28} loaderSize={LoaderSize.SMALL} />,
-      name: 'STX',
-    },
-    selectedToToken: {
-      amount: 123,
-      fiatAmount: 12312,
-      balance: 321,
-      image: <TokenImage token="STX" size={28} loaderSize={LoaderSize.SMALL} />,
-      name: 'STX',
-    },
-    inputAmount: '123',
-    slippage: 0.03,
-    onSelectFromToken: noop,
-    onSelectToToken: noop,
-    inputAmountInvalid: true,
-    onSlippageChanged: noop,
+    inputAmount: inputAmount,
+    onInputAmountChanged: setInputAmount,
+    selectedFromToken: fromToken,
+    selectedToToken: currencyToToken(to),
+    slippage: slippage,
+    onSlippageChanged: setSlippage,
+    onSelectToken,
+    inputAmountInvalid,
   };
 }
 
