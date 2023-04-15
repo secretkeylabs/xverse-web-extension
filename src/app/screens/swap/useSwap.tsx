@@ -35,12 +35,13 @@ export type UseSwap = {
   slippage: number;
   onSlippageChanged: (slippage: number) => void;
   minReceived?: number;
+  onSwap?: () => void;
 };
 
 export function useSwap(): UseSwap {
   const alexSDK = useState(() => new AlexSDK())[0];
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const { coinsList, stxAvailableBalance, stxBtcRate, btcFiatRate, fiatCurrency } =
+  const { coinsList, stxAvailableBalance, stxBtcRate, btcFiatRate, fiatCurrency, stxAddress } =
     useWalletSelector();
 
   const acceptableCoinList =
@@ -153,7 +154,7 @@ export function useSwap(): UseSwap {
         cancelled = true;
       };
     }
-  }, [from, to]);
+  }, [from, to, fromAmount]);
 
   function roundForDisplay(input?: number) {
     if (input == null) {
@@ -185,9 +186,24 @@ export function useSwap(): UseSwap {
       route: info?.route.map(getCurrencyName).join(' -> '),
       lpFee:
         info?.feeRate != null && fromAmount != null && fromToken != null
-          ? `${info.feeRate * fromAmount} ${fromToken.name}`
+          ? `${roundForDisplay(info.feeRate * fromAmount)} ${fromToken.name}`
           : undefined,
     },
+    submitError: inputAmountInvalid ? 'Invalid amount' : undefined,
+    onSwap:
+      fromAmount != null && toAmount != null && from != null && to != null && info != null
+        ? async () => {
+            const tx = await alexSDK.runSwap(
+              stxAddress,
+              from,
+              to,
+              BigInt(fromAmount * 1e8),
+              BigInt(Math.floor(toAmount * (1 - slippage) * 1e8)),
+              info.route
+            );
+            alert(tx.contractName + ':' + tx.functionName);
+          }
+        : undefined,
   };
 }
 

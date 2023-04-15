@@ -40,16 +40,11 @@ const DownArrow = styled.img((props) => ({
   height: props.theme.spacing(18),
 }));
 
-interface ButtonProps {
-  enabled: boolean;
-}
-
-const SendButtonContainer = styled.div<ButtonProps>((props) => ({
+const SendButtonContainer = styled.div((props) => ({
   paddingBottom: props.theme.spacing(12),
   paddingTop: props.theme.spacing(4),
   marginLeft: '5%',
   marginRight: '5%',
-  opacity: props.enabled ? 1 : 0.6,
 }));
 
 function SwapScreen() {
@@ -96,12 +91,12 @@ function SwapScreen() {
           loadingWalletData={swap.isLoadingWalletData}
         />
       )}
-      <SendButtonContainer enabled={!swap.submitError}>
+      <SendButtonContainer>
         <ActionButton
-          text={t('CONTINUE')}
-          onPress={() => {
-            alert('test');
-          }}
+          disabled={swap.onSwap == null}
+          warning={!!swap.submitError}
+          text={swap.submitError ?? t('CONTINUE')}
+          onPress={swap.onSwap!}
         />
       </SendButtonContainer>
       <BottomBar tab="dashboard" />
