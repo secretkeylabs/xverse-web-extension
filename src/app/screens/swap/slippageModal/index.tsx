@@ -62,7 +62,7 @@ export function SlippageModalContent(props: {
         disabled={invalid}
         warning={invalid}
         text={t('APPLY')}
-        onPress={() => props.onChange(result)}
+        onPress={() => props.onChange(result / 100)}
       />
     </Container>
   );
