@@ -197,7 +197,7 @@
     "CLOSE_TAB": "Close this tab",
     "CLICK": "Click",
     "THEN": "then",
-    "OPEN_WALLET":"to open your wallet",
+    "OPEN_WALLET": "to open your wallet",
     "RESTORE_SCREEN_TITLE": "Wallet restored",
     "RESTORE_SCREEN_SUBTITLE": "Your wallet has been successfully restored.",
     "SEARCH_XVERSE": "Locate Xverse and click"
@@ -269,7 +269,7 @@
     "ORDINAL": "Ordinal",
     "INSCRIPTION": "Inscription",
     "ACTIVATE_ORDINALS": "Activate Ordinals",
-    "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
+    "ACTIVATE_ORDINALS_INFO": "You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
     "COPIED": "Copied!"
@@ -368,7 +368,7 @@
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
     "TESTNET": "Testnet",
-    "ORDINALS":"Ordinals",
+    "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets"
   },
@@ -447,8 +447,8 @@
     "SPONSORED": "Sponsored",
     "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
   },
-  "DEPLOY_CONTRACT_REQUEST":{
-    "DEPLOY_CONTRACT":"deploy-contract",
+  "DEPLOY_CONTRACT_REQUEST": {
+    "DEPLOY_CONTRACT": "deploy-contract",
     "CONTRACT_NAME": "Contract name",
     "SOURCE_CODE": "Source code",
     "VIEW_SOURCE_CODE": "View contract code",
@@ -491,7 +491,7 @@
     "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
-},
+  },
   "SELECT_BTC_ADDRESS_SCREEN": {
     "TITLE": "Bitcoin Address Request",
     "ACCOUNT": "Account",
@@ -507,6 +507,13 @@
     "CONVERT": "Convert",
     "BALANCE": "Balance",
     "TO": "To",
-    "SELECT_COIN": "Select asset"
+    "SELECT_COIN": "Select asset",
+    "DETAILS": "Details",
+    "MIN_RECEIVE": "Minimum received",
+    "SLIPPAGE": "Slippage Tolerance",
+    "LP_FEE": "Liquidity Provider Fee",
+    "ROUTE": "Route",
+    "POWERED_BY_ALEX": "Powered by ALEX",
+    "CONTINUE": "Continue"
   }
 }

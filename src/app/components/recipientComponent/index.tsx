@@ -170,7 +170,7 @@ function RecipientComponent({
               <TokenImage
                 token={currencyType}
                 loading={false}
-                isSmallSize
+                size={32}
                 fungibleToken={fungibleToken}
               />
             </TokenContainer>
