@@ -83,7 +83,6 @@ function SwapScreen() {
       </ScrollContainer>
       {selecting != null && (
         <CoinSelectModal
-          onSelectBitcoin={() => null}
           onSelectStacks={() => {
             if (selecting === 'from') {
               swap.onSelectFromToken('STX');
