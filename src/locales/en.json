@@ -559,6 +559,10 @@
     "CLOSE_TAB": "Continue"
   },
   "SWAP_SCREEN": {
-    "SWAP": "Swap"
+    "SWAP": "Swap",
+    "CONVERT": "Convert",
+    "BALANCE": "Balance",
+    "TO": "To",
+    "SELECT_COIN": "Select asset"
   }
 }
