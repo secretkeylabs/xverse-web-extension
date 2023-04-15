@@ -84,19 +84,11 @@ function SwapScreen() {
       {selecting != null && (
         <CoinSelectModal
           onSelectStacks={() => {
-            if (selecting === 'from') {
-              swap.onSelectFromToken('STX');
-            } else {
-              swap.onSelectToToken('STX');
-            }
+            swap.onSelectToken('STX', selecting);
           }}
           onClose={() => setSelecting(undefined)}
           onSelectCoin={(coin) => {
-            if (selecting === 'from') {
-              swap.onSelectFromToken(coin);
-            } else {
-              swap.onSelectToToken(coin);
-            }
+            swap.onSelectToken(coin, selecting);
           }}
           visible={!!selecting}
           coins={swap.coinsList}
