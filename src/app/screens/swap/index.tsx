@@ -11,6 +11,7 @@ import { useSwap } from '@screens/swap/useSwap';
 import { useState } from 'react';
 import { SwapInfoBlock } from '@screens/swap/swapInfoBlock';
 import ActionButton from '@components/button';
+import CoinSelectModal from '@screens/home/coinSelectModal';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -56,6 +57,8 @@ function SwapScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const swap = useSwap();
 
+  const [selecting, setSelecting] = useState<'from' | 'to'>();
+
   return (
     <>
       <TopRow title={t('SWAP')} onClick={() => navigate('/')} />
@@ -67,12 +70,41 @@ function SwapScreen() {
             amount={swap.inputAmount}
             error={swap.inputAmountInvalid}
             onAmountChange={swap.onInputAmountChanged}
+            onSelectCoin={() => setSelecting('from')}
           />
           <DownArrow src={ArrowDown} />
-          <SwapTokenBlock title={t('TO')} selectedCoin={swap.selectedToToken} />
+          <SwapTokenBlock
+            title={t('TO')}
+            selectedCoin={swap.selectedToToken}
+            onSelectCoin={() => setSelecting('to')}
+          />
         </Container>
         <SwapInfoBlock swap={swap} />
       </ScrollContainer>
+      {selecting != null && (
+        <CoinSelectModal
+          onSelectBitcoin={() => null}
+          onSelectStacks={() => {
+            if (selecting === 'from') {
+              swap.onSelectFromToken('STX');
+            } else {
+              swap.onSelectToToken('STX');
+            }
+          }}
+          onClose={() => setSelecting(undefined)}
+          onSelectCoin={(coin) => {
+            if (selecting === 'from') {
+              swap.onSelectFromToken(coin);
+            } else {
+              swap.onSelectToToken(coin);
+            }
+          }}
+          visible={!!selecting}
+          coins={swap.coinsList}
+          title={selecting === 'from' ? t('FROM') : t('TO')}
+          loadingWalletData={swap.isLoadingWalletData}
+        />
+      )}
       <SendButtonContainer enabled={!swap.submitError}>
         <ActionButton
           text={t('CONTINUE')}

@@ -88,6 +88,7 @@ type SwapTokenBlockProps = {
   selectedCoin?: SwapToken;
   amount?: string;
   onAmountChange?: (amount: string) => void;
+  onSelectCoin?: () => void;
   error?: boolean;
 };
 
@@ -103,7 +104,7 @@ function SwapTokenBlock(props: SwapTokenBlockProps) {
       </RowContainer>
       <CardContainer>
         <RowContainer>
-          <CoinButtonContainer>
+          <CoinButtonContainer onClick={props.onSelectCoin}>
             {props.selectedCoin?.image}
             <CoinText>{props.selectedCoin?.name ?? t('SELECT_COIN')}</CoinText>
             <CoinButtonArrow src={ChevronIcon} />
