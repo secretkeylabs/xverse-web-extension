@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import ChevronIcon from '@assets/img/swap/chevron.svg';
+import BottomModal from '@components/bottomModal';
+import { SlippageModalContent } from '@screens/swap/slippageModal';
 
 const PoweredByAlexText = styled.span((props) => ({
   ...props.theme.body_xs,
@@ -56,6 +58,8 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
   const [expandDetail, setExpandDetail] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
+  const [showSlippageModal, setShowSlippageModal] = useState(false);
+
   return (
     <>
       <DL>
@@ -79,7 +83,10 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
             <DD>{swap.minReceived ?? '--'}</DD>
             <DT>{t('SLIPPAGE')}</DT>
             <DD>
-              <DetailButton style={{ alignItems: 'center', display: 'flex' }}>
+              <DetailButton
+                style={{ alignItems: 'center', display: 'flex' }}
+                onClick={() => setShowSlippageModal(true)}
+              >
                 {swap.slippage * 100}%
                 <img alt={t('SLIPPAGE')} src={SlippageEditIcon} style={{ width: 16, height: 16 }} />
               </DetailButton>
@@ -92,6 +99,19 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
         )}
       </DL>
       <PoweredByAlexText>{t('POWERED_BY_ALEX')}</PoweredByAlexText>
+      <BottomModal
+        header={t('SLIPPAGE_TITLE')}
+        visible={showSlippageModal}
+        onClose={() => setShowSlippageModal(false)}
+      >
+        <SlippageModalContent
+          slippage={swap.slippage}
+          onChange={(slippage) => {
+            swap.onSlippageChanged(slippage);
+            setShowSlippageModal(false);
+          }}
+        />
+      </BottomModal>
     </>
   );
 }

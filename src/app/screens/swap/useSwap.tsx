@@ -31,6 +31,8 @@ export type SwapToken = {
 };
 
 export type UseSwap = {
+  coinsList: FungibleToken[];
+  isLoadingWalletData: boolean;
   selectedFromToken?: SwapToken;
   selectedToToken?: SwapToken;
   onSelectFromToken: (token: 'STX' | FungibleToken) => void;
@@ -45,6 +47,7 @@ export type UseSwap = {
     route: string;
   };
   slippage: number;
+  onSlippageChanged: (slippage: number) => void;
   minReceived?: string;
 };
 
@@ -53,6 +56,8 @@ export function useSwap(): UseSwap {
   const { coinsList, stxAvailableBalance } = useWalletSelector();
 
   return {
+    coinsList: coinsList ?? [],
+    isLoadingWalletData: false,
     onInputAmountChanged: noop,
     selectedFromToken: {
       amount: 123,
@@ -73,6 +78,7 @@ export function useSwap(): UseSwap {
     onSelectFromToken: noop,
     onSelectToToken: noop,
     inputAmountInvalid: true,
+    onSlippageChanged: noop,
   };
 }
 
