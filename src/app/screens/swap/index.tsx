@@ -6,17 +6,24 @@ import BottomBar from '@components/tabBar';
 import SwapTokenBlock from '@screens/swap/swapTokenBlock';
 import ArrowDown from '@assets/img/swap/arrow_swap.svg';
 import useCoinsData from '@hooks/queries/useCoinData';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { useSwap } from '@screens/swap/useSwap';
+import { useState } from 'react';
+import { SwapInfoBlock } from '@screens/swap/swapInfoBlock';
+import ActionButton from '@components/button';
 
 const ScrollContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  row-gap: 16px;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
   }
   margin-left: 5%;
   margin-right: 5%;
+  padding-bottom: 16px;
 `;
 
 const Container = styled.div((props) => ({
@@ -32,22 +39,48 @@ const DownArrow = styled.img((props) => ({
   height: props.theme.spacing(18),
 }));
 
+interface ButtonProps {
+  enabled: boolean;
+}
+
+const SendButtonContainer = styled.div<ButtonProps>((props) => ({
+  paddingBottom: props.theme.spacing(12),
+  paddingTop: props.theme.spacing(4),
+  marginLeft: '5%',
+  marginRight: '5%',
+  opacity: props.enabled ? 1 : 0.6,
+}));
+
 function SwapScreen() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const { data } = useCoinsData();
-  console.log(data?.sortedFtList);
+  const swap = useSwap();
 
   return (
     <>
       <TopRow title={t('SWAP')} onClick={() => navigate('/')} />
       <ScrollContainer>
         <Container>
-          <SwapTokenBlock title={t('CONVERT')} />
+          <SwapTokenBlock
+            title={t('CONVERT')}
+            selectedCoin={swap.selectedFromToken}
+            amount={swap.inputAmount}
+            error={swap.inputAmountInvalid}
+            onAmountChange={swap.onInputAmountChanged}
+          />
           <DownArrow src={ArrowDown} />
-          <SwapTokenBlock title={t('TO')} />
+          <SwapTokenBlock title={t('TO')} selectedCoin={swap.selectedToToken} />
         </Container>
+        <SwapInfoBlock swap={swap} />
       </ScrollContainer>
+      <SendButtonContainer enabled={!swap.submitError}>
+        <ActionButton
+          text={t('CONTINUE')}
+          onPress={() => {
+            alert('test');
+          }}
+        />
+      </SendButtonContainer>
       <BottomBar tab="dashboard" />
     </>
   );
