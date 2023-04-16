@@ -110,6 +110,7 @@ interface Props {
   description: string;
   buttonText?: string;
   secondButtonText?: string;
+  isWarningAlert?: boolean;
   tickMarkButtonText?: string;
   onButtonClick?: () => void;
   onSecondButtonClick?: () => void;
@@ -118,7 +119,7 @@ interface Props {
 }
 
 function AlertMessage({
-  onClose, title, description, buttonText, secondButtonText, tickMarkButtonText, onButtonClick, onSecondButtonClick, tickMarkButtonClick,
+  onClose, title, description, buttonText, secondButtonText, tickMarkButtonText, isWarningAlert, onButtonClick, onSecondButtonClick, tickMarkButtonClick,
 }: Props) {
   return (
     <>
@@ -143,6 +144,7 @@ function AlertMessage({
           <ActionButton
             text={secondButtonText ?? 'Yes'}
             onPress={onSecondButtonClick}
+            warning={isWarningAlert}
           />
         </ButtonContainer>
         )}

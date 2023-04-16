@@ -65,7 +65,6 @@ function Setting() {
   const { unlockWallet, resetWallet } = useWalletReducer();
   const {
     unspentUtxos,
-    isLoading,
   } = useNonOrdinalUtxos();
 
   const openTermsOfService = () => {
@@ -123,7 +122,7 @@ function Setting() {
   };
 
   const onRestoreFundClick = () => {
-    navigate('restore-funds', {
+    navigate('/restore-funds', {
       state: {
         unspentUtxos,
       },

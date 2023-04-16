@@ -164,7 +164,8 @@ function ConfirmBtcTransactionComponent({
     network.type,
     new BigNumber(txFee),
   ));
-
+console.log("recopients")
+console.log(recipients[0].amountSats.toString())
   const {
     isLoading: isLoadingNonOrdinalBtcSend,
     error: errorSigningNonOrdial,
@@ -299,16 +300,16 @@ function ConfirmBtcTransactionComponent({
             title={t('CONFIRM_TRANSACTION.ASSET')}
           />
         ) : (
-          recipients?.map((recipient, index) => (
+          recipients?.map((recipient :Recipient, index) => (
             <BtcRecipientComponent
               recipientIndex={index + 1}
               address={recipient?.address}
-              value={satsToBtc(recipient?.amountSats).toString()}
+              value={recipient.amountSats.toString()}
               totalRecipient={recipients?.length}
               icon={IconBitcoin}
               title={t('CONFIRM_TRANSACTION.AMOUNT')}
               subValue={getBtcFiatEquivalent(
-                recipient?.amountSats,
+                new BigNumber(recipient?.amountSats),
                 btcFiatRate,
               )}
             />

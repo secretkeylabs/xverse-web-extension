@@ -58,7 +58,7 @@
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
     "NO_FUNDS": "You don’t have any funds to send.",
-    "BUY_CRYPTO": "Buy crypto →",
+    "BUY_CRYPTO": "Buy crypto",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {
       "ADDRESS_REQUIRED": "Recipient address is required",
@@ -112,7 +112,13 @@
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed please contact the developer of the requesting app for support",
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
     "YOU_WILL_TRANSFER": "You will transfer",
-    "YOU_WILL_RECEIVE": "You will receive"
+    "YOU_WILL_RECEIVE": "You will receive",
+    "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
+    "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
+    "BTC_TRANSFER_DANGER_ALERT_TITLE": "Danger",
+    "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
+    "CONITNUE": "Continue",
+    "BACK": "Back"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
