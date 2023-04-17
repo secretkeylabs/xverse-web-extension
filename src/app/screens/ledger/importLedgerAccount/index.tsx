@@ -345,6 +345,19 @@ function ImportLedger(): JSX.Element {
         return;
       }
 
+      if (currentAccount && isBitcoinSelected) {
+        const ledgerAccount: Account = {
+          ...currentAccount,
+          btcAddress: bitcoinCredentials?.address || '',
+          btcPublicKey: bitcoinCredentials?.publicKey || '',
+        };
+        await updateLedgerAccounts(ledgerAccount);
+        await ledgerDelay(1000);
+        handleClickNext();
+        setIsButtonDisabled(false);
+        return;
+      }
+
       if (selectedAccount) {
         const newLedgerAccount: Account = {
           ...selectedAccount,
