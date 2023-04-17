@@ -164,8 +164,7 @@ function ConfirmBtcTransactionComponent({
     network.type,
     new BigNumber(txFee),
   ));
-console.log("recopients")
-console.log(recipients[0].amountSats.toString())
+
   const {
     isLoading: isLoadingNonOrdinalBtcSend,
     error: errorSigningNonOrdial,
@@ -330,7 +329,7 @@ console.log(recipients[0].amountSats.toString())
         </Button>
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
-          fee={currentFee.toString()}
+          fee={new BigNumber(currentFee).toString()}
           type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
           btcRecipients={recipients}
           onApplyClick={onApplyClick}

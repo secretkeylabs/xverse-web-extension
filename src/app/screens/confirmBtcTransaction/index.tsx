@@ -73,12 +73,9 @@ function ConfirmBtcTransaction() {
       });
     }
   }, [errorBtcOrdinalTransaction]);
-console.log(fee)
-console.log(amount)
-console.log(recipient)
+
   useEffect(() => {
     if (!fee && !amount) {
-      console.log('inside');
       navigate('/send-btc');
     }
   });
