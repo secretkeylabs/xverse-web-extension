@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { initialNetworksList } from '@utils/constants';
 import {
   StoreEncryptedSeedKey,
   WalletActions,
@@ -33,10 +34,7 @@ const initialWalletState: WalletState = {
   stxPublicKey: '',
   btcPublicKey: '',
   ordinalsPublicKey: '',
-  network: {
-    type: 'Mainnet',
-    address: 'https://stacks-node-api.mainnet.stacks.co',
-  },
+  network: initialNetworksList[0],
   accountsList: [],
   selectedAccount: null,
   seedPhrase: '',
