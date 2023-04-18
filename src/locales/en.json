@@ -73,6 +73,30 @@
     "LEDGER_IMPORT_CLOSE_BUTTON": "Close",
     "LEDGER_IMPORT_TRY_AGAIN_BUTTON": "Try again"
   },
+  "LEDGER_CONFIRM_TRANSACTION_SCREEN": {
+    "CONNECT": {
+      "TITLE": "Connect your hardware wallet",
+      "SUBTITLE": "To continue, plug and unlock your device.",
+      "ERROR_TITLE": "Connection error",
+      "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+    },
+    "CONFIRM": {
+      "TITLE": "Confirm the transaction",
+      "SUBTITLE": "Authorise the transaction on your device to continue.",
+      "ERROR_TITLE": "Transaction denied",
+      "ERROR_SUBTITLE": "The transaction have been rejected. You can try again or close this tab."
+    },
+    "SUCCESS": {
+      "TITLE": "Transaction confirmed",
+      "SUBTITLE": "Your transaction have been successfully broadcasted. You can close this tab."
+    },
+    "CONFIRM_BUTTON": "Confirm",
+    "CONNECT_BUTTON": "Connect",
+    "CLOSE_BUTTON": "Close",
+    "CANCEL_BUTTON": "Cancel",
+    "SEE_TRANSACTION_BUTTON": "See transaction",
+    "RETRY_BUTTON": "Try again"
+  },
   "DASHBOARD_SCREEN": {
     "TOTAL_BALANCE": "total balance",
     "BITCOIN": "Bitcoin",
