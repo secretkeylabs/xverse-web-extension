@@ -6,6 +6,7 @@ const HeaderRow = styled.div((props) => ({
   position: 'absolute',
   width: '100%',
   top: props.theme.spacing(5),
+  left: 0,
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',

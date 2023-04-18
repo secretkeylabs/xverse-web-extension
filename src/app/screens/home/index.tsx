@@ -132,7 +132,8 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { coinsList, stxAddress, btcAddress, ordinalsAddress } = useWalletSelector();
+  const { coinsList, stxAddress, btcAddress, ordinalsAddress, isLedgerAccount } =
+    useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
@@ -177,7 +178,13 @@ function Home() {
     navigate('/send-stx');
   };
 
-  const onBtcSendClick = () => {
+  const onBtcSendClick = async () => {
+    if (isLedgerAccount) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL('options.html#/send-btc-ledger'),
+      });
+      return;
+    }
     navigate('/send-btc');
   };
 

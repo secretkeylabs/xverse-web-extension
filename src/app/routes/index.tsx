@@ -50,6 +50,7 @@ import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import ReviewLedgerBtcTransaction from '@screens/ledger/reviewLedgerBtcTransaction';
 import ConfirmLedgerBtcTransaction from '@screens/ledger/confirmLedgerBtcTransaction';
+import LedgerSendBtcScreen from '@screens/ledger/ledgerSendBtc';
 
 const router = createHashRouter([
   {
@@ -104,6 +105,10 @@ const router = createHashRouter([
       {
         path: 'send-btc',
         element: <SendBtcScreen />,
+      },
+      {
+        path: 'send-btc-ledger',
+        element: <LedgerSendBtcScreen />,
       },
       {
         path: 'confirm-stx-tx',

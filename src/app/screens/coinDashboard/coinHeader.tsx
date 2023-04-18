@@ -1,8 +1,6 @@
 import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
-import {
-  animated, config, useSpring,
-} from '@react-spring/web';
+import { animated, config, useSpring } from '@react-spring/web';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
@@ -192,6 +190,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
     btcFiatRate,
     stxLockedBalance,
     stxAvailableBalance,
+    isLedgerAccount,
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
@@ -264,7 +263,9 @@ export default function CoinHeader(props: CoinBalanceProps) {
   };
 
   function formatAddress(addr: string): string {
-    return addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
+    return addr
+      ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}`
+      : '';
   }
 
   const renderFtInfo = () => (
@@ -288,7 +289,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <img src={linkIcon} alt="link" />
           </ContractDeploymentButton>
         </TokenContractContainer>
-      ) : null }
+      ) : null}
     </>
   );
 
@@ -323,7 +324,15 @@ export default function CoinHeader(props: CoinBalanceProps) {
     }
   };
 
-  const goToSendScreen = () => {
+  const goToSendScreen = async () => {
+    if (isLedgerAccount) {
+      if (coin === 'BTC') {
+        await chrome.tabs.create({
+          url: chrome.runtime.getURL('options.html#/send-btc-ledger'),
+        });
+        return;
+      }
+    }
     if (coin === 'STX' || coin === 'BTC') {
       navigate(`/send-${coin}`);
     } else {
