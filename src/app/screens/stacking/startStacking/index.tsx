@@ -101,7 +101,7 @@ function StartStacking() {
           </ColumnContainer>
           <ColumnContainer>
             <StackingInfoTile title={t('POOL_FEE')} value={pool ? `${pool?.fee_percent}%` : undefined} color={theme.colors.feedback.success} />
-            <StackingInfoTile title={t('REWARD_CYCLES')} value={`${getCycles()}`} />
+            <StackingInfoTile title={t('REWARD_CYCLES')} value="Flexible" />
           </ColumnContainer>
         </StackingInfoContainer>
       </OuterContainer>

@@ -205,13 +205,12 @@ function Setting() {
         />
         {!isLoading && unspentUtxos && unspentUtxos?.length > 0 && (
           <SettingComponent
-            text={t('RECOVER_BTC')}
-            onClick={onRestoreFundClick}
-            icon={ArrowIcon}
-            showDivider
-          />
+          text={t('RECOVER_ASSETS')}
+          onClick={onRestoreFundClick}
+          icon={ArrowIcon}
+          showDivider
+        />
         )}
-
         <SettingComponent
           title={t('ABOUT')}
           text={t('TERMS_OF_SERVICE')}

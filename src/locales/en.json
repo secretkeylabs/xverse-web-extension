@@ -91,7 +91,7 @@
     "EDIT_FEES": "Edit Fees",
     "CONFIRM": "Confirm",
     "CANCEL": "Cancel",
-    "SATS": "SATS",
+    "SATS": "sats",
     "CONFIRM_TX": "Confirm Transaction",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
@@ -276,14 +276,31 @@
     "DENY": "No",
     "COPIED": "Copied!"
   },
-  "RESTORE_FUNDS_SCREEN": {
-    "TITLE": "Restore funds",
-    "AMOUNT": "Amount",
+  "RESTORE_FUND_SCREEN": {
+    "TITLE": "Restore assets",
+    "DESCRIPTION": "If you sent Ordinals to your Bitcoin payment address or Bitcoin to your ordinals address, you can recover it and send it to the correct address.",
+    "RECOVER_BTC": "Recover BTC",
+    "RECOVER_BTC_DESC": "If you sent Bitcoin to your Ordinals address.",
+    "RECOVER_ORDINALS": "Recover Ordinals",
+    "RECOVER_ORDINALS_DESC": "If you sent Ordinals to your Bitcoin payment address."
+  },
+  "RESTORE_BTC_SCREEN": {
+    "TITLE": "Restore BTC",
+    "BTC": "Bitcoin",
     "TRANSFER": "Transfer",
     "BACK": "Back",
     "ORDINAL_ADDRESS": "Ordinal address",
     "NO_FUNDS": "You don’t have any funds stored on your ordinal address.",
     "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
+  },
+  "RESTORE_ORDINAL_SCREEN": {
+    "TITLE": "Restore Oridnals",
+    "BTC": "Bitcoin",
+    "TRANSFER": "Transfer",
+    "BACK": "Back",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "NO_FUNDS": "You don’t have any Ordinals stored on your Bitcoin payment address.",
+    "DESCRIPTION": "You have Ordinals stored in your Bitcoin payment address. You can transfer them to your Ordinals address so that they show up in your collection."
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",
@@ -357,7 +374,8 @@
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "DLCS": "DLCs",
     "ACTIVATE_DLCS": "Display DLCs (Testnet only)",
-    "RECOVER_BTC": "Recover BTC in ordinal address"
+    "RECOVER_BTC": "Recover BTC in ordinal address",
+    "RECOVER_ASSETS": "Recover assets"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
