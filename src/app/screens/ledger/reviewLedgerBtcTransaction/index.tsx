@@ -29,7 +29,7 @@ function ReviewLedgerBtcTransaction() {
   };
 
   const goBackToScreen = () => {
-    navigate('/send-btc', {
+    navigate('/send-btc-ledger', {
       state: {
         amount,
         recipientAddress,
