@@ -113,6 +113,7 @@ interface Props {
   assetDetail?: string;
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse [];
+  amount?: string;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -128,6 +129,7 @@ function ConfirmBtcTransactionComponent({
   assetDetail,
   isRestoreFundFlow,
   nonOrdinalUtxos,
+  amount,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -299,11 +301,11 @@ function ConfirmBtcTransactionComponent({
             title={t('CONFIRM_TRANSACTION.ASSET')}
           />
         ) : (
-          recipients?.map((recipient :Recipient, index) => (
+          recipients?.map((recipient, index) => (
             <BtcRecipientComponent
               recipientIndex={index + 1}
               address={recipient?.address}
-              value={recipient.amountSats.toString()}
+              value={new BigNumber(recipient?.amountSats).isNaN() ? amount : satsToBtc(new BigNumber(recipient?.amountSats)).toString()}
               totalRecipient={recipients?.length}
               icon={IconBitcoin}
               title={t('CONFIRM_TRANSACTION.AMOUNT')}

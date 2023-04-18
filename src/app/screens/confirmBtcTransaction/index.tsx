@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import AlertMessage from '@components/alertMessage';
+import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
@@ -73,12 +74,6 @@ function ConfirmBtcTransaction() {
       });
     }
   }, [errorBtcOrdinalTransaction]);
-
-  useEffect(() => {
-    if (!fee && !amount) {
-      navigate('/send-btc');
-    }
-  });
 
   useEffect(() => {
     setRecipientAddress(location.state.recipientAddress);
@@ -172,7 +167,7 @@ function ConfirmBtcTransaction() {
 
       <ConfirmBtcTransactionComponent
         fee={fee}
-        recipients={recipient}
+        recipients={recipient as Recipient[]}
         loadingBroadcastedTx={isLoading}
         signedTxHex={signedTxHex}
         onConfirmClick={handleOnConfirmClick}
@@ -180,6 +175,7 @@ function ConfirmBtcTransaction() {
         onBackButtonClick={goBackToScreen}
         isRestoreFundFlow={isRestoreFundFlow}
         nonOrdinalUtxos={unspentUtxos}
+        amount={amount}
       >
         {ordinalsInBtc && ordinalsInBtc.length > 0 && (
         <InfoContainer
