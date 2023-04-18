@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import {  useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { animated, useTransition } from '@react-spring/web';
@@ -18,11 +18,9 @@ import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';
-import { useLocation } from 'react-router-dom';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 import LedgerImportStartSVG from '@assets/img/ledger/ledger_import_start.svg';
-import BtcIconSVG from '@assets/img/ledger/btc_icon.svg';
 import BtcOdrinalsIconSVG from '@assets/img/ledger/btc_ordinals_icon.svg';
 import StxIconSVG from '@assets/img/ledger/stx_icon.svg';
 import LedgerConnectBtcSVG from '@assets/img/ledger/ledger_import_connect_btc.svg';
