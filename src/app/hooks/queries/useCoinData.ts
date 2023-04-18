@@ -41,27 +41,32 @@ export const useCoinsData = () => {
         contractids.push(ft.principal);
       });
       const coinsReponse: CoinsResponse = await getCoinsInfo(contractids, fiatCurrency);
-      coinsReponse.forEach((coin) => {
-        if (!coin.name) {
-          coin.name = coin.contract.split('.')[1];
-        }
-      });
-
-      // update attributes of fungible token list
-      fungibleTokenList.forEach((ft) => {
+      if (coinsReponse) {
         coinsReponse.forEach((coin) => {
-          if (ft.principal === coin.contract) {
-            ft.ticker = coin.ticker;
-            ft.decimals = coin.decimals;
-            ft.supported = coin.supported;
-            ft.image = coin.image;
-            ft.name = coin.name;
-            ft.tokenFiatRate = coin.tokenFiatRate;
-            coin.visible = ft.visible;
+          if (!coin.name) {
+            coin.name = coin.contract.split('.')[1];
           }
         });
-      });
 
+        // update attributes of fungible token list
+        fungibleTokenList.forEach((ft) => {
+          coinsReponse.forEach((coin) => {
+            if (ft.principal === coin.contract) {
+              ft.ticker = coin.ticker;
+              ft.decimals = coin.decimals;
+              ft.supported = coin.supported;
+              ft.image = coin.image;
+              ft.name = coin.name;
+              ft.tokenFiatRate = coin.tokenFiatRate;
+              coin.visible = ft.visible;
+            }
+          });
+        });
+      } else {
+        fungibleTokenList.forEach((ft) => {
+          ft.name = ft.assetName;
+        });
+      }
       // sorting the list - moving supported to the top
       const supportedFts: FungibleToken[] = [];
       const unSupportedFts: FungibleToken[] = [];
