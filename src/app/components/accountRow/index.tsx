@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import useWalletSelector from '@hooks/useWalletSelector';
+import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 
 interface GradientCircleProps {
   firstGradient: string;
@@ -43,6 +44,12 @@ const CurrentAcountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(6),
+}));
+
+const CurrentAccountTextContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  gap: props.theme.spacing(4),
 }));
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
@@ -248,10 +255,16 @@ function AccountRow({
         {account &&
           (isSelected ? (
             <Button onClick={onClick}>
-              <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+              <CurrentAccountTextContainer>
+                <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+                {account.isLedgerAccount && <img src={LedgerBadge} alt="Ledger icon" />}
+              </CurrentAccountTextContainer>
             </Button>
           ) : (
-            <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
+            <CurrentAccountTextContainer>
+              <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
+              {account.isLedgerAccount && <img src={LedgerBadge} alt="Ledger icon" />}
+            </CurrentAccountTextContainer>
           ))}
         {!account ? (
           <BarLoaderContainer>

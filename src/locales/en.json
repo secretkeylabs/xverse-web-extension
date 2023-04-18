@@ -21,12 +21,10 @@
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select the assets to store",
     "LEDGER_IMPORT_2_SUBTITLE": "Store your Bitcoin, Stacks, NFTs, Ordinals, etc lorem ipsum security of a ledger wallet lorem ipsum dolor.",
-    "LEDGER_IMPORT_2_FOOTNOTE": "If you don’t want to set an address now, you have the possibility to set it up later.",
+    "LEDGER_IMPORT_2_FOOTNOTE": "If you don’t set an address now, you have the possibility to set it up later.",
     "LEDGER_IMPORT_2_SELECT": {
-      "BTC_TITLE": "Bitcoin payment address (default)",
-      "BTC_SUBTITLE": "Segwit address",
-      "ORDINALS_TITLE": "Ordinals address",
-      "ORDINALS_SUBTITLE": "Taproot address",
+      "BTC_TITLE": "Bitcoin and Ordinals address",
+      "BTC_SUBTITLE": "Segwit and Taproot address",
       "STACKS_TITLE": "Stacks address",
       "STACKS_SUBTITLE": "SIP-10 address"
     },
