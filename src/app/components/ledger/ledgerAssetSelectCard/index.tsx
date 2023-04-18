@@ -19,6 +19,13 @@ const CardInput = styled.input((props) => ({
   display: 'none',
 }));
 
+const CardImageContainer = styled.div((props) => ({
+  display: 'flex',
+  width: props.theme.spacing(24),
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+}));
+
 const CardTitle = styled.h3((props) => ({
   ...props.theme.body_bold_m,
 }));
@@ -47,7 +54,9 @@ function LedgerAssetSelectCard({
   return (
     <div>
       <CardContainer htmlFor={id} className={isChecked ? 'checked' : ''}>
-        <img src={icon} alt={`${title} icon`} />
+        <CardImageContainer>
+          <img src={icon} alt={`${title} icon`} />
+        </CardImageContainer>
         <div>
           <CardTitle>{title}</CardTitle>
           <CardText>{text}</CardText>
