@@ -1,21 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { animated, useTransition } from '@react-spring/web';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
 import {
-  Account,
-  importNestedSegwitAccountFromLedger,
-  importTaprootAccountFromLedger,
+  broadcastRawBtcTransaction,
   signLedgerNestedSegwitBtcTransaction,
 } from '@secretkeylabs/xverse-core';
-import useWalletReducer from '@hooks/useWalletReducer';
 import BigNumber from 'bignumber.js';
+import { LedgerTransactionType } from '../reviewLedgerBtcTransaction';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import { ledgerDelay } from '@common/utils/ledger';
+import { getBtcTxStatusUrl } from '@utils/helper';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
+
+import LedgerConnectDefaultSVG from '@assets/img/ledger/ledger_connect_default.svg';
+import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 
 const Container = styled.div`
   display: flex;
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
   flex-direction: column;
@@ -32,27 +40,54 @@ const OnBoardingContentContainer = styled(animated.div)((props) => ({
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
 }));
-const OnBoardingActionsContainer = styled.div((props) => ({
+
+const SuccessActionsContainer = styled.div((props) => ({
+  width: '100%',
   display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
+  flexDirection: 'column',
+  gap: '12px',
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(30),
 }));
 
-interface Credential {
-  publicKey: string;
-  address: string;
-}
+const TxConfirmedContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  > :first-child {
+    margin-bottom: 26px;
+  }
+`;
+const TxConfirmedTitle = styled.h1((props) => ({
+  ...props.theme.headline_s,
+}));
+
+const TxConfirmedDescription = styled.p((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white[200],
+}));
 
 function ConfirmLedgerBtcTransaction(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [signingResult, setSigningResult] = useState('');
-  const { t } = useTranslation('translation', { keyPrefix: 'ONBOARDING_SCREEN' });
-  const { addLedgerAccount } = useWalletReducer();
-  const navigate = useNavigate();
-  let [searchParams] = useSearchParams();
+  const [txId, setTxId] = useState<string | undefined>(undefined);
+
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState<boolean>(false);
+  const [isConnectFailed, setIsConnectFailed] = useState<boolean>(false);
+  const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
+  const [isTxRejected, setIsTxRejected] = useState<boolean>(false);
+
+  const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_CONFIRM_TRANSACTION_SCREEN' });
+  const location = useLocation();
+  const { network, selectedAccount } = useWalletSelector();
+
+  const {
+    recipient,
+    type,
+  }: { amount: BigNumber; recipient: Recipient; type: LedgerTransactionType } = location.state;
 
   const transition = useTransition(currentStepIndex, {
     from: {
@@ -65,46 +100,130 @@ function ConfirmLedgerBtcTransaction(): JSX.Element {
     },
   });
 
-  const handleClickNext = async () => {
-    const amount = searchParams.get('amount');
-    const address = searchParams.get('address');
-    if (!amount || !address) {
+  const handleConnectAndConfirm = async () => {
+    if (!selectedAccount) {
+      console.error('No account selected');
       return;
     }
-    if (currentStepIndex === 0) {
-      const transport = await Transport.create();
+    setIsButtonDisabled(true);
 
-      if (searchParams.get('amount') && searchParams.get('address')) {
-        const result = await signLedgerNestedSegwitBtcTransaction(transport, 'Testnet', 0, {
-          address,
-          amountSats: new BigNumber(parseInt(amount)),
-        });
+    const transport = await Transport.create();
 
-        setSigningResult(result);
-      }
+    if (!transport) {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+      setIsButtonDisabled(false);
+      return;
     }
-    if (currentStepIndex === 1) {
-      // Broadcast tx
+
+    setIsConnectSuccess(true);
+    await ledgerDelay(1500);
+    setCurrentStepIndex(1);
+
+    try {
+      const result = await signLedgerNestedSegwitBtcTransaction(
+        transport,
+        network.type,
+        selectedAccount.id,
+        recipient
+      );
+      setIsTxApproved(true);
+      await ledgerDelay(1500);
+      const transactionId = await broadcastRawBtcTransaction(result, network.type);
+      setTxId(transactionId.tx.hash);
+      setCurrentStepIndex(2);
+    } catch (err) {
+      console.error(err);
+      setIsTxRejected(true);
+      setIsButtonDisabled(false);
+    } finally {
+      transport.close();
     }
-    setCurrentStepIndex(currentStepIndex + 1);
+  };
+
+  const handleRetry = async () => {
+    setIsTxRejected(false);
+    setIsConnectSuccess(false);
+    setCurrentStepIndex(0);
+  };
+
+  const handleClose = () => {
+    if (typeof window !== 'undefined') {
+      window.close();
+    }
+  };
+
+  const handleSeeTransaction = () => {
+    if (!txId) {
+      console.error('No txId found');
+      return;
+    }
+    window.open(getBtcTxStatusUrl(txId, network), '_blank', 'noopener,noreferrer');
   };
 
   return (
     <Container>
-      {transition((style, index) => (
+      <FullScreenHeader />
+      {transition((style) => (
         <>
-          <OnBoardingContentContainer>
+          <OnBoardingContentContainer style={style}>
             {currentStepIndex === 0 ? (
-              <div>Connect your device to confirm the transaction</div>
+              <div>
+                <LedgerConnectionView
+                  title={t('CONNECT.TITLE')}
+                  text={t('CONNECT.SUBTITLE')}
+                  titleFailed={t('CONNECT.ERROR_TITLE')}
+                  textFailed={t('CONNECT.ERROR_SUBTITLE')}
+                  imageDefault={LedgerConnectDefaultSVG}
+                  isConnectSuccess={isConnectSuccess}
+                  isConnectFailed={isConnectFailed}
+                />
+              </div>
             ) : currentStepIndex === 1 ? (
-              <div>{signingResult}</div>
+              <div>
+                <LedgerConnectionView
+                  title={t('CONFIRM.TITLE')}
+                  text={t('CONFIRM.SUBTITLE')}
+                  titleFailed={t('CONFIRM.ERROR_TITLE')}
+                  textFailed={t('CONFIRM.ERROR_SUBTITLE')}
+                  imageDefault={LedgerConnectDefaultSVG}
+                  isConnectSuccess={isTxApproved}
+                  isConnectFailed={isTxRejected}
+                />
+              </div>
             ) : currentStepIndex === 2 ? (
-              <div>Transaction broadcasted, you can close this window</div>
+              <TxConfirmedContainer>
+                <img src={CheckCircleSVG} alt="Success" />
+                <TxConfirmedTitle>{t('SUCCESS.TITLE')}</TxConfirmedTitle>
+                <TxConfirmedDescription>{t('SUCCESS.SUBTITLE')}</TxConfirmedDescription>
+              </TxConfirmedContainer>
             ) : null}
           </OnBoardingContentContainer>
-          <OnBoardingActionsContainer>
-            <ActionButton onPress={handleClickNext} text={t('ONBOARDING_NEXT_BUTTON')} />
-          </OnBoardingActionsContainer>
+          {currentStepIndex !== 2 ? (
+            <SuccessActionsContainer>
+              <ActionButton
+                onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+                text={t(isTxRejected || isConnectFailed ? 'RETRY_BUTTON' : 'CONNECT_BUTTON')}
+                disabled={isButtonDisabled}
+                processing={isButtonDisabled}
+              />
+              <ActionButton
+                transparent
+                onPress={handleClose}
+                text={t('CANCEL_BUTTON')}
+                disabled={isButtonDisabled}
+              />
+            </SuccessActionsContainer>
+          ) : (
+            <SuccessActionsContainer>
+              <ActionButton onPress={handleClose} text={t('CLOSE_BUTTON')} />
+              <ActionButton
+                transparent
+                onPress={handleSeeTransaction}
+                text={t('SEE_TRANSACTION_BUTTON')}
+              />
+            </SuccessActionsContainer>
+          )}
         </>
       ))}
     </Container>
