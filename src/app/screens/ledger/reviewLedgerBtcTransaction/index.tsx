@@ -25,7 +25,7 @@ function ReviewLedgerBtcTransaction() {
 
   const handleOnConfirmClick = async () => {
     const txType: LedgerTransactionType = 'BTC';
-    navigate('/confirm-ledger-btc-tx', { state: { amount, recipient, type: txType } });
+    navigate('/confirm-ledger-tx', { state: { amount, recipient, type: txType } });
   };
 
   const goBackToScreen = () => {

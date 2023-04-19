@@ -49,8 +49,10 @@ import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import ReviewLedgerBtcTransaction from '@screens/ledger/reviewLedgerBtcTransaction';
-import ConfirmLedgerBtcTransaction from '@screens/ledger/confirmLedgerBtcTransaction';
+import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
 import LedgerSendBtcScreen from '@screens/ledger/ledgerSendBtc';
+import LedgerSendStxScreen from '@screens/ledger/ledgerSendStx';
+import ReviewLedgerStxTransaction from '@screens/ledger/reviewLedgerStxTransaction';
 
 const router = createHashRouter([
   {
@@ -111,6 +113,10 @@ const router = createHashRouter([
         element: <LedgerSendBtcScreen />,
       },
       {
+        path: 'send-stx-ledger',
+        element: <LedgerSendStxScreen />,
+      },
+      {
         path: 'confirm-stx-tx',
         element: <ConfirmStxTransaction />,
       },
@@ -127,8 +133,12 @@ const router = createHashRouter([
         element: <ReviewLedgerBtcTransaction />,
       },
       {
-        path: 'confirm-ledger-btc-tx',
-        element: <ConfirmLedgerBtcTransaction />,
+        path: 'review-ledger-stx-tx',
+        element: <ReviewLedgerStxTransaction />,
+      },
+      {
+        path: 'confirm-ledger-tx',
+        element: <ConfirmLedgerTransaction />,
       },
       {
         path: 'backup',

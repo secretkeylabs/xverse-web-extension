@@ -332,6 +332,12 @@ export default function CoinHeader(props: CoinBalanceProps) {
         });
         return;
       }
+      if (coin === 'STX') {
+        await chrome.tabs.create({
+          url: chrome.runtime.getURL('options.html#/send-stx-ledger'),
+        });
+        return;
+      }
     }
     if (coin === 'STX' || coin === 'BTC') {
       navigate(`/send-${coin}`);

@@ -174,7 +174,13 @@ function Home() {
     navigate('/manage-tokens');
   };
 
-  const onStxSendClick = () => {
+  const onStxSendClick = async () => {
+    if (isLedgerAccount) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL('options.html#/send-stx-ledger'),
+      });
+      return;
+    }
     navigate('/send-stx');
   };
 

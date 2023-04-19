@@ -1,4 +1,4 @@
-import {  useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { animated, useTransition } from '@react-spring/web';
@@ -268,13 +268,13 @@ function ImportLedger(): JSX.Element {
       (account) => account.stxAddress !== ''
     ).length;
     setAddressIndex(newAddressIndex);
-    const { address, publicKey } = await importStacksAccountFromLedger(
+    const { address, publicKey, testnetAddress } = await importStacksAccountFromLedger(
       transport,
       network,
       0,
       newAddressIndex
     );
-    setStacksCredentials({ address, publicKey });
+    setStacksCredentials({ address: testnetAddress, publicKey });
     await transport.close();
   };
 
