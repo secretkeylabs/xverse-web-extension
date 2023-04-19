@@ -24,6 +24,7 @@ export const useBtcWalletData = () => {
 
   return useQuery({
     queryKey: [`wallet-data-${btcAddress}`],
+    refetchOnWindowFocus: true,
     queryFn: fetchBtcWalletData,
   });
 };
