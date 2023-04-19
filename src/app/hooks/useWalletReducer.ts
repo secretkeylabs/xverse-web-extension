@@ -64,7 +64,7 @@ const useWalletReducer = () => {
       );
       dispatch(getActiveAccountsAction(accountsList));
     }
-    await sendMessage({
+    sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
         secretKey: decrypted,
