@@ -30,6 +30,7 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useCoinsData from '@hooks/queries/useCoinData';
+import useAppConfig from '@hooks/queries/useAppConfig';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import DLCActionButton from '@components/dlcButton';
@@ -151,8 +152,9 @@ function Home() {
 
   useEffect(() => {
     refetch();
-    console.log(btcClient)
   }, []);
+  
+  useAppConfig();
 
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
