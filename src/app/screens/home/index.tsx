@@ -35,6 +35,7 @@ import ReceiveCardComponent from '@components/receiveCardComponent';
 import DLCActionButton from '@components/dlcButton';
 import DlcTab from '@assets/img/bottomTabBar/dlc_tab.svg';
 import BalanceCard from './balanceCard';
+import useBtcClient from '@hooks/useBtcClient';
 
 const Container = styled.div`
   display: flex;
@@ -146,9 +147,11 @@ function Home() {
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
   useFeeMultipliers();
   useCoinRates();
+  const btcClient = useBtcClient()
 
   useEffect(() => {
     refetch();
+    console.log(btcClient)
   }, []);
 
   const onReceiveModalOpen = () => {

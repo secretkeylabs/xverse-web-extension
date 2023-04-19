@@ -69,6 +69,7 @@ export interface WalletState {
   coins: Coin[];
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
+  btcApiUrl: '';
   hasActivatedOrdinalsKey: boolean | undefined;
   hasActivatedDLCsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
