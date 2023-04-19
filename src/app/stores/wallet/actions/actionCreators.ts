@@ -171,11 +171,16 @@ export function ChangeFiatCurrencyAction(fiatCurrency: SupportedCurrency): actio
   };
 }
 
-export function ChangeNetworkAction(network: SettingsNetwork, networkAddress: string): actions.ChangeNetwork {
+export function ChangeNetworkAction(
+  network: SettingsNetwork,
+  networkAddress: string,
+  btcApiUrl: string,
+): actions.ChangeNetwork {
   return {
     type: actions.ChangeNetworkKey,
     network,
     networkAddress,
+    btcApiUrl,
   };
 }
 

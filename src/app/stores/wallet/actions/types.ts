@@ -91,6 +91,7 @@ export interface WalletData {
   showBtcReceiveAlert: boolean | null;
   showDlcBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
+  btcApiUrl: string;
 }
 
 export interface SetWallet {
@@ -188,6 +189,7 @@ export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
   networkAddress: string;
+  btcApiUrl: string;
 }
 
 export interface GetActiveAccounts {

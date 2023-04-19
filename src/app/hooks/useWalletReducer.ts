@@ -64,7 +64,7 @@ const useWalletReducer = () => {
       );
       dispatch(getActiveAccountsAction(accountsList));
     }
-    sendMessage({
+    await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
         secretKey: decrypted,
@@ -164,8 +164,13 @@ const useWalletReducer = () => {
     dispatch(fetchAccountAction(account, accountsList));
   };
 
-  const changeNetwork = async (changedNetwork: SettingsNetwork, networkObject: StacksNetwork, networkAddress: string) => {
-    dispatch(ChangeNetworkAction(changedNetwork, networkAddress));
+  const changeNetwork = async (
+    changedNetwork: SettingsNetwork,
+    networkObject: StacksNetwork,
+    networkAddress: string,
+    btcApiUrl: string,
+  ) => {
+    dispatch(ChangeNetworkAction(changedNetwork, networkAddress, btcApiUrl));
     const wallet = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
       index: 0n,

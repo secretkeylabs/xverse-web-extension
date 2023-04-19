@@ -1,6 +1,9 @@
-import { Account, StxMempoolTransactionData, SettingsNetwork } from '@secretkeylabs/xverse-core/types';
+import {
+  Account, StxMempoolTransactionData, SettingsNetwork, NetworkType,
+} from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
+import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
 import BigNumber from 'bignumber.js';
 import { ChainID } from '@stacks/transactions';
 import { BTC_TRANSACTION_STATUS_URL, TRANSACTION_STATUS_URL, BTC_TRANSACTION_TESTNET_STATUS_URL } from './constants';
@@ -122,6 +125,20 @@ export function checkNftExists(
 export async function isValidURL(str: string): Promise<boolean> {
   if (validUrl.isUri(str)) {
     const response = await getStacksInfo(str);
+    if (response) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export async function isValidBtcApi(url: string, network: NetworkType) {
+  if (validUrl.isUri(url)) {
+    const btcClient = new BitcoinEsploraApiProvider({
+      network,
+      url,
+    });
+    const response = await btcClient.getLatestBlockHeight();
     if (response) {
       return true;
     }

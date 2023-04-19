@@ -1,10 +1,5 @@
-import {
-  broadcastRawBtcTransaction,
-  fetchBtcAddressUnspent,
-  fetchBtcTransactionRawData,
-  NetworkType,
-} from '@secretkeylabs/xverse-core';
 import { Blockchain, Utxo } from 'dlc-lib';
+import useBtcClient from '@hooks/useBtcClient';
 
 class DlcBitcoinBlockchain implements Blockchain {
   // eslint-disable-next-line class-methods-use-this
