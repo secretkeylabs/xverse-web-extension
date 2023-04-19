@@ -227,6 +227,9 @@ const useWalletReducer = () => {
     );
     try {
       dispatch(addLedgerAcountAction(newLedgerAccountsList));
+      if (isLedgerAccount && updatedLedgerAccount.id === selectedAccount?.id) {
+        switchAccount(updatedLedgerAccount);
+      }
     } catch (err) {
       return Promise.reject(err);
     }
