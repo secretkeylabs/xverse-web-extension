@@ -11,8 +11,6 @@ import ActionButton from '@components/button';
 import { isValidBtcApi, isValidURL } from '@utils/helper';
 import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core/types';
 import useWalletReducer from '@hooks/useWalletReducer';
-import useNetworkSelector from '@hooks/useNetwork';
-import useAppConfig from '@hooks/queries/useAppConfig';
 import NetworkRow from './networkRow';
 
 const Container = styled.div`
@@ -89,7 +87,6 @@ const Button = styled.button({
 function ChangeNetworkScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const { network, btcApiUrl, networkAddress } = useWalletSelector();
-  const selectedNetwork = useNetworkSelector();
   const [changedNetwork, setChangedNetwork] = useState<SettingsNetwork>(network);
   const [error, setError] = useState<string>('');
   const [btcURLError, setBtcURLError] = useState('');
@@ -133,7 +130,7 @@ function ChangeNetworkScreen() {
   };
 
   const onResetStacks = async () => {
-    setUrl(selectedNetwork.coreApiUrl);
+    setUrl(networkAddress || network.address);
   };
 
   const onSubmit = async () => {
@@ -179,7 +176,7 @@ function ChangeNetworkScreen() {
         <ErrorMessage>{error}</ErrorMessage>
         <NodeInputHeader>
           <NodeText>BTC API URL</NodeText>
-          <NodeResetButton onClick={onResetBtcUrl} disabled={!btcApiUrl}>
+          <NodeResetButton onClick={onResetBtcUrl}>
             Reset URL
           </NodeResetButton>
         </NodeInputHeader>
