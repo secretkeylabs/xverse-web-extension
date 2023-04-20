@@ -574,5 +574,22 @@
     "CONTINUE": "Continue",
     "SLIPPAGE_DESC": "Your transaction will reverse if the price changes unfavorably by more of this percentage.",
     "APPLY": "Apply"
+  },
+  "SWAP_CONFIRM_SCREEN": {
+    "TOKEN_SWAP": "Token swap",
+    "FUNCTION": "Function",
+    "YOU_WILL_TRANSFER": "You will transfer",
+    "YOU_WILL_RECEIVE": "You will receive",
+    "AMOUNT": "Amount",
+    "LESS_THAN_OR_EQUAL_TO": "Less than or equal to",
+    "TO": "To",
+    "YOUR_ADDRESS": "Your address",
+    "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
+    "FEES": "Fees",
+    "ROUTE": "Route",
+    "COPIED": "Copied",
+    "COPY_YOUR_ADDRESS": "copy your address",
+    "ROUTE_DESC": "For the transaction to proceed, your BTC will be swapped for xBTC and STX. There is no additional cost for you and no STX will be added to your wallet."
   }
 }

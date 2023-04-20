@@ -14,7 +14,7 @@ const Container = styled.div((props) => ({
   rowGap: props.theme.spacing(4),
 }));
 
-const RowContainer = styled.div({
+export const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -62,7 +62,7 @@ const CoinButtonArrow = styled.img((props) => ({
   height: 12,
 }));
 
-const AmountTex = styled.input<{ error?: boolean }>((props) => ({
+export const AmountTex = styled.input<{ error?: boolean }>((props) => ({
   ...props.theme.body_bold_l,
   flex: 1,
   color: props.error ? props.theme.colors.feedback.error : props.theme.colors.white['0'],
@@ -77,7 +77,7 @@ const CoinText = styled.div((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
-const EstimateUSDText = styled.h1((props) => ({
+export const EstimateUSDText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white['400'],
   marginLeft: 'auto',

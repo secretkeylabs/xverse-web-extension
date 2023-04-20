@@ -14,25 +14,27 @@ interface TokenImageProps {
   fungibleToken?: FungibleToken;
   size?: number;
   loaderSize?: LoaderSize;
+  round?: boolean;
 }
 
-const TickerImage = styled.img<{ size?: number }>((props) => ({
+const TickerImage = styled.img<{ size?: number; round?: boolean }>((props) => ({
   height: props.size ?? 44,
   width: props.size ?? 44,
+  borderRadius: props.round ? '50%' : 'none',
 }));
 
 const LoaderImageContainer = styled.div({
   flex: 0.5,
 });
 
-const TickerIconContainer = styled.div<{ size?: number }>((props) => ({
+const TickerIconContainer = styled.div<{ size?: number; round?: boolean }>((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   height: props.size ?? 44,
   width: props.size ?? 44,
   marginRight: props.theme.spacing(3),
-  borderRadius: 30,
+  borderRadius: props.round ? '50%' : props.theme.radius(2),
   backgroundColor: props.color,
 }));
 
@@ -68,7 +70,7 @@ export default function TokenImage(props: TokenImageProps) {
       const background = stc(ticker);
       ticker = ticker && ticker.substring(0, 4);
       return (
-        <TickerIconContainer size={props.size} color={background}>
+        <TickerIconContainer size={props.size} color={background} round={props.round}>
           <TickerIconText>{ticker}</TickerIconText>
         </TickerIconContainer>
       );
@@ -79,5 +81,5 @@ export default function TokenImage(props: TokenImageProps) {
       </LoaderImageContainer>
     );
   }
-  return <TickerImage size={props.size} src={getCoinIcon()} />;
+  return <TickerImage size={props.size} src={getCoinIcon()} round={props.round} />;
 }
