@@ -41,7 +41,8 @@ const SuccessActionsContainer = styled.div((props) => ({
   gap: '12px',
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(30),
+  marginBottom: props.theme.spacing(20),
+  marginTop: props.theme.spacing(20),
 }));
 
 const TopImage = styled.img({
@@ -221,10 +222,11 @@ function AuthenticationRequest() {
         <SuccessActionsContainer>
           <ActionButton
             onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
-            text={t(isTxRejected || isConnectFailed ? 'RETRY_BUTTON' : 'CONNECT_BUTTON')}
+            text={t(isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'CONNECT_BUTTON')}
             disabled={isButtonDisabled}
             processing={isButtonDisabled}
           />
+          <ActionButton onPress={cancelCallback} text={t('CANCEL_BUTTON')} transparent />
         </SuccessActionsContainer>
       </BottomModal>
     </ConfirmScreen>
