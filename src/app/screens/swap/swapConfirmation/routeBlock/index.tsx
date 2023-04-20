@@ -7,7 +7,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import TokenImage from '@components/tokenImage';
-import { useState } from 'react';
+import { cloneElement, useState } from 'react';
+import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 
 const RouteDescription = styled.p((props) => ({
   ...props.theme.body_m,
@@ -55,7 +56,7 @@ const ProgressItemText = styled.p((props) => ({
 
 const mockData = ['STX', 'STX'];
 
-export default function RouteBlock() {
+export default function RouteBlock({ swap }: { swap: SwapConfirmationInput }) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
   const [isFold, setIsFold] = useState(false);
   return (
@@ -68,9 +69,9 @@ export default function RouteBlock() {
         <>
           <RouteProgress>
             <DashLine />
-            {mockData.map((name) => (
+            {swap.routers.map(({ name, image }) => (
               <ProgressItem>
-                <TokenImage token={name} size={24} round />
+                {cloneElement(image as any, { size: 24 })}
                 <ProgressItemText>{name}</ProgressItemText>
               </ProgressItem>
             ))}
