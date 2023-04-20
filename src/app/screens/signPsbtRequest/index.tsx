@@ -251,6 +251,7 @@ function SignPsbtRequest() {
             title={t('AMOUNT')}
             heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
           />
+          {data && (
           <OrdinalDetailComponent
             ordinalInscription={ordinalInfoData?.inscriptionNumber!}
             icon={IconOrdinal}
@@ -259,6 +260,7 @@ function SignPsbtRequest() {
             ordinalDetail={ordinalInfoData?.metadata['content type']}
             heading={t('YOU_WILL_TRANSFER')}
           />
+          )}
           <InputOutputComponent
             parsedPsbt={parsedPsbt}
             isExpanded={expandInputOutputView}
