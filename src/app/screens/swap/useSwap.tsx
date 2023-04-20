@@ -8,6 +8,7 @@ import { AlexSDK, Currency } from 'alex-sdk';
 import { ftDecimals } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
+import { useNavigate } from 'react-router-dom';
 
 export type SwapToken = {
   name: string;
@@ -39,6 +40,7 @@ export type UseSwap = {
 };
 
 export function useSwap(): UseSwap {
+  const navigate = useNavigate();
   const alexSDK = useState(() => new AlexSDK())[0];
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const { coinsList, stxAvailableBalance, stxBtcRate, btcFiatRate, fiatCurrency, stxAddress } =
@@ -106,6 +108,7 @@ export function useSwap(): UseSwap {
       token === 'STX' ? Currency.STX : alexSDK.getCurrencyFrom(token.principal)!
     );
   }
+
   const fromToken = currencyToToken(from, fromAmount);
   const inputAmountInvalid =
     isNaN(Number(inputAmount)) ||
@@ -162,6 +165,7 @@ export function useSwap(): UseSwap {
     }
     return Math.floor(input * 1000) / 1000;
   }
+
   const toAmount =
     exchangeRate != null && fromAmount != null ? fromAmount * exchangeRate : undefined;
 
@@ -201,7 +205,8 @@ export function useSwap(): UseSwap {
               BigInt(Math.floor(toAmount * (1 - slippage) * 1e8)),
               info.route
             );
-            alert(tx.contractName + ':' + tx.functionName);
+            // TODO: 跳转传参数
+            navigate('/swap-confirm');
           }
         : undefined,
   };
