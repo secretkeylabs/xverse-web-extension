@@ -120,6 +120,8 @@
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
+    "ADVANCED_SETTING_FEE_OPTION": "Edit fee",
+    "ADVANCED_SETTING_NONCE_OPTION": "Edit nonce",
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",
     "STANDARD": "Standard",

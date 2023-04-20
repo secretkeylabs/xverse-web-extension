@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import BottomModal from '@components/bottomModal';
 import BigNumber from 'bignumber.js';
 import {
@@ -8,6 +9,7 @@ import Select, { SingleValue } from 'react-select';
 import styled, { useTheme } from 'styled-components';
 import IconSats from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import ArrowIcon from '@assets/img/settings/arrow.svg';
 import { NumericFormat } from 'react-number-format';
 import ActionButton from '@components/button';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
@@ -130,6 +132,35 @@ const ErrorText = styled.h1((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.feedback.error,
 }));
+
+const TransactionSettingOptionText = styled.h1((props) => ({
+  ...props.theme.body_medium_l,
+  color: props.theme.colors.white[200],
+}));
+
+const TransactionSettingOptionButton = styled.button((props) => ({
+  background: 'transparent',
+  display: 'flex',
+  flexDirection: 'row',
+  width: '100%',
+  marginTop: props.theme.spacing(16),
+  paddingLeft: props.theme.spacing(12),
+  paddingRight: props.theme.spacing(12),
+  justifyContent: 'space-between',
+}));
+
+const TransactionSettingNonceOptionButton = styled.button((props) => ({
+  background: 'transparent',
+  display: 'flex',
+  flexDirection: 'row',
+  width: '100%',
+  marginTop: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(20),
+  paddingLeft: props.theme.spacing(12),
+  paddingRight: props.theme.spacing(12),
+  justifyContent: 'space-between',
+}));
+
 interface Props {
   visible: boolean;
   fee: string;
@@ -170,6 +201,8 @@ function TransactionSettingAlert({
   const theme = useTheme();
   const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const [error, setError] = useState('');
+  const [showNonceSettings, setShowNonceSettings] = useState(false);
+  const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
   const [selectedOption, setSelectedOption] = useState({
     label: t('TRANSACTION_SETTING.STANDARD'),
@@ -434,19 +467,44 @@ function TransactionSettingAlert({
     </NonceContainer>
   );
 
+  const onEditFeesPress = () => {
+    setShowFeeSettings(true);
+  };
+
+  const onEditNoncePress = () => {
+    setShowNonceSettings(true);
+  };
+
+  const onClosePress = () => {
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
+    onCrossClick();
+  };
+
   return (
-    <BottomModal visible={visible} header={type === 'STX' ? t('TRANSACTION_SETTING.ADVANCED_SETTING') : t('TRANSACTION_SETTING.EDIT_FEE')} onClose={onCrossClick}>
-      {editFeesSection}
-      {errorText}
-      {allowEditNonce && type === 'STX' && editNonceSection}
-      <ButtonContainer>
-        <ActionButton
-          text={t('TRANSACTION_SETTING.APPLY')}
-          processing={isLoading}
-          disabled={isLoading}
-          onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
-        />
-      </ButtonContainer>
+    <BottomModal
+      visible={visible}
+      header={
+        showFeeSettings
+          ? t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')
+          : showNonceSettings
+            ? t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')
+            : t('TRANSACTION_SETTING.ADVANCED_SETTING')
+      }
+      onClose={onClosePress}
+    >
+      <TransactionSettingOptionButton onClick={onEditFeesPress}>
+        <TransactionSettingOptionText>
+          {t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')}
+        </TransactionSettingOptionText>
+        <img src={ArrowIcon} alt="Arrow " />
+      </TransactionSettingOptionButton>
+      <TransactionSettingNonceOptionButton onClick={onEditNoncePress}>
+        <TransactionSettingOptionText>
+          {t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')}
+        </TransactionSettingOptionText>
+        <img src={ArrowIcon} alt="Arrow " />
+      </TransactionSettingNonceOptionButton>
     </BottomModal>
   );
 }
