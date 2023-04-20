@@ -285,7 +285,30 @@
     "TITLE": "Connection",
     "REQUEST_TOOLTIP": "Requested by",
     "CONNECT_BUTTON": "Connect",
-    "CANCEL_BUTTON": "Cancel"
+    "CANCEL_BUTTON": "Cancel",
+    "LEDGER": {
+      "CONNECT": {
+        "TITLE": "Connect your hardware wallet",
+        "SUBTITLE": "To continue, plug and unlock your device.",
+        "ERROR_TITLE": "Connection error",
+        "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+      },
+      "CONFIRM": {
+        "TITLE": "Confirm the signature",
+        "SUBTITLE": "Authorise the signature on your device to continue.",
+        "ERROR_TITLE": "Signature denied",
+        "ERROR_SUBTITLE": "The signatures has been rejected. You can try again or close this tab."
+      },
+      "SUCCESS": {
+        "TITLE": "Signature confirmed",
+        "SUBTITLE": "This transaction will be broadcasted by the sponsor."
+      },
+      "CONFIRM_BUTTON": "Confirm",
+      "CONNECT_BUTTON": "Connect",
+      "CLOSE_BUTTON": "Close",
+      "CANCEL_BUTTON": "Cancel",
+      "RETRY_BUTTON": "Try again"
+    }
   },
   "LOGIN_SCREEN": {
     "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",
