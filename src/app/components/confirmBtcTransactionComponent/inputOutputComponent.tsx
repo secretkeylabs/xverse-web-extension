@@ -115,7 +115,7 @@ function InputOutputComponent({
     from: { opacity: 0, height: 0 },
     to: {
       opacity: isExpanded ? 1 : 0,
-      height: isExpanded ? 250 : 0,
+      height: isExpanded ? 'auto' : 0,
     },
   });
 

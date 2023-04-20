@@ -7,8 +7,12 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { parsePsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { useTranslation } from 'react-i18next';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
+import IconOrdinal from '@assets/img/transactions/ordinal.svg';
 import styled from 'styled-components';
-import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
+import {
+  BtcUtxoDataResponse,
+  getBtcFiatEquivalent, getOrdinalIdFromUtxo, getOrdinalInfo, OrdinalInfo, satsToBtc,
+} from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
@@ -17,6 +21,8 @@ import BtcRecipientComponent from '@components/confirmBtcTransactionComponent/bt
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
 import { NumericFormat } from 'react-number-format';
+import { useMutation } from '@tanstack/react-query';
+import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -69,6 +75,36 @@ function SignPsbtRequest() {
     payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses,
   } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
+  const {
+    isLoading: ordinalLoading,
+    error: ordinalError,
+    data,
+    mutate: mutateOrdinalByUtxo,
+  } = useMutation<string | undefined, Error, { utxoHash: string; index: number }>(
+    async ({ utxoHash, index }) => {
+      const utxo: BtcUtxoDataResponse = {
+        tx_hash: utxoHash,
+        block_height: 0,
+        tx_input_n: 0,
+        tx_output_n: index,
+        value: 0,
+        ref_balance: 0,
+        spent: false,
+        confirmations: 0,
+        confirmed: '',
+        double_spend: false,
+        double_spend_tx: '',
+      };
+      return getOrdinalIdFromUtxo(utxo);
+    },
+  );
+  const {
+    data: ordinalInfoData,
+    mutate: ordinalInfoMutate,
+  } = useMutation<
+  OrdinalInfo | undefined,
+  Error,
+  { ordinalId: string }>(async ({ ordinalId }) => getOrdinalInfo(ordinalId));
 
   const handlePsbtParsing = useCallback(() => {
     try {
@@ -127,6 +163,21 @@ function SignPsbtRequest() {
     checkIfMismatch();
   }, []);
 
+  useEffect(() => {
+    if (parsedPsbt) {
+      mutateOrdinalByUtxo({
+        utxoHash: parsedPsbt.inputs[0].txid,
+        index: parsedPsbt.inputs[0].index,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (data) {
+      ordinalInfoMutate({ ordinalId: data });
+    }
+  }, [data]);
+
   const onSignPsbtConfirmed = async () => {
     try {
       setIsSigning(true);
@@ -168,13 +219,14 @@ function SignPsbtRequest() {
     setExpandInputOutputView(!expandInputOutputView);
   };
 
-  const getSatsAmountString = (sats: BigNumber) =>
+  const getSatsAmountString = (sats: BigNumber) => (
     <NumericFormat
       value={sats.toString()}
       displayType="text"
       thousandSeparator
       suffix={` ${t('SATS')}`}
-    />;
+    />
+  );
 
   return (
     <>
@@ -191,13 +243,21 @@ function SignPsbtRequest() {
               .replace('-', '')} BTC`}
             subValue={getBtcFiatEquivalent(
               new BigNumber(
-                parsedPsbt?.netAmount < 0 ? parsedPsbt?.netAmount * -1n : parsedPsbt?.netAmount
+                parsedPsbt?.netAmount < 0 ? parsedPsbt?.netAmount * -1n : parsedPsbt?.netAmount,
               ),
-              btcFiatRate
+              btcFiatRate,
             )}
             icon={IconBitcoin}
             title={t('AMOUNT')}
             heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
+          />
+          <OrdinalDetailComponent
+            ordinalInscription={ordinalInfoData?.inscriptionNumber!}
+            icon={IconOrdinal}
+            title={t('ORDINAL')}
+            ordinal={ordinalInfoData}
+            ordinalDetail={ordinalInfoData?.metadata['content type']}
+            heading={t('YOU_WILL_TRANSFER')}
           />
           <InputOutputComponent
             parsedPsbt={parsedPsbt}

@@ -112,7 +112,8 @@
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed please contact the developer of the requesting app for support",
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
     "YOU_WILL_TRANSFER": "You will transfer",
-    "YOU_WILL_RECEIVE": "You will receive"
+    "YOU_WILL_RECEIVE": "You will receive",
+    "ORDINAL": "Ordinal"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
