@@ -37,7 +37,7 @@ import ReceiveCardComponent from '@components/receiveCardComponent';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
 
-const Container = styled.div`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;

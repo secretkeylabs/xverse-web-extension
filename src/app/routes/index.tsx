@@ -48,6 +48,7 @@ import RestoreFunds from '@screens/restoreFunds';
 import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import SwapScreen from '@screens/swap';
+import SwapConfirmScreen from '@screens/swap/swapConfirmation';
 
 const router = createHashRouter([
   {
@@ -102,6 +103,10 @@ const router = createHashRouter([
       {
         path: 'swap',
         element: <SwapScreen />,
+      },
+      {
+        path: 'swap-confirm',
+        element: <SwapConfirmScreen />,
       },
       {
         path: 'confirm-stx-tx',

@@ -22,17 +22,6 @@ const DetailButton = styled.button((props) => ({
   color: props.theme.colors.white['200'],
 }));
 
-const EditSlippageButton = styled.button((props) => ({
-  display: 'flex',
-  justifyContent: 'flex-end',
-  flexDirection: 'row',
-  columnGap: props.theme.spacing(2),
-  background: 'transparent',
-  alignItems: 'center',
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
-}));
-
 const DL = styled.dl((props) => ({
   display: 'flex',
   flexWrap: 'wrap',
@@ -58,7 +47,6 @@ const DD = styled.dd((props) => ({
 export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
   const [expandDetail, setExpandDetail] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-
   const [showSlippageModal, setShowSlippageModal] = useState(false);
 
   return (
