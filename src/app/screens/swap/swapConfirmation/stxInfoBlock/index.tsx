@@ -9,6 +9,7 @@ import { StyledToolTip } from '@components/accountRow';
 import { useCallback, useState } from 'react';
 import TokenImage from '@components/tokenImage';
 import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
+import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 
 export const Container = styled.div((props) => ({
   display: 'flex',
@@ -108,21 +109,23 @@ const CurrencyText = styled.p((props) => ({
 
 interface StxInfoCardProps {
   type: 'transfer' | 'receive';
+  swap: SwapConfirmationInput;
 }
 
 export function FoldButton({ isFold, onSwitch }: { isFold: boolean; onSwitch: () => void }) {
   return <FoldArrow src={isFold ? FoldDownIcon : FoldIconUp} onClick={() => onSwitch()} />;
 }
 
-export default function StxInfoBlock({ type }: StxInfoCardProps) {
+export default function StxInfoBlock({ type, swap }: StxInfoCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
   const [isCopied, setIsCopied] = useState(false);
   const [isFold, setIsFold] = useState(false);
   const copyId = `address-${type}`;
   const onCopy = useCallback(() => {
-    navigator.clipboard.writeText('address ......');
+    void navigator.clipboard.writeText('address ......');
     setIsCopied(true);
   }, []);
+  const token = type === 'transfer' ? swap.fromToken : swap.toToken;
   return (
     <Container>
       <TitleContainer>
@@ -137,15 +140,15 @@ export default function StxInfoBlock({ type }: StxInfoCardProps) {
           <AmountContainer>
             <SpaceBetweenContainer>
               <ItemsCenterContainer>
-                <TokenImage token="STX" size={32} round />
-                <AmountLabel>{t('AMOUNT')}</AmountLabel>
+                {token.image}
+                <AmountLabel>{token.name}</AmountLabel>
               </ItemsCenterContainer>
               <ItemsCenterContainer>
-                <CurrencyText>33</CurrencyText>
-                <CurrencyText>STX</CurrencyText>
+                <CurrencyText>{token.amount}</CurrencyText>
+                <CurrencyText>{token.name}</CurrencyText>
               </ItemsCenterContainer>
             </SpaceBetweenContainer>
-            <EstimateUSDText>{` ~ $${100} USD`}</EstimateUSDText>
+            <EstimateUSDText>{` ~ $${token.fiatAmount} USD`}</EstimateUSDText>
           </AmountContainer>
           <DescriptionText>{t('TO')}</DescriptionText>
           <SpaceBetweenContainer>
@@ -154,7 +157,7 @@ export default function StxInfoBlock({ type }: StxInfoCardProps) {
               <AddressLabelText>{t('YOUR_ADDRESS')}</AddressLabelText>
             </ItemsCenterContainer>
             <CopyButton id={copyId} onClick={onCopy}>
-              <AddressText>{getTruncatedAddress('1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4xqX')}</AddressText>
+              <AddressText>{getTruncatedAddress(swap.address)}</AddressText>
               <CopyImg src={CopyIcon} />
             </CopyButton>
             <StyledToolTip

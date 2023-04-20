@@ -8,7 +8,9 @@ import ActionButton from '@components/button';
 import FreesBlock from '@screens/swap/swapConfirmation/freesBlock';
 import RouteBlock from '@screens/swap/swapConfirmation/routeBlock';
 import StxInfoBlock from '@screens/swap/swapConfirmation/stxInfoBlock';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { useHref, useLocation, useNavigate } from 'react-router-dom';
+import { useConfirmSwap } from '@screens/swap/swapConfirmation/useConfirmSwap';
 
 const TitleText = styled.div((props) => ({
   fontSize: 21,
@@ -32,28 +34,41 @@ export const ActionButtonWrap = styled.div((props) => ({
 
 export default function SwapConfirmation() {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const swap = useConfirmSwap(location.state);
 
   const onCancel = useCallback(() => {
-    window.close();
+    navigate('/swap');
   }, []);
 
-  const onConfirm = useCallback(() => {}, []);
+  const [confirming, setConfirming] = useState(false);
+  const onConfirm = useCallback(() => {
+    setConfirming(true);
+    swap.onConfirm().finally(() => {
+      setConfirming(false);
+    });
+  }, []);
 
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <Container>
         <TitleText>{t('TOKEN_SWAP')}</TitleText>
-        <StxInfoBlock type="transfer" />
-        <StxInfoBlock type="receive" />
+        <StxInfoBlock type="transfer" swap={swap} />
+        <StxInfoBlock type="receive" swap={swap} />
         <FunctionBlock name={'token-swap'} />
-        <RouteBlock />
-        <FreesBlock fee={12} currency={'STX'} />
+        <RouteBlock swap={swap} />
+        <FreesBlock
+          lpFee={swap.lpFeeAmount}
+          lpFeeFiatAmount={swap.lpFeeFiatAmount}
+          currency={swap.fromToken.name}
+        />
         <ButtonContainer>
           <ActionButtonWrap>
             <ActionButton text={t('CANCEL')} transparent onPress={onCancel} />
           </ActionButtonWrap>
-          <ActionButton text={t('CONFIRM')} onPress={onConfirm} />
+          <ActionButton text={t('CONFIRM')} processing={confirming} onPress={onConfirm} />
         </ButtonContainer>
       </Container>
       <BottomBar tab="dashboard" />

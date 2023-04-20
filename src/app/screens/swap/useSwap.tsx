@@ -9,6 +9,7 @@ import { ftDecimals } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import { useNavigate } from 'react-router-dom';
+import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 
 export type SwapToken = {
   name: string;
@@ -63,7 +64,7 @@ export function useSwap(): UseSwap {
     if (currency === Currency.STX) {
       return {
         balance: Number(microstacksToStx(BigNumber(stxAvailableBalance) as any)),
-        image: <TokenImage token="STX" size={28} loaderSize={LoaderSize.SMALL} />,
+        image: <TokenImage round={true} token="STX" size={28} loaderSize={LoaderSize.SMALL} />,
         name: 'STX',
         amount,
         fiatAmount:
@@ -80,7 +81,9 @@ export function useSwap(): UseSwap {
     }
     return {
       amount,
-      image: <TokenImage fungibleToken={token} size={28} loaderSize={LoaderSize.SMALL} />,
+      image: (
+        <TokenImage round={true} fungibleToken={token} size={28} loaderSize={LoaderSize.SMALL} />
+      ),
       name: (token.ticker ?? token.name).toUpperCase(),
       balance: Number(ftDecimals(token.balance, token.decimals ?? 0)),
       fiatAmount:
@@ -205,11 +208,26 @@ export function useSwap(): UseSwap {
               BigInt(Math.floor(toAmount * (1 - slippage) * 1e8)),
               info.route
             );
-            // TODO: 跳转传参数
-            navigate('/swap-confirm');
+            const state: SwapConfirmationInput = {
+              from: from!,
+              to: to!,
+              fromToken: fromToken!,
+              toToken: toToken!,
+              address: stxAddress,
+              fromAmount: fromAmount!,
+              minToAmount: toAmount! * (1 - slippage),
+              lpFeeAmount: info.feeRate * fromAmount!,
+              lpFeeFiatAmount: currencyToToken(from!, info.feeRate * fromAmount!)?.fiatAmount,
+              routers: info.route.map(currencyToToken).filter(isNotNull),
+              txToBroadcast: tx,
+            };
+            navigate('/swap-confirm', {
+              state,
+            });
           }
         : undefined,
   };
 }
 
 const noop = () => null;
+const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
