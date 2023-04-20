@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 // import ContractDetailTemplate from '../../templates/ContractDetailTemplate';
 import { useNavigate, useParams } from 'react-router-dom';
+import useBtcContracts from '@hooks/useBtcContracts';
 import { ContractState } from 'dlc-lib';
 import {
   acceptRequest,
@@ -134,6 +135,8 @@ const ButtonContainer = styled.div((props) => ({
 function DlcOfferRequest() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { handleContracts, handleOffer, handleAccept, handleReject, handleSign } =
+    useBtcContracts();
   const { t } = useTranslation('translation', { keyPrefix: 'DLC_SCREEN' });
   const { offer, counterpartyWalletUrl } = useParams();
   // counterpartyWalletUrl param is disabled for demo purposes
@@ -152,7 +155,7 @@ function DlcOfferRequest() {
 
   const {
     processing,
-    actionSuccess,
+    success,
     error,
     currentId,
     signingRequested,
@@ -164,49 +167,13 @@ function DlcOfferRequest() {
   const [usdEquivalent, setUsdEquivalent] = useState<string>();
   const [canAccept, setCanAccept] = useState(false);
 
-  async function handlePrivateKey() {
-    const btcPrivateKey = await getBtcNativeSegwitPrivateKey({
-      seedPhrase,
-      index: BigInt(selectedAccount?.id ?? 0),
-      network,
-    });
-    return btcPrivateKey;
-  }
-
-  function handleOffer(message: string): void {
-    dispatch(offerRequest(message));
-  }
-
-  async function handleAccept(): Promise<void> {
-    const btcPrivateKey = await handlePrivateKey();
-
-    if (selectedContract && currentId) {
-      dispatch(
-        acceptRequest(currentId, dlcBtcAddress, dlcBtcPublicKey, btcPrivateKey, network.type)
-      );
-    }
-  }
-
-  function handleReject(): void {
-    if (selectedContract && currentId) {
-      dispatch(rejectRequest(currentId));
-      navigate('/');
-    }
-  }
-
-  async function writeAndSignAcceptMessage(): Promise<void> {
-    const btcPrivateKey = await handlePrivateKey();
-    if (currentId) {
-      dispatch(signRequest(currentId, btcPrivateKey, network.type, counterpartyWalletUrl!));
-    }
-  }
-
   useEffect(() => {
     refetch();
   }, []);
 
   useEffect(() => {
     if (offer) {
+      console.log('inside useEffect')
       handleOffer(offer);
     }
   }, [offer]);
@@ -247,15 +214,15 @@ function DlcOfferRequest() {
   useEffect(() => {
     if (
       acceptMessageSubmitted &&
-      actionSuccess &&
+      success &&
       selectedContract?.state === ContractState.Accepted
     ) {
-      writeAndSignAcceptMessage();
+      signRequest(currentId!, dlcBtcPublicKey, network.type, counterpartyWalletUrl!);
     }
-  }, [acceptMessageSubmitted, actionSuccess, selectedContract]);
+  }, [acceptMessageSubmitted, success, selectedContract]);
 
   useEffect(() => {
-    if (signingRequested && actionSuccess && selectedContract?.state === ContractState.Broadcast) {
+    if (signingRequested && success && selectedContract?.state === ContractState.Broadcast) {
       const txID = Transaction.fromHex(selectedContract.dlcTransactions.fund).getId();
       navigate('/tx-status', {
         state: {
@@ -269,7 +236,7 @@ function DlcOfferRequest() {
         refetch();
       }, 1000);
     }
-  }, [signingRequested, actionSuccess, selectedContract]);
+  }, [signingRequested, success, selectedContract]);
 
   useEffect(() => {
     if (error) {
@@ -325,11 +292,11 @@ function DlcOfferRequest() {
                     text={t('ACCEPT')}
                     disabled={!canAccept}
                     processing={processing}
-                    onPress={() => handleAccept()}
+                    onPress={() => handleAccept(currentId!)}
                   />
                 </ButtonContainer>
                 <ButtonContainer>
-                  <ActionButton text={t('REJECT')} transparent onPress={() => handleReject()} />
+                  <ActionButton text={t('REJECT')} transparent onPress={() => handleReject(currentId!)} />
                 </ButtonContainer>
               </>
             )}

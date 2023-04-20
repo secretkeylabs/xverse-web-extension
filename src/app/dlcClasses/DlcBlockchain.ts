@@ -1,35 +1,39 @@
 import { Blockchain, Utxo } from 'dlc-lib';
-import useBtcClient from '@hooks/useBtcClient';
+import { UTXO } from '@secretkeylabs/xverse-core';
+import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
+class EsploraBlockchain implements Blockchain {
+  private readonly btcClient: BitcoinEsploraApiProvider;
 
-class DlcBitcoinBlockchain implements Blockchain {
-  // eslint-disable-next-line class-methods-use-this
-  async getTransaction(txid: string): Promise<string> {
-    const btcClient = useBtcClient();
-    const rawTx = await btcClient.getRawTransaction(txid);
-    return rawTx;
+  constructor(btcClient: BitcoinEsploraApiProvider) {
+    this.btcClient = btcClient;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async sendRawTransaction(txHex: string): Promise<void> {
-    const btcClient = useBtcClient();
-    const rawTx = await btcClient.sendRawTransaction(txHex);
-    console.log('Broadcasted TX: ', rawTx);
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  async getUtxosForAddress(address: string): Promise<Utxo[]> {
-    const btcClient = useBtcClient();
-    const utxoDataResponses = await btcClient.getUnspentUtxos(address)
-    return utxoDataResponses.map((utxoDataResponse) => ({
-      txid: utxoDataResponse.txid,
-      vout: utxoDataResponse.vout,
-      amount: utxoDataResponse.value,
+  formatUTXO(utxo: UTXO, address: string): Utxo {
+    return {
+      txid: utxo.txid,
+      vout: utxo.vout,
+      amount: utxo.value,
       reserved: false,
-      address,
+      address: address,
       redeemScript: '',
       maxWitnessLength: 107,
-    }));
+    };
+  }
+
+  async getTransaction(txid: string): Promise<string> {
+    return await this.btcClient.getRawTransaction(txid);
+  }
+
+  async sendRawTransaction(txHex: string): Promise<void> {
+    await this.btcClient.sendRawTransaction(txHex);
+  }
+
+  async getUtxosForAddress(address: string): Promise<Utxo[]> {
+    const utxos = await this.btcClient.getUnspentUtxos(address);
+    const formattedUTXOs = utxos.map((utxo) => this.formatUTXO(utxo, address));
+    console.log(formattedUTXOs, 'formattedUTXOs')
+    return formattedUTXOs;
   }
 }
 
-export default DlcBitcoinBlockchain;
+export default EsploraBlockchain;

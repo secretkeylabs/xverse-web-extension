@@ -20,7 +20,7 @@ import { getBtcTxStatusUrl } from '@utils/helper';
 const initialDlcState: DlcState = {
   contracts: [],
   processing: false,
-  actionSuccess: false,
+  success: false,
   error: undefined,
   signingRequested: false,
   acceptMessageSubmitted: false,
@@ -70,7 +70,7 @@ const dlcReducer = (
         ...state,
         contracts: newContracts,
         processing: false,
-        actionSuccess: true,
+        success: true,
         selectedContract: updatedContract,
         currentId: getId(updatedContract),
       };

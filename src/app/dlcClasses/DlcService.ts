@@ -19,8 +19,8 @@ class DlcService implements DlcAPI {
     return this.dlcManager.onOfferMessage(offerMessage);
   }
 
-  processContractSign(contractId: string, btcPrivateKey: string, btcNetwork: NetworkType, counterpartyWalletUrl: string): Promise<AnyContract> {
-    return this.dlcManager.onSignMessage(contractId, btcPrivateKey, btcNetwork, counterpartyWalletUrl);
+  processContractSign(contractId: string, btcPrivateKey: string, counterpartyWalletUrl: string): Promise<AnyContract> {
+    return this.dlcManager.onSignMessage(contractId, btcPrivateKey, counterpartyWalletUrl);
   }
 
   getContract(contractId: string): Promise<AnyContract> {

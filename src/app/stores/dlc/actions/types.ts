@@ -16,7 +16,7 @@ export const UpdateKey = 'Update';
 
 export interface DlcState {
   readonly contracts: AnyContract[];
-  readonly actionSuccess: boolean;
+  readonly success: boolean;
   readonly processing: boolean;
   readonly error?: string;
   readonly currentId?: string;
