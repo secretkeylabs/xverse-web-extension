@@ -33,11 +33,10 @@ function TransactionRequest() {
     feeMultipliers,
     accountsList,
     selectedAccount,
+    isLedgerAccount,
   } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-  const {
-    switchAccount,
-  } = useWalletReducer();
+  const { switchAccount } = useWalletReducer();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>();
   const [funcMetaData, setFuncMetaData] = useState<ContractFunction | undefined>(undefined);
   const [coinsMetaData, setCoinsMetaData] = useState<Coin[] | null>(null);
@@ -54,7 +53,7 @@ function TransactionRequest() {
       stxPublicKey,
       feeMultipliers!,
       selectedNetwork,
-      stxPendingTxData,
+      stxPendingTxData
     );
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
@@ -76,7 +75,9 @@ function TransactionRequest() {
     } = await getContractCallPromises(payload, stxAddress, selectedNetwork, stxPublicKey);
     setUnsignedTx(unSignedContractCall);
     setCoinsMetaData(coinMeta);
-    const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find((func) => func.name === payload.functionName);
+    const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find(
+      (func) => func.name === payload.functionName
+    );
     if (invokedFuncMetaData) {
       setFuncMetaData(invokedFuncMetaData);
     }
@@ -88,7 +89,7 @@ function TransactionRequest() {
       selectedNetwork,
       stxPublicKey,
       feeMultipliers!,
-      stxAddress,
+      stxAddress
     );
     setUnsignedTx(response.contractDeployTx);
     setCodeBody(response.codeBody);
@@ -108,7 +109,7 @@ function TransactionRequest() {
       });
       return;
     }
-    if (payload.stxAddress !== selectedAccount?.stxAddress) {
+    if (payload.stxAddress !== selectedAccount?.stxAddress && !isLedgerAccount) {
       const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
       if (account) {
         switchAccount(account);
