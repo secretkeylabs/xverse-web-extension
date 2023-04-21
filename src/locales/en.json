@@ -534,6 +534,7 @@
     "ROUTE": "Route",
     "COPIED": "Copied",
     "COPY_YOUR_ADDRESS": "copy your address",
+    "ADVANCED_SETTING": "Advanced settings",
     "ROUTE_DESC": "For the transaction to proceed, your BTC will be swapped for xBTC and STX. There is no additional cost for you and no STX will be added to your wallet."
   }
 }

@@ -5,12 +5,13 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import FunctionBlock from '@screens/swap/swapConfirmation/functionBlock';
 import ActionButton from '@components/button';
-import FreesBlock from '@screens/swap/swapConfirmation/freesBlock';
+import FeesBlock from '@screens/swap/swapConfirmation/freesBlock';
 import RouteBlock from '@screens/swap/swapConfirmation/routeBlock';
 import StxInfoBlock from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useConfirmSwap } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { AdvanceSettings } from '@screens/swap/swapConfirmation/advanceSettings';
 
 const TitleText = styled.div((props) => ({
   fontSize: 21,
@@ -57,13 +58,14 @@ export default function SwapConfirmation() {
         <TitleText>{t('TOKEN_SWAP')}</TitleText>
         <StxInfoBlock type="transfer" swap={swap} />
         <StxInfoBlock type="receive" swap={swap} />
-        <FunctionBlock name={swap.txToBroadcast.functionName} />
+        <FunctionBlock name={'swap-helper'} />
         <RouteBlock swap={swap} />
-        <FreesBlock
+        <FeesBlock
           lpFee={swap.lpFeeAmount}
           lpFeeFiatAmount={swap.lpFeeFiatAmount}
           currency={swap.fromToken.name}
         />
+        <AdvanceSettings swap={swap} />
         <ButtonContainer>
           <ActionButtonWrap>
             <ActionButton text={t('CANCEL')} transparent onPress={onCancel} />

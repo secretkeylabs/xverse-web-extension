@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import { useNavigate } from 'react-router-dom';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
 
 export type SwapToken = {
   name: string;
@@ -44,8 +45,15 @@ export function useSwap(): UseSwap {
   const navigate = useNavigate();
   const alexSDK = useState(() => new AlexSDK())[0];
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const { coinsList, stxAvailableBalance, stxBtcRate, btcFiatRate, fiatCurrency, stxAddress } =
-    useWalletSelector();
+  const {
+    coinsList,
+    stxAvailableBalance,
+    stxBtcRate,
+    btcFiatRate,
+    fiatCurrency,
+    stxAddress,
+    stxPublicKey,
+  } = useWalletSelector();
 
   const acceptableCoinList =
     coinsList?.filter((c) => alexSDK.getCurrencyFrom(c.principal) != null) ?? [];
@@ -208,6 +216,17 @@ export function useSwap(): UseSwap {
               BigInt(Math.floor(toAmount * (1 - slippage) * 1e8)),
               info.route
             );
+            const unsignedTx = await makeUnsignedContractCall({
+              publicKey: stxPublicKey,
+              contractAddress: tx.contractAddress,
+              contractName: tx.contractName,
+              functionName: tx.functionName,
+              functionArgs: tx.functionArgs as any,
+              anchorMode: AnchorMode.Any,
+              postConditionMode: PostConditionMode.Deny,
+              postConditions: tx.postConditions,
+            });
+
             const state: SwapConfirmationInput = {
               from: from!,
               to: to!,
@@ -219,7 +238,7 @@ export function useSwap(): UseSwap {
               lpFeeAmount: info.feeRate * fromAmount!,
               lpFeeFiatAmount: currencyToToken(from!, info.feeRate * fromAmount!)?.fiatAmount,
               routers: info.route.map(currencyToToken).filter(isNotNull),
-              txToBroadcast: tx,
+              unsignedTx,
             };
             navigate('/swap-confirm', {
               state,

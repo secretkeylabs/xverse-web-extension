@@ -3,7 +3,12 @@ import { ReactNode } from 'react';
 import { Currency } from 'alex-sdk';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { broadcastSignedTransaction, signTransaction } from '@secretkeylabs/xverse-core';
-import { makeUnsignedContractCall, AnchorMode, PostConditionMode } from '@stacks/transactions';
+import {
+  makeUnsignedContractCall,
+  AnchorMode,
+  PostConditionMode,
+  StacksTransaction,
+} from '@stacks/transactions';
 import type { TxToBroadCast } from 'alex-sdk/dist/helpers/SwapHelper';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +24,7 @@ export type SwapConfirmationInput = {
   lpFeeFiatAmount?: number;
   address: string;
   routers: { image: ReactNode; name: string }[];
-  txToBroadcast: TxToBroadCast;
+  unsignedTx: StacksTransaction;
 };
 
 export function useConfirmSwap(
@@ -31,18 +36,8 @@ export function useConfirmSwap(
   return {
     ...input,
     onConfirm: async () => {
-      const tx = await makeUnsignedContractCall({
-        publicKey: stxPublicKey,
-        contractAddress: input.txToBroadcast.contractAddress,
-        contractName: input.txToBroadcast.contractName,
-        functionName: input.txToBroadcast.functionName,
-        functionArgs: input.txToBroadcast.functionArgs as any,
-        anchorMode: AnchorMode.Any,
-        postConditionMode: PostConditionMode.Deny,
-        postConditions: input.txToBroadcast.postConditions,
-      });
       const signed = await signTransaction(
-        tx,
+        input.unsignedTx,
         seedPhrase,
         selectedAccount?.id ?? 0,
         selectedNetwork
