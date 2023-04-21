@@ -5,8 +5,6 @@ import styled from 'styled-components';
 import BottomBar from '@components/tabBar';
 import SwapTokenBlock from '@screens/swap/swapTokenBlock';
 import ArrowDown from '@assets/img/swap/arrow_swap.svg';
-import useCoinsData from '@hooks/queries/useCoinData';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { useSwap } from '@screens/swap/useSwap';
 import { useState } from 'react';
 import { SwapInfoBlock } from '@screens/swap/swapInfoBlock';

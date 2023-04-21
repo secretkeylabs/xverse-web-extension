@@ -6,7 +6,6 @@ import {
 } from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import TokenImage from '@components/tokenImage';
 import { cloneElement, useState } from 'react';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 
@@ -53,8 +52,6 @@ const ProgressItemText = styled.p((props) => ({
   color: props.theme.colors.white[0],
   marginTop: props.theme.spacing(4),
 }));
-
-const mockData = ['STX', 'STX'];
 
 export default function RouteBlock({ swap }: { swap: SwapConfirmationInput }) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
