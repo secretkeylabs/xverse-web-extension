@@ -9,7 +9,7 @@ import FreesBlock from '@screens/swap/swapConfirmation/freesBlock';
 import RouteBlock from '@screens/swap/swapConfirmation/routeBlock';
 import StxInfoBlock from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { useCallback, useState } from 'react';
-import { useHref, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useConfirmSwap } from '@screens/swap/swapConfirmation/useConfirmSwap';
 
 const TitleText = styled.div((props) => ({
@@ -57,7 +57,7 @@ export default function SwapConfirmation() {
         <TitleText>{t('TOKEN_SWAP')}</TitleText>
         <StxInfoBlock type="transfer" swap={swap} />
         <StxInfoBlock type="receive" swap={swap} />
-        <FunctionBlock name={'token-swap'} />
+        <FunctionBlock name={swap.txToBroadcast.functionName} />
         <RouteBlock swap={swap} />
         <FreesBlock
           lpFee={swap.lpFeeAmount}

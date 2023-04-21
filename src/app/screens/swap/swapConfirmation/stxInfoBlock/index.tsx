@@ -7,7 +7,6 @@ import CopyIcon from '@assets/img/swap/copy.svg';
 import { getTruncatedAddress } from '@utils/helper';
 import { StyledToolTip } from '@components/accountRow';
 import { useCallback, useState } from 'react';
-import TokenImage from '@components/tokenImage';
 import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 
@@ -121,8 +120,8 @@ export default function StxInfoBlock({ type, swap }: StxInfoCardProps) {
   const [isCopied, setIsCopied] = useState(false);
   const [isFold, setIsFold] = useState(false);
   const copyId = `address-${type}`;
-  const onCopy = useCallback(() => {
-    void navigator.clipboard.writeText('address ......');
+  const onCopy = useCallback(async () => {
+    await navigator.clipboard.writeText(swap.address);
     setIsCopied(true);
   }, []);
   const token = type === 'transfer' ? swap.fromToken : swap.toToken;
