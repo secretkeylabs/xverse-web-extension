@@ -51,6 +51,7 @@ function ChangePasswordScreen() {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const { seedPhrase } = useWalletSelector();
   const { unlockWallet } = useWalletReducer();
@@ -67,10 +68,12 @@ function ChangePasswordScreen() {
 
   const handleConfirmCurrentPasswordNextClick = async () => {
     try {
+      setLoading(true);
       await unlockWallet(password);
       setPassword('');
       setError('');
       setCurrentStepIndex(1);
+      setLoading(false);
     } catch (e) {
       setError(t('CREATE_PASSWORD_SCREEN.INCORRECT_PASSWORD_ERROR'));
     }
@@ -118,6 +121,7 @@ function ChangePasswordScreen() {
           handleBack={handleBackButtonClick}
           passwordError={error}
           stackButtonAlignment
+          loading={loading}
         />
         )}
         {currentStepIndex === 1 && (
@@ -130,6 +134,7 @@ function ChangePasswordScreen() {
           handleBack={handleBackButtonClick}
           checkPasswordStrength
           stackButtonAlignment
+          createPasswordFlow
         />
         )}
         {currentStepIndex === 2 && (
