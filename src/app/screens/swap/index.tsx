@@ -51,6 +51,7 @@ function SwapScreen() {
   const swap = useSwap();
 
   const [selecting, setSelecting] = useState<'from' | 'to'>();
+  const [loading, setLoading] = useState(false);
 
   return (
     <>
@@ -94,7 +95,15 @@ function SwapScreen() {
           disabled={swap.onSwap == null}
           warning={!!swap.submitError}
           text={swap.submitError ?? t('CONTINUE')}
-          onPress={swap.onSwap!}
+          processing={loading}
+          onPress={async () => {
+            try {
+              setLoading(true);
+              await swap.onSwap?.();
+            } finally {
+              setLoading(false);
+            }
+          }}
         />
       </SendButtonContainer>
       <BottomBar tab="dashboard" />
