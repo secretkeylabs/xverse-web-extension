@@ -23,49 +23,28 @@ export function contractError(error: string) {
   };
 }
 
-export function offerRequest(offerMessage: string) {
+export function offerRequest(counterpartyWalletUrl: string) {
   return {
     type: actions.OfferRequestKey,
-    offerMessage,
+    counterpartyWalletUrl: counterpartyWalletUrl,
   };
 }
 
-export function acceptRequest(
-  contractId: string,
-  btcAddress: string,
-  btcPublicKey: string,
-  btcPrivateKey: string,
-  network: NetworkType,
-) {
+export function acceptRequest() {
   return {
     type: actions.AcceptRequestKey,
-    contractId,
-    btcAddress,
-    btcPublicKey,
-    btcPrivateKey,
-    network,
   };
 }
 
-export function signRequest(
-  contractId: string,
-  btcPrivateKey: string,
-  btcNetwork: NetworkType,
-  counterpartyWalletURL: string,
-) {
+export function signRequest() {
   return {
     type: actions.SignRequestKey,
-    contractId,
-    btcPrivateKey,
-    btcNetwork,
-    counterpartyWalletURL,
   };
 }
 
-export function rejectRequest(contractId: string) {
+export function rejectRequest() {
   return {
     type: actions.RejectRequestKey,
-    contractId,
   };
 }
 

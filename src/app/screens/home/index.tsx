@@ -135,25 +135,24 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
+  const { coinsList, stxAddress, btcAddress, ordinalsAddress, hasActivatedDLCsKey, network } =
+    useWalletSelector();
+  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
+    useStxWalletData();
   const {
-    coinsList,
-    stxAddress,
-    btcAddress,
-    ordinalsAddress,
-    hasActivatedDLCsKey,
-    network,
-  } = useWalletSelector();
-  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
-  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData, refetch } = useBtcWalletData();
+    isLoading: loadingBtcWalletData,
+    isRefetching: refetchingBtcWalletData,
+    refetch,
+  } = useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
   useFeeMultipliers();
   useCoinRates();
-  const btcClient = useBtcClient()
+  const btcClient = useBtcClient();
 
   useEffect(() => {
     refetch();
   }, []);
-  
+
   useAppConfig();
 
   const onReceiveModalOpen = () => {
@@ -220,7 +219,7 @@ function Home() {
     navigate('/buy/BTC');
   };
 
-  const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined }) => {
+  const handleTokenPressed = (token: { coin: CurrencyTypes; ft: string | undefined }) => {
     navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
   };
 
@@ -262,7 +261,6 @@ function Home() {
           <Icon src={MiaToken} />
           <Icon src={AddToken} />
         </IconRow>
-
       </ReceiveCardComponent>
     </ReceiveContainer>
   );
@@ -271,7 +269,14 @@ function Home() {
     <>
       <AccountHeaderComponent />
       <Container>
-        <BalanceCard isLoading={(loadingStxWalletData || loadingBtcWalletData) || (refetchingStxWalletData || refetchingBtcWalletData)} />
+        <BalanceCard
+          isLoading={
+            loadingStxWalletData ||
+            loadingBtcWalletData ||
+            refetchingStxWalletData ||
+            refetchingBtcWalletData
+          }
+        />
         <RowButtonContainer>
           <ButtonContainer>
             <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
@@ -312,8 +317,12 @@ function Home() {
           />
         </ColumnContainer>
 
-        {hasActivatedDLCsKey && network.type === 'Testnet' && (
-        <DLCActionButton src={DlcTab} text={t('DLCS')} onPress={handleDLCButtonClick} />
+        {hasActivatedDLCsKey && ['Testnet', 'Regtest'].includes(network.type) && (
+          <DLCActionButton
+            src={DlcTab}
+            text={t('BITCOIN_CONTRACTS')}
+            onPress={handleDLCButtonClick}
+          />
         )}
 
         <CoinContainer>

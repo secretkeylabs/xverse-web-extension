@@ -1,4 +1,4 @@
-import { getId, BroadcastContract, ContractState } from 'dlc-lib';
+import { getId, BroadcastContract, ContractState, AnyContract } from 'dlc-lib';
 import {
   DlcActions,
   DlcState,
@@ -14,8 +14,6 @@ import {
   UpdateKey,
   SelectKey,
 } from './actions/types';
-import { Transaction } from 'bitcoinjs-lib';
-import { getBtcTxStatusUrl } from '@utils/helper';
 
 const initialDlcState: DlcState = {
   contracts: [],
@@ -24,6 +22,7 @@ const initialDlcState: DlcState = {
   error: undefined,
   signingRequested: false,
   acceptMessageSubmitted: false,
+  counterpartyWalletUrl: undefined,
 };
 
 const dlcReducer = (
@@ -48,6 +47,9 @@ const dlcReducer = (
         processing: true,
         acceptMessageSubmitted: false,
         signingRequested: false,
+        error: undefined,
+        success: false,
+        counterpartyWalletUrl: action.counterpartyWalletUrl,
       };
     case AcceptRequestKey:
       return { ...state, processing: true, acceptMessageSubmitted: true };
@@ -56,53 +58,75 @@ const dlcReducer = (
     case SignRequestKey:
       return { ...state, processing: true, signingRequested: true };
     case ActionSuccessKey: {
+      const { contracts } = state;
+      let updatedContracts: AnyContract[] = [];
       const updatedContract = action.contract;
-      const newContracts = [...state.contracts];
-      // NOTE: This is what fails. Contract ID is born in the dlcAPI.acceptContract call in the saga file. So our tempID is no longer found in the array so things break.
-      const contractIndex = state.contracts.findIndex(
+
+      const existingContractIndex = contracts.findIndex(
         (c) =>
           getId(c) === getId(updatedContract) ||
           c.temporaryContractId === updatedContract.temporaryContractId
       );
-      if (contractIndex >= 0) newContracts[contractIndex] = updatedContract;
-      else newContracts.push(updatedContract);
-      const newState = {
+
+      updatedContracts =
+        existingContractIndex >= 0
+          ? contracts.map((c, index) => (index === existingContractIndex ? updatedContract : c))
+          : [...contracts, updatedContract];
+
+      const updatedContractID = getId(updatedContract);
+
+      return {
         ...state,
-        contracts: newContracts,
+        contracts: updatedContracts,
         processing: false,
         success: true,
         selectedContract: updatedContract,
-        currentId: getId(updatedContract),
+        currentId: updatedContractID,
       };
-      console.log('newState', newState);
-      return newState;
     }
     case ActionErrorKey: {
       const { error } = action;
-      let newContracts = state.contracts;
+      const { contracts } = state;
+      let updatedContracts: AnyContract[] = [];
       const updatedContract = error.contract;
+
       if (updatedContract) {
-        newContracts = [...state.contracts];
-        const contractIndex = state.contracts.findIndex((c) => getId(c) === getId(updatedContract));
-        if (contractIndex >= 0) newContracts[contractIndex] = updatedContract;
-        else newContracts.push(updatedContract);
+        const existingContractIndex = contracts.findIndex(
+          (c) => getId(c) === getId(updatedContract)
+        );
+        console.log(existingContractIndex);
+
+        updatedContracts =
+          existingContractIndex >= 0
+            ? contracts.map((c, index) => (index === existingContractIndex ? updatedContract : c))
+            : [...contracts, updatedContract];
       }
-      const newState = {
+
+      return {
         ...state,
-        contracts: newContracts,
+        contracts: updatedContracts,
         processing: false,
-        actionSuccess: false,
+        success: false,
         error: error.error,
       };
-      return newState;
     }
     case UpdateKey: {
+      const { contracts } = state;
+      let updatedContracts: AnyContract[] = [];
       const updatedContract = action.contract;
-      const newContracts = [...state.contracts];
-      const contractIndex = state.contracts.findIndex((c) => getId(c) === getId(updatedContract));
-      if (contractIndex >= 0) newContracts[contractIndex] = updatedContract;
-      else newContracts.push(updatedContract);
-      return { ...state, contracts: newContracts };
+
+      const existingContractIndex = contracts.findIndex(
+        (c) =>
+          getId(c) === getId(updatedContract) ||
+          c.temporaryContractId === updatedContract.temporaryContractId
+      );
+
+      updatedContracts =
+        existingContractIndex >= 0
+          ? contracts.map((c, index) => (index === existingContractIndex ? updatedContract : c))
+          : [...contracts, updatedContract];
+
+      return { ...state, contracts: updatedContracts };
     }
     case SelectKey: {
       const { contract } = action;

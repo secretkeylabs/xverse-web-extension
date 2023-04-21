@@ -26,7 +26,7 @@
     "MANAGE_TOKEN": "Manage token list",
     "STACKS_AND_TOKEN": "Stacks, tokens and NFTs",
     "ORDINALS": "Ordinals",
-    "DLCS": "DLCs"
+    "BITCOIN_CONTRACTS": "Bitcoin Contracts"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -372,8 +372,8 @@
     "TESTNET": "Testnet",
     "ORDINALS":"Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
-    "DLCS": "DLCs",
-    "ACTIVATE_DLCS": "Display DLCs (Testnet only)",
+    "BITCOIN_CONTRACTS": "Bitcoin Contracts",
+    "ACTIVATE_BITCOIN_CONTRACTS": "Display Bitcoin Contracts (Testnet/Regtest only)",
     "RECOVER_BTC": "Recover BTC in ordinal address",
     "RECOVER_ASSETS": "Recover assets"
   },

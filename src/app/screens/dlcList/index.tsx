@@ -17,6 +17,7 @@ import TokenTile from '@components/tokenTile';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import { CurrencyTypes } from '@utils/constants';
 import Theme from 'theme';
+import { ContractState } from 'dlc-lib';
 
 const HeaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -49,14 +50,14 @@ const DlcTableHeader = styled.thead((props) => ({
 const DlcTableHeaderRow = styled.tr((props) => ({}));
 
 const DlcTableHeaderDataNarrow = styled.th((props) => ({
-  width: '20%',
+  width: '12%',
   ...props.theme.body_xs,
   textAlign: 'center',
   color: 'white',
 }));
 
 const DlcTableHeaderDataWide = styled.th((props) => ({
-  width: '30%',
+  width: '28%',
   ...props.theme.body_xs,
   textAlign: 'center',
   color: 'white',
@@ -171,13 +172,16 @@ function DlcList(): JSX.Element {
               <DlcTableHeaderRow>
                 <DlcTableHeaderDataWide>ID</DlcTableHeaderDataWide>
                 <DlcTableHeaderDataWide>Collateral</DlcTableHeaderDataWide>
+                <DlcTableHeaderDataNarrow>State</DlcTableHeaderDataNarrow>
                 <DlcTableHeaderDataNarrow>Details</DlcTableHeaderDataNarrow>
                 <DlcTableHeaderDataNarrow>TX</DlcTableHeaderDataNarrow>
               </DlcTableHeaderRow>
             </DlcTableHeader>
-            {contracts.map((contract) => (
-              <DlcTableElement key={contract.temporaryContractId} contract={contract} />
-            ))}
+            {[...contracts]
+              .filter((contract) => contract.state !== ContractState.Offered)
+              .map((contract) => (
+                <DlcTableElement key={contract.temporaryContractId} contract={contract} />
+              ))}
           </DlcTable>
         ) : (
           <RowContainer>

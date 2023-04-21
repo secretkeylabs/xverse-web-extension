@@ -1,22 +1,12 @@
 import ChromeStorage from '@utils/storage';
-import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { createStore, combineReducers } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
-import DlcBitcoinBlockchain from 'app/dlcClasses/DlcBlockchain';
 import LocalRepository from 'app/dlcClasses/persistence/localRepository';
-import { ContractUpdater, DlcManager, DlcSigner } from 'dlc-lib';
-import DlcService from 'app/dlcClasses/DlcService';
-import createSagaMiddleware from '@redux-saga/core';
 import dlcReducer from './dlc/reducer';
 import walletReducer from './wallet/reducer';
 import NftDataStateReducer from './nftData/reducer';
-import rootSaga from './root/saga';
 
 export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
-const dlcStorage = new LocalRepository();
-const blockchain = new DlcBitcoinBlockchain();
-const dlcSigner = new DlcSigner();
-const contractUpdater = new ContractUpdater(dlcSigner, blockchain);
-const dlcManager = new DlcManager(contractUpdater, dlcStorage);
 
 const rootPersistConfig = {
   key: 'root',
@@ -30,10 +20,16 @@ const WalletPersistConfig = {
   blacklist: ['seedPhrase'],
 };
 
+const DlcPersistConfig = {
+  key: 'dlcState',
+  storage,
+  blacklist: ['selectedContract', 'currentId', 'counterpartyWalletUrl', 'success', 'error'],
+};
+
 const appReducer = combineReducers({
   walletState: persistReducer(WalletPersistConfig, walletReducer),
   nftDataState: NftDataStateReducer,
-  dlcState: dlcReducer,
+  dlcState: persistReducer(DlcPersistConfig, dlcReducer),
 });
 
 const rootReducer = (state: any, action: any) => appReducer(state, action);
@@ -43,13 +39,7 @@ const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
 export type StoreState = ReturnType<typeof rootReducer>;
 
 const rootStore = (() => {
-  const sagaMiddleware = createSagaMiddleware({
-    context: {
-      dlcService: new DlcService(dlcManager, dlcStorage),
-    },
-  });
-  const store = createStore(persistedReducer, applyMiddleware(sagaMiddleware));
-  sagaMiddleware.run(rootSaga);
+  const store = createStore(persistedReducer);
   const persistedStore = persistStore(store);
   return { store, persistedStore };
 })();

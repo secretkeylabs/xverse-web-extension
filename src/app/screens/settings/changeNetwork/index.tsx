@@ -88,7 +88,7 @@ const Button = styled.button({
 
 function ChangeNetworkScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
-  const { network, btcApiUrl, networkAddress } = useWalletSelector();
+  const { network, btcApiUrl, networkAddress, hasActivatedDLCsKey } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const [changedNetwork, setChangedNetwork] = useState<SettingsNetwork>(network);
   const [error, setError] = useState<string>('');
@@ -96,7 +96,7 @@ function ChangeNetworkScreen() {
   const [btcUrl, setBtcUrl] = useState(btcApiUrl || network.btcApiUrl);
   const [url, setUrl] = useState<string>(networkAddress || network.address);
   const [isChangingNetwork, setIsChangingNetwork] = useState<boolean>(false);
-  const [isUrlEdited, setIsUrlEdited ] = useState(false);
+  const [isUrlEdited, setIsUrlEdited] = useState(false);
   const navigate = useNavigate();
   const { changeNetwork } = useWalletReducer();
 
@@ -141,7 +141,8 @@ function ChangeNetworkScreen() {
     const isValidStacksUrl = await isValidURL(url);
     const isValidBtcApiUrl = await isValidBtcApi(btcUrl, network.type);
     if (isValidStacksUrl && isValidBtcApiUrl) {
-      const networkObject = changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
+      const networkObject =
+        changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
       const btcChangedUrl = isUrlEdited ? btcUrl : '';
       await changeNetwork(changedNetwork, networkObject, url, btcChangedUrl);
       navigate('/settings');
@@ -166,6 +167,14 @@ function ChangeNetworkScreen() {
           onNetworkSelected={onNetworkSelected}
           showDivider={false}
         />
+        {hasActivatedDLCsKey && (
+          <NetworkRow
+            network={initialNetworksList[2]}
+            isSelected={changedNetwork.type === 'Regtest'}
+            onNetworkSelected={onNetworkSelected}
+            showDivider={false}
+          />
+        )}
         <NodeInputHeader>
           <NodeText>{t('NODE')}</NodeText>
           <NodeResetButton onClick={onResetStacks}>Reset URL</NodeResetButton>

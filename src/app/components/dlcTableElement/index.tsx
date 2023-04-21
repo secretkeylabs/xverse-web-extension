@@ -29,6 +29,7 @@ export interface ContractSummary {
   id: string;
   collateral: number | undefined;
   fundingTx: string;
+  state: ContractState;
 }
 
 const truncateContractID = (contractID: string) => {
@@ -62,6 +63,7 @@ function DlcTableElement({ contract }: Props) {
       id: truncateContractID('id' in contract ? contract.id : contract.temporaryContractId),
       collateral: 'acceptParams' in contract ? contract.acceptParams.collateral : undefined,
       fundingTx: btcTxStatusUrl ? btcTxStatusUrl : '',
+      state: ContractState[contract.state],
     };
     setContractSummary(contractSummary);
   };
@@ -74,6 +76,7 @@ function DlcTableElement({ contract }: Props) {
     <DlcTableRow>
       <DlcTableData>{contractSummary?.id}</DlcTableData>
       <DlcTableData>{contractSummary?.collateral}</DlcTableData>
+      <DlcTableData>{contractSummary?.state}</DlcTableData>
       <DlcTableData>
         <ActionButton text="Details" transparent={true} onPress={() => onClick()}></ActionButton>
       </DlcTableData>
@@ -86,7 +89,7 @@ function DlcTableElement({ contract }: Props) {
           ></ActionButton>
         )}
       </DlcTableData>
-    </DlcTableRow>
+    </DlcTableRow>    
   );
 }
 

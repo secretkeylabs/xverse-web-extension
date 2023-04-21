@@ -1,31 +1,23 @@
-import { useEffect, useState } from 'react';
-// import ContractDetailTemplate from '../../templates/ContractDetailTemplate';
-import { useNavigate, useParams } from 'react-router-dom';
-import useBtcContracts from '@hooks/useBtcContracts';
-import { ContractState } from 'dlc-lib';
-import {
-  acceptRequest,
-  actionError,
-  offerRequest,
-  rejectRequest,
-  signRequest,
-} from '@stores/dlc/actions/actionCreators';
 import { StoreState } from '@stores/index';
+
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import styled from 'styled-components';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import useBtcContracts from '@hooks/useBtcContracts';
+
+import { ContractState } from 'dlc-lib';
+
+import styled from 'styled-components';
 import ActionButton from '@components/button';
-import {
-  getBtcNativeSegwitPrivateKey,
-  satsToBtc,
-  getBtcFiatEquivalent,
-} from '@secretkeylabs/xverse-core';
 import AccountHeaderComponent from '@components/accountHeader';
 import TokenImage from '@components/tokenImage';
-import BigNumber from 'bignumber.js';
+
+import { satsToBtc, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { NumericFormat } from 'react-number-format';
-import { useBtcWalletData } from '@hooks/queries/useBtcWalletData';
-import { Transaction } from 'bitcoinjs-lib';
+import BigNumber from 'bignumber.js';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -133,48 +125,49 @@ const ButtonContainer = styled.div((props) => ({
 }));
 
 function DlcOfferRequest() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { handleContracts, handleOffer, handleAccept, handleReject, handleSign } =
-    useBtcContracts();
   const { t } = useTranslation('translation', { keyPrefix: 'DLC_SCREEN' });
+  const { handleOffer, handleAccept, handleReject, handleSign } = useBtcContracts();
+
   const { offer, counterpartyWalletUrl } = useParams();
-  // counterpartyWalletUrl param is disabled for demo purposes
-  // const [currentCounterpartyWalletUrl, setCurrentCounterpartyWalletUrl] =
-  //   useState<string>();
-  const {
-    dlcBtcAddress,
-    dlcBtcPublicKey,
-    seedPhrase,
-    btcBalance,
-    network,
-    selectedAccount,
-    btcFiatRate,
-  } = useSelector((state: StoreState) => state.walletState);
-  const { refetch } = useBtcWalletData();
-
-  const {
-    processing,
-    success,
-    error,
-    currentId,
-    signingRequested,
-    acceptMessageSubmitted,
-    selectedContract,
-  } = useSelector((state: StoreState) => state.dlcState);
-
   const [contractMaturityBound, setContractMaturityBound] = useState<string>();
   const [usdEquivalent, setUsdEquivalent] = useState<string>();
   const [canAccept, setCanAccept] = useState(false);
+
+  const { btcBalance, btcFiatRate } = useSelector((state: StoreState) => state.walletState);
+  const { refetch } = useBtcWalletData();
+
+  const { processing, error, currentId, selectedContract } = useSelector(
+    (state: StoreState) => state.dlcState
+  );
+
+  function formatAndSetContractMaturityBound(contractMaturityBound: number): void {
+    console.log('contractMaturityBound', contractMaturityBound)
+    const formattedContractMaturityBound = new Date(contractMaturityBound * 1000).toLocaleString();
+    setContractMaturityBound(formattedContractMaturityBound);
+  }
+
+  function getAndSetUsdEquivalent(satsAmount: number): void {
+    const satsAmountAsBigNumber = new BigNumber(satsAmount);
+    const updatedUsdEquivalent = getBtcFiatEquivalent(satsAmountAsBigNumber, btcFiatRate)
+      .toFixed(2)
+      .toString();
+    setUsdEquivalent(updatedUsdEquivalent);
+  }
+
+  function calculateAndSetCanAccept(totalCollateral: number, offerorCollateral: number): void {
+    const btcCollateralAmount = totalCollateral - offerorCollateral;
+    const updatedCanAccept = Number(btcBalance) >= btcCollateralAmount;
+    setCanAccept(updatedCanAccept);
+  }
 
   useEffect(() => {
     refetch();
   }, []);
 
   useEffect(() => {
-    if (offer) {
-      console.log('inside useEffect')
-      handleOffer(offer);
+    if (offer && counterpartyWalletUrl) {
+      console.log(error)
+      handleOffer(offer, counterpartyWalletUrl);
     }
   }, [offer]);
 
@@ -182,74 +175,15 @@ function DlcOfferRequest() {
     if (!selectedContract || !btcBalance) {
       return;
     }
-    const updatedContractMaturityBound = new Date(
-      selectedContract.contractMaturityBound
-    ).toLocaleString();
-    setContractMaturityBound(updatedContractMaturityBound);
 
-    const satsAmount = new BigNumber(selectedContract.contractInfo.totalCollateral);
-    const updatedUsdEquivalent = getBtcFiatEquivalent(satsAmount, btcFiatRate)
-      .toFixed(2)
-      .toString();
-    setUsdEquivalent(updatedUsdEquivalent);
+    formatAndSetContractMaturityBound(selectedContract.contractMaturityBound);
+    getAndSetUsdEquivalent(selectedContract.contractInfo.totalCollateral);
+    calculateAndSetCanAccept(
+      selectedContract.contractInfo.totalCollateral,
+      selectedContract.offerParams.collateral
+    );
 
-    const btcCollateralAmount =
-      selectedContract.contractInfo.totalCollateral - selectedContract.offerParams.collateral;
-    const updatedCanAccept = Number(btcBalance) >= btcCollateralAmount;
-    setCanAccept(updatedCanAccept);
   }, [selectedContract, btcBalance]);
-
-  useEffect(() => {
-    if (error) {
-      console.error(error);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    if (processing) {
-      console.log('Processing...');
-    }
-  }, [processing]);
-
-  useEffect(() => {
-    if (
-      acceptMessageSubmitted &&
-      success &&
-      selectedContract?.state === ContractState.Accepted
-    ) {
-      signRequest(currentId!, dlcBtcPublicKey, network.type, counterpartyWalletUrl!);
-    }
-  }, [acceptMessageSubmitted, success, selectedContract]);
-
-  useEffect(() => {
-    if (signingRequested && success && selectedContract?.state === ContractState.Broadcast) {
-      const txID = Transaction.fromHex(selectedContract.dlcTransactions.fund).getId();
-      navigate('/tx-status', {
-        state: {
-          txid: txID,
-          currency: 'BTC',
-          error: '',
-          browserTx: true,
-        },
-      });
-      setTimeout(() => {
-        refetch();
-      }, 1000);
-    }
-  }, [signingRequested, success, selectedContract]);
-
-  useEffect(() => {
-    if (error) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          error: error,
-          browserTx: true,
-        },
-      });
-    }
-  }, [error]);
 
   return (
     <>
@@ -296,7 +230,11 @@ function DlcOfferRequest() {
                   />
                 </ButtonContainer>
                 <ButtonContainer>
-                  <ActionButton text={t('REJECT')} transparent onPress={() => handleReject(currentId!)} />
+                  <ActionButton
+                    text={t('REJECT')}
+                    transparent
+                    onPress={() => handleReject(currentId!)}
+                  />
                 </ButtonContainer>
               </>
             )}

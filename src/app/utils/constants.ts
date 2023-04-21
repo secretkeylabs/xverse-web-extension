@@ -44,6 +44,11 @@ export const initialNetworksList: SettingsNetwork[] = [
     address: HIRO_TESTNET_DEFAULT,
     btcApiUrl: BTC_BASE_URI_TESTNET,
   },
+  {
+    type: 'Regtest',
+    address: HIRO_TESTNET_DEFAULT,
+    btcApiUrl: '',
+  },
 ];
 
 /**

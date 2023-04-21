@@ -196,8 +196,8 @@ function Setting() {
           showDivider
         />
         <SettingComponent
-          title={t('DLCS')}
-          text={t('ACTIVATE_DLCS')}
+          title={t('BITCOIN_CONTRACTS')}
+          text={t('ACTIVATE_BITCOIN_CONTRACTS')}
           toggle
           toggleFunction={switchActivateDLCsState}
           toggleValue={hasActivatedDLCsKey}
