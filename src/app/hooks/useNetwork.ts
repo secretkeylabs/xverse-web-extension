@@ -9,7 +9,7 @@ const useNetworkSelector = () => {
     () => (network.type === 'Mainnet'
       ? new StacksMainnet({ url: networkAddress })
       : new StacksTestnet({ url: networkAddress })),
-    [network.type, network.address],
+    [network.type, networkAddress],
   );
   return selectedNetwork;
 };

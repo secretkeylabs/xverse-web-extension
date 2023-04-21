@@ -49,7 +49,7 @@ async function getMempoolTransactions({
   offset: number;
   limit: number;
 }): Promise<MempoolTransactionListResponse> {
-  const apiUrl = `${getNetworkURL(network)}/extended/v1/tx/mempool?address=${stxAddress}`;
+  const apiUrl = `${network.coreApiUrl}/extended/v1/tx/mempool?address=${stxAddress}`;
   const results = await axios.get<MempoolTransactionListResponse>(apiUrl, {
     timeout: API_TIMEOUT_MILLI,
     params: {
