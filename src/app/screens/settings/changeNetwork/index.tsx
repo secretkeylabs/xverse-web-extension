@@ -8,7 +8,7 @@ import { initialNetworksList } from '@utils/constants';
 import Cross from '@assets/img/settings/x.svg';
 import { useState } from 'react';
 import ActionButton from '@components/button';
-import { isValidBtcApi, isValidURL } from '@utils/helper';
+import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core/types';
 import useWalletReducer from '@hooks/useWalletReducer';
 import NetworkRow from './networkRow';
@@ -93,7 +93,7 @@ function ChangeNetworkScreen() {
   const [btcUrl, setBtcUrl] = useState(btcApiUrl || network.btcApiUrl);
   const [url, setUrl] = useState<string>(networkAddress || network.address);
   const [isChangingNetwork, setIsChangingNetwork] = useState<boolean>(false);
-  const [isUrlEdited, setIsUrlEdited ] = useState(false);
+  const [isUrlEdited, setIsUrlEdited] = useState(false);
   const navigate = useNavigate();
   const { changeNetwork } = useWalletReducer();
 
@@ -106,13 +106,17 @@ function ChangeNetworkScreen() {
     setUrl(networkSelected.address);
     setChangedNetwork(networkSelected);
     setBtcUrl(networkSelected.btcApiUrl);
+    setError('');
+    setBtcURLError('');
   };
 
   const onChangeStacksUrl = (event: React.FormEvent<HTMLInputElement>) => {
+    setError('');
     setUrl(event.currentTarget.value);
   };
 
   const onChangeBtcApiUrl = (event: React.FormEvent<HTMLInputElement>) => {
+    setBtcURLError('');
     setIsUrlEdited(true);
     setBtcUrl(event.currentTarget.value);
   };
@@ -126,24 +130,33 @@ function ChangeNetworkScreen() {
   };
 
   const onResetBtcUrl = async () => {
-    setBtcUrl(network.btcApiUrl);
+    if (changedNetwork.type !== network.type) {
+      setBtcUrl(changedNetwork.btcApiUrl);
+    } else {
+      setBtcUrl(network.btcApiUrl);
+    }
+    setBtcURLError('');
   };
 
   const onResetStacks = async () => {
-    setUrl(networkAddress || network.address);
+    if (changedNetwork.type !== network.type) {
+      setUrl(changedNetwork.address);
+    } else {
+      setUrl(networkAddress || network.address);
+    }
+    setError('');
   };
 
   const onSubmit = async () => {
     setIsChangingNetwork(true);
-    const isValidStacksUrl = await isValidURL(url);
-    const isValidBtcApiUrl = await isValidBtcApi(btcUrl, network.type);
+    const isValidStacksUrl = await isValidStacksApi(url, changedNetwork.type).catch((err) => setError(err.message));
+    const isValidBtcApiUrl = await isValidBtcApi(btcUrl, changedNetwork.type).catch((err) => setBtcURLError(err.message));
     if (isValidStacksUrl && isValidBtcApiUrl) {
       const networkObject = changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
       const btcChangedUrl = isUrlEdited ? btcUrl : '';
       await changeNetwork(changedNetwork, networkObject, url, btcChangedUrl);
       navigate('/settings');
-    } else if (!isValidStacksUrl) setError(t('INVALID_URL'));
-    else if (!isValidBtcApiUrl) setBtcURLError(t('INVALID_URL'));
+    }
     setIsChangingNetwork(false);
   };
 
