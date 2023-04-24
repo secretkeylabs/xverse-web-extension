@@ -3,7 +3,7 @@
     "browser": true,
     "es2021": true
   },
-  "extends": ["plugin:react/recommended", "airbnb", "airbnb-typescript", "airbnb/hooks"],
+  "extends": ["plugin:react/recommended", "airbnb", "airbnb-typescript", "airbnb/hooks", "plugin:@tanstack/eslint-plugin-query/recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -13,7 +13,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles"],
+  "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles", "@tanstack/query"],
   "rules": {
     "no-inline-styles/no-inline-styles": 2,
     "react/react-in-jsx-scope": "off",

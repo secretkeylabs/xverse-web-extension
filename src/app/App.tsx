@@ -1,6 +1,7 @@
 import { ThemeProvider } from 'styled-components';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import rootStore from '@stores/index';
@@ -17,6 +18,7 @@ function App(): JSX.Element {
     <>
       <GlobalStyle />
       <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
         <Provider store={rootStore.store}>
           <PersistGate persistor={rootStore.persistedStore} loading={<LoadingScreen />}>
             <ThemeProvider theme={Theme}>
