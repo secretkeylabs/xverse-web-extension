@@ -1,7 +1,6 @@
 import ChromeStorage from '@utils/storage';
 import { createStore, combineReducers } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
-import LocalRepository from 'app/dlcClasses/persistence/localRepository';
 import dlcReducer from './dlc/reducer';
 import walletReducer from './wallet/reducer';
 import NftDataStateReducer from './nftData/reducer';

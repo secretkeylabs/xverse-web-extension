@@ -1,17 +1,16 @@
 import { StoreState } from '@stores/index';
 
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import useBtcContracts from '@hooks/useBtcContracts';
 
 import styled from 'styled-components';
 import ActionButton from '@components/button';
 import AccountHeaderComponent from '@components/accountHeader';
 import TokenImage from '@components/tokenImage';
 
-import { satsToBtc, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { satsToBtc } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import { ContractState } from 'dlc-lib';
@@ -19,7 +18,7 @@ import { ContractState } from 'dlc-lib';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: auto;
   margin-left: 16px;
   margin-right: 16px;
   overflow-y: auto;
@@ -78,14 +77,6 @@ const AmountText = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
-const CurrencyText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
-  marginLeft: props.theme.spacing(16),
-  color: props.theme.colors.white['200'],
-}));
-
 const AlertText = styled.i((props) => ({
   textAlign: 'justify',
   ...props.theme.body_xs,
@@ -125,38 +116,18 @@ const ButtonContainer = styled.div((props) => ({
 function DlcOfferRequest() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'DLC_SCREEN' });
-  const { handleOffer, handleAccept, handleReject, handleSign } = useBtcContracts();
 
-  const { offer, counterpartyWalletUrl } = useParams();
   const [contractMaturityBound, setContractMaturityBound] = useState<string>();
-  const [usdEquivalent, setUsdEquivalent] = useState<string>();
-  const [canAccept, setCanAccept] = useState(false);
 
-  const { btcBalance, btcFiatRate } = useSelector((state: StoreState) => state.walletState);
   const { refetch } = useBtcWalletData();
 
-  const { processing, error, currentId, selectedContract } = useSelector(
+  const { selectedContract } = useSelector(
     (state: StoreState) => state.dlcState
   );
 
   function formatAndSetContractMaturityBound(contractMaturityBound: number): void {
-    console.log('contractMaturityBound', contractMaturityBound);
     const formattedContractMaturityBound = new Date(contractMaturityBound * 1000).toLocaleString();
     setContractMaturityBound(formattedContractMaturityBound);
-  }
-
-  function getAndSetUsdEquivalent(satsAmount: number): void {
-    const satsAmountAsBigNumber = new BigNumber(satsAmount);
-    const updatedUsdEquivalent = getBtcFiatEquivalent(satsAmountAsBigNumber, btcFiatRate)
-      .toFixed(2)
-      .toString();
-    setUsdEquivalent(updatedUsdEquivalent);
-  }
-
-  function calculateAndSetCanAccept(totalCollateral: number, offerorCollateral: number): void {
-    const btcCollateralAmount = totalCollateral - offerorCollateral;
-    const updatedCanAccept = Number(btcBalance) >= btcCollateralAmount;
-    setCanAccept(updatedCanAccept);
   }
 
   function handleBack(): void {
@@ -168,24 +139,12 @@ function DlcOfferRequest() {
   }, []);
 
   useEffect(() => {
-    if (offer && counterpartyWalletUrl) {
-      console.log(error);
-      handleOffer(offer, counterpartyWalletUrl);
-    }
-  }, [offer]);
-
-  useEffect(() => {
-    if (!selectedContract || !btcBalance) {
+    if (!selectedContract) {
       return;
     }
 
     formatAndSetContractMaturityBound(selectedContract.contractMaturityBound);
-    getAndSetUsdEquivalent(selectedContract.contractInfo.totalCollateral);
-    calculateAndSetCanAccept(
-      selectedContract.contractInfo.totalCollateral,
-      selectedContract.offerParams.collateral
-    );
-  }, [selectedContract, btcBalance]);
+  }, [selectedContract]);
 
   return (
     <>

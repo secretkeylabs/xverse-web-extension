@@ -240,7 +240,11 @@ const router = createHashRouter([
       },
       {
         path: 'dlc-offer-request/:offer/:counterpartyWalletUrl',
-        element: <DlcOfferRequest />,
+        element: (
+          <AuthGuard>
+            <DlcOfferRequest />
+          </AuthGuard>
+        ),
       },
       {
         path: 'dlc-details',

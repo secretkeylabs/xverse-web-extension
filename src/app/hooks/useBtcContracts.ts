@@ -31,8 +31,6 @@ const useBtcContracts = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [isRegtest, setIsRegtest] = useState(false);
-
   const blockchain = new EsploraBlockchain(
     (txid: string) => btcClient.getRawTransaction(txid),
     (txHex: string) => btcClient.sendRawTransaction(txHex),
@@ -82,7 +80,6 @@ const useBtcContracts = () => {
       const contract = await dlcService.processContractOffer(offer);
       dispatch(actionSuccess(contract));
     } catch (error) {
-      console.log(error, 'error');
       dispatch(actionError({ error: `HandleOffer Effect Failure: ${error}` }));
     }
   }

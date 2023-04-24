@@ -126,6 +126,8 @@ const ButtonContainer = styled.div((props) => ({
 
 function DlcOfferRequest() {
   const { t } = useTranslation('translation', { keyPrefix: 'DLC_SCREEN' });
+  const navigate = useNavigate();
+
   const { handleOffer, handleAccept, handleReject, handleSign } = useBtcContracts();
 
   const { offer, counterpartyWalletUrl } = useParams();
@@ -133,15 +135,17 @@ function DlcOfferRequest() {
   const [usdEquivalent, setUsdEquivalent] = useState<string>();
   const [canAccept, setCanAccept] = useState(false);
 
-  const { btcBalance, btcFiatRate } = useSelector((state: StoreState) => state.walletState);
+  const { btcBalance, btcFiatRate, network } = useSelector(
+    (state: StoreState) => state.walletState
+  );
   const { refetch } = useBtcWalletData();
 
-  const { processing, error, currentId, selectedContract } = useSelector(
+  const { processing, currentId, selectedContract } = useSelector(
     (state: StoreState) => state.dlcState
   );
 
   function formatAndSetContractMaturityBound(contractMaturityBound: number): void {
-    console.log('contractMaturityBound', contractMaturityBound)
+    console.log('contractMaturityBound', contractMaturityBound);
     const formattedContractMaturityBound = new Date(contractMaturityBound * 1000).toLocaleString();
     setContractMaturityBound(formattedContractMaturityBound);
   }
@@ -165,10 +169,21 @@ function DlcOfferRequest() {
   }, []);
 
   useEffect(() => {
-    if (offer && counterpartyWalletUrl) {
-      console.log(error)
-      handleOffer(offer, counterpartyWalletUrl);
+    if (!offer || !counterpartyWalletUrl) {
+      return;
     }
+    if (['Testnet', 'Regtest'].includes(network.type)) {
+      handleOffer(offer, counterpartyWalletUrl);
+      return;
+    }
+    navigate('/tx-status', {
+      state: {
+        txid: '',
+        currency: 'BTC',
+        error: 'Change network to Testnet or Regtest to use this feature.',
+        browserTx: true,
+      },
+    });
   }, [offer]);
 
   useEffect(() => {
@@ -182,7 +197,6 @@ function DlcOfferRequest() {
       selectedContract.contractInfo.totalCollateral,
       selectedContract.offerParams.collateral
     );
-
   }, [selectedContract, btcBalance]);
 
   return (

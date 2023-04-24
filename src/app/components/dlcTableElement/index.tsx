@@ -11,13 +11,24 @@ import ActionButton from '@components/button';
 import { getBtcTxStatusUrl } from '@utils/helper';
 
 const DlcTableRow = styled.tr((props) => ({
-  width: '100%',
   height: 64,
 }));
 
-const DlcTableData = styled.td((props) => ({
+const DlcTableDataNarrow = styled.td((props) => ({
+  width: '8%',
   ...props.theme.body_xs,
+  alignContent: 'center',
   textAlign: 'left',
+  paddingLeft: props.theme.spacing(2),
+  color: props.theme.colors.white['200'],
+}));
+
+const DlcTableDataWide = styled.td((props) => ({
+  width: '28%',
+  ...props.theme.body_xs,
+  alignContent: 'center',
+  textAlign: 'left',
+  paddingLeft: props.theme.spacing(2),
   color: props.theme.colors.white['200'],
 }));
 
@@ -74,22 +85,18 @@ function DlcTableElement({ contract }: Props) {
 
   return (
     <DlcTableRow>
-      <DlcTableData>{contractSummary?.id}</DlcTableData>
-      <DlcTableData>{contractSummary?.collateral}</DlcTableData>
-      <DlcTableData>{contractSummary?.state}</DlcTableData>
-      <DlcTableData>
-        <ActionButton text="Details" transparent={true} onPress={() => onClick()}></ActionButton>
-      </DlcTableData>
-      <DlcTableData>
+      <DlcTableDataWide>{contractSummary?.id}</DlcTableDataWide>
+      <DlcTableDataWide>{contractSummary?.collateral}</DlcTableDataWide>
+      <DlcTableDataWide>{contractSummary?.state}</DlcTableDataWide>
+      <DlcTableDataNarrow>
+        <ActionButton text="Info" transparent={true} onPress={() => onClick()}></ActionButton>
+      </DlcTableDataNarrow>
+      <DlcTableDataNarrow>
         {contractSummary?.fundingTx && (
-          <ActionButton
-            text="TX"
-            transparent={true}
-            onPress={() => openNewTab()}
-          ></ActionButton>
+          <ActionButton text="TX" transparent={true} onPress={() => openNewTab()}></ActionButton>
         )}
-      </DlcTableData>
-    </DlcTableRow>    
+      </DlcTableDataNarrow>
+    </DlcTableRow>
   );
 }
 

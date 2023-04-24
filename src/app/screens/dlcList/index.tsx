@@ -41,25 +41,31 @@ const TableContainer = styled.div((props) => ({
 
 const DlcTable = styled.table(() => ({}));
 
-const DlcTableHeader = styled.thead((props) => ({
-  width: '100%',
+const DlcTableHeaderRow = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginLeft: props.theme.spacing(8),
+  marginRight: props.theme.spacing(8),
   height: '32px',
-  backgroundColor: props.theme.colors.background.elevation3,
+  backgroundColor: props.theme.colors.background.elevation6,
 }));
 
-const DlcTableHeaderRow = styled.tr((props) => ({}));
-
-const DlcTableHeaderDataNarrow = styled.th((props) => ({
-  width: '12%',
+const DlcTableHeaderDataNarrow = styled.div((props) => ({
+  width: '8%',
   ...props.theme.body_xs,
-  textAlign: 'center',
+  alignContent: 'center',
+  textAlign: 'left',
+  paddingLeft: props.theme.spacing(2),
   color: 'white',
 }));
 
-const DlcTableHeaderDataWide = styled.th((props) => ({
+const DlcTableHeaderDataWide = styled.div((props) => ({
   width: '28%',
   ...props.theme.body_xs,
-  textAlign: 'center',
+  alignContent: 'center',
+  textAlign: 'left',
+  paddingLeft: props.theme.spacing(2),
   color: 'white',
 }));
 
@@ -165,30 +171,32 @@ function DlcList(): JSX.Element {
           />
         </ColumnContainer>
       </HeaderContainer>
-      <TableContainer>
-        {contracts.length !== 0 ? (
-          <DlcTable>
-            <DlcTableHeader>
-              <DlcTableHeaderRow>
-                <DlcTableHeaderDataWide>ID</DlcTableHeaderDataWide>
-                <DlcTableHeaderDataWide>Collateral</DlcTableHeaderDataWide>
-                <DlcTableHeaderDataNarrow>State</DlcTableHeaderDataNarrow>
-                <DlcTableHeaderDataNarrow>Details</DlcTableHeaderDataNarrow>
-                <DlcTableHeaderDataNarrow>TX</DlcTableHeaderDataNarrow>
-              </DlcTableHeaderRow>
-            </DlcTableHeader>
-            {[...contracts]
-              .filter((contract) => contract.state !== ContractState.Offered)
-              .map((contract) => (
-                <DlcTableElement key={contract.temporaryContractId} contract={contract} />
-              ))}
-          </DlcTable>
-        ) : (
-          <RowContainer>
-            <DlcInfoText>{t('NO_DLC')}</DlcInfoText>
-          </RowContainer>
-        )}
-      </TableContainer>
+
+      {contracts.length !== 0 ? (
+        <>
+          <DlcTableHeaderRow>
+            <DlcTableHeaderDataWide>ID</DlcTableHeaderDataWide>
+            <DlcTableHeaderDataWide>Collateral</DlcTableHeaderDataWide>
+            <DlcTableHeaderDataWide>State</DlcTableHeaderDataWide>
+            <DlcTableHeaderDataNarrow>Info</DlcTableHeaderDataNarrow>
+            <DlcTableHeaderDataNarrow>TX</DlcTableHeaderDataNarrow>
+          </DlcTableHeaderRow>
+          <TableContainer>
+            <DlcTable>
+              {[...contracts]
+                .filter((contract) => contract.state !== ContractState.Offered)
+                .map((contract) => (
+                  <DlcTableElement key={contract.temporaryContractId} contract={contract} />
+                ))}
+            </DlcTable>
+          </TableContainer>
+        </>
+      ) : (
+        <RowContainer>
+          <DlcInfoText>{t('NO_DLC')}</DlcInfoText>
+        </RowContainer>
+      )}
+
       <BottomTabBar tab="dlc" />
     </>
   );

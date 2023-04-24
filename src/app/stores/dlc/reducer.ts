@@ -94,7 +94,6 @@ const dlcReducer = (
         const existingContractIndex = contracts.findIndex(
           (c) => getId(c) === getId(updatedContract)
         );
-        console.log(existingContractIndex);
 
         updatedContracts =
           existingContractIndex >= 0
