@@ -51,6 +51,7 @@ const initialWalletState: WalletState = {
   coins: [],
   feeMultipliers: null,
   networkAddress: undefined,
+  btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
@@ -160,8 +161,7 @@ const walletReducer = (
         ...state,
         network: action.network,
         networkAddress: action.networkAddress,
-        selectedAccount: null,
-        accountsList: [],
+        btcApiUrl: action.btcApiUrl,
       };
     case GetActiveAccountsKey:
       return {
