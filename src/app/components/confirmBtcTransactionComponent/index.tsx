@@ -320,7 +320,7 @@ function ConfirmBtcTransactionComponent({
           <TransactionDetailComponent
             title={t('CONFIRM_TRANSACTION.FEES')}
             value={`${currentFee.toString()} ${t('SATS')}`}
-            subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
+            subValue={getBtcFiatEquivalent(new BigNumber(currentFee), btcFiatRate)}
           />
           <Button onClick={onAdvancedSettingClick}>
             <>
@@ -350,13 +350,19 @@ function ConfirmBtcTransactionComponent({
             text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={onCancelClick}
-            disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+            disabled={
+              loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+            }
           />
         </TransparentButtonContainer>
         <ActionButton
           text={t('CONFIRM_TRANSACTION.CONFIRM')}
-          disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
-          processing={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+          disabled={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
+          processing={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>
