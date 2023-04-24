@@ -19,10 +19,17 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
-import { hashMessage } from '@secretkeylabs/xverse-core';
+import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
+import BottomModal from '@components/bottomModal';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import LedgerConnectDefault from '@assets/img/ledger/ledger_connect_default.svg';
+import ActionButton from '@components/button';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { ledgerDelay } from '@common/utils/ledger';
+import { signatureVrsToRsv } from '@stacks/common';
 
 const MainContainer = styled.div((props) => ({
   display: 'flex',
@@ -104,15 +111,31 @@ const ActionDisclaimer = styled.p((props) => ({
   marginBottom: props.theme.spacing(8),
 }));
 
+const SuccessActionsContainer = styled.div((props) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(20),
+  marginTop: props.theme.spacing(20),
+}));
+
 function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation');
   const [isSigning, setIsSigning] = useState<boolean>(false);
   const [showHash, setShowHash] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState<boolean>(false);
+  const [isConnectFailed, setIsConnectFailed] = useState<boolean>(false);
+  const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
+  const [isTxRejected, setIsTxRejected] = useState<boolean>(false);
   const { selectedAccount, accountsList, network } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
-  const {
-    messageType, request, payload, tabId, domain,
-  } = useSignatureRequest();
+  const { messageType, request, payload, tabId, domain } = useSignatureRequest();
   const navigate = useNavigate();
   const switchAccountBasedOnRequest = () => {
     if (getNetworkType(payload.network) !== network.type) {
@@ -163,6 +186,10 @@ function SignatureRequest(): JSX.Element {
   const confirmCallback = async () => {
     try {
       setIsSigning(true);
+      if (selectedAccount?.isLedgerAccount) {
+        setIsModalVisible(true);
+        return;
+      }
       const signature = await handleMessageSigning({
         message: payload.message,
         domain: domain || undefined,
@@ -177,6 +204,49 @@ function SignatureRequest(): JSX.Element {
     }
   };
 
+  const handleConnectAndConfirm = async () => {
+    if (!selectedAccount) {
+      console.error('No account selected');
+      return;
+    }
+    setIsButtonDisabled(true);
+
+    const transport = await Transport.create();
+
+    if (!transport) {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+      setIsButtonDisabled(false);
+      return;
+    }
+
+    setIsConnectSuccess(true);
+    await ledgerDelay(1500);
+    setCurrentStepIndex(1);
+
+    try {
+      const signature = await signStxMessage(transport, payload.message, selectedAccount.id);
+      const rsvSignature = signatureVrsToRsv(signature.signatureVRS.toString('hex'));
+      const data = {
+        signature: rsvSignature,
+        publicKey: selectedAccount.stxPublicKey,
+      };
+      if (signature) {
+        finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data });
+      }
+    } catch (e) {
+      console.error(e);
+      setIsTxRejected(true);
+      setIsButtonDisabled(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    setIsTxRejected(false);
+    setIsConnectSuccess(false);
+    setCurrentStepIndex(0);
+  };
+
   return (
     <ConfirmScreen
       onConfirm={confirmCallback}
@@ -189,21 +259,21 @@ function SignatureRequest(): JSX.Element {
       <MainContainer>
         <RequestImage src={SignatureIcon} alt="Signature" width={80} />
         <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
-        <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
+        <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${
+          payload.appDetails?.name
+        }`}</RequestSource>
         {isUtf8Message(messageType) && (
-          <SignatureRequestMessage
-            request={payload as SignaturePayload}
-          />
+          <SignatureRequestMessage request={payload as SignaturePayload} />
         )}
         {isStructuredMessage(messageType) && (
-          <SignatureRequestStructuredData
-            payload={payload as StructuredDataSignaturePayload}
-          />
+          <SignatureRequestStructuredData payload={payload as StructuredDataSignaturePayload} />
         )}
         <ShowHashButtonContainer>
           <Seperator />
           <ShowHashButton onClick={handleShowHash}>
-            {showHash ? t('SIGNATURE_REQUEST.HIDE_HASH_BUTTON') : t('SIGNATURE_REQUEST.SHOW_HASH_BUTTON')}
+            {showHash
+              ? t('SIGNATURE_REQUEST.HIDE_HASH_BUTTON')
+              : t('SIGNATURE_REQUEST.SHOW_HASH_BUTTON')}
             <img src={showHash ? Minus : Plus} alt="Show" />
           </ShowHashButton>
           <Seperator />
@@ -217,6 +287,46 @@ function SignatureRequest(): JSX.Element {
         <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
         <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
       </MainContainer>
+      <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+        {currentStepIndex === 0 ? (
+          <LedgerConnectionView
+            title={t('SIGNATURE_REQUEST.LEDGER.CONNECT.TITLE')}
+            text={t('SIGNATURE_REQUEST.LEDGER.CONNECT.SUBTITLE')}
+            titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_TITLE')}
+            textFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_SUBTITLE')}
+            imageDefault={LedgerConnectDefault}
+            isConnectSuccess={isConnectSuccess}
+            isConnectFailed={isConnectFailed}
+          />
+        ) : currentStepIndex === 1 ? (
+          <LedgerConnectionView
+            title={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.TITLE')}
+            text={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.SUBTITLE')}
+            titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_TITLE')}
+            textFailed={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE')}
+            imageDefault={LedgerConnectDefault}
+            isConnectSuccess={isTxApproved}
+            isConnectFailed={isTxRejected}
+          />
+        ) : null}
+        <SuccessActionsContainer>
+          <ActionButton
+            onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+            text={t(
+              isTxRejected || isConnectFailed
+                ? 'SIGNATURE_REQUEST.LEDGER.RETRY_BUTTON'
+                : 'SIGNATURE_REQUEST.LEDGER.CONNECT_BUTTON'
+            )}
+            disabled={isButtonDisabled}
+            processing={isButtonDisabled}
+          />
+          <ActionButton
+            onPress={cancelCallback}
+            text={t('SIGNATURE_REQUEST.LEDGER.CANCEL_BUTTON')}
+            transparent
+          />
+        </SuccessActionsContainer>
+      </BottomModal>
     </ConfirmScreen>
   );
 }

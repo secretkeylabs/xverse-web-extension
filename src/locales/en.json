@@ -195,7 +195,31 @@
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed please contact the developer of the requesting app for support",
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
     "YOU_WILL_TRANSFER": "You will transfer",
-    "YOU_WILL_RECEIVE": "You will receive"
+    "YOU_WILL_RECEIVE": "You will receive",
+    "LEDGER": {
+      "CONNECT": {
+        "TITLE": "Connect your hardware wallet",
+        "SUBTITLE": "To continue, plug and unlock your device.",
+        "ERROR_TITLE": "Connection error",
+        "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+      },
+      "CONFIRM": {
+        "TITLE": "Confirm the transaction",
+        "SUBTITLE": "Authorise the transaction on your device to continue.",
+        "ERROR_TITLE": "Transaction denied",
+        "ERROR_SUBTITLE": "The transaction have been rejected. You can try again or close this tab."
+      },
+      "SUCCESS": {
+        "TITLE": "Transaction confirmed",
+        "SUBTITLE": "Your transaction have been successfully broadcasted. You can close this tab."
+      },
+      "CONFIRM_BUTTON": "Confirm",
+      "CONNECT_BUTTON": "Connect",
+      "CLOSE_BUTTON": "Close",
+      "CANCEL_BUTTON": "Cancel",
+      "SEE_TRANSACTION_BUTTON": "See transaction",
+      "RETRY_BUTTON": "Try again"
+    }
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
@@ -285,7 +309,30 @@
     "TITLE": "Connection",
     "REQUEST_TOOLTIP": "Requested by",
     "CONNECT_BUTTON": "Connect",
-    "CANCEL_BUTTON": "Cancel"
+    "CANCEL_BUTTON": "Cancel",
+    "LEDGER": {
+      "CONNECT": {
+        "TITLE": "Connect your hardware wallet",
+        "SUBTITLE": "To continue, plug and unlock your device.",
+        "ERROR_TITLE": "Connection error",
+        "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+      },
+      "CONFIRM": {
+        "TITLE": "Confirm the signature",
+        "SUBTITLE": "Authorise the signature on your device to continue.",
+        "ERROR_TITLE": "Signature denied",
+        "ERROR_SUBTITLE": "The signatures has been rejected. You can try again or close this tab."
+      },
+      "SUCCESS": {
+        "TITLE": "Signature confirmed",
+        "SUBTITLE": "This transaction will be broadcasted by the sponsor."
+      },
+      "CONFIRM_BUTTON": "Confirm",
+      "CONNECT_BUTTON": "Connect",
+      "CLOSE_BUTTON": "Close",
+      "CANCEL_BUTTON": "Cancel",
+      "RETRY_BUTTON": "Try again"
+    }
   },
   "LOGIN_SCREEN": {
     "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",
@@ -542,7 +589,30 @@
     "ACTION_DISCLAIMER": "No transactions will be broadcasted and no fees will be applied.",
     "SIGNING_WARNING": "By signing this message, you prove that you are the owner of an account without broadcasting any on chain transactions. This signature cannot be used to send transactions on your behalf. You should only sign messages you trust.",
     "SIGN_BUTTON": "Sign",
-    "CANCEL_BUTTON": "Cancel"
+    "CANCEL_BUTTON": "Cancel",
+    "LEDGER": {
+      "CONNECT": {
+        "TITLE": "Connect your hardware wallet",
+        "SUBTITLE": "To continue, plug and unlock your device.",
+        "ERROR_TITLE": "Connection error",
+        "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+      },
+      "CONFIRM": {
+        "TITLE": "Confirm the signature",
+        "SUBTITLE": "Authorise the signature on your device to continue.",
+        "ERROR_TITLE": "Signature denied",
+        "ERROR_SUBTITLE": "The signatures has been rejected. You can try again or close this tab."
+      },
+      "SUCCESS": {
+        "TITLE": "Signature confirmed",
+        "SUBTITLE": "This transaction will be broadcasted by the sponsor."
+      },
+      "CONFIRM_BUTTON": "Confirm",
+      "CONNECT_BUTTON": "Connect",
+      "CLOSE_BUTTON": "Close",
+      "CANCEL_BUTTON": "Cancel",
+      "RETRY_BUTTON": "Try again"
+    }
   },
   "ERROR_SCREEN": {
     "TITLE": "Xverse crashed unexpectedly",
