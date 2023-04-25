@@ -18,6 +18,7 @@ interface PasswordInputProps {
   checkPasswordStrength? : boolean;
   stackButtonAlignment? : boolean;
   loading?: boolean;
+  createPasswordFlow?: boolean;
 }
 
 interface StrengthBarProps {
@@ -160,6 +161,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
     checkPasswordStrength,
     stackButtonAlignment = false,
     loading,
+    createPasswordFlow,
   } = props;
 
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
@@ -193,7 +195,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   useEffect(() => {
     if (passwordError) { setError(passwordError); return; }
-    if (enteredPassword && enteredPassword.length <= PasswordStrength.WEAK) { setError(t('PASSWORD_STRENGTH_ERROR')); return; }
+    if (enteredPassword && createPasswordFlow && enteredPassword.length <= PasswordStrength.WEAK) { setError(t('PASSWORD_STRENGTH_ERROR')); return; }
     setError('');
   }, [passwordError, enteredPassword]);
 
@@ -280,7 +282,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         <HeaderText>{title}</HeaderText>
       </HeaderContainer>
       <PasswordInputLabel>{inputLabel}</PasswordInputLabel>
-      <PasswordInputContainer hasError={!!error || (enteredPassword !== '' && enteredPassword.length <= PasswordStrength.WEAK)}>
+      <PasswordInputContainer hasError={!!error || (createPasswordFlow && (enteredPassword !== '' && enteredPassword.length <= PasswordStrength.WEAK))}>
         <Input
           type={isPasswordVisible ? 'text' : 'password'}
           value={enteredPassword}

@@ -56,6 +56,7 @@ function Setting() {
   const [showResetWalletPrompt, setShowResetWalletPrompt] = useState<boolean>(false);
   const [showResetWalletDisplay, setShowResetWalletDisplay] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const {
     fiatCurrency, network, hasActivatedOrdinalsKey,
@@ -65,7 +66,6 @@ function Setting() {
   const { unlockWallet, resetWallet } = useWalletReducer();
   const {
     unspentUtxos,
-    isLoading,
   } = useNonOrdinalUtxos();
 
   const openTermsOfService = () => {
@@ -131,10 +131,12 @@ function Setting() {
   };
   const handlePasswordNextClick = async () => {
     try {
+      setLoading(true);
       await unlockWallet(password);
       setPassword('');
       setError('');
       handleResetWallet();
+      setLoading(false);
     } catch (e) {
       setError(t('INCORRECT_PASSWORD_ERROR'));
     }
@@ -153,6 +155,7 @@ function Setting() {
           handleBack={goToSettingScreen}
           passwordError={error}
           stackButtonAlignment
+          loading={loading}
         />
       </ResetWalletContainer>
       )}
