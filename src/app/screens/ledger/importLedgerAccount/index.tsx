@@ -272,7 +272,10 @@ function ImportLedger(): JSX.Element {
       0,
       newAddressIndex
     );
-    setStacksCredentials({ address: testnetAddress, publicKey });
+    setStacksCredentials({
+      address: network.type === 'Mainnet' ? address : testnetAddress,
+      publicKey,
+    });
     await transport.close();
   };
 
