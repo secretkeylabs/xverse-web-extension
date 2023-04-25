@@ -132,14 +132,18 @@ export function checkNftExists(
   return false;
 }
 
-export async function isValidURL(str: string): Promise<boolean> {
-  if (validUrl.isUri(str)) {
-    const response = await getStacksInfo(str);
+export async function isValidStacksApi(url: string, type: NetworkType): Promise<boolean> {
+  const networkChainId = type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet;
+  if (validUrl.isUri(url)) {
+    const response = await getStacksInfo(url);
     if (response) {
+      if (response.network_id !== networkChainId) {
+        throw new Error('URL not compatible with current Network');
+      }
       return true;
     }
   }
-  return false;
+  throw new Error('Invalid URL');
 }
 
 export async function isValidBtcApi(url: string, network: NetworkType) {
@@ -153,7 +157,7 @@ export async function isValidBtcApi(url: string, network: NetworkType) {
       return true;
     }
   }
-  return false;
+  throw new Error('Invalid URL');
 }
 
 export const getNetworkType = (stxNetwork) =>

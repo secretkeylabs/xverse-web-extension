@@ -281,84 +281,92 @@ function ConfirmBtcTransactionComponent({
   }, [errorSigningNonOrdial]);
 
   return (
-    <OuterContainer>
-      {!isGalleryOpen && (
+    <>
+      <OuterContainer>
+        {!isGalleryOpen && (
         <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
-      )}
-      <Container>
-        {children}
-        <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
-          {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
-        </ReviewTransactionText>
-
-        {ordinalTxUtxo ? (
-          <BtcRecipientComponent
-            address={recipients[0]?.address}
-            value={assetDetail!}
-            icon={AssetIcon}
-            title={t('CONFIRM_TRANSACTION.ASSET')}
-          />
-        ) : (
-          recipients?.map((recipient, index) => (
-            <BtcRecipientComponent
-              recipientIndex={index + 1}
-              address={recipient?.address}
-              value={satsToBtc(recipient?.amountSats).toString()}
-              totalRecipient={recipients?.length}
-              icon={IconBitcoin}
-              title={t('CONFIRM_TRANSACTION.AMOUNT')}
-              subValue={getBtcFiatEquivalent(
-                recipient?.amountSats,
-                btcFiatRate,
-              )}
-            />
-          ))
         )}
+        <Container>
+          {children}
+          <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
+            {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
+          </ReviewTransactionText>
 
-        <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-        <TransactionDetailComponent
-          title={t('CONFIRM_TRANSACTION.FEES')}
-          value={`${currentFee.toString()} ${t('SATS')}`}
-          subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
-        />
-        <Button onClick={onAdvancedSettingClick}>
-          <>
-            <ButtonImage src={SettingIcon} />
-            <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
-          </>
-        </Button>
-        <TransactionSettingAlert
-          visible={openTransactionSettingModal}
-          fee={currentFee.toString()}
-          type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
-          btcRecipients={recipients}
-          onApplyClick={onApplyClick}
-          onCrossClick={closeTransactionSettingAlert}
-          nonOrdinalUtxos={nonOrdinalUtxos}
-          loading={loading}
-          isRestoreFlow={isRestoreFundFlow}
-        />
-      </Container>
-      <ErrorContainer>
-        <ErrorText>{error}</ErrorText>
-      </ErrorContainer>
+          {ordinalTxUtxo ? (
+            <BtcRecipientComponent
+              address={recipients[0]?.address}
+              value={assetDetail!}
+              icon={AssetIcon}
+              title={t('CONFIRM_TRANSACTION.ASSET')}
+            />
+          ) : (
+            recipients?.map((recipient, index) => (
+              <BtcRecipientComponent
+                recipientIndex={index + 1}
+                address={recipient?.address}
+                value={satsToBtc(recipient?.amountSats).toString()}
+                totalRecipient={recipients?.length}
+                icon={IconBitcoin}
+                title={t('CONFIRM_TRANSACTION.AMOUNT')}
+                subValue={getBtcFiatEquivalent(
+                  recipient?.amountSats,
+                  btcFiatRate,
+                )}
+              />
+            ))
+          )}
+
+          <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
+          <TransactionDetailComponent
+            title={t('CONFIRM_TRANSACTION.FEES')}
+            value={`${currentFee.toString()} ${t('SATS')}`}
+            subValue={getBtcFiatEquivalent(new BigNumber(currentFee), btcFiatRate)}
+          />
+          <Button onClick={onAdvancedSettingClick}>
+            <>
+              <ButtonImage src={SettingIcon} />
+              <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
+            </>
+          </Button>
+          <TransactionSettingAlert
+            visible={openTransactionSettingModal}
+            fee={currentFee.toString()}
+            type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
+            btcRecipients={recipients}
+            onApplyClick={onApplyClick}
+            onCrossClick={closeTransactionSettingAlert}
+            nonOrdinalUtxos={nonOrdinalUtxos}
+            loading={loading}
+            isRestoreFlow={isRestoreFundFlow}
+          />
+        </Container>
+        <ErrorContainer>
+          <ErrorText>{error}</ErrorText>
+        </ErrorContainer>
+      </OuterContainer>
       <ButtonContainer>
         <TransparentButtonContainer>
           <ActionButton
             text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={onCancelClick}
-            disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+            disabled={
+              loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+            }
           />
         </TransparentButtonContainer>
         <ActionButton
           text={t('CONFIRM_TRANSACTION.CONFIRM')}
-          disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
-          processing={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+          disabled={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
+          processing={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>
-    </OuterContainer>
+    </>
   );
 }
 

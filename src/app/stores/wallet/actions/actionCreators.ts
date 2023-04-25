@@ -173,7 +173,7 @@ export function ChangeFiatCurrencyAction(fiatCurrency: SupportedCurrency): actio
 
 export function ChangeNetworkAction(
   network: SettingsNetwork,
-  networkAddress: string,
+  networkAddress: string | undefined,
   btcApiUrl: string,
 ): actions.ChangeNetwork {
   return {

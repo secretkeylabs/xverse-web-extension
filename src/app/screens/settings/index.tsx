@@ -54,12 +54,15 @@ function Setting() {
   const [showResetWalletPrompt, setShowResetWalletPrompt] = useState<boolean>(false);
   const [showResetWalletDisplay, setShowResetWalletDisplay] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const { fiatCurrency, network, hasActivatedOrdinalsKey, hasActivatedDLCsKey } = useWalletSelector();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { unlockWallet, resetWallet } = useWalletReducer();
-  const { unspentUtxos, isLoading } = useNonOrdinalUtxos();
+  const {
+    unspentUtxos,
+  } = useNonOrdinalUtxos();
 
   const openTermsOfService = () => {
     window.open(TERMS_LINK);
@@ -128,10 +131,12 @@ function Setting() {
   };
   const handlePasswordNextClick = async () => {
     try {
+      setLoading(true);
       await unlockWallet(password);
       setPassword('');
       setError('');
       handleResetWallet();
+      setLoading(false);
     } catch (e) {
       setError(t('INCORRECT_PASSWORD_ERROR'));
     }
@@ -139,19 +144,20 @@ function Setting() {
 
   return (
     <>
-      {showResetWalletDisplay && (
-        <ResetWalletContainer>
-          <PasswordInput
-            title={t('ENTER_PASSWORD')}
-            inputLabel={t('PASSWORD')}
-            enteredPassword={password}
-            setEnteredPassword={setPassword}
-            handleContinue={handlePasswordNextClick}
-            handleBack={goToSettingScreen}
-            passwordError={error}
-            stackButtonAlignment
-          />
-        </ResetWalletContainer>
+      { showResetWalletDisplay && (
+      <ResetWalletContainer>
+        <PasswordInput
+          title={t('ENTER_PASSWORD')}
+          inputLabel={t('PASSWORD')}
+          enteredPassword={password}
+          setEnteredPassword={setPassword}
+          handleContinue={handlePasswordNextClick}
+          handleBack={goToSettingScreen}
+          passwordError={error}
+          stackButtonAlignment
+          loading={loading}
+        />
+      </ResetWalletContainer>
       )}
       <LogoContainer>
         <img src={XverseLogo} alt="xverse logo" />
@@ -203,7 +209,7 @@ function Setting() {
           toggleValue={hasActivatedDLCsKey}
           showDivider
         />
-        {!isLoading && unspentUtxos && unspentUtxos?.length > 0 && (
+        {!loading && unspentUtxos && unspentUtxos?.length > 0 && (
           <SettingComponent
           text={t('RECOVER_ASSETS')}
           onClick={onRestoreFundClick}
