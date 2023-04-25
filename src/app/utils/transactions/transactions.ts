@@ -1,4 +1,5 @@
 import { BtcTransactionData, StacksNetwork } from '@secretkeylabs/xverse-core';
+import { getNetworkURL } from '@secretkeylabs/xverse-core/api/helper';
 import { API_TIMEOUT_MILLI } from '@secretkeylabs/xverse-core/constant';
 import {
   AddressTransactionWithTransfers,
@@ -24,7 +25,9 @@ export async function getTransferTransactions(reqParams: {
   const {
     stxAddress, limit, network, offset,
   } = reqParams;
-  const apiUrl = `${network.coreApiUrl}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
+  const apiUrl = `${getNetworkURL(
+    network,
+  )}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
   const response = await axios.get<PaginatedResults<AddressTransactionWithTransfers>>(apiUrl, {
     params: {
       limit,

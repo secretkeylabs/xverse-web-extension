@@ -13,7 +13,7 @@ const useAppConfig = () => {
       const response = await getAppConfig();
       if (response.data.btcApiURL && network.type === 'Mainnet' && !btcApiUrl) {
         const updatedNetwork = { ...network, btcApiUrl: response.data.btcApiURL };
-        dispatch(ChangeNetworkAction(updatedNetwork, networkAddress || '', ''));
+        dispatch(ChangeNetworkAction(updatedNetwork, networkAddress, ''));
       }
       return response;
     } catch (err) {

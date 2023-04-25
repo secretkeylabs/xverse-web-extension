@@ -162,7 +162,7 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
-  networkAddress: string;
+  networkAddress: string | undefined;
   btcApiUrl: string;
 }
 
