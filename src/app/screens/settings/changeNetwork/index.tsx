@@ -86,7 +86,7 @@ const Button = styled.button({
 
 function ChangeNetworkScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
-  const { network, btcApiUrl, networkAddress, hasActivatedDLCsKey } = useWalletSelector();
+  const { network, btcApiUrl, networkAddress } = useWalletSelector();
   const [changedNetwork, setChangedNetwork] = useState<SettingsNetwork>(network);
   const [error, setError] = useState<string>('');
   const [btcURLError, setBtcURLError] = useState('');
@@ -177,14 +177,12 @@ function ChangeNetworkScreen() {
           onNetworkSelected={onNetworkSelected}
           showDivider={false}
         />
-        {hasActivatedDLCsKey && (
           <NetworkRow
             network={initialNetworksList[2]}
             isSelected={changedNetwork.type === 'Regtest'}
             onNetworkSelected={onNetworkSelected}
             showDivider={false}
           />
-        )}
         <NodeInputHeader>
           <NodeText>{t('NODE')}</NodeText>
           <NodeResetButton onClick={onResetStacks}>Reset URL</NodeResetButton>
