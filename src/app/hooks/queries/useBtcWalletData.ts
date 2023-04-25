@@ -5,15 +5,20 @@ import { BtcAddressData } from '@secretkeylabs/xverse-core/types';
 import { SetBtcWalletDataAction } from '@stores/wallet/actions/actionCreators';
 import useBtcClient from '@hooks/useBtcClient';
 import useWalletSelector from '../useWalletSelector';
+import { useLocation } from 'react-router-dom';
 
 export const useBtcWalletData = () => {
   const dispatch = useDispatch();
-  const { btcAddress } = useWalletSelector();
+  const { btcAddress, dlcBtcAddress, network } = useWalletSelector();
+  const location = useLocation();
   const btcClient = useBtcClient();
+  const address = location.pathname.startsWith('/dlc') || location.pathname.endsWith('nested')
+    ? dlcBtcAddress
+    : btcAddress;
 
   const fetchBtcWalletData = async () => {
     try {
-      const btcData: BtcAddressData = await btcClient.getBalance(btcAddress);
+      const btcData: BtcAddressData = await btcClient.getBalance(address);
       const btcBalance = new BigNumber(btcData.finalBalance);
       dispatch(SetBtcWalletDataAction(btcBalance));
       return btcData;
@@ -23,7 +28,7 @@ export const useBtcWalletData = () => {
   };
 
   return useQuery({
-    queryKey: [`wallet-data-${btcAddress}`],
+    queryKey: [`wallet-data-${address}`],
     refetchOnWindowFocus: true,
     queryFn: fetchBtcWalletData,
   });

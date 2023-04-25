@@ -25,28 +25,36 @@ const Button = styled.button({
   backgroundColor: 'transparent',
 });
 
-type Tab = 'dashboard' | 'nft' | 'stacking' | 'settings';
+type Tab = 'dashboard' | 'nft' | 'dlc' | 'stacking' | 'settings';
 
 interface Props {
-  tab: Tab
+  tab: Tab;
 }
-function BottomTabBar({ tab }:Props) {
+function BottomTabBar({ tab }: Props) {
   const navigate = useNavigate();
 
   const handleDashboardButtonClick = () => {
-    if (tab !== 'dashboard') { navigate('/'); }
+    if (tab !== 'dashboard') {
+      navigate('/');
+    }
   };
 
   const handleNftButtonClick = () => {
-    if (tab !== 'nft') { navigate('/nft-dashboard'); }
+    if (tab !== 'nft') {
+      navigate('/nft-dashboard');
+    }
   };
 
   const handleStackingButtonClick = () => {
-    if (tab !== 'stacking') { navigate('/stacking'); }
+    if (tab !== 'stacking') {
+      navigate('/stacking');
+    }
   };
 
   const handleSettingButtonClick = () => {
-    if (tab !== 'settings') { navigate('/settings'); }
+    if (tab !== 'settings') {
+      navigate('/settings');
+    }
   };
 
   return (

@@ -25,7 +25,8 @@
     "BUY": "Buy",
     "MANAGE_TOKEN": "Manage token list",
     "STACKS_AND_TOKEN": "Stacks, tokens and NFTs",
-    "ORDINALS": "Ordinals"
+    "ORDINALS": "Ordinals",
+    "BITCOIN_CONTRACTS": "Bitcoin Contracts"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -113,6 +114,15 @@
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive"
+  },
+  "DLC_SCREEN": {
+    "SEND_TO_MAIN": "Send to Main",
+    "RECEIVE_FROM_MAIN": "Receive from Main",
+    "NO_DLC": "There is no contract to show!",
+    "BITCOIN": "Bitcoin",
+    "ACCEPT": "Lock BTC",
+    "REJECT": "Reject Offer",
+    "BACK": "Back"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
@@ -362,6 +372,9 @@
     "TESTNET": "Testnet",
     "ORDINALS":"Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
+    "BITCOIN_CONTRACTS": "Bitcoin Contracts",
+    "ACTIVATE_BITCOIN_CONTRACTS": "Display Bitcoin Contracts (Testnet/Regtest only)",
+    "RECOVER_BTC": "Recover BTC in ordinal address",
     "RECOVER_ASSETS": "Recover assets"
   },
   "OPTIONS_DIALOG": {
@@ -475,6 +488,8 @@
     "RECEIVING_ORDINALS": "Receiving Ordinals",
     "RECEIVING_ORDINAL_INFO": "Use this address to receive Ordinals only. Do not use this address to receive Bitcoin payments.",
     "RECEIVING_BTC": "Receiving Bitcoin",
+    "RECEIVING_DLC_BTC": "Receiving Bitcoin to DLC Address",
+    "RECEIVING_DLC_BTC_INFO": "Please only use this address to receive Bitcoin payments for DLC transactions. This address should not be used for receiving payments for Ordinals.",
     "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"

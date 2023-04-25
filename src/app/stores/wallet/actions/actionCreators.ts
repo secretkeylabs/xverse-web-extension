@@ -73,8 +73,10 @@ export function selectAccount(
   selectedAccount: Account,
   stxAddress: string,
   btcAddress: string,
+  dlcBtcAddress: string,
   ordinalsAddress: string,
   masterPubKey: string,
+  dlcBtcPublicKey: string,
   stxPublicKey: string,
   btcPublicKey: string,
   ordinalsPublicKey: string,
@@ -87,8 +89,10 @@ export function selectAccount(
     selectedAccount,
     stxAddress,
     btcAddress,
+    dlcBtcAddress,
     ordinalsAddress,
     masterPubKey,
+    dlcBtcPublicKey,
     stxPublicKey,
     btcPublicKey,
     ordinalsPublicKey,
@@ -193,6 +197,13 @@ export function ChangeActivateOrdinalsAction(hasActivatedOrdinalsKey: boolean): 
   return {
     type: actions.ChangeHasActivatedOrdinalsKey,
     hasActivatedOrdinalsKey,
+  };
+}
+
+export function ChangeActivateDLCsAction(hasActivatedDLCsKey: boolean): actions.ChangeActivateDLCs {
+  return {
+    type: actions.ChangeHasActivatedDLCsKey,
+    hasActivatedDLCsKey,
   };
 }
 

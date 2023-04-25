@@ -32,7 +32,7 @@ function getOriginFromPort(port: chrome.runtime.Port) {
 
 function makeSearchParamsWithDefaults(
   port: chrome.runtime.Port,
-  otherParams: [string, string][] = [],
+  otherParams: [string, string][] = []
 ) {
   const urlParams = new URLSearchParams();
   // All actions must have a corresponding `origin` and `tabId`

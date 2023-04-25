@@ -137,7 +137,7 @@ function ConfirmBtcTransactionComponent({
   const [loading, setLoading] = useState(false);
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
-    btcAddress, selectedAccount, seedPhrase, network, btcFiatRate,
+    btcAddress, dlcBtcAddress, selectedAccount, seedPhrase, network, btcFiatRate,
   } = useSelector(
     (state: StoreState) => state.walletState,
   );

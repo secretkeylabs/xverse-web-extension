@@ -39,6 +39,10 @@ import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import SignatureRequest from '@screens/signatureRequest';
 import TransactionRequest from '@screens/transactionRequest';
 import ErrorBoundary from '@screens/error';
+import DlcList from '@screens/dlcList';
+import DlcOfferRequest from '@screens/dlcOffer';
+import DlcDetails from '@screens/dlcDetails';
+import SendBtcPrefilledScreen from '@screens/sendBtcPrefilled';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
 import SendOrdinal from '@screens/sendOrdinal';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
@@ -97,6 +101,10 @@ const router = createHashRouter([
       {
         path: 'send-btc',
         element: <SendBtcScreen />,
+      },
+      {
+        path: 'send-btc-prefilled/:r',
+        element: <SendBtcPrefilledScreen />,
       },
       {
         path: 'confirm-stx-tx',
@@ -229,6 +237,22 @@ const router = createHashRouter([
             <SignatureRequest />
           </AuthGuard>
         ),
+      },
+      {
+        path: 'dlc-offer-request/:offer/:counterpartyWalletUrl',
+        element: (
+          <AuthGuard>
+            <DlcOfferRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'dlc-details',
+        element: <DlcDetails />,
+      },
+      {
+        path: 'dlc-list',
+        element: <DlcList />,
       },
       {
         path: 'send-ordinal',

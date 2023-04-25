@@ -1,6 +1,7 @@
 import ChromeStorage from '@utils/storage';
 import { createStore, combineReducers } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
+import dlcReducer from './dlc/reducer';
 import walletReducer from './wallet/reducer';
 import NftDataStateReducer from './nftData/reducer';
 
@@ -9,7 +10,7 @@ export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
 const rootPersistConfig = {
   key: 'root',
   storage,
-  blacklist: ['nftDataState', 'walletState'],
+  blacklist: ['nftDataState', 'walletState', 'dlcState'],
 };
 
 const WalletPersistConfig = {
@@ -18,9 +19,16 @@ const WalletPersistConfig = {
   blacklist: ['seedPhrase'],
 };
 
+const DlcPersistConfig = {
+  key: 'dlcState',
+  storage,
+  blacklist: ['selectedContract', 'currentId', 'counterpartyWalletUrl', 'success', 'error'],
+};
+
 const appReducer = combineReducers({
   walletState: persistReducer(WalletPersistConfig, walletReducer),
   nftDataState: NftDataStateReducer,
+  dlcState: persistReducer(DlcPersistConfig, dlcReducer),
 });
 
 const rootReducer = (state: any, action: any) => appReducer(state, action);

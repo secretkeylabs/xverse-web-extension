@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import AddToken from '@assets/img/dashboard/add_token.svg';
@@ -33,7 +33,10 @@ import useCoinsData from '@hooks/queries/useCoinData';
 import useAppConfig from '@hooks/queries/useAppConfig';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
+import DLCActionButton from '@components/dlcButton';
+import DlcTab from '@assets/img/bottomTabBar/dlc_tab.svg';
 import BalanceCard from './balanceCard';
+import useBtcClient from '@hooks/useBtcClient';
 
 const Container = styled.div`
   display: flex;
@@ -132,12 +135,24 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { coinsList, stxAddress, btcAddress, ordinalsAddress } = useWalletSelector();
-  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
-  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
+  const { coinsList, stxAddress, btcAddress, ordinalsAddress, hasActivatedDLCsKey, network } =
+    useWalletSelector();
+  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
+    useStxWalletData();
+  const {
+    isLoading: loadingBtcWalletData,
+    isRefetching: refetchingBtcWalletData,
+    refetch,
+  } = useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
   useFeeMultipliers();
   useCoinRates();
+  const btcClient = useBtcClient();
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
   useAppConfig();
 
   const onReceiveModalOpen = () => {
@@ -204,8 +219,12 @@ function Home() {
     navigate('/buy/BTC');
   };
 
-  const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined }) => {
+  const handleTokenPressed = (token: { coin: CurrencyTypes; ft: string | undefined }) => {
     navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
+  };
+
+  const handleDLCButtonClick = () => {
+    navigate('/dlc-list');
   };
 
   const onOrdinalsReceivePress = () => {
@@ -242,7 +261,6 @@ function Home() {
           <Icon src={MiaToken} />
           <Icon src={AddToken} />
         </IconRow>
-
       </ReceiveCardComponent>
     </ReceiveContainer>
   );
@@ -251,7 +269,14 @@ function Home() {
     <>
       <AccountHeaderComponent />
       <Container>
-        <BalanceCard isLoading={(loadingStxWalletData || loadingBtcWalletData) || (refetchingStxWalletData || refetchingBtcWalletData)} />
+        <BalanceCard
+          isLoading={
+            loadingStxWalletData ||
+            loadingBtcWalletData ||
+            refetchingStxWalletData ||
+            refetchingBtcWalletData
+          }
+        />
         <RowButtonContainer>
           <ButtonContainer>
             <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
@@ -291,6 +316,14 @@ function Home() {
             onPress={handleTokenPressed}
           />
         </ColumnContainer>
+
+        {hasActivatedDLCsKey && ['Testnet', 'Regtest'].includes(network.type) && (
+          <DLCActionButton
+            src={DlcTab}
+            text={t('BITCOIN_CONTRACTS')}
+            onPress={handleDLCButtonClick}
+          />
+        )}
 
         <CoinContainer>
           {coinsList

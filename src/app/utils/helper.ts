@@ -1,12 +1,20 @@
 import {
-  Account, StxMempoolTransactionData, SettingsNetwork, NetworkType,
+  Account,
+  StxMempoolTransactionData,
+  SettingsNetwork,
+  NetworkType,
 } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
 import BigNumber from 'bignumber.js';
 import { ChainID } from '@stacks/transactions';
-import { BTC_TRANSACTION_STATUS_URL, TRANSACTION_STATUS_URL, BTC_TRANSACTION_TESTNET_STATUS_URL } from './constants';
+import {
+  BTC_TRANSACTION_STATUS_URL,
+  TRANSACTION_STATUS_URL,
+  BTC_TRANSACTION_TESTNET_STATUS_URL,
+  BTC_TRANSACTION_REGTEST_STATUS_URL,
+} from './constants';
 
 const validUrl = require('valid-url');
 
@@ -21,7 +29,7 @@ export function ftDecimals(value: number | string | BigNumber, decimals: number)
 
 export function convertAmountToFtDecimalPlaces(
   value: number | string | BigNumber,
-  decimals: number,
+  decimals: number
 ): number {
   const amount = initBigNumber(value);
   return amount.shiftedBy(+decimals).toNumber();
@@ -55,25 +63,21 @@ export function getTicker(name: string) {
 
 export function getTruncatedAddress(address: string) {
   if (address) {
-    return `${address.substring(0, 4)}...${address.substring(
-      address.length - 4,
-      address.length,
-    )}`;
+    return `${address.substring(0, 4)}...${address.substring(address.length - 4, address.length)}`;
   }
 }
 
 export function getShortTruncatedAddress(address: string) {
   if (address) {
-    return `${address.substring(0, 8)}...${address.substring(
-      address.length - 8,
-      address.length,
-    )}`;
+    return `${address.substring(0, 8)}...${address.substring(address.length - 8, address.length)}`;
   }
 }
 
 export function getAddressDetail(account: Account) {
   if (account) {
-    return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(account.stxAddress)}`;
+    return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(
+      account.stxAddress
+    )}`;
   }
   return '';
 }
@@ -87,10 +91,16 @@ export function getStxTxStatusUrl(transactionId: string, currentNetwork: Setting
 }
 
 export function getBtcTxStatusUrl(txId: string, network: SettingsNetwork) {
-  if (network.type === 'Testnet') {
-    return `${BTC_TRANSACTION_TESTNET_STATUS_URL}${txId}`;
+  switch (network.type) {
+    case 'Mainnet':
+      return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
+    case 'Testnet':
+      return `${BTC_TRANSACTION_TESTNET_STATUS_URL}${txId}`;
+    case 'Regtest':
+      return `${BTC_TRANSACTION_REGTEST_STATUS_URL}${txId}`;
+    default:
+      return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
   }
-  return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
 }
 
 export function getFetchableUrl(uri: string, protocol: string): string | undefined {
@@ -110,13 +120,13 @@ export function getFetchableUrl(uri: string, protocol: string): string | undefin
  */
 export function checkNftExists(
   pendingTransactions: StxMempoolTransactionData[],
-  nft: NftData,
+  nft: NftData
 ): boolean {
   const principal: string[] = nft?.fully_qualified_token_id?.split('::');
   const transaction = pendingTransactions.find(
-    (tx) => tx.contractCall?.contract_id === principal[0]
-      && tx.contractCall.function_args[0].repr.substring(1)
-      === nft.token_id.toString(),
+    (tx) =>
+      tx.contractCall?.contract_id === principal[0] &&
+      tx.contractCall.function_args[0].repr.substring(1) === nft.token_id.toString()
   );
   if (transaction) return true;
   return false;
@@ -150,4 +160,5 @@ export async function isValidBtcApi(url: string, network: NetworkType) {
   throw new Error('Invalid URL');
 }
 
-export const getNetworkType = (stxNetwork) => (stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet');
+export const getNetworkType = (stxNetwork) =>
+  stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';

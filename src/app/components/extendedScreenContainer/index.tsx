@@ -41,6 +41,7 @@ function ExtendedScreenContainer(): JSX.Element {
   const { t } = useTranslation('translation');
   const [dontShowOrdinalReceiveAlert, setDontShowOrdinalReceiveAlert] = useState<boolean>(false);
   const [dontShowBtcReceiveAlert, setDontShowBtcReceiveAlert] = useState<boolean>(false);
+
   const dispatch = useDispatch();
 
   const onReceiveAlertClose = () => {

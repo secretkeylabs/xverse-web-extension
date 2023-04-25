@@ -152,7 +152,8 @@ function ChangeNetworkScreen() {
     const isValidStacksUrl = await isValidStacksApi(url, changedNetwork.type).catch((err) => setError(err.message));
     const isValidBtcApiUrl = await isValidBtcApi(btcUrl, changedNetwork.type).catch((err) => setBtcURLError(err.message));
     if (isValidStacksUrl && isValidBtcApiUrl) {
-      const networkObject = changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
+      const networkObject =
+        changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
       const btcChangedUrl = isUrlEdited ? btcUrl : '';
       await changeNetwork(changedNetwork, networkObject, url, btcChangedUrl);
       navigate('/settings');
@@ -176,6 +177,12 @@ function ChangeNetworkScreen() {
           onNetworkSelected={onNetworkSelected}
           showDivider={false}
         />
+          <NetworkRow
+            network={initialNetworksList[2]}
+            isSelected={changedNetwork.type === 'Regtest'}
+            onNetworkSelected={onNetworkSelected}
+            showDivider={false}
+          />
         <NodeInputHeader>
           <NodeText>{t('NODE')}</NodeText>
           <NodeResetButton onClick={onResetStacks}>Reset URL</NodeResetButton>

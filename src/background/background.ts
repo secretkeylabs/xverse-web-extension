@@ -6,6 +6,8 @@ import {
 } from '@common/utils/legacy-external-message-handler';
 import { CONTENT_SCRIPT_PORT } from '@common/types/message-types';
 import type { LegacyMessageFromContentScript } from '@common/types/message-types';
+import popupCenter from '@common/utils/popup-center';
+import RequestsRoutes from '@common/utils/route-urls';
 
 function deleteTimer(port) {
   if (port._timer) {
@@ -36,4 +38,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   void internalBackgroundMessageHandler(message, sender, sendResponse);
   // Listener fn must return `true` to indicate the response will be async
   return true;
+});
+
+export interface RequestInterface {
+  action: 'dlc.offerRequest';
+  data: {
+    offer: string;
+    counterpartyWalletUrl: string;
+  };
+}
+
+chrome.runtime.onMessageExternal.addListener(async function (
+  request: RequestInterface,
+  sender,
+  sendResponse
+) {
+  switch (request.action) {
+    case 'dlc.offerRequest': {
+      console.log('[BG script]: request.data:', request.data);
+      const offerURI = encodeURIComponent(JSON.stringify(request.data.offer));
+      const counterpartyWalletUrlURI = encodeURIComponent(request.data.counterpartyWalletUrl);
+      const url = `/popup.html#${RequestsRoutes.DlcGetOfferRequest}/${offerURI}/${counterpartyWalletUrlURI}`;
+      await popupCenter({
+        url,
+      });
+      break;
+    }
+  }
+  sendResponse({ success: true });
 });

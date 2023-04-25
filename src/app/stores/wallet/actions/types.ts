@@ -36,14 +36,18 @@ export const SetCoinDataKey = 'SetCoinDataKey';
 
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 
+export const ChangeHasActivatedDLCsKey = 'ChangeHasActivatedDLCsKey';
+
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
+  dlcBtcAddress: string;
   ordinalsAddress: string;
   masterPubKey: string;
+  dlcBtcPublicKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
   ordinalsPublicKey: string;
@@ -64,7 +68,25 @@ export interface WalletState {
   coins: Coin[];
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
+  btcApiUrl: '';
   hasActivatedOrdinalsKey: boolean | undefined;
+  hasActivatedDLCsKey: boolean | undefined;
+  showBtcReceiveAlert: boolean | null;
+  showOrdinalReceiveAlert: boolean | null;
+}
+
+export interface WalletData {
+  stxAddress: string;
+  btcAddress: string;
+  dlcBtcAddress: string;
+  masterPubKey: string;
+  dlcBtcPublicKey: string;
+  stxPublicKey: string;
+  btcPublicKey: string;
+  seedPhrase: string;
+  networkAddress: string | undefined;
+  hasActivatedOrdinalsKey: boolean | undefined;
+  hasActivatedDLCsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
   btcApiUrl: string;
@@ -116,8 +138,10 @@ export interface SelectAccount {
   selectedAccount: Account | null;
   stxAddress: string;
   btcAddress: string;
+  dlcBtcAddress: string;
   ordinalsAddress: string;
   masterPubKey: string;
+  dlcBtcPublicKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
   ordinalsPublicKey: string;
@@ -176,6 +200,11 @@ export interface ChangeActivateOrdinals {
   hasActivatedOrdinalsKey: boolean;
 }
 
+export interface ChangeActivateDLCs {
+  type: typeof ChangeHasActivatedDLCsKey;
+  hasActivatedDLCsKey: boolean;
+}
+
 export interface ChangeShowBtcReceiveAlert {
   type: typeof ChangeShowBtcReceiveAlertKey;
   showBtcReceiveAlert: boolean | null;
@@ -206,5 +235,6 @@ export type WalletActions =
   | ChangeNetwork
   | GetActiveAccounts
   | ChangeActivateOrdinals
+  | ChangeActivateDLCs
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert;

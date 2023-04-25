@@ -22,6 +22,7 @@ import {
   SetStxWalletDataKey,
   SetCoinRatesKey,
   ChangeHasActivatedOrdinalsKey,
+  ChangeHasActivatedDLCsKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
 } from './actions/types';
@@ -29,9 +30,11 @@ import {
 const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',
+  dlcBtcAddress: '',
   ordinalsAddress: '',
   masterPubKey: '',
   stxPublicKey: '',
+  dlcBtcPublicKey: '',
   btcPublicKey: '',
   ordinalsPublicKey: '',
   network: initialNetworksList[0],
@@ -53,6 +56,7 @@ const initialWalletState: WalletState = {
   networkAddress: undefined,
   btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
+  hasActivatedDLCsKey: false,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
 };
@@ -60,7 +64,7 @@ const initialWalletState: WalletState = {
 const walletReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: WalletState = initialWalletState,
-  action: WalletActions,
+  action: WalletActions
 ): WalletState => {
   switch (action.type) {
     case SetWalletKey:
@@ -90,6 +94,8 @@ const walletReducer = (
         stxAddress: action.stxAddress,
         ordinalsAddress: action.ordinalsAddress,
         btcAddress: action.btcAddress,
+        dlcBtcAddress: action.dlcBtcAddress,
+        dlcBtcPublicKey: action.dlcBtcPublicKey,
         masterPubKey: action.masterPubKey,
         stxPublicKey: action.stxPublicKey,
         btcPublicKey: action.btcPublicKey,
@@ -173,6 +179,11 @@ const walletReducer = (
         ...state,
         hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
       };
+    case ChangeHasActivatedDLCsKey:
+      return {
+        ...state,
+        hasActivatedDLCsKey: action.hasActivatedDLCsKey,
+      };
     case ChangeShowBtcReceiveAlertKey:
       return {
         ...state,
@@ -183,6 +194,7 @@ const walletReducer = (
         ...state,
         showOrdinalReceiveAlert: action.showOrdinalReceiveAlert,
       };
+
     default:
       return state;
   }
