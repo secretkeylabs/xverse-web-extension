@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Plus from '@assets/img/dashboard/plus.svg';
+import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import { useDispatch } from 'react-redux';
 import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import Seperator from '@components/seperator';
@@ -125,7 +126,7 @@ function AccountList(): JSX.Element {
         </RowContainer>
         <RowContainer onClick={onImportLedgerAccount}>
           <AddAccountContainer>
-            <ButtonImage src={Plus} />
+            <ButtonImage src={ConnectLedger} />
           </AddAccountContainer>
           <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
         </RowContainer>
