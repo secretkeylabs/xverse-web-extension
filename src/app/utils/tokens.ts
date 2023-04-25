@@ -12,7 +12,7 @@ export function getFtTicker(ft: FungibleToken) {
 }
 
 export function getFtBalance(ft: FungibleToken) {
-  if (ft?.decimals) {
+  if (ft && ft.decimals) {
     return ftDecimals(ft.balance, ft.decimals);
   }
   return ft?.balance;
