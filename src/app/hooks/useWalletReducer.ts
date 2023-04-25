@@ -52,20 +52,26 @@ const useWalletReducer = () => {
   };
 
   const unlockWallet = async (password: string) => {
+    const decrypted = await decryptSeedPhrase(encryptedSeed, password);
     try {
-      const decrypted = await decryptSeedPhrase(encryptedSeed, password);
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
-      await sendMessage({
-        method: InternalMethods.ShareInMemoryKeyToBackground,
-        payload: {
-          secretKey: decrypted,
-        },
-      });
-      dispatch(unlockWalletAction(decrypted));
-      return decrypted;
     } catch (err) {
-      return Promise.reject(err);
+      dispatch(
+        fetchAccountAction(
+          accountsList[0],
+          accountsList,
+        ),
+      );
+      dispatch(getActiveAccountsAction(accountsList));
     }
+    sendMessage({
+      method: InternalMethods.ShareInMemoryKeyToBackground,
+      payload: {
+        secretKey: decrypted,
+      },
+    });
+    dispatch(unlockWalletAction(decrypted));
+    return decrypted;
   };
 
   const lockWallet = () => {
@@ -101,7 +107,12 @@ const useWalletReducer = () => {
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
-    await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [{ id: 0, bnsName, ...wallet }]);
+    try {
+      await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [{ id: 0, bnsName, ...wallet }]);
+    } catch (err) {
+      dispatch(fetchAccountAction({ ...wallet, id: 0, bnsName }, [{ ...wallet, id: 0 }]));
+      dispatch(getActiveAccountsAction([{ ...wallet, id: 0, bnsName }]));
+    }
   };
 
   const createWallet = async () => {
@@ -151,15 +162,28 @@ const useWalletReducer = () => {
     dispatch(fetchAccountAction(account, accountsList));
   };
 
-  const changeNetwork = async (changedNetwork: SettingsNetwork, networkObject: StacksNetwork, networkAddress: string) => {
-    dispatch(ChangeNetworkAction(changedNetwork, networkAddress));
+  const changeNetwork = async (
+    changedNetwork: SettingsNetwork,
+    networkObject: StacksNetwork,
+    networkAddress: string,
+    btcApiUrl: string,
+  ) => {
+    dispatch(ChangeNetworkAction(changedNetwork, networkAddress, btcApiUrl));
     const wallet = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
       index: 0n,
       network: changedNetwork.type,
     });
     dispatch(setWalletAction(wallet));
-    await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [{ ...wallet, id: 0 }]);
+    try {
+      await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [
+        { ...wallet, id: 0 },
+      ]);
+    } catch (err) {
+      const bnsName = await getBnsName(wallet.stxAddress, networkObject);
+      dispatch(fetchAccountAction({ ...wallet, id: 0, bnsName }, [{ ...wallet, id: 0 }]));
+      dispatch(getActiveAccountsAction([{ ...wallet, id: 0, bnsName }]));
+    }
     await refetchStxData();
     await refetchBtcData();
   };

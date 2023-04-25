@@ -340,13 +340,19 @@ function ConfirmBtcTransactionComponent({
             text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={onCancelClick}
-            disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+            disabled={
+              loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+            }
           />
         </TransparentButtonContainer>
         <ActionButton
           text={t('CONFIRM_TRANSACTION.CONFIRM')}
-          disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
-          processing={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+          disabled={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
+          processing={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>
