@@ -14,6 +14,7 @@ import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 function LedgerSendBtcScreen() {
   const location = useLocation();
@@ -119,6 +120,7 @@ function LedgerSendBtcScreen() {
 
   return (
     <>
+      <FullScreenHeader />
       <TopRow title={t('SEND')} onClick={() => {}} showBackButton={false} />
       <SendForm
         currencyType="BTC"

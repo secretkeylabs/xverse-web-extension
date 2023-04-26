@@ -61,8 +61,6 @@ function BalanceCard(props: BalanceCardProps) {
 
   function calculateTotalBalance() {
     let totalBalance = new BigNumber(0);
-    console.log(stxAddress);
-    console.log(btcAddress);
     if (stxAddress) {
       const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
         .multipliedBy(new BigNumber(stxBtcRate))

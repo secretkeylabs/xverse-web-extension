@@ -6,6 +6,7 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import ReviewLedgerBtcTransactionComponent from '@components/ledger/reviewLedgerBtcTransactionComponent';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 export type LedgerTransactionType = `BTC` | `ORDINALS` | `STX`;
 
@@ -38,6 +39,7 @@ function ReviewLedgerBtcTransaction() {
   };
   return (
     <>
+      <FullScreenHeader />
       <ReviewLedgerBtcTransactionComponent
         recipients={[recipient]}
         onConfirmClick={handleOnConfirmClick}

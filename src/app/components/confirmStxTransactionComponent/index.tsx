@@ -101,6 +101,7 @@ interface Props {
   onConfirmClick: (transactions: StacksTransaction[]) => void;
   children: ReactNode;
   isSponsored?: boolean;
+  skipModal?: boolean;
 }
 
 function ConfirmStxTransationComponent({
@@ -110,6 +111,7 @@ function ConfirmStxTransationComponent({
   children,
   onConfirmClick,
   onCancelClick,
+  skipModal = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const selectedNetwork = useNetworkSelector();
@@ -152,6 +154,10 @@ function ConfirmStxTransationComponent({
   };
 
   const onConfirmButtonClick = async () => {
+    if (skipModal) {
+      onConfirmClick(initialStxTransactions);
+      return;
+    }
     if (selectedAccount?.isLedgerAccount) {
       setIsModalVisible(true);
       return;

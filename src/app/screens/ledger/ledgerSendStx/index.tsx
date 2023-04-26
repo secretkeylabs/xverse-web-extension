@@ -15,6 +15,7 @@ import { StoreState } from '@stores/index';
 import { replaceCommaByDot } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 import useNetworkSelector from '@hooks/useNetwork';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 function LedgerSendStxScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
@@ -151,6 +152,7 @@ function LedgerSendStxScreen() {
 
   return (
     <>
+      <FullScreenHeader />
       <TopRow title={t('SEND')} onClick={() => {}} showBackButton={false} />
       <SendForm
         processing={isLoading}
