@@ -58,6 +58,13 @@ interface ColumnProps {
 const ColumnContainer = styled.div<ColumnProps>((props) => ({
   display: 'flex',
   flexDirection: props.isExpanded ? 'column' : 'row',
+  justifyContent: 'flex-end',
+  alignItems: props.isExpanded ? 'flex-end' : 'center',
+}));
+
+const ExpandedColumnContainer = styled.div<ColumnProps>((props) => ({
+  display: 'flex',
+  flexDirection: props.isExpanded ? 'column' : 'row',
   flex: 1,
   justifyContent: 'flex-end',
   alignItems: props.isExpanded ? 'flex-end' : 'center',
@@ -68,6 +75,11 @@ const RowContainer = styled.div({
   flexDirection: 'row',
   width: '100%',
   alignItems: 'center',
+});
+
+const TitleContainer = styled.div({
+  display: 'flex',
+  flex: 1,
 });
 
 const ExpandedContainer = styled(animated.div)({
@@ -129,7 +141,9 @@ function TransferAmountComponent({
   return (
     <Container>
       <RowContainer>
-        <TitleText>{title}</TitleText>
+        <TitleContainer>
+          <TitleText>{title}</TitleText>
+        </TitleContainer>
         <ColumnContainer isExpanded={isExpanded}>
           {!isExpanded && renderAmount}
           <Button onClick={onArrowClick}>
@@ -144,9 +158,9 @@ function TransferAmountComponent({
         <RowContainer>
           {icon && <Icon src={icon} />}
           <TitleText>{subValue === '' ? t('AMOUNT') : t('ASSET')}</TitleText>
-          <ColumnContainer isExpanded={isExpanded}>
+          <ExpandedColumnContainer isExpanded={isExpanded}>
             {renderAmount}
-          </ColumnContainer>
+          </ExpandedColumnContainer>
         </RowContainer>
         <FromContainer>
           <TransferDetailView title={subTitle} address={address!} />
