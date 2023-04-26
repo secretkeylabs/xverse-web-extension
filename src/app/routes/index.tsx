@@ -53,6 +53,8 @@ import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
 import LedgerSendBtcScreen from '@screens/ledger/ledgerSendBtc';
 import LedgerSendStxScreen from '@screens/ledger/ledgerSendStx';
 import ReviewLedgerStxTransaction from '@screens/ledger/reviewLedgerStxTransaction';
+import LedgerSendFtScreen from '@screens/ledger/ledgerSendFt';
+import ReviewLedgerFtTransaction from '@screens/ledger/reviewLedgerFtTransaction';
 
 const router = createHashRouter([
   {
@@ -117,6 +119,10 @@ const router = createHashRouter([
         element: <LedgerSendStxScreen />,
       },
       {
+        path: 'send-ft-ledger',
+        element: <LedgerSendFtScreen />,
+      },
+      {
         path: 'confirm-stx-tx',
         element: <ConfirmStxTransaction />,
       },
@@ -135,6 +141,10 @@ const router = createHashRouter([
       {
         path: 'review-ledger-stx-tx',
         element: <ReviewLedgerStxTransaction />,
+      },
+      {
+        path: 'review-ledger-ft-tx',
+        element: <ReviewLedgerFtTransaction />,
       },
       {
         path: 'confirm-ledger-tx',

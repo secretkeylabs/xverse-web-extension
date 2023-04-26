@@ -338,6 +338,12 @@ export default function CoinHeader(props: CoinBalanceProps) {
         });
         return;
       }
+      if (coin === 'FT') {
+        await chrome.tabs.create({
+          url: chrome.runtime.getURL(`options.html#/send-ft-ledger?coin=${fungibleToken?.name}`),
+        });
+        return;
+      }
     }
     if (coin === 'STX' || coin === 'BTC') {
       navigate(`/send-${coin}`);

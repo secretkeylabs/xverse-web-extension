@@ -25,6 +25,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import ReviewLedgerStxTransactionComponent from '@components/ledger/reviewLedgerStxTransactionComponent';
 import { LedgerTransactionType } from '../reviewLedgerBtcTransaction';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -183,6 +184,7 @@ function ReviewLedgerStxTransaction() {
 
   return (
     <>
+      <FullScreenHeader />
       <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleOnCancelClick} />
       <ReviewLedgerStxTransactionComponent
         initialStxTransactions={[unsignedTx]}

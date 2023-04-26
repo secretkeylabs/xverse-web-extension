@@ -213,7 +213,7 @@ function ImportLedger(): JSX.Element {
   const [accountName, setAccountName] = useState<string>('');
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
   const { addLedgerAccount, updateLedgerAccounts } = useWalletReducer();
-  const { ledgerAccountsList, selectedAccount } = useWalletSelector();
+  const { ledgerAccountsList, network } = useWalletSelector();
   const transition = useTransition(currentStepIndex, {
     from: {
       x: 24,
@@ -227,7 +227,6 @@ function ImportLedger(): JSX.Element {
 
   const importBtcAccounts = async () => {
     const transport = await Transport.create();
-    const network: NetworkType = 'Testnet';
     const newAddressIndex = ledgerAccountsList.filter(
       (account) => account.btcAddress !== ''
     ).length;
@@ -236,7 +235,7 @@ function ImportLedger(): JSX.Element {
       // Bitcoin
       const bitcoinAccount = await importNestedSegwitAccountFromLedger(
         transport,
-        network,
+        network.type,
         0,
         newAddressIndex,
         false
@@ -248,7 +247,7 @@ function ImportLedger(): JSX.Element {
       // Ordinals
       const ordinalsAccount = await importTaprootAccountFromLedger(
         transport,
-        network,
+        network.type,
         0,
         newAddressIndex,
         false
@@ -263,18 +262,20 @@ function ImportLedger(): JSX.Element {
 
   const importStxAccounts = async () => {
     const transport = await Transport.create();
-    const network: NetworkType = 'Testnet';
     const newAddressIndex = ledgerAccountsList.filter(
       (account) => account.stxAddress !== ''
     ).length;
     setAddressIndex(newAddressIndex);
     const { address, publicKey, testnetAddress } = await importStacksAccountFromLedger(
       transport,
-      network,
+      network.type,
       0,
       newAddressIndex
     );
-    setStacksCredentials({ address: testnetAddress, publicKey });
+    setStacksCredentials({
+      address: network.type === 'Mainnet' ? address : testnetAddress,
+      publicKey,
+    });
     await transport.close();
   };
 

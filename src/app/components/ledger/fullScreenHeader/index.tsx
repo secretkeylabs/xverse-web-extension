@@ -2,6 +2,8 @@ import styled from 'styled-components';
 
 import XverseLogoSVG from '@assets/img/full_logo_horizontal.svg';
 
+declare const VERSION: string;
+
 const HeaderRow = styled.div((props) => ({
   position: 'absolute',
   width: '100%',
@@ -28,7 +30,7 @@ function FullScreenHeader() {
   return (
     <HeaderRow>
       <XverseLogo src={XverseLogoSVG} />
-      <VersionText>V1.0.0</VersionText>
+      <VersionText>V{VERSION}</VersionText>
     </HeaderRow>
   );
 }

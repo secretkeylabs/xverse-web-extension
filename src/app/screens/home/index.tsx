@@ -202,7 +202,13 @@ function Home() {
     navigate('/receive/STX');
   };
 
-  const onSendFtSelect = (coin: FungibleToken) => {
+  const onSendFtSelect = async (coin: FungibleToken) => {
+    if (isLedgerAccount) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL(`options.html#/send-ft-ledger?coin=${coin.name}`),
+      });
+      return;
+    }
     navigate('send-ft', {
       state: {
         fungibleToken: coin,
