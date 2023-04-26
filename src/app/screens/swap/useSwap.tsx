@@ -158,7 +158,7 @@ export function useSwap(): UseSwap {
       setExchangeRate(undefined);
     } else {
       let cancelled = false;
-      alexSDK.getAmountTo(from, BigInt(fromAmount * 1e8), to).then((result) => {
+      alexSDK.getAmountTo(from, BigInt(Math.floor(fromAmount * 1e8)), to).then((result) => {
         if (cancelled) {
           return;
         }
@@ -212,7 +212,7 @@ export function useSwap(): UseSwap {
               stxAddress,
               from,
               to,
-              BigInt(fromAmount * 1e8),
+              BigInt(Math.floor(fromAmount * 1e8)),
               BigInt(Math.floor(toAmount * (1 - slippage) * 1e8)),
               info.route
             );
