@@ -25,6 +25,7 @@ import {
   ResponseError,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
+import { NumericFormat } from 'react-number-format';
 import TransactionDetailComponent from '../transactionDetailComponent';
 import BtcRecipientComponent from './btcRecipientComponent';
 
@@ -144,6 +145,7 @@ function ConfirmBtcTransactionComponent({
   const [currentFee, setCurrentFee] = useState(fee);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
+  const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const {
     isLoading,
     data,
@@ -217,6 +219,19 @@ function ConfirmBtcTransactionComponent({
   }, [ordinalData]);
 
   useEffect(() => {
+    const totalAmount: BigNumber = new BigNumber(0);
+    let sum: BigNumber = new BigNumber(0);
+    if (recipients) {
+      recipients.map((recipient) => {
+        sum = totalAmount.plus(recipient.amountSats);
+        return sum;
+      });
+      sum = sum?.plus(currentFee);
+    }
+    setTotal(sum);
+  }, [recipients]);
+
+  useEffect(() => {
     if (signedNonOrdinalBtcSend) {
       setCurrentFee(signedNonOrdinalBtcSend.fee);
       setSignedTx(signedNonOrdinalBtcSend.signedTx);
@@ -246,6 +261,15 @@ function ConfirmBtcTransactionComponent({
   const handleOnConfirmClick = () => {
     onConfirmClick(signedTx);
   };
+
+  const getAmountString = (amount: BigNumber, currency: string) => (
+    <NumericFormat
+      value={amount.toString()}
+      displayType="text"
+      thousandSeparator
+      suffix={` ${currency}`}
+    />
+  );
 
   useEffect(() => {
     if (recipients && txError) {
@@ -320,8 +344,13 @@ function ConfirmBtcTransactionComponent({
           <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
           <TransactionDetailComponent
             title={t('CONFIRM_TRANSACTION.FEES')}
-            value={`${currentFee.toString()} ${t('SATS')}`}
+            value={getAmountString(currentFee, t('SATS'))}
             subValue={getBtcFiatEquivalent(new BigNumber(currentFee), btcFiatRate)}
+          />
+          <TransactionDetailComponent
+            title={t('CONFIRM_TRANSACTION.TOTAL')}
+            value={getAmountString(satsToBtc(total), t('BTC'))}
+            subValue={getBtcFiatEquivalent(total, btcFiatRate)}
           />
           <Button onClick={onAdvancedSettingClick}>
             <>

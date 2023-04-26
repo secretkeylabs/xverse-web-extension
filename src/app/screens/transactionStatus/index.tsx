@@ -164,7 +164,7 @@ function TransactionStatus() {
     if (browserTx) window.close();
     else if (isOrdinal) navigate(-4);
     else if (isNft) navigate(-3);
-    else navigate(-2);
+    else navigate(-3);
   };
 
   const renderLink = (

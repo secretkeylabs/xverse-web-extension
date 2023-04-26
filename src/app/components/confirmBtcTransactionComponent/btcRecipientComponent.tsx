@@ -30,11 +30,11 @@ const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   width: '100%',
-  alignItems: 'center',
+  alignItems: 'flex-start',
 });
 
 const AddressContainer = styled.div({
-  marginTop: 22,
+  marginTop: 12,
 });
 
 const Icon = styled.img((props) => ({
@@ -55,6 +55,8 @@ const DownArrowIcon = styled.img((props) => ({
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
+  textAlign: 'center',
+  marginTop: 5,
 }));
 
 const ValueText = styled.h1((props) => ({
@@ -74,6 +76,7 @@ const ColumnContainer = styled.div({
   flex: 1,
   justifyContent: 'flex-end',
   alignItems: 'flex-end',
+  paddingTop: 5,
 });
 
 const MultipleAddressContainer = styled.div({
