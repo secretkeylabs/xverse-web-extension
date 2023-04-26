@@ -132,7 +132,7 @@ export function useSwap(): UseSwap {
   }>();
 
   useEffect(() => {
-    if (from == null || to == null) {
+    if (from == null || to == null || from === to) {
       setInfo(undefined);
     } else {
       let cancelled = false;
@@ -154,7 +154,7 @@ export function useSwap(): UseSwap {
   const [exchangeRate, setExchangeRate] = useState<number>();
 
   useEffect(() => {
-    if (from == null || to == null || fromAmount == null || fromAmount == 0) {
+    if (from == null || to == null || fromAmount == null || fromAmount == 0 || from === to) {
       setExchangeRate(undefined);
     } else {
       let cancelled = false;
