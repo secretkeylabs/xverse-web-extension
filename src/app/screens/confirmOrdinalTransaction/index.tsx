@@ -8,11 +8,12 @@ import BottomBar from '@components/tabBar';
 import useNftDataSelector from '@hooks/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
-import { broadcastRawBtcOrdinalTransaction, getOrdinalInfo, OrdinalInfo } from '@secretkeylabs/xverse-core';
+import { getOrdinalInfo } from '@secretkeylabs/xverse-core/api/xverse';
+import { BtcTransactionBroadcastResponse, OrdinalInfo } from '@secretkeylabs/xverse-core/types';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import BigNumber from 'bignumber.js';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useBtcClient from '@hooks/useBtcClient';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -87,20 +88,18 @@ function ConfirmOrdinalTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const navigate = useNavigate();
-  const { network } = useWalletSelector();
+  const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const {
-    fee, signedTxHex, ordinalUtxo,
-  } = location.state;
+  const { fee, signedTxHex, ordinalUtxo } = location.state;
 
   const {
     isLoading,
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<string, Error, { signedTx: string }>(
-    async ({ signedTx }) => broadcastRawBtcOrdinalTransaction(signedTx, network.type),
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
+    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
   );
   const { id } = useParams();
   const { ordinalsData } = useNftDataSelector();
@@ -129,7 +128,7 @@ function ConfirmOrdinalTransaction() {
     if (btcTxBroadcastData) {
       navigate('/tx-status', {
         state: {
-          txid: btcTxBroadcastData,
+          txid: btcTxBroadcastData.tx.hash,
           currency: 'BTC',
           error: '',
           isOrdinal: true,
@@ -196,13 +195,11 @@ function ConfirmOrdinalTransaction() {
           </Container>
         </ConfirmBtcTransactionComponent>
 
-        {!isGalleryOpen
-         && (
-         <BottomBarContainer>
-           <BottomBar tab="nft" />
-         </BottomBarContainer>
-         )}
-
+        {!isGalleryOpen && (
+          <BottomBarContainer>
+            <BottomBar tab="nft" />
+          </BottomBarContainer>
+        )}
       </ScrollContainer>
     </>
   );

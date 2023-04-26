@@ -1,6 +1,7 @@
 import TopRow from '@components/topRow';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import styled from 'styled-components';
 import { CurrencyTypes } from '@utils/constants';
 import { getFtTicker } from '@utils/tokens';
@@ -24,6 +25,7 @@ export default function CoinDashboard() {
   const [searchParams] = useSearchParams();
   const { coinsList } = useWalletSelector();
   const ftAddress = searchParams.get('ft');
+  useBtcWalletData();
 
   const handleBack = () => {
     navigate(-1);

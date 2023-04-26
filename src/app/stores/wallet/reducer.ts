@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { initialNetworksList } from '@utils/constants';
 import {
   StoreEncryptedSeedKey,
   WalletActions,
@@ -33,10 +34,7 @@ const initialWalletState: WalletState = {
   stxPublicKey: '',
   btcPublicKey: '',
   ordinalsPublicKey: '',
-  network: {
-    type: 'Mainnet',
-    address: 'https://stacks-node-api.mainnet.stacks.co',
-  },
+  network: initialNetworksList[0],
   accountsList: [],
   selectedAccount: null,
   seedPhrase: '',
@@ -53,6 +51,7 @@ const initialWalletState: WalletState = {
   coins: [],
   feeMultipliers: null,
   networkAddress: undefined,
+  btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
@@ -162,8 +161,7 @@ const walletReducer = (
         ...state,
         network: action.network,
         networkAddress: action.networkAddress,
-        selectedAccount: null,
-        accountsList: [],
+        btcApiUrl: action.btcApiUrl,
       };
     case GetActiveAccountsKey:
       return {
