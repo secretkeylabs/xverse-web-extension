@@ -24,6 +24,7 @@ import LedgerConnectDefaultSVG from '@assets/img/ledger/ledger_connect_default.s
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import { StacksTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
+import useBtcClient from '@hooks/useBtcClient';
 
 const Container = styled.div`
   display: flex;
@@ -90,6 +91,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
   const { network, selectedAccount } = useWalletSelector();
 
+  const btcClient = useBtcClient();
+
   const {
     recipient,
     type,
@@ -122,7 +125,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
       );
       setIsTxApproved(true);
       await ledgerDelay(1500);
-      const transactionId = await broadcastRawBtcTransaction(result, network.type);
+      const transactionId = await btcClient.sendRawTransaction(result);
       setTxId(transactionId.tx.hash);
       setCurrentStepIndex(2);
     } catch (err) {
