@@ -11,6 +11,7 @@ import Seperator from '@components/seperator';
 import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
+import { useMemo } from 'react';
 
 const Container = styled.div`
   display: flex;
@@ -65,6 +66,13 @@ function AccountList(): JSX.Element {
   const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
   const { createAccount } = useWalletReducer();
 
+  const displayedAccountsList = useMemo(() => {
+    if (network.type === 'Mainnet') {
+      return [...accountsList, ...ledgerAccountsList];
+    }
+    return accountsList;
+  }, [accountsList, ledgerAccountsList, network]);
+
   const handleAccountSelect = (account: Account) => {
     dispatch(
       selectAccount(
@@ -107,7 +115,7 @@ function AccountList(): JSX.Element {
     <Container>
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
-        {[...accountsList, ...ledgerAccountsList].map((account) => (
+        {displayedAccountsList.map((account) => (
           <>
             <AccountRow
               key={account.stxAddress + account.btcAddress}
@@ -124,12 +132,14 @@ function AccountList(): JSX.Element {
           </AddAccountContainer>
           <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
         </RowContainer>
-        <RowContainer onClick={onImportLedgerAccount}>
-          <AddAccountContainer>
-            <ButtonImage src={ConnectLedger} />
-          </AddAccountContainer>
-          <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
-        </RowContainer>
+        {network.type === 'Mainnet' && (
+          <RowContainer onClick={onImportLedgerAccount}>
+            <AddAccountContainer>
+              <ButtonImage src={ConnectLedger} />
+            </AddAccountContainer>
+            <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
+          </RowContainer>
+        )}
       </AccountContainer>
     </Container>
   );
