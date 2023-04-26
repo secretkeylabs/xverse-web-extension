@@ -1,10 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import {
-  broadcastRawBtcOrdinalTransaction,
-  broadcastRawBtcTransaction,
-} from '@secretkeylabs/xverse-core/api';
 import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
 import BottomBar from '@components/tabBar';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -18,6 +14,7 @@ import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import AlertMessage from '@components/alertMessage';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import useBtcClient from '@hooks/useBtcClient';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
@@ -27,6 +24,7 @@ function ConfirmBtcTransaction() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { network, ordinalsAddress, btcAddress } = useWalletSelector();
+  const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const [signedTx, setSignedTx] = useState<string>('');
   const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
@@ -39,21 +37,23 @@ function ConfirmBtcTransaction() {
   const {
     fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos,
   } = location.state;
+
   const {
     isLoading,
     error: txError,
     data: btcTxBroadcastData,
     mutate,
   } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => broadcastRawBtcTransaction(signedTx, network.type),
+    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
   );
 
   const {
     error: errorBtcOrdinalTransaction,
     data: btcOrdinalTxBroadcastData,
     mutate: broadcastOrdinalTransaction,
-  } = useMutation<string, Error, { signedTx: string }>(async ({ signedTx }) => broadcastRawBtcOrdinalTransaction(signedTx, network.type));
-
+} = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
+  async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+);
   const onClick = () => {
     navigate('/recover-ordinals');
   };
@@ -99,7 +99,7 @@ function ConfirmBtcTransaction() {
       saveTimeForNonOrdinalTransferTransaction(ordinalsAddress).then(() => {
         navigate('/tx-status', {
           state: {
-            txid: btcOrdinalTxBroadcastData,
+            txid: btcOrdinalTxBroadcastData.tx.hash,
             currency: 'BTC',
             isNft: true,
             error: '',
