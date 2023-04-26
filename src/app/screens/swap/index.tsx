@@ -97,6 +97,9 @@ function SwapScreen() {
           text={swap.submitError ?? t('CONTINUE')}
           processing={loading}
           onPress={async () => {
+            if (swap.submitError) {
+              return;
+            }
             try {
               setLoading(true);
               await swap.onSwap?.();
