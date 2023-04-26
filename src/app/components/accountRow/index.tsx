@@ -156,7 +156,7 @@ function AccountRow({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { showBtcReceiveAlert } = useWalletSelector();
-  const gradient = getAccountGradient(account?.stxAddress!);
+  const gradient = getAccountGradient(account?.stxAddress! + account?.btcAddress);
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
   const dispatch = useDispatch();

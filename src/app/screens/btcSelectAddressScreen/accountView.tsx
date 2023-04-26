@@ -75,7 +75,7 @@ interface Props {
   isBitcoinTx: boolean;
 }
 function AccountView({ account, isBitcoinTx }: Props) {
-  const gradient = getAccountGradient(account?.stxAddress!);
+  const gradient = getAccountGradient(account?.stxAddress + account?.btcAddress);
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
 
   function getName() {
