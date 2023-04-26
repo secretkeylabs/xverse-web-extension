@@ -30,6 +30,7 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useCoinsData from '@hooks/queries/useCoinData';
+import useAppConfig from '@hooks/queries/useAppConfig';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import BalanceCard from './balanceCard';
@@ -141,6 +142,7 @@ function Home() {
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
   useFeeMultipliers();
   useCoinRates();
+  useAppConfig();
 
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);

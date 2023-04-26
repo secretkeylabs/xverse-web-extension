@@ -1,12 +1,13 @@
-import { BtcAddressMempool } from '@secretkeylabs/xverse-core/types/api/blockstream/transactions';
-import { fetchPendingOrdinalsTransactions } from '@secretkeylabs/xverse-core/api/btc';
+import { BtcAddressMempool } from '@secretkeylabs/xverse-core/types/api/esplora';
 import { useQuery } from '@tanstack/react-query';
+import useBtcClient from '@hooks/useBtcClient';
 import useWalletSelector from '../useWalletSelector';
 
 const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
-  const { ordinalsAddress, network } = useWalletSelector();
+  const { ordinalsAddress } = useWalletSelector();
+  const btcClient = useBtcClient();
 
-  const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> => fetchPendingOrdinalsTransactions(ordinalsAddress, network.type);
+  const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> => btcClient.getAddressMempoolTransactions(ordinalsAddress);
 
   let isPending: boolean | undefined = false;
   let pendingTxHash: string | undefined;
@@ -15,7 +16,10 @@ const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
 
   if (response.data) {
     response.data.forEach((tx) => {
-      tx.vin.forEach((v) => { if (v.txid === ordinalUtxoHash) isPending = true; pendingTxHash = tx.txid; });
+      tx.vin.forEach((v) => {
+        if (v.txid === ordinalUtxoHash) isPending = true;
+        pendingTxHash = tx.txid;
+      });
     });
   }
 

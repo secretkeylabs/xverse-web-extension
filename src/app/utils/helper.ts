@@ -1,10 +1,9 @@
 import {
-  Account,
-  StxMempoolTransactionData,
-  SettingsNetwork,
+  Account, StxMempoolTransactionData, SettingsNetwork, NetworkType,
 } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
+import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
 import BigNumber from 'bignumber.js';
 import { ChainID } from '@stacks/transactions';
 import {
@@ -127,14 +126,32 @@ export function checkNftExists(
   return false;
 }
 
-export async function isValidURL(str: string): Promise<boolean> {
-  if (validUrl.isUri(str)) {
-    const response = await getStacksInfo(str);
+export async function isValidStacksApi(url: string, type: NetworkType): Promise<boolean> {
+  const networkChainId = type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet;
+  if (validUrl.isUri(url)) {
+    const response = await getStacksInfo(url);
+    if (response) {
+      if (response.network_id !== networkChainId) {
+        throw new Error('URL not compatible with current Network');
+      }
+      return true;
+    }
+  }
+  throw new Error('Invalid URL');
+}
+
+export async function isValidBtcApi(url: string, network: NetworkType) {
+  if (validUrl.isUri(url)) {
+    const btcClient = new BitcoinEsploraApiProvider({
+      network,
+      url,
+    });
+    const response = await btcClient.getLatestBlockHeight();
     if (response) {
       return true;
     }
   }
-  return false;
+  throw new Error('Invalid URL');
 }
 
 export const getNetworkType = (stxNetwork) =>

@@ -184,12 +184,14 @@ export function ChangeFiatCurrencyAction(
 
 export function ChangeNetworkAction(
   network: SettingsNetwork,
-  networkAddress: string
+  networkAddress: string | undefined,
+  btcApiUrl: string,
 ): actions.ChangeNetwork {
   return {
     type: actions.ChangeNetworkKey,
     network,
     networkAddress,
+    btcApiUrl,
   };
 }
 
