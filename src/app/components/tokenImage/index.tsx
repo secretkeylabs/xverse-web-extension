@@ -12,34 +12,43 @@ interface TokenImageProps {
   token?: string;
   loading?: boolean;
   fungibleToken?: FungibleToken;
+  isSmallSize?: boolean;
 }
 
-const TickerImage = styled.img({
-  height: 44,
-  width: 44,
-});
+interface ImageProps {
+  isSmallSize?: boolean;
+}
+interface TextProps {
+  isSmallSize?: boolean;
+}
+
+const TickerImage = styled.img<ImageProps>((props) => ({
+  height: props.isSmallSize ? 32 : 44,
+  width: props.isSmallSize ? 32 : 44,
+  borderRadius: 30,
+}));
 
 const LoaderImageContainer = styled.div({
   flex: 0.5,
 });
 
-const TickerIconContainer = styled.div((props) => ({
+const TickerIconContainer = styled.div<ImageProps>((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: 44,
-  width: 44,
+  height: props.isSmallSize ? 32 : 44,
+  width: props.isSmallSize ? 32 : 44,
   marginRight: props.theme.spacing(3),
   borderRadius: props.theme.radius(2),
   backgroundColor: props.color,
 }));
 
-const TickerIconText = styled.h1((props) => ({
+const TickerIconText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['0'],
   textAlign: 'center',
   wordBreak: 'break-all',
-  fontSize: 13,
+  fontSize: props.isSmallSize ? 10 : 13,
 }));
 
 export default function TokenImage(props: TokenImageProps) {
@@ -47,6 +56,7 @@ export default function TokenImage(props: TokenImageProps) {
     token,
     loading,
     fungibleToken,
+    isSmallSize,
   } = props;
 
   const getCoinIcon = useCallback(() => {
@@ -60,7 +70,7 @@ export default function TokenImage(props: TokenImageProps) {
   if (fungibleToken) {
     if (!loading) {
       if (fungibleToken?.image) {
-        return <TickerImage src={fungibleToken.image} />;
+        return <TickerImage isSmallSize={isSmallSize} src={fungibleToken.image} />;
       }
       let ticker = fungibleToken?.ticker;
       if (!ticker && fungibleToken?.name) {
@@ -69,8 +79,8 @@ export default function TokenImage(props: TokenImageProps) {
       const background = stc(ticker);
       ticker = ticker && ticker.substring(0, 4);
       return (
-        <TickerIconContainer color={background}>
-          <TickerIconText>{ticker}</TickerIconText>
+        <TickerIconContainer isSmallSize={isSmallSize} color={background}>
+          <TickerIconText isSmallSize={isSmallSize}>{ticker}</TickerIconText>
         </TickerIconContainer>
       );
     }
@@ -80,7 +90,8 @@ export default function TokenImage(props: TokenImageProps) {
       </LoaderImageContainer>
     );
   }
+
   return (
-    <TickerImage src={getCoinIcon()} />
+    <TickerImage isSmallSize={isSmallSize} src={getCoinIcon()} />
   );
 }

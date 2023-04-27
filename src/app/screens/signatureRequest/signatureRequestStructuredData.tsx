@@ -3,6 +3,7 @@ import { deserializeCV } from '@stacks/transactions/dist/esm/clarity';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import ClarityMessageView from './clarityMessageView';
+import CollapsableContainer from './collapsableContainer';
 
 interface SignatureRequestStructuredDataProps {
   payload: StructuredDataSignaturePayload;
@@ -25,12 +26,11 @@ export default function SignatureRequestStructuredData(props: SignatureRequestSt
   const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
   const { payload } = props;
   return (
-    <ContentContainer>
-      <RequestMessageTitle>{t('MESSAGE_HEADER')}</RequestMessageTitle>
+    <CollapsableContainer text="" title={t('MESSAGE_HEADER')}>
       <ClarityMessageView
         val={deserializeCV(Buffer.from(payload.message, 'hex'))}
         encoding="tryAscii"
       />
-    </ContentContainer>
+    </CollapsableContainer>
   );
 }

@@ -1,4 +1,5 @@
 import { PostCondition } from '@stacks/transactions';
+import AssetIcon from '@assets/img/transactions/Assets.svg';
 import PostConditionsView from './postConditionView';
 import { getAmountFromPostCondition } from './postConditionView/helper';
 
@@ -11,6 +12,7 @@ function NftPostConditionCard({ postCondition }: Props) {
     <PostConditionsView
       postCondition={postCondition}
       amount={amount}
+      icon={AssetIcon}
     />
   );
 }

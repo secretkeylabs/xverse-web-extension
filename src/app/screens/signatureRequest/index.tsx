@@ -5,14 +5,10 @@ import useSignatureRequest, {
   isUtf8Message,
   useSignMessage,
 } from '@hooks/useSignatureRequest';
-import SignatureIcon from '@assets/img/webInteractions/signatureIcon.svg';
-import Plus from '@assets/img/transactions/Plus.svg';
-import Minus from '@assets/img/transactions/Minus.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import { useTranslation } from 'react-i18next';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { useEffect, useState } from 'react';
-import Seperator from '@components/seperator';
 import { bytesToHex } from '@stacks/transactions';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -23,6 +19,7 @@ import { hashMessage } from '@secretkeylabs/xverse-core';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
+import CollapsableContainer from './collapsableContainer';
 
 const MainContainer = styled.div((props) => ({
   display: 'flex',
@@ -33,64 +30,23 @@ const MainContainer = styled.div((props) => ({
   height: '100%',
 }));
 
-const RequestImage = styled.img((props) => ({
-  marginTop: props.theme.spacing(20),
-  marginBottom: props.theme.spacing(12),
-  alignSelf: 'center',
-}));
-
 const RequestType = styled.h1((props) => ({
-  ...props.theme.headline_m,
+  ...props.theme.headline_s,
+  marginTop: props.theme.spacing(21),
   color: props.theme.colors.white[0],
-  textAlign: 'center',
+  textAlign: 'left',
 }));
 
 const RequestSource = styled.h2((props) => ({
-  ...props.theme.body_l,
-  color: props.theme.colors.white['400'],
-  marginTop: props.theme.spacing(2),
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[400],
+  marginTop: props.theme.spacing(4),
+  textAlign: 'left',
   marginBottom: props.theme.spacing(12),
-  textAlign: 'center',
-}));
-
-const ShowHashButtonContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  width: '100%',
-  div: {
-    flex: 1,
-  },
-});
-
-const ShowHashButton = styled.button((props) => ({
-  ...props.theme.body_xs,
-  background: 'none',
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  color: props.theme.colors.white[0],
-  marginBottom: props.theme.spacing(6),
-  marginTop: props.theme.spacing(12),
-  width: 111,
-  height: 34,
-  borderRadius: props.theme.radius(3),
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  img: {
-    marginLeft: props.theme.spacing(2),
-  },
-}));
-
-const MessageHashTitle = styled.p((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white[200],
-  marginBottom: props.theme.spacing(2),
-  opacity: 0.7,
 }));
 
 const MessageHash = styled.p((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.body_medium_m,
   textAlign: 'left',
   lineHeight: 1.6,
   wordWrap: 'break-word',
@@ -101,13 +57,13 @@ const MessageHash = styled.p((props) => ({
 const ActionDisclaimer = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[400],
+  marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(8),
 }));
 
 function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation');
   const [isSigning, setIsSigning] = useState<boolean>(false);
-  const [showHash, setShowHash] = useState(false);
   const { selectedAccount, accountsList, network } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
   const {
@@ -156,10 +112,6 @@ function SignatureRequest(): JSX.Element {
     window.close();
   };
 
-  const handleShowHash = async () => {
-    setShowHash((current) => !current);
-  };
-
   const confirmCallback = async () => {
     try {
       setIsSigning(true);
@@ -187,7 +139,6 @@ function SignatureRequest(): JSX.Element {
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
-        <RequestImage src={SignatureIcon} alt="Signature" width={80} />
         <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
         <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
         {isUtf8Message(messageType) && (
@@ -200,20 +151,9 @@ function SignatureRequest(): JSX.Element {
             payload={payload as StructuredDataSignaturePayload}
           />
         )}
-        <ShowHashButtonContainer>
-          <Seperator />
-          <ShowHashButton onClick={handleShowHash}>
-            {showHash ? t('SIGNATURE_REQUEST.HIDE_HASH_BUTTON') : t('SIGNATURE_REQUEST.SHOW_HASH_BUTTON')}
-            <img src={showHash ? Minus : Plus} alt="Show" />
-          </ShowHashButton>
-          <Seperator />
-        </ShowHashButtonContainer>
-        {showHash ? (
-          <>
-            <MessageHashTitle>{t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}</MessageHashTitle>
-            <MessageHash>{bytesToHex(hashMessage(payload.message))}</MessageHash>
-          </>
-        ) : null}
+        <CollapsableContainer text={bytesToHex(hashMessage(payload.message))} title={t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}>
+          <MessageHash>{bytesToHex(hashMessage(payload.message))}</MessageHash>
+        </CollapsableContainer>
         <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
         <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
       </MainContainer>
