@@ -1,4 +1,4 @@
-import { SignPsbtRequestEventDetails } from './../common/types/inpage-types';
+import { SignMessageRequestEventDetails, SignPsbtRequestEventDetails } from './../common/types/inpage-types';
 import { BitcoinProvider, GetAddressResponse } from 'sats-connect';
 import {
   DomEventName,
@@ -9,6 +9,7 @@ import {
   GetAddressResponseMessage,
   MESSAGE_SOURCE,
   SatsConnectMessageToContentScript,
+  SignMessageResponseMessage,
   SignPsbtResponseMessage,
 } from '@common/types/message-types';
 import { SignTransactionResponse } from 'sats-connect/src/transactions/signTransaction';
@@ -58,6 +59,27 @@ const SatsMethodsProvider: BitcoinProvider = {
         }
         if (typeof eventMessage.data.payload.signPsbtResponse !== 'string') {
           resolve(eventMessage.data.payload.signPsbtResponse);
+        }
+      };
+      window.addEventListener('message', handleMessage);
+    });
+  },
+  signMessage: async (signMessageRequest: string): Promise<string> => {
+    const event = new CustomEvent<SignMessageRequestEventDetails>(DomEventName.signMessageRequest, {
+      detail: { signMessageRequest },
+    });
+    document.dispatchEvent(event);
+    return new Promise((resolve, reject) => {
+      const handleMessage = (eventMessage: MessageEvent<SignMessageResponseMessage>) => {
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.signPsbtResponse)) return;
+        if (eventMessage.data.payload?.signMessageRequest !== signMessageRequest) return;
+        window.removeEventListener('message', handleMessage);
+        if (eventMessage.data.payload.signMessageResponse === 'cancel') {
+          reject(eventMessage.data.payload.signMessageResponse);
+          return;
+        }
+        if (typeof eventMessage.data.payload.signMessageResponse !== 'string') {
+          resolve(eventMessage.data.payload.signMessageResponse);
         }
       };
       window.addEventListener('message', handleMessage);
