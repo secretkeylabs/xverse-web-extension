@@ -133,7 +133,7 @@ export interface SelectAccount {
   bnsName?: string;
   network: SettingsNetwork;
   // stackingState: StackingStateData;
-  accountType: AccountType;
+  accountType?: AccountType;
   accountName: string | undefined;
 }
 export interface SetCoinRates {
