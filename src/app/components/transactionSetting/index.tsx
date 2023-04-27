@@ -22,6 +22,7 @@ import {
   getBtcFees, getBtcFeesForNonOrdinalBtcSend, getBtcFeesForOrdinalSend, isCustomFeesAllowed, Recipient,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { btcToSats, BtcUtxoDataResponse, ErrorCodes } from '@secretkeylabs/xverse-core';
+import EditNonce from './editNonce';
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,
@@ -481,6 +482,29 @@ function TransactionSettingAlert({
     onCrossClick();
   };
 
+  const renderContent = () => {
+    if (showNonceSettings) {
+      return <EditNonce nonce={nonce} />;
+    }
+
+    return (
+      <>
+        <TransactionSettingOptionButton onClick={onEditFeesPress}>
+          <TransactionSettingOptionText>
+            {t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')}
+          </TransactionSettingOptionText>
+          <img src={ArrowIcon} alt="Arrow " />
+        </TransactionSettingOptionButton>
+        <TransactionSettingNonceOptionButton onClick={onEditNoncePress}>
+          <TransactionSettingOptionText>
+            {t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')}
+          </TransactionSettingOptionText>
+          <img src={ArrowIcon} alt="Arrow " />
+        </TransactionSettingNonceOptionButton>
+      </>
+    );
+  };
+
   return (
     <BottomModal
       visible={visible}
@@ -493,18 +517,7 @@ function TransactionSettingAlert({
       }
       onClose={onClosePress}
     >
-      <TransactionSettingOptionButton onClick={onEditFeesPress}>
-        <TransactionSettingOptionText>
-          {t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')}
-        </TransactionSettingOptionText>
-        <img src={ArrowIcon} alt="Arrow " />
-      </TransactionSettingOptionButton>
-      <TransactionSettingNonceOptionButton onClick={onEditNoncePress}>
-        <TransactionSettingOptionText>
-          {t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')}
-        </TransactionSettingOptionText>
-        <img src={ArrowIcon} alt="Arrow " />
-      </TransactionSettingNonceOptionButton>
+      {renderContent()}
     </BottomModal>
   );
 }
