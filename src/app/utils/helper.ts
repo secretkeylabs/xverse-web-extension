@@ -160,5 +160,12 @@ export async function isValidBtcApi(url: string, network: NetworkType) {
   throw new Error('Invalid URL');
 }
 
-export const getNetworkType = (stxNetwork) =>
-  stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
+export const getNetworkType = (stxNetwork) => {
+  if (stxNetwork.chainId === ChainID.Mainnet) {
+    return 'Mainnet';
+  } else if (stxNetwork.chainId === ChainID.Testnet) {
+    return 'Testnet';
+  } else {
+    return 'Regtest';
+  }
+}
