@@ -195,7 +195,6 @@ function AccountRow({
   );
 
   const displayAddress = allowCopyAddress ? (
-    <>
       <RowContainer>
         <CopyButton id="bitcoin-address" onClick={handleOnBtcAddressClick}>
           <CopyImage src={Copy} alt="copy" />
@@ -225,7 +224,6 @@ function AccountRow({
           place="bottom"
         />
       </RowContainer>
-    </>
   ) : (
     <CurrentAccountDetailText>
       {showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}

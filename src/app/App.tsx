@@ -20,7 +20,6 @@ function App(): JSX.Element {
         <Provider store={rootStore.store}>
           <PersistGate persistor={rootStore.persistedStore} loading={<LoadingScreen />}>
             <ThemeProvider theme={Theme}>
-              {/* <PopupHandler /> */}
               <RouterProvider router={router} />
               <Toaster position="bottom-center" containerStyle={{ bottom: 80 }} />
             </ThemeProvider>
