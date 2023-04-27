@@ -12,7 +12,7 @@ const Container = styled.div((props) => ({
   width: 312,
   borderRadius: 12,
   zIndex: 16000,
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.background.elevation3,
   filter: 'drop-shadow(0px 16px 36px rgba(0, 0, 0, 0.5))',
 }));
 
@@ -34,7 +34,7 @@ const RowContainer = styled.div((props) => ({
   flexDirection: 'row',
   padding: '20px 16px 16px 16px',
   alignItems: 'space-between',
-  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: `1px solid ${props.theme.colors.background.elevation6}`,
 }));
 
 const TickMarkButtonContainer = styled.div((props) => ({
