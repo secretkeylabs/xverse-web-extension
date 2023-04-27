@@ -141,7 +141,6 @@ function SendBtcScreen() {
   }
 
   const handleNextClick = async (address: string, amountToSend: string) => {
-    console.log('isledgeraccount:', isLedgerAccount);
     setRecipientAddress(address);
     setAmount(amountToSend);
     const recipients: Recipient[] = [
@@ -156,7 +155,6 @@ function SendBtcScreen() {
         mutate({ recipients });
         return;
       }
-      // send tx with ledger
       const parsedAmountSats = btcToSats(new BigNumber(amount));
       navigate('/review-ledger-btc-tx', {
         state: {

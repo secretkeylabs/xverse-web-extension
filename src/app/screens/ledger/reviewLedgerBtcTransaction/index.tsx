@@ -1,8 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-
 import ReviewLedgerBtcTransactionComponent from '@components/ledger/reviewLedgerBtcTransactionComponent';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
@@ -14,7 +12,6 @@ function ReviewLedgerBtcTransaction() {
   const navigate = useNavigate();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const { refetch } = useBtcWalletData();
   const {
     amount,
     recipient,

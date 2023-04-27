@@ -11,9 +11,7 @@ import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import { StoreState } from '@stores/index';
 import { convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot } from '@utils/helper';
-import BottomBar from '@components/tabBar';
 import useNetworkSelector from '@hooks/useNetwork';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 

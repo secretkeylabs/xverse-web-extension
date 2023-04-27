@@ -1,19 +1,15 @@
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
 import { StoreState } from '@stores/index';
-import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { btcToSats, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
-import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
-import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
+import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 function LedgerSendBtcScreen() {
@@ -27,18 +23,17 @@ function LedgerSendBtcScreen() {
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
-  const [recipient, setRecipient] = useState<Recipient>();
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const { btcAddress, btcPublicKey, network, btcBalance, btcFiatRate, isLedgerAccount } =
-    useSelector((state: StoreState) => state.walletState);
+  const { btcAddress, network, btcBalance, isLedgerAccount } = useSelector(
+    (state: StoreState) => state.walletState
+  );
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isLedgerAccount) {
-      //TODO - Handle window close or navigate to home
-      console.warn('Not Ledger Account');
+      navigate('/');
     }
   }, [isLedgerAccount]);
 
@@ -101,7 +96,6 @@ function LedgerSendBtcScreen() {
       address,
       amountSats: btcToSats(new BigNumber(amountToSend)),
     };
-    setRecipient(btcRecipient);
 
     if (validateFields(address, amountToSend)) {
       navigate('/review-ledger-btc-tx', {

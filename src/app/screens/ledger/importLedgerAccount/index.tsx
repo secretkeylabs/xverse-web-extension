@@ -9,7 +9,6 @@ import {
   importNestedSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
-  NetworkType,
 } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { ledgerDelay } from '@common/utils/ledger';
@@ -232,7 +231,6 @@ function ImportLedger(): JSX.Element {
     ).length;
     setAddressIndex(newAddressIndex);
     if (isBitcoinSelected) {
-      // Bitcoin
       const bitcoinAccount = await importNestedSegwitAccountFromLedger(
         transport,
         network.type,
@@ -244,7 +242,6 @@ function ImportLedger(): JSX.Element {
         address: bitcoinAccount.address,
         publicKey: bitcoinAccount.publicKey,
       });
-      // Ordinals
       const ordinalsAccount = await importTaprootAccountFromLedger(
         transport,
         network.type,
@@ -387,7 +384,10 @@ function ImportLedger(): JSX.Element {
   };
 
   const handleClickNext = () => {
-    // Only let user name NEW account
+    /* 
+    Skip if Ledger account exists with the current account index
+    (i.e. either STX or BTC address already present for the account)
+    */
     if (currentStepIndex === 4) {
       const currentAccount = ledgerAccountsList.find((account) => account.id === addressIndex);
       if (currentAccount && currentAccount.stxAddress && currentAccount.btcAddress) {

@@ -6,7 +6,6 @@ import { animated, useTransition } from '@react-spring/web';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
 import {
-  broadcastRawBtcTransaction,
   broadcastSignedTransaction,
   signLedgerNestedSegwitBtcTransaction,
   signStxTransaction,

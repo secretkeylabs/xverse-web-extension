@@ -1,28 +1,20 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useMutation } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
-import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
+import {  TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
 import {
   addressToString,
-  broadcastSignedTransaction,
 } from '@secretkeylabs/xverse-core/transactions';
 import Seperator from '@components/seperator';
-import BottomBar from '@components/tabBar';
 import RecipientAddressView from '@components/recipinetAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
-import AccountHeaderComponent from '@components/accountHeader';
-import finalizeTxSignature from '@components/transactionsRequests/utils';
 import InfoContainer from '@components/infoContainer';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
-import useNetworkSelector from '@hooks/useNetwork';
-import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import ReviewLedgerStxTransactionComponent from '@components/ledger/reviewLedgerStxTransactionComponent';
 import { LedgerTransactionType } from '../reviewLedgerBtcTransaction';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
@@ -59,62 +51,15 @@ function ReviewLedgerStxTransaction() {
   const [fiatTotal, setFiatTotal] = useState(new BigNumber(0));
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const [recipient, setRecipient] = useState('');
-  const [txRaw, setTxRaw] = useState('');
   const [memo, setMemo] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const selectedNetwork = useNetworkSelector();
   const { unsignedTx, sponsored, isBrowserTx, tabId, requestToken } = location.state;
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
   const { stxBtcRate, btcFiatRate, network } = useWalletSelector();
-  const { refetch } = useStxWalletData();
-  const {
-    isLoading,
-    error: txError,
-    data: stxTxBroadcastData,
-    mutate,
-  } = useMutation<string, Error, { signedTx: StacksTransaction }>(async ({ signedTx }) =>
-    broadcastSignedTransaction(signedTx, selectedNetwork)
-  );
-
-  useEffect(() => {
-    if (stxTxBroadcastData) {
-      if (isBrowserTx) {
-        finalizeTxSignature({
-          requestPayload: requestToken,
-          tabId: Number(tabId),
-          data: { txId: stxTxBroadcastData, txRaw },
-        });
-      }
-      navigate('/tx-status', {
-        state: {
-          txid: stxTxBroadcastData,
-          currency: 'STX',
-          error: '',
-          browserTx: isBrowserTx,
-        },
-      });
-      setTimeout(() => {
-        refetch();
-      }, 1000);
-    }
-  }, [stxTxBroadcastData]);
-
-  useEffect(() => {
-    if (txError) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'STX',
-          error: txError.toString(),
-          browserTx: isBrowserTx,
-        },
-      });
-    }
-  }, [txError]);
 
   function updateUI() {
     const txPayload = unsignedTx.payload as TokenTransferPayload;
@@ -188,7 +133,7 @@ function ReviewLedgerStxTransaction() {
       <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleOnCancelClick} />
       <ReviewLedgerStxTransactionComponent
         initialStxTransactions={[unsignedTx]}
-        loading={isLoading}
+        loading={false}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
         isSponsored={sponsored}

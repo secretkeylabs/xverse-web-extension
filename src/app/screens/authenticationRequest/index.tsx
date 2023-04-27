@@ -3,12 +3,7 @@ import { useLocation } from 'react-router-dom';
 import ConfirmScreen from '@components/confirmScreen';
 import { decodeToken } from 'jsontokens';
 import { useTranslation } from 'react-i18next';
-import {
-  createAuthResponse,
-  handleLedgerStxJWTAuth,
-  makeLedgerCompatibleUnsignedAuthResponsePayload,
-  signStxJWTAuth,
-} from '@secretkeylabs/xverse-core';
+import { createAuthResponse, handleLedgerStxJWTAuth } from '@secretkeylabs/xverse-core';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { useState } from 'react';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -21,7 +16,7 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import ActionButton from '@components/button';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { ledgerDelay } from '@common/utils/ledger';
-import { publicKeyToAddress } from '@stacks/transactions';
+import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
 
 const MainContainer = styled.div({
   display: 'flex',
@@ -150,9 +145,9 @@ function AuthenticationRequest() {
     const profile = {
       stxAddress: {
         mainnet: selectedAccount.stxAddress,
-        testnet: publicKeyToAddress(26, {
+        testnet: publicKeyToAddress(AddressVersion.MainnetSingleSig, {
           data: Buffer.from(selectedAccount.stxPublicKey, 'hex'),
-          type: 6, // 6 = Public Key
+          type: StacksMessageType.PublicKey,
         }),
       },
     };

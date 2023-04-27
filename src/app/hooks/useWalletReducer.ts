@@ -32,7 +32,6 @@ const useWalletReducer = () => {
     selectedAccount,
     network,
     ledgerAccountsList,
-    isLedgerAccount,
   } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
@@ -54,7 +53,7 @@ const useWalletReducer = () => {
       currentAccounts
     );
 
-    if (!isLedgerAccount) {
+    if (!selectedAccount?.isLedgerAccount) {
       dispatch(
         setWalletAction(
           selectedAccount
@@ -67,7 +66,7 @@ const useWalletReducer = () => {
     dispatch(
       fetchAccountAction(
         selectedAccount
-          ? isLedgerAccount
+          ? selectedAccount.isLedgerAccount
             ? ledgerAccountsList[selectedAccount.id]
             : walletAccounts[selectedAccount.id]
           : walletAccounts[0],
@@ -192,7 +191,7 @@ const useWalletReducer = () => {
     changedNetwork: SettingsNetwork,
     networkObject: StacksNetwork,
     networkAddress: string,
-    btcApiUrl: string,
+    btcApiUrl: string
   ) => {
     dispatch(ChangeNetworkAction(changedNetwork, networkAddress, btcApiUrl));
     const wallet = await walletFromSeedPhrase({
@@ -228,7 +227,7 @@ const useWalletReducer = () => {
     );
     try {
       dispatch(addLedgerAcountAction(newLedgerAccountsList));
-      if (isLedgerAccount && updatedLedgerAccount.id === selectedAccount?.id) {
+      if (selectedAccount?.isLedgerAccount && updatedLedgerAccount.id === selectedAccount?.id) {
         switchAccount(updatedLedgerAccount);
       }
     } catch (err) {

@@ -115,7 +115,7 @@ function ConfirmStxTransationComponent({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const selectedNetwork = useNetworkSelector();
-  const { selectedAccount, seedPhrase, isLedgerAccount } = useWalletSelector();
+  const { selectedAccount, seedPhrase } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);

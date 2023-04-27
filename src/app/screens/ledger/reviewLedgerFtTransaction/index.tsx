@@ -34,7 +34,6 @@ const ValueText = styled.h1((props) => ({
 function ReviewLedgerFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
-  const selectedNetwork = useNetworkSelector();
   const location = useLocation();
   const { unsignedTx, amount, fungibleToken, memo, recepientAddress } = location.state;
 

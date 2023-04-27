@@ -13,7 +13,6 @@ import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import { StoreState } from '@stores/index';
 import { replaceCommaByDot } from '@utils/helper';
-import BottomBar from '@components/tabBar';
 import useNetworkSelector from '@hooks/useNetwork';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
@@ -40,8 +39,7 @@ function LedgerSendStxScreen() {
 
   useEffect(() => {
     if (!isLedgerAccount) {
-      //TODO - Handle window close or navigate to home
-      console.warn('Not Ledger Account');
+      navigate('/');
     }
   }, [isLedgerAccount]);
 
@@ -73,7 +71,6 @@ function LedgerSendStxScreen() {
   });
 
   useEffect(() => {
-    // FIXME route doesn't get updated in url bar
     if (data) {
       navigate('/review-ledger-stx-tx', {
         state: {
@@ -82,10 +79,6 @@ function LedgerSendStxScreen() {
       });
     }
   }, [data]);
-
-  const handleBackButtonClick = () => {
-    navigate(-1);
-  };
 
   function validateFields(associatedAddress: string, amount: string, memo: string): boolean {
     if (!associatedAddress) {
