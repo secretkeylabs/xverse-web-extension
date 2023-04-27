@@ -20,11 +20,13 @@ import {
 import {
   BtcUtxoDataResponse,
   ErrorCodes,
+  getBtcFiatEquivalent,
   ResponseError,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import RecipientComponent from '@components/recipientComponent';
 import TransferFeeView from '@components/transferFeeView';
+import { NumericFormat } from 'react-number-format';
 import TransactionDetailComponent from '../transactionDetailComponent';
 
 const OuterContainer = styled.div`
@@ -143,6 +145,7 @@ function ConfirmBtcTransactionComponent({
   const [currentFee, setCurrentFee] = useState(fee);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
+  const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const {
     isLoading,
     data,
@@ -216,6 +219,19 @@ function ConfirmBtcTransactionComponent({
   }, [ordinalData]);
 
   useEffect(() => {
+    const totalAmount: BigNumber = new BigNumber(0);
+    let sum: BigNumber = new BigNumber(0);
+    if (recipients) {
+      recipients.map((recipient) => {
+        sum = totalAmount.plus(recipient.amountSats);
+        return sum;
+      });
+      sum = sum?.plus(currentFee);
+    }
+    setTotal(sum);
+  }, [recipients]);
+
+  useEffect(() => {
     if (signedNonOrdinalBtcSend) {
       setCurrentFee(signedNonOrdinalBtcSend.fee);
       setSignedTx(signedNonOrdinalBtcSend.signedTx);
@@ -245,6 +261,15 @@ function ConfirmBtcTransactionComponent({
   const handleOnConfirmClick = () => {
     onConfirmClick(signedTx);
   };
+
+  const getAmountString = (amount: BigNumber, currency: string) => (
+    <NumericFormat
+      value={amount.toString()}
+      displayType="text"
+      thousandSeparator
+      suffix={` ${currency}`}
+    />
+  );
 
   useEffect(() => {
     if (recipients && txError) {
@@ -307,12 +332,18 @@ function ConfirmBtcTransactionComponent({
               totalRecipient={recipients?.length}
               currencyType="BTC"
               title={t('CONFIRM_TRANSACTION.AMOUNT')}
+              showSenderAddress={isRestoreFundFlow}
             />
           ))
         )}
 
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         <TransferFeeView fee={currentFee} currency={t('SATS')} />
+        <TransactionDetailComponent
+          title={t('CONFIRM_TRANSACTION.TOTAL')}
+          value={getAmountString(satsToBtc(total), t('BTC'))}
+          subValue={getBtcFiatEquivalent(total, btcFiatRate)}
+        />
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
