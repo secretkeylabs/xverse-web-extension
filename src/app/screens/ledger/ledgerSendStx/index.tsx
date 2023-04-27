@@ -12,7 +12,7 @@ import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import { StoreState } from '@stores/index';
-import { replaceCommaByDot } from '@utils/helper';
+import { isLedgerAccount, replaceCommaByDot } from '@utils/helper';
 import useNetworkSelector from '@hooks/useNetwork';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
@@ -25,7 +25,7 @@ function LedgerSendStxScreen() {
     stxPublicKey,
     feeMultipliers,
     network,
-    isLedgerAccount,
+    selectedAccount,
   } = useSelector((state: StoreState) => state.walletState);
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
@@ -38,10 +38,10 @@ function LedgerSendStxScreen() {
   let stxMemo: string | undefined;
 
   useEffect(() => {
-    if (!isLedgerAccount) {
+    if (!isLedgerAccount(selectedAccount)) {
       navigate('/');
     }
-  }, [isLedgerAccount]);
+  }, [selectedAccount]);
 
   if (location.state) {
     recipientAddress = location.state.recipientAddress;

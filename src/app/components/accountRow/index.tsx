@@ -4,7 +4,7 @@ import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { useTranslation } from 'react-i18next';
-import { getTruncatedAddress, getAddressDetail } from '@utils/helper';
+import { getTruncatedAddress, getAddressDetail, isHardwareAccount } from '@utils/helper';
 import BarLoader from '@components/barLoader';
 import Copy from '@assets/img/Copy.svg';
 import { LoaderSize } from '@utils/constants';
@@ -257,13 +257,13 @@ function AccountRow({
             <Button onClick={onClick}>
               <CurrentAccountTextContainer>
                 <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
-                {account.isLedgerAccount && <img src={LedgerBadge} alt="Ledger icon" />}
+                {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
               </CurrentAccountTextContainer>
             </Button>
           ) : (
             <CurrentAccountTextContainer>
               <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
-              {account.isLedgerAccount && <img src={LedgerBadge} alt="Ledger icon" />}
+              {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
             </CurrentAccountTextContainer>
           ))}
         {!account ? (

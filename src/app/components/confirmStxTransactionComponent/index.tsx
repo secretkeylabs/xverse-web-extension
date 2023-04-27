@@ -14,7 +14,7 @@ import {
   getNonce,
   signMultiStxTransactions,
   signTransaction,
-  signStxTransaction,
+  signLedgerStxTransaction,
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -23,6 +23,7 @@ import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import LedgerConnectDefault from '@assets/img/ledger/ledger_connect_default.svg';
 import { ledgerDelay } from '@common/utils/ledger';
+import { isHardwareAccount } from '@utils/helper';
 
 const Container = styled.div`
   display: flex;
@@ -158,7 +159,7 @@ function ConfirmStxTransationComponent({
       onConfirmClick(initialStxTransactions);
       return;
     }
-    if (selectedAccount?.isLedgerAccount) {
+    if (isHardwareAccount(selectedAccount)) {
       setIsModalVisible(true);
       return;
     }
@@ -212,7 +213,7 @@ function ConfirmStxTransationComponent({
     await ledgerDelay(1500);
     setCurrentStepIndex(1);
     try {
-      const signedTxs = await signStxTransaction(
+      const signedTxs = await signLedgerStxTransaction(
         transport,
         initialStxTransactions[0],
         selectedAccount.id

@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import { Coin, createDeployContractRequest } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { getNetworkType } from '@utils/helper';
+import { getNetworkType, isHardwareAccount } from '@utils/helper';
 import useNetworkSelector from '@hooks/useNetwork';
 import { getContractCallPromises, getTokenTransferRequest } from './helper';
 
@@ -26,15 +26,8 @@ const LoaderContainer = styled.div((props) => ({
 function TransactionRequest() {
   const { payload, tabId, requestToken } = useDappRequest();
   const navigate = useNavigate();
-  const {
-    stxAddress,
-    network,
-    stxPublicKey,
-    feeMultipliers,
-    accountsList,
-    selectedAccount,
-    isLedgerAccount,
-  } = useWalletSelector();
+  const { stxAddress, network, stxPublicKey, feeMultipliers, accountsList, selectedAccount } =
+    useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const { switchAccount } = useWalletReducer();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>();
@@ -109,7 +102,7 @@ function TransactionRequest() {
       });
       return;
     }
-    if (payload.stxAddress !== selectedAccount?.stxAddress && !isLedgerAccount) {
+    if (payload.stxAddress !== selectedAccount?.stxAddress && !isHardwareAccount(selectedAccount)) {
       const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
       if (account) {
         switchAccount(account);

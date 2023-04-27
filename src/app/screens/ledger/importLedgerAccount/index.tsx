@@ -307,7 +307,7 @@ function ImportLedger(): JSX.Element {
           stxPublicKey: stacksCredentials?.publicKey || '',
           btcPublicKey: bitcoinCredentials?.publicKey || '',
           ordinalsPublicKey: ordinalsCredentials?.publicKey || '',
-          isLedgerAccount: true,
+          accountType: 'ledger',
           accountName: `Ledger Account ${addressIndex + 1}`,
         };
         await addLedgerAccount(ledgerAccount);

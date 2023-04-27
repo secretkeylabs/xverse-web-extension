@@ -1,3 +1,4 @@
+import { AccountType } from '@secretkeylabs/xverse-core';
 import {
   Coin,
   FeesMultipliers,
@@ -69,7 +70,7 @@ export interface WalletState {
   hasActivatedOrdinalsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
-  isLedgerAccount: boolean | undefined;
+  accountType: AccountType | undefined;
   accountName: string | undefined;
   btcApiUrl: string;
 }
@@ -132,7 +133,7 @@ export interface SelectAccount {
   bnsName?: string;
   network: SettingsNetwork;
   // stackingState: StackingStateData;
-  isLedgerAccount: boolean | undefined;
+  accountType: AccountType;
   accountName: string | undefined;
 }
 export interface SetCoinRates {

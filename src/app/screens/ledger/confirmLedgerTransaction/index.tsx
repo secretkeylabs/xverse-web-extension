@@ -8,7 +8,7 @@ import ActionButton from '@components/button';
 import {
   broadcastSignedTransaction,
   signLedgerNestedSegwitBtcTransaction,
-  signStxTransaction,
+  signLedgerStxTransaction,
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { LedgerTransactionType } from '../reviewLedgerBtcTransaction';
@@ -138,7 +138,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
   const signAndBroadcastStxTx = async (transport: Transport, accountId: number) => {
     try {
-      const result = await signStxTransaction(transport, unsignedTx, accountId);
+      const result = await signLedgerStxTransaction(transport, unsignedTx, accountId);
       setIsTxApproved(true);
       await ledgerDelay(1500);
       const transactionHash = await broadcastSignedTransaction(result, selectedNetwork);

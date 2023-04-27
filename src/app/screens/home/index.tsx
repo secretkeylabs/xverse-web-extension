@@ -34,6 +34,7 @@ import useAppConfig from '@hooks/queries/useAppConfig';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import BalanceCard from './balanceCard';
+import { isLedgerAccount } from '@utils/helper';
 
 const Container = styled.div`
   display: flex;
@@ -133,7 +134,7 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { coinsList, stxAddress, btcAddress, ordinalsAddress, isLedgerAccount } =
+  const { coinsList, stxAddress, btcAddress, ordinalsAddress, selectedAccount } =
     useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
@@ -177,7 +178,7 @@ function Home() {
   };
 
   const onStxSendClick = async () => {
-    if (isLedgerAccount) {
+    if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL('options.html#/send-stx-ledger'),
       });
@@ -187,7 +188,7 @@ function Home() {
   };
 
   const onBtcSendClick = async () => {
-    if (isLedgerAccount) {
+    if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL('options.html#/send-btc-ledger'),
       });
@@ -205,7 +206,7 @@ function Home() {
   };
 
   const onSendFtSelect = async (coin: FungibleToken) => {
-    if (isLedgerAccount) {
+    if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#/send-ft-ledger?coin=${coin.name}`),
       });

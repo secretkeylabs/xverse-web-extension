@@ -10,6 +10,7 @@ import AccountRow from '@components/accountRow';
 
 import useWalletSelector from '@hooks/useWalletSelector';
 import OptionsDialog from './optionsDialog';
+import { isHardwareAccount } from '@utils/helper';
 
 const SelectedAccountContainer = styled.div((props) => ({
   paddingLeft: '5%',
@@ -58,7 +59,7 @@ function AccountHeaderComponent({
   disableCopy = false,
 }: AccountHeaderComponentProps) {
   const navigate = useNavigate();
-  const { selectedAccount, isLedgerAccount } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
 
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const [showOptionsDialog, setShowOptionsDialog] = useState<boolean>(false);
@@ -135,7 +136,7 @@ function AccountHeaderComponent({
         <AccountRow
           account={selectedAccount!}
           isSelected
-          allowCopyAddress={!disableCopy && !isLedgerAccount}
+          allowCopyAddress={!disableCopy && !isHardwareAccount(selectedAccount)}
           onAccountSelected={handleAccountSelect}
         />
         {!disableMenuOption && (

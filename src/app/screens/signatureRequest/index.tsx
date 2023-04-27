@@ -16,7 +16,7 @@ import Seperator from '@components/seperator';
 import { bytesToHex } from '@stacks/transactions';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { getNetworkType } from '@utils/helper';
+import { getNetworkType, isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
 import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
@@ -186,7 +186,7 @@ function SignatureRequest(): JSX.Element {
   const confirmCallback = async () => {
     try {
       setIsSigning(true);
-      if (selectedAccount?.isLedgerAccount) {
+      if (isHardwareAccount(selectedAccount)) {
         setIsModalVisible(true);
         return;
       }

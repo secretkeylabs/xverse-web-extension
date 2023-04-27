@@ -86,7 +86,7 @@ function AccountList(): JSX.Element {
         account.ordinalsPublicKey,
         network,
         undefined,
-        account.isLedgerAccount,
+        account.accountType,
         account.accountName
       )
     );

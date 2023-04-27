@@ -1,5 +1,8 @@
 import {
-  Account, StxMempoolTransactionData, SettingsNetwork, NetworkType,
+  Account,
+  StxMempoolTransactionData,
+  SettingsNetwork,
+  NetworkType,
 } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
@@ -156,3 +159,11 @@ export async function isValidBtcApi(url: string, network: NetworkType) {
 
 export const getNetworkType = (stxNetwork) =>
   stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
+
+export const isHardwareAccount = (account: Account | null): boolean => {
+  return account?.accountType !== 'software';
+};
+
+export const isLedgerAccount = (account: Account | null): boolean => {
+  return account?.accountType === 'ledger';
+};

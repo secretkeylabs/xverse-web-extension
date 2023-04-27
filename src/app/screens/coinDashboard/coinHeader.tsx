@@ -20,7 +20,7 @@ import { getFtBalance, getFtTicker } from '@utils/tokens';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { getExplorerUrl } from '@utils/helper';
+import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
 
 interface CoinBalanceProps {
   coin: CurrencyTypes;
@@ -190,7 +190,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
     btcFiatRate,
     stxLockedBalance,
     stxAvailableBalance,
-    isLedgerAccount,
+    selectedAccount,
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
@@ -325,7 +325,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   };
 
   const goToSendScreen = async () => {
-    if (isLedgerAccount) {
+    if (isLedgerAccount(selectedAccount)) {
       if (coin === 'BTC') {
         await chrome.tabs.create({
           url: chrome.runtime.getURL('options.html#/send-btc-ledger'),

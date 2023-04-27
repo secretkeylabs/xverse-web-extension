@@ -17,6 +17,7 @@ import ActionButton from '@components/button';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { ledgerDelay } from '@common/utils/ledger';
 import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
+import { isHardwareAccount } from '@utils/helper';
 
 const MainContainer = styled.div({
   display: 'flex',
@@ -79,7 +80,7 @@ function AuthenticationRequest() {
   const confirmCallback = async () => {
     setLoading(true);
     try {
-      if (selectedAccount?.isLedgerAccount) {
+      if (isHardwareAccount(selectedAccount)) {
         setIsModalVisible(true);
         return;
       }

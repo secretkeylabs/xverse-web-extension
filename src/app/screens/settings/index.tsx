@@ -15,6 +15,7 @@ import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreat
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import ResetWalletPrompt from '../../components/resetWallet';
 import SettingComponent from './settingComponent';
+import { isLedgerAccount } from '@utils/helper';
 
 declare const VERSION: string;
 
@@ -56,7 +57,7 @@ function Setting() {
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const { fiatCurrency, network, hasActivatedOrdinalsKey, isLedgerAccount } = useWalletSelector();
+  const { fiatCurrency, network, hasActivatedOrdinalsKey, selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { unlockWallet, resetWallet } = useWalletReducer();
@@ -166,7 +167,7 @@ function Setting() {
           textDetail={fiatCurrency}
           showDivider
         />
-        {!isLedgerAccount && (
+        {!isLedgerAccount(selectedAccount) && (
           <SettingComponent
             text={t('NETWORK')}
             onClick={openChangeNetworkScreen}

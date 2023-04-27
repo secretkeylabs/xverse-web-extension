@@ -11,6 +11,7 @@ import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import { isLedgerAccount } from '@utils/helper';
 
 function LedgerSendBtcScreen() {
   const location = useLocation();
@@ -24,7 +25,7 @@ function LedgerSendBtcScreen() {
   const [addressError, setAddressError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const { btcAddress, network, btcBalance, isLedgerAccount } = useSelector(
+  const { btcAddress, network, btcBalance, selectedAccount } = useSelector(
     (state: StoreState) => state.walletState
   );
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
@@ -32,10 +33,10 @@ function LedgerSendBtcScreen() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLedgerAccount) {
+    if (!isLedgerAccount(selectedAccount)) {
       navigate('/');
     }
-  }, [isLedgerAccount]);
+  }, [selectedAccount]);
 
   function validateFields(address: string, amountToSend: string): boolean {
     if (!address) {

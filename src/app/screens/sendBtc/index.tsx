@@ -14,6 +14,7 @@ import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
+import { isLedgerAccount } from '@utils/helper';
 
 function SendBtcScreen() {
   const location = useLocation();
@@ -35,7 +36,6 @@ function SendBtcScreen() {
     selectedAccount,
     seedPhrase,
     btcFiatRate,
-    isLedgerAccount,
   } = useSelector((state: StoreState) => state.walletState);
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 
@@ -151,7 +151,7 @@ function SendBtcScreen() {
     ];
     setRecipient(recipients);
     if (validateFields(address, amountToSend)) {
-      if (!isLedgerAccount) {
+      if (!isLedgerAccount(selectedAccount)) {
         mutate({ recipients });
         return;
       }

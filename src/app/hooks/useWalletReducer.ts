@@ -23,18 +23,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import useNetworkSelector from '@hooks/useNetwork';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 
 const useWalletReducer = () => {
-  const {
-    encryptedSeed,
-    accountsList,
-    seedPhrase,
-    selectedAccount,
-    network,
-    ledgerAccountsList,
-  } = useSelector((state: StoreState) => ({
-    ...state.walletState,
-  }));
+  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } =
+    useSelector((state: StoreState) => ({
+      ...state.walletState,
+    }));
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
@@ -53,7 +48,7 @@ const useWalletReducer = () => {
       currentAccounts
     );
 
-    if (!selectedAccount?.isLedgerAccount) {
+    if (!isHardwareAccount(selectedAccount)) {
       dispatch(
         setWalletAction(
           selectedAccount
@@ -66,7 +61,7 @@ const useWalletReducer = () => {
     dispatch(
       fetchAccountAction(
         selectedAccount
-          ? selectedAccount.isLedgerAccount
+          ? isLedgerAccount(selectedAccount)
             ? ledgerAccountsList[selectedAccount.id]
             : walletAccounts[selectedAccount.id]
           : walletAccounts[0],
@@ -180,7 +175,7 @@ const useWalletReducer = () => {
         account.ordinalsPublicKey,
         network,
         undefined,
-        account.isLedgerAccount,
+        account.accountType,
         account.accountName
       )
     );
@@ -227,7 +222,7 @@ const useWalletReducer = () => {
     );
     try {
       dispatch(addLedgerAcountAction(newLedgerAccountsList));
-      if (selectedAccount?.isLedgerAccount && updatedLedgerAccount.id === selectedAccount?.id) {
+      if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
         switchAccount(updatedLedgerAccount);
       }
     } catch (err) {

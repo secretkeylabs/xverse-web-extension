@@ -10,6 +10,7 @@ import {
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
+import { AccountType } from '@secretkeylabs/xverse-core';
 
 export function setWalletAction(wallet: BaseWallet): actions.SetWallet {
   return {
@@ -69,9 +70,7 @@ export function addAccoutAction(accountsList: Account[]): actions.AddAccount {
   };
 }
 
-export function addLedgerAcountAction(
-  ledgerAccountsList: Account[]
-): actions.AddLedgerAccount {
+export function addLedgerAcountAction(ledgerAccountsList: Account[]): actions.AddLedgerAccount {
   return {
     type: actions.AddLedgerAccountKey,
     ledgerAccountsList,
@@ -90,7 +89,7 @@ export function selectAccount(
   network: SettingsNetwork,
   // stackingState: StackingStateData,
   bnsName?: string,
-  isLedgerAccount?: boolean,
+  accountType?: AccountType,
   accountName?: string
 ): actions.SelectAccount {
   return {
@@ -106,7 +105,7 @@ export function selectAccount(
     network,
     // stackingState,
     bnsName,
-    isLedgerAccount,
+    accountType,
     accountName,
   };
 }
@@ -185,7 +184,7 @@ export function ChangeFiatCurrencyAction(
 export function ChangeNetworkAction(
   network: SettingsNetwork,
   networkAddress: string | undefined,
-  btcApiUrl: string,
+  btcApiUrl: string
 ): actions.ChangeNetwork {
   return {
     type: actions.ChangeNetworkKey,
