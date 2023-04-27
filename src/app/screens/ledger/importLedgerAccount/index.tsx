@@ -263,14 +263,14 @@ function ImportLedger(): JSX.Element {
       (account) => account.stxAddress !== ''
     ).length;
     setAddressIndex(newAddressIndex);
-    const { address, publicKey, testnetAddress } = await importStacksAccountFromLedger(
+    const { address, publicKey } = await importStacksAccountFromLedger(
       transport,
       network.type,
       0,
       newAddressIndex
     );
     setStacksCredentials({
-      address: network.type === 'Mainnet' ? address : testnetAddress,
+      address,
       publicKey,
     });
     await transport.close();
