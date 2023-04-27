@@ -1,3 +1,4 @@
+import InfoContainer from '@components/infoContainer';
 import { SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -25,7 +26,7 @@ const InputContainer = styled.div((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(6),
   border: `1px solid ${props.theme.colors.background.elevation6}`,
   backgroundColor: props.theme.colors.background.elevation1,
   borderRadius: 8,
@@ -47,7 +48,7 @@ interface Props {
   nonce?: string;
 }
 function EditNonce({ nonce }: Props) {
-  const { t } = useTranslation('translation');
+  const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
   const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const onInputEditNonceChange = (e: { target: { value: SetStateAction<string> } }) => {
     setNonceInput(e.target.value);
@@ -55,11 +56,13 @@ function EditNonce({ nonce }: Props) {
 
   return (
     <NonceContainer>
-      <DetailText>{t('TRANSACTION_SETTING.NONCE_INFO')}</DetailText>
-      <Text>{t('TRANSACTION_SETTING.NONCE')}</Text>
+      <DetailText>{t('NONCE_INFO')}</DetailText>
+      <Text>{t('NONCE')}</Text>
       <InputContainer>
         <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
       </InputContainer>
+      <InfoContainer bodyText={t('NONCE_WARNING')} />
+
     </NonceContainer>
   );
 }

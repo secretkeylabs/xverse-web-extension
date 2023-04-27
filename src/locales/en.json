@@ -134,7 +134,8 @@
     "NONCE_INFO": "You can use a custom nonce to replace a pending transaction with the same nonce.",
     "SAME_FEE_ERROR": "New fee must be greater than current fee",
     "GREATER_FEE_ERROR": "Fee is more than available balance",
-    "LOWER_THAN_MINIMUM": "Set fee is below minimum"
+    "LOWER_THAN_MINIMUM": "Set fee is below minimum",
+    "NONCE_WARNING": "Entering an erronous nonce can result in a failed transaction. Only apply changes if you know what you are doing."
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",

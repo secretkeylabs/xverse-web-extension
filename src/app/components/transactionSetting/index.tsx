@@ -23,6 +23,7 @@ import {
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { btcToSats, BtcUtxoDataResponse, ErrorCodes } from '@secretkeylabs/xverse-core';
 import EditNonce from './editNonce';
+import EditFee from './editFee';
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,
@@ -89,7 +90,7 @@ const NonceContainer = styled.div((props) => ({
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(22),
+  marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(20),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
@@ -454,20 +455,6 @@ function TransactionSettingAlert({
     </ErrorContainer>
   );
 
-  const onInputEditNonceChange = (e: { target: { value: SetStateAction<string> } }) => {
-    setNonceInput(e.target.value);
-  };
-
-  const editNonceSection = (
-    <NonceContainer>
-      <Text>{t('TRANSACTION_SETTING.NONCE')}</Text>
-      <InputContainer>
-        <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
-      </InputContainer>
-      <DetailText>{t('TRANSACTION_SETTING.NONCE_INFO')}</DetailText>
-    </NonceContainer>
-  );
-
   const onEditFeesPress = () => {
     setShowFeeSettings(true);
   };
@@ -485,6 +472,10 @@ function TransactionSettingAlert({
   const renderContent = () => {
     if (showNonceSettings) {
       return <EditNonce nonce={nonce} />;
+    }
+
+    if (showFeeSettings) {
+      return <EditFee fee={fee} type={type} />;
     }
 
     return (
@@ -518,6 +509,16 @@ function TransactionSettingAlert({
       onClose={onClosePress}
     >
       {renderContent()}
+      {(showFeeSettings || showNonceSettings) && (
+      <ButtonContainer>
+        <ActionButton
+          text={t('TRANSACTION_SETTING.APPLY')}
+          processing={isLoading}
+          disabled={isLoading}
+          onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
+        />
+      </ButtonContainer>
+      )}
     </BottomModal>
   );
 }
