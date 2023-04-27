@@ -18,6 +18,7 @@ const Container = styled.div((props) => ({
 
 const HeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
+  fontSize: 16,
   flex: 1,
 }));
 
@@ -25,6 +26,7 @@ const DescriptionText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
   margin: 16,
+  fontSize: 16,
 }));
 
 const RowContainer = styled.div((props) => ({
