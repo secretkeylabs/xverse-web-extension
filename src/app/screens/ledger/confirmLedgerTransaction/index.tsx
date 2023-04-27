@@ -184,6 +184,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
       default:
         break;
     }
+    await transport.close();
   };
 
   const handleRetry = async () => {

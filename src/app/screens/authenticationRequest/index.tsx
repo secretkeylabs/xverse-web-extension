@@ -170,6 +170,8 @@ function AuthenticationRequest() {
       console.error(e);
       setIsTxRejected(true);
       setIsButtonDisabled(false);
+    } finally {
+      await transport.close();
     }
   };
 
