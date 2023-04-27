@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import {
-  ReactNode, useEffect, useState,
-} from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
@@ -11,7 +9,11 @@ import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/c
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import TransferFeeView from '@components/transferFeeView';
 import {
-  setFee, setNonce, getNonce, signMultiStxTransactions, signTransaction,
+  setFee,
+  setNonce,
+  getNonce,
+  signMultiStxTransactions,
+  signTransaction,
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -32,7 +34,7 @@ const Container = styled.div`
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginBottom: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(12),
   marginTop: props.theme.spacing(12),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
@@ -60,10 +62,6 @@ const ButtonText = styled.div((props) => ({
   textAlign: 'center',
 }));
 
-const TransferFeeContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(12),
-}));
-
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
   alignSelf: 'center',
@@ -75,6 +73,23 @@ const SponsoredInfoText = styled.h1((props) => ({
   color: props.theme.colors.white['400'],
 }));
 
+const ReviewTransactionText = styled.h1((props) => ({
+  ...props.theme.headline_s,
+  color: props.theme.colors.white[0],
+  textAlign: 'left',
+}));
+
+const RequestedByText = styled.h1((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[400],
+  marginTop: props.theme.spacing(4),
+  textAlign: 'left',
+}));
+
+const TitleContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(16),
+}));
+
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
@@ -82,6 +97,10 @@ interface Props {
   onConfirmClick: (transactions: StacksTransaction[]) => void;
   children: ReactNode;
   isSponsored?: boolean;
+  isAsset?: boolean;
+  title?: string;
+  subTitle?: string;
+
 }
 
 function ConfirmStxTransationComponent({
@@ -89,15 +108,15 @@ function ConfirmStxTransationComponent({
   loading,
   isSponsored,
   children,
+  isAsset,
+  title,
+  subTitle,
   onConfirmClick,
   onCancelClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const selectedNetwork = useNetworkSelector();
-  const {
-    selectedAccount,
-    seedPhrase,
-  } = useWalletSelector();
+  const { selectedAccount, seedPhrase } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
 
@@ -160,21 +179,28 @@ function ConfirmStxTransationComponent({
   return (
     <>
       <Container>
+        <TitleContainer>
+          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRNSACTION')}</ReviewTransactionText>}
+          {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
+        </TitleContainer>
         {children}
-        <TransferFeeContainer>
+        <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
+        {initialStxTransactions[0]?.payload?.amount && (
           <TransferFeeView
-            fee={microstacksToStx(getFee())}
+            fee={microstacksToStx(
+              getFee().plus(new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10))),
+            )}
             currency="STX"
+            title={t('TOTAL')}
           />
-        </TransferFeeContainer>
-
+        )}
         {!isSponsored && (
-        <Button onClick={onAdvancedSettingClick}>
-          <>
-            <ButtonImage src={SettingIcon} />
-            <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
-          </>
-        </Button>
+          <Button onClick={onAdvancedSettingClick}>
+            <>
+              <ButtonImage src={SettingIcon} />
+              <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
+            </>
+          </Button>
         )}
         {isSponsored && <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>}
         <TransactionSettingAlert

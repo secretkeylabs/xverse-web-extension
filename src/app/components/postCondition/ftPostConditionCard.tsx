@@ -17,6 +17,7 @@ function FtPostConditionCard({ postCondition, ftMetaData }: Props) {
     <PostConditionsView
       postCondition={postCondition}
       amount={amount}
+      icon={ftMetaData?.image}
     />
   );
 }
