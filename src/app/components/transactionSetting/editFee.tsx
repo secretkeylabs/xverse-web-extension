@@ -33,14 +33,6 @@ const FiatAmountText = styled.h1((props) => ({
   color: props.theme.colors.white['400'],
 }));
 
-const AmountContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  background: 'orange',
-  justifyContent: 'flex-start',
-  alignItems: 'flex-start',
-}));
-
 const DetailText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['200'],
@@ -121,15 +113,6 @@ const FeeContainer = styled.div({
   flexDirection: 'column',
 });
 
-const ApplyButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(16),
-  marginBottom: props.theme.spacing(20),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
-
 const TickerContainer = styled.div({
   display: 'flex',
   flexDirection: 'row-reverse',
@@ -205,11 +188,11 @@ function EditFee({
             nonOrdinalUtxos!,
             ordinalsAddress,
             'Mainnet',
-            mode?.value,
+            mode,
           );
           setFeeInput(btcFee.toString());
         } else if (btcRecipients && selectedAccount) {
-          const btcFee = await getBtcFees(btcRecipients, btcAddress, network.type, mode?.value);
+          const btcFee = await getBtcFees(btcRecipients, btcAddress, network.type, mode);
           setFeeInput(btcFee.toString());
         }
       } else if (type === 'Ordinals') {

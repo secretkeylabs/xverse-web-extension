@@ -5,7 +5,6 @@ import {
   SetStateAction, useEffect, useRef, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select, { SingleValue } from 'react-select';
 import styled, { useTheme } from 'styled-components';
 import IconSats from '@assets/img/send/ic_sats_ticker.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
@@ -19,36 +18,15 @@ import {
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
 import {
-  getBtcFees, getBtcFeesForNonOrdinalBtcSend, getBtcFeesForOrdinalSend, isCustomFeesAllowed, Recipient,
+  isCustomFeesAllowed, Recipient,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import { btcToSats, BtcUtxoDataResponse, ErrorCodes } from '@secretkeylabs/xverse-core';
+import { BtcUtxoDataResponse } from '@secretkeylabs/xverse-core';
 import EditNonce from './editNonce';
 import EditFee from './editFee';
-
-const Text = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-}));
-
-const TickerContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row-reverse',
-  alignItems: 'center',
-});
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white['400'],
-}));
-
-const SubText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
-}));
-
-const DetailText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
-  marginTop: props.theme.spacing(8),
 }));
 
 const TickerImage = styled.img((props) => ({
@@ -58,27 +36,6 @@ const TickerImage = styled.img((props) => ({
   width: 24,
 }));
 
-const RowContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-});
-
-const SelectorContainer = styled.div({
-  display: 'flex',
-  alignItems: 'flex-end',
-  width: 148,
-  justifyContent: 'flex-end',
-});
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(8),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
-
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -86,34 +43,6 @@ const ButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(20),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-}));
-
-const FeeContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background.elevation1,
-  color: props.theme.colors.white['400'],
-  width: '100%',
-  border: 'transparent',
-}));
-
-const InputContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(4),
-  border: `1px solid ${props.theme.colors.background.elevation6}`,
-  backgroundColor: props.theme.colors.background.elevation1,
-  borderRadius: 8,
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(5),
 }));
 
 const ErrorContainer = styled.div((props) => ({
@@ -192,122 +121,15 @@ function TransactionSettingAlert({
 }:Props) {
   const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
-  const theme = useTheme();
   const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const [error, setError] = useState('');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
-  const [selectedOption, setSelectedOption] = useState({
-    label: t('TRANSACTION_SETTING.STANDARD'),
-    value: 'standard',
-  });
   const {
-    network,
-    btcAddress, stxBtcRate, btcFiatRate, fiatCurrency, btcBalance, selectedAccount, ordinalsAddress,
+    btcBalance,
   } = useSelector((state: StoreState) => state.walletState);
-  const inputRef = useRef(null);
-  const customStyles = {
-    control: (base: any, state: { isFocused: boolean, isSelected: boolean }) => ({
-      ...base,
-      ...theme.body_medium_m,
-      background: theme.colors.background.elevation1,
-      borderRadius: 8,
-      color: theme.colors.white['400'],
-      borderColor: theme.colors.background.elevation6,
-      boxShadow: state.isFocused ? null : null,
-      '&:hover': {
-        borderColor: theme.colors.background.elevation2,
-      },
-      height: 45,
-    }),
-    option: (base: any, state: { isFocused: boolean, isSelected: boolean }) => ({
-      ...base,
-      background: state.isFocused ? 'rgba(255, 255, 255, 0.09)' : '#3C3F60',
-    }),
-    menuList: (base: any) => ({
-      ...base,
-      padding: 0,
-      ...theme.body_medium_m,
-      color: theme.colors.white['0'],
-      background: '#3C3F60',
-      '&:hover': {
-        color: theme.colors.white['0'],
-      },
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      ...theme.body_medium_m,
-      height: '100%',
-      color: theme.colors.white['200'],
-      paddingTop: '3px',
-    }),
-  };
-
-  const StxFeeModes: { label: string; value: FeeModeType }[] = [
-    {
-      label: t('TRANSACTION_SETTING.LOW'),
-      value: 'low',
-    },
-    {
-      label: t('TRANSACTION_SETTING.STANDARD'),
-      value: 'standard',
-    },
-    {
-      label: t('TRANSACTION_SETTING.HIGH'),
-      value: 'high',
-    },
-    {
-      label: t('TRANSACTION_SETTING.CUSTOM'),
-      value: 'custom',
-    },
-  ];
-  const BtcFeeModes = [
-    {
-      label: t('TRANSACTION_SETTING.STANDARD'),
-      value: 'standard',
-    },
-    {
-      label: t('TRANSACTION_SETTING.HIGH'),
-      value: 'high',
-    },
-    {
-      label: t('TRANSACTION_SETTING.CUSTOM'),
-      value: 'custom',
-    },
-  ];
-
-  function getFiatEquivalent() {
-    return type === 'STX'
-      ? getStxFiatEquivalent(stxToMicrostacks(new BigNumber(feeInput)), stxBtcRate, btcFiatRate)
-      : getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
-  }
-
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (fiatAmount) {
-      if (fiatAmount.isLessThan(0.01)) {
-        return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      }
-      return (
-        <NumericFormat
-          value={fiatAmount.toFixed(2).toString()}
-          displayType="text"
-          thousandSeparator
-          prefix={`${currencySymbolMap[fiatCurrency]} `}
-          suffix={` ${fiatCurrency}`}
-          renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
-        />
-      );
-    }
-    return '';
-  };
-  function getTokenIcon() {
-    if (type === 'STX') {
-      return <TickerImage src={IconStacks} />;
-    } if (type === 'BTC') {
-      return <TickerImage src={IconSats} />;
-    }
-  }
+  
   function applyClickForStx() {
     if (previousFee && availableBalance) {
       const prevFee = stxToMicrostacks(new BigNumber(previousFee));
@@ -376,7 +198,18 @@ function TransactionSettingAlert({
     }
 
     if (showFeeSettings) {
-      return <EditFee fee={fee} type={type} setIsLoading={onLoading} setIsNotLoading={onComplete} />;
+      return (
+        <EditFee
+          fee={fee}
+          type={type}
+          setIsLoading={onLoading}
+          setIsNotLoading={onComplete}
+          btcRecipients={btcRecipients}
+          ordinalTxUtxo={ordinalTxUtxo}
+          isRestoreFlow={isRestoreFlow}
+          nonOrdinalUtxos={nonOrdinalUtxos}
+        />
+      );
     }
 
     return (
