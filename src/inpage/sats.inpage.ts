@@ -78,7 +78,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           reject(eventMessage.data.payload.signMessageResponse);
           return;
         }
-        if (typeof eventMessage.data.payload.signMessageResponse !== 'string') {
+        if (typeof eventMessage.data.payload.signMessageResponse === 'string') {
           resolve(eventMessage.data.payload.signMessageResponse);
         }
       };
