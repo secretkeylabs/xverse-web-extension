@@ -1,16 +1,11 @@
 import styled from 'styled-components';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import AddressIcon from '@assets/img/transactions/address.svg';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import { useSelector } from 'react-redux';
-import BigNumber from 'bignumber.js';
 import {
   animated, config, useSpring,
 } from '@react-spring/web';
-import { StoreState } from '@stores/index';
 import TransferDetailView from '@components/transferDetailView';
+import { useState } from 'react';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -63,6 +58,13 @@ interface ColumnProps {
 const ColumnContainer = styled.div<ColumnProps>((props) => ({
   display: 'flex',
   flexDirection: props.isExpanded ? 'column' : 'row',
+  justifyContent: 'flex-end',
+  alignItems: props.isExpanded ? 'flex-end' : 'center',
+}));
+
+const ExpandedColumnContainer = styled.div<ColumnProps>((props) => ({
+  display: 'flex',
+  flexDirection: props.isExpanded ? 'column' : 'row',
   flex: 1,
   justifyContent: 'flex-end',
   alignItems: props.isExpanded ? 'flex-end' : 'center',
@@ -73,6 +75,11 @@ const RowContainer = styled.div({
   flexDirection: 'row',
   width: '100%',
   alignItems: 'center',
+});
+
+const TitleContainer = styled.div({
+  display: 'flex',
+  flex: 1,
 });
 
 const ExpandedContainer = styled(animated.div)({
@@ -91,30 +98,27 @@ const Button = styled.button((props) => ({
 
 interface Props {
   title: string;
-  address: string;
   description?: string;
   value: string;
-  subValue: string;
-  icon: string;
-  isExpanded?: boolean;
-  onArrowClick: () => void;
+  address?: string;
+  subTitle?: string;
+  subValue?: string;
+  icon?: string;
 
 }
 
 function TransferAmountComponent({
-  title, address, value, subValue, description, icon, isExpanded = false, onArrowClick,
+  title, address, value, subValue, description, icon, subTitle,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const {
-    fiatCurrency,
-  } = useSelector((state: StoreState) => state.walletState);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const slideInStyles = useSpring({
     config: { ...config.gentle, duration: 400 },
     from: { opacity: 0, height: 0 },
     to: {
       opacity: isExpanded ? 1 : 0,
-      height: isExpanded ? 80 : 0,
+      height: isExpanded ? 90 : 0,
     },
   });
 
@@ -123,37 +127,23 @@ function TransferAmountComponent({
     config: { ...config.stiff },
   });
 
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (fiatAmount) {
-      if (fiatAmount.isLessThan(0.01)) {
-        return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      }
-      return (
-        <NumericFormat
-          value={fiatAmount.toFixed(2).toString()}
-          displayType="text"
-          thousandSeparator
-          prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
-          suffix={` ${fiatCurrency}`}
-          renderText={(text) => <SubValueText>{text}</SubValueText>}
-        />
-      );
-    }
-    return '';
-  };
-
   const renderAmount = value && (
     <>
       <ValueText>{value}</ValueText>
-      {isExpanded && <SubValueText>{getFiatAmountString(subValue)}</SubValueText>}
+      {isExpanded && subValue && <SubValueText>{subValue}</SubValueText>}
     </>
   );
+
+  const onArrowClick = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   return (
     <Container>
       <RowContainer>
-        {icon && !isExpanded && <Icon src={icon} /> }
-        <TitleText>{title}</TitleText>
+        <TitleContainer>
+          <TitleText>{title}</TitleText>
+        </TitleContainer>
         <ColumnContainer isExpanded={isExpanded}>
           {!isExpanded && renderAmount}
           <Button onClick={onArrowClick}>
@@ -164,18 +154,17 @@ function TransferAmountComponent({
 
       {isExpanded && (
       <ExpandedContainer style={slideInStyles}>
-        <DescriptionText>{description}</DescriptionText>
+        {description && <DescriptionText>{description}</DescriptionText>}
         <RowContainer>
-          <Icon src={icon} />
-          <TitleText>{t('AMOUNT')}</TitleText>
-          <ColumnContainer isExpanded={isExpanded}>
+          {icon && <Icon src={icon} />}
+          <TitleText>{subValue === '' ? t('AMOUNT') : t('ASSET')}</TitleText>
+          <ExpandedColumnContainer isExpanded={isExpanded}>
             {renderAmount}
-          </ColumnContainer>
+          </ExpandedColumnContainer>
         </RowContainer>
-        {/* <FromContainer>
-          <DescriptionText>{t('FROM')}</DescriptionText>
-          <TransferDetailView icon={AddressIcon} title={t('YOUR_ADDRESS')} address={address} />
-      </FromContainer> */}
+        <FromContainer>
+          <TransferDetailView title={subTitle} address={address!} />
+        </FromContainer>
       </ExpandedContainer>
       )}
     </Container>
