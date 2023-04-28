@@ -79,14 +79,6 @@ const Container = styled.div((props) => ({
   marginRight: props.theme.spacing(8),
 }));
 
-const NonceContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(16),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
-
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -285,69 +277,6 @@ function TransactionSettingAlert({
     },
   ];
 
-  const modifyStxFees = (mode: SingleValue<{ label: string; value: string; }>) => {
-    const currentFee = new BigNumber(fee);
-
-    switch (mode?.value) {
-      case 'low':
-        setFeeInput(currentFee.dividedBy(2).toString());
-        break;
-      case 'standard':
-        setFeeInput(currentFee.toString());
-        break;
-      case 'high':
-        setFeeInput(currentFee.multipliedBy(2).toString());
-        break;
-      case 'custom':
-        inputRef.current?.focus();
-        break;
-      default:
-        break;
-    }
-  };
-
-  useEffect(() => {
-    if (type === 'STX' && selectedOption.value !== 'custom') {
-      modifyStxFees(selectedOption);
-    }
-  }, [selectedOption]);
-
-  const modifyFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
-    try {
-      setSelectedOption(mode!);
-      setIsLoading(true);
-      if (mode?.value === 'custom') inputRef?.current?.focus();
-      else if (type === 'BTC') {
-        if (isRestoreFlow) {
-          const btcFee = await getBtcFeesForNonOrdinalBtcSend(btcAddress, nonOrdinalUtxos!, ordinalsAddress, 'Mainnet', mode?.value);
-          setFeeInput(btcFee.toString());
-        } else if (btcRecipients && selectedAccount) {
-          const btcFee = await getBtcFees(
-            btcRecipients,
-            btcAddress,
-            network.type,
-            mode?.value,
-          );
-          setFeeInput(btcFee.toString());
-        }
-      } else if (type === 'Ordinals') {
-        if (btcRecipients && ordinalTxUtxo) {
-          const txFees = await getBtcFeesForOrdinalSend(
-            btcRecipients[0].address,
-            ordinalTxUtxo,
-            btcAddress,
-            network.type,
-            mode?.value,
-          );
-          setFeeInput(txFees.toString());
-        }
-      }
-      setIsLoading(false);
-    } catch (err: any) {
-      if (Number(error) === ErrorCodes.InSufficientBalance) { setError(t('TX_ERRORS.INSUFFICIENT_BALANCE')); } else setError(error.toString());
-    }
-  };
-
   function getFiatEquivalent() {
     return type === 'STX'
       ? getStxFiatEquivalent(stxToMicrostacks(new BigNumber(feeInput)), stxBtcRate, btcFiatRate)
@@ -413,42 +342,6 @@ function TransactionSettingAlert({
     onApplyClick(feeInput.toString());
   }
 
-  const onInputEditFeesChange = (e: { target: { value: SetStateAction<string> } }) => {
-    setFeeInput(e.target.value);
-  };
-
-  const onFeeOptionChange = (value: { label: string; value: string } | null) => (type === 'STX' ? modifyStxFees(value) : modifyFees(value));
-
-  const editFeesSection = (
-    <Container>
-      <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
-      <RowContainer>
-        <FeeContainer>
-          <RowContainer>
-            <InputContainer>
-              <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
-              <TickerContainer>
-                {getTokenIcon()}
-                <Text>{type === 'STX' ? 'STX' : 'sats'}</Text>
-              </TickerContainer>
-            </InputContainer>
-            <SelectorContainer>
-              <Select
-                defaultValue={selectedOption}
-                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                onChange={onFeeOptionChange}
-                styles={customStyles}
-                options={type === 'STX' ? StxFeeModes : BtcFeeModes}
-              />
-            </SelectorContainer>
-          </RowContainer>
-          <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
-        </FeeContainer>
-      </RowContainer>
-      <DetailText>{t('TRANSACTION_SETTING.FEE_INFO')}</DetailText>
-    </Container>
-  );
-
   const errorText = !!error && (
     <ErrorContainer>
       <ErrorText>{error}</ErrorText>
@@ -463,6 +356,14 @@ function TransactionSettingAlert({
     setShowNonceSettings(true);
   };
 
+  const onLoading = () => {
+    setIsLoading(true);
+  };
+
+  const onComplete = () => {
+    setIsLoading(false);
+  };
+
   const onClosePress = () => {
     setShowNonceSettings(false);
     setShowFeeSettings(false);
@@ -475,7 +376,7 @@ function TransactionSettingAlert({
     }
 
     if (showFeeSettings) {
-      return <EditFee fee={fee} type={type} />;
+      return <EditFee fee={fee} type={type} setIsLoading={onLoading} setIsNotLoading={onComplete} />;
     }
 
     return (
