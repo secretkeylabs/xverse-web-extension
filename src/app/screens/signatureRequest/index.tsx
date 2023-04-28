@@ -3,19 +3,22 @@ import ConfirmScreen from '@components/confirmScreen';
 import useSignatureRequest, {
   isStructuredMessage,
   isUtf8Message,
+  useSignBip322Message,
   useSignMessage,
 } from '@hooks/useSignatureRequest';
 import AccountHeaderComponent from '@components/accountHeader';
 import { useTranslation } from 'react-i18next';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { bytesToHex } from '@stacks/transactions';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
-import { hashMessage } from '@secretkeylabs/xverse-core';
+import { hashMessage } from '@secretkeylabs/xverse-core/wallet';
+import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
@@ -35,12 +38,12 @@ const RequestType = styled.h1((props) => ({
   marginTop: props.theme.spacing(21),
   color: props.theme.colors.white[0],
   textAlign: 'left',
+  marginBottom: props.theme.spacing(4),
 }));
 
 const RequestSource = styled.h2((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[400],
-  marginTop: props.theme.spacing(4),
   textAlign: 'left',
   marginBottom: props.theme.spacing(12),
 }));
@@ -67,11 +70,13 @@ function SignatureRequest(): JSX.Element {
   const { selectedAccount, accountsList, network } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
   const {
-    messageType, request, payload, tabId, domain,
+    messageType, request, payload, tabId, domain, isSignMessageBip322,
   } = useSignatureRequest();
+
   const navigate = useNavigate();
+
   const switchAccountBasedOnRequest = () => {
-    if (getNetworkType(payload.network) !== network.type) {
+    if (!isSignMessageBip322 && getNetworkType(payload.network) !== network.type) {
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -83,7 +88,7 @@ function SignatureRequest(): JSX.Element {
       });
       return;
     }
-    if (payload.stxAddress !== selectedAccount?.stxAddress) {
+    if (!isSignMessageBip322 && payload.stxAddress !== selectedAccount?.stxAddress) {
       const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
       if (account) {
         switchAccount(account);
@@ -107,6 +112,8 @@ function SignatureRequest(): JSX.Element {
 
   const handleMessageSigning = useSignMessage(messageType);
 
+  const handleBip322MessageSigning = useSignBip322Message(payload.message, payload.address);
+
   const cancelCallback = () => {
     finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: 'cancel' });
     window.close();
@@ -115,12 +122,26 @@ function SignatureRequest(): JSX.Element {
   const confirmCallback = async () => {
     try {
       setIsSigning(true);
-      const signature = await handleMessageSigning({
-        message: payload.message,
-        domain: domain || undefined,
-      });
-      if (signature) {
-        finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: signature });
+      if (!isSignMessageBip322) {
+        const signature = await handleMessageSigning({
+          message: payload.message,
+          domain: domain || undefined,
+        });
+        if (signature) {
+          finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: signature });
+        }
+      } else {
+        const bip322signature = await handleBip322MessageSigning();
+        const signingMessage = {
+          source: MESSAGE_SOURCE,
+          method: ExternalSatsMethods.signMessageResponse,
+          payload: {
+            signMessageRequest: request,
+            signMessageResponse: bip322signature,
+          },
+        };
+        chrome.tabs.sendMessage(+tabId, signingMessage);
+        window.close();
       }
     } catch (err) {
       console.log(err);
@@ -128,6 +149,13 @@ function SignatureRequest(): JSX.Element {
       setIsSigning(false);
     }
   };
+
+  const getMessageHash = useCallback(() => {
+    if (!isSignMessageBip322) {
+      return bytesToHex(hashMessage(payload.message));
+    }
+    return bip0322Hash(payload.message);
+  }, [isSignMessageBip322]);
 
   return (
     <ConfirmScreen
@@ -140,19 +168,22 @@ function SignatureRequest(): JSX.Element {
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
         <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
-        <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
-        {isUtf8Message(messageType) && (
-          <SignatureRequestMessage
-            request={payload as SignaturePayload}
-          />
+        {!isSignMessageBip322 ? (
+          <RequestSource>
+            {`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}
+          </RequestSource>
+        ) : null}
+        {(isUtf8Message(messageType) || isSignMessageBip322) && (
+          <SignatureRequestMessage request={payload as SignaturePayload} />
         )}
-        {isStructuredMessage(messageType) && (
-          <SignatureRequestStructuredData
-            payload={payload as StructuredDataSignaturePayload}
-          />
+        {!isSignMessageBip322 && isStructuredMessage(messageType) && (
+          <SignatureRequestStructuredData payload={payload as StructuredDataSignaturePayload} />
         )}
-        <CollapsableContainer text={bytesToHex(hashMessage(payload.message))} title={t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}>
-          <MessageHash>{bytesToHex(hashMessage(payload.message))}</MessageHash>
+        <CollapsableContainer
+          text={getMessageHash()}
+          title={t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}
+        >
+          <MessageHash>{getMessageHash()}</MessageHash>
         </CollapsableContainer>
         <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
         <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />

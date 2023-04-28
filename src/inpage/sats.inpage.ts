@@ -71,7 +71,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<SignMessageResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.signPsbtResponse)) return;
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.signMessageResponse)) return;
         if (eventMessage.data.payload?.signMessageRequest !== signMessageRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.signMessageResponse === 'cancel') {
