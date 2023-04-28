@@ -13,7 +13,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { bytesToHex } from '@stacks/transactions';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { getNetworkType } from '@utils/helper';
+import { getNetworkType, getTruncatedAddress } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
 import { hashMessage } from '@secretkeylabs/xverse-core/wallet';
@@ -49,6 +49,48 @@ const RequestSource = styled.h2((props) => ({
 }));
 
 const MessageHash = styled.p((props) => ({
+  ...props.theme.body_medium_m,
+  textAlign: 'left',
+  lineHeight: 1.6,
+  wordWrap: 'break-word',
+  color: props.theme.colors.white[0],
+  marginBottom: props.theme.spacing(4),
+}));
+
+const SigningAddressContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  background: props.theme.colors.background.elevation1,
+  borderRadius: 12,
+  padding: '12px 16px',
+  marginBottom: 12,
+  flex: 1,
+}));
+
+const SigningAddressTitle = styled.p((props) => ({
+  ...props.theme.body_medium_m,
+  lineHeight: 1.6,
+  wordWrap: 'break-word',
+  color: props.theme.colors.white[200],
+  marginBottom: props.theme.spacing(4),
+}));
+
+const SigningAddress = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+}));
+
+const SigningAddressType = styled.p((props) => ({
+  ...props.theme.body_medium_m,
+  textAlign: 'left',
+  lineHeight: 1.6,
+  wordWrap: 'break-word',
+  color: props.theme.colors.white[0],
+  marginBottom: props.theme.spacing(4),
+}));
+
+const SigningAddressValue = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
   lineHeight: 1.6,
@@ -157,6 +199,32 @@ function SignatureRequest(): JSX.Element {
     return bip0322Hash(payload.message);
   }, [isSignMessageBip322]);
 
+  const getSigningAddressType = useCallback((address: string) => {
+    switch (address) {
+      case selectedAccount?.ordinalsAddress: {
+        return t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TAPROOT');
+      }
+      case selectedAccount?.btcAddress: {
+        return t('SIGNATURE_REQUEST.SIGNING_ADDRESS_SEGWIT');
+      }
+      default:
+        return t('SIGNATURE_REQUEST.SIGNING_ADDRESS_STX');
+    }
+  }, []);
+
+  const getSigningAddressValue = useCallback((address: string) => {
+    switch (address) {
+      case selectedAccount?.ordinalsAddress: {
+        return selectedAccount?.ordinalsAddress;
+      }
+      case selectedAccount?.btcAddress: {
+        return selectedAccount?.btcAddress;
+      }
+      default:
+        return selectedAccount?.stxAddress;
+    }
+  }, []);
+
   return (
     <ConfirmScreen
       onConfirm={confirmCallback}
@@ -185,6 +253,15 @@ function SignatureRequest(): JSX.Element {
         >
           <MessageHash>{getMessageHash()}</MessageHash>
         </CollapsableContainer>
+        <SigningAddressContainer>
+          <SigningAddressTitle>{t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}</SigningAddressTitle>
+          <SigningAddress>
+            <SigningAddressType>{getSigningAddressType(payload.address)}</SigningAddressType>
+            <SigningAddressValue>
+              {getTruncatedAddress(getSigningAddressValue(payload.address))}
+            </SigningAddressValue>
+          </SigningAddress>
+        </SigningAddressContainer>
         <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
         <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
       </MainContainer>
