@@ -79,7 +79,7 @@ function TransactionRequest() {
     setCoinsMetaData(coinMeta);
     const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find((func) => func.name === payload.functionName);
     const txAttachment = payload.attachment ?? undefined;
-    if (txAttachment) setAttachment(attachment);
+    if (txAttachment) setAttachment(txAttachment);
     if (invokedFuncMetaData) {
       setFuncMetaData(invokedFuncMetaData);
     }
