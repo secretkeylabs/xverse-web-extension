@@ -18,7 +18,7 @@ import {
   getBtcFeesForOrdinalSend,
   Recipient,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcUtxoDataResponse, ErrorCodes } from '@secretkeylabs/xverse-core';
+import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -118,7 +118,7 @@ interface Props {
   type?: string;
   fee: string;
   btcRecipients?: Recipient[];
-  ordinalTxUtxo?: BtcUtxoDataResponse;
+  ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
   setIsLoading: () => void;

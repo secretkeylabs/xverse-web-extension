@@ -16,7 +16,7 @@ import { StoreState } from '@stores/index';
 import {
   isCustomFeesAllowed, Recipient,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcUtxoDataResponse } from '@secretkeylabs/xverse-core';
+import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
 import EditNonce from './editNonce';
 import EditFee from './editFee';
 
@@ -79,7 +79,7 @@ interface Props {
   availableBalance?: BigNumber;
   type?: TxType;
   btcRecipients?: Recipient[];
-  ordinalTxUtxo?: BtcUtxoDataResponse;
+  ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
 }

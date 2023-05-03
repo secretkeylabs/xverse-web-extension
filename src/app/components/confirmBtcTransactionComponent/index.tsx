@@ -23,6 +23,7 @@ import {
   getBtcFiatEquivalent,
   ResponseError,
   satsToBtc,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
 import RecipientComponent from '@components/recipientComponent';
 import TransferFeeView from '@components/transferFeeView';
@@ -108,7 +109,7 @@ interface Props {
   fee: BigNumber;
   loadingBroadcastedTx: boolean;
   signedTxHex: string;
-  ordinalTxUtxo?: BtcUtxoDataResponse;
+  ordinalTxUtxo?: UTXO;
   recipients: Recipient[];
   children?: ReactNode;
   assetDetail?: string;
@@ -355,6 +356,7 @@ function ConfirmBtcTransactionComponent({
           fee={currentFee.toString()}
           type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
           btcRecipients={recipients}
+          ordinalTxUtxo={ordinalTxUtxo}
           onApplyClick={onApplyClick}
           onCrossClick={closeTransactionSettingAlert}
           nonOrdinalUtxos={nonOrdinalUtxos}
