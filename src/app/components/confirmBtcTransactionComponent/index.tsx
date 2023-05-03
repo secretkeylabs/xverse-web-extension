@@ -340,11 +340,13 @@ function ConfirmBtcTransactionComponent({
 
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         <TransferFeeView fee={currentFee} currency={t('SATS')} />
+        {!ordinalTxUtxo && (
         <TransactionDetailComponent
           title={t('CONFIRM_TRANSACTION.TOTAL')}
           value={getAmountString(satsToBtc(total), t('BTC'))}
           subValue={getBtcFiatEquivalent(total, btcFiatRate)}
         />
+        )}
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
