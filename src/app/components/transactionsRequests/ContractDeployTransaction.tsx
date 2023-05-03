@@ -2,7 +2,6 @@ import ConfirmStxTransationComponent from '@components/confirmStxTransactionComp
 import { PostCondition, StacksTransaction } from '@stacks/transactions';
 import styled from 'styled-components';
 import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
-import DeployContractImage from '@assets/img/webInteractions/deploy_contract.svg';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
@@ -14,26 +13,8 @@ import AccountHeaderComponent from '@components/accountHeader';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
 import finalizeTxSignature from './utils';
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginBottom: props.theme.spacing(12),
-}));
-
-const TopImage = styled.img({
-  width: 88,
-  height: 88,
-});
-
-const FunctionTitle = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
-  marginTop: 16,
-}));
 
 const Title = styled.h1((props) => ({
   ...props.theme.headline_category_s,
@@ -41,28 +22,15 @@ const Title = styled.h1((props) => ({
   textTransform: 'uppercase',
 }));
 
-const Value = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
-  marginTop: props.theme.spacing(2),
-}));
-
-const ColumnContainer = styled.div((props) => ({
-  display: 'flex',
-  marginTop: props.theme.spacing(6),
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(12),
-  borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  flexDirection: 'column',
-}));
-
 const DownloadContainer = styled.div((props) => ({
   display: 'flex',
-  marginTop: props.theme.spacing(13.5),
   flexDirection: 'row',
+  background: props.theme.colors.background.elevation1,
+  borderRadius: 12,
+  padding: '12px 16px',
   justifyContent: 'center',
   alignItems: 'center',
+  marginBottom: 12,
 }));
 
 const PostConditionContainer = styled.div((props) => ({
@@ -235,32 +203,26 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         onCancelClick={cancelCallback}
         loading={loaderForBroadcastingTx}
         isSponsored={sponsored}
+        title={t('DEPLOY_CONTRACT_REQUEST.DEPLOY_CONTRACT')}
       >
-        <Container>
-          <TopImage src={DeployContractImage} alt="deploy_contract" />
-          <FunctionTitle>{t('DEPLOY_CONTRACT_REQUEST.DEPLOY_CONTRACT')}</FunctionTitle>
-        </Container>
         {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
         {postConditionAlert}
         {sponsored && showSponsoredTransactionTag}
         {unsignedTx?.postConditions?.values?.map((postCondition) => (
           <StxPostConditionCard postCondition={postCondition as PostCondition} />
         ))}
-        <ColumnContainer>
-          <Title>{t('DEPLOY_CONTRACT_REQUEST.CONTRACT_NAME')}</Title>
-          <Value>{contractName}</Value>
-          <DownloadContainer>
-            <Title>{t('DEPLOY_CONTRACT_REQUEST.FUNCTION')}</Title>
-            <DownloadButtonContainer>
-              <Button onClick={downloadCode}>
-                <>
-                  <ButtonText>{t('DEPLOY_CONTRACT_REQUEST.DOWNLOAD')}</ButtonText>
-                  <ButtonImage src={DownloadImage} />
-                </>
-              </Button>
-            </DownloadButtonContainer>
-          </DownloadContainer>
-        </ColumnContainer>
+        <TransactionDetailComponent title={t('DEPLOY_CONTRACT_REQUEST.CONTRACT_NAME')} value={contractName} />
+        <DownloadContainer>
+          <Title>{t('DEPLOY_CONTRACT_REQUEST.FUNCTION')}</Title>
+          <DownloadButtonContainer>
+            <Button onClick={downloadCode}>
+              <>
+                <ButtonText>{t('DEPLOY_CONTRACT_REQUEST.DOWNLOAD')}</ButtonText>
+                <ButtonImage src={DownloadImage} />
+              </>
+            </Button>
+          </DownloadButtonContainer>
+        </DownloadContainer>
       </ConfirmStxTransationComponent>
     </>
   );

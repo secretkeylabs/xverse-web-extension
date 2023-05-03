@@ -7,41 +7,23 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
 import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
 import { addressToString, broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import Seperator from '@components/seperator';
+import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import BottomBar from '@components/tabBar';
-import RecipientAddressView from '@components/recipinetAddressView';
-import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
 import AccountHeaderComponent from '@components/accountHeader';
 import finalizeTxSignature from '@components/transactionsRequests/utils';
 import InfoContainer from '@components/infoContainer';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useNetworkSelector from '@hooks/useNetwork';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import RecipientComponent from '@components/recipientComponent';
+import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(4),
-}));
-
 const AlertContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
-}));
-
-const TitleText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-}));
-
-const ValueText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(2),
-  wordBreak: 'break-all',
 }));
 
 function ConfirmStxTransaction() {
@@ -141,23 +123,6 @@ function ConfirmStxTransaction() {
     }
   });
 
-  const networkInfoSection = (
-    <Container>
-      <TitleText>{t('CONFIRM_TRANSACTION.NETWORK')}</TitleText>
-      <ValueText>{network.type}</ValueText>
-    </Container>
-  );
-
-  const memoInfoSection = !!memo && (
-    <>
-      <Container>
-        <TitleText>{t('CONFIRM_TRANSACTION.MEMO')}</TitleText>
-        <ValueText>{memo}</ValueText>
-      </Container>
-      <Seperator />
-    </>
-  );
-
   const getAmount = () => {
     const txPayload = unsignedTx?.payload as TokenTransferPayload;
     const amountToTransfer = new BigNumber(txPayload?.amount?.toString(10));
@@ -183,6 +148,7 @@ function ConfirmStxTransaction() {
       });
     }
   };
+
   return (
     <>
       {isBrowserTx ? <AccountHeaderComponent disableMenuOption disableAccountSwitch />
@@ -194,16 +160,21 @@ function ConfirmStxTransaction() {
         onCancelClick={handleOnCancelClick}
         isSponsored={sponsored}
       >
-        <TransferAmountView currency="STX" amount={getAmount()} />
+        <RecipientComponent
+          address={recipient}
+          value={getAmount().toString()}
+          icon={IconStacks}
+          currencyType="STX"
+          title={t('CONFIRM_TRANSACTION.AMOUNT')}
+        />
+        <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
+        {memo && <TransferMemoView memo={memo} />}
         {hasTabClosed && (
         <AlertContainer>
           <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />
         </AlertContainer>
         )}
-        <RecipientAddressView recipient={recipient} />
-        {networkInfoSection}
-        <Seperator />
-        {memoInfoSection}
+
       </ConfirmStxTransationComponent>
       {!isBrowserTx && <BottomBar tab="dashboard" />}
     </>

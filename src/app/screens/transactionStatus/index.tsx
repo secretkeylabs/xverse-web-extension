@@ -2,12 +2,12 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ActionButton from '@components/button';
-import Copy from '@assets/img/dashboard/Copy.svg';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
 import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
+import CopyButton from '@components/copyButton';
 
 const TxStatusContainer = styled.div({
   background: 'rgba(25, 25, 48, 0.5)',
@@ -61,6 +61,11 @@ const RowContainer = styled.div((props) => ({
 const TxIDContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
+});
+
+const CopyButtonContainer = styled.div({
+  marginLeft: 8,
+  padding: 2,
 });
 
 const Image = styled.img({
@@ -159,11 +164,7 @@ function TransactionStatus() {
     if (browserTx) window.close();
     else if (isOrdinal) navigate(-4);
     else if (isNft) navigate(-3);
-    else navigate(-2);
-  };
-
-  const onCopyClick = () => {
-    navigator.clipboard.writeText(txid!);
+    else navigate(-3);
   };
 
   const renderLink = (
@@ -183,9 +184,9 @@ function TransactionStatus() {
       <TxIDText>{t('TRANSACTION_ID')}</TxIDText>
       <TxIDContainer>
         <IDText>{txid}</IDText>
-        <Button onClick={onCopyClick}>
-          <img src={Copy} alt="copy" />
-        </Button>
+        <CopyButtonContainer>
+          <CopyButton text={txid} />
+        </CopyButtonContainer>
       </TxIDContainer>
     </TransactionIDContainer>
   );
