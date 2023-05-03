@@ -2,18 +2,14 @@
 import BottomModal from '@components/bottomModal';
 import BigNumber from 'bignumber.js';
 import {
-  SetStateAction, useEffect, useRef, useState,
+  useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { useTheme } from 'styled-components';
-import IconSats from '@assets/img/send/ic_sats_ticker.svg';
-import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import styled from 'styled-components';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
-import { NumericFormat } from 'react-number-format';
 import ActionButton from '@components/button';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import {
-  getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
@@ -24,22 +20,10 @@ import { BtcUtxoDataResponse } from '@secretkeylabs/xverse-core';
 import EditNonce from './editNonce';
 import EditFee from './editFee';
 
-const FiatAmountText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
-}));
-
-const TickerImage = styled.img((props) => ({
-  marginLeft: props.theme.spacing(5),
-  alignSelf: 'center',
-  height: 24,
-  width: 24,
-}));
-
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(16),
+  marginTop: props.theme.spacing(10),
   marginBottom: props.theme.spacing(20),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
@@ -67,6 +51,7 @@ const TransactionSettingOptionButton = styled.button((props) => ({
   flexDirection: 'row',
   width: '100%',
   marginTop: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(16),
   paddingLeft: props.theme.spacing(12),
   paddingRight: props.theme.spacing(12),
   justifyContent: 'space-between',
@@ -77,7 +62,6 @@ const TransactionSettingNonceOptionButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   width: '100%',
-  marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(20),
   paddingLeft: props.theme.spacing(12),
   paddingRight: props.theme.spacing(12),
@@ -93,7 +77,6 @@ interface Props {
   onCrossClick: () => void;
   previousFee?: string;
   availableBalance?: BigNumber;
-  allowEditNonce?: boolean;
   type?: TxType;
   btcRecipients?: Recipient[];
   ordinalTxUtxo?: BtcUtxoDataResponse;
@@ -101,7 +84,6 @@ interface Props {
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
 }
 type TxType = 'STX' | 'BTC' | 'Ordinals';
-type FeeModeType = 'low' | 'standard' | 'high' | 'custom';
 
 function TransactionSettingAlert({
   visible,
@@ -112,7 +94,6 @@ function TransactionSettingAlert({
   onCrossClick,
   previousFee,
   availableBalance,
-  allowEditNonce = true,
   type = 'STX',
   btcRecipients,
   ordinalTxUtxo,
@@ -123,14 +104,17 @@ function TransactionSettingAlert({
   const [feeInput, setFeeInput] = useState(fee);
   const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
   const [error, setError] = useState('');
+  const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
   const {
     btcBalance,
   } = useSelector((state: StoreState) => state.walletState);
-  
+
   function applyClickForStx() {
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
     if (previousFee && availableBalance) {
       const prevFee = stxToMicrostacks(new BigNumber(previousFee));
       const currentFee = stxToMicrostacks(new BigNumber(feeInput));
@@ -147,13 +131,15 @@ function TransactionSettingAlert({
   }
 
   async function applyClickForBtc() {
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
     const currentFee = new BigNumber(feeInput);
     if (btcBalance && currentFee.gt(btcBalance)) {
       // show fee exceeds total balance error
       setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
       return;
     }
-    if (selectedOption.value === 'custom') {
+    if (selectedOption === 'custom') {
       const response = await isCustomFeesAllowed(feeInput.toString());
       if (!response) {
         setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
@@ -194,7 +180,7 @@ function TransactionSettingAlert({
 
   const renderContent = () => {
     if (showNonceSettings) {
-      return <EditNonce nonce={nonce} />;
+      return <EditNonce nonce={nonce!} setNonce={setNonceInput} />;
     }
 
     if (showFeeSettings) {
@@ -204,6 +190,9 @@ function TransactionSettingAlert({
           type={type}
           setIsLoading={onLoading}
           setIsNotLoading={onComplete}
+          setFee={setFeeInput}
+          setError={setError}
+          setFeeMode={setSelectedOption}
           btcRecipients={btcRecipients}
           ordinalTxUtxo={ordinalTxUtxo}
           isRestoreFlow={isRestoreFlow}
@@ -220,12 +209,14 @@ function TransactionSettingAlert({
           </TransactionSettingOptionText>
           <img src={ArrowIcon} alt="Arrow " />
         </TransactionSettingOptionButton>
+        {type === 'STX' && (
         <TransactionSettingNonceOptionButton onClick={onEditNoncePress}>
           <TransactionSettingOptionText>
             {t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')}
           </TransactionSettingOptionText>
           <img src={ArrowIcon} alt="Arrow " />
         </TransactionSettingNonceOptionButton>
+        )}
       </>
     );
   };
@@ -243,6 +234,7 @@ function TransactionSettingAlert({
       onClose={onClosePress}
     >
       {renderContent()}
+      {errorText}
       {(showFeeSettings || showNonceSettings) && (
       <ButtonContainer>
         <ActionButton

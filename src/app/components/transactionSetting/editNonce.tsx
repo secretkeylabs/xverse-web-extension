@@ -1,5 +1,5 @@
 import InfoContainer from '@components/infoContainer';
-import { SetStateAction, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -45,14 +45,19 @@ const InputField = styled.input((props) => ({
 }));
 
 interface Props {
-  nonce?: string;
+  nonce: string;
+  setNonce: (nonce: string) => void;
 }
-function EditNonce({ nonce }: Props) {
+function EditNonce({ nonce, setNonce }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
-  const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
+  const [nonceInput, setNonceInput] = useState(nonce);
   const onInputEditNonceChange = (e: { target: { value: SetStateAction<string> } }) => {
     setNonceInput(e.target.value);
   };
+
+  useEffect(() => {
+    setNonce(nonceInput);
+  }, [nonceInput]);
 
   return (
     <NonceContainer>
@@ -62,7 +67,6 @@ function EditNonce({ nonce }: Props) {
         <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
       </InputContainer>
       <InfoContainer bodyText={t('NONCE_WARNING')} />
-
     </NonceContainer>
   );
 }
