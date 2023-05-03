@@ -9,12 +9,12 @@ import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
 import CopyButton from '@components/copyButton';
 
-const TxStatusContainer = styled.div({
-  background: 'rgba(25, 25, 48, 0.5)',
+const TxStatusContainer = styled.div((props) => ({
+  background: props.theme.colors.background.elevation0,
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-});
+}));
 
 const Container = styled.div({
   display: 'flex',
