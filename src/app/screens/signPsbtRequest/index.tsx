@@ -6,15 +6,14 @@ import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { parsePsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { useTranslation } from 'react-i18next';
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import styled from 'styled-components';
 import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import AccountHeaderComponent from '@components/accountHeader';
-import BtcRecipientComponent from '@components/confirmBtcTransactionComponent/btcRecipientComponent';
 import { useNavigate } from 'react-router-dom';
+import RecipientComponent from '@components/recipientComponent';
 import InfoContainer from '@components/infoContainer';
 import { NumericFormat } from 'react-number-format';
 
@@ -168,13 +167,14 @@ function SignPsbtRequest() {
     setExpandInputOutputView(!expandInputOutputView);
   };
 
-  const getSatsAmountString = (sats: BigNumber) =>
+  const getSatsAmountString = (sats: BigNumber) => (
     <NumericFormat
       value={sats.toString()}
       displayType="text"
       thousandSeparator
       suffix={` ${t('SATS')}`}
-    />;
+    />
+  );
 
   return (
     <>
@@ -185,17 +185,11 @@ function SignPsbtRequest() {
           {!payload.broadcast ? (
             <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
           ) : null}
-          <BtcRecipientComponent
+          <RecipientComponent
             value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
               .toString()
-              .replace('-', '')} BTC`}
-            subValue={getBtcFiatEquivalent(
-              new BigNumber(
-                parsedPsbt?.netAmount < 0 ? parsedPsbt?.netAmount * -1n : parsedPsbt?.netAmount
-              ),
-              btcFiatRate
-            )}
-            icon={IconBitcoin}
+              .replace('-', '')}`}
+            currencyType="BTC"
             title={t('AMOUNT')}
             heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
           />

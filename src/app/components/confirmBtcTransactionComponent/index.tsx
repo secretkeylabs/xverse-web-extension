@@ -8,7 +8,6 @@ import AssetIcon from '@assets/img/transactions/Assets.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
 import { useSelector } from 'react-redux';
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { useMutation } from '@tanstack/react-query';
@@ -25,8 +24,10 @@ import {
   ResponseError,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
+import RecipientComponent from '@components/recipientComponent';
+import TransferFeeView from '@components/transferFeeView';
+import { NumericFormat } from 'react-number-format';
 import TransactionDetailComponent from '../transactionDetailComponent';
-import BtcRecipientComponent from './btcRecipientComponent';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -144,6 +145,7 @@ function ConfirmBtcTransactionComponent({
   const [currentFee, setCurrentFee] = useState(fee);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
+  const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const {
     isLoading,
     data,
@@ -217,6 +219,19 @@ function ConfirmBtcTransactionComponent({
   }, [ordinalData]);
 
   useEffect(() => {
+    const totalAmount: BigNumber = new BigNumber(0);
+    let sum: BigNumber = new BigNumber(0);
+    if (recipients) {
+      recipients.map((recipient) => {
+        sum = totalAmount.plus(recipient.amountSats);
+        return sum;
+      });
+      sum = sum?.plus(currentFee);
+    }
+    setTotal(sum);
+  }, [recipients]);
+
+  useEffect(() => {
     if (signedNonOrdinalBtcSend) {
       setCurrentFee(signedNonOrdinalBtcSend.fee);
       setSignedTx(signedNonOrdinalBtcSend.signedTx);
@@ -246,6 +261,15 @@ function ConfirmBtcTransactionComponent({
   const handleOnConfirmClick = () => {
     onConfirmClick(signedTx);
   };
+
+  const getAmountString = (amount: BigNumber, currency: string) => (
+    <NumericFormat
+      value={amount.toString()}
+      displayType="text"
+      thousandSeparator
+      suffix={` ${currency}`}
+    />
+  );
 
   useEffect(() => {
     if (recipients && txError) {
@@ -281,69 +305,66 @@ function ConfirmBtcTransactionComponent({
   }, [errorSigningNonOrdial]);
 
   return (
-    <>
-      <OuterContainer>
-        {!isGalleryOpen && (
+    <OuterContainer>
+      {!isGalleryOpen && (
         <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
-        )}
-        <Container>
-          {children}
-          <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
-            {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
-          </ReviewTransactionText>
+      )}
+      <Container>
+        {children}
+        <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
+          {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
+        </ReviewTransactionText>
 
-          {ordinalTxUtxo ? (
-            <BtcRecipientComponent
-              address={recipients[0]?.address}
-              value={assetDetail!}
-              icon={AssetIcon}
-              title={t('CONFIRM_TRANSACTION.ASSET')}
+        {ordinalTxUtxo ? (
+          <RecipientComponent
+            address={recipients[0]?.address}
+            value={assetDetail!}
+            icon={AssetIcon}
+            currencyType="Ordinal"
+            title={t('CONFIRM_TRANSACTION.ASSET')}
+          />
+        ) : (
+          recipients?.map((recipient, index) => (
+            <RecipientComponent
+              recipientIndex={index + 1}
+              address={recipient?.address}
+              value={satsToBtc(recipient?.amountSats).toString()}
+              totalRecipient={recipients?.length}
+              currencyType="BTC"
+              title={t('CONFIRM_TRANSACTION.AMOUNT')}
+              showSenderAddress={isRestoreFundFlow}
             />
-          ) : (
-            recipients?.map((recipient, index) => (
-              <BtcRecipientComponent
-                recipientIndex={index + 1}
-                address={recipient?.address}
-                value={satsToBtc(recipient?.amountSats).toString()}
-                totalRecipient={recipients?.length}
-                icon={IconBitcoin}
-                title={t('CONFIRM_TRANSACTION.AMOUNT')}
-                subValue={getBtcFiatEquivalent(
-                  recipient?.amountSats,
-                  btcFiatRate,
-                )}
-              />
-            ))
-          )}
+          ))
+        )}
 
-          <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-          <TransactionDetailComponent
-            title={t('CONFIRM_TRANSACTION.FEES')}
-            value={`${currentFee.toString()} ${t('SATS')}`}
-            subValue={getBtcFiatEquivalent(new BigNumber(currentFee), btcFiatRate)}
-          />
-          <Button onClick={onAdvancedSettingClick}>
-            <>
-              <ButtonImage src={SettingIcon} />
-              <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
-            </>
-          </Button>
-          <TransactionSettingAlert
-            visible={openTransactionSettingModal}
-            fee={currentFee.toString()}
-            type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
-            btcRecipients={recipients}
-            onApplyClick={onApplyClick}
-            onCrossClick={closeTransactionSettingAlert}
-            nonOrdinalUtxos={nonOrdinalUtxos}
-            loading={loading}
-            isRestoreFlow={isRestoreFundFlow}
-          />
-        </Container>
-        <ErrorContainer>
-          <ErrorText>{error}</ErrorText>
-        </ErrorContainer>
-      </OuterContainer>
+        <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
+        <TransferFeeView fee={currentFee} currency={t('SATS')} />
+        <TransactionDetailComponent
+          title={t('CONFIRM_TRANSACTION.TOTAL')}
+          value={getAmountString(satsToBtc(total), t('BTC'))}
+          subValue={getBtcFiatEquivalent(total, btcFiatRate)}
+        />
+        <Button onClick={onAdvancedSettingClick}>
+          <>
+            <ButtonImage src={SettingIcon} />
+            <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
+          </>
+        </Button>
+        <TransactionSettingAlert
+          visible={openTransactionSettingModal}
+          fee={currentFee.toString()}
+          type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
+          btcRecipients={recipients}
+          onApplyClick={onApplyClick}
+          onCrossClick={closeTransactionSettingAlert}
+          nonOrdinalUtxos={nonOrdinalUtxos}
+          loading={loading}
+          isRestoreFlow={isRestoreFundFlow}
+        />
+      </Container>
+      <ErrorContainer>
+        <ErrorText>{error}</ErrorText>
+      </ErrorContainer>
       <ButtonContainer>
         <TransparentButtonContainer>
           <ActionButton
@@ -366,7 +387,7 @@ function ConfirmBtcTransactionComponent({
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>
-    </>
+    </OuterContainer>
   );
 }
 

@@ -22,7 +22,6 @@ import {
   Coin,
   extractFromPayload,
 } from '@secretkeylabs/xverse-core';
-import RedirectAddressView from '@components/redirectAddressView';
 import { useNavigate } from 'react-router-dom';
 import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
@@ -31,6 +30,7 @@ import AccountHeaderComponent from '@components/accountHeader';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
 import finalizeTxSignature from './utils';
 
 const PostConditionContainer = styled.div((props) => ({
@@ -118,31 +118,6 @@ const DappTitle = styled.h2((props) => ({
   marginTop: 4,
 }));
 
-const Title = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-  marginTop: props.theme.spacing(12),
-}));
-
-const Value = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
-  marginTop: props.theme.spacing(2),
-}));
-
-const Detail = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-  marginTop: props.theme.spacing(2),
-}));
-
-const FuncArgContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -196,7 +171,6 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
   const [isShowMore, setIsShowMore] = useState(false);
-  const Illustration = headerImageMapping[request.functionName ?? ''];
 
   useOnOriginTabClose(
     tabId,
@@ -218,9 +192,6 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
     </ShowMoreButtonContainer>
   );
 
-  const renderContractAddress = isShowMore && (
-    <RedirectAddressView recipient={request.contractAddress} title={t('CONTRACT_CALL_REQUEST.CONTRACT_ADDRESS')} />
-  );
   type ArgToView = { name: string; value: string; type: any };
   const getFunctionArgs = (): Array<ArgToView> => {
     const args: Array<ArgToView> = [];
@@ -258,17 +229,16 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
     return args;
   };
 
+  const truncateFunctionArgsView = (value: string) => `${value.substring(0, 12)}...${value.substring(
+    value.length - 12,
+    value.length,
+  )}`;
+
   const functionArgsView = () => {
     const args = getFunctionArgs();
-    if (isShowMore) {
-      return args.map((arg, index) => (
-        <FuncArgContainer>
-          <Title>{arg.name}</Title>
-          <Value>{arg.value}</Value>
-          <Detail>{arg.type}</Detail>
-        </FuncArgContainer>
-      ));
-    }
+    return args.map((arg, index) => (
+      <TransactionDetailComponent title={arg.name} value={arg.value.length > 20 ? truncateFunctionArgsView(arg.value) : arg.value} description={arg.type} />
+    ));
   };
 
   const showSponsoredTransactionTag = (
@@ -363,25 +333,16 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         onConfirmClick={confirmCallback}
         onCancelClick={cancelCallback}
         loading={false}
+        title={request.functionName}
+        subTitle={`Requested by ${request.appDetails?.name}`}
       >
         <>
-          <Container>
-            <TopImage src={Illustration || ContractCall} alt="contract-call" />
-            <FunctionTitle>{request.functionName}</FunctionTitle>
-            <DappTitle>{`Requested by ${request.appDetails?.name}`}</DappTitle>
-          </Container>
           {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
-
           {postConditionAlert}
           {request.sponsored && showSponsoredTransactionTag}
           {renderPostConditionsCard()}
-          <FuncArgContainer>
-            <Title>{t('CONTRACT_CALL_REQUEST.FUNCTION')}</Title>
-            <Value>{request?.functionName}</Value>
-          </FuncArgContainer>
+          <TransactionDetailComponent title={t('CONTRACT_CALL_REQUEST.FUNCTION')} value={request?.functionName} />
           {functionArgsView()}
-          {renderContractAddress}
-          {showMoreButton}
         </>
       </ConfirmStxTransationComponent>
     </>
