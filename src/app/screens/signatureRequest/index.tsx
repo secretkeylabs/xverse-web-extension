@@ -35,7 +35,7 @@ const MainContainer = styled.div((props) => ({
 
 const RequestType = styled.h1((props) => ({
   ...props.theme.headline_s,
-  marginTop: props.theme.spacing(21),
+  marginTop: props.theme.spacing(11),
   color: props.theme.colors.white[0],
   textAlign: 'left',
   marginBottom: props.theme.spacing(4),
@@ -75,7 +75,7 @@ const SigningAddressTitle = styled.p((props) => ({
   marginBottom: props.theme.spacing(4),
 }));
 
-const SigningAddress = styled.div((props) => ({
+const SigningAddress = styled.div(({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -109,13 +109,32 @@ const ActionDisclaimer = styled.p((props) => ({
 function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation');
   const [isSigning, setIsSigning] = useState<boolean>(false);
-  const { selectedAccount, accountsList, network } = useWalletSelector();
+  const { accountsList, network } = useWalletSelector();
+  const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
   const {
     messageType, request, payload, tabId, domain, isSignMessageBip322,
   } = useSignatureRequest();
-
   const navigate = useNavigate();
+
+  const checkAddressAvailability = () => {
+    const account = accountsList.filter((acc) => {
+      if (acc.btcAddress === payload.address) {
+        setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_SEGWIT'));
+        return true;
+      }
+      if (acc.ordinalsAddress === payload.address) {
+        setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TAPROOT'));
+        return true;
+      }
+      if (acc.stxAddress === payload.stxAddress) {
+        setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_STX'));
+        return true;
+      }
+      return false;
+    });
+    return account[0];
+  };
 
   const switchAccountBasedOnRequest = () => {
     if (!isSignMessageBip322 && getNetworkType(payload.network) !== network.type) {
@@ -123,28 +142,26 @@ function SignatureRequest(): JSX.Element {
         state: {
           txid: '',
           currency: 'STX',
-          error:
-            'There’s a mismatch between your active network and the network you’re logged with.',
+          errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
+          error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
           browserTx: true,
         },
       });
       return;
     }
-    if (!isSignMessageBip322 && payload.stxAddress !== selectedAccount?.stxAddress) {
-      const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
-      if (account) {
-        switchAccount(account);
-      } else {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'STX',
-            error:
-              'There’s a mismatch between your active  address and the address you’re logged with.',
-            browserTx: true,
-          },
-        });
-      }
+    const account = checkAddressAvailability();
+    if (account) {
+      switchAccount(account);
+    } else {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'STX',
+          errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
+          error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
+          browserTx: true,
+        },
+      });
     }
   };
 
@@ -199,32 +216,6 @@ function SignatureRequest(): JSX.Element {
     return bip0322Hash(payload.message);
   }, [isSignMessageBip322]);
 
-  const getSigningAddressType = useCallback((address: string) => {
-    switch (address) {
-      case selectedAccount?.ordinalsAddress: {
-        return t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TAPROOT');
-      }
-      case selectedAccount?.btcAddress: {
-        return t('SIGNATURE_REQUEST.SIGNING_ADDRESS_SEGWIT');
-      }
-      default:
-        return t('SIGNATURE_REQUEST.SIGNING_ADDRESS_STX');
-    }
-  }, []);
-
-  const getSigningAddressValue = useCallback((address: string) => {
-    switch (address) {
-      case selectedAccount?.ordinalsAddress: {
-        return selectedAccount?.ordinalsAddress;
-      }
-      case selectedAccount?.btcAddress: {
-        return selectedAccount?.btcAddress;
-      }
-      default:
-        return selectedAccount?.stxAddress;
-    }
-  }, []);
-
   return (
     <ConfirmScreen
       onConfirm={confirmCallback}
@@ -256,9 +247,9 @@ function SignatureRequest(): JSX.Element {
         <SigningAddressContainer>
           <SigningAddressTitle>{t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}</SigningAddressTitle>
           <SigningAddress>
-            <SigningAddressType>{getSigningAddressType(payload.address)}</SigningAddressType>
+            <SigningAddressType>{addressType}</SigningAddressType>
             <SigningAddressValue>
-              {getTruncatedAddress(getSigningAddressValue(payload.address))}
+              {getTruncatedAddress(payload.address)}
             </SigningAddressValue>
           </SigningAddress>
         </SigningAddressContainer>
