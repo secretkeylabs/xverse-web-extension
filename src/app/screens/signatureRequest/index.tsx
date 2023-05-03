@@ -249,7 +249,7 @@ function SignatureRequest(): JSX.Element {
           <SigningAddress>
             <SigningAddressType>{addressType}</SigningAddressType>
             <SigningAddressValue>
-              {getTruncatedAddress(payload.address)}
+              {getTruncatedAddress(payload.address || payload.stxAddress)}
             </SigningAddressValue>
           </SigningAddress>
         </SigningAddressContainer>
