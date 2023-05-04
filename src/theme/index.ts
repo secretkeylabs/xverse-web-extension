@@ -1,7 +1,7 @@
 const Theme = {
   colors: {
     action: {
-      classic: '#5565F7',
+      classic: '#FFFFFF',
       classicLight: '#7383FF',
       classic800: 'rgba(85, 101, 247, 0.2)',
     },

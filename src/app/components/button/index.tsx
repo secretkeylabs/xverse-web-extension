@@ -40,7 +40,7 @@ const AnimatedTransparentButton = styled(TransparentButton)`
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.background.elevation0,
   textAlign: 'center',
 }));
 
