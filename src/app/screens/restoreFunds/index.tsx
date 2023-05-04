@@ -34,7 +34,7 @@ function RestoreFunds() {
   };
 
   const handleOnRestoreBtcClick = () => {
-    navigate('btc', {
+    navigate('/recover-btc', {
       state: {
         unspentUtxos,
       },
@@ -42,7 +42,7 @@ function RestoreFunds() {
   };
 
   const handleOnRestoreOridnalClick = () => {
-    navigate('ordinals');
+    navigate('/recover-ordinals');
   };
 
   return (
