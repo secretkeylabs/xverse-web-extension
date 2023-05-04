@@ -58,7 +58,7 @@
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
     "NO_FUNDS": "You don’t have any funds to send.",
-    "BUY_CRYPTO": "Buy crypto →",
+    "BUY_CRYPTO": "Buy crypto",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {
       "ADDRESS_REQUIRED": "Recipient address is required",
@@ -111,8 +111,15 @@
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed please contact the developer of the requesting app for support",
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
+    "To": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
-    "YOU_WILL_RECEIVE": "You will receive"
+    "YOU_WILL_RECEIVE": "You will receive",
+    "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
+    "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
+    "BTC_TRANSFER_DANGER_ALERT_TITLE": "Danger",
+    "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
+    "CONITNUE": "Continue",
+    "BACK": "Back"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
@@ -284,7 +291,7 @@
     "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
   },
   "RESTORE_ORDINAL_SCREEN": {
-    "TITLE": "Restore Oridnals",
+    "TITLE": "Restore Ordinals",
     "BTC": "Bitcoin",
     "TRANSFER": "Transfer",
     "BACK": "Back",
@@ -458,8 +465,13 @@
     "HIDE_HASH_BUTTON": "Hide Hash",
     "ACTION_DISCLAIMER": "No transactions will be broadcasted and no fees will be applied.",
     "SIGNING_WARNING": "By signing this message, you prove that you are the owner of an account without broadcasting any on chain transactions. This signature cannot be used to send transactions on your behalf. You should only sign messages you trust.",
+    "SIGNING_ADDRESS_TITLE": "Signing with",
+    "SIGNING_ADDRESS_STX": "Your Stacks address",
+    "SIGNING_ADDRESS_SEGWIT": "Your Bitcoin payment address",
+    "SIGNING_ADDRESS_TAPROOT": "Your Ordinals address",
     "SIGN_BUTTON": "Sign",
-    "CANCEL_BUTTON": "Cancel"
+    "CANCEL_BUTTON": "Cancel",
+    "SIGNATURE_ERROR_TITLE": "Signature Error"
   },
   "ERROR_SCREEN": {
     "TITLE": "Xverse crashed unexpectedly",

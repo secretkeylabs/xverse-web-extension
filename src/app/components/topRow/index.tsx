@@ -36,7 +36,6 @@ const AnimatedBackButton = styled(BackButton)`
 }
 `;
 
-
 interface Props {
   title: string;
   onClick: () => void;
@@ -44,12 +43,12 @@ interface Props {
 
 function TopRow({ title, onClick }: Props) {
   return (
-      <TopSectionContainer>
-        <AnimatedBackButton onClick={onClick}>
-          <img src={ArrowLeft} alt="back button" />
-        </AnimatedBackButton>
-        <HeaderText>{title}</HeaderText>
-      </TopSectionContainer>
+    <TopSectionContainer>
+      <AnimatedBackButton onClick={onClick}>
+        <img src={ArrowLeft} alt="back button" />
+      </AnimatedBackButton>
+      <HeaderText>{title}</HeaderText>
+    </TopSectionContainer>
   );
 }
 

@@ -45,6 +45,7 @@ function BackupWalletScreen() {
   const { seedPhrase } = useWalletSelector();
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [showSeed, setShowSeed] = useState<boolean>(false);
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
@@ -55,10 +56,12 @@ function BackupWalletScreen() {
 
   const handlePasswordNextClick = async () => {
     try {
+      setLoading(true);
       await unlockWallet(password);
       setPassword('');
       setError('');
       setShowSeed(true);
+      setLoading(false);
     } catch (e) {
       setError(t('CREATE_PASSWORD_SCREEN.INCORRECT_PASSWORD_ERROR'));
     }
@@ -79,6 +82,7 @@ function BackupWalletScreen() {
               handleBack={goToSettingScreen}
               passwordError={error}
               stackButtonAlignment
+              loading={loading}
             />
           </EnterPasswordContainer>
 

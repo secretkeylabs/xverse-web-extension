@@ -438,16 +438,7 @@ function SendForm({
   };
 
   const buyCryptoMessage = balance === 0 && (currencyType === 'STX' || currencyType === 'BTC') && (
-    <BuyCryptoContainer>
-      <img src={Info} alt="alert" />
-      <ColumnContainer>
-        <BuyCryptoText>{t('NO_FUNDS')}</BuyCryptoText>
-        <BuyCryptoRedirectButton onClick={onBuyClick}>
-          <BuyCryptoRedirectText>{t('BUY_CRYPTO')}</BuyCryptoRedirectText>
-        </BuyCryptoRedirectButton>
-
-      </ColumnContainer>
-    </BuyCryptoContainer>
+    <InfoContainer bodyText={t('NO_FUNDS')} redirectText={t('BUY_CRYPTO')} onClick={onBuyClick} />
   );
 
   const checkIfEnableButton = () => {
