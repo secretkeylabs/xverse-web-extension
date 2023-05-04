@@ -9,12 +9,12 @@ import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
 import CopyButton from '@components/copyButton';
 
-const TxStatusContainer = styled.div({
-  background: 'rgba(25, 25, 48, 0.5)',
+const TxStatusContainer = styled.div((props) => ({
+  background: props.theme.colors.background.elevation0,
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-});
+}));
 
 const Container = styled.div({
   display: 'flex',
@@ -164,7 +164,7 @@ function TransactionStatus() {
     if (browserTx) window.close();
     else if (isOrdinal) navigate(-4);
     else if (isNft) navigate(-3);
-    else navigate(-2);
+    else navigate(-3);
   };
 
   const renderLink = (

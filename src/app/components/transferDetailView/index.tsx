@@ -47,7 +47,7 @@ const ColumnContainer = styled.div({
 });
 
 interface Props {
-  icon: string;
+  icon?: string;
   title?: string;
   amount?: string;
   children?: ReactNode;
@@ -61,7 +61,7 @@ function TransferDetailView({
 }: Props) {
   return (
     <RowContainer>
-      <Icon src={icon} />
+      {icon && <Icon src={icon} />}
       {amount ? (
         <ColumnContainer>
           <AmountText>{amount}</AmountText>
