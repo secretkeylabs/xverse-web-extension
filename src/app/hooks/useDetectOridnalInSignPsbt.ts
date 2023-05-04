@@ -1,9 +1,9 @@
 import {
-  BtcUtxoDataResponse,
   getOrdinalIdFromUtxo,
   getOrdinalInfo,
   OrdinalInfo,
   ParsedPSBT,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 
@@ -13,18 +13,13 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   const [ordinalInfoData, setOrdinalInfoData] = useState<OrdinalInfo | undefined>(undefined);
 
   const getOridnalId = async (utxoHash: string, index: number) => {
-    const utxo: BtcUtxoDataResponse = {
-      tx_hash: utxoHash,
-      block_height: 0,
-      tx_input_n: 0,
-      tx_output_n: index,
+    const utxo: UTXO = {
+      txid: utxoHash,
+      vout: index,
+      status: {
+        confirmed: false,
+      },
       value: 0,
-      ref_balance: 0,
-      spent: false,
-      confirmations: 0,
-      confirmed: '',
-      double_spend: false,
-      double_spend_tx: '',
     };
     const data = await getOrdinalIdFromUtxo(utxo);
     return data;
