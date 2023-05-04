@@ -5,6 +5,7 @@ import { CoinsResponse, FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { getCoinsInfo, getFtData } from '@secretkeylabs/xverse-core/api';
 import useNetworkSelector from '@hooks/useNetwork';
 import { setCoinDataAction } from '@stores/wallet/actions/actionCreators';
+import { getCoinMetaData } from '@secretkeylabs/xverse-core';
 
 export const useCoinsData = () => {
   const dispatch = useDispatch();
@@ -40,33 +41,32 @@ export const useCoinsData = () => {
       fungibleTokenList.forEach((ft) => {
         contractids.push(ft.principal);
       });
-      const coinsReponse: CoinsResponse = await getCoinsInfo(contractids, fiatCurrency);
-      if (coinsReponse) {
+      let coinsReponse: CoinsResponse = await getCoinsInfo(contractids, fiatCurrency);
+      if (!coinsReponse) {
+        coinsReponse = await getCoinMetaData(contractids, currentNetworkInstance);
+      }
+
+      coinsReponse.forEach((coin) => {
+        if (!coin.name) {
+          coin.name = coin.contract.split('.')[1];
+        }
+      });
+
+      // update attributes of fungible token list
+      fungibleTokenList.forEach((ft) => {
         coinsReponse.forEach((coin) => {
-          if (!coin.name) {
-            coin.name = coin.contract.split('.')[1];
+          if (ft.principal === coin.contract) {
+            ft.ticker = coin.ticker;
+            ft.decimals = coin.decimals;
+            ft.supported = coin.supported;
+            ft.image = coin.image;
+            ft.name = coin.name;
+            ft.tokenFiatRate = coin.tokenFiatRate;
+            coin.visible = ft.visible;
           }
         });
+      });
 
-        // update attributes of fungible token list
-        fungibleTokenList.forEach((ft) => {
-          coinsReponse.forEach((coin) => {
-            if (ft.principal === coin.contract) {
-              ft.ticker = coin.ticker;
-              ft.decimals = coin.decimals;
-              ft.supported = coin.supported;
-              ft.image = coin.image;
-              ft.name = coin.name;
-              ft.tokenFiatRate = coin.tokenFiatRate;
-              coin.visible = ft.visible;
-            }
-          });
-        });
-      } else {
-        fungibleTokenList.forEach((ft) => {
-          ft.name = ft.assetName;
-        });
-      }
       // sorting the list - moving supported to the top
       const supportedFts: FungibleToken[] = [];
       const unSupportedFts: FungibleToken[] = [];
@@ -76,7 +76,7 @@ export const useCoinsData = () => {
       });
       const sortedFtList: FungibleToken[] = [...supportedFts, ...unSupportedFts];
       dispatch(setCoinDataAction(sortedFtList, coinsReponse));
-      return { sortedFtList, coinsReponse};
+      return { sortedFtList, coinsReponse };
     } catch (error: any) {
       return Promise.reject(error);
     }
