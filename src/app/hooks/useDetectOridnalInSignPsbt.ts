@@ -28,13 +28,15 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   async function handleOrdinalAndOrdinalInfo() {
     if (parsedPsbt) {
       setLoading(true);
-      const data = await getOridnalId(parsedPsbt.inputs[0].txid, parsedPsbt.inputs[0].index);
-      if (data) {
-        setOrdinalId(data);
-        const response = await getOrdinalInfo(data);
-        setOrdinalInfoData(response);
-      }
-      setLoading(false);
+      parsedPsbt.inputs.forEach(async (input) => {
+        const data = await getOridnalId(input.txid, input.index);
+        if (data) {
+          setOrdinalId(data);
+          const response = await getOrdinalInfo(data);
+          setOrdinalInfoData(response);
+        }
+        setLoading(false);
+      });
     }
   }
 
