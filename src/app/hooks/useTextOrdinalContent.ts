@@ -6,12 +6,10 @@ const useTextOrdinalContent = (ordinal: OrdinalInfo) => {
   const [textContent, setTextContent] = useState('');
 
   useEffect(() => {
-    if(ordinal) {
-      const url = `https://gammaordinals.com${ordinal?.metadata.content}`;
-  
+    if (ordinal) {
       (async () => {
         if (ordinal?.metadata['content type'].startsWith('text/plain')) {
-          const response: string = await getTextOrdinalContent(url); 
+          const response: string = await getTextOrdinalContent(ordinal?.metadata.content);
           setTextContent(response ?? '');
         }
       })();
