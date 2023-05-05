@@ -19,7 +19,7 @@ const Container = styled.div((props) => ({
 const RecipientTitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
-  marginBottom: 16,
+  marginBottom: 10,
 }));
 
 const RowContainer = styled.div({
@@ -72,6 +72,7 @@ const ColumnContainer = styled.div({
   flex: 1,
   justifyContent: 'flex-end',
   alignItems: 'flex-end',
+  marginTop: 12,
 });
 
 const CrossContainer = styled.div({

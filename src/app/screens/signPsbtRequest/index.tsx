@@ -210,14 +210,6 @@ function SignPsbtRequest() {
                 {!payload.broadcast ? (
                   <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
                 ) : null}
-                <RecipientComponent
-                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
-                    .toString()
-                    .replace('-', '')}`}
-                  currencyType="BTC"
-                  title={t('AMOUNT')}
-                  heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
-                />
                 {ordinalId && (
                 <OrdinalDetailComponent
                   ordinalInscription={ordinalInfoData?.inscriptionNumber!}
@@ -226,9 +218,16 @@ function SignPsbtRequest() {
                   ordinal={ordinalInfoData}
                   ordinalDetail={ordinalInfoData?.metadata['content type']}
                   heading={t('YOU_WILL_TRANSFER')}
-
                 />
                 )}
+                <RecipientComponent
+                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
+                    .toString()
+                    .replace('-', '')}`}
+                  currencyType="BTC"
+                  title={t('AMOUNT')}
+                  heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
+                />
                 <InputOutputComponent
                   parsedPsbt={parsedPsbt}
                   isExpanded={expandInputOutputView}
