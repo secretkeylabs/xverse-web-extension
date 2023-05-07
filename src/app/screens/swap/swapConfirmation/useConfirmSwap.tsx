@@ -25,6 +25,7 @@ export type SwapConfirmationInput = {
   address: string;
   routers: { image: ReactNode; name: string }[];
   unsignedTx: StacksTransaction;
+  functionName: string;
 };
 
 export function useConfirmSwap(
