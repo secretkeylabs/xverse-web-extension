@@ -58,7 +58,7 @@ export default function SwapConfirmation() {
         <TitleText>{t('TOKEN_SWAP')}</TitleText>
         <StxInfoBlock type="transfer" swap={swap} />
         <StxInfoBlock type="receive" swap={swap} />
-        <FunctionBlock name={'swap-helper'} />
+        <FunctionBlock name={swap.functionName} />
         <RouteBlock swap={swap} />
         <FeesBlock
           lpFee={swap.lpFeeAmount}

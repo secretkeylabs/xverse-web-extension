@@ -239,6 +239,7 @@ export function useSwap(): UseSwap {
               lpFeeFiatAmount: currencyToToken(from!, info.feeRate * fromAmount!)?.fiatAmount,
               routers: info.route.map(currencyToToken).filter(isNotNull),
               unsignedTx,
+              functionName: `${tx.contractName}\n${tx.functionName}`,
             };
             navigate('/swap-confirm', {
               state,
