@@ -209,3 +209,12 @@ export function ChangeShowOrdinalReceiveAlertAction(showOrdinalReceiveAlert: boo
     showOrdinalReceiveAlert,
   };
 }
+
+export function setBrcCoinsDataAction(
+  brcCoinsList: FungibleToken[],
+): actions.SetBrcCoinsData {
+  return {
+    type: actions.SetBrcCoinsListKey,
+    brcCoinsList,
+  };
+}
