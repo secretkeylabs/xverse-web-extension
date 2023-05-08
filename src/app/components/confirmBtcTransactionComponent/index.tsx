@@ -23,6 +23,7 @@ import {
   getBtcFiatEquivalent,
   ResponseError,
   satsToBtc,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
 import RecipientComponent from '@components/recipientComponent';
 import TransferFeeView from '@components/transferFeeView';
@@ -108,7 +109,7 @@ interface Props {
   fee: BigNumber;
   loadingBroadcastedTx: boolean;
   signedTxHex: string;
-  ordinalTxUtxo?: BtcUtxoDataResponse;
+  ordinalTxUtxo?: UTXO;
   recipients: Recipient[];
   children?: ReactNode;
   assetDetail?: string;
@@ -341,11 +342,13 @@ function ConfirmBtcTransactionComponent({
 
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         <TransferFeeView fee={currentFee} currency={t('SATS')} />
+        {!ordinalTxUtxo && (
         <TransactionDetailComponent
           title={t('CONFIRM_TRANSACTION.TOTAL')}
           value={getAmountString(satsToBtc(total), t('BTC'))}
           subValue={getBtcFiatEquivalent(total, btcFiatRate)}
         />
+        )}
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
@@ -357,6 +360,7 @@ function ConfirmBtcTransactionComponent({
           fee={new BigNumber(currentFee).toString()}
           type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
           btcRecipients={recipients}
+          ordinalTxUtxo={ordinalTxUtxo}
           onApplyClick={onApplyClick}
           onCrossClick={closeTransactionSettingAlert}
           nonOrdinalUtxos={nonOrdinalUtxos}

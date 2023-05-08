@@ -174,7 +174,6 @@ function ConfirmBtcTransaction() {
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={goBackToScreen}
         onBackButtonClick={goBackToScreen}
-        isRestoreFundFlow={isRestoreFundFlow}
         nonOrdinalUtxos={unspentUtxos}
         amount={amount}
       >
