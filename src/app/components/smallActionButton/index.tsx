@@ -13,14 +13,11 @@ const Button = styled.div<ButtonProps>((props) => ({
   width: 48,
   height: 48,
   transition: 'all 0.2s ease',
-}));
-
-const AnimatedButton = styled(Button)`
-  :hover {
-    background: ${(props) => (props.theme.colors.action.classicLight)};
-    opacity: 0.6;
+  ':hover': {
+    background: props.isOpaque ?props.theme.colors.background.elevation2 : props.theme.colors.action.classicLight,
+    opacity: props.isOpaque ? 0.85 : 0.6 ,
   }
-`;
+}));
 
 const TransparentButton = styled(Button)`
   background-color: transparent;
@@ -38,13 +35,6 @@ const ButtonText = styled.h1((props) => ({
   fontWeight: 700,
   marginTop: props.theme.spacing(4),
   color: 'rgba(255, 255, 255, 0.9)',
-}));
-
-const AnimatedButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 700,
-  color: props.theme.colors.white[0],
-  textAlign: 'center',
 }));
 
 const ButtonImage = styled.img({
@@ -80,9 +70,9 @@ function SmallActionButton({
 
   return (
     <ButtonContainer onClick={handleOnPress}>
-      <AnimatedButton isOpaque={isOpaque}>
+      <Button isOpaque={isOpaque}>
         { src && <ButtonImage src={src} />}
-      </AnimatedButton>
+      </Button>
       <ButtonText>{text}</ButtonText>
     </ButtonContainer>
   );

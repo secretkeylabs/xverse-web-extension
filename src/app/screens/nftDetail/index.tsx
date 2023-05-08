@@ -8,7 +8,7 @@ import BottomTabBar from '@components/tabBar';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
-import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
+import ShareNetwork from '@assets/img/nftDashboard/share.svg';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
@@ -40,6 +40,11 @@ margin-right: 5%;
 
 const ReceiveButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(12),
+}));
+
+const GalleryReceiveButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(3),
+  width: '100%',
 }));
 
 const BackButtonContainer = styled.div((props) => ({
@@ -379,9 +384,9 @@ function NftDetailScreen() {
       </BackButtonContainer>
       <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
       <ButtonContainer>
-        <ReceiveButtonContainer>
+        <GalleryReceiveButtonContainer>
           <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
-        </ReceiveButtonContainer>
+        </GalleryReceiveButtonContainer>
 
         <ShareButtonContainer>
           <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />

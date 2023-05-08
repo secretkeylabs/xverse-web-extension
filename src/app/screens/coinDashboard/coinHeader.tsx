@@ -1,15 +1,8 @@
 import TokenImage from '@components/tokenImage';
-import {
-  animated, config, useSpring,
-} from '@react-spring/web';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
 import Buy from '@assets/img/dashboard/black_plus.svg';
-import PlusIcon from '@assets/img/transactions/Plus.svg';
-import MinusIcon from '@assets/img/transactions/Minus.svg';
-import CopyIcon from '@assets/img/transactions/Copy.svg';
-import linkIcon from '@assets/img/linkIcon.svg';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
@@ -20,8 +13,6 @@ import { CurrencyTypes } from '@utils/constants';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import { getExplorerUrl } from '@utils/helper';
 import SmallActionButton from '@components/smallActionButton';
 
 interface CoinBalanceProps {
@@ -117,76 +108,11 @@ const AvailableStxContainer = styled.div((props) => ({
   },
 }));
 
-const ShowMoreButton = styled.button((props) => ({
-  ...props.theme.body_xs,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(8),
-  alignSelf: 'center',
-  width: 144,
-  background: 'none',
-  color: props.theme.colors.white[0],
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  height: 34,
-  borderRadius: props.theme.radius(3),
-  img: {
-    marginLeft: props.theme.spacing(3),
-  },
-}));
-
-const TokenContractContainer = styled(animated.div)((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(8),
-  h1: {
-    ...props.theme.headline_category_s,
-    color: props.theme.colors.white[400],
-    textTransform: 'uppercase',
-  },
-}));
-
-const ContractAddressCopyButton = styled.button((props) => ({
-  display: 'flex',
-  marginTop: props.theme.spacing(2),
-  background: 'none',
-  justifyContent: 'space-between',
-}));
-
-const TokenContractAddress = styled.p((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white[0],
-  textAlign: 'left',
-  marginRight: props.theme.spacing(1.5),
-}));
-
 const StacksLockedInfoText = styled.span((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[400],
   textAlign: 'left',
 }));
-
-const ContractDeploymentButton = styled.button((props) => ({
-  ...props.theme.body_m,
-  display: 'flex',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(8),
-  background: 'none',
-  color: props.theme.colors.white[400],
-  span: {
-    color: props.theme.colors.white[0],
-    marginLeft: props.theme.spacing(3),
-  },
-  img: {
-    marginLeft: props.theme.spacing(3),
-  },
-}));
-
-const CopyImage = styled.img({
-  width: 23,
-  height: 23,
-  border: 1.5,
-});
 
 export default function CoinHeader(props: CoinBalanceProps) {
   const { coin, fungibleToken } = props;
@@ -201,15 +127,6 @@ export default function CoinHeader(props: CoinBalanceProps) {
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const [ftInfoShown, setInfoShown] = useState<boolean>(false);
-  const slideInStyles = useSpring({
-    config: { ...config.stiff },
-    from: { opacity: 0, height: 0 },
-    to: {
-      opacity: ftInfoShown ? 1 : 0,
-      height: ftInfoShown ? 80 : 0,
-    },
-  });
 
   function getBalanceAmount() {
     switch (coin) {
@@ -261,43 +178,6 @@ export default function CoinHeader(props: CoinBalanceProps) {
     }
   }
 
-  const openContractDeployment = () => {
-    window.open(getExplorerUrl(fungibleToken?.principal as string), '_blank');
-  };
-
-  const handleCopyContractAddress = () => {
-    navigator.clipboard.writeText(fungibleToken?.principal as string);
-  };
-
-  function formatAddress(addr: string): string {
-    return addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
-  }
-
-  const renderFtInfo = () => (
-    <>
-      <ShowMoreButton onClick={() => setInfoShown(!ftInfoShown)}>
-        {ftInfoShown ? t('LESS_FT_INFO_BUTTON') : t('SHOW_FT_INFO_BUTTON')}
-        <img src={ftInfoShown ? MinusIcon : PlusIcon} alt="show" />
-      </ShowMoreButton>
-      {ftInfoShown ? (
-        <TokenContractContainer style={slideInStyles}>
-          <h1>{t('FT_CONTRACT_PREFIX')}</h1>
-          <ContractAddressCopyButton onClick={handleCopyContractAddress}>
-            <TokenContractAddress>
-              {formatAddress(fungibleToken?.principal as string)}
-            </TokenContractAddress>
-            <CopyImage src={CopyIcon} />
-          </ContractAddressCopyButton>
-          <ContractDeploymentButton onClick={openContractDeployment}>
-            {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
-            <span>{t('STACKS_EXPLORER')}</span>
-            <img src={linkIcon} alt="link" />
-          </ContractDeploymentButton>
-        </TokenContractContainer>
-      ) : null }
-    </>
-  );
-
   const renderStackingBalances = () => {
     if (stxLockedBalance && !new BigNumber(stxLockedBalance).eq(0, 10) && coin === 'STX') {
       return (
@@ -341,7 +221,6 @@ export default function CoinHeader(props: CoinBalanceProps) {
     }
   };
 
-
   const getDashboardTitle = () => {
     if (fungibleToken) {
       return `${getFtTicker(fungibleToken)} ${t('BALANCE')}`;
@@ -380,7 +259,6 @@ export default function CoinHeader(props: CoinBalanceProps) {
           />
         </BalanceValuesContainer>
       </BalanceInfoContainer>
-      {fungibleToken ? renderFtInfo() : null}
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
