@@ -33,6 +33,7 @@ import useCoinsData from '@hooks/queries/useCoinData';
 import useAppConfig from '@hooks/queries/useAppConfig';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
+import useBtcCoinBalance from '@hooks/queries/useBtcCoinsBalance';
 import BalanceCard from './balanceCard';
 import SmallActionButton from '@components/smallActionButton';
 
@@ -132,10 +133,13 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { coinsList, stxAddress, btcAddress, ordinalsAddress } = useWalletSelector();
+  const {
+    coinsList, stxAddress, btcAddress, ordinalsAddress, brcCoinsList,
+  } = useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
+  const { isLoading: loadingBtcCoinData, isRefetching: refetchingBtcCoinData } = useBtcCoinBalance();
   useFeeMultipliers();
   useCoinRates();
   useAppConfig();
@@ -251,7 +255,14 @@ function Home() {
     <>
       <AccountHeaderComponent />
       <Container>
-        <BalanceCard isLoading={(loadingStxWalletData || loadingBtcWalletData) || (refetchingStxWalletData || refetchingBtcWalletData)} />
+        <BalanceCard
+          isLoading={
+            loadingStxWalletData
+            || loadingBtcWalletData
+            || refetchingStxWalletData
+            || refetchingBtcWalletData
+          }
+        />
         <RowButtonContainer>
           <ButtonContainer>
             <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
@@ -296,6 +307,16 @@ function Home() {
                 onPress={handleTokenPressed}
               />
             ))}
+          {brcCoinsList?.map((coin) => (
+            <TokenTile
+              title={coin.name}
+              currency="FT"
+              loading={loadingBtcCoinData || refetchingBtcCoinData}
+              underlayColor={Theme.colors.background.elevation1}
+              fungibleToken={coin}
+              onPress={() => null}
+            />
+          ))}
         </CoinContainer>
         <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={onReceiveModalClose}>
           {receiveContent}

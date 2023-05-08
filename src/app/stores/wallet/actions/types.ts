@@ -39,6 +39,8 @@ export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 
+export const SetBrcCoinsListKey = 'SetBrcCoinsList';
+
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
@@ -62,6 +64,7 @@ export interface WalletState {
   btcBalance: BigNumber;
   coinsList: FungibleToken[] | null;
   coins: Coin[];
+  brcCoinsList: FungibleToken[] | null;
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
@@ -186,6 +189,11 @@ export interface ChangeShowOrdinalReceiveAlert {
   showOrdinalReceiveAlert: boolean | null;
 }
 
+export interface SetBrcCoinsData {
+  type: typeof SetBrcCoinsListKey;
+  brcCoinsList: FungibleToken[];
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -207,4 +215,5 @@ export type WalletActions =
   | GetActiveAccounts
   | ChangeActivateOrdinals
   | ChangeShowBtcReceiveAlert
-  | ChangeShowOrdinalReceiveAlert;
+  | ChangeShowOrdinalReceiveAlert
+  | SetBrcCoinsData;
