@@ -340,7 +340,7 @@ function ConfirmBtcTransactionComponent({
         )}
 
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-        <TransferFeeView fee={currentFee} currency={t('SATS')} />
+        <TransferFeeView fee={currentFee} currency={t('CONFIRM_TRANSACTION.SATS')} />
         <TransactionDetailComponent
           title={t('CONFIRM_TRANSACTION.TOTAL')}
           value={getAmountString(satsToBtc(total), t('BTC'))}
