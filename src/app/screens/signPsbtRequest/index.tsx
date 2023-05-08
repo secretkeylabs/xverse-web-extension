@@ -20,7 +20,7 @@ import RecipientComponent from '@components/recipientComponent';
 import InfoContainer from '@components/infoContainer';
 import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
-import useDetectOrdinalInSignPsbt from '@hooks/useDetectOridnalInSignPsbt';
+import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -217,7 +217,7 @@ function SignPsbtRequest() {
                   title={t('ORDINAL')}
                   ordinal={ordinalInfoData}
                   ordinalDetail={ordinalInfoData?.metadata['content type']}
-                  heading={t('YOU_WILL_TRANSFER')}
+                  heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
                 />
                 )}
                 <RecipientComponent

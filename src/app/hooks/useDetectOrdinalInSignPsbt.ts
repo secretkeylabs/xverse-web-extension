@@ -12,7 +12,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   const [ordinalId, setOrdinalId] = useState<string | undefined>(undefined);
   const [ordinalInfoData, setOrdinalInfoData] = useState<OrdinalInfo | undefined>(undefined);
 
-  const getOridnalId = async (utxoHash: string, index: number) => {
+  const getOrdinalId = async (utxoHash: string, index: number) => {
     const utxo: UTXO = {
       txid: utxoHash,
       vout: index,
@@ -29,7 +29,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
     if (parsedPsbt) {
       setLoading(true);
       parsedPsbt.inputs.forEach(async (input) => {
-        const data = await getOridnalId(input.txid, input.index);
+        const data = await getOrdinalId(input.txid, input.index);
         if (data) {
           setOrdinalId(data);
           const response = await getOrdinalInfo(data);
