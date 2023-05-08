@@ -123,7 +123,7 @@ const Theme = {
     letterSpacing: 0.02,
   },
   headline_m: {
-    fontFamily: 'IBMPlexSans-Regular',
+    fontFamily: 'IBMPlexSans-Bold',
     fontStyle: 'normal',
     fontWeight: '700',
     fontSize: 24,

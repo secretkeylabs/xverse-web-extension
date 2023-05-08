@@ -331,7 +331,8 @@
     "TIMESTAMP": "Timestamp",
     "GENESIS_HEIGHT": "genesis height",
     "LOCATION": "Location",
-    "ORDINAL_NOT_DISPLAYED": "This ordinal cannot be displayed."
+    "ORDINAL_NOT_DISPLAYED": "This ordinal cannot be displayed.",
+    "COLLECTIBLE": "Collectible"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",

@@ -77,7 +77,7 @@ const GalleryShareDialogeContainer = styled.div({
 const ExtensionContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: 32,
+  marginTop: 8,
   alignItems: 'center',
   flex: 1,
 });
@@ -105,7 +105,7 @@ const ExtensionNFtContainer = styled.div((props) => ({
 }));
 
 const NftTitleText = styled.h1((props) => ({
-  ...props.theme.headline_s,
+  ...props.theme.headline_m,
   color: props.theme.colors.white['0'],
   marginBottom: props.theme.spacing(12),
   textAlign: 'center',
@@ -131,7 +131,7 @@ const DescriptionText = styled.h1((props) => ({
 }));
 
 const NftOwnedByText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.body_medium_m,
   color: props.theme.colors.white['400'],
   textAlign: 'center',
 }));
@@ -195,7 +195,7 @@ const WebGalleryButton = styled.button((props) => ({
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.body_m,
   fontWeight: 700,
   color: props.theme.colors.white['200'],
   textAlign: 'center',
@@ -337,7 +337,7 @@ function NftDetailScreen() {
 
   const extensionView = (
     <ExtensionContainer>
-      <CollectibleText>Collectible</CollectibleText>
+      <CollectibleText>{t('COLLECTIBLE')}</CollectibleText>
       <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
       <ExtensionNFtContainer>
         <NftImage

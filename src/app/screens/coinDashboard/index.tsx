@@ -15,7 +15,7 @@ import TransactionsHistoryList from './transactionsHistoryList';
 const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.spacing(4),
   flexDirection: 'column',
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
