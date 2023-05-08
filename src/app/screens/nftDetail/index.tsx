@@ -23,6 +23,7 @@ import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
 import { MoonLoader } from 'react-spinners';
 import AccountHeaderComponent from '@components/accountHeader';
+import SmallActionButton from '@components/smallActionButton';
 import NftAttribute from './nftAttribute';
 import DescriptionTile from './descriptionTile';
 
@@ -38,8 +39,7 @@ margin-right: 5%;
 }`;
 
 const ReceiveButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(3),
-  width: '100%',
+  marginRight: props.theme.spacing(12),
 }));
 
 const BackButtonContainer = styled.div((props) => ({
@@ -53,12 +53,12 @@ const ButtonContainer = styled.div((props) => ({
   position: 'relative',
   flexDirection: 'row',
   maxWidth: 400,
-  marginBottom: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(13.5),
 }));
 
 const ShareDialogeContainer = styled.div({
   position: 'absolute',
-  bottom: 0,
+  top: 0,
   right: 0,
 });
 
@@ -102,6 +102,13 @@ const ExtensionNFtContainer = styled.div((props) => ({
 const NftTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white['0'],
+  marginBottom: props.theme.spacing(12),
+  textAlign: 'center',
+}));
+
+const CollectibleText = styled.h1((props) => ({
+  ...props.theme.body_bold_m,
+  color: props.theme.colors.white['400'],
   textAlign: 'center',
 }));
 
@@ -179,7 +186,7 @@ const WebGalleryButton = styled.button((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.spacing(29),
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
@@ -324,39 +331,36 @@ function NftDetailScreen() {
   );
 
   const extensionView = (
-    <>
-      <ExtensionContainer>
-        <ExtensionNFtContainer>
-          <NftImage
-            metadata={nft?.token_metadata!}
-          />
-        </ExtensionNFtContainer>
-        <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
-        {ownedByView}
-        <WebGalleryButton onClick={openInGalleryView}>
-          <>
-            <ButtonImage src={SquaresFour} />
-            <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
-          </>
-        </WebGalleryButton>
-      </ExtensionContainer>
+    <ExtensionContainer>
+      <CollectibleText>Collectible</CollectibleText>
+      <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+      <ExtensionNFtContainer>
+        <NftImage
+          metadata={nft?.token_metadata!}
+        />
+      </ExtensionNFtContainer>
       <ButtonContainer>
         <ReceiveButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+          <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
         </ReceiveButtonContainer>
-        <ShareButtonContainer>
-          <ActionButton
-            src={ShareNetwork}
-            text={t('SHARE')}
-            onPress={onSharePress}
-            transparent
-          />
-        </ShareButtonContainer>
+        <SmallActionButton
+          src={ShareNetwork}
+          text={t('SHARE')}
+          onPress={onSharePress}
+          isOpaque
+        />
         <ShareDialogeContainer>
           {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`} onCrossClick={onCrossPress} />}
         </ShareDialogeContainer>
       </ButtonContainer>
-    </>
+      {ownedByView}
+      <WebGalleryButton onClick={openInGalleryView}>
+        <>
+          <ButtonImage src={SquaresFour} />
+          <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
+        </>
+      </WebGalleryButton>
+    </ExtensionContainer>
   );
 
   const galleryView = isLoading || !nft ? (
@@ -432,7 +436,7 @@ function NftDetailScreen() {
     <>
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      ) : <TopRow title={t('NFT_DETAIL')} onClick={handleBackButtonClick} />}
+      ) : <TopRow title="" onClick={handleBackButtonClick} />}
       <Container>
         {isGalleryOpen ? galleryView : extensionView}
       </Container>

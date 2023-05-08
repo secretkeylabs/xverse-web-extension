@@ -1,12 +1,17 @@
 import styled from 'styled-components';
-import { MoonLoader } from 'react-spinners';
 
-const Button = styled.button((props) => ({
+interface ButtonProps {
+  isOpaque?: boolean;
+}
+const Button = styled.div<ButtonProps>((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
   borderRadius: 14,
-  backgroundColor: props.theme.colors.action.classic,
+  backgroundColor: props.isOpaque ? props.theme.colors.background.elevation2 : props.theme.colors.action.classic,
   width: 48,
   height: 48,
-  opacity: props.disabled ? 0.6 : 1,
   transition: 'all 0.2s ease',
 }));
 
@@ -47,35 +52,35 @@ const ButtonImage = styled.img({
   transform: 'all',
 });
 
-const ButtonContainer = styled.div({
+const ButtonContainer = styled.button({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
+  justifyContent: 'center',
   padding: 0,
+  background: 'transparent',
 });
 
 interface Props {
   src?: string;
   text: string;
   onPress: () => void;
-  transparent?: boolean;
+  isOpaque?: boolean;
 }
 
 function SmallActionButton({
   src,
   text,
   onPress,
-  transparent,
+  isOpaque,
 }: Props) {
   const handleOnPress = () => {
     onPress();
   };
 
   return (
-    <ButtonContainer>
-      <AnimatedButton
-        onClick={handleOnPress}
-      >
+    <ButtonContainer onClick={handleOnPress}>
+      <AnimatedButton isOpaque={isOpaque}>
         { src && <ButtonImage src={src} />}
       </AnimatedButton>
       <ButtonText>{text}</ButtonText>
