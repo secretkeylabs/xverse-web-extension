@@ -8,6 +8,7 @@ export enum DomEventName {
   transactionRequest = 'stacksTransactionRequest',
   getAddressRequest = 'SatsAddressRequest',
   signPsbtRequest = 'SatsPsbtRequest',
+  signMessageRequest = 'SatsSignMessage',
 }
 
 export interface AuthenticationRequestEventDetails {
@@ -39,3 +40,9 @@ export interface SignPsbtRequestEventDetails {
 }
 
 export type SignPsbtRequestEvent = CustomEvent<SignPsbtRequestEventDetails>;
+
+export interface SignMessageRequestEventDetails {
+  signMessageRequest: string;
+}
+
+export type SignMessageRequestEvent = CustomEvent<SignMessageRequestEventDetails>;

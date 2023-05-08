@@ -207,6 +207,27 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
+    case ExternalSatsMethods.signMessageRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['signMessageRequest', payload],
+      ]);
+
+      const { id } = await triggerRequstWindowOpen(RequestsRoutes.SignatureRequest, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            signMessageRequest: payload,
+            signMessageResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.signMessageResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
     default: {
       break;
     }

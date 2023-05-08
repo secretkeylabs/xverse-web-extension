@@ -114,6 +114,7 @@ interface Props {
   assetDetail?: string;
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse [];
+  amount?: string;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -129,6 +130,7 @@ function ConfirmBtcTransactionComponent({
   assetDetail,
   isRestoreFundFlow,
   nonOrdinalUtxos,
+  amount,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -352,7 +354,7 @@ function ConfirmBtcTransactionComponent({
         </Button>
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
-          fee={currentFee.toString()}
+          fee={new BigNumber(currentFee).toString()}
           type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
           btcRecipients={recipients}
           onApplyClick={onApplyClick}
