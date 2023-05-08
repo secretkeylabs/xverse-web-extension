@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import logo from '@assets/img/full_logo_vertical.svg';
+import logo from '@assets/img/xverse_logo.svg';
 import styled from 'styled-components';
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
@@ -37,8 +37,8 @@ const TopSectionContainer = styled.div((props) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: props.theme.spacing(50),
-  marginBottom: props.theme.spacing(15),
+  marginTop: props.theme.spacing(60),
+  marginBottom: props.theme.spacing(30),
 }));
 
 const PasswordInputLabel = styled.h2((props) => ({

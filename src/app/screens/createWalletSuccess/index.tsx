@@ -61,7 +61,7 @@ const Subtitle = styled.h2((props) => ({
 
 const ContinueButton = styled.button((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.background.elevation0,
   backgroundColor: props.theme.colors.action.classic,
   borderRadius: props.theme.radius(1),
   marginLeft: props.theme.spacing(8),
