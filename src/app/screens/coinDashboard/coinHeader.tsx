@@ -1,12 +1,11 @@
-import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
 import {
   animated, config, useSpring,
 } from '@react-spring/web';
-import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
+import Buy from '@assets/img/dashboard/black_plus.svg';
 import PlusIcon from '@assets/img/transactions/Plus.svg';
 import MinusIcon from '@assets/img/transactions/Minus.svg';
 import CopyIcon from '@assets/img/transactions/Copy.svg';
@@ -23,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { getExplorerUrl } from '@utils/helper';
+import SmallActionButton from '@components/smallActionButton';
 
 interface CoinBalanceProps {
   coin: CurrencyTypes;
@@ -42,11 +42,10 @@ const BalanceInfoContainer = styled.div({
   alignItems: 'center',
 });
 
-const BalanceValuesContainer = styled.div((props) => ({
+const BalanceValuesContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-}));
+});
 
 const CoinBalanceText = styled.h1((props) => ({
   ...props.theme.headline_l,
@@ -57,22 +56,29 @@ const CoinBalanceText = styled.h1((props) => ({
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white['200'],
   fontSize: 14,
   marginTop: props.theme.spacing(2),
   textAlign: 'center',
+}));
+
+const BalanceTitleText = styled.h1((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white['400'],
+  textAlign: 'center',
+  marginTop: props.theme.spacing(4),
 }));
 
 const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
+  alignItems: 'center',
   marginTop: props.theme.spacing(11),
 }));
 
 const ButtonContainer = styled.div((props) => ({
-  flex: 1,
-  marginRight: props.theme.spacing(3),
+  marginRight: props.theme.spacing(12),
 }));
 
 const HeaderSeparator = styled.div((props) => ({
@@ -335,6 +341,17 @@ export default function CoinHeader(props: CoinBalanceProps) {
     }
   };
 
+
+  const getDashboardTitle = () => {
+    if (fungibleToken) {
+      return `${getFtTicker(fungibleToken)} ${t('BALANCE')}`;
+    }
+    if (coin) {
+      return `${coin} ${t('BALANCE')}`;
+    }
+    return '';
+  };
+
   return (
     <Container>
       <BalanceInfoContainer>
@@ -343,6 +360,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
           loading={false}
           fungibleToken={fungibleToken || undefined}
         />
+        <BalanceTitleText>{getDashboardTitle()}</BalanceTitleText>
         <BalanceValuesContainer>
           <NumericFormat
             value={getBalanceAmount()}
@@ -366,20 +384,27 @@ export default function CoinHeader(props: CoinBalanceProps) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <ActionButton src={ArrowUpRight} text="Send" onPress={() => goToSendScreen()} />
+          <SmallActionButton src={ArrowUpRight} text="Send" onPress={() => goToSendScreen()} />
         </ButtonContainer>
-        <ButtonContainer>
-          <ActionButton
-            src={ArrowDownLeft}
-            text="Receive"
-            onPress={() => navigate(`/receive/${coin}`)}
-          />
-        </ButtonContainer>
-        {!fungibleToken && (
-          <ButtonContainer>
-            <ActionButton src={CreditCard} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
-          </ButtonContainer>
-        )}
+        {!fungibleToken ? (
+          <>
+            <ButtonContainer>
+              <SmallActionButton
+                src={ArrowDownLeft}
+                text="Receive"
+                onPress={() => navigate(`/receive/${coin}`)}
+              />
+            </ButtonContainer>
+            <SmallActionButton src={Buy} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
+          </>
+        )
+          : (
+            <SmallActionButton
+              src={ArrowDownLeft}
+              text="Receive"
+              onPress={() => navigate(`/receive/${coin}`)}
+            />
+          )}
       </RowButtonContainer>
     </Container>
   );

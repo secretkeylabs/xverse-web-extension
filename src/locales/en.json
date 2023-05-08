@@ -412,7 +412,8 @@
     "FT_CONTRACT_PREFIX": "Token Contract",
     "OPEN_FT_CONTRACT_DEPLOYMENT": "View the contract on",
     "STACKS_EXPLORER": "Stacks Explorer",
-    "INCREASE_FEE_BUTTON": "Increase fee"
+    "INCREASE_FEE_BUTTON": "Increase fee",
+    "BALANCE": "Balance"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",
