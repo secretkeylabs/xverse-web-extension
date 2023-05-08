@@ -7,7 +7,7 @@ import TopRow from '@components/topRow';
 import BottomTabBar from '@components/tabBar';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
-import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
+import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share.svg';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -346,7 +346,7 @@ function NftDetailScreen() {
       </ExtensionNFtContainer>
       <ButtonContainer>
         <ReceiveButtonContainer>
-          <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+          <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={handleOnSendClick} />
         </ReceiveButtonContainer>
         <SmallActionButton
           src={ShareNetwork}
@@ -385,7 +385,7 @@ function NftDetailScreen() {
       <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
       <ButtonContainer>
         <GalleryReceiveButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+          <ActionButton src={ArrowUp} text={t('SEND')} onPress={handleOnSendClick} />
         </GalleryReceiveButtonContainer>
 
         <ShareButtonContainer>

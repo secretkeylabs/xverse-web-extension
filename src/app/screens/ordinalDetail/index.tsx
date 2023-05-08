@@ -6,7 +6,7 @@ import TopRow from '@components/topRow';
 import BottomTabBar from '@components/tabBar';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
-import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
+import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
@@ -318,7 +318,7 @@ function OrdinalDetailScreen() {
       </ExtensionOrdinalsContainer>
       {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
       <ButtonContainer>
-        <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleSendOrdinal} />
+        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={handleSendOrdinal} />
       </ButtonContainer>
       {ownedByView}
 
@@ -350,7 +350,7 @@ function OrdinalDetailScreen() {
       </OrdinalGalleryTitleText>
       <ButtonContainer>
         <SendButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleSendOrdinal} />
+          <ActionButton src={ArrowUp} text={t('SEND')} onPress={handleSendOrdinal} />
         </SendButtonContainer>
       </ButtonContainer>
       <RowContainer>
