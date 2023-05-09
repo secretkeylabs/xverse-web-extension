@@ -21,7 +21,7 @@ import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import { BtcUtxoDataResponse, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, UTXO } from '@secretkeylabs/xverse-core';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -107,7 +107,7 @@ function SendOrdinal() {
   } = useWalletSelector();
   const { ordinalsData } = useNftDataSelector();
   const [ordinal, setOrdinal] = useState<OrdinalInfo | undefined>(undefined);
-  const [ordinalUtxo, setOrdinalUtxo] = useState<BtcUtxoDataResponse | undefined>(undefined);
+  const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
 
