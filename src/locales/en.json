@@ -24,8 +24,8 @@
     "SEND": "Send",
     "BUY": "Buy",
     "MANAGE_TOKEN": "Manage token list",
-    "STACKS_AND_TOKEN": "Stacks, tokens and NFTs",
-    "ORDINALS": "Ordinals"
+    "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
+    "ORDINALS": "Ordinals & BRC-20 Tokens"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"

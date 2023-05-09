@@ -44,14 +44,12 @@ const Button = styled.button((props) => ({
 const ColumnContainer = styled.div({
   display: 'flex',
   flex: 1,
-  marginRight: 30,
   flexDirection: 'column',
 });
 const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'flex-end',
-  flex: 2,
 });
 
 const ButtonIcon = styled.img({
