@@ -6,11 +6,16 @@ import {
   UTXO,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
+import useWalletSelector from './useWalletSelector';
 
 const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   const [loading, setLoading] = useState(false);
   const [ordinalId, setOrdinalId] = useState<string | undefined>(undefined);
+  const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
   const [ordinalInfoData, setOrdinalInfoData] = useState<OrdinalInfo | undefined>(undefined);
+  const {
+    ordinalsAddress,
+  } = useWalletSelector();
 
   const getOrdinalId = async (utxoHash: string, index: number) => {
     const utxo: UTXO = {
@@ -37,6 +42,11 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
         }
         setLoading(false);
       });
+      parsedPsbt.outputs.forEach(async (output) => {
+        if (output.address === ordinalsAddress) {
+          setUserReceivesOrdinal(true);
+        }
+      });
     }
   }
 
@@ -48,6 +58,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
     ordinalId,
     loading,
     ordinalInfoData,
+    userReceivesOrdinal,
   };
 };
 

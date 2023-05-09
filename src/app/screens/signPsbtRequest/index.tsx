@@ -96,6 +96,7 @@ function SignPsbtRequest() {
     ordinalId,
     loading,
     ordinalInfoData,
+    userReceivesOrdinal,
   } = useDetectOrdinalInSignPsbt(parsedPsbt);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
@@ -217,7 +218,7 @@ function SignPsbtRequest() {
                   title={t('ORDINAL')}
                   ordinal={ordinalInfoData}
                   ordinalDetail={ordinalInfoData?.metadata['content type']}
-                  heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
+                  heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
                 />
                 )}
                 <RecipientComponent
