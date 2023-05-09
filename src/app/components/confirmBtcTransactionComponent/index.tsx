@@ -232,7 +232,7 @@ function ConfirmBtcTransactionComponent({
       sum = sum?.plus(currentFee);
     }
     setTotal(sum);
-  }, [recipients]);
+  }, [recipients, currentFee]);
 
   useEffect(() => {
     if (signedNonOrdinalBtcSend) {
