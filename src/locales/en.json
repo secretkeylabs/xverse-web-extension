@@ -41,8 +41,8 @@
     "COPY_ADDRESS": "Copy address",
     "COPIED_ADDRESS": "Address copied to clipboard",
     "BTC_ADDRESS": "Bitcoin address",
-    "ORDINAL_ADDRESS": "Ordinal address",
-    "ORDINALS_RECEIVE_MESSAGE": "Only send Ordinals to this address.",
+    "ORDINAL_ADDRESS": "Ordinal & BRC-20 address",
+    "ORDINALS_RECEIVE_MESSAGE": "Only send Ordinals and BRC-20 tokens to this address.",
     "BTC_RECEIVE_MESSAGE": "Do not send Ordinals to this address, use your Ordinals NFT receive address."
   },
   "SEND": {
