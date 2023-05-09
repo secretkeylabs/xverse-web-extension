@@ -140,7 +140,7 @@ function EditFee({
   setError,
   setFeeMode,
 }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
+  const { t } = useTranslation('translation');
   const {
     network,
     btcAddress,
@@ -157,6 +157,7 @@ function EditFee({
   const modifyStxFees = (mode: string) => {
     const currentFee = new BigNumber(fee);
     setFeeMode(mode);
+    setError('');
     setSelectedOption(mode);
     switch (mode) {
       case 'low':
@@ -180,6 +181,7 @@ function EditFee({
     try {
       setSelectedOption(mode);
       setIsLoading();
+      setError('');
       if (mode === 'custom') inputRef?.current?.focus();
       else if (type === 'BTC') {
         if (isRestoreFlow) {
@@ -211,6 +213,8 @@ function EditFee({
     } catch (err: any) {
       if (Number(err) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
       } else setError(err.toString());
     }
   };
@@ -256,7 +260,7 @@ function EditFee({
 
   return (
     <Container>
-      <Text>{t('FEE')}</Text>
+      <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
       <FeeContainer>
         <InputContainer>
           <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
@@ -268,7 +272,7 @@ function EditFee({
       <ButtonContainer>
         {type === 'STX' && (
           <FeeButton isSelected={selectedOption === 'low'} onClick={() => modifyStxFees('low')}>
-            {t('LOW')}
+            {t('TRANSACTION_SETTING.LOW')}
           </FeeButton>
         )}
         <FeeButton
@@ -276,14 +280,14 @@ function EditFee({
           isBtc={type === 'BTC' || type === 'Ordinals'}
           onClick={() => (type === 'STX' ? modifyStxFees('standard') : modifyFees('standard'))}
         >
-          {t('STANDARD')}
+          {t('TRANSACTION_SETTING.STANDARD')}
         </FeeButton>
         <FeeButton
           isSelected={selectedOption === 'high'}
           isBtc={type === 'BTC' || type === 'Ordinals'}
           onClick={() => (type === 'STX' ? modifyStxFees('high') : modifyFees('high'))}
         >
-          {t('HIGH')}
+          {t('TRANSACTION_SETTING.HIGH')}
         </FeeButton>
         <FeeButton
           isSelected={selectedOption === 'custom'}
@@ -291,10 +295,10 @@ function EditFee({
           isBtc={type === 'BTC' || type === 'Ordinals'}
           onClick={() => (type === 'STX' ? modifyStxFees('custom') : modifyFees('custom'))}
         >
-          {t('CUSTOM')}
+          {t('TRANSACTION_SETTING.CUSTOM')}
         </FeeButton>
       </ButtonContainer>
-      <DetailText>{t('FEE_INFO')}</DetailText>
+      <DetailText>{t('TRANSACTION_SETTING.FEE_INFO')}</DetailText>
     </Container>
   );
 }
