@@ -1,16 +1,11 @@
 import styled from 'styled-components';
-import { BtcOrdinal, OrdinalInfo } from '@secretkeylabs/xverse-core/types/index';
+import { Inscription } from '@secretkeylabs/xverse-core/types/index';
 import { useNavigate } from 'react-router-dom';
-import useOrdinalDataReducer from '@hooks/useOrdinalReducer';
-import { getOrdinalInfo } from '@secretkeylabs/xverse-core';
-import { useMutation } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import useNftDataSelector from '@hooks/useNftDataSelector';
 import { useTranslation } from 'react-i18next';
 import OrdinalImage from './ordinalImage';
 
 interface Props {
-  asset: BtcOrdinal;
+  asset: Inscription;
 }
 
 const NftNameText = styled.h1((props) => ({
@@ -52,49 +47,22 @@ const GridItemContainer = styled.button<GridContainerProps>((props) => ({
 function Ordinal({ asset }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
-  const { storeOrdinalsMetaData } = useOrdinalDataReducer();
-  const { ordinalsData } = useNftDataSelector();
-  const [ordinalData, setOrdinalData] = useState<OrdinalInfo>();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const {
-    data: ordinalDetailsData,
-    mutate,
-  } = useMutation<
-  OrdinalInfo | undefined,
-  Error,
-  { ordinalId: string }>(async ({ ordinalId }) => getOrdinalInfo(ordinalId));
-  useEffect(() => {
-    const ordinalMetaData = ordinalsData.find((ordinal) => ordinal?.metadata?.id === asset?.id);
-    if (!ordinalMetaData && asset?.id) {
-      mutate({ ordinalId: asset?.id });
-    } else {
-      setOrdinalData(ordinalMetaData);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (ordinalDetailsData) {
-      storeOrdinalsMetaData(ordinalDetailsData);
-      setOrdinalData(ordinalDetailsData);
-    }
-  }, [ordinalDetailsData]);
 
   const handleOnClick = () => {
-    storeOrdinalsMetaData(ordinalData!);
-    navigate(`ordinal-detail/${asset.id}/${asset.utxo.tx_hash}`);
+    navigate(`ordinal-detail/${asset.id}/${asset.output}`);
   };
-
   return (
     <GridItemContainer onClick={handleOnClick} showBorder={isGalleryOpen}>
-      { isGalleryOpen ? (
+      {isGalleryOpen ? (
         <NftImageContainer>
-          <OrdinalImage isNftDashboard ordinal={ordinalData!} />
+          <OrdinalImage isNftDashboard ordinal={asset} />
         </NftImageContainer>
       ) : (
-        <OrdinalImage isNftDashboard ordinal={ordinalData!} />
+        <OrdinalImage isNftDashboard ordinal={asset} />
       )}
       <NftNameTextContainer>
-        <NftNameText>{ordinalData?.inscriptionNumber ?? t('INSCRIPTION')}</NftNameText>
+        <NftNameText>{asset?.number ?? t('INSCRIPTION')}</NftNameText>
       </NftNameTextContainer>
     </GridItemContainer>
   );

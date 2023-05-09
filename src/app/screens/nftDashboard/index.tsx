@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ActionButton from '@components/button';
-import { getNfts, getOrdinalsByAddress } from '@secretkeylabs/xverse-core/api';
+import { getNfts } from '@secretkeylabs/xverse-core/api';
 import { useCallback, useEffect, useState } from 'react';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
@@ -17,8 +17,9 @@ import useNetworkSelector from '@hooks/useNetwork';
 import Ordinal from '@screens/ordinals';
 import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
-import { BtcOrdinal, NftsListData } from '@secretkeylabs/xverse-core/types';
+import { InscriptionsList, NftsListData } from '@secretkeylabs/xverse-core/types';
 import AlertMessage from '@components/alertMessage';
+import useAddressInscriptions from '@hooks/queries/ordinals/useAddressInscriptions';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
 
@@ -43,7 +44,9 @@ const GridContainer = styled.div<GridContainerProps>((props) => ({
   columnGap: props.theme.spacing(8),
   rowGap: props.theme.spacing(6),
   marginTop: props.theme.spacing(14),
-  gridTemplateColumns: props.isGalleryOpen ? 'repeat(auto-fill,minmax(300px,1fr))' : 'repeat(auto-fill,minmax(150px,1fr))',
+  gridTemplateColumns: props.isGalleryOpen
+    ? 'repeat(auto-fill,minmax(300px,1fr))'
+    : 'repeat(auto-fill,minmax(150px,1fr))',
   gridTemplateRows: props.isGalleryOpen ? 'repeat(minmax(300px,1fr))' : 'minmax(150px,220px)',
 }));
 
@@ -197,45 +200,34 @@ function NftDashboard() {
     return getNfts(stxAddress, selectedNetwork, pageParam);
   }
 
-  const fetchOrdinals = useCallback(async (): Promise<BtcOrdinal[]> => {
-    let response = await getOrdinalsByAddress(ordinalsAddress);
-    response = response.filter((ordinal) => ordinal.id !== undefined);
-    return response;
-  }, [ordinalsAddress]);
-
   const {
     isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
-  } = useInfiniteQuery(
-    [`nft-meta-data${stxAddress}`],
-    fetchNfts,
-    {
-      keepPreviousData: false,
-      getNextPageParam: (lastpage, pages) => {
-        const currentLength = pages.map(((page) => page.nftsList)).flat().length;
-        if (currentLength < lastpage.total) {
-          return currentLength;
-        }
-        return false;
-      },
+  } = useInfiniteQuery([`nft-meta-data${stxAddress}`], fetchNfts, {
+    keepPreviousData: false,
+    getNextPageParam: (lastpage, pages) => {
+      const currentLength = pages.map((page) => page.nftsList).flat().length;
+      if (currentLength < lastpage.total) {
+        return currentLength;
+      }
+      return false;
     },
-  );
-
-  const { data: ordinals } = useQuery({
-    queryKey: [`ordinals-${ordinalsAddress}`],
-    queryFn: fetchOrdinals,
   });
+
+  const {
+    data: ordinals, hasNextPage: hasNextPageOrdinals, fetchNextPage: fetchNextOrdinalsPage, refetch: refetchOrdinals,
+  } = useAddressInscriptions();
 
   const refetchCollectibles = useCallback(async () => {
     await refetch();
-    await fetchOrdinals();
-  }, [refetch, fetchOrdinals]);
+    await refetchOrdinals();
+  }, [refetch]);
 
   useEffect(() => {
     refetchCollectibles();
   }, [stxAddress, ordinalsAddress]);
 
   const nfts = data?.pages.map((page) => page.nftsList).flat();
-  const ordinalsLength = ordinals?.length;
+  const ordinalsLength = ordinals?.pages[0].total;
   let totalNfts = data && data.pages.length > 0 ? data.pages[0].total : 0;
 
   if (hasActivatedOrdinalsKey && ordinalsLength) {
@@ -244,13 +236,18 @@ function NftDashboard() {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   useEffect(() => {
-    if (hasActivatedOrdinalsKey === undefined && ordinals && ordinals?.length > 0) {
+    if (hasActivatedOrdinalsKey === undefined && ordinals && ordinalsLength) {
       setShowActivateOrdinalsAlert(true);
     }
   }, [hasActivatedOrdinalsKey, ordinalsLength]);
 
   const onLoadMoreButtonClick = () => {
-    fetchNextPage();
+    if (hasNextPageOrdinals) {
+      fetchNextOrdinalsPage();
+    }
+    if (hasNextPage) {
+      fetchNextPage();
+    }
   };
 
   const openInGalleryView = async () => {
@@ -267,38 +264,31 @@ function NftDashboard() {
     setOpenReceiveModal(false);
   };
 
-  const nftListView = (
-    totalNfts === 0 && ordinalsLength === 0 ? (
-      <NoCollectiblesText>
-        {t('NO_COLLECTIBLES')}
-      </NoCollectiblesText>
-    ) : (
-      <>
-        <GridContainer isGalleryOpen={isGalleryOpen}>
-          { hasActivatedOrdinalsKey && ordinals?.map((ordinal) => (
-            <Ordinal asset={ordinal} key={ordinal.id} />
-          ))}
-          { nfts?.map((nft) => (
-            <Nft asset={nft} key={nft.asset_identifier} />
-          ))}
-        </GridContainer>
-        {hasNextPage && (isFetchingNextPage
-          ? (
-            <LoadMoreButtonContainer>
-              <MoonLoader color="white" size={30} />
-            </LoadMoreButtonContainer>
-          )
-          : (
-            <LoadMoreButtonContainer>
-              <LoadMoreButton onClick={onLoadMoreButtonClick}>
-                {t('LOAD_MORE')}
-              </LoadMoreButton>
-            </LoadMoreButtonContainer>
-          )
-        )}
-      </>
+  const renderOrdinalsList = useCallback(
+    (list: InscriptionsList) => list.results.map((ordinal) => <Ordinal asset={ordinal} key={ordinal.id} />),
+    [],
+  );
 
-    )
+  const nftListView = totalNfts === 0 && ordinalsLength === 0 ? (
+    <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>
+  ) : (
+    <>
+      <GridContainer isGalleryOpen={isGalleryOpen}>
+        {hasActivatedOrdinalsKey && ordinals?.pages?.map(renderOrdinalsList)}
+        {nfts?.map((nft) => (
+          <Nft asset={nft} key={nft.asset_identifier} />
+        ))}
+      </GridContainer>
+      {(hasNextPage || hasNextPageOrdinals) && (isFetchingNextPage ? (
+        <LoadMoreButtonContainer>
+          <MoonLoader color="white" size={30} />
+        </LoadMoreButtonContainer>
+      ) : (
+        <LoadMoreButtonContainer>
+          <LoadMoreButton onClick={onLoadMoreButtonClick}>{t('LOAD_MORE')}</LoadMoreButton>
+        </LoadMoreButtonContainer>
+      ))}
+    </>
   );
 
   const onSharePress = () => {
@@ -326,15 +316,15 @@ function NftDashboard() {
   return (
     <>
       {showActivateOrdinalsAlert && (
-      <AlertMessage
-        title={t('ACTIVATE_ORDINALS')}
-        description={t('ACTIVATE_ORDINALS_INFO')}
-        buttonText={t('DENY')}
-        onClose={onActivateOrdinalsAlertCrossPress}
-        secondButtonText={t('ACTIVATE')}
-        onButtonClick={onActivateOrdinalsAlertDenyPress}
-        onSecondButtonClick={onActivateOrdinalsAlertActivatePress}
-      />
+        <AlertMessage
+          title={t('ACTIVATE_ORDINALS')}
+          description={t('ACTIVATE_ORDINALS_INFO')}
+          buttonText={t('DENY')}
+          onClose={onActivateOrdinalsAlertCrossPress}
+          secondButtonText={t('ACTIVATE')}
+          onButtonClick={onActivateOrdinalsAlertDenyPress}
+          onSecondButtonClick={onActivateOrdinalsAlertActivatePress}
+        />
       )}
       <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
