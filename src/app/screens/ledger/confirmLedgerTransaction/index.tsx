@@ -7,23 +7,22 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
 import {
   broadcastSignedTransaction,
-  signLedgerNestedSegwitBtcTransaction,
+  signLedgerNativeSegwitBtcTransaction,
   signLedgerStxTransaction,
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
-import { LedgerTransactionType } from '../reviewLedgerBtcTransaction';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import { ledgerDelay } from '@common/utils/ledger';
 import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
-
+import useBtcClient from '@hooks/useBtcClient';
+import useNetworkSelector from '@hooks/useNetwork';
+import { StacksTransaction } from '@stacks/transactions';
 import LedgerConnectDefaultSVG from '@assets/img/ledger/ledger_connect_default.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
-import { StacksTransaction } from '@stacks/transactions';
-import useNetworkSelector from '@hooks/useNetwork';
-import useBtcClient from '@hooks/useBtcClient';
+import { LedgerTransactionType } from '../reviewLedgerBtcTransaction';
 
 const Container = styled.div`
   display: flex;
@@ -116,7 +115,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
   const signAndBroadcastBtcTx = async (transport: Transport, accountId: number) => {
     try {
-      const result = await signLedgerNestedSegwitBtcTransaction(
+      const result = await signLedgerNativeSegwitBtcTransaction(
         transport,
         network.type,
         accountId,

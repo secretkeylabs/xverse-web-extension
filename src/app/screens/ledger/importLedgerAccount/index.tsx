@@ -6,18 +6,18 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
 import {
   Account,
-  importNestedSegwitAccountFromLedger,
+  importNativeSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
 } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { ledgerDelay } from '@common/utils/ledger';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
-import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 import LedgerImportStartSVG from '@assets/img/ledger/ledger_import_start.svg';
 import BtcOdrinalsIconSVG from '@assets/img/ledger/btc_ordinals_icon.svg';
@@ -231,7 +231,7 @@ function ImportLedger(): JSX.Element {
     ).length;
     setAddressIndex(newAddressIndex);
     if (isBitcoinSelected) {
-      const bitcoinAccount = await importNestedSegwitAccountFromLedger(
+      const bitcoinAccount = await importNativeSegwitAccountFromLedger(
         transport,
         network.type,
         0,
