@@ -234,7 +234,6 @@ function TransactionSettingAlert({
       onClose={onClosePress}
     >
       {renderContent()}
-      {errorText}
       {(showFeeSettings || showNonceSettings) && (
       <ButtonContainer>
         <ActionButton
