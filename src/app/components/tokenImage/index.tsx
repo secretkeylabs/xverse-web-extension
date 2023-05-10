@@ -36,10 +36,10 @@ const TickerIconContainer = styled.div<ImageProps>((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: props.isSmallSize ? 32 : 44,
-  width: props.isSmallSize ? 32 : 44,
+  height: props.isSmallSize ? 32 : 40,
+  width: props.isSmallSize ? 32 : 40,
   marginRight: props.theme.spacing(3),
-  borderRadius: props.theme.radius(2),
+  borderRadius: 30,
   backgroundColor: props.color,
 }));
 

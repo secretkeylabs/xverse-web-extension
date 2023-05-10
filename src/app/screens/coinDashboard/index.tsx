@@ -1,4 +1,5 @@
 import TopRow from '@components/topRow';
+import BottomBar from '@components/tabBar';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -9,6 +10,7 @@ import linkIcon from '@assets/img/linkIcon.svg';
 import { useTranslation } from 'react-i18next';
 import { getExplorerUrl } from '@utils/helper';
 import CopyButton from '@components/copyButton';
+import { FungibleToken } from '@secretkeylabs/xverse-core';
 import CoinHeader from './coinHeader';
 import TransactionsHistoryList from './transactionsHistoryList';
 
@@ -32,6 +34,27 @@ const TokenContractContainer = styled.div((props) => ({
   h1: {
     ...props.theme.body_medium_m,
     color: props.theme.colors.white[400],
+  },
+}));
+
+const TransactionHistoryContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  paddingLeft: 16,
+  paddingRight: 16,
+  marginTop: props.theme.spacing(30),
+  borderTop: `1px solid ${props.theme.colors.background.elevation2}`,
+  h1: {
+    ...props.theme.headline_s,
+    color: props.theme.colors.white[0],
+    marginTop: 32,
+  },
+  h2: {
+    ...props.theme.body_m,
+    fontStyle: 'italic',
+    color: props.theme.colors.white[200],
+    marginTop: 16,
   },
 }));
 
@@ -100,8 +123,10 @@ export default function CoinDashboard() {
   const [showFtContractDetails, setShowFtContractDetails] = useState(false);
   const { coin } = useParams();
   const [searchParams] = useSearchParams();
-  const { coinsList } = useWalletSelector();
+  const { coinsList, brcCoinsList } = useWalletSelector();
   const ftAddress = searchParams.get('ft');
+  const brc20FtName = searchParams.get('brc20ft');
+
   useBtcWalletData();
 
   const handleBack = () => {
@@ -109,7 +134,11 @@ export default function CoinDashboard() {
   };
 
   const ft = coinsList?.find((ftCoin) => ftCoin.principal === ftAddress);
-
+  let brc20Ft : FungibleToken | undefined;
+  if (brc20FtName) {
+    brc20Ft = brcCoinsList?.find((brc20FtCoin) => brc20FtCoin.name === brc20FtName);
+  }
+  console.log(brc20Ft);
   const openContractDeployment = () => {
     window.open(getExplorerUrl(ft?.principal as string), '_blank');
   };
@@ -149,6 +178,13 @@ export default function CoinDashboard() {
           </TokenContractContainer>
         );
       }
+    } else if (brc20FtName) {
+      return (
+        <TransactionHistoryContainer>
+          <h1>{t('TRANSACTION_HISTORY_TITLE')}</h1>
+          <h2>{`${t('COMING_SOON')}!`}</h2>
+        </TransactionHistoryContainer>
+      );
     }
     return <TransactionsHistoryList coin={coin as CurrencyTypes} txFilter={`${ft?.principal}::${ft?.assetName}`} />;
   };
@@ -157,7 +193,7 @@ export default function CoinDashboard() {
     <>
       <TopRow title="" onClick={handleBack} />
       <Container>
-        <CoinHeader coin={coin as CurrencyTypes} fungibleToken={ft} />
+        <CoinHeader isBRC20Token={!!brc20FtName} coin={coin as CurrencyTypes} fungibleToken={ft || brc20Ft} />
         {ft && (
           <FtInfoContainer>
             <Button isSelected={!showFtContractDetails} onClick={onTransactionsClick}>{t('TRANSACTIONS')}</Button>
@@ -167,6 +203,7 @@ export default function CoinDashboard() {
         {showContent()}
 
       </Container>
+      <BottomBar tab="dashboard" />
     </>
   );
 }

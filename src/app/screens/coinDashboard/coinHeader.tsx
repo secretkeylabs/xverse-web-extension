@@ -1,6 +1,6 @@
 import TokenImage from '@components/tokenImage';
-import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
-import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
+import ArrowDown from '@assets/img/dashboard/arrow_down.svg';
+import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
 import Buy from '@assets/img/dashboard/black_plus.svg';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -18,6 +18,7 @@ import SmallActionButton from '@components/smallActionButton';
 interface CoinBalanceProps {
   coin: CurrencyTypes;
   fungibleToken?: FungibleToken;
+  isBRC20Token: boolean;
 }
 
 const Container = styled.div((props) => ({
@@ -25,6 +26,46 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
+}));
+
+const RowContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
+const ProtocolText = styled.p((props) => ({
+  ...props.theme.headline_category_s,
+  fontWeight: '700',
+  height: 15,
+  marginTop: 6,
+  textTransform: 'uppercase',
+  marginLeft: props.theme.spacing(2),
+  backgroundColor: props.theme.colors.white['400'],
+  padding: '1px 6px 1px',
+  color: props.theme.colors.background.elevation0,
+  borderRadius: props.theme.radius(2),
+}));
+
+const ComingSoonContainer = styled.div((props) => ({
+  display: 'flex',
+  position: 'absolute',
+  top: 73,
+  left: -20,
+  background: props.theme.colors.orange_main,
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '2px 5px 1px',
+  borderRadius: 40,
+  width: 86,
+  marginTop: props.theme.spacing(4),
+  h1: {
+    ...props.theme.body_bold_m,
+    fontSize: 10,
+    textTransform: 'uppercase',
+    color: props.theme.colors.background.elevation0,
+  },
 }));
 
 const BalanceInfoContainer = styled.div({
@@ -64,13 +105,20 @@ const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  alignItems: 'center',
   marginTop: props.theme.spacing(11),
 }));
 
 const ButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
   marginRight: props.theme.spacing(12),
 }));
+
+const RecieveButtonContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+});
 
 const HeaderSeparator = styled.div((props) => ({
   border: `0.5px solid ${props.theme.colors.white[400]}`,
@@ -115,7 +163,7 @@ const StacksLockedInfoText = styled.span((props) => ({
 }));
 
 export default function CoinHeader(props: CoinBalanceProps) {
-  const { coin, fungibleToken } = props;
+  const { coin, fungibleToken, isBRC20Token } = props;
   const {
     btcBalance,
     stxBalance,
@@ -239,7 +287,10 @@ export default function CoinHeader(props: CoinBalanceProps) {
           loading={false}
           fungibleToken={fungibleToken || undefined}
         />
-        <BalanceTitleText>{getDashboardTitle()}</BalanceTitleText>
+        <RowContainer>
+          <BalanceTitleText>{getDashboardTitle()}</BalanceTitleText>
+          {isBRC20Token && <ProtocolText>BRC-20</ProtocolText>}
+        </RowContainer>
         <BalanceValuesContainer>
           <NumericFormat
             value={getBalanceAmount()}
@@ -262,13 +313,15 @@ export default function CoinHeader(props: CoinBalanceProps) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <SmallActionButton src={ArrowUpRight} text="Send" onPress={() => goToSendScreen()} />
+          <SmallActionButton isDisabled={isBRC20Token} src={ArrowUp} text="Send" onPress={() => goToSendScreen()} />
+          {isBRC20Token && <ComingSoonContainer><h1>{t('COMING_SOON')}</h1></ComingSoonContainer>}
         </ButtonContainer>
+
         {!fungibleToken ? (
           <>
             <ButtonContainer>
               <SmallActionButton
-                src={ArrowDownLeft}
+                src={ArrowDown}
                 text="Receive"
                 onPress={() => navigate(`/receive/${coin}`)}
               />
@@ -277,11 +330,13 @@ export default function CoinHeader(props: CoinBalanceProps) {
           </>
         )
           : (
-            <SmallActionButton
-              src={ArrowDownLeft}
-              text="Receive"
-              onPress={() => navigate(`/receive/${coin}`)}
-            />
+            <RecieveButtonContainer>
+              <SmallActionButton
+                src={ArrowDown}
+                text="Receive"
+                onPress={() => navigate(isBRC20Token ? '/receive/ORD' : `/receive/${coin}`)}
+              />
+            </RecieveButtonContainer>
           )}
       </RowButtonContainer>
     </Container>

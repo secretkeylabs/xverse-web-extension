@@ -390,7 +390,7 @@
     "SEND_COIN_BUTTON": "SEND",
     "RECEIVE_COIN_BUTTON": "Receive",
     "BUY_COIN_BUTTON": "Buy",
-    "TRANSACTION_HISTORY_TITLE": "Transaction History",
+    "TRANSACTION_HISTORY_TITLE": "Transaction history",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
@@ -416,7 +416,8 @@
     "INCREASE_FEE_BUTTON": "Increase fee",
     "BALANCE": "Balance",
     "TRANSACTIONS": "TRANSACTIONS",
-    "CONTRACT": "CONTRACT"
+    "CONTRACT": "CONTRACT",
+    "COMING_SOON": "Coming soon"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",

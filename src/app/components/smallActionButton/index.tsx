@@ -14,9 +14,9 @@ const Button = styled.div<ButtonProps>((props) => ({
   height: 48,
   transition: 'all 0.2s ease',
   ':hover': {
-    background: props.isOpaque ?props.theme.colors.background.elevation2 : props.theme.colors.action.classicLight,
-    opacity: props.isOpaque ? 0.85 : 0.6 ,
-  }
+    background: props.isOpaque ? props.theme.colors.background.elevation2 : props.theme.colors.action.classicLight,
+    opacity: props.isOpaque ? 0.85 : 0.6,
+  },
 }));
 
 const TransparentButton = styled(Button)`
@@ -42,20 +42,25 @@ const ButtonImage = styled.img({
   transform: 'all',
 });
 
-const ButtonContainer = styled.button({
+interface ButtonContainerProps {
+  isDisabled?: boolean;
+}
+const ButtonContainer = styled.button<ButtonContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   padding: 0,
   background: 'transparent',
-});
+  opacity: props.isDisabled ? 0.3 : 1,
+}));
 
 interface Props {
   src?: string;
   text: string;
   onPress: () => void;
   isOpaque?: boolean;
+  isDisabled?: boolean;
 }
 
 function SmallActionButton({
@@ -63,13 +68,14 @@ function SmallActionButton({
   text,
   onPress,
   isOpaque,
+  isDisabled,
 }: Props) {
   const handleOnPress = () => {
-    onPress();
+    if (!isDisabled) onPress();
   };
 
   return (
-    <ButtonContainer onClick={handleOnPress}>
+    <ButtonContainer isDisabled={isDisabled} onClick={handleOnPress}>
       <Button isOpaque={isOpaque}>
         { src && <ButtonImage src={src} />}
       </Button>
