@@ -68,7 +68,7 @@ function TransferFeeView({ fee, currency, title }: Props) {
           thousandSeparator
           prefix={`${currencySymbolMap[fiatCurrency]} `}
           suffix={` ${fiatCurrency}`}
-          renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
+          renderText={(value: string) => <FiatAmountText>{`~ ${value}`}</FiatAmountText>}
         />
       );
     }

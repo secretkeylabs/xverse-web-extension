@@ -348,6 +348,7 @@ function ConfirmBtcTransactionComponent({
             title={t('CONFIRM_TRANSACTION.TOTAL')}
             value={getAmountString(satsToBtc(total), t('BTC'))}
             subValue={getBtcFiatEquivalent(total, btcFiatRate)}
+            subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
           />
           )}
           <Button onClick={onAdvancedSettingClick}>
