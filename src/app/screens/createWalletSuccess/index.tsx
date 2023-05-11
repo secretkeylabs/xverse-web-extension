@@ -50,6 +50,7 @@ const Title = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
+  fontSize: 20,
 }));
 
 const Subtitle = styled.h2((props) => ({
@@ -60,7 +61,7 @@ const Subtitle = styled.h2((props) => ({
 }));
 
 const ContinueButton = styled.button((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.body_bold_m,
   color: props.theme.colors.background.elevation0,
   backgroundColor: props.theme.colors.action.classic,
   borderRadius: props.theme.radius(1),
