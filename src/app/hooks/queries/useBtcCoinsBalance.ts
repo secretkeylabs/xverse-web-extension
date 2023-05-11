@@ -11,7 +11,9 @@ const useBtcCoinBalance = () => {
 
   const fetchBrcCoinsBalances = async () => {
     try {
-      const list = await getOrdinalsFtBalance(ordinalsAddress);
+      const list = await getOrdinalsFtBalance(
+        'bc1pewc3eywdhvf6nl7shwrtfjrc07s24z52m3vts57ysn6c7ywqsd3sg87qaf'
+      );
       dispatch(setBrcCoinsDataAction(list));
       return list;
     } catch (e: any) {

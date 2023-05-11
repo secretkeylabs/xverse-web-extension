@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
 import Image from 'rc-image';
@@ -52,13 +52,14 @@ interface Props {
 
 function NftImage({ metadata }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const imgUrl = useMemo(() => getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? ''), [metadata]);
   if (metadata?.image_protocol) {
     return (
       <ImageContainer isGalleryOpen={isGalleryOpen}>
         <Suspense>
           <StyledImg
             width="100%"
-            src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
+            src={imgUrl}
             placeholder={(
               <LoaderContainer isGalleryOpen={isGalleryOpen}>
                 <MoonLoader color="white" size={25} />

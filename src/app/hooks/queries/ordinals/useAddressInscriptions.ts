@@ -9,16 +9,16 @@ const useAddressInscriptions = () => {
   const PageSize = 60;
 
   const getInscriptionsByAddress = async ({ pageParam = 0 }) => {
-    const response = await ordinalsApi.getInscriptions(
-      ordinalsAddress,
-      pageParam || 0,
-      PageSize,
-    );
-    return response;
+    try {
+      const response = await ordinalsApi.getInscriptions(ordinalsAddress, pageParam || 0, PageSize);
+      return response;
+    } catch (err) {
+      return Promise.reject(err);
+    }
   };
 
   const {
-    isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
+    isLoading, data, isFetchingNextPage, hasNextPage, error, refetch, fetchNextPage,
   } = useInfiniteQuery([`inscriptions-${ordinalsAddress}`], getInscriptionsByAddress, {
     keepPreviousData: false,
     getNextPageParam: (lastpage, pages) => {
@@ -33,6 +33,7 @@ const useAddressInscriptions = () => {
   return {
     isLoading,
     data,
+    error,
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,

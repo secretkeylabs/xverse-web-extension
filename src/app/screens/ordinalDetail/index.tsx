@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import TopRow from '@components/topRow';
 import BottomTabBar from '@components/tabBar';
@@ -9,8 +9,7 @@ import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { useEffect, useState } from 'react';
-import { MoonLoader } from 'react-spinners';
+import { useEffect, useMemo, useState } from 'react';
 import AccountHeaderComponent from '@components/accountHeader';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import DescriptionTile from '@screens/nftDetail/descriptionTile';
@@ -18,7 +17,8 @@ import InfoContainer from '@components/infoContainer';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import AlertMessage from '@components/alertMessage';
 import { getBtcTxStatusUrl } from '@utils/helper';
-import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 
 const Container = styled.div`
   display: flex;
@@ -172,13 +172,6 @@ const AssetDeatilButtonText = styled.div((props) => ({
   textAlign: 'center',
 }));
 
-const LoaderContainer = styled.div({
-  display: 'flex',
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
 const ButtonIcon = styled.img({
   width: 12,
   height: 12,
@@ -208,34 +201,36 @@ function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
   const { ordinalsAddress, network } = useWalletSelector();
-  const { id, txHash } = useParams();
-  const { isPending, pendingTxHash } = usePendingOrdinalTxs(txHash);
+  const { selectedOrdinal } = useNftDataSelector();
+  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
+  const { isPending, pendingTxHash } = usePendingOrdinalTxs(selectedOrdinal?.tx_id);
   const [notSupportedOrdinal, setNotSupportedOrdinal] = useState<boolean>(false);
   const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState<boolean>(false);
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { isLoading, data: ordinalDetailsData } = useInscriptionDetails(id);
+
+  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
   useEffect(() => {
-    if (ordinalDetailsData) {
+    if (selectedOrdinal) {
       if (
-        ordinalDetailsData?.content_type.includes('image') ||
-        ordinalDetailsData?.content_type.includes('text')
+        selectedOrdinal?.content_type.includes('image')
+        || selectedOrdinal?.content_type.includes('text')
       ) {
         setNotSupportedOrdinal(false);
       } else setNotSupportedOrdinal(true);
     }
-  }, [ordinalDetailsData?.content_type]);
+  }, [selectedOrdinal?.content_type]);
 
   const handleBackButtonClick = () => {
+    setSelectedOrdinalDetails(null);
     navigate('/nft-dashboard');
   };
 
   const openInGalleryView = async () => {
+    setSelectedOrdinalDetails(selectedOrdinal);
     await chrome.tabs.create({
-      url: chrome.runtime.getURL(`options.html#/nft-dashboard/ordinal-detail/${id}/${txHash}`),
+      url: chrome.runtime.getURL('options.html#/nft-dashboard/ordinal-detail'),
     });
   };
-
   const showAlert = () => {
     setshowSendOridnalsAlert(true);
   };
@@ -248,11 +243,7 @@ function OrdinalDetailScreen() {
     if (isPending) {
       showAlert();
     } else {
-      navigate('send-ordinal', {
-        state: {
-          ordinal: ordinalDetailsData,
-        },
-      });
+      navigate('send-ordinal');
     }
   };
 
@@ -281,9 +272,9 @@ function OrdinalDetailScreen() {
     <>
       <ExtensionContainer>
         <ExtensionOrdinalsContainer>
-          <OrdinalImage ordinal={ordinalDetailsData!} />
+          <OrdinalImage ordinal={selectedOrdinal!} />
         </ExtensionOrdinalsContainer>
-        <OrdinalTitleText>{ordinalDetailsData?.number}</OrdinalTitleText>
+        <OrdinalTitleText>{selectedOrdinal?.number}</OrdinalTitleText>
         {ownedByView}
         <WebGalleryButton onClick={openInGalleryView}>
           <>
@@ -299,11 +290,7 @@ function OrdinalDetailScreen() {
     </>
   );
 
-  const galleryView = isLoading ? (
-    <LoaderContainer>
-      <MoonLoader color="white" size={30} />
-    </LoaderContainer>
-  ) : (
+  const galleryView = (
     <Container>
       <BackButtonContainer>
         <Button onClick={handleBackButtonClick}>
@@ -314,7 +301,7 @@ function OrdinalDetailScreen() {
         </Button>
       </BackButtonContainer>
       <OrdinalGalleryTitleText>
-        {ordinalDetailsData?.number ?? t('INSCRIPTION')}
+        {selectedOrdinal?.number ?? t('INSCRIPTION')}
       </OrdinalGalleryTitleText>
       <ButtonContainer>
         <SendButtonContainer>
@@ -323,39 +310,39 @@ function OrdinalDetailScreen() {
       </ButtonContainer>
       <RowContainer>
         <OrdinalsContainer>
-          <OrdinalImage ordinal={ordinalDetailsData!} inNftDetail />
+          <OrdinalImage ordinal={selectedOrdinal!} inNftDetail />
           {ownedByView}
         </OrdinalsContainer>
         <DescriptionContainer>
           <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
           {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
-          <DescriptionTile title={t('ID')} value={id!} />
-          {ordinalDetailsData?.content_type && (
+          <DescriptionTile title={t('ID')} value={selectedOrdinal?.id!} />
+          {selectedOrdinal?.content_length && (
             <DescriptionTile
               title={t('CONTENT_LENGTH')}
-              value={ordinalDetailsData?.content_length.toString()!}
+              value={selectedOrdinal?.content_length.toString()!}
             />
           )}
-          {ordinalDetailsData?.content_type && (
-            <DescriptionTile title={t('CONTENT_TYPE')} value={ordinalDetailsData?.content_type!} />
+          {selectedOrdinal?.content_type && (
+            <DescriptionTile title={t('CONTENT_TYPE')} value={selectedOrdinal?.content_type!} />
           )}
-          {ordinalDetailsData?.value && (
-            <DescriptionTile title={t('OUTPUT_VALUE')} value={ordinalDetailsData?.value!} />
+          {selectedOrdinal?.value && (
+            <DescriptionTile title={t('OUTPUT_VALUE')} value={selectedOrdinal?.value!} />
           )}
-          {ordinalDetailsData?.timestamp && (
+          {selectedOrdinal?.timestamp && (
             <DescriptionTile
               title={t('TIMESTAMP')}
-              value={ordinalDetailsData?.timestamp.toString()!}
+              value={selectedOrdinal?.timestamp.toString()!}
             />
           )}
-          {ordinalDetailsData?.genesis_block_height && (
+          {selectedOrdinal?.genesis_block_height && (
             <DescriptionTile
               title={t('GENESIS_HEIGHT')}
-              value={ordinalDetailsData?.genesis_block_height.toString()!}
+              value={selectedOrdinal?.genesis_block_height.toString()!}
             />
           )}
-          {ordinalDetailsData?.location && (
-            <DescriptionTile title={t('LOCATION')} value={ordinalDetailsData?.location!} />
+          {selectedOrdinal?.location && (
+            <DescriptionTile title={t('LOCATION')} value={selectedOrdinal?.location!} />
           )}
         </DescriptionContainer>
       </RowContainer>

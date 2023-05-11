@@ -2,10 +2,13 @@ import styled from 'styled-components';
 import { Inscription } from '@secretkeylabs/xverse-core/types/index';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import useNftDataReducer from '@hooks/stores/useNftReducer';
+import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import OrdinalImage from './ordinalImage';
 
 interface Props {
   asset: Inscription;
+  isGalleryOpen: boolean;
 }
 
 const NftNameText = styled.h1((props) => ({
@@ -44,14 +47,16 @@ const GridItemContainer = styled.button<GridContainerProps>((props) => ({
   border: props.showBorder ? ` 1px solid ${props.theme.colors.background.elevation2}` : 'transparent',
 }));
 
-function Ordinal({ asset }: Props) {
+function Ordinal({ asset, isGalleryOpen }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
 
   const handleOnClick = () => {
-    navigate(`ordinal-detail/${asset.id}/${asset.output}`);
+    setSelectedOrdinalDetails(asset);
+    navigate('ordinal-detail');
   };
+
   return (
     <GridItemContainer onClick={handleOnClick} showBorder={isGalleryOpen}>
       {isGalleryOpen ? (
@@ -62,7 +67,7 @@ function Ordinal({ asset }: Props) {
         <OrdinalImage isNftDashboard ordinal={asset} />
       )}
       <NftNameTextContainer>
-        <NftNameText>{asset?.number ?? t('INSCRIPTION')}</NftNameText>
+        <NftNameText>{`${t('INSCRIPTION')} ${asset?.number} `}</NftNameText>
       </NftNameTextContainer>
     </GridItemContainer>
   );
