@@ -66,7 +66,7 @@ const ContractAddressCopyButton = styled.button((props) => ({
 }));
 
 const TokenContractAddress = styled.p((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.body_medium_l,
   color: props.theme.colors.white[0],
   textAlign: 'left',
   marginRight: props.theme.spacing(1),
@@ -81,6 +81,11 @@ const FtInfoContainer = styled.div((props) => ({
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(14),
 }));
+
+const ShareIcon = styled.img({
+  width: 18,
+  height: 18,
+});
 
 const ContractDeploymentButton = styled.button((props) => ({
   ...props.theme.body_m,
@@ -102,7 +107,7 @@ interface ButtonProps {
   isSelected: boolean;
 }
 const Button = styled.button<ButtonProps>((props) => ({
-  ...props.theme.body_medium_l,
+  ...props.theme.body_bold_l,
   fontSize: 11,
   display: 'flex',
   justifyContent: 'center',
@@ -138,7 +143,7 @@ export default function CoinDashboard() {
   if (brc20FtName) {
     brc20Ft = brcCoinsList?.find((brc20FtCoin) => brc20FtCoin.name === brc20FtName);
   }
-  console.log(brc20Ft);
+
   const openContractDeployment = () => {
     window.open(getExplorerUrl(ft?.principal as string), '_blank');
   };
@@ -173,7 +178,7 @@ export default function CoinDashboard() {
             <ContractDeploymentButton onClick={openContractDeployment}>
               {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
               <span>{t('STACKS_EXPLORER')}</span>
-              <img src={linkIcon} alt="link" />
+              <ShareIcon src={linkIcon} alt="link" />
             </ContractDeploymentButton>
           </TokenContractContainer>
         );

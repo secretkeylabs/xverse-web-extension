@@ -8,6 +8,14 @@ interface TitleProps {
   textColor: string;
 }
 
+const CustomSwitch = styled(Switch)`
+.react-switch-handle {
+  background-color: ${({ checked }) => (checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)')} !important;
+  border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
+
+}
+`;
+
 const Button = styled.button<ButtonProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -89,7 +97,7 @@ function SettingComponent({
         {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
         {icon && <img src={icon} alt="arrow icon" />}
         {toggle && toggleFunction && (
-        <Switch
+        <CustomSwitch
           onColor={theme.colors.purple_main}
           offColor={theme.colors.background.elevation3}
           onChange={toggleFunction}

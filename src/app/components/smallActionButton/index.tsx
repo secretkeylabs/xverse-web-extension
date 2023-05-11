@@ -8,7 +8,7 @@ const Button = styled.div<ButtonProps>((props) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: 14,
+  borderRadius: 16,
   backgroundColor: props.isOpaque ? props.theme.colors.background.elevation2 : props.theme.colors.action.classic,
   width: 48,
   height: 48,
