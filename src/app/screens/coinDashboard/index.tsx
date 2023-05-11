@@ -61,15 +61,15 @@ const TransactionHistoryContainer = styled.div((props) => ({
 const ContractAddressCopyButton = styled.button((props) => ({
   display: 'flex',
   marginTop: props.theme.spacing(2),
-  background: 'none',
-  justifyContent: 'space-between',
+  background: 'transparent',
 }));
 
 const TokenContractAddress = styled.p((props) => ({
   ...props.theme.body_medium_l,
   color: props.theme.colors.white[0],
   textAlign: 'left',
-  marginRight: props.theme.spacing(1),
+  overflowWrap: 'break-word',
+  width: 300,
 }));
 
 const FtInfoContainer = styled.div((props) => ({
@@ -85,6 +85,10 @@ const FtInfoContainer = styled.div((props) => ({
 const ShareIcon = styled.img({
   width: 18,
   height: 18,
+});
+
+const CopyButtonContainer = styled.div({
+  marginRight: 4,
 });
 
 const ContractDeploymentButton = styled.button((props) => ({
@@ -173,7 +177,10 @@ export default function CoinDashboard() {
               <TokenContractAddress>
                 {formatAddress(ft?.principal as string)}
               </TokenContractAddress>
-              <CopyButton text={ft?.principal as string} />
+              <CopyButtonContainer>
+                <CopyButton text={ft?.principal as string} />
+              </CopyButtonContainer>
+
             </ContractAddressCopyButton>
             <ContractDeploymentButton onClick={openContractDeployment}>
               {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
