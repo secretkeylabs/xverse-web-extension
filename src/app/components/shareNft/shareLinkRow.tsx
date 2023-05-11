@@ -6,7 +6,9 @@ const RowContainer = styled.button`
   align-items: center;
   background: transparent;
   justify-content: center;
-  padding: 8px;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-bottom: 8px;
   :hover {
     opacity: 0.8;
   }

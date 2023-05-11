@@ -20,7 +20,6 @@ import OrdinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import TokenTile from '@components/tokenTile';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import Theme from 'theme';
-import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
 import { CurrencyTypes } from '@utils/constants';
@@ -34,6 +33,7 @@ import useAppConfig from '@hooks/queries/useAppConfig';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import useBtcCoinBalance from '@hooks/queries/useBtcCoinsBalance';
+import SmallActionButton from '@components/smallActionButton';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -70,7 +70,6 @@ const CoinContainer = styled.div({
   flexDirection: 'column',
   alignItems: 'space-between',
   justifyContent: 'space-between',
-  marginBottom: 35,
 });
 
 const Button = styled.button((props) => ({
@@ -104,15 +103,15 @@ const RowButtonContainer = styled.div((props) => ({
 }));
 
 const ButtonContainer = styled.div((props) => ({
-  width: '100%',
-  marginRight: props.theme.spacing(5),
+  marginRight: props.theme.spacing(11),
 }));
 
 const TokenListButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'flex-end',
-  marginTop: props.theme.spacing(12),
+  justifyContent: 'center',
+  marginTop: props.theme.spacing(6),
+  marginBottom: props.theme.spacing(22),
 }));
 
 const Icon = styled.img({
@@ -208,8 +207,10 @@ function Home() {
     navigate('/buy/BTC');
   };
 
-  const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined }) => {
-    navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
+  const handleTokenPressed = (token: { coin: CurrencyTypes, ft: string | undefined, brc20Ft?: string }) => {
+    if (token.brc20Ft) {
+      navigate(`/coinDashboard/${token.coin}?brc20ft=${token.brc20Ft}`);
+    } else { navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`); }
   };
 
   const onOrdinalsReceivePress = () => {
@@ -250,7 +251,6 @@ function Home() {
       </ReceiveCardComponent>
     </ReceiveContainer>
   );
-
   return (
     <>
       <AccountHeaderComponent />
@@ -265,24 +265,15 @@ function Home() {
         />
         <RowButtonContainer>
           <ButtonContainer>
-            <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
+            <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
           </ButtonContainer>
           <ButtonContainer>
-            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
+            <SmallActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ButtonContainer>
           <ButtonContainer>
-            <ActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
+            <SmallActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
           </ButtonContainer>
         </RowButtonContainer>
-
-        <TokenListButtonContainer>
-          <Button onClick={handleManageTokenListOnClick}>
-            <>
-              <ButtonImage src={ListDashes} />
-              <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
-            </>
-          </Button>
-        </TokenListButtonContainer>
 
         <ColumnContainer>
           <TokenTile
@@ -323,7 +314,7 @@ function Home() {
               loading={loadingBtcCoinData || refetchingBtcCoinData}
               underlayColor={Theme.colors.background.elevation1}
               fungibleToken={coin}
-              onPress={() => null}
+              onPress={handleTokenPressed}
             />
           ))}
         </CoinContainer>
@@ -331,6 +322,14 @@ function Home() {
           {receiveContent}
         </BottomModal>
 
+        <TokenListButtonContainer>
+          <Button onClick={handleManageTokenListOnClick}>
+            <>
+              <ButtonImage src={ListDashes} />
+              <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
+            </>
+          </Button>
+        </TokenListButtonContainer>
         <CoinSelectModal
           onSelectBitcoin={onBtcSendClick}
           onSelectStacks={onStxSendClick}
