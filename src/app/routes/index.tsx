@@ -47,6 +47,7 @@ import SignPsbtRequest from '@screens/signPsbtRequest';
 import RestoreFunds from '@screens/restoreFunds';
 import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
+import ConfirmBRC20Transaction from '@screens/confirmBrc20Transaction';
 
 const router = createHashRouter([
   {
@@ -229,6 +230,10 @@ const router = createHashRouter([
             <SignatureRequest />
           </AuthGuard>
         ),
+      },
+      {
+        path: 'confirm-brc20-tx',
+        element: <ConfirmBRC20Transaction />,
       },
       {
         path: 'send-ordinal',

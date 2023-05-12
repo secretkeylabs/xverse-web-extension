@@ -120,7 +120,14 @@
     "BTC_TRANSFER_DANGER_ALERT_TITLE": "Danger",
     "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
     "CONITNUE": "Continue",
-    "BACK": "Back"
+    "BACK": "Back",
+    "BRC20_INFO_MESSAGE": "To transfer BRC-20 tokens, you must first inscribe the transfer and then send the inscription to your recipient.",
+    "TWO_TRANSACTIONS": "You will be sending 2 transactions.",
+    "INSCRIBE": "INSCRIBE",
+    "BRC20_SEND": "SEND",
+    "INSCRIPTION_FEES": "Inscription fee",
+    "TRANSACTION_FEES": "Transaction fee",
+    "TOTAL_FEES": "Total fees"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
