@@ -30,7 +30,7 @@ const CurrencyText = styled.h1((props) => ({
 }));
 
 const BalanceAmountText = styled.h1((props) => ({
-  ...props.theme.headline_l,
+  ...props.theme.headline_xl,
   color: props.theme.colors.white['0'],
 }));
 

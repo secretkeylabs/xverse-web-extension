@@ -6,7 +6,7 @@ import TopRow from '@components/topRow';
 import BottomTabBar from '@components/tabBar';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
-import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
+import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
@@ -22,6 +22,7 @@ import InfoContainer from '@components/infoContainer';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import AlertMessage from '@components/alertMessage';
 import { getBtcTxStatusUrl } from '@utils/helper';
+import SmallActionButton from '@components/smallActionButton';
 
 const Container = styled.div`
   display: flex;
@@ -51,13 +52,13 @@ const ButtonContainer = styled.div((props) => ({
   position: 'relative',
   flexDirection: 'row',
   maxWidth: 400,
-  marginBottom: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(10.5),
 }));
 
 const ExtensionContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: 32,
+  marginTop: 8,
   alignItems: 'center',
   flex: 1,
 });
@@ -83,10 +84,11 @@ const ExtensionOrdinalsContainer = styled.div((props) => ({
   alignItems: 'center',
   borderRadius: 8,
   marginBottom: props.theme.spacing(12),
+  marginTop: props.theme.spacing(12),
 }));
 
 const OrdinalTitleText = styled.h1((props) => ({
-  ...props.theme.headline_s,
+  ...props.theme.headline_m,
   color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));
@@ -105,7 +107,7 @@ const DescriptionText = styled.h1((props) => ({
 }));
 
 const NftOwnedByText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.body_medium_m,
   color: props.theme.colors.white['400'],
   textAlign: 'center',
 }));
@@ -142,11 +144,12 @@ const WebGalleryButton = styled.button((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.spacing(18),
+  marginBottom: props.theme.spacing(16),
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.body_m,
   fontWeight: 700,
   color: props.theme.colors.white['200'],
   textAlign: 'center',
@@ -198,6 +201,12 @@ const OrdinalsTag = styled.div({
   height: 22,
   padding: '3px 6px',
 });
+
+const CollectibleText = styled.h1((props) => ({
+  ...props.theme.body_bold_m,
+  color: props.theme.colors.white['400'],
+  textAlign: 'center',
+}));
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -301,25 +310,25 @@ function OrdinalDetailScreen() {
     </RowContainer>
   );
   const extensionView = (
-    <>
-      <ExtensionContainer>
-        <ExtensionOrdinalsContainer>
-          <OrdinalImage ordinal={ordinalData!} />
-        </ExtensionOrdinalsContainer>
-        <OrdinalTitleText>{ordinalData?.inscriptionNumber}</OrdinalTitleText>
-        {ownedByView}
-        <WebGalleryButton onClick={openInGalleryView}>
-          <>
-            <ButtonImage src={SquaresFour} />
-            <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
-          </>
-        </WebGalleryButton>
-      </ExtensionContainer>
+    <ExtensionContainer>
+      <CollectibleText>{t('COLLECTIBLE')}</CollectibleText>
+      <OrdinalTitleText>{ordinalData?.inscriptionNumber}</OrdinalTitleText>
+      <ExtensionOrdinalsContainer>
+        <OrdinalImage ordinal={ordinalData!} />
+      </ExtensionOrdinalsContainer>
       {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
       <ButtonContainer>
-        <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleSendOrdinal} />
+        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={handleSendOrdinal} />
       </ButtonContainer>
-    </>
+      {ownedByView}
+
+      <WebGalleryButton onClick={openInGalleryView}>
+        <>
+          <ButtonImage src={SquaresFour} />
+          <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
+        </>
+      </WebGalleryButton>
+    </ExtensionContainer>
   );
 
   const galleryView = isLoading ? (
@@ -341,7 +350,7 @@ function OrdinalDetailScreen() {
       </OrdinalGalleryTitleText>
       <ButtonContainer>
         <SendButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleSendOrdinal} />
+          <ActionButton src={ArrowUp} text={t('SEND')} onPress={handleSendOrdinal} />
         </SendButtonContainer>
       </ButtonContainer>
       <RowContainer>
@@ -393,7 +402,7 @@ function OrdinalDetailScreen() {
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow title={t('NFT_DETAIL')} onClick={handleBackButtonClick} />
+        <TopRow title="" onClick={handleBackButtonClick} />
       )}
       <Container>
         {showSendOridnalsAlert && (

@@ -115,6 +115,21 @@ const CoinBalanceText = styled.h1((props) => ({
   textAlign: 'end',
 }));
 
+const TokenTitleContainer = styled.div({
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const ProtocolText = styled.p((props) => ({
+  ...props.theme.headline_category_s,
+  fontWeight: '700',
+  textTransform: 'uppercase',
+  marginLeft: props.theme.spacing(5),
+  backgroundColor: props.theme.colors.white['400'],
+  padding: '2px 6px 1px',
+  borderRadius: props.theme.radius(2),
+}));
+
 function TokenLoader() {
   return (
     <LoaderMainContainer>
@@ -133,6 +148,7 @@ interface Props {
   onPress: (token: {
     coin: CurrencyTypes;
     ft: string | undefined;
+    brc20Ft?: string | undefined;
   }) => void;
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
@@ -310,15 +326,30 @@ function TokenTile({
     onPress({
       coin: currency as CurrencyTypes,
       ft: fungibleToken && fungibleToken.principal,
+      brc20Ft: !fungibleToken?.principal && fungibleToken?.name,
     });
   };
 
   return (
-    <TileContainer inModel={enlargeTicker} color={underlayColor} margin={margin} onClick={handleTokenPressed}>
+    <TileContainer
+      inModel={enlargeTicker}
+      color={underlayColor}
+      margin={margin}
+      onClick={handleTokenPressed}
+    >
       <RowContainer>
         {renderIcon()}
         <TextContainer>
-          <CoinTickerText>{getTickerTitle()}</CoinTickerText>
+          <TokenTitleContainer>
+            <CoinTickerText>{getTickerTitle()}</CoinTickerText>
+            {
+              fungibleToken?.protocol ? (
+                <ProtocolText>
+                  {fungibleToken?.protocol === 'stacks' ? 'Sip-10' : fungibleToken?.protocol}
+                </ProtocolText>
+              ) : null
+            }
+          </TokenTitleContainer>
           <SubText>{title}</SubText>
         </TextContainer>
       </RowContainer>

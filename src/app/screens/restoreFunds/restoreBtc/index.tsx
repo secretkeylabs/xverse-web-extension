@@ -81,7 +81,7 @@ function RestoreBtc() {
   if (unspentUtxos) {
     amount = sumUnspentOutputs(unspentUtxos);
   }
-  const isNoAmount = amount.isEqualTo(0);
+  const isNoAmount = amount.isEqualTo(0) || !unspentUtxos[0]?.status.confirmed;
 
   const { data: ordinalsFee, isLoading } = useQuery({
     queryKey: [`getFee-${ordinalsAddress}`],

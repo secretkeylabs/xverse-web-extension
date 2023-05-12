@@ -16,6 +16,7 @@ import {
   TransactionRequestEvent,
   GetAddressRequestEvent,
   SignPsbtRequestEvent,
+  SignMessageRequestEvent,
 } from '@common/types/inpage-types';
 
 // Legacy messaging to work with older versions of Connect
@@ -143,6 +144,18 @@ document.addEventListener(DomEventName.signPsbtRequest, ((
     payload: event.detail.signPsbtRequest,
     urlParam: 'signPsbtRequest',
     method: ExternalSatsMethods.signPsbtRequest,
+  });
+}) as EventListener);
+
+// Listen for a CustomEvent (Message Signing request) coming from the web app
+document.addEventListener(DomEventName.signMessageRequest, ((
+  event: SignMessageRequestEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.SignatureRequest,
+    payload: event.detail.signMessageRequest,
+    urlParam: 'signMessageRequest',
+    method: ExternalSatsMethods.signMessageRequest,
   });
 }) as EventListener);
 

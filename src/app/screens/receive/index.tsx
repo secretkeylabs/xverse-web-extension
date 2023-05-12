@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import TopRow from '@components/topRow';
 import { useNavigate, useParams } from 'react-router-dom';
 import QRCode from 'react-qr-code';
-import Copy from '@assets/img/dashboard/Copy.svg';
+import Copy from '@assets/img/dashboard/copy_black_icon.svg';
 import Tick from '@assets/img/dashboard/tick.svg';
 import { useState } from 'react';
 import ActionButton from '@components/button';

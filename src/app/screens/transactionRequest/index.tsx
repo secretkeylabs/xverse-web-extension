@@ -37,6 +37,7 @@ function TransactionRequest() {
   const [contractName, setContractName] = useState(undefined);
   const stxPendingTxData = useStxPendingTxData();
   const [hasSwitchedAccount, setHasSwitchedAccount] = useState(false);
+  const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
 
   const handleTokenTransferRequest = async () => {
     const unsignedSendStxTx = await getTokenTransferRequest(
@@ -71,6 +72,8 @@ function TransactionRequest() {
     const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find(
       (func) => func.name === payload.functionName
     );
+    const txAttachment = payload.attachment ?? undefined;
+    if (txAttachment) setAttachment(txAttachment);
     if (invokedFuncMetaData) {
       setFuncMetaData(invokedFuncMetaData);
     }
@@ -154,6 +157,7 @@ function TransactionRequest() {
           request={payload}
           unsignedTx={unsignedTx}
           funcMetaData={funcMetaData}
+          attachment={attachment}
           coinsMetaData={coinsMetaData}
           tabId={Number(tabId)}
           requestToken={requestToken}

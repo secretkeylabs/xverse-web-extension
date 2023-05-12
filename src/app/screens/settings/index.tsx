@@ -120,7 +120,7 @@ function Setting() {
   };
 
   const onRestoreFundClick = () => {
-    navigate('restore-funds', {
+    navigate('/restore-funds', {
       state: {
         unspentUtxos,
       },

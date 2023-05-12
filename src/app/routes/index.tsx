@@ -223,15 +223,15 @@ const router = createHashRouter([
         element: <Setting />,
       },
       {
-        path: 'settings/restore-funds',
+        path: 'restore-funds',
         element: <RestoreFunds />,
       },
       {
-        path: 'settings/restore-funds/btc',
+        path: 'recover-btc',
         element: <RestoreBtc />,
       },
       {
-        path: 'settings/restore-funds/ordinals',
+        path: 'recover-ordinals',
         element: <RestoreOrdinals />,
       },
       {

@@ -15,11 +15,11 @@ const Container = styled.button((props) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   paddingLeft: props.theme.spacing(6),
-  paddingRight: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(8),
-  paddingBottom: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(6),
+  paddingTop: props.theme.spacing(5),
+  paddingBottom: props.theme.spacing(4),
   borderRadius: 12,
-  width: 260,
+  width: 220,
   background: props.theme.colors.background.elevation2,
 }));
 
@@ -29,7 +29,7 @@ const CrossContainer = styled.button(() => ({
   justifyContent: 'flex-end',
   background: 'transparent',
   width: '100%',
-
+  paddingRight: 4,
 }));
 
 interface Props {

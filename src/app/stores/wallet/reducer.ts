@@ -25,6 +25,7 @@ import {
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
   AddLedgerAccountKey,
+  SetBrcCoinsListKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -51,6 +52,7 @@ const initialWalletState: WalletState = {
   btcBalance: new BigNumber(0),
   coinsList: null,
   coins: [],
+  brcCoinsList: [],
   feeMultipliers: null,
   networkAddress: undefined,
   btcApiUrl: '',
@@ -193,6 +195,11 @@ const walletReducer = (
       return {
         ...state,
         showOrdinalReceiveAlert: action.showOrdinalReceiveAlert,
+      };
+    case SetBrcCoinsListKey:
+      return {
+        ...state,
+        brcCoinsList: action.brcCoinsList,
       };
     default:
       return state;

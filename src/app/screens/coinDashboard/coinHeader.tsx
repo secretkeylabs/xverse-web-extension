@@ -1,14 +1,8 @@
-import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
-import { animated, config, useSpring } from '@react-spring/web';
-import CreditCard from '@assets/img/dashboard/credit_card.svg';
-import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
-import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
+import ArrowDown from '@assets/img/dashboard/arrow_down.svg';
+import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
-import PlusIcon from '@assets/img/transactions/Plus.svg';
-import MinusIcon from '@assets/img/transactions/Minus.svg';
-import CopyIcon from '@assets/img/transactions/Copy.svg';
-import linkIcon from '@assets/img/linkIcon.svg';
+import Buy from '@assets/img/dashboard/black_plus.svg';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
@@ -19,12 +13,13 @@ import { CurrencyTypes } from '@utils/constants';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
+import { isLedgerAccount } from '@utils/helper';
+import SmallActionButton from '@components/smallActionButton';
 
 interface CoinBalanceProps {
   coin: CurrencyTypes;
   fungibleToken?: FungibleToken;
+  isBRC20Token: boolean;
 }
 
 const Container = styled.div((props) => ({
@@ -34,17 +29,56 @@ const Container = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
 }));
 
+const RowContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
+const ProtocolText = styled.p((props) => ({
+  ...props.theme.headline_category_s,
+  fontWeight: '700',
+  height: 15,
+  marginTop: 6,
+  textTransform: 'uppercase',
+  marginLeft: props.theme.spacing(2),
+  backgroundColor: props.theme.colors.white['400'],
+  padding: '1px 6px 1px',
+  color: props.theme.colors.background.elevation0,
+  borderRadius: props.theme.radius(2),
+}));
+
+const ComingSoonContainer = styled.div((props) => ({
+  display: 'flex',
+  position: 'absolute',
+  top: 73,
+  left: -20,
+  background: props.theme.colors.orange_main,
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '2px 5px 1px',
+  borderRadius: 40,
+  width: 86,
+  marginTop: props.theme.spacing(4),
+  h1: {
+    ...props.theme.body_bold_m,
+    fontSize: 10,
+    textTransform: 'uppercase',
+    color: props.theme.colors.background.elevation0,
+  },
+}));
+
 const BalanceInfoContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
 });
 
-const BalanceValuesContainer = styled.div((props) => ({
+const BalanceValuesContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-}));
+});
 
 const CoinBalanceText = styled.h1((props) => ({
   ...props.theme.headline_l,
@@ -55,10 +89,17 @@ const CoinBalanceText = styled.h1((props) => ({
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white['200'],
   fontSize: 14,
   marginTop: props.theme.spacing(2),
   textAlign: 'center',
+}));
+
+const BalanceTitleText = styled.h1((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white['400'],
+  textAlign: 'center',
+  marginTop: props.theme.spacing(4),
 }));
 
 const RowButtonContainer = styled.div((props) => ({
@@ -69,9 +110,16 @@ const RowButtonContainer = styled.div((props) => ({
 }));
 
 const ButtonContainer = styled.div((props) => ({
-  flex: 1,
-  marginRight: props.theme.spacing(3),
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+  marginRight: props.theme.spacing(12),
 }));
+
+const RecieveButtonContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+});
 
 const HeaderSeparator = styled.div((props) => ({
   border: `0.5px solid ${props.theme.colors.white[400]}`,
@@ -109,79 +157,14 @@ const AvailableStxContainer = styled.div((props) => ({
   },
 }));
 
-const ShowMoreButton = styled.button((props) => ({
-  ...props.theme.body_xs,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(8),
-  alignSelf: 'center',
-  width: 144,
-  background: 'none',
-  color: props.theme.colors.white[0],
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  height: 34,
-  borderRadius: props.theme.radius(3),
-  img: {
-    marginLeft: props.theme.spacing(3),
-  },
-}));
-
-const TokenContractContainer = styled(animated.div)((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(8),
-  h1: {
-    ...props.theme.headline_category_s,
-    color: props.theme.colors.white[400],
-    textTransform: 'uppercase',
-  },
-}));
-
-const ContractAddressCopyButton = styled.button((props) => ({
-  display: 'flex',
-  marginTop: props.theme.spacing(2),
-  background: 'none',
-  justifyContent: 'space-between',
-}));
-
-const TokenContractAddress = styled.p((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white[0],
-  textAlign: 'left',
-  marginRight: props.theme.spacing(1.5),
-}));
-
 const StacksLockedInfoText = styled.span((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[400],
   textAlign: 'left',
 }));
 
-const ContractDeploymentButton = styled.button((props) => ({
-  ...props.theme.body_m,
-  display: 'flex',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(8),
-  background: 'none',
-  color: props.theme.colors.white[400],
-  span: {
-    color: props.theme.colors.white[0],
-    marginLeft: props.theme.spacing(3),
-  },
-  img: {
-    marginLeft: props.theme.spacing(3),
-  },
-}));
-
-const CopyImage = styled.img({
-  width: 23,
-  height: 23,
-  border: 1.5,
-});
-
 export default function CoinHeader(props: CoinBalanceProps) {
-  const { coin, fungibleToken } = props;
+  const { coin, fungibleToken, isBRC20Token } = props;
   const {
     btcBalance,
     stxBalance,
@@ -194,15 +177,6 @@ export default function CoinHeader(props: CoinBalanceProps) {
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const [ftInfoShown, setInfoShown] = useState<boolean>(false);
-  const slideInStyles = useSpring({
-    config: { ...config.stiff },
-    from: { opacity: 0, height: 0 },
-    to: {
-      opacity: ftInfoShown ? 1 : 0,
-      height: ftInfoShown ? 80 : 0,
-    },
-  });
 
   function getBalanceAmount() {
     switch (coin) {
@@ -253,45 +227,6 @@ export default function CoinHeader(props: CoinBalanceProps) {
         return '';
     }
   }
-
-  const openContractDeployment = () => {
-    window.open(getExplorerUrl(fungibleToken?.principal as string), '_blank');
-  };
-
-  const handleCopyContractAddress = () => {
-    navigator.clipboard.writeText(fungibleToken?.principal as string);
-  };
-
-  function formatAddress(addr: string): string {
-    return addr
-      ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}`
-      : '';
-  }
-
-  const renderFtInfo = () => (
-    <>
-      <ShowMoreButton onClick={() => setInfoShown(!ftInfoShown)}>
-        {ftInfoShown ? t('LESS_FT_INFO_BUTTON') : t('SHOW_FT_INFO_BUTTON')}
-        <img src={ftInfoShown ? MinusIcon : PlusIcon} alt="show" />
-      </ShowMoreButton>
-      {ftInfoShown ? (
-        <TokenContractContainer style={slideInStyles}>
-          <h1>{t('FT_CONTRACT_PREFIX')}</h1>
-          <ContractAddressCopyButton onClick={handleCopyContractAddress}>
-            <TokenContractAddress>
-              {formatAddress(fungibleToken?.principal as string)}
-            </TokenContractAddress>
-            <CopyImage src={CopyIcon} />
-          </ContractAddressCopyButton>
-          <ContractDeploymentButton onClick={openContractDeployment}>
-            {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
-            <span>{t('STACKS_EXPLORER')}</span>
-            <img src={linkIcon} alt="link" />
-          </ContractDeploymentButton>
-        </TokenContractContainer>
-      ) : null}
-    </>
-  );
 
   const renderStackingBalances = () => {
     if (stxLockedBalance && !new BigNumber(stxLockedBalance).eq(0, 10) && coin === 'STX') {
@@ -356,6 +291,16 @@ export default function CoinHeader(props: CoinBalanceProps) {
     }
   };
 
+  const getDashboardTitle = () => {
+    if (fungibleToken) {
+      return `${getFtTicker(fungibleToken)} ${t('BALANCE')}`;
+    }
+    if (coin) {
+      return `${coin} ${t('BALANCE')}`;
+    }
+    return '';
+  };
+
   return (
     <Container>
       <BalanceInfoContainer>
@@ -364,6 +309,10 @@ export default function CoinHeader(props: CoinBalanceProps) {
           loading={false}
           fungibleToken={fungibleToken || undefined}
         />
+        <RowContainer>
+          <BalanceTitleText>{getDashboardTitle()}</BalanceTitleText>
+          {isBRC20Token && <ProtocolText>BRC-20</ProtocolText>}
+        </RowContainer>
         <BalanceValuesContainer>
           <NumericFormat
             value={getBalanceAmount()}
@@ -383,23 +332,41 @@ export default function CoinHeader(props: CoinBalanceProps) {
           />
         </BalanceValuesContainer>
       </BalanceInfoContainer>
-      {fungibleToken ? renderFtInfo() : null}
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <ActionButton src={ArrowUpRight} text="Send" onPress={() => goToSendScreen()} />
-        </ButtonContainer>
-        <ButtonContainer>
-          <ActionButton
-            src={ArrowDownLeft}
-            text="Receive"
-            onPress={() => navigate(`/receive/${coin}`)}
+          <SmallActionButton
+            isDisabled={isBRC20Token}
+            src={ArrowUp}
+            text="Send"
+            onPress={() => goToSendScreen()}
           />
+          {isBRC20Token && (
+            <ComingSoonContainer>
+              <h1>{t('COMING_SOON')}</h1>
+            </ComingSoonContainer>
+          )}
         </ButtonContainer>
-        {!fungibleToken && (
-          <ButtonContainer>
-            <ActionButton src={CreditCard} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
-          </ButtonContainer>
+
+        {!fungibleToken ? (
+          <>
+            <ButtonContainer>
+              <SmallActionButton
+                src={ArrowDown}
+                text="Receive"
+                onPress={() => navigate(`/receive/${coin}`)}
+              />
+            </ButtonContainer>
+            <SmallActionButton src={Buy} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
+          </>
+        ) : (
+          <RecieveButtonContainer>
+            <SmallActionButton
+              src={ArrowDown}
+              text="Receive"
+              onPress={() => navigate(isBRC20Token ? '/receive/ORD' : `/receive/${coin}`)}
+            />
+          </RecieveButtonContainer>
         )}
       </RowButtonContainer>
     </Container>

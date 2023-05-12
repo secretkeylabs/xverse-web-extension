@@ -7,48 +7,21 @@ import {
   NonFungibleConditionCode,
   PostCondition,
 } from '@stacks/transactions';
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import Seperator from '@components/seperator';
-import { useContext } from 'react';
-import { ShowMoreContext } from '@components/transactionsRequests/ContractCallRequest';
-import RedirectAddressView from '@components/redirectAddressView';
+
+import TransferAmountComponent from '@components/transferAmountComponent';
 import {
   getNameFromPostCondition,
   getSymbolFromPostCondition,
 } from './helper';
 
-const MainContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-});
-
-const PostConditionContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  marginTop: props.theme.spacing(4),
-}));
-
-const Title = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  marginTop: 24,
-  textTransform: 'uppercase',
-}));
-
-const TickerText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
-}));
-
 type Props = {
   postCondition: PostCondition;
   amount: string;
+  icon?: string;
 };
 
-function PostConditionsView({ postCondition, amount }: Props) {
+function PostConditionsView({ postCondition, amount, icon }: Props) {
   const { stxAddress } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
@@ -81,33 +54,21 @@ function PostConditionsView({ postCondition, amount }: Props) {
   const address = addressToString(postCondition?.principal?.address!);
   const isSending = address === stxAddress;
   const isContractPrincipal = !!contractName || address.includes('.');
-  const { showMore } = useContext(ShowMoreContext);
-
   return (
-    <MainContainer>
-      <Title>
-        {`${
-          isContractPrincipal ? t('CONTRACT') : isSending ? t('YOU') : t('ANOTHER_ADDRESS')
-        } ${title}`}
-      </Title>
-      <PostConditionContainer>
-        <TickerText>{`${amount} ${ticker}`}</TickerText>
-        {name !== 'STX' && <TickerText>{name}</TickerText>}
-        {showMore && (
-        <>
-          <RedirectAddressView
-            recipient={`${address}${contractName ? `.${contractName}` : ''}`}
-            title={`${isContractPrincipal
-              ? t('CONTRACT_ADDRESS')
-              : isSending
-                ? t('MY_ADDRESS')
-                : t('RECIPIENT_ADDRESS')}`}
-          />
-          <Seperator />
-        </>
-        )}
-      </PostConditionContainer>
-    </MainContainer>
+    <TransferAmountComponent
+      title={`${
+        isContractPrincipal ? t('CONTRACT') : isSending ? t('YOU') : t('ANOTHER_ADDRESS')
+      } ${title}`}
+      value={`${amount} ${ticker}`}
+      subValue={name !== 'STX' ? name : ''}
+      icon={icon}
+      address={`${address}${contractName ? `.${contractName}` : ''}`}
+      subTitle={`${isContractPrincipal
+        ? t('CONTRACT_ADDRESS')
+        : isSending
+          ? t('MY_ADDRESS')
+          : t('RECIPIENT_ADDRESS')}`}
+    />
   );
 }
 export default PostConditionsView;

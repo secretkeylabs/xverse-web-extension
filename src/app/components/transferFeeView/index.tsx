@@ -1,4 +1,4 @@
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import { getBtcFiatEquivalent, getFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
 import BigNumber from 'bignumber.js';
@@ -10,43 +10,52 @@ import styled from 'styled-components';
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginTop: props.theme.spacing(8),
+  background: props.theme.colors.background.elevation1,
+  borderRadius: 12,
+  padding: '12px 16px',
+  justifyContent: 'center',
+  marginBottom: 12,
 }));
 
 const FeeText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[0],
 }));
 
 const FeeTitleContainer = styled.div({
   display: 'flex',
-  flex: 1,
+  flexDirection: 'column',
 });
 
 const FeeContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
+  flex: 1,
   alignItems: 'flex-end',
 });
 
 const TitleText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[200],
 }));
 
 const FiatAmountText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
+  ...props.theme.body_m,
+  fontSize: 12,
+  color: props.theme.colors.white[400],
 }));
 
 interface Props {
   fee: BigNumber;
   currency: string;
+  title?: string;
 }
-function TransferFeeView({ fee, currency }: Props) {
+function TransferFeeView({ fee, currency, title }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { btcFiatRate, fiatCurrency } = useSelector((state: StoreState) => state.walletState);
-
+  const { btcFiatRate, stxBtcRate, fiatCurrency } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
+  const fiatRate = getFiatEquivalent(Number(fee), currency, stxBtcRate, btcFiatRate);
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (fiatAmount) {
       if (fiatAmount.isLessThan(0.01)) {
@@ -59,7 +68,7 @@ function TransferFeeView({ fee, currency }: Props) {
           thousandSeparator
           prefix={`${currencySymbolMap[fiatCurrency]} `}
           suffix={` ${fiatCurrency}`}
-          renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
+          renderText={(value: string) => <FiatAmountText>{`~ ${value}`}</FiatAmountText>}
         />
       );
     }
@@ -69,12 +78,22 @@ function TransferFeeView({ fee, currency }: Props) {
   return (
     <RowContainer>
       <FeeTitleContainer>
-        <TitleText>{t('FEES')}</TitleText>
+        <TitleText>{title ?? t('FEES')}</TitleText>
       </FeeTitleContainer>
       <FeeContainer>
-        <FeeText>{`${fee.toString()} ${currency}`}</FeeText>
+        <NumericFormat
+          value={fee.toString()}
+          displayType="text"
+          thousandSeparator
+          suffix={` ${currency}`}
+          renderText={(value: string) => <FeeText>{value}</FeeText>}
+        />
         <FiatAmountText>
-          {getFiatAmountString(getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate))}
+          {getFiatAmountString(
+            currency === 'sats'
+              ? getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)
+              : new BigNumber(fiatRate!),
+          )}
         </FiatAmountText>
       </FeeContainer>
     </RowContainer>

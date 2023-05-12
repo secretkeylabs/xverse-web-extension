@@ -12,12 +12,13 @@ const Container = styled.div((props) => ({
   width: 312,
   borderRadius: 12,
   zIndex: 16000,
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.background.elevation3,
   filter: 'drop-shadow(0px 16px 36px rgba(0, 0, 0, 0.5))',
 }));
 
 const HeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
+  fontSize: 16,
   flex: 1,
 }));
 
@@ -25,6 +26,7 @@ const DescriptionText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
   margin: 16,
+  fontSize: 16,
 }));
 
 const RowContainer = styled.div((props) => ({
@@ -32,7 +34,7 @@ const RowContainer = styled.div((props) => ({
   flexDirection: 'row',
   padding: '20px 16px 16px 16px',
   alignItems: 'space-between',
-  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: `1px solid ${props.theme.colors.background.elevation6}`,
 }));
 
 const TickMarkButtonContainer = styled.div((props) => ({
@@ -110,6 +112,7 @@ interface Props {
   description: string;
   buttonText?: string;
   secondButtonText?: string;
+  isWarningAlert?: boolean;
   tickMarkButtonText?: string;
   onButtonClick?: () => void;
   onSecondButtonClick?: () => void;
@@ -118,7 +121,7 @@ interface Props {
 }
 
 function AlertMessage({
-  onClose, title, description, buttonText, secondButtonText, tickMarkButtonText, onButtonClick, onSecondButtonClick, tickMarkButtonClick,
+  onClose, title, description, buttonText, secondButtonText, tickMarkButtonText, isWarningAlert, onButtonClick, onSecondButtonClick, tickMarkButtonClick,
 }: Props) {
   return (
     <>
@@ -143,6 +146,7 @@ function AlertMessage({
           <ActionButton
             text={secondButtonText ?? 'Yes'}
             onPress={onSecondButtonClick}
+            warning={isWarningAlert}
           />
         </ButtonContainer>
         )}

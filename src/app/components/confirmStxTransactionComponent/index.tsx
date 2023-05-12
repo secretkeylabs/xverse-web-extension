@@ -41,7 +41,7 @@ const Container = styled.div`
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginBottom: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(12),
   marginTop: props.theme.spacing(12),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
@@ -69,10 +69,6 @@ const ButtonText = styled.div((props) => ({
   textAlign: 'center',
 }));
 
-const TransferFeeContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(12),
-}));
-
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
   alignSelf: 'center',
@@ -95,6 +91,23 @@ const SuccessActionsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(20),
 }));
 
+const ReviewTransactionText = styled.h1((props) => ({
+  ...props.theme.headline_s,
+  color: props.theme.colors.white[0],
+  textAlign: 'left',
+}));
+
+const RequestedByText = styled.h1((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[400],
+  marginTop: props.theme.spacing(4),
+  textAlign: 'left',
+}));
+
+const TitleContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(16),
+}));
+
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
@@ -103,6 +116,9 @@ interface Props {
   children: ReactNode;
   isSponsored?: boolean;
   skipModal?: boolean;
+  isAsset?: boolean;
+  title?: string;
+  subTitle?: string;
 }
 
 function ConfirmStxTransationComponent({
@@ -110,6 +126,9 @@ function ConfirmStxTransationComponent({
   loading,
   isSponsored,
   children,
+  isAsset,
+  title,
+  subTitle,
   onConfirmClick,
   onCancelClick,
   skipModal = false,
@@ -239,11 +258,23 @@ function ConfirmStxTransationComponent({
   return (
     <>
       <Container>
+        <TitleContainer>
+          {!isAsset && (
+            <ReviewTransactionText>{title ?? t('REVIEW_TRNSACTION')}</ReviewTransactionText>
+          )}
+          {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
+        </TitleContainer>
         {children}
-        <TransferFeeContainer>
-          <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
-        </TransferFeeContainer>
-
+        <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
+        {initialStxTransactions[0]?.payload?.amount && (
+          <TransferFeeView
+            fee={microstacksToStx(
+              getFee().plus(new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10)))
+            )}
+            currency="STX"
+            title={t('TOTAL')}
+          />
+        )}
         {!isSponsored && (
           <Button onClick={onAdvancedSettingClick}>
             <>
