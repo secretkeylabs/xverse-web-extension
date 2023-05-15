@@ -37,7 +37,7 @@ const ConfirmButton = styled.button((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.background.elevation0,
   width: '50%',
   height: 44,
   marginLeft: 6,

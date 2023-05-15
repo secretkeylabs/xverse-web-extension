@@ -18,6 +18,11 @@ const TopSectionContainer = styled.div({
   alignItems: 'center',
 });
 
+const Logo = styled.img({
+  width: 57,
+  height: 57,
+});
+
 const LandingTitle = styled.h1((props) => ({
   ...props.theme.tile_text,
   paddingTop: props.theme.spacing(15),
@@ -136,7 +141,7 @@ function Landing(): JSX.Element {
       <AppVersion>Beta</AppVersion>
       <ContentContainer style={styles}>
         <TopSectionContainer>
-          <img src={logo} width={100} alt="logo" />
+          <Logo src={logo} alt="logo" />
           <LandingTitle>{t('SCREEN_TITLE')}</LandingTitle>
         </TopSectionContainer>
         <ActionButtonsContainer>

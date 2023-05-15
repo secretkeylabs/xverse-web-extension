@@ -51,7 +51,7 @@ const ActionButtonsContainer = styled.div((props) => ({
 const AcceptButton = styled.button((props) => ({
   ...props.theme.body_bold_m,
   display: 'flex',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.background.elevation0,
   alignItems: 'center',
   justifyContent: 'center',
   marginTop: 'auto',

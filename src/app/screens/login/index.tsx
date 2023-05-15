@@ -11,6 +11,11 @@ import ActionButton from '@components/button';
 
 declare const VERSION: string;
 
+const Logo = styled.img({
+  width: 57,
+  height: 57,
+});
+
 const ScreenContainer = styled(animated.div)({
   display: 'flex',
   flexDirection: 'column',
@@ -160,7 +165,7 @@ function Login(): JSX.Element {
       <AppVersion>Beta</AppVersion>
       <ContentContainer style={styles}>
         <TopSectionContainer>
-          <img src={logo} width={140} alt="logo" />
+          <Logo src={logo} />
           <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
         </TopSectionContainer>
         <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
