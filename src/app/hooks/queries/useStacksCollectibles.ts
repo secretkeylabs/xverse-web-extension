@@ -14,7 +14,7 @@ const useStacksCollectibles = () => {
 
   const {
     isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch,
-  } = useInfiniteQuery([`nft-meta-data${stxAddress}`], fetchNfts, {
+  } = useInfiniteQuery([`nft-meta-data-${stxAddress}`], fetchNfts, {
     keepPreviousData: false,
     getNextPageParam: (lastpage, pages) => {
       const currentLength = pages.map((page) => page.nftsList).flat().length;
