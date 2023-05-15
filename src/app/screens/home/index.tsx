@@ -297,7 +297,7 @@ function Home() {
           {brcCoinsList?.map((coin) => (
             <TokenTile
               title={coin.name}
-              currency="FT"
+              currency="brc20"
               loading={loadingBtcCoinData || refetchingBtcCoinData}
               underlayColor={Theme.colors.background.elevation1}
               fungibleToken={coin}
