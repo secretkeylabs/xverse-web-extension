@@ -148,6 +148,7 @@ interface Props {
   onPress: (token: {
     coin: CurrencyTypes;
     ft: string | undefined;
+    brc20Ft?: string | undefined;
   }) => void;
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
@@ -325,6 +326,7 @@ function TokenTile({
     onPress({
       coin: currency as CurrencyTypes,
       ft: fungibleToken && fungibleToken.principal,
+      brc20Ft: !fungibleToken?.principal && fungibleToken?.name,
     });
   };
 

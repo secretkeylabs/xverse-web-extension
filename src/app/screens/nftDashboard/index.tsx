@@ -147,7 +147,7 @@ const GalleryCollectiblesHeadingText = styled.h1((props) => ({
 }));
 
 const CollectiblesValueText = styled.h1((props) => ({
-  ...props.theme.headline_l,
+  ...props.theme.headline_xl,
 }));
 
 const LoadMoreButtonContainer = styled.div((props) => ({

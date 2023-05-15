@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 
-const TopSectionContainer = styled.h1((props) => ({
+const TopSectionContainer = styled.div((props) => ({
   display: 'flex',
+  minHeight: 18,
   marginTop: props.theme.spacing(11),
   marginLeft: props.theme.spacing(8),
   flexDirection: 'row',

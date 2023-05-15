@@ -114,6 +114,7 @@
     "To": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive",
+    "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
     "BTC_TRANSFER_DANGER_ALERT_TITLE": "Danger",
@@ -334,7 +335,8 @@
     "TIMESTAMP": "Timestamp",
     "GENESIS_HEIGHT": "genesis height",
     "LOCATION": "Location",
-    "ORDINAL_NOT_DISPLAYED": "This ordinal cannot be displayed."
+    "ORDINAL_NOT_DISPLAYED": "This ordinal cannot be displayed.",
+    "COLLECTIBLE": "Collectible"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
@@ -392,7 +394,7 @@
     "SEND_COIN_BUTTON": "SEND",
     "RECEIVE_COIN_BUTTON": "Receive",
     "BUY_COIN_BUTTON": "Buy",
-    "TRANSACTION_HISTORY_TITLE": "Transaction History",
+    "TRANSACTION_HISTORY_TITLE": "Transaction history",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
@@ -412,10 +414,14 @@
     "STX_LOCKED_BALANCE_PREFIX": "Locked",
     "SHOW_FT_INFO_BUTTON": "Show more info",
     "LESS_FT_INFO_BUTTON": "Show less info",
-    "FT_CONTRACT_PREFIX": "Token Contract",
+    "FT_CONTRACT_PREFIX": "Token contract",
     "OPEN_FT_CONTRACT_DEPLOYMENT": "View the contract on",
     "STACKS_EXPLORER": "Stacks Explorer",
-    "INCREASE_FEE_BUTTON": "Increase fee"
+    "INCREASE_FEE_BUTTON": "Increase fee",
+    "BALANCE": "Balance",
+    "TRANSACTIONS": "TRANSACTIONS",
+    "CONTRACT": "CONTRACT",
+    "COMING_SOON": "Coming soon"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",

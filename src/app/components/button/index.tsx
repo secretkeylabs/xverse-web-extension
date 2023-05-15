@@ -37,10 +37,21 @@ const AnimatedTransparentButton = styled(TransparentButton)`
 }
 `;
 
-const ButtonText = styled.div((props) => ({
+interface TextProps {
+  warning?: boolean;
+}
+
+const ButtonText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white['0'],
+  color: `${props.warning ? props.theme.colors.white[0] : props.theme.colors.background.elevation0}`,
+  textAlign: 'center',
+}));
+
+const AnimatedButtonText = styled.div((props) => ({
+  ...props.theme.body_xs,
+  fontWeight: 700,
+  color: props.theme.colors.white[0],
   textAlign: 'center',
 }));
 
@@ -83,7 +94,7 @@ function ActionButton({
         ) : (
           <>
             {src && <ButtonImage src={src} />}
-            <ButtonText>{text}</ButtonText>
+            <AnimatedButtonText>{text}</AnimatedButtonText>
           </>
         )}
       </AnimatedTransparentButton>
@@ -97,11 +108,11 @@ function ActionButton({
       warning={warning}
     >
       {processing ? (
-        <MoonLoader color="white" size={12} />
+        <MoonLoader color="#12151E" size={12} />
       ) : (
         <>
           { src && <ButtonImage src={src} />}
-          <ButtonText>{text}</ButtonText>
+          <ButtonText warning={warning}>{text}</ButtonText>
         </>
       )}
     </AnimatedButton>

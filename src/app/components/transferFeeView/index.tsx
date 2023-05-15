@@ -68,7 +68,7 @@ function TransferFeeView({ fee, currency, title }: Props) {
           thousandSeparator
           prefix={`${currencySymbolMap[fiatCurrency]} `}
           suffix={` ${fiatCurrency}`}
-          renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
+          renderText={(value: string) => <FiatAmountText>{`~ ${value}`}</FiatAmountText>}
         />
       );
     }
@@ -81,12 +81,18 @@ function TransferFeeView({ fee, currency, title }: Props) {
         <TitleText>{title ?? t('FEES')}</TitleText>
       </FeeTitleContainer>
       <FeeContainer>
-        <FeeText>{`${fee.toString()} ${currency}`}</FeeText>
+        <NumericFormat
+          value={fee.toString()}
+          displayType="text"
+          thousandSeparator
+          suffix={` ${currency}`}
+          renderText={(value: string) => <FeeText>{value}</FeeText>}
+        />
         <FiatAmountText>
           {getFiatAmountString(
-            currency === 'SATS'
+            currency === 'sats'
               ? getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)
-              : new BigNumber(fiatRate!)
+              : new BigNumber(fiatRate!),
           )}
         </FiatAmountText>
       </FeeContainer>
