@@ -3,11 +3,12 @@ import { NonFungibleToken, getBnsNftName } from '@secretkeylabs/xverse-core/type
 import { BNS_CONTRACT } from '@utils/constants';
 import NftUser from '@assets/img/nftDashboard/nft_user.svg';
 import { useNavigate } from 'react-router-dom';
-import useNftDataReducer from '@hooks/useNftReducer';
+import useNftDataReducer from '@hooks/stores/useNftReducer';
 import NftImage from './nftImage';
 
 interface Props {
   asset: NonFungibleToken;
+  isGalleryOpen: boolean;
 }
 
 const NftNameText = styled.h1((props) => ({
@@ -60,11 +61,9 @@ const GridItemContainer = styled.button<GridContainerProps>((props) => ({
   border: props.showBorder ? ` 1px solid ${props.theme.colors.background.elevation2}` : 'transparent',
 }));
 
-function Nft({ asset }: Props) {
+function Nft({ asset, isGalleryOpen }: Props) {
   const navigate = useNavigate();
   const { storeNftData } = useNftDataReducer();
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const url = `${asset.asset_identifier}::${asset.value.repr}`;
 
   function getName() {
     if (asset?.data?.token_metadata) {
@@ -78,6 +77,7 @@ function Nft({ asset }: Props) {
   }
 
   const handleOnClick = () => {
+    const url = `${asset.asset_identifier}::${asset.value.repr}`;
     storeNftData(asset?.data!);
     if (asset.asset_identifier !== BNS_CONTRACT) {
       navigate(`nft-detail/${url}`);

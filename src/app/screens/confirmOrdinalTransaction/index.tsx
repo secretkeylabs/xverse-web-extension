@@ -2,14 +2,13 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
-import useNftDataSelector from '@hooks/useNftDataSelector';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
-import { getOrdinalInfo } from '@secretkeylabs/xverse-core/api/xverse';
-import { BtcTransactionBroadcastResponse, OrdinalInfo } from '@secretkeylabs/xverse-core/types';
+import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import BigNumber from 'bignumber.js';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -101,24 +100,8 @@ function ConfirmOrdinalTransaction() {
   } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
     async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
   );
-  const { id } = useParams();
-  const { ordinalsData } = useNftDataSelector();
-  const ordinalId = id!.split('::');
-  const ordinal = ordinalsData.find((inscription) => inscription?.metadata?.id === ordinalId[0]);
+  const { selectedOrdinal } = useNftDataSelector();
   const { refetch } = useBtcWalletData();
-
-  const {
-    data: ordinalInfoData,
-    mutate: ordinalInfoMutate,
-  } = useMutation<OrdinalInfo>(
-    async () => getOrdinalInfo(id),
-  );
-
-  useEffect(() => {
-    if (!ordinal) {
-      ordinalInfoMutate();
-    }
-  }, [ordinal]);
 
   useEffect(() => {
     setRecipientAddress(location.state.recipientAddress);
@@ -186,11 +169,11 @@ function ConfirmOrdinalTransaction() {
           onCancelClick={handleOnCancelClick}
           onBackButtonClick={handleOnCancelClick}
           ordinalTxUtxo={ordinalUtxo}
-          assetDetail={ordinal?.inscriptionNumber ?? ordinalInfoData?.inscriptionNumber}
+          assetDetail={selectedOrdinal?.number.toString()}
         >
           <Container>
             <NFtContainer>
-              <OrdinalImage inNftSend ordinal={ordinal! ?? ordinalInfoData} />
+              <OrdinalImage inNftSend ordinal={selectedOrdinal!} />
             </NFtContainer>
           </Container>
         </ConfirmBtcTransactionComponent>
