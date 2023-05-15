@@ -340,8 +340,10 @@ function TokenTile({
       <RowContainer>
         {renderIcon()}
         <TextContainer>
+
+          <CoinTickerText>{getTickerTitle()}</CoinTickerText>
           <TokenTitleContainer>
-            <CoinTickerText>{getTickerTitle()}</CoinTickerText>
+            <SubText>{title}</SubText>
             {
               fungibleToken?.protocol ? (
                 <ProtocolText>
@@ -350,7 +352,6 @@ function TokenTile({
               ) : null
             }
           </TokenTitleContainer>
-          <SubText>{title}</SubText>
         </TextContainer>
       </RowContainer>
       {loading ? (

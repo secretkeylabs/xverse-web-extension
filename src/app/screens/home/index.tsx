@@ -3,11 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import AddToken from '@assets/img/dashboard/add_token.svg';
-import StacksToken from '@assets/img/dashboard/stacks_token.svg';
-import MiaToken from '@assets/img/dashboard/mia_token.svg';
-import NycToken from '@assets/img/dashboard/nyc_token.svg';
-import CoinToken from '@assets/img/dashboard/coin_token.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
@@ -16,7 +11,8 @@ import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import OrdinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
+import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
+import OrdinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
 import TokenTile from '@components/tokenTile';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import Theme from 'theme';
@@ -119,11 +115,9 @@ const Icon = styled.img({
   height: 24,
 });
 
-const IconRow = styled.div({
-  display: 'flex',
-  width: 140,
-  flexDirection: 'row',
-  justifyContent: 'space-between',
+const MergedIcon = styled.img({
+  width: 40,
+  height: 40,
 });
 
 function Home() {
@@ -232,7 +226,7 @@ function Home() {
         address={ordinalsAddress}
         onQrAddressClick={onOrdinalsReceivePress}
       >
-        <Icon src={OrdinalsIcon} />
+        <MergedIcon src={OrdinalsIcon} />
       </ReceiveCardComponent>
 
       <ReceiveCardComponent
@@ -240,14 +234,7 @@ function Home() {
         address={stxAddress}
         onQrAddressClick={onSTXReceiveSelect}
       >
-        <IconRow>
-          <Icon src={StacksToken} />
-          <Icon src={CoinToken} />
-          <Icon src={NycToken} />
-          <Icon src={MiaToken} />
-          <Icon src={AddToken} />
-        </IconRow>
-
+        <MergedIcon src={SIP10Icon} />
       </ReceiveCardComponent>
     </ReceiveContainer>
   );

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import onboarding1 from '@assets/img/onboarding/onboarding1.svg';
 import onboarding2 from '@assets/img/onboarding/onboarding2.svg';
-import onboarding3 from '@assets/img/onboarding/onboarding3.svg';
+import onboarding3 from '@assets/img/onboarding/onboarding3.png';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
