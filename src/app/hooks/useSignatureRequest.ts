@@ -16,6 +16,7 @@ import {
   SignMessagePayload,
 } from 'sats-connect';
 import { signBip322Message } from '@secretkeylabs/xverse-core/connect/bip322Signature';
+import { ClarityType } from '@stacks/transactions/dist/esm/clarity';
 import useWalletSelector from './useWalletSelector';
 
 export type SignatureMessageType = 'utf8' | 'structured';
@@ -77,7 +78,7 @@ export function useSignMessage(messageType: SignatureMessageType) {
         return signMessage(message, privateKey);
       }
       if (!domain) throw new Error('Domain is required for structured messages');
-      return signStructuredDataMessage(message as ClarityValue, domain, privateKey);
+      return signStructuredDataMessage({ type: ClarityType.StringASCII, data: message } as ClarityValue, domain, privateKey);
     },
     [selectedAccount],
   );
