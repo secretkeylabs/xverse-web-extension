@@ -1,15 +1,15 @@
-import { Inscription } from '@secretkeylabs/xverse-core/types';
+import { OrdinalInfo } from '@secretkeylabs/xverse-core';
 import { getTextOrdinalContent } from '@secretkeylabs/xverse-core/api/index';
 import { useEffect, useState } from 'react';
 
-const useTextOrdinalContent = (ordinal: Inscription) => {
+const useTextOrdinalContent = (ordinal: OrdinalInfo) => {
   const [textContent, setTextContent] = useState('');
 
   useEffect(() => {
     if (ordinal) {
       (async () => {
-        if (ordinal?.content_type.startsWith('text/plain')) {
-          const response: string = await getTextOrdinalContent(ordinal?.id);
+        if (ordinal?.metadata['content type'].startsWith('text/plain')) {
+          const response: string = await getTextOrdinalContent(ordinal?.metadata.content);
           setTextContent(response ?? '');
         }
       })();

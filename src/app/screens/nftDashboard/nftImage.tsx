@@ -52,7 +52,6 @@ interface Props {
 
 function NftImage({ metadata }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-
   if (metadata?.image_protocol) {
     return (
       <ImageContainer isGalleryOpen={isGalleryOpen}>

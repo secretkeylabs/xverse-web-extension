@@ -1,4 +1,4 @@
-import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
+import useHasStateRehydrated from '@hooks/useHasRehydrated';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';

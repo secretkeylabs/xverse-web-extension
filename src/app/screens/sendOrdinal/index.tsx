@@ -1,15 +1,19 @@
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useMemo, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
+import {
+  BtcOrdinal, ErrorCodes, OrdinalInfo, ResponseError,
+} from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
+import { getOrdinalsByAddress } from '@secretkeylabs/xverse-core/api';
 import {
   SignedBtcTx,
   signOrdinalSendTransaction,
   getBtcFeesForOrdinalSend,
 } from '@secretkeylabs/xverse-core/transactions/btc';
+import useNftDataSelector from '@hooks/useNftDataSelector';
 import useWalletSelector from '@hooks/useWalletSelector';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
@@ -17,9 +21,7 @@ import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
-import useBtcClient from '@hooks/useBtcClient';
+import { getBtcFiatEquivalent, UTXO } from '@secretkeylabs/xverse-core';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -99,19 +101,43 @@ function SendOrdinal() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
   const { id } = useParams();
-  const { selectedOrdinal } = useNftDataSelector();
-  const btcClient = useBtcClient();
   const location = useLocation();
   const {
     network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
   } = useWalletSelector();
+  const { ordinalsData } = useNftDataSelector();
+  const [ordinal, setOrdinal] = useState<OrdinalInfo | undefined>(undefined);
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
 
-  const address: string | undefined = useMemo(() => (location.state ? location.state.recipientAddress : undefined), [location.state]);
+  let address: string | undefined;
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  if (location.state) {
+    address = location.state.recipientAddress;
+  }
+
+  const ordinalIdDetails = id!.split('::');
+
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+
+  useEffect(() => {
+    const data = ordinalsData.find(
+      (inscription) => inscription?.metadata?.id === ordinalIdDetails[0],
+    );
+    if (data) {
+      setOrdinal(data);
+    }
+  }, []);
+
+  function fetchOrdinals(): Promise<BtcOrdinal[]> {
+    return getOrdinalsByAddress(ordinalsAddress);
+  }
+
+  const { data: ordinals } = useQuery({
+    queryKey: [`ordinals-${ordinalsAddress}`],
+    queryFn: fetchOrdinals,
+  });
 
   const {
     isLoading,
@@ -119,14 +145,18 @@ function SendOrdinal() {
     error: txError,
     mutate,
   } = useMutation<SignedBtcTx, ResponseError, string>(async (recepient) => {
-    const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
-    const ordUtxo = addressUtxos.find((utx) => utx.txid === selectedOrdinal?.tx_id);
-    setOrdinalUtxo(ordUtxo);
-    if (ordUtxo) {
-      const txFees = await getBtcFeesForOrdinalSend(recepient, ordUtxo, btcAddress, network.type);
+    const ordinalUtx = ordinals?.find((inscription) => inscription.id === ordinalIdDetails[0])?.utxo;
+    setOrdinalUtxo(ordinalUtx);
+    if (ordinalUtx) {
+      const txFees = await getBtcFeesForOrdinalSend(
+        recepient,
+        ordinalUtx,
+        btcAddress,
+        network.type,
+      );
       const signedTx = await signOrdinalSendTransaction(
         recepient,
-        ordUtxo,
+        ordinalUtx,
         btcAddress,
         Number(selectedAccount?.id),
         seedPhrase,
@@ -221,9 +251,9 @@ function SendOrdinal() {
         >
           <Container>
             <NFtContainer>
-              <OrdinalImage inNftSend ordinal={selectedOrdinal!} />
+              <OrdinalImage inNftSend ordinal={ordinal!} />
             </NFtContainer>
-            <OrdinalInscriptionNumber>{selectedOrdinal?.number}</OrdinalInscriptionNumber>
+            <OrdinalInscriptionNumber>{ordinal?.inscriptionNumber}</OrdinalInscriptionNumber>
           </Container>
         </SendForm>
         <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>

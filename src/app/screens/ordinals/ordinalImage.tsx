@@ -7,7 +7,7 @@ import Image from 'rc-image';
 import { getFetchableUrl } from '@utils/helper';
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import { useTranslation } from 'react-i18next';
-import { Inscription } from '@secretkeylabs/xverse-core';
+import { OrdinalInfo } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 
 interface ContainerProps {
@@ -47,8 +47,8 @@ const OrdinalsTag = styled.div({
   borderRadius: 40,
   width: 79,
   height: 22,
-  left: 12,
-  bottom: 12,
+  left: 10,
+  bottom: 10,
   zIndex: 1000,
   position: 'absolute',
   padding: '3px 6px',
@@ -96,7 +96,7 @@ const StyledImg = styled(Image)`
 `;
 
 interface Props {
-  ordinal: Inscription;
+  ordinal: OrdinalInfo;
   isNftDashboard?: boolean;
   inNftDetail?: boolean;
   inNftSend?: boolean;
@@ -114,7 +114,7 @@ function OrdinalImage({
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
 
-  if (ordinal?.content_type.includes('image')) {
+  if (ordinal?.metadata['content type'].includes('image')) {
     return (
       <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
         <Suspense>
@@ -125,7 +125,7 @@ function OrdinalImage({
                 <MoonLoader color="white" size={20} />
               </LoaderContainer>
               )}
-            src={getFetchableUrl(`https://api.hiro.so/ordinals/v1/inscriptions/${ordinal.id}/content`, 'http')}
+            src={getFetchableUrl(`https://gammaordinals.com${ordinal?.metadata.content}`, 'http')}
             fallback={PlaceholderImage}
           />
         </Suspense>
@@ -138,7 +138,7 @@ function OrdinalImage({
       </ImageContainer>
     );
   }
-  if (ordinal?.content_type.includes('text')) {
+  if (ordinal?.metadata['content type'].includes('text')) {
     if (!textContent) {
       return (
         <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>

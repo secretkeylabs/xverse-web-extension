@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
+import { OrdinalInfo } from '@secretkeylabs/xverse-core';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
-import { Inscription } from '@secretkeylabs/xverse-core/types/api/ordinals';
 import * as actions from './types';
 
 export function setNftDataAction(nftData: NftData[]): actions.SetNftData {
@@ -10,9 +10,9 @@ export function setNftDataAction(nftData: NftData[]): actions.SetNftData {
   };
 }
 
-export function setSelectedOrdinalAction(selectedOrdinal: Inscription | null): actions.SetSelectedOrdinal {
+export function setOrdinalDataAction(ordinalsData: OrdinalInfo[]): actions.SetOrdinalData {
   return {
-    type: actions.SetSelectedOrdinalKey,
-    selectedOrdinal,
+    type: actions.SetOrdinalDataKey,
+    ordinalsData,
   };
 }
