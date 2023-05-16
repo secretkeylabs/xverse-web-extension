@@ -9,7 +9,7 @@ import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
-import useNftDataSelector from '@hooks/useNftDataSelector';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
 import AccountHeaderComponent from '@components/accountHeader';
 import TopRow from '@components/topRow';

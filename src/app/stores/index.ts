@@ -9,7 +9,7 @@ export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
 const rootPersistConfig = {
   key: 'root',
   storage,
-  blacklist: ['nftDataState', 'walletState'],
+  blacklist: ['walletState'],
 };
 
 const WalletPersistConfig = {

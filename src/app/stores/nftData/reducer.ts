@@ -1,10 +1,8 @@
-import {
-  NftDataAction, NftDataState, SetNftDataKey, SetOrdinalDataKey,
-} from './actions/types';
+import { NftDataAction, NftDataState, SetNftDataKey, SetSelectedOrdinalKey } from './actions/types';
 
 const initialNftDataState :NftDataState = {
   nftData: [],
-  ordinalsData: [],
+  selectedOrdinal: null,
 };
 
 const NftDataStateReducer = (
@@ -18,10 +16,10 @@ const NftDataStateReducer = (
         ...state,
         nftData: action.nftData,
       };
-    case SetOrdinalDataKey:
+    case SetSelectedOrdinalKey:
       return {
         ...state,
-        ordinalsData: action.ordinalsData,
+        selectedOrdinal: action.selectedOrdinal,
       };
     default:
       return state;

@@ -15,6 +15,7 @@ import styled from 'styled-components';
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import { useEffect } from 'react';
+import { UTXO } from '@secretkeylabs/xverse-core';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
@@ -85,7 +86,7 @@ function RestoreBtc() {
 
   const { data: ordinalsFee, isLoading } = useQuery({
     queryKey: [`getFee-${ordinalsAddress}`],
-    queryFn: () => getBtcFeesForNonOrdinalBtcSend(btcAddress, unspentUtxos as BtcUtxoDataResponse[], ordinalsAddress, 'Mainnet'),
+    queryFn: () => getBtcFeesForNonOrdinalBtcSend(btcAddress, unspentUtxos, ordinalsAddress, 'Mainnet'),
   });
 
   const {
@@ -96,7 +97,7 @@ function RestoreBtc() {
   Error,
   {
     recipientAddress: string,
-    nonOrdinalUtxos: Array<BtcUtxoDataResponse>,
+    nonOrdinalUtxos: Array<UTXO>,
     accountIndex: number,
     seedPhrase: string,
     network: NetworkType,
@@ -109,7 +110,7 @@ function RestoreBtc() {
   const onClickTransfer = () => {
     mutateSignNonOrdinalBtcTransaction({
       recipientAddress: btcAddress,
-      nonOrdinalUtxos: unspentUtxos as BtcUtxoDataResponse [],
+      nonOrdinalUtxos: unspentUtxos,
       accountIndex: selectedAccount?.id ?? 0,
       seedPhrase,
       network: network.type,
