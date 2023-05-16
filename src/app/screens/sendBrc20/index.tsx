@@ -168,7 +168,7 @@ function SendBrc20Screen() {
       const recipients: Recipient[] = [
         {
           address: order.inscriptionRequest.charge.address,
-          amountSats: btcToSats(new BigNumber(order.inscriptionRequest.charge.amount)),
+          amountSats: new BigNumber(order.inscriptionRequest.charge.amount),
         },
       ];
       const data = await signBtcTransaction(
@@ -189,7 +189,7 @@ function SendBrc20Screen() {
         state: {
           signedTxHex: data?.signedTx,
           recipientAddress: orderAddress,
-          amount: orderAmount.toString(),
+          amount: order.inscriptionRequest.charge.amount.toString(),
           recipient: recipients,
           fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
           fee: data?.fee,
