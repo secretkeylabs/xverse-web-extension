@@ -190,7 +190,7 @@ function SendBrc20Screen() {
           signedTxHex: data?.signedTx,
           recipientAddress: orderAddress,
           amount: orderAmount.toString(),
-          recipients,
+          recipient: recipients,
           fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
           fee: data?.fee,
           fiatFee: getBtcFiatEquivalent(data?.fee, btcFiatRate),
