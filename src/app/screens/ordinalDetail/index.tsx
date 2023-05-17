@@ -466,9 +466,11 @@ function OrdinalDetailScreen() {
         <DescriptionContainer>
           <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
           {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
-          {isBrc20Ordinal
+          {
+          isBrc20Ordinal
             ? showBrc20OrdinalDetial(true)
-            : ordinalDescriptionData}
+            : ordinalDescriptionData
+          }
         </DescriptionContainer>
       </RowContainer>
     </Container>
