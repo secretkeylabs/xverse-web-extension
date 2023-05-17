@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import TopRow from '@components/topRow';
-import { StoreState } from '@stores/index';
 import { getTicker } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 import styled from 'styled-components';
 import ActionButton from '@components/button';
 import {
-  btcToSats,
   createBrc20TransferOrder,
   getBtcFiatEquivalent,
   signBtcTransaction,
@@ -19,6 +16,7 @@ import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
 import InfoContainer from '@components/infoContainer';
 import TokenImage from '@components/tokenImage';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -59,7 +57,7 @@ const BRC20TokenTag = styled.div((props) => ({
     ...props.theme.body_bold_l,
     fontSize: 11,
     color: props.theme.colors.background.elevation0,
-  }
+  },
 }));
 
 interface ContainerProps {
@@ -139,12 +137,9 @@ function SendBrc20Screen() {
   const navigate = useNavigate();
   const {
     btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate,
-  } = useSelector((state: StoreState) => state.walletState);
+  } = useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
-  const [orderAddress, setOrderAddress] = useState('');
-  const [orderAmount, setOrderAmount] = useState<number>(0);
-  const [fee, setFee] = useState<number>(0);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
 
   const location = useLocation();
@@ -182,21 +177,36 @@ function SendBrc20Screen() {
     return false;
   };
 
-  const onNextClicked = async () => {
+  const handleInscribeTransferOrder = async () => {
     try {
-      setIsCreatingOrder(true);
       const order = await createBrc20TransferOrder(
         fungibleToken.ticker,
         amountToSend,
         ordinalsAddress,
       );
-      setOrderAddress(order.inscriptionRequest.charge.address);
-      setOrderAmount(order.inscriptionRequest.charge.amount);
-      setFee(order.feesResponse.fastestFee);
+      if ((order.inscriptionRequest as any).error) {
+        throw new Error((order.inscriptionRequest as any).error);
+      }
+      return order;
+    } catch (error) {
+      if (error instanceof Error) {
+        setAmountError(error.message);
+      } else {
+        console.log('Unexpected error', error);
+      }
+      return Promise.reject(error);
+    }
+  };
+
+  const onNextClicked = async () => {
+    try {
+      setIsCreatingOrder(true);
+      const order = await handleInscribeTransferOrder();
+      const orderAmount = new BigNumber(order.inscriptionRequest.charge.amount);
       const recipients: Recipient[] = [
         {
           address: order.inscriptionRequest.charge.address,
-          amountSats: new BigNumber(order.inscriptionRequest.charge.amount),
+          amountSats: orderAmount,
         },
       ];
       const data = await signBtcTransaction(
@@ -212,14 +222,13 @@ function SendBrc20Screen() {
           setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
         } else setAmountError(err.toString());
       });
-      const parsedAmountSats = btcToSats(new BigNumber(orderAmount));
       navigate('/confirm-btc-tx', {
         state: {
           signedTxHex: data?.signedTx,
-          recipientAddress: orderAddress,
+          recipientAddress: order.inscriptionRequest.charge.address,
           amount: order.inscriptionRequest.charge.amount.toString(),
           recipient: recipients,
-          fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
+          fiatAmount: getBtcFiatEquivalent(orderAmount, btcFiatRate),
           fee: data?.fee,
           fiatFee: getBtcFiatEquivalent(data?.fee, btcFiatRate),
           total: data?.total,
@@ -227,7 +236,6 @@ function SendBrc20Screen() {
           isBrc20TokenFlow: true,
         },
       });
-    //   mutate({ recipients });
     } catch (err) {
       setIsCreatingOrder(false);
     }
@@ -237,19 +245,25 @@ function SendBrc20Screen() {
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
       <BRC20TokenTagContainer>
-      <BRC20TokenTag><h1>{t('BRC20_TOKEN')}</h1> </BRC20TokenTag>
+        <BRC20TokenTag>
+          <h1>{t('BRC20_TOKEN')}</h1>
+          {' '}
+        </BRC20TokenTag>
       </BRC20TokenTagContainer>
       <TokenContainer>
-          <TokenImage
-            token={'FT'}
-            loading={false}
-            fungibleToken={fungibleToken || undefined}
-          />
-        </TokenContainer>
+        <TokenImage
+          token="FT"
+          loading={false}
+          fungibleToken={fungibleToken || undefined}
+        />
+      </TokenContainer>
       <Container>
         <RowContainer>
           <TitleText>{t('AMOUNT')}</TitleText>
-          <BalanceText>{t('BALANCE')}:</BalanceText>
+          <BalanceText>
+            {t('BALANCE')}
+            :
+          </BalanceText>
           <Text>{fungibleToken.balance}</Text>
         </RowContainer>
         <AmountInputContainer error={amountError !== ''}>
