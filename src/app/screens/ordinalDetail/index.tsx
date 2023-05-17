@@ -344,24 +344,24 @@ function OrdinalDetailScreen() {
     const content = JSON.parse(textContent)
     if (content.op === 'mint') {
       return (
-      <ColumnContainer>
-        <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={content.amt} />
-       {!isGallery && <OrdinalAttributeComponent title={t('OWNED_BY')} value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-          ordinalsAddress.length - 4,
-          ordinalsAddress.length,
-        )}`} showOridnalTag isAddress />}
-      </ColumnContainer>
+        <ColumnContainer>
+          <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={content.amt} />
+          {!isGallery && <OrdinalAttributeComponent title={t('OWNED_BY')} value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+            ordinalsAddress.length - 4,
+            ordinalsAddress.length,
+          )}`} showOridnalTag isAddress />}
+        </ColumnContainer>
       )
     }
     if (content.op === 'transfer') {
       return (
-      <ColumnContainer>
-        <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={content.amt} />
-        {!isGallery && <OrdinalAttributeComponent title={t('OWNED_BY')} value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-          ordinalsAddress.length - 4,
-          ordinalsAddress.length,
-        )}`} showOridnalTag isAddress />}
-      </ColumnContainer>
+        <ColumnContainer>
+          <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={content.amt} />
+          {!isGallery && <OrdinalAttributeComponent title={t('OWNED_BY')} value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+            ordinalsAddress.length - 4,
+            ordinalsAddress.length,
+          )}`} showOridnalTag isAddress />}
+        </ColumnContainer>
       )
     }
     if (content.op === 'deploy') {
@@ -424,37 +424,37 @@ function OrdinalDetailScreen() {
 
   const ordinalDescriptionData = (
     <>
-    <DescriptionTile title={t('ID')} value={id!} />
-    {ordinalData?.metadata['content length'] && (
-      <DescriptionTile
-        title={t('CONTENT_LENGTH')}
-        value={ordinalData?.metadata['content length']!}
-      />
-    )}
-    {ordinalData?.metadata['content type'] && (
-      <DescriptionTile
-        title={t('CONTENT_TYPE')}
-        value={ordinalData?.metadata['content type']!}
-      />
-    )}
-    {ordinalData?.metadata['output value'] && (
-      <DescriptionTile
-        title={t('OUTPUT_VALUE')}
-        value={ordinalData?.metadata['output value']!}
-      />
-    )}
-    {ordinalData?.metadata.timestamp && (
-      <DescriptionTile title={t('TIMESTAMP')} value={ordinalData?.metadata.timestamp!} />
-    )}
-    {ordinalData?.metadata['genesis height'] && (
-      <DescriptionTile
-        title={t('GENESIS_HEIGHT')}
-        value={ordinalData?.metadata['genesis height']!}
-      />
-    )}
-    {ordinalData?.metadata.location && (
-      <DescriptionTile title={t('LOCATION')} value={ordinalData?.metadata.location!} />
-    )}
+      <DescriptionTile title={t('ID')} value={id!} />
+      {ordinalData?.metadata['content length'] && (
+        <DescriptionTile
+          title={t('CONTENT_LENGTH')}
+          value={ordinalData?.metadata['content length']!}
+        />
+      )}
+      {ordinalData?.metadata['content type'] && (
+        <DescriptionTile
+          title={t('CONTENT_TYPE')}
+          value={ordinalData?.metadata['content type']!}
+        />
+      )}
+      {ordinalData?.metadata['output value'] && (
+        <DescriptionTile
+          title={t('OUTPUT_VALUE')}
+          value={ordinalData?.metadata['output value']!}
+        />
+      )}
+      {ordinalData?.metadata.timestamp && (
+        <DescriptionTile title={t('TIMESTAMP')} value={ordinalData?.metadata.timestamp!} />
+      )}
+      {ordinalData?.metadata['genesis height'] && (
+        <DescriptionTile
+          title={t('GENESIS_HEIGHT')}
+          value={ordinalData?.metadata['genesis height']!}
+        />
+      )}
+      {ordinalData?.metadata.location && (
+        <DescriptionTile title={t('LOCATION')} value={ordinalData?.metadata.location!} />
+      )}
     </>
   );
 
@@ -488,9 +488,9 @@ function OrdinalDetailScreen() {
         <DescriptionContainer>
           <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
           {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
-     {isBrc20Ordinal? 
-     showBrc20OrdinalDetial(true)
-      :ordinalDescriptionData}
+          {isBrc20Ordinal ?
+            showBrc20OrdinalDetial(true)
+            : ordinalDescriptionData}
         </DescriptionContainer>
       </RowContainer>
     </Container>

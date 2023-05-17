@@ -18,6 +18,7 @@ import {
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
 import InfoContainer from '@components/infoContainer';
+import TokenImage from '@components/tokenImage';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -33,6 +34,33 @@ const RowContainer = styled.div({
   flexDirection: 'row',
   alignItems: 'center',
 });
+
+const BRC20TokenTagContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  marginTop: 6,
+});
+
+const TokenContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(8),
+}));
+
+const BRC20TokenTag = styled.div((props) => ({
+  background: props.theme.colors.white[400],
+  borderRadius: 40,
+  width: 54,
+  height: 19,
+  padding: '2px 6px',
+  h1: {
+    ...props.theme.body_bold_l,
+    fontSize: 11,
+    color: props.theme.colors.background.elevation0,
+  }
+}));
 
 interface ContainerProps {
   error: boolean;
@@ -196,6 +224,7 @@ function SendBrc20Screen() {
           fiatFee: getBtcFiatEquivalent(data?.fee, btcFiatRate),
           total: data?.total,
           fiatTotal: getBtcFiatEquivalent(data?.total, btcFiatRate),
+          isBrc20TokenFlow: true,
         },
       });
     //   mutate({ recipients });
@@ -207,6 +236,16 @@ function SendBrc20Screen() {
   return (
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
+      <BRC20TokenTagContainer>
+      <BRC20TokenTag><h1>{t('BRC20_TOKEN')}</h1> </BRC20TokenTag>
+      </BRC20TokenTagContainer>
+      <TokenContainer>
+          <TokenImage
+            token={'FT'}
+            loading={false}
+            fungibleToken={fungibleToken || undefined}
+          />
+        </TokenContainer>
       <Container>
         <RowContainer>
           <TitleText>{t('AMOUNT')}</TitleText>

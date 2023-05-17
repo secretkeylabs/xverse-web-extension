@@ -35,7 +35,7 @@ function ConfirmBtcTransaction() {
   } = useOrdinalsByAddress(btcAddress);
   const { unspentUtxos: withdrawOridnalsUtxos } = useNonOrdinalUtxos();
   const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos,
+    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, isBrc20TokenFlow
   } = location.state;
 
   const {
@@ -134,7 +134,7 @@ function ConfirmBtcTransaction() {
   };
 
   const goBackToScreen = () => {
-    if (isRestoreFundFlow) {
+    if (isRestoreFundFlow || isBrc20TokenFlow) {
       navigate(-1);
     } else {
       navigate('/send-btc', {
