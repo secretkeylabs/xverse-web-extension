@@ -22,7 +22,8 @@ import InfoContainer from '@components/infoContainer';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import AlertMessage from '@components/alertMessage';
 import { getBtcTxStatusUrl } from '@utils/helper';
-import SmallActionButton from '@components/smallActionButton';
+import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import OrdinalAttributeComponent from './ordinalAttributeComponent';
 
 const Container = styled.div`
   display: flex;
@@ -122,11 +123,28 @@ const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
 
-const RowContainer = styled.h1((props) => ({
+const RowContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'flex-start',
   marginTop: props.theme.spacing(6),
   flexDirection: 'row',
+}));
+
+const ColumnContainer = styled.div((props) => ({
+  display: 'flex',
+  alignItems: 'flex-start',
+  flexDirection: 'column',
+  width: '100%',
+}));
+
+const Row = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  flexDirection: 'row',
+}));
+
+const MintLimitContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(30),
 }));
 
 const DescriptionContainer = styled.h1((props) => ({
@@ -144,8 +162,7 @@ const WebGalleryButton = styled.button((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(18),
-  marginBottom: props.theme.spacing(16),
+  marginTop: props.theme.spacing(6),
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
@@ -153,6 +170,25 @@ const WebGalleryButtonText = styled.div((props) => ({
   fontWeight: 700,
   color: props.theme.colors.white['200'],
   textAlign: 'center',
+}));
+
+const SendButton = styled.button((props) => ({
+  background: '#FFFFFF',
+  borderRadius: 16,
+  display: 'flex',
+  width: 100,
+  flexDirection: 'row',
+  padding: '12px 14px',
+  alignItems: 'center',
+  ':hover': {
+    background: props.theme.colors.action.classicLight,
+    opacity: 0.6,
+  },
+  h1: {
+    ...props.theme.body_medium_m,
+    fontSize: 14,
+    marginLeft: 6,
+  },
 }));
 
 const ButtonImage = styled.img((props) => ({
@@ -227,12 +263,14 @@ function OrdinalDetailScreen() {
   const [ordinalData, setOrdinalData] = useState<OrdinalInfo>();
   const [notSupportedOrdinal, setNotSupportedOrdinal] = useState<boolean>(false);
   const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState<boolean>(false);
+  const [isBrc20Ordinal, setIsBrc20Ordinal] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const {
     isLoading,
     data: ordinalDetailsData,
     mutate,
   } = useMutation<OrdinalInfo | undefined, Error, { ordinalId: string }>(async ({ ordinalId }) => getOrdinalInfo(ordinalId));
+  const textContent = useTextOrdinalContent(ordinalData!);
 
   useEffect(() => {
     const ordinalMetaData = ordinalsData.find((ordinal) => ordinal?.metadata?.id === id);
@@ -250,6 +288,14 @@ function OrdinalDetailScreen() {
       } else setNotSupportedOrdinal(true);
     }
   }, [ordinalData]);
+
+  useEffect(() => {
+    if (textContent) {
+      if (textContent.includes("brc-20")) {
+        setIsBrc20Ordinal(true);
+      }
+    }
+  }, [textContent]);
 
   useEffect(() => {
     if (ordinalDetailsData) {
@@ -294,6 +340,48 @@ function OrdinalDetailScreen() {
     }
   };
 
+  const showBrc20OrdinalDetial = (isGallery: boolean) => {
+    const content = JSON.parse(textContent)
+    if (content.op === 'mint') {
+      return (
+      <ColumnContainer>
+        <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={content.amt} />
+       {!isGallery && <OrdinalAttributeComponent title={t('OWNED_BY')} value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+          ordinalsAddress.length - 4,
+          ordinalsAddress.length,
+        )}`} showOridnalTag isAddress />}
+      </ColumnContainer>
+      )
+    }
+    if (content.op === 'transfer') {
+      return (
+      <ColumnContainer>
+        <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={content.amt} />
+        {!isGallery && <OrdinalAttributeComponent title={t('OWNED_BY')} value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+          ordinalsAddress.length - 4,
+          ordinalsAddress.length,
+        )}`} showOridnalTag isAddress />}
+      </ColumnContainer>
+      )
+    }
+    if (content.op === 'deploy') {
+      return (
+        <ColumnContainer>
+          <Row>
+            <OrdinalAttributeComponent title={t('TOTAL_SUPPLY')} value={content.max} />
+            <MintLimitContainer>
+              <OrdinalAttributeComponent title={t('MINT_LIMIT')} value={content.lim} />
+            </MintLimitContainer>
+          </Row>
+          {!isGallery && <OrdinalAttributeComponent title={t('OWNED_BY')} value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+            ordinalsAddress.length - 4,
+            ordinalsAddress.length,
+          )}`} showOridnalTag isAddress />}
+        </ColumnContainer>
+      )
+    }
+  }
+
   const ownedByView = (
     <RowContainer>
       <NftOwnedByText>{t('OWNED_BY')}</NftOwnedByText>
@@ -311,24 +399,63 @@ function OrdinalDetailScreen() {
   );
   const extensionView = (
     <ExtensionContainer>
-      <CollectibleText>{t('COLLECTIBLE')}</CollectibleText>
+      <CollectibleText>{isBrc20Ordinal ? t('BRC20_INSCRIPTION') : t('COLLECTIBLE')}</CollectibleText>
       <OrdinalTitleText>{ordinalData?.inscriptionNumber}</OrdinalTitleText>
-      <ExtensionOrdinalsContainer>
-        <OrdinalImage ordinal={ordinalData!} />
-      </ExtensionOrdinalsContainer>
-      {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
-      <ButtonContainer>
-        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={handleSendOrdinal} />
-      </ButtonContainer>
-      {ownedByView}
-
       <WebGalleryButton onClick={openInGalleryView}>
         <>
           <ButtonImage src={SquaresFour} />
           <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
         </>
       </WebGalleryButton>
+      <ExtensionOrdinalsContainer>
+        <OrdinalImage ordinal={ordinalData!} />
+      </ExtensionOrdinalsContainer>
+      {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
+      <ButtonContainer>
+        <SendButton onClick={handleSendOrdinal}>
+          <img src={ArrowUp} alt="arrow" />
+          <h1>{t('SEND')}</h1>
+        </SendButton>
+      </ButtonContainer>
+      {isBrc20Ordinal ? showBrc20OrdinalDetial(false) : ownedByView}
     </ExtensionContainer>
+  );
+
+
+  const ordinalDescriptionData = (
+    <>
+    <DescriptionTile title={t('ID')} value={id!} />
+    {ordinalData?.metadata['content length'] && (
+      <DescriptionTile
+        title={t('CONTENT_LENGTH')}
+        value={ordinalData?.metadata['content length']!}
+      />
+    )}
+    {ordinalData?.metadata['content type'] && (
+      <DescriptionTile
+        title={t('CONTENT_TYPE')}
+        value={ordinalData?.metadata['content type']!}
+      />
+    )}
+    {ordinalData?.metadata['output value'] && (
+      <DescriptionTile
+        title={t('OUTPUT_VALUE')}
+        value={ordinalData?.metadata['output value']!}
+      />
+    )}
+    {ordinalData?.metadata.timestamp && (
+      <DescriptionTile title={t('TIMESTAMP')} value={ordinalData?.metadata.timestamp!} />
+    )}
+    {ordinalData?.metadata['genesis height'] && (
+      <DescriptionTile
+        title={t('GENESIS_HEIGHT')}
+        value={ordinalData?.metadata['genesis height']!}
+      />
+    )}
+    {ordinalData?.metadata.location && (
+      <DescriptionTile title={t('LOCATION')} value={ordinalData?.metadata.location!} />
+    )}
+    </>
   );
 
   const galleryView = isLoading ? (
@@ -361,37 +488,9 @@ function OrdinalDetailScreen() {
         <DescriptionContainer>
           <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
           {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
-          <DescriptionTile title={t('ID')} value={id!} />
-          {ordinalData?.metadata['content length'] && (
-            <DescriptionTile
-              title={t('CONTENT_LENGTH')}
-              value={ordinalData?.metadata['content length']!}
-            />
-          )}
-          {ordinalData?.metadata['content type'] && (
-            <DescriptionTile
-              title={t('CONTENT_TYPE')}
-              value={ordinalData?.metadata['content type']!}
-            />
-          )}
-          {ordinalData?.metadata['output value'] && (
-            <DescriptionTile
-              title={t('OUTPUT_VALUE')}
-              value={ordinalData?.metadata['output value']!}
-            />
-          )}
-          {ordinalData?.metadata.timestamp && (
-            <DescriptionTile title={t('TIMESTAMP')} value={ordinalData?.metadata.timestamp!} />
-          )}
-          {ordinalData?.metadata['genesis height'] && (
-            <DescriptionTile
-              title={t('GENESIS_HEIGHT')}
-              value={ordinalData?.metadata['genesis height']!}
-            />
-          )}
-          {ordinalData?.metadata.location && (
-            <DescriptionTile title={t('LOCATION')} value={ordinalData?.metadata.location!} />
-          )}
+     {isBrc20Ordinal? 
+     showBrc20OrdinalDetial(true)
+      :ordinalDescriptionData}
         </DescriptionContainer>
       </RowContainer>
     </Container>

@@ -282,7 +282,10 @@
     "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
-    "COPIED": "Copied!"
+    "COPIED": "Copied!",
+    "MINT": "MINT",
+    "TRANSFER": "Transfer",
+    "DEPLOY": "DEPLOY"
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Restore assets",
@@ -343,7 +346,12 @@
     "GENESIS_HEIGHT": "genesis height",
     "LOCATION": "Location",
     "ORDINAL_NOT_DISPLAYED": "This ordinal cannot be displayed.",
-    "COLLECTIBLE": "Collectible"
+    "COLLECTIBLE": "Collectible",
+    "BRC20_INSCRIPTION": "BRC-20 Inscription",
+    "AMOUNT_TO_MINT": "Amount to mint",
+    "AMOUNT_TO_TRANSFER": "Amount to transfer",
+    "TOTAL_SUPPLY": "Total supply",
+    "MINT_LIMIT": "Mint limit"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
