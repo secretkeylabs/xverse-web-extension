@@ -93,11 +93,13 @@ function TransferFeeView({
           suffix={` ${currency}`}
           renderText={(value: string) => <FeeText>{value}</FeeText>}
         />
-        <FiatAmountText>
-          {feePerVByte?.toString()}
-          {' '}
-          sats/vB
-        </FiatAmountText>
+        {currency === 'BTC' && (
+          <FiatAmountText>
+            {feePerVByte?.toString()}
+            {' '}
+            sats/vB
+          </FiatAmountText>
+        )}
         <FiatAmountText>
           {getFiatAmountString(
             currency === 'sats'

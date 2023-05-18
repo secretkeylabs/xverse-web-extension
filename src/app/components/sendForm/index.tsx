@@ -373,7 +373,7 @@ function SendForm({
     </Container>
   );
 
-  const onAddressInputChange = (e: { target: { value: SetStateAction<string> } }) => {
+  const onAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRecipientAddress(e.target.value);
   };
 

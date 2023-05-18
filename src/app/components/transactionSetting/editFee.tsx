@@ -6,7 +6,7 @@ import {
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
 import {
-  SetStateAction, useEffect, useRef, useState,
+  useEffect, useRef, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -64,6 +64,18 @@ const InputField = styled.input((props) => ({
   backgroundColor: 'transparent',
   color: props.theme.colors.white['0'],
   border: 'transparent',
+  width: '55%',
+  '&::-webkit-outer-spin-button': {
+    '-webkit-appearance': 'none',
+    margin: 0,
+  },
+  '&::-webkit-inner-spin-button': {
+    '-webkit-appearance': 'none',
+    margin: 0,
+  },
+  '&[type=number]': {
+    '-moz-appearance': 'textfield',
+  },
 }));
 
 const FeeText = styled.h1((props) => ({
@@ -122,7 +134,7 @@ const TickerContainer = styled.div({
 interface Props {
   type?: string;
   fee: string;
-  feePerVByte?: BigNumber;
+  feeRate?: BigNumber | string;
   btcRecipients?: Recipient[];
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
@@ -130,13 +142,14 @@ interface Props {
   setIsLoading: () => void;
   setIsNotLoading: () => void;
   setFee: (fee: string) => void;
+  setFeeRate: (feeRate: string) => void;
   setFeeMode: (feeMode: string) => void;
   setError: (error: string) => void;
 }
 function EditFee({
   type,
   fee,
-  feePerVByte,
+  feeRate,
   btcRecipients,
   ordinalTxUtxo,
   isRestoreFlow,
@@ -144,6 +157,7 @@ function EditFee({
   setIsLoading,
   setIsNotLoading,
   setFee,
+  setFeeRate,
   setError,
   setFeeMode,
 }: Props) {
@@ -158,7 +172,8 @@ function EditFee({
     ordinalsAddress,
   } = useWalletSelector();
   const [selectedOption, setSelectedOption] = useState<string>('standard');
-  const [feeInput, setFeeInput] = useState(fee);
+  const [totalFee, setTotalFee] = useState(fee);
+  const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString());
   const inputRef = useRef(null);
 
   const modifyStxFees = (mode: string) => {
@@ -168,13 +183,13 @@ function EditFee({
     setSelectedOption(mode);
     switch (mode) {
       case 'low':
-        setFeeInput(currentFee.dividedBy(2).toString());
+        setFeeRateInput(currentFee.dividedBy(2).toString());
         break;
       case 'standard':
-        setFeeInput(currentFee.toString());
+        setFeeRateInput(currentFee.toString());
         break;
       case 'high':
-        setFeeInput(currentFee.multipliedBy(2).toString());
+        setFeeRateInput(currentFee.multipliedBy(2).toString());
         break;
       case 'custom':
         inputRef.current?.focus();
@@ -199,10 +214,11 @@ function EditFee({
             'Mainnet',
             mode,
           );
-          setFeeInput(btcFee.toString());
+          setFeeRateInput(btcFee.toString());
         } else if (btcRecipients && selectedAccount) {
-          const btcFee = await getBtcFees(btcRecipients, btcAddress, network.type, mode);
-          setFeeInput(btcFee.toString());
+          const { fee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, mode);
+          setFeeRateInput(selectedFeeRate?.toString());
+          setTotalFee(fee.toString());
         }
       } else if (type === 'Ordinals') {
         if (btcRecipients && ordinalTxUtxo) {
@@ -213,16 +229,17 @@ function EditFee({
             network.type,
             mode,
           );
-          setFeeInput(txFees.toString());
+          setFeeRateInput(txFees.toString());
         }
       }
-      setIsNotLoading();
     } catch (err: any) {
       if (Number(err) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
       } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
       } else setError(err.toString());
+    } finally {
+      setIsNotLoading();
     }
   };
 
@@ -233,13 +250,41 @@ function EditFee({
   }, [selectedOption]);
 
   useEffect(() => {
-    setFee(feeInput);
-  }, [feeInput]);
+    setFee(totalFee);
+  }, [totalFee]);
+
+  const recalculateFees = async () => {
+    if (!btcRecipients || !selectedAccount) return;
+
+    try {
+      setIsLoading();
+      setError('');
+
+      const { fee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, selectedOption, feeRateInput);
+      setFeeRateInput(selectedFeeRate?.toString());
+      setTotalFee(fee.toString());
+    } catch (err: any) {
+      if (Number(err) === ErrorCodes.InSufficientBalance) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setError(err.toString());
+    } finally {
+      setIsNotLoading();
+    }
+  };
+
+  useEffect(() => {
+    if (feeRateInput) {
+      setFeeRate(feeRateInput);
+      recalculateFees();
+    }
+  }, [feeRateInput]);
 
   function getFiatEquivalent() {
     return type === 'STX'
-      ? getStxFiatEquivalent(stxToMicrostacks(new BigNumber(feeInput)), stxBtcRate, btcFiatRate)
-      : getBtcFiatEquivalent(new BigNumber(feeInput), btcFiatRate);
+      ? getStxFiatEquivalent(stxToMicrostacks(new BigNumber(totalFee)), stxBtcRate, btcFiatRate)
+      : getBtcFiatEquivalent(new BigNumber(totalFee), btcFiatRate);
   }
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
@@ -261,8 +306,12 @@ function EditFee({
     return '';
   };
 
-  const onInputEditFeesChange = (e: { target: { value: SetStateAction<string> } }) => {
-    setFeeInput(e.target.value);
+  const onInputEditFeesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFeeRateInput(e.target.value);
+
+    if (selectedOption !== 'custom') {
+      setSelectedOption('custom');
+    }
   };
 
   return (
@@ -270,9 +319,14 @@ function EditFee({
       <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
       <FeeContainer>
         <InputContainer>
-          <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
+          <InputField type="number" ref={inputRef} value={feeRateInput?.toString()} onChange={onInputEditFeesChange} />
+          {type === 'BTC' && (
+            <FeeText>sats /vB</FeeText>
+          )}
           <TickerContainer>
-            <FeeText>{`${feePerVByte?.toString()} sats /vB`}</FeeText>
+            {type === 'BTC' && (
+              <FeeText>{`${totalFee} sats`}</FeeText>
+            )}
             <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
           </TickerContainer>
         </InputContainer>

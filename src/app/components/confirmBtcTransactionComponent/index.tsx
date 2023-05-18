@@ -148,6 +148,7 @@ function ConfirmBtcTransactionComponent({
     (state: StoreState) => state.walletState,
   );
   const [currentFee, setCurrentFee] = useState(fee);
+  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
@@ -252,8 +253,9 @@ function ConfirmBtcTransactionComponent({
     setOpenTransactionSettingModal(false);
   };
 
-  const onApplyClick = (modifiedFee: string) => {
+  const onApplyClick = ({ fee: modifiedFee, feeRate }: { fee: string; feeRate?: string; nonce?: string }) => {
     setCurrentFee(new BigNumber(modifiedFee));
+    setCurrentFeeRate(new BigNumber(feeRate));
     if (ordinalTxUtxo) ordinalMutate(modifiedFee);
     else if (isRestoreFundFlow) {
       mutateSignNonOrdinalBtcTransaction(modifiedFee);
@@ -344,7 +346,7 @@ function ConfirmBtcTransactionComponent({
           )}
 
           <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-          <TransferFeeView feePerVByte={feePerVByte} fee={currentFee} currency={t('CONFIRM_TRANSACTION.SATS')} />
+          <TransferFeeView feePerVByte={currentFeeRate} fee={currentFee} currency={t('CONFIRM_TRANSACTION.SATS')} />
           {!ordinalTxUtxo && (
           <TransactionDetailComponent
             title={t('CONFIRM_TRANSACTION.TOTAL')}
