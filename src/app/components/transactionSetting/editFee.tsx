@@ -19,6 +19,7 @@ import {
   Recipient,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
+import useDebounce from '@hooks/useDebounce';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -173,8 +174,9 @@ function EditFee({
   } = useWalletSelector();
   const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [totalFee, setTotalFee] = useState(fee);
-  const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString());
+  const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
   const inputRef = useRef(null);
+  const debouncedFeeRateInput = useDebounce(feeRateInput, 300);
 
   const modifyStxFees = (mode: string) => {
     const currentFee = new BigNumber(fee);
@@ -219,9 +221,9 @@ function EditFee({
           );
           setFeeRateInput(btcFee.toString());
         } else if (btcRecipients && selectedAccount) {
-          const { fee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, mode);
+          const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, mode);
           setFeeRateInput(selectedFeeRate?.toString());
-          setTotalFee(fee.toString());
+          setTotalFee(modifiedFee.toString());
         }
       } else if (type === 'Ordinals') {
         if (btcRecipients && ordinalTxUtxo) {
@@ -280,9 +282,14 @@ function EditFee({
   useEffect(() => {
     if (feeRateInput) {
       setFeeRate(feeRateInput);
-      recalculateFees();
     }
   }, [feeRateInput]);
+
+  useEffect(() => {
+    if (debouncedFeeRateInput) {
+      recalculateFees();
+    }
+  }, [debouncedFeeRateInput]);
 
   function getFiatEquivalent() {
     return type === 'STX'

@@ -8,11 +8,10 @@ import {
 import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
-import Info from '@assets/img/info.svg';
 import Switch from '@assets/img/send/switch.svg';
 import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
-import { useBnsName, useBNSResolver, useDebounce } from '@hooks/queries/useBnsName';
+import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -21,6 +20,7 @@ import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-c
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { getCurrencyFlag } from '@utils/currency';
+import useDebounce from '@hooks/useDebounce';
 
 interface ContainerProps {
   error: boolean;
