@@ -162,13 +162,19 @@ function AccountRow({
     navigator.clipboard.writeText(account?.btcAddress!);
     setOnBtcCopied(true);
     setOnStxCopied(false);
-    if (showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
+    // set 'Copied' text back to 'Bitcoin address' after 3 seconds
+    setTimeout(() => setOnBtcCopied(false), 3000);
+    if (showBtcReceiveAlert !== null) {
+      dispatch(ChangeShowBtcReceiveAlertAction(true));
+    }
   };
 
   const handleOnStxAddressClick = () => {
     navigator.clipboard.writeText(account?.stxAddress!);
     setOnStxCopied(true);
     setOnBtcCopied(false);
+    // set 'Copied' text back to 'Stacks address' after 3 seconds
+    setTimeout(() => setOnStxCopied(false), 3000);
   };
 
   const onRowClick = () => {
