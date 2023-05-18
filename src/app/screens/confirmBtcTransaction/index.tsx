@@ -11,7 +11,6 @@ import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
 import InfoContainer from '@components/infoContainer';
 import { useTranslation } from 'react-i18next';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
-import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import AlertMessage from '@components/alertMessage';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import useBtcClient from '@hooks/useBtcClient';
@@ -33,9 +32,8 @@ function ConfirmBtcTransaction() {
   const {
     ordinals: ordinalsInBtc,
   } = useOrdinalsByAddress(btcAddress);
-  const { unspentUtxos: withdrawOridnalsUtxos } = useNonOrdinalUtxos();
   const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos,
+    fee, feePerVByte, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos,
   } = location.state;
 
   const {
@@ -51,9 +49,10 @@ function ConfirmBtcTransaction() {
     error: errorBtcOrdinalTransaction,
     data: btcOrdinalTxBroadcastData,
     mutate: broadcastOrdinalTransaction,
-} = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-  async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-);
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
+    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  );
+
   const onClick = () => {
     navigate('/recover-ordinals');
   };
@@ -167,6 +166,7 @@ function ConfirmBtcTransaction() {
 
       <ConfirmBtcTransactionComponent
         fee={fee}
+        feePerVByte={feePerVByte}
         recipients={recipient as Recipient[]}
         loadingBroadcastedTx={isLoading}
         signedTxHex={signedTxHex}

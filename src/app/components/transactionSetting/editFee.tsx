@@ -62,8 +62,13 @@ const InputContainer = styled.div((props) => ({
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
   backgroundColor: 'transparent',
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white['0'],
   border: 'transparent',
+}));
+
+const FeeText = styled.h1((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white['0'],
 }));
 
 const SubText = styled.h1((props) => ({
@@ -109,14 +114,15 @@ const FeeContainer = styled.div({
 
 const TickerContainer = styled.div({
   display: 'flex',
-  flexDirection: 'row-reverse',
-  alignItems: 'center',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
   flex: 1,
 });
 
 interface Props {
   type?: string;
   fee: string;
+  feePerVByte?: BigNumber;
   btcRecipients?: Recipient[];
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
@@ -130,6 +136,7 @@ interface Props {
 function EditFee({
   type,
   fee,
+  feePerVByte,
   btcRecipients,
   ordinalTxUtxo,
   isRestoreFlow,
@@ -232,7 +239,7 @@ function EditFee({
   function getFiatEquivalent() {
     return type === 'STX'
       ? getStxFiatEquivalent(stxToMicrostacks(new BigNumber(feeInput)), stxBtcRate, btcFiatRate)
-      : getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
+      : getBtcFiatEquivalent(new BigNumber(feeInput), btcFiatRate);
   }
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
@@ -245,7 +252,7 @@ function EditFee({
           value={fiatAmount.toFixed(2).toString()}
           displayType="text"
           thousandSeparator
-          prefix={`${currencySymbolMap[fiatCurrency]} `}
+          prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
           suffix={` ${fiatCurrency}`}
           renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
         />
@@ -265,6 +272,7 @@ function EditFee({
         <InputContainer>
           <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
           <TickerContainer>
+            <FeeText>{`${feePerVByte?.toString()} sats /vB`}</FeeText>
             <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
           </TickerContainer>
         </InputContainer>

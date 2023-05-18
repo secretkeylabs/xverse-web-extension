@@ -180,7 +180,7 @@ function ConfirmStxTransationComponent({
     <>
       <Container>
         <TitleContainer>
-          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRNSACTION')}</ReviewTransactionText>}
+          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>}
           {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
         {children}

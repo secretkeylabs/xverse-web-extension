@@ -46,33 +46,38 @@ const FiatAmountText = styled.h1((props) => ({
 }));
 
 interface Props {
+  feePerVByte?: BigNumber;
   fee: BigNumber;
   currency: string;
   title?: string;
 }
-function TransferFeeView({ fee, currency, title }: Props) {
+function TransferFeeView({
+  feePerVByte, fee, currency, title,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { btcFiatRate, stxBtcRate, fiatCurrency } = useSelector(
     (state: StoreState) => state.walletState,
   );
   const fiatRate = getFiatEquivalent(Number(fee), currency, stxBtcRate, btcFiatRate);
   const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (fiatAmount) {
-      if (fiatAmount.isLessThan(0.01)) {
-        return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      }
-      return (
-        <NumericFormat
-          value={fiatAmount.toFixed(2).toString()}
-          displayType="text"
-          thousandSeparator
-          prefix={`${currencySymbolMap[fiatCurrency]} `}
-          suffix={` ${fiatCurrency}`}
-          renderText={(value: string) => <FiatAmountText>{`~ ${value}`}</FiatAmountText>}
-        />
-      );
+    if (!fiatAmount) {
+      return '';
     }
-    return '';
+
+    if (fiatAmount.isLessThan(0.01)) {
+      return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
+    }
+
+    return (
+      <NumericFormat
+        value={fiatAmount.toFixed(2).toString()}
+        displayType="text"
+        thousandSeparator
+        prefix={`${currencySymbolMap[fiatCurrency]} `}
+        suffix={` ${fiatCurrency}`}
+        renderText={(value: string) => <FiatAmountText>{`~ ${value}`}</FiatAmountText>}
+      />
+    );
   };
 
   return (
@@ -88,6 +93,11 @@ function TransferFeeView({ fee, currency, title }: Props) {
           suffix={` ${currency}`}
           renderText={(value: string) => <FeeText>{value}</FeeText>}
         />
+        <FiatAmountText>
+          {feePerVByte?.toString()}
+          {' '}
+          sats/vB
+        </FiatAmountText>
         <FiatAmountText>
           {getFiatAmountString(
             currency === 'sats'

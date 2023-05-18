@@ -207,7 +207,7 @@ function SignPsbtRequest() {
           <>
             <OuterContainer>
               <Container>
-                <ReviewTransactionText>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>
+                <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
                 {!payload.broadcast ? (
                   <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
                 ) : null}

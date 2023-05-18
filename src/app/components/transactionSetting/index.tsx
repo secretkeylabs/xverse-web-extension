@@ -71,6 +71,7 @@ const TransactionSettingNonceOptionButton = styled.button((props) => ({
 interface Props {
   visible: boolean;
   fee: string;
+  feePerVByte?: BigNumber;
   loading?: boolean;
   nonce?: string;
   onApplyClick: (fee: string, nonce?: string) => void;
@@ -88,6 +89,7 @@ type TxType = 'STX' | 'BTC' | 'Ordinals';
 function TransactionSettingAlert({
   visible,
   fee,
+  feePerVByte,
   loading,
   nonce,
   onApplyClick,
@@ -187,6 +189,7 @@ function TransactionSettingAlert({
       return (
         <EditFee
           fee={fee}
+          feePerVByte={feePerVByte}
           type={type}
           setIsLoading={onLoading}
           setIsNotLoading={onComplete}

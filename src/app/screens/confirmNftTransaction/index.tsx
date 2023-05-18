@@ -64,19 +64,6 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
-const IndicationText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-  fontSize: 14,
-}));
-
-const ValueText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(2),
-  wordBreak: 'break-all',
-}));
-
 const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -101,7 +88,7 @@ const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white[0],
   marginBottom: props.theme.spacing(16),
-  textAlign:  'center' 
+  textAlign: 'center',
 }));
 
 function ConfirmNftTransaction() {
@@ -199,7 +186,7 @@ function ConfirmNftTransaction() {
                 metadata={nft?.token_metadata!}
               />
             </NFtContainer>
-            <ReviewTransactionText>{t('REVIEW_TRNSACTION')}</ReviewTransactionText>
+            <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
           </Container>
           <RecipientComponent
             address={recipientAddress}

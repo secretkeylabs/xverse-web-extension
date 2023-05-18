@@ -107,6 +107,7 @@ const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => 
 
 interface Props {
   fee: BigNumber;
+  feePerVByte: BigNumber;
   loadingBroadcastedTx: boolean;
   signedTxHex: string;
   ordinalTxUtxo?: UTXO;
@@ -123,6 +124,7 @@ interface Props {
 
 function ConfirmBtcTransactionComponent({
   fee,
+  feePerVByte,
   loadingBroadcastedTx,
   signedTxHex,
   ordinalTxUtxo,
@@ -316,7 +318,7 @@ function ConfirmBtcTransactionComponent({
         <Container>
           {children}
           <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
-            {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
+            {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
           </ReviewTransactionText>
 
           {ordinalTxUtxo ? (
@@ -342,7 +344,7 @@ function ConfirmBtcTransactionComponent({
           )}
 
           <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-          <TransferFeeView fee={currentFee} currency={t('CONFIRM_TRANSACTION.SATS')} />
+          <TransferFeeView feePerVByte={feePerVByte} fee={currentFee} currency={t('CONFIRM_TRANSACTION.SATS')} />
           {!ordinalTxUtxo && (
           <TransactionDetailComponent
             title={t('CONFIRM_TRANSACTION.TOTAL')}
@@ -360,6 +362,7 @@ function ConfirmBtcTransactionComponent({
           <TransactionSettingAlert
             visible={openTransactionSettingModal}
             fee={new BigNumber(currentFee).toString()}
+            feePerVByte={feePerVByte}
             type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
             btcRecipients={recipients}
             ordinalTxUtxo={ordinalTxUtxo}
