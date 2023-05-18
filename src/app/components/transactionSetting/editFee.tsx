@@ -184,12 +184,15 @@ function EditFee({
     switch (mode) {
       case 'low':
         setFeeRateInput(currentFee.dividedBy(2).toString());
+        setTotalFee(currentFee.dividedBy(2).toString());
         break;
       case 'standard':
         setFeeRateInput(currentFee.toString());
+        setTotalFee(currentFee.toString());
         break;
       case 'high':
         setFeeRateInput(currentFee.multipliedBy(2).toString());
+        setTotalFee(currentFee.multipliedBy(2).toString());
         break;
       case 'custom':
         inputRef.current?.focus();
