@@ -7,6 +7,7 @@ import BottomTabBar from '@components/tabBar';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
+import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useMemo, useState } from 'react';
@@ -389,7 +390,7 @@ function OrdinalDetailScreen() {
   const extensionView = (
     <ExtensionContainer>
       <CollectibleText>{isBrc20Ordinal ? t('BRC20_INSCRIPTION') : t('COLLECTIBLE')}</CollectibleText>
-      <OrdinalTitleText>{selectedOrdinal?.number}</OrdinalTitleText>
+      <OrdinalTitleText>{`${t('INSCRIPTION')} ${selectedOrdinal?.number}`}</OrdinalTitleText>
       <WebGalleryButton onClick={openInGalleryView}>
         <>
           <ButtonImage src={SquaresFour} />
@@ -451,11 +452,11 @@ function OrdinalDetailScreen() {
         </Button>
       </BackButtonContainer>
       <OrdinalGalleryTitleText>
-        {selectedOrdinal?.number ?? t('INSCRIPTION')}
+        {`${t('INSCRIPTION')} ${selectedOrdinal?.number}` ?? t('INSCRIPTION')}
       </OrdinalGalleryTitleText>
       <ButtonContainer>
         <SendButtonContainer>
-          <ActionButton src={ArrowUp} text={t('SEND')} onPress={handleSendOrdinal} />
+          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleSendOrdinal} />
         </SendButtonContainer>
       </ButtonContainer>
       <RowContainer>
