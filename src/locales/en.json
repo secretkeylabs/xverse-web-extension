@@ -78,7 +78,7 @@
     "SWITCH_TO": "Switch to",
     "SEND_ORDINAL_TITLE": "Send Ordinal",
     "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals.",
-    "BRC20_TOKEN": "BRC_20"
+    "BRC20_TOKEN": "BRC-20"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -505,7 +505,7 @@
     "RECEIVING_ORDINALS": "Receiving Ordinals",
     "RECEIVING_ORDINAL_INFO": "Use this address to receive Ordinals only. Do not use this address to receive Bitcoin payments.",
     "RECEIVING_BTC": "Receiving Bitcoin",
-    "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
+    "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals & BRC-20 tokens.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
 },
