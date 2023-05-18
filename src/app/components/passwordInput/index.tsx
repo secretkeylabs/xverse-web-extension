@@ -208,13 +208,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   useEffect(() => {
     if (enteredPassword !== '') {
-      if (enteredPasswordLength <= REQUIRED_PASSWORD_LENGTH || score <= PasswordStrength.WeakScore) {
-        setPasswordStrength(PasswordStrength.WeakScore);
-      } else if (score <= PasswordStrength.AverageScore) {
-        setPasswordStrength(PasswordStrength.AverageScore);
-      } else if (score <= PasswordStrength.StrongScore) {
-        setPasswordStrength(PasswordStrength.StrongScore);
-      }
+      setPasswordStrength(score);
     }
 
     return () => {
