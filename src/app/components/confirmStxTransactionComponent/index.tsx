@@ -116,6 +116,7 @@ function ConfirmStxTransationComponent({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const selectedNetwork = useNetworkSelector();
+  const [showFeeSettings, setShowFeeSettings] = useState(false);
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
@@ -210,6 +211,8 @@ function ConfirmStxTransationComponent({
           nonce={getTxNonce()}
           onApplyClick={applyTxSettings}
           onCrossClick={closeTransactionSettingAlert}
+          showFeeSettings={showFeeSettings}
+          setShowFeeSettings={setShowFeeSettings}
         />
       </Container>
       <ButtonContainer>
