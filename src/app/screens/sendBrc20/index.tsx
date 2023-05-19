@@ -198,9 +198,19 @@ function SendBrc20Screen() {
     }
   };
 
+  const validateBrcAmount = () => {
+    if (+amountToSend > fungibleToken.balance) {
+      throw new Error(t('ERRORS.INSUFFICIENT_BALANCE'));
+    }
+    if (!amountToSend || +amountToSend === 0) {
+      throw new Error(t('ERRORS.AMOUNT_REQUIRED'));
+    }
+  };
+
   const onNextClicked = async () => {
     try {
       setIsCreatingOrder(true);
+      validateBrcAmount();
       const order = await handleInscribeTransferOrder();
       const orderAmount = new BigNumber(order.inscriptionRequest.charge.amount);
       const recipients: Recipient[] = [
@@ -237,6 +247,11 @@ function SendBrc20Screen() {
         },
       });
     } catch (err) {
+      if (err instanceof Error) {
+        setAmountError(err.message);
+      } else {
+        console.log('Unexpected error', err);
+      }
       setIsCreatingOrder(false);
     }
   };
