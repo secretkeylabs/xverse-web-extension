@@ -15,6 +15,7 @@ import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import AlertMessage from '@components/alertMessage';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import useBtcClient from '@hooks/useBtcClient';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
@@ -35,7 +36,7 @@ function ConfirmBtcTransaction() {
   } = useOrdinalsByAddress(btcAddress);
   const { unspentUtxos: withdrawOridnalsUtxos } = useNonOrdinalUtxos();
   const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos,
+    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, btcSendBrowserTx, requestString, tabId,
   } = location.state;
 
   const {
@@ -51,9 +52,9 @@ function ConfirmBtcTransaction() {
     error: errorBtcOrdinalTransaction,
     data: btcOrdinalTxBroadcastData,
     mutate: broadcastOrdinalTransaction,
-} = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-  async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-);
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
+    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  );
   const onClick = () => {
     navigate('/recover-ordinals');
   };
@@ -81,16 +82,29 @@ function ConfirmBtcTransaction() {
 
   useEffect(() => {
     if (btcTxBroadcastData) {
-      navigate('/tx-status', {
-        state: {
-          txid: btcTxBroadcastData.tx.hash,
-          currency: 'BTC',
-          error: '',
-        },
-      });
-      setTimeout(() => {
-        refetch();
-      }, 1000);
+      if (btcSendBrowserTx) {
+        const btcSendMessage = {
+          source: MESSAGE_SOURCE,
+          method: ExternalSatsMethods.sendBtcResponse,
+          payload: {
+            sendBtcRequest: requestString,
+            sendBtcResponse: btcTxBroadcastData.tx.hash,
+          },
+        };
+        chrome.tabs.sendMessage(+tabId, btcSendMessage);
+        window.close();
+      } else {
+        navigate('/tx-status', {
+          state: {
+            txid: btcTxBroadcastData.tx.hash,
+            currency: 'BTC',
+            error: '',
+          },
+        });
+        setTimeout(() => {
+          refetch();
+        }, 1000);
+      }
     }
   }, [btcTxBroadcastData]);
 
@@ -119,6 +133,7 @@ function ConfirmBtcTransaction() {
           txid: '',
           currency: 'BTC',
           error: txError.toString(),
+          browserTx: btcSendBrowserTx,
         },
       });
     }

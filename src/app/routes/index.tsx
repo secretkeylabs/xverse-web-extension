@@ -47,6 +47,7 @@ import SignPsbtRequest from '@screens/signPsbtRequest';
 import RestoreFunds from '@screens/restoreFunds';
 import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
+import BtcSendScreen from '@screens/btcSendScreen';
 
 const router = createHashRouter([
   {
@@ -151,6 +152,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SignPsbtRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'btc-send-request',
+        element: (
+          <AuthGuard>
+            <BtcSendScreen />
           </AuthGuard>
         ),
       },
