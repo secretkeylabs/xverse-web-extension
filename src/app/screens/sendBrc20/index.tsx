@@ -1,11 +1,8 @@
+import styled from 'styled-components';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import TopRow from '@components/topRow';
-import { getTicker } from '@utils/helper';
-import BottomBar from '@components/tabBar';
-import styled from 'styled-components';
-import ActionButton from '@components/button';
 import {
   createBrc20TransferOrder,
   getBtcFiatEquivalent,
@@ -13,25 +10,12 @@ import {
   ErrorCodes,
 } from '@secretkeylabs/xverse-core';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import BigNumber from 'bignumber.js';
-import InfoContainer from '@components/infoContainer';
-import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flex: 1,
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(16),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-}));
-
-const RowContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-});
+import TopRow from '@components/topRow';
+import BottomBar from '@components/tabBar';
+import ActionButton from '@components/button';
+import Brc20TransferForm from './brc20TransferForm';
+import Brc20TransferInfo from './brc20TransferInfo';
 
 const BRC20TokenTagContainer = styled.div({
   display: 'flex',
@@ -39,13 +23,6 @@ const BRC20TokenTagContainer = styled.div({
   justifyContent: 'center',
   marginTop: 6,
 });
-
-const TokenContainer = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(8),
-}));
 
 const BRC20TokenTag = styled.div((props) => ({
   background: props.theme.colors.white[400],
@@ -58,66 +35,6 @@ const BRC20TokenTag = styled.div((props) => ({
     fontSize: 11,
     color: props.theme.colors.background.elevation0,
   },
-}));
-
-interface ContainerProps {
-  error: boolean;
-}
-
-const AmountInputContainer = styled.div<ContainerProps>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(4),
-  border: props.error
-    ? '1px solid rgba(211, 60, 60, 0.3)'
-    : `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background['elevation-1'],
-  borderRadius: 8,
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  height: 44,
-  ':focus-within': {
-    border: `1px solid ${props.theme.colors.background.elevation6}`,
-  },
-}));
-
-const TitleText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  flex: 1,
-  display: 'flex',
-}));
-
-const InputFieldContainer = styled.div(() => ({
-  flex: 1,
-}));
-
-const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background['elevation-1'],
-  color: props.theme.colors.white['0'],
-  width: '100%',
-  border: 'transparent',
-}));
-
-const Text = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-}));
-
-const BalanceText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
-  marginRight: props.theme.spacing(2),
-}));
-
-const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(3),
-}));
-
-const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
 }));
 
 interface ButtonProps {
@@ -133,7 +50,7 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
 }));
 
 function SendBrc20Screen() {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  const { t } = useTranslation('translation');
   const navigate = useNavigate();
   const {
     btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate,
@@ -141,24 +58,20 @@ function SendBrc20Screen() {
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   const location = useLocation();
   const { fungibleToken } = location.state;
 
   const handleBackButtonClick = () => {
-    navigate('/');
-  };
-
-  function getTokenCurrency() {
-    if (fungibleToken) {
-      if (fungibleToken?.ticker) {
-        return fungibleToken.ticker.toUpperCase();
-      }
-      if (fungibleToken?.name) {
-        return getTicker(fungibleToken.name).toUpperCase();
-      }
+    if (showForm) {
+      setAmountError('');
+      setAmountToSend('');
+      setShowForm(false);
+    } else {
+      navigate('/');
     }
-  }
+  };
 
   const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
     const newValue = e.currentTarget.value;
@@ -200,14 +113,14 @@ function SendBrc20Screen() {
 
   const validateBrcAmount = () => {
     if (+amountToSend > fungibleToken.balance) {
-      throw new Error(t('ERRORS.INSUFFICIENT_BALANCE'));
+      throw new Error(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
     }
     if (!amountToSend || +amountToSend === 0) {
-      throw new Error(t('ERRORS.AMOUNT_REQUIRED'));
+      throw new Error(t('SEND.ERRORS.AMOUNT_REQUIRED'));
     }
   };
 
-  const onNextClicked = async () => {
+  const createTransferRequest = async () => {
     try {
       setIsCreatingOrder(true);
       validateBrcAmount();
@@ -227,9 +140,9 @@ function SendBrc20Screen() {
         network.type,
       ).catch((err) => {
         if (Number(err) === ErrorCodes.InSufficientBalance) {
-          setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
+          setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
         } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
-          setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+          setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE_FEES'));
         } else setAmountError(err.toString());
       });
       navigate('/confirm-btc-tx', {
@@ -256,46 +169,40 @@ function SendBrc20Screen() {
     }
   };
 
+  const handleNext = async () => {
+    if (!showForm) {
+      setShowForm(true);
+    } else {
+      await createTransferRequest();
+    }
+  };
+
   return (
     <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
+      <TopRow title={t('SEND_BRC_20.SEND')} onClick={handleBackButtonClick} />
       <BRC20TokenTagContainer>
         <BRC20TokenTag>
-          <h1>{t('BRC20_TOKEN')}</h1>
-          {' '}
+          <h1>{t('SEND_BRC_20.BRC20_TOKEN')}</h1>
         </BRC20TokenTag>
       </BRC20TokenTagContainer>
-      <TokenContainer>
-        <TokenImage
-          token="FT"
-          loading={false}
-          fungibleToken={fungibleToken || undefined}
+      {showForm ? (
+        <Brc20TransferForm
+          amountToSend={amountToSend}
+          onAmountChange={onInputChange}
+          amountError={amountError}
+          token={fungibleToken}
         />
-      </TokenContainer>
-      <Container>
-        <RowContainer>
-          <TitleText>{t('AMOUNT')}</TitleText>
-          <BalanceText>
-            {t('BALANCE')}
-            :
-          </BalanceText>
-          <Text>{fungibleToken.balance}</Text>
-        </RowContainer>
-        <AmountInputContainer error={amountError !== ''}>
-          <InputFieldContainer>
-            <InputField value={amountToSend} placeholder="0" onChange={onInputChange} />
-          </InputFieldContainer>
-          <Text>{getTokenCurrency()}</Text>
-        </AmountInputContainer>
-        <ErrorContainer>
-          <ErrorText>{amountError}</ErrorText>
-        </ErrorContainer>
-        <div style={{ marginTop: 16 }}>
-          <InfoContainer bodyText="To transfer BRC-20 tokens, you must first inscribe the transfer and then send the inscription to your recipient." />
-        </div>
-      </Container>
+      ) : (
+        <Brc20TransferInfo />
+      )}
       <SendButtonContainer enabled={checkIfEnableButton()}>
-        <ActionButton text={t('NEXT')} processing={isCreatingOrder} onPress={onNextClicked} />
+        <ActionButton
+          text={
+            showForm ? t('SEND_BRC_20.SEND_NEXT_BUTTON') : t('SEND_BRC_20.SEND_INFO_START_BUTTON')
+          }
+          processing={isCreatingOrder}
+          onPress={handleNext}
+        />
       </SendButtonContainer>
       <BottomBar tab="dashboard" />
     </>
