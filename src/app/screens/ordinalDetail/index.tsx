@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
@@ -244,9 +244,13 @@ const Text = styled.h1((props) => ({
   marginLeft: props.theme.spacing(2),
 }));
 
-const DetailRow = styled.div((props) => ({
+interface DetailSectionProps {
+  isGallery: boolean;
+}
+
+const DetailSection = styled.div<DetailSectionProps>((props) => ({
   display: 'flex',
-  flexDirection: 'row',
+  flexDirection: !props.isGallery ? 'row' : 'column',
   justifyContent: 'space-between',
   width: '100%',
   paddingRight: props.theme.spacing(20),
@@ -263,6 +267,7 @@ function OrdinalDetailScreen() {
   const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState<boolean>(false);
   const [isBrc20Ordinal, setIsBrc20Ordinal] = useState<boolean>(false);
   const textContent = useTextOrdinalContent(selectedOrdinal!);
+  const theme = useTheme();
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
   const isTransferValid = useMemo(
@@ -345,14 +350,15 @@ function OrdinalDetailScreen() {
     if (content.op === 'transfer') {
       return (
         <ColumnContainer>
-          <DetailRow>
+          <DetailSection isGallery={isGalleryOpen}>
             <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={content.amt} />
             <OrdinalAttributeComponent
               title={t('BRC20_TRANSFER_STATUS')}
               value={isTransferValid}
+              valueColor={isBrcTransferValid(selectedOrdinal!) ? theme.colors.feedback.success : theme.colors.feedback.error}
               isAddress
             />
-          </DetailRow>
+          </DetailSection>
           {!isGallery && (
           <OrdinalAttributeComponent
             title={t('OWNED_BY')}

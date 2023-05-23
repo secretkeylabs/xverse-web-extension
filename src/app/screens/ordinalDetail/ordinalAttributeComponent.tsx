@@ -22,11 +22,15 @@ const TitleText = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
-const ValueText = styled.h1((props) => ({
+interface ValueTextProps {
+  color?: string,
+}
+
+const ValueText = styled.h1<ValueTextProps>((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'center',
+  color: props.color || props.theme.colors.white[0],
 }));
-
 
 const OrdinalsTag = styled.div({
   display: 'flex',
@@ -58,30 +62,35 @@ interface Props {
   value: string;
   isAddress?: boolean;
   showOridnalTag?: boolean;
+  valueColor?: string;
 }
 
-
-function OrdinalAttributeComponent({ title, value, showOridnalTag, isAddress }: Props) {
+function OrdinalAttributeComponent({ title, value, showOridnalTag, isAddress, valueColor }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
 
   return (
     <Container>
       <TitleText>{title}</TitleText>
       <RowContainer>
-        {isAddress ? <ValueText>{value}</ValueText> : <NumericFormat
-          value={value}
-          displayType="text"
-          thousandSeparator
-          renderText={(value) => <ValueText>{value}</ValueText>}
-        />
-        }
-        {showOridnalTag && <OrdinalsTag>
-          <ButtonIcon src={OrdinalsIcon} />
-          <Text>{t('ORDINALS')}</Text>
-        </OrdinalsTag>}
+        {isAddress ? (
+          <ValueText color={valueColor}>{value}</ValueText>
+        ) : (
+          <NumericFormat
+            value={value}
+            displayType="text"
+            thousandSeparator
+            renderText={(value) => <ValueText>{value}</ValueText>}
+          />
+        )}
+        {showOridnalTag && (
+          <OrdinalsTag>
+            <ButtonIcon src={OrdinalsIcon} />
+            <Text>{t('ORDINALS')}</Text>
+          </OrdinalsTag>
+        )}
       </RowContainer>
     </Container>
-  )
+  );
 }
 
 

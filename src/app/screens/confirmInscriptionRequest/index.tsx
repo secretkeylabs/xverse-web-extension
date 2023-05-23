@@ -329,7 +329,7 @@ function ConfirmInscriptionRequest() {
               brcContent={textContent}
               isGalleryOpen={false}
               isNftDashboard={false}
-              inNftDetail
+              inNftDetail={false}
               isSmallImage={false}
             />
           </Brc20TileContainer>

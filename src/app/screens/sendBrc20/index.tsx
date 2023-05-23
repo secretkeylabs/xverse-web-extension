@@ -113,9 +113,11 @@ function SendBrc20Screen() {
 
   const validateBrcAmount = () => {
     if (+amountToSend > fungibleToken.balance) {
+      setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
       throw new Error(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
     }
     if (!amountToSend || +amountToSend === 0) {
+      setAmountError(t('SEND.ERRORS.AMOUNT_REQUIRED'));
       throw new Error(t('SEND.ERRORS.AMOUNT_REQUIRED'));
     }
   };

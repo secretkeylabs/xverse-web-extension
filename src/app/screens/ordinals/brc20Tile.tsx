@@ -48,7 +48,6 @@ const BRC20Text = styled.h1<TextProps>((props) => ({
   color: props.theme.colors.white[0],
   fontSize: props.inNftSend ? 16 : 'calc(0.8vw + 2vh)',
   textAlign: 'center',
-  marginTop: 8,
 }));
 
 interface TickerProps {
