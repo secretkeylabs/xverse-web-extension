@@ -161,11 +161,6 @@ function SendBrc20Screen() {
         },
       });
     } catch (err) {
-      if (err instanceof Error) {
-        setAmountError(err.message);
-      } else {
-        console.log('Unexpected error', err);
-      }
       setIsCreatingOrder(false);
     }
   };
