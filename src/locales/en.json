@@ -52,6 +52,7 @@
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
     "BTC_RECIPIENT_PLACEHOLDER": "Enter Bitcoin address",
+    "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter Ordinals address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
@@ -345,6 +346,7 @@
     "BRC20_INSCRIPTION": "BRC-20 Inscription",
     "AMOUNT_TO_MINT": "Amount to mint",
     "AMOUNT_TO_TRANSFER": "Amount to transfer",
+    "BRC20_TRANSFER_STATUS": "Status",
     "TOTAL_SUPPLY": "Total supply",
     "MINT_LIMIT": "Mint limit"
   },

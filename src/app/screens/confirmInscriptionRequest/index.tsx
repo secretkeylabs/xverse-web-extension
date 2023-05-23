@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  useEffect, useState,
+  useEffect, useMemo, useState,
 } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { BtcTransactionBroadcastResponse, ResponseError } from '@secretkeylabs/xverse-core/types';
@@ -21,12 +21,15 @@ import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
-import RecipientComponent from '@components/recipientComponent';
-import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
 import BigNumber from 'bignumber.js';
+import TransferFeeView from '@components/transferFeeView';
+import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import { NumericFormat } from 'react-number-format';
+import { satsToBtc } from '@secretkeylabs/xverse-core';
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
@@ -45,8 +48,8 @@ const OuterContainer = styled.div`
 `;
 
 const ReviewTransactionText = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[200],
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(16),
   textAlign: 'center',
@@ -71,7 +74,8 @@ const Button = styled.button((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(10),
+  marginTop: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(8),
 }));
 
 const ButtonText = styled.div((props) => ({
@@ -86,26 +90,53 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
+const DetailRow = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(8),
+}));
+
+const TitleText = styled.h1((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[200],
+}));
+
+const ValueText = styled.h1((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[0],
+}));
+
+const Icon = styled.img((props) => ({
+  marginRight: props.theme.spacing(4),
+  width: 32,
+  height: 32,
+  borderRadius: 30,
+}));
+
 function ConfirmInscriptionRequest() {
   const navigate = useNavigate();
-  const { t } = useTranslation('translation');
-  const {
-    btcAddress, network, selectedAccount, seedPhrase,
-  } = useWalletSelector();
-  const btcClient = useBtcClient();
-  const [recipientAddress, setRecipientAddress] = useState('');
-  const [signedTx, setSignedTx] = useState<string>('');
-  const [textContent, setTextContent] = useState<string>('');
-  const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
   const location = useLocation();
-  const { refetch } = useBtcWalletData();
-  const { ordinals: ordinalsInBtc } = useOrdinalsByAddress(btcAddress);
-  const { unspentUtxos: withdrawOridnalsUtxos } = useNonOrdinalUtxos();
   const {
     fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, brcContent,
   } = location.state;
+  const { t } = useTranslation('translation');
+  const {
+    btcAddress, network, selectedAccount, seedPhrase, btcFiatRate,
+  } = useWalletSelector();
+  const btcClient = useBtcClient();
+  const [signedTx, setSignedTx] = useState<string>('');
+  const [textContent, setTextContent] = useState<string>('');
+  const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [currentFee, setCurrentFee] = useState(fee);
+  const content = useMemo(() => textContent && JSON.parse(textContent), [textContent]);
+  const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
+  const { refetch } = useBtcWalletData();
+  const { ordinals: ordinalsInBtc } = useOrdinalsByAddress(btcAddress);
+  const { unspentUtxos: withdrawOridnalsUtxos } = useNonOrdinalUtxos();
 
   useEffect(() => {
     axios
@@ -159,8 +190,17 @@ function ConfirmInscriptionRequest() {
   };
 
   useEffect(() => {
-    setRecipientAddress(location.state.recipientAddress);
-  }, [location]);
+    const totalAmount: BigNumber = new BigNumber(0);
+    let sum: BigNumber = new BigNumber(0);
+    if (recipient) {
+      recipient.map((r) => {
+        sum = totalAmount.plus(r.amountSats);
+        return sum;
+      });
+      sum = sum?.plus(currentFee);
+    }
+    setTotal(sum);
+  }, [recipient, currentFee]);
 
   useEffect(() => {
     if (btcTxBroadcastData) {
@@ -210,12 +250,21 @@ function ConfirmInscriptionRequest() {
 
   const onApplyClick = (modifiedFee: string) => {
     setCurrentFee(new BigNumber(modifiedFee));
-    mutateTxFee({ recipients: [recipient], txFee: modifiedFee });
+    mutateTxFee({ recipients: recipient, txFee: modifiedFee });
   };
 
   const closeTransactionSettingAlert = () => {
     setOpenTransactionSettingModal(false);
   };
+
+  const getAmountString = (amountTotal: BigNumber, currency: string) => (
+    <NumericFormat
+      value={amountTotal.toString()}
+      displayType="text"
+      thousandSeparator
+      suffix={` ${currency}`}
+    />
+  );
 
   return (
     <>
@@ -240,7 +289,7 @@ function ConfirmInscriptionRequest() {
           onClick={onClick}
         />
       )}
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 32 }}>
         <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={goBackToScreen} />
       </div>
       <OuterContainer>
@@ -263,21 +312,32 @@ function ConfirmInscriptionRequest() {
             />
           </div>
         )}
-        <ReviewTransactionText>{t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}</ReviewTransactionText>
-        <RecipientComponent
-          address={recipientAddress}
-          value={textContent!}
-          icon={AssetIcon}
-          currencyType="Ordinal"
-          title={t('CONFIRM_TRANSACTION.ASSET')}
-        />
-        <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-        <TransactionDetailComponent title="Bitcoin Value" value={amount} />
-        <CollapsableContainer title="Fees" text="">
-          <TransactionDetailComponent title="Inscription fee" value={amount} />
-          <TransactionDetailComponent title="Transaction fee" value={amount} />
-          <TransactionDetailComponent title="Total fee" value={amount} />
+        <ReviewTransactionText>Inscribe Transfer Ordinal</ReviewTransactionText>
+        <CollapsableContainer title="You will inscribe" text="">
+          <DetailRow>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <Icon src={OrdinalsIcon} />
+              <TitleText>Ordinal</TitleText>
+            </div>
+            <ValueText>BRC-20 Transfer</ValueText>
+          </DetailRow>
+          <DetailRow>
+            <TitleText>Transfer</TitleText>
+            <ValueText>{getAmountString(new BigNumber(content.amt), content.tick)}</ValueText>
+          </DetailRow>
         </CollapsableContainer>
+        <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
+        <TransactionDetailComponent
+          title="Inscription Service Fee"
+          value={getAmountString(satsToBtc(new BigNumber(amount)), t('BTC'))}
+        />
+        <TransferFeeView fee={currentFee} currency={t('CONFIRM_TRANSACTION.SATS')} />
+        <TransactionDetailComponent
+          title={t('CONFIRM_TRANSACTION.TOTAL')}
+          value={getAmountString(satsToBtc(total), t('BTC'))}
+          subValue={getBtcFiatEquivalent(total, btcFiatRate)}
+          subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
+        />
         <Button onClick={onAdvancedSettingClick}>
           <>
             <ButtonImage src={SettingIcon} />
@@ -300,23 +360,11 @@ function ConfirmInscriptionRequest() {
             onPress={handleOnConfirmClick}
           />
         </ButtonContainer>
-        {/* <ConfirmBtcTransactionComponent
-          fee={fee}
-          recipients={recipient as Recipient[]}
-          loadingBroadcastedTx={isLoading}
-          signedTxHex={signedTxHex}
-          isRestoreFundFlow={isRestoreFundFlow}
-          onConfirmClick={handleOnConfirmClick}
-          onCancelClick={goBackToScreen}
-          onBackButtonClick={goBackToScreen}
-          nonOrdinalUtxos={unspentUtxos}
-          amount={amount}
-        /> */}
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
           fee={new BigNumber(currentFee).toString()}
           type="BTC"
-          btcRecipients={[recipient]}
+          btcRecipients={recipient}
           onApplyClick={onApplyClick}
           onCrossClick={closeTransactionSettingAlert}
           nonOrdinalUtxos={unspentUtxos}
