@@ -213,14 +213,15 @@ function EditFee({
       if (mode === 'custom') inputRef?.current?.focus();
       else if (type === 'BTC') {
         if (isRestoreFlow) {
-          const btcFee = await getBtcFeesForNonOrdinalBtcSend(
+          const { fee: modifiedFee, selectedFeeRate } = await getBtcFeesForNonOrdinalBtcSend(
             btcAddress,
             nonOrdinalUtxos!,
             ordinalsAddress,
             'Mainnet',
             mode,
           );
-          setFeeRateInput(btcFee.toString());
+          setFeeRateInput(selectedFeeRate?.toString());
+          setTotalFee(modifiedFee.toString());
         } else if (btcRecipients && selectedAccount) {
           const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, mode);
           setFeeRateInput(selectedFeeRate?.toString());
@@ -259,14 +260,27 @@ function EditFee({
   }, [totalFee]);
 
   const recalculateFees = async () => {
-    if (type === 'BTC' && btcRecipients && selectedAccount) {
+    if (type === 'BTC') {
       try {
         setIsLoading();
         setError('');
 
-        const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, selectedOption, feeRateInput);
-        setFeeRateInput(selectedFeeRate?.toString());
-        setTotalFee(modifiedFee.toString());
+        if (isRestoreFlow) {
+          const { fee: modifiedFee, selectedFeeRate } = await getBtcFeesForNonOrdinalBtcSend(
+            btcAddress,
+            nonOrdinalUtxos!,
+            ordinalsAddress,
+            'Mainnet',
+            selectedOption,
+            feeRateInput,
+          );
+          setFeeRateInput(selectedFeeRate?.toString());
+          setTotalFee(modifiedFee.toString());
+        } else if (btcRecipients && selectedAccount) {
+          const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, selectedOption, feeRateInput);
+          setFeeRateInput(selectedFeeRate?.toString());
+          setTotalFee(modifiedFee.toString());
+        }
       } catch (err: any) {
         if (Number(err) === ErrorCodes.InSufficientBalance) {
           setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
