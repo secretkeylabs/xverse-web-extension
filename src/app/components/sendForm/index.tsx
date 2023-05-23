@@ -8,11 +8,10 @@ import {
 import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
-import Info from '@assets/img/info.svg';
 import Switch from '@assets/img/send/switch.svg';
 import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
-import { useBnsName, useBNSResolver, useDebounce } from '@hooks/queries/useBnsName';
+import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -21,6 +20,7 @@ import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-c
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { getCurrencyFlag } from '@utils/currency';
+import useDebounce from '@hooks/useDebounce';
 
 interface ContainerProps {
   error: boolean;
@@ -158,42 +158,6 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
   opacity: props.enabled ? 1 : 0.6,
 }));
 
-const BuyCryptoContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  borderRadius: 12,
-  alignItems: 'flex-start',
-  backgroundColor: 'transparent',
-  padding: props.theme.spacing(8),
-  marginTop: props.theme.spacing(11),
-  border: '1px solid rgba(255, 255, 255, 0.2)',
-}));
-
-const BuyCryptoText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  marginBottom: props.theme.spacing(2),
-  color: props.theme.colors.white['400'],
-}));
-
-const BuyCryptoRedirectText = styled.h1((props) => ({
-  ...props.theme.tile_text,
-  fontSize: 12,
-}));
-
-const BuyCryptoRedirectButton = styled.button((props) => ({
-  backgroundColor: 'transparent',
-  color: props.theme.colors.white['0'],
-  display: 'flex',
-  justifyContent: 'flex-start',
-  alignItems: 'flex-start',
-}));
-
-const ColumnContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginLeft: props.theme.spacing(8),
-}));
-
 const SwitchToFiatButton = styled.button((props) => ({
   backgroundColor: props.theme.colors.background.elevation0,
   border: `1px solid ${props.theme.colors.background.elevation3}`,
@@ -288,6 +252,17 @@ function SendForm({
       }
     }
   }, [recepientError, associatedAddress]);
+
+  useEffect(() => {
+    const resultRegex = /^\d*\.?\d*$/;
+
+    if (!amountToSend || !resultRegex.test(amountToSend)) {
+      return;
+    }
+
+    const amountInCurrency = getFiatEquivalent(Number(amountToSend), currencyType, stxBtcRate, btcFiatRate, fungibleToken);
+    setFiatAmount(amountInCurrency);
+  }, [amountToSend]);
 
   function getTokenCurrency() {
     if (fungibleToken) {
@@ -398,7 +373,7 @@ function SendForm({
     </Container>
   );
 
-  const onAddressInputChange = (e: { target: { value: SetStateAction<string> } }) => {
+  const onAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRecipientAddress(e.target.value);
   };
 

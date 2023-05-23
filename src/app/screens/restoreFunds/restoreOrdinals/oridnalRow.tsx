@@ -2,9 +2,11 @@ import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails
 import useWalletSelector from '@hooks/useWalletSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import {
-  BtcOrdinal, ErrorCodes, getBtcFiatEquivalent, getOrdinalInfo,
+  BtcOrdinal, ErrorCodes, getBtcFiatEquivalent,
 } from '@secretkeylabs/xverse-core';
-import { getBtcFeesForOrdinalSend, SignedBtcTx, signOrdinalSendTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
+import {
+  SignedBtcTx, signOrdinalSendTransaction,
+} from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -86,12 +88,6 @@ function OrdinalRow({
     error: transactionError,
     mutate,
   } = useMutation<SignedBtcTx, string>(async () => {
-    const txFees = await getBtcFeesForOrdinalSend(
-      ordinalsAddress,
-      ordinal.utxo,
-      btcAddress,
-      network.type,
-    );
     const tx = await signOrdinalSendTransaction(
       ordinalsAddress,
       ordinal.utxo,
@@ -99,7 +95,6 @@ function OrdinalRow({
       Number(selectedAccount?.id),
       seedPhrase,
       network.type,
-      txFees,
     );
     return tx;
   });
@@ -111,6 +106,7 @@ function OrdinalRow({
           signedTxHex: signedTx.signedTx,
           recipientAddress: ordinalsAddress,
           fee: signedTx.fee,
+          feePerVByte: signedTx.feePerVByte,
           fiatFee: getBtcFiatEquivalent(signedTx.fee, btcFiatRate),
           total: signedTx.total,
           fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),

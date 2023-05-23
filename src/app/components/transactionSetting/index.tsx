@@ -71,9 +71,10 @@ const TransactionSettingNonceOptionButton = styled.button((props) => ({
 interface Props {
   visible: boolean;
   fee: string;
+  feePerVByte?: BigNumber;
   loading?: boolean;
   nonce?: string;
-  onApplyClick: (fee: string, nonce?: string) => void;
+  onApplyClick: (params: { fee: string; feeRate?: string; nonce?: string }) => void;
   onCrossClick: () => void;
   previousFee?: string;
   availableBalance?: BigNumber;
@@ -90,6 +91,7 @@ type TxType = 'STX' | 'BTC' | 'Ordinals';
 function TransactionSettingAlert({
   visible,
   fee,
+  feePerVByte,
   loading,
   nonce,
   onApplyClick,
@@ -106,7 +108,8 @@ function TransactionSettingAlert({
 }:Props) {
   const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
-  const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
+  const [feeRate, setFeeRate] = useState<BigNumber | string | undefined>(feePerVByte);
+  const [nonceInput, setNonceInput] = useState <string | undefined >(nonce);
   const [error, setError] = useState('');
   const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
@@ -130,7 +133,7 @@ function TransactionSettingAlert({
       }
     }
     setError('');
-    onApplyClick(feeInput.toString(), nonceInput);
+    onApplyClick({ fee: feeInput.toString(), nonce: nonceInput });
   }
 
   async function applyClickForBtc() {
@@ -150,7 +153,7 @@ function TransactionSettingAlert({
       }
     }
     setError('');
-    onApplyClick(feeInput.toString());
+    onApplyClick({ fee: feeInput.toString(), feeRate: feeRate?.toString() });
   }
 
   const errorText = !!error && (
@@ -190,10 +193,12 @@ function TransactionSettingAlert({
       return (
         <EditFee
           fee={fee}
+          feeRate={feeRate}
           type={type}
           setIsLoading={onLoading}
           setIsNotLoading={onComplete}
           setFee={setFeeInput}
+          setFeeRate={setFeeRate}
           setError={setError}
           setFeeMode={setSelectedOption}
           btcRecipients={btcRecipients}
