@@ -154,6 +154,7 @@ function SendBrc20Screen() {
           recipient: recipients,
           fiatAmount: order.inscriptionRequest.charge.fiat_value,
           fee: data?.fee,
+          feePerVByte: data?.feePerVByte,
           fiatFee: getBtcFiatEquivalent(data?.fee, btcFiatRate),
           total: data?.total,
           fiatTotal: getBtcFiatEquivalent(data?.total, btcFiatRate),

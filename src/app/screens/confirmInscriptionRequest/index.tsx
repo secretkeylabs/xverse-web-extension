@@ -125,7 +125,14 @@ function ConfirmInscriptionRequest() {
   const location = useLocation();
   const { t } = useTranslation('translation');
   const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, brcContent,
+    fee,
+    amount,
+    signedTxHex,
+    recipient,
+    isRestoreFundFlow,
+    unspentUtxos,
+    brcContent,
+    feePerVByte,
   } = location.state;
   const {
     btcAddress, network, selectedAccount, seedPhrase, btcFiatRate,
@@ -137,6 +144,8 @@ function ConfirmInscriptionRequest() {
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [currentFee, setCurrentFee] = useState(fee);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
+  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
+  const [showFeeSettings, setShowFeeSettings] = useState(false);
   const { refetch } = useBtcWalletData();
   const { ordinals: ordinalsInBtc } = useOrdinalsByAddress(btcAddress);
 
@@ -261,7 +270,15 @@ function ConfirmInscriptionRequest() {
     setOpenTransactionSettingModal(true);
   };
 
-  const onApplyClick = (modifiedFee: string) => {
+  const onApplyClick = ({
+    fee: modifiedFee,
+    feeRate,
+  }: {
+    fee: string;
+    feeRate?: string;
+    nonce?: string;
+  }) => {
+    setCurrentFeeRate(new BigNumber(feeRate));
     mutateTxFee({ recipients: recipient, txFee: modifiedFee });
   };
 
@@ -292,6 +309,10 @@ function ConfirmInscriptionRequest() {
           isWarningAlert
         />
       )}
+
+      <div style={{ marginBottom: 32 }}>
+        <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={goBackToScreen} />
+      </div>
       {ordinalsInBtc && ordinalsInBtc.length > 0 && (
         <InfoContainer
           type="Warning"
@@ -301,9 +322,6 @@ function ConfirmInscriptionRequest() {
           onClick={onClick}
         />
       )}
-      <div style={{ marginBottom: 32 }}>
-        <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={goBackToScreen} />
-      </div>
       <OuterContainer>
         {textContent && (
           <Brc20TileContainer>
@@ -335,7 +353,11 @@ function ConfirmInscriptionRequest() {
           title="Inscription Service Fee"
           value={getAmountString(satsToBtc(new BigNumber(amount)), t('BTC'))}
         />
-        <TransferFeeView fee={currentFee} currency={t('CONFIRM_TRANSACTION.SATS')} />
+        <TransferFeeView
+          feePerVByte={currentFeeRate}
+          fee={currentFee}
+          currency={t('CONFIRM_TRANSACTION.SATS')}
+        />
         <TransactionDetailComponent
           title={t('CONFIRM_TRANSACTION.TOTAL')}
           value={getAmountString(satsToBtc(total), t('BTC'))}
@@ -374,6 +396,9 @@ function ConfirmInscriptionRequest() {
           nonOrdinalUtxos={unspentUtxos}
           loading={loadingFee}
           isRestoreFlow={isRestoreFundFlow}
+          feePerVByte={feePerVByte}
+          showFeeSettings={showFeeSettings}
+          setShowFeeSettings={setShowFeeSettings}
         />
       </OuterContainer>
       <BottomBarContainer>
