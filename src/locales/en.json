@@ -278,9 +278,9 @@
     "ACTIVATE": "Activate",
     "DENY": "No",
     "COPIED": "Copied!",
-    "MINT": "MINT",
+    "MINT": "Mint",
     "TRANSFER": "Transfer",
-    "DEPLOY": "DEPLOY"
+    "DEPLOY": "Deploy"
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Restore assets",
