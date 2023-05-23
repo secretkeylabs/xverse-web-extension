@@ -2,6 +2,7 @@ import TokenImage from '@components/tokenImage';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 import { getTicker } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
@@ -116,11 +117,14 @@ function Brc20TransferForm(props: Props) {
       </TokenContainer>
       <RowContainer>
         <TitleText>{t('AMOUNT')}</TitleText>
-        <BalanceText>
-          {t('BALANCE')}
-          :
-        </BalanceText>
-        <Text>{token.balance}</Text>
+        <BalanceText>{t('BALANCE')}:</BalanceText>
+        <Text>
+          <NumericFormat
+            value={token.balance.toString()}
+            displayType="text"
+            thousandSeparator
+          />
+        </Text>
       </RowContainer>
       <AmountInputContainer error={amountError !== ''}>
         <InputFieldContainer>
