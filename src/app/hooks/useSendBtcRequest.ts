@@ -11,7 +11,6 @@ function useSendBtcRequest() {
   const params = new URLSearchParams(search);
   const requestToken = params.get('sendBtcRequest') ?? '';
   const request = decodeToken(requestToken) as any as SendBtcTransactionOptions;
-  const requestString = decodeToken(requestToken as string);
   const tabId = params.get('tabId') ?? '0';
 
   const {
@@ -52,7 +51,6 @@ function useSendBtcRequest() {
     signedTx,
     isLoading,
     error,
-    requestString,
   };
 }
 

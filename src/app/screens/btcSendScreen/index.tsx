@@ -30,9 +30,8 @@ function BtcSendScreen() {
     signedTx,
     isLoading,
     tabId,
-    requestString,
+    requestToken,
   } = useSendBtcRequest();
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
   const {
     btcFiatRate,
@@ -58,7 +57,7 @@ function BtcSendScreen() {
           total: signedTx.total,
           fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),
           btcSendBrowserTx: true,
-          requestString,
+          requestToken,
           tabId,
         },
       });

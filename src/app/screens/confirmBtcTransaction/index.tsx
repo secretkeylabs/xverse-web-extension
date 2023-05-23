@@ -16,6 +16,7 @@ import AlertMessage from '@components/alertMessage';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import useBtcClient from '@hooks/useBtcClient';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import AccountHeaderComponent from '@components/accountHeader';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
@@ -36,7 +37,7 @@ function ConfirmBtcTransaction() {
   } = useOrdinalsByAddress(btcAddress);
   const { unspentUtxos: withdrawOridnalsUtxos } = useNonOrdinalUtxos();
   const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, btcSendBrowserTx, requestString, tabId,
+    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, btcSendBrowserTx, requestToken, tabId,
   } = location.state;
 
   const {
@@ -87,7 +88,7 @@ function ConfirmBtcTransaction() {
           source: MESSAGE_SOURCE,
           method: ExternalSatsMethods.sendBtcResponse,
           payload: {
-            sendBtcRequest: requestString,
+            sendBtcRequest: requestToken,
             sendBtcResponse: btcTxBroadcastData.tx.hash,
           },
         };
@@ -179,7 +180,7 @@ function ConfirmBtcTransaction() {
           isWarningAlert
         />
       )}
-
+      {btcSendBrowserTx && <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />}
       <ConfirmBtcTransactionComponent
         fee={fee}
         recipients={recipient as Recipient[]}
@@ -191,6 +192,7 @@ function ConfirmBtcTransaction() {
         onBackButtonClick={goBackToScreen}
         nonOrdinalUtxos={unspentUtxos}
         amount={amount}
+        isBtcSendBrowserTx={btcSendBrowserTx}
       >
         {ordinalsInBtc && ordinalsInBtc.length > 0 && (
         <InfoContainer
@@ -202,9 +204,11 @@ function ConfirmBtcTransaction() {
         />
         )}
       </ConfirmBtcTransactionComponent>
+      {!btcSendBrowserTx && (
       <BottomBarContainer>
         <BottomBar tab="dashboard" />
       </BottomBarContainer>
+      )}
     </>
   );
 }

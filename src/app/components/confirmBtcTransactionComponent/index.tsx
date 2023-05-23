@@ -116,6 +116,7 @@ interface Props {
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse [];
   amount?: string;
+  isBtcSendBrowserTx?: boolean;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -132,6 +133,7 @@ function ConfirmBtcTransactionComponent({
   isRestoreFundFlow,
   nonOrdinalUtxos,
   amount,
+  isBtcSendBrowserTx,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -310,7 +312,7 @@ function ConfirmBtcTransactionComponent({
   return (
     <>
       <OuterContainer>
-        {!isGalleryOpen && (
+        {(!isBtcSendBrowserTx && !isGalleryOpen) && (
         <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
         )}
         <Container>

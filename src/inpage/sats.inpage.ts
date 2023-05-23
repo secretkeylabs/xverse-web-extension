@@ -100,7 +100,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           reject(eventMessage.data.payload.sendBtcResponse);
           return;
         }
-        if (typeof eventMessage.data.payload.sendBtcResponse !== 'string') {
+        if (typeof eventMessage.data.payload.sendBtcResponse === 'string') {
           resolve(eventMessage.data.payload.sendBtcResponse);
         }
       };

@@ -46,7 +46,7 @@
     "react-tooltip": "^5.4.0",
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
-    "sats-connect": "0.2.0",
+    "sats-connect": "file:/Users/imamah/Desktop/sats-connect/sats-connect-repo/sats-connect",
     "stream-browserify": "^3.0.0",
     "string-to-color": "^2.2.2",
     "styled-components": "^5.3.5",
