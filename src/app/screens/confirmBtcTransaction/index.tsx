@@ -35,7 +35,7 @@ function ConfirmBtcTransaction() {
   } = useOrdinalsByAddress(btcAddress);
   const { unspentUtxos: withdrawOridnalsUtxos } = useNonOrdinalUtxos();
   const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, isBrc20TokenFlow
+    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, isBrc20TokenFlow,
   } = location.state;
 
   const {
@@ -51,9 +51,9 @@ function ConfirmBtcTransaction() {
     error: errorBtcOrdinalTransaction,
     data: btcOrdinalTxBroadcastData,
     mutate: broadcastOrdinalTransaction,
-} = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-  async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-);
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
+    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  );
   const onClick = () => {
     navigate('/recover-ordinals');
   };
@@ -86,6 +86,7 @@ function ConfirmBtcTransaction() {
           txid: btcTxBroadcastData.tx.hash,
           currency: 'BTC',
           error: '',
+          isBrc20TokenFlow,
         },
       });
       setTimeout(() => {

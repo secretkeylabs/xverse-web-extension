@@ -409,18 +409,18 @@ function SendForm({
         <InputFieldContainer>
           <InputField
             value={recipientAddress}
-            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' ? t('BTC_RECIPIENT_PLACEHOLDER') : t('RECIPIENT_PLACEHOLDER')}
+            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' || currencyType === 'brc20-Ordinal' ? t('BTC_RECIPIENT_PLACEHOLDER') : t('RECIPIENT_PLACEHOLDER')}
             onChange={onAddressInputChange}
           />
         </InputFieldContainer>
       </AmountInputContainer>
-      {associatedAddress && currencyType !== 'BTC' && currencyType !== 'Ordinal' && (
+      {associatedAddress && currencyType !== 'BTC' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && (
         <>
           <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
           <AssociatedText>{associatedAddress}</AssociatedText>
         </>
       )}
-      {associatedBnsName && currencyType !== 'BTC' && currencyType !== 'Ordinal' && (
+      {associatedBnsName && currencyType !== 'BTC' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && (
       <>
         <SubText>{t('ASSOCIATED_BNS_DOMAIN')}</SubText>
         <AssociatedText>{associatedBnsName}</AssociatedText>
@@ -450,7 +450,7 @@ function SendForm({
   return (
     <>
       <ScrollContainer>
-        {currencyType !== 'NFT' && currencyType !== 'Ordinal' && (
+        {currencyType !== 'NFT' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && (
         <TokenContainer>
           <TokenImage
             token={currencyType || undefined}
@@ -470,7 +470,7 @@ function SendForm({
           <ErrorContainer>
             <ErrorText>{addressError}</ErrorText>
           </ErrorContainer>
-          {currencyType !== 'BTC' && currencyType !== 'NFT' && currencyType !== 'Ordinal' && !hideMemo && (
+          {currencyType !== 'BTC' && currencyType !== 'NFT' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && !hideMemo && (
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
@@ -494,6 +494,13 @@ function SendForm({
             currencyType === 'Ordinal' && (
               <OrdinalInfoContainer>
                 <InfoContainer bodyText={t('SEND_ORDINAL_WALLET_WARNING')} type="Warning" />
+              </OrdinalInfoContainer>
+            )
+          }
+          {
+            currencyType === 'brc20-Ordinal' && (
+              <OrdinalInfoContainer>
+                <InfoContainer bodyText={t('SEND_BRC20_ORDINAL_WALLET_WARNING')} />
               </OrdinalInfoContainer>
             )
           }

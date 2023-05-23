@@ -162,7 +162,8 @@ function Home() {
   };
 
   function getCoinsList() {
-    return coinsList ? coinsList?.filter((ft) => ft.visible) : [];
+    const list = coinsList ? coinsList?.filter((ft) => ft.visible) : [];
+    return brcCoinsList ? list.concat(brcCoinsList) : list;
   }
 
   const handleManageTokenListOnClick = () => {

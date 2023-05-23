@@ -77,7 +77,8 @@
     "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
     "SWITCH_TO": "Switch to",
     "SEND_ORDINAL_TITLE": "Send Ordinal",
-    "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals."
+    "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals.",
+    "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens."
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -156,7 +157,8 @@
     "FAILED": "Transaction Failed",
     "RETRY": "Try again",
     "SPONSORED_SUCCESS_MSG": "Transaction signed",
-    "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor"
+    "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor",
+    "BRC20_ORDINAL_MSG": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer."
   },
   "LEGAL_SCREEN": {
     "SCREEN_TITLE": "Legal",
