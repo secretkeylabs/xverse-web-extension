@@ -83,6 +83,8 @@ interface Props {
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  showFeeSettings: boolean;
+  setShowFeeSettings: (value: boolean) => void;
 }
 type TxType = 'STX' | 'BTC' | 'Ordinals';
 
@@ -101,6 +103,8 @@ function TransactionSettingAlert({
   ordinalTxUtxo,
   isRestoreFlow,
   nonOrdinalUtxos,
+  showFeeSettings,
+  setShowFeeSettings,
 }:Props) {
   const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
@@ -109,7 +113,6 @@ function TransactionSettingAlert({
   const [error, setError] = useState('');
   const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
-  const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
   const {
     btcBalance,
