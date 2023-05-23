@@ -1,39 +1,31 @@
+import styled from 'styled-components';
+import axios from 'axios';
+import BigNumber from 'bignumber.js';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  useEffect, useMemo, useState,
-} from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { NumericFormat } from 'react-number-format';
+import { Recipient, SignedBtcTx, signBtcTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
 import { BtcTransactionBroadcastResponse, ResponseError } from '@secretkeylabs/xverse-core/types';
-import BottomBar from '@components/tabBar';
+import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
+import useBtcClient from '@hooks/useBtcClient';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
-import styled from 'styled-components';
-import InfoContainer from '@components/infoContainer';
-import { useTranslation } from 'react-i18next';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
-import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import InfoContainer from '@components/infoContainer';
+import BottomBar from '@components/tabBar';
+import TransferFeeView from '@components/transferFeeView';
 import AlertMessage from '@components/alertMessage';
-import { Recipient, SignedBtcTx, signBtcTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
-import useBtcClient from '@hooks/useBtcClient';
 import Brc20Tile from '@screens/ordinals/brc20Tile';
-import axios from 'axios';
-import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import ActionButton from '@components/button';
-import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
-import BigNumber from 'bignumber.js';
-import TransferFeeView from '@components/transferFeeView';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
-import { NumericFormat } from 'react-number-format';
-import { satsToBtc } from '@secretkeylabs/xverse-core';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-
-const BottomBarContainer = styled.h1((props) => ({
-  marginTop: props.theme.spacing(5),
-}));
+import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -46,6 +38,14 @@ const OuterContainer = styled.div`
     display: none;
   }
 `;
+
+const Brc20TileContainer = styled.div({
+  width: 112,
+  height: 112,
+  alignSelf: 'center',
+  display: 'flex',
+  alignItems: 'center',
+});
 
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
@@ -116,13 +116,17 @@ const Icon = styled.img((props) => ({
   borderRadius: 30,
 }));
 
+const BottomBarContainer = styled.h1((props) => ({
+  marginTop: props.theme.spacing(5),
+}));
+
 function ConfirmInscriptionRequest() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation('translation');
   const {
     fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, brcContent,
   } = location.state;
-  const { t } = useTranslation('translation');
   const {
     btcAddress, network, selectedAccount, seedPhrase, btcFiatRate,
   } = useWalletSelector();
@@ -132,11 +136,11 @@ function ConfirmInscriptionRequest() {
   const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [currentFee, setCurrentFee] = useState(fee);
-  const content = useMemo(() => textContent && JSON.parse(textContent), [textContent]);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const { refetch } = useBtcWalletData();
   const { ordinals: ordinalsInBtc } = useOrdinalsByAddress(btcAddress);
-  const { unspentUtxos: withdrawOridnalsUtxos } = useNonOrdinalUtxos();
+
+  const content = useMemo(() => textContent && JSON.parse(textContent), [textContent]);
 
   useEffect(() => {
     axios
@@ -190,6 +194,14 @@ function ConfirmInscriptionRequest() {
   };
 
   useEffect(() => {
+    if (data) {
+      setCurrentFee(data.fee);
+      setSignedTx(data.signedTx);
+      setOpenTransactionSettingModal(false);
+    }
+  }, [data]);
+
+  useEffect(() => {
     const totalAmount: BigNumber = new BigNumber(0);
     let sum: BigNumber = new BigNumber(0);
     if (recipient) {
@@ -209,6 +221,7 @@ function ConfirmInscriptionRequest() {
           txid: btcTxBroadcastData.tx.hash,
           currency: 'BTC',
           error: '',
+          isBrc20TokenFlow: true,
         },
       });
       setTimeout(() => {
@@ -249,7 +262,6 @@ function ConfirmInscriptionRequest() {
   };
 
   const onApplyClick = (modifiedFee: string) => {
-    setCurrentFee(new BigNumber(modifiedFee));
     mutateTxFee({ recipients: recipient, txFee: modifiedFee });
   };
 
@@ -294,15 +306,7 @@ function ConfirmInscriptionRequest() {
       </div>
       <OuterContainer>
         {textContent && (
-          <div
-            style={{
-              width: 112,
-              height: 112,
-              alignSelf: 'center',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
+          <Brc20TileContainer>
             <Brc20Tile
               brcContent={textContent}
               isGalleryOpen={false}
@@ -310,10 +314,10 @@ function ConfirmInscriptionRequest() {
               inNftDetail
               isSmallImage={false}
             />
-          </div>
+          </Brc20TileContainer>
         )}
         <ReviewTransactionText>Inscribe Transfer Ordinal</ReviewTransactionText>
-        <CollapsableContainer title="You will inscribe" text="">
+        <CollapsableContainer title="You will inscribe" text="" initialValue>
           <DetailRow>
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
               <Icon src={OrdinalsIcon} />
