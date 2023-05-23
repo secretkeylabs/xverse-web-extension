@@ -3,6 +3,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   getBtcFiatEquivalent,
 } from '@secretkeylabs/xverse-core';
+import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import {
   useEffect,
@@ -31,11 +32,54 @@ function BtcSendScreen() {
     isLoading,
     tabId,
     requestToken,
+    error,
   } = useSendBtcRequest();
   const navigate = useNavigate();
   const {
     btcFiatRate,
+    network,
   } = useWalletSelector();
+  const { t } = useTranslation('translation');
+
+  const checkIfMismatch = () => {
+    if (payload.network.type !== network.type) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
+          browserTx: true,
+        },
+      });
+    }
+    if (new BigNumber(payload?.satsAmount).lt(BITCOIN_DUST_AMOUNT_SATS)) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error: t('SEND.ERRORS.BELOW_MINIMUM_AMOUNT'),
+          browserTx: true,
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    checkIfMismatch();
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error,
+          browserTx: true,
+        },
+      });
+    }
+  }, [error]);
 
   useEffect(() => {
     if (signedTx) {
