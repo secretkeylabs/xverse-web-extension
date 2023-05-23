@@ -118,20 +118,18 @@ function SendOrdinal() {
     data,
     error: txError,
     mutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>(async (recepient) => {
+  } = useMutation<SignedBtcTx, ResponseError, string>(async (recipient) => {
     const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
     const ordUtxo = addressUtxos.find((utx) => utx.txid === selectedOrdinal?.tx_id);
     setOrdinalUtxo(ordUtxo);
     if (ordUtxo) {
-      const txFees = await getBtcFeesForOrdinalSend(recepient, ordUtxo, btcAddress, network.type);
       const signedTx = await signOrdinalSendTransaction(
-        recepient,
+        recipient,
         ordUtxo,
         btcAddress,
         Number(selectedAccount?.id),
         seedPhrase,
         network.type,
-        txFees,
       );
       return signedTx;
     }
@@ -154,6 +152,7 @@ function SendOrdinal() {
           signedTxHex: data.signedTx,
           recipientAddress,
           fee: data.fee,
+          feePerVByte: data.feePerVByte,
           fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
           total: data.total,
           fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),

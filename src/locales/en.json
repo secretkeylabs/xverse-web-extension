@@ -98,7 +98,7 @@
     "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
     "TOTAL": "Total",
     "AMOUNT_PLUS_FEES": "Amount + fees",
-    "REVIEW_TRNSACTION": "Review transaction",
+    "REVIEW_TRANSACTION": "Review transaction",
     "AMOUNT": "Amount",
     "YOUR_ADDRESS": "Your address",
     "FROM": "From",
@@ -130,7 +130,7 @@
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
-    "ADVANCED_SETTING_FEE_OPTION": "Edit fee",
+    "ADVANCED_SETTING_FEE_OPTION": "Edit fees",
     "ADVANCED_SETTING_NONCE_OPTION": "Edit nonce",
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",

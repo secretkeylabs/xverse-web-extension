@@ -3,6 +3,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import {
   BtcUtxoDataResponse, getBtcFiatEquivalent, NetworkType, satsToBtc,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
 import {
   getBtcFeesForNonOrdinalBtcSend, SignedBtcTx, signNonOrdinalBtcSendTransaction, sumUnspentOutputs,
@@ -15,7 +16,6 @@ import styled from 'styled-components';
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import { useEffect } from 'react';
-import { UTXO } from '@secretkeylabs/xverse-core';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
@@ -84,7 +84,7 @@ function RestoreBtc() {
   }
   const isNoAmount = amount.isEqualTo(0) || !unspentUtxos[0]?.status.confirmed;
 
-  const { data: ordinalsFee, isLoading } = useQuery({
+  const { data: ordinalsFee } = useQuery({
     queryKey: [`getFee-${ordinalsAddress}`],
     queryFn: () => getBtcFeesForNonOrdinalBtcSend(btcAddress, unspentUtxos, ordinalsAddress, 'Mainnet'),
   });
@@ -114,7 +114,7 @@ function RestoreBtc() {
       accountIndex: selectedAccount?.id ?? 0,
       seedPhrase,
       network: network.type,
-      fee: ordinalsFee,
+      fee: ordinalsFee?.fee,
     });
   };
 
@@ -144,8 +144,9 @@ function RestoreBtc() {
             },
           ],
           fiatAmount: getBtcFiatEquivalent(amount, btcFiatRate),
-          fee: ordinalsFee,
-          fiatFee: getBtcFiatEquivalent(ordinalsFee!, btcFiatRate),
+          fee: ordinalsFee?.fee,
+          feePerVByte: ordinalsFee?.selectedFeeRate,
+          fiatFee: getBtcFiatEquivalent(ordinalsFee?.fee!, btcFiatRate),
           isRestoreFundFlow: true,
           unspentUtxos,
         },
