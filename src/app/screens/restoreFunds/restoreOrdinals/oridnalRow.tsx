@@ -91,7 +91,7 @@ function OrdinalRow({
     data: signedTx,
     mutate,
   } = useMutation<SignedBtcTx, string>(async () => {
-    const txFees = await getBtcFeesForOrdinalSend(
+    const { fee: txFees } = await getBtcFeesForOrdinalSend(
       ordinalsAddress,
       ordinal.utxo,
       btcAddress,

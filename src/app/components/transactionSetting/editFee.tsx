@@ -177,6 +177,7 @@ function EditFee({
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
   const inputRef = useRef(null);
   const debouncedFeeRateInput = useDebounce(feeRateInput, 300);
+  const isBtcOrOrdinals = type === 'BTC' || type === 'Ordinals';
 
   const modifyStxFees = (mode: string) => {
     const currentFee = new BigNumber(fee);
@@ -225,17 +226,16 @@ function EditFee({
           setFeeRateInput(selectedFeeRate?.toString());
           setTotalFee(modifiedFee.toString());
         }
-      } else if (type === 'Ordinals') {
-        if (btcRecipients && ordinalTxUtxo) {
-          const txFees = await getBtcFeesForOrdinalSend(
-            btcRecipients[0].address,
-            ordinalTxUtxo,
-            btcAddress,
-            network.type,
-            mode,
-          );
-          setFeeRateInput(txFees.toString());
-        }
+      } else if (type === 'Ordinals' && btcRecipients && ordinalTxUtxo) {
+        const { fee: modifiedFee, selectedFeeRate } = await getBtcFeesForOrdinalSend(
+          btcRecipients[0].address,
+          ordinalTxUtxo,
+          btcAddress,
+          network.type,
+          mode,
+        );
+        setFeeRateInput(selectedFeeRate?.toString());
+        setTotalFee(modifiedFee.toString());
       }
     } catch (err: any) {
       if (Number(err) === ErrorCodes.InSufficientBalance) {
@@ -259,23 +259,47 @@ function EditFee({
   }, [totalFee]);
 
   const recalculateFees = async () => {
-    if (!btcRecipients || !selectedAccount) return;
+    if (type === 'BTC' && btcRecipients && selectedAccount) {
+      try {
+        setIsLoading();
+        setError('');
 
-    try {
-      setIsLoading();
-      setError('');
+        const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, selectedOption, feeRateInput);
+        setFeeRateInput(selectedFeeRate?.toString());
+        setTotalFee(modifiedFee.toString());
+      } catch (err: any) {
+        if (Number(err) === ErrorCodes.InSufficientBalance) {
+          setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+        } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
+          setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
+        } else setError(err.toString());
+      } finally {
+        setIsNotLoading();
+      }
+    } else if (type === 'Ordinals' && btcRecipients && ordinalTxUtxo) {
+      try {
+        setIsLoading();
+        setError('');
 
-      const { fee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, selectedOption, feeRateInput);
-      setFeeRateInput(selectedFeeRate?.toString());
-      setTotalFee(fee.toString());
-    } catch (err: any) {
-      if (Number(err) === ErrorCodes.InSufficientBalance) {
-        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
-      } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
-        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
-      } else setError(err.toString());
-    } finally {
-      setIsNotLoading();
+        const { fee: modifiedFee, selectedFeeRate } = await getBtcFeesForOrdinalSend(
+          btcRecipients[0].address,
+          ordinalTxUtxo,
+          btcAddress,
+          network.type,
+          selectedOption,
+          feeRateInput,
+        );
+        setFeeRateInput(selectedFeeRate?.toString());
+        setTotalFee(modifiedFee.toString());
+      } catch (err: any) {
+        if (Number(err) === ErrorCodes.InSufficientBalance) {
+          setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+        } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
+          setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
+        } else setError(err.toString());
+      } finally {
+        setIsNotLoading();
+      }
     }
   };
 
@@ -330,11 +354,11 @@ function EditFee({
       <FeeContainer>
         <InputContainer>
           <InputField type="number" ref={inputRef} value={feeRateInput?.toString()} onChange={onInputEditFeesChange} />
-          {type === 'BTC' && (
+          {isBtcOrOrdinals && (
             <FeeText>sats /vB</FeeText>
           )}
           <TickerContainer>
-            {type === 'BTC' && (
+            {isBtcOrOrdinals && (
               <FeeText>{`${totalFee} sats`}</FeeText>
             )}
             <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
@@ -349,14 +373,14 @@ function EditFee({
         )}
         <FeeButton
           isSelected={selectedOption === 'standard'}
-          isBtc={type === 'BTC' || type === 'Ordinals'}
+          isBtc={isBtcOrOrdinals}
           onClick={() => (type === 'STX' ? modifyStxFees('standard') : modifyFees('standard'))}
         >
           {t('TRANSACTION_SETTING.STANDARD')}
         </FeeButton>
         <FeeButton
           isSelected={selectedOption === 'high'}
-          isBtc={type === 'BTC' || type === 'Ordinals'}
+          isBtc={isBtcOrOrdinals}
           onClick={() => (type === 'STX' ? modifyStxFees('high') : modifyFees('high'))}
         >
           {t('TRANSACTION_SETTING.HIGH')}
@@ -364,7 +388,7 @@ function EditFee({
         <FeeButton
           isSelected={selectedOption === 'custom'}
           isLastInRow
-          isBtc={type === 'BTC' || type === 'Ordinals'}
+          isBtc={isBtcOrOrdinals}
           onClick={() => (type === 'STX' ? modifyStxFees('custom') : modifyFees('custom'))}
         >
           {t('TRANSACTION_SETTING.CUSTOM')}
