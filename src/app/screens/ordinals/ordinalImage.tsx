@@ -9,8 +9,7 @@ import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import { useTranslation } from 'react-i18next';
 import { Inscription } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
-import stc from 'string-to-color';
-import { NumericFormat } from 'react-number-format';
+import Brc20Tile from './brc20Tile';
 
 interface ContainerProps {
   isGalleryOpen: boolean;
@@ -38,13 +37,6 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
 const ButtonIcon = styled.img({
   width: 12,
   height: 12,
-});
-
-const BRC20Container = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
 });
 
 const OrdinalsTag = styled.div({
@@ -98,43 +90,11 @@ const OrdinalContentText = styled.h1<TextProps>((props) => ({
   textAlign: 'center',
 }));
 
-const BRC20Text = styled.h1<TextProps>((props) => ({
-  ...props.theme.body_bold_l,
-  color: props.theme.colors.white[0],
-  fontSize: props.inNftSend ? 16 : 'calc(0.8vw + 2vh)',
-  textAlign: 'center',
-  marginTop: 8,
-}));
-
 const StyledImg = styled(Image)`
   border-radius: 8px;
   object-fit: contain;
   image-rendering: pixelated;
 `;
-
-interface TickerProps {
-  enlargeTicker? : boolean;
-}
-
-const TickerIconContainer = styled.div<TickerProps>((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: props.enlargeTicker ? 50 : 34.65,
-  width: props.enlargeTicker ? 50 : 34.65,
-  marginTop: 3,
-  marginBottom: 3,
-  borderRadius: 50,
-  backgroundColor: props.color,
-}));
-
-const TickerIconText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-  wordBreak: 'break-all',
-  fontSize: 10,
-}));
 
 interface Props {
   ordinal: Inscription;
@@ -154,16 +114,6 @@ function OrdinalImage({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
-
-  function renderFTIcon(ticker: string) {
-    const background = stc(ticker);
-    ticker = ticker && ticker.substring(0, 4);
-    return (
-      <TickerIconContainer color={background} enlargeTicker={isGalleryOpen}>
-        <TickerIconText>{ticker}</TickerIconText>
-      </TickerIconContainer>
-    );
-  }
 
   if (ordinal?.content_type.includes('image')) {
     return (
@@ -199,67 +149,15 @@ function OrdinalImage({
     }
 
     if (textContent.includes('brc-20')) {
-      const content = JSON.parse(textContent);
-      if (content?.op === 'mint') {
-        return (
-          <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
-            <BRC20Container>
-              <BRC20Text>{t('MINT')}</BRC20Text>
-              {renderFTIcon(content?.tick)}
-              <NumericFormat
-                value={content?.amt}
-                displayType="text"
-                thousandSeparator
-                renderText={(text) => <BRC20Text>{text}</BRC20Text>}
-              />
-              {isNftDashboard && (
-              <OrdinalsTag>
-                <ButtonIcon src={OrdinalsIcon} />
-                <Text>{t('ORDINAL')}</Text>
-              </OrdinalsTag>
-              )}
-            </BRC20Container>
-          </ImageContainer>
-        );
-      }
-      if (content?.op === 'transfer') {
-        return (
-          <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
-            <BRC20Container>
-              <BRC20Text>{t('TRANSFER')}</BRC20Text>
-              {renderFTIcon(content?.tick)}
-              <NumericFormat
-                value={content?.amt}
-                displayType="text"
-                thousandSeparator
-                renderText={(text) => <BRC20Text>{text}</BRC20Text>}
-              />
-              {isNftDashboard && (
-              <OrdinalsTag>
-                <ButtonIcon src={OrdinalsIcon} />
-                <Text>{t('ORDINAL')}</Text>
-              </OrdinalsTag>
-              )}
-            </BRC20Container>
-          </ImageContainer>
-        );
-      }
-      if (content?.op === 'deploy') {
-        return (
-          <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
-            <BRC20Container>
-              <BRC20Text>{t('DEPLOY')}</BRC20Text>
-              {renderFTIcon(content?.tick)}
-              {isNftDashboard && (
-              <OrdinalsTag>
-                <ButtonIcon src={OrdinalsIcon} />
-                <Text>{t('ORDINAL')}</Text>
-              </OrdinalsTag>
-              )}
-            </BRC20Container>
-          </ImageContainer>
-        );
-      }
+      return (
+        <Brc20Tile
+          brcContent={textContent}
+          isGalleryOpen={isGalleryOpen}
+          isNftDashboard={isNftDashboard}
+          inNftDetail={inNftDetail}
+          isSmallImage={isSmallImage}
+        />
+      );
     }
     return (
       <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>

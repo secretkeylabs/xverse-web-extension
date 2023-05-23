@@ -145,18 +145,18 @@ function SendBrc20Screen() {
           setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE_FEES'));
         } else setAmountError(err.toString());
       });
-      navigate('/confirm-btc-tx', {
+      navigate('/confirm-inscription-request', {
         state: {
+          brcContent: order.inscriptionRequest.files[0].dataURL,
           signedTxHex: data?.signedTx,
           recipientAddress: order.inscriptionRequest.charge.address,
           amount: order.inscriptionRequest.charge.amount.toString(),
           recipient: recipients,
-          fiatAmount: getBtcFiatEquivalent(orderAmount, btcFiatRate),
+          fiatAmount: order.inscriptionRequest.charge.fiat_value,
           fee: data?.fee,
           fiatFee: getBtcFiatEquivalent(data?.fee, btcFiatRate),
           total: data?.total,
           fiatTotal: getBtcFiatEquivalent(data?.total, btcFiatRate),
-          isBrc20TokenFlow: true,
         },
       });
     } catch (err) {
