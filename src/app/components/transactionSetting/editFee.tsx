@@ -354,8 +354,13 @@ function EditFee({
     return '';
   };
 
-  const onInputEditFeesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFeeRateInput(e.target.value);
+  const onInputEditFeesChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+    setFeeRateInput(value);
+
+    if (type !== 'BTC' && type !== 'Ordinals') {
+      setFeeRateInput(value);
+      setTotalFee(value);
+    }
 
     if (selectedOption !== 'custom') {
       setSelectedOption('custom');
