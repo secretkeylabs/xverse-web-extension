@@ -187,6 +187,14 @@ function Home() {
   };
 
   const onSendFtSelect = (coin: FungibleToken) => {
+    if (coin.protocol === 'brc-20') {
+      navigate('send-brc20', {
+        state: {
+          fungibleToken: coin,
+        },
+      });
+      return;
+    }
     navigate('send-ft', {
       state: {
         fungibleToken: coin,

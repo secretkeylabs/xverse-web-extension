@@ -402,6 +402,15 @@ function SendForm({
     setRecipientAddress(e.target.value);
   };
 
+  const getAddressInputPlaceholder = () => {
+    if (currencyType === 'BTC') {
+      return t('BTC_RECIPIENT_PLACEHOLDER');
+    } if (currencyType === 'Ordinal' || currencyType === 'brc20-Ordinal') {
+      return t('ORDINAL_RECIPIENT_PLACEHOLDER');
+    }
+    return t('RECIPIENT_PLACEHOLDER');
+  };
+
   const renderEnterRecipientSection = (
     <Container>
       <TitleText>{t('RECIPIENT')}</TitleText>
@@ -409,7 +418,7 @@ function SendForm({
         <InputFieldContainer>
           <InputField
             value={recipientAddress}
-            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' || currencyType === 'brc20-Ordinal' ? t('BTC_RECIPIENT_PLACEHOLDER') : t('RECIPIENT_PLACEHOLDER')}
+            placeholder={getAddressInputPlaceholder()}
             onChange={onAddressInputChange}
           />
         </InputFieldContainer>

@@ -11,6 +11,7 @@ import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useMemo, useState } from 'react';
+import { isBrcTransferValid } from '@secretkeylabs/xverse-core/api';
 import AccountHeaderComponent from '@components/accountHeader';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import DescriptionTile from '@screens/nftDetail/descriptionTile';
@@ -243,6 +244,14 @@ const Text = styled.h1((props) => ({
   marginLeft: props.theme.spacing(2),
 }));
 
+const DetailRow = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',
+  paddingRight: props.theme.spacing(20),
+}));
+
 function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
@@ -256,6 +265,10 @@ function OrdinalDetailScreen() {
   const textContent = useTextOrdinalContent(selectedOrdinal!);
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isTransferValid = useMemo(
+    () => (isBrcTransferValid(selectedOrdinal!) ? 'Valid' : 'Void'),
+    [selectedOrdinal],
+  );
 
   useEffect(() => {
     if (selectedOrdinal) {
@@ -309,7 +322,7 @@ function OrdinalDetailScreen() {
     }
   };
 
-  const showBrc20OrdinalDetial = (isGallery: boolean) => {
+  const showBrc20OrdinalDetail = (isGallery: boolean) => {
     const content = JSON.parse(textContent);
     if (content.op === 'mint') {
       return (
@@ -332,7 +345,14 @@ function OrdinalDetailScreen() {
     if (content.op === 'transfer') {
       return (
         <ColumnContainer>
-          <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={content.amt} />
+          <DetailRow>
+            <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={content.amt} />
+            <OrdinalAttributeComponent
+              title={t('BRC20_TRANSFER_STATUS')}
+              value={isTransferValid}
+              isAddress
+            />
+          </DetailRow>
           {!isGallery && (
           <OrdinalAttributeComponent
             title={t('OWNED_BY')}
@@ -407,7 +427,7 @@ function OrdinalDetailScreen() {
           <h1>{t('SEND')}</h1>
         </SendButton>
       </ButtonContainer>
-      {isBrc20Ordinal ? showBrc20OrdinalDetial(false) : ownedByView}
+      {isBrc20Ordinal ? showBrc20OrdinalDetail(false) : ownedByView}
     </ExtensionContainer>
   );
 
@@ -467,11 +487,9 @@ function OrdinalDetailScreen() {
         <DescriptionContainer>
           <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
           {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
-          {
-          isBrc20Ordinal
-            ? showBrc20OrdinalDetial(true)
-            : ordinalDescriptionData
-          }
+          {isBrc20Ordinal
+            ? showBrc20OrdinalDetail(true)
+            : ordinalDescriptionData}
         </DescriptionContainer>
       </RowContainer>
     </Container>
@@ -494,7 +512,7 @@ function OrdinalDetailScreen() {
             description={t('ORDINAL_PENDING_SEND_DESCRIPTION')}
           />
         )}
-        {isGalleryOpen ? galleryView : extensionView}
+        {isGalleryOpen && selectedOrdinal !== null ? galleryView : extensionView}
       </Container>
       {!isGalleryOpen && (
         <BottomBarContainer>
