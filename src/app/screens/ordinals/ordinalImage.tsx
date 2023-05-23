@@ -112,15 +112,19 @@ const StyledImg = styled(Image)`
   image-rendering: pixelated;
 `;
 
-const TickerIconContainer = styled.div((props) => ({
+interface TickerProps {
+  enlargeTicker? : boolean;
+}
+
+const TickerIconContainer = styled.div<TickerProps>((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: 34.65,
-  width: 34.65,
+  height: props.enlargeTicker ? 50 : 34.65,
+  width: props.enlargeTicker ? 50 : 34.65,
   marginTop: 3,
   marginBottom: 3,
-  borderRadius: 20,
+  borderRadius: 50,
   backgroundColor: props.color,
 }));
 
@@ -155,7 +159,7 @@ function OrdinalImage({
     const background = stc(ticker);
     ticker = ticker && ticker.substring(0, 4);
     return (
-      <TickerIconContainer color={background}>
+      <TickerIconContainer color={background} enlargeTicker={isGalleryOpen}>
         <TickerIconText>{ticker}</TickerIconText>
       </TickerIconContainer>
     );
