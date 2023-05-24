@@ -18,7 +18,6 @@ import SmallActionButton from '@components/smallActionButton';
 interface CoinBalanceProps {
   coin: CurrencyTypes;
   fungibleToken?: FungibleToken;
-  isBRC20Token: boolean;
 }
 
 const Container = styled.div((props) => ({
@@ -46,26 +45,6 @@ const ProtocolText = styled.p((props) => ({
   padding: '1px 6px 1px',
   color: props.theme.colors.background.elevation0,
   borderRadius: props.theme.radius(2),
-}));
-
-const ComingSoonContainer = styled.div((props) => ({
-  display: 'flex',
-  position: 'absolute',
-  top: 73,
-  left: -20,
-  background: props.theme.colors.orange_main,
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: '2px 5px 1px',
-  borderRadius: 40,
-  width: 86,
-  marginTop: props.theme.spacing(4),
-  h1: {
-    ...props.theme.body_bold_m,
-    fontSize: 10,
-    textTransform: 'uppercase',
-    color: props.theme.colors.background.elevation0,
-  },
 }));
 
 const BalanceInfoContainer = styled.div({
@@ -163,7 +142,7 @@ const StacksLockedInfoText = styled.span((props) => ({
 }));
 
 export default function CoinHeader(props: CoinBalanceProps) {
-  const { coin, fungibleToken, isBRC20Token } = props;
+  const { coin, fungibleToken } = props;
   const {
     btcBalance,
     stxBalance,
@@ -260,8 +239,14 @@ export default function CoinHeader(props: CoinBalanceProps) {
   const goToSendScreen = () => {
     if (coin === 'STX' || coin === 'BTC') {
       navigate(`/send-${coin}`);
-    } else {
+    } else if (coin === 'FT') {
       navigate('/send-ft', {
+        state: {
+          fungibleToken,
+        },
+      });
+    } else if (coin === 'brc20') {
+      navigate('/send-brc20', {
         state: {
           fungibleToken,
         },
@@ -289,7 +274,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
         />
         <RowContainer>
           <BalanceTitleText>{getDashboardTitle()}</BalanceTitleText>
-          {isBRC20Token && <ProtocolText>BRC-20</ProtocolText>}
+          {coin === 'brc20' && <ProtocolText>BRC-20</ProtocolText>}
         </RowContainer>
         <BalanceValuesContainer>
           <NumericFormat
@@ -313,8 +298,11 @@ export default function CoinHeader(props: CoinBalanceProps) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <SmallActionButton isDisabled={isBRC20Token} src={ArrowUp} text="Send" onPress={() => goToSendScreen()} />
-          {isBRC20Token && <ComingSoonContainer><h1>{t('COMING_SOON')}</h1></ComingSoonContainer>}
+          <SmallActionButton
+            src={ArrowUp}
+            text="Send"
+            onPress={() => goToSendScreen()}
+          />
         </ButtonContainer>
 
         {!fungibleToken ? (
@@ -328,16 +316,15 @@ export default function CoinHeader(props: CoinBalanceProps) {
             </ButtonContainer>
             <SmallActionButton src={Buy} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
           </>
-        )
-          : (
-            <RecieveButtonContainer>
-              <SmallActionButton
-                src={ArrowDown}
-                text="Receive"
-                onPress={() => navigate(isBRC20Token ? '/receive/ORD' : `/receive/${coin}`)}
-              />
-            </RecieveButtonContainer>
-          )}
+        ) : (
+          <RecieveButtonContainer>
+            <SmallActionButton
+              src={ArrowDown}
+              text="Receive"
+              onPress={() => navigate(coin === 'brc20' ? '/receive/ORD' : `/receive/${coin}`)}
+            />
+          </RecieveButtonContainer>
+        )}
       </RowButtonContainer>
     </Container>
   );

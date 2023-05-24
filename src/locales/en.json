@@ -52,6 +52,7 @@
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
     "BTC_RECIPIENT_PLACEHOLDER": "Enter Bitcoin address",
+    "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter Ordinals address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
@@ -77,7 +78,8 @@
     "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
     "SWITCH_TO": "Switch to",
     "SEND_ORDINAL_TITLE": "Send Ordinal",
-    "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals."
+    "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals.",
+    "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens."
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -156,7 +158,8 @@
     "FAILED": "Transaction Failed",
     "RETRY": "Try again",
     "SPONSORED_SUCCESS_MSG": "Transaction signed",
-    "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor"
+    "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor",
+    "BRC20_ORDINAL_MSG": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer."
   },
   "LEGAL_SCREEN": {
     "SCREEN_TITLE": "Legal",
@@ -275,7 +278,10 @@
     "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
-    "COPIED": "Copied!"
+    "COPIED": "Copied!",
+    "MINT": "Mint",
+    "TRANSFER": "Transfer",
+    "DEPLOY": "Deploy"
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Restore assets",
@@ -336,7 +342,13 @@
     "GENESIS_HEIGHT": "genesis height",
     "LOCATION": "Location",
     "ORDINAL_NOT_DISPLAYED": "This ordinal cannot be displayed.",
-    "COLLECTIBLE": "Collectible"
+    "COLLECTIBLE": "Collectible",
+    "BRC20_INSCRIPTION": "BRC-20 Inscription",
+    "AMOUNT_TO_MINT": "Amount to mint",
+    "AMOUNT_TO_TRANSFER": "Amount to transfer",
+    "BRC20_TRANSFER_STATUS": "Status",
+    "TOTAL_SUPPLY": "Total supply",
+    "MINT_LIMIT": "Mint limit"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
@@ -496,7 +508,7 @@
     "RECEIVING_ORDINALS": "Receiving Ordinals",
     "RECEIVING_ORDINAL_INFO": "Use this address to receive Ordinals only. Do not use this address to receive Bitcoin payments.",
     "RECEIVING_BTC": "Receiving Bitcoin",
-    "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
+    "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals & BRC-20 tokens.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
 },
@@ -509,5 +521,19 @@
     "ORDINAL_ADDRESS": "Ordinal address",
     "NETWORK_MISMATCH_ERROR_TITLE": "Mismatched Network",
     "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings."
+  },
+  "SEND_BRC_20": {
+    "BRC20_TOKEN": "BRC-20",
+    "SEND_INFO_TITLE": "Sending a BRC-20 token",
+    "SEND_INFO_SUBTITLE": "To transfer BRC-20 tokens, you need to make two separate transactions:",
+    "SEND_STEP_1_TITLE": "Inscribe Transfer",
+    "SEND_STEP_1": "Create an Ordinal inscription with the token and amount you would like to send.",
+    "SEND_STEP_2_TITLE": "Send transfer inscription",
+    "SEND_STEP_2": "Once you have the transfer inscription, you can send it to your recipient to transfer the BRC-20 token.",
+    "SEND_INFO_START_BUTTON": "Start",
+    "SEND_NEXT_BUTTON": "Next",
+    "SEND": "Send",
+    "AMOUNT": "Amount",
+    "BALANCE": "Balance"
   }
 }

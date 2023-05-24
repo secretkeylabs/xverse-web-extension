@@ -162,7 +162,8 @@ function Home() {
   };
 
   function getCoinsList() {
-    return coinsList ? coinsList?.filter((ft) => ft.visible) : [];
+    const list = coinsList ? coinsList?.filter((ft) => ft.visible) : [];
+    return brcCoinsList ? list.concat(brcCoinsList) : list;
   }
 
   const handleManageTokenListOnClick = () => {
@@ -186,6 +187,14 @@ function Home() {
   };
 
   const onSendFtSelect = (coin: FungibleToken) => {
+    if (coin.protocol === 'brc-20') {
+      navigate('send-brc20', {
+        state: {
+          fungibleToken: coin,
+        },
+      });
+      return;
+    }
     navigate('send-ft', {
       state: {
         fungibleToken: coin,
@@ -297,7 +306,7 @@ function Home() {
           {brcCoinsList?.map((coin) => (
             <TokenTile
               title={coin.name}
-              currency="FT"
+              currency="brc20"
               loading={loadingBtcCoinData || refetchingBtcCoinData}
               underlayColor={Theme.colors.background.elevation1}
               fungibleToken={coin}

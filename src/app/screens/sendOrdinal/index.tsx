@@ -20,6 +20,7 @@ import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
+import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -108,9 +109,8 @@ function SendOrdinal() {
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
-
+  const textContent = useTextOrdinalContent(selectedOrdinal!);
   const address: string | undefined = useMemo(() => (location.state ? location.state.recipientAddress : undefined), [location.state]);
-
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
   const {
@@ -191,6 +191,7 @@ function SendOrdinal() {
       mutate(associatedAddress);
     }
   };
+
   return (
     <>
       {isGalleryOpen && (
@@ -212,7 +213,7 @@ function SendOrdinal() {
         )}
         <SendForm
           processing={isLoading}
-          currencyType="Ordinal"
+          currencyType={textContent.includes('brc-20') ? 'brc20-Ordinal' : 'Ordinal'}
           disableAmountInput
           recepientError={error}
           recipient={address}
@@ -222,7 +223,7 @@ function SendOrdinal() {
             <NFtContainer>
               <OrdinalImage inNftSend ordinal={selectedOrdinal!} />
             </NFtContainer>
-            <OrdinalInscriptionNumber>{selectedOrdinal?.number}</OrdinalInscriptionNumber>
+            <OrdinalInscriptionNumber>{`Inscription ${selectedOrdinal?.number}`}</OrdinalInscriptionNumber>
           </Container>
         </SendForm>
         <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>

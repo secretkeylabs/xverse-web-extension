@@ -184,6 +184,8 @@ function TokenTile({
         return satsToBtc(new BigNumber(btcBalance)).toString();
       case 'FT':
         return fungibleToken ? getFtBalance(fungibleToken) : '';
+      case 'brc20':
+        return fungibleToken ? getFtBalance(fungibleToken) : '';
       default:
     }
   }

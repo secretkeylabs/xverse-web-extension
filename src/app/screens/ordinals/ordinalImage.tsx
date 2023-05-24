@@ -9,6 +9,7 @@ import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import { useTranslation } from 'react-i18next';
 import { Inscription } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import Brc20Tile from './brc20Tile';
 
 interface ContainerProps {
   isGalleryOpen: boolean;
@@ -22,14 +23,14 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   marginBottom: props.inNftDetail ? props.theme.spacing(8) : 0,
   alignItems: 'center',
   width: '100%',
-  height: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
+  height: props.isGalleryOpen ? props.inNftDetail ? 540 : 300 : props.isSmallImage ? 50 : 150,
   minHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
-  maxHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
+  maxHeight: props.isGalleryOpen ? props.inNftDetail ? 450 : 300 : props.isSmallImage ? 50 : 150,
   overflow: 'hidden',
   position: 'relative',
   fontSize: '3em',
   wordWrap: 'break-word',
-  backgroundColor: props.isGalleryOpen ? 'transparent' : '#1b1e2b',
+  backgroundColor: '#1b1e2b',
   borderRadius: 8,
 }));
 
@@ -146,14 +147,26 @@ function OrdinalImage({
         </ImageContainer>
       );
     }
+
+    if (textContent.includes('brc-20')) {
+      return (
+        <Brc20Tile
+          brcContent={textContent}
+          isGalleryOpen={isGalleryOpen}
+          isNftDashboard={isNftDashboard}
+          inNftDetail={inNftDetail}
+          isSmallImage={isSmallImage}
+        />
+      );
+    }
     return (
       <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
         <OrdinalContentText inNftSend={inNftSend}>{textContent}</OrdinalContentText>
         {isNftDashboard && (
-          <OrdinalsTag>
-            <ButtonIcon src={OrdinalsIcon} />
-            <Text>{t('ORDINAL')}</Text>
-          </OrdinalsTag>
+        <OrdinalsTag>
+          <ButtonIcon src={OrdinalsIcon} />
+          <Text>{t('ORDINAL')}</Text>
+        </OrdinalsTag>
         )}
       </ImageContainer>
     );

@@ -47,6 +47,8 @@ import SignPsbtRequest from '@screens/signPsbtRequest';
 import RestoreFunds from '@screens/restoreFunds';
 import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
+import SendBrc20Screen from '@screens/sendBrc20';
+import ConfirmInscriptionRequest from '@screens/confirmInscriptionRequest';
 
 const router = createHashRouter([
   {
@@ -235,6 +237,22 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SendOrdinal />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'send-brc20',
+        element: (
+          <AuthGuard>
+            <SendBrc20Screen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'confirm-inscription-request',
+        element: (
+          <AuthGuard>
+            <ConfirmInscriptionRequest />
           </AuthGuard>
         ),
       },

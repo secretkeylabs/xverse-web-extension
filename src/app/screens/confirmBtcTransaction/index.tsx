@@ -33,7 +33,8 @@ function ConfirmBtcTransaction() {
     ordinals: ordinalsInBtc,
   } = useOrdinalsByAddress(btcAddress);
   const {
-    fee, feePerVByte, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos,
+    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, isBrc20TokenFlow,
+    feePerVByte,
   } = location.state;
 
   const {
@@ -85,6 +86,7 @@ function ConfirmBtcTransaction() {
           txid: btcTxBroadcastData.tx.hash,
           currency: 'BTC',
           error: '',
+          isBrc20TokenFlow,
         },
       });
       setTimeout(() => {
@@ -133,7 +135,7 @@ function ConfirmBtcTransaction() {
   };
 
   const goBackToScreen = () => {
-    if (isRestoreFundFlow) {
+    if (isRestoreFundFlow || isBrc20TokenFlow) {
       navigate(-1);
     } else {
       navigate('/send-btc', {
