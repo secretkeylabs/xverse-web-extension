@@ -8,11 +8,10 @@ import {
 import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
-import Info from '@assets/img/info.svg';
 import Switch from '@assets/img/send/switch.svg';
 import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
-import { useBnsName, useBNSResolver, useDebounce } from '@hooks/queries/useBnsName';
+import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
 import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -21,6 +20,7 @@ import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-c
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { getCurrencyFlag } from '@utils/currency';
+import useDebounce from '@hooks/useDebounce';
 
 interface ContainerProps {
   error: boolean;
@@ -158,42 +158,6 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
   opacity: props.enabled ? 1 : 0.6,
 }));
 
-const BuyCryptoContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  borderRadius: 12,
-  alignItems: 'flex-start',
-  backgroundColor: 'transparent',
-  padding: props.theme.spacing(8),
-  marginTop: props.theme.spacing(11),
-  border: '1px solid rgba(255, 255, 255, 0.2)',
-}));
-
-const BuyCryptoText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  marginBottom: props.theme.spacing(2),
-  color: props.theme.colors.white['400'],
-}));
-
-const BuyCryptoRedirectText = styled.h1((props) => ({
-  ...props.theme.tile_text,
-  fontSize: 12,
-}));
-
-const BuyCryptoRedirectButton = styled.button((props) => ({
-  backgroundColor: 'transparent',
-  color: props.theme.colors.white['0'],
-  display: 'flex',
-  justifyContent: 'flex-start',
-  alignItems: 'flex-start',
-}));
-
-const ColumnContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginLeft: props.theme.spacing(8),
-}));
-
 const SwitchToFiatButton = styled.button((props) => ({
   backgroundColor: props.theme.colors.background.elevation0,
   border: `1px solid ${props.theme.colors.background.elevation3}`,
@@ -288,6 +252,17 @@ function SendForm({
       }
     }
   }, [recepientError, associatedAddress]);
+
+  useEffect(() => {
+    const resultRegex = /^\d*\.?\d*$/;
+
+    if (!amountToSend || !resultRegex.test(amountToSend)) {
+      return;
+    }
+
+    const amountInCurrency = getFiatEquivalent(Number(amountToSend), currencyType, stxBtcRate, btcFiatRate, fungibleToken);
+    setFiatAmount(amountInCurrency);
+  }, [amountToSend]);
 
   function getTokenCurrency() {
     if (fungibleToken) {
@@ -398,8 +373,17 @@ function SendForm({
     </Container>
   );
 
-  const onAddressInputChange = (e: { target: { value: SetStateAction<string> } }) => {
+  const onAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRecipientAddress(e.target.value);
+  };
+
+  const getAddressInputPlaceholder = () => {
+    if (currencyType === 'BTC') {
+      return t('BTC_RECIPIENT_PLACEHOLDER');
+    } if (currencyType === 'Ordinal' || currencyType === 'brc20-Ordinal') {
+      return t('ORDINAL_RECIPIENT_PLACEHOLDER');
+    }
+    return t('RECIPIENT_PLACEHOLDER');
   };
 
   const renderEnterRecipientSection = (
@@ -409,18 +393,18 @@ function SendForm({
         <InputFieldContainer>
           <InputField
             value={recipientAddress}
-            placeholder={currencyType === 'BTC' || currencyType === 'Ordinal' ? t('BTC_RECIPIENT_PLACEHOLDER') : t('RECIPIENT_PLACEHOLDER')}
+            placeholder={getAddressInputPlaceholder()}
             onChange={onAddressInputChange}
           />
         </InputFieldContainer>
       </AmountInputContainer>
-      {associatedAddress && currencyType !== 'BTC' && currencyType !== 'Ordinal' && (
+      {associatedAddress && currencyType !== 'BTC' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && (
         <>
           <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
           <AssociatedText>{associatedAddress}</AssociatedText>
         </>
       )}
-      {associatedBnsName && currencyType !== 'BTC' && currencyType !== 'Ordinal' && (
+      {associatedBnsName && currencyType !== 'BTC' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && (
       <>
         <SubText>{t('ASSOCIATED_BNS_DOMAIN')}</SubText>
         <AssociatedText>{associatedBnsName}</AssociatedText>
@@ -450,7 +434,7 @@ function SendForm({
   return (
     <>
       <ScrollContainer>
-        {currencyType !== 'NFT' && currencyType !== 'Ordinal' && (
+        {currencyType !== 'NFT' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && (
         <TokenContainer>
           <TokenImage
             token={currencyType || undefined}
@@ -470,7 +454,7 @@ function SendForm({
           <ErrorContainer>
             <ErrorText>{addressError}</ErrorText>
           </ErrorContainer>
-          {currencyType !== 'BTC' && currencyType !== 'NFT' && currencyType !== 'Ordinal' && !hideMemo && (
+          {currencyType !== 'BTC' && currencyType !== 'NFT' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && !hideMemo && (
           <>
             <Container>
               <TitleText>{t('MEMO')}</TitleText>
@@ -494,6 +478,13 @@ function SendForm({
             currencyType === 'Ordinal' && (
               <OrdinalInfoContainer>
                 <InfoContainer bodyText={t('SEND_ORDINAL_WALLET_WARNING')} type="Warning" />
+              </OrdinalInfoContainer>
+            )
+          }
+          {
+            currencyType === 'brc20-Ordinal' && (
+              <OrdinalInfoContainer>
+                <InfoContainer bodyText={t('SEND_BRC20_ORDINAL_WALLET_WARNING')} />
               </OrdinalInfoContainer>
             )
           }

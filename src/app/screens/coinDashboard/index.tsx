@@ -205,7 +205,7 @@ export default function CoinDashboard() {
     <>
       <TopRow title="" onClick={handleBack} />
       <Container>
-        <CoinHeader isBRC20Token={!!brc20FtName} coin={coin as CurrencyTypes} fungibleToken={ft || brc20Ft} />
+        <CoinHeader coin={coin as CurrencyTypes} fungibleToken={ft || brc20Ft} />
         {ft && (
           <FtInfoContainer>
             <Button isSelected={!showFtContractDetails} onClick={onTransactionsClick}>{t('TRANSACTIONS')}</Button>

@@ -90,7 +90,9 @@ function ConfirmOrdinalTransaction() {
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const { fee, signedTxHex, ordinalUtxo } = location.state;
+  const {
+    fee, feePerVByte, signedTxHex, ordinalUtxo,
+  } = location.state;
 
   const {
     isLoading,
@@ -162,6 +164,7 @@ function ConfirmOrdinalTransaction() {
       <ScrollContainer>
         <ConfirmBtcTransactionComponent
           fee={fee}
+          feePerVByte={feePerVByte}
           recipients={[{ address: recipientAddress, amountSats: new BigNumber(0) }]}
           loadingBroadcastedTx={isLoading}
           signedTxHex={signedTxHex}

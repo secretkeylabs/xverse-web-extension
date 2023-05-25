@@ -8,6 +8,7 @@ import Failure from '@assets/img/send/x_circle.svg';
 import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
 import CopyButton from '@components/copyButton';
+import InfoContainer from '@components/infoContainer';
 
 const TxStatusContainer = styled.div((props) => ({
   background: props.theme.colors.background.elevation0,
@@ -66,6 +67,12 @@ const TxIDContainer = styled.div({
 const CopyButtonContainer = styled.div({
   marginLeft: 8,
   padding: 2,
+});
+
+const InfoMessageContainer = styled.div({
+  marginLeft: 8,
+  marginRight: 8,
+  marginTop: 20,
 });
 
 const Image = styled.img({
@@ -131,7 +138,7 @@ function TransactionStatus() {
   const location = useLocation();
   const { network } = useWalletSelector();
   const {
-    txid, currency, error, sponsored, browserTx, isOrdinal, isNft, errorTitle,
+    txid, currency, error, sponsored, browserTx, isOrdinal, isNft, errorTitle, isBrc20TokenFlow,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -198,7 +205,7 @@ function TransactionStatus() {
           <OuterContainer>
             {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
             {txid && renderLink}
-            {txid && renderTransactionID}
+            {isBrc20TokenFlow ? <InfoMessageContainer><InfoContainer bodyText={t('BRC20_ORDINAL_MSG')} /></InfoMessageContainer> : txid && renderTransactionID}
           </OuterContainer>
         )}
       <ButtonContainer>
