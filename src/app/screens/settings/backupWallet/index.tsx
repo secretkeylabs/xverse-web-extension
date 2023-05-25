@@ -61,9 +61,10 @@ function BackupWalletScreen() {
       setPassword('');
       setError('');
       setShowSeed(true);
-      setLoading(false);
     } catch (e) {
       setError(t('CREATE_PASSWORD_SCREEN.INCORRECT_PASSWORD_ERROR'));
+    } finally {
+      setLoading(false);
     }
   };
 

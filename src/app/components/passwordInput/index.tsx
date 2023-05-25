@@ -189,7 +189,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   useEffect(() => {
     const keyDownHandler = (event) => {
-      if (event.key === 'Enter' && enteredPassword && enteredPasswordLength > REQUIRED_PASSWORD_LENGTH) {
+      if (event.key === 'Enter' && !!enteredPassword && enteredPasswordLength >= REQUIRED_PASSWORD_LENGTH && (checkPasswordStrength ? score >= PasswordStrength.AverageScore : true)) {
         event.preventDefault();
         handleContinue();
       }
@@ -308,7 +308,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
           <ActionButton
             processing={loading}
-            disabled={!enteredPassword || score <= PasswordStrength.WeakScore}
+            disabled={!enteredPassword || (!!checkPasswordStrength && score <= PasswordStrength.WeakScore)}
             text={t('CONTINUE_BUTTON')}
             onPress={handleContinue}
           />
