@@ -29,17 +29,6 @@ const ButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(8),
 }));
 
-const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
-  marginLeft: props.theme.spacing(10),
-  marginRight: props.theme.spacing(10),
-}));
-
-const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
-}));
-
 const TransactionSettingOptionText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
   color: props.theme.colors.white[200],
@@ -76,8 +65,6 @@ interface Props {
   nonce?: string;
   onApplyClick: (params: { fee: string; feeRate?: string; nonce?: string }) => void;
   onCrossClick: () => void;
-  previousFee?: string;
-  availableBalance?: BigNumber;
   type?: TxType;
   btcRecipients?: Recipient[];
   ordinalTxUtxo?: UTXO;
@@ -96,8 +83,6 @@ function TransactionSettingAlert({
   nonce,
   onApplyClick,
   onCrossClick,
-  previousFee,
-  availableBalance,
   type = 'STX',
   btcRecipients,
   ordinalTxUtxo,
@@ -115,30 +100,24 @@ function TransactionSettingAlert({
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
   const {
-    btcBalance,
+    btcBalance, stxAvailableBalance,
   } = useSelector((state: StoreState) => state.walletState);
 
   function applyClickForStx() {
-    setShowNonceSettings(false);
-    setShowFeeSettings(false);
-    if (previousFee && availableBalance) {
-      const prevFee = stxToMicrostacks(new BigNumber(previousFee));
+    if (stxAvailableBalance) {
       const currentFee = stxToMicrostacks(new BigNumber(feeInput));
-      if (currentFee.isEqualTo(prevFee)) {
-        setError(t('TRANSACTION_SETTING.SAME_FEE_ERROR'));
-        return;
-      } if (currentFee.gt(availableBalance)) {
+      if (currentFee.gt(stxAvailableBalance)) {
         setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
         return;
       }
     }
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
     setError('');
     onApplyClick({ fee: feeInput.toString(), nonce: nonceInput });
   }
 
   async function applyClickForBtc() {
-    setShowNonceSettings(false);
-    setShowFeeSettings(false);
     const currentFee = new BigNumber(feeInput);
     if (btcBalance && currentFee.gt(btcBalance)) {
       // show fee exceeds total balance error
@@ -152,15 +131,11 @@ function TransactionSettingAlert({
         return;
       }
     }
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
     setError('');
     onApplyClick({ fee: feeInput.toString(), feeRate: feeRate?.toString() });
   }
-
-  const errorText = !!error && (
-    <ErrorContainer>
-      <ErrorText>{error}</ErrorText>
-    </ErrorContainer>
-  );
 
   const onEditFeesPress = () => {
     setShowFeeSettings(true);

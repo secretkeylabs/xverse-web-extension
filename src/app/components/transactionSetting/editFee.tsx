@@ -68,7 +68,7 @@ const InputField = styled.input((props) => ({
   backgroundColor: 'transparent',
   color: props.theme.colors.white['0'],
   border: 'transparent',
-  width: '55%',
+  width: '50%',
   '&::-webkit-outer-spin-button': {
     '-webkit-appearance': 'none',
     margin: 0,
@@ -366,15 +366,18 @@ function EditFee({
   };
 
   const onInputEditFeesChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+    if (error) {
+      setError('');
+    }
     setFeeRateInput(value);
+
+    if (selectedOption !== 'custom') {
+      setSelectedOption('custom');
+    }
 
     if (type !== 'BTC' && type !== 'Ordinals') {
       setFeeRateInput(value);
       setTotalFee(value);
-    }
-
-    if (selectedOption !== 'custom') {
-      setSelectedOption('custom');
     }
   };
 
