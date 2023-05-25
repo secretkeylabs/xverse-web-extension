@@ -45,13 +45,16 @@ const Text = styled.h1((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
-const InputContainer = styled.div((props) => ({
+interface InputContainerProps {
+  withError?: boolean;
+}
+const InputContainer = styled.div<InputContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(6),
-  border: `1px solid ${props.theme.colors.background.elevation6}`,
+  border: `1px solid ${props.withError ? props.theme.colors.feedback.error : props.theme.colors.background.elevation6}`,
   backgroundColor: props.theme.colors.background.elevation1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
@@ -132,6 +135,12 @@ const TickerContainer = styled.div({
   flex: 1,
 });
 
+const ErrorText = styled.h1((props) => ({
+  ...props.theme.body_xs,
+  color: props.theme.colors.feedback.error,
+  marginBottom: props.theme.spacing(2),
+}));
+
 interface Props {
   type?: string;
   fee: string;
@@ -140,6 +149,7 @@ interface Props {
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  error: string;
   setIsLoading: () => void;
   setIsNotLoading: () => void;
   setFee: (fee: string) => void;
@@ -155,6 +165,7 @@ function EditFee({
   ordinalTxUtxo,
   isRestoreFlow,
   nonOrdinalUtxos,
+  error,
   setIsLoading,
   setIsNotLoading,
   setFee,
@@ -176,7 +187,7 @@ function EditFee({
   const [totalFee, setTotalFee] = useState(fee);
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
   const inputRef = useRef(null);
-  const debouncedFeeRateInput = useDebounce(feeRateInput, 300);
+  const debouncedFeeRateInput = useDebounce(feeRateInput, 500);
   const isBtcOrOrdinals = type === 'BTC' || type === 'Ordinals';
 
   const modifyStxFees = (mode: string) => {
@@ -371,18 +382,25 @@ function EditFee({
     <Container>
       <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
       <FeeContainer>
-        <InputContainer>
+        <InputContainer withError={!!error}>
           <InputField type="number" ref={inputRef} value={feeRateInput?.toString()} onChange={onInputEditFeesChange} />
           {isBtcOrOrdinals && (
-            <FeeText>sats /vB</FeeText>
+            <FeeText>SATS /vB</FeeText>
           )}
           <TickerContainer>
             {isBtcOrOrdinals && (
-              <FeeText>{`${totalFee} sats`}</FeeText>
+              <NumericFormat
+                value={totalFee}
+                displayType="text"
+                thousandSeparator
+                suffix=" SATS"
+                renderText={(value: string) => <FeeText>{value}</FeeText>}
+              />
             )}
             <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
           </TickerContainer>
         </InputContainer>
+        {error && <ErrorText>{error}</ErrorText>}
       </FeeContainer>
       <ButtonContainer>
         {type === 'STX' && (

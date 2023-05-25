@@ -195,6 +195,7 @@ function TransactionSettingAlert({
           fee={fee}
           feeRate={feeRate}
           type={type}
+          error={error}
           setIsLoading={onLoading}
           setIsNotLoading={onComplete}
           setFee={setFeeInput}
@@ -247,7 +248,7 @@ function TransactionSettingAlert({
         <ActionButton
           text={t('TRANSACTION_SETTING.APPLY')}
           processing={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !!error}
           onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
         />
       </ButtonContainer>
