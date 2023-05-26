@@ -22,7 +22,7 @@ export const MOON_PAY_API_KEY = process.env.MOON_PAY_API_KEY;
 export const BINANCE_URL = 'https://www.binancecnt.com/en/pre-connect';
 export const BINANCE_MERCHANT_CODE = process.env.BINANCE_MERCHANT_CODE;
 
-export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal';
+export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal' | 'brc20' | 'brc20-Ordinal';
 export enum LoaderSize {
   SMALLEST,
   SMALL,

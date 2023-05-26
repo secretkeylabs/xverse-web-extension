@@ -168,7 +168,7 @@ function ConfirmStxTransationComponent({
     onConfirmClick(signedTxs);
   };
 
-  const applyTxSettings = (settingFee: string, nonce?: string) => {
+  const applyTxSettings = ({ fee: settingFee, nonce }: { fee: string; feeRate?: string; nonce?: string }) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
     setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {
@@ -181,7 +181,7 @@ function ConfirmStxTransationComponent({
     <>
       <Container>
         <TitleContainer>
-          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRNSACTION')}</ReviewTransactionText>}
+          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>}
           {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
         {children}
