@@ -24,7 +24,7 @@ function useSendBtcRequest() {
     const recipients: Recipient[] = [
       {
         address: request.payload?.recipientAddress,
-        amountSats: new BigNumber(request.payload?.satsAmount),
+        amountSats: new BigNumber(request.payload?.amountSats),
       },
     ];
     const signedTx = await signBtcTransaction(

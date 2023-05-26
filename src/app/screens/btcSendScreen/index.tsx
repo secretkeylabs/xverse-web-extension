@@ -52,7 +52,7 @@ function BtcSendScreen() {
         },
       });
     }
-    if (new BigNumber(payload?.satsAmount).lt(BITCOIN_DUST_AMOUNT_SATS)) {
+    if (new BigNumber(payload?.amountSats).lt(BITCOIN_DUST_AMOUNT_SATS)) {
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -83,16 +83,16 @@ function BtcSendScreen() {
 
   useEffect(() => {
     if (signedTx) {
-      const parsedAmountSats = new BigNumber(payload.satsAmount);
+      const parsedAmountSats = new BigNumber(payload.amountSats);
       navigate('/confirm-btc-tx', {
         state: {
           signedTxHex: signedTx.signedTx,
           recipientAddress: payload.recipientAddress,
-          amount: payload.satsAmount,
+          amount: payload.amountSats,
           recipient: [
             {
               address: payload?.recipientAddress,
-              amountSats: new BigNumber(payload?.satsAmount),
+              amountSats: new BigNumber(payload?.amountSats),
             },
           ],
           fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
