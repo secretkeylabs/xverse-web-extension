@@ -18,7 +18,7 @@ const ImageContainer = styled.div<ContainerProps>(
     display: 'flex',
     justifyContent: 'center',
     marginBottom: inNftDetail ? theme.spacing(8) : 0,
-    alignItems: 'center',
+    paddingTop: isGalleryOpen ? 100 : 30,
     width: '100%',
     height: isGalleryOpen ? (inNftDetail ? 540 : 300) : isSmallImage ? 50 : 150,
     minHeight: isGalleryOpen ? 300 : isSmallImage ? 50 : 150,
@@ -36,7 +36,7 @@ const BRC20Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
 });
 
 interface TextProps {
