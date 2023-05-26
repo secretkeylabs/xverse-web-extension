@@ -388,7 +388,7 @@ function EditFee({
         <InputContainer withError={!!error}>
           <InputField type="number" ref={inputRef} value={feeRateInput?.toString()} onChange={onInputEditFeesChange} />
           {isBtcOrOrdinals && (
-            <FeeText>SATS /vB</FeeText>
+            <FeeText>sats /vB</FeeText>
           )}
           <TickerContainer>
             {isBtcOrOrdinals && (
@@ -396,7 +396,7 @@ function EditFee({
                 value={totalFee}
                 displayType="text"
                 thousandSeparator
-                suffix=" SATS"
+                suffix=" sats"
                 renderText={(value: string) => <FeeText>{value}</FeeText>}
               />
             )}
