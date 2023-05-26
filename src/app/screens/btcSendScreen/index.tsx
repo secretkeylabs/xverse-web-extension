@@ -97,6 +97,7 @@ function BtcSendScreen() {
           ],
           fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
           fee: signedTx.fee,
+          feePerVByte: signedTx.feePerVByte,
           fiatFee: getBtcFiatEquivalent(signedTx.fee, btcFiatRate),
           total: signedTx.total,
           fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),
