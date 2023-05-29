@@ -51,7 +51,8 @@
     "string-to-color": "^2.2.2",
     "styled-components": "^5.3.5",
     "valid-url": "^1.0.9",
-    "webextension-polyfill": "^0.10.0"
+    "webextension-polyfill": "^0.10.0",
+    "zxcvbn": "^4.4.2"
   },
   "scripts": {
     "build": "npm run clean && NODE_ENV=production npx node webpack/utils/build.js",
@@ -81,6 +82,7 @@
     "@types/react-modal": "^3.13.1",
     "@types/styled-components": "^5.1.26",
     "@types/webextension-polyfill": "^0.9.1",
+    "@types/zxcvbn": "^4.4.1",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
     "babel-core": "^6.26.3",

@@ -6,6 +6,7 @@ import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import { useEffect, useState } from 'react';
 import ActionButton from '@components/button';
 import { animated, useTransition } from '@react-spring/web';
+import zxcvbn from 'zxcvbn';
 
 interface PasswordInputProps {
   title: string;
@@ -132,11 +133,15 @@ const StrengthBar = styled(animated.div)<StrengthBarProps>((props) => ({
   },
 }));
 
+const REQUIRED_PASSWORD_LENGTH = 5;
+
 export enum PasswordStrength {
-  WEAK = 5,
-  MEDIUM = 8,
-  STRONG = 12,
-  EMPTY = 0,
+  NoScore,
+  PoorScore,
+  WeakScore,
+  AverageScore,
+  StrongScore,
+  MeetsAllRequirements,
 }
 
 interface TransparentButtonContainerProps {
@@ -168,8 +173,10 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
   const theme = useTheme();
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>(
-    PasswordStrength.EMPTY,
+    PasswordStrength.NoScore,
   );
+  const { score } = zxcvbn(enteredPassword);
+  const enteredPasswordLength = enteredPassword.length;
   const [error, setError] = useState<string>(passwordError ?? '');
   const transition = useTransition(passwordStrength, {
     from: {
@@ -182,7 +189,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   useEffect(() => {
     const keyDownHandler = (event) => {
-      if (event.key === 'Enter' && enteredPassword && enteredPassword.length > PasswordStrength.WEAK) {
+      if (event.key === 'Enter' && !!enteredPassword && enteredPasswordLength >= REQUIRED_PASSWORD_LENGTH && (checkPasswordStrength ? score >= PasswordStrength.AverageScore : true)) {
         event.preventDefault();
         handleContinue();
       }
@@ -195,23 +202,17 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   useEffect(() => {
     if (passwordError) { setError(passwordError); return; }
-    if (enteredPassword && createPasswordFlow && enteredPassword.length <= PasswordStrength.WEAK) { setError(t('PASSWORD_STRENGTH_ERROR')); return; }
+    if (enteredPassword && !!createPasswordFlow && score <= PasswordStrength.WeakScore) { setError(t('PASSWORD_STRENGTH_ERROR')); return; }
     setError('');
   }, [passwordError, enteredPassword]);
 
   useEffect(() => {
     if (enteredPassword !== '') {
-      const passwordLength = enteredPassword.length;
-      if (passwordLength <= PasswordStrength.WEAK) {
-        setPasswordStrength(PasswordStrength.WEAK);
-      } else if (passwordLength <= PasswordStrength.MEDIUM) {
-        setPasswordStrength(PasswordStrength.MEDIUM);
-      } else if (passwordLength >= PasswordStrength.STRONG) {
-        setPasswordStrength(PasswordStrength.MEDIUM);
-      }
+      setPasswordStrength(score);
     }
+
     return () => {
-      setPasswordStrength(PasswordStrength.EMPTY);
+      setPasswordStrength(PasswordStrength.NoScore);
     };
   }, [enteredPassword, setPasswordStrength]);
 
@@ -223,9 +224,9 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
     setEnteredPassword(event.currentTarget.value);
   };
 
-  function renderStrengthBar() {
+  const renderStrengthBar = () => {
     if (enteredPassword !== '') {
-      if (enteredPassword.length <= PasswordStrength.WEAK) {
+      if (enteredPasswordLength <= REQUIRED_PASSWORD_LENGTH || score <= PasswordStrength.WeakScore) {
         return (
           <PasswordStrengthContainer>
             <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
@@ -238,7 +239,8 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
           </PasswordStrengthContainer>
         );
       }
-      if (enteredPassword.length <= PasswordStrength.MEDIUM) {
+
+      if (score <= PasswordStrength.AverageScore) {
         return (
           <PasswordStrengthContainer>
             <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
@@ -251,6 +253,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
           </PasswordStrengthContainer>
         );
       }
+
       return (
         <PasswordStrengthContainer>
           <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
@@ -273,7 +276,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         </StrengthBar>
       </PasswordStrengthContainer>
     );
-  }
+  };
 
   return (
     <Container>
@@ -282,12 +285,11 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         <HeaderText>{title}</HeaderText>
       </HeaderContainer>
       <PasswordInputLabel>{inputLabel}</PasswordInputLabel>
-      <PasswordInputContainer hasError={!!error || (createPasswordFlow && (enteredPassword !== '' && enteredPassword.length <= PasswordStrength.WEAK))}>
+      <PasswordInputContainer hasError={!!error || (!!createPasswordFlow && (enteredPassword !== '' && enteredPasswordLength <= REQUIRED_PASSWORD_LENGTH))}>
         <Input
           type={isPasswordVisible ? 'text' : 'password'}
           value={enteredPassword}
           onChange={handlePasswordChange}
-
         />
         <Button onClick={handleTogglePasswordView}>
           <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
@@ -306,7 +308,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
           <ActionButton
             processing={loading}
-            disabled={!enteredPassword || enteredPassword.length <= PasswordStrength.WEAK}
+            disabled={!enteredPassword || (!!checkPasswordStrength && score <= PasswordStrength.WeakScore)}
             text={t('CONTINUE_BUTTON')}
             onPress={handleContinue}
           />

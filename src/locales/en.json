@@ -193,7 +193,7 @@
     "PASSWORD_STRENGTH_WEAK": "Weak",
     "PASSWORD_STRENGTH_MEDIUM": "Medium",
     "PASSWORD_STRENGTH_STRONG": "Strong",
-    "PASSWORD_STRENGTH_ERROR": "You need to enter a stronger password",
+    "PASSWORD_STRENGTH_ERROR": "Your password should be at least 9 characters long. Use a mix of uppercase letters, lowercase letters, numbers, and symbols",
     "CONFIRM_PASSWORD_MATCH_ERROR": "Please make sure your passwords match",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
