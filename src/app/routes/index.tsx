@@ -175,7 +175,11 @@ const router = createHashRouter([
       },
       {
         path: 'restoreWallet',
-        element: <RestoreWallet />,
+        element: (
+          <WalletExistsGuard>
+            <RestoreWallet />
+          </WalletExistsGuard>
+        ),
       },
       {
         path: 'forgotPassword',
