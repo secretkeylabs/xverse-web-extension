@@ -62,8 +62,11 @@ const CheckBoxContainer = styled.div((props) => ({
   margin: props.theme.spacing(8),
   display: 'flex',
   justifyContent: 'center',
-  cursor: 'pointer',
   userSelect: 'none',
+}));
+
+const CheckBoxWrapper = styled.div(() => ({
+  cursor: 'pointer',
 }));
 
 function WalletExists(): JSX.Element {
@@ -86,12 +89,14 @@ function WalletExists(): JSX.Element {
         <Subtitle>{t('SCREEN_SUBTITLE')}</Subtitle>
       </ContentContainer>
       <CheckBoxContainer>
-        <CheckBox
-          checkBoxLabel={t('UNDERSTAND')}
-          isChecked={userAccepted}
-          checkBoxId="backup"
-          onCheck={handleToggleAccept}
-        />
+        <CheckBoxWrapper>
+          <CheckBox
+            checkBoxLabel={t('UNDERSTAND')}
+            isChecked={userAccepted}
+            checkBoxId="backup"
+            onCheck={handleToggleAccept}
+          />
+        </CheckBoxWrapper>
       </CheckBoxContainer>
       <ContinueButton onClick={handleClose} disabled={!userAccepted}>
         {t('CLOSE_TAB')}

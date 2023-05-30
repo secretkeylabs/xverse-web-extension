@@ -7,7 +7,6 @@ import {
   ChangeNetworkKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
-  DisableWalletExistsGuardKey,
   FetchAccountKey,
   GetActiveAccountsKey,
   LockWalletKey,
@@ -58,7 +57,6 @@ const initialWalletState: WalletState = {
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
-  walletExistsGuardEnabled: true,
 };
 
 const walletReducer = (
@@ -191,11 +189,6 @@ const walletReducer = (
       return {
         ...state,
         brcCoinsList: action.brcCoinsList,
-      };
-    case DisableWalletExistsGuardKey:
-      return {
-        ...state,
-        walletExistsGuardEnabled: false,
       };
     default:
       return state;

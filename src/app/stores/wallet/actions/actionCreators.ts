@@ -51,12 +51,6 @@ export function resetWalletAction(): actions.ResetWallet {
   };
 }
 
-export function disableWalletExistsGuardAction(): actions.DisableWalletExistsGuard {
-  return {
-    type: actions.DisableWalletExistsGuardKey,
-  };
-}
-
 export function fetchAccountAction(
   selectedAccount: Account,
   accountsList: Account[],
