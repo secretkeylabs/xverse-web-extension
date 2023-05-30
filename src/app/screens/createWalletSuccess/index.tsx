@@ -1,3 +1,4 @@
+import WarningIcon from '@assets/img/Warning.svg';
 import CheckCircle from '@assets/img/createWalletSuccess/CheckCircle.svg';
 import Extension from '@assets/img/createWalletSuccess/extension.svg';
 import Logo from '@assets/img/createWalletSuccess/logo.svg';
@@ -79,6 +80,11 @@ const ContinueButton = styled.button((props) => ({
   },
 }));
 
+const Icon = styled.img(() => ({
+  width: 88,
+  height: 88,
+}));
+
 const actionToKeyMap: Record<string, { title: string; subTitle: string }> = {
   create: {
     title: 'SCREEN_TITLE',
@@ -103,10 +109,12 @@ function CreateWalletSuccess(): JSX.Element {
 
   const actionTranslateKeys = actionToKeyMap[action ?? 'create'];
 
+  const icon = action === 'exists' ? WarningIcon : CheckCircle;
+
   return (
     <>
       <ContentContainer>
-        <img src={CheckCircle} alt="success" />
+        <Icon src={icon} alt="success" />
         <Title>{t(actionTranslateKeys.title)}</Title>
         <Subtitle>{t(actionTranslateKeys.subTitle)}</Subtitle>
       </ContentContainer>
