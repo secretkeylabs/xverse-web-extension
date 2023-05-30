@@ -49,6 +49,7 @@ import SignatureRequest from '@screens/signatureRequest';
 import Stacking from '@screens/stacking';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
 
 const router = createHashRouter([
@@ -136,6 +137,10 @@ const router = createHashRouter([
       {
         path: 'wallet-success/:action',
         element: <CreateWalletSuccess />,
+      },
+      {
+        path: 'wallet-exists',
+        element: <WalletExists />,
       },
       {
         path: 'transaction-request',

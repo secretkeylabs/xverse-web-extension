@@ -3,6 +3,7 @@ import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
+import { DisableWalletExistsGuardKey } from './wallet/actions/types';
 import walletReducer from './wallet/reducer';
 
 export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
@@ -34,7 +35,7 @@ const rootStore = (() => {
   const storeMiddleware = [
     createStateSyncMiddleware({
       // We don't want to sync the redux-persist actions
-      blacklist: ['persist/PERSIST', 'persist/REHYDRATE'],
+      blacklist: ['persist/PERSIST', 'persist/REHYDRATE', DisableWalletExistsGuardKey],
     }),
   ];
   const store = createStore(persistedReducer, applyMiddleware(...storeMiddleware));

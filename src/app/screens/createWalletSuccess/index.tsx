@@ -1,4 +1,3 @@
-import WarningIcon from '@assets/img/Warning.svg';
 import CheckCircle from '@assets/img/createWalletSuccess/CheckCircle.svg';
 import Extension from '@assets/img/createWalletSuccess/extension.svg';
 import Logo from '@assets/img/createWalletSuccess/logo.svg';
@@ -80,26 +79,6 @@ const ContinueButton = styled.button((props) => ({
   },
 }));
 
-const Icon = styled.img(() => ({
-  width: 88,
-  height: 88,
-}));
-
-const actionToKeyMap: Record<string, { title: string; subTitle: string }> = {
-  create: {
-    title: 'SCREEN_TITLE',
-    subTitle: 'SCREEN_SUBTITLE',
-  },
-  restore: {
-    title: 'RESTORE_SCREEN_TITLE',
-    subTitle: 'RESTORE_SCREEN_SUBTITLE',
-  },
-  exists: {
-    title: 'EXISTS_SCREEN_TITLE',
-    subTitle: 'EXISTS_SCREEN_SUBTITLE',
-  },
-};
-
 function CreateWalletSuccess(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'WALLET_SUCCESS_SCREEN' });
   const { action } = useParams();
@@ -107,16 +86,12 @@ function CreateWalletSuccess(): JSX.Element {
     window.close();
   };
 
-  const actionTranslateKeys = actionToKeyMap[action ?? 'create'];
-
-  const icon = action === 'exists' ? WarningIcon : CheckCircle;
-
   return (
     <>
       <ContentContainer>
-        <Icon src={icon} alt="success" />
-        <Title>{t(actionTranslateKeys.title)}</Title>
-        <Subtitle>{t(actionTranslateKeys.subTitle)}</Subtitle>
+        <img src={CheckCircle} alt="success" />
+        <Title>{action === 'restore' ? t('RESTORE_SCREEN_TITLE') : t('SCREEN_TITLE')}</Title>
+        <Subtitle>{action === 'restore' ? t('RESTORE_SCREEN_SUBTITLE') : t('SCREEN_SUBTITLE')}</Subtitle>
       </ContentContainer>
       <ContinueButton onClick={handleOpenWallet}>{t('CLOSE_TAB')}</ContinueButton>
       <InstructionsContainer>
@@ -134,6 +109,7 @@ function CreateWalletSuccess(): JSX.Element {
           <InstructionsText>{t('OPEN_WALLET')}</InstructionsText>
         </RowContainer>
       </InstructionsContainer>
+
     </>
   );
 }

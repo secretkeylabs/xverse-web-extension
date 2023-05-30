@@ -38,7 +38,7 @@ export function storeEncryptedSeedAction(encryptedSeed: string): actions.StoreEn
   };
 }
 
-export function setWalletSeedPhraseAction(seedPhrase: string) : actions.SetWalletSeedPhrase {
+export function setWalletSeedPhraseAction(seedPhrase: string): actions.SetWalletSeedPhrase {
   return {
     type: actions.SetWalletSeedPhraseKey,
     seedPhrase,
@@ -48,6 +48,12 @@ export function setWalletSeedPhraseAction(seedPhrase: string) : actions.SetWalle
 export function resetWalletAction(): actions.ResetWallet {
   return {
     type: actions.ResetWalletKey,
+  };
+}
+
+export function disableWalletExistsGuardAction(): actions.DisableWalletExistsGuard {
+  return {
+    type: actions.DisableWalletExistsGuardKey,
   };
 }
 
@@ -160,7 +166,9 @@ export function FetchUpdatedVisibleCoinListAction(
   };
 }
 
-export function ChangeFiatCurrencyAction(fiatCurrency: SupportedCurrency): actions.ChangeFiatCurrency {
+export function ChangeFiatCurrencyAction(
+  fiatCurrency: SupportedCurrency,
+): actions.ChangeFiatCurrency {
   return {
     type: actions.ChangeFiatCurrencyKey,
     fiatCurrency,
@@ -180,39 +188,41 @@ export function ChangeNetworkAction(
   };
 }
 
-export function getActiveAccountsAction(
-  accountsList: Account[],
-): actions.GetActiveAccounts {
+export function getActiveAccountsAction(accountsList: Account[]): actions.GetActiveAccounts {
   return {
     type: actions.GetActiveAccountsKey,
     accountsList,
   };
 }
 
-export function ChangeActivateOrdinalsAction(hasActivatedOrdinalsKey: boolean): actions.ChangeActivateOrdinals {
+export function ChangeActivateOrdinalsAction(
+  hasActivatedOrdinalsKey: boolean,
+): actions.ChangeActivateOrdinals {
   return {
     type: actions.ChangeHasActivatedOrdinalsKey,
     hasActivatedOrdinalsKey,
   };
 }
 
-export function ChangeShowBtcReceiveAlertAction(showBtcReceiveAlert: boolean | null): actions.ChangeShowBtcReceiveAlert {
+export function ChangeShowBtcReceiveAlertAction(
+  showBtcReceiveAlert: boolean | null,
+): actions.ChangeShowBtcReceiveAlert {
   return {
     type: actions.ChangeShowBtcReceiveAlertKey,
     showBtcReceiveAlert,
   };
 }
 
-export function ChangeShowOrdinalReceiveAlertAction(showOrdinalReceiveAlert: boolean | null): actions.ChangeShowOrdinalReceiveAlert {
+export function ChangeShowOrdinalReceiveAlertAction(
+  showOrdinalReceiveAlert: boolean | null,
+): actions.ChangeShowOrdinalReceiveAlert {
   return {
     type: actions.ChangeShowOrdinalReceiveAlertKey,
     showOrdinalReceiveAlert,
   };
 }
 
-export function setBrcCoinsDataAction(
-  brcCoinsList: FungibleToken[],
-): actions.SetBrcCoinsData {
+export function setBrcCoinsDataAction(brcCoinsList: FungibleToken[]): actions.SetBrcCoinsData {
   return {
     type: actions.SetBrcCoinsListKey,
     brcCoinsList,

@@ -206,9 +206,13 @@
     "OPEN_WALLET": "to open your wallet",
     "RESTORE_SCREEN_TITLE": "Wallet restored",
     "RESTORE_SCREEN_SUBTITLE": "Your wallet has been successfully restored.",
-    "EXISTS_SCREEN_TITLE": "Wallet exists",
-    "EXISTS_SCREEN_SUBTITLE": "A wallet was created or restored in another tab. Any seed phrases generated in this tab will not be valid. If unsure, please create a new wallet or restore from your backed up seed phrase.",
     "SEARCH_XVERSE": "Locate Xverse and click"
+  },
+  "WALLET_EXISTS_SCREEN": {
+    "CLOSE_TAB": "Close this tab",
+    "SCREEN_TITLE": "Wallet exists",
+    "SCREEN_SUBTITLE": "A wallet was created or restored in another tab. Any seed phrases generated in this tab will not be valid. If unsure, please create a new wallet or restore from your backed up seed phrase.",
+    "UNDERSTAND": "I understand"
   },
   "CONFIRM_TRANSACTION_SCREEN": {
     "CONFIRM_BUTTON": "Confirm",
@@ -230,6 +234,7 @@
     "FORGOT_PASSWORD_BUTTON": "Forgot your password?"
   },
   "FORGOT_PASSWORD_SCREEN": {
+    "TITLE": "Forgot Password",
     "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seedphrase you used when you generated your wallet.",
     "PARAGRAPH2": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
     "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"

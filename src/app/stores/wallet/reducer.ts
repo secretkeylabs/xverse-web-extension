@@ -1,30 +1,31 @@
-import BigNumber from 'bignumber.js';
 import { initialNetworksList } from '@utils/constants';
+import BigNumber from 'bignumber.js';
 import {
-  StoreEncryptedSeedKey,
-  WalletActions,
-  SetWalletKey,
-  ResetWalletKey,
-  WalletState,
-  UnlockWalletKey,
-  LockWalletKey,
-  FetchAccountKey,
-  SelectAccountKey,
-  SetBtcWalletDataKey,
-  SetCoinDataKey,
   AddAccountKey,
-  UpdateVisibleCoinListKey,
-  SetFeeMultiplierKey,
   ChangeFiatCurrencyKey,
-  ChangeNetworkKey,
-  GetActiveAccountsKey,
-  SetWalletSeedPhraseKey,
-  SetStxWalletDataKey,
-  SetCoinRatesKey,
   ChangeHasActivatedOrdinalsKey,
+  ChangeNetworkKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
+  DisableWalletExistsGuardKey,
+  FetchAccountKey,
+  GetActiveAccountsKey,
+  LockWalletKey,
+  ResetWalletKey,
+  SelectAccountKey,
   SetBrcCoinsListKey,
+  SetBtcWalletDataKey,
+  SetCoinDataKey,
+  SetCoinRatesKey,
+  SetFeeMultiplierKey,
+  SetStxWalletDataKey,
+  SetWalletKey,
+  SetWalletSeedPhraseKey,
+  StoreEncryptedSeedKey,
+  UnlockWalletKey,
+  UpdateVisibleCoinListKey,
+  WalletActions,
+  WalletState,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -57,6 +58,7 @@ const initialWalletState: WalletState = {
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
+  walletExistsGuardEnabled: true,
 };
 
 const walletReducer = (
@@ -189,6 +191,11 @@ const walletReducer = (
       return {
         ...state,
         brcCoinsList: action.brcCoinsList,
+      };
+    case DisableWalletExistsGuardKey:
+      return {
+        ...state,
+        walletExistsGuardEnabled: false,
       };
     default:
       return state;

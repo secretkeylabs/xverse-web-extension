@@ -1,17 +1,18 @@
 import {
+  Account,
+  BaseWallet,
   Coin,
   FeesMultipliers,
   FungibleToken,
+  SettingsNetwork,
   SupportedCurrency,
   TransactionData,
-  Account,
-  BaseWallet,
-  SettingsNetwork,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 
 export const SetWalletKey = 'SetWallet';
 export const ResetWalletKey = 'ResetWallet';
+export const DisableWalletExistsGuardKey = 'DisableWalletExistsGuard';
 export const FetchAccountKey = 'FetchAccount';
 export const SelectAccountKey = 'SelectAccount';
 export const UnlockWalletKey = 'UnlockWallet';
@@ -71,6 +72,7 @@ export interface WalletState {
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
   btcApiUrl: string;
+  walletExistsGuardEnabled: boolean;
 }
 
 export interface SetWallet {
@@ -102,6 +104,10 @@ export interface LockWallet {
 }
 export interface ResetWallet {
   type: typeof ResetWalletKey;
+}
+
+export interface DisableWalletExistsGuard {
+  type: typeof DisableWalletExistsGuardKey;
 }
 
 export interface FetchAccount {
@@ -216,4 +222,5 @@ export type WalletActions =
   | ChangeActivateOrdinals
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
-  | SetBrcCoinsData;
+  | SetBrcCoinsData
+  | DisableWalletExistsGuard;
