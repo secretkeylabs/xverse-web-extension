@@ -29,6 +29,7 @@ const ValueText = styled.h1((props) => ({
 const SubValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
+  textAlign: 'right',
   color: props.theme.colors.white[400],
 }));
 
