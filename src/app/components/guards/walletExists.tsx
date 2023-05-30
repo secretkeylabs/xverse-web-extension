@@ -9,7 +9,7 @@ interface WalletExistsGuardProps {
 function WalletExistsGuard({ children }: WalletExistsGuardProps): React.ReactElement {
   const { encryptedSeed } = useWalletSelector();
   const hydrated = useHasStateRehydrated();
-  if (hydrated && encryptedSeed) return <Navigate to="/wallet-success/restore" />;
+  if (hydrated && encryptedSeed) return <Navigate to="/wallet-success/exists" />;
 
   return children;
 }

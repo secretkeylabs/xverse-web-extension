@@ -1,10 +1,10 @@
 import CheckCircle from '@assets/img/createWalletSuccess/CheckCircle.svg';
 import Extension from '@assets/img/createWalletSuccess/extension.svg';
-import Pin from '@assets/img/createWalletSuccess/pin.svg';
 import Logo from '@assets/img/createWalletSuccess/logo.svg';
+import Pin from '@assets/img/createWalletSuccess/pin.svg';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
 const InstructionsContainer = styled.div((props) => ({
   display: 'flex',
@@ -79,6 +79,21 @@ const ContinueButton = styled.button((props) => ({
   },
 }));
 
+const actionToKeyMap: Record<string, { title: string; subTitle: string }> = {
+  create: {
+    title: 'SCREEN_TITLE',
+    subTitle: 'SCREEN_SUBTITLE',
+  },
+  restore: {
+    title: 'RESTORE_SCREEN_TITLE',
+    subTitle: 'RESTORE_SCREEN_SUBTITLE',
+  },
+  exists: {
+    title: 'EXISTS_SCREEN_TITLE',
+    subTitle: 'EXISTS_SCREEN_SUBTITLE',
+  },
+};
+
 function CreateWalletSuccess(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'WALLET_SUCCESS_SCREEN' });
   const { action } = useParams();
@@ -86,12 +101,14 @@ function CreateWalletSuccess(): JSX.Element {
     window.close();
   };
 
+  const actionTranslateKeys = actionToKeyMap[action ?? 'create'];
+
   return (
     <>
       <ContentContainer>
         <img src={CheckCircle} alt="success" />
-        <Title>{action === 'restore' ? t('RESTORE_SCREEN_TITLE') : t('SCREEN_TITLE')}</Title>
-        <Subtitle>{action === 'restore' ? t('RESTORE_SCREEN_SUBTITLE') : t('SCREEN_SUBTITLE')}</Subtitle>
+        <Title>{t(actionTranslateKeys.title)}</Title>
+        <Subtitle>{t(actionTranslateKeys.subTitle)}</Subtitle>
       </ContentContainer>
       <ContinueButton onClick={handleOpenWallet}>{t('CLOSE_TAB')}</ContinueButton>
       <InstructionsContainer>
@@ -109,7 +126,6 @@ function CreateWalletSuccess(): JSX.Element {
           <InstructionsText>{t('OPEN_WALLET')}</InstructionsText>
         </RowContainer>
       </InstructionsContainer>
-
     </>
   );
 }
