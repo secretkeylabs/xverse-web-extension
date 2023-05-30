@@ -132,7 +132,6 @@ function RestoreBtc() {
 
   useEffect(() => {
     if (signedNonOrdinalBtcSend) {
-      console.log(ordinalsFee)
       navigate('/confirm-btc-tx', {
         state: {
           signedTxHex: signedNonOrdinalBtcSend.signedTx,
