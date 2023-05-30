@@ -55,7 +55,9 @@ function ConfirmBtcTransaction() {
   );
 
   const onClick = () => {
-    navigate('/recover-ordinals');
+    navigate('/recover-ordinals', {
+      state: { isRestoreFundFlow: true },
+    });
   };
 
   const onContinueButtonClick = () => {
