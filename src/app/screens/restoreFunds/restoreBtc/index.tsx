@@ -86,7 +86,7 @@ function RestoreBtc() {
 
   const { data: ordinalsFee } = useQuery({
     queryKey: [`getFee-${ordinalsAddress}`],
-    queryFn: () => getBtcFeesForNonOrdinalBtcSend(btcAddress, unspentUtxos, ordinalsAddress, 'Mainnet'),
+    queryFn: () => getBtcFeesForNonOrdinalBtcSend(btcAddress, unspentUtxos, ordinalsAddress, network.type),
   });
 
   const {
