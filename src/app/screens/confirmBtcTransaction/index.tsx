@@ -104,7 +104,7 @@ function ConfirmBtcTransaction() {
           state: {
             txid: btcOrdinalTxBroadcastData.tx.hash,
             currency: 'BTC',
-            isNft: true,
+            isOrdinal: true,
             error: '',
           },
         });
