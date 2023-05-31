@@ -203,10 +203,16 @@
     "CLOSE_TAB": "Close this tab",
     "CLICK": "Click",
     "THEN": "then",
-    "OPEN_WALLET":"to open your wallet",
+    "OPEN_WALLET": "to open your wallet",
     "RESTORE_SCREEN_TITLE": "Wallet restored",
     "RESTORE_SCREEN_SUBTITLE": "Your wallet has been successfully restored.",
     "SEARCH_XVERSE": "Locate Xverse and click"
+  },
+  "WALLET_EXISTS_SCREEN": {
+    "CLOSE_TAB": "Close this tab",
+    "SCREEN_TITLE": "Wallet exists",
+    "SCREEN_SUBTITLE": "A wallet was created or restored in another tab. Any seed phrases generated in this tab will not be valid. If unsure, please create a new wallet or restore from your backed up seed phrase.",
+    "UNDERSTAND": "I understand"
   },
   "CONFIRM_TRANSACTION_SCREEN": {
     "CONFIRM_BUTTON": "Confirm",
@@ -228,6 +234,7 @@
     "FORGOT_PASSWORD_BUTTON": "Forgot your password?"
   },
   "FORGOT_PASSWORD_SCREEN": {
+    "TITLE": "Forgot Password",
     "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seedphrase you used when you generated your wallet.",
     "PARAGRAPH2": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
     "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"
@@ -275,7 +282,7 @@
     "ORDINAL": "Ordinal",
     "INSCRIPTION": "Inscription",
     "ACTIVATE_ORDINALS": "Activate Ordinals",
-    "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
+    "ACTIVATE_ORDINALS_INFO": "You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
     "COPIED": "Copied!",
@@ -384,7 +391,7 @@
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
     "TESTNET": "Testnet",
-    "ORDINALS":"Ordinals",
+    "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets"
   },
@@ -467,8 +474,8 @@
     "SPONSORED": "Sponsored",
     "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
   },
-  "DEPLOY_CONTRACT_REQUEST":{
-    "DEPLOY_CONTRACT":"deploy-contract",
+  "DEPLOY_CONTRACT_REQUEST": {
+    "DEPLOY_CONTRACT": "deploy-contract",
     "CONTRACT_NAME": "Contract name",
     "SOURCE_CODE": "Source code",
     "VIEW_SOURCE_CODE": "View contract code",
@@ -511,7 +518,7 @@
     "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals & BRC-20 tokens.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
-},
+  },
   "SELECT_BTC_ADDRESS_SCREEN": {
     "TITLE": "Bitcoin Address Request",
     "ACCOUNT": "Account",

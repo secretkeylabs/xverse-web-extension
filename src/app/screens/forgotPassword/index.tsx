@@ -81,7 +81,7 @@ function ForgotPassword(): JSX.Element {
 
   return (
     <Container>
-      <BackHeader headerText="Forgot Password" onPressBack={onBack} />
+      <BackHeader headerText={t('TITLE')} onPressBack={onBack} />
       <Paragraph>{t('PARAGRAPH1')}</Paragraph>
       <Paragraph>{t('PARAGRAPH2')}</Paragraph>
       <BottomContainer>
