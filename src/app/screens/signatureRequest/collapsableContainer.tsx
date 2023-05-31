@@ -9,6 +9,7 @@ interface Props {
   title: string;
   text: string;
   children: React.ReactNode;
+  initialValue?: boolean;
 }
 
 const ContentContainer = styled.div((props) => ({
@@ -61,12 +62,10 @@ const Text = styled.p((props) => ({
 }));
 
 export default function CollapsableContainer(props: Props) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const { title, children, text, initialValue } = props;
+  const [isExpanded, setIsExpanded] = useState(initialValue);
   const [showArrow, setShowArrow] = useState(true);
   const [infoText, setInfoText] = useState('');
-  const {
-    title, children, text,
-  } = props;
 
   useEffect(() => {
     setInfoText(text);

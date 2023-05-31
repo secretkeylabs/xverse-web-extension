@@ -80,7 +80,7 @@ function AccountList(): JSX.Element {
         network,
       ),
     );
-    navigate(-1);
+    navigate('/');
   };
 
   const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;

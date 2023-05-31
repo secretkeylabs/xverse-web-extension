@@ -3,19 +3,22 @@ import ConfirmScreen from '@components/confirmScreen';
 import useSignatureRequest, {
   isStructuredMessage,
   isUtf8Message,
+  useSignBip322Message,
   useSignMessage,
 } from '@hooks/useSignatureRequest';
 import AccountHeaderComponent from '@components/accountHeader';
 import { useTranslation } from 'react-i18next';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { bytesToHex } from '@stacks/transactions';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { getNetworkType } from '@utils/helper';
+import { getNetworkType, getTruncatedAddress } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
-import { hashMessage } from '@secretkeylabs/xverse-core';
+import { hashMessage } from '@secretkeylabs/xverse-core/wallet';
+import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
@@ -32,20 +35,62 @@ const MainContainer = styled.div((props) => ({
 
 const RequestType = styled.h1((props) => ({
   ...props.theme.headline_s,
-  marginTop: props.theme.spacing(21),
+  marginTop: props.theme.spacing(11),
   color: props.theme.colors.white[0],
   textAlign: 'left',
+  marginBottom: props.theme.spacing(4),
 }));
 
 const RequestSource = styled.h2((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[400],
-  marginTop: props.theme.spacing(4),
   textAlign: 'left',
   marginBottom: props.theme.spacing(12),
 }));
 
 const MessageHash = styled.p((props) => ({
+  ...props.theme.body_medium_m,
+  textAlign: 'left',
+  lineHeight: 1.6,
+  wordWrap: 'break-word',
+  color: props.theme.colors.white[0],
+  marginBottom: props.theme.spacing(4),
+}));
+
+const SigningAddressContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  background: props.theme.colors.background.elevation1,
+  borderRadius: 12,
+  padding: '12px 16px',
+  marginBottom: 12,
+  flex: 1,
+}));
+
+const SigningAddressTitle = styled.p((props) => ({
+  ...props.theme.body_medium_m,
+  lineHeight: 1.6,
+  wordWrap: 'break-word',
+  color: props.theme.colors.white[200],
+  marginBottom: props.theme.spacing(4),
+}));
+
+const SigningAddress = styled.div(({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+}));
+
+const SigningAddressType = styled.p((props) => ({
+  ...props.theme.body_medium_m,
+  textAlign: 'left',
+  lineHeight: 1.6,
+  wordWrap: 'break-word',
+  color: props.theme.colors.white[0],
+  marginBottom: props.theme.spacing(4),
+}));
+
+const SigningAddressValue = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
   lineHeight: 1.6,
@@ -64,40 +109,59 @@ const ActionDisclaimer = styled.p((props) => ({
 function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation');
   const [isSigning, setIsSigning] = useState<boolean>(false);
-  const { selectedAccount, accountsList, network } = useWalletSelector();
+  const { accountsList, network } = useWalletSelector();
+  const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
   const {
-    messageType, request, payload, tabId, domain,
+    messageType, request, payload, tabId, domain, isSignMessageBip322,
   } = useSignatureRequest();
   const navigate = useNavigate();
+
+  const checkAddressAvailability = () => {
+    const account = accountsList.filter((acc) => {
+      if (acc.btcAddress === payload.address) {
+        setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_SEGWIT'));
+        return true;
+      }
+      if (acc.ordinalsAddress === payload.address) {
+        setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TAPROOT'));
+        return true;
+      }
+      if (acc.stxAddress === payload.stxAddress) {
+        setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_STX'));
+        return true;
+      }
+      return false;
+    });
+    return account[0];
+  };
+
   const switchAccountBasedOnRequest = () => {
-    if (getNetworkType(payload.network) !== network.type) {
+    if (!isSignMessageBip322 && getNetworkType(payload.network) !== network.type) {
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'STX',
-          error:
-            'There’s a mismatch between your active network and the network you’re logged with.',
+          errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
+          error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
           browserTx: true,
         },
       });
       return;
     }
-    if (payload.stxAddress !== selectedAccount?.stxAddress) {
-      const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
-      if (account) {
-        switchAccount(account);
-      } else {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'STX',
-            error:
-              'There’s a mismatch between your active  address and the address you’re logged with.',
-            browserTx: true,
-          },
-        });
-      }
+    const account = checkAddressAvailability();
+    if (account) {
+      switchAccount(account);
+    } else {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'STX',
+          errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
+          error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
+          browserTx: true,
+        },
+      });
     }
   };
 
@@ -107,6 +171,8 @@ function SignatureRequest(): JSX.Element {
 
   const handleMessageSigning = useSignMessage(messageType);
 
+  const handleBip322MessageSigning = useSignBip322Message(payload.message, payload.address);
+
   const cancelCallback = () => {
     finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: 'cancel' });
     window.close();
@@ -115,12 +181,26 @@ function SignatureRequest(): JSX.Element {
   const confirmCallback = async () => {
     try {
       setIsSigning(true);
-      const signature = await handleMessageSigning({
-        message: payload.message,
-        domain: domain || undefined,
-      });
-      if (signature) {
-        finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: signature });
+      if (!isSignMessageBip322) {
+        const signature = await handleMessageSigning({
+          message: payload.message,
+          domain: domain || undefined,
+        });
+        if (signature) {
+          finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: signature });
+        }
+      } else {
+        const bip322signature = await handleBip322MessageSigning();
+        const signingMessage = {
+          source: MESSAGE_SOURCE,
+          method: ExternalSatsMethods.signMessageResponse,
+          payload: {
+            signMessageRequest: request,
+            signMessageResponse: bip322signature,
+          },
+        };
+        chrome.tabs.sendMessage(+tabId, signingMessage);
+        window.close();
       }
     } catch (err) {
       console.log(err);
@@ -128,6 +208,13 @@ function SignatureRequest(): JSX.Element {
       setIsSigning(false);
     }
   };
+
+  const getMessageHash = useCallback(() => {
+    if (!isSignMessageBip322) {
+      return bytesToHex(hashMessage(payload.message));
+    }
+    return bip0322Hash(payload.message);
+  }, [isSignMessageBip322]);
 
   return (
     <ConfirmScreen
@@ -140,20 +227,32 @@ function SignatureRequest(): JSX.Element {
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
         <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
-        <RequestSource>{`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}</RequestSource>
-        {isUtf8Message(messageType) && (
-          <SignatureRequestMessage
-            request={payload as SignaturePayload}
-          />
+        {!isSignMessageBip322 ? (
+          <RequestSource>
+            {`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}
+          </RequestSource>
+        ) : null}
+        {(isUtf8Message(messageType) || isSignMessageBip322) && (
+          <SignatureRequestMessage request={payload as SignaturePayload} />
         )}
-        {isStructuredMessage(messageType) && (
-          <SignatureRequestStructuredData
-            payload={payload as StructuredDataSignaturePayload}
-          />
+        {!isSignMessageBip322 && isStructuredMessage(messageType) && (
+          <SignatureRequestStructuredData payload={payload as StructuredDataSignaturePayload} />
         )}
-        <CollapsableContainer text={bytesToHex(hashMessage(payload.message))} title={t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}>
-          <MessageHash>{bytesToHex(hashMessage(payload.message))}</MessageHash>
+        <CollapsableContainer
+          text={getMessageHash()}
+          title={t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}
+        >
+          <MessageHash>{getMessageHash()}</MessageHash>
         </CollapsableContainer>
+        <SigningAddressContainer>
+          <SigningAddressTitle>{t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}</SigningAddressTitle>
+          <SigningAddress>
+            <SigningAddressType>{addressType}</SigningAddressType>
+            <SigningAddressValue>
+              {getTruncatedAddress(payload.address || payload.stxAddress)}
+            </SigningAddressValue>
+          </SigningAddress>
+        </SigningAddressContainer>
         <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
         <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
       </MainContainer>

@@ -1,11 +1,12 @@
+import { useWalletExistsGuardContext } from '@components/guards/walletExists';
+import PasswordInput from '@components/passwordInput';
+import Steps from '@components/steps';
+import useWalletReducer from '@hooks/useWalletReducer';
 import * as bip39 from 'bip39';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import useWalletReducer from '@hooks/useWalletReducer';
-import Steps from '@components/steps';
-import PasswordInput from '@components/passwordInput';
 import EnterSeedPhrase from './enterSeedphrase';
 
 const Container = styled.div((props) => ({
@@ -17,7 +18,6 @@ const Container = styled.div((props) => ({
   width: 360,
   backgroundColor: props.theme.colors.background.elevation0,
   padding: `${props.theme.spacing(12)}px ${props.theme.spacing(8)}px 0 ${props.theme.spacing(8)}px`,
-
 }));
 
 const PasswordContainer = styled.div((props) => ({
@@ -38,6 +38,7 @@ function RestoreWallet(): JSX.Element {
   const [seedError, setSeedError] = useState<string>('');
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
+  const { disableWalletExistsGuard } = useWalletExistsGuardContext();
 
   const cleanMnemonic = (rawSeed: string): string => rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
@@ -74,6 +75,9 @@ function RestoreWallet(): JSX.Element {
     setIsRestoring(true);
     if (confirmPassword === password) {
       setError('');
+
+      disableWalletExistsGuard?.();
+
       const seed = cleanMnemonic(seedPhrase);
       await restoreWallet(seed, password);
       setIsRestoring(false);

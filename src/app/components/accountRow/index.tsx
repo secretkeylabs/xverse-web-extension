@@ -9,7 +9,7 @@ import BarLoader from '@components/barLoader';
 import Copy from '@assets/img/Copy.svg';
 import { LoaderSize } from '@utils/constants';
 import { Account } from '@secretkeylabs/xverse-core';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -153,6 +153,13 @@ function AccountRow({
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
   const dispatch = useDispatch();
+  const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
+  const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
+
+  useEffect(() => () => {
+    clearTimeout(btcCopiedTooltipTimeoutRef.current);
+    clearTimeout(stxCopiedTooltipTimeoutRef.current);
+  }, []);
 
   function getName() {
     return account?.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
@@ -162,13 +169,19 @@ function AccountRow({
     navigator.clipboard.writeText(account?.btcAddress!);
     setOnBtcCopied(true);
     setOnStxCopied(false);
-    if (showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
+    // set 'Copied' text back to 'Bitcoin address' after 3 seconds
+    btcCopiedTooltipTimeoutRef.current = setTimeout(() => setOnBtcCopied(false), 3000);
+    if (showBtcReceiveAlert !== null) {
+      dispatch(ChangeShowBtcReceiveAlertAction(true));
+    }
   };
 
   const handleOnStxAddressClick = () => {
     navigator.clipboard.writeText(account?.stxAddress!);
     setOnStxCopied(true);
     setOnBtcCopied(false);
+    // set 'Copied' text back to 'Stacks address' after 3 seconds
+    stxCopiedTooltipTimeoutRef.current = setTimeout(() => setOnStxCopied(false), 3000);
   };
 
   const onRowClick = () => {

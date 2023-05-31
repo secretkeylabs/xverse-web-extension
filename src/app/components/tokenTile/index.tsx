@@ -100,6 +100,7 @@ const SubText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['400'],
   fontSize: 12,
+  textAlign: 'left',
 }));
 
 const FiatAmountText = styled.h1((props) => ({
@@ -113,6 +114,29 @@ const CoinBalanceText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white['0'],
   textAlign: 'end',
+}));
+
+const TokenTitleContainer = styled.div({
+  display: 'flex',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+});
+
+const TagContainer = styled.div({
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const ProtocolText = styled.p((props) => ({
+  ...props.theme.headline_category_s,
+  fontWeight: '700',
+  textTransform: 'uppercase',
+  marginLeft: props.theme.spacing(5),
+  backgroundColor: props.theme.colors.white['400'],
+  padding: '2px 6px 1px',
+  borderRadius: props.theme.radius(2),
+  whiteSpace: 'nowrap',
 }));
 
 function TokenLoader() {
@@ -133,6 +157,7 @@ interface Props {
   onPress: (token: {
     coin: CurrencyTypes;
     ft: string | undefined;
+    brc20Ft?: string | undefined;
   }) => void;
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
@@ -167,6 +192,8 @@ function TokenTile({
       case 'BTC':
         return satsToBtc(new BigNumber(btcBalance)).toString();
       case 'FT':
+        return fungibleToken ? getFtBalance(fungibleToken) : '';
+      case 'brc20':
         return fungibleToken ? getFtBalance(fungibleToken) : '';
       default:
     }
@@ -310,16 +337,32 @@ function TokenTile({
     onPress({
       coin: currency as CurrencyTypes,
       ft: fungibleToken && fungibleToken.principal,
+      brc20Ft: !fungibleToken?.principal && fungibleToken?.name,
     });
   };
 
   return (
-    <TileContainer inModel={enlargeTicker} color={underlayColor} margin={margin} onClick={handleTokenPressed}>
+    <TileContainer
+      inModel={enlargeTicker}
+      color={underlayColor}
+      margin={margin}
+      onClick={handleTokenPressed}
+    >
       <RowContainer>
         {renderIcon()}
         <TextContainer>
+
           <CoinTickerText>{getTickerTitle()}</CoinTickerText>
-          <SubText>{title}</SubText>
+          <TokenTitleContainer>
+            <SubText>{title}</SubText>
+            {fungibleToken?.protocol ? (
+              <TagContainer>
+                <ProtocolText>
+                  {fungibleToken?.protocol === 'stacks' ? 'Sip-10' : fungibleToken?.protocol}
+                </ProtocolText>
+              </TagContainer>
+            ) : null}
+          </TokenTitleContainer>
         </TextContainer>
       </RowContainer>
       {loading ? (

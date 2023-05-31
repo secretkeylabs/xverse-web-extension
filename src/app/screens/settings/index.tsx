@@ -123,7 +123,7 @@ function Setting() {
   };
 
   const onRestoreFundClick = () => {
-    navigate('restore-funds', {
+    navigate('/restore-funds', {
       state: {
         unspentUtxos,
       },
@@ -136,9 +136,10 @@ function Setting() {
       setPassword('');
       setError('');
       handleResetWallet();
-      setLoading(false);
     } catch (e) {
       setError(t('INCORRECT_PASSWORD_ERROR'));
+    } finally {
+      setLoading(false);
     }
   };
 

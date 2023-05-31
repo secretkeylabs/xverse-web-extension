@@ -1,10 +1,10 @@
 import CheckCircle from '@assets/img/createWalletSuccess/CheckCircle.svg';
 import Extension from '@assets/img/createWalletSuccess/extension.svg';
-import Pin from '@assets/img/createWalletSuccess/pin.svg';
 import Logo from '@assets/img/createWalletSuccess/logo.svg';
+import Pin from '@assets/img/createWalletSuccess/pin.svg';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
 const InstructionsContainer = styled.div((props) => ({
   display: 'flex',
@@ -50,6 +50,7 @@ const Title = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
+  fontSize: 20,
 }));
 
 const Subtitle = styled.h2((props) => ({
@@ -60,8 +61,8 @@ const Subtitle = styled.h2((props) => ({
 }));
 
 const ContinueButton = styled.button((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  ...props.theme.body_bold_m,
+  color: props.theme.colors.background.elevation0,
   backgroundColor: props.theme.colors.action.classic,
   borderRadius: props.theme.radius(1),
   marginLeft: props.theme.spacing(8),

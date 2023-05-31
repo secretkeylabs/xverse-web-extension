@@ -8,6 +8,11 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import styled from 'styled-components';
 import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
+import InfoContainer from '@components/infoContainer';
+import { useTranslation } from 'react-i18next';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import AlertMessage from '@components/alertMessage';
+import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import useBtcClient from '@hooks/useBtcClient';
 
 const BottomBarContainer = styled.h1((props) => ({
@@ -16,13 +21,20 @@ const BottomBarContainer = styled.h1((props) => ({
 
 function ConfirmBtcTransaction() {
   const navigate = useNavigate();
+  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { network, ordinalsAddress, btcAddress } = useWalletSelector();
   const btcClient = useBtcClient();
-  const { ordinalsAddress } = useWalletSelector();
   const [recipientAddress, setRecipientAddress] = useState('');
+  const [signedTx, setSignedTx] = useState<string>('');
+  const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
   const location = useLocation();
   const { refetch } = useBtcWalletData();
   const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos,
+    ordinals: ordinalsInBtc,
+  } = useOrdinalsByAddress(btcAddress);
+  const {
+    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, isBrc20TokenFlow,
+    feePerVByte,
   } = location.state;
 
   const {
@@ -41,6 +53,16 @@ function ConfirmBtcTransaction() {
   } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
     async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
   );
+
+  const onClick = () => {
+    navigate('/recover-ordinals', {
+      state: { isRestoreFundFlow: true },
+    });
+  };
+
+  const onContinueButtonClick = () => {
+    mutate({ signedTx });
+  };
 
   useEffect(() => {
     if (errorBtcOrdinalTransaction) {
@@ -66,6 +88,7 @@ function ConfirmBtcTransaction() {
           txid: btcTxBroadcastData.tx.hash,
           currency: 'BTC',
           error: '',
+          isBrc20TokenFlow,
         },
       });
       setTimeout(() => {
@@ -81,7 +104,7 @@ function ConfirmBtcTransaction() {
           state: {
             txid: btcOrdinalTxBroadcastData.tx.hash,
             currency: 'BTC',
-            isNft: true,
+            isOrdinal: true,
             error: '',
           },
         });
@@ -107,13 +130,14 @@ function ConfirmBtcTransaction() {
   const handleOnConfirmClick = (txHex: string) => {
     if (isRestoreFundFlow) {
       broadcastOrdinalTransaction({ signedTx: txHex });
-    } else {
-      mutate({ signedTx: txHex });
-    }
+    } else if (ordinalsInBtc && ordinalsInBtc.length > 0) {
+      setSignedTx(txHex);
+      setShowOrdinalsDetectedAlert(true);
+    } else mutate({ signedTx: txHex });
   };
 
   const goBackToScreen = () => {
-    if (isRestoreFundFlow) {
+    if (isRestoreFundFlow || isBrc20TokenFlow) {
       navigate(-1);
     } else {
       navigate('/send-btc', {
@@ -124,20 +148,49 @@ function ConfirmBtcTransaction() {
       });
     }
   };
+
+  const onClosePress = () => {
+    setShowOrdinalsDetectedAlert(false);
+  };
+
   return (
     <>
+      {showOrdinalsDetectedAlert && (
+        <AlertMessage
+          title={t('BTC_TRANSFER_DANGER_ALERT_TITLE')}
+          description={t('BTC_TRANSFER_DANGER_ALERT_DESC')}
+          buttonText={t('BACK')}
+          onClose={onClosePress}
+          secondButtonText={t('CONITNUE')}
+          onButtonClick={onClosePress}
+          onSecondButtonClick={onContinueButtonClick}
+          isWarningAlert
+        />
+      )}
+
       <ConfirmBtcTransactionComponent
         fee={fee}
-        recipients={recipient}
+        feePerVByte={feePerVByte}
+        recipients={recipient as Recipient[]}
         loadingBroadcastedTx={isLoading}
         signedTxHex={signedTxHex}
         isRestoreFundFlow={isRestoreFundFlow}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={goBackToScreen}
         onBackButtonClick={goBackToScreen}
-        isRestoreFundFlow={isRestoreFundFlow}
         nonOrdinalUtxos={unspentUtxos}
-      />
+        amount={amount}
+      >
+        {ordinalsInBtc && ordinalsInBtc.length > 0 && (
+        <InfoContainer
+          type="Warning"
+          showWarningBackground
+          bodyText={t('ORDINAL_DETECTED_WARNING')}
+          redirectText={t('ORDINAL_DETECTED_ACTION')}
+          onClick={onClick}
+        />
+        )}
+      </ConfirmBtcTransactionComponent>
       <BottomBarContainer>
         <BottomBar tab="dashboard" />
       </BottomBarContainer>
