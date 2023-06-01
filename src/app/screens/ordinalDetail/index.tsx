@@ -284,6 +284,7 @@ function OrdinalDetailScreen() {
         setNotSupportedOrdinal(false);
       } else setNotSupportedOrdinal(true);
     }
+    return () => setSelectedOrdinalDetails(null);
   }, [selectedOrdinal?.content_type]);
 
   useEffect(() => {
@@ -295,7 +296,6 @@ function OrdinalDetailScreen() {
   }, [textContent]);
 
   const handleBackButtonClick = () => {
-    setSelectedOrdinalDetails(null);
     navigate('/nft-dashboard');
   };
 
