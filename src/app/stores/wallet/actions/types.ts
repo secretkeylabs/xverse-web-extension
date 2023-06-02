@@ -1,12 +1,12 @@
 import {
+  Account,
+  BaseWallet,
   Coin,
   FeesMultipliers,
   FungibleToken,
+  SettingsNetwork,
   SupportedCurrency,
   TransactionData,
-  Account,
-  BaseWallet,
-  SettingsNetwork,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 
@@ -216,4 +216,5 @@ export type WalletActions =
   | ChangeActivateOrdinals
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
-  | SetBrcCoinsData;
+  | SetBrcCoinsData
+  | DisableWalletExistsGuard;

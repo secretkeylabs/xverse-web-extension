@@ -1,4 +1,5 @@
 import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails';
+import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import {
@@ -79,6 +80,7 @@ function OrdinalRow({
   const {
     network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
   } = useWalletSelector();
+  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
   const ordinalData = useInscriptionDetails(ordinal.id);
 
@@ -100,6 +102,7 @@ function OrdinalRow({
   });
 
   useEffect(() => {
+    setSelectedOrdinalDetails(ordinalData?.data!);
     if (signedTx) {
       navigate(`/confirm-ordinal-tx/${ordinal.id}`, {
         state: {
