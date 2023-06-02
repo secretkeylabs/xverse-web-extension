@@ -117,7 +117,7 @@ const Text = styled.h1((props) => ({
 }));
 
 interface Brc20TileProps {
-  brcContent: string;
+  brcContent: { tick: string, amt: string, op: string };
   isNftDashboard?: boolean;
   inNftDetail?: boolean;
   isSmallImage?: boolean;
@@ -126,7 +126,7 @@ interface Brc20TileProps {
 
 export default function Brc20Tile(props: Brc20TileProps) {
   const {
-    brcContent, isSmallImage, isNftDashboard, inNftDetail, isGalleryOpen,
+    brcContent: content, isSmallImage, isNftDashboard, inNftDetail, isGalleryOpen,
   } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   function renderFTIcon(ticker: string) {
@@ -138,11 +138,9 @@ export default function Brc20Tile(props: Brc20TileProps) {
       </TickerIconContainer>
     );
   }
-  try {
-    const regex = /”/g;
-    const validBrcContentValue = brcContent.replace(regex, '"');
-    const content = JSON.parse(validBrcContentValue);
-    if (content?.op === 'mint') {
+
+  switch (content?.op) {
+    case 'mint':
       return (
         <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
           <BRC20Container>
@@ -163,8 +161,7 @@ export default function Brc20Tile(props: Brc20TileProps) {
           </BRC20Container>
         </ImageContainer>
       );
-    }
-    if (content?.op === 'transfer') {
+    case 'transfer':
       return (
         <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
           <BRC20Container>
@@ -185,8 +182,7 @@ export default function Brc20Tile(props: Brc20TileProps) {
           </BRC20Container>
         </ImageContainer>
       );
-    }
-    if (content?.op === 'deploy') {
+    case 'deploy':
       return (
         <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
           <BRC20Container>
@@ -201,12 +197,11 @@ export default function Brc20Tile(props: Brc20TileProps) {
           </BRC20Container>
         </ImageContainer>
       );
-    }
-  } catch (error) {
-    return (
-      <PlaceholderImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
-        <img src={PlaceholderImage} alt="ordinal" />
-      </PlaceholderImageContainer>
-    );
+    default:
+      return (
+        <PlaceholderImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
+          <img src={PlaceholderImage} alt="ordinal" />
+        </PlaceholderImageContainer>
+      );
   }
 }
