@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-void */
 import internalBackgroundMessageHandler from '@common/utils/messageHandlers';
 import {
   handleLegacyExternalMethodFormat,
@@ -7,21 +7,9 @@ import {
 import { CONTENT_SCRIPT_PORT } from '@common/types/message-types';
 import type { LegacyMessageFromContentScript } from '@common/types/message-types';
 
-function deleteTimer(port) {
-  if (port._timer) {
-    clearTimeout(port._timer);
-    delete port._timer;
-  }
-}
-function forceReconnect(port) {
-  deleteTimer(port);
-  port.disconnect();
-}
-
 // Listen for connection to the content-script - port for two-way communication
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== CONTENT_SCRIPT_PORT) return;
-  port._timer = setTimeout(forceReconnect, 250e3, port);
   port.onMessage.addListener((message: LegacyMessageFromContentScript, port) => {
     if (inferLegacyMessage(message)) {
       void handleLegacyExternalMethodFormat(message, port);
@@ -29,11 +17,40 @@ chrome.runtime.onConnect.addListener((port) => {
       return;
     }
   });
-  port.onDisconnect.addListener(deleteTimer);
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   void internalBackgroundMessageHandler(message, sender, sendResponse);
-  // Listener fn must return `true` to indicate the response will be async
   return true;
 });
+
+const storageArea = chrome.storage.local as chrome.storage.LocalStorageArea;
+
+const testIntervalMs = 10000;
+const storageWaitTimeMs = 100;
+
+async function hasChromiumIssue1316588() {
+  return new Promise((resolve) => {
+    let dispatched = false;
+    const testEventDispatching = () => {
+      storageArea.onChanged.removeListener(testEventDispatching);
+      dispatched = true;
+    };
+    storageArea.onChanged.addListener(testEventDispatching);
+    void storageArea.set({ testEventDispatching: Math.random() });
+    setTimeout(() => resolve(!dispatched), storageWaitTimeMs);
+  });
+}
+
+function fixChromiumIssue1316588() {
+  void hasChromiumIssue1316588().then((hasIssue) => {
+    if (hasIssue) {
+      chrome.runtime.reload();
+      return;
+    }
+
+    setTimeout(fixChromiumIssue1316588, testIntervalMs);
+  });
+}
+
+fixChromiumIssue1316588();
