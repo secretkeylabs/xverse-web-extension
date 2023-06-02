@@ -53,6 +53,14 @@ const PlaceholderImageContainer = styled.div<ContainerProps>(({
   maxHeight: isGalleryOpen ? (inNftDetail ? 450 : 300) : isSmallImage ? 50 : 150,
 }));
 
+const OrdinalContentText = styled.h1<TextProps>((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[0],
+  fontSize: props.inNftSend ? 15 : 'calc(0.8vw + 2vh)',
+  overflow: 'hidden',
+  textAlign: 'center',
+}));
+
 interface TextProps {
   inNftSend?: boolean;
 }
@@ -139,71 +147,85 @@ export default function Brc20Tile(props: Brc20TileProps) {
     );
   }
 
-  const content = JSON.parse(brcContent);
+  try {
+    const content = JSON.parse(brcContent);
 
-  switch (content?.op) {
-    case 'mint':
-      return (
-        <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
-          <BRC20Container>
-            <BRC20Text>{t('MINT')}</BRC20Text>
-            {renderFTIcon(content?.tick)}
-            <NumericFormat
-              value={content?.amt}
-              displayType="text"
-              thousandSeparator
-              renderText={(text) => <BRC20Text>{text}</BRC20Text>}
-            />
-            {isNftDashboard && (
-              <OrdinalsTag>
-                <ButtonIcon src={OrdinalsIcon} />
-                <Text>{t('ORDINAL')}</Text>
-              </OrdinalsTag>
-            )}
-          </BRC20Container>
-        </ImageContainer>
-      );
-    case 'transfer':
-      return (
-        <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
-          <BRC20Container>
-            <BRC20Text>{t('TRANSFER')}</BRC20Text>
-            {renderFTIcon(content?.tick)}
-            <NumericFormat
-              value={content?.amt}
-              displayType="text"
-              thousandSeparator
-              renderText={(text) => <BRC20Text>{text}</BRC20Text>}
-            />
-            {isNftDashboard && (
-              <OrdinalsTag>
-                <ButtonIcon src={OrdinalsIcon} />
-                <Text>{t('ORDINAL')}</Text>
-              </OrdinalsTag>
-            )}
-          </BRC20Container>
-        </ImageContainer>
-      );
-    case 'deploy':
-      return (
-        <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
-          <BRC20Container>
-            <BRC20Text>{t('DEPLOY')}</BRC20Text>
-            {renderFTIcon(content?.tick)}
-            {isNftDashboard && (
-              <OrdinalsTag>
-                <ButtonIcon src={OrdinalsIcon} />
-                <Text>{t('ORDINAL')}</Text>
-              </OrdinalsTag>
-            )}
-          </BRC20Container>
-        </ImageContainer>
-      );
-    default:
-      return (
-        <PlaceholderImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
-          <img src={PlaceholderImage} alt="ordinal" />
-        </PlaceholderImageContainer>
-      );
+    switch (content?.op) {
+      case 'mint':
+        return (
+          <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
+            <BRC20Container>
+              <BRC20Text>{t('MINT')}</BRC20Text>
+              {renderFTIcon(content?.tick)}
+              <NumericFormat
+                value={content?.amt}
+                displayType="text"
+                thousandSeparator
+                renderText={(text) => <BRC20Text>{text}</BRC20Text>}
+              />
+              {isNftDashboard && (
+                <OrdinalsTag>
+                  <ButtonIcon src={OrdinalsIcon} />
+                  <Text>{t('ORDINAL')}</Text>
+                </OrdinalsTag>
+              )}
+            </BRC20Container>
+          </ImageContainer>
+        );
+      case 'transfer':
+        return (
+          <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
+            <BRC20Container>
+              <BRC20Text>{t('TRANSFER')}</BRC20Text>
+              {renderFTIcon(content?.tick)}
+              <NumericFormat
+                value={content?.amt}
+                displayType="text"
+                thousandSeparator
+                renderText={(text) => <BRC20Text>{text}</BRC20Text>}
+              />
+              {isNftDashboard && (
+                <OrdinalsTag>
+                  <ButtonIcon src={OrdinalsIcon} />
+                  <Text>{t('ORDINAL')}</Text>
+                </OrdinalsTag>
+              )}
+            </BRC20Container>
+          </ImageContainer>
+        );
+      case 'deploy':
+        return (
+          <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
+            <BRC20Container>
+              <BRC20Text>{t('DEPLOY')}</BRC20Text>
+              {renderFTIcon(content?.tick)}
+              {isNftDashboard && (
+                <OrdinalsTag>
+                  <ButtonIcon src={OrdinalsIcon} />
+                  <Text>{t('ORDINAL')}</Text>
+                </OrdinalsTag>
+              )}
+            </BRC20Container>
+          </ImageContainer>
+        );
+      default:
+        return (
+          <PlaceholderImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
+            <img src={PlaceholderImage} alt="ordinal" />
+          </PlaceholderImageContainer>
+        );
+    }
+  } catch (e) {
+    return (
+      <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
+        <OrdinalContentText inNftSend={false}>{brcContent}</OrdinalContentText>
+        {isNftDashboard && (
+        <OrdinalsTag>
+          <ButtonIcon src={OrdinalsIcon} />
+          <Text>{t('ORDINAL')}</Text>
+        </OrdinalsTag>
+        )}
+      </ImageContainer>
+    );
   }
 }

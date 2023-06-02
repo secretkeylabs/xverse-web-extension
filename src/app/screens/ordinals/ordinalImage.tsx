@@ -148,7 +148,19 @@ function OrdinalImage({
       );
     }
 
-    const textInscription = (
+    if (textContent.includes('brc-20')) {
+      return (
+        <Brc20Tile
+          brcContent={textContent}
+          isGalleryOpen={isGalleryOpen}
+          isNftDashboard={isNftDashboard}
+          inNftDetail={inNftDetail}
+          isSmallImage={isSmallImage}
+        />
+      );
+    }
+
+    return (
       <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
         <OrdinalContentText inNftSend={inNftSend}>{textContent}</OrdinalContentText>
         {isNftDashboard && (
@@ -159,26 +171,6 @@ function OrdinalImage({
         )}
       </ImageContainer>
     );
-
-    if (textContent.includes('brc-20')) {
-      try {
-        JSON.parse(textContent);
-
-        return (
-          <Brc20Tile
-            brcContent={textContent}
-            isGalleryOpen={isGalleryOpen}
-            isNftDashboard={isNftDashboard}
-            inNftDetail={inNftDetail}
-            isSmallImage={isSmallImage}
-          />
-        );
-      } catch (e) {
-        return textInscription;
-      }
-    }
-
-    return textInscription;
   }
 
   return (
