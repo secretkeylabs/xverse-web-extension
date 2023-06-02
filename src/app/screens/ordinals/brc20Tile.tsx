@@ -117,7 +117,7 @@ const Text = styled.h1((props) => ({
 }));
 
 interface Brc20TileProps {
-  brcContent: { tick: string, amt: string, op: string };
+  brcContent: string;
   isNftDashboard?: boolean;
   inNftDetail?: boolean;
   isSmallImage?: boolean;
@@ -126,7 +126,7 @@ interface Brc20TileProps {
 
 export default function Brc20Tile(props: Brc20TileProps) {
   const {
-    brcContent: content, isSmallImage, isNftDashboard, inNftDetail, isGalleryOpen,
+    brcContent, isSmallImage, isNftDashboard, inNftDetail, isGalleryOpen,
   } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   function renderFTIcon(ticker: string) {
@@ -138,6 +138,8 @@ export default function Brc20Tile(props: Brc20TileProps) {
       </TickerIconContainer>
     );
   }
+
+  const content = JSON.parse(brcContent);
 
   switch (content?.op) {
     case 'mint':

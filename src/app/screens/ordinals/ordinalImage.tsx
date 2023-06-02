@@ -162,11 +162,11 @@ function OrdinalImage({
 
     if (textContent.includes('brc-20')) {
       try {
-        const brcContent = JSON.parse(textContent);
+        JSON.parse(textContent);
 
         return (
           <Brc20Tile
-            brcContent={brcContent}
+            brcContent={textContent}
             isGalleryOpen={isGalleryOpen}
             isNftDashboard={isNftDashboard}
             inNftDetail={inNftDetail}
