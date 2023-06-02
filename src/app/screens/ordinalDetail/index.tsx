@@ -284,6 +284,7 @@ function OrdinalDetailScreen() {
         setNotSupportedOrdinal(false);
       } else setNotSupportedOrdinal(true);
     }
+    return () => setSelectedOrdinalDetails(null);
   }, [selectedOrdinal?.content_type]);
 
   useEffect(() => {
@@ -295,7 +296,6 @@ function OrdinalDetailScreen() {
   }, [textContent]);
 
   const handleBackButtonClick = () => {
-    setSelectedOrdinalDetails(null);
     navigate('/nft-dashboard');
   };
 
@@ -328,7 +328,9 @@ function OrdinalDetailScreen() {
   };
 
   const showBrc20OrdinalDetail = (isGallery: boolean) => {
-    const content = JSON.parse(textContent);
+    const regex = /”/g;
+    const validBrcContentValue = textContent.replace(regex, '"');
+    const content = JSON.parse(validBrcContentValue);
     if (content.op === 'mint') {
       return (
         <ColumnContainer>
