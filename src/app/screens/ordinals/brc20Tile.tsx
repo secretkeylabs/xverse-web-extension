@@ -148,7 +148,9 @@ export default function Brc20Tile(props: Brc20TileProps) {
   }
 
   try {
-    const content = JSON.parse(brcContent);
+    const regex = /”/g;
+    const validBrcContentValue = brcContent.replace(regex, '"');
+    const content = JSON.parse(validBrcContentValue);
 
     switch (content?.op) {
       case 'mint':
