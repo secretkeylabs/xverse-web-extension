@@ -20,7 +20,8 @@ const useAddressInscriptions = () => {
   const {
     isLoading, data, isFetchingNextPage, hasNextPage, error, refetch, fetchNextPage,
   } = useInfiniteQuery([`inscriptions-${ordinalsAddress}`], getInscriptionsByAddress, {
-    keepPreviousData: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     getNextPageParam: (lastpage, pages) => {
       const currentLength = pages.map((page) => page.results).flat().length;
       if (currentLength < lastpage.total) {
