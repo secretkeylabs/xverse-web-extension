@@ -6,7 +6,7 @@ const useAddressInscriptions = () => {
   const { ordinalsAddress } = useWalletSelector();
   const ordinalsApi = useOrdinalsApi();
 
-  const PageSize = 60;
+  const PageSize = 30;
 
   const getInscriptionsByAddress = async ({ pageParam = 0 }) => {
     try {
