@@ -1,17 +1,15 @@
-import { OrdinalInfo } from '@secretkeylabs/xverse-core';
+import { Inscription } from '@secretkeylabs/xverse-core/types';
 import { getTextOrdinalContent } from '@secretkeylabs/xverse-core/api/index';
 import { useEffect, useState } from 'react';
 
-const useTextOrdinalContent = (ordinal: OrdinalInfo) => {
+const useTextOrdinalContent = (ordinal: Inscription) => {
   const [textContent, setTextContent] = useState('');
 
   useEffect(() => {
-    if(ordinal) {
-      const url = `https://gammaordinals.com${ordinal?.metadata.content}`;
-  
+    if (ordinal) {
       (async () => {
-        if (ordinal?.metadata['content type'].startsWith('text/plain')) {
-          const response: string = await getTextOrdinalContent(url); 
+        if (ordinal?.content_type.startsWith('text/plain')) {
+          const response: string = await getTextOrdinalContent(ordinal?.id);
           setTextContent(response ?? '');
         }
       })();

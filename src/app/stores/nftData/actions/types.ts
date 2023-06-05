@@ -1,22 +1,23 @@
-import { OrdinalInfo } from '@secretkeylabs/xverse-core';
+import { Inscription } from '@secretkeylabs/xverse-core/types/api/ordinals';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 
 export interface NftDataState {
   nftData: NftData[];
-  ordinalsData: OrdinalInfo[];
+  selectedOrdinal: Inscription | null;
 }
 
 export const SetNftDataKey = 'SetNftData';
-export const SetOrdinalDataKey = 'SetOrdinalDataKey';
+
+export const SetSelectedOrdinalKey = 'SetSelectedOrdinal';
 
 export interface SetNftData {
   type: typeof SetNftDataKey;
   nftData: NftData[];
 }
 
-export interface SetOrdinalData {
-  type: typeof SetOrdinalDataKey;
-  ordinalsData: OrdinalInfo[];
+export interface SetSelectedOrdinal {
+  type: typeof SetSelectedOrdinalKey;
+  selectedOrdinal: Inscription | null;
 }
 
-export type NftDataAction = SetNftData | SetOrdinalData;
+export type NftDataAction = SetNftData | SetSelectedOrdinal;

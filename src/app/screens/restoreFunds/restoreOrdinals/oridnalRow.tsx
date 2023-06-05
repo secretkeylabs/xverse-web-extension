@@ -1,10 +1,14 @@
+import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails';
+import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import {
-  BtcOrdinal, getBtcFiatEquivalent, getOrdinalInfo,
+  BtcOrdinal, ErrorCodes, getBtcFiatEquivalent,
 } from '@secretkeylabs/xverse-core';
-import { getBtcFeesForOrdinalSend, SignedBtcTx, signOrdinalSendTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  SignedBtcTx, signOrdinalSendTransaction,
+} from '@secretkeylabs/xverse-core/transactions/btc';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -66,37 +70,26 @@ const LoaderContainer = styled.div((props) => ({
 
 interface Props {
   ordinal: BtcOrdinal;
+  setError: (error: string) => void;
 }
 
 function OrdinalRow({
-  ordinal,
+  ordinal, setError,
 }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_ORDINAL_SCREEN' });
+  const { t } = useTranslation('translation');
   const {
     network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
   } = useWalletSelector();
+  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
-
-  function fetchOrdinalInfo() {
-    return getOrdinalInfo(ordinal.id);
-  }
-
-  const { data } = useQuery({
-    queryKey: [`ordinals-${ordinal.id}`],
-    queryFn: fetchOrdinalInfo,
-  });
+  const ordinalData = useInscriptionDetails(ordinal.id);
 
   const {
     isLoading,
     data: signedTx,
+    error: transactionError,
     mutate,
   } = useMutation<SignedBtcTx, string>(async () => {
-    const txFees = await getBtcFeesForOrdinalSend(
-      ordinalsAddress,
-      ordinal.utxo,
-      btcAddress,
-      network.type,
-    );
     const tx = await signOrdinalSendTransaction(
       ordinalsAddress,
       ordinal.utxo,
@@ -104,18 +97,19 @@ function OrdinalRow({
       Number(selectedAccount?.id),
       seedPhrase,
       network.type,
-      txFees,
     );
     return tx;
   });
 
   useEffect(() => {
+    setSelectedOrdinalDetails(ordinalData?.data!);
     if (signedTx) {
       navigate(`/confirm-ordinal-tx/${ordinal.id}`, {
         state: {
           signedTxHex: signedTx.signedTx,
           recipientAddress: ordinalsAddress,
           fee: signedTx.fee,
+          feePerVByte: signedTx.feePerVByte,
           fiatFee: getBtcFiatEquivalent(signedTx.fee, btcFiatRate),
           total: signedTx.total,
           fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),
@@ -125,6 +119,16 @@ function OrdinalRow({
     }
   }, [signedTx]);
 
+  useEffect(() => {
+    if (transactionError) {
+      if (Number(transactionError) === ErrorCodes.InSufficientBalance) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(transactionError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setError(transactionError.toString());
+    }
+  }, [transactionError]);
+
   const onClick = () => {
     mutate();
   };
@@ -132,11 +136,11 @@ function OrdinalRow({
   return (
     <OrdinalCard>
       <OrdinalImageContainer>
-        <OrdinalImage isSmallImage ordinal={data!} />
+        <OrdinalImage isSmallImage ordinal={ordinalData?.data!} />
       </OrdinalImageContainer>
 
       <ColumnContainer>
-        <TitleText>{data?.inscriptionNumber}</TitleText>
+        <TitleText>{`Inscription ${ordinalData?.data?.number}`}</TitleText>
         <ValueText>Ordinal</ValueText>
       </ColumnContainer>
       <ButtonContainer>
@@ -145,7 +149,7 @@ function OrdinalRow({
             <LoaderContainer>
               <MoonLoader color="white" size={15} />
             </LoaderContainer>
-          ) : t('TRANSFER')}
+          ) : t('RESTORE_ORDINAL_SCREEN.TRANSFER')}
         </TransferButton>
       </ButtonContainer>
     </OrdinalCard>
