@@ -24,8 +24,8 @@
     "SEND": "Send",
     "BUY": "Buy",
     "MANAGE_TOKEN": "Manage token list",
-    "STACKS_AND_TOKEN": "Stacks, tokens and NFTs",
-    "ORDINALS": "Ordinals"
+    "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
+    "ORDINALS": "Ordinals & BRC-20 Tokens"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -41,8 +41,8 @@
     "COPY_ADDRESS": "Copy address",
     "COPIED_ADDRESS": "Address copied to clipboard",
     "BTC_ADDRESS": "Bitcoin address",
-    "ORDINAL_ADDRESS": "Ordinal address",
-    "ORDINALS_RECEIVE_MESSAGE": "Only send Ordinals to this address.",
+    "ORDINAL_ADDRESS": "Ordinal & BRC-20 address",
+    "ORDINALS_RECEIVE_MESSAGE": "Only send Ordinals and BRC-20 tokens to this address.",
     "BTC_RECEIVE_MESSAGE": "Do not send Ordinals to this address, use your Ordinals NFT receive address."
   },
   "SEND": {
@@ -52,13 +52,14 @@
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
     "BTC_RECIPIENT_PLACEHOLDER": "Enter Bitcoin address",
+    "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter Ordinals address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
     "NO_FUNDS": "You don’t have any funds to send.",
-    "BUY_CRYPTO": "Buy crypto →",
+    "BUY_CRYPTO": "Buy crypto",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {
       "ADDRESS_REQUIRED": "Recipient address is required",
@@ -77,7 +78,8 @@
     "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
     "SWITCH_TO": "Switch to",
     "SEND_ORDINAL_TITLE": "Send Ordinal",
-    "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals."
+    "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals.",
+    "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens."
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -96,7 +98,7 @@
     "SPONSORED_TX_INFO": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
     "TOTAL": "Total",
     "AMOUNT_PLUS_FEES": "Amount + fees",
-    "REVIEW_TRNSACTION": "Review transaction",
+    "REVIEW_TRANSACTION": "Review transaction",
     "AMOUNT": "Amount",
     "YOUR_ADDRESS": "Your address",
     "FROM": "From",
@@ -111,8 +113,16 @@
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed please contact the developer of the requesting app for support",
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
+    "To": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
-    "YOU_WILL_RECEIVE": "You will receive"
+    "YOU_WILL_RECEIVE": "You will receive",
+    "ORDINAL": "Ordinal",
+    "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
+    "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
+    "BTC_TRANSFER_DANGER_ALERT_TITLE": "Danger",
+    "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
+    "CONITNUE": "Continue",
+    "BACK": "Back"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "Insufficient balance",
@@ -120,19 +130,22 @@
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
+    "ADVANCED_SETTING_FEE_OPTION": "Edit fees",
+    "ADVANCED_SETTING_NONCE_OPTION": "Edit nonce",
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",
-    "STANDARD": "Standard",
-    "HIGH": "High",
+    "STANDARD": "Regular",
+    "HIGH": "Fast",
     "CUSTOM": "Custom",
-    "LOW": "Low",
+    "LOW": "Slow",
     "FEE_INFO": "Apply a higher fee to help your transaction confirm quickly, especially when the network is congested.",
     "NONCE": "Nonce",
     "APPLY": "Apply",
     "NONCE_INFO": "You can use a custom nonce to replace a pending transaction with the same nonce.",
     "SAME_FEE_ERROR": "New fee must be greater than current fee",
     "GREATER_FEE_ERROR": "Fee is more than available balance",
-    "LOWER_THAN_MINIMUM": "Set fee is below minimum"
+    "LOWER_THAN_MINIMUM": "Set fee is below minimum",
+    "NONCE_WARNING": "Entering an erronous nonce can result in a failed transaction. Only apply changes if you know what you are doing."
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",
@@ -145,7 +158,8 @@
     "FAILED": "Transaction Failed",
     "RETRY": "Try again",
     "SPONSORED_SUCCESS_MSG": "Transaction signed",
-    "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor"
+    "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor",
+    "BRC20_ORDINAL_MSG": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer."
   },
   "LEGAL_SCREEN": {
     "SCREEN_TITLE": "Legal",
@@ -179,7 +193,7 @@
     "PASSWORD_STRENGTH_WEAK": "Weak",
     "PASSWORD_STRENGTH_MEDIUM": "Medium",
     "PASSWORD_STRENGTH_STRONG": "Strong",
-    "PASSWORD_STRENGTH_ERROR": "You need to enter a stronger password",
+    "PASSWORD_STRENGTH_ERROR": "Your password should be at least 9 characters long. Use a mix of uppercase letters, lowercase letters, numbers, and symbols",
     "CONFIRM_PASSWORD_MATCH_ERROR": "Please make sure your passwords match",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
@@ -189,10 +203,16 @@
     "CLOSE_TAB": "Close this tab",
     "CLICK": "Click",
     "THEN": "then",
-    "OPEN_WALLET":"to open your wallet",
+    "OPEN_WALLET": "to open your wallet",
     "RESTORE_SCREEN_TITLE": "Wallet restored",
     "RESTORE_SCREEN_SUBTITLE": "Your wallet has been successfully restored.",
     "SEARCH_XVERSE": "Locate Xverse and click"
+  },
+  "WALLET_EXISTS_SCREEN": {
+    "CLOSE_TAB": "Close this tab",
+    "SCREEN_TITLE": "Wallet exists",
+    "SCREEN_SUBTITLE": "A wallet was created or restored in another tab. Any seed phrases generated in this tab will not be valid. If unsure, please create a new wallet or restore from your backed up seed phrase.",
+    "UNDERSTAND": "I understand"
   },
   "CONFIRM_TRANSACTION_SCREEN": {
     "CONFIRM_BUTTON": "Confirm",
@@ -214,6 +234,7 @@
     "FORGOT_PASSWORD_BUTTON": "Forgot your password?"
   },
   "FORGOT_PASSWORD_SCREEN": {
+    "TITLE": "Forgot Password",
     "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seedphrase you used when you generated your wallet.",
     "PARAGRAPH2": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
     "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"
@@ -261,10 +282,13 @@
     "ORDINAL": "Ordinal",
     "INSCRIPTION": "Inscription",
     "ACTIVATE_ORDINALS": "Activate Ordinals",
-    "ACTIVATE_ORDINALS_INFO":"You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
+    "ACTIVATE_ORDINALS_INFO": "You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
-    "COPIED": "Copied!"
+    "COPIED": "Copied!",
+    "MINT": "Mint",
+    "TRANSFER": "Transfer",
+    "DEPLOY": "Deploy"
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Restore assets",
@@ -284,7 +308,7 @@
     "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
   },
   "RESTORE_ORDINAL_SCREEN": {
-    "TITLE": "Restore Oridnals",
+    "TITLE": "Restore Ordinals",
     "BTC": "Bitcoin",
     "TRANSFER": "Transfer",
     "BACK": "Back",
@@ -324,7 +348,14 @@
     "TIMESTAMP": "Timestamp",
     "GENESIS_HEIGHT": "genesis height",
     "LOCATION": "Location",
-    "ORDINAL_NOT_DISPLAYED": "This ordinal cannot be displayed."
+    "ORDINAL_NOT_DISPLAYED": "This ordinal cannot be displayed.",
+    "COLLECTIBLE": "Collectible",
+    "BRC20_INSCRIPTION": "BRC-20 Inscription",
+    "AMOUNT_TO_MINT": "Amount to mint",
+    "AMOUNT_TO_TRANSFER": "Amount to transfer",
+    "BRC20_TRANSFER_STATUS": "Status",
+    "TOTAL_SUPPLY": "Total supply",
+    "MINT_LIMIT": "Mint limit"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
@@ -360,7 +391,7 @@
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
     "TESTNET": "Testnet",
-    "ORDINALS":"Ordinals",
+    "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets"
   },
@@ -382,7 +413,7 @@
     "SEND_COIN_BUTTON": "SEND",
     "RECEIVE_COIN_BUTTON": "Receive",
     "BUY_COIN_BUTTON": "Buy",
-    "TRANSACTION_HISTORY_TITLE": "Transaction History",
+    "TRANSACTION_HISTORY_TITLE": "Transaction history",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
@@ -402,10 +433,14 @@
     "STX_LOCKED_BALANCE_PREFIX": "Locked",
     "SHOW_FT_INFO_BUTTON": "Show more info",
     "LESS_FT_INFO_BUTTON": "Show less info",
-    "FT_CONTRACT_PREFIX": "Token Contract",
+    "FT_CONTRACT_PREFIX": "Token contract",
     "OPEN_FT_CONTRACT_DEPLOYMENT": "View the contract on",
     "STACKS_EXPLORER": "Stacks Explorer",
-    "INCREASE_FEE_BUTTON": "Increase fee"
+    "INCREASE_FEE_BUTTON": "Increase fee",
+    "BALANCE": "Balance",
+    "TRANSACTIONS": "TRANSACTIONS",
+    "CONTRACT": "CONTRACT",
+    "COMING_SOON": "Coming soon"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",
@@ -439,8 +474,8 @@
     "SPONSORED": "Sponsored",
     "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
   },
-  "DEPLOY_CONTRACT_REQUEST":{
-    "DEPLOY_CONTRACT":"deploy-contract",
+  "DEPLOY_CONTRACT_REQUEST": {
+    "DEPLOY_CONTRACT": "deploy-contract",
     "CONTRACT_NAME": "Contract name",
     "SOURCE_CODE": "Source code",
     "VIEW_SOURCE_CODE": "View contract code",
@@ -458,8 +493,13 @@
     "HIDE_HASH_BUTTON": "Hide Hash",
     "ACTION_DISCLAIMER": "No transactions will be broadcasted and no fees will be applied.",
     "SIGNING_WARNING": "By signing this message, you prove that you are the owner of an account without broadcasting any on chain transactions. This signature cannot be used to send transactions on your behalf. You should only sign messages you trust.",
+    "SIGNING_ADDRESS_TITLE": "Signing with",
+    "SIGNING_ADDRESS_STX": "Your Stacks address",
+    "SIGNING_ADDRESS_SEGWIT": "Your Bitcoin payment address",
+    "SIGNING_ADDRESS_TAPROOT": "Your Ordinals address",
     "SIGN_BUTTON": "Sign",
-    "CANCEL_BUTTON": "Cancel"
+    "CANCEL_BUTTON": "Cancel",
+    "SIGNATURE_ERROR_TITLE": "Signature Error"
   },
   "ERROR_SCREEN": {
     "TITLE": "Xverse crashed unexpectedly",
@@ -475,10 +515,10 @@
     "RECEIVING_ORDINALS": "Receiving Ordinals",
     "RECEIVING_ORDINAL_INFO": "Use this address to receive Ordinals only. Do not use this address to receive Bitcoin payments.",
     "RECEIVING_BTC": "Receiving Bitcoin",
-    "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals.",
+    "RECEIVING_BTC_INFO": "Use this address to receive Bitcoin payments only. Do not use this address to receive Ordinals & BRC-20 tokens.",
     "I_UNDERSTAND": "I understand",
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
-},
+  },
   "SELECT_BTC_ADDRESS_SCREEN": {
     "TITLE": "Bitcoin Address Request",
     "ACCOUNT": "Account",
@@ -488,5 +528,19 @@
     "ORDINAL_ADDRESS": "Ordinal address",
     "NETWORK_MISMATCH_ERROR_TITLE": "Mismatched Network",
     "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings."
+  },
+  "SEND_BRC_20": {
+    "BRC20_TOKEN": "BRC-20",
+    "SEND_INFO_TITLE": "Sending a BRC-20 token",
+    "SEND_INFO_SUBTITLE": "To transfer BRC-20 tokens, you need to make two separate transactions:",
+    "SEND_STEP_1_TITLE": "Inscribe Transfer",
+    "SEND_STEP_1": "Create an Ordinal inscription with the token and amount you would like to send.",
+    "SEND_STEP_2_TITLE": "Send transfer inscription",
+    "SEND_STEP_2": "Once you have the transfer inscription, you can send it to your recipient to transfer the BRC-20 token.",
+    "SEND_INFO_START_BUTTON": "Start",
+    "SEND_NEXT_BUTTON": "Next",
+    "SEND": "Send",
+    "AMOUNT": "Amount",
+    "BALANCE": "Balance"
   }
 }

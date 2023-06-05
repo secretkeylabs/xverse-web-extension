@@ -38,7 +38,6 @@ export const useStxWalletData = () => {
   return useQuery({
     queryKey: [`wallet-data-${stxAddress}`],
     queryFn: fetchStxWalletData,
-    refetchOnMount: false,
   });
 };
 

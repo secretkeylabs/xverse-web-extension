@@ -1,39 +1,18 @@
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import BottomBar from '@components/tabBar';
-import RecipientAddressView from '@components/recipinetAddressView';
-import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import TopRow from '@components/topRow';
-import BigNumber from 'bignumber.js';
 import useNetworkSelector from '@hooks/useNetwork';
+import RecipientComponent from '@components/recipientComponent';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
-
-const InfoContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(12),
-  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
-}));
-
-const TitleText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-}));
-
-const ValueText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(2),
-  wordBreak: 'break-all',
-}));
 
 function ConfirmFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -112,18 +91,15 @@ function ConfirmFtTransaction() {
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleBackButtonClick}
       >
-        <TransferAmountView currency="FT" amount={new BigNumber(amount)} fungibleToken={fungibleToken} />
-        <RecipientAddressView recipient={recepientAddress} />
-        <InfoContainer>
-          <TitleText>{t('NETWORK')}</TitleText>
-          <ValueText>{network.type}</ValueText>
-        </InfoContainer>
-        {!!memo && (
-        <InfoContainer>
-          <TitleText>{t('MEMO')}</TitleText>
-          <ValueText>{memo}</ValueText>
-        </InfoContainer>
-        )}
+        <RecipientComponent
+          address={recepientAddress}
+          value={`${amount}`}
+          fungibleToken={fungibleToken}
+          title={t('AMOUNT')}
+          currencyType="FT"
+        />
+        <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+        {memo && <TransferMemoView memo={memo} />}
 
       </ConfirmStxTransationComponent>
       <BottomBar tab="dashboard" />

@@ -2,17 +2,17 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
-import useNftDataSelector from '@hooks/useNftDataSelector';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
-import { broadcastRawBtcOrdinalTransaction, getOrdinalInfo, OrdinalInfo } from '@secretkeylabs/xverse-core';
+import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import BigNumber from 'bignumber.js';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useBtcClient from '@hooks/useBtcClient';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -87,11 +87,11 @@ function ConfirmOrdinalTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const navigate = useNavigate();
-  const { network } = useWalletSelector();
+  const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
   const {
-    fee, signedTxHex, ordinalUtxo,
+    fee, feePerVByte, signedTxHex, ordinalUtxo,
   } = location.state;
 
   const {
@@ -99,27 +99,11 @@ function ConfirmOrdinalTransaction() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<string, Error, { signedTx: string }>(
-    async ({ signedTx }) => broadcastRawBtcOrdinalTransaction(signedTx, network.type),
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
+    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
   );
-  const { id } = useParams();
-  const { ordinalsData } = useNftDataSelector();
-  const ordinalId = id!.split('::');
-  const ordinal = ordinalsData.find((inscription) => inscription?.metadata?.id === ordinalId[0]);
+  const { selectedOrdinal } = useNftDataSelector();
   const { refetch } = useBtcWalletData();
-
-  const {
-    data: ordinalInfoData,
-    mutate: ordinalInfoMutate,
-  } = useMutation<OrdinalInfo>(
-    async () => getOrdinalInfo(id),
-  );
-
-  useEffect(() => {
-    if (!ordinal) {
-      ordinalInfoMutate();
-    }
-  }, [ordinal]);
 
   useEffect(() => {
     setRecipientAddress(location.state.recipientAddress);
@@ -129,7 +113,7 @@ function ConfirmOrdinalTransaction() {
     if (btcTxBroadcastData) {
       navigate('/tx-status', {
         state: {
-          txid: btcTxBroadcastData,
+          txid: btcTxBroadcastData.tx.hash,
           currency: 'BTC',
           error: '',
           isOrdinal: true,
@@ -180,6 +164,7 @@ function ConfirmOrdinalTransaction() {
       <ScrollContainer>
         <ConfirmBtcTransactionComponent
           fee={fee}
+          feePerVByte={feePerVByte}
           recipients={[{ address: recipientAddress, amountSats: new BigNumber(0) }]}
           loadingBroadcastedTx={isLoading}
           signedTxHex={signedTxHex}
@@ -187,22 +172,20 @@ function ConfirmOrdinalTransaction() {
           onCancelClick={handleOnCancelClick}
           onBackButtonClick={handleOnCancelClick}
           ordinalTxUtxo={ordinalUtxo}
-          assetDetail={ordinal?.inscriptionNumber ?? ordinalInfoData?.inscriptionNumber}
+          assetDetail={selectedOrdinal?.number.toString()}
         >
           <Container>
             <NFtContainer>
-              <OrdinalImage inNftSend ordinal={ordinal! ?? ordinalInfoData} />
+              <OrdinalImage inNftSend ordinal={selectedOrdinal!} />
             </NFtContainer>
           </Container>
         </ConfirmBtcTransactionComponent>
 
-        {!isGalleryOpen
-         && (
-         <BottomBarContainer>
-           <BottomBar tab="nft" />
-         </BottomBarContainer>
-         )}
-
+        {!isGalleryOpen && (
+          <BottomBarContainer>
+            <BottomBar tab="nft" />
+          </BottomBarContainer>
+        )}
       </ScrollContainer>
     </>
   );

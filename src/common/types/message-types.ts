@@ -101,6 +101,8 @@ export enum ExternalSatsMethods {
   getAddressResponse = 'getAddressResponse',
   signPsbtRequest = 'signPsbtRequest',
   signPsbtResponse = 'signPsbtResponse',
+  signMessageRequest = 'signMessageRequest',
+  signMessageResponse = 'signMessageResponse',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -108,7 +110,7 @@ type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, s
 export type GetAddressResponseMessage = Message<
 ExternalSatsMethods.getAddressResponse,
 {
-  addressRequest: string
+  addressRequest: string;
   addressResponse: GetAddressResponse | string;
 }
 >;
@@ -123,6 +125,22 @@ ExternalSatsMethods.signPsbtResponse,
 }
 >;
 
-export type SatsConnectMessageFromContentScript = GetAddressRequestMessage | SignPsbtRequestMessage;
+type SignMessageRequestMessage = Message<ExternalSatsMethods.signMessageRequest, string>;
 
-export type SatsConnectMessageToContentScript = GetAddressResponseMessage | SignPsbtResponseMessage;
+export type SignMessageResponseMessage = Message<
+ExternalSatsMethods.signMessageResponse,
+{
+  signMessageRequest: string;
+  signMessageResponse: string;
+}
+>;
+
+export type SatsConnectMessageFromContentScript =
+  | GetAddressRequestMessage
+  | SignPsbtRequestMessage
+  | SignMessageRequestMessage;
+
+export type SatsConnectMessageToContentScript =
+  | GetAddressResponseMessage
+  | SignPsbtResponseMessage
+  | SignMessageResponseMessage;

@@ -1,4 +1,5 @@
 import { PostCondition } from '@stacks/transactions';
+import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import PostConditionsView from './postConditionView';
 import { getAmountFromPostCondition } from './postConditionView/helper';
 
@@ -11,6 +12,7 @@ function StxPostConditionCard({ postCondition }: Props) {
     <PostConditionsView
       postCondition={postCondition}
       amount={amount}
+      icon={IconStacks}
     />
   );
 }

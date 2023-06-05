@@ -8,13 +8,14 @@ import Failure from '@assets/img/send/x_circle.svg';
 import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
 import CopyButton from '@components/copyButton';
+import InfoContainer from '@components/infoContainer';
 
-const TxStatusContainer = styled.div({
-  background: 'rgba(25, 25, 48, 0.5)',
+const TxStatusContainer = styled.div((props) => ({
+  background: props.theme.colors.background.elevation0,
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-});
+}));
 
 const Container = styled.div({
   display: 'flex',
@@ -66,6 +67,12 @@ const TxIDContainer = styled.div({
 const CopyButtonContainer = styled.div({
   marginLeft: 8,
   padding: 2,
+});
+
+const InfoMessageContainer = styled.div({
+  marginLeft: 8,
+  marginRight: 8,
+  marginTop: 20,
 });
 
 const Image = styled.img({
@@ -131,7 +138,7 @@ function TransactionStatus() {
   const location = useLocation();
   const { network } = useWalletSelector();
   const {
-    txid, currency, error, sponsored, browserTx, isOrdinal, isNft, errorTitle,
+    txid, currency, error, sponsored, browserTx, isOrdinal, isNft, errorTitle, isBrc20TokenFlow,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -164,7 +171,7 @@ function TransactionStatus() {
     if (browserTx) window.close();
     else if (isOrdinal) navigate(-4);
     else if (isNft) navigate(-3);
-    else navigate(-2);
+    else navigate(-3);
   };
 
   const renderLink = (
@@ -198,7 +205,7 @@ function TransactionStatus() {
           <OuterContainer>
             {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
             {txid && renderLink}
-            {txid && renderTransactionID}
+            {isBrc20TokenFlow ? <InfoMessageContainer><InfoContainer bodyText={t('BRC20_ORDINAL_MSG')} /></InfoMessageContainer> : txid && renderTransactionID}
           </OuterContainer>
         )}
       <ButtonContainer>

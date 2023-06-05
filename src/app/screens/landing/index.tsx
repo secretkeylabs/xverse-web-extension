@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import logo from '@assets/img/full_logo_vertical.svg';
+import logo from '@assets/img/xverse_logo.svg';
 import { useTranslation } from 'react-i18next';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
@@ -9,13 +9,18 @@ const ContentContainer = styled(animated.div)({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  marginTop: 130,
+  marginTop: 180,
 });
 
 const TopSectionContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
+});
+
+const Logo = styled.img({
+  width: 57,
+  height: 57,
 });
 
 const LandingTitle = styled.h1((props) => ({
@@ -25,6 +30,7 @@ const LandingTitle = styled.h1((props) => ({
   paddingRight: props.theme.spacing(34),
   color: props.theme.colors.white['200'],
   textAlign: 'center',
+  fontSize: 16,
 }));
 
 const ActionButtonsContainer = styled.div((props) => ({
@@ -39,9 +45,9 @@ const ActionButtonsContainer = styled.div((props) => ({
 
 const CreateButton = styled.button((props) => ({
   display: 'flex',
-  ...props.theme.tile_text,
+  ...props.theme.body_medium_m,
   fontSize: 12,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.background.elevation0,
   textAlign: 'center',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -70,7 +76,7 @@ const AppVersion = styled.p((props) => ({
 
 const RestoreButton = styled.button((props) => ({
   display: 'flex',
-  ...props.theme.tile_text,
+  ...props.theme.body_medium_m,
   fontSize: 12,
   color: props.theme.colors.white['0'],
   textAlign: 'center',
@@ -135,7 +141,7 @@ function Landing(): JSX.Element {
       <AppVersion>Beta</AppVersion>
       <ContentContainer style={styles}>
         <TopSectionContainer>
-          <img src={logo} width={100} alt="logo" />
+          <Logo src={logo} alt="logo" />
           <LandingTitle>{t('SCREEN_TITLE')}</LandingTitle>
         </TopSectionContainer>
         <ActionButtonsContainer>

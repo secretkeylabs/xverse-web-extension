@@ -12,7 +12,7 @@ interface TransactionRecipientProps {
 }
 
 function isBtcTransaction(tx: StxTransactionData | BtcTransactionData): tx is BtcTransactionData {
-  return (tx as BtcTransactionData).addresses !== undefined;
+  return (tx as BtcTransactionData).txType === 'bitcoin';
 }
 
 function formatAddress(addr: string): string {
@@ -22,7 +22,7 @@ function formatAddress(addr: string): string {
 export default function TransactionRecipient(props: TransactionRecipientProps): JSX.Element | null {
   const { transaction } = props;
   if (isBtcTransaction(transaction)) {
-    return <RecipientAddress>{formatAddress(transaction.addresses[1])}</RecipientAddress>;
+    return <RecipientAddress>{formatAddress(transaction.recipientAddress ?? '')}</RecipientAddress>;
   }
   if (transaction.txType === 'token_transfer' || transaction.txType === 'coinbase') {
     return (

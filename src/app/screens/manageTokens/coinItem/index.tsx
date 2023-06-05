@@ -32,6 +32,14 @@ const CoinIcon = styled.img((props) => ({
   resizeMode: 'stretch',
 }));
 
+const CustomSwitch = styled(Switch)`
+.react-switch-handle {
+  background-color: ${({ checked }) => (checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)')} !important;
+  border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
+
+}
+`;
+
 const TickerIconContainer = styled.div((props) => ({
   display: 'flex',
   marginRight: props.theme.spacing(7),
@@ -102,8 +110,8 @@ function CoinItem({
             <UnSelectedCoinTitleText>{coin.name}</UnSelectedCoinTitleText>
           )}
         </CoinContainer>
-        <Switch
-          onColor={Theme.colors.action.classic}
+        <CustomSwitch
+          onColor={Theme.colors.purple_main}
           offColor={Theme.colors.background.elevation3}
           onChange={toggleSwitch}
           checked={isEnabled!}

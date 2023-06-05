@@ -29,6 +29,7 @@ const ValueText = styled.h1((props) => ({
 const SubValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
+  textAlign: 'right',
   color: props.theme.colors.white[400],
 }));
 
@@ -48,11 +49,12 @@ interface Props {
   title: string;
   subTitle?: string;
   value?: string;
+  description?: string;
   subValue?: BigNumber;
 }
 
 function TransactionDetailComponent({
-  title, subTitle, value, subValue,
+  title, subTitle, value, subValue, description,
 }: Props) {
   const {
     fiatCurrency,
@@ -83,6 +85,7 @@ function TransactionDetailComponent({
       </TitleContainer>
       <ColumnContainer>
         {value && <ValueText>{value}</ValueText>}
+        {description && <SubValueText>{description}</SubValueText>}
         {subValue && <SubValueText>{getFiatAmountString(subValue)}</SubValueText>}
       </ColumnContainer>
     </Container>

@@ -8,7 +8,6 @@ import AssetIcon from '@assets/img/transactions/Assets.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
 import { useSelector } from 'react-redux';
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { useMutation } from '@tanstack/react-query';
@@ -24,9 +23,12 @@ import {
   getBtcFiatEquivalent,
   ResponseError,
   satsToBtc,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
+import RecipientComponent from '@components/recipientComponent';
+import TransferFeeView from '@components/transferFeeView';
+import { NumericFormat } from 'react-number-format';
 import TransactionDetailComponent from '../transactionDetailComponent';
-import BtcRecipientComponent from './btcRecipientComponent';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -105,14 +107,16 @@ const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => 
 
 interface Props {
   fee: BigNumber;
+  feePerVByte: BigNumber;
   loadingBroadcastedTx: boolean;
   signedTxHex: string;
-  ordinalTxUtxo?: BtcUtxoDataResponse;
+  ordinalTxUtxo?: UTXO;
   recipients: Recipient[];
   children?: ReactNode;
   assetDetail?: string;
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse [];
+  amount?: string;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -120,6 +124,7 @@ interface Props {
 
 function ConfirmBtcTransactionComponent({
   fee,
+  feePerVByte,
   loadingBroadcastedTx,
   signedTxHex,
   ordinalTxUtxo,
@@ -128,6 +133,7 @@ function ConfirmBtcTransactionComponent({
   assetDetail,
   isRestoreFundFlow,
   nonOrdinalUtxos,
+  amount,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -135,15 +141,17 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
-  const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const {
     btcAddress, selectedAccount, seedPhrase, network, btcFiatRate,
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
+  const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [currentFee, setCurrentFee] = useState(fee);
+  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
+  const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const {
     isLoading,
     data,
@@ -204,7 +212,7 @@ function ConfirmBtcTransactionComponent({
     if (data) {
       setCurrentFee(data.fee);
       setSignedTx(data.signedTx);
-      setOpenTransactionSettingModal(false);
+      setShowFeeSettings(false);
     }
   }, [data]);
 
@@ -212,28 +220,42 @@ function ConfirmBtcTransactionComponent({
     if (ordinalData) {
       setCurrentFee(ordinalData.fee);
       setSignedTx(ordinalData.signedTx);
-      setOpenTransactionSettingModal(false);
+      setShowFeeSettings(false);
     }
   }, [ordinalData]);
+
+  useEffect(() => {
+    const totalAmount: BigNumber = new BigNumber(0);
+    let sum: BigNumber = new BigNumber(0);
+    if (recipients) {
+      recipients.map((recipient) => {
+        sum = totalAmount.plus(recipient.amountSats);
+        return sum;
+      });
+      sum = sum?.plus(currentFee);
+    }
+    setTotal(sum);
+  }, [recipients, currentFee]);
 
   useEffect(() => {
     if (signedNonOrdinalBtcSend) {
       setCurrentFee(signedNonOrdinalBtcSend.fee);
       setSignedTx(signedNonOrdinalBtcSend.signedTx);
-      setOpenTransactionSettingModal(false);
+      setShowFeeSettings(false);
     }
   }, [signedNonOrdinalBtcSend]);
 
   const onAdvancedSettingClick = () => {
-    setOpenTransactionSettingModal(true);
+    setShowFeeSettings(true);
   };
 
   const closeTransactionSettingAlert = () => {
-    setOpenTransactionSettingModal(false);
+    setShowFeeSettings(false);
   };
 
-  const onApplyClick = (modifiedFee: string) => {
+  const onApplyClick = ({ fee: modifiedFee, feeRate }: { fee: string; feeRate?: string; nonce?: string }) => {
     setCurrentFee(new BigNumber(modifiedFee));
+    setCurrentFeeRate(new BigNumber(feeRate));
     if (ordinalTxUtxo) ordinalMutate(modifiedFee);
     else if (isRestoreFundFlow) {
       mutateSignNonOrdinalBtcTransaction(modifiedFee);
@@ -247,9 +269,18 @@ function ConfirmBtcTransactionComponent({
     onConfirmClick(signedTx);
   };
 
+  const getAmountString = (amount: BigNumber, currency: string) => (
+    <NumericFormat
+      value={amount.toString()}
+      displayType="text"
+      thousandSeparator
+      suffix={` ${currency}`}
+    />
+  );
+
   useEffect(() => {
     if (recipients && txError) {
-      setOpenTransactionSettingModal(false);
+      setShowFeeSettings(false);
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
       } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
@@ -260,7 +291,7 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     if (recipients && ordinalError) {
-      setOpenTransactionSettingModal(false);
+      setShowFeeSettings(false);
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
       } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
@@ -271,7 +302,7 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     if (recipients && errorSigningNonOrdial) {
-      setOpenTransactionSettingModal(false);
+      setShowFeeSettings(false);
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
         setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
       } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
@@ -289,39 +320,41 @@ function ConfirmBtcTransactionComponent({
         <Container>
           {children}
           <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
-            {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
+            {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
           </ReviewTransactionText>
 
           {ordinalTxUtxo ? (
-            <BtcRecipientComponent
+            <RecipientComponent
               address={recipients[0]?.address}
               value={assetDetail!}
               icon={AssetIcon}
+              currencyType="Ordinal"
               title={t('CONFIRM_TRANSACTION.ASSET')}
             />
           ) : (
             recipients?.map((recipient, index) => (
-              <BtcRecipientComponent
+              <RecipientComponent
                 recipientIndex={index + 1}
                 address={recipient?.address}
                 value={satsToBtc(recipient?.amountSats).toString()}
                 totalRecipient={recipients?.length}
-                icon={IconBitcoin}
+                currencyType="BTC"
                 title={t('CONFIRM_TRANSACTION.AMOUNT')}
-                subValue={getBtcFiatEquivalent(
-                  recipient?.amountSats,
-                  btcFiatRate,
-                )}
+                showSenderAddress={isRestoreFundFlow}
               />
             ))
           )}
 
           <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
+          <TransferFeeView feePerVByte={currentFeeRate} fee={currentFee} currency={t('CONFIRM_TRANSACTION.SATS')} />
+          {!ordinalTxUtxo && (
           <TransactionDetailComponent
-            title={t('CONFIRM_TRANSACTION.FEES')}
-            value={`${currentFee.toString()} ${t('SATS')}`}
-            subValue={getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate)}
+            title={t('CONFIRM_TRANSACTION.TOTAL')}
+            value={getAmountString(satsToBtc(total), t('BTC'))}
+            subValue={getBtcFiatEquivalent(total, btcFiatRate)}
+            subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
           />
+          )}
           <Button onClick={onAdvancedSettingClick}>
             <>
               <ButtonImage src={SettingIcon} />
@@ -329,15 +362,19 @@ function ConfirmBtcTransactionComponent({
             </>
           </Button>
           <TransactionSettingAlert
-            visible={openTransactionSettingModal}
-            fee={currentFee.toString()}
+            visible={showFeeSettings}
+            fee={new BigNumber(currentFee).toString()}
+            feePerVByte={feePerVByte}
             type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
             btcRecipients={recipients}
+            ordinalTxUtxo={ordinalTxUtxo}
             onApplyClick={onApplyClick}
             onCrossClick={closeTransactionSettingAlert}
             nonOrdinalUtxos={nonOrdinalUtxos}
             loading={loading}
             isRestoreFlow={isRestoreFundFlow}
+            showFeeSettings={showFeeSettings}
+            setShowFeeSettings={setShowFeeSettings}
           />
         </Container>
         <ErrorContainer>
