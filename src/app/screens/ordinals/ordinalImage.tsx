@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-import { Suspense } from 'react';
 import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
@@ -9,6 +7,7 @@ import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import { useTranslation } from 'react-i18next';
 import { Inscription } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import Brc20Tile from './brc20Tile';
 
 interface ContainerProps {
@@ -90,7 +89,7 @@ const OrdinalContentText = styled.h1<TextProps>((props) => ({
   textAlign: 'center',
 }));
 
-const StyledImg = styled(Image)`
+const StyledLazyLoadImage = styled(LazyLoadImage)`
   border-radius: 8px;
   object-fit: contain;
   image-rendering: pixelated;
@@ -118,18 +117,15 @@ function OrdinalImage({
   if (ordinal?.content_type.includes('image')) {
     return (
       <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
-        <Suspense>
-          <StyledImg
-            width="100%"
-            placeholder={(
-              <LoaderContainer isGalleryOpen={isGalleryOpen}>
-                <MoonLoader color="white" size={20} />
-              </LoaderContainer>
+        <StyledLazyLoadImage
+          width="100%"
+          placeholder={(
+            <LoaderContainer isGalleryOpen={isGalleryOpen}>
+              <MoonLoader color="white" size={20} />
+            </LoaderContainer>
               )}
-            src={getFetchableUrl(`https://api.hiro.so/ordinals/v1/inscriptions/${ordinal.id}/content`, 'http')}
-            fallback={PlaceholderImage}
-          />
-        </Suspense>
+          src={getFetchableUrl(`https://api.hiro.so/ordinals/v1/inscriptions/${ordinal.id}/content`, 'http')}
+        />
         {isNftDashboard && (
           <OrdinalsTag>
             <ButtonIcon src={OrdinalsIcon} />
