@@ -85,7 +85,7 @@ function SignPsbtRequest() {
 
   const handlePsbtParsing = useCallback(() => {
     try {
-      return parsePsbt(selectedAccount!, payload.inputsToSign, payload.psbtBase64);
+      return parsePsbt(selectedAccount!, payload.inputsToSign, payload.psbtBase64, network.type);
     } catch (err) {
       return '';
     }
