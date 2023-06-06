@@ -208,6 +208,7 @@ function NftDashboard() {
     data: ordinals,
     error: ordinalsError,
     hasNextPage: hasNextPageOrdinals,
+    isFetchingNextPage: isFetchingNextPageOrdinals,
     isLoading: isLoadingOrdinals,
     fetchNextPage: fetchNextOrdinalsPage,
     refetch: refetchOrdinals,
@@ -281,16 +282,15 @@ function NftDashboard() {
             <Nft asset={nft} key={nft.asset_identifier} isGalleryOpen={isGalleryOpen} />
           ))}
         </GridContainer>
-        {(hasNextPage || hasNextPageOrdinals)
-            && (isFetchingNextPage ? (
-              <LoadMoreButtonContainer>
-                <MoonLoader color="white" size={30} />
-              </LoadMoreButtonContainer>
-            ) : (
-              <LoadMoreButtonContainer>
-                <LoadMoreButton onClick={onLoadMoreButtonClick}>{t('LOAD_MORE')}</LoadMoreButton>
-              </LoadMoreButtonContainer>
-            ))}
+        {(hasNextPage || hasNextPageOrdinals) && (
+        <LoadMoreButtonContainer>
+          {isFetchingNextPage || isFetchingNextPageOrdinals ? (
+            <MoonLoader color="white" size={30} />
+          ) : (
+            <LoadMoreButton onClick={onLoadMoreButtonClick}>{t('LOAD_MORE')}</LoadMoreButton>
+          )}
+        </LoadMoreButtonContainer>
+        )}
       </>
     )),
     [ordinals, nfts],
