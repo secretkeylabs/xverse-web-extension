@@ -6,7 +6,7 @@ const useAddressInscriptions = () => {
   const { ordinalsAddress } = useWalletSelector();
   const ordinalsApi = useOrdinalsApi();
 
-  const PageSize = 60;
+  const PageSize = 30;
 
   const getInscriptionsByAddress = async ({ pageParam = 0 }) => {
     try {
@@ -20,7 +20,8 @@ const useAddressInscriptions = () => {
   const {
     isLoading, data, isFetchingNextPage, hasNextPage, error, refetch, fetchNextPage,
   } = useInfiniteQuery([`inscriptions-${ordinalsAddress}`], getInscriptionsByAddress, {
-    keepPreviousData: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     getNextPageParam: (lastpage, pages) => {
       const currentLength = pages.map((page) => page.results).flat().length;
       if (currentLength < lastpage.total) {
