@@ -11,6 +11,8 @@ import { animated, useSpring } from '@react-spring/web';
 import ActionButton from '@components/button';
 import useCacheMigration from '@hooks/useCacheMigration';
 import MigrationConfirmation from '@screens/migrationConfirmation';
+import { decryptSeedPhrase } from '@utils/encryptionUtils';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 declare const VERSION: string;
 
@@ -108,6 +110,8 @@ function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
+  const { encryptedSeed } = useWalletSelector();
+
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -153,6 +157,7 @@ function Login(): JSX.Element {
   const handleVerifyPassword = async () => {
     setIsVerifying(true);
     try {
+      await decryptSeedPhrase(encryptedSeed, password);
       const hasMigrated = localStorage.getItem('migrated');
       const isReminderDue = Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
       if (!hasMigrated && isReminderDue) {
