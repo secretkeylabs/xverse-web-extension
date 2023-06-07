@@ -4,6 +4,7 @@ import { setWalletSeedPhraseAction } from '@stores/wallet/actions/actionCreators
 import { createRoot } from 'react-dom/client';
 import { queryClient, offlineStorage } from '@utils/query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
+import migrateCachedStorage from '@utils/migrate';
 import App from '../../app/App';
 import './index.css';
 
@@ -25,6 +26,7 @@ const renderApp = async () => {
     persister: offlineStorage,
     buster: VERSION,
   });
+  await migrateCachedStorage();
   const container = document.getElementById('app');
   const root = createRoot(container);
   return root.render(<App />);

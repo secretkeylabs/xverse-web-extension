@@ -85,6 +85,7 @@ const useWalletReducer = () => {
   const resetWallet = () => {
     dispatch(resetWalletAction());
     chrome.storage.local.clear();
+    localStorage.clear();
     sendMessage({
       method: InternalMethods.RemoveInMemoryKeys,
       payload: undefined,
@@ -192,15 +193,24 @@ const useWalletReducer = () => {
       index: 0n,
       network: changedNetwork.type,
     });
+    const account: Account = {
+      id: 0,
+      btcAddress: wallet.btcAddress,
+      btcPublicKey: wallet.btcPublicKey,
+      masterPubKey: wallet.masterPubKey,
+      ordinalsAddress: wallet.ordinalsAddress,
+      ordinalsPublicKey: wallet.ordinalsPublicKey,
+      stxAddress: wallet.stxAddress,
+      stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
+    };
     dispatch(setWalletAction(wallet));
     try {
-      await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [
-        { ...wallet, id: 0 },
-      ]);
+      await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [account]);
     } catch (err) {
       const bnsName = await getBnsName(wallet.stxAddress, networkObject);
-      dispatch(fetchAccountAction({ ...wallet, id: 0, bnsName }, [{ ...wallet, id: 0 }]));
-      dispatch(getActiveAccountsAction([{ ...wallet, id: 0, bnsName }]));
+      dispatch(fetchAccountAction({ ...account, bnsName }, [account]));
+      dispatch(getActiveAccountsAction([{ ...account, bnsName }]));
     }
     await refetchStxData();
     await refetchBtcData();
