@@ -547,7 +547,7 @@
   "CACHE_MIGRATION_SCREEN": {
     "TITLE":"Your wallet data store needs to be updated in order to remain secure.",
     "WARNING": "Please make sure you have your seed phrase backed up securely before moving forward.",
-    "SUCCESS_TITLE": "Update Complete you can now close this tab and use your wallet normally",
+    "SUCCESS_TITLE": "Update Complete",
     "SKIP_BUTTON": "Do it later",
     "CONFIRM_BUTTON": "Confirm",
     "CLOSE_TAB": "Continue"
