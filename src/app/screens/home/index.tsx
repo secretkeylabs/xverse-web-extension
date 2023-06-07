@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
@@ -219,6 +219,26 @@ function Home() {
   const onOrdinalsReceivePress = () => {
     navigate('/receive/ORD');
   };
+
+  const openInNewTab = async () => {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL('options.html#/migration-confirmation'),
+    });
+  };
+
+  const redirectToMigrate = async () => {
+    try {
+      await openInNewTab();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  useEffect(() => {
+    if (true) { // TODO: check if user has not migrated yet
+      redirectToMigrate();
+    }
+  }, []);
 
   const receiveContent = (
     <ReceiveContainer>
