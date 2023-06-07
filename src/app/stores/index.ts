@@ -18,7 +18,7 @@ const rootPersistConfig = {
   blacklist: ['walletState'],
 };
 
-const WalletPersistConfig: PersistConfig<WalletState> = {
+export const WalletPersistConfig: PersistConfig<WalletState> = {
   version: 1,
   key: 'walletState',
   storage,

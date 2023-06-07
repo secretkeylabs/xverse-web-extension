@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
 import ActionButton from '@components/button';
+import useCacheMigration from '@hooks/useCacheMigration';
+import MigrationConfirmation from '@screens/migrationConfirmation';
 
 declare const VERSION: string;
 
@@ -109,6 +111,7 @@ function Login(): JSX.Element {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showMigration, setShowMigration] = useState(false);
   const styles = useSpring({
     from: {
       opacity: 0,
@@ -120,6 +123,7 @@ function Login(): JSX.Element {
     },
     delay: 100,
   });
+  const { migrateCachedStorage } = useCacheMigration();
 
   const openInNewTab = async () => {
     await chrome.tabs.create({
@@ -128,11 +132,8 @@ function Login(): JSX.Element {
   };
 
   const redirectToMigrate = async () => {
-    try {
-      await openInNewTab();
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    await migrateCachedStorage(password);
+    setIsVerifying(false);
   };
 
   const handleTogglePasswordView = () => {
@@ -148,14 +149,14 @@ function Login(): JSX.Element {
   const handleVerifyPassword = async () => {
     setIsVerifying(true);
     try {
-      await unlockWallet(password);
-      setIsVerifying(false);
       const hasMigrated = localStorage.getItem('migrated');
       if (!hasMigrated) {
-        redirectToMigrate();
-        return;
+        setShowMigration(true);
+      } else {
+        await unlockWallet(password);
+        setIsVerifying(false);
+        navigate(-1);
       }
-      navigate(-1);
     } catch (err) {
       setIsVerifying(false);
       setError(t('VERIFY_PASSWORD_ERROR'));
@@ -180,35 +181,50 @@ function Login(): JSX.Element {
   };
 
   return (
-    <ScreenContainer>
-      <AppVersion>Beta</AppVersion>
-      <ContentContainer style={styles}>
-        <TopSectionContainer>
-          <Logo src={logo} />
-          <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
-        </TopSectionContainer>
-        <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
-        <PasswordInputContainer>
-          <PasswordInput
-            type={isPasswordVisible ? 'text' : 'password'}
-            value={password}
-            onChange={handlePasswordChange}
-            placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
-            autoFocus
-          />
-          <button type="button" onClick={handleTogglePasswordView} style={{ background: 'none' }}>
-            <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
-          </button>
-        </PasswordInputContainer>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <ButtonContainer>
-          <ActionButton onPress={handleVerifyPassword} text={t('VERIFY_PASSWORD_BUTTON')} processing={isVerifying} />
-        </ButtonContainer>
-        <ForgotPasswordButton onClick={handleForgotPassword}>
-          {t('FORGOT_PASSWORD_BUTTON')}
-        </ForgotPasswordButton>
-      </ContentContainer>
-    </ScreenContainer>
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    <>
+      {!showMigration ? (
+        <ScreenContainer>
+          <AppVersion>Beta</AppVersion>
+          <ContentContainer style={styles}>
+            <TopSectionContainer>
+              <Logo src={logo} />
+              <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
+            </TopSectionContainer>
+            <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
+            <PasswordInputContainer>
+              <PasswordInput
+                type={isPasswordVisible ? 'text' : 'password'}
+                value={password}
+                onChange={handlePasswordChange}
+                placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={handleTogglePasswordView}
+                style={{ background: 'none' }}
+              >
+                <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
+              </button>
+            </PasswordInputContainer>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+            <ButtonContainer>
+              <ActionButton
+                onPress={handleVerifyPassword}
+                text={t('VERIFY_PASSWORD_BUTTON')}
+                processing={isVerifying}
+              />
+            </ButtonContainer>
+            <ForgotPasswordButton onClick={handleForgotPassword}>
+              {t('FORGOT_PASSWORD_BUTTON')}
+            </ForgotPasswordButton>
+          </ContentContainer>
+        </ScreenContainer>
+      ) : (
+        <MigrationConfirmation migrateCallback={redirectToMigrate} />
+      )}
+    </>
   );
 }
 export default Login;

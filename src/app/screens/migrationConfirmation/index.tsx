@@ -14,9 +14,6 @@ const Container = styled.div`
   margin-right: auto;
   flex-direction: column;
   flex: 1;
-  &::-webkit-scrollbar {
-    display: none;
-  }
 `;
 
 const ButtonsContainer = styled.div((props) => ({
@@ -60,17 +57,23 @@ const Icon = styled.img((props) => ({
   marginBottom: props.theme.spacing(8),
 }));
 
-function MigrationConfirmation(): JSX.Element {
+interface Props {
+  migrateCallback: () => Promise<void>;
+}
+
+function MigrationConfirmation(props: Props): JSX.Element {
+  const {migrateCallback} = props;
   const [hasFinishedMigrating, setHasFinishedMigrating] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CACHE_MIGRATION_SCREEN' });
+
   const handleConfirm = async () => {
-    await migrateCachedStorage();
+    await migrateCallback();
     setHasFinishedMigrating(true);
   };
 
   const onCloseTab = () => {
-    window.close();
+    navigate('/');
   };
 
   const handleSkip = () => {
@@ -89,7 +92,6 @@ function MigrationConfirmation(): JSX.Element {
         ) : (
           <OnboardingTitle>{t('SUCCESS_TITLE')}</OnboardingTitle>
         )}
-
         {!hasFinishedMigrating ? (
           <ButtonsContainer>
             <SkipButtonContainer>
