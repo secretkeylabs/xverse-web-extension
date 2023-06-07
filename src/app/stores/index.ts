@@ -1,22 +1,34 @@
+/* eslint-disable no-underscore-dangle */
 import ChromeStorage from '@utils/storage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
-import { persistReducer, persistStore } from 'redux-persist';
+import { persistReducer, persistStore, PersistConfig } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
 import walletReducer from './wallet/reducer';
+import { WalletState } from './wallet/actions/types';
 
 export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
 
+export const persistVersion = 1;
+
 const rootPersistConfig = {
+  version: 1,
   key: 'root',
   storage,
   blacklist: ['walletState'],
 };
 
-const WalletPersistConfig = {
+const WalletPersistConfig: PersistConfig<WalletState> = {
+  version: 1,
   key: 'walletState',
   storage,
   blacklist: ['seedPhrase'],
+  migrate: (state) => {
+    if (state?._persist.version === -1) {
+      return Promise.resolve({ ...state, accountsList: [] });
+    }
+    return Promise.resolve(state);
+  },
 };
 
 const appReducer = combineReducers({
