@@ -125,13 +125,13 @@ function Login(): JSX.Element {
   });
   const { migrateCachedStorage } = useCacheMigration();
 
-  const openInNewTab = async () => {
-    await chrome.tabs.create({
-      url: chrome.runtime.getURL('options.html#/migration-confirmation'),
-    });
+  const handleSkipMigration = async () => {
+    await unlockWallet(password);
+    setIsVerifying(false);
+    navigate(-1);
   };
 
-  const redirectToMigrate = async () => {
+  const handleMigrateCache = async () => {
     await migrateCachedStorage(password);
     setIsVerifying(false);
   };
@@ -222,7 +222,7 @@ function Login(): JSX.Element {
           </ContentContainer>
         </ScreenContainer>
       ) : (
-        <MigrationConfirmation migrateCallback={redirectToMigrate} />
+        <MigrationConfirmation migrateCallback={handleMigrateCache} skipCallback={handleSkipMigration} />
       )}
     </>
   );

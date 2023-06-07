@@ -59,25 +59,32 @@ const Icon = styled.img((props) => ({
 
 interface Props {
   migrateCallback: () => Promise<void>;
+  skipCallback: () => Promise<void>
 }
 
 function MigrationConfirmation(props: Props): JSX.Element {
-  const {migrateCallback} = props;
+  const { migrateCallback, skipCallback } = props;
   const [hasFinishedMigrating, setHasFinishedMigrating] = useState(false);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSkipping, setIsSkipping] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'CACHE_MIGRATION_SCREEN' });
 
   const handleConfirm = async () => {
+    setIsLoading(true);
     await migrateCallback();
     setHasFinishedMigrating(true);
+    setIsLoading(false);
   };
 
   const onCloseTab = () => {
     navigate('/');
   };
 
-  const handleSkip = () => {
-    navigate('/');
+  const handleSkip = async () => {
+    setIsSkipping(true);
+    await skipCallback();
+    setIsSkipping(false);
   };
 
   return (
@@ -99,9 +106,14 @@ function MigrationConfirmation(props: Props): JSX.Element {
                 text={t('SKIP_BUTTON')}
                 onPress={handleSkip}
                 warning
+                processing={isSkipping}
               />
             </SkipButtonContainer>
-            <ActionButton onPress={handleConfirm} text={t('CONFIRM_BUTTON')} />
+            <ActionButton
+              onPress={handleConfirm}
+              text={t('CONFIRM_BUTTON')}
+              processing={isLoading}
+            />
           </ButtonsContainer>
         ) : (
           <ButtonsContainer>
