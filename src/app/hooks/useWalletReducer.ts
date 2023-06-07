@@ -97,6 +97,17 @@ const useWalletReducer = () => {
       index: 0n,
       network: 'Mainnet',
     });
+    const account: Account = {
+      id: 0,
+      btcAddress: wallet.btcAddress,
+      btcPublicKey: wallet.btcPublicKey,
+      masterPubKey: wallet.masterPubKey,
+      ordinalsAddress: wallet.ordinalsAddress,
+      ordinalsPublicKey: wallet.ordinalsPublicKey,
+      stxAddress: wallet.stxAddress,
+      stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
+    };
     const encryptSeed = await encryptSeedPhrase(seed, password);
     await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
@@ -108,18 +119,25 @@ const useWalletReducer = () => {
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
     try {
-      await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [{ id: 0, bnsName, ...wallet }]);
+      await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [{ bnsName, ...account }]);
     } catch (err) {
-      dispatch(fetchAccountAction({ ...wallet, id: 0, bnsName }, [{ ...wallet, id: 0 }]));
-      dispatch(getActiveAccountsAction([{ ...wallet, id: 0, bnsName }]));
+      dispatch(fetchAccountAction({ ...account, bnsName }, [{ ...account }]));
+      dispatch(getActiveAccountsAction([{ ...account, bnsName }]));
     }
   };
 
   const createWallet = async () => {
     const wallet = await newWallet();
     const account: Account = {
-      ...wallet,
       id: 0,
+      btcAddress: wallet.btcAddress,
+      btcPublicKey: wallet.btcPublicKey,
+      masterPubKey: wallet.masterPubKey,
+      ordinalsAddress: wallet.ordinalsAddress,
+      ordinalsPublicKey: wallet.ordinalsPublicKey,
+      stxAddress: wallet.stxAddress,
+      stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
     };
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
