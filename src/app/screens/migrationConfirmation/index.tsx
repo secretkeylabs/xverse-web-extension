@@ -39,7 +39,7 @@ function MigrationConfirmation(): JSX.Element {
     <Container>
       <OnBoardingContentContainer>
         <OnboardingTitle>
-          We want to make a migration of your data to ensure you have the best experience with our extension.
+          Your wallet data needs to be migrated in order to remain secure. Please make sure you have your seed phrase backed up securely before moving forward. 
         </OnboardingTitle>
 
         <ActionButton
