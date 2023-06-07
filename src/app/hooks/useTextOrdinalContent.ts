@@ -1,22 +1,21 @@
 import { Inscription } from '@secretkeylabs/xverse-core/types';
 import { getTextOrdinalContent } from '@secretkeylabs/xverse-core/api/index';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import PQueue from 'p-queue';
+
+const queue = new PQueue({ concurrency: 1 });
 
 const useTextOrdinalContent = (ordinal: Inscription) => {
-  const [textContent, setTextContent] = useState('');
+  const {
+    data: textContent,
+  } = useQuery({
+    queryKey: [`ordinal-text-${ordinal?.id}`],
+    queryFn: async () => queue.add(() => getTextOrdinalContent(ordinal?.id)),
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
 
-  useEffect(() => {
-    if (ordinal) {
-      (async () => {
-        if (ordinal?.content_type.startsWith('text/plain')) {
-          const response: string = await getTextOrdinalContent(ordinal?.id);
-          setTextContent(response ?? '');
-        }
-      })();
-    }
-  }, [ordinal]);
-
-  return textContent.toString();
+  return textContent?.toString();
 };
 
 export default useTextOrdinalContent;
