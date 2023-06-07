@@ -371,6 +371,7 @@
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",
     "BACKUP_WALLET": "Backup Wallet",
+    "AUTO_LOCK": "Auto Lock",
     "RESET_WALLET": "Reset Wallet",
     "ABOUT": "About",
     "TERMS_OF_SERVICE": "Terms of Service",
@@ -542,5 +543,12 @@
     "SEND": "Send",
     "AMOUNT": "Amount",
     "BALANCE": "Balance"
+  },
+  "CACHE_MIGRATION_SCREEN": {
+    "TITLE":"Your wallet data store needs to be updated in order to remain secure. Please make sure you have your seed phrase backed up securely before moving forward.",
+    "SUCCESS_TITLE": "Update Complete you can now close this tab and use your wallet normally",
+    "SKIP_BUTTON": "Skip",
+    "CONFIRM_BUTTON": "Confirm",
+    "CLOSE_TAB": "Close this tab"
   }
 }
