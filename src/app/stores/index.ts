@@ -25,10 +25,8 @@ const WalletPersistConfig: PersistConfig<WalletState> = {
   blacklist: ['seedPhrase'],
   migrate: (state) => {
     if (state?._persist.version === -1) {
-      console.log(state, 'un-migrated');
       return Promise.resolve({ ...state, accountsList: [] });
     }
-    console.log(state, 'migrated');
     return Promise.resolve(state);
   },
 };
