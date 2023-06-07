@@ -190,12 +190,6 @@ function Setting() {
           showDivider
         />
         <SettingComponent
-          text={t('AUTO_LOCK')}
-          onClick={openBackUpWalletScreen}
-          icon={ArrowIcon}
-          showDivider
-        />
-        <SettingComponent
           text={t('RESET_WALLET')}
           onClick={openResetWalletPrompt}
           showWarningTitle
