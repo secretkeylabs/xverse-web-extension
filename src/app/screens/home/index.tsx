@@ -220,25 +220,25 @@ function Home() {
     navigate('/receive/ORD');
   };
 
-  const openInNewTab = async () => {
-    await chrome.tabs.create({
-      url: chrome.runtime.getURL('options.html#/migration-confirmation'),
-    });
-  };
+  // const openInNewTab = async () => {
+  //   await chrome.tabs.create({
+  //     url: chrome.runtime.getURL('options.html#/migration-confirmation'),
+  //   });
+  // };
 
-  const redirectToMigrate = async () => {
-    try {
-      await openInNewTab();
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
+  // const redirectToMigrate = async () => {
+  //   try {
+  //     await openInNewTab();
+  //   } catch (err) {
+  //     return Promise.reject(err);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (true) { // TODO: check if user has not migrated yet
-      redirectToMigrate();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (true) { // TODO: check if user has not migrated yet
+  //     redirectToMigrate();
+  //   }
+  // }, []);
 
   const receiveContent = (
     <ReceiveContainer>
