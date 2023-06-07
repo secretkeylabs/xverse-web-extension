@@ -130,6 +130,7 @@ const useWalletReducer = () => {
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
+    localStorage.setItem('migrated', 'true');
     try {
       await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [{ bnsName, ...account }]);
     } catch (err) {
@@ -153,6 +154,7 @@ const useWalletReducer = () => {
     };
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
+    localStorage.setItem('migrated', 'true');
     await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
