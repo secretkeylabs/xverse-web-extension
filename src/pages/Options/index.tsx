@@ -4,7 +4,6 @@ import { setWalletSeedPhraseAction } from '@stores/wallet/actions/actionCreators
 import { createRoot } from 'react-dom/client';
 import { queryClient, offlineStorage } from '@utils/query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
-import migrateCachedStorage from '@utils/migrate';
 import App from '../../app/App';
 import './index.css';
 
