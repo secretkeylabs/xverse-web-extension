@@ -134,7 +134,7 @@ function Login(): JSX.Element {
     await unlockWallet(password);
     setIsVerifying(false);
     const skipTime = new Date().getTime();
-    const migrationReminder = addMinutes(skipTime, 1).getTime();
+    const migrationReminder = addMinutes(skipTime, 10).getTime();
     localStorage.setItem('migrationReminder', migrationReminder.toString());
     navigate(-1);
   };
