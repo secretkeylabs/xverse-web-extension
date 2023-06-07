@@ -40,6 +40,17 @@ const useWalletReducer = () => {
 
   const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, currentNetworkObject: StacksNetwork, currentAccounts: Account[]) => {
     const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, currentNetworkObject, currentAccounts);
+    walletAccounts[0] = {
+      id: walletAccounts[0].id,
+      btcAddress: walletAccounts[0].btcAddress,
+      btcPublicKey: walletAccounts[0].btcPublicKey,
+      masterPubKey: walletAccounts[0].masterPubKey,
+      ordinalsAddress: walletAccounts[0].ordinalsAddress,
+      ordinalsPublicKey: walletAccounts[0].ordinalsPublicKey,
+      stxAddress: walletAccounts[0].stxAddress,
+      stxPublicKey: walletAccounts[0].stxPublicKey,
+      bnsName: walletAccounts[0].bnsName,
+    };
     dispatch(
       setWalletAction(
         selectedAccount
@@ -85,6 +96,7 @@ const useWalletReducer = () => {
   const resetWallet = () => {
     dispatch(resetWalletAction());
     chrome.storage.local.clear();
+    localStorage.clear();
     sendMessage({
       method: InternalMethods.RemoveInMemoryKeys,
       payload: undefined,
@@ -192,15 +204,24 @@ const useWalletReducer = () => {
       index: 0n,
       network: changedNetwork.type,
     });
+    const account: Account = {
+      id: 0,
+      btcAddress: wallet.btcAddress,
+      btcPublicKey: wallet.btcPublicKey,
+      masterPubKey: wallet.masterPubKey,
+      ordinalsAddress: wallet.ordinalsAddress,
+      ordinalsPublicKey: wallet.ordinalsPublicKey,
+      stxAddress: wallet.stxAddress,
+      stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
+    };
     dispatch(setWalletAction(wallet));
     try {
-      await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [
-        { ...wallet, id: 0 },
-      ]);
+      await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [account]);
     } catch (err) {
       const bnsName = await getBnsName(wallet.stxAddress, networkObject);
-      dispatch(fetchAccountAction({ ...wallet, id: 0, bnsName }, [{ ...wallet, id: 0 }]));
-      dispatch(getActiveAccountsAction([{ ...wallet, id: 0, bnsName }]));
+      dispatch(fetchAccountAction({ ...account, bnsName }, [account]));
+      dispatch(getActiveAccountsAction([{ ...account, bnsName }]));
     }
     await refetchStxData();
     await refetchBtcData();
