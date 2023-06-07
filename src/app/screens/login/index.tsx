@@ -5,6 +5,7 @@ import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { addHours, addMinutes } from 'date-fns';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
 import ActionButton from '@components/button';
@@ -128,6 +129,9 @@ function Login(): JSX.Element {
   const handleSkipMigration = async () => {
     await unlockWallet(password);
     setIsVerifying(false);
+    const skipTime = new Date().getTime();
+    const migrationReminder = addMinutes(skipTime, 1).getTime();
+    localStorage.setItem('migrationReminder', migrationReminder.toString());
     navigate(-1);
   };
 
@@ -150,7 +154,8 @@ function Login(): JSX.Element {
     setIsVerifying(true);
     try {
       const hasMigrated = localStorage.getItem('migrated');
-      if (!hasMigrated) {
+      const isReminderDue = Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
+      if (!hasMigrated && isReminderDue) {
         setShowMigration(true);
       } else {
         await unlockWallet(password);
