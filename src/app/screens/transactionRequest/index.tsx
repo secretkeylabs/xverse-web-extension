@@ -89,7 +89,7 @@ function TransactionRequest() {
             txid: '',
             currency: 'STX',
             error:
-              'There are missing function arguments in the transaction request',
+              'Contract function call missing arguments',
             browserTx: true,
           },
         });
