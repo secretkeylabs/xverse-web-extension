@@ -39,7 +39,7 @@ function MigrationConfirmation(): JSX.Element {
     <Container>
       <OnBoardingContentContainer>
         <OnboardingTitle>
-          Your wallet data needs to be migrated in order to remain secure. Please make sure you have your seed phrase backed up securely before moving forward. 
+          Your wallet data store needs to be updated in order to remain secure. Please make sure you have your seed phrase backed up securely before moving forward. 
         </OnboardingTitle>
 
         <ActionButton
