@@ -40,6 +40,17 @@ const useWalletReducer = () => {
 
   const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, currentNetworkObject: StacksNetwork, currentAccounts: Account[]) => {
     const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, currentNetworkObject, currentAccounts);
+    walletAccounts[0] = {
+      id: walletAccounts[0].id,
+      btcAddress: walletAccounts[0].btcAddress,
+      btcPublicKey: walletAccounts[0].btcPublicKey,
+      masterPubKey: walletAccounts[0].masterPubKey,
+      ordinalsAddress: walletAccounts[0].ordinalsAddress,
+      ordinalsPublicKey: walletAccounts[0].ordinalsPublicKey,
+      stxAddress: walletAccounts[0].stxAddress,
+      stxPublicKey: walletAccounts[0].stxPublicKey,
+      bnsName: walletAccounts[0].bnsName,
+    };
     dispatch(
       setWalletAction(
         selectedAccount
