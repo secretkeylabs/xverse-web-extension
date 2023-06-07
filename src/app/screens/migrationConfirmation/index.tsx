@@ -41,6 +41,12 @@ const OnboardingTitle = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
+const OnboardingContent = styled.div((props) => ({
+  ...props.theme.body_l,
+  marginTop: 10,
+  textAlign: 'center',
+}));
+
 const SkipButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(2),
   width: '100%',
@@ -76,7 +82,10 @@ function MigrationConfirmation(): JSX.Element {
       <OnBoardingContentContainer>
         <Icon src={!hasFinishedMigrating ? WarningStatus : CheckCircle} />
         {!hasFinishedMigrating ? (
-          <OnboardingTitle>{t('TITLE')}</OnboardingTitle>
+          <>
+            <OnboardingTitle>{t('TITLE')}</OnboardingTitle>
+            <OnboardingContent>{t('WARNING')}</OnboardingContent>
+          </>
         ) : (
           <OnboardingTitle>{t('SUCCESS_TITLE')}</OnboardingTitle>
         )}
@@ -88,7 +97,6 @@ function MigrationConfirmation(): JSX.Element {
                 text={t('SKIP_BUTTON')}
                 onPress={handleSkip}
                 warning
-                src={WarningIcon}
               />
             </SkipButtonContainer>
             <ActionButton onPress={handleConfirm} text={t('CONFIRM_BUTTON')} />

@@ -545,7 +545,8 @@
     "BALANCE": "Balance"
   },
   "CACHE_MIGRATION_SCREEN": {
-    "TITLE":"Your wallet data store needs to be updated in order to remain secure. Please make sure you have your seed phrase backed up securely before moving forward.",
+    "TITLE":"Your wallet data store needs to be updated in order to remain secure.",
+    "WARNING": "Please make sure you have your seed phrase backed up securely before moving forward.",
     "SUCCESS_TITLE": "Update Complete you can now close this tab and use your wallet normally",
     "SKIP_BUTTON": "Skip",
     "CONFIRM_BUTTON": "Confirm",
