@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import ActionButton from '@components/button';
-import migrateCachedStorage from '@utils/migrate';
-import WarningIcon from '@assets/img/Warning.svg';
 import WarningStatus from '@assets/img/warningIcon.svg';
 import CheckCircle from '@assets/img/createWalletSuccess/CheckCircle.svg';
 
