@@ -23,12 +23,6 @@ const WalletPersistConfig: PersistConfig<WalletState> = {
   key: 'walletState',
   storage,
   blacklist: ['seedPhrase'],
-  migrate: (state) => {
-    if (state?._persist.version === -1) {
-      return Promise.resolve({ ...state, accountsList: [] });
-    }
-    return Promise.resolve(state);
-  },
 };
 
 const appReducer = combineReducers({
