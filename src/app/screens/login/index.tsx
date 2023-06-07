@@ -121,6 +121,20 @@ function Login(): JSX.Element {
     delay: 100,
   });
 
+  const openInNewTab = async () => {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL('options.html#/migration-confirmation'),
+    });
+  };
+
+  const redirectToMigrate = async () => {
+    try {
+      await openInNewTab();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
   const handleTogglePasswordView = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
@@ -136,6 +150,11 @@ function Login(): JSX.Element {
     try {
       await unlockWallet(password);
       setIsVerifying(false);
+      const hasMigrated = localStorage.getItem('migrated');
+      if (!hasMigrated) {
+        redirectToMigrate();
+        return;
+      }
       navigate(-1);
     } catch (err) {
       setIsVerifying(false);

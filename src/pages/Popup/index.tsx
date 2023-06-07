@@ -25,7 +25,6 @@ const renderApp = async () => {
     persister: offlineStorage,
     buster: VERSION,
   });
-  await migrateCachedStorage();
   const container = document.getElementById('app');
   const root = createRoot(container);
   return root.render(<App />);
