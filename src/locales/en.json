@@ -52,7 +52,7 @@
       "TITLE_BTC": "Bitcoin address added",
       "TITLE_ORDINALS": "Ordinals address added",
       "TITLE_STX": "Stacks address added",
-      "SUBTITLE": "Lorem ipsum you can receive and send Bitcoin/Stacks Payments using Xverse and Ledger ipsum."
+      "SUBTITLE": "You can now receive and send Bitcoin, Ordinals and BRC-20 tokens using Xverse and Ledger."
     },
     "LEDGER_ADD_ACCOUNT_NAME": {
       "TITLE": "Name your Ledger wallet",
@@ -61,7 +61,7 @@
     },
     "LEDGER_IMPORT_END": {
       "TITLE": "Your wallet is ready!",
-      "SUBTITLE": "Store your Bitcoin, Stacks, NFTs, Ordinals, etc lorem ipsum security of a ledger wallet lorem ipsum dolor sit amet."
+      "SUBTITLE": "Now is the time to start managing your digital assets with ease and confidence."
     },
     "LEDGER_IMPORT_2_BUTTON": "Get started",
     "LEDGER_IMPORT_CONTINUE_BUTTON": "Continue",

@@ -28,7 +28,7 @@ export function ftDecimals(value: number | string | BigNumber, decimals: number)
 
 export function convertAmountToFtDecimalPlaces(
   value: number | string | BigNumber,
-  decimals: number
+  decimals: number,
 ): number {
   const amount = initBigNumber(value);
   return amount.shiftedBy(+decimals).toNumber();
@@ -75,7 +75,7 @@ export function getShortTruncatedAddress(address: string) {
 export function getAddressDetail(account: Account) {
   if (account.btcAddress && account.stxAddress) {
     return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(
-      account.stxAddress
+      account.stxAddress,
     )}`;
   }
   if (account.btcAddress || account.stxAddress) {
@@ -117,13 +117,12 @@ export function getFetchableUrl(uri: string, protocol: string): string | undefin
  */
 export function checkNftExists(
   pendingTransactions: StxMempoolTransactionData[],
-  nft: NftData
+  nft: NftData,
 ): boolean {
   const principal: string[] = nft?.fully_qualified_token_id?.split('::');
   const transaction = pendingTransactions.find(
-    (tx) =>
-      tx.contractCall?.contract_id === principal[0] &&
-      tx.contractCall.function_args[0].repr.substring(1) === nft.token_id.toString()
+    (tx) => tx.contractCall?.contract_id === principal[0]
+      && tx.contractCall.function_args[0].repr.substring(1) === nft.token_id.toString(),
   );
   if (transaction) return true;
   return false;
@@ -157,13 +156,8 @@ export async function isValidBtcApi(url: string, network: NetworkType) {
   throw new Error('Invalid URL');
 }
 
-export const getNetworkType = (stxNetwork) =>
-  stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
+export const getNetworkType = (stxNetwork) => (stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet');
 
-export const isHardwareAccount = (account: Account | null): boolean => {
-  return account?.accountType !== 'software';
-};
+export const isHardwareAccount = (account: Account | null): boolean => account?.accountType && account?.accountType !== 'software';
 
-export const isLedgerAccount = (account: Account | null): boolean => {
-  return account?.accountType === 'ledger';
-};
+export const isLedgerAccount = (account: Account | null): boolean => account?.accountType === 'ledger';
