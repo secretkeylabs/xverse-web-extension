@@ -28,5 +28,4 @@ const renderApp = async () => {
   const root = createRoot(container);
   return root.render(<App />);
 };
-
 renderApp();
