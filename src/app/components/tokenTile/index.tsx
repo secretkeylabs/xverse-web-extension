@@ -100,6 +100,7 @@ const SubText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['400'],
   fontSize: 12,
+  textAlign: 'left',
 }));
 
 const FiatAmountText = styled.h1((props) => ({
@@ -117,6 +118,13 @@ const CoinBalanceText = styled.h1((props) => ({
 
 const TokenTitleContainer = styled.div({
   display: 'flex',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+});
+
+const TagContainer = styled.div({
+  display: 'flex',
   alignItems: 'center',
 });
 
@@ -128,6 +136,7 @@ const ProtocolText = styled.p((props) => ({
   backgroundColor: props.theme.colors.white['400'],
   padding: '2px 6px 1px',
   borderRadius: props.theme.radius(2),
+  whiteSpace: 'nowrap',
 }));
 
 function TokenLoader() {
@@ -183,6 +192,8 @@ function TokenTile({
       case 'BTC':
         return satsToBtc(new BigNumber(btcBalance)).toString();
       case 'FT':
+        return fungibleToken ? getFtBalance(fungibleToken) : '';
+      case 'brc20':
         return fungibleToken ? getFtBalance(fungibleToken) : '';
       default:
     }
@@ -340,17 +351,18 @@ function TokenTile({
       <RowContainer>
         {renderIcon()}
         <TextContainer>
+
+          <CoinTickerText>{getTickerTitle()}</CoinTickerText>
           <TokenTitleContainer>
-            <CoinTickerText>{getTickerTitle()}</CoinTickerText>
-            {
-              fungibleToken?.protocol ? (
+            <SubText>{title}</SubText>
+            {fungibleToken?.protocol ? (
+              <TagContainer>
                 <ProtocolText>
                   {fungibleToken?.protocol === 'stacks' ? 'Sip-10' : fungibleToken?.protocol}
                 </ProtocolText>
-              ) : null
-            }
+              </TagContainer>
+            ) : null}
           </TokenTitleContainer>
-          <SubText>{title}</SubText>
         </TextContainer>
       </RowContainer>
       {loading ? (

@@ -5,11 +5,21 @@ import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { addHours, addMinutes } from 'date-fns';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
 import ActionButton from '@components/button';
+import useCacheMigration from '@hooks/useCacheMigration';
+import MigrationConfirmation from '@screens/migrationConfirmation';
+import { decryptSeedPhrase } from '@utils/encryptionUtils';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 declare const VERSION: string;
+
+const Logo = styled.img({
+  width: 57,
+  height: 57,
+});
 
 const ScreenContainer = styled(animated.div)({
   display: 'flex',
@@ -100,10 +110,13 @@ function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
+  const { encryptedSeed } = useWalletSelector();
+
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showMigration, setShowMigration] = useState(false);
   const styles = useSpring({
     from: {
       opacity: 0,
@@ -115,6 +128,21 @@ function Login(): JSX.Element {
     },
     delay: 100,
   });
+  const { migrateCachedStorage } = useCacheMigration();
+
+  const handleSkipMigration = async () => {
+    await unlockWallet(password);
+    setIsVerifying(false);
+    const skipTime = new Date().getTime();
+    const migrationReminder = addMinutes(skipTime, 10).getTime();
+    localStorage.setItem('migrationReminder', migrationReminder.toString());
+    navigate(-1);
+  };
+
+  const handleMigrateCache = async () => {
+    await migrateCachedStorage(password);
+    setIsVerifying(false);
+  };
 
   const handleTogglePasswordView = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -129,9 +157,16 @@ function Login(): JSX.Element {
   const handleVerifyPassword = async () => {
     setIsVerifying(true);
     try {
-      await unlockWallet(password);
-      setIsVerifying(false);
-      navigate(-1);
+      await decryptSeedPhrase(encryptedSeed, password);
+      const hasMigrated = localStorage.getItem('migrated');
+      const isReminderDue = Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
+      if (!hasMigrated && isReminderDue) {
+        setShowMigration(true);
+      } else {
+        await unlockWallet(password);
+        setIsVerifying(false);
+        navigate(-1);
+      }
     } catch (err) {
       setIsVerifying(false);
       setError(t('VERIFY_PASSWORD_ERROR'));
@@ -156,35 +191,50 @@ function Login(): JSX.Element {
   };
 
   return (
-    <ScreenContainer>
-      <AppVersion>Beta</AppVersion>
-      <ContentContainer style={styles}>
-        <TopSectionContainer>
-          <img src={logo} width={140} alt="logo" />
-          <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
-        </TopSectionContainer>
-        <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
-        <PasswordInputContainer>
-          <PasswordInput
-            type={isPasswordVisible ? 'text' : 'password'}
-            value={password}
-            onChange={handlePasswordChange}
-            placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
-            autoFocus
-          />
-          <button type="button" onClick={handleTogglePasswordView} style={{ background: 'none' }}>
-            <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
-          </button>
-        </PasswordInputContainer>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <ButtonContainer>
-          <ActionButton onPress={handleVerifyPassword} text={t('VERIFY_PASSWORD_BUTTON')} processing={isVerifying} />
-        </ButtonContainer>
-        <ForgotPasswordButton onClick={handleForgotPassword}>
-          {t('FORGOT_PASSWORD_BUTTON')}
-        </ForgotPasswordButton>
-      </ContentContainer>
-    </ScreenContainer>
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    <>
+      {!showMigration ? (
+        <ScreenContainer>
+          <AppVersion>Beta</AppVersion>
+          <ContentContainer style={styles}>
+            <TopSectionContainer>
+              <Logo src={logo} />
+              <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
+            </TopSectionContainer>
+            <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
+            <PasswordInputContainer>
+              <PasswordInput
+                type={isPasswordVisible ? 'text' : 'password'}
+                value={password}
+                onChange={handlePasswordChange}
+                placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={handleTogglePasswordView}
+                style={{ background: 'none' }}
+              >
+                <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
+              </button>
+            </PasswordInputContainer>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+            <ButtonContainer>
+              <ActionButton
+                onPress={handleVerifyPassword}
+                text={t('VERIFY_PASSWORD_BUTTON')}
+                processing={isVerifying}
+              />
+            </ButtonContainer>
+            <ForgotPasswordButton onClick={handleForgotPassword}>
+              {t('FORGOT_PASSWORD_BUTTON')}
+            </ForgotPasswordButton>
+          </ContentContainer>
+        </ScreenContainer>
+      ) : (
+        <MigrationConfirmation migrateCallback={handleMigrateCache} skipCallback={handleSkipMigration} />
+      )}
+    </>
   );
 }
 export default Login;

@@ -27,13 +27,15 @@ const Label = styled.p((props) => ({
 
 const ContinueButton = styled.button<ButtonProps>((props) => ({
   display: 'flex',
+  ...props.theme.body_bold_m,
+  fontSize: 12,
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: props.theme.colors.action.classic,
   marginBottom: props.theme.spacing(30),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.background.elevation0,
   width: '100%',
   height: 44,
   opacity: props.enabled ? 1 : 0.6,

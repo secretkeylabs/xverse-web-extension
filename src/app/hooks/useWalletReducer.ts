@@ -26,35 +26,38 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 
 const useWalletReducer = () => {
-  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } =
-    useSelector((state: StoreState) => ({
-      ...state.walletState,
-    }));
+  const {
+    encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList,
+  } = useSelector((state: StoreState) => ({
+    ...state.walletState,
+  }));
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
 
-  const loadActiveAccounts = async (
-    secretKey: string,
-    currentNetwork: SettingsNetwork,
-    currentNetworkObject: StacksNetwork,
-    currentAccounts: Account[]
-  ) => {
-    const walletAccounts = await restoreWalletWithAccounts(
-      secretKey,
-      currentNetwork,
-      currentNetworkObject,
-      currentAccounts
-    );
+  const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, currentNetworkObject: StacksNetwork, currentAccounts: Account[]) => {
+    const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, currentNetworkObject, currentAccounts);
+
+    walletAccounts[0] = {
+      id: walletAccounts[0].id,
+      btcAddress: walletAccounts[0].btcAddress,
+      btcPublicKey: walletAccounts[0].btcPublicKey,
+      masterPubKey: walletAccounts[0].masterPubKey,
+      ordinalsAddress: walletAccounts[0].ordinalsAddress,
+      ordinalsPublicKey: walletAccounts[0].ordinalsPublicKey,
+      stxAddress: walletAccounts[0].stxAddress,
+      stxPublicKey: walletAccounts[0].stxPublicKey,
+      bnsName: walletAccounts[0].bnsName,
+    };
 
     if (!isHardwareAccount(selectedAccount)) {
       dispatch(
         setWalletAction(
           selectedAccount
             ? { ...walletAccounts[selectedAccount.id], seedPhrase: secretKey }
-            : { ...walletAccounts[0], seedPhrase: secretKey }
-        )
+            : { ...walletAccounts[0], seedPhrase: secretKey },
+        ),
       );
     }
 
@@ -65,9 +68,10 @@ const useWalletReducer = () => {
             ? ledgerAccountsList[selectedAccount.id]
             : walletAccounts[selectedAccount.id]
           : walletAccounts[0],
-        walletAccounts
-      )
+        walletAccounts,
+      ),
     );
+
     dispatch(getActiveAccountsAction(walletAccounts));
   };
 
@@ -100,6 +104,7 @@ const useWalletReducer = () => {
   const resetWallet = () => {
     dispatch(resetWalletAction());
     chrome.storage.local.clear();
+    localStorage.clear();
     sendMessage({
       method: InternalMethods.RemoveInMemoryKeys,
       payload: undefined,
@@ -112,6 +117,17 @@ const useWalletReducer = () => {
       index: 0n,
       network: 'Mainnet',
     });
+    const account: Account = {
+      id: 0,
+      btcAddress: wallet.btcAddress,
+      btcPublicKey: wallet.btcPublicKey,
+      masterPubKey: wallet.masterPubKey,
+      ordinalsAddress: wallet.ordinalsAddress,
+      ordinalsPublicKey: wallet.ordinalsPublicKey,
+      stxAddress: wallet.stxAddress,
+      stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
+    };
     const encryptSeed = await encryptSeedPhrase(seed, password);
     await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
@@ -122,24 +138,31 @@ const useWalletReducer = () => {
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
+    localStorage.setItem('migrated', 'true');
     try {
-      await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [
-        { id: 0, bnsName, ...wallet },
-      ]);
+      await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [{ bnsName, ...account }]);
     } catch (err) {
-      dispatch(fetchAccountAction({ ...wallet, id: 0, bnsName }, [{ ...wallet, id: 0 }]));
-      dispatch(getActiveAccountsAction([{ ...wallet, id: 0, bnsName }]));
+      dispatch(fetchAccountAction({ ...account, bnsName }, [{ ...account }]));
+      dispatch(getActiveAccountsAction([{ ...account, bnsName }]));
     }
   };
 
   const createWallet = async () => {
     const wallet = await newWallet();
     const account: Account = {
-      ...wallet,
       id: 0,
+      btcAddress: wallet.btcAddress,
+      btcPublicKey: wallet.btcPublicKey,
+      masterPubKey: wallet.masterPubKey,
+      ordinalsAddress: wallet.ordinalsAddress,
+      ordinalsPublicKey: wallet.ordinalsPublicKey,
+      stxAddress: wallet.stxAddress,
+      stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
     };
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
+    localStorage.setItem('migrated', 'true');
     await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
@@ -154,7 +177,7 @@ const useWalletReducer = () => {
         seedPhrase,
         network,
         selectedNetwork,
-        accountsList
+        accountsList,
       );
       dispatch(addAccoutAction(newAccountsList));
     } catch (err) {
@@ -176,8 +199,8 @@ const useWalletReducer = () => {
         network,
         undefined,
         account.accountType,
-        account.accountName
-      )
+        account.accountName,
+      ),
     );
     dispatch(fetchAccountAction(account, accountsList));
   };
@@ -186,7 +209,7 @@ const useWalletReducer = () => {
     changedNetwork: SettingsNetwork,
     networkObject: StacksNetwork,
     networkAddress: string,
-    btcApiUrl: string
+    btcApiUrl: string,
   ) => {
     dispatch(ChangeNetworkAction(changedNetwork, networkAddress, btcApiUrl));
     const wallet = await walletFromSeedPhrase({
@@ -194,15 +217,24 @@ const useWalletReducer = () => {
       index: 0n,
       network: changedNetwork.type,
     });
+    const account: Account = {
+      id: 0,
+      btcAddress: wallet.btcAddress,
+      btcPublicKey: wallet.btcPublicKey,
+      masterPubKey: wallet.masterPubKey,
+      ordinalsAddress: wallet.ordinalsAddress,
+      ordinalsPublicKey: wallet.ordinalsPublicKey,
+      stxAddress: wallet.stxAddress,
+      stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
+    };
     dispatch(setWalletAction(wallet));
     try {
-      await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [
-        { ...wallet, id: 0 },
-      ]);
+      await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [account]);
     } catch (err) {
       const bnsName = await getBnsName(wallet.stxAddress, networkObject);
-      dispatch(fetchAccountAction({ ...wallet, id: 0, bnsName }, [{ ...wallet, id: 0 }]));
-      dispatch(getActiveAccountsAction([{ ...wallet, id: 0, bnsName }]));
+      dispatch(fetchAccountAction({ ...account, bnsName }, [account]));
+      dispatch(getActiveAccountsAction([{ ...account, bnsName }]));
     }
     await refetchStxData();
     await refetchBtcData();
@@ -217,9 +249,7 @@ const useWalletReducer = () => {
   };
 
   const updateLedgerAccounts = async (updatedLedgerAccount: Account) => {
-    const newLedgerAccountsList = ledgerAccountsList.map((account) =>
-      account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account
-    );
+    const newLedgerAccountsList = ledgerAccountsList.map((account) => (account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account));
     try {
       dispatch(addLedgerAcountAction(newLedgerAccountsList));
       if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {

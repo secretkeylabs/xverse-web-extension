@@ -70,6 +70,7 @@ function SendBtcScreen() {
           recipient,
           fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
           fee: data.fee,
+          feePerVByte: data.feePerVByte,
           fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
           total: data.total,
           fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),

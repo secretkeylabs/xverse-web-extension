@@ -1,10 +1,10 @@
 import CheckCircle from '@assets/img/createWalletSuccess/CheckCircle.svg';
 import Extension from '@assets/img/createWalletSuccess/extension.svg';
-import Pin from '@assets/img/createWalletSuccess/pin.svg';
 import Logo from '@assets/img/createWalletSuccess/logo.svg';
+import Pin from '@assets/img/createWalletSuccess/pin.svg';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
 const InstructionsContainer = styled.div((props) => ({
   display: 'flex',

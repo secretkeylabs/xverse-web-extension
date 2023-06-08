@@ -135,6 +135,7 @@ function ConfirmStxTransationComponent({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const selectedNetwork = useNetworkSelector();
+  const [showFeeSettings, setShowFeeSettings] = useState(false);
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
@@ -150,15 +151,14 @@ function ConfirmStxTransationComponent({
     setButtonLoading(loading);
   }, [loading]);
 
-  const getFee = () =>
-    isSponsored
-      ? new BigNumber(0)
-      : new BigNumber(
-          initialStxTransactions
-            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
-            .reduce((prev, curr) => prev + curr, BigInt(0))
-            .toString(10)
-        );
+  const getFee = () => (isSponsored
+    ? new BigNumber(0)
+    : new BigNumber(
+      initialStxTransactions
+        .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+        .reduce((prev, curr) => prev + curr, BigInt(0))
+        .toString(10),
+    ));
 
   const getTxNonce = (): string => {
     const nonce = getNonce(initialStxTransactions[0]);
@@ -189,7 +189,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions[0],
         seedPhrase,
         selectedAccount?.id ?? 0,
-        selectedNetwork
+        selectedNetwork,
       );
       signedTxs.push(signedContractCall);
     } else if (initialStxTransactions.length === 2) {
@@ -197,13 +197,13 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase
+        seedPhrase,
       );
     }
     onConfirmClick(signedTxs);
   };
 
-  const applyTxSettings = (settingFee: string, nonce?: string) => {
+  const applyTxSettings = ({ fee: settingFee, nonce }: { fee: string; feeRate?: string; nonce?: string }) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
     setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {
@@ -235,7 +235,7 @@ function ConfirmStxTransationComponent({
       const signedTxs = await signLedgerStxTransaction(
         transport,
         initialStxTransactions[0],
-        selectedAccount.id
+        selectedAccount.id,
       );
       setIsTxApproved(true);
       await ledgerDelay(1500);
@@ -259,9 +259,7 @@ function ConfirmStxTransationComponent({
     <>
       <Container>
         <TitleContainer>
-          {!isAsset && (
-            <ReviewTransactionText>{title ?? t('REVIEW_TRNSACTION')}</ReviewTransactionText>
-          )}
+          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>}
           {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
         {children}
@@ -269,7 +267,7 @@ function ConfirmStxTransationComponent({
         {initialStxTransactions[0]?.payload?.amount && (
           <TransferFeeView
             fee={microstacksToStx(
-              getFee().plus(new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10)))
+              getFee().plus(new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10))),
             )}
             currency="STX"
             title={t('TOTAL')}
@@ -291,6 +289,8 @@ function ConfirmStxTransationComponent({
           nonce={getTxNonce()}
           onApplyClick={applyTxSettings}
           onCrossClick={closeTransactionSettingAlert}
+          showFeeSettings={showFeeSettings}
+          setShowFeeSettings={setShowFeeSettings}
         />
       </Container>
       <ButtonContainer>
@@ -335,7 +335,7 @@ function ConfirmStxTransationComponent({
           <ActionButton
             onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
             text={t(
-              isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON'
+              isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
             )}
             disabled={isButtonDisabled}
             processing={isButtonDisabled}

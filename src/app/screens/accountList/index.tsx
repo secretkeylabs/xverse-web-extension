@@ -90,7 +90,7 @@ function AccountList(): JSX.Element {
         account.accountName
       )
     );
-    navigate(-1);
+    navigate('/');
   };
 
   const isAccountSelected = (account: Account) =>

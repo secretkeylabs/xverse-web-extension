@@ -9,8 +9,8 @@ import {
   TransactionData,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
-import * as actions from './types';
 import { AccountType } from '@secretkeylabs/xverse-core';
+import * as actions from './types';
 
 export function setWalletAction(wallet: BaseWallet): actions.SetWallet {
   return {
@@ -54,7 +54,7 @@ export function resetWalletAction(): actions.ResetWallet {
 
 export function fetchAccountAction(
   selectedAccount: Account,
-  accountsList: Account[]
+  accountsList: Account[],
 ): actions.FetchAccount {
   return {
     type: actions.FetchAccountKey,
@@ -90,7 +90,7 @@ export function selectAccount(
   // stackingState: StackingStateData,
   bnsName?: string,
   accountType?: AccountType,
-  accountName?: string
+  accountName?: string,
 ): actions.SelectAccount {
   return {
     type: actions.SelectAccountKey,
@@ -119,7 +119,7 @@ export function setFeeMultiplierAction(feeMultipliers: FeesMultipliers): actions
 
 export function setCoinRatesAction(
   stxBtcRate: BigNumber,
-  btcFiatRate: BigNumber
+  btcFiatRate: BigNumber,
 ): actions.SetCoinRates {
   return {
     type: actions.SetCoinRatesKey,
@@ -133,7 +133,7 @@ export function setStxWalletDataAction(
   stxAvailableBalance: BigNumber,
   stxLockedBalance: BigNumber,
   stxTransactions: TransactionData[],
-  stxNonce: number
+  stxNonce: number,
 ): actions.SetStxWalletData {
   return {
     type: actions.SetStxWalletDataKey,
@@ -154,7 +154,7 @@ export function SetBtcWalletDataAction(balance: BigNumber): actions.SetBtcWallet
 
 export function setCoinDataAction(
   coinsList: FungibleToken[],
-  supportedCoins: Coin[]
+  supportedCoins: Coin[],
 ): actions.SetCoinData {
   return {
     type: actions.SetCoinDataKey,
@@ -164,7 +164,7 @@ export function setCoinDataAction(
 }
 
 export function FetchUpdatedVisibleCoinListAction(
-  coinsList: FungibleToken[]
+  coinsList: FungibleToken[],
 ): actions.UpdateVisibleCoinList {
   return {
     type: actions.UpdateVisibleCoinListKey,
@@ -173,7 +173,7 @@ export function FetchUpdatedVisibleCoinListAction(
 }
 
 export function ChangeFiatCurrencyAction(
-  fiatCurrency: SupportedCurrency
+  fiatCurrency: SupportedCurrency,
 ): actions.ChangeFiatCurrency {
   return {
     type: actions.ChangeFiatCurrencyKey,
@@ -184,7 +184,7 @@ export function ChangeFiatCurrencyAction(
 export function ChangeNetworkAction(
   network: SettingsNetwork,
   networkAddress: string | undefined,
-  btcApiUrl: string
+  btcApiUrl: string,
 ): actions.ChangeNetwork {
   return {
     type: actions.ChangeNetworkKey,
@@ -202,7 +202,7 @@ export function getActiveAccountsAction(accountsList: Account[]): actions.GetAct
 }
 
 export function ChangeActivateOrdinalsAction(
-  hasActivatedOrdinalsKey: boolean
+  hasActivatedOrdinalsKey: boolean,
 ): actions.ChangeActivateOrdinals {
   return {
     type: actions.ChangeHasActivatedOrdinalsKey,
@@ -211,7 +211,7 @@ export function ChangeActivateOrdinalsAction(
 }
 
 export function ChangeShowBtcReceiveAlertAction(
-  showBtcReceiveAlert: boolean | null
+  showBtcReceiveAlert: boolean | null,
 ): actions.ChangeShowBtcReceiveAlert {
   return {
     type: actions.ChangeShowBtcReceiveAlertKey,
@@ -220,7 +220,7 @@ export function ChangeShowBtcReceiveAlertAction(
 }
 
 export function ChangeShowOrdinalReceiveAlertAction(
-  showOrdinalReceiveAlert: boolean | null
+  showOrdinalReceiveAlert: boolean | null,
 ): actions.ChangeShowOrdinalReceiveAlert {
   return {
     type: actions.ChangeShowOrdinalReceiveAlertKey,
@@ -228,9 +228,7 @@ export function ChangeShowOrdinalReceiveAlertAction(
   };
 }
 
-export function setBrcCoinsDataAction(
-  brcCoinsList: FungibleToken[],
-): actions.SetBrcCoinsData {
+export function setBrcCoinsDataAction(brcCoinsList: FungibleToken[]): actions.SetBrcCoinsData {
   return {
     type: actions.SetBrcCoinsListKey,
     brcCoinsList,

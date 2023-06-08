@@ -29,17 +29,6 @@ const ButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(8),
 }));
 
-const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
-  marginLeft: props.theme.spacing(10),
-  marginRight: props.theme.spacing(10),
-}));
-
-const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
-}));
-
 const TransactionSettingOptionText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
   color: props.theme.colors.white[200],
@@ -71,68 +60,64 @@ const TransactionSettingNonceOptionButton = styled.button((props) => ({
 interface Props {
   visible: boolean;
   fee: string;
+  feePerVByte?: BigNumber;
   loading?: boolean;
   nonce?: string;
-  onApplyClick: (fee: string, nonce?: string) => void;
+  onApplyClick: (params: { fee: string; feeRate?: string; nonce?: string }) => void;
   onCrossClick: () => void;
-  previousFee?: string;
-  availableBalance?: BigNumber;
   type?: TxType;
   btcRecipients?: Recipient[];
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  showFeeSettings: boolean;
+  setShowFeeSettings: (value: boolean) => void;
 }
 type TxType = 'STX' | 'BTC' | 'Ordinals';
 
 function TransactionSettingAlert({
   visible,
   fee,
+  feePerVByte,
   loading,
   nonce,
   onApplyClick,
   onCrossClick,
-  previousFee,
-  availableBalance,
   type = 'STX',
   btcRecipients,
   ordinalTxUtxo,
   isRestoreFlow,
   nonOrdinalUtxos,
+  showFeeSettings,
+  setShowFeeSettings,
 }:Props) {
   const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
-  const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
+  const [feeRate, setFeeRate] = useState<BigNumber | string | undefined>(feePerVByte);
+  const [nonceInput, setNonceInput] = useState <string | undefined >(nonce);
   const [error, setError] = useState('');
   const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
-  const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
   const {
-    btcBalance,
+    btcBalance, stxAvailableBalance,
   } = useSelector((state: StoreState) => state.walletState);
 
   function applyClickForStx() {
-    setShowNonceSettings(false);
-    setShowFeeSettings(false);
-    if (previousFee && availableBalance) {
-      const prevFee = stxToMicrostacks(new BigNumber(previousFee));
+    if (stxAvailableBalance) {
       const currentFee = stxToMicrostacks(new BigNumber(feeInput));
-      if (currentFee.isEqualTo(prevFee)) {
-        setError(t('TRANSACTION_SETTING.SAME_FEE_ERROR'));
-        return;
-      } if (currentFee.gt(availableBalance)) {
+      if (currentFee.gt(stxAvailableBalance)) {
         setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
         return;
       }
     }
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
     setError('');
-    onApplyClick(feeInput.toString(), nonceInput);
+    onApplyClick({ fee: feeInput.toString(), nonce: nonceInput });
   }
 
   async function applyClickForBtc() {
-    setShowNonceSettings(false);
-    setShowFeeSettings(false);
     const currentFee = new BigNumber(feeInput);
     if (btcBalance && currentFee.gt(btcBalance)) {
       // show fee exceeds total balance error
@@ -146,15 +131,11 @@ function TransactionSettingAlert({
         return;
       }
     }
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
     setError('');
-    onApplyClick(feeInput.toString());
+    onApplyClick({ fee: feeInput.toString(), feeRate: feeRate?.toString() });
   }
-
-  const errorText = !!error && (
-    <ErrorContainer>
-      <ErrorText>{error}</ErrorText>
-    </ErrorContainer>
-  );
 
   const onEditFeesPress = () => {
     setShowFeeSettings(true);
@@ -187,10 +168,13 @@ function TransactionSettingAlert({
       return (
         <EditFee
           fee={fee}
+          feeRate={feeRate}
           type={type}
+          error={error}
           setIsLoading={onLoading}
           setIsNotLoading={onComplete}
           setFee={setFeeInput}
+          setFeeRate={setFeeRate}
           setError={setError}
           setFeeMode={setSelectedOption}
           btcRecipients={btcRecipients}
@@ -239,7 +223,7 @@ function TransactionSettingAlert({
         <ActionButton
           text={t('TRANSACTION_SETTING.APPLY')}
           processing={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !!error}
           onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
         />
       </ButtonContainer>
