@@ -24,6 +24,7 @@ import {
   UnlockWalletKey,
   UpdateVisibleCoinListKey,
   WalletActions,
+  WalletSessionPeriods,
   WalletState,
 } from './actions/types';
 
@@ -57,6 +58,7 @@ const initialWalletState: WalletState = {
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
+  walletLockPeriod: WalletSessionPeriods.STANDARD,
 };
 
 const walletReducer = (

@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
@@ -30,6 +30,8 @@ import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import useBtcCoinBalance from '@hooks/queries/useBtcCoinsBalance';
 import SmallActionButton from '@components/smallActionButton';
+import useCurrentSession from '@hooks/useCurrentSession';
+import useWalletReducer from '@hooks/useWalletReducer';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -129,6 +131,9 @@ function Home() {
   const {
     coinsList, stxAddress, btcAddress, ordinalsAddress, brcCoinsList,
   } = useWalletSelector();
+  const { lockWallet } = useWalletReducer();
+  const { shouldLock } = useCurrentSession();
+  const [sessionEnded, setSessionEnded] = useState(false);
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
@@ -136,6 +141,18 @@ function Home() {
   useFeeMultipliers();
   useCoinRates();
   useAppConfig();
+
+  useEffect(() => {
+    const determine = async () => {
+      const is = await shouldLock();
+      console.log("🚀 ~ file: index.tsx:148 ~ determine ~ is:", is)
+      setSessionEnded(is);
+    };
+    determine();
+    if (sessionEnded) {
+      lockWallet();
+    }
+  }, [sessionEnded]);
 
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);

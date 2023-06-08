@@ -72,12 +72,6 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'migration-confirmation',
-        element: (
-          <MigrationConfirmation />
-        ),
-      },
-      {
         index: true,
         element: (
           <AuthGuard>

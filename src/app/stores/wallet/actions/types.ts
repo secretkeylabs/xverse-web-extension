@@ -41,6 +41,12 @@ export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKe
 
 export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 
+export enum WalletSessionPeriods {
+  LOW = 1,
+  STANDARD = 5,
+  LONG = 10,
+}
+
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
@@ -71,6 +77,7 @@ export interface WalletState {
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
   btcApiUrl: string;
+  walletLockPeriod: WalletSessionPeriods;
 }
 
 export interface SetWallet {

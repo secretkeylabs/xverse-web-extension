@@ -24,6 +24,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import useNetworkSelector from '@hooks/useNetwork';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useCurrentSession from './useCurrentSession';
 
 const useWalletReducer = () => {
   const {
@@ -37,6 +38,7 @@ const useWalletReducer = () => {
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
+  const { setSessionStartTime, clearSessionTime } = useCurrentSession();
 
   const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, currentNetworkObject: StacksNetwork, currentAccounts: Account[]) => {
     const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, currentNetworkObject, currentAccounts);
@@ -74,6 +76,8 @@ const useWalletReducer = () => {
         ),
       );
       dispatch(getActiveAccountsAction(accountsList));
+    } finally {
+      setSessionStartTime();
     }
     sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
@@ -87,6 +91,7 @@ const useWalletReducer = () => {
 
   const lockWallet = () => {
     dispatch(lockWalletAction());
+    clearSessionTime();
     sendMessage({
       method: InternalMethods.RemoveInMemoryKeys,
       payload: undefined,
@@ -97,6 +102,7 @@ const useWalletReducer = () => {
     dispatch(resetWalletAction());
     chrome.storage.local.clear();
     localStorage.clear();
+    clearSessionTime();
     sendMessage({
       method: InternalMethods.RemoveInMemoryKeys,
       payload: undefined,
@@ -135,6 +141,8 @@ const useWalletReducer = () => {
     } catch (err) {
       dispatch(fetchAccountAction({ ...account, bnsName }, [{ ...account }]));
       dispatch(getActiveAccountsAction([{ ...account, bnsName }]));
+    } finally {
+      setSessionStartTime();
     }
   };
 
@@ -153,6 +161,7 @@ const useWalletReducer = () => {
     };
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
+    setSessionStartTime();
     await sendMessage({
       method: InternalMethods.ShareInMemoryKeyToBackground,
       payload: {
