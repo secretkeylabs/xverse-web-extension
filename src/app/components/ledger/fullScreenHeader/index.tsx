@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import XverseLogoSVG from '@assets/img/full_logo_horizontal.svg';
+import XverseLogoSVG from '@assets/img/settings/logo.svg';
 
 declare const VERSION: string;
 
@@ -17,7 +17,7 @@ const HeaderRow = styled.div((props) => ({
 }));
 
 const XverseLogo = styled.img((props) => ({
-  height: '30px',
+  height: '18px',
 }));
 
 const VersionText = styled.p((props) => ({
@@ -30,7 +30,10 @@ function FullScreenHeader() {
   return (
     <HeaderRow>
       <XverseLogo src={XverseLogoSVG} />
-      <VersionText>V{VERSION}</VersionText>
+      <VersionText>
+        V
+        {VERSION}
+      </VersionText>
     </HeaderRow>
   );
 }

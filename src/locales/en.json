@@ -16,11 +16,11 @@
     "ONBOARDING_CONTINUE_BUTTON": "Continue"
   },
   "LEDGER_IMPORT_SCREEN": {
-    "LEDGER_IMPORT_1_TITLE": "The security of harware lorem ipsum dolor sit amet",
-    "LEDGER_IMPORT_1_SUBTITLE": "Store your Bitcoin, Stacks, NFTs, Ordinals, etc lorem ipsum security of a ledger wallet lorem ipsum dolor sit amet.",
+    "LEDGER_IMPORT_1_TITLE": "Protect Your Assets with Ease",
+    "LEDGER_IMPORT_1_SUBTITLE": "Experience the convenience and top-notch security of Ledger Wallet to store your Bitcoin, Ordinals, BRC-20 tokens and more.",
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select the assets to store",
-    "LEDGER_IMPORT_2_SUBTITLE": "Store your Bitcoin, Stacks, NFTs, Ordinals, etc lorem ipsum security of a ledger wallet lorem ipsum dolor.",
+    "LEDGER_IMPORT_2_SUBTITLE": "Experience the convenience and top-notch security of Ledger Wallet to store your Bitcoin, Ordinals, BRC-20 tokens and more.",
     "LEDGER_IMPORT_2_FOOTNOTE": "If you don’t set an address now, you have the possibility to set it up later.",
     "LEDGER_IMPORT_2_SELECT": {
       "BTC_TITLE": "Bitcoin and Ordinals address",
