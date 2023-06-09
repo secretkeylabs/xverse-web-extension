@@ -135,7 +135,7 @@ function ReviewLedgerBtcTransactionComponent({
       <Container>
         {children}
         <ReviewTransactionText isOridnalTx={false}>
-          {t('CONFIRM_TRANSACTION.REVIEW_TRNSACTION')}
+          {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
         </ReviewTransactionText>
 
         {recipients?.map((recipient, index) => (

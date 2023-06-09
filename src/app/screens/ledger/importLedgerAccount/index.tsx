@@ -554,7 +554,7 @@ function ImportLedger(): JSX.Element {
                       : 'LEDGER_ADDRESS_ADDED.TITLE_BTC_ORDINALS',
                   )}
                 </SelectAssetTitle>
-                <SelectAssetText>{t('LEDGER_ADDRESS_ADDED.SUBTITLE')}</SelectAssetText>
+                <SelectAssetText>{isStacksSelected ? t('LEDGER_ADDRESS_ADDED.SUBTITLE_STX') : t('LEDGER_ADDRESS_ADDED.SUBTITLE')}</SelectAssetText>
               </AddressAddedContainer>
             )}
             {currentStepIndex === 5 && (

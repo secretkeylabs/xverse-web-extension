@@ -240,23 +240,24 @@ export default function CoinHeader(props: CoinBalanceProps) {
 
   const goToSendScreen = async () => {
     if (isLedgerAccount(selectedAccount)) {
-      if (coin === 'BTC') {
-        await chrome.tabs.create({
-          url: chrome.runtime.getURL('options.html#/send-btc-ledger'),
-        });
-        return;
-      }
-      if (coin === 'STX') {
-        await chrome.tabs.create({
-          url: chrome.runtime.getURL('options.html#/send-stx-ledger'),
-        });
-        return;
-      }
-      if (coin === 'FT') {
-        await chrome.tabs.create({
-          url: chrome.runtime.getURL(`options.html#/send-ft-ledger?coin=${fungibleToken?.name}`),
-        });
-        return;
+      switch (coin) {
+        case 'BTC':
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL('options.html#/send-btc-ledger'),
+          });
+          return;
+        case 'STX':
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL('options.html#/send-stx-ledger'),
+          });
+          return;
+        case 'FT':
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL(`options.html#/send-ft-ledger?coin=${fungibleToken?.name}`),
+          });
+          return;
+        default:
+          return;
       }
     }
     if (coin === 'STX' || coin === 'BTC') {

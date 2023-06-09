@@ -52,7 +52,8 @@
       "TITLE_BTC": "Bitcoin address added",
       "TITLE_ORDINALS": "Ordinals address added",
       "TITLE_STX": "Stacks address added",
-      "SUBTITLE": "You can now receive and send Bitcoin, Ordinals and BRC-20 tokens using Xverse and Ledger."
+      "SUBTITLE": "You can now receive and send Bitcoin, Ordinals and BRC-20 tokens using Xverse and Ledger.",
+      "SUBTITLE_STX": "You can now receive and send Stacks tokens using Xverse and Ledger."
     },
     "LEDGER_ADD_ACCOUNT_NAME": {
       "TITLE": "Name your Ledger wallet",
