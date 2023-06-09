@@ -328,7 +328,9 @@ function OrdinalDetailScreen() {
   };
 
   const showBrc20OrdinalDetail = (isGallery: boolean) => {
-    const content = JSON.parse(textContent);
+    const regex = /”/g;
+    const validBrcContentValue = textContent.replace(regex, '"');
+    const content = JSON.parse(validBrcContentValue);
     if (content.op === 'mint') {
       return (
         <ColumnContainer>

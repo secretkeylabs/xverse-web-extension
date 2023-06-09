@@ -57,7 +57,9 @@ function ConfirmBtcTransaction() {
   );
 
   const onClick = () => {
-    navigate('/recover-ordinals');
+    navigate('/recover-ordinals', {
+      state: { isRestoreFundFlow: true },
+    });
   };
 
   const onContinueButtonClick = () => {
@@ -117,7 +119,7 @@ function ConfirmBtcTransaction() {
           state: {
             txid: btcOrdinalTxBroadcastData.tx.hash,
             currency: 'BTC',
-            isNft: true,
+            isOrdinal: true,
             error: '',
           },
         });

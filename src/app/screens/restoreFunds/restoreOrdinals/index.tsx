@@ -1,7 +1,7 @@
 import TopRow from '@components/topRow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
@@ -51,9 +51,12 @@ function RestoreOrdinals() {
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const [error, setError] = useState('');
-
+  const location = useLocation();
+  const isRestoreFundFlow = location.state?.isRestoreFundFlow;
   const handleOnCancelClick = () => {
-    navigate(-1);
+    if (isRestoreFundFlow) {
+      navigate('/send-btc');
+    } else { navigate(-1); }
   };
 
   return (

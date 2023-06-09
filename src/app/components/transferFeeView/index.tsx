@@ -94,11 +94,13 @@ function TransferFeeView({
           renderText={(value: string) => <FeeText>{value}</FeeText>}
         />
         {currency === 'sats' && (
-          <FiatAmountText>
-            {feePerVByte?.toString()}
-            {' '}
-            sats/vB
-          </FiatAmountText>
+          <NumericFormat
+            value={feePerVByte?.toString()}
+            displayType="text"
+            thousandSeparator
+            suffix=" sats/vB"
+            renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
+          />
         )}
         <FiatAmountText>
           {getFiatAmountString(

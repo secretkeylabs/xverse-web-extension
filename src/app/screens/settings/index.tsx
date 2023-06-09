@@ -136,28 +136,29 @@ function Setting() {
       setPassword('');
       setError('');
       handleResetWallet();
-      setLoading(false);
     } catch (e) {
       setError(t('INCORRECT_PASSWORD_ERROR'));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      { showResetWalletDisplay && (
-      <ResetWalletContainer>
-        <PasswordInput
-          title={t('ENTER_PASSWORD')}
-          inputLabel={t('PASSWORD')}
-          enteredPassword={password}
-          setEnteredPassword={setPassword}
-          handleContinue={handlePasswordNextClick}
-          handleBack={goToSettingScreen}
-          passwordError={error}
-          stackButtonAlignment
-          loading={loading}
-        />
-      </ResetWalletContainer>
+      {showResetWalletDisplay && (
+        <ResetWalletContainer>
+          <PasswordInput
+            title={t('ENTER_PASSWORD')}
+            inputLabel={t('PASSWORD')}
+            enteredPassword={password}
+            setEnteredPassword={setPassword}
+            handleContinue={handlePasswordNextClick}
+            handleBack={goToSettingScreen}
+            passwordError={error}
+            stackButtonAlignment
+            loading={loading}
+          />
+        </ResetWalletContainer>
       )}
       <LogoContainer>
         <img src={XverseLogo} alt="xverse logo" />
@@ -227,7 +228,11 @@ function Setting() {
           showDivider
         />
         <SettingComponent text={`${t('VERSION')}`} textDetail={`${VERSION} (Beta)`} />
-        <ResetWalletPrompt showResetWalletPrompt={showResetWalletPrompt} onResetWalletPromptClose={onResetWalletPromptClose} openResetWalletScreen={openResetWalletScreen} />
+        <ResetWalletPrompt
+          showResetWalletPrompt={showResetWalletPrompt}
+          onResetWalletPromptClose={onResetWalletPromptClose}
+          openResetWalletScreen={openResetWalletScreen}
+        />
       </Container>
 
       <BottomBar tab="settings" />
