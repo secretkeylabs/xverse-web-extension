@@ -1,6 +1,7 @@
 import useSendBtcRequest from '@hooks/useSendBtcRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  ErrorCodes,
   getBtcFiatEquivalent,
 } from '@secretkeylabs/xverse-core';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
@@ -70,14 +71,34 @@ function BtcSendScreen() {
 
   useEffect(() => {
     if (error) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          error,
-          browserTx: true,
-        },
-      });
+      if (Number(error) === ErrorCodes.InSufficientBalance) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'BTC',
+            error: t('TX_ERRORS.INSUFFICIENT_BALANCE'),
+            browserTx: true,
+          },
+        });
+      } else if (Number(error) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'BTC',
+            error: t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'),
+            browserTx: true,
+          },
+        });
+      } else {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'BTC',
+            error,
+            browserTx: true,
+          },
+        });
+      }
     }
   }, [error]);
 
