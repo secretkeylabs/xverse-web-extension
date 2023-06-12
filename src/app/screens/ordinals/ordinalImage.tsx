@@ -1,13 +1,12 @@
 import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import Image from 'rc-image';
 import { getFetchableUrl } from '@utils/helper';
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import { useTranslation } from 'react-i18next';
 import { Inscription } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import Image from 'rc-image';
 import Brc20Tile from './brc20Tile';
 
 interface ContainerProps {
@@ -89,7 +88,7 @@ const OrdinalContentText = styled.h1<TextProps>((props) => ({
   textAlign: 'center',
 }));
 
-const StyledLazyLoadImage = styled(LazyLoadImage)`
+const StyledImage = styled(Image)`
   border-radius: 8px;
   object-fit: contain;
   image-rendering: pixelated;
@@ -117,7 +116,7 @@ function OrdinalImage({
   if (ordinal?.content_type.includes('image')) {
     return (
       <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
-        <StyledLazyLoadImage
+        <StyledImage
           width="100%"
           placeholder={(
             <LoaderContainer isGalleryOpen={isGalleryOpen}>
