@@ -109,15 +109,15 @@ function Landing(): JSX.Element {
     delay: 100,
   });
 
-  const openInNewTab = async (isRestore = false) => {
+  const startWalletOnboarding = async (isRestore = false) => {
     const params = isRestore ? '?restore=true' : '';
     await chrome.tabs.create({
       url: chrome.runtime.getURL(`options.html#/onboarding${params}`),
     });
   };
 
-  const handlePressCreate = async () => openInNewTab();
-  const handlePressRestore = async () => openInNewTab(true);
+  const handlePressCreate = async () => startWalletOnboarding();
+  const handlePressRestore = async () => startWalletOnboarding(true);
 
   return (
     <>
