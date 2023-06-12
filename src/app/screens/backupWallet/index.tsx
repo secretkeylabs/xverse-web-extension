@@ -2,7 +2,7 @@ import backup from '@assets/img/backupWallet/backup.svg';
 import ActionButton from '@components/button';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import * as bip39 from 'bip39';
+import { generateMnemonic } from '@secretkeylabs/xverse-core/wallet';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -63,7 +63,7 @@ function BackupWallet(): JSX.Element {
 
   useEffect(() => {
     if (!seedPhrase) {
-      const newSeedPhrase = bip39.generateMnemonic();
+      const newSeedPhrase = generateMnemonic();
       storeSeedPhrase(newSeedPhrase);
     }
   }, []);
