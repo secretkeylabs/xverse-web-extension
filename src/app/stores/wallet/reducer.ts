@@ -19,6 +19,7 @@ import {
   SetFeeMultiplierKey,
   SetStxWalletDataKey,
   SetWalletKey,
+  SetWalletLockPeriodKey,
   SetWalletSeedPhraseKey,
   StoreEncryptedSeedKey,
   UnlockWalletKey,
@@ -191,6 +192,11 @@ const walletReducer = (
       return {
         ...state,
         brcCoinsList: action.brcCoinsList,
+      };
+    case SetWalletLockPeriodKey:
+      return {
+        ...state,
+        walletLockPeriod: action.walletLockPeriod,
       };
     default:
       return state;

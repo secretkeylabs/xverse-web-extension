@@ -394,7 +394,9 @@
     "TESTNET": "Testnet",
     "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
-    "RECOVER_ASSETS": "Recover assets"
+    "RECOVER_ASSETS": "Recover assets",
+    "LOCK_COUNTDOWN": "Lock countdown",
+    "LOCK_COUNTDOWN_TITLE": "Select the desired duration before the extension locks."
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",

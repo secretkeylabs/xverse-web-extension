@@ -222,3 +222,12 @@ export function setBrcCoinsDataAction(brcCoinsList: FungibleToken[]): actions.Se
     brcCoinsList,
   };
 }
+
+export function setWalletLockPeriodAction(
+  walletLockPeriod: actions.WalletSessionPeriods,
+): actions.SetWalletLockPeriod {
+  return {
+    type: actions.SetWalletLockPeriodKey,
+    walletLockPeriod,
+  };
+}

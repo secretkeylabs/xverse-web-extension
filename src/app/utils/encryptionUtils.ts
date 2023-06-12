@@ -28,7 +28,7 @@ async function generateKeyArgon2(password: string, salt: string): Promise<string
   }
 }
 
-async function generatePasswordHash(password: string) {
+export async function generatePasswordHash(password: string) {
   const existingSalt = getSalt();
   if (existingSalt) {
     const argonHash = await generateKeyArgon2(password, existingSalt);

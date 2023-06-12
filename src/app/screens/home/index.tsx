@@ -30,7 +30,7 @@ import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import useBtcCoinBalance from '@hooks/queries/useBtcCoinsBalance';
 import SmallActionButton from '@components/smallActionButton';
-import useCurrentSession from '@hooks/useCurrentSession';
+import useWalletSession from '@hooks/useWalletSession';
 import useWalletReducer from '@hooks/useWalletReducer';
 import BalanceCard from './balanceCard';
 
@@ -131,8 +131,7 @@ function Home() {
   const {
     coinsList, stxAddress, btcAddress, ordinalsAddress, brcCoinsList,
   } = useWalletSelector();
-  const { lockWallet } = useWalletReducer();
-  const { shouldLock } = useCurrentSession();
+  const { shouldLock, clearSessionKey } = useWalletSession();
   const [sessionEnded, setSessionEnded] = useState(false);
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
@@ -145,12 +144,11 @@ function Home() {
   useEffect(() => {
     const determine = async () => {
       const is = await shouldLock();
-      console.log("🚀 ~ file: index.tsx:148 ~ determine ~ is:", is)
       setSessionEnded(is);
     };
     determine();
     if (sessionEnded) {
-      lockWallet();
+      clearSessionKey();
     }
   }, [sessionEnded]);
 

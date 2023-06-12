@@ -17,14 +17,12 @@ import {
   storeEncryptedSeedAction,
   unlockWalletAction,
 } from '@stores/wallet/actions/actionCreators';
-import { decryptSeedPhrase, encryptSeedPhrase } from '@utils/encryptionUtils';
-import { InternalMethods } from '@common/types/message-types';
-import { sendMessage } from '@common/types/messages';
+import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
 import { useSelector, useDispatch } from 'react-redux';
 import useNetworkSelector from '@hooks/useNetwork';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
-import useCurrentSession from './useCurrentSession';
+import useWalletSession from './useWalletSession';
 
 const useWalletReducer = () => {
   const {
@@ -38,7 +36,7 @@ const useWalletReducer = () => {
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
-  const { setSessionStartTime, clearSessionTime } = useCurrentSession();
+  const { setSessionStartTime, clearSessionTime } = useWalletSession();
 
   const loadActiveAccounts = async (secretKey: string, currentNetwork: SettingsNetwork, currentNetworkObject: StacksNetwork, currentAccounts: Account[]) => {
     const walletAccounts = await restoreWalletWithAccounts(secretKey, currentNetwork, currentNetworkObject, currentAccounts);
@@ -65,6 +63,7 @@ const useWalletReducer = () => {
   };
 
   const unlockWallet = async (password: string) => {
+    const pHash = await generatePasswordHash(password);
     const decrypted = await decryptSeedPhrase(encryptedSeed, password);
     try {
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
@@ -77,14 +76,9 @@ const useWalletReducer = () => {
       );
       dispatch(getActiveAccountsAction(accountsList));
     } finally {
+      chrome.storage.session.set({ pHash: pHash.hash });
       setSessionStartTime();
     }
-    sendMessage({
-      method: InternalMethods.ShareInMemoryKeyToBackground,
-      payload: {
-        secretKey: decrypted,
-      },
-    });
     dispatch(unlockWalletAction(decrypted));
     return decrypted;
   };
@@ -92,10 +86,6 @@ const useWalletReducer = () => {
   const lockWallet = () => {
     dispatch(lockWalletAction());
     clearSessionTime();
-    sendMessage({
-      method: InternalMethods.RemoveInMemoryKeys,
-      payload: undefined,
-    });
   };
 
   const resetWallet = () => {
@@ -103,10 +93,6 @@ const useWalletReducer = () => {
     chrome.storage.local.clear();
     localStorage.clear();
     clearSessionTime();
-    sendMessage({
-      method: InternalMethods.RemoveInMemoryKeys,
-      payload: undefined,
-    });
   };
 
   const restoreWallet = async (seed: string, password: string) => {
@@ -127,22 +113,18 @@ const useWalletReducer = () => {
       bnsName: wallet.bnsName,
     };
     const encryptSeed = await encryptSeedPhrase(seed, password);
-    await sendMessage({
-      method: InternalMethods.ShareInMemoryKeyToBackground,
-      payload: {
-        secretKey: wallet.seedPhrase,
-      },
-    });
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
+    const pHash = await generatePasswordHash(password);
     try {
-      await loadActiveAccounts(wallet.seedPhrase, network, selectedNetwork, [{ bnsName, ...account }]);
+      await loadActiveAccounts(seed, network, selectedNetwork, [{ bnsName, ...account }]);
     } catch (err) {
       dispatch(fetchAccountAction({ ...account, bnsName }, [{ ...account }]));
       dispatch(getActiveAccountsAction([{ ...account, bnsName }]));
     } finally {
       setSessionStartTime();
+      chrome.storage.session.set({ pHash: pHash.hash });
     }
   };
 
@@ -162,12 +144,6 @@ const useWalletReducer = () => {
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
     setSessionStartTime();
-    await sendMessage({
-      method: InternalMethods.ShareInMemoryKeyToBackground,
-      payload: {
-        secretKey: wallet.seedPhrase,
-      },
-    });
   };
 
   const createAccount = async () => {

@@ -1,18 +1,22 @@
+import { useDispatch } from 'react-redux';
 import { addMinutes } from 'date-fns';
-import useWalletSelector from './useWalletSelector';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { WalletSessionPeriods } from '@stores/wallet/actions/types';
+import { setWalletLockPeriodAction } from '@stores/wallet/actions/actionCreators';
 
 const SESSION_START_TIME_KEY = 'sessionStartTime';
 
-const useCurrentSession = () => {
+const useWalletSession = () => {
   const { walletLockPeriod } = useWalletSelector();
+  const dispatch = useDispatch();
 
   const setSessionStartTime = () => {
     const sessionStartTime = new Date().getTime();
     chrome.storage.session.set({ sessionStartTime });
   };
 
-  const clearSessionTime = () => {
-    chrome.storage.session.remove(SESSION_START_TIME_KEY);
+  const clearSessionTime = async () => {
+    await chrome.storage.session.remove(SESSION_START_TIME_KEY);
   };
 
   const getSessionStartTime = async () => {
@@ -26,12 +30,24 @@ const useCurrentSession = () => {
     return currentTime >= addMinutes(startTime, walletLockPeriod).getTime();
   };
 
+  const setWalletLockPeriod = async (lockPeriod: WalletSessionPeriods) => {
+    await clearSessionTime();
+    dispatch(setWalletLockPeriodAction(lockPeriod));
+    setSessionStartTime();
+  };
+
+  const clearSessionKey = () => {
+    chrome.storage.session.remove('pHash');
+  };
+
   return {
     setSessionStartTime,
+    setWalletLockPeriod,
     getSessionStartTime,
     shouldLock,
     clearSessionTime,
+    clearSessionKey,
   };
 };
 
-export default useCurrentSession;
+export default useWalletSession;
