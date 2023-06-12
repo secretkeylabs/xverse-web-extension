@@ -1,8 +1,12 @@
 import backup from '@assets/img/backupWallet/backup.svg';
-import styled from 'styled-components';
+import ActionButton from '@components/button';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import * as bip39 from 'bip39';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import ActionButton from '@components/button';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -54,6 +58,15 @@ const TransparentButtonContainer = styled.div((props) => ({
 function BackupWallet(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const navigate = useNavigate();
+  const { seedPhrase } = useWalletSelector();
+  const { storeSeedPhrase } = useWalletReducer();
+
+  useEffect(() => {
+    if (!seedPhrase) {
+      const newSeedPhrase = bip39.generateMnemonic();
+      storeSeedPhrase(newSeedPhrase);
+    }
+  }, []);
 
   const handleBackup = () => {
     navigate('/backupWalletSteps');
