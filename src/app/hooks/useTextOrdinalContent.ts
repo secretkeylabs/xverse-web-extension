@@ -9,8 +9,8 @@ const useTextOrdinalContent = (ordinal: Inscription) => {
   const {
     data: textContent,
   } = useQuery({
-    queryKey: [`ordinal-text-${ordinal.id}`],
-    queryFn: async () => await queue.add(() => getTextOrdinalContent(ordinal.id)),
+    queryKey: [`ordinal-text-${ordinal?.id}`],
+    queryFn: async () => queue.add(() => getTextOrdinalContent(ordinal?.id)),
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
