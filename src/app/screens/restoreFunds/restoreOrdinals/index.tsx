@@ -1,12 +1,20 @@
-import TopRow from '@components/topRow';
-import useWalletSelector from '@hooks/useWalletSelector';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { BtcOrdinal, ErrorCodes, Inscription } from '@secretkeylabs/xverse-core/types';
+import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import {
+  SignedBtcTx,
+  signOrdinalSendTransaction,
+} from '@secretkeylabs/xverse-core/transactions/btc';
+import useWalletSelector from '@hooks/useWalletSelector';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
+import TopRow from '@components/topRow';
 import styled from 'styled-components';
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
-import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
-import { useState } from 'react';
 import OrdinalRow from './oridnalRow';
 
 const RestoreFundTitle = styled.h1((props) => ({
@@ -15,11 +23,11 @@ const RestoreFundTitle = styled.h1((props) => ({
   color: props.theme.colors.white[200],
 }));
 
-const ErrorContainer = styled.div((props) => ({
+const ErrorContainer = styled.div({
   display: 'flex',
   flex: 1,
   alignItems: 'flex-end',
-}));
+});
 
 const Container = styled.div({
   display: 'flex',
@@ -45,18 +53,68 @@ const ButtonContainer = styled.div({
 
 function RestoreOrdinals() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_ORDINAL_SCREEN' });
-  const {
-    btcAddress,
-  } = useWalletSelector();
+  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+    useWalletSelector();
+  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const [error, setError] = useState('');
   const location = useLocation();
   const isRestoreFundFlow = location.state?.isRestoreFundFlow;
+
+  const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
+
+  const {
+    isLoading,
+    error: transactionError,
+    mutateAsync,
+  } = useMutation<SignedBtcTx, string, BtcOrdinal>(async (ordinal) => {
+    const tx = await signOrdinalSendTransaction(
+      ordinalsAddress,
+      ordinal.utxo,
+      btcAddress,
+      Number(selectedAccount?.id),
+      seedPhrase,
+      network.type,
+      undefined,
+      ordinalsUtxos!,
+    );
+    return tx;
+  });
+
+  useEffect(() => {
+    if (transactionError) {
+      if (Number(transactionError) === ErrorCodes.InSufficientBalance) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(transactionError) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setError(transactionError.toString());
+    }
+  }, [transactionError]);
+
   const handleOnCancelClick = () => {
     if (isRestoreFundFlow) {
       navigate('/send-btc');
-    } else { navigate(-1); }
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const onClickTransfer = async (selectedOrdinal: BtcOrdinal, ordinalData: Inscription) => {
+    const signedTx = await mutateAsync(selectedOrdinal);
+    setSelectedOrdinalDetails(ordinalData);
+    navigate(`/confirm-ordinal-tx/${selectedOrdinal.id}`, {
+      state: {
+        signedTxHex: signedTx.signedTx,
+        recipientAddress: ordinalsAddress,
+        fee: signedTx.fee,
+        feePerVByte: signedTx.feePerVByte,
+        fiatFee: getBtcFiatEquivalent(signedTx.fee, btcFiatRate),
+        total: signedTx.total,
+        fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),
+        ordinalUtxo: selectedOrdinal.utxo,
+      },
+    });
   };
 
   return (
@@ -70,18 +128,22 @@ function RestoreOrdinals() {
               <ActionButton text={t('BACK')} onPress={handleOnCancelClick} />
             </ButtonContainer>
           </>
-        )
-          : (
-            <>
-              <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
-              {ordinals?.map((ordinal) => (
-                <OrdinalRow setError={setError} ordinal={ordinal} />
-              ))}
-              <ErrorContainer>
-                <ErrorText>{error}</ErrorText>
-              </ErrorContainer>
-            </>
-          )}
+        ) : (
+          <>
+            <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
+            {ordinals?.map((ordinal) => (
+              <OrdinalRow
+                isLoading={isLoading}
+                handleOrdinalTransfer={onClickTransfer}
+                ordinal={ordinal}
+                key={ordinal.id}
+              />
+            ))}
+            <ErrorContainer>
+              <ErrorText>{error}</ErrorText>
+            </ErrorContainer>
+          </>
+        )}
       </Container>
       <BottomTabBar tab="nft" />
     </>
