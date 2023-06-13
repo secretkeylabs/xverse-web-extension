@@ -395,8 +395,8 @@
     "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets",
-    "LOCK_COUNTDOWN": "Lock countdown",
-    "LOCK_COUNTDOWN_TITLE": "Select the desired duration before the extension locks."
+    "LOCK_COUNTDOWN": "Auto-lock Timer",
+    "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically."
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
