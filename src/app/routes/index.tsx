@@ -24,10 +24,10 @@ import Landing from '@screens/landing';
 import LegalLinks from '@screens/legalLinks';
 import Login from '@screens/login';
 import ManageTokens from '@screens/manageTokens';
+import MigrationConfirmation from '@screens/migrationConfirmation';
 import NftDashboard from '@screens/nftDashboard';
 import NftDetailScreen from '@screens/nftDetail';
 import Onboarding from '@screens/onboarding';
-import MigrationConfirmation from '@screens/migrationConfirmation';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
 import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
@@ -73,9 +73,7 @@ const router = createHashRouter([
       },
       {
         path: 'migration-confirmation',
-        element: (
-          <MigrationConfirmation />
-        ),
+        element: <MigrationConfirmation />,
       },
       {
         index: true,
@@ -87,7 +85,11 @@ const router = createHashRouter([
       },
       {
         path: 'legal',
-        element: <LegalLinks />,
+        element: (
+          <WalletExistsGuard>
+            <LegalLinks />
+          </WalletExistsGuard>
+        ),
       },
       {
         path: 'manage-tokens',
