@@ -4,9 +4,10 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { getFetchableUrl } from '@utils/helper';
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import { useTranslation } from 'react-i18next';
-import { Inscription } from '@secretkeylabs/xverse-core';
+import { Inscription, getErc721Metadata } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import Image from 'rc-image';
+import { useEffect, useState } from 'react';
 import Brc20Tile from './brc20Tile';
 
 interface ContainerProps {
@@ -112,28 +113,62 @@ function OrdinalImage({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+  const [brc721eImage, setBrc721eImage] = useState<string | undefined>(undefined);
+
+  const fetchBrc721eMetadata = async () => {
+    if (!textContent) {
+      return;
+    }
+
+    try {
+      const parsedContent = JSON.parse(textContent);
+      const erc721Metadata = await getErc721Metadata(parsedContent.contract, parsedContent.token_id);
+
+      const url = getFetchableUrl(erc721Metadata, 'ipfs');
+
+      if (url) {
+        const ipfsMetadata = await (await fetch(url)).json();
+        setBrc721eImage(getFetchableUrl(ipfsMetadata.image, 'ipfs'));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (textContent?.includes('brc-721e')) {
+      fetchBrc721eMetadata();
+    }
+  }, [textContent]);
+
+  const renderImage = (tag: string, src?: string) => (
+    <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
+      <StyledImage
+        width="100%"
+        placeholder={(
+          <LoaderContainer isGalleryOpen={isGalleryOpen}>
+            <MoonLoader color="white" size={20} />
+          </LoaderContainer>
+          )}
+        src={src}
+      />
+      {isNftDashboard && (
+        <OrdinalsTag>
+          <ButtonIcon src={OrdinalsIcon} />
+          <Text>{tag}</Text>
+        </OrdinalsTag>
+      )}
+    </ImageContainer>
+  );
 
   if (ordinal?.content_type.includes('image')) {
-    return (
-      <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
-        <StyledImage
-          width="100%"
-          placeholder={(
-            <LoaderContainer isGalleryOpen={isGalleryOpen}>
-              <MoonLoader color="white" size={20} />
-            </LoaderContainer>
-              )}
-          src={getFetchableUrl(`https://api.hiro.so/ordinals/v1/inscriptions/${ordinal.id}/content`, 'http')}
-        />
-        {isNftDashboard && (
-          <OrdinalsTag>
-            <ButtonIcon src={OrdinalsIcon} />
-            <Text>{t('ORDINAL')}</Text>
-          </OrdinalsTag>
-        )}
-      </ImageContainer>
-    );
+    return renderImage(t('ORDINAL'), getFetchableUrl(`https://api.hiro.so/ordinals/v1/inscriptions/${ordinal.id}/content`, 'http'));
   }
+
+  if ((ordinal?.content_type.includes('text') || ordinal?.content_type.includes('json')) && textContent?.includes('brc-721e')) {
+    return renderImage('BRC-721e', brc721eImage);
+  }
+
   if (ordinal?.content_type.includes('text')) {
     if (!textContent) {
       return (

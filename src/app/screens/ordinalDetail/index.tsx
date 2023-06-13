@@ -280,6 +280,7 @@ function OrdinalDetailScreen() {
       if (
         selectedOrdinal?.content_type.includes('image')
         || selectedOrdinal?.content_type.includes('text')
+        || textContent?.includes('brc-721e')
       ) {
         setNotSupportedOrdinal(false);
       } else setNotSupportedOrdinal(true);
