@@ -39,10 +39,21 @@ function BtcSendScreen() {
   const {
     btcFiatRate,
     network,
+    btcAddress,
   } = useWalletSelector();
   const { t } = useTranslation('translation');
 
   const checkIfMismatch = () => {
+    if (payload.senderAddress !== btcAddress) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'STX',
+          error: t('ADDRESS_MISMATCH'),
+          browserTx: true,
+        },
+      });
+    }
     if (payload.network.type !== network.type) {
       navigate('/tx-status', {
         state: {

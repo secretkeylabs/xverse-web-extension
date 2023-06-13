@@ -29,7 +29,7 @@ function useSendBtcRequest() {
     ];
     const signedTx = await signBtcTransaction(
       recipients,
-      btcAddress,
+      request.payload?.senderAddress,
       selectedAccount?.id ?? 0,
       seedPhrase,
       network.type,
