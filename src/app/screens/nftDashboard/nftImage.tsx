@@ -52,19 +52,19 @@ interface Props {
 
 function NftImage({ metadata }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-
   if (metadata?.image_protocol) {
     return (
       <ImageContainer isGalleryOpen={isGalleryOpen}>
         <Suspense>
           <StyledImg
             width="100%"
+            preview={false}
             src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
             placeholder={(
               <LoaderContainer isGalleryOpen={isGalleryOpen}>
                 <MoonLoader color="white" size={25} />
               </LoaderContainer>
-              )}
+          )}
             fallback={NftPlaceholderImage}
           />
         </Suspense>

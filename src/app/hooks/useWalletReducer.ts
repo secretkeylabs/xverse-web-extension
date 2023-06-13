@@ -132,6 +132,7 @@ const useWalletReducer = () => {
     dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
     const pHash = await generatePasswordHash(password);
+    localStorage.setItem('migrated', 'true');
     try {
       await loadActiveAccounts(seed, network, selectedNetwork, [
         {
@@ -185,6 +186,13 @@ const useWalletReducer = () => {
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
     setSessionStartTime();
+    localStorage.setItem('migrated', 'true');
+    await sendMessage({
+      method: InternalMethods.ShareInMemoryKeyToBackground,
+      payload: {
+        secretKey: wallet.seedPhrase,
+      },
+    });
   };
 
   const createAccount = async () => {
