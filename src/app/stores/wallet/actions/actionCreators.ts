@@ -62,7 +62,7 @@ export function fetchAccountAction(
   };
 }
 
-export function addAccoutAction(accountsList: Account[]): actions.AddAccount {
+export function addAccountAction(accountsList: Account[]): actions.AddAccount {
   return {
     type: actions.AddAccountKey,
     accountsList,
