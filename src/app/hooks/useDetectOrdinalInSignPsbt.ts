@@ -1,21 +1,21 @@
 import {
   getOrdinalIdFromUtxo,
-  getOrdinalInfo,
-  OrdinalInfo,
+  Inscription,
   ParsedPSBT,
   UTXO,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
+import useOrdinalsApi from './useOrdinalsApi';
 import useWalletSelector from './useWalletSelector';
 
 const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   const [loading, setLoading] = useState(false);
-  const [ordinalId, setOrdinalId] = useState<string | undefined>(undefined);
   const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
-  const [ordinalInfoData, setOrdinalInfoData] = useState<OrdinalInfo | undefined>(undefined);
+  const [ordinalInfoData, setOrdinalInfoData] = useState<Array<Inscription>>([]);
   const {
     ordinalsAddress,
   } = useWalletSelector();
+  const OrdinalsApi = useOrdinalsApi();
 
   const getOrdinalId = async (utxoHash: string, index: number) => {
     const utxo: UTXO = {
@@ -31,17 +31,18 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   };
 
   async function handleOrdinalAndOrdinalInfo() {
+    const ordinals: Inscription[] = [];
     if (parsedPsbt) {
       setLoading(true);
       parsedPsbt.inputs.forEach(async (input) => {
         const data = await getOrdinalId(input.txid, input.index);
         if (data) {
-          setOrdinalId(data);
-          const response = await getOrdinalInfo(data);
-          setOrdinalInfoData(response);
+          const response = await OrdinalsApi.getInscription(data);
+          ordinals.push(response);
         }
         setLoading(false);
       });
+      setOrdinalInfoData(ordinals);
       parsedPsbt.outputs.forEach(async (output) => {
         if (output.address === ordinalsAddress) {
           setUserReceivesOrdinal(true);
@@ -55,7 +56,6 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   }, []);
 
   return {
-    ordinalId,
     loading,
     ordinalInfoData,
     userReceivesOrdinal,
