@@ -1,4 +1,4 @@
-import { useWalletExistsGuardContext } from '@components/guards/walletExists';
+import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { StoreState } from '@stores/index';
@@ -56,7 +56,7 @@ function CreatePassword(): JSX.Element {
   }));
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const { createWallet } = useWalletReducer();
-  const { disableWalletExistsGuard } = useWalletExistsGuardContext();
+  const { disableWalletExistsGuard } = useWalletExistsContext();
 
   const handleContinuePasswordCreation = () => {
     setCurrentStepIndex(1);

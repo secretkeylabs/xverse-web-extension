@@ -1,4 +1,4 @@
-import { useWalletExistsGuardContext } from '@components/guards/walletExists';
+import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
 import Steps from '@components/steps';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -45,7 +45,7 @@ export default function BackupWalletSteps(): JSX.Element {
     ...state.walletState,
   }));
   const { createWallet } = useWalletReducer();
-  const { disableWalletExistsGuard } = useWalletExistsGuardContext();
+  const { disableWalletExistsGuard } = useWalletExistsContext();
 
   const handleSeedCheckContinue = () => {
     setCurrentActiveIndex(1);
