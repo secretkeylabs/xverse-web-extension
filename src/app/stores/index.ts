@@ -1,11 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 import ChromeStorage from '@utils/storage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
-import { persistReducer, persistStore, PersistConfig } from 'redux-persist';
+import { PersistConfig, persistReducer, persistStore } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
-import walletReducer from './wallet/reducer';
 import { WalletState } from './wallet/actions/types';
+import walletReducer from './wallet/reducer';
 
 export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
 

@@ -1,5 +1,7 @@
+import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
 import Steps from '@components/steps';
+import useWalletReducer from '@hooks/useWalletReducer';
 import { StoreState } from '@stores/index';
 import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
 import { encryptSeedPhrase } from '@utils/encryptionUtils';
@@ -42,6 +44,8 @@ export default function BackupWalletSteps(): JSX.Element {
   const { seedPhrase } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
+  const { createWallet } = useWalletReducer();
+  const { disableWalletExistsGuard } = useWalletExistsContext();
 
   const handleSeedCheckContinue = () => {
     setCurrentActiveIndex(1);
@@ -70,8 +74,10 @@ export default function BackupWalletSteps(): JSX.Element {
   const handleConfirmPasswordContinue = async () => {
     try {
       if (confirmPassword === password) {
+        disableWalletExistsGuard?.();
         const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
         dispatch(storeEncryptedSeedAction(encryptedSeed));
+        await createWallet(seedPhrase);
         navigate('/wallet-success/create');
       }
     } catch (err) {
