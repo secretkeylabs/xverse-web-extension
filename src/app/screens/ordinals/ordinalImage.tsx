@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Inscription } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import Image from 'rc-image';
+import ActionButton from '@components/button';
 import Brc20Tile from './brc20Tile';
 
 interface ContainerProps {
@@ -21,9 +22,9 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   marginBottom: props.inNftDetail ? props.theme.spacing(8) : 0,
   alignItems: 'center',
   width: '100%',
-  height: props.isGalleryOpen ? props.inNftDetail ? 540 : 300 : props.isSmallImage ? 50 : 150,
+  height: props.isGalleryOpen ? (props.inNftDetail ? 540 : 300) : props.isSmallImage ? 50 : 150,
   minHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
-  maxHeight: props.isGalleryOpen ? props.inNftDetail ? 450 : 300 : props.isSmallImage ? 50 : 150,
+  maxHeight: props.isGalleryOpen ? (props.inNftDetail ? 450 : 300) : props.isSmallImage ? 50 : 150,
   overflow: 'hidden',
   position: 'relative',
   fontSize: '3em',
@@ -78,6 +79,7 @@ const Text = styled.h1((props) => ({
 
 interface TextProps {
   inNftSend?: boolean;
+  blur?: boolean
 }
 
 const OrdinalContentText = styled.h1<TextProps>((props) => ({
@@ -86,6 +88,7 @@ const OrdinalContentText = styled.h1<TextProps>((props) => ({
   fontSize: props.inNftSend ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
   textAlign: 'center',
+  filter: `blur(${props.blur ? '3px' : 0})`,
 }));
 
 const StyledImage = styled(Image)`
@@ -112,6 +115,10 @@ function OrdinalImage({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+
+  const openInOrdinalsExplorer = () => {
+    window.open(`https://www.ord.io/${ordinal.number}`);
+  };
 
   if (ordinal?.content_type.includes('image')) {
     return (
@@ -152,6 +159,38 @@ function OrdinalImage({
           inNftDetail={inNftDetail}
           isSmallImage={isSmallImage}
         />
+      );
+    }
+    if (ordinal?.content_type.includes('html')) {
+      return (
+        <ImageContainer
+          isSmallImage={isSmallImage}
+          inNftDetail={inNftDetail}
+          isGalleryOpen={isGalleryOpen}
+        >
+          <OrdinalContentText blur={inNftDetail} inNftSend={inNftSend}>
+            {textContent}
+          </OrdinalContentText>
+          {inNftDetail ? (
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '30%',
+                zIndex: 10000,
+                width: 169,
+              }}
+            >
+              <ActionButton onPress={openInOrdinalsExplorer} text="Open in Explorer" />
+            </div>
+          ) : null}
+          {isNftDashboard && (
+            <OrdinalsTag>
+              <ButtonIcon src={OrdinalsIcon} />
+              <Text>{t('ORDINAL')}</Text>
+            </OrdinalsTag>
+          )}
+        </ImageContainer>
       );
     }
     return (
