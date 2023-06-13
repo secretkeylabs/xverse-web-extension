@@ -34,15 +34,15 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
     const ordinals: Inscription[] = [];
     if (parsedPsbt) {
       setLoading(true);
-      parsedPsbt.inputs.forEach(async (input) => {
+      await Promise.all(parsedPsbt.inputs.map(async (input) => {
         const data = await getOrdinalId(input.txid, input.index);
         if (data) {
           const response = await OrdinalsApi.getInscription(data);
           ordinals.push(response);
         }
-        setLoading(false);
-      });
+      }));
       setOrdinalInfoData(ordinals);
+      setLoading(false);
       parsedPsbt.outputs.forEach(async (output) => {
         if (output.address === ordinalsAddress) {
           setUserReceivesOrdinal(true);
