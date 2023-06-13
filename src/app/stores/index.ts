@@ -1,5 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-import * as actions from '@stores/wallet/actions/types';
 import ChromeStorage from '@utils/storage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { PersistConfig, persistReducer, persistStore } from 'redux-persist';
@@ -41,7 +40,7 @@ const rootStore = (() => {
   const storeMiddleware = [
     createStateSyncMiddleware({
       // We don't want to sync the redux-persist actions
-      blacklist: [actions.UnlockWalletKey, 'persist/PERSIST', 'persist/REHYDRATE'],
+      blacklist: ['persist/PERSIST', 'persist/REHYDRATE'],
     }),
   ];
   const store = createStore(persistedReducer, applyMiddleware(...storeMiddleware));
