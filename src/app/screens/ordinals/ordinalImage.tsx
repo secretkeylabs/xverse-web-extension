@@ -165,7 +165,7 @@ function OrdinalImage({
     return renderImage(t('ORDINAL'), getFetchableUrl(`https://api.hiro.so/ordinals/v1/inscriptions/${ordinal.id}/content`, 'http'));
   }
 
-  if ((ordinal?.content_type.includes('text') || ordinal?.content_type.includes('json')) && textContent?.includes('brc-721e')) {
+  if (textContent?.includes('brc-721e')) {
     return renderImage('BRC-721e', brc721eImage);
   }
 
