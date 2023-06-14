@@ -32,7 +32,7 @@ const useWalletReducer = () => {
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
-  const { setSessionStartTime, clearSessionTime } = useWalletSession();
+  const { setSessionStartTime, clearSessionTime, clearSessionKey } = useWalletSession();
 
   const loadActiveAccounts = async (
     secretKey: string,
@@ -103,9 +103,10 @@ const useWalletReducer = () => {
     return decrypted;
   };
 
-  const lockWallet = () => {
+  const lockWallet = async () => {
     dispatch(lockWalletAction());
-    clearSessionTime();
+    await clearSessionTime();
+    await clearSessionKey();
   };
 
   const resetWallet = () => {
@@ -196,12 +197,6 @@ const useWalletReducer = () => {
     dispatch(fetchAccountAction(account, [account]));
     setSessionStartTime();
     localStorage.setItem('migrated', 'true');
-    await sendMessage({
-      method: InternalMethods.ShareInMemoryKeyToBackground,
-      payload: {
-        secretKey: wallet.seedPhrase,
-      },
-    });
   };
 
   const createAccount = async () => {
