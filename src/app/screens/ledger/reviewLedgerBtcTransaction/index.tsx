@@ -6,7 +6,7 @@ import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
-export type LedgerTransactionType = `BTC` | `ORDINALS` | `STX`;
+export type LedgerTransactionType = 'BTC' | 'ORDINALS' | 'STX';
 
 function ReviewLedgerBtcTransaction() {
   const navigate = useNavigate();

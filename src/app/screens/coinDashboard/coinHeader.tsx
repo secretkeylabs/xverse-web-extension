@@ -257,7 +257,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
           });
           return;
         default:
-          return;
+          break;
       }
     }
     if (coin === 'STX' || coin === 'BTC') {
