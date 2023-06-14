@@ -7,7 +7,7 @@ interface SessionGuardProps {
 }
 
 function SessionGuard({ children }: SessionGuardProps): ReactElement | null {
-  const { shouldLock, clearSessionKey } = useWalletSession();
+  const { shouldLock } = useWalletSession();
   const { lockWallet } = useWalletReducer();
   const [lockTested, setLockTested] = useState(false);
 
@@ -15,8 +15,7 @@ function SessionGuard({ children }: SessionGuardProps): ReactElement | null {
     const tryLock = async () => {
       const sessionEnded = await shouldLock();
       if (sessionEnded) {
-        await clearSessionKey();
-        lockWallet();
+        await lockWallet();
       }
       setLockTested(true);
     };
