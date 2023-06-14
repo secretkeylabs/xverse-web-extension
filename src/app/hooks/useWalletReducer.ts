@@ -196,12 +196,6 @@ const useWalletReducer = () => {
     dispatch(fetchAccountAction(account, [account]));
     setSessionStartTime();
     localStorage.setItem('migrated', 'true');
-    await sendMessage({
-      method: InternalMethods.ShareInMemoryKeyToBackground,
-      payload: {
-        secretKey: wallet.seedPhrase,
-      },
-    });
   };
 
   const createAccount = async () => {
