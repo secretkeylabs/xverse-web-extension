@@ -70,7 +70,7 @@ function CreatePassword(): JSX.Element {
       dispatch(storeEncryptedSeedAction(encryptedSeed));
       await createWallet(seedPhrase);
 
-      navigate('/wallet-success/create');
+      navigate('/wallet-success/create', { replace: true });
     } else {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));
     }

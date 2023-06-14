@@ -78,7 +78,7 @@ export default function BackupWalletSteps(): JSX.Element {
         const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
         dispatch(storeEncryptedSeedAction(encryptedSeed));
         await createWallet(seedPhrase);
-        navigate('/wallet-success/create');
+        navigate('/wallet-success/create', { replace: true });
       }
     } catch (err) {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));

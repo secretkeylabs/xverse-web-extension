@@ -83,7 +83,7 @@ function RestoreWallet(): JSX.Element {
       await restoreWallet(seed, password);
       setIsRestoring(false);
 
-      navigate('/wallet-success/restore');
+      navigate('/wallet-success/restore', { replace: true });
     } else {
       setIsRestoring(false);
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));

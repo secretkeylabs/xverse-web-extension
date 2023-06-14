@@ -71,9 +71,9 @@ function LegalLinks() {
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {
-      navigate('/restoreWallet');
+      navigate('/restoreWallet', { replace: true });
     } else {
-      navigate('/backup');
+      navigate('/backup', { replace: true });
     }
   };
   return (
