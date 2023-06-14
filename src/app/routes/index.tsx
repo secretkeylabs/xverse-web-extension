@@ -1,6 +1,6 @@
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import AuthGuard from '@components/guards/auth';
-import WalletExistsGuard from '@components/guards/walletExists';
+import OnboardingGuard from '@components/guards/onboarding';
 import ScreenContainer from '@components/screenContainer';
 import AccountList from '@screens/accountList';
 import AuthenticationRequest from '@screens/authenticationRequest';
@@ -66,9 +66,9 @@ const router = createHashRouter([
       {
         path: 'onboarding',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <Onboarding />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
@@ -81,7 +81,11 @@ const router = createHashRouter([
       },
       {
         path: 'legal',
-        element: <LegalLinks />,
+        element: (
+          <OnboardingGuard>
+            <LegalLinks />
+          </OnboardingGuard>
+        ),
       },
       {
         path: 'manage-tokens',
@@ -122,17 +126,17 @@ const router = createHashRouter([
       {
         path: 'backup',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <BackupWallet />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
         path: 'create-password',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <CreatePassword />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
@@ -182,9 +186,9 @@ const router = createHashRouter([
       {
         path: 'restoreWallet',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <RestoreWallet />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
@@ -194,9 +198,9 @@ const router = createHashRouter([
       {
         path: 'backupWalletSteps',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <BackupWalletSteps />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {

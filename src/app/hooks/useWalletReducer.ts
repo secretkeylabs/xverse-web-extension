@@ -76,6 +76,12 @@ const useWalletReducer = () => {
         walletAccounts,
       ),
     );
+    dispatch(
+      fetchAccountAction(
+        selectedAccount ? walletAccounts[selectedAccount.id] : walletAccounts[0],
+        walletAccounts,
+      ),
+    );
     dispatch(getActiveAccountsAction(walletAccounts));
   };
 
@@ -170,8 +176,11 @@ const useWalletReducer = () => {
     }
   };
 
-  const createWallet = async () => {
-    const wallet = await newWallet();
+  const createWallet = async (mnemonic?: string) => {
+    const wallet = mnemonic
+      ? await walletFromSeedPhrase({ mnemonic, index: 0n, network: 'Mainnet' })
+      : await newWallet();
+
     const account: Account = {
       id: 0,
       btcAddress: wallet.btcAddress,
@@ -272,6 +281,13 @@ const useWalletReducer = () => {
     await refetchBtcData();
   };
 
+  /**
+   * This should only be used as a storage location when creating a new wallet
+   */
+  const storeSeedPhrase = async (seed: string) => {
+    dispatch(unlockWalletAction(seed));
+  };
+
   return {
     unlockWallet,
     lockWallet,
@@ -281,6 +297,7 @@ const useWalletReducer = () => {
     switchAccount,
     changeNetwork,
     createAccount,
+    storeSeedPhrase,
   };
 };
 

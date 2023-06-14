@@ -101,7 +101,7 @@ function SettingComponent({
           onColor={theme.colors.purple_main}
           offColor={theme.colors.background.elevation3}
           onChange={toggleFunction}
-          checked={toggleValue!}
+          checked={toggleValue ?? false}
           uncheckedIcon={false}
           checkedIcon={false}
         />
