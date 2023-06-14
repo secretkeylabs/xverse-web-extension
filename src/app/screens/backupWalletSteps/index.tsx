@@ -72,15 +72,13 @@ export default function BackupWalletSteps(): JSX.Element {
   };
 
   const handleConfirmPasswordContinue = async () => {
-    try {
-      if (confirmPassword === password) {
-        disableWalletExistsGuard?.();
-        const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
-        dispatch(storeEncryptedSeedAction(encryptedSeed));
-        await createWallet(seedPhrase);
-        navigate('/wallet-success/create');
-      }
-    } catch (err) {
+    if (confirmPassword === password) {
+      disableWalletExistsGuard?.();
+      const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
+      dispatch(storeEncryptedSeedAction(encryptedSeed));
+      await createWallet(seedPhrase);
+      navigate('/wallet-success/create');
+    } else {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));
     }
   };
