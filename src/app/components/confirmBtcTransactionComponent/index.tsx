@@ -203,8 +203,8 @@ function ConfirmBtcTransactionComponent({
       Number(selectedAccount?.id),
       seedPhrase,
       network.type,
+      [ordinalTxUtxo!],
       new BigNumber(txFee),
-      [ordinalTxUtxo],
     );
     return signedTx;
   });

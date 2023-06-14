@@ -52,9 +52,10 @@ const ButtonContainer = styled.div({
 });
 
 function RestoreOrdinals() {
-  const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_ORDINAL_SCREEN' });
-  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
-    useWalletSelector();
+  const { t } = useTranslation('translation');
+  const {
+    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
+  } = useWalletSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
@@ -76,7 +77,6 @@ function RestoreOrdinals() {
       Number(selectedAccount?.id),
       seedPhrase,
       network.type,
-      undefined,
       ordinalsUtxos!,
     );
     return tx;
@@ -119,18 +119,18 @@ function RestoreOrdinals() {
 
   return (
     <>
-      <TopRow title={t('TITLE')} onClick={handleOnCancelClick} />
+      <TopRow title={t('RESTORE_ORDINAL_SCREEN.TITLE')} onClick={handleOnCancelClick} />
       <Container>
         {ordinals?.length === 0 ? (
           <>
-            <RestoreFundTitle>{t('NO_FUNDS')}</RestoreFundTitle>
+            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
             <ButtonContainer>
-              <ActionButton text={t('BACK')} onPress={handleOnCancelClick} />
+              <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
             </ButtonContainer>
           </>
         ) : (
           <>
-            <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
+            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
             {ordinals?.map((ordinal) => (
               <OrdinalRow
                 isLoading={isLoading}
