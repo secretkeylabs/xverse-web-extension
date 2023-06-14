@@ -337,9 +337,9 @@ function ConfirmBtcTransactionComponent({
             recipients?.map((recipient, index) => (
               <RecipientComponent
                 recipientIndex={index + 1}
-                address={recipient?.address}
-                value={satsToBtc(recipient?.amountSats).toString()}
-                totalRecipient={recipients?.length}
+                address={recipient.address}
+                value={satsToBtc(recipient.amountSats).toString()}
+                totalRecipient={recipients.length}
                 currencyType="BTC"
                 title={t('CONFIRM_TRANSACTION.AMOUNT')}
                 showSenderAddress={isRestoreFundFlow}

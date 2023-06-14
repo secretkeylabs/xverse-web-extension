@@ -155,6 +155,8 @@ function ConfirmBtcTransaction() {
   const goBackToScreen = () => {
     if (isRestoreFundFlow || isBrc20TokenFlow) {
       navigate(-1);
+    } else if (btcSendBrowserTx) {
+      window.close();
     } else {
       navigate('/send-btc', {
         state: {

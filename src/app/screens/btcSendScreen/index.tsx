@@ -34,6 +34,7 @@ function BtcSendScreen() {
     tabId,
     requestToken,
     error,
+    recipient,
   } = useSendBtcRequest();
   const navigate = useNavigate();
   const {
@@ -49,7 +50,7 @@ function BtcSendScreen() {
         state: {
           txid: '',
           currency: 'STX',
-          error: t('ADDRESS_MISMATCH'),
+          error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
           browserTx: true,
         },
       });
@@ -82,21 +83,13 @@ function BtcSendScreen() {
 
   useEffect(() => {
     if (error) {
-      if (Number(error) === ErrorCodes.InSufficientBalance) {
+      if (Number(error) === ErrorCodes.InSufficientBalanceWithTxFee || Number(error) === ErrorCodes.InSufficientBalance) {
         navigate('/tx-status', {
           state: {
             txid: '',
             currency: 'BTC',
+            errorTitle: t('TX_ERRORS.INVALID_TRANSACTION'),
             error: t('TX_ERRORS.INSUFFICIENT_BALANCE'),
-            browserTx: true,
-          },
-        });
-      } else if (Number(error) === ErrorCodes.InSufficientBalanceWithTxFee) {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'BTC',
-            error: t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'),
             browserTx: true,
           },
         });
@@ -121,12 +114,7 @@ function BtcSendScreen() {
           signedTxHex: signedTx.signedTx,
           recipientAddress: payload.recipientAddress,
           amount: payload.amountSats,
-          recipient: [
-            {
-              address: payload?.recipientAddress,
-              amountSats: new BigNumber(payload?.amountSats),
-            },
-          ],
+          recipient,
           fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
           fee: signedTx.fee,
           feePerVByte: signedTx.feePerVByte,
