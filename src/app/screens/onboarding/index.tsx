@@ -109,13 +109,13 @@ function Onboarding(): JSX.Element {
 
     if (isLegalAccepted) {
       if (isRestore) {
-        navigate('/restoreWallet');
+        navigate('/restoreWallet', { replace: true });
       } else {
-        navigate('/backup');
+        navigate('/backup', { replace: true });
       }
     } else {
       const params = isRestore ? '?restore=true' : '';
-      navigate(`/legal${params}`);
+      navigate(`/legal${params}`, { replace: true });
     }
   };
 
