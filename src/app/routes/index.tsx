@@ -44,6 +44,7 @@ import BackupWalletScreen from '@screens/settings/backupWallet';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import ChangePasswordScreen from '@screens/settings/changePassword';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
+import LockCountdown from '@screens/settings/lockCountdown';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import SignatureRequest from '@screens/signatureRequest';
 import Stacking from '@screens/stacking';
@@ -283,6 +284,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <ConfirmInscriptionRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'lockCountdown',
+        element: (
+          <AuthGuard>
+            <LockCountdown />
           </AuthGuard>
         ),
       },

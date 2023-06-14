@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import ChromeStorage from '@utils/storage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { PersistConfig, persistReducer, persistStore } from 'redux-persist';
@@ -8,8 +7,6 @@ import { WalletState } from './wallet/actions/types';
 import walletReducer from './wallet/reducer';
 
 export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
-
-export const persistVersion = 1;
 
 const rootPersistConfig = {
   version: 1,
@@ -36,18 +33,16 @@ const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
 
 export type StoreState = ReturnType<typeof rootReducer>;
 
-const rootStore = (() => {
-  const storeMiddleware = [
-    createStateSyncMiddleware({
-      // We don't want to sync the redux-persist actions
-      blacklist: ['persist/PERSIST', 'persist/REHYDRATE'],
-    }),
-  ];
-  const store = createStore(persistedReducer, applyMiddleware(...storeMiddleware));
-  const persistedStore = persistStore(store);
-  initMessageListener(store);
+const storeMiddleware = [
+  createStateSyncMiddleware({
+    // We don't want to sync the redux-persist actions
+    blacklist: ['persist/PERSIST', 'persist/REHYDRATE'],
+  }),
+];
+const store = createStore(persistedReducer, applyMiddleware(...storeMiddleware));
+const persistedStore = persistStore(store);
+initMessageListener(store);
 
-  return { store, persistedStore };
-})();
+const rootStore = { store, persistedStore };
 
 export default rootStore;
