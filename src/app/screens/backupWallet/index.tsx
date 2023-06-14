@@ -69,11 +69,11 @@ function BackupWallet(): JSX.Element {
   }, []);
 
   const handleBackup = () => {
-    navigate('/backupWalletSteps');
+    navigate('/backupWalletSteps', { replace: true });
   };
 
   const handleSkip = () => {
-    navigate('/create-password');
+    navigate('/create-password', { replace: true });
   };
 
   return (

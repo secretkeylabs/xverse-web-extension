@@ -13,12 +13,13 @@ const CheckBoxWrapper = styled.div((props) => ({
   label: {
     marginLeft: props.theme.spacing(5),
   },
+  '> input, > label': {
+    cursor: 'pointer',
+  },
 }));
 
 function CheckBox(props: CheckBoxProps): JSX.Element {
-  const {
-    isChecked, checkBoxId, checkBoxLabel, onCheck,
-  } = props;
+  const { isChecked, checkBoxId, checkBoxLabel, onCheck } = props;
   return (
     <CheckBoxWrapper>
       <input id={checkBoxId} type="checkbox" checked={isChecked} onChange={onCheck} />
