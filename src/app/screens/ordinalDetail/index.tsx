@@ -442,14 +442,16 @@ function OrdinalDetailScreen() {
           <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
         </>
       </WebGalleryButton>
-      <ViewInExplorerButton>
-        <ActionButton
-          src={Globe}
-          text={t('VIEW_IN_EXPLORER')}
-          onPress={openInOrdinalsExplorer}
-          transparent
-        />
-      </ViewInExplorerButton>
+      {selectedOrdinal?.content_type.includes('html') ? (
+        <ViewInExplorerButton>
+          <ActionButton
+            src={Globe}
+            text={t('VIEW_IN_EXPLORER')}
+            onPress={openInOrdinalsExplorer}
+            transparent
+          />
+        </ViewInExplorerButton>
+      ) : null}
       <ExtensionOrdinalsContainer>
         <OrdinalImage ordinal={selectedOrdinal!} />
       </ExtensionOrdinalsContainer>
