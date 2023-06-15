@@ -356,7 +356,7 @@
     "BRC20_TRANSFER_STATUS": "Status",
     "TOTAL_SUPPLY": "Total supply",
     "MINT_LIMIT": "Mint limit",
-    "VIEW_IN_EXPLORER": "View in explorer"
+    "VIEW_ON_ORD_IO": "View on Ord.io"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",

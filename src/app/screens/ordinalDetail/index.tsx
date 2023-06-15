@@ -446,7 +446,7 @@ function OrdinalDetailScreen() {
         <ViewInExplorerButton>
           <ActionButton
             src={Globe}
-            text={t('VIEW_IN_EXPLORER')}
+            text={t('VIEW_ON_ORD_IO')}
             onPress={openInOrdinalsExplorer}
             transparent
           />
@@ -518,7 +518,7 @@ function OrdinalDetailScreen() {
           <SendButtonContainer>
             <ActionButton
               src={Globe}
-              text={t('VIEW_IN_EXPLORER')}
+              text={t('VIEW_ON_ORD_IO')}
               onPress={openInOrdinalsExplorer}
               transparent
             />
