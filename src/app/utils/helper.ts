@@ -158,6 +158,6 @@ export async function isValidBtcApi(url: string, network: NetworkType) {
 
 export const getNetworkType = (stxNetwork) => (stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet');
 
-export const isHardwareAccount = (account: Account | null): boolean => account?.accountType && account?.accountType !== 'software';
+export const isHardwareAccount = (account: Account | null): boolean => !!account?.accountType && account?.accountType !== 'software';
 
 export const isLedgerAccount = (account: Account | null): boolean => account?.accountType === 'ledger';

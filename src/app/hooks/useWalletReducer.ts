@@ -19,18 +19,17 @@ import {
 import { decryptSeedPhrase, encryptSeedPhrase } from '@utils/encryptionUtils';
 import { InternalMethods } from '@common/types/message-types';
 import { sendMessage } from '@common/types/messages';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import useNetworkSelector from '@hooks/useNetwork';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
+import useWalletSelector from './useWalletSelector';
 
 const useWalletReducer = () => {
   const {
     encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList,
-  } = useSelector((state: StoreState) => ({
-    ...state.walletState,
-  }));
+  } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();

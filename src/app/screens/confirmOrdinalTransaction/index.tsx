@@ -13,6 +13,9 @@ import OrdinalImage from '@screens/ordinals/ordinalImage';
 import BigNumber from 'bignumber.js';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useBtcClient from '@hooks/useBtcClient';
+import { isLedgerAccount } from '@utils/helper';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { LedgerTransactionType } from '@screens/ledger/reviewLedgerBtcTransaction';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -86,6 +89,7 @@ const NFtContainer = styled.div((props) => ({
 function ConfirmOrdinalTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -139,6 +143,12 @@ function ConfirmOrdinalTransaction() {
   }, [txError]);
 
   const handleOnConfirmClick = (txHex: string) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const txType: LedgerTransactionType = 'ORDINALS';
+      navigate('/confirm-ledger-tx', { state: { recipient: { address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }, type: txType, ordinalUtxo } });
+      return;
+    }
+
     mutate({ signedTx: txHex });
   };
 

@@ -18,7 +18,7 @@ import DescriptionTile from '@screens/nftDetail/descriptionTile';
 import InfoContainer from '@components/infoContainer';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import AlertMessage from '@components/alertMessage';
-import { getBtcTxStatusUrl } from '@utils/helper';
+import { getBtcTxStatusUrl, isLedgerAccount } from '@utils/helper';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
@@ -129,18 +129,18 @@ const RowContainer = styled.div((props) => ({
   flexDirection: 'row',
 }));
 
-const ColumnContainer = styled.div((props) => ({
+const ColumnContainer = styled.div({
   display: 'flex',
   alignItems: 'flex-start',
   flexDirection: 'column',
   width: '100%',
-}));
+});
 
-const Row = styled.div((props) => ({
+const Row = styled.div({
   display: 'flex',
   justifyContent: 'space-between',
   flexDirection: 'row',
-}));
+});
 
 const MintLimitContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(30),
@@ -259,7 +259,7 @@ const DetailSection = styled.div<DetailSectionProps>((props) => ({
 function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { ordinalsAddress, network } = useWalletSelector();
+  const { ordinalsAddress, network, selectedAccount } = useWalletSelector();
   const { selectedOrdinal } = useNftDataSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(selectedOrdinal?.tx_id);
@@ -313,12 +313,20 @@ function OrdinalDetailScreen() {
     setshowSendOridnalsAlert(false);
   };
 
-  const handleSendOrdinal = () => {
+  const handleSendOrdinal = async () => {
     if (isPending) {
       showAlert();
-    } else {
-      navigate('send-ordinal');
+      return;
     }
+
+    if (isLedgerAccount(selectedAccount)) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL('options.html#/send-ordinal-ledger'),
+      });
+      return;
+    }
+
+    navigate('send-ordinal');
   };
 
   const handleRedirectToTx = () => {

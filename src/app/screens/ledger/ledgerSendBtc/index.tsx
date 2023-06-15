@@ -25,8 +25,10 @@ function LedgerSendBtcScreen() {
   const [addressError, setAddressError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const { btcAddress, network, btcBalance, selectedAccount } = useSelector(
-    (state: StoreState) => state.walletState
+  const {
+    btcAddress, network, btcBalance, selectedAccount,
+  } = useSelector(
+    (state: StoreState) => state.walletState,
   );
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 

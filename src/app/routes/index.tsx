@@ -47,6 +47,7 @@ import SendBtcScreen from '@screens/sendBtc';
 import SendFtScreen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
+import LedgerSendOrdinal from '@screens/ledger/ledgerSendOrdinal';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import BackupWalletScreen from '@screens/settings/backupWallet';
@@ -310,6 +311,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SendOrdinal />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'send-ordinal-ledger',
+        element: (
+          <AuthGuard>
+            <LedgerSendOrdinal />
           </AuthGuard>
         ),
       },

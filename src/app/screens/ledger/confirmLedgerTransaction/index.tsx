@@ -74,14 +74,14 @@ const TxConfirmedDescription = styled.p((props) => ({
 }));
 
 function ConfirmLedgerTransaction(): JSX.Element {
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [txId, setTxId] = useState<string | undefined>(undefined);
 
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-  const [isConnectSuccess, setIsConnectSuccess] = useState<boolean>(false);
-  const [isConnectFailed, setIsConnectFailed] = useState<boolean>(false);
-  const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
-  const [isTxRejected, setIsTxRejected] = useState<boolean>(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState(false);
+  const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isTxApproved, setIsTxApproved] = useState(false);
+  const [isTxRejected, setIsTxRejected] = useState(false);
 
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_CONFIRM_TRANSACTION_SCREEN' });
   const location = useLocation();
@@ -95,11 +95,13 @@ function ConfirmLedgerTransaction(): JSX.Element {
     recipient,
     type,
     unsignedTx,
+    ordinalUtxo,
   }: {
     amount: BigNumber;
     recipient: Recipient;
     type: LedgerTransactionType;
     unsignedTx: StacksTransaction;
+    ordinalUtxo: any;
   } = location.state;
 
   const transition = useTransition(currentStepIndex, {
@@ -113,13 +115,36 @@ function ConfirmLedgerTransaction(): JSX.Element {
     },
   });
 
+  const signAndBroadcastOrdinalsTx = async (transport: Transport, accountId: number) => {
+    try {
+      const result = await signLedgerNativeSegwitBtcTransaction(
+        transport,
+        network.type,
+        accountId,
+        recipient,
+        ordinalUtxo,
+      );
+      setIsTxApproved(true);
+      await ledgerDelay(1500);
+      const transactionId = await btcClient.sendRawTransaction(result);
+      setTxId(transactionId.tx.hash);
+      setCurrentStepIndex(2);
+    } catch (err) {
+      console.error(err);
+      setIsTxRejected(true);
+      setIsButtonDisabled(false);
+    } finally {
+      transport.close();
+    }
+  };
+
   const signAndBroadcastBtcTx = async (transport: Transport, accountId: number) => {
     try {
       const result = await signLedgerNativeSegwitBtcTransaction(
         transport,
         network.type,
         accountId,
-        recipient
+        recipient,
       );
       setIsTxApproved(true);
       await ledgerDelay(1500);
@@ -180,6 +205,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
         await signAndBroadcastStxTx(transport as Transport, selectedAccount.id);
         break;
       case 'ORDINALS':
+        await signAndBroadcastOrdinalsTx(transport as Transport, selectedAccount.id);
+        break;
       default:
         break;
     }
@@ -212,6 +239,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
         window.open(getStxTxStatusUrl(txId, network), '_blank', 'noopener,noreferrer');
         break;
       case 'ORDINALS':
+        window.open(getBtcTxStatusUrl(txId, network), '_blank', 'noopener,noreferrer');
+        break;
       default:
         break;
     }
