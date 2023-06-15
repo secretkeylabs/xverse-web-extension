@@ -3,6 +3,7 @@ import { MoonLoader } from 'react-spinners';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { getFetchableUrl } from '@utils/helper';
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
+import PlaceholderHtml from '@assets/img/nftDashboard/code.svg';
 import { useTranslation } from 'react-i18next';
 import { Inscription } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
@@ -116,10 +117,6 @@ function OrdinalImage({
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
 
-  const openInOrdinalsExplorer = () => {
-    window.open(`https://www.ord.io/${ordinal.number}`);
-  };
-
   if (ordinal?.content_type.includes('image')) {
     return (
       <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
@@ -168,22 +165,10 @@ function OrdinalImage({
           inNftDetail={inNftDetail}
           isGalleryOpen={isGalleryOpen}
         >
-          <OrdinalContentText blur={inNftDetail} inNftSend={inNftSend}>
-            {textContent}
-          </OrdinalContentText>
-          {inNftDetail ? (
-            <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '30%',
-                zIndex: 10000,
-                width: 169,
-              }}
-            >
-              <ActionButton onPress={openInOrdinalsExplorer} text="Open in Explorer" />
-            </div>
-          ) : null}
+          <div style={{display: 'flex', flexDirection: 'column'}}>
+            <img src={PlaceholderHtml} />
+            <OrdinalContentText>.html</OrdinalContentText>
+          </div>
           {isNftDashboard && (
             <OrdinalsTag>
               <ButtonIcon src={OrdinalsIcon} />
