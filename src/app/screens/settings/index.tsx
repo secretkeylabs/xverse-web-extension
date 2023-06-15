@@ -122,6 +122,10 @@ function Setting() {
     navigate('/');
   };
 
+  const openLockCountdownScreen = () => {
+    navigate('/lockCountdown');
+  };
+
   const onRestoreFundClick = () => {
     navigate('/restore-funds', {
       state: {
@@ -186,6 +190,12 @@ function Setting() {
         <SettingComponent
           text={t('BACKUP_WALLET')}
           onClick={openBackUpWalletScreen}
+          icon={ArrowIcon}
+          showDivider
+        />
+        <SettingComponent
+          text={t('LOCK_COUNTDOWN')}
+          onClick={openLockCountdownScreen}
           icon={ArrowIcon}
           showDivider
         />

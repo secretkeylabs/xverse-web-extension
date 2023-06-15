@@ -8,6 +8,7 @@ import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
+import Globe from '@assets/img/nftDashboard/globe.svg';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useMemo, useState } from 'react';
@@ -161,6 +162,16 @@ const WebGalleryButton = styled.button((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
+  marginTop: props.theme.spacing(6),
+}));
+
+const ViewInExplorerButton = styled.button((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: 'transparent',
+  width: 158,
   marginTop: props.theme.spacing(6),
 }));
 
@@ -328,6 +339,10 @@ function OrdinalDetailScreen() {
     }
   };
 
+  const openInOrdinalsExplorer = () => {
+    window.open(`https://www.ord.io/${selectedOrdinal?.number}`);
+  };
+
   const showBrc20OrdinalDetail = (isGallery: boolean) => {
     const regex = /”/g;
     const validBrcContentValue = textContent.replace(regex, '"');
@@ -418,7 +433,9 @@ function OrdinalDetailScreen() {
   );
   const extensionView = (
     <ExtensionContainer>
-      <CollectibleText>{isBrc20Ordinal ? t('BRC20_INSCRIPTION') : t('COLLECTIBLE')}</CollectibleText>
+      <CollectibleText>
+        {isBrc20Ordinal ? t('BRC20_INSCRIPTION') : t('COLLECTIBLE')}
+      </CollectibleText>
       <OrdinalTitleText>{`${t('INSCRIPTION')} ${selectedOrdinal?.number}`}</OrdinalTitleText>
       <WebGalleryButton onClick={openInGalleryView}>
         <>
@@ -426,6 +443,16 @@ function OrdinalDetailScreen() {
           <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
         </>
       </WebGalleryButton>
+      {selectedOrdinal?.content_type.includes('html') ? (
+        <ViewInExplorerButton>
+          <ActionButton
+            src={Globe}
+            text={t('VIEW_ON_ORD_IO')}
+            onPress={openInOrdinalsExplorer}
+            transparent
+          />
+        </ViewInExplorerButton>
+      ) : null}
       <ExtensionOrdinalsContainer>
         <OrdinalImage ordinal={selectedOrdinal!} />
       </ExtensionOrdinalsContainer>
@@ -487,6 +514,18 @@ function OrdinalDetailScreen() {
         <SendButtonContainer>
           <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleSendOrdinal} />
         </SendButtonContainer>
+        {
+          selectedOrdinal?.content_type.includes('html') ? (
+          <SendButtonContainer>
+            <ActionButton
+              src={Globe}
+              text={t('VIEW_ON_ORD_IO')}
+              onPress={openInOrdinalsExplorer}
+              transparent
+            />
+          </SendButtonContainer>
+          ) : null
+        }
       </ButtonContainer>
       <RowContainer>
         <OrdinalsContainer>
@@ -496,9 +535,7 @@ function OrdinalDetailScreen() {
         <DescriptionContainer>
           <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
           {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
-          {isBrc20Ordinal
-            ? showBrc20OrdinalDetail(true)
-            : ordinalDescriptionData}
+          {isBrc20Ordinal ? showBrc20OrdinalDetail(true) : ordinalDescriptionData}
         </DescriptionContainer>
       </RowContainer>
     </Container>
