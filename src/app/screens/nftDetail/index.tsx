@@ -14,7 +14,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
 import ShareDialog from '@components/shareNft';
 import { GAMMA_URL } from '@utils/constants';
-import { getExplorerUrl } from '@utils/helper';
+import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useNftDataReducer from '@hooks/stores/useNftReducer';
 import { useMutation } from '@tanstack/react-query';
@@ -247,7 +247,7 @@ const LoaderContainer = styled.div({
 function NftDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress } = useWalletSelector();
+  const { stxAddress, selectedAccount } = useWalletSelector();
   const { id } = useParams();
   const nftIdDetails = id!.split('::');
   const { nftData } = useNftDataSelector();
@@ -315,7 +315,14 @@ function NftDetailScreen() {
     });
   };
 
-  const handleOnSendClick = () => {
+  const handleOnSendClick = async () => {
+    if (isLedgerAccount(selectedAccount)) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL(`options.html#/send-nft-ledger/${id}`),
+      });
+      return;
+    }
+
     navigate('send-nft', {
       state: {
         nft,

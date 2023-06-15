@@ -18,6 +18,8 @@ import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import { isLedgerAccount } from '@utils/helper';
+import { LedgerTransactionType } from '@screens/ledger/reviewLedgerBtcTransaction';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -94,6 +96,7 @@ const ReviewTransactionText = styled.h1((props) => ({
 function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
@@ -149,6 +152,12 @@ function ConfirmNftTransaction() {
   }, [txError]);
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const txType: LedgerTransactionType = 'STX';
+      navigate('/confirm-ledger-tx', { state: { unsignedTx, type: txType } });
+      return;
+    }
+
     mutate({ signedTx: txs[0] });
   };
 

@@ -48,6 +48,7 @@ import SendFtScreen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
 import LedgerSendOrdinal from '@screens/ledger/ledgerSendOrdinal';
+import LedgerSendNft from '@screens/ledger/ledgerSendNft';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import BackupWalletScreen from '@screens/settings/backupWallet';
@@ -364,6 +365,10 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/nft-detail/:id/send-nft',
         element: <SendNft />,
+      },
+      {
+        path: 'send-nft-ledger/:id',
+        element: <LedgerSendNft />,
       },
       {
         path: 'confirm-nft-tx/:id',
