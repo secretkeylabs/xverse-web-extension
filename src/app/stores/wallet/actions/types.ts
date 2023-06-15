@@ -41,6 +41,14 @@ export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKe
 
 export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 
+export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
+
+export enum WalletSessionPeriods {
+  LOW = 1,
+  STANDARD = 10,
+  LONG = 30,
+}
+
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
@@ -71,6 +79,7 @@ export interface WalletState {
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
   btcApiUrl: string;
+  walletLockPeriod: WalletSessionPeriods;
 }
 
 export interface SetWallet {
@@ -194,6 +203,11 @@ export interface SetBrcCoinsData {
   brcCoinsList: FungibleToken[];
 }
 
+export interface SetWalletLockPeriod {
+  type: typeof SetWalletLockPeriodKey;
+  walletLockPeriod: WalletSessionPeriods;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -217,4 +231,5 @@ export type WalletActions =
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
   | SetBrcCoinsData
+  | SetWalletLockPeriod
   | DisableWalletExistsGuard;

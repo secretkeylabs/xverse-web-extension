@@ -1,8 +1,10 @@
-import { SendBtcRequestEventDetails, SignMessageRequestEventDetails, SignPsbtRequestEventDetails } from './../common/types/inpage-types';
-import { BitcoinProvider, GetAddressResponse } from 'sats-connect';
+import { BitcoinProvider, GetAddressResponse, SignTransactionResponse } from 'sats-connect';
 import {
   DomEventName,
   GetAddressRequestEventDetails,
+  SignMessageRequestEventDetails,
+  SignPsbtRequestEventDetails,
+  SendBtcRequestEventDetails,
 } from '@common/types/inpage-types';
 import {
   ExternalSatsMethods,
@@ -13,7 +15,6 @@ import {
   SignPsbtResponseMessage,
   SendBtcResponseMessage,
 } from '@common/types/message-types';
-import { SignTransactionResponse } from 'sats-connect/src/transactions/signTransaction';
 
 const isValidEvent = (event: MessageEvent, method: SatsConnectMessageToContentScript['method']) => {
   const { data } = event;

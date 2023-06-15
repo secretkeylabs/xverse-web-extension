@@ -1,6 +1,6 @@
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import AuthGuard from '@components/guards/auth';
-import WalletExistsGuard from '@components/guards/walletExists';
+import OnboardingGuard from '@components/guards/onboarding';
 import ScreenContainer from '@components/screenContainer';
 import AccountList from '@screens/accountList';
 import AuthenticationRequest from '@screens/authenticationRequest';
@@ -27,7 +27,6 @@ import ManageTokens from '@screens/manageTokens';
 import NftDashboard from '@screens/nftDashboard';
 import NftDetailScreen from '@screens/nftDetail';
 import Onboarding from '@screens/onboarding';
-import MigrationConfirmation from '@screens/migrationConfirmation';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
 import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
@@ -46,6 +45,7 @@ import BackupWalletScreen from '@screens/settings/backupWallet';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import ChangePasswordScreen from '@screens/settings/changePassword';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
+import LockCountdown from '@screens/settings/lockCountdown';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import SignatureRequest from '@screens/signatureRequest';
 import Stacking from '@screens/stacking';
@@ -67,15 +67,9 @@ const router = createHashRouter([
       {
         path: 'onboarding',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <Onboarding />
-          </WalletExistsGuard>
-        ),
-      },
-      {
-        path: 'migration-confirmation',
-        element: (
-          <MigrationConfirmation />
+          </OnboardingGuard>
         ),
       },
       {
@@ -88,7 +82,11 @@ const router = createHashRouter([
       },
       {
         path: 'legal',
-        element: <LegalLinks />,
+        element: (
+          <OnboardingGuard>
+            <LegalLinks />
+          </OnboardingGuard>
+        ),
       },
       {
         path: 'manage-tokens',
@@ -129,17 +127,17 @@ const router = createHashRouter([
       {
         path: 'backup',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <BackupWallet />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
         path: 'create-password',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <CreatePassword />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
@@ -197,9 +195,9 @@ const router = createHashRouter([
       {
         path: 'restoreWallet',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <RestoreWallet />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
@@ -209,9 +207,9 @@ const router = createHashRouter([
       {
         path: 'backupWalletSteps',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <BackupWalletSteps />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
@@ -295,6 +293,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <ConfirmInscriptionRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'lockCountdown',
+        element: (
+          <AuthGuard>
+            <LockCountdown />
           </AuthGuard>
         ),
       },

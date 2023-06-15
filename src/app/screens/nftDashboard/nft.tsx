@@ -30,6 +30,7 @@ interface ContainerProps {
 const GradientContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   width: props.isGalleryView ? '100%' : 150,
+  minHeight: props.isGalleryView ? 200 : 150,
   height: props.isGalleryView ? '100%' : 150,
   justifyContent: 'center',
   alignItems: 'center',

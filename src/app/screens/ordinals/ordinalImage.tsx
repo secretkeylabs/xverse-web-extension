@@ -1,13 +1,14 @@
 import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import Image from 'rc-image';
 import { getFetchableUrl } from '@utils/helper';
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
+import PlaceholderHtml from '@assets/img/nftDashboard/code.svg';
 import { useTranslation } from 'react-i18next';
 import { Inscription } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import Image from 'rc-image';
+import ActionButton from '@components/button';
 import Brc20Tile from './brc20Tile';
 
 interface ContainerProps {
@@ -22,9 +23,9 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   marginBottom: props.inNftDetail ? props.theme.spacing(8) : 0,
   alignItems: 'center',
   width: '100%',
-  height: props.isGalleryOpen ? props.inNftDetail ? 540 : 300 : props.isSmallImage ? 50 : 150,
+  height: props.isGalleryOpen ? (props.inNftDetail ? 540 : 300) : props.isSmallImage ? 50 : 150,
   minHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
-  maxHeight: props.isGalleryOpen ? props.inNftDetail ? 450 : 300 : props.isSmallImage ? 50 : 150,
+  maxHeight: props.isGalleryOpen ? (props.inNftDetail ? 450 : 300) : props.isSmallImage ? 50 : 150,
   overflow: 'hidden',
   position: 'relative',
   fontSize: '3em',
@@ -79,6 +80,7 @@ const Text = styled.h1((props) => ({
 
 interface TextProps {
   inNftSend?: boolean;
+  blur?: boolean
 }
 
 const OrdinalContentText = styled.h1<TextProps>((props) => ({
@@ -87,9 +89,10 @@ const OrdinalContentText = styled.h1<TextProps>((props) => ({
   fontSize: props.inNftSend ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
   textAlign: 'center',
+  filter: `blur(${props.blur ? '3px' : 0})`,
 }));
 
-const StyledLazyLoadImage = styled(LazyLoadImage)`
+const StyledImage = styled(Image)`
   border-radius: 8px;
   object-fit: contain;
   image-rendering: pixelated;
@@ -117,7 +120,7 @@ function OrdinalImage({
   if (ordinal?.content_type.includes('image')) {
     return (
       <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
-        <StyledLazyLoadImage
+        <StyledImage
           width="100%"
           placeholder={(
             <LoaderContainer isGalleryOpen={isGalleryOpen}>
@@ -153,6 +156,26 @@ function OrdinalImage({
           inNftDetail={inNftDetail}
           isSmallImage={isSmallImage}
         />
+      );
+    }
+    if (ordinal?.content_type.includes('html')) {
+      return (
+        <ImageContainer
+          isSmallImage={isSmallImage}
+          inNftDetail={inNftDetail}
+          isGalleryOpen={isGalleryOpen}
+        >
+          <div style={{display: 'flex', flexDirection: 'column'}}>
+            <img src={PlaceholderHtml} />
+            <OrdinalContentText>.html</OrdinalContentText>
+          </div>
+          {isNftDashboard && (
+            <OrdinalsTag>
+              <ButtonIcon src={OrdinalsIcon} />
+              <Text>{t('ORDINAL')}</Text>
+            </OrdinalsTag>
+          )}
+        </ImageContainer>
       );
     }
     return (
