@@ -114,7 +114,6 @@ function LedgerSendOrdinal() {
   const address: string | undefined = useMemo(() => (location.state ? location.state.recipientAddress : undefined), [location.state]);
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
-  console.log('btcAddress', btcAddress);
   const {
     isLoading,
     data,
