@@ -1,4 +1,4 @@
-import { useWalletExistsGuardContext } from '@components/guards/walletExists';
+import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
 import Steps from '@components/steps';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -38,9 +38,10 @@ function RestoreWallet(): JSX.Element {
   const [seedError, setSeedError] = useState<string>('');
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
-  const { disableWalletExistsGuard } = useWalletExistsGuardContext();
+  const { disableWalletExistsGuard } = useWalletExistsContext();
 
-  const cleanMnemonic = (rawSeed: string): string => rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
+  const cleanMnemonic = (rawSeed: string): string =>
+    rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
   const handleNewPasswordBack = () => {
     setCurrentStepIndex(0);
@@ -82,7 +83,7 @@ function RestoreWallet(): JSX.Element {
       await restoreWallet(seed, password);
       setIsRestoring(false);
 
-      navigate('/wallet-success/restore');
+      navigate('/wallet-success/restore', { replace: true });
     } else {
       setIsRestoring(false);
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));

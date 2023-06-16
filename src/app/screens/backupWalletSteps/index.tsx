@@ -1,9 +1,11 @@
+import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
 import Steps from '@components/steps';
+import useWalletReducer from '@hooks/useWalletReducer';
 import { StoreState } from '@stores/index';
 import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
 import { encryptSeedPhrase } from '@utils/encryptionUtils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -42,6 +44,14 @@ export default function BackupWalletSteps(): JSX.Element {
   const { seedPhrase } = useSelector((state: StoreState) => ({
     ...state.walletState,
   }));
+  const { createWallet } = useWalletReducer();
+  const { disableWalletExistsGuard } = useWalletExistsContext();
+
+  useEffect(() => {
+    if (!seedPhrase) {
+      navigate('/backup');
+    }
+  }, [seedPhrase]);
 
   const handleSeedCheckContinue = () => {
     setCurrentActiveIndex(1);
@@ -68,13 +78,13 @@ export default function BackupWalletSteps(): JSX.Element {
   };
 
   const handleConfirmPasswordContinue = async () => {
-    try {
-      if (confirmPassword === password) {
-        const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
-        dispatch(storeEncryptedSeedAction(encryptedSeed));
-        navigate('/wallet-success/create');
-      }
-    } catch (err) {
+    if (confirmPassword === password) {
+      disableWalletExistsGuard?.();
+      const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
+      dispatch(storeEncryptedSeedAction(encryptedSeed));
+      await createWallet(seedPhrase);
+      navigate('/wallet-success/create', { replace: true });
+    } else {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));
     }
   };

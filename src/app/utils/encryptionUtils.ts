@@ -1,9 +1,9 @@
-import argon2 from 'argon2-browser';
-import { encryptMnemonic, decryptMnemonic } from '@stacks/encryption';
 import {
-  encryptMnemonicWithCallback,
   decryptMnemonicWithCallback,
+  encryptMnemonicWithCallback,
 } from '@secretkeylabs/xverse-core/wallet';
+import { decryptMnemonic, encryptMnemonic } from '@stacks/encryption';
+import argon2 from 'argon2-browser';
 import { getSalt, saveSalt } from './localStorage';
 
 function generateRandomKey(bytesCount: number): string {
@@ -12,23 +12,19 @@ function generateRandomKey(bytesCount: number): string {
 }
 
 async function generateKeyArgon2(password: string, salt: string): Promise<string> {
-  try {
-    const result = await argon2.hash({
-      pass: password,
-      salt,
-      time: 3,
-      mem: 64 * 1024,
-      parallelism: 4,
-      hashLen: 48,
-      type: argon2.ArgonType.Argon2i,
-    });
-    return result.hashHex;
-  } catch (e) {
-    return Promise.reject(e);
-  }
+  const result = await argon2.hash({
+    pass: password,
+    salt,
+    time: 3,
+    mem: 64 * 1024,
+    parallelism: 4,
+    hashLen: 48,
+    type: argon2.ArgonType.Argon2i,
+  });
+  return result.hashHex;
 }
 
-async function generatePasswordHash(password: string) {
+export async function generatePasswordHash(password: string) {
   const existingSalt = getSalt();
   if (existingSalt) {
     const argonHash = await generateKeyArgon2(password, existingSalt);
@@ -65,6 +61,6 @@ export async function decryptSeedPhrase(encryptedSeed: string, password: string)
     });
     return seedPhrase;
   } catch (err) {
-    return Promise.reject(Error('Invalid Password'));
+    throw new Error('Invalid Password');
   }
 }
