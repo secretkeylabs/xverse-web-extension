@@ -81,7 +81,7 @@ function CoinSelectModal({
     return (
       <Container>
         {renderFixedCoins()}
-        {coins.map((coin) => (
+        {stxAddress && coins.map((coin) => (
           <TokenTile
             key={coin.principal}
             title={coin.name}
