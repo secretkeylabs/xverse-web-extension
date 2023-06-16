@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "^1.0.0",
+    "@secretkeylabs/xverse-core": "^1.1.0",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
     "@stacks/stacks-blockchain-api-types": "^6.1.1",
