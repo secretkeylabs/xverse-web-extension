@@ -67,7 +67,7 @@
       "ADDRESS_INVALID": "Recipient address invalid",
       "SEND_TO_SELF": "Cannot send to self",
       "INVALID_AMOUNT": "Invalid amount",
-      "BELOW_MINIMUM_AMOUNT": "Amount should not be less than 5500 sats",
+      "BELOW_MINIMUM_AMOUNT": "Amount should not be less than 1500 sats",
       "MINIMUM_AMOUNT": "Minimum amount is 0.000001 STX",
       "INSUFFICIENT_BALANCE": "Insufficient balance",
       "MEMO_LENGTH": "Memo exceeds allowed length",

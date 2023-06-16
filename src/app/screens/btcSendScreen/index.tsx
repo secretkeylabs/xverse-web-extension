@@ -65,21 +65,30 @@ function BtcSendScreen() {
         },
       });
     }
-    if (new BigNumber(payload?.amountSats).lt(BITCOIN_DUST_AMOUNT_SATS)) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          error: t('SEND.ERRORS.BELOW_MINIMUM_AMOUNT'),
-          browserTx: true,
-        },
-      });
-    }
+  };
+
+  const checkIfValidAmount = () => {
+    recipient.forEach((recipient)=> {
+      if (recipient.amountSats.lt(BITCOIN_DUST_AMOUNT_SATS)) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'BTC',
+            error: t('SEND.ERRORS.BELOW_MINIMUM_AMOUNT'),
+            browserTx: true,
+          },
+        });
+      }
+    })
   };
 
   useEffect(() => {
     checkIfMismatch();
   }, []);
+
+  useEffect(() => {
+    checkIfValidAmount();
+  }, [recipient]);
 
   useEffect(() => {
     if (error) {
@@ -108,14 +117,10 @@ function BtcSendScreen() {
 
   useEffect(() => {
     if (signedTx) {
-      const parsedAmountSats = new BigNumber(payload.amountSats);
       navigate('/confirm-btc-tx', {
         state: {
           signedTxHex: signedTx.signedTx,
-          recipientAddress: payload.recipientAddress,
-          amount: payload.amountSats,
           recipient,
-          fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
           fee: signedTx.fee,
           feePerVByte: signedTx.feePerVByte,
           fiatFee: getBtcFiatEquivalent(signedTx.fee, btcFiatRate),

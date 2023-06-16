@@ -23,10 +23,10 @@ function useSendBtcRequest() {
 
   const generateSignedTransaction = async () => {
     const recipients: Recipient[] = [];
-    request.payload?.recipientAddress?.forEach(async (address, index) => {
+    request.payload?.recipients?.forEach(async (value) => {
       const recipient: Recipient = {
-        address,
-        amountSats: new BigNumber(request.payload?.amountSats[index]),
+        address: value.address,
+        amountSats: new BigNumber(value.amountSats),
       };
       recipients.push(recipient);
     });
