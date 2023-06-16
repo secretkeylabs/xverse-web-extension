@@ -392,7 +392,8 @@
     "EARN_BTC": "Earn BTC",
     "PENDING_DELEGATION": "Pending delegation",
     "DELEGATED": "Delegated",
-    "IN_PROGRESS": "In progress"
+    "IN_PROGRESS": "In progress",
+    "NO_EARN_OPTION": "No earn option available for Ledger Bitcoin-only wallet"
   },
   "NFT_DASHBOARD_SCREEN": {
     "COLLECTIBLES": "Number of collectibles",
