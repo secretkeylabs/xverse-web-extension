@@ -14,6 +14,9 @@ import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import AlertMessage from '@components/alertMessage';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import useBtcClient from '@hooks/useBtcClient';
+import { isLedgerAccount } from '@utils/helper';
+import { LedgerTransactionType } from '@screens/ledger/reviewLedgerBtcTransaction';
+import BigNumber from 'bignumber.js';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
@@ -22,7 +25,9 @@ const BottomBarContainer = styled.h1((props) => ({
 function ConfirmBtcTransaction() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { network, ordinalsAddress, btcAddress } = useWalletSelector();
+  const {
+    network, ordinalsAddress, btcAddress, selectedAccount,
+  } = useWalletSelector();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const [signedTx, setSignedTx] = useState<string>('');
@@ -126,13 +131,17 @@ function ConfirmBtcTransaction() {
       });
     }
   }, [txError]);
-
+console.log(amount)
+console.log(recipient)
   const handleOnConfirmClick = (txHex: string) => {
     if (isRestoreFundFlow) {
       broadcastOrdinalTransaction({ signedTx: txHex });
     } else if (ordinalsInBtc && ordinalsInBtc.length > 0) {
       setSignedTx(txHex);
       setShowOrdinalsDetectedAlert(true);
+    } else if (isLedgerAccount(selectedAccount)) {
+      const txType: LedgerTransactionType = 'BTC';
+      navigate('/confirm-ledger-tx', { state: { amount: new BigNumber(amount), recipient: recipient[0], type: txType } });
     } else mutate({ signedTx: txHex });
   };
 

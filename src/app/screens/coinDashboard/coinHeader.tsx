@@ -243,7 +243,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
       switch (coin) {
         case 'BTC':
           await chrome.tabs.create({
-            url: chrome.runtime.getURL('options.html#/send-btc-ledger'),
+            url: chrome.runtime.getURL('options.html#/send-btc'),
           });
           return;
         case 'STX':

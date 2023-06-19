@@ -152,19 +152,7 @@ function SendBtcScreen() {
     ];
     setRecipient(recipients);
     if (validateFields(address, amountToSend)) {
-      if (!isLedgerAccount(selectedAccount)) {
-        mutate({ recipients });
-        return;
-      }
-      const parsedAmountSats = btcToSats(new BigNumber(amount));
-      navigate('/review-ledger-btc-tx', {
-        state: {
-          recipientAddress,
-          amount,
-          recipients,
-          fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
-        },
-      });
+      mutate({ recipients });
     }
   };
 

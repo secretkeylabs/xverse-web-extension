@@ -185,7 +185,7 @@ function Home() {
   const onBtcSendClick = async () => {
     if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/send-btc-ledger'),
+        url: chrome.runtime.getURL('options.html#/send-btc'),
       });
       return;
     }
