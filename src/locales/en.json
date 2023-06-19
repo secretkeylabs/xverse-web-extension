@@ -355,7 +355,8 @@
     "AMOUNT_TO_TRANSFER": "Amount to transfer",
     "BRC20_TRANSFER_STATUS": "Status",
     "TOTAL_SUPPLY": "Total supply",
-    "MINT_LIMIT": "Mint limit"
+    "MINT_LIMIT": "Mint limit",
+    "VIEW_ON_ORD_IO": "View on Ord.io"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
@@ -394,7 +395,9 @@
     "TESTNET": "Testnet",
     "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
-    "RECOVER_ASSETS": "Recover assets"
+    "RECOVER_ASSETS": "Recover assets",
+    "LOCK_COUNTDOWN": "Auto-lock Timer",
+    "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically."
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
