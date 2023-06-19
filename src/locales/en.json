@@ -45,7 +45,8 @@
       "BTC": "Bitcoin address",
       "ORDINALS": "Ordinals address",
       "STX": "Stacks address",
-      "ALERT": "Verify that these addresses match the addresses displayed on the device."
+      "ALERT": "Verify that these addresses match the addresses displayed on the device.",
+      "ALREADY_CONNECTED_WARNING": "Ledger device has already been connected to your Xverse wallet. Would you like to create another account?"
     },
     "LEDGER_ADDRESS_ADDED": {
       "TITLE_BTC_ORDINALS": "Bitcoin & Ordinals wallets added",
@@ -72,7 +73,8 @@
     "LEDGER_IMPORT_NEXT_BUTTON": "Next",
     "LEDGER_IMPORT_CONFIRM_BUTTON": "Confirm",
     "LEDGER_IMPORT_CLOSE_BUTTON": "Close",
-    "LEDGER_IMPORT_TRY_AGAIN_BUTTON": "Try again"
+    "LEDGER_IMPORT_TRY_AGAIN_BUTTON": "Try again",
+    "LEDGER_IMPORT_YES_BUTTON": "Yes"
   },
   "LEDGER_CONFIRM_TRANSACTION_SCREEN": {
     "CONNECT": {
