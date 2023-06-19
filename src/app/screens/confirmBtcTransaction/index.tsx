@@ -131,8 +131,7 @@ function ConfirmBtcTransaction() {
       });
     }
   }, [txError]);
-console.log(amount)
-console.log(recipient)
+
   const handleOnConfirmClick = (txHex: string) => {
     if (isRestoreFundFlow) {
       broadcastOrdinalTransaction({ signedTx: txHex });
