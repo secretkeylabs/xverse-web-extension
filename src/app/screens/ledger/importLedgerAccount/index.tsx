@@ -250,7 +250,7 @@ function ImportLedger(): JSX.Element {
         network.type,
         0,
         newAddressIndex,
-        false,
+        true,
       );
       setBitcoinCredentials({
         address: bitcoinAccount.address,
@@ -261,7 +261,7 @@ function ImportLedger(): JSX.Element {
         network.type,
         0,
         newAddressIndex,
-        false,
+        true,
       );
       setOrdinalsCredentials({
         address: ordinalsAccount.address,
