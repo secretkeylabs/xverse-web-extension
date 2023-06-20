@@ -130,18 +130,18 @@ const RowContainer = styled.div((props) => ({
   flexDirection: 'row',
 }));
 
-const ColumnContainer = styled.div((props) => ({
+const ColumnContainer = styled.div({
   display: 'flex',
   alignItems: 'flex-start',
   flexDirection: 'column',
   width: '100%',
-}));
+});
 
-const Row = styled.div((props) => ({
+const Row = styled.div({
   display: 'flex',
   justifyContent: 'space-between',
   flexDirection: 'row',
-}));
+});
 
 const MintLimitContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(30),
@@ -299,10 +299,8 @@ function OrdinalDetailScreen() {
   }, [selectedOrdinal?.content_type]);
 
   useEffect(() => {
-    if (textContent) {
-      if (textContent.includes('brc-20')) {
-        setIsBrc20Ordinal(true);
-      }
+    if (textContent?.includes('brc-20')) {
+      setIsBrc20Ordinal(true);
     }
   }, [textContent]);
 
@@ -317,6 +315,7 @@ function OrdinalDetailScreen() {
       url: chrome.runtime.getURL('options.html#/nft-dashboard/ordinal-detail'),
     });
   };
+
   const showAlert = () => {
     setshowSendOridnalsAlert(true);
   };
@@ -343,79 +342,6 @@ function OrdinalDetailScreen() {
     window.open(`https://www.ord.io/${selectedOrdinal?.number}`);
   };
 
-  const showBrc20OrdinalDetail = (isGallery: boolean) => {
-    const regex = /”/g;
-    const validBrcContentValue = textContent.replace(regex, '"');
-    const content = JSON.parse(validBrcContentValue);
-    if (content.op === 'mint') {
-      return (
-        <ColumnContainer>
-          <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={content.amt} />
-          {!isGallery && (
-          <OrdinalAttributeComponent
-            title={t('OWNED_BY')}
-            value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-              ordinalsAddress.length - 4,
-              ordinalsAddress.length,
-            )}`}
-            showOridnalTag
-            isAddress
-          />
-          )}
-        </ColumnContainer>
-      );
-    }
-    if (content.op === 'transfer') {
-      return (
-        <ColumnContainer>
-          <DetailSection isGallery={isGalleryOpen}>
-            <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={content.amt} />
-            <OrdinalAttributeComponent
-              title={t('BRC20_TRANSFER_STATUS')}
-              value={isTransferValid}
-              valueColor={isBrcTransferValid(selectedOrdinal!) ? theme.colors.feedback.success : theme.colors.feedback.error}
-              isAddress
-            />
-          </DetailSection>
-          {!isGallery && (
-          <OrdinalAttributeComponent
-            title={t('OWNED_BY')}
-            value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-              ordinalsAddress.length - 4,
-              ordinalsAddress.length,
-            )}`}
-            showOridnalTag
-            isAddress
-          />
-          )}
-        </ColumnContainer>
-      );
-    }
-    if (content.op === 'deploy') {
-      return (
-        <ColumnContainer>
-          <Row>
-            <OrdinalAttributeComponent title={t('TOTAL_SUPPLY')} value={content.max} />
-            <MintLimitContainer>
-              <OrdinalAttributeComponent title={t('MINT_LIMIT')} value={content.lim} />
-            </MintLimitContainer>
-          </Row>
-          {!isGallery && (
-          <OrdinalAttributeComponent
-            title={t('OWNED_BY')}
-            value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-              ordinalsAddress.length - 4,
-              ordinalsAddress.length,
-            )}`}
-            showOridnalTag
-            isAddress
-          />
-          )}
-        </ColumnContainer>
-      );
-    }
-  };
-
   const ownedByView = (
     <RowContainer>
       <NftOwnedByText>{t('OWNED_BY')}</NftOwnedByText>
@@ -430,41 +356,6 @@ function OrdinalDetailScreen() {
         <Text>{t('ORDINALS')}</Text>
       </OrdinalsTag>
     </RowContainer>
-  );
-  const extensionView = (
-    <ExtensionContainer>
-      <CollectibleText>
-        {isBrc20Ordinal ? t('BRC20_INSCRIPTION') : t('COLLECTIBLE')}
-      </CollectibleText>
-      <OrdinalTitleText>{`${t('INSCRIPTION')} ${selectedOrdinal?.number}`}</OrdinalTitleText>
-      <WebGalleryButton onClick={openInGalleryView}>
-        <>
-          <ButtonImage src={SquaresFour} />
-          <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
-        </>
-      </WebGalleryButton>
-      {selectedOrdinal?.content_type.includes('html') ? (
-        <ViewInExplorerButton>
-          <ActionButton
-            src={Globe}
-            text={t('VIEW_ON_ORD_IO')}
-            onPress={openInOrdinalsExplorer}
-            transparent
-          />
-        </ViewInExplorerButton>
-      ) : null}
-      <ExtensionOrdinalsContainer>
-        <OrdinalImage ordinal={selectedOrdinal!} />
-      </ExtensionOrdinalsContainer>
-      {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
-      <ButtonContainer>
-        <SendButton onClick={handleSendOrdinal}>
-          <img src={ArrowUp} alt="arrow" />
-          <h1>{t('SEND')}</h1>
-        </SendButton>
-      </ButtonContainer>
-      {isBrc20Ordinal ? showBrc20OrdinalDetail(false) : ownedByView}
-    </ExtensionContainer>
   );
 
   const ordinalDescriptionData = (
@@ -495,6 +386,119 @@ function OrdinalDetailScreen() {
         <DescriptionTile title={t('LOCATION')} value={selectedOrdinal?.location!} />
       )}
     </>
+  );
+
+  const showBrc20OrdinalDetail = (isGallery: boolean) => {
+    try {
+      const regex = /”/g;
+      const validBrcContentValue = textContent.replace(regex, '"');
+      const content = JSON.parse(validBrcContentValue);
+
+      switch (content.op) {
+        case 'mint':
+          return (
+            <ColumnContainer>
+              <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={content.amt} />
+              {!isGallery && (
+              <OrdinalAttributeComponent
+                title={t('OWNED_BY')}
+                value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+                  ordinalsAddress.length - 4,
+                  ordinalsAddress.length,
+                )}`}
+                showOridnalTag
+                isAddress
+              />
+              )}
+            </ColumnContainer>
+          );
+        case 'transfer':
+          return (
+            <ColumnContainer>
+              <DetailSection isGallery={isGalleryOpen}>
+                <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={content.amt} />
+                <OrdinalAttributeComponent
+                  title={t('BRC20_TRANSFER_STATUS')}
+                  value={isTransferValid}
+                  valueColor={isBrcTransferValid(selectedOrdinal!) ? theme.colors.feedback.success : theme.colors.feedback.error}
+                  isAddress
+                />
+              </DetailSection>
+              {!isGallery && (
+              <OrdinalAttributeComponent
+                title={t('OWNED_BY')}
+                value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+                  ordinalsAddress.length - 4,
+                  ordinalsAddress.length,
+                )}`}
+                showOridnalTag
+                isAddress
+              />
+              )}
+            </ColumnContainer>
+          );
+        case 'deploy':
+          return (
+            <ColumnContainer>
+              <Row>
+                <OrdinalAttributeComponent title={t('TOTAL_SUPPLY')} value={content.max} />
+                <MintLimitContainer>
+                  <OrdinalAttributeComponent title={t('MINT_LIMIT')} value={content.lim} />
+                </MintLimitContainer>
+              </Row>
+              {!isGallery && (
+              <OrdinalAttributeComponent
+                title={t('OWNED_BY')}
+                value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+                  ordinalsAddress.length - 4,
+                  ordinalsAddress.length,
+                )}`}
+                showOridnalTag
+                isAddress
+              />
+              )}
+            </ColumnContainer>
+          );
+        default:
+          return null;
+      }
+    } catch (error) {
+      return isGallery ? ordinalDescriptionData : ownedByView;
+    }
+  };
+
+  const extensionView = (
+    <ExtensionContainer>
+      <CollectibleText>{isBrc20Ordinal ? t('BRC20_INSCRIPTION') : t('COLLECTIBLE')}</CollectibleText>
+      <OrdinalTitleText>{`${t('INSCRIPTION')} ${selectedOrdinal?.number}`}</OrdinalTitleText>
+      <WebGalleryButton onClick={openInGalleryView}>
+        <>
+          <ButtonImage src={SquaresFour} />
+          <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
+        </>
+      </WebGalleryButton>
+      {selectedOrdinal?.content_type.includes('html') ? (
+        <ViewInExplorerButton>
+          <ActionButton
+            src={Globe}
+            text={t('VIEW_ON_ORD_IO')}
+            onPress={openInOrdinalsExplorer}
+            transparent
+          />
+        </ViewInExplorerButton>
+      ) : null}
+      <ExtensionOrdinalsContainer>
+        <OrdinalImage ordinal={selectedOrdinal!} />
+      </ExtensionOrdinalsContainer>
+      {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
+      <ButtonContainer>
+        <SendButton onClick={handleSendOrdinal}>
+          <img src={ArrowUp} alt="arrow" />
+          <h1>{t('SEND')}</h1>
+        </SendButton>
+      </ButtonContainer>
+      {isBrc20Ordinal ? showBrc20OrdinalDetail(false) : ownedByView}
+    </ExtensionContainer>
   );
 
   const galleryView = (
