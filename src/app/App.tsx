@@ -1,6 +1,7 @@
 import LoadingScreen from '@components/loadingScreen';
 import rootStore from '@stores/index';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { queryClient } from '@utils/query';
 import { Toaster } from 'react-hot-toast';
 import { Provider } from 'react-redux';
@@ -18,6 +19,7 @@ function App(): JSX.Element {
     <>
       <GlobalStyle />
       <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
         <Provider store={rootStore.store}>
           <PersistGate persistor={rootStore.persistedStore} loading={<LoadingScreen />}>
             <SessionGuard>
