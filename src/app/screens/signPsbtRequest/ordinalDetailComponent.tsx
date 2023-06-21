@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { animated, useSpring } from '@react-spring/web';
 import Cross from '@assets/img/dashboard/X.svg';
 import styled from 'styled-components';
-import { OrdinalInfo } from '@secretkeylabs/xverse-core';
+import { Inscription } from '@secretkeylabs/xverse-core';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 
 const Container = styled.div((props) => ({
@@ -123,7 +123,7 @@ interface Props {
   icon: string;
   title: string;
   heading?: string;
-  ordinal?: OrdinalInfo;
+  ordinal?: Inscription;
 }
 function OrdinalDetailComponent({
   ordinalInscription,
@@ -152,7 +152,6 @@ function OrdinalDetailComponent({
   const onCrossClick = () => {
     setShowOrdinal(false);
   };
-
   return (
     <>
       {showOrdinal && (
@@ -166,7 +165,7 @@ function OrdinalDetailComponent({
           <OrdinalImageContainer>
             <OrdinalImage ordinal={ordinal!} />
           </OrdinalImageContainer>
-          <InscriptionText>{ordinal?.inscriptionNumber}</InscriptionText>
+          <InscriptionText>{`Inscription ${ordinal?.number} `}</InscriptionText>
         </OrdinalOuterImageContainer>
       </OrdinalBackgroundContainer>
       )}

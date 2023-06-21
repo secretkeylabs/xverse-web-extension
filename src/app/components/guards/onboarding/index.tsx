@@ -1,32 +1,30 @@
+import { useMemo, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+
 import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
 import useWalletSelector from '@hooks/useWalletSelector';
+
 import {
-  createContext,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
-import { Navigate } from 'react-router-dom';
+  WalletExistsContext,
+  WalletExistsContextProps,
+  useWalletExistsContext,
+} from './WalletExistsContext';
+import useOnboardingSingleton from './useOnboardingSingleton';
 
 interface WalletExistsGuardProps {
   children: React.ReactElement;
 }
 
-type WalletExistsGuardContext = {
-  disableWalletExistsGuard?: () => void;
-};
+/**
+ * This guard is used to redirect the user to the wallet exists page if they have a wallet and ensures
+ * that only 1 onboarding workflow tab exists at a time (via the useOnboardingSingleton hook).
+ */
+function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactElement {
+  useOnboardingSingleton();
 
-const WalletExistsContext = createContext<WalletExistsGuardContext>({});
-
-export const useWalletExistsGuardContext = (): WalletExistsGuardContext => {
-  const context = useContext(WalletExistsContext);
-  return context;
-};
-
-function WalletExistsGuard({ children }: WalletExistsGuardProps): React.ReactElement {
   const [walletExistsGuardEnabled, setWalletExistsGuardEnabled] = useState(true);
 
-  const contextValue: WalletExistsGuardContext = useMemo(
+  const contextValue: WalletExistsContextProps = useMemo(
     () => ({
       disableWalletExistsGuard: () => setWalletExistsGuardEnabled(false),
     }),
@@ -45,4 +43,6 @@ function WalletExistsGuard({ children }: WalletExistsGuardProps): React.ReactEle
   );
 }
 
-export default WalletExistsGuard;
+export default OnboardingGuard;
+
+export { useWalletExistsContext };

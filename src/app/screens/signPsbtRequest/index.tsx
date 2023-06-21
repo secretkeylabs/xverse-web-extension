@@ -85,7 +85,7 @@ function SignPsbtRequest() {
 
   const handlePsbtParsing = useCallback(() => {
     try {
-      return parsePsbt(selectedAccount!, payload.inputsToSign, payload.psbtBase64);
+      return parsePsbt(selectedAccount!, payload.inputsToSign, payload.psbtBase64, network.type);
     } catch (err) {
       return '';
     }
@@ -93,7 +93,6 @@ function SignPsbtRequest() {
 
   const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
   const {
-    ordinalId,
     loading,
     ordinalInfoData,
     userReceivesOrdinal,
@@ -211,16 +210,16 @@ function SignPsbtRequest() {
                 {!payload.broadcast ? (
                   <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
                 ) : null}
-                {ordinalId && (
-                <OrdinalDetailComponent
-                  ordinalInscription={ordinalInfoData?.inscriptionNumber!}
-                  icon={IconOrdinal}
-                  title={t('ORDINAL')}
-                  ordinal={ordinalInfoData}
-                  ordinalDetail={ordinalInfoData?.metadata['content type']}
-                  heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
-                />
-                )}
+                {ordinalInfoData && ordinalInfoData.map((ordinalData) => (
+                  <OrdinalDetailComponent
+                    ordinalInscription={`Inscription ${ordinalData?.number}`}
+                    icon={IconOrdinal}
+                    title={t('ORDINAL')}
+                    ordinal={ordinalData}
+                    ordinalDetail={ordinalData?.content_type}
+                    heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
+                  />
+                ))}
                 <RecipientComponent
                   value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
                     .toString()
