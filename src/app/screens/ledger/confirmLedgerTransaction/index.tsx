@@ -98,8 +98,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     unsignedTx,
     ordinalUtxo,
   }: {
-    amount: BigNumber;
-    recipient: Recipient;
+    recipient: Recipient[];
     type: LedgerTransactionType;
     unsignedTx: StacksTransaction;
     ordinalUtxo: any;
