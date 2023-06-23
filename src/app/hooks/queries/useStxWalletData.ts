@@ -1,11 +1,11 @@
-import { useDispatch } from 'react-redux';
-import { useQuery } from '@tanstack/react-query';
-import { StxAddressData } from '@secretkeylabs/xverse-core/types';
 import { fetchStxAddressData } from '@secretkeylabs/xverse-core/api';
-import { PAGINATION_LIMIT } from '@utils/constants';
+import { StxAddressData } from '@secretkeylabs/xverse-core/types';
 import { setStxWalletDataAction } from '@stores/wallet/actions/actionCreators';
-import useWalletSelector from '../useWalletSelector';
+import { useQuery } from '@tanstack/react-query';
+import { PAGINATION_LIMIT } from '@utils/constants';
+import { useDispatch } from 'react-redux';
 import useNetworkSelector from '../useNetwork';
+import useWalletSelector from '../useWalletSelector';
 
 export const useStxWalletData = () => {
   const dispatch = useDispatch();
@@ -13,32 +13,28 @@ export const useStxWalletData = () => {
   const currentNetworkInstance = useNetworkSelector();
 
   const fetchStxWalletData = async (): Promise<StxAddressData> => {
-    try {
-      const stxData: StxAddressData = await fetchStxAddressData(
-        stxAddress,
-        currentNetworkInstance,
-        0,
-        PAGINATION_LIMIT,
-      );
-      dispatch(
-        setStxWalletDataAction(
-          stxData.balance,
-          stxData.availableBalance,
-          stxData.locked,
-          stxData.transactions,
-          stxData.nonce,
-        ),
-      );
-      return stxData;
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const stxData: StxAddressData = await fetchStxAddressData(
+      stxAddress,
+      currentNetworkInstance,
+      0,
+      PAGINATION_LIMIT,
+    );
+    dispatch(
+      setStxWalletDataAction(
+        stxData.balance,
+        stxData.availableBalance,
+        stxData.locked,
+        stxData.transactions,
+        stxData.nonce,
+      ),
+    );
+    return stxData;
   };
 
   return useQuery({
     queryKey: [`wallet-data-${stxAddress}`],
     queryFn: fetchStxWalletData,
-    refetchOnMount: false,
+    enabled: !!stxAddress,
   });
 };
 

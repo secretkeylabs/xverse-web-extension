@@ -1,21 +1,25 @@
-import styled from 'styled-components';
-import logo from '@assets/img/full_logo_vertical.svg';
-import { useTranslation } from 'react-i18next';
-import useWalletReducer from '@hooks/useWalletReducer';
+import logo from '@assets/img/xverse_logo.svg';
 import { animated, useSpring } from '@react-spring/web';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const ContentContainer = styled(animated.div)({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  marginTop: 130,
+  marginTop: 180,
 });
 
 const TopSectionContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
+});
+
+const Logo = styled.img({
+  width: 57,
+  height: 57,
 });
 
 const LandingTitle = styled.h1((props) => ({
@@ -25,6 +29,7 @@ const LandingTitle = styled.h1((props) => ({
   paddingRight: props.theme.spacing(34),
   color: props.theme.colors.white['200'],
   textAlign: 'center',
+  fontSize: 16,
 }));
 
 const ActionButtonsContainer = styled.div((props) => ({
@@ -39,9 +44,9 @@ const ActionButtonsContainer = styled.div((props) => ({
 
 const CreateButton = styled.button((props) => ({
   display: 'flex',
-  ...props.theme.tile_text,
+  ...props.theme.body_medium_m,
   fontSize: 12,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.background.elevation0,
   textAlign: 'center',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -70,7 +75,7 @@ const AppVersion = styled.p((props) => ({
 
 const RestoreButton = styled.button((props) => ({
   display: 'flex',
-  ...props.theme.tile_text,
+  ...props.theme.body_medium_m,
   fontSize: 12,
   color: props.theme.colors.white['0'],
   textAlign: 'center',
@@ -92,7 +97,6 @@ const RestoreButton = styled.button((props) => ({
 
 function Landing(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LANDING_SCREEN' });
-  const { createWallet } = useWalletReducer();
   const styles = useSpring({
     from: {
       opacity: 0,
@@ -105,37 +109,22 @@ function Landing(): JSX.Element {
     delay: 100,
   });
 
-  const openInNewTab = async () => {
+  const startWalletOnboarding = async (isRestore = false) => {
+    const params = isRestore ? '?restore=true' : '';
     await chrome.tabs.create({
-      url: chrome.runtime.getURL('options.html#/onboarding'),
+      url: chrome.runtime.getURL(`options.html#/onboarding${params}`),
     });
   };
 
-  const handlePressCreate = async () => {
-    try {
-      await createWallet();
-    } catch (err) {
-      return await Promise.reject(err);
-    } finally {
-      setTimeout(async () => openInNewTab(), 500);
-    }
-  };
+  const handlePressCreate = async () => startWalletOnboarding();
+  const handlePressRestore = async () => startWalletOnboarding(true);
 
-  const handlePressRestore = async () => {
-    try {
-      window.localStorage.setItem('isRestore', 'true');
-      await openInNewTab();
-      return true;
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
   return (
     <>
       <AppVersion>Beta</AppVersion>
       <ContentContainer style={styles}>
         <TopSectionContainer>
-          <img src={logo} width={100} alt="logo" />
+          <Logo src={logo} alt="logo" />
           <LandingTitle>{t('SCREEN_TITLE')}</LandingTitle>
         </TopSectionContainer>
         <ActionButtonsContainer>

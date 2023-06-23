@@ -37,6 +37,7 @@ const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
   paddingTop: props.theme.spacing(12),
   paddingBottom: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(12),
   borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
   borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
   flexDirection: 'column',
@@ -60,19 +61,8 @@ const SponosredText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
 }));
 const PostConditionAlertText = styled.h1((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.body_medium_l,
   color: props.theme.colors.white['0'],
-}));
-
-const TopImage = styled.img({
-  width: 88,
-  height: 88,
-});
-
-const FunctionTitle = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
-  marginTop: 16,
 }));
 
 const Line = styled.div((props) => ({
@@ -112,20 +102,6 @@ const ShowMoreButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const DappTitle = styled.h2((props) => ({
-  ...props.theme.body_l,
-  color: props.theme.colors.white['400'],
-  marginTop: 4,
-}));
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginBottom: props.theme.spacing(12),
-}));
-
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
@@ -142,15 +118,6 @@ const ButtonSymbolText = styled.div((props) => ({
   fontSize: 20,
 }));
 
-const headerImageMapping = {
-  'purchase-asset': NFTImage,
-  'buy-item': NFTImage,
-  'buy-in-ustx': NFTImage,
-  'name-preorder': BNSImage,
-  'swap-x-for-y': SwapImage,
-  'swap-helper': SwapImage,
-};
-
 interface ContractCallRequestProps {
   request: ContractCallPayload;
   unsignedTx: StacksTransaction;
@@ -158,13 +125,14 @@ interface ContractCallRequestProps {
   coinsMetaData: Coin[] | null;
   tabId: number;
   requestToken: string;
+  attachment: Buffer | undefined;
 }
 
 export const ShowMoreContext = createContext({ showMore: false });
 
 export default function ContractCallRequest(props: ContractCallRequestProps) {
   const {
-    request, unsignedTx, funcMetaData, coinsMetaData, tabId, requestToken,
+    request, unsignedTx, funcMetaData, coinsMetaData, tabId, requestToken, attachment,
   } = props;
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
@@ -177,18 +145,6 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
       setHasTabClosed(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-  );
-
-  const showMoreButton = (
-    <ShowMoreButtonContainer>
-      <Line />
-      <ButtonContainer>
-        <ShowMoreButton onClick={() => setIsShowMore(!isShowMore)}>
-          <ButtonText>{isShowMore ? t('CONTRACT_CALL_REQUEST.SHOW_LESS') : t('CONTRACT_CALL_REQUEST.SHOW_MORE')}</ButtonText>
-          <ButtonSymbolText>{isShowMore ? t('CONTRACT_CALL_REQUEST.MINUS') : t('CONTRACT_CALL_REQUEST.PLUS')}</ButtonSymbolText>
-        </ShowMoreButton>
-      </ButtonContainer>
-    </ShowMoreButtonContainer>
   );
 
   type ArgToView = { name: string; value: string; type: any };
@@ -255,9 +211,9 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
       </PostConditionContainer>
   );
   const navigate = useNavigate();
-  const broadcastTx = async (tx: StacksTransaction[]) => {
+  const broadcastTx = async (tx: StacksTransaction[], txAttachment: Buffer | undefined = undefined) => {
     try {
-      const broadcastResult: string = await broadcastSignedTransaction(tx[0], selectedNetwork);
+      const broadcastResult: string = await broadcastSignedTransaction(tx[0], selectedNetwork, txAttachment);
       if (broadcastResult) {
         finalizeTxSignature({ requestPayload: requestToken, tabId, data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') } });
         navigate('/tx-status', {
@@ -292,7 +248,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         },
       });
     } else {
-      broadcastTx(transactions);
+      broadcastTx(transactions, attachment);
     }
   };
   const cancelCallback = () => {

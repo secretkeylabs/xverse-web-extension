@@ -1,12 +1,12 @@
 import {
+  Account,
+  BaseWallet,
   Coin,
   FeesMultipliers,
   FungibleToken,
+  SettingsNetwork,
   SupportedCurrency,
   TransactionData,
-  Account,
-  BaseWallet,
-  SettingsNetwork,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 
@@ -39,6 +39,16 @@ export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 
+export const SetBrcCoinsListKey = 'SetBrcCoinsList';
+
+export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
+
+export enum WalletSessionPeriods {
+  LOW = 1,
+  STANDARD = 10,
+  LONG = 30,
+}
+
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
@@ -62,12 +72,14 @@ export interface WalletState {
   btcBalance: BigNumber;
   coinsList: FungibleToken[] | null;
   coins: Coin[];
+  brcCoinsList: FungibleToken[] | null;
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
   btcApiUrl: string;
+  walletLockPeriod: WalletSessionPeriods;
 }
 
 export interface SetWallet {
@@ -186,6 +198,16 @@ export interface ChangeShowOrdinalReceiveAlert {
   showOrdinalReceiveAlert: boolean | null;
 }
 
+export interface SetBrcCoinsData {
+  type: typeof SetBrcCoinsListKey;
+  brcCoinsList: FungibleToken[];
+}
+
+export interface SetWalletLockPeriod {
+  type: typeof SetWalletLockPeriodKey;
+  walletLockPeriod: WalletSessionPeriods;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -207,4 +229,7 @@ export type WalletActions =
   | GetActiveAccounts
   | ChangeActivateOrdinals
   | ChangeShowBtcReceiveAlert
-  | ChangeShowOrdinalReceiveAlert;
+  | ChangeShowOrdinalReceiveAlert
+  | SetBrcCoinsData
+  | SetWalletLockPeriod
+  | DisableWalletExistsGuard;

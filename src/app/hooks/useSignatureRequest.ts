@@ -1,30 +1,17 @@
 import { getStxAddressKeyChain } from '@secretkeylabs/xverse-core/wallet';
+import { signMessage } from '@secretkeylabs/xverse-core/connect/signature';
+import { SignaturePayload } from '@stacks/connect';
 import {
-  signMessage,
-  signStructuredDataMessage,
-} from '@secretkeylabs/xverse-core/connect/signature';
-import {
-  SignaturePayload,
-} from '@stacks/connect';
-import {
-  ChainID, ClarityValue, deserializeCV, TupleCV,
+  ChainID, TupleCV, deserializeCV, signStructuredData, createStacksPrivateKey,
 } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  SignMessagePayload,
-} from 'sats-connect';
+import { SignMessagePayload } from 'sats-connect';
 import { signBip322Message } from '@secretkeylabs/xverse-core/connect/bip322Signature';
 import useWalletSelector from './useWalletSelector';
 
 export type SignatureMessageType = 'utf8' | 'structured';
-
-export interface SignatureMessage {
-  message: string | ClarityValue;
-  domain?: TupleCV | undefined;
-  messageType: SignatureMessageType;
-}
 
 export function isStructuredMessage(
   messageType: SignatureMessageType,
@@ -33,10 +20,6 @@ export function isStructuredMessage(
 }
 export function isUtf8Message(messageType: SignatureMessageType): messageType is 'utf8' {
   return messageType === 'utf8';
-}
-
-export function isSignatureMessageType(messageType: unknown): messageType is SignatureMessageType {
-  return typeof messageType === 'string' && ['utf8', 'structured'].includes(messageType);
 }
 
 export function isSignBip322Request(
@@ -63,21 +46,32 @@ function useSignatureRequest() {
     tabId,
   };
 }
+
 export function useSignMessage(messageType: SignatureMessageType) {
   const { selectedAccount, seedPhrase, network } = useWalletSelector();
   return useCallback(
-    async ({ message, domain }: { message: string | ClarityValue; domain?: TupleCV }) => {
+    async ({ message, domain }: { message: string; domain?: TupleCV }) => {
       if (!selectedAccount) return null;
       const { privateKey } = await getStxAddressKeyChain(
         seedPhrase,
         network.type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet,
         selectedAccount.id,
       );
-      if (messageType === 'utf8' && typeof message === 'string') {
+      if (messageType === 'utf8') {
         return signMessage(message, privateKey);
       }
       if (!domain) throw new Error('Domain is required for structured messages');
-      return signStructuredDataMessage(message as ClarityValue, domain, privateKey);
+      const sk = createStacksPrivateKey(privateKey);
+      const messageDeserialize = deserializeCV(Buffer.from(message, 'hex'));
+      const signature = signStructuredData({
+        domain,
+        message: messageDeserialize,
+        privateKey: sk,
+      }).data;
+      return {
+        signature,
+        publicKey: selectedAccount.stxPublicKey,
+      };
     },
     [selectedAccount],
   );

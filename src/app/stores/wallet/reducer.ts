@@ -1,29 +1,32 @@
-import BigNumber from 'bignumber.js';
 import { initialNetworksList } from '@utils/constants';
+import BigNumber from 'bignumber.js';
 import {
-  StoreEncryptedSeedKey,
-  WalletActions,
-  SetWalletKey,
-  ResetWalletKey,
-  WalletState,
-  UnlockWalletKey,
-  LockWalletKey,
-  FetchAccountKey,
-  SelectAccountKey,
-  SetBtcWalletDataKey,
-  SetCoinDataKey,
   AddAccountKey,
-  UpdateVisibleCoinListKey,
-  SetFeeMultiplierKey,
   ChangeFiatCurrencyKey,
-  ChangeNetworkKey,
-  GetActiveAccountsKey,
-  SetWalletSeedPhraseKey,
-  SetStxWalletDataKey,
-  SetCoinRatesKey,
   ChangeHasActivatedOrdinalsKey,
+  ChangeNetworkKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
+  FetchAccountKey,
+  GetActiveAccountsKey,
+  LockWalletKey,
+  ResetWalletKey,
+  SelectAccountKey,
+  SetBrcCoinsListKey,
+  SetBtcWalletDataKey,
+  SetCoinDataKey,
+  SetCoinRatesKey,
+  SetFeeMultiplierKey,
+  SetStxWalletDataKey,
+  SetWalletKey,
+  SetWalletLockPeriodKey,
+  SetWalletSeedPhraseKey,
+  StoreEncryptedSeedKey,
+  UnlockWalletKey,
+  UpdateVisibleCoinListKey,
+  WalletActions,
+  WalletSessionPeriods,
+  WalletState,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -49,12 +52,14 @@ const initialWalletState: WalletState = {
   btcBalance: new BigNumber(0),
   coinsList: null,
   coins: [],
+  brcCoinsList: [],
   feeMultipliers: null,
   networkAddress: undefined,
   btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: false,
   showOrdinalReceiveAlert: false,
+  walletLockPeriod: WalletSessionPeriods.STANDARD,
 };
 
 const walletReducer = (
@@ -182,6 +187,16 @@ const walletReducer = (
       return {
         ...state,
         showOrdinalReceiveAlert: action.showOrdinalReceiveAlert,
+      };
+    case SetBrcCoinsListKey:
+      return {
+        ...state,
+        brcCoinsList: action.brcCoinsList,
+      };
+    case SetWalletLockPeriodKey:
+      return {
+        ...state,
+        walletLockPeriod: action.walletLockPeriod,
       };
     default:
       return state;

@@ -16,7 +16,7 @@ import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
 import { checkNftExists } from '@utils/helper';
 import NftImage from '@screens/nftDashboard/nftImage';
-import useNftDataSelector from '@hooks/useNftDataSelector';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';

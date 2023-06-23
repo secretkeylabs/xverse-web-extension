@@ -50,7 +50,7 @@ function RestoreFunds() {
       <TopRow title={t('TITLE')} onClick={handleOnCancelClick} />
       <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
       <Container>
-        <FundsRow image={IconBitcoin} title={t('RECOVER_BTC')} description={t('RECOVER_BTC_DESC')} onClick={handleOnRestoreBtcClick} />
+        {/* <FundsRow image={IconBitcoin} title={t('RECOVER_BTC')} description={t('RECOVER_BTC_DESC')} onClick={handleOnRestoreBtcClick} /> */}
         <FundsRow image={OrdinalsIcon} title={t('RECOVER_ORDINALS')} description={t('RECOVER_ORDINALS_DESC')} onClick={handleOnRestoreOridnalClick}  />
       </Container>
       <BottomTabBar tab="nft" />

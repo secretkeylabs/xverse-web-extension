@@ -58,12 +58,13 @@ function NftImage({ metadata }: Props) {
         <Suspense>
           <StyledImg
             width="100%"
+            preview={false}
             src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
             placeholder={(
               <LoaderContainer isGalleryOpen={isGalleryOpen}>
                 <MoonLoader color="white" size={25} />
               </LoaderContainer>
-              )}
+          )}
             fallback={NftPlaceholderImage}
           />
         </Suspense>

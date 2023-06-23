@@ -1,14 +1,16 @@
-/* eslint-disable no-nested-ternary */
-import { Suspense } from 'react';
 import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import Image from 'rc-image';
 import { getFetchableUrl } from '@utils/helper';
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
+import PlaceholderHtml from '@assets/img/nftDashboard/code.svg';
 import { useTranslation } from 'react-i18next';
-import { OrdinalInfo } from '@secretkeylabs/xverse-core';
+import { Inscription, getErc721Metadata } from '@secretkeylabs/xverse-core';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import Image from 'rc-image';
+import { useEffect, useState } from 'react';
+import ActionButton from '@components/button';
+import Brc20Tile from './brc20Tile';
 
 interface ContainerProps {
   isGalleryOpen: boolean;
@@ -22,14 +24,14 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   marginBottom: props.inNftDetail ? props.theme.spacing(8) : 0,
   alignItems: 'center',
   width: '100%',
-  height: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
+  height: props.isGalleryOpen ? (props.inNftDetail ? 540 : 300) : props.isSmallImage ? 50 : 150,
   minHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
-  maxHeight: props.isGalleryOpen ? 300 : props.isSmallImage ? 50 : 150,
+  maxHeight: props.isGalleryOpen ? (props.inNftDetail ? 450 : 300) : props.isSmallImage ? 50 : 150,
   overflow: 'hidden',
   position: 'relative',
   fontSize: '3em',
   wordWrap: 'break-word',
-  backgroundColor: props.isGalleryOpen ? 'transparent' : '#1b1e2b',
+  backgroundColor: '#1b1e2b',
   borderRadius: 8,
 }));
 
@@ -47,8 +49,8 @@ const OrdinalsTag = styled.div({
   borderRadius: 40,
   width: 79,
   height: 22,
-  left: 10,
-  bottom: 10,
+  left: 12,
+  bottom: 12,
   zIndex: 1000,
   position: 'absolute',
   padding: '3px 6px',
@@ -79,6 +81,7 @@ const Text = styled.h1((props) => ({
 
 interface TextProps {
   inNftSend?: boolean;
+  blur?: boolean
 }
 
 const OrdinalContentText = styled.h1<TextProps>((props) => ({
@@ -87,16 +90,17 @@ const OrdinalContentText = styled.h1<TextProps>((props) => ({
   fontSize: props.inNftSend ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
   textAlign: 'center',
+  filter: `blur(${props.blur ? '3px' : 0})`,
 }));
 
-const StyledImg = styled(Image)`
+const StyledImage = styled(Image)`
   border-radius: 8px;
   object-fit: contain;
   image-rendering: pixelated;
 `;
 
 interface Props {
-  ordinal: OrdinalInfo;
+  ordinal: Inscription;
   isNftDashboard?: boolean;
   inNftDetail?: boolean;
   inNftSend?: boolean;
@@ -113,32 +117,63 @@ function OrdinalImage({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+  const [brc721eImage, setBrc721eImage] = useState<string | undefined>(undefined);
 
-  if (ordinal?.metadata['content type'].includes('image')) {
-    return (
-      <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
-        <Suspense>
-          <StyledImg
-            width="100%"
-            placeholder={(
-              <LoaderContainer isGalleryOpen={isGalleryOpen}>
-                <MoonLoader color="white" size={20} />
-              </LoaderContainer>
-              )}
-            src={getFetchableUrl(`https://gammaordinals.com${ordinal?.metadata.content}`, 'http')}
-            fallback={PlaceholderImage}
-          />
-        </Suspense>
-        {isNftDashboard && (
-          <OrdinalsTag>
-            <ButtonIcon src={OrdinalsIcon} />
-            <Text>{t('ORDINAL')}</Text>
-          </OrdinalsTag>
-        )}
-      </ImageContainer>
-    );
+  const fetchBrc721eMetadata = async () => {
+    if (!textContent) {
+      return;
+    }
+
+    try {
+      const parsedContent = JSON.parse(textContent);
+      const erc721Metadata = await getErc721Metadata(parsedContent.contract, parsedContent.token_id);
+
+      const url = getFetchableUrl(erc721Metadata, 'ipfs');
+
+      if (url) {
+        const ipfsMetadata = await (await fetch(url)).json();
+        setBrc721eImage(getFetchableUrl(ipfsMetadata.image, 'ipfs'));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (textContent?.includes('brc-721e')) {
+      fetchBrc721eMetadata();
+    }
+  }, [textContent]);
+
+  const renderImage = (tag: string, src?: string) => (
+    <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
+      <StyledImage
+        width="100%"
+        placeholder={(
+          <LoaderContainer isGalleryOpen={isGalleryOpen}>
+            <MoonLoader color="white" size={20} />
+          </LoaderContainer>
+          )}
+        src={src}
+      />
+      {isNftDashboard && (
+        <OrdinalsTag>
+          <ButtonIcon src={OrdinalsIcon} />
+          <Text>{tag}</Text>
+        </OrdinalsTag>
+      )}
+    </ImageContainer>
+  );
+
+  if (ordinal?.content_type.includes('image')) {
+    return renderImage(t('ORDINAL'), getFetchableUrl(`https://api.hiro.so/ordinals/v1/inscriptions/${ordinal.id}/content`, 'http'));
   }
-  if (ordinal?.metadata['content type'].includes('text')) {
+
+  if (textContent?.includes('brc-721e')) {
+    return renderImage('BRC-721e', brc721eImage);
+  }
+
+  if (ordinal?.content_type.includes('text')) {
     if (!textContent) {
       return (
         <ImageContainer isSmallImage={isSmallImage} isGalleryOpen={isGalleryOpen}>
@@ -146,14 +181,46 @@ function OrdinalImage({
         </ImageContainer>
       );
     }
+
+    if (textContent.includes('brc-20')) {
+      return (
+        <Brc20Tile
+          brcContent={textContent}
+          isGalleryOpen={isGalleryOpen}
+          isNftDashboard={isNftDashboard}
+          inNftDetail={inNftDetail}
+          isSmallImage={isSmallImage}
+        />
+      );
+    }
+    if (ordinal?.content_type.includes('html')) {
+      return (
+        <ImageContainer
+          isSmallImage={isSmallImage}
+          inNftDetail={inNftDetail}
+          isGalleryOpen={isGalleryOpen}
+        >
+          <div style={{display: 'flex', flexDirection: 'column'}}>
+            <img src={PlaceholderHtml} />
+            <OrdinalContentText>.html</OrdinalContentText>
+          </div>
+          {isNftDashboard && (
+            <OrdinalsTag>
+              <ButtonIcon src={OrdinalsIcon} />
+              <Text>{t('ORDINAL')}</Text>
+            </OrdinalsTag>
+          )}
+        </ImageContainer>
+      );
+    }
     return (
       <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
         <OrdinalContentText inNftSend={inNftSend}>{textContent}</OrdinalContentText>
         {isNftDashboard && (
-          <OrdinalsTag>
-            <ButtonIcon src={OrdinalsIcon} />
-            <Text>{t('ORDINAL')}</Text>
-          </OrdinalsTag>
+        <OrdinalsTag>
+          <ButtonIcon src={OrdinalsIcon} />
+          <Text>{t('ORDINAL')}</Text>
+        </OrdinalsTag>
         )}
       </ImageContainer>
     );

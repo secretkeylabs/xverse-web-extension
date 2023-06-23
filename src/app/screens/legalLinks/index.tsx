@@ -1,10 +1,10 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import LinkIcon from '@assets/img/linkIcon.svg';
-import { useNavigate } from 'react-router-dom';
-import { saveIsTermsAccepted } from '@utils/localStorage';
 import Seperator from '@components/seperator';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
+import { saveIsTermsAccepted } from '@utils/localStorage';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -51,7 +51,7 @@ const ActionButtonsContainer = styled.div((props) => ({
 const AcceptButton = styled.button((props) => ({
   ...props.theme.body_bold_m,
   display: 'flex',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.background.elevation0,
   alignItems: 'center',
   justifyContent: 'center',
   marginTop: 'auto',
@@ -65,15 +65,15 @@ const AcceptButton = styled.button((props) => ({
 function LegalLinks() {
   const { t } = useTranslation('translation', { keyPrefix: 'LEGAL_SCREEN' });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleLegalAccept = () => {
     saveIsTermsAccepted(true);
-    const isRestore = localStorage.getItem('isRestore');
+    const isRestore = !!searchParams.get('restore');
     if (isRestore) {
-      localStorage.removeItem('isRestore');
-      navigate('/restoreWallet');
+      navigate('/restoreWallet', { replace: true });
     } else {
-      navigate('/backup');
+      navigate('/backup', { replace: true });
     }
   };
   return (

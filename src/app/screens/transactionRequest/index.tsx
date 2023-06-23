@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
-import { Coin, createDeployContractRequest } from '@secretkeylabs/xverse-core';
+import { Coin, createDeployContractRequest, extractFromPayload } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType } from '@utils/helper';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -45,6 +45,7 @@ function TransactionRequest() {
   const [contractName, setContractName] = useState(undefined);
   const stxPendingTxData = useStxPendingTxData();
   const [hasSwitchedAccount, setHasSwitchedAccount] = useState(false);
+  const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
 
   const handleTokenTransferRequest = async () => {
     const unsignedSendStxTx = await getTokenTransferRequest(
@@ -77,8 +78,22 @@ function TransactionRequest() {
     setUnsignedTx(unSignedContractCall);
     setCoinsMetaData(coinMeta);
     const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find((func) => func.name === payload.functionName);
+    const txAttachment = payload.attachment ?? undefined;
+    if (txAttachment) setAttachment(txAttachment);
     if (invokedFuncMetaData) {
       setFuncMetaData(invokedFuncMetaData);
+      const { funcArgs } = extractFromPayload(payload);
+      if (invokedFuncMetaData?.args.length !== funcArgs.length) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'STX',
+            error:
+              'Contract function call missing arguments',
+            browserTx: true,
+          },
+        });
+      }
     }
   };
 
@@ -160,6 +175,7 @@ function TransactionRequest() {
           request={payload}
           unsignedTx={unsignedTx}
           funcMetaData={funcMetaData}
+          attachment={attachment}
           coinsMetaData={coinsMetaData}
           tabId={Number(tabId)}
           requestToken={requestToken}

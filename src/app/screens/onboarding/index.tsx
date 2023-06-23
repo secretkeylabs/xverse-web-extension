@@ -1,14 +1,14 @@
-import { useState } from 'react';
 import onboarding1 from '@assets/img/onboarding/onboarding1.svg';
 import onboarding2 from '@assets/img/onboarding/onboarding2.svg';
-import onboarding3 from '@assets/img/onboarding/onboarding3.svg';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import onboarding3 from '@assets/img/onboarding/onboarding3.png';
+import ActionButton from '@components/button';
+import Steps from '@components/steps';
 import { animated, useTransition } from '@react-spring/web';
 import { getIsTermsAccepted, saveHasFinishedOnboarding } from '@utils/localStorage';
-import Steps from '@components/steps';
-import ActionButton from '@components/button';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Container = styled.div`
   display: flex;
@@ -75,6 +75,7 @@ function Onboarding(): JSX.Element {
       opacity: 1,
     },
   });
+  const [searchParams] = useSearchParams();
 
   const onboardingViews = [
     {
@@ -102,18 +103,19 @@ function Onboarding(): JSX.Element {
   };
 
   const handleSkip = () => {
-    const isRestore = localStorage.getItem('isRestore');
     saveHasFinishedOnboarding(true);
     const isLegalAccepted = getIsTermsAccepted();
+    const isRestore = !!searchParams.get('restore');
+
     if (isLegalAccepted) {
       if (isRestore) {
-        localStorage.removeItem('isRestore');
-        navigate('/restoreWallet');
+        navigate('/restoreWallet', { replace: true });
       } else {
-        navigate('/backup');
+        navigate('/backup', { replace: true });
       }
     } else {
-      navigate('/legal');
+      const params = isRestore ? '?restore=true' : '';
+      navigate(`/legal${params}`, { replace: true });
     }
   };
 
@@ -136,10 +138,7 @@ function Onboarding(): JSX.Element {
           </OnBoardingContentContainer>
           {index === onboardingViews.length - 1 ? (
             <OnBoardingActionsContainer>
-              <ActionButton
-                onPress={handleSkip}
-                text={t('ONBOARDING_CONTINUE_BUTTON')}
-              />
+              <ActionButton onPress={handleSkip} text={t('ONBOARDING_CONTINUE_BUTTON')} />
             </OnBoardingActionsContainer>
           ) : (
             <OnBoardingActionsContainer>
