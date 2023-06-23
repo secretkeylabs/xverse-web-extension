@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
+import styled from 'styled-components';
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
-import Swap from '@assets/img/dashboard/swap.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
@@ -9,9 +9,12 @@ import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import OrdinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import Swap from '@assets/img/dashboard/swap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
+import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
+import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import useAppConfig from '@hooks/queries/useAppConfig';
@@ -28,14 +31,8 @@ import { CurrencyTypes } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import Theme from 'theme';
-import AlertMessage from '@components/alertMessage';
-import { useDispatch } from 'react-redux';
-import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import BalanceCard from './balanceCard';
-import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
-import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import SquareButton from './squareButton';
 
 export const Container = styled.div`
@@ -105,10 +102,6 @@ const RowButtonContainer = styled.div((props) => ({
   columnGap: props.theme.spacing(11),
 }));
 
-const ButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(11),
-}));
-
 const TokenListButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -132,7 +125,6 @@ function Home() {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
