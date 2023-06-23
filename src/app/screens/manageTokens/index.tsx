@@ -40,9 +40,9 @@ function ManageTokens() {
     if (coinToBeUpdated) coinToBeUpdated.visible = isEnabled;
     else if (!coinToBeUpdated && isEnabled) {
       const coinToBeAdded: FungibleToken = {
-        name: coin.name,
+        name: coin?.name,
         visible: true,
-        principal: coin.contract,
+        principal: coin?.contract,
         balance: '0',
         total_sent: '',
         total_received: '',
@@ -61,14 +61,15 @@ function ManageTokens() {
   };
 
   function showDivider(index: number): boolean {
-    return !(index === coins.length - 1);
+    if (coins) return !(index === coins.length - 1);
+    return false;
   }
 
   return (
     <Container>
       <TopRow title={t('ADD_COINS')} onClick={handleBackButtonClick} />
       <TokenContainer>
-        {coins.map((coin, index) => (
+        {coins?.map((coin, index) => (
           <CoinItem coin={coin} disabled={false} toggled={toggled} enabled={coin.visible} showDivider={showDivider(index)} />
         ))}
       </TokenContainer>
