@@ -1,4 +1,6 @@
 /* eslint-disable no-await-in-loop */
+import styled from 'styled-components';
+import Swap from '@assets/img/dashboard/swap.svg';
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
@@ -8,10 +10,11 @@ import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import OrdinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import Swap from '@assets/img/swap/swap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
+import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
+import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import useAppConfig from '@hooks/queries/useAppConfig';
@@ -28,12 +31,9 @@ import { CurrencyTypes } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import Theme from 'theme';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
-import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
-import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 
 export const Container = styled.div`
   display: flex;
@@ -99,11 +99,6 @@ const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.spacing(11),
-}));
-
-const ButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(11),
-  columnGap: props.theme.spacing(11),
 }));
 
 const TokenListButtonContainer = styled.div((props) => ({
