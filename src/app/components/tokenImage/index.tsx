@@ -47,7 +47,7 @@ const TickerIconText = styled.h1((props) => ({
 }));
 
 export default function TokenImage(props: TokenImageProps) {
-  const { token, loading, fungibleToken } = props;
+  const { token, loading, fungibleToken, round, size, loaderSize } = props;
 
   const getCoinIcon = useCallback(() => {
     if (token === 'STX') {
@@ -61,7 +61,7 @@ export default function TokenImage(props: TokenImageProps) {
   if (fungibleToken) {
     if (!loading) {
       if (fungibleToken?.image) {
-        return <TickerImage size={props.size} src={fungibleToken.image} />;
+        return <TickerImage size={size} src={fungibleToken.image} />;
       }
       let ticker = fungibleToken?.ticker;
       if (!ticker && fungibleToken?.name) {
@@ -70,16 +70,16 @@ export default function TokenImage(props: TokenImageProps) {
       const background = stc(ticker);
       ticker = ticker && ticker.substring(0, 4);
       return (
-        <TickerIconContainer size={props.size} color={background} round={props.round}>
+        <TickerIconContainer size={size} color={background} round={round}>
           <TickerIconText>{ticker}</TickerIconText>
         </TickerIconContainer>
       );
     }
     return (
       <LoaderImageContainer>
-        <BarLoader loaderSize={props.loaderSize ?? LoaderSize.LARGE} />
+        <BarLoader loaderSize={loaderSize ?? LoaderSize.LARGE} />
       </LoaderImageContainer>
     );
   }
-  return <TickerImage size={props.size} src={getCoinIcon()} round={props.round} />;
+  return <TickerImage size={size} src={getCoinIcon()} round={round} />;
 }

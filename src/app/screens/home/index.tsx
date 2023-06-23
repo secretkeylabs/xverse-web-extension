@@ -1,17 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import AddToken from '@assets/img/dashboard/add_token.svg';
-import StacksToken from '@assets/img/dashboard/stacks_token.svg';
-import MiaToken from '@assets/img/dashboard/mia_token.svg';
-import NycToken from '@assets/img/dashboard/nyc_token.svg';
-import CoinToken from '@assets/img/dashboard/coin_token.svg';
-import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
-import ListDashes from '@assets/img/dashboard/list_dashes.svg';
-import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import Swap from '@assets/img/dashboard/swap.svg';
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
@@ -42,10 +30,8 @@ import { CurrencyTypes } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import Theme from 'theme';
 import BalanceCard from './balanceCard';
-import SquareButton from './squareButton';
 
 export const Container = styled.div`
   display: flex;
