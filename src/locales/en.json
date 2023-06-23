@@ -562,6 +562,7 @@
     "SWAP": "Swap",
     "CONVERT": "Convert",
     "BALANCE": "Balance",
+    "FROM": "From",
     "TO": "To",
     "SELECT_COIN": "Select asset",
     "DETAILS": "Details",
