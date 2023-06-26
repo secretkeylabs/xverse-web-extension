@@ -1,36 +1,36 @@
 /* eslint-disable no-await-in-loop */
-import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
-import ListDashes from '@assets/img/dashboard/list_dashes.svg';
-import CreditCard from '@assets/img/dashboard/credit_card.svg';
+import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
+import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
+import CreditCard from '@assets/img/dashboard/credit_card.svg';
+import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import OrdinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
-import TokenTile from '@components/tokenTile';
-import CoinSelectModal from '@screens/home/coinSelectModal';
-import Theme from 'theme';
-import BottomBar from '@components/tabBar';
+import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import { CurrencyTypes } from '@utils/constants';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useStxWalletData from '@hooks/queries/useStxWalletData';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
-import useCoinRates from '@hooks/queries/useCoinRates';
-import useCoinsData from '@hooks/queries/useCoinData';
-import useAppConfig from '@hooks/queries/useAppConfig';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
-import useBtcCoinBalance from '@hooks/queries/useBtcCoinsBalance';
 import SmallActionButton from '@components/smallActionButton';
 import { isLedgerAccount } from '@utils/helper';
+import BottomBar from '@components/tabBar';
+import TokenTile from '@components/tokenTile';
+import useAppConfig from '@hooks/queries/useAppConfig';
+import useBtcCoinBalance from '@hooks/queries/useBtcCoinsBalance';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useCoinsData from '@hooks/queries/useCoinData';
+import useCoinRates from '@hooks/queries/useCoinRates';
+import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useWalletSelector from '@hooks/useWalletSelector';
+import CoinSelectModal from '@screens/home/coinSelectModal';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { CurrencyTypes } from '@utils/constants';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import Theme from 'theme';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -123,18 +123,21 @@ const MergedIcon = styled.img({
 });
 
 function Home() {
-  const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'DASHBOARD_SCREEN',
+  });
   const navigate = useNavigate();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const {
-    coinsList, stxAddress, btcAddress, ordinalsAddress, selectedAccount, brcCoinsList,
-  } = useWalletSelector();
-  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } = useStxWalletData();
-  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } = useBtcWalletData();
+  const { coinsList, stxAddress, btcAddress, ordinalsAddress, selectedAccount, brcCoinsList } = useWalletSelector();
+  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
+    useStxWalletData();
+  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
+    useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
-  const { isLoading: loadingBtcCoinData, isRefetching: refetchingBtcCoinData } = useBtcCoinBalance();
+  const { isLoading: loadingBtcCoinData, isRefetching: refetchingBtcCoinData } =
+    useBtcCoinBalance();
   useFeeMultipliers();
   useCoinRates();
   useAppConfig();
@@ -279,10 +282,10 @@ function Home() {
       <Container>
         <BalanceCard
           isLoading={
-            (stxAddress && loadingStxWalletData)
-            || (btcAddress && loadingBtcWalletData)
-            || refetchingStxWalletData
-            || refetchingBtcWalletData
+            loadingStxWalletData ||
+            loadingBtcWalletData ||
+            refetchingStxWalletData ||
+            refetchingBtcWalletData
           }
         />
         <RowButtonContainer>

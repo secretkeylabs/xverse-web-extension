@@ -14,8 +14,7 @@ function AuthGuard({ children }: AuthGuardProps) {
 
   if (hydrated && !encryptedSeed) return <Navigate to="/landing" />;
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return <>{children}</>;
+  return children;
 }
 
 export default AuthGuard;

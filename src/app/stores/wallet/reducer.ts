@@ -20,11 +20,13 @@ import {
   SetFeeMultiplierKey,
   SetStxWalletDataKey,
   SetWalletKey,
+  SetWalletLockPeriodKey,
   SetWalletSeedPhraseKey,
   StoreEncryptedSeedKey,
   UnlockWalletKey,
   UpdateVisibleCoinListKey,
   WalletActions,
+  WalletSessionPeriods,
   WalletState,
 } from './actions/types';
 
@@ -61,6 +63,7 @@ const initialWalletState: WalletState = {
   showOrdinalReceiveAlert: false,
   accountType: 'software',
   accountName: undefined,
+  walletLockPeriod: WalletSessionPeriods.STANDARD,
 };
 
 const walletReducer = (
@@ -200,6 +203,11 @@ const walletReducer = (
       return {
         ...state,
         brcCoinsList: action.brcCoinsList,
+      };
+    case SetWalletLockPeriodKey:
+      return {
+        ...state,
+        walletLockPeriod: action.walletLockPeriod,
       };
     default:
       return state;

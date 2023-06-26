@@ -130,6 +130,7 @@ function SendOrdinal() {
         Number(selectedAccount?.id),
         seedPhrase,
         network.type,
+        [ordUtxo],
       );
       return signedTx;
     }
