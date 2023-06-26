@@ -120,7 +120,7 @@ interface Props {
   children?: ReactNode;
   assetDetail?: string;
   isRestoreFundFlow?: boolean;
-  nonOrdinalUtxos?: BtcUtxoDataResponse [];
+  nonOrdinalUtxos?: BtcUtxoDataResponse[];
   amount?: string;
   isBtcSendBrowserTx?: boolean;
   onConfirmClick: (signedTxHex: string) => void;
@@ -210,6 +210,7 @@ function ConfirmBtcTransactionComponent({
       Number(selectedAccount?.id),
       seedPhrase,
       network.type,
+      [ordinalTxUtxo!],
       new BigNumber(txFee),
     );
     return signedTx;
@@ -260,7 +261,14 @@ function ConfirmBtcTransactionComponent({
     setShowFeeSettings(false);
   };
 
-  const onApplyClick = ({ fee: modifiedFee, feeRate }: { fee: string; feeRate?: string; nonce?: string }) => {
+  const onApplyClick = ({
+    fee: modifiedFee,
+    feeRate,
+  }: {
+    fee: string;
+    feeRate?: string;
+    nonce?: string;
+  }) => {
     setCurrentFee(new BigNumber(modifiedFee));
     setCurrentFeeRate(new BigNumber(feeRate));
     if (ordinalTxUtxo) ordinalMutate(modifiedFee);
@@ -352,15 +360,22 @@ function ConfirmBtcTransactionComponent({
             ))
           )}
 
-          <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-          <TransferFeeView feePerVByte={currentFeeRate} fee={currentFee} currency={t('CONFIRM_TRANSACTION.SATS')} />
-          {!ordinalTxUtxo && (
           <TransactionDetailComponent
-            title={t('CONFIRM_TRANSACTION.TOTAL')}
-            value={getAmountString(satsToBtc(total), t('BTC'))}
-            subValue={getBtcFiatEquivalent(total, btcFiatRate)}
-            subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
+            title={t('CONFIRM_TRANSACTION.NETWORK')}
+            value={network.type}
           />
+          <TransferFeeView
+            feePerVByte={currentFeeRate}
+            fee={currentFee}
+            currency={t('CONFIRM_TRANSACTION.SATS')}
+          />
+          {!ordinalTxUtxo && (
+            <TransactionDetailComponent
+              title={t('CONFIRM_TRANSACTION.TOTAL')}
+              value={getAmountString(satsToBtc(total), t('BTC'))}
+              subValue={getBtcFiatEquivalent(total, btcFiatRate)}
+              subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
+            />
           )}
           <Button onClick={onAdvancedSettingClick}>
             <>
@@ -394,13 +409,19 @@ function ConfirmBtcTransactionComponent({
             text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={onCancelClick}
-            disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+            disabled={
+              loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+            }
           />
         </TransparentButtonContainer>
         <ActionButton
           text={t('CONFIRM_TRANSACTION.CONFIRM')}
-          disabled={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
-          processing={loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend}
+          disabled={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
+          processing={
+            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+          }
           onPress={handleOnConfirmClick}
         />
       </ButtonContainer>
