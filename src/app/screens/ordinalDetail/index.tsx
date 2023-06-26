@@ -332,7 +332,7 @@ function OrdinalDetailScreen() {
 
     if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/send-ordinal-ledger'),
+        url: chrome.runtime.getURL('options.html#/send-ordinal'),
       });
       return;
     }
