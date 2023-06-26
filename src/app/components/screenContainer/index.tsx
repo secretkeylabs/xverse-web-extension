@@ -1,9 +1,5 @@
-import AlertMessage from '@components/alertMessage';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -36,29 +32,8 @@ const TestnetText = styled.h1((props) => ({
 function ScreenContainer(): JSX.Element {
   const {
     network,
-    showBtcReceiveAlert,
-    showOrdinalReceiveAlert,
   } = useWalletSelector();
   const { t } = useTranslation('translation');
-  const [dontShowOrdinalReceiveAlert, setDontShowOrdinalReceiveAlert] = useState<boolean>(false);
-  const [dontShowBtcReceiveAlert, setDontShowBtcReceiveAlert] = useState<boolean>(false);
-  const dispatch = useDispatch();
-
-  const onReceiveAlertClose = () => {
-    if (dontShowBtcReceiveAlert) { dispatch(ChangeShowBtcReceiveAlertAction(null)); } else dispatch(ChangeShowBtcReceiveAlertAction(false));
-  };
-
-  const onReceiveOrdinalAlertClose = () => {
-    if (dontShowOrdinalReceiveAlert) { dispatch(ChangeShowOrdinalReceiveAlertAction(null)); } else dispatch(ChangeShowOrdinalReceiveAlertAction(false));
-  };
-
-  const onDontShowReceiveBtcAlert = () => {
-    setDontShowBtcReceiveAlert(true);
-  };
-
-  const onDontShowReceiveOrdinalAlert = () => {
-    setDontShowOrdinalReceiveAlert(true);
-  };
 
   return (
     <RouteContainer>
@@ -66,28 +41,6 @@ function ScreenContainer(): JSX.Element {
         <TestnetContainer>
           <TestnetText>{t('SETTING_SCREEN.TESTNET')}</TestnetText>
         </TestnetContainer>
-      )}
-      {showBtcReceiveAlert && (
-      <AlertMessage
-        title={t('ADDRESS_RECEIVE_ALERT_MESSAGE.RECEIVING_BTC')}
-        description={t('ADDRESS_RECEIVE_ALERT_MESSAGE.RECEIVING_BTC_INFO')}
-        buttonText={t('ADDRESS_RECEIVE_ALERT_MESSAGE.I_UNDERSTAND')}
-        onClose={onReceiveAlertClose}
-        onButtonClick={onReceiveAlertClose}
-        tickMarkButtonText={t('ADDRESS_RECEIVE_ALERT_MESSAGE.DO_NOT_SHOW_MESSAGE')}
-        tickMarkButtonClick={onDontShowReceiveBtcAlert}
-      />
-      )}
-      {showOrdinalReceiveAlert && (
-      <AlertMessage
-        title={t('ADDRESS_RECEIVE_ALERT_MESSAGE.RECEIVING_ORDINALS')}
-        description={t('ADDRESS_RECEIVE_ALERT_MESSAGE.RECEIVING_ORDINAL_INFO')}
-        buttonText={t('ADDRESS_RECEIVE_ALERT_MESSAGE.I_UNDERSTAND')}
-        onClose={onReceiveOrdinalAlertClose}
-        onButtonClick={onReceiveOrdinalAlertClose}
-        tickMarkButtonText={t('ADDRESS_RECEIVE_ALERT_MESSAGE.DO_NOT_SHOW_MESSAGE')}
-        tickMarkButtonClick={onDontShowReceiveOrdinalAlert}
-      />
       )}
       <Outlet />
     </RouteContainer>

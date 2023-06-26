@@ -30,7 +30,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
+import AlertMessage from '@components/alertMessage';
+import { useDispatch } from 'react-redux';
+import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import BalanceCard from './balanceCard';
+import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
+import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 
 const Container = styled.div`
   display: flex;
@@ -121,14 +126,15 @@ const MergedIcon = styled.img({
 });
 
 function Home() {
-  const { t } = useTranslation('translation', {
-    keyPrefix: 'DASHBOARD_SCREEN',
-  });
+  const { t } = useTranslation('translation');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { coinsList, stxAddress, btcAddress, ordinalsAddress, brcCoinsList } = useWalletSelector();
+  const [btcReceiveAlert, setBtcReceiveAlert] = useState<boolean>(false);
+  const [ordinalReceiveAlert, setOrdinalReceiveAlert] = useState<boolean>(false);
+  const { coinsList, stxAddress, btcAddress, ordinalsAddress, brcCoinsList, showBtcReceiveAlert, showOrdinalReceiveAlert } = useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
@@ -213,6 +219,24 @@ function Home() {
     navigate('/buy/BTC');
   };
 
+  const onOrdinalReceiveAlertOpen = () => {
+    if (showOrdinalReceiveAlert)
+    setOrdinalReceiveAlert(true);
+  };
+
+  const onOrdinalReceiveAlertClose = () => {
+    setOrdinalReceiveAlert(false);
+  };
+
+  const onReceiveAlertClose = () => {
+    setBtcReceiveAlert(false);
+  };
+
+  const onReceiveAlertOpen = () => {
+    if (showBtcReceiveAlert)
+      setBtcReceiveAlert(true);
+  };
+
   const handleTokenPressed = (token: {
     coin: CurrencyTypes;
     ft: string | undefined;
@@ -232,23 +256,25 @@ function Home() {
   const receiveContent = (
     <ReceiveContainer>
       <ReceiveCardComponent
-        title={t('BITCOIN')}
+        title={t('DASHBOARD_SCREEN.BITCOIN')}
         address={btcAddress}
         onQrAddressClick={onBTCReceiveSelect}
+        onCopyAddressClick={onReceiveAlertOpen}
       >
         <Icon src={BitcoinToken} />
       </ReceiveCardComponent>
 
       <ReceiveCardComponent
-        title={t('ORDINALS')}
+        title={t('DASHBOARD_SCREEN.ORDINALS')}
         address={ordinalsAddress}
         onQrAddressClick={onOrdinalsReceivePress}
+        onCopyAddressClick={onOrdinalReceiveAlertOpen}
       >
         <MergedIcon src={OrdinalsIcon} />
       </ReceiveCardComponent>
 
       <ReceiveCardComponent
-        title={t('STACKS_AND_TOKEN')}
+        title={t('DASHBOARD_SCREEN.STACKS_AND_TOKEN')}
         address={stxAddress}
         onQrAddressClick={onSTXReceiveSelect}
       >
@@ -259,6 +285,8 @@ function Home() {
   return (
     <>
       <AccountHeaderComponent />
+      {btcReceiveAlert && <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose}/>}
+      {ordinalReceiveAlert && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose}/>}
       <Container>
         <BalanceCard
           isLoading={
@@ -270,23 +298,23 @@ function Home() {
         />
         <RowButtonContainer>
           <ButtonContainer>
-            <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
+            <SmallActionButton src={ArrowUpRight} text={t('DASHBOARD_SCREEN.SEND')} onPress={onSendModalOpen} />
           </ButtonContainer>
           <ButtonContainer>
             <SmallActionButton
               src={ArrowDownLeft}
-              text={t('RECEIVE')}
+              text={t('DASHBOARD_SCREEN.RECEIVE')}
               onPress={onReceiveModalOpen}
             />
           </ButtonContainer>
           <ButtonContainer>
-            <SmallActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
+            <SmallActionButton src={CreditCard} text={t('DASHBOARD_SCREEN.BUY')} onPress={onBuyModalOpen} />
           </ButtonContainer>
         </RowButtonContainer>
 
         <ColumnContainer>
           <TokenTile
-            title={t('BITCOIN')}
+            title={t('DASHBOARD_SCREEN.BITCOIN')}
             currency="BTC"
             icon={IconBitcoin}
             loading={loadingBtcWalletData || refetchingBtcWalletData}
@@ -294,7 +322,7 @@ function Home() {
             onPress={handleTokenPressed}
           />
           <TokenTile
-            title={t('STACKS')}
+            title={t('DASHBOARD_SCREEN.STACKS')}
             currency="STX"
             icon={IconStacks}
             loading={loadingStxWalletData || refetchingStxWalletData}
@@ -327,7 +355,7 @@ function Home() {
             />
           ))}
         </CoinContainer>
-        <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={onReceiveModalClose}>
+        <BottomModal visible={openReceiveModal} header={t('DASHBOARD_SCREEN.RECEIVE')} onClose={onReceiveModalClose}>
           {receiveContent}
         </BottomModal>
 
@@ -335,7 +363,7 @@ function Home() {
           <Button onClick={handleManageTokenListOnClick}>
             <>
               <ButtonImage src={ListDashes} />
-              <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
+              <ButtonText>{t('DASHBOARD_SCREEN.MANAGE_TOKEN')}</ButtonText>
             </>
           </Button>
         </TokenListButtonContainer>
@@ -346,7 +374,7 @@ function Home() {
           onSelectCoin={onSendFtSelect}
           visible={openSendModal}
           coins={getCoinsList()}
-          title={t('SEND')}
+          title={t('DASHBOARD_SCREEN.SEND')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
 
@@ -357,7 +385,7 @@ function Home() {
           onSelectCoin={onBuyModalClose}
           visible={openBuyModal}
           coins={[]}
-          title={t('BUY')}
+          title={t('DASHBOARD_SCREEN.BUY')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
       </Container>
