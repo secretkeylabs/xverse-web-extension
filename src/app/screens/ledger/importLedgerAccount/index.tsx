@@ -67,6 +67,13 @@ const ImportStartContainer = styled.div((props) => ({
   maxWidth: '328px',
 }));
 
+const ButtonContainer = styled.div((props) => ({
+  marginLeft:  3 ,
+  marginRight:  3 ,
+  marginTop: props.theme.spacing(4),
+  width: '100%',
+}));
+
 const ImportStartTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
   marginTop: props.theme.spacing(30),
@@ -306,13 +313,13 @@ function ImportLedger(): JSX.Element {
         return;
       }
     }
-    if (currentStepIndex === 2 && ledgerAccountsList.length !== 0) {
-      setCurrentStepIndex(2.5);
+    if (currentStepIndex === 1 && ledgerAccountsList.length !== 0) {
+      setCurrentStepIndex(1.5);
     } else { setCurrentStepIndex(currentStepIndex + 1); }
   };
 
   const handleClickMultipleAccounts = () => {
-    setCurrentStepIndex(3);
+    setCurrentStepIndex(2);
   };
 
   const checkDeviceConnection = async () => {
@@ -531,7 +538,7 @@ function ImportLedger(): JSX.Element {
                 isConnectFailed={isConnectFailed}
               />
             )}
-            {currentStepIndex === 2.5 && (
+            {currentStepIndex === 1.5 && (
             <CreateAnotherAccountContainer>
               <img src={isBitcoinSelected ? BtcOdrinalsIconSVG : StxIconSVG} alt="" />
               <SelectAssetTitle>
@@ -628,6 +635,28 @@ function ImportLedger(): JSX.Element {
                 disabled={!isBitcoinSelected && !isStacksSelected}
               />
             )}
+              {currentStepIndex === 1.5 && (
+              <>
+                <ButtonContainer>
+                  <ActionButton
+                    disabled={isButtonDisabled}
+                    processing={isButtonDisabled}
+                    onPress={backToAssetSelection}
+                    transparent
+                    text={t('LEDGER_IMPORT_CANCEL_BUTTON')}
+                  />
+
+                </ButtonContainer>
+                <ButtonContainer>
+                  <ActionButton
+                    disabled={isButtonDisabled}
+                    processing={isButtonDisabled}
+                    onPress={handleClickMultipleAccounts}
+                    text={t('LEDGER_IMPORT_YES_BUTTON')}
+                  />
+                </ButtonContainer>
+              </>
+            )}
             {currentStepIndex === 2 && (
               <ActionButton
                 processing={isButtonDisabled}
@@ -639,14 +668,6 @@ function ImportLedger(): JSX.Element {
                     : 'LEDGER_IMPORT_CONNECT_BUTTON',
                 )}
               />
-            )}
-            {currentStepIndex === 2.5 && (
-            <ActionButton
-              disabled={isButtonDisabled}
-              processing={isButtonDisabled}
-              onPress={handleClickMultipleAccounts}
-              text={t('LEDGER_IMPORT_YES_BUTTON')}
-            />
             )}
             {currentStepIndex === 3 && (
               <ActionButton

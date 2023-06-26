@@ -46,7 +46,7 @@
       "ORDINALS": "Ordinals address",
       "STX": "Stacks address",
       "ALERT": "Verify that these addresses match the addresses displayed on the device.",
-      "ALREADY_CONNECTED_WARNING": "Ledger device has already been connected to your Xverse wallet. Would you like to create another account?"
+      "ALREADY_CONNECTED_WARNING": "An account has already been added to your wallet from this device. Would you like to create a new account?"
     },
     "LEDGER_ADDRESS_ADDED": {
       "TITLE_BTC_ORDINALS": "Bitcoin & Ordinals wallets added",
@@ -74,7 +74,8 @@
     "LEDGER_IMPORT_CONFIRM_BUTTON": "Confirm",
     "LEDGER_IMPORT_CLOSE_BUTTON": "Close",
     "LEDGER_IMPORT_TRY_AGAIN_BUTTON": "Try again",
-    "LEDGER_IMPORT_YES_BUTTON": "Yes"
+    "LEDGER_IMPORT_YES_BUTTON": "Add a new account",
+    "LEDGER_IMPORT_CANCEL_BUTTON": "Cancel"
   },
   "LEDGER_CONFIRM_TRANSACTION_SCREEN": {
     "CONNECT": {
@@ -395,7 +396,7 @@
     "PENDING_DELEGATION": "Pending delegation",
     "DELEGATED": "Delegated",
     "IN_PROGRESS": "In progress",
-    "NO_EARN_OPTION": "No earn option available for Ledger Bitcoin-only wallet"
+    "NO_EARN_OPTION": "No Earn options currently available for this wallet type."
   },
   "NFT_DASHBOARD_SCREEN": {
     "COLLECTIBLES": "Number of collectibles",
