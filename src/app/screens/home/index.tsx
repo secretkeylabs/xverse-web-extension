@@ -126,7 +126,9 @@ const MergedIcon = styled.img({
 });
 
 function Home() {
-  const { t } = useTranslation('translation');
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'DASHBOARD_SCREEN',
+  });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
@@ -256,7 +258,7 @@ function Home() {
   const receiveContent = (
     <ReceiveContainer>
       <ReceiveCardComponent
-        title={t('DASHBOARD_SCREEN.BITCOIN')}
+        title={t('BITCOIN')}
         address={btcAddress}
         onQrAddressClick={onBTCReceiveSelect}
         onCopyAddressClick={onReceiveAlertOpen}
@@ -265,7 +267,7 @@ function Home() {
       </ReceiveCardComponent>
 
       <ReceiveCardComponent
-        title={t('DASHBOARD_SCREEN.ORDINALS')}
+        title={t('ORDINALS')}
         address={ordinalsAddress}
         onQrAddressClick={onOrdinalsReceivePress}
         onCopyAddressClick={onOrdinalReceiveAlertOpen}
@@ -274,7 +276,7 @@ function Home() {
       </ReceiveCardComponent>
 
       <ReceiveCardComponent
-        title={t('DASHBOARD_SCREEN.STACKS_AND_TOKEN')}
+        title={t('STACKS_AND_TOKEN')}
         address={stxAddress}
         onQrAddressClick={onSTXReceiveSelect}
       >
@@ -298,23 +300,23 @@ function Home() {
         />
         <RowButtonContainer>
           <ButtonContainer>
-            <SmallActionButton src={ArrowUpRight} text={t('DASHBOARD_SCREEN.SEND')} onPress={onSendModalOpen} />
+            <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
           </ButtonContainer>
           <ButtonContainer>
             <SmallActionButton
               src={ArrowDownLeft}
-              text={t('DASHBOARD_SCREEN.RECEIVE')}
+              text={t('RECEIVE')}
               onPress={onReceiveModalOpen}
             />
           </ButtonContainer>
           <ButtonContainer>
-            <SmallActionButton src={CreditCard} text={t('DASHBOARD_SCREEN.BUY')} onPress={onBuyModalOpen} />
+            <SmallActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
           </ButtonContainer>
         </RowButtonContainer>
 
         <ColumnContainer>
           <TokenTile
-            title={t('DASHBOARD_SCREEN.BITCOIN')}
+            title={t('BITCOIN')}
             currency="BTC"
             icon={IconBitcoin}
             loading={loadingBtcWalletData || refetchingBtcWalletData}
@@ -322,7 +324,7 @@ function Home() {
             onPress={handleTokenPressed}
           />
           <TokenTile
-            title={t('DASHBOARD_SCREEN.STACKS')}
+            title={t('STACKS')}
             currency="STX"
             icon={IconStacks}
             loading={loadingStxWalletData || refetchingStxWalletData}
@@ -355,7 +357,7 @@ function Home() {
             />
           ))}
         </CoinContainer>
-        <BottomModal visible={openReceiveModal} header={t('DASHBOARD_SCREEN.RECEIVE')} onClose={onReceiveModalClose}>
+        <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={onReceiveModalClose}>
           {receiveContent}
         </BottomModal>
 
@@ -363,7 +365,7 @@ function Home() {
           <Button onClick={handleManageTokenListOnClick}>
             <>
               <ButtonImage src={ListDashes} />
-              <ButtonText>{t('DASHBOARD_SCREEN.MANAGE_TOKEN')}</ButtonText>
+              <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
             </>
           </Button>
         </TokenListButtonContainer>
@@ -374,7 +376,7 @@ function Home() {
           onSelectCoin={onSendFtSelect}
           visible={openSendModal}
           coins={getCoinsList()}
-          title={t('DASHBOARD_SCREEN.SEND')}
+          title={t('SEND')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
 
@@ -385,7 +387,7 @@ function Home() {
           onSelectCoin={onBuyModalClose}
           visible={openBuyModal}
           coins={[]}
-          title={t('DASHBOARD_SCREEN.BUY')}
+          title={t('BUY')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
       </Container>
