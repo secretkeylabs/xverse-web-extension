@@ -260,14 +260,14 @@ function NftDetailScreen() {
   } = useMutation<
   NftDetailResponse | undefined,
   Error,
-  { principal: string }>(async ({ principal }) => {
+  { principal: string }>({ mutationFn: async ({ principal }) => {
     const contractInfo: string[] = principal.split('.');
     return getNftDetail(
       nftIdDetails[2].replace('u', ''),
       contractInfo[0],
       contractInfo[1],
     );
-  });
+  } });
 
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
@@ -318,7 +318,7 @@ function NftDetailScreen() {
   const handleOnSendClick = async () => {
     if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL(`options.html#/send-nft-ledger/${id}`),
+        url: chrome.runtime.getURL(`options.html#/send-nft/${id}`),
       });
       return;
     }

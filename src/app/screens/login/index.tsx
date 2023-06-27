@@ -13,6 +13,7 @@ import useCacheMigration from '@hooks/useCacheMigration';
 import MigrationConfirmation from '@screens/migrationConfirmation';
 import { decryptSeedPhrase } from '@utils/encryptionUtils';
 import useWalletSelector from '@hooks/useWalletSelector';
+import useWalletSession from '@hooks/useWalletSession';
 
 declare const VERSION: string;
 

@@ -65,10 +65,6 @@ const CheckBoxContainer = styled.div((props) => ({
   userSelect: 'none',
 }));
 
-const CheckBoxWrapper = styled.div(() => ({
-  cursor: 'pointer',
-}));
-
 function WalletExists(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'WALLET_EXISTS_SCREEN' });
   const [userAccepted, setUserAccepted] = useState(false);
@@ -89,14 +85,12 @@ function WalletExists(): JSX.Element {
         <Subtitle>{t('SCREEN_SUBTITLE')}</Subtitle>
       </ContentContainer>
       <CheckBoxContainer>
-        <CheckBoxWrapper>
-          <CheckBox
-            checkBoxLabel={t('UNDERSTAND')}
-            isChecked={userAccepted}
-            checkBoxId="backup"
-            onCheck={handleToggleAccept}
-          />
-        </CheckBoxWrapper>
+        <CheckBox
+          checkBoxLabel={t('UNDERSTAND')}
+          isChecked={userAccepted}
+          checkBoxId="backup"
+          onCheck={handleToggleAccept}
+        />
       </CheckBoxContainer>
       <ContinueButton onClick={handleClose} disabled={!userAccepted}>
         {t('CLOSE_TAB')}
