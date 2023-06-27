@@ -1,11 +1,6 @@
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { Coin } from '@secretkeylabs/xverse-core/types/api/xverse/coins';
 import ChevronIcon from '@assets/img/swap/chevron.svg';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
-import { ftDecimals } from '@utils/helper';
-import { microstacksToStx } from '@secretkeylabs/xverse-core/currency';
-import BigNumber from 'bignumber.js';
 import { SwapToken } from '@screens/swap/useSwap';
 
 const Container = styled.div((props) => ({
@@ -57,10 +52,10 @@ const CoinButtonContainer = styled.button((props) => ({
   alignItems: 'center',
 }));
 
-const CoinButtonArrow = styled.img((props) => ({
+const CoinButtonArrow = styled.img({
   width: 12,
   height: 12,
-}));
+});
 
 export const AmountTex = styled.input<{ error?: boolean }>((props) => ({
   ...props.theme.body_bold_l,
@@ -92,34 +87,41 @@ type SwapTokenBlockProps = {
   error?: boolean;
 };
 
-function SwapTokenBlock(props: SwapTokenBlockProps) {
+function SwapTokenBlock({
+  title,
+  selectedCoin,
+  amount,
+  onAmountChange,
+  onSelectCoin,
+  error,
+}: SwapTokenBlockProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
   return (
     <Container>
       <RowContainer>
-        <TitleText>{props.title}</TitleText>
+        <TitleText>{title}</TitleText>
         <BalanceText>{t('BALANCE')}:</BalanceText>
-        <Text>{props.selectedCoin?.balance ?? '--'}</Text>
+        <Text>{selectedCoin?.balance ?? '--'}</Text>
       </RowContainer>
       <CardContainer>
         <RowContainer>
-          <CoinButtonContainer onClick={props.onSelectCoin}>
-            {props.selectedCoin?.image}
-            <CoinText>{props.selectedCoin?.name ?? t('SELECT_COIN')}</CoinText>
+          <CoinButtonContainer onClick={onSelectCoin}>
+            {selectedCoin?.image}
+            <CoinText>{selectedCoin?.name ?? t('SELECT_COIN')}</CoinText>
             <CoinButtonArrow src={ChevronIcon} />
           </CoinButtonContainer>
           <AmountTex
-            error={props.error}
+            error={error}
             placeholder="0"
-            disabled={props.onAmountChange == null}
-            value={props.amount ?? props.selectedCoin?.amount?.toString() ?? ''}
-            onChange={(e) => props.onAmountChange?.(e.target.value)}
+            disabled={onAmountChange == null}
+            value={amount ?? selectedCoin?.amount?.toString() ?? ''}
+            onChange={(e) => onAmountChange?.(e.target.value)}
           />
         </RowContainer>
         <RowContainer>
           <EstimateUSDText>
-            {props.selectedCoin?.fiatAmount ? `≈ $ ${props.selectedCoin.fiatAmount} USD` : '--'}
+            {selectedCoin?.fiatAmount ? `≈ $ ${selectedCoin.fiatAmount} USD` : '--'}
           </EstimateUSDText>
         </RowContainer>
       </CardContainer>
