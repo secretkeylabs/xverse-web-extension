@@ -31,6 +31,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
+import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
+import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -130,7 +132,9 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { coinsList, stxAddress, btcAddress, ordinalsAddress, selectedAccount, brcCoinsList } = useWalletSelector();
+  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
+  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
+  const { coinsList, stxAddress, btcAddress, ordinalsAddress, selectedAccount, brcCoinsList, showBtcReceiveAlert, showOrdinalReceiveAlert } = useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
@@ -233,6 +237,24 @@ function Home() {
     navigate('/buy/BTC');
   };
 
+  const onOrdinalReceiveAlertOpen = () => {
+    if (showOrdinalReceiveAlert)
+    setIsOrdinalReceiveAlertVisible(true);
+  };
+
+  const onOrdinalReceiveAlertClose = () => {
+    setIsOrdinalReceiveAlertVisible(false);
+  };
+
+  const onReceiveAlertClose = () => {
+    setIsBtcReceiveAlertVisible(false);
+  };
+
+  const onReceiveAlertOpen = () => {
+    if (showBtcReceiveAlert)
+    setIsBtcReceiveAlertVisible(true);
+  };
+
   const handleTokenPressed = (token: {
     coin: CurrencyTypes;
     ft: string | undefined;
@@ -255,6 +277,7 @@ function Home() {
         title={t('BITCOIN')}
         address={btcAddress}
         onQrAddressClick={onBTCReceiveSelect}
+        onCopyAddressClick={onReceiveAlertOpen}
       >
         <Icon src={BitcoinToken} />
       </ReceiveCardComponent>
@@ -263,6 +286,7 @@ function Home() {
         title={t('ORDINALS')}
         address={ordinalsAddress}
         onQrAddressClick={onOrdinalsReceivePress}
+        onCopyAddressClick={onOrdinalReceiveAlertOpen}
       >
         <MergedIcon src={OrdinalsIcon} />
       </ReceiveCardComponent>
@@ -281,6 +305,8 @@ function Home() {
   return (
     <>
       <AccountHeaderComponent />
+      {isBtcReceiveAlertVisible && <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose}/>}
+      {isOrdinalReceiveAlertVisible && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose}/>}
       <Container>
         <BalanceCard
           isLoading={

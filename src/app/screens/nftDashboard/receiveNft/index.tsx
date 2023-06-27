@@ -11,6 +11,7 @@ import ReceiveCardComponent from '../../../components/receiveCardComponent';
 interface Props {
   visible: boolean;
   onClose: () => void;
+  setOrdinalReceiveAlert: () => void;
   isGalleryOpen: boolean;
 }
 
@@ -44,16 +45,22 @@ const Text = styled.h1((props) => ({
   flex: 1,
 }));
 
-function ReceiveNftModal({ visible, onClose, isGalleryOpen }: Props) {
+function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAlert }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress, ordinalsAddress } = useWalletSelector();
+  const { stxAddress, ordinalsAddress, showOrdinalReceiveAlert } = useWalletSelector();
+
   const onReceivePress = () => {
     navigate('/receive/STX');
   };
 
   const onOrdinalsReceivePress = () => {
     navigate('/receive/ORD');
+  };
+
+  const onOrdinalReceiveAlertOpen = () => {
+    if (showOrdinalReceiveAlert)
+    setOrdinalReceiveAlert();
   };
 
   const receiveContent = (

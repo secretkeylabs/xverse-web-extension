@@ -22,6 +22,7 @@ import useAddressInscriptions from '@hooks/queries/ordinals/useAddressInscriptio
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
+import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 
 const Container = styled.div`
   display: flex;
@@ -200,9 +201,10 @@ function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const dispatch = useDispatch();
   const { stxAddress, ordinalsAddress, hasActivatedOrdinalsKey } = useWalletSelector();
-  const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
+  const [showShareNftOptions, setShowNftOptions] = useState(false);
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [showActivateOrdinalsAlert, setShowActivateOrdinalsAlert] = useState(false);
+  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const {
     data: nftsList,
     hasNextPage,
@@ -278,6 +280,14 @@ function NftDashboard() {
     [],
   );
 
+  const onOrdinalReceiveAlertOpen = () => {
+    setIsOrdinalReceiveAlertVisible(true);
+  };
+
+  const onOrdinalReceiveAlertClose = () => {
+    setIsOrdinalReceiveAlertVisible(false);
+  };
+
   const NftListView = useCallback(
     () => (totalNfts === 0 && ordinalsLength === 0 ? (
       <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>
@@ -333,6 +343,7 @@ function NftDashboard() {
 
   return (
     <>
+      {isOrdinalReceiveAlertVisible && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />}
       {showActivateOrdinalsAlert && (
         <AlertMessage
           title={t('ACTIVATE_ORDINALS')}
@@ -387,6 +398,7 @@ function NftDashboard() {
                 visible={openReceiveModal}
                 isGalleryOpen={isGalleryOpen}
                 onClose={onReceiveModalClose}
+                setOrdinalReceiveAlert={onOrdinalReceiveAlertOpen}
               />
             </ReceiveNftContainer>
           )}
