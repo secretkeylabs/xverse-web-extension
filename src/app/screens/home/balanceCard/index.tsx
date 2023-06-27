@@ -1,5 +1,3 @@
-import { StoreState } from '@stores/index';
-import { useSelector } from 'react-redux';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
@@ -8,6 +6,7 @@ import BarLoader from '@components/barLoader';
 import { LoaderSize } from '@utils/constants';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { useTranslation } from 'react-i18next';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -55,8 +54,7 @@ interface BalanceCardProps {
 
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } =
-    useSelector((state: StoreState) => state.walletState);
+  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } = useWalletSelector();
   const { isLoading } = props;
 
   function calculateTotalBalance() {

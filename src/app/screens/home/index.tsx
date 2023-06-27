@@ -136,7 +136,8 @@ function Home() {
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const { coinsList, stxAddress, btcAddress, ordinalsAddress, selectedAccount, brcCoinsList, showBtcReceiveAlert, showOrdinalReceiveAlert } = useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
-    useStxWalletData();
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  stxAddress ? useStxWalletData() : { isLoading: false, isRefetching: false };
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
     useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();

@@ -14,6 +14,10 @@ export const useCoinsData = () => {
 
   const fetchCoinData = async () => {
     try {
+      if (!stxAddress) {
+        throw new Error('No stx address');
+      }
+      
       const fungibleTokenList: Array<FungibleToken> = await getFtData(
         stxAddress,
         currentNetworkInstance,

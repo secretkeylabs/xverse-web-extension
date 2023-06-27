@@ -21,8 +21,6 @@ import {
 } from '@stores/wallet/actions/actionCreators';
 import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
 import { useDispatch } from 'react-redux';
-import { InternalMethods } from '@common/types/message-types';
-import { sendMessage } from '@common/types/messages';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import useWalletSession from './useWalletSession';
 import useWalletSelector from './useWalletSelector';
