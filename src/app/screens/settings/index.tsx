@@ -13,9 +13,9 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import { useDispatch } from 'react-redux';
 import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import { isLedgerAccount } from '@utils/helper';
 import ResetWalletPrompt from '../../components/resetWallet';
 import SettingComponent from './settingComponent';
-import { isLedgerAccount } from '@utils/helper';
 
 declare const VERSION: string;
 
@@ -123,12 +123,15 @@ function Setting() {
     navigate('/lockCountdown');
   };
 
-  const onRestoreFundClick = () => {
-    navigate('/restore-funds', {
-      state: {
-        unspentUtxos,
-      },
-    });
+  const onRestoreFundClick = async () => {
+    if (isLedgerAccount(selectedAccount)) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL('options.html#/restore-funds'),
+      });
+      return;
+    }
+
+    navigate('/restore-funds');
   };
   const handlePasswordNextClick = async () => {
     try {

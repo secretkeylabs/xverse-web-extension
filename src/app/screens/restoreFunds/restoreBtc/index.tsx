@@ -11,11 +11,12 @@ import {
 import { useMutation, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import { useEffect } from 'react';
+import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
@@ -76,8 +77,9 @@ function RestoreBtc() {
     seedPhrase,
   } = useWalletSelector();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { unspentUtxos } = location.state;
+  const {
+    unspentUtxos,
+  } = useNonOrdinalUtxos();
   let amount = new BigNumber(0);
   if (unspentUtxos) {
     amount = sumUnspentOutputs(unspentUtxos);
@@ -103,9 +105,9 @@ function RestoreBtc() {
     network: NetworkType,
     fee?: BigNumber
   }
-  >(async ({
+  >({ mutationFn: async ({
     recipientAddress, nonOrdinalUtxos, accountIndex, seedPhrase, network, fee,
-  }) => signNonOrdinalBtcSendTransaction(recipientAddress, nonOrdinalUtxos, accountIndex, seedPhrase, network, fee));
+  }) => signNonOrdinalBtcSendTransaction(recipientAddress, nonOrdinalUtxos, accountIndex, seedPhrase, network, fee) });
 
   const onClickTransfer = () => {
     mutateSignNonOrdinalBtcTransaction({

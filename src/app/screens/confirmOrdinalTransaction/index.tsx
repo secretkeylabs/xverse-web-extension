@@ -103,9 +103,7 @@ function ConfirmOrdinalTransaction() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-  );
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
   const { selectedOrdinal } = useNftDataSelector();
   const { refetch } = useBtcWalletData();
 
@@ -186,7 +184,7 @@ function ConfirmOrdinalTransaction() {
         >
           <Container>
             <NFtContainer>
-              <OrdinalImage inNftSend ordinal={selectedOrdinal!} />
+              <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
             </NFtContainer>
           </Container>
         </ConfirmBtcTransactionComponent>
