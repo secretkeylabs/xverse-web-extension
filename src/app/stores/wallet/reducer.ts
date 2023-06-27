@@ -57,8 +57,8 @@ const initialWalletState: WalletState = {
   networkAddress: undefined,
   btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
-  showBtcReceiveAlert: false,
-  showOrdinalReceiveAlert: false,
+  showBtcReceiveAlert: true,
+  showOrdinalReceiveAlert: true,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
 };
 

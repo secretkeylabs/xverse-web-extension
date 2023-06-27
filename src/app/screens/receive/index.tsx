@@ -10,8 +10,8 @@ import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BottomTabBar from '@components/tabBar';
 import InfoContainer from '@components/infoContainer';
-import { useDispatch } from 'react-redux';
-import { ChangeShowBtcReceiveAlertAction, ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
+import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -95,8 +95,9 @@ const InfoAlertContainer = styled.div({
 function Receive(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
   const [addressCopied, setAddressCopied] = useState(false);
+  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
+  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible]  = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const {
     stxAddress,
     btcAddress,
@@ -144,11 +145,19 @@ function Receive(): JSX.Element {
     return <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>;
   };
 
+  const onReceiveAlertClose = () => {
+    setIsBtcReceiveAlertVisible(false);
+  };
+
+  const onOrdinalReceiveAlertClose = () => {
+    setIsOrdinalReceiveAlertVisible(false);
+  };
+
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
     setAddressCopied(true);
-    if (currency === 'BTC' && showBtcReceiveAlert !== null) { dispatch(ChangeShowBtcReceiveAlertAction(true)); }
-    if (currency === 'ORD' && showOrdinalReceiveAlert !== null) { dispatch(ChangeShowOrdinalReceiveAlertAction(true)); }
+    if (currency === 'BTC' && showBtcReceiveAlert) { setIsBtcReceiveAlertVisible(true); }
+    if (currency === 'ORD' && showOrdinalReceiveAlert ) { setIsOrdinalReceiveAlertVisible(true); }
   };
   return (
     <>
@@ -197,6 +206,9 @@ function Receive(): JSX.Element {
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />
       </BottomBarContainer>
+      {isBtcReceiveAlertVisible && <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose}/>}
+      {isOrdinalReceiveAlertVisible && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose}/>}
+    
     </>
   );
 }
