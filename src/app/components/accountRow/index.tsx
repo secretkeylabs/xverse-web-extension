@@ -255,7 +255,7 @@ function AccountRow({
   );
 
   return (
-    <TopSectionContainer onClick={onRowClick}>
+    <TopSectionContainer>
       <GradientCircle
         firstGradient={gradient[0]}
         secondGradient={gradient[1]}
@@ -272,10 +272,12 @@ function AccountRow({
               </CurrentAccountTextContainer>
             </Button>
           ) : (
-            <CurrentAccountTextContainer>
-              <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
-              {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
-            </CurrentAccountTextContainer>
+            <Button onClick={onClick}>
+              <CurrentAccountTextContainer>
+                <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
+                {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+              </CurrentAccountTextContainer>
+            </Button>
           ))}
         {!account ? (
           <BarLoaderContainer>

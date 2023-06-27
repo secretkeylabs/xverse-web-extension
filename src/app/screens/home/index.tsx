@@ -188,7 +188,7 @@ function Home() {
   const onBtcSendClick = async () => {
     if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/send-btc-ledger'),
+        url: chrome.runtime.getURL('options.html#/send-btc'),
       });
       return;
     }
@@ -267,6 +267,7 @@ function Home() {
         <MergedIcon src={OrdinalsIcon} />
       </ReceiveCardComponent>
 
+      {stxAddress && (
       <ReceiveCardComponent
         title={t('STACKS_AND_TOKEN')}
         address={stxAddress}
@@ -274,6 +275,7 @@ function Home() {
       >
         <MergedIcon src={SIP10Icon} />
       </ReceiveCardComponent>
+      )}
     </ReceiveContainer>
   );
   return (

@@ -67,6 +67,13 @@ const ImportStartContainer = styled.div((props) => ({
   maxWidth: '328px',
 }));
 
+const ButtonContainer = styled.div((props) => ({
+  marginLeft:  3 ,
+  marginRight:  3 ,
+  marginTop: props.theme.spacing(4),
+  width: '100%',
+}));
+
 const ImportStartTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
   marginTop: props.theme.spacing(30),
@@ -116,6 +123,15 @@ const AddAddressHeaderContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(16),
 }));
 
+const CreateAnotherAccountContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(90),
+  marginBottom: props.theme.spacing(16),
+}));
+
 const AddAddressDetailsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -161,6 +177,11 @@ const AddAccountNameTitleContainer = styled.div((props) => ({
   flexDirection: 'column',
   gap: props.theme.spacing(4),
   marginBottom: props.theme.spacing(22),
+}));
+
+const CreateMultipleAccountsText = styled.h3((props) => ({
+  ...props.theme.body_l,
+  textAlign: 'center',
 }));
 
 const EndScreenContainer = styled.div((props) => ({
@@ -236,7 +257,7 @@ function ImportLedger(): JSX.Element {
         network.type,
         0,
         newAddressIndex,
-        false,
+        true,
       );
       setBitcoinCredentials({
         address: bitcoinAccount.address,
@@ -247,7 +268,7 @@ function ImportLedger(): JSX.Element {
         network.type,
         0,
         newAddressIndex,
-        false,
+        true,
       );
       setOrdinalsCredentials({
         address: ordinalsAccount.address,
@@ -292,7 +313,13 @@ function ImportLedger(): JSX.Element {
         return;
       }
     }
-    setCurrentStepIndex(currentStepIndex + 1);
+    if (currentStepIndex === 1 && ledgerAccountsList.length !== 0) {
+      setCurrentStepIndex(1.5);
+    } else { setCurrentStepIndex(currentStepIndex + 1); }
+  };
+
+  const handleClickMultipleAccounts = () => {
+    setCurrentStepIndex(2);
   };
 
   const checkDeviceConnection = async () => {
@@ -511,6 +538,21 @@ function ImportLedger(): JSX.Element {
                 isConnectFailed={isConnectFailed}
               />
             )}
+            {currentStepIndex === 1.5 && (
+            <CreateAnotherAccountContainer>
+              <img src={isBitcoinSelected ? BtcOdrinalsIconSVG : StxIconSVG} alt="" />
+              <SelectAssetTitle>
+                {t(
+                  isBitcoinSelected
+                    ? 'LEDGER_ADD_ADDRESS.TITLE_BTC'
+                    : 'LEDGER_ADD_ADDRESS.TITLE_STX',
+                )}
+              </SelectAssetTitle>
+              <CreateMultipleAccountsText>
+                {t('LEDGER_ADD_ADDRESS.ALREADY_CONNECTED_WARNING')}
+              </CreateMultipleAccountsText>
+            </CreateAnotherAccountContainer>
+            )}
             {currentStepIndex === 3 && (
               <>
                 <AddAddressHeaderContainer>
@@ -593,6 +635,28 @@ function ImportLedger(): JSX.Element {
                 disabled={!isBitcoinSelected && !isStacksSelected}
               />
             )}
+              {currentStepIndex === 1.5 && (
+              <>
+                <ButtonContainer>
+                  <ActionButton
+                    disabled={isButtonDisabled}
+                    processing={isButtonDisabled}
+                    onPress={backToAssetSelection}
+                    transparent
+                    text={t('LEDGER_IMPORT_CANCEL_BUTTON')}
+                  />
+
+                </ButtonContainer>
+                <ButtonContainer>
+                  <ActionButton
+                    disabled={isButtonDisabled}
+                    processing={isButtonDisabled}
+                    onPress={handleClickMultipleAccounts}
+                    text={t('LEDGER_IMPORT_YES_BUTTON')}
+                  />
+                </ButtonContainer>
+              </>
+            )}
             {currentStepIndex === 2 && (
               <ActionButton
                 processing={isButtonDisabled}
@@ -605,7 +669,6 @@ function ImportLedger(): JSX.Element {
                 )}
               />
             )}
-
             {currentStepIndex === 3 && (
               <ActionButton
                 disabled={isButtonDisabled}
