@@ -6,10 +6,9 @@ import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import TopRow from '@components/topRow';
 import BigNumber from 'bignumber.js';
-import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { LedgerTransactionType } from '../reviewLedgerBtcTransaction';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import { LedgerTransactionType } from '../confirmLedgerTransaction';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',
@@ -64,7 +63,7 @@ function ReviewLedgerFtTransaction() {
         loading={false}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleBackButtonClick}
-        skipModal={true}
+        skipModal
       >
         <TransferAmountView
           currency="FT"

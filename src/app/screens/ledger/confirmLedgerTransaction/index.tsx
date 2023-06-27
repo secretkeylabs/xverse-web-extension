@@ -23,7 +23,8 @@ import useNetworkSelector from '@hooks/useNetwork';
 import { StacksTransaction } from '@stacks/transactions';
 import LedgerConnectDefaultSVG from '@assets/img/ledger/ledger_connect_default.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
-import { LedgerTransactionType } from '../reviewLedgerBtcTransaction';
+
+export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS';
 
 const Container = styled.div`
   display: flex;

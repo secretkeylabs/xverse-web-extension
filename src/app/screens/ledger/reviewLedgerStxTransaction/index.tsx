@@ -16,8 +16,8 @@ import InfoContainer from '@components/infoContainer';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import ReviewLedgerStxTransactionComponent from '@components/ledger/reviewLedgerStxTransactionComponent';
-import { LedgerTransactionType } from '../reviewLedgerBtcTransaction';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import { LedgerTransactionType } from '../confirmLedgerTransaction';
 
 const Container = styled.div((props) => ({
   display: 'flex',

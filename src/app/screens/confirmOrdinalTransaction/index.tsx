@@ -15,7 +15,7 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useBtcClient from '@hooks/useBtcClient';
 import { isLedgerAccount } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { LedgerTransactionType } from '@screens/ledger/reviewLedgerBtcTransaction';
+import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
 
 const ScrollContainer = styled.div`
   display: flex;

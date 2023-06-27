@@ -19,7 +19,7 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { isLedgerAccount } from '@utils/helper';
-import { LedgerTransactionType } from '@screens/ledger/reviewLedgerBtcTransaction';
+import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -120,7 +120,7 @@ function ConfirmNftTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
+  { signedTx: StacksTransaction }>({ mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork) });
 
   useEffect(() => {
     if (stxTxBroadcastData) {
