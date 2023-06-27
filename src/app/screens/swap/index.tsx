@@ -32,10 +32,15 @@ const Container = styled.div((props) => ({
   marginTop: props.theme.spacing(16),
 }));
 
-const DownArrow = styled.img((props) => ({
+const DownArrowButton = styled.button((props) => ({
   alignSelf: 'center',
+  borderRadius: props.theme.radius(3),
   width: props.theme.spacing(18),
   height: props.theme.spacing(18),
+  transition: 'all 0.2s ease',
+  ':hover': {
+    opacity: 0.8,
+  },
 }));
 
 const SendButtonContainer = styled.div((props) => ({
@@ -66,7 +71,9 @@ function SwapScreen() {
             onAmountChange={swap.onInputAmountChanged}
             onSelectCoin={() => setSelecting('from')}
           />
-          <DownArrow src={ArrowDown} />
+          <DownArrowButton onClick={swap.handleClickDownArrow}>
+            <img src={ArrowDown} alt="arrow-down"/>
+          </DownArrowButton>
           <SwapTokenBlock
             title={t('TO')}
             selectedCoin={swap.selectedToToken}

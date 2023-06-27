@@ -29,6 +29,7 @@ export type UseSwap = {
   inputAmount: string;
   inputAmountInvalid?: boolean;
   onInputAmountChanged: (amount: string) => void;
+  handleClickDownArrow: (event: React.MouseEvent<HTMLButtonElement>) => void;
   submitError?: string;
   swapInfo?: {
     exchangeRate?: string;
@@ -177,6 +178,12 @@ export function useSwap(): UseSwap {
     return Math.floor(input * 1000) / 1000;
   }
 
+  const toggleFromToTokens = () => {
+    const prevFrom = from;
+    setFrom(to);
+    setTo(prevFrom);
+  }
+
   const toAmount =
     exchangeRate != null && fromAmount != null ? fromAmount * exchangeRate : undefined;
 
@@ -192,6 +199,7 @@ export function useSwap(): UseSwap {
     onSlippageChanged: setSlippage,
     onSelectToken,
     inputAmountInvalid,
+    handleClickDownArrow: toggleFromToTokens,
     minReceived: toAmount != null ? roundForDisplay(toAmount * (1 - slippage)) : undefined,
     swapInfo: {
       exchangeRate:
