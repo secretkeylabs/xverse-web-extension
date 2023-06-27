@@ -134,8 +134,8 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const [btcReceiveAlert, setBtcReceiveAlert] = useState<boolean>(false);
-  const [ordinalReceiveAlert, setOrdinalReceiveAlert] = useState<boolean>(false);
+  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
+  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const { coinsList, stxAddress, btcAddress, ordinalsAddress, brcCoinsList, showBtcReceiveAlert, showOrdinalReceiveAlert } = useWalletSelector();
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
@@ -223,20 +223,20 @@ function Home() {
 
   const onOrdinalReceiveAlertOpen = () => {
     if (showOrdinalReceiveAlert)
-    setOrdinalReceiveAlert(true);
+    setIsOrdinalReceiveAlertVisible(true);
   };
 
   const onOrdinalReceiveAlertClose = () => {
-    setOrdinalReceiveAlert(false);
+    setIsOrdinalReceiveAlertVisible(false);
   };
 
   const onReceiveAlertClose = () => {
-    setBtcReceiveAlert(false);
+    setIsBtcReceiveAlertVisible(false);
   };
 
   const onReceiveAlertOpen = () => {
     if (showBtcReceiveAlert)
-      setBtcReceiveAlert(true);
+    setIsBtcReceiveAlertVisible(true);
   };
 
   const handleTokenPressed = (token: {
@@ -287,8 +287,8 @@ function Home() {
   return (
     <>
       <AccountHeaderComponent />
-      {btcReceiveAlert && <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose}/>}
-      {ordinalReceiveAlert && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose}/>}
+      {isBtcReceiveAlertVisible && <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose}/>}
+      {isOrdinalReceiveAlertVisible && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose}/>}
       <Container>
         <BalanceCard
           isLoading={

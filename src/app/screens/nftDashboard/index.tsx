@@ -193,11 +193,11 @@ const BarLoaderContainer = styled.div((props) => ({
 function NftDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const dispatch = useDispatch();
-  const { stxAddress, ordinalsAddress, hasActivatedOrdinalsKey, showOrdinalReceiveAlert } = useWalletSelector();
-  const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
+  const { stxAddress, ordinalsAddress, hasActivatedOrdinalsKey } = useWalletSelector();
+  const [showShareNftOptions, setShowNftOptions] = useState(false);
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [showActivateOrdinalsAlert, setShowActivateOrdinalsAlert] = useState(false);
-  const [ordinalReceiveAlert, setOrdinalReceiveAlert] = useState<boolean>(false);
+  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const {
     data: nftsList,
     hasNextPage,
@@ -274,11 +274,11 @@ function NftDashboard() {
   );
 
   const onOrdinalReceiveAlertOpen = () => {
-    setOrdinalReceiveAlert(true);
+    setIsOrdinalReceiveAlertVisible(true);
   };
 
   const onOrdinalReceiveAlertClose = () => {
-    setOrdinalReceiveAlert(false);
+    setIsOrdinalReceiveAlertVisible(false);
   };
 
   const NftListView = useCallback(
@@ -330,7 +330,7 @@ function NftDashboard() {
 
   return (
     <>
-      {ordinalReceiveAlert && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />}
+      {isOrdinalReceiveAlertVisible && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />}
       {showActivateOrdinalsAlert && (
         <AlertMessage
           title={t('ACTIVATE_ORDINALS')}
