@@ -86,7 +86,7 @@ function SwapScreen() {
           }}
           visible={!!selecting}
           coins={swap.coinsList}
-          title={selecting === 'from' ? t('FROM') : t('TO')}
+          title={selecting === 'from' ? t('ASSET_TO_CONVERT_FROM') : t('ASSET_TO_CONVERT_TO')}
           loadingWalletData={swap.isLoadingWalletData}
         />
       )}

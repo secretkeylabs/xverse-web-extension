@@ -564,6 +564,8 @@
     "BALANCE": "Balance",
     "FROM": "From",
     "TO": "To",
+    "ASSET_TO_CONVERT_FROM": "Asset to convert from",
+    "ASSET_TO_CONVERT_TO": "Asset to convert to",
     "SELECT_COIN": "Select asset",
     "DETAILS": "Details",
     "MIN_RECEIVE": "Minimum received",
