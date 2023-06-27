@@ -50,7 +50,7 @@ export function useSwap(): UseSwap {
     stxAvailableBalance,
     stxBtcRate,
     btcFiatRate,
-    fiatCurrency,
+    // fiatCurrency,
     stxAddress,
     stxPublicKey,
   } = useWalletSelector();
@@ -72,7 +72,7 @@ export function useSwap(): UseSwap {
     if (currency === Currency.STX) {
       return {
         balance: Number(microstacksToStx(BigNumber(stxAvailableBalance) as any)),
-        image: <TokenImage round={true} token="STX" size={28} loaderSize={LoaderSize.SMALL} />,
+        image: <TokenImage round token="STX" size={28} loaderSize={LoaderSize.SMALL} />,
         name: 'STX',
         amount,
         fiatAmount:
@@ -82,7 +82,7 @@ export function useSwap(): UseSwap {
       };
     }
     const token = acceptableCoinList.find(
-      (c) => alexSDK.getCurrencyFrom(c.principal) === currency
+      (c) => alexSDK.getCurrencyFrom(c.principal) === currency,
     )!;
     if (token == null) {
       return undefined;
@@ -90,7 +90,7 @@ export function useSwap(): UseSwap {
     return {
       amount,
       image: (
-        <TokenImage round={true} fungibleToken={token} size={28} loaderSize={LoaderSize.SMALL} />
+        <TokenImage round fungibleToken={token} size={28} loaderSize={LoaderSize.SMALL} />
       ),
       name: (token.ticker ?? token.name).toUpperCase(),
       balance: Number(ftDecimals(token.balance, token.decimals ?? 0)),
@@ -106,7 +106,7 @@ export function useSwap(): UseSwap {
       return 'STX';
     }
     const token = acceptableCoinList.find(
-      (c) => alexSDK.getCurrencyFrom(c.principal) === currency
+      (c) => alexSDK.getCurrencyFrom(c.principal) === currency,
     )!;
     if (token == null) {
       return currency;
@@ -154,7 +154,7 @@ export function useSwap(): UseSwap {
   const [exchangeRate, setExchangeRate] = useState<number>();
 
   useEffect(() => {
-    if (from == null || to == null || fromAmount == null || fromAmount == 0 || from === to) {
+    if (from == null || to == null || fromAmount == null || fromAmount === 0 || from === to) {
       setExchangeRate(undefined);
     } else {
       let cancelled = false;
@@ -184,11 +184,11 @@ export function useSwap(): UseSwap {
   return {
     coinsList: acceptableCoinList,
     isLoadingWalletData: false,
-    inputAmount: inputAmount,
+    inputAmount,
     onInputAmountChanged: setInputAmount,
     selectedFromToken: fromToken,
     selectedToToken: toToken,
-    slippage: slippage,
+    slippage,
     onSlippageChanged: setSlippage,
     onSelectToken,
     inputAmountInvalid,
@@ -214,7 +214,7 @@ export function useSwap(): UseSwap {
               to,
               BigInt(Math.floor(fromAmount * 1e8)),
               BigInt(Math.floor(toAmount * (1 - slippage) * 1e8)),
-              info.route
+              info.route,
             );
             const unsignedTx = await makeUnsignedContractCall({
               publicKey: stxPublicKey,
