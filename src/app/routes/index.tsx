@@ -1,6 +1,6 @@
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import AuthGuard from '@components/guards/auth';
-import WalletExistsGuard from '@components/guards/walletExists';
+import OnboardingGuard from '@components/guards/onboarding';
 import ScreenContainer from '@components/screenContainer';
 import AccountList from '@screens/accountList';
 import AuthenticationRequest from '@screens/authenticationRequest';
@@ -27,7 +27,6 @@ import ManageTokens from '@screens/manageTokens';
 import NftDashboard from '@screens/nftDashboard';
 import NftDetailScreen from '@screens/nftDetail';
 import Onboarding from '@screens/onboarding';
-import MigrationConfirmation from '@screens/migrationConfirmation';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
 import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
@@ -45,14 +44,13 @@ import SendBtcScreen from '@screens/sendBtc';
 import SendFtScreen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
-import LedgerSendOrdinal from '@screens/ledger/ledgerSendOrdinal';
-import LedgerSendNft from '@screens/ledger/ledgerSendNft';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import BackupWalletScreen from '@screens/settings/backupWallet';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import ChangePasswordScreen from '@screens/settings/changePassword';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
+import LockCountdown from '@screens/settings/lockCountdown';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import SignatureRequest from '@screens/signatureRequest';
 import Stacking from '@screens/stacking';
@@ -74,15 +72,9 @@ const router = createHashRouter([
       {
         path: 'onboarding',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <Onboarding />
-          </WalletExistsGuard>
-        ),
-      },
-      {
-        path: 'migration-confirmation',
-        element: (
-          <MigrationConfirmation />
+          </OnboardingGuard>
         ),
       },
       {
@@ -99,7 +91,11 @@ const router = createHashRouter([
       },
       {
         path: 'legal',
-        element: <LegalLinks />,
+        element: (
+          <OnboardingGuard>
+            <LegalLinks />
+          </OnboardingGuard>
+        ),
       },
       {
         path: 'manage-tokens',
@@ -160,17 +156,17 @@ const router = createHashRouter([
       {
         path: 'backup',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <BackupWallet />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
         path: 'create-password',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <CreatePassword />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
@@ -220,9 +216,9 @@ const router = createHashRouter([
       {
         path: 'restoreWallet',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <RestoreWallet />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
@@ -232,9 +228,9 @@ const router = createHashRouter([
       {
         path: 'backupWalletSteps',
         element: (
-          <WalletExistsGuard>
+          <OnboardingGuard>
             <BackupWalletSteps />
-          </WalletExistsGuard>
+          </OnboardingGuard>
         ),
       },
       {
@@ -306,14 +302,6 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'send-ordinal-ledger',
-        element: (
-          <AuthGuard>
-            <LedgerSendOrdinal />
-          </AuthGuard>
-        ),
-      },
-      {
         path: 'send-brc20',
         element: (
           <AuthGuard>
@@ -326,6 +314,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <ConfirmInscriptionRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'lockCountdown',
+        element: (
+          <AuthGuard>
+            <LockCountdown />
           </AuthGuard>
         ),
       },
@@ -355,10 +351,6 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/nft-detail/:id/send-nft',
         element: <SendNft />,
-      },
-      {
-        path: 'send-nft-ledger/:id',
-        element: <LedgerSendNft />,
       },
       {
         path: 'confirm-nft-tx/:id',

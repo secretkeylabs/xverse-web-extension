@@ -1,19 +1,9 @@
-import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails';
-import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
-import useWalletSelector from '@hooks/useWalletSelector';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
-import {
-  BtcOrdinal, ErrorCodes, getBtcFiatEquivalent,
-} from '@secretkeylabs/xverse-core';
-import {
-  SignedBtcTx, signOrdinalSendTransaction,
-} from '@secretkeylabs/xverse-core/transactions/btc';
-import { useMutation } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
+import { MoonLoader } from 'react-spinners';
+import { useTranslation } from 'react-i18next';
+import { BtcOrdinal, Inscription } from '@secretkeylabs/xverse-core/types';
+import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails';
+import OrdinalImage from '@screens/ordinals/ordinalImage';
 
 const OrdinalCard = styled.div((props) => ({
   display: 'flex',
@@ -62,75 +52,26 @@ const ColumnContainer = styled.div({
   marginLeft: 12,
 });
 
-const LoaderContainer = styled.div((props) => ({
+const LoaderContainer = styled.div({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-}));
+});
 
 interface Props {
   ordinal: BtcOrdinal;
-  setError: (error: string) => void;
+  isLoading: boolean;
+  handleOrdinalTransfer: (ordinal: BtcOrdinal, ordinalData: Inscription) => Promise<void>;
 }
 
-function OrdinalRow({
-  ordinal, setError,
-}: Props) {
+function OrdinalRow({ ordinal, isLoading, handleOrdinalTransfer }: Props) {
   const { t } = useTranslation('translation');
-  const {
-    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
-  } = useWalletSelector();
-  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
-  const navigate = useNavigate();
   const ordinalData = useInscriptionDetails(ordinal.id);
 
-  const {
-    isLoading,
-    data: signedTx,
-    error: transactionError,
-    mutate,
-  } = useMutation<SignedBtcTx, string>(async () => {
-    const tx = await signOrdinalSendTransaction(
-      ordinalsAddress,
-      ordinal.utxo,
-      btcAddress,
-      Number(selectedAccount?.id),
-      seedPhrase,
-      network.type,
-    );
-    return tx;
-  });
-
-  useEffect(() => {
-    setSelectedOrdinalDetails(ordinalData?.data!);
-    if (signedTx) {
-      navigate(`/confirm-ordinal-tx/${ordinal.id}`, {
-        state: {
-          signedTxHex: signedTx.signedTx,
-          recipientAddress: ordinalsAddress,
-          fee: signedTx.fee,
-          feePerVByte: signedTx.feePerVByte,
-          fiatFee: getBtcFiatEquivalent(signedTx.fee, btcFiatRate),
-          total: signedTx.total,
-          fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),
-          ordinalUtxo: ordinal.utxo,
-        },
-      });
+  const onClick = async () => {
+    if (ordinalData && ordinalData.data) {
+      await handleOrdinalTransfer(ordinal, ordinalData.data);
     }
-  }, [signedTx]);
-
-  useEffect(() => {
-    if (transactionError) {
-      if (Number(transactionError) === ErrorCodes.InSufficientBalance) {
-        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE'));
-      } else if (Number(transactionError) === ErrorCodes.InSufficientBalanceWithTxFee) {
-        setError(t('TX_ERRORS.INSUFFICIENT_BALANCE_FEES'));
-      } else setError(transactionError.toString());
-    }
-  }, [transactionError]);
-
-  const onClick = () => {
-    mutate();
   };
 
   return (
@@ -149,7 +90,9 @@ function OrdinalRow({
             <LoaderContainer>
               <MoonLoader color="white" size={15} />
             </LoaderContainer>
-          ) : t('RESTORE_ORDINAL_SCREEN.TRANSFER')}
+          ) : (
+            t('RESTORE_ORDINAL_SCREEN.TRANSFER')
+          )}
         </TransferButton>
       </ButtonContainer>
     </OrdinalCard>

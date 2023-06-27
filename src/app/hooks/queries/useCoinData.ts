@@ -5,6 +5,7 @@ import { CoinsResponse, FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { getCoinsInfo, getFtData } from '@secretkeylabs/xverse-core/api';
 import useNetworkSelector from '@hooks/useNetwork';
 import { setCoinDataAction } from '@stores/wallet/actions/actionCreators';
+import { getCoinMetaData } from '@secretkeylabs/xverse-core';
 
 export const useCoinsData = () => {
   const dispatch = useDispatch();
@@ -40,7 +41,11 @@ export const useCoinsData = () => {
       fungibleTokenList.forEach((ft) => {
         contractids.push(ft.principal);
       });
-      const coinsReponse: CoinsResponse = await getCoinsInfo(contractids, fiatCurrency);
+      let coinsReponse: CoinsResponse = await getCoinsInfo(contractids, fiatCurrency);
+      if (!coinsReponse) {
+        coinsReponse = await getCoinMetaData(contractids, currentNetworkInstance);
+      }
+
       coinsReponse.forEach((coin) => {
         if (!coin.name) {
           coin.name = coin.contract.split('.')[1];
@@ -71,7 +76,7 @@ export const useCoinsData = () => {
       });
       const sortedFtList: FungibleToken[] = [...supportedFts, ...unSupportedFts];
       dispatch(setCoinDataAction(sortedFtList, coinsReponse));
-      return { sortedFtList, coinsReponse};
+      return { sortedFtList, coinsReponse };
     } catch (error: any) {
       return Promise.reject(error);
     }

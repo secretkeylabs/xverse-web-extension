@@ -1,6 +1,6 @@
+import Eye from '@assets/img/createPassword/Eye.svg';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import Eye from '@assets/img/createPassword/Eye.svg';
 import SeedPhraseWord from './word';
 
 interface SeedPhraseViewProps {
@@ -75,7 +75,8 @@ export default function SeedphraseView(props: SeedPhraseViewProps) {
       <OuterSeedContainer>
         <SeedContainer isVisible={isVisible}>
           {seedPhraseWords.map((word, index) => (
-            <SeedPhraseWord index={index} word={word} />
+            // eslint-disable-next-line react/no-array-index-key
+            <SeedPhraseWord key={index} index={index} word={word} />
           ))}
         </SeedContainer>
       </OuterSeedContainer>

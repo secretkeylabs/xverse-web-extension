@@ -9,7 +9,7 @@ import {
   broadcastSignedTransaction,
   signLedgerNativeSegwitBtcTransaction,
   signLedgerStxTransaction,
-  signLedgerTaprootBtcTransaction,
+  signLedgerMixedBtcTransaction,
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -117,12 +117,11 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
   const signAndBroadcastOrdinalsTx = async (transport: Transport, accountId: number) => {
     try {
-      const result = await signLedgerTaprootBtcTransaction(
+      const result = await signLedgerMixedBtcTransaction(
         transport,
         network.type,
         accountId,
         recipient,
-        btcAddress,
         ordinalUtxo,
       );
       setIsTxApproved(true);

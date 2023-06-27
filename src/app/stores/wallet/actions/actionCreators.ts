@@ -63,7 +63,7 @@ export function fetchAccountAction(
   };
 }
 
-export function addAccoutAction(accountsList: Account[]): actions.AddAccount {
+export function addAccountAction(accountsList: Account[]): actions.AddAccount {
   return {
     type: actions.AddAccountKey,
     accountsList,
@@ -232,5 +232,14 @@ export function setBrcCoinsDataAction(brcCoinsList: FungibleToken[]): actions.Se
   return {
     type: actions.SetBrcCoinsListKey,
     brcCoinsList,
+  };
+}
+
+export function setWalletLockPeriodAction(
+  walletLockPeriod: actions.WalletSessionPeriods,
+): actions.SetWalletLockPeriod {
+  return {
+    type: actions.SetWalletLockPeriodKey,
+    walletLockPeriod,
   };
 }
