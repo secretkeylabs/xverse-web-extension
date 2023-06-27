@@ -63,7 +63,17 @@ const CoinButtonArrow = styled.img({
   height: 12,
 });
 
-export const AmountTex = styled.input<{ error?: boolean }>((props) => ({
+export const NumberInput = styled.input`
+  ::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  ::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`;
+export const AmountInput = styled(NumberInput)<{ error?: boolean }>((props) => ({
   ...props.theme.body_bold_l,
   flex: 1,
   color: props.error ? props.theme.colors.feedback.error : props.theme.colors.white['0'],
@@ -117,12 +127,13 @@ function SwapTokenBlock({
             <CoinText>{selectedCoin?.name ?? t('SELECT_COIN')}</CoinText>
             <CoinButtonArrow src={ChevronIcon} />
           </CoinButtonContainer>
-          <AmountTex
+          <AmountInput
             error={error}
             placeholder="0"
             disabled={onAmountChange == null}
             value={amount ?? selectedCoin?.amount?.toString() ?? ''}
             onChange={(e) => onAmountChange?.(e.target.value)}
+            type="number"
           />
         </RowContainer>
         <RowContainer>
