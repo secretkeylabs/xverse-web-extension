@@ -198,7 +198,7 @@ export function useSwap(): UseSwap {
         exchangeRate != null && fromToken != null && toToken != null
           ? `1 ${fromToken.name} = ${roundForDisplay(exchangeRate)} ${toToken.name}`
           : undefined,
-      route: info?.route.map(getCurrencyName).join(' -> '),
+      route: info?.route.map(getCurrencyName).join(' \u2192 '),
       lpFee:
         info?.feeRate != null && fromAmount != null && fromToken != null
           ? `${roundForDisplay(info.feeRate * fromAmount)} ${fromToken.name}`
