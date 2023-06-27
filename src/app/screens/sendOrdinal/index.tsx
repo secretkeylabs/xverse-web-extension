@@ -8,7 +8,6 @@ import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import {
   SignedBtcTx,
   signOrdinalSendTransaction,
-  getBtcFeesForOrdinalSend,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import useWalletSelector from '@hooks/useWalletSelector';
 import SendForm from '@components/sendForm';
@@ -21,6 +20,7 @@ import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import { isLedgerAccount } from '@utils/helper';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -118,7 +118,7 @@ function SendOrdinal() {
     data,
     error: txError,
     mutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>(async (recipient) => {
+  } = useMutation<SignedBtcTx, ResponseError, string>({ mutationFn: async (recipient) => {
     const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
     const ordUtxo = addressUtxos.find((utx) => utx.txid === selectedOrdinal?.tx_id);
     setOrdinalUtxo(ordUtxo);
@@ -134,7 +134,7 @@ function SendOrdinal() {
       );
       return signedTx;
     }
-  });
+  } });
 
   useEffect(() => {
     if (txError) {
@@ -198,14 +198,16 @@ function SendOrdinal() {
       {isGalleryOpen && (
         <>
           <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          <ButtonContainer>
-            <Button onClick={handleBackButtonClick}>
-              <>
-                <ButtonImage src={ArrowLeft} />
-                <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-              </>
-            </Button>
-          </ButtonContainer>
+          {!isLedgerAccount(selectedAccount) && (
+            <ButtonContainer>
+              <Button onClick={handleBackButtonClick}>
+                <>
+                  <ButtonImage src={ArrowLeft} />
+                  <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
+                </>
+              </Button>
+            </ButtonContainer>
+          )}
         </>
       )}
       <ScrollContainer>
@@ -222,7 +224,7 @@ function SendOrdinal() {
         >
           <Container>
             <NFtContainer>
-              <OrdinalImage inNftSend ordinal={selectedOrdinal!} />
+              <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
             </NFtContainer>
             <OrdinalInscriptionNumber>{`Inscription ${selectedOrdinal?.number}`}</OrdinalInscriptionNumber>
           </Container>
