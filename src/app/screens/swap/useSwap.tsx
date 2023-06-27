@@ -63,7 +63,7 @@ export function useSwap(): UseSwap {
   const [from, setFrom] = useState<Currency>();
   const [to, setTo] = useState<Currency>();
 
-  const fromAmount = isNaN(Number(inputAmount)) ? undefined : Number(inputAmount);
+  const fromAmount = Number.isNaN(Number(inputAmount)) ? undefined : Number(inputAmount);
 
   function currencyToToken(currency?: Currency, amount?: number): SwapToken | undefined {
     if (currency == null) {
@@ -116,13 +116,13 @@ export function useSwap(): UseSwap {
 
   function onSelectToken(token: 'STX' | FungibleToken, side: 'from' | 'to') {
     (side === 'from' ? setFrom : setTo)(
-      token === 'STX' ? Currency.STX : alexSDK.getCurrencyFrom(token.principal)!
+      token === 'STX' ? Currency.STX : alexSDK.getCurrencyFrom(token.principal)!,
     );
   }
 
   const fromToken = currencyToToken(from, fromAmount);
   const inputAmountInvalid =
-    isNaN(Number(inputAmount)) ||
+    Number.isNaN(Number(inputAmount)) ||
     (fromAmount != null &&
       (fromAmount < 0 || (fromToken?.balance != null && fromToken.balance < fromAmount)));
 
@@ -204,7 +204,7 @@ export function useSwap(): UseSwap {
           ? `${roundForDisplay(info.feeRate * fromAmount)} ${fromToken.name}`
           : undefined,
     },
-    submitError: inputAmountInvalid ? 'Invalid amount' : undefined,
+    submitError: inputAmountInvalid ? t('ERRORS.INSUFFICIENT_BALANCE_FEES') : undefined,
     onSwap:
       fromAmount != null && toAmount != null && from != null && to != null && info != null
         ? async () => {
