@@ -295,6 +295,7 @@ function Home() {
 
         <ColumnContainer>
           <TokenTile
+            key="btc"
             title={t('BITCOIN')}
             currency="BTC"
             icon={IconBitcoin}
@@ -303,6 +304,7 @@ function Home() {
             onPress={handleTokenPressed}
           />
           <TokenTile
+            key="stx"
             title={t('STACKS')}
             currency="STX"
             icon={IconStacks}
@@ -317,6 +319,7 @@ function Home() {
             ?.filter((ft) => ft.visible)
             .map((coin) => (
               <TokenTile
+                key={coin.name}
                 title={coin.name}
                 currency="FT"
                 loading={loadingCoinData || refetchingCoinData}
@@ -327,6 +330,7 @@ function Home() {
             ))}
           {brcCoinsList?.map((coin) => (
             <TokenTile
+              key={coin.name}
               title={coin.name}
               currency="brc20"
               loading={loadingBtcCoinData || refetchingBtcCoinData}
