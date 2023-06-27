@@ -1,4 +1,3 @@
-import BottomModal from '@components/bottomModal';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useState } from 'react';
@@ -10,6 +9,20 @@ const Container = styled.div`
   padding: 16px;
   row-gap: 16px;
 `;
+
+const TitleRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+const ResetButton = styled.button((props) => ({
+  display: 'inline',
+  background: 'transparent',
+  color: props.theme.colors.orange_main,
+  ...props.theme.body_medium_m,
+  ':hover': {
+    opacity: 0.8,
+  },
+}));
 
 const Title = styled.div((props) => ({
   ...props.theme.body_medium_m,
@@ -37,19 +50,29 @@ const Description = styled.p((props) => ({
   color: props.theme.colors.white['400'],
 }));
 
-export function SlippageModalContent(props: {
+const DEFAULT_SLIPPAGE = '4%';
+export function SlippageModalContent({
+  slippage,
+  onChange,
+}: {
   slippage: number;
   onChange: (slippage: number) => void;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const [percentage, setPercentage] = useState((props.slippage * 100).toString() + '%');
+  const [percentage, setPercentage] = useState(`${(slippage * 100).toString()}%`);
   const result = Number(percentage.replace('%', ''));
-  let invalid = isNaN(result) || result >= 100 || result <= 0;
+  const invalid = Number.isNaN(result) || result >= 100 || result <= 0;
+
+  const handleClickResetSlippage = () => setPercentage(DEFAULT_SLIPPAGE);
+
   return (
     <Container>
-      <Title>{t('SLIPPAGE')}</Title>
+      <TitleRow>
+        <Title>{t('SLIPPAGE')}</Title>
+        <ResetButton onClick={handleClickResetSlippage}>{t('RESET_TO_DEFAULT')}</ResetButton>
+      </TitleRow>
       <Input
-        placeholder="4%"
+        placeholder={DEFAULT_SLIPPAGE}
         value={percentage}
         onChange={(e) => setPercentage(e.target.value)}
         onFocus={(e) => {
@@ -62,8 +85,9 @@ export function SlippageModalContent(props: {
         disabled={invalid}
         warning={invalid}
         text={t('APPLY')}
-        onPress={() => props.onChange(result / 100)}
+        onPress={() => onChange(result / 100)}
       />
     </Container>
   );
 }
+export default SlippageModalContent;
