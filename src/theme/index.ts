@@ -15,9 +15,9 @@ const Theme = {
       900: 'rgba(255, 255, 255, 0.1)',
     },
     background: {
-      'elevation-1': '#070A13',
       elevation0: '#12151E',
-      elevation1: '#1D2032',
+      elevation1: '#1D2032', // deprecated?
+      elevation_1: '#070A13',
       elevation2: '#272A44',
       elevation3: '#303354',
       elevation6: '#4C5187',

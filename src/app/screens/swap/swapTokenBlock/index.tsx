@@ -35,15 +35,15 @@ const CardContainer = styled.div<{ error?: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'column',
   rowGap: props.theme.spacing(3),
-  background: props.theme.colors.background.elevation1,
-  border: `1px solid ${props.theme.colors.background.elevation2}`,
+  background: props.theme.colors.background.elevation_1,
+  border: '1px solid',
   'border-color': props.error
     ? props.theme.colors.feedback.error_700
-    : props.theme.colors.background.elevation6,
+    : props.theme.colors.background.elevation2,
   borderRadius: 8,
   padding: props.theme.spacing(8),
   ':focus-within': {
-    border: `1px solid`,
+    border: '1px solid',
     'border-color': props.error
       ? props.theme.colors.feedback.error_700
       : props.theme.colors.background.elevation6,
