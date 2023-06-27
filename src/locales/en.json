@@ -577,6 +577,7 @@
     "CONTINUE": "Continue",
     "SLIPPAGE_DESC": "Your transaction will reverse if the price changes unfavorably by more of this percentage.",
     "APPLY": "Apply",
+    "RESET_TO_DEFAULT": "Reset to default",
     "ERRORS": {
       "INVALID_AMOUNT": "Invalid amount",
       "INSUFFICIENT_BALANCE_FEES": "Insufficient balance"
