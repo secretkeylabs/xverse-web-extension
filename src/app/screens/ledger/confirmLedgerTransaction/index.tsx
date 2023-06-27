@@ -93,12 +93,12 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const btcClient = useBtcClient();
 
   const {
-    recipient,
+    recipients,
     type,
     unsignedTx,
     ordinalUtxo,
   }: {
-    recipient: Recipient[];
+    recipients: Recipient[];
     type: LedgerTransactionType;
     unsignedTx: StacksTransaction;
     ordinalUtxo: any;
@@ -121,7 +121,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         transport,
         network.type,
         accountId,
-        recipient,
+        recipients,
         ordinalUtxo,
       );
       setIsTxApproved(true);
@@ -144,7 +144,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         transport,
         network.type,
         accountId,
-        recipient,
+        recipients,
       );
       setIsTxApproved(true);
       await ledgerDelay(1500);
