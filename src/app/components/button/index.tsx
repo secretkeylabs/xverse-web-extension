@@ -17,6 +17,7 @@ const Button = styled.button<ButtonProps>((props) => ({
   height: 44,
   opacity: props.disabled ? 0.6 : 1,
   transition: 'all 0.2s ease',
+  cursor: props.disabled ? 'not-allowed' : 'auto',
 }));
 
 const AnimatedButton = styled(Button)`
