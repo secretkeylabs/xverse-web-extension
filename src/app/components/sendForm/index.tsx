@@ -108,7 +108,7 @@ const BalanceText = styled.h1((props) => ({
 
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  backgroundColor: props.theme.colors.background.elevation_1,
   color: props.theme.colors.white['0'],
   width: '100%',
   border: 'transparent',
@@ -121,7 +121,7 @@ const AmountInputContainer = styled.div<ContainerProps>((props) => ({
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
   border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  backgroundColor: props.theme.colors.background.elevation_1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
@@ -137,7 +137,7 @@ const MemoInputContainer = styled.div<ContainerProps>((props) => ({
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
   border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  backgroundColor: props.theme.colors.background.elevation_1,
   borderRadius: 8,
   padding: props.theme.spacing(7),
   height: 76,
