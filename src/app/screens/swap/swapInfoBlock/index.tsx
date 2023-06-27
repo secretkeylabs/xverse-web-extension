@@ -26,7 +26,7 @@ const DL = styled.dl((props) => ({
   display: 'flex',
   flexWrap: 'wrap',
   justifyContent: 'space-between',
-  rowGap: props.theme.spacing(4),
+  rowGap: props.theme.spacing(8),
 }));
 
 const DT = styled.dt((props) => ({
