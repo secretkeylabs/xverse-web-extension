@@ -56,6 +56,7 @@ const CoinButtonContainer = styled.button((props) => ({
   columnGap: props.theme.spacing(2),
   background: 'transparent',
   alignItems: 'center',
+  minHeight: '28px', // same as icon height
 }));
 
 const CoinButtonArrow = styled.img({

@@ -62,7 +62,7 @@
     "build": "npm run clean && NODE_ENV=production npx node webpack/utils/build.js",
     "start": "npx node webpack/utils/devServer.js",
     "clean": "rimraf build",
-    "test": "npx jest",
+    "test": "jest ./src",
     "style": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "resolutions": {
