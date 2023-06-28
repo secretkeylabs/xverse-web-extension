@@ -263,7 +263,7 @@ export function useSwap(): UseSwap {
     if (input == null) {
       return undefined;
     }
-    return Math.floor(input * 1000) / 1000;
+    return input.toFixed(4);
   }
 
   function toggleFromToTokens() {
@@ -276,7 +276,7 @@ export function useSwap(): UseSwap {
   const toAmount =
     exchangeRate != null && fromAmount != null ? fromAmount * exchangeRate : undefined;
 
-  const toToken = currencyToToken(selectedCurrency.to, roundForDisplay(toAmount));
+  const toToken = currencyToToken(selectedCurrency.to, toAmount);
   return {
     coinsList: acceptableCoinList,
     isLoadingWalletData: false,
