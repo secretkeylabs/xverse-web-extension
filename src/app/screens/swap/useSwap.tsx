@@ -55,7 +55,7 @@ export type SelectedCurrencyState = {
   prevFrom?: Currency;
 };
 
-function updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side }) {
+function updateOppositeCurrencyIfSameAsSelected(state: SelectedCurrencyState, { newCurrency, side }) {
   switch (side) {
     case 'from':
       if (state.to !== newCurrency) {
