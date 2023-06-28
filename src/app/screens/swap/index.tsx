@@ -99,7 +99,7 @@ function SwapScreen() {
       )}
       <SendButtonContainer>
         <ActionButton
-          disabled={swap.onSwap == null}
+          disabled={!!swap.submitError || swap.onSwap == null}
           warning={!!swap.submitError}
           text={swap.submitError ?? t('CONTINUE')}
           processing={loading}
