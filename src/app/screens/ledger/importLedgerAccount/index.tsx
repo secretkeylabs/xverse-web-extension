@@ -367,18 +367,18 @@ function ImportLedger(): JSX.Element {
         return;
       }
 
-      if (currentAccount && isStacksSelected) {
-        const ledgerAccount: Account = {
-          ...currentAccount,
-          stxAddress: stacksCredentials?.address || '',
-          stxPublicKey: stacksCredentials?.publicKey || '',
-        };
-        await updateLedgerAccounts(ledgerAccount);
-        await ledgerDelay(1000);
-        handleClickNext();
-        setIsButtonDisabled(false);
-        return;
-      }
+      // if (currentAccount && isStacksSelected) {
+      //   const ledgerAccount: Account = {
+      //     ...currentAccount,
+      //     stxAddress: stacksCredentials?.address || '',
+      //     stxPublicKey: stacksCredentials?.publicKey || '',
+      //   };
+      //   await updateLedgerAccounts(ledgerAccount);
+      //   await ledgerDelay(1000);
+      //   handleClickNext();
+      //   setIsButtonDisabled(false);
+      //   return;
+      // }
 
       if (currentAccount && isBitcoinSelected) {
         const ledgerAccount: Account = {
@@ -507,14 +507,14 @@ function ImportLedger(): JSX.Element {
                     onChange={handleAssetSelect}
                   />
 
-                  <LedgerAssetSelectCard
+                  {/* <LedgerAssetSelectCard
                     icon={StxIconSVG}
                     title={t('LEDGER_IMPORT_2_SELECT.STACKS_TITLE')}
                     text={t('LEDGER_IMPORT_2_SELECT.STACKS_SUBTITLE')}
                     id="stx_select_card"
                     isChecked={isStacksSelected}
                     onChange={handleAssetSelect}
-                  />
+                  /> */}
                   <SelectAssetFootNote>{t('LEDGER_IMPORT_2_FOOTNOTE')}</SelectAssetFootNote>
                 </ImportCardContainer>
               </div>
