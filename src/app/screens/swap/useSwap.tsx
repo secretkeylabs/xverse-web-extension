@@ -44,7 +44,7 @@ export type UseSwap = {
   };
   slippage: number;
   onSlippageChanged: (slippage: number) => void;
-  minReceived?: number;
+  minReceived?: string;
   onSwap?: () => void;
 };
 
@@ -55,7 +55,7 @@ export type SelectedCurrencyState = {
   prevFrom?: Currency;
 };
 
-function updateOppositeCurrencyIfSameAsSelected(state, {newCurrency, side}) {
+function updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side }) {
   switch (side) {
     case 'from':
       if (state.to !== newCurrency) {
@@ -88,14 +88,14 @@ export const selectedTokenReducer: (
         ...state,
         prevFrom: state.from,
         from: newCurrency,
-        to: updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side })
+        to: updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side }),
       };
     case 'to':
       return {
         ...state,
         prevTo: state.to,
         to: newCurrency,
-        from: updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side })
+        from: updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side }),
       };
     default:
       return state;
@@ -289,7 +289,10 @@ export function useSwap(): UseSwap {
     onSelectToken,
     inputAmountInvalid,
     handleClickDownArrow: toggleFromToTokens,
-    minReceived: toAmount != null ? roundForDisplay(toAmount * (1 - slippage)) : undefined,
+    minReceived:
+      toAmount != null
+        ? `${roundForDisplay(toAmount * (1 - slippage))} ${toToken?.name}`
+        : undefined,
     swapInfo: {
       exchangeRate:
         exchangeRate != null && fromToken != null && toToken != null
