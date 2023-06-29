@@ -36,6 +36,7 @@ const GradientCircle = styled.button<GradientCircleProps>((props) => ({
 const TopSectionContainer = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
+  alignItems: 'center',
   paddingTop: props.theme.spacing(8),
   backgroundColor: 'transparent',
 }));
@@ -168,12 +169,13 @@ function AccountRow({
     clearTimeout(stxCopiedTooltipTimeoutRef.current);
   }, []);
 
-  function getName() {
-    return (
-      account?.accountName
+  const getName = () => {
+    const name = (account?.accountName
       ?? account?.bnsName
       ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`
     );
+
+    return name.length > 20 ? `${name.slice(0, 20)}...` : name;
   }
 
   const handleOnBtcAddressClick = () => {
@@ -279,13 +281,16 @@ function AccountRow({
               </CurrentAccountTextContainer>
             </Button>
           ))}
-        {!account ? (
+
+        {!!account && !isHardwareAccount(account) && (
+          displayAddress
+        )}
+
+        {!account && (
           <BarLoaderContainer>
             <BarLoader loaderSize={LoaderSize.LARGE} />
             <BarLoader loaderSize={LoaderSize.MEDIUM} />
           </BarLoaderContainer>
-        ) : (
-          displayAddress
         )}
       </CurrentAcountContainer>
     </TopSectionContainer>
