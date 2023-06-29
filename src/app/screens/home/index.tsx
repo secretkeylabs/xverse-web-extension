@@ -2,12 +2,12 @@
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
+import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import OrdinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
-import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import StacksIcon from '@assets/img/dashboard/stack_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
@@ -338,7 +338,7 @@ function Home() {
             <TokenTile
               title={t('BITCOIN')}
               currency="BTC"
-              icon={IconBitcoin}
+              icon={BitcoinIcon}
               loading={loadingBtcWalletData || refetchingBtcWalletData}
               underlayColor={Theme.colors.background.elevation1}
               onPress={handleTokenPressed}
@@ -348,7 +348,7 @@ function Home() {
             <TokenTile
               title={t('STACKS')}
               currency="STX"
-              icon={IconStacks}
+              icon={StacksIcon}
               loading={loadingStxWalletData || refetchingStxWalletData}
               underlayColor={Theme.colors.background.elevation1}
               onPress={handleTokenPressed}
@@ -372,16 +372,6 @@ function Home() {
             {brcCoinsList?.map((coin) => (
               <TokenTile
                 title={coin.name}
-                currency="FT"
-                loading={loadingBtcCoinData || refetchingBtcCoinData}
-                underlayColor={Theme.colors.background.elevation1}
-                fungibleToken={coin}
-                onPress={handleTokenPressed}
-              />
-            ))}
-            {brcCoinsList?.map((coin) => (
-              <TokenTile
-                title={coin.name}
                 currency="brc20"
                 loading={loadingBtcCoinData || refetchingBtcCoinData}
                 underlayColor={Theme.colors.background.elevation1}
@@ -395,14 +385,16 @@ function Home() {
           {receiveContent}
         </BottomModal>
 
-        <TokenListButtonContainer>
-          <Button onClick={handleManageTokenListOnClick}>
-            <>
-              <ButtonImage src={ListDashes} />
-              <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
-            </>
-          </Button>
-        </TokenListButtonContainer>
+        {!isLedgerAccount(selectedAccount) && (
+          <TokenListButtonContainer>
+            <Button onClick={handleManageTokenListOnClick}>
+              <>
+                <ButtonImage src={ListDashes} />
+                <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
+              </>
+            </Button>
+          </TokenListButtonContainer>
+        )}
         <CoinSelectModal
           onSelectBitcoin={onBtcSendClick}
           onSelectStacks={onStxSendClick}

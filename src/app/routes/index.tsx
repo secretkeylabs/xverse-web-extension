@@ -121,10 +121,10 @@ const router = createHashRouter([
         path: 'send-btc',
         element: <SendBtcScreen />,
       },
-      {
-        path: 'send-stx-ledger',
-        element: <LedgerSendStxScreen />,
-      },
+      // {
+      //   path: 'send-stx-ledger',
+      //   element: <LedgerSendStxScreen />,
+      // },
       {
         path: 'send-ft-ledger',
         element: <LedgerSendFtScreen />,
@@ -141,10 +141,10 @@ const router = createHashRouter([
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,
       },
-      {
-        path: 'review-ledger-stx-tx',
-        element: <ReviewLedgerStxTransaction />,
-      },
+      // {
+      //   path: 'review-ledger-stx-tx',
+      //   element: <ReviewLedgerStxTransaction />,
+      // },
       {
         path: 'review-ledger-ft-tx',
         element: <ReviewLedgerFtTransaction />,

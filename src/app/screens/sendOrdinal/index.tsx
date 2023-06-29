@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import {
@@ -99,7 +99,6 @@ const ButtonImage = styled.img((props) => ({
 function SendOrdinal() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { id } = useParams();
   const { selectedOrdinal } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
@@ -148,7 +147,7 @@ function SendOrdinal() {
 
   useEffect(() => {
     if (data) {
-      navigate(`/confirm-ordinal-tx/${id}`, {
+      navigate(`/confirm-ordinal-tx/${selectedOrdinal?.id}`, {
         state: {
           signedTxHex: data.signedTx,
           recipientAddress,
