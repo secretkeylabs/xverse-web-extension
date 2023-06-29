@@ -25,6 +25,8 @@ const ASSET_PATH = process.env.ASSET_PATH || '/';
 const SRC_ROOT_PATH = path.join(__dirname, '../', 'src');
 const BUILD_ROOT_PATH = path.join(__dirname, '../', 'build');
 
+console.log('build root path: ', BUILD_ROOT_PATH);
+
 var fileExtensions = ['jpg', 'jpeg', 'png', 'gif', 'eot', 'otf', 'svg', 'ttf', 'woff', 'woff2'];
 var options = {
   mode: env.NODE_ENV || 'development',
