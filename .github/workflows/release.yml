@@ -33,7 +33,7 @@ jobs:
       - run: pwd; ls -l
       - name: Create Archive
         run: pwd; ls -l; zip -r xverse-extension-${{ github.ref_name }}.zip build
-        working-directory: ${{ github.workspace }}/${{
+        # working-directory: ${{ github.workspace }}/xverse-web-extension
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
