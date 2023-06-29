@@ -355,9 +355,9 @@ function Home() {
             />
           )}
         </ColumnContainer>
-        {stxAddress && (
+        {(!!coinsList?.length || !!brcCoinsList?.length) && (
           <CoinContainer>
-            {coinsList
+            {!!stxAddress && coinsList
               ?.filter((ft) => ft.visible)
               .map((coin) => (
                 <TokenTile

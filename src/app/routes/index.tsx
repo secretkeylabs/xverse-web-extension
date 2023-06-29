@@ -125,10 +125,10 @@ const router = createHashRouter([
       //   path: 'send-stx-ledger',
       //   element: <LedgerSendStxScreen />,
       // },
-      {
-        path: 'send-ft-ledger',
-        element: <LedgerSendFtScreen />,
-      },
+      // {
+      //   path: 'send-ft-ledger',
+      //   element: <LedgerSendFtScreen />,
+      // },
       {
         path: 'confirm-stx-tx',
         element: <ConfirmStxTransaction />,
@@ -145,10 +145,10 @@ const router = createHashRouter([
       //   path: 'review-ledger-stx-tx',
       //   element: <ReviewLedgerStxTransaction />,
       // },
-      {
-        path: 'review-ledger-ft-tx',
-        element: <ReviewLedgerFtTransaction />,
-      },
+      // {
+      //   path: 'review-ledger-ft-tx',
+      //   element: <ReviewLedgerFtTransaction />,
+      // },
       {
         path: 'confirm-ledger-tx',
         element: <ConfirmLedgerTransaction />,
