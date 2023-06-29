@@ -26,6 +26,10 @@ export const ButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   marginBottom: props.theme.spacing(20),
   marginTop: props.theme.spacing(16),
+  position: 'sticky',
+  bottom: 0,
+  background: props.theme.colors.background.elevation0,
+  padding: `${props.theme.spacing(4)}px 0`
 }));
 
 export const ActionButtonWrap = styled.div((props) => ({
