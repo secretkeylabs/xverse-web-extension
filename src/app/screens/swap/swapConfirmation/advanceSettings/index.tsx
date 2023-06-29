@@ -38,9 +38,9 @@ export function AdvanceSettings({ swap }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [showFeeSettings, setShowFeeSettings] = useState(false);
 
-  const onApplyClick = useCallback((settingFee: string, nonce?: string) => {
-    const fee = BigInt(stxToMicrostacks(new BigNumber(settingFee) as any).toString());
-    swap.unsignedTx.setFee(fee);
+  const onApplyClick = useCallback(({ fee, nonce }: { fee: string; nonce?: string }) => {
+    const settingFee = BigInt(stxToMicrostacks(new BigNumber(fee) as any).toString());
+    swap.unsignedTx.setFee(settingFee);
     if (nonce != null) {
       swap.unsignedTx.setNonce(BigInt(nonce));
     }
@@ -59,12 +59,15 @@ export function AdvanceSettings({ swap }: Props) {
         visible={showModal}
         fee={microstacksToStx(
           new BigNumber(
-            (swap.unsignedTx.auth?.spendingCondition?.fee ?? BigInt(0)).toString()
-          ) as any
+            (swap.unsignedTx.auth?.spendingCondition?.fee ?? BigInt(0)).toString(),
+          ) as any,
         ).toString()}
         type="STX"
         nonce={(swap.unsignedTx.auth?.spendingCondition?.nonce ?? BigInt(0)).toString()}
-        onCrossClick={() => {setShowModal(false); setShowFeeSettings(false)}}
+        onCrossClick={() => {
+          setShowModal(false);
+          setShowFeeSettings(false);
+        }}
         onApplyClick={onApplyClick}
         showFeeSettings={showFeeSettings}
         setShowFeeSettings={setShowFeeSettings}
