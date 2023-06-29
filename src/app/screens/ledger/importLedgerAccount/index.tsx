@@ -245,7 +245,7 @@ function ImportLedger(): JSX.Element {
     },
   });
 
-  const importBtcAccounts = async () => {
+  const importBtcAccounts = async (showAddress: boolean = false) => {
     const transport = await Transport.create();
     const newAddressIndex = ledgerAccountsList.filter(
       (account) => account.btcAddress !== '',
@@ -257,7 +257,7 @@ function ImportLedger(): JSX.Element {
         network.type,
         0,
         newAddressIndex,
-        true,
+        showAddress,
       );
       setBitcoinCredentials({
         address: bitcoinAccount.address,
@@ -268,7 +268,7 @@ function ImportLedger(): JSX.Element {
         network.type,
         0,
         newAddressIndex,
-        true,
+        showAddress,
       );
       setOrdinalsCredentials({
         address: ordinalsAccount.address,
@@ -334,6 +334,9 @@ function ImportLedger(): JSX.Element {
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
       handleClickNext();
+      if (!isStacksSelected) {
+        await importBtcAccounts(true);
+      }
       setIsButtonDisabled(false);
     } catch (err) {
       console.error(err);
