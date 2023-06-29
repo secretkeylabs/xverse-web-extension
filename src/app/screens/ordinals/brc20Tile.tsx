@@ -56,19 +56,20 @@ const PlaceholderImageContainer = styled.div<ContainerProps>(({
 const OrdinalContentText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[0],
-  fontSize: props.inNftSend ? 15 : 'calc(0.8vw + 2vh)',
+  fontSize: (props.inNftSend || props.withoutSizeIncrease) ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
   textAlign: 'center',
 }));
 
 interface TextProps {
   inNftSend?: boolean;
+  withoutSizeIncrease?: boolean;
 }
 
 const BRC20Text = styled.h1<TextProps>((props) => ({
   ...props.theme.body_bold_l,
   color: props.theme.colors.white[0],
-  fontSize: props.inNftSend ? 16 : 'calc(0.8vw + 2vh)',
+  fontSize: (props.inNftSend || props.withoutSizeIncrease) ? 16 : 'calc(0.8vw + 2vh)',
   textAlign: 'center',
 }));
 
@@ -130,11 +131,12 @@ interface Brc20TileProps {
   inNftDetail?: boolean;
   isSmallImage?: boolean;
   isGalleryOpen: boolean;
+  withoutSizeIncrease?: boolean;
 }
 
 export default function Brc20Tile(props: Brc20TileProps) {
   const {
-    brcContent, isSmallImage, isNftDashboard, inNftDetail, isGalleryOpen,
+    brcContent, isSmallImage, isNftDashboard, inNftDetail, isGalleryOpen, withoutSizeIncrease,
   } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   function renderFTIcon(ticker: string) {
@@ -157,13 +159,13 @@ export default function Brc20Tile(props: Brc20TileProps) {
         return (
           <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
             <BRC20Container>
-              <BRC20Text>{t('MINT')}</BRC20Text>
+              <BRC20Text withoutSizeIncrease={withoutSizeIncrease}>{t('MINT')}</BRC20Text>
               {renderFTIcon(content?.tick)}
               <NumericFormat
                 value={content?.amt}
                 displayType="text"
                 thousandSeparator
-                renderText={(text) => <BRC20Text>{text}</BRC20Text>}
+                renderText={(text) => <BRC20Text withoutSizeIncrease={withoutSizeIncrease}>{text}</BRC20Text>}
               />
               {isNftDashboard && (
                 <OrdinalsTag>
@@ -178,13 +180,13 @@ export default function Brc20Tile(props: Brc20TileProps) {
         return (
           <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
             <BRC20Container>
-              <BRC20Text>{t('TRANSFER')}</BRC20Text>
+              <BRC20Text withoutSizeIncrease={withoutSizeIncrease}>{t('TRANSFER')}</BRC20Text>
               {renderFTIcon(content?.tick)}
               <NumericFormat
                 value={content?.amt}
                 displayType="text"
                 thousandSeparator
-                renderText={(text) => <BRC20Text>{text}</BRC20Text>}
+                renderText={(text) => <BRC20Text withoutSizeIncrease={withoutSizeIncrease}>{text}</BRC20Text>}
               />
               {isNftDashboard && (
                 <OrdinalsTag>
@@ -199,7 +201,7 @@ export default function Brc20Tile(props: Brc20TileProps) {
         return (
           <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
             <BRC20Container>
-              <BRC20Text>{t('DEPLOY')}</BRC20Text>
+              <BRC20Text withoutSizeIncrease={withoutSizeIncrease}>{t('DEPLOY')}</BRC20Text>
               {renderFTIcon(content?.tick)}
               {isNftDashboard && (
                 <OrdinalsTag>
@@ -220,7 +222,7 @@ export default function Brc20Tile(props: Brc20TileProps) {
   } catch (e) {
     return (
       <ImageContainer isSmallImage={isSmallImage} inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
-        <OrdinalContentText inNftSend={false}>{brcContent}</OrdinalContentText>
+        <OrdinalContentText inNftSend={false} withoutSizeIncrease={withoutSizeIncrease}>{brcContent}</OrdinalContentText>
         {isNftDashboard && (
         <OrdinalsTag>
           <ButtonIcon src={OrdinalsIcon} />

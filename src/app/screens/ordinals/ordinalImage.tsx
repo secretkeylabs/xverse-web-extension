@@ -194,6 +194,7 @@ function OrdinalImage({
           isNftDashboard={isNftDashboard}
           inNftDetail={inNftDetail}
           isSmallImage={isSmallImage}
+          withoutSizeIncrease={withoutSizeIncrease}
         />
       );
     }

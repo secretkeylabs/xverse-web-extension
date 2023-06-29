@@ -34,7 +34,7 @@
       "STX_TITLE": "Connect Your Ledger",
       "STX_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Stacks app.",
       "TITLE_FAILED": "Connection failed",
-      "BTC_SUBTITLE_FAILED": "Make sure your Ledger device is connected unlocked, authorised by your browser and the Bitcoin app is open.",
+      "BTC_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open.",
       "STX_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Stacks app is open."
     },
     "LEDGER_ADD_ADDRESS": {
@@ -81,8 +81,10 @@
     "CONNECT": {
       "TITLE": "Connect your hardware wallet",
       "SUBTITLE": "To continue, connect and unlock your device.",
+      "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app.",
       "ERROR_TITLE": "Connection error",
-      "ERROR_SUBTITLE": "Unable to connect to device."
+      "ERROR_SUBTITLE": "Unable to connect to device.",
+      "BTC_ERROR_SUBTITLE": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open."
     },
     "CONFIRM": {
       "TITLE": "Confirm transaction",

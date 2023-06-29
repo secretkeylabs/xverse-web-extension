@@ -89,7 +89,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
 
-  const { network, selectedAccount, btcAddress } = useWalletSelector();
+  const { network, selectedAccount } = useWalletSelector();
 
   const btcClient = useBtcClient();
 
@@ -258,9 +258,9 @@ function ConfirmLedgerTransaction(): JSX.Element {
               <div>
                 <LedgerConnectionView
                   title={t('CONNECT.TITLE')}
-                  text={t('CONNECT.SUBTITLE')}
+                  text={t('CONNECT.BTC_SUBTITLE')}
                   titleFailed={t('CONNECT.ERROR_TITLE')}
-                  textFailed={t('CONNECT.ERROR_SUBTITLE')}
+                  textFailed={t('CONNECT.BTC_ERROR_SUBTITLE')}
                   imageDefault={LedgerConnectDefaultSVG}
                   isConnectSuccess={isConnectSuccess}
                   isConnectFailed={isConnectFailed}
