@@ -40,7 +40,6 @@ const ProgressItem = styled.div((props) => ({
   flexDirection: 'column',
   alignItems: 'center',
   position: 'relative',
-  zIndex: '2',
   paddingRight: props.theme.spacing(3.5),
   paddingLeft: props.theme.spacing(3.5),
   background: props.theme.colors.background.elevation1,
