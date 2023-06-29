@@ -30,8 +30,10 @@ jobs:
         run: npm run build --if-present
       # - name: Test
         # run: npm test --passWithNoTests
+      - run: pwd; ls -l
       - name: Create Archive
-        run: zip -r xverse-extension-${{ github.ref_name }}.zip . -i build
+        run: pwd; ls -l; zip -r xverse-extension-${{ github.ref_name }}.zip build
+        working-directory: ${{ github.workspace }}/${{
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
