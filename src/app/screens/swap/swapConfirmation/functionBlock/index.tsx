@@ -2,11 +2,10 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Container, TitleContainer, TitleText } from '@screens/swap/swapConfirmation/stxInfoBlock';
 
-const FunctionName = styled.pre((props) => ({
+const FunctionName = styled.div((props) => ({
+  ...props.theme.body_medium_m,
   marginLeft: 10,
   color: props.theme.colors.white[0],
-  fontSize: 14,
-  fontWeight: 500,
   textAlign: 'right'
 }));
 
