@@ -266,15 +266,18 @@ export function useSwap(): UseSwap {
     return input.toFixed(4);
   }
 
+  const toAmount =
+    exchangeRate != null && fromAmount != null ? fromAmount * exchangeRate : undefined;
+
   function toggleFromToTokens() {
     setSelectedCurrency((prevState) => ({
       to: prevState.from,
       from: prevState.to,
     }));
+    if (toAmount) {
+      setInputAmount(String(toAmount));
+    }
   }
-
-  const toAmount =
-    exchangeRate != null && fromAmount != null ? fromAmount * exchangeRate : undefined;
 
   const toToken = currencyToToken(selectedCurrency.to, toAmount);
   return {
