@@ -29,20 +29,34 @@ const Title = styled.div((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
-const Input = styled.input((props) => ({
+const Input = styled.input<{ error: boolean }>((props) => ({
   ...props.theme.body_medium_m,
   height: 48,
   backgroundColor: props.theme.colors.background.elevation1,
-  borderColor: 'transparent',
   borderStyle: 'solid',
   borderWidth: 1,
   borderRadius: 8,
   color: props.theme.colors.white['0'],
   padding: '14px 16px',
   outline: 'none',
-  ':focus': {
-    borderColor: props.theme.colors.background.elevation6,
+  borderColor: props.error ? props.theme.colors.feedback.error_700 : 'transparent',
+  ':focus-within': {
+    border: '1px solid',
+    'border-color': props.error
+      ? props.theme.colors.feedback.error_700
+      : props.theme.colors.background.elevation6,
   },
+}));
+
+const InputFeedback = styled.span((props) => ({
+  ...props.theme.body_s,
+  color: props.theme.colors.feedback.error,
+}));
+
+const InputRow = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: props.theme.spacing(4),
 }));
 
 const Description = styled.p((props) => ({
@@ -71,15 +85,19 @@ export function SlippageModalContent({
         <Title>{t('SLIPPAGE')}</Title>
         <ResetButton onClick={handleClickResetSlippage}>{t('RESET_TO_DEFAULT')}</ResetButton>
       </TitleRow>
-      <Input
-        placeholder={DEFAULT_SLIPPAGE}
-        value={percentage}
-        onChange={(e) => setPercentage(e.target.value)}
-        onFocus={(e) => {
-          const current = e.target.value.replace('%', '');
-          e.target.setSelectionRange(0, current.length);
-        }}
-      />
+      <InputRow>
+        <Input
+          error={invalid}
+          placeholder={DEFAULT_SLIPPAGE}
+          value={percentage}
+          onChange={(e) => setPercentage(e.target.value)}
+          onFocus={(e) => {
+            const current = e.target.value.replace('%', '');
+            e.target.setSelectionRange(0, current.length);
+          }}
+        />
+        {invalid && <InputFeedback>{t('ERRORS.SLIPPAGE_TOLERANCE_CANNOT_EXCEED')}</InputFeedback>}
+      </InputRow>
       <Description>{t('SLIPPAGE_DESC')}</Description>
       <ActionButton
         disabled={invalid}
