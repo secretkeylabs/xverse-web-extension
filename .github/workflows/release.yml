@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           always-auth: true
@@ -27,7 +27,7 @@ jobs:
       # - name: Test
         # run: npm test --passWithNoTests
       - name: Create Archive
-        run: zip -r xverse-extension-${{ github.ref_name }}.zip build
+        run: zip -r xverse-extension-${{ github.ref_name }}.zip . -i build
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
