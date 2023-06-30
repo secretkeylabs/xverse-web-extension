@@ -16,13 +16,9 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import {
   getNetworkType,
   isHardwareAccount,
-  isLedgerAccount,
   getTruncatedAddress,
 } from '@utils/helper';
 import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
-import SignatureRequestMessage from './signatureRequestMessage';
-import SignatureRequestStructuredData from './signatureRequestStructuredData';
-import { finalizeMessageSignature } from './utils';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import LedgerConnectDefault from '@assets/img/ledger/ledger_connect_default.svg';
@@ -34,6 +30,9 @@ import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
 import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { finalizeMessageSignature } from './utils';
+import SignatureRequestStructuredData from './signatureRequestStructuredData';
+import SignatureRequestMessage from './signatureRequestMessage';
 import CollapsableContainer from './collapsableContainer';
 
 const MainContainer = styled.div((props) => ({
@@ -131,15 +130,14 @@ const SuccessActionsContainer = styled.div((props) => ({
 
 function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation');
-  const [isSigning, setIsSigning] = useState<boolean>(false);
-  const [showHash, setShowHash] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-  const [isConnectSuccess, setIsConnectSuccess] = useState<boolean>(false);
-  const [isConnectFailed, setIsConnectFailed] = useState<boolean>(false);
-  const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
-  const [isTxRejected, setIsTxRejected] = useState<boolean>(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState(false);
+  const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isTxApproved, setIsTxApproved] = useState(false);
+  const [isTxRejected, setIsTxRejected] = useState(false);
   const { selectedAccount, accountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
@@ -163,7 +161,7 @@ function SignatureRequest(): JSX.Element {
       }
       return false;
     });
-    return account[0];
+    return isHardwareAccount(selectedAccount) ? (account[0] || selectedAccount) : account[0];
   };
 
   const switchAccountBasedOnRequest = () => {
@@ -212,7 +210,7 @@ function SignatureRequest(): JSX.Element {
     try {
       setIsSigning(true);
       if (isHardwareAccount(selectedAccount)) {
-        setIsModalVisible(true);
+        // setIsModalVisible(true);
         return;
       }
       if (!isSignMessageBip322) {
@@ -301,6 +299,7 @@ function SignatureRequest(): JSX.Element {
       cancelText={t('SIGNATURE_REQUEST.CANCEL_BUTTON')}
       confirmText={t('SIGNATURE_REQUEST.SIGN_BUTTON')}
       loading={isSigning}
+      disabled={isHardwareAccount(selectedAccount)}
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
@@ -332,7 +331,11 @@ function SignatureRequest(): JSX.Element {
           </SigningAddress>
         </SigningAddressContainer>
         <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
-        <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
+        {isHardwareAccount(selectedAccount) ? (
+          <InfoContainer bodyText="Message signing with Ledger is not yet supported." />
+        ) : (
+          <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
+        )}
       </MainContainer>
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 ? (

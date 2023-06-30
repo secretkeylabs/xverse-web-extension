@@ -41,6 +41,10 @@ const ConfirmButton = styled.button((props) => ({
   width: '50%',
   height: 44,
   marginLeft: 6,
+  ':disabled': {
+    background: props.theme.colors.white[600],
+    cursor: 'initial',
+  }
 }));
 
 const CancelButton = styled.button((props) => ({
@@ -64,10 +68,11 @@ type Props = {
   onConfirm: () => void;
   onCancel: () => void;
   loading: boolean;
+  disabled?: boolean;
 };
 
 function ConfirmScreen({
-  children, onConfirm, onCancel, confirmText, cancelText, loading,
+  children, onConfirm, onCancel, confirmText, cancelText, loading, disabled = false,
 }: Props) {
   return (
     <>
@@ -78,7 +83,7 @@ function ConfirmScreen({
       </MainContainer>
       <ButtonsContainer>
         <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
-        <ConfirmButton onClick={onConfirm}>
+        <ConfirmButton onClick={onConfirm} disabled={disabled}>
           {loading ? <MoonLoader color="white" size={20} /> : confirmText}
         </ConfirmButton>
       </ButtonsContainer>

@@ -18,6 +18,7 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import { ledgerDelay } from '@common/utils/ledger';
 import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
 import { isHardwareAccount } from '@utils/helper';
+import InfoContainer from '@components/infoContainer';
 
 const MainContainer = styled.div({
   display: 'flex',
@@ -60,6 +61,11 @@ const DappTitle = styled.h2((props) => ({
   marginTop: 4,
 }));
 
+const InfoContainerWrapper = styled.div((props) => ({
+  margin: props.theme.spacing(10),
+  marginBottom: 0,
+}));
+
 function AuthenticationRequest() {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -81,7 +87,7 @@ function AuthenticationRequest() {
     setLoading(true);
     try {
       if (isHardwareAccount(selectedAccount)) {
-        setIsModalVisible(true);
+        // setIsModalVisible(true);
         return;
       }
 
@@ -188,12 +194,18 @@ function AuthenticationRequest() {
       confirmText={t('CONNECT_BUTTON')}
       cancelText={t('CANCEL_BUTTON')}
       loading={loading}
+      disabled={isHardwareAccount(selectedAccount)}
     >
       <AccountHeaderComponent />
       <MainContainer>
         <TopImage src={getDappLogo()} alt="Dapp Logo" />
         <FunctionTitle>{t('TITLE')}</FunctionTitle>
         <DappTitle>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappTitle>
+        {isHardwareAccount(selectedAccount) && (
+          <InfoContainerWrapper>
+            <InfoContainer bodyText="Message signing with Ledger is not yet supported." />
+          </InfoContainerWrapper>
+        )}
       </MainContainer>
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 ? (
