@@ -161,3 +161,5 @@ export const getNetworkType = (stxNetwork) => (stxNetwork.chainId === ChainID.Ma
 export const isHardwareAccount = (account: Account | null): boolean => !!account?.accountType && account?.accountType !== 'software';
 
 export const isLedgerAccount = (account: Account | null): boolean => account?.accountType === 'ledger';
+
+export const isInOptions = (): boolean => !!location?.pathname?.match(/options.html$/);
