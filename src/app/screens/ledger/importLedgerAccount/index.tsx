@@ -27,6 +27,7 @@ import InfoIconSVG from '@assets/img/ledger/info_icon.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import LedgerImportEndSVG from '@assets/img/ledger/ledger_import_end.svg';
 import ArrowLeftIconSVG from '@assets/img/ledger/arrow_left_icon.svg';
+import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 const Container = styled.div`
@@ -500,6 +501,9 @@ function ImportLedger(): JSX.Element {
                   <SelectAssetTitle>{t('LEDGER_IMPORT_2_TITLE')}</SelectAssetTitle>
                   <SelectAssetText>{t('LEDGER_IMPORT_2_SUBTITLE')}</SelectAssetText>
                 </SelectAssetTextContainer>
+
+                <InfoContainer bodyText={t('LEDGER_IMPORT_2_WARNING')} type="Warning" />
+
                 <ImportCardContainer id="card_container">
                   <LedgerAssetSelectCard
                     icon={BtcOdrinalsIconSVG}
