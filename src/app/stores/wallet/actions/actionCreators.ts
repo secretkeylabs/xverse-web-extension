@@ -28,6 +28,8 @@ export function unlockWalletAction(seed: string) {
 }
 
 export function lockWalletAction() {
+  // We post the closeWallet action to the guard so that any open tabs will close
+  PostGuardPing('closeWallet');
   return {
     type: actions.LockWalletKey,
   };
@@ -48,8 +50,8 @@ export function setWalletSeedPhraseAction(seedPhrase: string): actions.SetWallet
 }
 
 export function resetWalletAction(): actions.ResetWallet {
-  // We post the resetWallet action to the guard so that any open tabs will close
-  PostGuardPing('resetWallet');
+  // We post the closeWallet action to the guard so that any open tabs will close
+  PostGuardPing('closeWallet');
   return {
     type: actions.ResetWalletKey,
   };
