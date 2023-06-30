@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import LedgerConnectDoneSVG from '@assets/img/ledger/ledger_import_connect_done.svg';
 import LedgerConnectFailSVG from '@assets/img/ledger/ledger_import_connect_fail.svg';
 
-const ConnectLedgerContainer = styled.div`
+export const ConnectLedgerContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -16,11 +16,11 @@ const ConnectLedgerContainer = styled.div`
   }
 `;
 
-const ConnectLedgerTitle = styled.h1((props) => ({
+export const ConnectLedgerTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
 }));
 
-const ConnectLedgerText = styled.p((props) => ({
+export const ConnectLedgerText = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
   textAlign: 'center',

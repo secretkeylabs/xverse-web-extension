@@ -99,6 +99,7 @@
     },
     "CONFIRM_BUTTON": "Confirm",
     "CONNECT_BUTTON": "Connect",
+    "CONTINUE_BUTTON": "Continue",
     "CLOSE_BUTTON": "Close",
     "CANCEL_BUTTON": "Cancel",
     "SEE_TRANSACTION_BUTTON": "See transaction",

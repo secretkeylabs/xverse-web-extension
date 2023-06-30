@@ -14,7 +14,7 @@ import {
 import BigNumber from 'bignumber.js';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import LedgerConnectionView, { ConnectLedgerContainer, ConnectLedgerText, ConnectLedgerTitle } from '@components/ledger/connectLedgerView';
 import { ledgerDelay } from '@common/utils/ledger';
 import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
@@ -23,6 +23,7 @@ import useNetworkSelector from '@hooks/useNetwork';
 import { StacksTransaction } from '@stacks/transactions';
 import LedgerConnectDefaultSVG from '@assets/img/ledger/ledger_connect_default.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
+import InfoIcon from '@assets/img/info.svg';
 
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS';
 
@@ -74,6 +75,11 @@ const TxConfirmedDescription = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
 }));
+
+const InfoImage = styled.img`
+  width: 64px;
+  height: 64px;
+`;
 
 function ConfirmLedgerTransaction(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -197,7 +203,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
     setIsConnectSuccess(true);
     await ledgerDelay(1500);
-    setCurrentStepIndex(1);
+    setCurrentStepIndex(0.5);
 
     switch (type) {
       case 'BTC':
@@ -214,6 +220,10 @@ function ConfirmLedgerTransaction(): JSX.Element {
     }
     await transport.close();
   };
+
+  const goToConfirmationStep = () => {
+    setCurrentStepIndex(1);
+  }
 
   const handleRetry = async () => {
     setIsTxRejected(false);
@@ -266,6 +276,17 @@ function ConfirmLedgerTransaction(): JSX.Element {
                   isConnectFailed={isConnectFailed}
                 />
               </div>
+            ) : currentStepIndex === 0.5 ? (
+              <div>
+                <ConnectLedgerContainer>
+                  <InfoImage
+                    src={InfoIcon}
+                    alt="external inputs warning"
+                  />
+                  <ConnectLedgerTitle>External inputs</ConnectLedgerTitle>
+                  <ConnectLedgerText>You should see a warning on your device saying "There are external inputs”. This is normal as you'll be using simultaneously two different addresses for this transaction.</ConnectLedgerText>
+                </ConnectLedgerContainer>
+              </div>
             ) : currentStepIndex === 1 ? (
               <div>
                 <LedgerConnectionView
@@ -286,7 +307,14 @@ function ConfirmLedgerTransaction(): JSX.Element {
               </TxConfirmedContainer>
             ) : null}
           </OnBoardingContentContainer>
-          {currentStepIndex !== 2 ? (
+          {currentStepIndex === 0.5 ? (
+            <SuccessActionsContainer>
+              <ActionButton
+                onPress={goToConfirmationStep}
+                text={t('CONTINUE_BUTTON')}
+              />
+            </SuccessActionsContainer>
+          ) : currentStepIndex !== 2 ? (
             <SuccessActionsContainer>
               <ActionButton
                 onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
