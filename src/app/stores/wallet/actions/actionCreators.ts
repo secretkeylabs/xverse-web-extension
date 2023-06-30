@@ -1,3 +1,5 @@
+import { PostGuardPing } from '@components/guards/singleTab';
+import { AccountType } from '@secretkeylabs/xverse-core';
 import {
   Account,
   BaseWallet,
@@ -9,7 +11,6 @@ import {
   TransactionData,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
-import { AccountType } from '@secretkeylabs/xverse-core';
 import * as actions from './types';
 
 export function setWalletAction(wallet: BaseWallet): actions.SetWallet {
@@ -47,6 +48,8 @@ export function setWalletSeedPhraseAction(seedPhrase: string): actions.SetWallet
 }
 
 export function resetWalletAction(): actions.ResetWallet {
+  // We post the resetWallet action to the guard so that any open tabs will close
+  PostGuardPing('resetWallet');
   return {
     type: actions.ResetWalletKey,
   };

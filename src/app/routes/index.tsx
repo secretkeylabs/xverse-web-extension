@@ -1,6 +1,7 @@
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import AuthGuard from '@components/guards/auth';
 import OnboardingGuard from '@components/guards/onboarding';
+import { SingleTabGuard } from '@components/guards/singleTab';
 import ScreenContainer from '@components/screenContainer';
 import AccountList from '@screens/accountList';
 import AuthenticationRequest from '@screens/authenticationRequest';
@@ -79,7 +80,13 @@ const router = createHashRouter([
       },
       {
         path: 'import-ledger',
-        element: <ImportLedger />,
+        element: (
+          <AuthGuard>
+            <SingleTabGuard guardName='importLedger'>
+              <ImportLedger />
+            </SingleTabGuard>
+          </AuthGuard>
+        )
       },
       {
         index: true,
