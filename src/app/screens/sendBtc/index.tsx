@@ -14,7 +14,7 @@ import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
-import { isLedgerAccount } from '@utils/helper';
+import { isInOptions } from '@utils/helper';
 
 function SendBtcScreen() {
   const location = useLocation();
@@ -52,7 +52,7 @@ function SendBtcScreen() {
       recipients: Recipient[];
     }
   >(async ({ recipients }) =>
-    signBtcTransaction(recipients, btcAddress, selectedAccount?.id ?? 0, seedPhrase, network.type)
+    signBtcTransaction(recipients, btcAddress, selectedAccount?.id ?? 0, seedPhrase, network.type),
   );
 
   const handleBackButtonClick = () => {
@@ -160,9 +160,11 @@ function SendBtcScreen() {
     return satsToBtc(new BigNumber(btcBalance)).toNumber();
   }
 
+  const showNavButtons = !isInOptions();
+
   return (
     <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
+      <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton={showNavButtons} />
       <SendForm
         currencyType="BTC"
         amountError={amountError}
