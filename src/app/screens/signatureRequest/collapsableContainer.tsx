@@ -69,7 +69,7 @@ export default function CollapsableContainer(props: Props) {
 
   useEffect(() => {
     setInfoText(text);
-    if (text.length > 30) {
+    if (text.length > 32) {
       const concatenatedText = `${text.substring(0, 32)}...`;
       setInfoText(concatenatedText);
     } else {
