@@ -203,7 +203,11 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
     setIsConnectSuccess(true);
     await ledgerDelay(1500);
-    setCurrentStepIndex(0.5);
+    if (type === 'ORDINALS') {
+      setCurrentStepIndex(0.5);
+    } else {
+      setCurrentStepIndex(1);
+    }
 
     switch (type) {
       case 'BTC':
