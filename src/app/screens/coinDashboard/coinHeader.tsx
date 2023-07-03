@@ -256,6 +256,11 @@ export default function CoinHeader(props: CoinBalanceProps) {
             url: chrome.runtime.getURL(`options.html#/send-ft-ledger?coin=${fungibleToken?.name}`),
           });
           return;
+        case 'brc20':
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL(`options.html#/send-brc20?coinName=${fungibleToken?.name}`),
+          });
+          return;
         default:
           break;
       }

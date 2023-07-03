@@ -169,9 +169,7 @@ function ConfirmInscriptionRequest() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-  );
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
 
   const {
     isLoading: loadingFee,
@@ -185,14 +183,14 @@ function ConfirmInscriptionRequest() {
     recipients: Recipient[];
     txFee: string;
   }
-  >(async ({ recipients, txFee }) => signBtcTransaction(
+  >({ mutationFn: async ({ recipients, txFee }) => signBtcTransaction(
     recipients,
     btcAddress,
     selectedAccount?.id ?? 0,
     seedPhrase,
     network.type,
     new BigNumber(txFee),
-  ));
+  ) });
 
   const onContinueButtonClick = () => {
     mutate({ signedTx });

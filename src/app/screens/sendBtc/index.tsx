@@ -54,9 +54,8 @@ function SendBtcScreen() {
     {
       recipients: Recipient[];
     }
-  >(async ({ recipients }) =>
-    signBtcTransaction(recipients, btcAddress, selectedAccount?.id ?? 0, seedPhrase, network.type),
-  );
+  >({ mutationFn: async ({ recipients }) =>
+    signBtcTransaction(recipients, btcAddress, selectedAccount?.id ?? 0, seedPhrase, network.type) });
 
   const handleBackButtonClick = () => {
     navigate('/');

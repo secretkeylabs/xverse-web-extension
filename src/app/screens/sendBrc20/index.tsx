@@ -53,7 +53,7 @@ function SendBrc20Screen() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
   const {
-    btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate,
+    btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate, brcCoinsList,
   } = useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
@@ -61,7 +61,9 @@ function SendBrc20Screen() {
   const [showForm, setShowForm] = useState(false);
 
   const location = useLocation();
-  const { fungibleToken } = location.state;
+
+  const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
+  const fungibleToken = location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
 
   const handleBackButtonClick = () => {
     if (showForm) {

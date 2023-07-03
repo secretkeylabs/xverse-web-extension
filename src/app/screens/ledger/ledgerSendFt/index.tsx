@@ -14,13 +14,12 @@ import { convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot } from '@
 import useNetworkSelector from '@hooks/useNetwork';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 function LedgerSendFtScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxPublicKey, network, feeMultipliers, coinsList } = useSelector(
-    (state: StoreState) => state.walletState
-  );
+  const { stxAddress, stxPublicKey, network, feeMultipliers, coinsList } = useWalletSelector();
 
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
@@ -54,7 +53,7 @@ function LedgerSendFtScreen() {
     StacksTransaction,
     Error,
     { associatedAddress: string; amount: string; memo?: string; fungibleToken: FungibleToken }
-  >(async ({ associatedAddress, amount, memo, fungibleToken }) => {
+  >({ mutationFn: async ({ associatedAddress, amount, memo, fungibleToken }) => {
     let convertedAmount = amount;
     if (fungibleToken?.decimals) {
       convertedAmount = convertAmountToFtDecimalPlaces(amount, fungibleToken.decimals).toString();
@@ -84,7 +83,7 @@ function LedgerSendFtScreen() {
     }
 
     return unsignedTx;
-  });
+  } });
 
   useEffect(() => {
     if (data) {
