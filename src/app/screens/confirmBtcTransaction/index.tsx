@@ -17,6 +17,8 @@ import useBtcClient from '@hooks/useBtcClient';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { useDispatch } from 'react-redux';
+import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
@@ -25,9 +27,7 @@ const BottomBarContainer = styled.h1((props) => ({
 function ConfirmBtcTransaction() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const {
-    network, ordinalsAddress, btcAddress, selectedAccount,
-  } = useWalletSelector();
+  const { ordinalsAddress, btcAddress, selectedAccount, shouldResetUserFlow } = useWalletSelector();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const [signedTx, setSignedTx] = useState<string>('');
@@ -41,6 +41,7 @@ function ConfirmBtcTransaction() {
     fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, isBrc20TokenFlow,
     feePerVByte,
   } = location.state;
+  const dispatch = useDispatch();
 
   const {
     isLoading,
@@ -60,6 +61,19 @@ function ConfirmBtcTransaction() {
       state: { isRestoreFundFlow: true },
     });
   };
+
+  useEffect(() => {
+    if (shouldResetUserFlow) {
+      console.log('confirm transaction resetUserFlow effect', shouldResetUserFlow);
+      navigate('/send-btc', {
+        state: {
+          amount,
+          recipientAddress,
+        },
+      });
+      dispatch(setShouldResetUserFlow(false));
+    }
+  }, [shouldResetUserFlow]);
 
   const onContinueButtonClick = () => {
     mutate({ signedTx });

@@ -28,6 +28,7 @@ import {
   WalletActions,
   WalletSessionPeriods,
   WalletState,
+  SetShouldResetUserFlowKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -64,6 +65,7 @@ const initialWalletState: WalletState = {
   accountType: 'software',
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
+  shouldResetUserFlow: false,
 };
 
 const walletReducer = (
@@ -209,6 +211,11 @@ const walletReducer = (
         ...state,
         walletLockPeriod: action.walletLockPeriod,
       };
+    case SetShouldResetUserFlowKey:
+      return {
+        ...state,
+        shouldResetUserFlow: action.shouldResetUserFlow
+      }
     default:
       return state;
   }
