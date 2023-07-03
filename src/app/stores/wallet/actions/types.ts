@@ -44,6 +44,7 @@ export const AddLedgerAccountKey = 'AddLedgerAccountKey';
 export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
+export const SetShouldResetUserFlowKey = 'SetShouldResetUserFlow';
 
 export enum WalletSessionPeriods {
   LOW = 1,
@@ -85,6 +86,7 @@ export interface WalletState {
   accountName: string | undefined;
   btcApiUrl: string;
   walletLockPeriod: WalletSessionPeriods;
+  shouldResetUserFlow: boolean;
 }
 
 export interface SetWallet {
@@ -245,3 +247,8 @@ export type WalletActions =
   | SetBrcCoinsData
   | SetWalletLockPeriod
   | DisableWalletExistsGuard;
+
+export type ShouldResetUserFlow = {
+  type: typeof ShouldResetUserFlowKey;
+  shouldResetUserFlow: boolean;
+}

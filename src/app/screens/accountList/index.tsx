@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import Plus from '@assets/img/dashboard/plus.svg';
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import { useDispatch } from 'react-redux';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
+import { selectAccount, setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
 import Seperator from '@components/seperator';
 import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -90,6 +90,7 @@ function AccountList(): JSX.Element {
         account.accountName
       )
     );
+    dispatch(setShouldResetUserFlow(true));
     navigate('/');
   };
 
