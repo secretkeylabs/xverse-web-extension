@@ -64,7 +64,6 @@ function ConfirmBtcTransaction() {
 
   useEffect(() => {
     if (shouldResetUserFlow) {
-      console.log('confirm transaction resetUserFlow effect', shouldResetUserFlow);
       navigate('/send-btc', {
         state: {
           amount,
