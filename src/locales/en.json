@@ -87,6 +87,10 @@
       "ERROR_SUBTITLE": "Unable to connect to device.",
       "BTC_ERROR_SUBTITLE": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open."
     },
+    "EXTERNAL_INPUTS": {
+      "TITLE": "External inputs",
+      "SUBTITLE": "You should see a warning on your device saying \"There are external inputs\". This is normal as you'll be using simultaneously two different addresses for this transaction."
+    },
     "CONFIRM": {
       "TITLE": "Confirm transaction",
       "SUBTITLE": "Confirm the transaction on your device to continue.",

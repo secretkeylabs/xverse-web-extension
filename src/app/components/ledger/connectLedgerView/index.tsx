@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
-import LedgerConnectDoneSVG from '@assets/img/ledger/ledger_import_connect_done.svg';
-import LedgerConnectFailSVG from '@assets/img/ledger/ledger_import_connect_fail.svg';
+import ledgerConnectDoneIcon from '@assets/img/ledger/ledger_import_connect_done.svg';
+import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
 
 export const ConnectLedgerContainer = styled.div`
   display: flex;
@@ -51,9 +51,9 @@ function LedgerConnectionView({
         src={
           !isConnectSuccess
             ? isConnectFailed
-              ? LedgerConnectFailSVG
+              ? ledgerConnectFailIcon
               : imageDefault
-            : LedgerConnectDoneSVG
+            : ledgerConnectDoneIcon
         }
         alt="connect ledger device"
       />

@@ -14,16 +14,19 @@ import {
 import BigNumber from 'bignumber.js';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import LedgerConnectionView, { ConnectLedgerContainer, ConnectLedgerText, ConnectLedgerTitle } from '@components/ledger/connectLedgerView';
+import LedgerConnectionView, { ConnectLedgerContainer, ConnectLedgerText } from '@components/ledger/connectLedgerView';
 import { ledgerDelay } from '@common/utils/ledger';
 import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import { StacksTransaction } from '@stacks/transactions';
-import LedgerConnectDefaultSVG from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import InfoIcon from '@assets/img/info.svg';
+import ledgerConnectDoneIcon from '@assets/img/ledger/ledger_import_connect_done.svg';
+import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
+import checkmarkIcon from '@assets/img/checkmarkIcon.svg';
 
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS';
 
@@ -81,6 +84,30 @@ const InfoImage = styled.img`
   height: 64px;
 `;
 
+export const ConnectLedgerTitle = styled.h1((props) => ({
+  ...props.theme.headline_s,
+  marginBottom: props.theme.spacing(12),
+}));
+
+interface ConnectLedgerTextAdvancedProps {
+  isCompleted?: boolean;
+}
+export const ConnectLedgerTextAdvanced = styled.p<ConnectLedgerTextAdvancedProps>((props) => ({
+  ...props.theme.body_m,
+  display: 'flex',
+  alignItems: 'flex-start',
+  color: props.isCompleted ? props.theme.colors.white[400] : props.theme.colors.white[200],
+  width: '90%',
+  ':last-child': {
+    marginTop: props.theme.spacing(8),
+  }
+}));
+
+const CheckmarkIcon = styled.img(props => `
+  margin-top: ${props.theme.spacing(2)}px;
+  margin-right: ${props.theme.spacing(3)}px;
+`);
+
 function ConfirmLedgerTransaction(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [txId, setTxId] = useState<string | undefined>(undefined);
@@ -89,6 +116,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
+  const [isFinalTxApproved, setIsFinalTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
 
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_CONFIRM_TRANSACTION_SCREEN' });
@@ -132,9 +160,15 @@ function ConfirmLedgerTransaction(): JSX.Element {
         recipient,
         ordinalUtxo,
       );
+      const {value: psbtCreatedValue} = await result.next();
+
+      const {value: taprootSignedValue} = await result.next();
       setIsTxApproved(true);
+      
+      const {value: txHex} = await result.next();
+      setIsFinalTxApproved(true);
       await ledgerDelay(1500);
-      const transactionId = await btcClient.sendRawTransaction(result);
+      const transactionId = await btcClient.sendRawTransaction(txHex || taprootSignedValue);
       setTxId(transactionId.tx.hash);
       setCurrentStepIndex(2);
     } catch (err) {
@@ -154,7 +188,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         accountId,
         recipient,
       );
-      setIsTxApproved(true);
+      setIsFinalTxApproved(true);
       await ledgerDelay(1500);
       const transactionId = await btcClient.sendRawTransaction(result);
       setTxId(transactionId.tx.hash);
@@ -171,7 +205,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const signAndBroadcastStxTx = async (transport: Transport, accountId: number) => {
     try {
       const result = await signLedgerStxTransaction(transport, unsignedTx, accountId);
-      setIsTxApproved(true);
+      setIsFinalTxApproved(true);
       await ledgerDelay(1500);
       const transactionHash = await broadcastSignedTransaction(result, selectedNetwork);
       setTxId(transactionHash);
@@ -275,7 +309,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
                   text={t('CONNECT.BTC_SUBTITLE')}
                   titleFailed={t('CONNECT.ERROR_TITLE')}
                   textFailed={t('CONNECT.BTC_ERROR_SUBTITLE')}
-                  imageDefault={LedgerConnectDefaultSVG}
+                  imageDefault={ledgerConnectDefaultIcon}
                   isConnectSuccess={isConnectSuccess}
                   isConnectFailed={isConnectFailed}
                 />
@@ -287,23 +321,45 @@ function ConfirmLedgerTransaction(): JSX.Element {
                     src={InfoIcon}
                     alt="external inputs warning"
                   />
-                  <ConnectLedgerTitle>External inputs</ConnectLedgerTitle>
-                  <ConnectLedgerText>You should see a warning on your device saying "There are external inputs”. This is normal as you'll be using simultaneously two different addresses for this transaction.</ConnectLedgerText>
+                  <ConnectLedgerTitle>{t('EXTERNAL_INPUTS.TITLE')}</ConnectLedgerTitle>
+                  <ConnectLedgerText>{t('EXTERNAL_INPUTS.SUBTITLE')}</ConnectLedgerText>
                 </ConnectLedgerContainer>
               </div>
-            ) : currentStepIndex === 1 ? (
+            ) : currentStepIndex === 1 ? (type === 'ORDINALS' ? (
+              <ConnectLedgerContainer>
+                <img
+                  src={
+                    !isFinalTxApproved
+                      ? isTxRejected
+                        ? ledgerConnectFailIcon
+                        : ledgerConnectDefaultIcon
+                      : ledgerConnectDoneIcon
+                  }
+                  alt="confirm tx on the ledger device"
+                />
+                <ConnectLedgerTitle>{!isFinalTxApproved && isTxRejected ? t('CONFIRM.ERROR_TITLE') : t('CONFIRM.TITLE')}</ConnectLedgerTitle>
+                {!isFinalTxApproved && isTxRejected ? (
+                  <ConnectLedgerText>{t('CONFIRM.ERROR_SUBTITLE')}</ConnectLedgerText>
+                ) : (
+                  <>
+                    <ConnectLedgerTextAdvanced isCompleted={isTxApproved}>{isTxApproved ? <CheckmarkIcon src={checkmarkIcon} alt="" /> : '1. '}Confirm the Ordinal inscription transfer on your device.</ConnectLedgerTextAdvanced>
+                    <ConnectLedgerTextAdvanced isCompleted={isFinalTxApproved}>{isFinalTxApproved ? <CheckmarkIcon src={checkmarkIcon} alt="" /> : '2. '}Confirm the payment of transaction fees from BTC payment address on your device.</ConnectLedgerTextAdvanced>
+                  </>
+                )}
+              </ConnectLedgerContainer>
+            ) : (
               <div>
                 <LedgerConnectionView
                   title={t('CONFIRM.TITLE')}
                   text={t('CONFIRM.SUBTITLE')}
                   titleFailed={t('CONFIRM.ERROR_TITLE')}
                   textFailed={t('CONFIRM.ERROR_SUBTITLE')}
-                  imageDefault={LedgerConnectDefaultSVG}
-                  isConnectSuccess={isTxApproved}
+                  imageDefault={ledgerConnectDefaultIcon}
+                  isConnectSuccess={isFinalTxApproved}
                   isConnectFailed={isTxRejected}
                 />
               </div>
-            ) : currentStepIndex === 2 ? (
+            )) : currentStepIndex === 2 ? (
               <TxConfirmedContainer>
                 <img src={CheckCircleSVG} alt="Success" />
                 <TxConfirmedTitle>{t('SUCCESS.TITLE')}</TxConfirmedTitle>
