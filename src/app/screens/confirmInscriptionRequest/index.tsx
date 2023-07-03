@@ -26,6 +26,8 @@ import ActionButton from '@components/button';
 import TransactionSettingAlert from '@components/transactionSetting';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
+import { isLedgerAccount } from '@utils/helper';
+import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -253,6 +255,9 @@ function ConfirmInscriptionRequest() {
     if (ordinalsInBtc && ordinalsInBtc.length > 0) {
       setSignedTx(signedTxHex);
       setShowOrdinalsDetectedAlert(true);
+    } else if (isLedgerAccount(selectedAccount)) {
+      const txType: LedgerTransactionType = 'BTC';
+      navigate('/confirm-ledger-tx', { state: { amount: new BigNumber(amount), recipient: recipient[0], type: txType } });
     } else mutate({ signedTx: signedTxHex });
   };
 
@@ -329,6 +334,7 @@ function ConfirmInscriptionRequest() {
               isNftDashboard={false}
               inNftDetail={false}
               isSmallImage={false}
+              withoutSizeIncrease
             />
           </Brc20TileContainer>
         )}
