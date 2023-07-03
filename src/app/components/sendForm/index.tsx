@@ -221,16 +221,17 @@ function SendForm({
   stxMemo,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  // TODO tim: use context instead of duplicated local state and parent state (as props)
   const [amount, setAmount] = useState(amountToSend ?? '');
+  const [recipientAddress, setRecipientAddress] = useState(recipient ?? '');
   const [memo, setMemo] = useState(stxMemo ?? '');
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
   const [switchToFiat, setSwitchToFiat] = useState(false);
   const [addressError, setAddressError] = useState<string | undefined>(recepientError);
-  const [recipientAddress, setRecipientAddress] = useState(recipient ?? '');
   const navigate = useNavigate();
 
   const {
-    stxBtcRate, btcFiatRate, fiatCurrency, stxAddress,
+    stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount
   } = useSelector(
     (state: StoreState) => state.walletState,
   );
@@ -242,6 +243,11 @@ function SendForm({
     stxAddress,
     currencyType,
   );
+
+  useEffect(() => {
+    setAmount('');
+    setRecipientAddress('');
+  }, [selectedAccount]);
 
   useEffect(() => {
     if (recepientError) {
