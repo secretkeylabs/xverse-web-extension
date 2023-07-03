@@ -69,8 +69,8 @@ export default function CollapsableContainer(props: Props) {
 
   useEffect(() => {
     setInfoText(text);
-    if (text.length > 35) {
-      const concatenatedText = `${text.substring(0, 35)}...`;
+    if (text.length > 30) {
+      const concatenatedText = `${text.substring(0, 32)}...`;
       setInfoText(concatenatedText);
     } else {
       setShowArrow(false);
