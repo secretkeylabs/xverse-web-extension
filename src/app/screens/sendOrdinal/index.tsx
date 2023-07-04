@@ -21,6 +21,7 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import { isLedgerAccount } from '@utils/helper';
+import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core/api';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -166,7 +167,14 @@ function SendOrdinal() {
     navigate(-1);
   };
 
+  const activeAccountOwnsOrdinal =
+    selectedOrdinal && selectedAccount && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);
+
   function validateFields(associatedAddress: string): boolean {
+    if (!activeAccountOwnsOrdinal) {
+      setError(t('ERRORS.ORDINAL_NOT_OWNED'));
+      return false;
+    }
     if (!associatedAddress) {
       setError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
