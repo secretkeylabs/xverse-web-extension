@@ -143,7 +143,6 @@ function ConfirmInscriptionRequest() {
   const [signedTx, setSignedTx] = useState<string>('');
   const [textContent, setTextContent] = useState<string>('');
   const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
-  const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [currentFee, setCurrentFee] = useState(fee);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
@@ -206,7 +205,7 @@ function ConfirmInscriptionRequest() {
     if (data) {
       setCurrentFee(data.fee);
       setSignedTx(data.signedTx);
-      setOpenTransactionSettingModal(false);
+      setShowFeeSettings(false);
     }
   }, [data]);
 
@@ -270,7 +269,7 @@ function ConfirmInscriptionRequest() {
   };
 
   const onAdvancedSettingClick = () => {
-    setOpenTransactionSettingModal(true);
+    setShowFeeSettings(true);
   };
 
   const onApplyClick = ({
@@ -286,7 +285,7 @@ function ConfirmInscriptionRequest() {
   };
 
   const closeTransactionSettingAlert = () => {
-    setOpenTransactionSettingModal(false);
+    setShowFeeSettings(false);
   };
 
   const getAmountString = (amountTotal: BigNumber, currency: string) => (
@@ -391,7 +390,7 @@ function ConfirmInscriptionRequest() {
           />
         </ButtonContainer>
         <TransactionSettingAlert
-          visible={openTransactionSettingModal}
+          visible={showFeeSettings}
           fee={new BigNumber(currentFee).toString()}
           type="BTC"
           btcRecipients={recipient}
