@@ -6,6 +6,7 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
 import {
   Account,
+  getMasterFingerPrint,
   importNativeSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
@@ -227,6 +228,7 @@ function ImportLedger(): JSX.Element {
   const [bitcoinCredentials, setBitcoinCredentials] = useState<Credential | undefined>(undefined);
   const [ordinalsCredentials, setOrdinalsCredentials] = useState<Credential | undefined>(undefined);
   const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
+  const [masterPubKey, setMasterPubKey] = useState<string>('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
@@ -302,7 +304,7 @@ function ImportLedger(): JSX.Element {
     setCurrentStepIndex(6);
   };
 
-  const handleClickNext = () => {
+  const handleClickNext = async () => {
     /*
     Skip if Ledger account exists with the current account index
     (i.e. either STX or BTC address already present for the account)
@@ -314,13 +316,31 @@ function ImportLedger(): JSX.Element {
         return;
       }
     }
-    if (currentStepIndex === 1 && ledgerAccountsList.length !== 0) {
-      setCurrentStepIndex(1.5);
-    } else { setCurrentStepIndex(currentStepIndex + 1); }
+
+    setCurrentStepIndex(currentStepIndex + 1);
   };
 
-  const handleClickMultipleAccounts = () => {
-    setCurrentStepIndex(2);
+  const handleClickMultipleAccounts = async () => {
+    try {
+      setCurrentStepIndex(3);
+      setIsButtonDisabled(true);
+      if (!isStacksSelected) {
+        await importBtcAccounts(true);
+      }
+      setIsButtonDisabled(false);
+    } catch (err) {
+      console.error(err);
+      setIsButtonDisabled(false);
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+    }
+  };
+
+  const fetchMasterPubKey = async () => {
+    const transport = await Transport.create();
+    const masterFingerPrint = await getMasterFingerPrint(transport);
+    setMasterPubKey(masterFingerPrint);
+    return masterFingerPrint;
   };
 
   const checkDeviceConnection = async () => {
@@ -334,6 +354,12 @@ function ImportLedger(): JSX.Element {
       }
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
+      const masterFingerPrint = await fetchMasterPubKey();
+      if (ledgerAccountsList?.find((account) => account.masterPubKey === masterFingerPrint)) {
+        setIsButtonDisabled(false);
+        setCurrentStepIndex(2.5);
+        return;
+      }
       handleClickNext();
       if (!isStacksSelected) {
         await importBtcAccounts(true);
@@ -357,7 +383,7 @@ function ImportLedger(): JSX.Element {
           stxAddress: stacksCredentials?.address || '',
           btcAddress: bitcoinCredentials?.address || '',
           ordinalsAddress: ordinalsCredentials?.address || '',
-          masterPubKey: '',
+          masterPubKey,
           stxPublicKey: stacksCredentials?.publicKey || '',
           btcPublicKey: bitcoinCredentials?.publicKey || '',
           ordinalsPublicKey: ordinalsCredentials?.publicKey || '',
@@ -545,20 +571,20 @@ function ImportLedger(): JSX.Element {
                 isConnectFailed={isConnectFailed}
               />
             )}
-            {currentStepIndex === 1.5 && (
-            <CreateAnotherAccountContainer>
-              <img src={isBitcoinSelected ? BtcOdrinalsIconSVG : StxIconSVG} alt="" />
-              <SelectAssetTitle>
-                {t(
-                  isBitcoinSelected
-                    ? 'LEDGER_ADD_ADDRESS.TITLE_BTC'
-                    : 'LEDGER_ADD_ADDRESS.TITLE_STX',
-                )}
-              </SelectAssetTitle>
-              <CreateMultipleAccountsText>
-                {t('LEDGER_ADD_ADDRESS.ALREADY_CONNECTED_WARNING')}
-              </CreateMultipleAccountsText>
-            </CreateAnotherAccountContainer>
+            {currentStepIndex === 2.5 && (
+              <CreateAnotherAccountContainer>
+                <img src={isBitcoinSelected ? BtcOdrinalsIconSVG : StxIconSVG} alt="" />
+                <SelectAssetTitle>
+                  {t(
+                    isBitcoinSelected
+                      ? 'LEDGER_ADD_ADDRESS.TITLE_BTC'
+                      : 'LEDGER_ADD_ADDRESS.TITLE_STX',
+                  )}
+                </SelectAssetTitle>
+                <CreateMultipleAccountsText>
+                  {t('LEDGER_ADD_ADDRESS.ALREADY_CONNECTED_WARNING')}
+                </CreateMultipleAccountsText>
+              </CreateAnotherAccountContainer>
             )}
             {currentStepIndex === 3 && (
               <>
@@ -642,7 +668,19 @@ function ImportLedger(): JSX.Element {
                 disabled={!isBitcoinSelected && !isStacksSelected}
               />
             )}
-              {currentStepIndex === 1.5 && (
+            {currentStepIndex === 2 && (
+              <ActionButton
+                processing={isButtonDisabled}
+                disabled={isButtonDisabled}
+                onPress={checkDeviceConnection}
+                text={t(
+                  isConnectFailed
+                    ? 'LEDGER_IMPORT_TRY_AGAIN_BUTTON'
+                    : 'LEDGER_IMPORT_CONNECT_BUTTON',
+                )}
+              />
+            )}
+            {currentStepIndex === 2.5 && (
               <>
                 <ButtonContainer>
                   <ActionButton
@@ -663,18 +701,6 @@ function ImportLedger(): JSX.Element {
                   />
                 </ButtonContainer>
               </>
-            )}
-            {currentStepIndex === 2 && (
-              <ActionButton
-                processing={isButtonDisabled}
-                disabled={isButtonDisabled}
-                onPress={checkDeviceConnection}
-                text={t(
-                  isConnectFailed
-                    ? 'LEDGER_IMPORT_TRY_AGAIN_BUTTON'
-                    : 'LEDGER_IMPORT_CONNECT_BUTTON',
-                )}
-              />
             )}
             {currentStepIndex === 3 && (
               <ActionButton
