@@ -30,9 +30,12 @@ jobs:
       # - name: Test
       # run: npm test --passWithNoTests
       - name: Create Archive
-        run: echo ${{ github.ref_name }} | sed 's/\//-/' | xargs -I {} zip -r xverse-extension-{}.zip ./build; zip -r xverse-extension-{}.zip build
+        id: create-archive
+        run: |
+          echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').$(git rev-parse --short ${{ github.sha }}).zip" >> $GITHUB_OUTPUT
+          zip -r ${{ steps.create-archive.output.FILENAME }} ./build
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
           name: release-build
-          path: xverse-extension-${{ github.ref_name }}.zip
+          path: ${{ steps.create-archive.output.FILENAME }}
