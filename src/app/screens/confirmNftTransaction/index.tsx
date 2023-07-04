@@ -20,6 +20,8 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { isLedgerAccount } from '@utils/helper';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
+import { useDispatch } from 'react-redux';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -96,9 +98,10 @@ const ReviewTransactionText = styled.h1((props) => ({
 function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { selectedAccount } = useWalletSelector();
+  const { selectedAccount, shouldResetUserFlow } = useWalletSelector();
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const { id } = useParams();
   const { nftData } = useNftDataSelector();
   const nftIdDetails = id!.split('::');
@@ -160,6 +163,13 @@ function ConfirmNftTransaction() {
 
     mutate({ signedTx: txs[0] });
   };
+
+  useEffect(() => {
+    if (shouldResetUserFlow) {
+      navigate('/nft-dashboard');
+      dispatch(setShouldResetUserFlow(false));
+    }
+  }, [shouldResetUserFlow]);
 
   const handleOnCancelClick = () => {
     navigate(-1);
