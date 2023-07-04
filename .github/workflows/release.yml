@@ -34,9 +34,7 @@ jobs:
         run: |
           echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').$(git rev-parse --short ${{ github.sha }}).zip" >> $GITHUB_OUTPUT
       - name: Create Archive
-        run: |
-          echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').$(git rev-parse --short ${{ github.sha }}).zip" >> $GITHUB_OUTPUT
-          zip -r ${{ steps.save-filename.output.FILENAME }} ./build
+        run: zip -r ${{ steps.save-filename.output.FILENAME }} ./build
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
