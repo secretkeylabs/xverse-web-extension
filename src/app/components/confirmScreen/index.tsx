@@ -42,7 +42,7 @@ const ConfirmButton = styled.button((props) => ({
   height: 44,
   marginLeft: 6,
   ':disabled': {
-    background: props.theme.colors.white[600],
+    backgroundColor: props.theme.colors.white[600],
     cursor: 'initial',
   }
 }));

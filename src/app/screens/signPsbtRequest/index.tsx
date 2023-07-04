@@ -21,6 +21,7 @@ import InfoContainer from '@components/infoContainer';
 import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
 import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
+import { isLedgerAccount } from '@utils/helper';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -146,6 +147,10 @@ function SignPsbtRequest() {
 
   const onSignPsbtConfirmed = async () => {
     try {
+      if (isLedgerAccount(selectedAccount)) {
+        return;
+      }
+
       setIsSigning(true);
       const response = await confirmSignPsbt();
       setIsSigning(false);
@@ -207,7 +212,10 @@ function SignPsbtRequest() {
             <OuterContainer>
               <Container>
                 <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
-                {!payload.broadcast ? (
+                {isLedgerAccount(selectedAccount) && (
+                  <InfoContainer bodyText="Incoming transaction signing with Ledger is not yet supported." />
+                )}
+                {!isLedgerAccount(selectedAccount) && !payload.broadcast ? (
                   <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
                 ) : null}
                 {ordinalInfoData && ordinalInfoData.map((ordinalData) => (
@@ -249,7 +257,7 @@ function SignPsbtRequest() {
               <TransparentButtonContainer>
                 <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
               </TransparentButtonContainer>
-              <ActionButton text={t('CONFIRM')} onPress={onSignPsbtConfirmed} processing={isSigning} />
+              <ActionButton text={t('CONFIRM')} onPress={onSignPsbtConfirmed} processing={isSigning} disabled={isLedgerAccount(selectedAccount)} />
             </ButtonContainer>
           </>
         )}
