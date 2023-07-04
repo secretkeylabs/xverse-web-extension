@@ -16,6 +16,8 @@ import useBtcClient from '@hooks/useBtcClient';
 import { isLedgerAccount } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { useDispatch } from 'react-redux';
+import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -89,11 +91,12 @@ const NFtContainer = styled.div((props) => ({
 function ConfirmOrdinalTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { selectedAccount } = useWalletSelector();
+  const { selectedAccount, shouldResetUserFlow } = useWalletSelector();
   const navigate = useNavigate();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
+  const dispatch = useDispatch();
   const {
     fee, feePerVByte, signedTxHex, ordinalUtxo,
   } = location.state;
@@ -153,6 +156,13 @@ function ConfirmOrdinalTransaction() {
   const handleOnCancelClick = () => {
     navigate(-1);
   };
+
+  useEffect(() => {
+    if (shouldResetUserFlow) {
+      navigate('/nft-dashboard');
+      dispatch(setShouldResetUserFlow(false));
+    }
+  }, [shouldResetUserFlow]);
 
   return (
     <>
