@@ -255,7 +255,7 @@ function ConfirmInscriptionRequest() {
       setSignedTx(signedTxHex);
       setShowOrdinalsDetectedAlert(true);
     } else if (isLedgerAccount(selectedAccount)) {
-      const txType: LedgerTransactionType = 'BTC';
+      const txType: LedgerTransactionType = 'BRC-20';
       navigate('/confirm-ledger-tx', { state: { amount: new BigNumber(amount), recipient: recipient[0], type: txType } });
     } else mutate({ signedTx: signedTxHex });
   };

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
@@ -27,8 +27,9 @@ import InfoIcon from '@assets/img/info.svg';
 import ledgerConnectDoneIcon from '@assets/img/ledger/ledger_import_connect_done.svg';
 import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
 import checkmarkIcon from '@assets/img/checkmarkIcon.svg';
+import InfoContainer from '@components/infoContainer';
 
-export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS';
+export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';
 
 const Container = styled.div`
   display: flex;
@@ -106,6 +107,11 @@ export const ConnectLedgerTextAdvanced = styled.p<ConnectLedgerTextAdvancedProps
 const CheckmarkIcon = styled.img(props => `
   margin-top: ${props.theme.spacing(2)}px;
   margin-right: ${props.theme.spacing(3)}px;
+`);
+
+const InfoContainerWrapper = styled.div(props => `
+  text-align: left;
+  margin-top: ${props.theme.spacing(8)}px;
 `);
 
 function ConfirmLedgerTransaction(): JSX.Element {
@@ -245,6 +251,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
     switch (type) {
       case 'BTC':
+      case 'BRC-20':
         await signAndBroadcastBtcTx(transport as Transport, selectedAccount.id);
         break;
       case 'STX':
@@ -283,6 +290,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
     switch (type) {
       case 'BTC':
+      case 'BRC-20':
         window.open(getBtcTxStatusUrl(txId, network), '_blank', 'noopener,noreferrer');
         break;
       case 'STX':
@@ -364,6 +372,11 @@ function ConfirmLedgerTransaction(): JSX.Element {
                 <img src={CheckCircleSVG} alt="Success" />
                 <TxConfirmedTitle>{t('SUCCESS.TITLE')}</TxConfirmedTitle>
                 <TxConfirmedDescription>{t('SUCCESS.SUBTITLE')}</TxConfirmedDescription>
+                {type === 'BRC-20' && (
+                  <InfoContainerWrapper>
+                    <InfoContainer bodyText="The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer." />
+                  </InfoContainerWrapper>
+                )}
               </TxConfirmedContainer>
             ) : null}
           </OnBoardingContentContainer>
