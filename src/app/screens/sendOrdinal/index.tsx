@@ -21,6 +21,9 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import { isLedgerAccount } from '@utils/helper';
+import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
+import { useDispatch } from 'react-redux';
+import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core/api';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -102,8 +105,9 @@ function SendOrdinal() {
   const { selectedOrdinal } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
+  const dispatch = useDispatch();
   const {
-    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
+    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate, shouldResetUserFlow
   } = useWalletSelector();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
@@ -166,7 +170,21 @@ function SendOrdinal() {
     navigate(-1);
   };
 
+  useEffect(() => {
+    if (shouldResetUserFlow) {
+      navigate('/nft-dashboard');
+      dispatch(setShouldResetUserFlow(false));
+    }
+  }, [shouldResetUserFlow]);
+
+  const activeAccountOwnsOrdinal =
+    selectedOrdinal && selectedAccount && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);
+
   function validateFields(associatedAddress: string): boolean {
+    if (!activeAccountOwnsOrdinal) {
+      setError(t('ERRORS.ORDINAL_NOT_OWNED'));
+      return false;
+    }
     if (!associatedAddress) {
       setError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
