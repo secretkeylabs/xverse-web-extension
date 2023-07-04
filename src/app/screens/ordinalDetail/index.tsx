@@ -1,28 +1,28 @@
-import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import TopRow from '@components/topRow';
-import BottomTabBar from '@components/tabBar';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
 import Globe from '@assets/img/nftDashboard/globe.svg';
-import ActionButton from '@components/button';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useEffect, useMemo, useState } from 'react';
-import { isBrcTransferValid } from '@secretkeylabs/xverse-core/api';
+import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
-import DescriptionTile from '@screens/nftDetail/descriptionTile';
-import InfoContainer from '@components/infoContainer';
-import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import AlertMessage from '@components/alertMessage';
-import { getBtcTxStatusUrl } from '@utils/helper';
+import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
+import BottomTabBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import useWalletSelector from '@hooks/useWalletSelector';
+import DescriptionTile from '@screens/nftDetail/descriptionTile';
+import OrdinalImage from '@screens/ordinals/ordinalImage';
+import { isBrcTransferValid } from '@secretkeylabs/xverse-core/api';
+import { getBtcTxStatusUrl } from '@utils/helper';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled, { useTheme } from 'styled-components';
 import OrdinalAttributeComponent from './ordinalAttributeComponent';
 
 const Container = styled.div`
@@ -68,7 +68,7 @@ const OrdinalsContainer = styled.div((props) => ({
   maxWidth: 450,
   width: '60%',
   display: 'flex',
-  aspectRatio: 1,
+  aspectRatio: '1',
   flexDirection: 'column',
   justifyContent: 'flex-start',
   alignItems: 'flex-start',
@@ -80,7 +80,7 @@ const ExtensionOrdinalsContainer = styled.div((props) => ({
   maxHeight: 148,
   width: 148,
   display: 'flex',
-  aspectRatio: 1,
+  aspectRatio: '1',
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
@@ -289,9 +289,9 @@ function OrdinalDetailScreen() {
   useEffect(() => {
     if (selectedOrdinal) {
       if (
-        selectedOrdinal?.content_type.includes('image')
-        || selectedOrdinal?.content_type.includes('text')
-        || textContent?.includes('brc-721e')
+        selectedOrdinal?.content_type.includes('image') ||
+        selectedOrdinal?.content_type.includes('text') ||
+        textContent?.includes('brc-721e')
       ) {
         setNotSupportedOrdinal(false);
       } else setNotSupportedOrdinal(true);
@@ -339,7 +339,7 @@ function OrdinalDetailScreen() {
   };
 
   const openInOrdinalsExplorer = () => {
-    window.open(`https://www.ord.io/${selectedOrdinal?.number}`);
+    window.open(`https://ord.xverse.app/inscription/${selectedOrdinal?.id}`);
   };
 
   const ownedByView = (
@@ -400,15 +400,15 @@ function OrdinalDetailScreen() {
             <ColumnContainer>
               <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={content.amt} />
               {!isGallery && (
-              <OrdinalAttributeComponent
-                title={t('OWNED_BY')}
-                value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-                  ordinalsAddress.length - 4,
-                  ordinalsAddress.length,
-                )}`}
-                showOridnalTag
-                isAddress
-              />
+                <OrdinalAttributeComponent
+                  title={t('OWNED_BY')}
+                  value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+                    ordinalsAddress.length - 4,
+                    ordinalsAddress.length,
+                  )}`}
+                  showOridnalTag
+                  isAddress
+                />
               )}
             </ColumnContainer>
           );
@@ -420,20 +420,24 @@ function OrdinalDetailScreen() {
                 <OrdinalAttributeComponent
                   title={t('BRC20_TRANSFER_STATUS')}
                   value={isTransferValid}
-                  valueColor={isBrcTransferValid(selectedOrdinal!) ? theme.colors.feedback.success : theme.colors.feedback.error}
+                  valueColor={
+                    isBrcTransferValid(selectedOrdinal!)
+                      ? theme.colors.feedback.success
+                      : theme.colors.feedback.error
+                  }
                   isAddress
                 />
               </DetailSection>
               {!isGallery && (
-              <OrdinalAttributeComponent
-                title={t('OWNED_BY')}
-                value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-                  ordinalsAddress.length - 4,
-                  ordinalsAddress.length,
-                )}`}
-                showOridnalTag
-                isAddress
-              />
+                <OrdinalAttributeComponent
+                  title={t('OWNED_BY')}
+                  value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+                    ordinalsAddress.length - 4,
+                    ordinalsAddress.length,
+                  )}`}
+                  showOridnalTag
+                  isAddress
+                />
               )}
             </ColumnContainer>
           );
@@ -447,15 +451,15 @@ function OrdinalDetailScreen() {
                 </MintLimitContainer>
               </Row>
               {!isGallery && (
-              <OrdinalAttributeComponent
-                title={t('OWNED_BY')}
-                value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-                  ordinalsAddress.length - 4,
-                  ordinalsAddress.length,
-                )}`}
-                showOridnalTag
-                isAddress
-              />
+                <OrdinalAttributeComponent
+                  title={t('OWNED_BY')}
+                  value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+                    ordinalsAddress.length - 4,
+                    ordinalsAddress.length,
+                  )}`}
+                  showOridnalTag
+                  isAddress
+                />
               )}
             </ColumnContainer>
           );
@@ -469,7 +473,9 @@ function OrdinalDetailScreen() {
 
   const extensionView = (
     <ExtensionContainer>
-      <CollectibleText>{isBrc20Ordinal ? t('BRC20_INSCRIPTION') : t('COLLECTIBLE')}</CollectibleText>
+      <CollectibleText>
+        {isBrc20Ordinal ? t('BRC20_INSCRIPTION') : t('COLLECTIBLE')}
+      </CollectibleText>
       <OrdinalTitleText>{`${t('INSCRIPTION')} ${selectedOrdinal?.number}`}</OrdinalTitleText>
       <WebGalleryButton onClick={openInGalleryView}>
         <>
@@ -477,16 +483,14 @@ function OrdinalDetailScreen() {
           <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
         </>
       </WebGalleryButton>
-      {selectedOrdinal?.content_type.includes('html') ? (
-        <ViewInExplorerButton>
-          <ActionButton
-            src={Globe}
-            text={t('VIEW_ON_ORD_IO')}
-            onPress={openInOrdinalsExplorer}
-            transparent
-          />
-        </ViewInExplorerButton>
-      ) : null}
+      <ViewInExplorerButton>
+        <ActionButton
+          src={Globe}
+          text={t('VIEW_IN_ORDINALS_EXPLORER')}
+          onPress={openInOrdinalsExplorer}
+          transparent
+        />
+      </ViewInExplorerButton>
       <ExtensionOrdinalsContainer>
         <OrdinalImage ordinal={selectedOrdinal!} />
       </ExtensionOrdinalsContainer>
@@ -518,18 +522,14 @@ function OrdinalDetailScreen() {
         <SendButtonContainer>
           <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleSendOrdinal} />
         </SendButtonContainer>
-        {
-          selectedOrdinal?.content_type.includes('html') ? (
-          <SendButtonContainer>
-            <ActionButton
-              src={Globe}
-              text={t('VIEW_ON_ORD_IO')}
-              onPress={openInOrdinalsExplorer}
-              transparent
-            />
-          </SendButtonContainer>
-          ) : null
-        }
+        <SendButtonContainer>
+          <ActionButton
+            src={Globe}
+            text={t('VIEW_IN_ORDINALS_EXPLORER')}
+            onPress={openInOrdinalsExplorer}
+            transparent
+          />
+        </SendButtonContainer>
       </ButtonContainer>
       <RowContainer>
         <OrdinalsContainer>
