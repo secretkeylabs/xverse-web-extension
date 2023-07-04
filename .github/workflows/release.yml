@@ -4,13 +4,12 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "chore/release-workflow"
+      - 'chore/release-workflow'
   release:
-      types: [created]
+    types: [created]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -29,11 +28,10 @@ jobs:
       - name: Build
         run: npm run build --if-present
       # - name: Test
-        # run: npm test --passWithNoTests
+      # run: npm test --passWithNoTests
       - run: pwd; ls -l
       - name: Create Archive
         run: pwd; ls -l; zip -r xverse-extension-${{ github.ref_name }}.zip build
-        # working-directory: ${{ github.workspace }}/xverse-web-extension
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
