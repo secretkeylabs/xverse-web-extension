@@ -39,37 +39,3 @@ jobs:
           path: build.zip
           retention-days: 30
           if-no-files-found: error
-      # - name: Comment on pull request
-      #   uses: tonyhallett/artifacts-url-comments@v1.1.0
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     prefix: Here are the artifacts
-      #     suffix: Have a nice day.
-      #     format: (name)[url]
-  comment-on-pr:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Artifact URL
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
-          WORKFLOW_ID: ${{ github.run_id }}
-        run: |
-          ARTIFACT_URL=$(gh api "/repos/$OWNER/$REPO/actions/artifacts" \
-            --jq ".artifacts[] |
-            select(.workflow_run.id==$WORKFLOW_ID) |
-            select(.expired==false) |
-            .archive_download_url")
-          echo "ARTIFACT URL: $ARTIFACT_URL"
-          echo "ARTIFACT_URL=$ARTIFACT_URL" >> "$GITHUB_ENV"
-      - name: Update Comment
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{ github.event.number }}
-          body: |-
-            build: ${{ env.ARTIFACT_URL }}
-
-            Please note that files only stay for around 30 days
