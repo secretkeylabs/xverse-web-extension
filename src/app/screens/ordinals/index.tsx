@@ -1,9 +1,8 @@
-import styled from 'styled-components';
-import { Inscription } from '@secretkeylabs/xverse-core/types/index';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import useNftDataReducer from '@hooks/stores/useNftReducer';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
+import { Inscription } from '@secretkeylabs/xverse-core/types/index';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import OrdinalImage from './ordinalImage';
 
 interface Props {
@@ -29,6 +28,7 @@ const NftImageContainer = styled.div({
   justifyContent: 'center',
   alignItems: 'center',
   width: '100%',
+  aspectRatio: '1',
   overflow: 'hidden',
 });
 
@@ -43,8 +43,12 @@ const GridItemContainer = styled.button<GridContainerProps>((props) => ({
   padding: props.showBorder ? props.theme.spacing(7) : 0,
   marginBottom: props.theme.spacing(16),
   borderRadius: props.theme.radius(3),
-  background: props.showBorder ? 'linear-gradient(27.88deg, #1D2032 0%, rgba(29, 32, 50, 0) 100%)' : 'transparent',
-  border: props.showBorder ? ` 1px solid ${props.theme.colors.background.elevation2}` : 'transparent',
+  background: props.showBorder
+    ? 'linear-gradient(27.88deg, #1D2032 0%, rgba(29, 32, 50, 0) 100%)'
+    : 'transparent',
+  border: props.showBorder
+    ? ` 1px solid ${props.theme.colors.background.elevation2}`
+    : 'transparent',
 }));
 
 function Ordinal({ asset, isGalleryOpen }: Props) {
