@@ -75,7 +75,7 @@ const Container = styled.div({
   alignItems: 'center',
 });
 
-const NFtContainer = styled.div((props) => ({
+const NftContainer = styled.div((props) => ({
   maxWidth: 150,
   maxHeight: 150,
   width: '60%',
@@ -169,14 +169,14 @@ function ConfirmOrdinalTransaction() {
       {isGalleryOpen && (
         <>
           <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          <ButtonContainer>
+          {/* <ButtonContainer>
             <Button onClick={handleOnCancelClick}>
               <>
                 <ButtonImage src={ArrowLeft} />
                 <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
               </>
             </Button>
-          </ButtonContainer>
+          </ButtonContainer> */}
         </>
       )}
       <ScrollContainer>
@@ -193,9 +193,9 @@ function ConfirmOrdinalTransaction() {
           assetDetail={selectedOrdinal?.number.toString()}
         >
           <Container>
-            <NFtContainer>
+            <NftContainer>
               <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
-            </NFtContainer>
+            </NftContainer>
           </Container>
         </ConfirmBtcTransactionComponent>
 

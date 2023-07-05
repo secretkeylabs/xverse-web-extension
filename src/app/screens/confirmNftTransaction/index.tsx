@@ -180,14 +180,14 @@ function ConfirmNftTransaction() {
       {isGalleryOpen && (
       <>
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-        <ButtonContainer>
+        {/* <ButtonContainer>
           <Button onClick={handleOnCancelClick}>
             <>
               <ButtonImage src={ArrowLeft} />
               <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
             </>
           </Button>
-        </ButtonContainer>
+        </ButtonContainer> */}
       </>
       )}
       <ScrollContainer>

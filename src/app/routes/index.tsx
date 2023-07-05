@@ -332,6 +332,14 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
+      {
+        path: 'confirm-nft-tx/:id',
+        element: <AuthGuard><ConfirmNftTransaction /></AuthGuard>,
+      },
+      {
+        path: 'confirm-ordinal-tx/:id',
+        element: <AuthGuard><ConfirmOrdinalTransaction /></AuthGuard>,
+      },
     ],
   },
   {
@@ -358,14 +366,6 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/nft-detail/:id/send-nft',
         element: <SendNft />,
-      },
-      {
-        path: 'confirm-nft-tx/:id',
-        element: <ConfirmNftTransaction />,
-      },
-      {
-        path: 'confirm-ordinal-tx/:id',
-        element: <ConfirmOrdinalTransaction />,
       },
       {
         path: 'nft-dashboard/ordinal-detail/send-ordinal',

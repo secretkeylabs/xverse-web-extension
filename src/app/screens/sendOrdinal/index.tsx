@@ -45,7 +45,7 @@ const Container = styled.div({
   flex: 1,
 });
 
-const NFtContainer = styled.div((props) => ({
+const NftContainer = styled.div((props) => ({
   maxHeight: 148,
   width: 148,
   display: 'flex',
@@ -53,8 +53,8 @@ const NFtContainer = styled.div((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
-  marginTop: props.theme.spacing(16),
-  marginBottom: props.theme.spacing(12),
+  marginTop: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(6),
 }));
 
 const OrdinalInscriptionNumber = styled.h1((props) => ({
@@ -240,9 +240,9 @@ function SendOrdinal() {
           onPressSend={onPressNext}
         >
           <Container>
-            <NFtContainer>
+            <NftContainer>
               <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
-            </NFtContainer>
+            </NftContainer>
             <OrdinalInscriptionNumber>{`Inscription ${selectedOrdinal?.number}`}</OrdinalInscriptionNumber>
           </Container>
         </SendForm>
