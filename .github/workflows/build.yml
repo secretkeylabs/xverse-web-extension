@@ -26,16 +26,35 @@ jobs:
       # - name: Test
       # run: npm test --passWithNoTests
       - name: Save Filename
-        id: save-filename
         run: |
-          echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').$(git rev-parse --short ${{ github.sha }}).zip" >> $GITHUB_OUTPUT
+          BRANCH_NAME=echo ${{ github.head_ref }} | sed 's/\//-/'
+          GIT_SHA_SHORT=git rev-parse --short ${{ github.sha }}
+          echo "FILENAME=xverse-extension.$BRANCH_NAME.$GIT_SHA_SHORT.zip" >> $GITHUB_ENV
       - name: Create Archive
-        run: |
-          zip -r build.zip ./build
+        run: zip -r build.zip ./build
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.save-filename.outputs.FILENAME }}
+          name: ${{ env.FILENAME }}
           path: build.zip
           retention-days: 30
           if-no-files-found: error
+  comment-on-pr:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Artifact URL
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          WORKFLOW_ID: ${{ github.run_id }}
+        run: |
+          ARTIFACT_URL="https://github.com/$OWNER/$REPO/actions/runs/$WORKFLOW_ID"
+          echo "ARTIFACT_URL=$ARTIFACT_URL" >> $GITHUB_ENV
+      - name: Update Comment
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.number }}
+          body: |-
+            build: ${{ env.ARTIFACT_URL }}
+            Please note that files only stay for around 30 days
