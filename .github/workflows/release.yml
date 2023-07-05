@@ -32,13 +32,22 @@ jobs:
       - name: Save Filename
         id: save-filename
         run: |
-          echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').$(git rev-parse --short ${{ github.sha }}).zip" >> $GITHUB_OUTPUT
+          echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').zip" >> $GITHUB_OUTPUT
       - name: Create Archive
         run: |
-          echo Zipping to ${{ steps.save-filename.outputs.FILENAME }}
-          zip -r ${{ steps.save-filename.outputs.FILENAME }} ./build
+          zip -r build.zip ./build
       - name: Upload Archive
         uses: actions/upload-artifact@v3
+        with:    
+          name: ${{ steps.save-filename.outputs.FILENAME }}
+          path: build.zip
+      - name: Upload Release Asset
+        if: ${{ github.event.release.upload_url }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: release-build
-          path: ${{ steps.save-filename.outputs.FILENAME }}
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build.zip
+          asset_name: ${{ steps.save-filename.outputs.FILENAME }}
+          asset_content_type: application/zip
