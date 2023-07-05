@@ -203,7 +203,7 @@ function AuthenticationRequest() {
         <DappTitle>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappTitle>
         {isHardwareAccount(selectedAccount) && (
           <InfoContainerWrapper>
-            <InfoContainer bodyText="Message signing with Ledger is not yet supported." />
+            <InfoContainer bodyText="Message signing is not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
           </InfoContainerWrapper>
         )}
       </MainContainer>

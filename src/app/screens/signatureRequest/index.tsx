@@ -302,41 +302,43 @@ function SignatureRequest(): JSX.Element {
       disabled={isHardwareAccount(selectedAccount)}
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      <MainContainer>
-        <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
-        {!isSignMessageBip322 ? (
-          <RequestSource>
-            {`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}
-          </RequestSource>
-        ) : null}
-        {(isUtf8Message(messageType) || isSignMessageBip322) && (
-          <SignatureRequestMessage request={payload as SignaturePayload} />
-        )}
-        {!isSignMessageBip322 && isStructuredMessage(messageType) && (
-          <SignatureRequestStructuredData payload={payload as StructuredDataSignaturePayload} />
-        )}
-        <CollapsableContainer
-          text={getMessageHash()}
-          title={t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}
-        >
-          <MessageHash>{getMessageHash()}</MessageHash>
-        </CollapsableContainer>
-        <SigningAddressContainer>
-          <SigningAddressTitle>{t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}</SigningAddressTitle>
-          <SigningAddress>
-            <SigningAddressType>{addressType}</SigningAddressType>
-            <SigningAddressValue>
-              {getTruncatedAddress(payload.address || payload.stxAddress)}
-            </SigningAddressValue>
-          </SigningAddress>
-        </SigningAddressContainer>
-        <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
-        {isHardwareAccount(selectedAccount) ? (
-          <InfoContainer bodyText="Message signing with Ledger is not yet supported." />
-        ) : (
+      {isHardwareAccount(selectedAccount) ? (
+        <MainContainer>
+          <InfoContainer bodyText="Message signing is not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
+        </MainContainer>
+      ) : (
+        <MainContainer>
+          <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
+          {!isSignMessageBip322 ? (
+            <RequestSource>
+              {`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}
+            </RequestSource>
+          ) : null}
+          {(isUtf8Message(messageType) || isSignMessageBip322) && (
+            <SignatureRequestMessage request={payload as SignaturePayload} />
+          )}
+          {!isSignMessageBip322 && isStructuredMessage(messageType) && (
+            <SignatureRequestStructuredData payload={payload as StructuredDataSignaturePayload} />
+          )}
+          <CollapsableContainer
+            text={getMessageHash()}
+            title={t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}
+          >
+            <MessageHash>{getMessageHash()}</MessageHash>
+          </CollapsableContainer>
+          <SigningAddressContainer>
+            <SigningAddressTitle>{t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}</SigningAddressTitle>
+            <SigningAddress>
+              <SigningAddressType>{addressType}</SigningAddressType>
+              <SigningAddressValue>
+                {getTruncatedAddress(payload.address || payload.stxAddress)}
+              </SigningAddressValue>
+            </SigningAddress>
+          </SigningAddressContainer>
+          <ActionDisclaimer>{t('SIGNATURE_REQUEST.ACTION_DISCLAIMER')}</ActionDisclaimer>
           <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} />
-        )}
-      </MainContainer>
+        </MainContainer>
+      )}
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 ? (
           <LedgerConnectionView
