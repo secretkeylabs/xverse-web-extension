@@ -55,8 +55,10 @@ const ExpandedContainer = styled(animated.div)({
 const Text = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
-  lineHeight: 1.6,
-  wordWrap: 'break-word',
+  width: 260,
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
   color: props.theme.colors.white[0],
   marginBottom: props.theme.spacing(4),
 }));
@@ -65,14 +67,9 @@ export default function CollapsableContainer(props: Props) {
   const { title, children, text, initialValue } = props;
   const [isExpanded, setIsExpanded] = useState(initialValue);
   const [showArrow, setShowArrow] = useState(true);
-  const [infoText, setInfoText] = useState('');
 
   useEffect(() => {
-    setInfoText(text);
-    if (text.length > 35) {
-      const concatenatedText = `${text.substring(0, 35)}...`;
-      setInfoText(concatenatedText);
-    } else {
+    if (text.length < 32) {
       setShowArrow(false);
     }
     if (text === '') setShowArrow(true);
@@ -106,7 +103,7 @@ export default function CollapsableContainer(props: Props) {
         </Button>
         )}
       </RowContainer>
-      {!isExpanded && text !== '' && <Text>{infoText}</Text>}
+      {!isExpanded && text !== '' && <Text>{text}</Text>}
       <ExpandedContainer style={slideInStyles}>
         {children}
       </ExpandedContainer>

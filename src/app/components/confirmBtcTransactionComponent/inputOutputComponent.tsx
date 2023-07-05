@@ -159,7 +159,7 @@ function InputOutputComponent({
                 icon={IconBitcoin}
                 hideAddress
                 hideCopyButton={btcAddress === address[index] || ordinalsAddress === address[index]}
-                amount={satsToBtc(new BigNumber(input.value)).toString()}
+                amount={`${satsToBtc(new BigNumber(input.value)).toString()} BTC`}
                 address={input.userSigns ? address[index] : input.txid}
               >
                 {renderSubValue(input, address[index])}

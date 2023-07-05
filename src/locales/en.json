@@ -356,7 +356,7 @@
     "BRC20_TRANSFER_STATUS": "Status",
     "TOTAL_SUPPLY": "Total supply",
     "MINT_LIMIT": "Mint limit",
-    "VIEW_ON_ORD_IO": "View on Ord.io"
+    "VIEW_IN_ORDINALS_EXPLORER": "Open in Ordinal Viewer"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
@@ -548,7 +548,7 @@
     "BALANCE": "Balance"
   },
   "CACHE_MIGRATION_SCREEN": {
-    "TITLE":"Your wallet data store needs to be updated in order to remain secure.",
+    "TITLE": "Your wallet data store needs to be updated in order to remain secure.",
     "WARNING": "Please make sure you have your seed phrase backed up securely before moving forward.",
     "SUCCESS_TITLE": "Update Complete",
     "SKIP_BUTTON": "Do it later",
