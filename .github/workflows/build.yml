@@ -58,7 +58,7 @@ jobs:
         run: |
           ARTIFACT_URL=$(gh api "/repos/$OWNER/$REPO/actions/artifacts" \
             --jq ".artifacts.[] |
-            select(.workflow_run.id==build) |
+            select(.workflow_run.id=='build') |
             select(.expired==false) |
             .archive_download_url")
           echo "ARTIFACT URL: $ARTIFACT_URL"
