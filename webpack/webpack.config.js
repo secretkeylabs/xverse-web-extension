@@ -97,7 +97,9 @@ var options = {
     ],
   },
   resolve: {
-    plugins: [new TsconfigPathsPlugin()],
+    plugins: [new TsconfigPathsPlugin({
+      configFile: path.join(__dirname, '../', 'tsconfig.json')
+    })],
     extensions: fileExtensions
       .map((extension) => '.' + extension)
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
