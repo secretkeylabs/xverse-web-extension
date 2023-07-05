@@ -18,10 +18,10 @@ const Button = styled.button<ButtonProps>((props) => ({
   opacity: props.disabled ? 0.6 : 1,
   transition: 'all 0.2s ease',
   ':disabled': {
-    backgroundColor: props.theme.colors.white[600],
+    opacity: 0.6,
     cursor: 'initial',
     ':hover': {
-      backgroundColor: props.theme.colors.white[600],
+      opacity: 0.6,
     }
   }
 }));

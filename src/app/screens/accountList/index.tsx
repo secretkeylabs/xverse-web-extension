@@ -59,6 +59,10 @@ const AddAccountText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
+// TODO: Make the buttons sticky on the bottom
+const ButtonsWrapper = styled.div`
+`;
+
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
@@ -68,7 +72,7 @@ function AccountList(): JSX.Element {
 
   const displayedAccountsList = useMemo(() => {
     if (network.type === 'Mainnet') {
-      return [...accountsList, ...ledgerAccountsList];
+      return [...ledgerAccountsList, ...accountsList];
     }
     return accountsList;
   }, [accountsList, ledgerAccountsList, network]);
@@ -127,20 +131,22 @@ function AccountList(): JSX.Element {
             <Seperator />
           </>
         ))}
-        <RowContainer onClick={async () => onCreateAccount()}>
-          <AddAccountContainer>
-            <ButtonImage src={Plus} />
-          </AddAccountContainer>
-          <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
-        </RowContainer>
-        {network.type === 'Mainnet' && (
-          <RowContainer onClick={onImportLedgerAccount}>
+        <ButtonsWrapper>
+          <RowContainer onClick={async () => onCreateAccount()}>
             <AddAccountContainer>
-              <ButtonImage src={ConnectLedger} />
+              <ButtonImage src={Plus} />
             </AddAccountContainer>
-            <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
+            <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
           </RowContainer>
-        )}
+          {network.type === 'Mainnet' && (
+            <RowContainer onClick={onImportLedgerAccount}>
+              <AddAccountContainer>
+                <ButtonImage src={ConnectLedger} />
+              </AddAccountContainer>
+              <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
+            </RowContainer>
+          )}
+        </ButtonsWrapper>
       </AccountContainer>
     </Container>
   );
