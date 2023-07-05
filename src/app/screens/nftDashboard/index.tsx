@@ -207,6 +207,7 @@ function NftDashboard() {
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const {
     data: nftsList,
+    error: stacksError,
     hasNextPage,
     isFetchingNextPage,
     isLoading,
@@ -295,7 +296,7 @@ function NftDashboard() {
       <>
         <GridContainer isGalleryOpen={isGalleryOpen}>
           {hasActivatedOrdinalsKey && !ordinalsError && ordinals?.pages?.map(renderOrdinalsList)}
-          {nfts?.map((nft) => (
+          {!stacksError && nfts?.map((nft) => (
             <Nft asset={nft} key={nft.value.hex} isGalleryOpen={isGalleryOpen} />
           ))}
         </GridContainer>
@@ -363,7 +364,7 @@ function NftDashboard() {
           ) : (
             <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>
           )}
-          {ordinalsAddress && isLoading ? (
+          {ordinalsAddress && isLoadingOrdinals ? (
             <BarLoaderContainer>
               <BarLoader loaderSize={LoaderSize.LARGE} />
             </BarLoaderContainer>
