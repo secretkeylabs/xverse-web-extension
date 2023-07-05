@@ -27,8 +27,8 @@ jobs:
       # run: npm test --passWithNoTests
       - name: Save Filename
         run: |
-          BRANCH_NAME=echo ${{ github.head_ref }} | sed 's/\//-/'
-          GIT_SHA_SHORT=git rev-parse --short ${{ github.sha }}
+          BRANCH_NAME=$(echo ${{ github.head_ref }} | sed 's/\//-/')
+          GIT_SHA_SHORT=$(git rev-parse --short ${{ github.sha }})
           echo "FILENAME=xverse-extension.$BRANCH_NAME.$GIT_SHA_SHORT.zip" >> $GITHUB_ENV
       - name: Create Archive
         run: zip -r build.zip ./build
