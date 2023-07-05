@@ -296,7 +296,7 @@ function NftDashboard() {
         <GridContainer isGalleryOpen={isGalleryOpen}>
           {hasActivatedOrdinalsKey && !ordinalsError && ordinals?.pages?.map(renderOrdinalsList)}
           {nfts?.map((nft) => (
-            <Nft asset={nft} key={nft.asset_identifier} isGalleryOpen={isGalleryOpen} />
+            <Nft asset={nft} key={nft.value.hex} isGalleryOpen={isGalleryOpen} />
           ))}
         </GridContainer>
         {(hasNextPage || hasNextPageOrdinals) && (
