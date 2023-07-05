@@ -325,6 +325,66 @@ function ImportLedger(): JSX.Element {
     setCurrentStepIndex(currentStepIndex + 1);
   };
 
+  const saveAddressToWallet = async () => {
+    setIsButtonDisabled(true);
+    const currentAccount = ledgerAccountsList.find((account) => account.id === addressIndex);
+    try {
+      if (!currentAccount) {
+        const ledgerAccount: Account = {
+          id: addressIndex,
+          stxAddress: stacksCredentials?.address || '',
+          btcAddress: bitcoinCredentials?.address || '',
+          ordinalsAddress: ordinalsCredentials?.address || '',
+          masterPubKey,
+          stxPublicKey: stacksCredentials?.publicKey || '',
+          btcPublicKey: bitcoinCredentials?.publicKey || '',
+          ordinalsPublicKey: ordinalsCredentials?.publicKey || '',
+          accountType: 'ledger',
+          accountName: `Ledger Account ${addressIndex + 1}`,
+        };
+        await addLedgerAccount(ledgerAccount);
+        await ledgerDelay(1000);
+        setCurrentStepIndex(4);
+        setIsButtonDisabled(false);
+        return;
+      }
+
+      // if (currentAccount && isStacksSelected) {
+      //   const ledgerAccount: Account = {
+      //     ...currentAccount,
+      //     stxAddress: stacksCredentials?.address || '',
+      //     stxPublicKey: stacksCredentials?.publicKey || '',
+      //   };
+      //   await updateLedgerAccounts(ledgerAccount);
+      //   await ledgerDelay(1000);
+      //   handleClickNext();
+      //   setIsButtonDisabled(false);
+      //   return;
+      // }
+
+      if (currentAccount && isBitcoinSelected) {
+        const ledgerAccount: Account = {
+          ...currentAccount,
+          btcAddress: bitcoinCredentials?.address || '',
+          btcPublicKey: bitcoinCredentials?.publicKey || '',
+          ordinalsAddress: ordinalsCredentials?.address || '',
+          ordinalsPublicKey: ordinalsCredentials?.publicKey || '',
+        };
+        await updateLedgerAccounts(ledgerAccount);
+        await ledgerDelay(1000);
+        setCurrentStepIndex(4);
+        setIsButtonDisabled(false);
+        return;
+      }
+
+      await ledgerDelay(500);
+      setIsButtonDisabled(false);
+    } catch (err) {
+      console.error(err);
+      setIsButtonDisabled(false);
+    }
+  };
+
   const handleClickMultipleAccounts = async () => {
     try {
       setCurrentStepIndex(3);
@@ -332,7 +392,7 @@ function ImportLedger(): JSX.Element {
       if (!isStacksSelected) {
         await importBtcAccounts(true);
       }
-      setIsButtonDisabled(false);
+      saveAddressToWallet();
     } catch (err) {
       console.error(err);
       setIsButtonDisabled(false);
@@ -369,73 +429,12 @@ function ImportLedger(): JSX.Element {
       if (!isStacksSelected) {
         await importBtcAccounts(true);
       }
-      setIsButtonDisabled(false);
+      saveAddressToWallet();
     } catch (err) {
       console.error(err);
       setIsButtonDisabled(false);
       setIsConnectSuccess(false);
       setIsConnectFailed(true);
-    }
-  };
-
-  const saveAddressToWallet = async () => {
-    setIsButtonDisabled(true);
-    const currentAccount = ledgerAccountsList.find((account) => account.id === addressIndex);
-    try {
-      if (!currentAccount) {
-        const ledgerAccount: Account = {
-          id: addressIndex,
-          stxAddress: stacksCredentials?.address || '',
-          btcAddress: bitcoinCredentials?.address || '',
-          ordinalsAddress: ordinalsCredentials?.address || '',
-          masterPubKey,
-          stxPublicKey: stacksCredentials?.publicKey || '',
-          btcPublicKey: bitcoinCredentials?.publicKey || '',
-          ordinalsPublicKey: ordinalsCredentials?.publicKey || '',
-          accountType: 'ledger',
-          accountName: `Ledger Account ${addressIndex + 1}`,
-        };
-        await addLedgerAccount(ledgerAccount);
-        await ledgerDelay(1000);
-        handleClickNext();
-        setIsButtonDisabled(false);
-        return;
-      }
-
-      // if (currentAccount && isStacksSelected) {
-      //   const ledgerAccount: Account = {
-      //     ...currentAccount,
-      //     stxAddress: stacksCredentials?.address || '',
-      //     stxPublicKey: stacksCredentials?.publicKey || '',
-      //   };
-      //   await updateLedgerAccounts(ledgerAccount);
-      //   await ledgerDelay(1000);
-      //   handleClickNext();
-      //   setIsButtonDisabled(false);
-      //   return;
-      // }
-
-      if (currentAccount && isBitcoinSelected) {
-        const ledgerAccount: Account = {
-          ...currentAccount,
-          btcAddress: bitcoinCredentials?.address || '',
-          btcPublicKey: bitcoinCredentials?.publicKey || '',
-          ordinalsAddress: ordinalsCredentials?.address || '',
-          ordinalsPublicKey: ordinalsCredentials?.publicKey || '',
-        };
-        await updateLedgerAccounts(ledgerAccount);
-        await ledgerDelay(1000);
-        handleClickNext();
-        setIsButtonDisabled(false);
-        return;
-      }
-
-      await ledgerDelay(500);
-      handleClickNext();
-      setIsButtonDisabled(false);
-    } catch (err) {
-      console.error(err);
-      setIsButtonDisabled(false);
     }
   };
 
