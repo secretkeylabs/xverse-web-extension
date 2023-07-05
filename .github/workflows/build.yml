@@ -37,6 +37,7 @@ jobs:
         with:
           name: ${{ steps.save-filename.outputs.FILENAME }}
           path: build.zip
+          retention-days: 30
           if-no-files-found: error
       # - name: Comment on pull request
       #   uses: tonyhallett/artifacts-url-comments@v1.1.0
@@ -55,10 +56,11 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
+          WORKFLOW_ID: ${{ github.run_id }}
         run: |
           ARTIFACT_URL=$(gh api "/repos/$OWNER/$REPO/actions/artifacts" \
-            --jq ".artifacts.[] |
-            select(.workflow_run.id=='build') |
+            --jq ".artifacts[] |
+            select(.workflow_run.id==$WORKFLOW_ID) |
             select(.expired==false) |
             .archive_download_url")
           echo "ARTIFACT URL: $ARTIFACT_URL"
@@ -70,4 +72,4 @@ jobs:
           body: |-
             build: ${{ env.ARTIFACT_URL }}
 
-            Please note that files only stay for around 90 days
+            Please note that files only stay for around 30 days
