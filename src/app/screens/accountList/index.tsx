@@ -21,12 +21,21 @@ const Container = styled.div`
     display: none;
   }
 `;
-const RowContainer = styled.button((props) => ({
+
+const ButtonContainer = styled.button((props) => ({
+  width: '100%',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   background: 'transparent',
-  marginTop: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(4),
+  paddingBottom: props.theme.spacing(4),
+  paddingLeft: props.theme.spacing(11),
+  paddingRight: props.theme.spacing(11),
+  transition: 'background-color 0.2s ease',
+  ':hover': {
+    backgroundColor: props.theme.colors.background.elevation1
+  }
 }));
 
 const AccountContainer = styled.div((props) => ({
@@ -34,7 +43,6 @@ const AccountContainer = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(11),
   paddingRight: props.theme.spacing(11),
-  marginBottom: props.theme.spacing(11),
 }));
 
 const AddAccountContainer = styled.div((props) => ({
@@ -59,9 +67,13 @@ const AddAccountText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
-// TODO: Make the buttons sticky on the bottom
-const ButtonsWrapper = styled.div`
-`;
+const ButtonsWrapper = styled.div(props => `
+  position: sticky;
+  bottom: 0;
+  background-color: ${props.theme.colors.background.elevation0};
+  margin-top: ${props.theme.spacing(8)}px;
+  margin-bottom: ${props.theme.spacing(11)}px;
+`);
 
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
@@ -131,23 +143,23 @@ function AccountList(): JSX.Element {
             <Seperator />
           </>
         ))}
-        <ButtonsWrapper>
-          <RowContainer onClick={async () => onCreateAccount()}>
-            <AddAccountContainer>
-              <ButtonImage src={Plus} />
-            </AddAccountContainer>
-            <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
-          </RowContainer>
-          {network.type === 'Mainnet' && (
-            <RowContainer onClick={onImportLedgerAccount}>
-              <AddAccountContainer>
-                <ButtonImage src={ConnectLedger} />
-              </AddAccountContainer>
-              <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
-            </RowContainer>
-          )}
-        </ButtonsWrapper>
       </AccountContainer>
+      <ButtonsWrapper>
+        <ButtonContainer onClick={async () => onCreateAccount()}>
+          <AddAccountContainer>
+            <ButtonImage src={Plus} />
+          </AddAccountContainer>
+          <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
+        </ButtonContainer>
+        {network.type === 'Mainnet' && (
+          <ButtonContainer onClick={onImportLedgerAccount}>
+            <AddAccountContainer>
+              <ButtonImage src={ConnectLedger} />
+            </AddAccountContainer>
+            <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
+          </ButtonContainer>
+        )}
+      </ButtonsWrapper>
     </Container>
   );
 }
