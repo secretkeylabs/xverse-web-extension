@@ -2,9 +2,9 @@ name: Release
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 'chore/release-workflow'
+  # push:
+  #   branches:
+  #     - 'chore/release-workflow'
   release:
     types: [created]
 
@@ -38,7 +38,7 @@ jobs:
           zip -r build.zip ./build
       - name: Upload Archive
         uses: actions/upload-artifact@v3
-        with:    
+        with:
           name: ${{ steps.save-filename.outputs.FILENAME }}
           path: build.zip
       - name: Upload Release Asset
