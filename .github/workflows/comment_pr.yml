@@ -50,6 +50,6 @@ jobs:
         with:
           issue-number: ${{ env.PR_NUMBER }}
           body: |-
-            build: ${{ env. ARTIFACT_URL }}
+            build: ${{ env.ARTIFACT_URL }}
 
-            Please note that files only stay for around 90 days
+            Please note that files only stay for around 30 days
