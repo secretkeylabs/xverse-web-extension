@@ -317,6 +317,11 @@ function ImportLedger(): JSX.Element {
       }
     }
 
+    if (currentStepIndex === 0) {
+      setCurrentStepIndex(2);
+      return;
+    }
+
     setCurrentStepIndex(currentStepIndex + 1);
   };
 
@@ -475,7 +480,7 @@ function ImportLedger(): JSX.Element {
     setAddressIndex(0);
     setAccountName('');
 
-    setCurrentStepIndex(1);
+    setCurrentStepIndex(0);
   };
 
   const handleAssetSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -519,6 +524,10 @@ function ImportLedger(): JSX.Element {
                 <ImportStartImage src={LedgerImportStartSVG} />
                 <ImportStartTitle>{t('LEDGER_IMPORT_1_TITLE')}</ImportStartTitle>
                 <ImportStartText>{t('LEDGER_IMPORT_1_SUBTITLE')}</ImportStartText>
+
+                <div style={{ marginTop: 24 }}>
+                  <InfoContainer bodyText={t('LEDGER_IMPORT_2_WARNING')} />
+                </div>
               </ImportStartContainer>
             )}
             {currentStepIndex === 1 && (
@@ -527,8 +536,6 @@ function ImportLedger(): JSX.Element {
                   <SelectAssetTitle>{t('LEDGER_IMPORT_2_TITLE')}</SelectAssetTitle>
                   <SelectAssetText>{t('LEDGER_IMPORT_2_SUBTITLE')}</SelectAssetText>
                 </SelectAssetTextContainer>
-
-                <InfoContainer bodyText={t('LEDGER_IMPORT_2_WARNING')} type="Warning" />
 
                 <ImportCardContainer id="card_container">
                   <LedgerAssetSelectCard
