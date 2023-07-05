@@ -38,10 +38,11 @@ jobs:
           name: ${{ steps.save-filename.outputs.FILENAME }}
           path: build.zip
           if-no-files-found: error
-      - name: Comment to PR
-        uses: gavv/pull-request-artifacts@v1.0.0
+      - name: Comment on pull request
+        uses: tonyhallett/artifacts-url-comments@v1.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          commit: ${{ github.event.pull_request.head.sha }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: |
-            ${{ steps.save-filename.outputs.FILENAME }}
+          prefix: Here are the artifacts 
+          suffix: Have a nice day.
+          format: (name)[url]
