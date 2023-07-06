@@ -6,12 +6,11 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           always-auth: true
@@ -25,11 +24,26 @@ jobs:
       - name: Build
         run: npm run build --if-present
       # - name: Test
-        # run: npm test --passWithNoTests
+      # run: npm test --passWithNoTests
+      - name: Save Filename
+        id: save-filename
+        run: |
+          echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').zip" >> $GITHUB_OUTPUT
       - name: Create Archive
-        run: zip -r xverse-extension-${{ github.ref_name }}.zip build
+        run: |
+          zip -r build.zip ./build
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
-          name: release-build
-          path: xverse-extension-${{ github.ref_name }}.zip
+          name: ${{ steps.save-filename.outputs.FILENAME }}
+          path: build.zip
+      - name: Upload Release Asset
+        if: ${{ github.event.release.upload_url }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build.zip
+          asset_name: ${{ steps.save-filename.outputs.FILENAME }}
+          asset_content_type: application/zip
