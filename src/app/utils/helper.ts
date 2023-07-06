@@ -121,8 +121,9 @@ export function checkNftExists(
 ): boolean {
   const principal: string[] = nft?.fully_qualified_token_id?.split('::');
   const transaction = pendingTransactions.find(
-    (tx) => tx.contractCall?.contract_id === principal[0]
-      && tx.contractCall.function_args[0].repr.substring(1) === nft.token_id.toString(),
+    (tx) =>
+      tx.contractCall?.contract_id === principal[0] &&
+      tx.contractCall.function_args[0].repr.substring(1) === nft.token_id.toString(),
   );
   if (transaction) return true;
   return false;
@@ -156,11 +157,14 @@ export async function isValidBtcApi(url: string, network: NetworkType) {
   throw new Error('Invalid URL');
 }
 
-export const getNetworkType = (stxNetwork) => (stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet');
+export const getNetworkType = (stxNetwork) =>
+  stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
 
-export const isHardwareAccount = (account: Account | null): boolean => !!account?.accountType && account?.accountType !== 'software';
+export const isHardwareAccount = (account: Account | null): boolean =>
+  !!account?.accountType && account?.accountType !== 'software';
 
-export const isLedgerAccount = (account: Account | null): boolean => account?.accountType === 'ledger';
+export const isLedgerAccount = (account: Account | null): boolean =>
+  account?.accountType === 'ledger';
 
 export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
 
