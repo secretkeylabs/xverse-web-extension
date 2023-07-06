@@ -133,9 +133,8 @@ function AccountList(): JSX.Element {
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
         {displayedAccountsList.map((account) => (
-          <React.Fragment key={account.id}>
+          <React.Fragment key={account.btcAddress}>
             <AccountRow
-              key={account.stxAddress + account.btcAddress}
               account={account}
               isSelected={isAccountSelected(account)}
               onAccountSelected={handleAccountSelect}

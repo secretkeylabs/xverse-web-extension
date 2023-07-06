@@ -248,20 +248,21 @@ function ImportLedger(): JSX.Element {
     },
   });
 
-  const importBtcAccounts = async (showAddress: boolean = false) => {
+  const importBtcAccounts = async (showAddress: boolean, masterFingerPrint?: string) => {
     let btcCreds;
     let ordinalsCreds;
     const transport = await Transport.create();
-    const newAddressIndex = ledgerAccountsList.filter(
-      (account) => account.btcAddress !== '',
-    ).length;
+    const newAddressIndex = ledgerAccountsList.length;
     setAddressIndex(newAddressIndex);
+    const newDeviceAccountIndex = ledgerAccountsList.filter(
+      (account) => account.masterPubKey === (masterFingerPrint || masterPubKey),
+    ).length;
     if (isBitcoinSelected) {
       const bitcoinAccount = await importNativeSegwitAccountFromLedger(
         transport,
         network.type,
         0,
-        newAddressIndex,
+        newDeviceAccountIndex,
         showAddress,
       );
       btcCreds = {
@@ -273,7 +274,7 @@ function ImportLedger(): JSX.Element {
         transport,
         network.type,
         0,
-        newAddressIndex,
+        newDeviceAccountIndex,
         showAddress,
       );
       ordinalsCreds = {
@@ -284,20 +285,21 @@ function ImportLedger(): JSX.Element {
     }
     await transport.close();
 
-    return {btcCreds, ordinalsCreds};
+    return {btcCreds, ordinalsCreds, newAddressIndex};
   };
 
   const importStxAccounts = async () => {
     const transport = await Transport.create();
-    const newAddressIndex = ledgerAccountsList.filter(
-      (account) => account.stxAddress !== '',
-    ).length;
+    const newAddressIndex = ledgerAccountsList.length;
     setAddressIndex(newAddressIndex);
+    const newDeviceAccountIndex = ledgerAccountsList.filter(
+      (account) => account.masterPubKey === masterPubKey,
+    ).length;
     const { address, publicKey } = await importStacksAccountFromLedger(
       transport,
       network.type,
       0,
-      newAddressIndex,
+      newDeviceAccountIndex,
     );
     setStacksCredentials({
       address,
@@ -316,7 +318,7 @@ function ImportLedger(): JSX.Element {
     (i.e. either STX or BTC address already present for the account)
     */
     if (currentStepIndex === 4) {
-      const currentAccount = ledgerAccountsList.find((account) => account.id === addressIndex);
+      const currentAccount = ledgerAccountsList.find((account) => account.id === addressIndex && account.masterPubKey === masterPubKey);
       if (currentAccount && currentAccount.stxAddress && currentAccount.btcAddress) {
         handleSkipToEnd();
         return;
@@ -331,14 +333,14 @@ function ImportLedger(): JSX.Element {
     setCurrentStepIndex(currentStepIndex + 1);
   };
 
-  const saveAddressToWallet = async ({btcCreds, ordinalsCreds, masterFingerPrint}: {btcCreds?: Credential, ordinalsCreds?: Credential, masterFingerPrint?: string}) => {
+  const saveAddressToWallet = async ({btcCreds, ordinalsCreds, masterFingerPrint, newAddressIndex}: {btcCreds?: Credential, ordinalsCreds?: Credential, masterFingerPrint?: string, newAddressIndex: number}) => {
     setIsButtonDisabled(true);
-    const currentAccount = ledgerAccountsList.find((account) => account.id === addressIndex && account.masterPubKey === masterFingerPrint);
+    const currentAccount = ledgerAccountsList.find((account) => account.id === newAddressIndex && account.masterPubKey === masterFingerPrint);
     try {
 
       if (!currentAccount) {
         const ledgerAccount: Account = {
-          id: addressIndex,
+          id: newAddressIndex,
           stxAddress: stacksCredentials?.address || '',
           btcAddress: btcCreds?.address || '',
           ordinalsAddress: ordinalsCreds?.address || '',
@@ -347,7 +349,7 @@ function ImportLedger(): JSX.Element {
           btcPublicKey: btcCreds?.publicKey || '',
           ordinalsPublicKey: ordinalsCreds?.publicKey || '',
           accountType: 'ledger',
-          accountName: `Ledger Account ${addressIndex + 1}`,
+          accountName: `Ledger Account ${newAddressIndex}`,
         };
         await addLedgerAccount(ledgerAccount);
         await ledgerDelay(1000);
@@ -397,8 +399,8 @@ function ImportLedger(): JSX.Element {
       setCurrentStepIndex(3);
       setIsButtonDisabled(true);
       if (!isStacksSelected) {
-        const {btcCreds, ordinalsCreds} = await importBtcAccounts(true);
-        await saveAddressToWallet({btcCreds, ordinalsCreds});
+        const {btcCreds, ordinalsCreds, newAddressIndex} = await importBtcAccounts(true);
+        await saveAddressToWallet({btcCreds, ordinalsCreds, newAddressIndex});
       }
     } catch (err) {
       console.error(err);
@@ -419,14 +421,14 @@ function ImportLedger(): JSX.Element {
     try {
       setIsConnectFailed(false);
       setIsButtonDisabled(true);
+      const masterFingerPrint = await fetchMasterPubKey();
       if (isStacksSelected) {
         await importStxAccounts();
       } else {
-        await importBtcAccounts();
+        await importBtcAccounts(false, masterFingerPrint);
       }
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
-      const masterFingerPrint = await fetchMasterPubKey();
       if (ledgerAccountsList?.find((account) => account.masterPubKey === masterFingerPrint)) {
         setIsButtonDisabled(false);
         setCurrentStepIndex(2.5);
@@ -434,8 +436,8 @@ function ImportLedger(): JSX.Element {
       }
       handleClickNext();
       if (!isStacksSelected) {
-        const {btcCreds, ordinalsCreds} = await importBtcAccounts(true);
-        await saveAddressToWallet({btcCreds, ordinalsCreds, masterFingerPrint});
+        const {btcCreds, ordinalsCreds, newAddressIndex} = await importBtcAccounts(true, masterFingerPrint);
+        await saveAddressToWallet({btcCreds, ordinalsCreds, masterFingerPrint, newAddressIndex});
       }
     } catch (err) {
       console.error(err);
@@ -453,7 +455,7 @@ function ImportLedger(): JSX.Element {
 
     try {
       setIsButtonDisabled(true);
-      const accountToUpdate = ledgerAccountsList.find((account) => account.id === addressIndex);
+      const accountToUpdate = ledgerAccountsList.find((account) => account.id === addressIndex && account.masterPubKey === masterPubKey);
       if (!accountToUpdate) {
         throw new Error('Account not found');
       }
@@ -719,7 +721,7 @@ function ImportLedger(): JSX.Element {
               <ActionButton
                 disabled={isButtonDisabled}
                 processing={isButtonDisabled}
-                onPress={() => saveAddressToWallet({btcCreds: bitcoinCredentials, ordinalsCreds: ordinalsCredentials, masterFingerPrint: masterPubKey})}
+                onPress={() => saveAddressToWallet({btcCreds: bitcoinCredentials, ordinalsCreds: ordinalsCredentials, masterFingerPrint: masterPubKey, newAddressIndex: addressIndex})}
                 text={t('LEDGER_IMPORT_ADD_BUTTON')}
               />
             )}
