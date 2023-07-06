@@ -2,16 +2,15 @@ name: Build
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           always-auth: true
@@ -25,4 +24,18 @@ jobs:
       - name: Build
         run: npm run build --if-present
       # - name: Test
-        # run: npm test --passWithNoTests
+      # run: npm test --passWithNoTests
+      - name: Save Filename
+        id: save-filename
+        run: |
+          echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').$(git rev-parse --short ${{ github.sha }}).zip" >> $GITHUB_OUTPUT
+      - name: Create Archive
+        run: |
+          zip -r build.zip ./build
+      - name: Upload Archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.save-filename.outputs.FILENAME }}
+          path: build.zip
+          retention-days: 30
+          if-no-files-found: error
