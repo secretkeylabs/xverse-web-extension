@@ -7,19 +7,18 @@ import * as actions from './wallet/actions/types';
 import { WalletState } from './wallet/actions/types';
 import walletReducer from './wallet/reducer';
 
-export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
 
 const rootPersistConfig = {
   version: 1,
   key: 'root',
-  storage,
+  storage: ChromeStorage,
   blacklist: ['walletState'],
 };
 
 export const WalletPersistConfig: PersistConfig<WalletState> = {
   version: 1,
   key: 'walletState',
-  storage,
+  storage: ChromeStorage,
   blacklist: ['seedPhrase'],
 };
 

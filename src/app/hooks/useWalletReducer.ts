@@ -14,20 +14,25 @@ import {
   resetWalletAction,
   selectAccount,
   setWalletAction,
-  storeEncryptedSeedAction,
   updateLedgerAccountsAction,
   unlockWalletAction,
 } from '@stores/wallet/actions/actionCreators';
-import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
 import { useDispatch } from 'react-redux';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
+import { SessionStorageKeys, getFromSessionStorage } from '@utils/sessionStorageUtils';
 import useWalletSession from './useWalletSession';
 import useWalletSelector from './useWalletSelector';
 
 const useWalletReducer = () => {
   const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } =
     useWalletSelector();
+  const {
+    getSeed,
+    storeSeed,
+    initSeedVault,
+    lockVault,
+  } = useSecretKey();
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
@@ -103,17 +108,13 @@ const useWalletReducer = () => {
   };
 
   const unlockWallet = async (password: string) => {
-    const pHash = await generatePasswordHash(password);
-    const decrypted = await decryptSeedPhrase(encryptedSeed, password);
+    const decrypted = await getSeed(password);
     try {
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
     } catch (err) {
       dispatch(fetchAccountAction(accountsList[0], accountsList));
       dispatch(getActiveAccountsAction(accountsList));
     } finally {
-      chrome.storage.session.set({
-        pHash: pHash.hash,
-      });
       setSessionStartTime();
     }
     dispatch(unlockWalletAction(decrypted));
@@ -122,14 +123,15 @@ const useWalletReducer = () => {
 
   const lockWallet = async () => {
     dispatch(lockWalletAction());
-    await clearSessionTime();
+    const passPhrase = await getFromSessionStorage(SessionStorageKeys.PASSWORD_HASH);
+    await lockVault(passPhrase);
     await clearSessionKey();
   };
 
-  const resetWallet = () => {
+  const resetWallet = async () => {
     dispatch(resetWalletAction());
-    chrome.storage.local.clear();
-    chrome.storage.session.clear();
+    await chrome.storage.local.clear();
+    await chrome.storage.session.clear();
     localStorage.clear();
     clearSessionTime();
   };
@@ -151,11 +153,10 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
-    const encryptSeed = await encryptSeedPhrase(seed, password);
+    await initSeedVault(password);
+    await storeSeed(seed);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
-    dispatch(storeEncryptedSeedAction(encryptSeed));
     dispatch(setWalletAction(wallet));
-    const pHash = await generatePasswordHash(password);
     localStorage.setItem('migrated', 'true');
     try {
       await loadActiveAccounts(seed, network, selectedNetwork, [
@@ -188,9 +189,6 @@ const useWalletReducer = () => {
       );
     } finally {
       setSessionStartTime();
-      chrome.storage.session.set({
-        pHash: pHash.hash,
-      });
     }
   };
 

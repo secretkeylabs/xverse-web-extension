@@ -1,6 +1,7 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { setWalletLockPeriodAction } from '@stores/wallet/actions/actionCreators';
 import { WalletSessionPeriods } from '@stores/wallet/actions/types';
+import { SessionStorageKeys } from '@utils/sessionStorageUtils';
 import { addMinutes } from 'date-fns';
 import { useDispatch } from 'react-redux';
 
@@ -25,7 +26,7 @@ const useWalletSession = () => {
   };
 
   const shouldLock = async () => {
-    const pHash = await chrome.storage.session.get('pHash');
+    const pHash = await chrome.storage.session.get(SessionStorageKeys.PASSWORD_HASH);
 
     if (!pHash) return false;
 

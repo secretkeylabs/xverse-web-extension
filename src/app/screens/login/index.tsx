@@ -158,7 +158,6 @@ function Login(): JSX.Element {
   const handleVerifyPassword = async () => {
     setIsVerifying(true);
     try {
-      await decryptSeedPhrase(encryptedSeed, password);
       const hasMigrated = localStorage.getItem('migrated');
       const isReminderDue =
         Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();

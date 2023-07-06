@@ -52,4 +52,4 @@ class ChromeStorage {
     });
   }
 }
-export default ChromeStorage;
+export default new ChromeStorage(chrome.storage.local, chrome.runtime);
