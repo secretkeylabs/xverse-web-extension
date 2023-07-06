@@ -28,6 +28,7 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import { isLedgerAccount } from '@utils/helper';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -137,7 +138,7 @@ function ConfirmInscriptionRequest() {
     feePerVByte,
   } = location.state;
   const {
-    btcAddress, network, selectedAccount, seedPhrase, btcFiatRate,
+    btcAddress, network, selectedAccount, seedPhrase, btcFiatRate, shouldResetUserFlow
   } = useWalletSelector();
   const btcClient = useBtcClient();
   const [signedTx, setSignedTx] = useState<string>('');
@@ -151,6 +152,13 @@ function ConfirmInscriptionRequest() {
   const { ordinals: ordinalsInBtc } = useOrdinalsByAddress(btcAddress);
 
   const content = useMemo(() => textContent && JSON.parse(textContent), [textContent]);
+
+  const resetUserFlow = useResetUserFlow();
+  useEffect(() => {
+    if (shouldResetUserFlow) {
+      resetUserFlow('/confirm-inscription-request');
+    }
+  }, [shouldResetUserFlow]);
 
   useEffect(() => {
     axios

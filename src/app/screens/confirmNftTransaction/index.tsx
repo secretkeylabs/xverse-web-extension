@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
@@ -20,8 +19,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { isLedgerAccount } from '@utils/helper';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
-import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
-import { useDispatch } from 'react-redux';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -101,7 +99,6 @@ function ConfirmNftTransaction() {
   const { selectedAccount, shouldResetUserFlow } = useWalletSelector();
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
   const { id } = useParams();
   const { nftData } = useNftDataSelector();
   const nftIdDetails = id!.split('::');
@@ -164,10 +161,10 @@ function ConfirmNftTransaction() {
     mutate({ signedTx: txs[0] });
   };
 
+  const resetUserFlow = useResetUserFlow();
   useEffect(() => {
     if (shouldResetUserFlow) {
-      navigate('/nft-dashboard');
-      dispatch(setShouldResetUserFlow(false));
+      resetUserFlow('/confirm-nft-tx');
     }
   }, [shouldResetUserFlow]);
 

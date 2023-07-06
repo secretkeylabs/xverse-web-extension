@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -16,8 +15,7 @@ import useBtcClient from '@hooks/useBtcClient';
 import { isLedgerAccount } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
-import { useDispatch } from 'react-redux';
-import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -96,7 +94,6 @@ function ConfirmOrdinalTransaction() {
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const dispatch = useDispatch();
   const {
     fee, feePerVByte, signedTxHex, ordinalUtxo,
   } = location.state;
@@ -157,10 +154,10 @@ function ConfirmOrdinalTransaction() {
     navigate(-1);
   };
 
+  const resetUserFlow = useResetUserFlow();
   useEffect(() => {
     if (shouldResetUserFlow) {
-      navigate('/nft-dashboard');
-      dispatch(setShouldResetUserFlow(false));
+      resetUserFlow('/confirm-ordinal-tx');
     }
   }, [shouldResetUserFlow]);
 

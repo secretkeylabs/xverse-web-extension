@@ -24,6 +24,7 @@ import { isLedgerAccount } from '@utils/helper';
 import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
 import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core/api';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -170,10 +171,10 @@ function SendOrdinal() {
     navigate(-1);
   };
 
+  const resetUserFlow = useResetUserFlow();
   useEffect(() => {
     if (shouldResetUserFlow) {
-      navigate('/nft-dashboard');
-      dispatch(setShouldResetUserFlow(false));
+      resetUserFlow('/send-ordinal');
     }
   }, [shouldResetUserFlow]);
 

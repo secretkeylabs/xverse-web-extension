@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -10,6 +10,7 @@ import {
   ErrorCodes,
 } from '@secretkeylabs/xverse-core';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
@@ -53,7 +54,7 @@ function SendBrc20Screen() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
   const {
-    btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate, brcCoinsList,
+    btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate, brcCoinsList, shouldResetUserFlow
   } = useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
@@ -64,6 +65,13 @@ function SendBrc20Screen() {
 
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
   const fungibleToken = location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
+
+  const resetUserFlow = useResetUserFlow();
+  useEffect(() => {
+    if (shouldResetUserFlow) {
+      resetUserFlow('/send-brc20');
+    }
+  }, [shouldResetUserFlow]);
 
   const handleBackButtonClick = () => {
     if (showForm) {

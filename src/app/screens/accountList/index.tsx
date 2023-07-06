@@ -12,7 +12,7 @@ import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import React, { useMemo } from 'react';
-import { hasTabWhichRequiresReset } from '@utils/helper';
+import { hasTabWhichRequiresReset } from '@hooks/useResetUserFlow';
 
 const Container = styled.div`
   display: flex;
