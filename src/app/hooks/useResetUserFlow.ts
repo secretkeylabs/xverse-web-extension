@@ -7,8 +7,10 @@ const userFlowConfig: Record<string, { resetTo: string }> = {
   '/confirm-btc-tx': { resetTo: '/send-btc' },
   '/send-brc20': { resetTo: '/send-brc20' },
   '/confirm-inscription-request': { resetTo: '/send-brc20' },
+  '/ordinal-detail': { resetTo: '/nft-dashboard' },
   '/send-ordinal': { resetTo: '/nft-dashboard' },
   '/confirm-ordinal-tx': { resetTo: '/nft-dashboard' },
+  '/nft-detail': { resetTo: '/nft-dashboard' },
   '/send-nft': { resetTo: '/nft-dashboard' },
   '/confirm-nft-tx': { resetTo: '/nft-dashboard' },
 };

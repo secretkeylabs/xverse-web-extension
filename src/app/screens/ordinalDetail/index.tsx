@@ -23,6 +23,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import OrdinalAttributeComponent from './ordinalAttributeComponent';
 
 const Container = styled.div`
@@ -270,7 +271,7 @@ const DetailSection = styled.div<DetailSectionProps>((props) => ({
 function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { ordinalsAddress, network, selectedAccount } = useWalletSelector();
+  const { ordinalsAddress, network, selectedAccount, shouldResetUserFlow } = useWalletSelector();
   const { selectedOrdinal } = useNftDataSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(selectedOrdinal?.tx_id);
@@ -285,6 +286,13 @@ function OrdinalDetailScreen() {
     () => (isBrcTransferValid(selectedOrdinal!) ? 'Valid' : 'Void'),
     [selectedOrdinal],
   );
+
+  const resetUserFlow = useResetUserFlow();
+  useEffect(() => {
+    if (shouldResetUserFlow) {
+      resetUserFlow('/ordinal-detail');
+    }
+  }, [shouldResetUserFlow]);
 
   useEffect(() => {
     if (selectedOrdinal) {

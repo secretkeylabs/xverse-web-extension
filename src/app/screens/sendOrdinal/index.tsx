@@ -21,8 +21,6 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import { isLedgerAccount } from '@utils/helper';
-import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
-import { useDispatch } from 'react-redux';
 import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core/api';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
@@ -106,7 +104,6 @@ function SendOrdinal() {
   const { selectedOrdinal } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
-  const dispatch = useDispatch();
   const {
     network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate, shouldResetUserFlow
   } = useWalletSelector();
