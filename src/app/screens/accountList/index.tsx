@@ -11,7 +11,7 @@ import Seperator from '@components/seperator';
 import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 const Container = styled.div`
   display: flex;
@@ -133,7 +133,7 @@ function AccountList(): JSX.Element {
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
         {displayedAccountsList.map((account) => (
-          <>
+          <React.Fragment key={account.id}>
             <AccountRow
               key={account.stxAddress + account.btcAddress}
               account={account}
@@ -141,7 +141,7 @@ function AccountList(): JSX.Element {
               onAccountSelected={handleAccountSelect}
             />
             <Seperator />
-          </>
+          </React.Fragment>
         ))}
       </AccountContainer>
       <ButtonsWrapper>
