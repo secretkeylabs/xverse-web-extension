@@ -64,7 +64,7 @@
     },
     "LEDGER_IMPORT_END": {
       "TITLE": "Your wallet is ready!",
-      "SUBTITLE": "You can open the wallet from your account list."
+      "SUBTITLE": "You can switch to this wallet from the accounts selection drop-down."
     },
     "LEDGER_IMPORT_2_BUTTON": "Get started",
     "LEDGER_IMPORT_CONTINUE_BUTTON": "Continue",

@@ -26,7 +26,7 @@ import LedgerConnectBtcSVG from '@assets/img/ledger/ledger_import_connect_btc.sv
 import LedgerConnectStxSVG from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import InfoIconSVG from '@assets/img/ledger/info_icon.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
-import LedgerImportEndSVG from '@assets/img/ledger/ledger_import_end.svg';
+import LedgerAccountSwitchSVG from '@assets/img/ledger/account_switch.svg';
 import ArrowLeftIconSVG from '@assets/img/ledger/arrow_left_icon.svg';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
@@ -198,7 +198,7 @@ const EndScreenTextContainer = styled.div((props) => ({
   alignItems: 'center',
   textAlign: 'center',
   gap: props.theme.spacing(6),
-  marginTop: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(20),
 }));
 
 const AssetSelectionButton = styled.button((props) => ({
@@ -349,7 +349,7 @@ function ImportLedger(): JSX.Element {
           btcPublicKey: btcCreds?.publicKey || '',
           ordinalsPublicKey: ordinalsCreds?.publicKey || '',
           accountType: 'ledger',
-          accountName: `Ledger Account ${newAddressIndex}`,
+          accountName: `Ledger Account ${newAddressIndex + 1}`,
         };
         await addLedgerAccount(ledgerAccount);
         await ledgerDelay(1000);
@@ -664,11 +664,11 @@ function ImportLedger(): JSX.Element {
             )}
             {currentStepIndex === 6 && (
               <EndScreenContainer>
-                <img src={LedgerImportEndSVG} alt="Wallet created" />
                 <EndScreenTextContainer>
                   <SelectAssetTitle>{t('LEDGER_IMPORT_END.TITLE')}</SelectAssetTitle>
                   <SelectAssetText>{t('LEDGER_IMPORT_END.SUBTITLE')}</SelectAssetText>
                 </EndScreenTextContainer>
+                <img src={LedgerAccountSwitchSVG} alt="Wallet created" />
               </EndScreenContainer>
             )}
           </OnBoardingContentContainer>
