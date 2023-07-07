@@ -27,7 +27,7 @@ export default function FeesBlock({ lpFee, lpFeeFiatAmount, currency }: FeeTextP
     <Container>
       <RowContainer>
         <TitleText>{t('FEES')}</TitleText>
-        <FeeText>{`${lpFee.toString()} ${currency}`}</FeeText>
+        <FeeText>{`${lpFee.toFixed(6)} ${currency}`}</FeeText>
       </RowContainer>
       <EstimateUSDText>{` ~ $${lpFeeFiatAmount} USD`}</EstimateUSDText>
     </Container>
