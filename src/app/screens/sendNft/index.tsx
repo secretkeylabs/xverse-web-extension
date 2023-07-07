@@ -20,8 +20,7 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';
-import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
-import { useDispatch } from 'react-redux';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -102,7 +101,6 @@ function SendNft() {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
-  const dispatch = useDispatch();
   let address: string | undefined;
 
   if (location.state) {
@@ -126,7 +124,6 @@ function SendNft() {
     stxPublicKey,
     network,
     feeMultipliers,
-    shouldResetUserFlow,
   } = useWalletSelector();
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -176,12 +173,8 @@ function SendNft() {
     }
   }, [data]);
 
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      navigate('/nft-dashboard');
-      dispatch(setShouldResetUserFlow(false));
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-nft'), []);
 
   const handleBackButtonClick = () => {
     navigate(-1);

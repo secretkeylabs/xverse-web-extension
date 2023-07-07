@@ -24,6 +24,7 @@ import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
 import { MoonLoader } from 'react-spinners';
 import AccountHeaderComponent from '@components/accountHeader';
 import SmallActionButton from '@components/smallActionButton';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import NftAttribute from './nftAttribute';
 import DescriptionTile from './descriptionTile';
 
@@ -271,6 +272,9 @@ function NftDetailScreen() {
 
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/nft-detail'), []);
 
   useEffect(() => {
     const data = nftData.find((nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)));

@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
@@ -15,7 +15,7 @@ import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
-import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 function SendBtcScreen() {
   const location = useLocation();
@@ -37,10 +37,8 @@ function SendBtcScreen() {
     selectedAccount,
     seedPhrase,
     btcFiatRate,
-    shouldResetUserFlow,
   } = useSelector((state: StoreState) => state.walletState);
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const dispatch = useDispatch();
 
   const navigate = useNavigate();
   const {
@@ -81,13 +79,8 @@ function SendBtcScreen() {
     }
   }, [data]);
 
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      setAmount('');
-      setRecipientAddress('');
-      dispatch(setShouldResetUserFlow(false));
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-btc'), []);
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {

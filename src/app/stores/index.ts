@@ -42,7 +42,6 @@ const storeMiddleware = [
       actions.SetWalletSeedPhraseKey,
       actions.UnlockWalletKey,
       actions.SelectAccountKey,
-      actions.SetShouldResetUserFlowKey
     ],
   }),
 ];

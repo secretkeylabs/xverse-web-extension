@@ -23,6 +23,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import OrdinalAttributeComponent from './ordinalAttributeComponent';
 
 const Container = styled.div`
@@ -285,6 +286,9 @@ function OrdinalDetailScreen() {
     () => (isBrcTransferValid(selectedOrdinal!) ? 'Valid' : 'Void'),
     [selectedOrdinal],
   );
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/ordinal-detail'), []);
 
   useEffect(() => {
     if (selectedOrdinal) {
