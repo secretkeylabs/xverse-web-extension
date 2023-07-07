@@ -20,15 +20,18 @@ import LedgerInput from '@components/ledger/ledgerInput';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 
 import LedgerImportStartSVG from '@assets/img/ledger/ledger_import_start.svg';
-import BtcOdrinalsIconSVG from '@assets/img/ledger/btc_ordinals_icon.svg';
+import BtcOrdinalsIconSVG from '@assets/img/ledger/btc_ordinals_icon.svg';
+import BtcIconSVG from '@assets/img/ledger/btc_icon.svg';
+import OrdinalsIconSVG from '@assets/img/ledger/ordinals_icon.svg';
 import StxIconSVG from '@assets/img/ledger/stx_icon.svg';
 import LedgerConnectBtcSVG from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import LedgerConnectStxSVG from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import InfoIconSVG from '@assets/img/ledger/info_icon.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import LedgerAccountSwitchSVG from '@assets/img/ledger/account_switch.svg';
 import ArrowLeftIconSVG from '@assets/img/ledger/arrow_left_icon.svg';
 import InfoContainer from '@components/infoContainer';
+import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
+import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 const Container = styled.div`
@@ -104,9 +107,11 @@ const SelectAssetTextContainer = styled.div((props) => ({
 const SelectAssetTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
 }));
+
 const SelectAssetText = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
+  textAlign: 'center',
 }));
 
 const SelectAssetFootNote = styled.p((props) => ({
@@ -121,8 +126,8 @@ const AddAddressHeaderContainer = styled.div((props) => ({
   flexDirection: 'column',
   alignItems: 'center',
   gap: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(20),
-  marginBottom: props.theme.spacing(16),
+  marginTop: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(8),
 }));
 
 const CreateAnotherAccountContainer = styled.div((props) => ({
@@ -138,20 +143,7 @@ const AddAddressDetailsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  gap: props.theme.spacing(12),
-}));
-
-const AlertContainer = styled.div((props) => ({
-  marginTop: 'auto',
-  marginBottom: props.theme.spacing(12),
-  width: '100%',
-  padding: props.theme.spacing(8),
-  display: 'flex',
-  flexDirection: 'row',
-  gap: props.theme.spacing(10),
-  alignItems: 'center',
-  borderRadius: props.theme.radius(2),
-  border: '1px solid rgba(255, 255, 255, 0.2)',
+  gap: props.theme.spacing(20),
 }));
 
 const AddressAddedContainer = styled.div`
@@ -211,9 +203,37 @@ const AssetSelectionButton = styled.button((props) => ({
   alignItems: 'center',
   gap: props.theme.spacing(3),
 }));
+
 const AssetSelectionButtonText = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[0],
+}));
+
+const ConfirmationText = styled.p((props) => ({
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  textAlign: 'center',
+  marginTop: props.theme.spacing(50),
+}));
+
+const ConfirmationStepsContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  marginTop: props.theme.spacing(12),
+}));
+
+interface ConfirmationStepProps {
+  isCompleted: boolean;
+}
+const ConfirmationStep = styled.div<ConfirmationStepProps>((props) => ({
+  width: 32,
+  height: 4,
+  backgroundColor: props.isCompleted ? props.theme.colors.white[0] : props.theme.colors.white[900],
+  borderRadius: props.theme.radius(1),
+  transition: 'background-color 0.2s ease-in-out',
+  ':first-child': {
+    marginRight: props.theme.spacing(4),
+  },
 }));
 
 interface Credential {
@@ -228,12 +248,16 @@ function ImportLedger(): JSX.Element {
   const [bitcoinCredentials, setBitcoinCredentials] = useState<Credential | undefined>(undefined);
   const [ordinalsCredentials, setOrdinalsCredentials] = useState<Credential | undefined>(undefined);
   const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
-  const [masterPubKey, setMasterPubKey] = useState<string>('');
+  const [masterPubKey, setMasterPubKey] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [addressIndex, setAddressIndex] = useState(0);
-  const [accountName, setAccountName] = useState<string>('');
+  const [accountName, setAccountName] = useState('');
+  const [isBtcAddressConfirmed, setIsBtcAddressConfirmed] = useState(false);
+  const [isOrdinalsAddressConfirmed, setIsOrdinalsAddressConfirmed] = useState(false);
+  const [isBtcAddressRejected, setIsBtcAddressRejected] = useState(false);
+  const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
   const { addLedgerAccount, updateLedgerAccounts } = useWalletReducer();
   const { ledgerAccountsList, network } = useWalletSelector();
@@ -258,30 +282,59 @@ function ImportLedger(): JSX.Element {
       (account) => account.masterPubKey === (masterFingerPrint || masterPubKey),
     ).length;
     if (isBitcoinSelected) {
-      const bitcoinAccount = await importNativeSegwitAccountFromLedger(
-        transport,
-        network.type,
-        0,
-        newDeviceAccountIndex,
-        showAddress,
-      );
-      btcCreds = {
-        address: bitcoinAccount.address,
-        publicKey: bitcoinAccount.publicKey,
-      };
-      setBitcoinCredentials(btcCreds);
-      const ordinalsAccount = await importTaprootAccountFromLedger(
-        transport,
-        network.type,
-        0,
-        newDeviceAccountIndex,
-        showAddress,
-      );
-      ordinalsCreds = {
-        address: ordinalsAccount.address,
-        publicKey: ordinalsAccount.publicKey,
-      };
-      setOrdinalsCredentials(ordinalsCreds);
+      try {
+        const bitcoinAccount = await importNativeSegwitAccountFromLedger(
+          transport,
+          network.type,
+          0,
+          newDeviceAccountIndex,
+          showAddress,
+        );
+        btcCreds = {
+          address: bitcoinAccount.address,
+          publicKey: bitcoinAccount.publicKey,
+        };
+        setBitcoinCredentials(btcCreds);
+        if (showAddress) {
+          setIsBtcAddressConfirmed(true);
+          setCurrentStepIndex(3.5);
+        }
+      } catch (err: any) {
+        if (err.statusCode === 27013) {
+          setIsBtcAddressRejected(true);
+        } else {
+          setIsConnectFailed(true);
+        }
+        setIsButtonDisabled(false);
+        await transport.close();
+        return;
+      }
+      try {
+        const ordinalsAccount = await importTaprootAccountFromLedger(
+          transport,
+          network.type,
+          0,
+          newDeviceAccountIndex,
+          showAddress,
+        );
+        ordinalsCreds = {
+          address: ordinalsAccount.address,
+          publicKey: ordinalsAccount.publicKey,
+        };
+        setOrdinalsCredentials(ordinalsCreds);
+        if (showAddress) {
+          setIsOrdinalsAddressConfirmed(true);
+        }
+      } catch (err: any) {
+        if (err.statusCode === 27013) {
+          setIsOrdinalsAddressRejected(true);
+        } else {
+          setIsConnectFailed(true);
+        }
+        setIsButtonDisabled(false);
+        await transport.close();
+        return;
+      }
     }
     await transport.close();
 
@@ -420,6 +473,8 @@ function ImportLedger(): JSX.Element {
   const checkDeviceConnection = async () => {
     try {
       setIsConnectFailed(false);
+      setIsBtcAddressRejected(false);
+      setIsOrdinalsAddressRejected(false);
       setIsButtonDisabled(true);
       const masterFingerPrint = await fetchMasterPubKey();
       if (isStacksSelected) {
@@ -547,7 +602,7 @@ function ImportLedger(): JSX.Element {
 
                 <ImportCardContainer id="card_container">
                   <LedgerAssetSelectCard
-                    icon={BtcOdrinalsIconSVG}
+                    icon={BtcOrdinalsIconSVG}
                     title={t('LEDGER_IMPORT_2_SELECT.BTC_TITLE')}
                     text={t('LEDGER_IMPORT_2_SELECT.BTC_SUBTITLE')}
                     id="btc_select_card"
@@ -588,7 +643,7 @@ function ImportLedger(): JSX.Element {
             )}
             {currentStepIndex === 2.5 && (
               <CreateAnotherAccountContainer>
-                <img src={isBitcoinSelected ? BtcOdrinalsIconSVG : StxIconSVG} alt="" />
+                <img src={isBitcoinSelected ? BtcOrdinalsIconSVG : StxIconSVG} alt="" />
                 <SelectAssetTitle>
                   {t(
                     isBitcoinSelected
@@ -601,14 +656,16 @@ function ImportLedger(): JSX.Element {
                 </CreateMultipleAccountsText>
               </CreateAnotherAccountContainer>
             )}
-            {currentStepIndex === 3 && (
+            {currentStepIndex === 3 && ((isConnectFailed || isBtcAddressRejected) ? (
+              <LedgerFailView title={t(isBtcAddressRejected ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED' : 'LEDGER_CONNECT.TITLE_FAILED')} text={t(isBtcAddressRejected ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED' : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED')} />
+            ) : (
               <>
                 <AddAddressHeaderContainer>
-                  <img src={isBitcoinSelected ? BtcOdrinalsIconSVG : StxIconSVG} alt="" />
+                  <img src={isBitcoinSelected ? BtcIconSVG : StxIconSVG} width={32} height={32} alt="bitcoin" />
                   <SelectAssetTitle>
                     {t(
                       isBitcoinSelected
-                        ? 'LEDGER_ADD_ADDRESS.TITLE_BTC'
+                        ? 'LEDGER_ADD_ADDRESS.TITLE_VERIFY_BTC'
                         : 'LEDGER_ADD_ADDRESS.TITLE_STX',
                     )}
                   </SelectAssetTitle>
@@ -620,20 +677,45 @@ function ImportLedger(): JSX.Element {
                     address={bitcoinCredentials?.address}
                   />
                   <LedgerAddressComponent
-                    title={t('LEDGER_ADD_ADDRESS.ORDINALS')}
-                    address={ordinalsCredentials?.address}
-                  />
-                  <LedgerAddressComponent
                     title={t('LEDGER_ADD_ADDRESS.STX')}
                     address={stacksCredentials?.address}
                   />
                 </AddAddressDetailsContainer>
-                <AlertContainer>
-                  <img src={InfoIconSVG} alt="info" />
-                  <p>{t('LEDGER_ADD_ADDRESS.ALERT')}</p>
-                </AlertContainer>
+                <ConfirmationText>
+                  {t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}
+                </ConfirmationText>
+                <ConfirmationStepsContainer>
+                  <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
+                  <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
+                </ConfirmationStepsContainer>
               </>
-            )}
+            ))}
+            {currentStepIndex === 3.5 && ((isConnectFailed || isOrdinalsAddressRejected) ? (
+              <LedgerFailView title={t(isOrdinalsAddressRejected ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED' : 'LEDGER_CONNECT.TITLE_FAILED')} text={t(isOrdinalsAddressRejected ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED' : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED')} />
+            ) : (
+              <>
+                <AddAddressHeaderContainer>
+                  <img src={OrdinalsIconSVG} width={32} height={32} alt="ordinals" />
+                  <SelectAssetTitle>
+                    {t('LEDGER_ADD_ADDRESS.TITLE_VERIFY_ORDINALS')}
+                  </SelectAssetTitle>
+                </AddAddressHeaderContainer>
+                <AddAddressDetailsContainer>
+                  <SelectAssetText>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
+                  <LedgerAddressComponent
+                    title={t('LEDGER_ADD_ADDRESS.ORDINALS')}
+                    address={ordinalsCredentials?.address}
+                  />
+                </AddAddressDetailsContainer>
+                <ConfirmationText>
+                  {t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}
+                </ConfirmationText>
+                <ConfirmationStepsContainer>
+                  <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
+                  <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
+                </ConfirmationStepsContainer>
+              </>
+            ))}
             {currentStepIndex === 4 && (
               <AddressAddedContainer>
                 <img src={CheckCircleSVG} alt="Success" />
@@ -717,12 +799,12 @@ function ImportLedger(): JSX.Element {
                 </ButtonContainer>
               </>
             )}
-            {currentStepIndex === 3 && (
+            {(currentStepIndex === 3 || currentStepIndex === 3.5) && (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) && (
               <ActionButton
-                disabled={isButtonDisabled}
                 processing={isButtonDisabled}
-                onPress={() => saveAddressToWallet({btcCreds: bitcoinCredentials, ordinalsCreds: ordinalsCredentials, masterFingerPrint: masterPubKey, newAddressIndex: addressIndex})}
-                text={t('LEDGER_IMPORT_ADD_BUTTON')}
+                disabled={isButtonDisabled}
+                onPress={backToAssetSelection}
+                text={t('LEDGER_IMPORT_TRY_AGAIN_BUTTON')}
               />
             )}
             {currentStepIndex === 4 && (
