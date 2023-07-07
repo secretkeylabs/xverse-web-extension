@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -16,8 +15,7 @@ import useBtcClient from '@hooks/useBtcClient';
 import { isLedgerAccount } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
-import { useDispatch } from 'react-redux';
-import { setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -91,12 +89,11 @@ const NftContainer = styled.div((props) => ({
 function ConfirmOrdinalTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { selectedAccount, shouldResetUserFlow } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const dispatch = useDispatch();
   const {
     fee, feePerVByte, signedTxHex, ordinalUtxo,
   } = location.state;
@@ -157,12 +154,8 @@ function ConfirmOrdinalTransaction() {
     navigate(-1);
   };
 
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      navigate('/nft-dashboard');
-      dispatch(setShouldResetUserFlow(false));
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-ordinal-tx'), []);
 
   return (
     <>

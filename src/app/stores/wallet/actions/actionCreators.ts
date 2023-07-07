@@ -248,12 +248,3 @@ export function setWalletLockPeriodAction(
     walletLockPeriod,
   };
 }
-
-export function setShouldResetUserFlow(
-  shouldResetUserFlow: boolean
-): actions.SetShouldResetUserFlow {
-  return {
-    type: actions.SetShouldResetUserFlowKey,
-    shouldResetUserFlow
-  };
-}
