@@ -138,7 +138,7 @@ function ConfirmInscriptionRequest() {
     feePerVByte,
   } = location.state;
   const {
-    btcAddress, network, selectedAccount, seedPhrase, btcFiatRate, shouldResetUserFlow
+    btcAddress, network, selectedAccount, seedPhrase, btcFiatRate
   } = useWalletSelector();
   const btcClient = useBtcClient();
   const [signedTx, setSignedTx] = useState<string>('');
@@ -153,12 +153,8 @@ function ConfirmInscriptionRequest() {
 
   const content = useMemo(() => textContent && JSON.parse(textContent), [textContent]);
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/confirm-inscription-request');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-inscription-request'), []);
 
   useEffect(() => {
     axios

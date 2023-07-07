@@ -26,7 +26,7 @@ const BottomBarContainer = styled.h1((props) => ({
 function ConfirmBtcTransaction() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { ordinalsAddress, btcAddress, selectedAccount, shouldResetUserFlow } = useWalletSelector();
+  const { ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const [signedTx, setSignedTx] = useState<string>('');
@@ -60,12 +60,8 @@ function ConfirmBtcTransaction() {
     });
   };
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/confirm-btc-tx');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-btc-tx'), []);
 
   const onContinueButtonClick = () => {
     mutate({ signedTx });

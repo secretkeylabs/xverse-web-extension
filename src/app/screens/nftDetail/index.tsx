@@ -24,9 +24,9 @@ import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
 import { MoonLoader } from 'react-spinners';
 import AccountHeaderComponent from '@components/accountHeader';
 import SmallActionButton from '@components/smallActionButton';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import NftAttribute from './nftAttribute';
 import DescriptionTile from './descriptionTile';
-import {useResetUserFlow} from '@hooks/useResetUserFlow';
 
 const Container = styled.div`
 display: flex;
@@ -248,7 +248,7 @@ const LoaderContainer = styled.div({
 function NftDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress, selectedAccount, shouldResetUserFlow } = useWalletSelector();
+  const { stxAddress, selectedAccount } = useWalletSelector();
   const { id } = useParams();
   const nftIdDetails = id!.split('::');
   const { nftData } = useNftDataSelector();
@@ -273,12 +273,8 @@ function NftDetailScreen() {
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/nft-detail');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/nft-detail'), []);
 
   useEffect(() => {
     const data = nftData.find((nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)));

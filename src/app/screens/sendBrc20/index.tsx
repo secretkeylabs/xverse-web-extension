@@ -54,7 +54,7 @@ function SendBrc20Screen() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
   const {
-    btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate, brcCoinsList, shouldResetUserFlow
+    btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate, brcCoinsList
   } = useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
@@ -66,12 +66,8 @@ function SendBrc20Screen() {
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
   const fungibleToken = location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/send-brc20');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-brc20'), []);
 
   const handleBackButtonClick = () => {
     if (showForm) {

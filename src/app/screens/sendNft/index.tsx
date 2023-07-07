@@ -124,7 +124,6 @@ function SendNft() {
     stxPublicKey,
     network,
     feeMultipliers,
-    shouldResetUserFlow,
   } = useWalletSelector();
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -174,12 +173,8 @@ function SendNft() {
     }
   }, [data]);
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/send-nft');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-nft'), []);
 
   const handleBackButtonClick = () => {
     navigate(-1);

@@ -37,7 +37,6 @@ function SendBtcScreen() {
     selectedAccount,
     seedPhrase,
     btcFiatRate,
-    shouldResetUserFlow,
   } = useSelector((state: StoreState) => state.walletState);
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 
@@ -80,12 +79,8 @@ function SendBtcScreen() {
     }
   }, [data]);
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/send-btc');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-btc'), []);
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {

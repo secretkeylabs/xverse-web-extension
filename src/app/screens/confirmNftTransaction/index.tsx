@@ -96,7 +96,7 @@ const ReviewTransactionText = styled.h1((props) => ({
 function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { selectedAccount, shouldResetUserFlow } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
@@ -161,12 +161,8 @@ function ConfirmNftTransaction() {
     mutate({ signedTx: txs[0] });
   };
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/confirm-nft-tx');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-nft-tx'), []);
 
   const handleOnCancelClick = () => {
     navigate(-1);

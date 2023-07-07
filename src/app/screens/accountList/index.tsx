@@ -6,13 +6,13 @@ import styled from 'styled-components';
 import Plus from '@assets/img/dashboard/plus.svg';
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import { useDispatch } from 'react-redux';
-import { selectAccount, setShouldResetUserFlow } from '@stores/wallet/actions/actionCreators';
+import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import Seperator from '@components/seperator';
 import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
-import React, { useMemo } from 'react';
-import { hasTabWhichRequiresReset } from '@hooks/useResetUserFlow';
+import React, { useEffect, useMemo } from 'react';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const Container = styled.div`
   display: flex;
@@ -90,6 +90,10 @@ function AccountList(): JSX.Element {
     return accountsList;
   }, [accountsList, ledgerAccountsList, network]);
 
+  const { broadcastResetUserFlow, closeChannel } = useResetUserFlow();
+  // destructor
+  useEffect(() => closeChannel, []);
+
   const handleAccountSelect = (account: Account) => {
     dispatch(
       selectAccount(
@@ -107,11 +111,7 @@ function AccountList(): JSX.Element {
         account.accountName
       )
     );
-    (async function dispatchIfResetRequired() {
-      if (await hasTabWhichRequiresReset()) {
-        dispatch(setShouldResetUserFlow(true));
-      }
-    })();
+    broadcastResetUserFlow();
     navigate('/');
   };
 

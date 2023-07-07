@@ -89,7 +89,7 @@ const NftContainer = styled.div((props) => ({
 function ConfirmOrdinalTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { selectedAccount, shouldResetUserFlow } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -154,12 +154,8 @@ function ConfirmOrdinalTransaction() {
     navigate(-1);
   };
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/confirm-ordinal-tx');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-ordinal-tx'), []);
 
   return (
     <>

@@ -271,7 +271,7 @@ const DetailSection = styled.div<DetailSectionProps>((props) => ({
 function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { ordinalsAddress, network, selectedAccount, shouldResetUserFlow } = useWalletSelector();
+  const { ordinalsAddress, network, selectedAccount } = useWalletSelector();
   const { selectedOrdinal } = useNftDataSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(selectedOrdinal?.tx_id);
@@ -287,12 +287,8 @@ function OrdinalDetailScreen() {
     [selectedOrdinal],
   );
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/ordinal-detail');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/ordinal-detail'), []);
 
   useEffect(() => {
     if (selectedOrdinal) {

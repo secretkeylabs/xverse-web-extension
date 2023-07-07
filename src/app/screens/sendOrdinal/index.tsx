@@ -105,7 +105,7 @@ function SendOrdinal() {
   const btcClient = useBtcClient();
   const location = useLocation();
   const {
-    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate, shouldResetUserFlow
+    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate
   } = useWalletSelector();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
@@ -168,12 +168,9 @@ function SendOrdinal() {
     navigate(-1);
   };
 
-  const resetUserFlow = useResetUserFlow();
-  useEffect(() => {
-    if (shouldResetUserFlow) {
-      resetUserFlow('/send-ordinal');
-    }
-  }, [shouldResetUserFlow]);
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-ordinal'), []);
+
 
   const activeAccountOwnsOrdinal =
     selectedOrdinal && selectedAccount && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);
