@@ -162,4 +162,22 @@ export const isHardwareAccount = (account: Account | null): boolean => !!account
 
 export const isLedgerAccount = (account: Account | null): boolean => account?.accountType === 'ledger';
 
-export const isInOptions = (): boolean => !!location?.pathname?.match(/options.html$/);
+export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
+
+const userFlowConfig = [
+  { matchPattern: '/send-btc', resetTo: '/send-btc' },
+  { matchPattern: '/confirm-btc-tx', resetTo: '/send-btc' },
+  { matchPattern: '/send-brc20', resetTo: '/send-brc20' },
+  { matchPattern: '/confirm-inscription-request', resetTo: '/send-brc20' },
+  { matchPattern: '/send-ordinal', resetTo: '/nft-dashboard' },
+  { matchPattern: '/confirm-ordinal-tx', resetTo: '/nft-dashboard' },
+  { matchPattern: '/send-nft', resetTo: '/nft-dashboard' },
+  { matchPattern: '/confirm-nft-tx', resetTo: '/nft-dashboard' },
+];
+
+export const hasTabWhichRequiresReset = async (): Promise<boolean> => {
+  const optionsTabs = await chrome.tabs.query({ url: chrome.runtime.getURL('options.html') });
+  return !!optionsTabs?.some((tab) =>
+    userFlowConfig.some(({ matchPattern }) => tab.url?.match(matchPattern)),
+  );
+};

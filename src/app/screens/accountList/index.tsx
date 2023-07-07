@@ -12,6 +12,7 @@ import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import React, { useMemo } from 'react';
+import { hasTabWhichRequiresReset } from '@utils/helper';
 
 const Container = styled.div`
   display: flex;
@@ -106,7 +107,11 @@ function AccountList(): JSX.Element {
         account.accountName
       )
     );
-    dispatch(setShouldResetUserFlow(true));
+    (async function dispatchIfResetRequired() {
+      if (await hasTabWhichRequiresReset()) {
+        dispatch(setShouldResetUserFlow(true));
+      }
+    })();
     navigate('/');
   };
 
