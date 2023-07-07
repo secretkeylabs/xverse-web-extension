@@ -1,13 +1,11 @@
-export enum SessionStorageKeys {
-  PASSWORD_HASH = 'passwordHash',
-}
-
-export const getFromSessionStorage = async (key: string) => {
+export const getSessionItem= async (key: string) => {
   const result = await chrome.storage.session.get(key);
   return result[key];
 };
 
-export const setFromSessionStorage = async (key: string, value: string) =>
+export const setSessionItem = async (key: string, value: any) =>
   chrome.storage.session.set({
     [key]: value,
   });
+
+export const removeSessionItem = async (key: string) => chrome.storage.session.remove(key);

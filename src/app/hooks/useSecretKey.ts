@@ -6,7 +6,7 @@ import SeedVault, {
 } from '@secretkeylabs/xverse-core/seedVault';
 import * as cryptoUtils from '@utils/encryptionUtils';
 import ChromeStorage from '@utils/storage';
-import { getFromSessionStorage, setFromSessionStorage } from '@utils/sessionStorageUtils';
+import { getSessionItem, setSessionItem } from '@utils/sessionStorageUtils';
 
 const cryptoUtilsAdapter: CryptoUtilsAdapter = {
   encrypt: cryptoUtils.encryptSeedPhrase,
@@ -16,8 +16,8 @@ const cryptoUtilsAdapter: CryptoUtilsAdapter = {
 };
 
 const secureStorageAdapter: SecureStorageAdapter = {
-  get: getFromSessionStorage,
-  set: setFromSessionStorage,
+  get: getSessionItem,
+  set: setSessionItem,
 };
 
 const commonStorageAdapter: CommonStorageAdapter = {

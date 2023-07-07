@@ -5,6 +5,7 @@ import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/x
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
 import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
+import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core/seedVault';
 import {
   ChangeNetworkAction,
   addAccountAction,
@@ -37,7 +38,7 @@ const useWalletReducer = () => {
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
-  const { setSessionStartTime, clearSessionTime, clearSessionKey } = useWalletSession();
+  const { setSessionStartTime, clearSessionTime } = useWalletSession();
 
   const loadActiveAccounts = async (
     secretKey: string,
@@ -123,9 +124,8 @@ const useWalletReducer = () => {
 
   const lockWallet = async () => {
     dispatch(lockWalletAction());
-    const passPhrase = await getFromSessionStorage(SessionStorageKeys.PASSWORD_HASH);
+    const passPhrase = await getSessionItem(SeedVaultStorageKeys.PASSWORD_HASH);
     await lockVault(passPhrase);
-    await clearSessionKey();
   };
 
   const resetWallet = async () => {

@@ -1,9 +1,10 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { setWalletLockPeriodAction } from '@stores/wallet/actions/actionCreators';
+import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core/seedVault';
 import { WalletSessionPeriods } from '@stores/wallet/actions/types';
-import { SessionStorageKeys } from '@utils/sessionStorageUtils';
 import { addMinutes } from 'date-fns';
 import { useDispatch } from 'react-redux';
+import {getSessionItem, removeSessionItem, setSessionItem} from '@utils/sessionStorageUtils';
 
 const SESSION_START_TIME_KEY = 'sessionStartTime';
 
@@ -13,24 +14,17 @@ const useWalletSession = () => {
 
   const setSessionStartTime = () => {
     const sessionStartTime = new Date().getTime();
-    chrome.storage.session.set({ [SESSION_START_TIME_KEY]: sessionStartTime });
+    setSessionItem(SESSION_START_TIME_KEY, sessionStartTime);
   };
 
   const clearSessionTime = async () => {
-    await chrome.storage.session.remove(SESSION_START_TIME_KEY);
-  };
-
-  const getSessionStartTime = async () => {
-    const { sessionStartTime } = await chrome.storage.session.get(SESSION_START_TIME_KEY);
-    return sessionStartTime;
+    await removeSessionItem(SESSION_START_TIME_KEY);
   };
 
   const shouldLock = async () => {
-    const pHash = await chrome.storage.session.get(SessionStorageKeys.PASSWORD_HASH);
-
+    const pHash = await getSessionItem(SeedVaultStorageKeys.PASSWORD_HASH);
     if (!pHash) return false;
-
-    const startTime = await getSessionStartTime();
+    const startTime = await await getSessionItem(SESSION_START_TIME_KEY);
     const currentTime = new Date().getTime();
     return currentTime >= addMinutes(startTime, walletLockPeriod).getTime();
   };
@@ -41,17 +35,11 @@ const useWalletSession = () => {
     setSessionStartTime();
   };
 
-  const clearSessionKey = async () => {
-    await chrome.storage.session.remove('pHash');
-  };
-
   return {
     setSessionStartTime,
     setWalletLockPeriod,
-    getSessionStartTime,
     shouldLock,
     clearSessionTime,
-    clearSessionKey,
   };
 };
 
