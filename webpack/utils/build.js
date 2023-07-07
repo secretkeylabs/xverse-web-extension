@@ -8,6 +8,14 @@ var webpack = require('webpack'),
 
 config.mode = 'production';
 
-webpack(config, function (err) {
+webpack(config, function (err, stats) {
   if (err) throw err;
+  console.log(
+    stats.toString({
+      preset: 'minimal',
+      colors: true,
+      outputPath: true,
+      env: true,
+    }),
+  );
 });
