@@ -24,12 +24,12 @@ const TitleText = styled.div((props) => ({
 export const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginBottom: props.theme.spacing(20),
-  marginTop: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(8),
+  marginTop: props.theme.spacing(8),
   position: 'sticky',
   bottom: 0,
   background: props.theme.colors.background.elevation0,
-  padding: `${props.theme.spacing(4)}px 0`
+  padding: `${props.theme.spacing(12)}px 0`
 }));
 
 export const ActionButtonWrap = styled.div((props) => ({
