@@ -233,11 +233,10 @@ function ConfirmBtcTransactionComponent({
   }, [ordinalData]);
 
   useEffect(() => {
-    const totalAmount: BigNumber = new BigNumber(0);
     let sum: BigNumber = new BigNumber(0);
     if (recipients) {
       recipients.map((recipient) => {
-        sum = totalAmount.plus(recipient.amountSats);
+        sum = sum.plus(recipient.amountSats);
         return sum;
       });
       sum = sum?.plus(currentFee);
