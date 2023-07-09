@@ -26,19 +26,20 @@ const RowContainer = styled.div({
   flexDirection: 'row',
 });
 
-const GradientCircle = styled.button<GradientCircleProps>((props) => ({
+const GradientCircle = styled.div<GradientCircleProps>((props) => ({
   height: 40,
   width: 40,
   borderRadius: 25,
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
 
-const TopSectionContainer = styled.button((props) => ({
+const TopSectionContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   paddingTop: props.theme.spacing(8),
   backgroundColor: 'transparent',
+  cursor: 'pointer',
 }));
 
 const CurrentAcountContainer = styled.div((props) => ({
@@ -97,7 +98,7 @@ const AddressContainer = styled.div({
   justifyContent: 'center',
 });
 
-const Button = styled.button`
+const TransparentSpan = styled.span`
   background: transparent;
 `;
 
@@ -178,7 +179,7 @@ function AccountRow({
     return name.length > 20 ? `${name.slice(0, 20)}...` : name;
   }
 
-  const handleOnBtcAddressClick = () => {
+  const handleOnBtcAddressClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     navigator.clipboard.writeText(account?.btcAddress!);
     setOnBtcCopied(true);
     setOnStxCopied(false);
@@ -187,20 +188,16 @@ function AccountRow({
     if (showBtcReceiveAlert !== null) {
       dispatch(ChangeShowBtcReceiveAlertAction(true));
     }
+    event.stopPropagation();
   };
 
-  const handleOnStxAddressClick = () => {
+  const handleOnStxAddressClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     navigator.clipboard.writeText(account?.stxAddress!);
     setOnStxCopied(true);
     setOnBtcCopied(false);
     // set 'Copied' text back to 'Stacks address' after 3 seconds
     stxCopiedTooltipTimeoutRef.current = setTimeout(() => setOnStxCopied(false), 3000);
-  };
-
-  const onRowClick = () => {
-    if (!allowCopyAddress) {
-      onAccountSelected(account!);
-    }
+    event.stopPropagation();
   };
 
   const onClick = () => {
@@ -257,29 +254,28 @@ function AccountRow({
   );
 
   return (
-    <TopSectionContainer>
+    <TopSectionContainer onClick={onClick}>
       <GradientCircle
         firstGradient={gradient[0]}
         secondGradient={gradient[1]}
         thirdGradient={gradient[2]}
-        onClick={onClick}
       />
       <CurrentAcountContainer>
         {account
           && (isSelected ? (
-            <Button onClick={onClick}>
+            <TransparentSpan>
               <CurrentAccountTextContainer>
                 <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
                 {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
               </CurrentAccountTextContainer>
-            </Button>
+            </TransparentSpan>
           ) : (
-            <Button onClick={onClick}>
+            <TransparentSpan onClick={onClick}>
               <CurrentAccountTextContainer>
                 <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
                 {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
               </CurrentAccountTextContainer>
-            </Button>
+            </TransparentSpan>
           ))}
 
         {!!account && !isHardwareAccount(account) && (
