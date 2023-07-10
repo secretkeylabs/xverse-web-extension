@@ -67,12 +67,13 @@
       "ADDRESS_INVALID": "Recipient address invalid",
       "SEND_TO_SELF": "Cannot send to self",
       "INVALID_AMOUNT": "Invalid amount",
-      "BELOW_MINIMUM_AMOUNT": "Amount should not be less than 5500 sats",
+      "BELOW_MINIMUM_AMOUNT": "Amount should not be less than 1500 sats",
       "MINIMUM_AMOUNT": "Minimum amount is 0.000001 STX",
       "INSUFFICIENT_BALANCE": "Insufficient balance",
       "MEMO_LENGTH": "Memo exceeds allowed length",
       "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
-      "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state"
+      "NFT_SEND_DETAIL": "This Nft is already sent and is in pending state",
+      "INVALID_TRANSACTION": "Invalid Transaction"
     },
     "SEND_NFT": "Send NFT",
     "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
@@ -125,8 +126,9 @@
     "BACK": "Back"
   },
   "TX_ERRORS": {
-    "INSUFFICIENT_BALANCE": "Insufficient balance",
-    "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees"
+    "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
+    "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
+    "INVALID_TRANSACTION":"Invalid Transaction"
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
