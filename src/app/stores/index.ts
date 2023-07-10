@@ -42,6 +42,8 @@ const storeMiddleware = [
       actions.SetWalletSeedPhraseKey,
       actions.UnlockWalletKey,
       actions.SelectAccountKey,
+      actions.AddAccountKey,
+      actions.AddLedgerAccountKey,
     ],
   }),
 ];
