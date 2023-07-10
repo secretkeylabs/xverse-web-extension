@@ -138,7 +138,7 @@ function ConfirmBtcTransaction() {
       setShowOrdinalsDetectedAlert(true);
     } else if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'BTC';
-      navigate('/confirm-ledger-tx', { state: { amount: new BigNumber(amount), recipient: recipient[0], type: txType } });
+      navigate('/confirm-ledger-tx', { state: { recipients: recipient, type: txType } });
     } else mutate({ signedTx: txHex });
   };
 
