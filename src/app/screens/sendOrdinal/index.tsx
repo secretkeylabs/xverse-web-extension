@@ -214,7 +214,7 @@ function SendOrdinal() {
         )}
         <SendForm
           processing={isLoading}
-          currencyType={textContent.includes('brc-20') ? 'brc20-Ordinal' : 'Ordinal'}
+          currencyType={textContent?.includes('brc-20') ? 'brc20-Ordinal' : 'Ordinal'}
           disableAmountInput
           recepientError={error}
           recipient={address}
