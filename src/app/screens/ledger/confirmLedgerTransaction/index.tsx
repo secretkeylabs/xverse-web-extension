@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
@@ -10,6 +10,7 @@ import {
   signLedgerNativeSegwitBtcTransaction,
   signLedgerStxTransaction,
   signLedgerMixedBtcTransaction,
+  getMasterFingerPrint,
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -129,7 +130,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
 
-  const { network, selectedAccount } = useWalletSelector();
+  const { network, selectedAccount, ledgerAccountsList } = useWalletSelector();
 
   const btcClient = useBtcClient();
 
@@ -241,6 +242,10 @@ function ConfirmLedgerTransaction(): JSX.Element {
       return;
     }
 
+    const masterFingerPrint = await getMasterFingerPrint(transport);
+    const deviceAccounts = ledgerAccountsList.filter((account) => account.masterPubKey === masterFingerPrint);
+    const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount.id);
+
     setIsConnectSuccess(true);
     await ledgerDelay(1500);
     if (type === 'ORDINALS') {
@@ -252,13 +257,13 @@ function ConfirmLedgerTransaction(): JSX.Element {
     switch (type) {
       case 'BTC':
       case 'BRC-20':
-        await signAndBroadcastBtcTx(transport as Transport, selectedAccount.id);
+        await signAndBroadcastBtcTx(transport as Transport, accountId);
         break;
       case 'STX':
-        await signAndBroadcastStxTx(transport as Transport, selectedAccount.id);
+        await signAndBroadcastStxTx(transport as Transport, accountId);
         break;
       case 'ORDINALS':
-        await signAndBroadcastOrdinalsTx(transport as Transport, selectedAccount.id);
+        await signAndBroadcastOrdinalsTx(transport as Transport, accountId);
         break;
       default:
         break;
