@@ -20,6 +20,7 @@ import RecipientComponent from '@components/recipientComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { deserializeTransaction } from '@stacks/transactions';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const AlertContainer = styled.div((props) => ({
@@ -41,8 +42,9 @@ function ConfirmStxTransaction() {
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
   const {
-    unsignedTx, sponsored, isBrowserTx, tabId, requestToken,
+    unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken,
   } = location.state;
+  const unsignedTx = deserializeTransaction(stringHex);
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -61,7 +63,7 @@ function ConfirmStxTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
+  { signedTx: StacksTransaction }>({ mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork) });
 
   useEffect(() => {
     if (stxTxBroadcastData) {
