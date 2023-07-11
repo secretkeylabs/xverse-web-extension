@@ -27,8 +27,6 @@ import ledgerConfirmBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.s
 import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ledger_confirm_ordinals.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import InfoIcon from '@assets/img/info.svg';
-import ledgerConnectDoneIcon from '@assets/img/ledger/ledger_import_connect_done.svg';
-import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
 import InfoContainer from '@components/infoContainer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 
@@ -266,9 +264,13 @@ function ConfirmLedgerTransaction(): JSX.Element {
   
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
-      if (type === 'ORDINALS') {
+
+      if (type === 'ORDINALS' && currentStepIndex !== 0.5 && currentStepIndex !== 1) {
         setCurrentStepIndex(0.5);
-      } else {
+        return;
+      }
+      
+      if (currentStepIndex !== 1) {
         setCurrentStepIndex(1);
       }
   
@@ -297,6 +299,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
   const goToConfirmationStep = () => {
     setCurrentStepIndex(1);
+
+    handleConnectAndConfirm();
   }
 
   const handleRetry = async () => {
@@ -335,14 +339,6 @@ function ConfirmLedgerTransaction(): JSX.Element {
     }
   };
 
-  let ledgerConnectIcon = ledgerConnectDefaultIcon;
-
-  if (isFinalTxApproved && !isTxRejected) {
-    ledgerConnectIcon = ledgerConnectDoneIcon;
-  } else if (!isFinalTxApproved && isTxRejected) {
-    ledgerConnectIcon = ledgerConnectFailIcon;
-  }
-
   const renderLedgerConfirmationView = () => {
     switch (currentStepIndex) {
       case 0:
@@ -360,7 +356,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
           </div>
         );
       case 0.5:
-        if (!isFinalTxApproved && isTxRejected) {
+        if (isTxRejected || isConnectFailed) {
           return <LedgerFailView title={t('CONFIRM.ERROR_TITLE')} text={t('CONFIRM.ERROR_SUBTITLE')} />;
         }
 
@@ -378,7 +374,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         );
       case 1:
         if (type === 'ORDINALS') {
-          if (!isFinalTxApproved && isTxRejected) {
+          if (isTxRejected || isConnectFailed) {
             return <LedgerFailView title={t('CONFIRM.ERROR_TITLE')} text={t('CONFIRM.ERROR_SUBTITLE')} />;
           }
 
@@ -414,7 +410,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         );
       case 1.5:
         if (type === 'ORDINALS') {
-          if (!isFinalTxApproved && isTxRejected) {
+          if (isTxRejected || isConnectFailed) {
             return <LedgerFailView title={t('CONFIRM.ERROR_TITLE')} text={t('CONFIRM.ERROR_SUBTITLE')} />;
           }
 
