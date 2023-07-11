@@ -230,7 +230,7 @@ const ConfirmationStep = styled.div<ConfirmationStepProps>((props) => ({
   height: 4,
   backgroundColor: props.isCompleted ? props.theme.colors.white[0] : props.theme.colors.white[900],
   borderRadius: props.theme.radius(1),
-  transition: 'background-color 0.2s ease-in-out',
+  transition: 'background-color 0.2s ease',
   ':first-child': {
     marginRight: props.theme.spacing(4),
   },

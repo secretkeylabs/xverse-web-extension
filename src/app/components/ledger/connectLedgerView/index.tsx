@@ -45,16 +45,18 @@ function LedgerConnectionView({
   isConnectSuccess,
   isConnectFailed,
 }: LedgerConnectionProps) {
+  let ledgerConnectIcon = imageDefault;
+
+  if (isConnectSuccess && !isConnectFailed) {
+    ledgerConnectIcon = ledgerConnectDoneIcon;
+  } else if (!isConnectSuccess && isConnectFailed) {
+    ledgerConnectIcon = ledgerConnectFailIcon;
+  }
+
   return (
     <ConnectLedgerContainer>
       <img
-        src={
-          !isConnectSuccess
-            ? isConnectFailed
-              ? ledgerConnectFailIcon
-              : imageDefault
-            : ledgerConnectDoneIcon
-        }
+        src={ledgerConnectIcon}
         alt="connect ledger device"
       />
       <ConnectLedgerTitle>{isConnectFailed ? titleFailed : title}</ConnectLedgerTitle>

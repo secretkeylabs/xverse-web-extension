@@ -184,21 +184,22 @@ const WebGalleryButtonText = styled.div((props) => ({
 }));
 
 const SendButton = styled.button((props) => ({
-  background: '#FFFFFF',
-  borderRadius: 16,
+  backgroundColor: props.theme.colors.white['0'],
+  borderRadius: props.theme.radius(3),
   display: 'flex',
   width: 100,
   flexDirection: 'row',
   padding: '12px 14px',
   alignItems: 'center',
+  transition: 'background-color 0.2s ease, opacity 0.2s ease',
   ':hover': {
-    background: props.theme.colors.action.classicLight,
+    backgroundColor: props.theme.colors.action.classicLight,
     opacity: 0.6,
   },
   h1: {
     ...props.theme.body_medium_m,
-    fontSize: 14,
-    marginLeft: 6,
+    fontSize: '0.875rem',
+    marginLeft: props.theme.spacing(3),
   },
 }));
 

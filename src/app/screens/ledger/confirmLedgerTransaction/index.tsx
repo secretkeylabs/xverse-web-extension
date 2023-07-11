@@ -29,6 +29,7 @@ import ledgerConnectDoneIcon from '@assets/img/ledger/ledger_import_connect_done
 import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
 import checkmarkIcon from '@assets/img/checkmarkIcon.svg';
 import InfoContainer from '@components/infoContainer';
+import LedgerFailView from '@components/ledger/failLedgerView';
 
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';
 
@@ -231,44 +232,60 @@ function ConfirmLedgerTransaction(): JSX.Element {
       console.error('No account selected');
       return;
     }
-    setIsButtonDisabled(true);
 
-    const transport = await Transport.create();
+    try {
+      setIsButtonDisabled(true);
 
-    if (!transport) {
+      const transport = await Transport.create();
+  
+      if (!transport) {
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+        setIsButtonDisabled(false);
+        return;
+      }
+  
+      const masterFingerPrint = await getMasterFingerPrint(transport);
+  
+      if (!masterFingerPrint) {
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+        setIsButtonDisabled(false);
+        return;
+      }
+  
+      const deviceAccounts = ledgerAccountsList.filter((account) => account.masterPubKey === masterFingerPrint);
+      const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount.id);
+  
+      setIsConnectSuccess(true);
+      await ledgerDelay(1500);
+      if (type === 'ORDINALS') {
+        setCurrentStepIndex(0.5);
+      } else {
+        setCurrentStepIndex(1);
+      }
+  
+      switch (type) {
+        case 'BTC':
+        case 'BRC-20':
+          await signAndBroadcastBtcTx(transport as Transport, accountId);
+          break;
+        case 'STX':
+          await signAndBroadcastStxTx(transport as Transport, accountId);
+          break;
+        case 'ORDINALS':
+          await signAndBroadcastOrdinalsTx(transport as Transport, accountId);
+          break;
+        default:
+          break;
+      }
+      await transport.close();
+    } catch (err) {
       setIsConnectSuccess(false);
       setIsConnectFailed(true);
+    } finally {
       setIsButtonDisabled(false);
-      return;
     }
-
-    const masterFingerPrint = await getMasterFingerPrint(transport);
-    const deviceAccounts = ledgerAccountsList.filter((account) => account.masterPubKey === masterFingerPrint);
-    const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount.id);
-
-    setIsConnectSuccess(true);
-    await ledgerDelay(1500);
-    if (type === 'ORDINALS') {
-      setCurrentStepIndex(0.5);
-    } else {
-      setCurrentStepIndex(1);
-    }
-
-    switch (type) {
-      case 'BTC':
-      case 'BRC-20':
-        await signAndBroadcastBtcTx(transport as Transport, accountId);
-        break;
-      case 'STX':
-        await signAndBroadcastStxTx(transport as Transport, accountId);
-        break;
-      case 'ORDINALS':
-        await signAndBroadcastOrdinalsTx(transport as Transport, accountId);
-        break;
-      default:
-        break;
-    }
-    await transport.close();
   };
 
   const goToConfirmationStep = () => {
@@ -278,6 +295,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const handleRetry = async () => {
     setIsTxRejected(false);
     setIsConnectSuccess(false);
+    setIsConnectFailed(false);
     setCurrentStepIndex(0);
   };
 
@@ -309,94 +327,108 @@ function ConfirmLedgerTransaction(): JSX.Element {
     }
   };
 
-  return (
-    <Container>
-      <FullScreenHeader />
-      {transition((style) => (
-        <>
-          <OnBoardingContentContainer style={style}>
-            {currentStepIndex === 0 ? (
-              <div>
-                <LedgerConnectionView
-                  title={t('CONNECT.TITLE')}
-                  text={t('CONNECT.BTC_SUBTITLE')}
-                  titleFailed={t('CONNECT.ERROR_TITLE')}
-                  textFailed={t('CONNECT.BTC_ERROR_SUBTITLE')}
-                  imageDefault={ledgerConnectDefaultIcon}
-                  isConnectSuccess={isConnectSuccess}
-                  isConnectFailed={isConnectFailed}
-                />
-              </div>
-            ) : currentStepIndex === 0.5 ? (
-              <div>
-                <ConnectLedgerContainer>
-                  <InfoImage
-                    src={InfoIcon}
-                    alt="external inputs warning"
-                  />
-                  <ConnectLedgerTitle>{t('EXTERNAL_INPUTS.TITLE')}</ConnectLedgerTitle>
-                  <ConnectLedgerText>{t('EXTERNAL_INPUTS.SUBTITLE')}</ConnectLedgerText>
-                </ConnectLedgerContainer>
-              </div>
-            ) : currentStepIndex === 1 ? (type === 'ORDINALS' ? (
-              <ConnectLedgerContainer>
-                <img
-                  src={
-                    !isFinalTxApproved
-                      ? isTxRejected
-                        ? ledgerConnectFailIcon
-                        : ledgerConnectDefaultIcon
-                      : ledgerConnectDoneIcon
-                  }
-                  alt="confirm tx on the ledger device"
-                />
-                <ConnectLedgerTitle>{!isFinalTxApproved && isTxRejected ? t('CONFIRM.ERROR_TITLE') : t('CONFIRM.TITLE')}</ConnectLedgerTitle>
-                {!isFinalTxApproved && isTxRejected ? (
-                  <ConnectLedgerText>{t('CONFIRM.ERROR_SUBTITLE')}</ConnectLedgerText>
-                ) : (
-                  <>
-                    <ConnectLedgerTextAdvanced isCompleted={isTxApproved}>{isTxApproved ? <CheckmarkIcon src={checkmarkIcon} alt="" /> : '1. '}Confirm the Ordinal inscription transfer on your device.</ConnectLedgerTextAdvanced>
-                    <ConnectLedgerTextAdvanced isCompleted={isFinalTxApproved}>{isFinalTxApproved ? <CheckmarkIcon src={checkmarkIcon} alt="" /> : '2. '}Confirm the payment of transaction fees from BTC payment address on your device.</ConnectLedgerTextAdvanced>
-                  </>
-                )}
-              </ConnectLedgerContainer>
-            ) : (
-              <div>
-                <LedgerConnectionView
-                  title={t('CONFIRM.TITLE')}
-                  text={t('CONFIRM.SUBTITLE')}
-                  titleFailed={t('CONFIRM.ERROR_TITLE')}
-                  textFailed={t('CONFIRM.ERROR_SUBTITLE')}
-                  imageDefault={ledgerConnectDefaultIcon}
-                  isConnectSuccess={isFinalTxApproved}
-                  isConnectFailed={isTxRejected}
-                />
-              </div>
-            )) : currentStepIndex === 2 ? (
-              <TxConfirmedContainer>
-                <img src={CheckCircleSVG} alt="Success" />
-                <TxConfirmedTitle>{t('SUCCESS.TITLE')}</TxConfirmedTitle>
-                <TxConfirmedDescription>{t('SUCCESS.SUBTITLE')}</TxConfirmedDescription>
-                {type === 'BRC-20' && (
-                  <InfoContainerWrapper>
-                    <InfoContainer bodyText="The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer." />
-                  </InfoContainerWrapper>
-                )}
-              </TxConfirmedContainer>
-            ) : null}
-          </OnBoardingContentContainer>
-          {currentStepIndex === 0.5 ? (
-            <SuccessActionsContainer>
-              <ActionButton
-                onPress={goToConfirmationStep}
-                text={t('CONTINUE_BUTTON')}
+  let ledgerConnectIcon = ledgerConnectDefaultIcon;
+
+  if (isFinalTxApproved && !isTxRejected) {
+    ledgerConnectIcon = ledgerConnectDoneIcon;
+  } else if (!isFinalTxApproved && isTxRejected) {
+    ledgerConnectIcon = ledgerConnectFailIcon;
+  }
+
+  const renderLedgerConfirmationView = () => {
+    switch (currentStepIndex) {
+      case 0:
+        return (
+          <div>
+            <LedgerConnectionView
+              title={t('CONNECT.TITLE')}
+              text={t('CONNECT.BTC_SUBTITLE')}
+              titleFailed={t('CONNECT.ERROR_TITLE')}
+              textFailed={t('CONNECT.BTC_ERROR_SUBTITLE')}
+              imageDefault={ledgerConnectDefaultIcon}
+              isConnectSuccess={isConnectSuccess}
+              isConnectFailed={isConnectFailed}
+            />
+          </div>
+        );
+      case 0.5:
+        if (!isFinalTxApproved && isTxRejected) {
+          return <LedgerFailView title={t('CONFIRM.ERROR_TITLE')} text={t('CONFIRM.ERROR_SUBTITLE')} />;
+        }
+
+        return (
+          <div>
+            <ConnectLedgerContainer>
+              <InfoImage
+                src={InfoIcon}
+                alt="external inputs warning"
               />
-            </SuccessActionsContainer>
-          ) : currentStepIndex !== 2 ? (
+              <ConnectLedgerTitle>{t('EXTERNAL_INPUTS.TITLE')}</ConnectLedgerTitle>
+              <ConnectLedgerText>{t('EXTERNAL_INPUTS.SUBTITLE')}</ConnectLedgerText>
+            </ConnectLedgerContainer>
+          </div>
+        );
+      case 1:
+        if (type === 'ORDINALS') {
+          return (
+            <ConnectLedgerContainer>
+              <img
+                src={ledgerConnectIcon}
+                alt="confirm tx on the ledger device"
+              />
+              <ConnectLedgerTitle>{!isFinalTxApproved && isTxRejected ? t('CONFIRM.ERROR_TITLE') : t('CONFIRM.TITLE')}</ConnectLedgerTitle>
+              {!isFinalTxApproved && isTxRejected ? (
+                <ConnectLedgerText>{t('CONFIRM.ERROR_SUBTITLE')}</ConnectLedgerText>
+              ) : (
+                <>
+                  <ConnectLedgerTextAdvanced isCompleted={isTxApproved}>{isTxApproved ? <CheckmarkIcon src={checkmarkIcon} alt="" /> : '1. '}Confirm the Ordinal inscription transfer on your device.</ConnectLedgerTextAdvanced>
+                  <ConnectLedgerTextAdvanced isCompleted={isFinalTxApproved}>{isFinalTxApproved ? <CheckmarkIcon src={checkmarkIcon} alt="" /> : '2. '}Confirm the payment of transaction fees from BTC payment address on your device.</ConnectLedgerTextAdvanced>
+                </>
+              )}
+            </ConnectLedgerContainer>
+          );
+        }
+
+        return (
+          <div>
+            <LedgerConnectionView
+              title={t('CONFIRM.TITLE')}
+              text={t('CONFIRM.SUBTITLE')}
+              titleFailed={t('CONFIRM.ERROR_TITLE')}
+              textFailed={t('CONFIRM.ERROR_SUBTITLE')}
+              imageDefault={ledgerConnectDefaultIcon}
+              isConnectSuccess={isFinalTxApproved}
+              isConnectFailed={isTxRejected}
+            />
+          </div>
+        );
+      case 2:
+        return (
+          <TxConfirmedContainer>
+            <img src={CheckCircleSVG} alt="Success" />
+            <TxConfirmedTitle>{t('SUCCESS.TITLE')}</TxConfirmedTitle>
+            <TxConfirmedDescription>{t('SUCCESS.SUBTITLE')}</TxConfirmedDescription>
+            {type === 'BRC-20' && (
+              <InfoContainerWrapper>
+                <InfoContainer bodyText="The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer." />
+              </InfoContainerWrapper>
+            )}
+          </TxConfirmedContainer>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderLedgerConfirmationControls = () => {
+    switch (currentStepIndex) {
+      case 0.5:
+        if (isTxRejected || isConnectFailed) {
+          return (
             <SuccessActionsContainer>
               <ActionButton
-                onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
-                text={t(isTxRejected || isConnectFailed ? 'RETRY_BUTTON' : 'CONNECT_BUTTON')}
+                onPress={handleRetry}
+                text={t('RETRY_BUTTON')}
                 disabled={isButtonDisabled}
                 processing={isButtonDisabled}
               />
@@ -407,16 +439,57 @@ function ConfirmLedgerTransaction(): JSX.Element {
                 disabled={isButtonDisabled}
               />
             </SuccessActionsContainer>
-          ) : (
-            <SuccessActionsContainer>
-              <ActionButton onPress={handleClose} text={t('CLOSE_BUTTON')} />
-              <ActionButton
-                transparent
-                onPress={handleSeeTransaction}
-                text={t('SEE_TRANSACTION_BUTTON')}
-              />
-            </SuccessActionsContainer>
-          )}
+          );
+        }
+
+        return (
+          <SuccessActionsContainer>
+            <ActionButton
+              onPress={goToConfirmationStep}
+              text={t('CONTINUE_BUTTON')}
+            />
+          </SuccessActionsContainer>
+        );
+      case 2:
+        return (
+          <SuccessActionsContainer>
+            <ActionButton onPress={handleClose} text={t('CLOSE_BUTTON')} />
+            <ActionButton
+              transparent
+              onPress={handleSeeTransaction}
+              text={t('SEE_TRANSACTION_BUTTON')}
+            />
+          </SuccessActionsContainer>
+        );
+      default:
+        return (
+          <SuccessActionsContainer>
+            <ActionButton
+              onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+              text={t(isTxRejected || isConnectFailed ? 'RETRY_BUTTON' : 'CONNECT_BUTTON')}
+              disabled={isButtonDisabled}
+              processing={isButtonDisabled}
+            />
+            <ActionButton
+              transparent
+              onPress={handleClose}
+              text={t('CANCEL_BUTTON')}
+              disabled={isButtonDisabled}
+            />
+          </SuccessActionsContainer>
+        );
+    }
+  };
+
+  return (
+    <Container>
+      <FullScreenHeader />
+      {transition((style) => (
+        <>
+          <OnBoardingContentContainer style={style}>
+            {renderLedgerConfirmationView()}
+          </OnBoardingContentContainer>
+          {renderLedgerConfirmationControls()}
         </>
       ))}
     </Container>

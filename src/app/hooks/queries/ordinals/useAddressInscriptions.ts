@@ -12,7 +12,7 @@ const useAddressInscriptions = () => {
   const getInscriptionsByAddress = async ({ pageParam = 0 }) => {
     try {
       if (!ordinalsAddress) {
-        throw new InvalidParamsError("stxAddress is required");
+        throw new InvalidParamsError("ordinalsAddress is required");
       }
       const response = await ordinalsApi.getInscriptions(ordinalsAddress, pageParam || 0, PageSize);
       return response;
