@@ -39,6 +39,7 @@ import LedgerSendStxScreen from '@screens/ledger/ledgerSendStx';
 import ReviewLedgerStxTransaction from '@screens/ledger/reviewLedgerStxTransaction';
 import LedgerSendFtScreen from '@screens/ledger/ledgerSendFt';
 import ReviewLedgerFtTransaction from '@screens/ledger/reviewLedgerFtTransaction';
+import BtcSendScreen from '@screens/btcSendScreen';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20Screen from '@screens/sendBrc20';
 import SendBtcScreen from '@screens/sendBtc';
@@ -213,6 +214,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SignPsbtRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'btc-send-request',
+        element: (
+          <AuthGuard>
+            <BtcSendScreen />
           </AuthGuard>
         ),
       },

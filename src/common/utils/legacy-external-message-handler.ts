@@ -228,6 +228,27 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
+    case ExternalSatsMethods.sendBtcRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['sendBtcRequest', payload],
+      ]);
+
+      const { id } = await triggerRequstWindowOpen(RequestsRoutes.SendBtcTx, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            sendBtcRequest: payload,
+            sendBtcResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.sendBtcResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
     default: {
       break;
     }

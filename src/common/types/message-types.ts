@@ -103,6 +103,8 @@ export enum ExternalSatsMethods {
   signPsbtResponse = 'signPsbtResponse',
   signMessageRequest = 'signMessageRequest',
   signMessageResponse = 'signMessageResponse',
+  sendBtcRequest = 'sendBtcRequest',
+  sendBtcResponse = 'sendBtcResponse',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -135,12 +137,24 @@ ExternalSatsMethods.signMessageResponse,
 }
 >;
 
+type SendBtcRequestMessage = Message<ExternalSatsMethods.sendBtcRequest, string>;
+
+export type SendBtcResponseMessage = Message<
+ExternalSatsMethods.sendBtcResponse,
+{
+  sendBtcRequest: string;
+  sendBtcResponse: string;
+}
+>;
+
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage
   | SignPsbtRequestMessage
-  | SignMessageRequestMessage;
+  | SignMessageRequestMessage
+  | SendBtcRequestMessage;
 
 export type SatsConnectMessageToContentScript =
   | GetAddressResponseMessage
   | SignPsbtResponseMessage
-  | SignMessageResponseMessage;
+  | SignMessageResponseMessage
+  | SendBtcResponseMessage;
