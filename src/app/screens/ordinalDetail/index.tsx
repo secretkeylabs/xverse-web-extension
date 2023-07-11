@@ -172,7 +172,7 @@ const ViewInExplorerButton = styled.button((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   backgroundColor: 'transparent',
-  width: 158,
+  width: 190,
   marginTop: props.theme.spacing(6),
 }));
 
