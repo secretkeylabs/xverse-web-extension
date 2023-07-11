@@ -23,11 +23,12 @@ import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import { StacksTransaction } from '@stacks/transactions';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConfirmBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ledger_confirm_ordinals.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import InfoIcon from '@assets/img/info.svg';
 import ledgerConnectDoneIcon from '@assets/img/ledger/ledger_import_connect_done.svg';
 import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
-import checkmarkIcon from '@assets/img/checkmarkIcon.svg';
 import InfoContainer from '@components/infoContainer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 
@@ -89,7 +90,7 @@ const InfoImage = styled.img`
 
 export const ConnectLedgerTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
-  marginBottom: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(6),
 }));
 
 interface ConnectLedgerTextAdvancedProps {
@@ -100,21 +101,33 @@ export const ConnectLedgerTextAdvanced = styled.p<ConnectLedgerTextAdvancedProps
   display: 'flex',
   alignItems: 'flex-start',
   color: props.isCompleted ? props.theme.colors.white[400] : props.theme.colors.white[200],
-  width: '90%',
-  ':last-child': {
-    marginTop: props.theme.spacing(8),
-  }
+  textAlign: 'center',
 }));
-
-const CheckmarkIcon = styled.img(props => `
-  margin-top: ${props.theme.spacing(2)}px;
-  margin-right: ${props.theme.spacing(3)}px;
-`);
 
 const InfoContainerWrapper = styled.div(props => `
   text-align: left;
   margin-top: ${props.theme.spacing(8)}px;
 `);
+
+const ConfirmationStepsContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  marginTop: props.theme.spacing(16),
+}));
+
+interface ConfirmationStepProps {
+  isCompleted: boolean;
+}
+const ConfirmationStep = styled.div<ConfirmationStepProps>((props) => ({
+  width: 32,
+  height: 4,
+  backgroundColor: props.isCompleted ? props.theme.colors.white[0] : props.theme.colors.white[900],
+  borderRadius: props.theme.radius(1),
+  transition: 'background-color 0.2s ease',
+  ':first-child': {
+    marginRight: props.theme.spacing(4),
+  },
+}));
 
 function ConfirmLedgerTransaction(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -172,7 +185,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
       const {value: taprootSignedValue} = await result.next();
       setIsTxApproved(true);
-      
+      setCurrentStepIndex(1.5);
+
       const {value: txHex} = await result.next();
       setIsFinalTxApproved(true);
       await ledgerDelay(1500);
@@ -247,13 +261,6 @@ function ConfirmLedgerTransaction(): JSX.Element {
   
       const masterFingerPrint = await getMasterFingerPrint(transport);
   
-      if (!masterFingerPrint) {
-        setIsConnectSuccess(false);
-        setIsConnectFailed(true);
-        setIsButtonDisabled(false);
-        return;
-      }
-  
       const deviceAccounts = ledgerAccountsList.filter((account) => account.masterPubKey === masterFingerPrint);
       const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount.id);
   
@@ -296,6 +303,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     setIsTxRejected(false);
     setIsConnectSuccess(false);
     setIsConnectFailed(false);
+    setIsTxApproved(false);
     setCurrentStepIndex(0);
   };
 
@@ -370,21 +378,23 @@ function ConfirmLedgerTransaction(): JSX.Element {
         );
       case 1:
         if (type === 'ORDINALS') {
+          if (!isFinalTxApproved && isTxRejected) {
+            return <LedgerFailView title={t('CONFIRM.ERROR_TITLE')} text={t('CONFIRM.ERROR_SUBTITLE')} />;
+          }
+
           return (
             <ConnectLedgerContainer>
               <img
-                src={ledgerConnectIcon}
-                alt="confirm tx on the ledger device"
+                src={ledgerConfirmOrdinalsIcon}
+                alt="confirm ordinal transfer tx on the ledger device"
               />
-              <ConnectLedgerTitle>{!isFinalTxApproved && isTxRejected ? t('CONFIRM.ERROR_TITLE') : t('CONFIRM.TITLE')}</ConnectLedgerTitle>
-              {!isFinalTxApproved && isTxRejected ? (
-                <ConnectLedgerText>{t('CONFIRM.ERROR_SUBTITLE')}</ConnectLedgerText>
-              ) : (
-                <>
-                  <ConnectLedgerTextAdvanced isCompleted={isTxApproved}>{isTxApproved ? <CheckmarkIcon src={checkmarkIcon} alt="" /> : '1. '}Confirm the Ordinal inscription transfer on your device.</ConnectLedgerTextAdvanced>
-                  <ConnectLedgerTextAdvanced isCompleted={isFinalTxApproved}>{isFinalTxApproved ? <CheckmarkIcon src={checkmarkIcon} alt="" /> : '2. '}Confirm the payment of transaction fees from BTC payment address on your device.</ConnectLedgerTextAdvanced>
-                </>
-              )}
+              <ConnectLedgerTitle>{t('CONFIRM.TITLE')}</ConnectLedgerTitle>
+              <ConnectLedgerTextAdvanced isCompleted={isTxApproved}>Confirm the Ordinal inscription transfer on your device.</ConnectLedgerTextAdvanced>
+              <ConfirmationStepsContainer>
+                <ConfirmationStep isCompleted={isTxApproved} />
+                <ConfirmationStep isCompleted={isFinalTxApproved} />
+              </ConfirmationStepsContainer>
+              <div />
             </ConnectLedgerContainer>
           );
         }
@@ -402,6 +412,29 @@ function ConfirmLedgerTransaction(): JSX.Element {
             />
           </div>
         );
+      case 1.5:
+        if (type === 'ORDINALS') {
+          if (!isFinalTxApproved && isTxRejected) {
+            return <LedgerFailView title={t('CONFIRM.ERROR_TITLE')} text={t('CONFIRM.ERROR_SUBTITLE')} />;
+          }
+
+          return (
+            <ConnectLedgerContainer>
+              <img
+                src={ledgerConfirmBtcIcon}
+                alt="confirm btc fee tx on the ledger device"
+              />
+              <ConnectLedgerTitle>{t('CONFIRM.TITLE')}</ConnectLedgerTitle>
+              <ConnectLedgerTextAdvanced isCompleted={isFinalTxApproved}>Confirm the payment of transaction fees from the Bitcoin payment address on your device.</ConnectLedgerTextAdvanced>
+              <ConfirmationStepsContainer>
+                <ConfirmationStep isCompleted={isTxApproved} />
+                <ConfirmationStep isCompleted={isFinalTxApproved} />
+              </ConfirmationStepsContainer>
+              <div />
+            </ConnectLedgerContainer>
+          );
+        }
+        return null;
       case 2:
         return (
           <TxConfirmedContainer>
@@ -450,6 +483,36 @@ function ConfirmLedgerTransaction(): JSX.Element {
             />
           </SuccessActionsContainer>
         );
+      case 1:
+      case 1.5:
+        if (type === 'ORDINALS' && !isTxRejected && !isConnectFailed) {
+          return (
+            <SuccessActionsContainer>
+              <ActionButton
+                transparent
+                onPress={handleClose}
+                text={t('CANCEL_BUTTON')}
+              />
+            </SuccessActionsContainer>
+          );
+        }
+
+        return (
+          <SuccessActionsContainer>
+            <ActionButton
+              onPress={(isTxRejected || isConnectFailed) ? handleRetry : handleConnectAndConfirm}
+              text={t((isTxRejected || isConnectFailed) ? 'RETRY_BUTTON' : 'CONNECT_BUTTON')}
+              disabled={isButtonDisabled}
+              processing={isButtonDisabled}
+            />
+            <ActionButton
+              transparent
+              onPress={handleClose}
+              text={t('CANCEL_BUTTON')}
+              disabled={isButtonDisabled}
+            />
+          </SuccessActionsContainer>
+        );
       case 2:
         return (
           <SuccessActionsContainer>
@@ -465,8 +528,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
         return (
           <SuccessActionsContainer>
             <ActionButton
-              onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
-              text={t(isTxRejected || isConnectFailed ? 'RETRY_BUTTON' : 'CONNECT_BUTTON')}
+              onPress={(isTxRejected || isConnectFailed) ? handleRetry : handleConnectAndConfirm}
+              text={t((isTxRejected || isConnectFailed) ? 'RETRY_BUTTON' : 'CONNECT_BUTTON')}
               disabled={isButtonDisabled}
               processing={isButtonDisabled}
             />
