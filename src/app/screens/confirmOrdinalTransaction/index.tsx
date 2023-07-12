@@ -143,7 +143,7 @@ function ConfirmOrdinalTransaction() {
   const handleOnConfirmClick = (txHex: string) => {
     if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'ORDINALS';
-      navigate('/confirm-ledger-tx', { state: { recipients: { address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }, type: txType, ordinalUtxo } });
+      navigate('/confirm-ledger-tx', { state: { recipients: [{ address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }], type: txType, ordinalUtxo } });
       return;
     }
 
