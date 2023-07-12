@@ -2,16 +2,15 @@ import { SwapToken } from '@screens/swap/useSwap';
 import { ReactNode } from 'react';
 import { Currency } from 'alex-sdk';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { broadcastSignedTransaction, signTransaction } from '@secretkeylabs/xverse-core';
 import {
-  makeUnsignedContractCall,
-  AnchorMode,
-  PostConditionMode,
-  StacksTransaction,
-} from '@stacks/transactions';
-import type { TxToBroadCast } from 'alex-sdk/dist/helpers/SwapHelper';
+  broadcastSignedTransaction,
+  signTransaction,
+  sponsorTransaction,
+} from '@secretkeylabs/xverse-core';
+import { StacksTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useNavigate } from 'react-router-dom';
+import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -29,10 +28,11 @@ export type SwapConfirmationInput = {
 };
 
 export function useConfirmSwap(
-  input: SwapConfirmationInput
+  input: SwapConfirmationInput,
 ): SwapConfirmationInput & { onConfirm: () => Promise<void> } {
-  const { selectedAccount, seedPhrase, stxPublicKey } = useWalletSelector();
+  const { selectedAccount, seedPhrase } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
+  const { isSponsored } = useSponsoredTransaction();
   const navigate = useNavigate();
   return {
     ...input,
@@ -41,10 +41,15 @@ export function useConfirmSwap(
         input.unsignedTx,
         seedPhrase,
         selectedAccount?.id ?? 0,
-        selectedNetwork
+        selectedNetwork,
       );
       try {
-        const broadcastResult: string = await broadcastSignedTransaction(signed, selectedNetwork);
+        let broadcastResult: string | null;
+        if (isSponsored) {
+          broadcastResult = await sponsorTransaction(signed);
+        } else {
+          broadcastResult = await broadcastSignedTransaction(signed, selectedNetwork);
+        }
         if (broadcastResult) {
           navigate('/tx-status', {
             state: {

@@ -12,6 +12,8 @@ import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useConfirmSwap } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import { AdvanceSettings } from '@screens/swap/swapConfirmation/advanceSettings';
+import { useSponsoredTransaction } from '@hooks/useSponsoredTransaction';
+import SponsoredTransactionIcon from '@assets/img/transactions/CircleWavyCheck.svg';
 
 const TitleText = styled.div((props) => ({
   fontSize: 21,
@@ -29,7 +31,7 @@ export const ButtonContainer = styled.div((props) => ({
   position: 'sticky',
   bottom: 0,
   background: props.theme.colors.background.elevation0,
-  padding: `${props.theme.spacing(12)}px 0`
+  padding: `${props.theme.spacing(12)}px 0`,
 }));
 
 export const ActionButtonWrap = styled.div((props) => ({
@@ -37,11 +39,26 @@ export const ActionButtonWrap = styled.div((props) => ({
   width: '100%',
 }));
 
+const SponsoredTransactionText = styled.div((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white[200],
+  marginTop: props.theme.spacing(10),
+  display: 'flex',
+  gap: props.theme.spacing(4),
+}));
+
+const Icon = styled.img((props) => ({
+  marginTop: props.theme.spacing(1),
+  width: 24,
+  height: 24,
+}));
+
 export default function SwapConfirmation() {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
   const location = useLocation();
   const navigate = useNavigate();
   const swap = useConfirmSwap(location.state);
+  const { isSponsored } = useSponsoredTransaction();
 
   const onCancel = useCallback(() => {
     navigate('/swap');
@@ -69,7 +86,14 @@ export default function SwapConfirmation() {
           lpFeeFiatAmount={swap.lpFeeFiatAmount}
           currency={swap.fromToken.name}
         />
-        <AdvanceSettings swap={swap} />
+        {isSponsored ? (
+          <SponsoredTransactionText>
+            <Icon src={SponsoredTransactionIcon} />
+            {t('THIS_IS_A_SPONSORED_TRANSACTION')}
+          </SponsoredTransactionText>
+        ) : (
+          <AdvanceSettings swap={swap} />
+        )}
         <ButtonContainer>
           <ActionButtonWrap>
             <ActionButton text={t('CANCEL')} transparent onPress={onCancel} />
