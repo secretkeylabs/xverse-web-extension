@@ -94,7 +94,7 @@
     },
     "EXTERNAL_INPUTS": {
       "TITLE": "External inputs",
-      "SUBTITLE": "You should see a warning on your device saying \"There are external inputs\". This is normal as you'll be using simultaneously two different addresses for this transaction."
+      "SUBTITLE": "Your device may display a warning regarding external inputs. This is expected as you'll be signing inputs from two addresses in one transaction."
     },
     "CONFIRM": {
       "TITLE": "Confirm transaction",
@@ -103,7 +103,7 @@
       "ERROR_SUBTITLE": "The transaction has been rejected. You can try again or close this tab."
     },
     "SUCCESS": {
-      "TITLE": "Transaction confirmed",
+      "TITLE": "Transaction broadcasted",
       "SUBTITLE": "Your transaction has been successfully broadcasted. You can close this tab."
     },
     "CONFIRM_BUTTON": "Confirm",
@@ -240,7 +240,7 @@
         "ERROR_SUBTITLE": "The transaction have been rejected. You can try again or close this tab."
       },
       "SUCCESS": {
-        "TITLE": "Transaction confirmed",
+        "TITLE": "Transaction broadcasted",
         "SUBTITLE": "Your transaction have been successfully broadcasted. You can close this tab."
       },
       "CONFIRM_BUTTON": "Confirm",
