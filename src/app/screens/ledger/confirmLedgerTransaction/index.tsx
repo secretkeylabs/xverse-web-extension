@@ -147,13 +147,13 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const btcClient = useBtcClient();
 
   const {
-    recipient,
+    recipients,
     type,
     unsignedTx,
     ordinalUtxo,
   }: {
     amount: BigNumber;
-    recipient: Recipient;
+    recipients: Recipient[];
     type: LedgerTransactionType;
     unsignedTx: StacksTransaction;
     ordinalUtxo: any;
@@ -176,7 +176,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         transport,
         network.type,
         accountId,
-        recipient,
+        recipients,
         ordinalUtxo,
       );
       const {value: psbtCreatedValue} = await result.next();
@@ -206,7 +206,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         transport,
         network.type,
         accountId,
-        recipient,
+        recipients,
       );
       setIsFinalTxApproved(true);
       await ledgerDelay(1500);
