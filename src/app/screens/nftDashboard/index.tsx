@@ -311,7 +311,7 @@ function NftDashboard() {
         )}
       </>
     )),
-    [ordinals, nfts],
+    [ordinals, nfts, hasActivatedOrdinalsKey],
   );
 
   const onSharePress = () => {
