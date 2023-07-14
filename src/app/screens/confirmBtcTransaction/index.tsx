@@ -15,7 +15,6 @@ import AlertMessage from '@components/alertMessage';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import useBtcClient from '@hooks/useBtcClient';
 import { isLedgerAccount } from '@utils/helper';
-import BigNumber from 'bignumber.js';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
@@ -42,6 +41,7 @@ function ConfirmBtcTransaction() {
     fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, btcSendBrowserTx, requestToken, tabId, isBrc20TokenFlow,
     feePerVByte,
   } = location.state;
+  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
 
   const {
     isLoading,
@@ -154,7 +154,7 @@ function ConfirmBtcTransaction() {
       setShowOrdinalsDetectedAlert(true);
     } else if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'BTC';
-      navigate('/confirm-ledger-tx', { state: { recipients: recipient, type: txType } });
+      navigate('/confirm-ledger-tx', { state: { recipients: recipient, type: txType, feeRateInput: currentFeeRate } });
     } else mutate({ signedTx: txHex });
   };
 
@@ -203,8 +203,9 @@ function ConfirmBtcTransaction() {
         onCancelClick={goBackToScreen}
         onBackButtonClick={goBackToScreen}
         nonOrdinalUtxos={unspentUtxos}
-        amount={amount}
         isBtcSendBrowserTx={btcSendBrowserTx}
+        currentFeeRate={currentFeeRate}
+        setCurrentFeeRate={setCurrentFeeRate}
       >
         {ordinalsInBtc && ordinalsInBtc.length > 0 && (
         <InfoContainer

@@ -29,6 +29,7 @@ import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import InfoIcon from '@assets/img/info.svg';
 import InfoContainer from '@components/infoContainer';
 import LedgerFailView from '@components/ledger/failLedgerView';
+import { UTXO } from '@secretkeylabs/xverse-core/types';
 
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';
 
@@ -151,12 +152,14 @@ function ConfirmLedgerTransaction(): JSX.Element {
     type,
     unsignedTx,
     ordinalUtxo,
+    feeRateInput,
   }: {
     amount: BigNumber;
     recipients: Recipient[];
     type: LedgerTransactionType;
     unsignedTx: StacksTransaction;
-    ordinalUtxo: any;
+    ordinalUtxo?: UTXO;
+    feeRateInput?: string;
   } = location.state;
 
   const transition = useTransition(currentStepIndex, {
@@ -177,6 +180,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         network.type,
         accountId,
         recipients,
+        feeRateInput?.toString(),
         ordinalUtxo,
       );
       const {value: psbtCreatedValue} = await result.next();
@@ -207,6 +211,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         network.type,
         accountId,
         recipients,
+        feeRateInput?.toString(),
       );
       setIsFinalTxApproved(true);
       await ledgerDelay(1500);
