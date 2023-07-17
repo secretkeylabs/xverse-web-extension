@@ -1,31 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getSponsorInfo } from '@secretkeylabs/xverse-core/api';
+import { getSponsorInfo } from '@secretkeylabs/xverse-core';
 
-export const useSponsorInfoQuery = () =>
+export const useSponsorInfoQuery = (sponsorUrl?: string) =>
   useQuery({
     queryKey: ['sponsorInfo'],
     queryFn: async () => {
       try {
-        return await getSponsorInfo();
+        return await getSponsorInfo(sponsorUrl);
       } catch (e: any) {
         return Promise.reject(e);
       }
     },
   });
 
-export const useSponsoredTransaction = () => {
-  // TODO default to false after testing UI
-  const [isSponsored, setIsSponsored] = useState(true);
+export const useSponsoredTransaction = (sponsorUrl?: string) => {
+  const [isSponsored, setIsSponsored] = useState(false);
 
-  // TODO: fetch from xverse-core sponsor service once it is deployed
-  // const { error, data: isActive } = useSponsorInfoQuery();
-  // useEffect(() => {
-  //   if (!error) {
-  //     setIsSponsored(!!isActive);
-  //   }
-  // }, [isActive, error]);
-
+  const { error, data: isActive } = useSponsorInfoQuery(sponsorUrl);
+  useEffect(() => {
+    if (!error) {
+      setIsSponsored(!!isActive);
+    }
+  }, [isActive, error]);
 
   return {
     isSponsored,

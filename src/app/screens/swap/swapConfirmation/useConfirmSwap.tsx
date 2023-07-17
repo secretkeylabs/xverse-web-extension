@@ -27,12 +27,14 @@ export type SwapConfirmationInput = {
   functionName: string;
 };
 
+const XVERSE_SPONSOR_2_URL = "https://sponsor2.xverse.app";
+
 export function useConfirmSwap(
   input: SwapConfirmationInput,
 ): SwapConfirmationInput & { onConfirm: () => Promise<void> } {
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-  const { isSponsored } = useSponsoredTransaction();
+  const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
   const navigate = useNavigate();
   return {
     ...input,
@@ -46,7 +48,7 @@ export function useConfirmSwap(
       try {
         let broadcastResult: string | null;
         if (isSponsored) {
-          broadcastResult = await sponsorTransaction(signed);
+          broadcastResult = await sponsorTransaction(signed, XVERSE_SPONSOR_2_URL);
         } else {
           broadcastResult = await broadcastSignedTransaction(signed, selectedNetwork);
         }
