@@ -111,7 +111,7 @@ const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => 
 }));
 
 interface Props {
-  fee: BigNumber;
+  currentFee: BigNumber;
   feePerVByte: BigNumber;
   loadingBroadcastedTx: boolean;
   signedTxHex: string;
@@ -123,6 +123,7 @@ interface Props {
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
   isBtcSendBrowserTx?: boolean;
   currentFeeRate: BigNumber;
+  setCurrentFee: (feeRate: BigNumber) => void;
   setCurrentFeeRate: (feeRate: BigNumber) => void;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
@@ -130,7 +131,7 @@ interface Props {
 }
 
 function ConfirmBtcTransactionComponent({
-  fee,
+  currentFee,
   feePerVByte,
   loadingBroadcastedTx,
   signedTxHex,
@@ -142,6 +143,7 @@ function ConfirmBtcTransactionComponent({
   nonOrdinalUtxos,
   isBtcSendBrowserTx,
   currentFeeRate,
+  setCurrentFee,
   setCurrentFeeRate,
   onConfirmClick,
   onCancelClick,
@@ -156,7 +158,6 @@ function ConfirmBtcTransactionComponent({
     (state: StoreState) => state.walletState,
   );
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const [currentFee, setCurrentFee] = useState(fee);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));

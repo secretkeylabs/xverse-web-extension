@@ -106,6 +106,8 @@ function ConfirmOrdinalTransaction() {
   } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
   const { selectedOrdinal } = useNftDataSelector();
   const { refetch } = useBtcWalletData();
+  const [currentFee, setCurrentFee] = useState(fee);
+  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
 
   useEffect(() => {
     setRecipientAddress(location.state.recipientAddress);
@@ -143,7 +145,7 @@ function ConfirmOrdinalTransaction() {
   const handleOnConfirmClick = (txHex: string) => {
     if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'ORDINALS';
-      navigate('/confirm-ledger-tx', { state: { recipients: [{ address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }], type: txType, ordinalUtxo } });
+      navigate('/confirm-ledger-tx', { state: { recipients: [{ address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }], type: txType, ordinalUtxo, feeRateInput: currentFeeRate, fee: currentFee } });
       return;
     }
 
@@ -184,6 +186,10 @@ function ConfirmOrdinalTransaction() {
           onBackButtonClick={handleOnCancelClick}
           ordinalTxUtxo={ordinalUtxo}
           assetDetail={selectedOrdinal?.number.toString()}
+          currentFee={currentFee}
+          setCurrentFee={setCurrentFee}
+          currentFeeRate={currentFeeRate}
+          setCurrentFeeRate={setCurrentFeeRate}
         >
           <Container>
             <NftContainer>

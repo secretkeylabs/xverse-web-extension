@@ -41,6 +41,7 @@ function ConfirmBtcTransaction() {
     fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, btcSendBrowserTx, requestToken, tabId, isBrc20TokenFlow,
     feePerVByte,
   } = location.state;
+  const [currentFee, setCurrentFee] = useState(fee);
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
 
   const {
@@ -154,7 +155,7 @@ function ConfirmBtcTransaction() {
       setShowOrdinalsDetectedAlert(true);
     } else if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'BTC';
-      navigate('/confirm-ledger-tx', { state: { recipients: recipient, type: txType, feeRateInput: currentFeeRate } });
+      navigate('/confirm-ledger-tx', { state: { recipients: recipient, type: txType, feeRateInput: currentFeeRate, fee: currentFee } });
     } else mutate({ signedTx: txHex });
   };
 
@@ -204,6 +205,8 @@ function ConfirmBtcTransaction() {
         onBackButtonClick={goBackToScreen}
         nonOrdinalUtxos={unspentUtxos}
         isBtcSendBrowserTx={btcSendBrowserTx}
+        currentFee={currentFee}
+        setCurrentFee={setCurrentFee}
         currentFeeRate={currentFeeRate}
         setCurrentFeeRate={setCurrentFeeRate}
       >

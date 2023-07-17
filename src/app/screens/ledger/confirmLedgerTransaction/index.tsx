@@ -11,25 +11,27 @@ import {
   signLedgerStxTransaction,
   signLedgerMixedBtcTransaction,
   getMasterFingerPrint,
+  satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import LedgerConnectionView, { ConnectLedgerContainer, ConnectLedgerText } from '@components/ledger/connectLedgerView';
 import { ledgerDelay } from '@common/utils/ledger';
-import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
+import { getBtcTxStatusUrl, getStxTxStatusUrl, getTruncatedAddress } from '@utils/helper';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import { StacksTransaction } from '@stacks/transactions';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConfirmBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ledger_confirm_ordinals.svg';
+import ledgerConfirmBtcIcon from '@assets/img/ledger/btc_icon.svg';
+import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ordinals_icon_big.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import InfoIcon from '@assets/img/info.svg';
 import InfoContainer from '@components/infoContainer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import { UTXO } from '@secretkeylabs/xverse-core/types';
+import Stepper from '@components/stepper';
 
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';
 
@@ -101,6 +103,7 @@ export const ConnectLedgerTextAdvanced = styled.p<ConnectLedgerTextAdvancedProps
   alignItems: 'flex-start',
   color: props.isCompleted ? props.theme.colors.white[400] : props.theme.colors.white[200],
   textAlign: 'center',
+  marginBottom: props.theme.spacing(16),
 }));
 
 const InfoContainerWrapper = styled.div(props => `
@@ -108,24 +111,21 @@ const InfoContainerWrapper = styled.div(props => `
   margin-top: ${props.theme.spacing(8)}px;
 `);
 
-const ConfirmationStepsContainer = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  marginTop: props.theme.spacing(16),
+const TxDetails = styled.div(props => ({
+  marginTop: props.theme.spacing(36),
+  width: '100%',
+  fontSize: '0.875rem',
+  fontWeight: 500,
 }));
 
-interface ConfirmationStepProps {
-  isCompleted: boolean;
-}
-const ConfirmationStep = styled.div<ConfirmationStepProps>((props) => ({
-  width: 32,
-  height: 4,
-  backgroundColor: props.isCompleted ? props.theme.colors.white[0] : props.theme.colors.white[900],
-  borderRadius: props.theme.radius(1),
-  transition: 'background-color 0.2s ease',
-  ':first-child': {
-    marginRight: props.theme.spacing(4),
-  },
+const TxDetailsRow = styled.div(props => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  marginBottom: props.theme.spacing(6),
+}));
+
+const TxDetailsTitle = styled.div(props => ({
+  color: props.theme.colors.white[200],
 }));
 
 function ConfirmLedgerTransaction(): JSX.Element {
@@ -153,6 +153,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     unsignedTx,
     ordinalUtxo,
     feeRateInput,
+    fee,
   }: {
     amount: BigNumber;
     recipients: Recipient[];
@@ -160,6 +161,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     unsignedTx: StacksTransaction;
     ordinalUtxo?: UTXO;
     feeRateInput?: string;
+    fee?: BigNumber;
   } = location.state;
 
   const transition = useTransition(currentStepIndex, {
@@ -344,6 +346,34 @@ function ConfirmLedgerTransaction(): JSX.Element {
     }
   };
 
+  const renderTxDetails = () => (
+    <TxDetails>
+      <TxDetailsRow>
+        <TxDetailsTitle>Recipient{recipients.length > 1 ? 's' : ''}</TxDetailsTitle>
+        <div style={{display: 'flex', flexDirection: 'column'}}>
+          {recipients.map((recipient) => (
+            <div key={recipient.address}>{getTruncatedAddress(recipient.address)}</div>
+          ))}
+        </div>
+      </TxDetailsRow>
+      <TxDetailsRow>
+        <TxDetailsTitle>{ordinalUtxo?.value ? 'Ordinal value' : 'Amount'}</TxDetailsTitle>
+        <div>{ordinalUtxo?.value ? satsToBtc(new BigNumber(ordinalUtxo?.value)).toString() : satsToBtc(recipients[0].amountSats).toString()} BTC</div>
+      </TxDetailsRow>
+      <TxDetailsRow>
+        <TxDetailsTitle>Fees</TxDetailsTitle>
+        <div>{satsToBtc(fee).toString()} BTC</div>
+      </TxDetailsRow>
+    </TxDetails>
+  );
+
+  const renderOrdinalTxDetails = () => (
+    <>
+      <Stepper steps={[{title: 'Send ordinal', isCompleted: isTxApproved}, {title: 'Confirm fees', isCompleted: isFinalTxApproved}]} />    
+      {renderTxDetails()}
+    </>
+  );
+
   const renderLedgerConfirmationView = () => {
     switch (currentStepIndex) {
       case 0:
@@ -388,13 +418,11 @@ function ConfirmLedgerTransaction(): JSX.Element {
               <img
                 src={ledgerConfirmOrdinalsIcon}
                 alt="confirm ordinal transfer tx on the ledger device"
+                style={{marginBottom: 16}}
               />
-              <ConnectLedgerTitle>{t('CONFIRM.TITLE')}</ConnectLedgerTitle>
+              <ConnectLedgerTitle>Confirm ordinal send</ConnectLedgerTitle>
               <ConnectLedgerTextAdvanced isCompleted={isTxApproved}>Confirm the Ordinal inscription transfer on your device.</ConnectLedgerTextAdvanced>
-              <ConfirmationStepsContainer>
-                <ConfirmationStep isCompleted={isTxApproved} />
-                <ConfirmationStep isCompleted={isFinalTxApproved} />
-              </ConfirmationStepsContainer>
+              {renderOrdinalTxDetails()}
               <div />
             </ConnectLedgerContainer>
           );
@@ -411,6 +439,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
               isConnectSuccess={isFinalTxApproved}
               isConnectFailed={isTxRejected}
             />
+            {renderTxDetails()}
           </div>
         );
       case 1.5:
@@ -424,13 +453,11 @@ function ConfirmLedgerTransaction(): JSX.Element {
               <img
                 src={ledgerConfirmBtcIcon}
                 alt="confirm btc fee tx on the ledger device"
+                style={{marginBottom: 16, width: 32, height: 32}}
               />
               <ConnectLedgerTitle>{t('CONFIRM.TITLE')}</ConnectLedgerTitle>
               <ConnectLedgerTextAdvanced isCompleted={isFinalTxApproved}>Confirm the payment of transaction fees from the Bitcoin payment address on your device.</ConnectLedgerTextAdvanced>
-              <ConfirmationStepsContainer>
-                <ConfirmationStep isCompleted={isTxApproved} />
-                <ConfirmationStep isCompleted={isFinalTxApproved} />
-              </ConfirmationStepsContainer>
+              {renderOrdinalTxDetails()}
               <div />
             </ConnectLedgerContainer>
           );
@@ -469,7 +496,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
               <ActionButton
                 transparent
                 onPress={handleClose}
-                text={t('CANCEL_BUTTON')}
+                text={t('CLOSE_BUTTON')}
                 disabled={isButtonDisabled}
               />
             </SuccessActionsContainer>
@@ -509,7 +536,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
             <ActionButton
               transparent
               onPress={handleClose}
-              text={t('CANCEL_BUTTON')}
+              text={t(isTxRejected || isConnectFailed ? 'CLOSE_BUTTON' : 'CANCEL_BUTTON')}
               disabled={isButtonDisabled}
             />
           </SuccessActionsContainer>
