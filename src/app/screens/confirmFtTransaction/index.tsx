@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
+import { deserializeTransaction } from '@stacks/transactions';
 import BottomBar from '@components/tabBar';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import TopRow from '@components/topRow';
@@ -20,8 +21,9 @@ function ConfirmFtTransaction() {
   const selectedNetwork = useNetworkSelector();
   const location = useLocation();
   const {
-    unsignedTx, amount, fungibleToken, memo, recepientAddress,
+    unsignedTx: seedHex, amount, fungibleToken, memo, recepientAddress,
   } = location.state;
+  const unsignedTx = deserializeTransaction(seedHex);
   const {
     refetch,
   } = useStxWalletData();
@@ -38,7 +40,7 @@ function ConfirmFtTransaction() {
   } = useMutation<
   string,
   Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork));
+  { signedTx: StacksTransaction }>({ mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork) });
 
   useEffect(() => {
     if (stxTxBroadcastData) {

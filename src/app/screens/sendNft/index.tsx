@@ -131,7 +131,7 @@ function SendNft() {
   StacksTransaction,
   Error,
   { tokenId: string; associatedAddress: string }
-  >(async ({ tokenId, associatedAddress }) => {
+  >({ mutationFn: async ({ tokenId, associatedAddress }) => {
     const principal = nft?.fully_qualified_token_id?.split('::')!;
     const name = principal[1].split(':')[0];
     const contractInfo: string[] = principal[0].split('.');
@@ -160,13 +160,13 @@ function SendNft() {
     }
     setRecipientAddress(associatedAddress);
     return unsignedTx;
-  });
+  }});
 
   useEffect(() => {
     if (data) {
       navigate(`/confirm-nft-tx/${id}`, {
         state: {
-          unsignedTx: data,
+          unsignedTx: data.serialize().toString('hex'),
           recipientAddress,
         },
       });

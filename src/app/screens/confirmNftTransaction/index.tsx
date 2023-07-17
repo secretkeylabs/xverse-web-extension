@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
+import { deserializeTransaction } from '@stacks/transactions';
+import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
@@ -103,7 +105,8 @@ function ConfirmNftTransaction() {
   const { nftData } = useNftDataSelector();
   const nftIdDetails = id!.split('::');
   const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
-  const { unsignedTx, recipientAddress } = location.state;
+  const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
+  const unsignedTx = deserializeTransaction(unsignedTxHex);
   const {
     network,
   } = useWalletSelector();
@@ -111,7 +114,6 @@ function ConfirmNftTransaction() {
     refetch,
   } = useStxWalletData();
   const selectedNetwork = useNetworkSelector();
-
   const {
     isLoading,
     error: txError,
