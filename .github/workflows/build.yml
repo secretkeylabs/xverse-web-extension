@@ -81,4 +81,4 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token $GITHUB_TOKEN" \
             $GITHUB_URL \
-            -d "{\"body\":\"> Test with build here: ${{ env.ARTIFACT_URL }} \`\"}"
+            -d "{\"body\":\"> Test with build here: ${{ env.ARTIFACT_URL }}\"}"
