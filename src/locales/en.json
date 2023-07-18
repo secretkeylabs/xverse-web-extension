@@ -602,27 +602,5 @@
     "ADVANCED_SETTING": "Advanced settings",
     "ROUTE_DESC": "For the transaction to proceed, your BTC will be swapped for xBTC and STX. There is no additional cost for you and no STX will be added to your wallet.",
     "THIS_IS_A_SPONSORED_TRANSACTION": "This is a sponsored transaction, no transaction fees will be deducted from your account."
-  },
-  "SEND_BRC_20": {
-    "BRC20_TOKEN": "BRC-20",
-    "SEND_INFO_TITLE": "Sending a BRC-20 token",
-    "SEND_INFO_SUBTITLE": "To transfer BRC-20 tokens, you need to make two separate transactions:",
-    "SEND_STEP_1_TITLE": "Inscribe Transfer",
-    "SEND_STEP_1": "Create an Ordinal inscription with the token and amount you would like to send.",
-    "SEND_STEP_2_TITLE": "Send transfer inscription",
-    "SEND_STEP_2": "Once you have the transfer inscription, you can send it to your recipient to transfer the BRC-20 token.",
-    "SEND_INFO_START_BUTTON": "Start",
-    "SEND_NEXT_BUTTON": "Next",
-    "SEND": "Send",
-    "AMOUNT": "Amount",
-    "BALANCE": "Balance"
-  },
-  "CACHE_MIGRATION_SCREEN": {
-    "TITLE":"Your wallet data store needs to be updated in order to remain secure.",
-    "WARNING": "Please make sure you have your seed phrase backed up securely before moving forward.",
-    "SUCCESS_TITLE": "Update Complete",
-    "SKIP_BUTTON": "Do it later",
-    "CONFIRM_BUTTON": "Confirm",
-    "CLOSE_TAB": "Continue"
   }
 }
