@@ -100,6 +100,7 @@ const RowButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   marginTop: props.theme.spacing(11),
   columnGap: props.theme.spacing(11),
+
 }));
 
 const TokenListButtonContainer = styled.div((props) => ({

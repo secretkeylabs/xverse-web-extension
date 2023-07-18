@@ -46,9 +46,14 @@ const TickerIconText = styled.h1((props) => ({
   fontSize: 13,
 }));
 
-export default function TokenImage(props: TokenImageProps) {
-  const { token, loading, fungibleToken, round, size, loaderSize } = props;
-
+export default function TokenImage({
+  token,
+  loading,
+  fungibleToken,
+  size,
+  loaderSize,
+  round,
+}: TokenImageProps) {
   const getCoinIcon = useCallback(() => {
     if (token === 'STX') {
       return IconStacks;
