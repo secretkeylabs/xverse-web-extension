@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getSponsorInfo } from '@secretkeylabs/xverse-core';
+import { getSponsorInfo } from '@secretkeylabs/xverse-core/api';
 
 export const useSponsorInfoQuery = (sponsorUrl?: string) =>
   useQuery({
@@ -26,7 +26,6 @@ export const useSponsoredTransaction = (sponsorUrl?: string) => {
 
   return {
     isSponsored,
-    setIsSponsored,
   };
 };
 

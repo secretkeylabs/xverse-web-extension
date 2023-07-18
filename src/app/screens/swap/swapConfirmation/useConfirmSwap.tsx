@@ -11,6 +11,7 @@ import { StacksTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useNavigate } from 'react-router-dom';
 import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
+import {ApiResponseError} from '@secretkeylabs/xverse-core/types';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -68,7 +69,8 @@ export function useConfirmSwap(
             state: {
               txid: '',
               currency: 'STX',
-              error: e.message,
+              error: e instanceof ApiResponseError ? e.data.message : e.message,
+              sponsored: isSponsored,
               browserTx: true,
             },
           });
