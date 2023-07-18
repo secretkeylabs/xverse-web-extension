@@ -6,7 +6,7 @@ import {
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
 import {
-  useEffect, useRef, useState,
+  useEffect, useMemo, useRef, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -20,6 +20,7 @@ import {
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
 import useDebounce from '@hooks/useDebounce';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -189,6 +190,8 @@ function EditFee({
   const inputRef = useRef(null);
   const debouncedFeeRateInput = useDebounce(feeRateInput, 500);
   const isBtcOrOrdinals = type === 'BTC' || type === 'Ordinals';
+  const { ordinals } = useOrdinalsByAddress(btcAddress);
+  const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
 
   const modifyStxFees = (mode: string) => {
     const currentFee = new BigNumber(fee);
@@ -244,6 +247,7 @@ function EditFee({
           ordinalTxUtxo,
           btcAddress,
           network.type,
+          ordinalsUtxos!,
           mode,
         );
         setFeeRateInput(selectedFeeRate?.toString());
@@ -311,6 +315,7 @@ function EditFee({
           ordinalTxUtxo,
           btcAddress,
           network.type,
+          ordinalsUtxos!,
           selectedOption,
           feeRateInput,
         );
