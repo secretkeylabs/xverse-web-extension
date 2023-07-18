@@ -15,6 +15,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { isLedgerAccount } from '@utils/helper';
 import SmallActionButton from '@components/smallActionButton';
+import { useState } from 'react';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
 
 interface CoinBalanceProps {
   coin: CurrencyTypes;
@@ -136,6 +139,16 @@ const AvailableStxContainer = styled.div((props) => ({
   },
 }));
 
+const VerifyOrViewContainer = styled.div(props => ({
+  margin: props.theme.spacing(8),
+  marginTop: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(20),
+}));
+
+const VerifyButtonContainer = styled.div(props => ({
+  marginBottom: props.theme.spacing(6),
+}));
+
 const StacksLockedInfoText = styled.span((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[400],
@@ -156,6 +169,16 @@ export default function CoinHeader(props: CoinBalanceProps) {
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+  const [openReceiveModal, setOpenReceiveModal] = useState(false);
+  const isReceivingAddressesVisible = !isLedgerAccount(selectedAccount);
+
+  const handleReceiveModalOpen = () => {
+    setOpenReceiveModal(true);
+  };
+
+  const handleReceiveModalClose = () => {
+    setOpenReceiveModal(false);
+  };
 
   function getBalanceAmount() {
     switch (coin) {
@@ -292,6 +315,21 @@ export default function CoinHeader(props: CoinBalanceProps) {
     return '';
   };
 
+  const verifyOrViewAddresses = (
+    <VerifyOrViewContainer>
+      <VerifyButtonContainer>
+        <ActionButton text="Verify address on Ledger" onPress={async () => {
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${coin}`),
+          });
+        }} />
+      </VerifyButtonContainer>
+      <ActionButton transparent text="View address" onPress={() => {
+        navigate(`/receive/${coin}`);
+      }} />
+    </VerifyOrViewContainer>
+  );
+
   return (
     <Container>
       <BalanceInfoContainer>
@@ -339,7 +377,13 @@ export default function CoinHeader(props: CoinBalanceProps) {
               <SmallActionButton
                 src={ArrowDown}
                 text="Receive"
-                onPress={() => navigate(`/receive/${coin}`)}
+                onPress={() => {
+                  if (isReceivingAddressesVisible) {
+                    navigate(`/receive/${coin}`);
+                  } else {
+                    handleReceiveModalOpen();
+                  }
+                }}
               />
             </ButtonContainer>
             <SmallActionButton src={Buy} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
@@ -354,6 +398,10 @@ export default function CoinHeader(props: CoinBalanceProps) {
           </RecieveButtonContainer>
         )}
       </RowButtonContainer>
+
+      <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={handleReceiveModalClose}>
+        {verifyOrViewAddresses}
+      </BottomModal>
     </Container>
   );
 }

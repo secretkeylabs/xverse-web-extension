@@ -12,6 +12,7 @@ import BottomTabBar from '@components/tabBar';
 import InfoContainer from '@components/infoContainer';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
+import { isLedgerAccount } from '@utils/helper';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -159,6 +160,7 @@ function Receive(): JSX.Element {
     if (currency === 'BTC' && showBtcReceiveAlert) { setIsBtcReceiveAlertVisible(true); }
     if (currency === 'ORD' && showOrdinalReceiveAlert ) { setIsOrdinalReceiveAlertVisible(true); }
   };
+
   return (
     <>
       <TopRow title={t('RECEIVE')} onClick={handleBackButtonClick} />
@@ -201,14 +203,12 @@ function Receive(): JSX.Element {
             <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
           )}
         </CopyContainer>
-
       </OuterContainer>
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />
       </BottomBarContainer>
       {isBtcReceiveAlertVisible && <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose}/>}
       {isOrdinalReceiveAlertVisible && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose}/>}
-    
     </>
   );
 }

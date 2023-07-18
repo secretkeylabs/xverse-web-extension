@@ -39,9 +39,9 @@ const TransparentButton = styled(Button)`
 `;
 
 const AnimatedTransparentButton = styled(TransparentButton)`
-:hover {
-  background: ${(props) => props.theme.colors.background.elevation6_800};
-}
+  :hover {
+    background: ${(props) => props.theme.colors.background.elevation6_800};
+  }
 `;
 
 interface TextProps {
@@ -90,6 +90,7 @@ function ActionButton({
   const handleOnPress = () => {
     if (!disabled) { onPress(); }
   };
+
   if (transparent) {
     return (
       <AnimatedTransparentButton

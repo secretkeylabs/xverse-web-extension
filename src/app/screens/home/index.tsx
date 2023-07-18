@@ -33,6 +33,7 @@ import styled from 'styled-components';
 import Theme from 'theme';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
+import ActionButton from '@components/button';
 import BalanceCard from './balanceCard';
 
 const Container = styled.div`
@@ -124,6 +125,16 @@ const MergedIcon = styled.img({
   height: 40,
 });
 
+const VerifyOrViewContainer = styled.div(props => ({
+  margin: props.theme.spacing(8),
+  marginTop: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(20),
+}));
+
+const VerifyButtonContainer = styled.div(props => ({
+  marginBottom: props.theme.spacing(6),
+}));
+
 function Home() {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
@@ -135,6 +146,8 @@ function Home() {
   const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const { coinsList, stxAddress, btcAddress, ordinalsAddress, selectedAccount, brcCoinsList, showBtcReceiveAlert, showOrdinalReceiveAlert } = useWalletSelector();
+  const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(!isLedgerAccount(selectedAccount));
+  const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
   // eslint-disable-next-line react-hooks/rules-of-hooks
   stxAddress ? useStxWalletData() : { isLoading: false, isRefetching: false };
@@ -153,6 +166,11 @@ function Home() {
 
   const onReceiveModalClose = () => {
     setOpenReceiveModal(false);
+
+    if (isLedgerAccount(selectedAccount)) {
+      setAreReceivingAddressesVisible(false);
+      setChoseToVerifyAddresses(false);
+    }
   };
 
   const onSendModalOpen = () => {
@@ -279,6 +297,8 @@ function Home() {
         address={btcAddress}
         onQrAddressClick={onBTCReceiveSelect}
         onCopyAddressClick={onReceiveAlertOpen}
+        showVerifyButton={choseToVerifyAddresses}
+        currency="BTC"
       >
         <Icon src={BitcoinToken} />
       </ReceiveCardComponent>
@@ -288,21 +308,43 @@ function Home() {
         address={ordinalsAddress}
         onQrAddressClick={onOrdinalsReceivePress}
         onCopyAddressClick={onOrdinalReceiveAlertOpen}
+        showVerifyButton={choseToVerifyAddresses}
+        currency="ORD"
       >
         <MergedIcon src={OrdinalsIcon} />
       </ReceiveCardComponent>
 
       {stxAddress && (
-      <ReceiveCardComponent
-        title={t('STACKS_AND_TOKEN')}
-        address={stxAddress}
-        onQrAddressClick={onSTXReceiveSelect}
-      >
-        <MergedIcon src={SIP10Icon} />
-      </ReceiveCardComponent>
+        <ReceiveCardComponent
+          title={t('STACKS_AND_TOKEN')}
+          address={stxAddress}
+          onQrAddressClick={onSTXReceiveSelect}
+          showVerifyButton={choseToVerifyAddresses}
+          currency="STX"
+        >
+          <MergedIcon src={SIP10Icon} />
+        </ReceiveCardComponent>
       )}
     </ReceiveContainer>
   );
+
+  const verifyOrViewAddresses = (
+    <VerifyOrViewContainer>
+      <VerifyButtonContainer>
+        <ActionButton text="Verify addresses on Ledger" onPress={() => {
+          setChoseToVerifyAddresses(true);
+          setAreReceivingAddressesVisible(true);
+        }} />
+      </VerifyButtonContainer>
+      <ActionButton transparent text="View addresses" onPress={() => {
+        if (choseToVerifyAddresses) {
+          setChoseToVerifyAddresses(false);
+        }
+        setAreReceivingAddressesVisible(true);
+      }} />
+    </VerifyOrViewContainer>
+  );
+
   return (
     <>
       <AccountHeaderComponent />
@@ -382,7 +424,7 @@ function Home() {
           </CoinContainer>
         )}
         <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={onReceiveModalClose}>
-          {receiveContent}
+          {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
         </BottomModal>
 
         {!isLedgerAccount(selectedAccount) && (

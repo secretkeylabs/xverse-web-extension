@@ -34,6 +34,7 @@ import RestoreFunds from '@screens/restoreFunds';
 import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
+import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
 import LedgerSendStxScreen from '@screens/ledger/ledgerSendStx';
 import ReviewLedgerStxTransaction from '@screens/ledger/reviewLedgerStxTransaction';
@@ -85,6 +86,16 @@ const router = createHashRouter([
           <AuthGuard>
             <SingleTabGuard guardName='importLedger'>
               <ImportLedger />
+            </SingleTabGuard>
+          </AuthGuard>
+        )
+      },
+      {
+        path: 'verify-ledger',
+        element: (
+          <AuthGuard>
+            <SingleTabGuard guardName='verifyLedger'>
+              <VerifyLedger />
             </SingleTabGuard>
           </AuthGuard>
         )

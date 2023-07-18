@@ -9,7 +9,7 @@ import {
   addressToString,
 } from '@secretkeylabs/xverse-core/transactions';
 import Seperator from '@components/seperator';
-import RecipientAddressView from '@components/recipinetAddressView';
+import RecipientAddressView from '@components/recipientAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
 import InfoContainer from '@components/infoContainer';

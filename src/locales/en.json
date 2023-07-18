@@ -83,6 +83,29 @@
     "LEDGER_IMPORT_YES_BUTTON": "Add a new account",
     "LEDGER_IMPORT_CANCEL_BUTTON": "Cancel"
   },
+  "LEDGER_VERIFY_SCREEN": {
+    "TITLE_VERIFY_BTC": "Verify Bitcoin payment address",
+    "TITLE_VERIFY_ORDINALS": "Verify Ordinals address",
+    "SUBTITLE_VERIFY": "Verify that this address matches the address displayed on your device.",
+    "CONNECT_BUTTON": "Connect",
+    "CLOSE_BUTTON": "Close",
+    "TRY_AGAIN_BUTTON": "Try again",
+    "VERIFY_AGAIN_BUTTON": "Verify again",
+    "BTC_RECEIVE_MESSAGE": "Do not send Ordinals to this address, use your Ordinals NFT receive address.",
+    "ORDINALS_RECEIVE_MESSAGE": "Only send Ordinals and BRC-20 tokens to this address.",
+    "BTC_ADDRESS": "Bitcoin payment address",
+    "ORDINALS_ADDRESS": "Ordinals address",
+    "TITLE_CANCELLED": "Account address rejected",
+    "SUBTITLE_CANCELLED": "The account address was rejected on the device.",
+    "TITLE_FAILED": "Connection failed",
+    "BTC_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open.",
+    "BTC_TITLE_VERIFIED": "Bitcoin payment address verified successfully",
+    "ORDINALS_TITLE_VERIFIED": "Ordinals address verified successfully",
+    "LEDGER_CONNECT": {
+      "BTC_TITLE": "Connect Your Ledger",
+      "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app."
+    }
+  },
   "LEDGER_CONFIRM_TRANSACTION_SCREEN": {
     "CONNECT": {
       "TITLE": "Connect your hardware wallet",
@@ -596,7 +619,8 @@
     "BALANCE": "Balance",
     "TRANSACTIONS": "TRANSACTIONS",
     "CONTRACT": "CONTRACT",
-    "COMING_SOON": "Coming soon"
+    "COMING_SOON": "Coming soon",
+    "RECEIVE": "Receive"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",

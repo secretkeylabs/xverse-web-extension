@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
-import RecipientAddressView from '@components/recipinetAddressView';
+import RecipientAddressView from '@components/recipientAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import TopRow from '@components/topRow';

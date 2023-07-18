@@ -30,7 +30,6 @@ import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import LedgerAccountSwitchSVG from '@assets/img/ledger/account_switch.svg';
 import ArrowLeftIconSVG from '@assets/img/ledger/arrow_left_icon.svg';
 import InfoContainer from '@components/infoContainer';
-import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
