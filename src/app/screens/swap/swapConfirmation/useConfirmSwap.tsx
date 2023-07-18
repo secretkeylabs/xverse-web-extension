@@ -11,7 +11,7 @@ import { StacksTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useNavigate } from 'react-router-dom';
 import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
-import {ApiResponseError} from '@secretkeylabs/xverse-core/types';
+import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -28,7 +28,7 @@ export type SwapConfirmationInput = {
   functionName: string;
 };
 
-const XVERSE_SPONSOR_2_URL = "https://sponsor2.xverse.app";
+const XVERSE_SPONSOR_2_URL = 'https://sponsor2.xverse.app';
 
 export function useConfirmSwap(
   input: SwapConfirmationInput,
