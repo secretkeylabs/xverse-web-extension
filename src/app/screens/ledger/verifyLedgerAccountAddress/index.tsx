@@ -151,7 +151,7 @@ function VerifyLedger(): JSX.Element {
   });
 
   const isBitcoinSelected = currency === 'BTC';
-  const isOrdinalSelected = currency === 'ORD' || 'brc-20';
+  const isOrdinalSelected = currency === 'ORD' || currency === 'brc-20';
 
   const getAddress = () => {
     switch (currency) {
