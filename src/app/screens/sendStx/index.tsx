@@ -45,7 +45,7 @@ function SendStxScreen() {
   StacksTransaction,
   Error,
   { associatedAddress: string; amount: string; memo?: string }
-  >(async ({ associatedAddress, amount, memo }) => {
+  >({ mutationFn: async ({ associatedAddress, amount, memo }) => {
     const unsignedSendStxTx: StacksTransaction = await generateUnsignedStxTokenTransferTransaction(
       associatedAddress,
       stxToMicrostacks(new BigNumber(amount)).toString(),
@@ -60,13 +60,13 @@ function SendStxScreen() {
       unsignedSendStxTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
     }
     return unsignedSendStxTx;
-  });
+  }});
 
   useEffect(() => {
     if (data) {
       navigate('/confirm-stx-tx', {
         state: {
-          unsignedTx: data,
+          unsignedTx: data.serialize().toString('hex'),
         },
       });
     }

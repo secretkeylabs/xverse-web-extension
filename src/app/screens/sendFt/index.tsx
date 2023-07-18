@@ -47,7 +47,7 @@ function SendFtScreen() {
   StacksTransaction,
   Error,
   { associatedAddress: string; amount: string; memo?: string }
-  >(async ({ associatedAddress, amount, memo }) => {
+  >({ mutationFn: async ({ associatedAddress, amount, memo }) => {
     let convertedAmount = amount;
     if (fungibleToken?.decimals) {
       convertedAmount = convertAmountToFtDecimalPlaces(amount, fungibleToken.decimals).toString();
@@ -77,13 +77,13 @@ function SendFtScreen() {
     }
 
     return unsignedTx;
-  });
+  }});
 
   useEffect(() => {
     if (data) {
       navigate('/confirm-ft-tx', {
         state: {
-          unsignedTx: data,
+          unsignedTx: data.serialize().toString('hex'),
           amount: amountToSend.toString(),
           fungibleToken,
           memo: txMemo,

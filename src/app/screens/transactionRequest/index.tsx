@@ -60,7 +60,7 @@ function TransactionRequest() {
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
       state: {
-        unsignedTx: unsignedSendStxTx,
+        unsignedTx: unsignedSendStxTx.serialize().toString('hex'),
         sponosred: payload.sponsored,
         isBrowserTx: true,
         tabId,

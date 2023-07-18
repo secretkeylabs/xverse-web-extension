@@ -14,6 +14,8 @@ import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import AlertMessage from '@components/alertMessage';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import useBtcClient from '@hooks/useBtcClient';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import AccountHeaderComponent from '@components/accountHeader';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
@@ -33,7 +35,7 @@ function ConfirmBtcTransaction() {
     ordinals: ordinalsInBtc,
   } = useOrdinalsByAddress(btcAddress);
   const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, isBrc20TokenFlow,
+    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, btcSendBrowserTx, requestToken, tabId, isBrc20TokenFlow,
     feePerVByte,
   } = location.state;
 
@@ -83,17 +85,30 @@ function ConfirmBtcTransaction() {
 
   useEffect(() => {
     if (btcTxBroadcastData) {
-      navigate('/tx-status', {
-        state: {
-          txid: btcTxBroadcastData.tx.hash,
-          currency: 'BTC',
-          error: '',
-          isBrc20TokenFlow,
-        },
-      });
-      setTimeout(() => {
-        refetch();
-      }, 1000);
+      if (btcSendBrowserTx) {
+        const btcSendMessage = {
+          source: MESSAGE_SOURCE,
+          method: ExternalSatsMethods.sendBtcResponse,
+          payload: {
+            sendBtcRequest: requestToken,
+            sendBtcResponse: btcTxBroadcastData.tx.hash,
+          },
+        };
+        chrome.tabs.sendMessage(+tabId, btcSendMessage);
+        window.close();
+      } else {
+        navigate('/tx-status', {
+          state: {
+            txid: btcTxBroadcastData.tx.hash,
+            currency: 'BTC',
+            error: '',
+            isBrc20TokenFlow,
+          },
+        });
+        setTimeout(() => {
+          refetch();
+        }, 1000);
+      }
     }
   }, [btcTxBroadcastData]);
 
@@ -122,6 +137,7 @@ function ConfirmBtcTransaction() {
           txid: '',
           currency: 'BTC',
           error: txError.toString(),
+          browserTx: btcSendBrowserTx,
         },
       });
     }
@@ -139,6 +155,8 @@ function ConfirmBtcTransaction() {
   const goBackToScreen = () => {
     if (isRestoreFundFlow || isBrc20TokenFlow) {
       navigate(-1);
+    } else if (btcSendBrowserTx) {
+      window.close();
     } else {
       navigate('/send-btc', {
         state: {
@@ -167,7 +185,7 @@ function ConfirmBtcTransaction() {
           isWarningAlert
         />
       )}
-
+      {btcSendBrowserTx && <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />}
       <ConfirmBtcTransactionComponent
         fee={fee}
         feePerVByte={feePerVByte}
@@ -180,6 +198,7 @@ function ConfirmBtcTransaction() {
         onBackButtonClick={goBackToScreen}
         nonOrdinalUtxos={unspentUtxos}
         amount={amount}
+        isBtcSendBrowserTx={btcSendBrowserTx}
       >
         {ordinalsInBtc && ordinalsInBtc.length > 0 && (
         <InfoContainer
@@ -191,9 +210,11 @@ function ConfirmBtcTransaction() {
         />
         )}
       </ConfirmBtcTransactionComponent>
+      {!btcSendBrowserTx && (
       <BottomBarContainer>
         <BottomBar tab="dashboard" />
       </BottomBarContainer>
+      )}
     </>
   );
 }

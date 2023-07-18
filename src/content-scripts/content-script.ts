@@ -17,6 +17,7 @@ import {
   GetAddressRequestEvent,
   SignPsbtRequestEvent,
   SignMessageRequestEvent,
+  SendBtcRequestEvent,
 } from '@common/types/inpage-types';
 
 // Legacy messaging to work with older versions of Connect
@@ -156,6 +157,18 @@ document.addEventListener(DomEventName.signMessageRequest, ((
     payload: event.detail.signMessageRequest,
     urlParam: 'signMessageRequest',
     method: ExternalSatsMethods.signMessageRequest,
+  });
+}) as EventListener);
+
+// Listen for a CustomEvent (Send BTC request) coming from the web app
+document.addEventListener(DomEventName.sendBtcRequest, ((
+  event: SendBtcRequestEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.SendBtcTx,
+    payload: event.detail.sendBtcRequest,
+    urlParam: 'sendBtcRequest',
+    method: ExternalSatsMethods.sendBtcRequest,
   });
 }) as EventListener);
 

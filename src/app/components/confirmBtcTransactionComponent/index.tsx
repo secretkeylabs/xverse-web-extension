@@ -48,12 +48,17 @@ const Container = styled.div((props) => ({
   marginRight: props.theme.spacing(8),
 }));
 
-const ButtonContainer = styled.div((props) => ({
+interface ButtonProps {
+  isBtcSendBrowserTx?: boolean;
+}
+
+const ButtonContainer = styled.div<ButtonProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
+  position: 'relative',
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(5),
+  marginBottom: props.isBtcSendBrowserTx ? props.theme.spacing(20) : props.theme.spacing(5),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -117,6 +122,7 @@ interface Props {
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
   amount?: string;
+  isBtcSendBrowserTx?: boolean;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
@@ -134,6 +140,7 @@ function ConfirmBtcTransactionComponent({
   isRestoreFundFlow,
   nonOrdinalUtxos,
   amount,
+  isBtcSendBrowserTx,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -226,11 +233,10 @@ function ConfirmBtcTransactionComponent({
   }, [ordinalData]);
 
   useEffect(() => {
-    const totalAmount: BigNumber = new BigNumber(0);
     let sum: BigNumber = new BigNumber(0);
     if (recipients) {
       recipients.map((recipient) => {
-        sum = totalAmount.plus(recipient.amountSats);
+        sum = sum.plus(recipient.amountSats);
         return sum;
       });
       sum = sum?.plus(currentFee);
@@ -322,8 +328,8 @@ function ConfirmBtcTransactionComponent({
   return (
     <>
       <OuterContainer>
-        {!isGalleryOpen && (
-          <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
+        {(!isBtcSendBrowserTx && !isGalleryOpen) && (
+        <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
         )}
         <Container>
           {children}
@@ -343,9 +349,9 @@ function ConfirmBtcTransactionComponent({
             recipients?.map((recipient, index) => (
               <RecipientComponent
                 recipientIndex={index + 1}
-                address={recipient?.address}
-                value={satsToBtc(recipient?.amountSats).toString()}
-                totalRecipient={recipients?.length}
+                address={recipient.address}
+                value={satsToBtc(recipient.amountSats).toString()}
+                totalRecipient={recipients.length}
                 currencyType="BTC"
                 title={t('CONFIRM_TRANSACTION.AMOUNT')}
                 showSenderAddress={isRestoreFundFlow}
@@ -396,7 +402,7 @@ function ConfirmBtcTransactionComponent({
           <ErrorText>{error}</ErrorText>
         </ErrorContainer>
       </OuterContainer>
-      <ButtonContainer>
+      <ButtonContainer isBtcSendBrowserTx={isBtcSendBrowserTx}>
         <TransparentButtonContainer>
           <ActionButton
             text={t('CONFIRM_TRANSACTION.CANCEL')}
