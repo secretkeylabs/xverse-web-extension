@@ -9,6 +9,7 @@ import { StyledToolTip } from '@components/accountRow';
 import { useCallback, useState } from 'react';
 import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import TokenImage from '@components/tokenImage';
 
 export const Container = styled.div((props) => ({
   display: 'flex',
@@ -48,10 +49,10 @@ const DescriptionText = styled.h3((props) => ({
   marginBottom: props.theme.spacing(4),
 }));
 
-const AmountContainer = styled.div((props) => ({
+const AmountContainer = styled.div(() => ({
   display: 'flex',
   alignItems: 'center',
-  flexDirection: 'column',
+  'flex-direction': 'column',
 }));
 
 const AmountLabel = styled.p((props) => ({
@@ -62,7 +63,7 @@ const AmountLabel = styled.p((props) => ({
   marginLeft: props.theme.spacing(5),
 }));
 
-const SpaceBetweenContainer = styled.div((props) => ({
+const SpaceBetweenContainer = styled.div(() => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -74,7 +75,7 @@ const AddressImg = styled.img(() => ({
   height: 32,
 }));
 
-const ItemsCenterContainer = styled.div((props) => ({
+const ItemsCenterContainer = styled.div(() => ({
   display: 'flex',
   alignItems: 'center',
 }));
@@ -139,7 +140,8 @@ export default function StxInfoBlock({ type, swap }: StxInfoCardProps) {
           <AmountContainer>
             <SpaceBetweenContainer>
               <ItemsCenterContainer>
-                {token.image}
+                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                <TokenImage {...token.image} />
                 <AmountLabel>{token.name}</AmountLabel>
               </ItemsCenterContainer>
               <ItemsCenterContainer>

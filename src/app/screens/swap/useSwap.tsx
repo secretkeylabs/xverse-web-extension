@@ -1,8 +1,8 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FungibleToken, microstacksToStx } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
-import TokenImage from '@components/tokenImage';
+import { TokenImageProps } from '@components/tokenImage';
 import { LoaderSize } from '@utils/constants';
 import { AlexSDK, Currency } from 'alex-sdk';
 import { ftDecimals } from '@utils/helper';
@@ -20,7 +20,7 @@ export type Side = 'from' | 'to';
 
 export type SwapToken = {
   name: string;
-  image: ReactNode;
+  image: TokenImageProps;
   balance?: number;
   amount?: number;
   fiatAmount?: number;
@@ -55,7 +55,10 @@ export type SelectedCurrencyState = {
   prevFrom?: Currency;
 };
 
-function updateOppositeCurrencyIfSameAsSelected(state: SelectedCurrencyState, { newCurrency, side }) {
+function updateOppositeCurrencyIfSameAsSelected(
+  state: SelectedCurrencyState,
+  { newCurrency, side },
+) {
   switch (side) {
     case 'from':
       if (state.to !== newCurrency) {
@@ -141,7 +144,7 @@ export function useSwap(): UseSwap {
     if (currency === Currency.STX) {
       return {
         balance: Number(microstacksToStx(BigNumber(stxAvailableBalance) as any)),
-        image: <TokenImage token="STX" size={28} loaderSize={LoaderSize.SMALL} />,
+        image: { token: 'STX', size: 28, loaderSize: LoaderSize.SMALL },
         name: 'STX',
         amount,
         fiatAmount:
@@ -158,7 +161,7 @@ export function useSwap(): UseSwap {
     }
     return {
       amount,
-      image: <TokenImage fungibleToken={token} size={28} loaderSize={LoaderSize.SMALL} />,
+      image: { fungibleToken: token, size: 28, loaderSize: LoaderSize.SMALL },
       name: (token.ticker ?? token.name).toUpperCase(),
       balance: Number(ftDecimals(token.balance, token.decimals ?? 0)),
       fiatAmount:
@@ -346,7 +349,7 @@ export function useSwap(): UseSwap {
               lpFeeFiatAmount: currencyToToken(selectedCurrency.from!, info.feeRate * fromAmount!)
                 ?.fiatAmount,
               routers: info.route.map(currencyToToken).filter(isNotNull),
-              unsignedTx,
+              unsignedTx: unsignedTx.serialize().toString('hex'),
               functionName: `${tx.contractName}\n${tx.functionName}`,
             };
             navigate('/swap-confirm', {

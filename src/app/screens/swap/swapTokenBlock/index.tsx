@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import ChevronIcon from '@assets/img/swap/chevron.svg';
 import { SwapToken } from '@screens/swap/useSwap';
+import TokenImage from '@components/tokenImage';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -124,7 +125,8 @@ function SwapTokenBlock({
       <CardContainer error={error}>
         <RowContainer>
           <CoinButtonContainer onClick={onSelectCoin}>
-            {selectedCoin?.image}
+            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+            { selectedCoin && <TokenImage {...selectedCoin?.image} /> }
             <CoinText>{selectedCoin?.name ?? t('SELECT_COIN')}</CoinText>
             <CoinButtonArrow src={ChevronIcon} />
           </CoinButtonContainer>

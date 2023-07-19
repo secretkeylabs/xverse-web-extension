@@ -1,5 +1,4 @@
 import { SwapToken } from '@screens/swap/useSwap';
-import { ReactNode } from 'react';
 import { Currency } from 'alex-sdk';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -7,11 +6,12 @@ import {
   signTransaction,
   sponsorTransaction,
 } from '@secretkeylabs/xverse-core';
-import { StacksTransaction } from '@stacks/transactions';
+import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useNavigate } from 'react-router-dom';
 import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
+import { TokenImageProps } from '@components/tokenImage';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -23,8 +23,8 @@ export type SwapConfirmationInput = {
   lpFeeAmount: number;
   lpFeeFiatAmount?: number;
   address: string;
-  routers: { image: ReactNode; name: string }[];
-  unsignedTx: StacksTransaction;
+  routers: { image: TokenImageProps; name: string }[];
+  unsignedTx: string; // serialized hex StacksTransaction
   functionName: string;
 };
 
@@ -37,11 +37,12 @@ export function useConfirmSwap(
   const selectedNetwork = useNetworkSelector();
   const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
   const navigate = useNavigate();
+  const unsignedTx = deserializeTransaction(input.unsignedTx);
   return {
     ...input,
     onConfirm: async () => {
       const signed = await signTransaction(
-        input.unsignedTx,
+        unsignedTx,
         seedPhrase,
         selectedAccount?.id ?? 0,
         selectedNetwork,

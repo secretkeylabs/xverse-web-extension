@@ -8,7 +8,7 @@ import { LoaderSize } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 
-interface TokenImageProps {
+export interface TokenImageProps {
   token?: string;
   loading?: boolean;
   fungibleToken?: FungibleToken;

@@ -109,7 +109,7 @@ function SwapScreen() {
             }
             try {
               setLoading(true);
-              await swap.onSwap?.();
+              swap.onSwap?.();
             } finally {
               setLoading(false);
             }

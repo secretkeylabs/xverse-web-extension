@@ -6,8 +6,9 @@ import {
 } from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { cloneElement, useState } from 'react';
+import { useState } from 'react';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import TokenImage from '@components/tokenImage';
 
 const RouteDescription = styled.p((props) => ({
   ...props.theme.body_m,
@@ -66,8 +67,9 @@ export default function RouteBlock({ swap }: { swap: SwapConfirmationInput }) {
           <RouteProgress>
             <DashLine />
             {swap.routers.map(({ name, image }) => (
-              <ProgressItem>
-                {cloneElement(image as any, { size: 24 })}
+              <ProgressItem key={name}>
+                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                <TokenImage {...image} size={24} />
                 <ProgressItemText>{name}</ProgressItemText>
               </ProgressItem>
             ))}
