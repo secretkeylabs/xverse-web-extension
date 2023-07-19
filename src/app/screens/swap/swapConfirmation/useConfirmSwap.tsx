@@ -28,7 +28,8 @@ export type SwapConfirmationInput = {
   functionName: string;
 };
 
-const XVERSE_SPONSOR_2_URL = 'https://sponsor2.xverse.app';
+// TODO use the proper custom domain for this once done
+const XVERSE_SPONSOR_2_URL = 'https://stacks-transaction-sponsor-swaps-pr-3.onrender.com';
 
 export function useConfirmSwap(
   input: SwapConfirmationInput,
