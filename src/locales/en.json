@@ -113,7 +113,8 @@
       "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app.",
       "ERROR_TITLE": "Connection error",
       "ERROR_SUBTITLE": "Unable to connect to device.",
-      "BTC_ERROR_SUBTITLE": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open."
+      "BTC_ERROR_SUBTITLE": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open.",
+      "WRONG_DEVICE_ERROR_SUBTITLE": "The public key of the connected device did not match the wallet public key. Make sure you have the correct device connected."
     },
     "EXTERNAL_INPUTS": {
       "TITLE": "External inputs",

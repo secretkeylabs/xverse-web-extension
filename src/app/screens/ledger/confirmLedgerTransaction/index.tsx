@@ -128,6 +128,17 @@ const TxDetailsTitle = styled.div(props => ({
   color: props.theme.colors.white[200],
 }));
 
+const RecipientsWrapper = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+const ConfirmTxIconBig = styled.img(props => ({
+  width: 32,
+  height: 32,
+  marginBottom: props.theme.spacing(8),
+}));
+
 function ConfirmLedgerTransaction(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [txId, setTxId] = useState<string | undefined>(undefined);
@@ -135,6 +146,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isWrongDevice, setIsWrongDevice] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isFinalTxApproved, setIsFinalTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
@@ -265,9 +277,15 @@ function ConfirmLedgerTransaction(): JSX.Element {
       }
   
       const masterFingerPrint = await getMasterFingerPrint(transport);
-  
+
       const deviceAccounts = ledgerAccountsList.filter((account) => account.masterPubKey === masterFingerPrint);
       const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount.id);
+
+      if (accountId === -1) {
+        setIsConnectFailed(true);
+        setIsWrongDevice(true);
+        return;
+      }
   
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
@@ -314,6 +332,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     setIsTxRejected(false);
     setIsConnectSuccess(false);
     setIsConnectFailed(false);
+    setIsWrongDevice(false);
     setIsTxApproved(false);
     setCurrentStepIndex(0);
   };
@@ -350,11 +369,11 @@ function ConfirmLedgerTransaction(): JSX.Element {
     <TxDetails>
       <TxDetailsRow>
         <TxDetailsTitle>Recipient{recipients.length > 1 ? 's' : ''}</TxDetailsTitle>
-        <div style={{display: 'flex', flexDirection: 'column'}}>
+        <RecipientsWrapper>
           {recipients.map((recipient) => (
             <div key={recipient.address}>{getTruncatedAddress(recipient.address)}</div>
           ))}
-        </div>
+        </RecipientsWrapper>
       </TxDetailsRow>
       <TxDetailsRow>
         <TxDetailsTitle>{ordinalUtxo?.value ? 'Ordinal value' : 'Amount'}</TxDetailsTitle>
@@ -383,7 +402,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
               title={t('CONNECT.TITLE')}
               text={t('CONNECT.BTC_SUBTITLE')}
               titleFailed={t('CONNECT.ERROR_TITLE')}
-              textFailed={t('CONNECT.BTC_ERROR_SUBTITLE')}
+              textFailed={t(isWrongDevice ? 'CONNECT.WRONG_DEVICE_ERROR_SUBTITLE' : 'CONNECT.BTC_ERROR_SUBTITLE')}
               imageDefault={ledgerConnectDefaultIcon}
               isConnectSuccess={isConnectSuccess}
               isConnectFailed={isConnectFailed}
@@ -415,10 +434,9 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
           return (
             <ConnectLedgerContainer>
-              <img
+              <ConfirmTxIconBig
                 src={ledgerConfirmOrdinalsIcon}
                 alt="confirm ordinal transfer tx on the ledger device"
-                style={{marginBottom: 16}}
               />
               <ConnectLedgerTitle>Confirm ordinal send</ConnectLedgerTitle>
               <ConnectLedgerTextAdvanced isCompleted={isTxApproved}>Confirm the Ordinal inscription transfer on your device.</ConnectLedgerTextAdvanced>
@@ -450,10 +468,9 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
           return (
             <ConnectLedgerContainer>
-              <img
+              <ConfirmTxIconBig
                 src={ledgerConfirmBtcIcon}
                 alt="confirm btc fee tx on the ledger device"
-                style={{marginBottom: 16, width: 32, height: 32}}
               />
               <ConnectLedgerTitle>{t('CONFIRM.TITLE')}</ConnectLedgerTitle>
               <ConnectLedgerTextAdvanced isCompleted={isFinalTxApproved}>Confirm the payment of transaction fees from the Bitcoin payment address on your device.</ConnectLedgerTextAdvanced>
