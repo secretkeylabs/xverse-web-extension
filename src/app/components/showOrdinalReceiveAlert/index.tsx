@@ -13,7 +13,6 @@ function ShowOrdinalReceiveAlert({ onOrdinalReceiveAlertClose }: Props) {
 
     const onDontShowReceiveOrdinalAlert = () => {
         dispatch(ChangeShowOrdinalReceiveAlertAction(false));
-        onOrdinalReceiveAlertClose();
     };
 
     return (
