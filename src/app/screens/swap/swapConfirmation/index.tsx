@@ -62,7 +62,7 @@ export default function SwapConfirmation() {
 
   const onCancel = useCallback(() => {
     navigate('/swap');
-  }, []);
+  }, [navigate]);
 
   const [confirming, setConfirming] = useState(false);
   const onConfirm = useCallback(() => {

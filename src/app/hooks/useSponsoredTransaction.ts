@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getSponsorInfo } from '@secretkeylabs/xverse-core/api';
+import { getSponsorInfo, sponsorTransaction } from '@secretkeylabs/xverse-core/api';
+import { StacksTransaction } from '@secretkeylabs/xverse-core';
 
 export const useSponsorInfoQuery = (sponsorUrl?: string) =>
   useQuery({
@@ -17,15 +18,20 @@ export const useSponsorInfoQuery = (sponsorUrl?: string) =>
 export const useSponsoredTransaction = (sponsorUrl?: string) => {
   const [isSponsored, setIsSponsored] = useState(false);
 
-  const { error, data: isActive } = useSponsorInfoQuery(sponsorUrl);
+  const { error, data: isActive, isLoading } = useSponsorInfoQuery(sponsorUrl);
+
   useEffect(() => {
-    if (!error) {
+    if (!isLoading && !error) {
       setIsSponsored(!!isActive);
     }
-  }, [isActive, error]);
+  }, [isActive, error, isLoading]);
+
+  const sponsorTransactionToUrl = async (signed: StacksTransaction) =>
+    sponsorTransaction(signed, sponsorUrl);
 
   return {
     isSponsored,
+    sponsorTransaction: sponsorTransactionToUrl,
   };
 };
 

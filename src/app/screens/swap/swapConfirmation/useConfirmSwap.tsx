@@ -4,7 +4,6 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   broadcastSignedTransaction,
   signTransaction,
-  sponsorTransaction,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -12,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
+import { XVERSE_SPONSOR_2_URL } from '@utils/constants';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -28,17 +28,15 @@ export type SwapConfirmationInput = {
   functionName: string;
 };
 
-// TODO use the proper custom domain for this once done
-const XVERSE_SPONSOR_2_URL = 'https://stacks-transaction-sponsor-swaps-pr-3.onrender.com';
-
 export function useConfirmSwap(
   input: SwapConfirmationInput,
 ): SwapConfirmationInput & { onConfirm: () => Promise<void> } {
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-  const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
+  const { isSponsored, sponsorTransaction } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
   const navigate = useNavigate();
   const unsignedTx = deserializeTransaction(input.unsignedTx);
+
   return {
     ...input,
     onConfirm: async () => {
@@ -49,9 +47,9 @@ export function useConfirmSwap(
         selectedNetwork,
       );
       try {
-        let broadcastResult: string | null;
+        let broadcastResult: string;
         if (isSponsored) {
-          broadcastResult = await sponsorTransaction(signed, XVERSE_SPONSOR_2_URL);
+          broadcastResult = await sponsorTransaction(signed);
         } else {
           broadcastResult = await broadcastSignedTransaction(signed, selectedNetwork);
         }
@@ -61,6 +59,7 @@ export function useConfirmSwap(
               txid: broadcastResult,
               currency: 'STX',
               error: '',
+              sponsored: isSponsored,
               browserTx: true,
             },
           });

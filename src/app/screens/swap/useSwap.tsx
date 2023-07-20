@@ -3,7 +3,7 @@ import { FungibleToken, microstacksToStx } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TokenImageProps } from '@components/tokenImage';
-import { LoaderSize } from '@utils/constants';
+import { LoaderSize, XVERSE_SPONSOR_2_URL } from '@utils/constants';
 import { AlexSDK, Currency } from 'alex-sdk';
 import { ftDecimals } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -11,6 +11,7 @@ import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import { useNavigate } from 'react-router-dom';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
+import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 
 // const noop = () => null;
 const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
@@ -118,16 +119,13 @@ export function useSwap(): UseSwap {
     stxAddress,
     stxPublicKey,
   } = useWalletSelector();
+  const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
 
   const acceptableCoinList =
     coinsList?.filter((c) => alexSDK.getCurrencyFrom(c.principal) != null) ?? [];
 
   const [inputAmount, setInputAmount] = useState('');
   const [slippage, setSlippage] = useState(0.04);
-  // const [from, setFrom] = useState<Currency | undefined>();
-  // const [to, setTo] = useState<Currency | undefined>();
-  // const [prevFrom, setPrevFrom] = useState<Currency | undefined>();
-  // const [prevTo, setPrevTo] = useState<Currency | undefined>();
   const [selectedCurrency, setSelectedCurrency] = useState<SelectedCurrencyState>({
     to: undefined,
     from: undefined,
@@ -229,7 +227,7 @@ export function useSwap(): UseSwap {
         cancelled = true;
       };
     }
-  }, [selectedCurrency.from, selectedCurrency.to]);
+  }, [selectedCurrency.from, selectedCurrency.to, alexSDK]);
 
   const [exchangeRate, setExchangeRate] = useState<number>();
 
@@ -260,7 +258,7 @@ export function useSwap(): UseSwap {
         cancelled = true;
       };
     }
-  }, [selectedCurrency.from, selectedCurrency.to, fromAmount]);
+  }, [selectedCurrency.from, selectedCurrency.to, fromAmount, alexSDK]);
 
   function roundForDisplay(input?: number) {
     if (input == null) {
@@ -335,6 +333,7 @@ export function useSwap(): UseSwap {
               anchorMode: AnchorMode.Any,
               postConditionMode: PostConditionMode.Deny,
               postConditions: tx.postConditions,
+              sponsored: isSponsored,
             });
 
             const state: SwapConfirmationInput = {
