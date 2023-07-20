@@ -10,9 +10,7 @@ import {
   MempoolTransaction,
 } from '@stacks/stacks-blockchain-api-types';
 import { useMemo } from 'react';
-import {
-  animated, config, useSpring,
-} from '@react-spring/web';
+import { animated, config, useSpring } from '@react-spring/web';
 import {
   isAddressTransactionWithTransfers,
   isBtcTransaction,
@@ -65,11 +63,11 @@ const SectionHeader = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
 }));
 
-const SectionSeparator = styled.div({
-  border: '0.5px solid  rgba(255, 255, 255, 0.6)',
+const SectionSeparator = styled.div((props) => ({
+  border: `0.5px solid ${props.theme.colors.white[400]}`,
   opacity: 0.2,
   flexGrow: 1,
-});
+}));
 
 const SectionTitle = styled.p((props) => ({
   ...props.theme.body_xs,
@@ -84,63 +82,71 @@ interface TransactionsHistoryListProps {
 
 const groupBtcTxsByDate = (
   transactions: BtcTransactionData[],
-): { [x: string]: BtcTransactionData[] } => transactions.reduce(
-  (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
-    const txDate = formatDate(new Date(transaction.seenTime));
-    if (!all[txDate]) {
-      if (transaction.txStatus === 'pending') {
-        all.Pending = [transaction];
+): { [x: string]: BtcTransactionData[] } =>
+  transactions.reduce(
+    (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
+      const txDate = formatDate(new Date(transaction.seenTime));
+      if (!all[txDate]) {
+        if (transaction.txStatus === 'pending') {
+          all.Pending = [transaction];
+        } else {
+          all[txDate] = [transaction];
+        }
       } else {
-        all[txDate] = [transaction];
+        all[txDate].push(transaction);
+        all[txDate].sort((txA, txB) => {
+          if (txB.blockHeight > txA.blockHeight) {
+            return 1;
+          }
+          return -1;
+        });
       }
-    } else {
-      all[txDate].push(transaction);
-      all[txDate].sort((txA, txB) => {
-        if (txB.blockHeight > txA.blockHeight) {
-          return 1;
-        } return -1;
-      });
-    }
-    return all;
-  },
-  {},
-);
+      return all;
+    },
+    {},
+  );
 
-const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) => txs.reduce(
-  (
-    all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
-    transaction: AddressTransactionWithTransfers | Tx,
-  ) => {
-    const date = formatDate(
-      new Date(
-        transaction.tx?.burn_block_time_iso ? transaction.tx.burn_block_time_iso : Date.now(),
-      ),
-    );
-    if (!all[date]) {
-      all[date] = [transaction];
-    } else {
-      all[date].push(transaction);
-    }
-    return all;
-  },
-  {},
-);
+const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) =>
+  txs.reduce(
+    (
+      all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
+      transaction: AddressTransactionWithTransfers | Tx,
+    ) => {
+      const date = formatDate(
+        new Date(
+          isAddressTransactionWithTransfers(transaction) && transaction.tx?.burn_block_time_iso
+            ? transaction.tx.burn_block_time_iso
+            : Date.now(),
+        ),
+      );
+      if (!all[date]) {
+        all[date] = [transaction];
+      } else {
+        all[date].push(transaction);
+      }
+      return all;
+    },
+    {},
+  );
 
 const filterTxs = (
   txs: (AddressTransactionWithTransfers | MempoolTransaction)[],
   filter: string,
-): (AddressTransactionWithTransfers | MempoolTransaction)[] => txs.filter((atx) => {
-  const tx = isAddressTransactionWithTransfers(atx) ? atx.tx : atx;
-  const acceptedTypes = tx.tx_type === 'contract_call';
-  return (
-    acceptedTypes
-      && ((atx?.ft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
-        .length > 0
-        || (atx?.nft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
-          .length > 0
-        || tx?.contract_call?.contract_id === filter)
-  );
-});
+): (AddressTransactionWithTransfers | MempoolTransaction)[] =>
+  txs.filter((atx) => {
+    const tx = isAddressTransactionWithTransfers(atx) ? atx.tx : atx;
+    const acceptedTypes = tx.tx_type === 'contract_call';
+    const ftTransfers = atx && isAddressTransactionWithTransfers(atx) ? atx.ft_transfers || [] : [];
+    const nftTransfers =
+      atx && isAddressTransactionWithTransfers(atx) ? atx.nft_transfers || [] : [];
+
+    return (
+      acceptedTypes &&
+      (ftTransfers.filter((transfer) => transfer.asset_identifier.includes(filter)).length > 0 ||
+        nftTransfers.filter((transfer) => transfer.asset_identifier.includes(filter)).length > 0 ||
+        tx?.contract_call?.contract_id === filter)
+    );
+  });
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, txFilter } = props;
@@ -155,23 +161,28 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   const groupedTxs = useMemo(() => {
-    if (data && data.length > 0) {
-      if (isBtcTransactionArr(data)) {
-        return groupBtcTxsByDate(data);
-      }
-      if (txFilter && coin === 'FT') {
-        const filteredTxs = filterTxs(data, txFilter);
-        return groupedTxsByDateMap(filteredTxs);
-      }
-      return groupedTxsByDateMap(data);
+    if (!data?.length) {
+      return;
     }
+
+    if (isBtcTransactionArr(data)) {
+      return groupBtcTxsByDate(data);
+    }
+
+    if (txFilter && coin === 'FT') {
+      const filteredTxs = filterTxs(data, txFilter);
+      return groupedTxsByDateMap(filteredTxs);
+    }
+
+    return groupedTxsByDateMap(data);
   }, [data, isLoading, isFetching]);
+
   return (
     <ListItemsContainer>
       <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>
-      {groupedTxs
-        && !isLoading
-        && Object.keys(groupedTxs).map((group) => (
+      {groupedTxs &&
+        !isLoading &&
+        Object.keys(groupedTxs).map((group) => (
           <GroupContainer style={styles}>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
