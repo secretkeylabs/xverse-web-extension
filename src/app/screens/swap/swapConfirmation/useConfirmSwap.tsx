@@ -39,6 +39,8 @@ export function useConfirmSwap(
 
   return {
     ...input,
+    lpFeeAmount: isSponsored ? 0 : input.lpFeeAmount,
+    lpFeeFiatAmount: isSponsored ? 0 : input.lpFeeFiatAmount,
     onConfirm: async () => {
       const signed = await signTransaction(
         unsignedTx,
