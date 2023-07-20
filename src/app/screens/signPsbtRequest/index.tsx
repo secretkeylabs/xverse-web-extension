@@ -21,6 +21,7 @@ import InfoContainer from '@components/infoContainer';
 import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
 import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
+import { isLedgerAccount } from '@utils/helper';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -146,6 +147,10 @@ function SignPsbtRequest() {
 
   const onSignPsbtConfirmed = async () => {
     try {
+      if (isLedgerAccount(selectedAccount)) {
+        return;
+      }
+
       setIsSigning(true);
       const response = await confirmSignPsbt();
       setIsSigning(false);
@@ -205,51 +210,57 @@ function SignPsbtRequest() {
         : (
           <>
             <OuterContainer>
-              <Container>
-                <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
-                {!payload.broadcast ? (
-                  <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
-                ) : null}
-                {ordinalInfoData && ordinalInfoData.map((ordinalData) => (
-                  <OrdinalDetailComponent
-                    ordinalInscription={`Inscription ${ordinalData?.number}`}
-                    icon={IconOrdinal}
-                    title={t('ORDINAL')}
-                    ordinal={ordinalData}
-                    ordinalDetail={ordinalData?.content_type}
-                    heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
+              {isLedgerAccount(selectedAccount) ? (
+                <Container>
+                  <InfoContainer bodyText="External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
+                </Container>
+              ) : (
+                <Container>
+                  <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
+                  {!payload.broadcast && (
+                    <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
+                  )}
+                  {ordinalInfoData && ordinalInfoData.map((ordinalData) => (
+                    <OrdinalDetailComponent
+                      ordinalInscription={`Inscription ${ordinalData?.number}`}
+                      icon={IconOrdinal}
+                      title={t('ORDINAL')}
+                      ordinal={ordinalData}
+                      ordinalDetail={ordinalData?.content_type}
+                      heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
+                    />
+                  ))}
+                  <RecipientComponent
+                    value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
+                      .toString()
+                      .replace('-', '')}`}
+                    currencyType="BTC"
+                    title={t('AMOUNT')}
+                    heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
                   />
-                ))}
-                <RecipientComponent
-                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
-                    .toString()
-                    .replace('-', '')}`}
-                  currencyType="BTC"
-                  title={t('AMOUNT')}
-                  heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
-                />
-                <InputOutputComponent
-                  parsedPsbt={parsedPsbt}
-                  isExpanded={expandInputOutputView}
-                  address={signingAddresses}
-                  onArrowClick={expandInputOutputSection}
-                />
+                  <InputOutputComponent
+                    parsedPsbt={parsedPsbt}
+                    isExpanded={expandInputOutputView}
+                    address={signingAddresses}
+                    onArrowClick={expandInputOutputSection}
+                  />
 
-                <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-                {payload.broadcast ? (
-                  <TransactionDetailComponent
-                    title={t('FEES')}
-                    value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
-                    subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
-                  />
-                ) : null}
-              </Container>
+                  <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+                  {payload.broadcast ? (
+                    <TransactionDetailComponent
+                      title={t('FEES')}
+                      value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
+                      subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+                    />
+                  ) : null}
+                </Container>
+              )}
             </OuterContainer>
             <ButtonContainer>
               <TransparentButtonContainer>
                 <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
               </TransparentButtonContainer>
-              <ActionButton text={t('CONFIRM')} onPress={onSignPsbtConfirmed} processing={isSigning} />
+              <ActionButton text={t('CONFIRM')} onPress={onSignPsbtConfirmed} processing={isSigning} disabled={isLedgerAccount(selectedAccount)} />
             </ButtonContainer>
           </>
         )}

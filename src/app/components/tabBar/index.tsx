@@ -8,6 +8,7 @@ import UnselectedNftTab from '@assets/img/bottomTabBar/unselected_nft_tab.svg';
 import UnselectedSettingsTab from '@assets/img/bottomTabBar/unselected_setting_tab.svg';
 import UnselectedStackingTab from '@assets/img/bottomTabBar/unselected_stacking_tab.svg';
 import UnselectedWalletTab from '@assets/img/bottomTabBar/unselected_wallet_tab.svg';
+import { isInOptions } from '@utils/helper';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -28,42 +29,54 @@ const Button = styled.button({
 type Tab = 'dashboard' | 'nft' | 'stacking' | 'settings';
 
 interface Props {
-  tab: Tab
+  tab: Tab;
 }
-function BottomTabBar({ tab }:Props) {
+function BottomTabBar({ tab }: Props) {
   const navigate = useNavigate();
 
   const handleDashboardButtonClick = () => {
-    if (tab !== 'dashboard') { navigate('/'); }
+    if (tab !== 'dashboard') {
+      navigate('/');
+    }
   };
 
   const handleNftButtonClick = () => {
-    if (tab !== 'nft') { navigate('/nft-dashboard'); }
+    if (tab !== 'nft') {
+      navigate('/nft-dashboard');
+    }
   };
 
   const handleStackingButtonClick = () => {
-    if (tab !== 'stacking') { navigate('/stacking'); }
+    if (tab !== 'stacking') {
+      navigate('/stacking');
+    }
   };
 
   const handleSettingButtonClick = () => {
-    if (tab !== 'settings') { navigate('/settings'); }
+    if (tab !== 'settings') {
+      navigate('/settings');
+    }
   };
 
+  const showBottomBar = !isInOptions();
+
   return (
-    <RowContainer>
-      <Button onClick={handleDashboardButtonClick}>
-        <img src={tab === 'dashboard' ? WalletTab : UnselectedWalletTab} alt="dashboard" />
-      </Button>
-      <Button onClick={handleNftButtonClick}>
-        <img src={tab === 'nft' ? NftTab : UnselectedNftTab} alt="nft" />
-      </Button>
-      <Button onClick={handleStackingButtonClick}>
-        <img src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} alt="stacking" />
-      </Button>
-      <Button onClick={handleSettingButtonClick}>
-        <img src={tab === 'settings' ? SettingsTab : UnselectedSettingsTab} alt="settings" />
-      </Button>
-    </RowContainer>
+    showBottomBar ? (
+      <RowContainer>
+        <Button onClick={handleDashboardButtonClick}>
+          <img src={tab === 'dashboard' ? WalletTab : UnselectedWalletTab} alt="dashboard" />
+        </Button>
+        <Button onClick={handleNftButtonClick}>
+          <img src={tab === 'nft' ? NftTab : UnselectedNftTab} alt="nft" />
+        </Button>
+        <Button onClick={handleStackingButtonClick}>
+          <img src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} alt="stacking" />
+        </Button>
+        <Button onClick={handleSettingButtonClick}>
+          <img src={tab === 'settings' ? SettingsTab : UnselectedSettingsTab} alt="settings" />
+        </Button>
+      </RowContainer>
+    ) : null
   );
 }
 

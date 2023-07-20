@@ -14,6 +14,9 @@ import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import AlertMessage from '@components/alertMessage';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import useBtcClient from '@hooks/useBtcClient';
+import { isLedgerAccount } from '@utils/helper';
+import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
 
@@ -24,7 +27,7 @@ const BottomBarContainer = styled.h1((props) => ({
 function ConfirmBtcTransaction() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { network, ordinalsAddress, btcAddress } = useWalletSelector();
+  const { ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const [signedTx, setSignedTx] = useState<string>('');
@@ -38,29 +41,30 @@ function ConfirmBtcTransaction() {
     fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, btcSendBrowserTx, requestToken, tabId, isBrc20TokenFlow,
     feePerVByte,
   } = location.state;
+  const [currentFee, setCurrentFee] = useState(fee);
+  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
 
   const {
     isLoading,
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-  );
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
 
   const {
     error: errorBtcOrdinalTransaction,
     data: btcOrdinalTxBroadcastData,
     mutate: broadcastOrdinalTransaction,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-  );
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
 
   const onClick = () => {
     navigate('/recover-ordinals', {
       state: { isRestoreFundFlow: true },
     });
   };
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-btc-tx'), []);
 
   const onContinueButtonClick = () => {
     mutate({ signedTx });
@@ -149,6 +153,9 @@ function ConfirmBtcTransaction() {
     } else if (ordinalsInBtc && ordinalsInBtc.length > 0) {
       setSignedTx(txHex);
       setShowOrdinalsDetectedAlert(true);
+    } else if (isLedgerAccount(selectedAccount)) {
+      const txType: LedgerTransactionType = 'BTC';
+      navigate('/confirm-ledger-tx', { state: { recipients: recipient, type: txType, feeRateInput: currentFeeRate, fee: currentFee } });
     } else mutate({ signedTx: txHex });
   };
 
@@ -197,8 +204,11 @@ function ConfirmBtcTransaction() {
         onCancelClick={goBackToScreen}
         onBackButtonClick={goBackToScreen}
         nonOrdinalUtxos={unspentUtxos}
-        amount={amount}
         isBtcSendBrowserTx={btcSendBrowserTx}
+        currentFee={currentFee}
+        setCurrentFee={setCurrentFee}
+        currentFeeRate={currentFeeRate}
+        setCurrentFeeRate={setCurrentFeeRate}
       >
         {ordinalsInBtc && ordinalsInBtc.length > 0 && (
         <InfoContainer

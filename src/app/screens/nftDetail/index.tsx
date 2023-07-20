@@ -14,7 +14,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
 import ShareDialog from '@components/shareNft';
 import { GAMMA_URL } from '@utils/constants';
-import { getExplorerUrl } from '@utils/helper';
+import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useNftDataReducer from '@hooks/stores/useNftReducer';
 import { useMutation } from '@tanstack/react-query';
@@ -24,6 +24,7 @@ import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
 import { MoonLoader } from 'react-spinners';
 import AccountHeaderComponent from '@components/accountHeader';
 import SmallActionButton from '@components/smallActionButton';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import NftAttribute from './nftAttribute';
 import DescriptionTile from './descriptionTile';
 
@@ -247,7 +248,7 @@ const LoaderContainer = styled.div({
 function NftDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress } = useWalletSelector();
+  const { stxAddress, selectedAccount } = useWalletSelector();
   const { id } = useParams();
   const nftIdDetails = id!.split('::');
   const { nftData } = useNftDataSelector();
@@ -260,17 +261,20 @@ function NftDetailScreen() {
   } = useMutation<
   NftDetailResponse | undefined,
   Error,
-  { principal: string }>(async ({ principal }) => {
+  { principal: string }>({ mutationFn: async ({ principal }) => {
     const contractInfo: string[] = principal.split('.');
     return getNftDetail(
       nftIdDetails[2].replace('u', ''),
       contractInfo[0],
       contractInfo[1],
     );
-  });
+  } });
 
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/nft-detail'), []);
 
   useEffect(() => {
     const data = nftData.find((nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)));
@@ -315,7 +319,14 @@ function NftDetailScreen() {
     });
   };
 
-  const handleOnSendClick = () => {
+  const handleOnSendClick = async () => {
+    if (isLedgerAccount(selectedAccount)) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL(`options.html#/send-nft/${id}`),
+      });
+      return;
+    }
+
     navigate('send-nft', {
       state: {
         nft,

@@ -6,6 +6,7 @@ import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
+import { getBtcTxStatusUrl, isLedgerAccount } from '@utils/helper';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import BottomTabBar from '@components/tabBar';
@@ -18,11 +19,11 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import DescriptionTile from '@screens/nftDetail/descriptionTile';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { isBrcTransferValid } from '@secretkeylabs/xverse-core/api';
-import { getBtcTxStatusUrl } from '@utils/helper';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import OrdinalAttributeComponent from './ordinalAttributeComponent';
 
 const Container = styled.div`
@@ -171,7 +172,7 @@ const ViewInExplorerButton = styled.button((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   backgroundColor: 'transparent',
-  width: 158,
+  width: 190,
   marginTop: props.theme.spacing(6),
 }));
 
@@ -183,21 +184,22 @@ const WebGalleryButtonText = styled.div((props) => ({
 }));
 
 const SendButton = styled.button((props) => ({
-  background: '#FFFFFF',
-  borderRadius: 16,
+  backgroundColor: props.theme.colors.white['0'],
+  borderRadius: props.theme.radius(3),
   display: 'flex',
   width: 100,
   flexDirection: 'row',
   padding: '12px 14px',
   alignItems: 'center',
+  transition: 'background-color 0.2s ease, opacity 0.2s ease',
   ':hover': {
-    background: props.theme.colors.action.classicLight,
+    backgroundColor: props.theme.colors.action.classicLight,
     opacity: 0.6,
   },
   h1: {
     ...props.theme.body_medium_m,
-    fontSize: 14,
-    marginLeft: 6,
+    fontSize: '0.875rem',
+    marginLeft: props.theme.spacing(3),
   },
 }));
 
@@ -270,7 +272,7 @@ const DetailSection = styled.div<DetailSectionProps>((props) => ({
 function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { ordinalsAddress, network } = useWalletSelector();
+  const { ordinalsAddress, network, selectedAccount } = useWalletSelector();
   const { selectedOrdinal } = useNftDataSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(selectedOrdinal?.tx_id);
@@ -285,6 +287,9 @@ function OrdinalDetailScreen() {
     () => (isBrcTransferValid(selectedOrdinal!) ? 'Valid' : 'Void'),
     [selectedOrdinal],
   );
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/ordinal-detail'), []);
 
   useEffect(() => {
     if (selectedOrdinal) {
@@ -324,12 +329,20 @@ function OrdinalDetailScreen() {
     setshowSendOridnalsAlert(false);
   };
 
-  const handleSendOrdinal = () => {
+  const handleSendOrdinal = async () => {
     if (isPending) {
       showAlert();
-    } else {
-      navigate('send-ordinal');
+      return;
     }
+
+    if (isLedgerAccount(selectedAccount)) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL('options.html#/send-ordinal'),
+      });
+      return;
+    }
+
+    navigate('send-ordinal');
   };
 
   const handleRedirectToTx = () => {

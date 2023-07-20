@@ -111,7 +111,7 @@ const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => 
 }));
 
 interface Props {
-  fee: BigNumber;
+  currentFee: BigNumber;
   feePerVByte: BigNumber;
   loadingBroadcastedTx: boolean;
   signedTxHex: string;
@@ -121,15 +121,17 @@ interface Props {
   assetDetail?: string;
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
-  amount?: string;
   isBtcSendBrowserTx?: boolean;
+  currentFeeRate: BigNumber;
+  setCurrentFee: (feeRate: BigNumber) => void;
+  setCurrentFeeRate: (feeRate: BigNumber) => void;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
   onBackButtonClick: () => void;
 }
 
 function ConfirmBtcTransactionComponent({
-  fee,
+  currentFee,
   feePerVByte,
   loadingBroadcastedTx,
   signedTxHex,
@@ -139,8 +141,10 @@ function ConfirmBtcTransactionComponent({
   assetDetail,
   isRestoreFundFlow,
   nonOrdinalUtxos,
-  amount,
   isBtcSendBrowserTx,
+  currentFeeRate,
+  setCurrentFee,
+  setCurrentFeeRate,
   onConfirmClick,
   onCancelClick,
   onBackButtonClick,
@@ -154,8 +158,6 @@ function ConfirmBtcTransactionComponent({
     (state: StoreState) => state.walletState,
   );
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const [currentFee, setCurrentFee] = useState(fee);
-  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
@@ -171,21 +173,21 @@ function ConfirmBtcTransactionComponent({
     recipients: Recipient[];
     txFee: string;
   }
-  >(async ({ recipients, txFee }) => signBtcTransaction(
+  >({ mutationFn: async ({ recipients, txFee }) => signBtcTransaction(
     recipients,
     btcAddress,
     selectedAccount?.id ?? 0,
     seedPhrase,
     network.type,
     new BigNumber(txFee),
-  ));
+  ) });
 
   const {
     isLoading: isLoadingNonOrdinalBtcSend,
     error: errorSigningNonOrdial,
     data: signedNonOrdinalBtcSend,
     mutate: mutateSignNonOrdinalBtcTransaction,
-  } = useMutation<SignedBtcTx, ResponseError, string>(async (txFee) => {
+  } = useMutation<SignedBtcTx, ResponseError, string>({ mutationFn: async (txFee) => {
     const signedNonOrdinalBtcTx = await signNonOrdinalBtcSendTransaction(
       btcAddress,
       nonOrdinalUtxos!,
@@ -195,14 +197,14 @@ function ConfirmBtcTransactionComponent({
       new BigNumber(txFee),
     );
     return signedNonOrdinalBtcTx;
-  });
+  } });
 
   const {
     isLoading: isLoadingOrdData,
     data: ordinalData,
     error: ordinalError,
     mutate: ordinalMutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>(async (txFee) => {
+  } = useMutation<SignedBtcTx, ResponseError, string>({ mutationFn: async (txFee) => {
     const signedTx = await signOrdinalSendTransaction(
       recipients[0]?.address,
       ordinalTxUtxo!,
@@ -214,7 +216,7 @@ function ConfirmBtcTransactionComponent({
       new BigNumber(txFee),
     );
     return signedTx;
-  });
+  } });
 
   useEffect(() => {
     if (data) {

@@ -2,13 +2,12 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import {
   SignedBtcTx,
   signOrdinalSendTransaction,
-  getBtcFeesForOrdinalSend,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import useWalletSelector from '@hooks/useWalletSelector';
 import SendForm from '@components/sendForm';
@@ -21,6 +20,9 @@ import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import { isLedgerAccount } from '@utils/helper';
+import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core/api';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -42,7 +44,7 @@ const Container = styled.div({
   flex: 1,
 });
 
-const NFtContainer = styled.div((props) => ({
+const NftContainer = styled.div((props) => ({
   maxHeight: 148,
   width: 148,
   display: 'flex',
@@ -50,8 +52,8 @@ const NFtContainer = styled.div((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
-  marginTop: props.theme.spacing(16),
-  marginBottom: props.theme.spacing(12),
+  marginTop: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(6),
 }));
 
 const OrdinalInscriptionNumber = styled.h1((props) => ({
@@ -99,12 +101,11 @@ const ButtonImage = styled.img((props) => ({
 function SendOrdinal() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { id } = useParams();
   const { selectedOrdinal } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
   const {
-    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
+    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate
   } = useWalletSelector();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
@@ -118,7 +119,7 @@ function SendOrdinal() {
     data,
     error: txError,
     mutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>(async (recipient) => {
+  } = useMutation<SignedBtcTx, ResponseError, string>({ mutationFn: async (recipient) => {
     const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
     const ordUtxo = addressUtxos.find((utx) => utx.txid === selectedOrdinal?.tx_id);
     setOrdinalUtxo(ordUtxo);
@@ -134,7 +135,7 @@ function SendOrdinal() {
       );
       return signedTx;
     }
-  });
+  } });
 
   useEffect(() => {
     if (txError) {
@@ -148,7 +149,7 @@ function SendOrdinal() {
 
   useEffect(() => {
     if (data) {
-      navigate(`/confirm-ordinal-tx/${id}`, {
+      navigate(`/confirm-ordinal-tx/${selectedOrdinal?.id}`, {
         state: {
           signedTxHex: data.signedTx,
           recipientAddress,
@@ -167,7 +168,18 @@ function SendOrdinal() {
     navigate(-1);
   };
 
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-ordinal'), []);
+
+
+  const activeAccountOwnsOrdinal =
+    selectedOrdinal && selectedAccount && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);
+
   function validateFields(associatedAddress: string): boolean {
+    if (!activeAccountOwnsOrdinal) {
+      setError(t('ERRORS.ORDINAL_NOT_OWNED'));
+      return false;
+    }
     if (!associatedAddress) {
       setError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
@@ -198,14 +210,16 @@ function SendOrdinal() {
       {isGalleryOpen && (
         <>
           <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          <ButtonContainer>
-            <Button onClick={handleBackButtonClick}>
-              <>
-                <ButtonImage src={ArrowLeft} />
-                <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-              </>
-            </Button>
-          </ButtonContainer>
+          {!isLedgerAccount(selectedAccount) && (
+            <ButtonContainer>
+              <Button onClick={handleBackButtonClick}>
+                <>
+                  <ButtonImage src={ArrowLeft} />
+                  <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
+                </>
+              </Button>
+            </ButtonContainer>
+          )}
         </>
       )}
       <ScrollContainer>
@@ -221,9 +235,9 @@ function SendOrdinal() {
           onPressSend={onPressNext}
         >
           <Container>
-            <NFtContainer>
-              <OrdinalImage inNftSend ordinal={selectedOrdinal!} />
-            </NFtContainer>
+            <NftContainer>
+              <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
+            </NftContainer>
             <OrdinalInscriptionNumber>{`Inscription ${selectedOrdinal?.number}`}</OrdinalInscriptionNumber>
           </Container>
         </SendForm>
