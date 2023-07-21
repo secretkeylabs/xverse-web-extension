@@ -1,7 +1,7 @@
-import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
+import { BtcTransactionData, Brc20HistoryTransactionData } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  fetchBtcTransactionsData,
+  fetchBtcTransactionsData, getBrc20History,
 } from '@secretkeylabs/xverse-core/api';
 import {
   AddressTransactionWithTransfers,
@@ -12,13 +12,13 @@ import { CurrencyTypes, PAGINATION_LIMIT } from '@utils/constants';
 import { getStxAddressTransactions } from '@utils/transactions/transactions';
 import useNetworkSelector from '../useNetwork';
 
-export default function useTransactions(coinType: CurrencyTypes) {
+export default function useTransactions(coinType: CurrencyTypes, brc20Token: string | null) {
   const {
     network, stxAddress, btcAddress, ordinalsAddress, hasActivatedOrdinalsKey
   } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const fetchTransactions = async (): Promise<
-  BtcTransactionData[] | (AddressTransactionWithTransfers | MempoolTransaction)[]
+  BtcTransactionData[] | (AddressTransactionWithTransfers | MempoolTransaction)[] | Brc20HistoryTransactionData[]
   > => {
     try {
       if (coinType === 'STX' || coinType === 'FT' || coinType === 'NFT') {
@@ -32,6 +32,10 @@ export default function useTransactions(coinType: CurrencyTypes) {
           hasActivatedOrdinalsKey as boolean,
         );
         return btcData;
+      }
+      if (coinType === 'brc20' && brc20Token) {
+        const brc20Data = await getBrc20History(ordinalsAddress, brc20Token);
+        return brc20Data;
       }
       return [];
     } catch (err) {

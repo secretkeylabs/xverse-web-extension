@@ -10,11 +10,11 @@ import {
   MempoolTransaction,
 } from '@stacks/stacks-blockchain-api-types';
 import { useMemo } from 'react';
-import {
-  animated, config, useSpring,
-} from '@react-spring/web';
+import { animated, config, useSpring } from '@react-spring/web';
 import {
   isAddressTransactionWithTransfers,
+  isBrc20Transaction,
+  isBrc20TransactionArr,
   isBtcTransaction,
   isBtcTransactionArr,
   Tx,
@@ -80,71 +80,79 @@ const SectionTitle = styled.p((props) => ({
 interface TransactionsHistoryListProps {
   coin: CurrencyTypes;
   txFilter: string | null;
+  brc20Token: string | null;
 }
 
 const groupBtcTxsByDate = (
   transactions: BtcTransactionData[],
-): { [x: string]: BtcTransactionData[] } => transactions.reduce(
-  (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
-    const txDate = formatDate(new Date(transaction.seenTime));
-    if (!all[txDate]) {
-      if (transaction.txStatus === 'pending') {
-        all.Pending = [transaction];
+): { [x: string]: BtcTransactionData[] } =>
+  transactions.reduce(
+    (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
+      const txDate = formatDate(new Date(transaction.seenTime));
+      if (!all[txDate]) {
+        if (transaction.txStatus === 'pending') {
+          all.Pending = [transaction];
+        } else {
+          all[txDate] = [transaction];
+        }
       } else {
-        all[txDate] = [transaction];
+        all[txDate].push(transaction);
+        all[txDate].sort((txA, txB) => {
+          if (txB.blockHeight > txA.blockHeight) {
+            return 1;
+          }
+          return -1;
+        });
       }
-    } else {
-      all[txDate].push(transaction);
-      all[txDate].sort((txA, txB) => {
-        if (txB.blockHeight > txA.blockHeight) {
-          return 1;
-        } return -1;
-      });
-    }
-    return all;
-  },
-  {},
-);
+      return all;
+    },
+    {},
+  );
 
-const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) => txs.reduce(
-  (
-    all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
-    transaction: AddressTransactionWithTransfers | Tx,
-  ) => {
-    const date = formatDate(
-      new Date(
-        transaction.tx?.burn_block_time_iso ? transaction.tx.burn_block_time_iso : Date.now(),
-      ),
-    );
-    if (!all[date]) {
-      all[date] = [transaction];
-    } else {
-      all[date].push(transaction);
-    }
-    return all;
-  },
-  {},
-);
+const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) =>
+  txs.reduce(
+    (
+      all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
+      transaction: AddressTransactionWithTransfers | Tx,
+    ) => {
+      const date = formatDate(
+        new Date(
+          transaction.tx?.burn_block_time_iso ? transaction.tx.burn_block_time_iso : Date.now(),
+        ),
+      );
+      if (!all[date]) {
+        all[date] = [transaction];
+      } else {
+        all[date].push(transaction);
+      }
+      return all;
+    },
+    {},
+  );
 
 const filterTxs = (
   txs: (AddressTransactionWithTransfers | MempoolTransaction)[],
   filter: string,
-): (AddressTransactionWithTransfers | MempoolTransaction)[] => txs.filter((atx) => {
-  const tx = isAddressTransactionWithTransfers(atx) ? atx.tx : atx;
-  const acceptedTypes = tx.tx_type === 'contract_call';
-  return (
-    acceptedTypes
-      && ((atx?.ft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
-        .length > 0
-        || (atx?.nft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
-          .length > 0
-        || tx?.contract_call?.contract_id === filter)
-  );
-});
+): (AddressTransactionWithTransfers | MempoolTransaction)[] =>
+  txs.filter((atx) => {
+    const tx = isAddressTransactionWithTransfers(atx) ? atx.tx : atx;
+    const acceptedTypes = tx.tx_type === 'contract_call';
+    return (
+      acceptedTypes &&
+      ((atx?.ft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
+        .length > 0 ||
+        (atx?.nft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
+          .length > 0 ||
+        tx?.contract_call?.contract_id === filter)
+    );
+  });
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
-  const { coin, txFilter } = props;
-  const { data, isLoading, isFetching } = useTransactions((coin as CurrencyTypes) || 'STX');
+  const { coin, txFilter, brc20Token } = props;
+  const { data, isLoading, isFetching } = useTransactions(
+    (coin as CurrencyTypes) || 'STX',
+    brc20Token,
+  );
   const styles = useSpring({
     config: { ...config.stiff },
     from: { opacity: 0 },
@@ -152,11 +160,12 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       opacity: 1,
     },
   });
+
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   const groupedTxs = useMemo(() => {
     if (data && data.length > 0) {
-      if (isBtcTransactionArr(data)) {
+      if (isBtcTransactionArr(data) || isBrc20TransactionArr(data)) {
         return groupBtcTxsByDate(data);
       }
       if (txFilter && coin === 'FT') {
@@ -169,16 +178,16 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
   return (
     <ListItemsContainer>
       <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>
-      {groupedTxs
-        && !isLoading
-        && Object.keys(groupedTxs).map((group) => (
+      {groupedTxs &&
+        !isLoading &&
+        Object.keys(groupedTxs).map((group) => (
           <GroupContainer style={styles}>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
               <SectionSeparator />
             </SectionHeader>
             {groupedTxs[group].map((transaction) => {
-              if (isBtcTransaction(transaction)) {
+              if (isBtcTransaction(transaction) || isBrc20Transaction(transaction)) {
                 return (
                   <BtcTransactionHistoryItem transaction={transaction} key={transaction.txid} />
                 );

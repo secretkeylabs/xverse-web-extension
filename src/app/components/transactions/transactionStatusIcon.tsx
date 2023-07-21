@@ -1,4 +1,8 @@
-import { BtcTransactionData, StxTransactionData } from '@secretkeylabs/xverse-core';
+import {
+  Brc20HistoryTransactionData,
+  BtcTransactionData,
+  StxTransactionData,
+} from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import ReceiveIcon from '@assets/img/transactions/received.svg';
 import SendIcon from '@assets/img/transactions/sent.svg';
@@ -8,7 +12,7 @@ import FailedIcon from '@assets/img/transactions/failed.svg';
 import OrdinalsIcon from '@assets/img/transactions/ordinal.svg';
 
 interface TransactionStatusIconPros {
-  transaction: StxTransactionData | BtcTransactionData;
+  transaction: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData;
   currency: CurrencyTypes;
 }
 
@@ -45,6 +49,19 @@ function TransactionStatusIcon(props: TransactionStatusIconPros) {
       return <img src={ReceiveIcon} alt="received" />;
     }
     return <img src={SendIcon} alt="sent" />;
+  }
+  if (currency === 'brc20') {
+    const tx = transaction as Brc20HistoryTransactionData;
+    if (tx.txStatus === 'pending') {
+      return <img src={PendingIcon} alt="pending" />;
+    }
+    if (tx.incoming) {
+      return <img src={ReceiveIcon} alt="received" />;
+    }
+    if (tx.type === 'send') {
+      return <img src={SendIcon} alt="sent" />;
+    }
+    return <img src={ContractIcon} alt="inscribe-transaction" />;
   }
   return <img src={ContractIcon} alt="contract" />;
 }
