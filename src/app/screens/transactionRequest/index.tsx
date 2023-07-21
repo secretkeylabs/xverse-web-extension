@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import { Coin, createDeployContractRequest, extractFromPayload } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { getNetworkType } from '@utils/helper';
+import { getNetworkType, isHardwareAccount } from '@utils/helper';
 import useNetworkSelector from '@hooks/useNetwork';
 import { getContractCallPromises, getTokenTransferRequest } from './helper';
 
@@ -26,18 +26,10 @@ const LoaderContainer = styled.div((props) => ({
 function TransactionRequest() {
   const { payload, tabId, requestToken } = useDappRequest();
   const navigate = useNavigate();
-  const {
-    stxAddress,
-    network,
-    stxPublicKey,
-    feeMultipliers,
-    accountsList,
-    selectedAccount,
-  } = useWalletSelector();
+  const { stxAddress, network, stxPublicKey, feeMultipliers, accountsList, selectedAccount } =
+    useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-  const {
-    switchAccount,
-  } = useWalletReducer();
+  const { switchAccount } = useWalletReducer();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>();
   const [funcMetaData, setFuncMetaData] = useState<ContractFunction | undefined>(undefined);
   const [coinsMetaData, setCoinsMetaData] = useState<Coin[] | null>(null);
@@ -55,7 +47,7 @@ function TransactionRequest() {
       stxPublicKey,
       feeMultipliers!,
       selectedNetwork,
-      stxPendingTxData,
+      stxPendingTxData
     );
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
@@ -77,7 +69,9 @@ function TransactionRequest() {
     } = await getContractCallPromises(payload, stxAddress, selectedNetwork, stxPublicKey);
     setUnsignedTx(unSignedContractCall);
     setCoinsMetaData(coinMeta);
-    const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find((func) => func.name === payload.functionName);
+    const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find(
+      (func) => func.name === payload.functionName
+    );
     const txAttachment = payload.attachment ?? undefined;
     if (txAttachment) setAttachment(txAttachment);
     if (invokedFuncMetaData) {
@@ -103,7 +97,7 @@ function TransactionRequest() {
       selectedNetwork,
       stxPublicKey,
       feeMultipliers!,
-      stxAddress,
+      stxAddress
     );
     setUnsignedTx(response.contractDeployTx);
     setCodeBody(response.codeBody);
@@ -123,7 +117,7 @@ function TransactionRequest() {
       });
       return;
     }
-    if (payload.stxAddress !== selectedAccount?.stxAddress) {
+    if (payload.stxAddress !== selectedAccount?.stxAddress && !isHardwareAccount(selectedAccount)) {
       const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
       if (account) {
         switchAccount(account);

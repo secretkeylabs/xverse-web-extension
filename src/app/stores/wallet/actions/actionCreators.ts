@@ -1,3 +1,5 @@
+import { PostGuardPing } from '@components/guards/singleTab';
+import { AccountType } from '@secretkeylabs/xverse-core';
 import {
   Account,
   BaseWallet,
@@ -26,6 +28,8 @@ export function unlockWalletAction(seed: string) {
 }
 
 export function lockWalletAction() {
+  // We post the closeWallet action to the guard so that any open tabs will close
+  PostGuardPing('closeWallet');
   return {
     type: actions.LockWalletKey,
   };
@@ -46,6 +50,8 @@ export function setWalletSeedPhraseAction(seedPhrase: string): actions.SetWallet
 }
 
 export function resetWalletAction(): actions.ResetWallet {
+  // We post the closeWallet action to the guard so that any open tabs will close
+  PostGuardPing('closeWallet');
   return {
     type: actions.ResetWalletKey,
   };
@@ -69,6 +75,13 @@ export function addAccountAction(accountsList: Account[]): actions.AddAccount {
   };
 }
 
+export function addLedgerAcountAction(ledgerAccountsList: Account[]): actions.AddLedgerAccount {
+  return {
+    type: actions.AddLedgerAccountKey,
+    ledgerAccountsList,
+  };
+}
+
 export function selectAccount(
   selectedAccount: Account,
   stxAddress: string,
@@ -81,6 +94,8 @@ export function selectAccount(
   network: SettingsNetwork,
   // stackingState: StackingStateData,
   bnsName?: string,
+  accountType?: AccountType,
+  accountName?: string,
 ): actions.SelectAccount {
   return {
     type: actions.SelectAccountKey,
@@ -95,6 +110,8 @@ export function selectAccount(
     network,
     // stackingState,
     bnsName,
+    accountType,
+    accountName,
   };
 }
 

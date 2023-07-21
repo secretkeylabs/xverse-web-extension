@@ -1,6 +1,7 @@
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import AuthGuard from '@components/guards/auth';
 import OnboardingGuard from '@components/guards/onboarding';
+import { SingleTabGuard } from '@components/guards/singleTab';
 import ScreenContainer from '@components/screenContainer';
 import AccountList from '@screens/accountList';
 import AuthenticationRequest from '@screens/authenticationRequest';
@@ -32,6 +33,13 @@ import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
 import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
+import ImportLedger from '@screens/ledger/importLedgerAccount';
+import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
+import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
+import LedgerSendStxScreen from '@screens/ledger/ledgerSendStx';
+import ReviewLedgerStxTransaction from '@screens/ledger/reviewLedgerStxTransaction';
+import LedgerSendFtScreen from '@screens/ledger/ledgerSendFt';
+import ReviewLedgerFtTransaction from '@screens/ledger/reviewLedgerFtTransaction';
 import BtcSendScreen from '@screens/btcSendScreen';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20Screen from '@screens/sendBrc20';
@@ -73,6 +81,26 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'import-ledger',
+        element: (
+          <AuthGuard>
+            <SingleTabGuard guardName='importLedger'>
+              <ImportLedger />
+            </SingleTabGuard>
+          </AuthGuard>
+        )
+      },
+      {
+        path: 'verify-ledger',
+        element: (
+          <AuthGuard>
+            <SingleTabGuard guardName='verifyLedger'>
+              <VerifyLedger />
+            </SingleTabGuard>
+          </AuthGuard>
+        )
+      },
+      {
         index: true,
         element: (
           <AuthGuard>
@@ -112,6 +140,14 @@ const router = createHashRouter([
         path: 'send-btc',
         element: <SendBtcScreen />,
       },
+      // {
+      //   path: 'send-stx-ledger',
+      //   element: <LedgerSendStxScreen />,
+      // },
+      // {
+      //   path: 'send-ft-ledger',
+      //   element: <LedgerSendFtScreen />,
+      // },
       {
         path: 'confirm-stx-tx',
         element: <ConfirmStxTransaction />,
@@ -123,6 +159,18 @@ const router = createHashRouter([
       {
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,
+      },
+      // {
+      //   path: 'review-ledger-stx-tx',
+      //   element: <ReviewLedgerStxTransaction />,
+      // },
+      // {
+      //   path: 'review-ledger-ft-tx',
+      //   element: <ReviewLedgerFtTransaction />,
+      // },
+      {
+        path: 'confirm-ledger-tx',
+        element: <ConfirmLedgerTransaction />,
       },
       {
         path: 'backup',
@@ -304,6 +352,14 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
+      {
+        path: 'confirm-nft-tx/:id',
+        element: <AuthGuard><ConfirmNftTransaction /></AuthGuard>,
+      },
+      {
+        path: 'confirm-ordinal-tx/:id',
+        element: <AuthGuard><ConfirmOrdinalTransaction /></AuthGuard>,
+      },
     ],
   },
   {
@@ -330,14 +386,6 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/nft-detail/:id/send-nft',
         element: <SendNft />,
-      },
-      {
-        path: 'confirm-nft-tx/:id',
-        element: <ConfirmNftTransaction />,
-      },
-      {
-        path: 'confirm-ordinal-tx/:id',
-        element: <ConfirmOrdinalTransaction />,
       },
       {
         path: 'nft-dashboard/ordinal-detail/send-ordinal',

@@ -19,6 +19,9 @@ import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import { isLedgerAccount } from '@utils/helper';
+import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -95,6 +98,7 @@ const ReviewTransactionText = styled.h1((props) => ({
 function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
@@ -150,8 +154,17 @@ function ConfirmNftTransaction() {
   }, [txError]);
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const txType: LedgerTransactionType = 'STX';
+      navigate('/confirm-ledger-tx', { state: { unsignedTx, type: txType } });
+      return;
+    }
+
     mutate({ signedTx: txs[0] });
   };
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-nft-tx'), []);
 
   const handleOnCancelClick = () => {
     navigate(-1);
@@ -162,14 +175,14 @@ function ConfirmNftTransaction() {
       {isGalleryOpen && (
       <>
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-        <ButtonContainer>
+        {/* <ButtonContainer>
           <Button onClick={handleOnCancelClick}>
             <>
               <ButtonImage src={ArrowLeft} />
               <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
             </>
           </Button>
-        </ButtonContainer>
+        </ButtonContainer> */}
       </>
       )}
       <ScrollContainer>

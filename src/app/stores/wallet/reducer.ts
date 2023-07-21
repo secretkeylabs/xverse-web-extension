@@ -7,6 +7,7 @@ import {
   ChangeNetworkKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
+  AddLedgerAccountKey,
   FetchAccountKey,
   GetActiveAccountsKey,
   LockWalletKey,
@@ -39,6 +40,7 @@ const initialWalletState: WalletState = {
   ordinalsPublicKey: '',
   network: initialNetworksList[0],
   accountsList: [],
+  ledgerAccountsList: [],
   selectedAccount: null,
   seedPhrase: '',
   encryptedSeed: '',
@@ -59,6 +61,8 @@ const initialWalletState: WalletState = {
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: true,
   showOrdinalReceiveAlert: true,
+  accountType: 'software',
+  accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
 };
 
@@ -88,6 +92,11 @@ const walletReducer = (
         ...state,
         accountsList: action.accountsList,
       };
+    case AddLedgerAccountKey:
+      return {
+        ...state,
+        ledgerAccountsList: action.ledgerAccountsList,
+      };
     case SelectAccountKey:
       return {
         ...state,
@@ -100,6 +109,8 @@ const walletReducer = (
         btcPublicKey: action.btcPublicKey,
         ordinalsPublicKey: action.ordinalsPublicKey,
         network: action.network,
+        accountType: action.accountType,
+        accountName: action.accountName,
       };
     case StoreEncryptedSeedKey:
       return {
