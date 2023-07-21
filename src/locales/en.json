@@ -143,11 +143,15 @@
     "STACKS": "Stacks",
     "ACCOUNT_NAME": "Account",
     "RECEIVE": "Receive",
+    "CANCEL": "Cancel",
+    "REMOVE_WALLET": "Remove wallet",
     "SEND": "Send",
     "BUY": "Buy",
     "MANAGE_TOKEN": "Manage token list",
     "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
-    "ORDINALS": "Ordinals & BRC-20 Tokens"
+    "ORDINALS": "Ordinals & BRC-20 Tokens",
+    "REMOVE_FROM_LIST_TITLE": "Remove from list",
+    "REMOVE_FROM_LIST_DESCRIPTION": "This will remove this wallet from this list. You can import it again by connecting your device."
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -277,7 +281,7 @@
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
     "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
-    "INVALID_TRANSACTION":"Invalid Transaction"
+    "INVALID_TRANSACTION": "Invalid Transaction"
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
@@ -577,7 +581,8 @@
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
     "LOCK": "Lock",
-    "RESET_WALLET": "Reset Wallet"
+    "RESET_WALLET": "Reset Wallet",
+    "REMOVE_FROM_LIST": "Remove from list"
   },
   "BUY_SCREEN": {
     "BUY": "Buy",

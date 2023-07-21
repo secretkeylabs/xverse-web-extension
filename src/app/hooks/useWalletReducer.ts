@@ -26,7 +26,8 @@ import useWalletSession from './useWalletSession';
 import useWalletSelector from './useWalletSelector';
 
 const useWalletReducer = () => {
-  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } = useWalletSelector();
+  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } =
+    useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
@@ -59,20 +60,20 @@ const useWalletReducer = () => {
     };
 
     if (!isHardwareAccount(selectedAccount)) {
-    dispatch(
-      setWalletAction(
-        selectedAccount
-          ? {
-              ...walletAccounts[selectedAccount.id],
-              seedPhrase: secretKey,
-            }
-          : {
-              ...walletAccounts[0],
-              seedPhrase: secretKey,
-            },
-      ),
-    );
-          }
+      dispatch(
+        setWalletAction(
+          selectedAccount
+            ? {
+                ...walletAccounts[selectedAccount.id],
+                seedPhrase: secretKey,
+              }
+            : {
+                ...walletAccounts[0],
+                seedPhrase: secretKey,
+              },
+        ),
+      );
+    }
 
     dispatch(
       fetchAccountAction(
@@ -297,8 +298,22 @@ const useWalletReducer = () => {
     }
   };
 
+  const removeLedgerAccount = async (ledgerAccount: Account) => {
+    try {
+      dispatch(
+        addLedgerAcountAction(
+          ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
+        ),
+      );
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
   const updateLedgerAccounts = async (updatedLedgerAccount: Account) => {
-    const newLedgerAccountsList = ledgerAccountsList.map((account) => (account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account));
+    const newLedgerAccountsList = ledgerAccountsList.map((account) =>
+      account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account,
+    );
     try {
       dispatch(addLedgerAcountAction(newLedgerAccountsList));
       if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
@@ -320,6 +335,7 @@ const useWalletReducer = () => {
     createAccount,
     storeSeedPhrase,
     addLedgerAccount,
+    removeLedgerAccount,
     updateLedgerAccounts,
   };
 };

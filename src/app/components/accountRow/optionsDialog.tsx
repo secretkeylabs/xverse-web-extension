@@ -1,6 +1,4 @@
-import useWalletReducer from '@hooks/useWalletReducer';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
@@ -35,46 +33,31 @@ const ButtonRow = styled.button`
   }
 `;
 
-const WarningButton = styled(ButtonRow)`
-  color: ${(props) => props.theme.colors.feedback.error};
-`;
-
 const OuterContainer = styled.div({
-  height: 600,
-  width: 360,
-  margin: 'auto',
-  top: 0,
-  left: 0,
-  bottom: 0,
-  right: 0,
   position: 'fixed',
+  width: 360,
+  height: 600,
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
   backgroundColor: 'transparent',
+  zIndex: 1,
 });
 
 interface Props {
   closeDialog: () => void;
-  showResetWalletPrompt: () => void;
+  showRemoveAccountPrompt: () => void;
+  optionsDialogTopIndent: string;
 }
 
-function OptionsDialog({ closeDialog, showResetWalletPrompt }: Props) {
+function OptionsDialog({ closeDialog, showRemoveAccountPrompt, optionsDialogTopIndent }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'OPTIONS_DIALOG' });
-  const navigate = useNavigate();
-  const { lockWallet } = useWalletReducer();
-
-  const handleAccountSelect = () => {
-    navigate('/account-list');
-  };
-
-  const onLockPress = () => {
-    lockWallet();
-  };
 
   return (
     <OuterContainer onClick={closeDialog}>
-      <Container>
-        <ButtonRow onClick={handleAccountSelect}>{t('SWITCH_ACCOUNT')}</ButtonRow>
-        <ButtonRow onClick={onLockPress}>{t('LOCK')}</ButtonRow>
-        <WarningButton onClick={showResetWalletPrompt}>{t('RESET_WALLET')}</WarningButton>
+      <Container style={{ top: optionsDialogTopIndent }}>
+        <ButtonRow onClick={showRemoveAccountPrompt}>{t('REMOVE_FROM_LIST')}</ButtonRow>
       </Container>
     </OuterContainer>
   );
