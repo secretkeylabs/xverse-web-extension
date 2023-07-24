@@ -26,6 +26,9 @@ import ActionButton from '@components/button';
 import TransactionSettingAlert from '@components/transactionSetting';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
+import { isLedgerAccount } from '@utils/helper';
+import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -135,13 +138,12 @@ function ConfirmInscriptionRequest() {
     feePerVByte,
   } = location.state;
   const {
-    btcAddress, network, selectedAccount, seedPhrase, btcFiatRate,
+    btcAddress, network, selectedAccount, seedPhrase, btcFiatRate
   } = useWalletSelector();
   const btcClient = useBtcClient();
   const [signedTx, setSignedTx] = useState<string>('');
   const [textContent, setTextContent] = useState<string>('');
   const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
-  const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [currentFee, setCurrentFee] = useState(fee);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
@@ -150,6 +152,9 @@ function ConfirmInscriptionRequest() {
   const { ordinals: ordinalsInBtc } = useOrdinalsByAddress(btcAddress);
 
   const content = useMemo(() => textContent && JSON.parse(textContent), [textContent]);
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-inscription-request'), []);
 
   useEffect(() => {
     axios
@@ -169,9 +174,7 @@ function ConfirmInscriptionRequest() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-  );
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
 
   const {
     isLoading: loadingFee,
@@ -185,14 +188,14 @@ function ConfirmInscriptionRequest() {
     recipients: Recipient[];
     txFee: string;
   }
-  >(async ({ recipients, txFee }) => signBtcTransaction(
+  >({ mutationFn: async ({ recipients, txFee }) => signBtcTransaction(
     recipients,
     btcAddress,
     selectedAccount?.id ?? 0,
     seedPhrase,
     network.type,
     new BigNumber(txFee),
-  ));
+  ) });
 
   const onContinueButtonClick = () => {
     mutate({ signedTx });
@@ -206,7 +209,7 @@ function ConfirmInscriptionRequest() {
     if (data) {
       setCurrentFee(data.fee);
       setSignedTx(data.signedTx);
-      setOpenTransactionSettingModal(false);
+      setShowFeeSettings(false);
     }
   }, [data]);
 
@@ -255,6 +258,9 @@ function ConfirmInscriptionRequest() {
     if (ordinalsInBtc && ordinalsInBtc.length > 0) {
       setSignedTx(signedTxHex);
       setShowOrdinalsDetectedAlert(true);
+    } else if (isLedgerAccount(selectedAccount)) {
+      const txType: LedgerTransactionType = 'BRC-20';
+      navigate('/confirm-ledger-tx', { state: { amount: new BigNumber(amount), recipients: recipient, type: txType, fee } });
     } else mutate({ signedTx: signedTxHex });
   };
 
@@ -267,7 +273,7 @@ function ConfirmInscriptionRequest() {
   };
 
   const onAdvancedSettingClick = () => {
-    setOpenTransactionSettingModal(true);
+    setShowFeeSettings(true);
   };
 
   const onApplyClick = ({
@@ -283,7 +289,7 @@ function ConfirmInscriptionRequest() {
   };
 
   const closeTransactionSettingAlert = () => {
-    setOpenTransactionSettingModal(false);
+    setShowFeeSettings(false);
   };
 
   const getAmountString = (amountTotal: BigNumber, currency: string) => (
@@ -331,6 +337,7 @@ function ConfirmInscriptionRequest() {
               isNftDashboard={false}
               inNftDetail={false}
               isSmallImage={false}
+              withoutSizeIncrease
             />
           </Brc20TileContainer>
         )}
@@ -387,7 +394,7 @@ function ConfirmInscriptionRequest() {
           />
         </ButtonContainer>
         <TransactionSettingAlert
-          visible={openTransactionSettingModal}
+          visible={showFeeSettings}
           fee={new BigNumber(currentFee).toString()}
           type="BTC"
           btcRecipients={recipient}

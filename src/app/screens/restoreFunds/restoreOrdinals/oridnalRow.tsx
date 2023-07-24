@@ -77,7 +77,7 @@ function OrdinalRow({ ordinal, isLoading, handleOrdinalTransfer }: Props) {
   return (
     <OrdinalCard>
       <OrdinalImageContainer>
-        <OrdinalImage isSmallImage ordinal={ordinalData?.data!} />
+        <OrdinalImage isSmallImage withoutSizeIncrease ordinal={ordinalData?.data!} />
       </OrdinalImageContainer>
 
       <ColumnContainer>

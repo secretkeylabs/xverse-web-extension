@@ -69,7 +69,7 @@ function RestoreOrdinals() {
     isLoading,
     error: transactionError,
     mutateAsync,
-  } = useMutation<SignedBtcTx, string, BtcOrdinal>(async (ordinal) => {
+  } = useMutation<SignedBtcTx, string, BtcOrdinal>({ mutationFn: async (ordinal) => {
     const tx = await signOrdinalSendTransaction(
       ordinalsAddress,
       ordinal.utxo,
@@ -80,7 +80,7 @@ function RestoreOrdinals() {
       ordinalsUtxos!,
     );
     return tx;
-  });
+  } });
 
   useEffect(() => {
     if (transactionError) {

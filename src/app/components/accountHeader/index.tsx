@@ -10,6 +10,7 @@ import AccountRow from '@components/accountRow';
 
 import useWalletSelector from '@hooks/useWalletSelector';
 import OptionsDialog from './optionsDialog';
+import { isHardwareAccount } from '@utils/helper';
 
 const SelectedAccountContainer = styled.div((props) => ({
   paddingLeft: '5%',
@@ -52,11 +53,13 @@ interface AccountHeaderComponentProps {
   disableCopy?: boolean;
 }
 
-function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = false, disableCopy = false }:AccountHeaderComponentProps) {
+function AccountHeaderComponent({
+  disableMenuOption,
+  disableAccountSwitch = false,
+  disableCopy = false,
+}: AccountHeaderComponentProps) {
   const navigate = useNavigate();
-  const {
-    selectedAccount,
-  } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
 
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const [showOptionsDialog, setShowOptionsDialog] = useState<boolean>(false);
@@ -100,7 +103,9 @@ function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = fals
   };
 
   const handleAccountSelect = () => {
-    if (!disableAccountSwitch) { navigate('/account-list'); }
+    if (!disableAccountSwitch) {
+      navigate('/account-list');
+    }
   };
 
   const handleOptionsSelect = () => {
@@ -131,7 +136,7 @@ function AccountHeaderComponent({ disableMenuOption, disableAccountSwitch = fals
         <AccountRow
           account={selectedAccount!}
           isSelected
-          allowCopyAddress={!disableCopy}
+          allowCopyAddress={!disableCopy && !isHardwareAccount(selectedAccount)}
           onAccountSelected={handleAccountSelect}
         />
         {!disableMenuOption && (

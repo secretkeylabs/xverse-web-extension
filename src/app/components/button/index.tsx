@@ -17,6 +17,13 @@ const Button = styled.button<ButtonProps>((props) => ({
   height: 44,
   opacity: props.disabled ? 0.6 : 1,
   transition: 'all 0.2s ease',
+  ':disabled': {
+    opacity: 0.6,
+    cursor: 'initial',
+    ':hover': {
+      opacity: 0.6,
+    }
+  }
 }));
 
 const AnimatedButton = styled(Button)`
@@ -32,9 +39,9 @@ const TransparentButton = styled(Button)`
 `;
 
 const AnimatedTransparentButton = styled(TransparentButton)`
-:hover {
-  background: ${(props) => props.theme.colors.background.elevation6_800};
-}
+  :hover {
+    background: ${(props) => props.theme.colors.background.elevation6_800};
+  }
 `;
 
 interface TextProps {
@@ -83,6 +90,7 @@ function ActionButton({
   const handleOnPress = () => {
     if (!disabled) { onPress(); }
   };
+
   if (transparent) {
     return (
       <AnimatedTransparentButton

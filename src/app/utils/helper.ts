@@ -1,12 +1,19 @@
 import {
-  Account, StxMempoolTransactionData, SettingsNetwork, NetworkType,
+  Account,
+  StxMempoolTransactionData,
+  SettingsNetwork,
+  NetworkType,
 } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
 import BigNumber from 'bignumber.js';
 import { ChainID } from '@stacks/transactions';
-import { BTC_TRANSACTION_STATUS_URL, TRANSACTION_STATUS_URL, BTC_TRANSACTION_TESTNET_STATUS_URL } from './constants';
+import {
+  BTC_TRANSACTION_STATUS_URL,
+  TRANSACTION_STATUS_URL,
+  BTC_TRANSACTION_TESTNET_STATUS_URL,
+} from './constants';
 
 const validUrl = require('valid-url');
 
@@ -55,25 +62,25 @@ export function getTicker(name: string) {
 
 export function getTruncatedAddress(address: string) {
   if (address) {
-    return `${address.substring(0, 4)}...${address.substring(
-      address.length - 4,
-      address.length,
-    )}`;
+    return `${address.substring(0, 4)}...${address.substring(address.length - 4, address.length)}`;
   }
 }
 
 export function getShortTruncatedAddress(address: string) {
   if (address) {
-    return `${address.substring(0, 8)}...${address.substring(
-      address.length - 8,
-      address.length,
-    )}`;
+    return `${address.substring(0, 8)}...${address.substring(address.length - 8, address.length)}`;
   }
 }
 
 export function getAddressDetail(account: Account) {
-  if (account) {
-    return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(account.stxAddress)}`;
+  if (account.btcAddress && account.stxAddress) {
+    return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(
+      account.stxAddress,
+    )}`;
+  }
+  if (account.btcAddress || account.stxAddress) {
+    const existingAddress = account.btcAddress || account.stxAddress;
+    return getTruncatedAddress(existingAddress);
   }
   return '';
 }
@@ -114,9 +121,9 @@ export function checkNftExists(
 ): boolean {
   const principal: string[] = nft?.fully_qualified_token_id?.split('::');
   const transaction = pendingTransactions.find(
-    (tx) => tx.contractCall?.contract_id === principal[0]
-      && tx.contractCall.function_args[0].repr.substring(1)
-      === nft.token_id.toString(),
+    (tx) =>
+      tx.contractCall?.contract_id === principal[0] &&
+      tx.contractCall.function_args[0].repr.substring(1) === nft.token_id.toString(),
   );
   if (transaction) return true;
   return false;
@@ -150,4 +157,13 @@ export async function isValidBtcApi(url: string, network: NetworkType) {
   throw new Error('Invalid URL');
 }
 
-export const getNetworkType = (stxNetwork) => (stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet');
+export const getNetworkType = (stxNetwork) =>
+  stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
+
+export const isHardwareAccount = (account: Account | null): boolean =>
+  !!account?.accountType && account?.accountType !== 'software';
+
+export const isLedgerAccount = (account: Account | null): boolean =>
+  account?.accountType === 'ledger';
+
+export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
