@@ -10,13 +10,6 @@ import { useState } from 'react';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import TokenImage from '@components/tokenImage';
 
-const RouteDescription = styled.p((props) => ({
-  ...props.theme.body_m,
-  fontWeight: 400,
-  color: props.theme.colors.white[400],
-  marginTop: props.theme.spacing(8),
-}));
-
 const RouteProgress = styled.div((props) => ({
   position: 'relative',
   display: 'flex',
@@ -63,19 +56,16 @@ export default function RouteBlock({ swap }: { swap: SwapConfirmationInput }) {
         <FoldButton isFold={isFold} onSwitch={() => setIsFold((prev) => !prev)} />
       </TitleContainer>
       {isFold ? null : (
-        <>
-          <RouteProgress>
-            <DashLine />
-            {swap.routers.map(({ name, image }) => (
-              <ProgressItem key={name}>
-                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                <TokenImage {...image} size={24} />
-                <ProgressItemText>{name}</ProgressItemText>
-              </ProgressItem>
-            ))}
-          </RouteProgress>
-          <RouteDescription>{t('ROUTE_DESC')}</RouteDescription>
-        </>
+        <RouteProgress>
+          <DashLine />
+          {swap.routers.map(({ name, image }) => (
+            <ProgressItem key={name}>
+              {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+              <TokenImage {...image} size={24} />
+              <ProgressItemText>{name}</ProgressItemText>
+            </ProgressItem>
+          ))}
+        </RouteProgress>
       )}
     </Container>
   );
