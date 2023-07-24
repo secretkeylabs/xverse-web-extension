@@ -261,7 +261,7 @@ const Option = styled.div<OptionProps>((props) => ({
   paddingTop: props.theme.spacing(7),
   paddingBottom: props.theme.spacing(7),
   borderRadius: props.theme.radius(2),
-  fontSize: '0.875rem',
+  fontSize: '0.75rem',
   marginBottom: props.theme.spacing(6),
   border: `1px solid ${props.selected ? 'rgba(115, 131, 255, 0.40)' : 'transparent'}`,
   cursor: 'pointer',
@@ -746,24 +746,24 @@ function ImportLedger(): JSX.Element {
             )}
             {currentStepIndex === 0.5 && (
               <ImportBeforeStartContainer>
-                <ImportBeforeStartTitle>Before Getting Started</ImportBeforeStartTitle>
+                <ImportBeforeStartTitle>Before getting started</ImportBeforeStartTitle>
                 <ImportBeforeStartText>
-                  Please select one of the following options to continue.
+                  Do you use Ledger Live with the hardware wallet device you wish to connect?
                 </ImportBeforeStartText>
                 <OptionsContainer>
                   <Option
                     onClick={() => setSelectedLedgerLiveOption('using')}
                     selected={selectedLedgerLiveOption === 'using'}
                   >
-                    <OptionIcon selected={selectedLedgerLiveOption === 'using'} />I am using Ledger
-                    Live with this device.
+                    <OptionIcon selected={selectedLedgerLiveOption === 'using'} />I use Ledger
+                    Live with the device.
                   </Option>
                   <Option
                     onClick={() => setSelectedLedgerLiveOption('not using')}
                     selected={selectedLedgerLiveOption === 'not using'}
                   >
-                    <OptionIcon selected={selectedLedgerLiveOption === 'not using'} />I am not using
-                    Ledger Live with this device.
+                    <OptionIcon selected={selectedLedgerLiveOption === 'not using'} />I do not use
+                    Ledger Live with the device.
                   </Option>
                 </OptionsContainer>
               </ImportBeforeStartContainer>
