@@ -40,7 +40,7 @@ const AmountInputContainer = styled.div<ContainerProps>((props) => ({
   border: props.error
     ? '1px solid rgba(211, 60, 60, 0.3)'
     : `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  backgroundColor: props.theme.colors.background.elevation_1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
@@ -62,7 +62,7 @@ const InputFieldContainer = styled.div(() => ({
 
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  backgroundColor: props.theme.colors.background.elevation_1,
   color: props.theme.colors.white['0'],
   width: '100%',
   border: 'transparent',

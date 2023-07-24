@@ -84,7 +84,7 @@ const CopyImage = styled.img`
   margin-right: 4px;
 `;
 
-const StyledToolTip = styled(Tooltip)`
+export const StyledToolTip = styled(Tooltip)`
   background-color: #ffffff;
   color: #12151e;
   border-radius: 8px;
