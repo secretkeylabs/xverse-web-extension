@@ -95,7 +95,7 @@ const CopyImage = styled.img((props) => ({
   marginRight: props.theme.spacing(2),
 }));
 
-const StyledToolTip = styled(Tooltip)`
+export const StyledToolTip = styled(Tooltip)`
   background-color: #ffffff;
   color: #12151e;
   border-radius: 8px;

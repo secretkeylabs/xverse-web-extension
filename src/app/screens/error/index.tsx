@@ -12,7 +12,7 @@ const ScreenContainer = styled.div((props) => ({
   width: '100vw',
   flexDirection: 'column',
   alignItems: 'center',
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  backgroundColor: props.theme.colors.background.elevation_1,
   paddingTop: props.theme.spacing(80),
   paddingLeft: props.theme.spacing(9),
   paddingRight: props.theme.spacing(9),
