@@ -49,7 +49,7 @@ function CoinSelectModal({
   function renderFixedCoins() {
     return (
       <>
-        {btcAddress && (
+        {btcAddress && onSelectBitcoin != null && (
           <TokenTile
             title={t('BITCOIN')}
             currency="BTC"
