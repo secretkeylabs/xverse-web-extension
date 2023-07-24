@@ -1,3 +1,4 @@
+import { AccountType } from '@secretkeylabs/xverse-core';
 import {
   Account,
   BaseWallet,
@@ -38,6 +39,7 @@ export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
+export const AddLedgerAccountKey = 'AddLedgerAccountKey';
 
 export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 
@@ -58,6 +60,7 @@ export interface WalletState {
   btcPublicKey: string;
   ordinalsPublicKey: string;
   accountsList: Account[];
+  ledgerAccountsList: Account[];
   selectedAccount: Account | null;
   network: SettingsNetwork;
   seedPhrase: string;
@@ -78,6 +81,8 @@ export interface WalletState {
   hasActivatedOrdinalsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
+  accountType: AccountType | undefined;
+  accountName: string | undefined;
   btcApiUrl: string;
   walletLockPeriod: WalletSessionPeriods;
 }
@@ -123,6 +128,10 @@ export interface AddAccount {
   type: typeof AddAccountKey;
   accountsList: Account[];
 }
+export interface AddLedgerAccount {
+  type: typeof AddLedgerAccountKey;
+  ledgerAccountsList: Account[];
+}
 export interface SelectAccount {
   type: typeof SelectAccountKey;
   selectedAccount: Account | null;
@@ -136,6 +145,8 @@ export interface SelectAccount {
   bnsName?: string;
   network: SettingsNetwork;
   // stackingState: StackingStateData;
+  accountType?: AccountType;
+  accountName: string | undefined;
 }
 export interface SetCoinRates {
   type: typeof SetCoinRatesKey;
@@ -213,6 +224,7 @@ export type WalletActions =
   | ResetWallet
   | FetchAccount
   | AddAccount
+  | AddLedgerAccount
   | SelectAccount
   | StoreEncryptedSeed
   | SetWalletSeedPhrase

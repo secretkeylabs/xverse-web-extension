@@ -5,9 +5,7 @@ import XverseLogo from '@assets/img/settings/logo.svg';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import BottomBar from '@components/tabBar';
-import {
-  PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK,
-} from '@utils/constants';
+import { PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK } from '@utils/constants';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import PasswordInput from '@components/passwordInput';
@@ -15,6 +13,7 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import { useDispatch } from 'react-redux';
 import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import { isLedgerAccount } from '@utils/helper';
 import ResetWalletPrompt from '../../components/resetWallet';
 import SettingComponent from './settingComponent';
 
@@ -58,9 +57,7 @@ function Setting() {
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const {
-    fiatCurrency, network, hasActivatedOrdinalsKey,
-  } = useWalletSelector();
+  const { fiatCurrency, network, hasActivatedOrdinalsKey, selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { unlockWallet, resetWallet } = useWalletReducer();
@@ -126,12 +123,15 @@ function Setting() {
     navigate('/lockCountdown');
   };
 
-  const onRestoreFundClick = () => {
-    navigate('/restore-funds', {
-      state: {
-        unspentUtxos,
-      },
-    });
+  const onRestoreFundClick = async () => {
+    if (isLedgerAccount(selectedAccount)) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL('options.html#/restore-funds'),
+      });
+      return;
+    }
+
+    navigate('/restore-funds');
   };
   const handlePasswordNextClick = async () => {
     try {
@@ -175,11 +175,14 @@ function Setting() {
           textDetail={fiatCurrency}
           showDivider
         />
-        <SettingComponent
-          text={t('NETWORK')}
-          onClick={openChangeNetworkScreen}
-          textDetail={network.type}
-        />
+        {!isLedgerAccount(selectedAccount) && (
+          <SettingComponent
+            text={t('NETWORK')}
+            onClick={openChangeNetworkScreen}
+            textDetail={network.type}
+          />
+        )}
+
         <SettingComponent
           title={t('SECURITY')}
           text={t('UPDATE_PASSWORD')}

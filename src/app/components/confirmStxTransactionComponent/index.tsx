@@ -14,9 +14,16 @@ import {
   getNonce,
   signMultiStxTransactions,
   signTransaction,
+  signLedgerStxTransaction,
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import BottomModal from '@components/bottomModal';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import LedgerConnectDefault from '@assets/img/ledger/ledger_connect_default.svg';
+import { ledgerDelay } from '@common/utils/ledger';
+import { isHardwareAccount } from '@utils/helper';
 
 const Container = styled.div`
   display: flex;
@@ -74,6 +81,17 @@ const SponsoredInfoText = styled.h1((props) => ({
   color: props.theme.colors.white['400'],
 }));
 
+const SuccessActionsContainer = styled.div((props) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(20),
+  marginTop: props.theme.spacing(20),
+}));
+
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white[0],
@@ -98,10 +116,10 @@ interface Props {
   onConfirmClick: (transactions: StacksTransaction[]) => void;
   children: ReactNode;
   isSponsored?: boolean;
+  skipModal?: boolean;
   isAsset?: boolean;
   title?: string;
   subTitle?: string;
-
 }
 
 function ConfirmStxTransationComponent({
@@ -114,6 +132,7 @@ function ConfirmStxTransationComponent({
   subTitle,
   onConfirmClick,
   onCancelClick,
+  skipModal = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const selectedNetwork = useNetworkSelector();
@@ -121,6 +140,13 @@ function ConfirmStxTransationComponent({
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState<boolean>(false);
+  const [isConnectFailed, setIsConnectFailed] = useState<boolean>(false);
+  const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
+  const [isTxRejected, setIsTxRejected] = useState<boolean>(false);
 
   useEffect(() => {
     setButtonLoading(loading);
@@ -150,6 +176,15 @@ function ConfirmStxTransationComponent({
   };
 
   const onConfirmButtonClick = async () => {
+    if (skipModal) {
+      onConfirmClick(initialStxTransactions);
+      return;
+    }
+    if (isHardwareAccount(selectedAccount)) {
+      setIsModalVisible(true);
+      return;
+    }
+
     let signedTxs: StacksTransaction[] = [];
     if (initialStxTransactions.length === 1) {
       const signedContractCall = await signTransaction(
@@ -177,6 +212,49 @@ function ConfirmStxTransationComponent({
       setNonce(initialStxTransactions[0], BigInt(nonce));
     }
     setOpenTransactionSettingModal(false);
+  };
+
+  const handleConnectAndConfirm = async () => {
+    if (!selectedAccount) {
+      console.error('No account selected');
+      return;
+    }
+    setIsButtonDisabled(true);
+
+    const transport = await Transport.create();
+
+    if (!transport) {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+      setIsButtonDisabled(false);
+      return;
+    }
+
+    setIsConnectSuccess(true);
+    await ledgerDelay(1500);
+    setCurrentStepIndex(1);
+    try {
+      const signedTxs = await signLedgerStxTransaction(
+        transport,
+        initialStxTransactions[0],
+        selectedAccount.id,
+      );
+      setIsTxApproved(true);
+      await ledgerDelay(1500);
+      onConfirmClick([signedTxs]);
+    } catch (e) {
+      console.error(e);
+      setIsTxRejected(true);
+      setIsButtonDisabled(false);
+    } finally {
+      transport.close();
+    }
+  };
+
+  const handleRetry = async () => {
+    setIsTxRejected(false);
+    setIsConnectSuccess(false);
+    setCurrentStepIndex(0);
   };
 
   return (
@@ -233,6 +311,40 @@ function ConfirmStxTransationComponent({
           onPress={onConfirmButtonClick}
         />
       </ButtonContainer>
+      <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+        {currentStepIndex === 0 ? (
+          <LedgerConnectionView
+            title={t('LEDGER.CONNECT.TITLE')}
+            text={t('LEDGER.CONNECT.SUBTITLE')}
+            titleFailed={t('LEDGER.CONNECT.ERROR_TITLE')}
+            textFailed={t('LEDGER.CONNECT.ERROR_SUBTITLE')}
+            imageDefault={LedgerConnectDefault}
+            isConnectSuccess={isConnectSuccess}
+            isConnectFailed={isConnectFailed}
+          />
+        ) : currentStepIndex === 1 ? (
+          <LedgerConnectionView
+            title={t('LEDGER.CONFIRM.TITLE')}
+            text={t('LEDGER.CONFIRM.SUBTITLE')}
+            titleFailed={t('LEDGER.CONFIRM.ERROR_TITLE')}
+            textFailed={t('LEDGER.CONFIRM.ERROR_SUBTITLE')}
+            imageDefault={LedgerConnectDefault}
+            isConnectSuccess={isTxApproved}
+            isConnectFailed={isTxRejected}
+          />
+        ) : null}
+        <SuccessActionsContainer>
+          <ActionButton
+            onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+            text={t(
+              isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
+            )}
+            disabled={isButtonDisabled}
+            processing={isButtonDisabled}
+          />
+          <ActionButton onPress={onCancelClick} text={t('LEDGER.CANCEL_BUTTON')} transparent />
+        </SuccessActionsContainer>
+      </BottomModal>
     </>
   );
 }

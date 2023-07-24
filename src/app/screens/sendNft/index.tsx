@@ -20,6 +20,7 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -171,6 +172,9 @@ function SendNft() {
       });
     }
   }, [data]);
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-nft'), []);
 
   const handleBackButtonClick = () => {
     navigate(-1);

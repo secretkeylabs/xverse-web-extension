@@ -1,3 +1,4 @@
+import WalletCloseGuard from '@components/guards/walletCloseGuard';
 import { decryptMnemonic } from '@stacks/encryption';
 import rootStore from '@stores/index';
 import { setWalletSeedPhraseAction } from '@stores/wallet/actions/actionCreators';
@@ -27,7 +28,11 @@ const renderApp = async () => {
   });
   const container = document.getElementById('app');
   const root = createRoot(container!);
-  return root.render(<App />);
+  return root.render(
+    <WalletCloseGuard>
+      <App />
+    </WalletCloseGuard>,
+  );
 };
 
 renderApp();

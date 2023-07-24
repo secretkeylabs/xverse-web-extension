@@ -1,0 +1,17 @@
+<svg width="160" height="37" viewBox="0 0 160 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="1" y="1" width="32" height="35" rx="4" stroke="white" stroke-width="1.5"/>
+<circle cx="6" cy="6" r="1" fill="white"/>
+<circle cx="9.5" cy="6" r="1" fill="white"/>
+<circle cx="13" cy="6" r="1" fill="white"/>
+<circle cx="45.5" cy="18.5" r="1.5" fill="white"/>
+<circle cx="52.5" cy="18.5" r="1.5" fill="white" fill-opacity="0.2"/>
+<circle cx="59.5" cy="18.5" r="1.5" fill="white" fill-opacity="0.2"/>
+<circle cx="100.5" cy="18.5" r="1.5" fill="white" fill-opacity="0.2"/>
+<circle cx="107.5" cy="18.5" r="1.5" fill="white" fill-opacity="0.2"/>
+<circle cx="114.5" cy="18.5" r="1.5" fill="white" fill-opacity="0.2"/>
+<path d="M137 1L127 1V31C127 33.7614 129.239 36 132 36C134.761 36 137 33.7614 137 31V1Z" fill="#12151E" stroke="white" stroke-width="1.5"/>
+<path d="M159 36L159 26L132 26C129.239 26 127 28.2386 127 31C127 33.7614 129.239 36 132 36L159 36Z" fill="#12151E" stroke="white" stroke-width="1.5"/>
+<circle cx="1.5" cy="1.5" r="1.5" transform="matrix(-1 0 0 1 133.5 29.5)" fill="white"/>
+<circle cx="80" cy="18" r="13.25" stroke="white" stroke-width="1.5"/>
+<circle cx="80" cy="18" r="7" fill="white"/>
+</svg>

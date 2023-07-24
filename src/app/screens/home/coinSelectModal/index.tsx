@@ -5,6 +5,7 @@ import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const Container = styled.div((props) => ({
   marginTop: props.theme.spacing(6),
@@ -34,7 +35,7 @@ function CoinSelectModal({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const theme = useTheme();
-
+  const { btcAddress, stxAddress } = useWalletSelector();
   const handleOnBitcoinPress = () => {
     onSelectBitcoin?.();
     onClose();
@@ -48,7 +49,7 @@ function CoinSelectModal({
   function renderFixedCoins() {
     return (
       <>
-        {onSelectBitcoin != null && (
+        {btcAddress && (
           <TokenTile
             title={t('BITCOIN')}
             currency="BTC"
@@ -60,8 +61,7 @@ function CoinSelectModal({
             onPress={handleOnBitcoinPress}
           />
         )}
-
-        {onSelectStacks != null && (
+        {stxAddress && (
           <TokenTile
             title={t('STACKS')}
             currency="STX"
@@ -81,7 +81,7 @@ function CoinSelectModal({
     return (
       <Container>
         {renderFixedCoins()}
-        {coins.map((coin) => (
+        {stxAddress && coins.map((coin) => (
           <TokenTile
             key={coin.principal}
             title={coin.name}

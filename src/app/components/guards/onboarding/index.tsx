@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
+import { useSingleTabGuard } from '@components/guards/singleTab';
 import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
 import useWalletSelector from '@hooks/useWalletSelector';
 
@@ -9,7 +10,6 @@ import {
   WalletExistsContextProps,
   useWalletExistsContext,
 } from './WalletExistsContext';
-import useOnboardingSingleton from './useOnboardingSingleton';
 
 interface WalletExistsGuardProps {
   children: React.ReactElement;
@@ -17,10 +17,10 @@ interface WalletExistsGuardProps {
 
 /**
  * This guard is used to redirect the user to the wallet exists page if they have a wallet and ensures
- * that only 1 onboarding workflow tab exists at a time (via the useOnboardingSingleton hook).
+ * that only 1 onboarding workflow tab exists at a time (via the useSingleTabGuard hook).
  */
 function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactElement {
-  useOnboardingSingleton();
+  useSingleTabGuard('onboarding');
 
   const [walletExistsGuardEnabled, setWalletExistsGuardEnabled] = useState(true);
 

@@ -19,3 +19,15 @@
    2. Check `Developer mode`
    3. Click on `Load unpacked extension`
    4. Select the `build` folder.
+
+### Developing with local dependencies
+
+Use esm build, and reference your filesystem in package.json
+
+For example, if your xverse-core and xverse-web-extension are in same directory,
+make or pull your local changes to xverse-core, then:
+
+```
+cd ../xverse-core && npm i && npm run build:esm && \
+cd $OLDPWD && npm i --legacy-peer-deps @secretkeylabs/xverse-core@../xverse-core && npm start
+```

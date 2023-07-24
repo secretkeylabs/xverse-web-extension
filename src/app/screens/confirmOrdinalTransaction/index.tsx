@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -13,6 +12,10 @@ import OrdinalImage from '@screens/ordinals/ordinalImage';
 import BigNumber from 'bignumber.js';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useBtcClient from '@hooks/useBtcClient';
+import { isLedgerAccount } from '@utils/helper';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -70,7 +73,7 @@ const Container = styled.div({
   alignItems: 'center',
 });
 
-const NFtContainer = styled.div((props) => ({
+const NftContainer = styled.div((props) => ({
   maxWidth: 150,
   maxHeight: 150,
   width: '60%',
@@ -86,6 +89,7 @@ const NFtContainer = styled.div((props) => ({
 function ConfirmOrdinalTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -99,11 +103,11 @@ function ConfirmOrdinalTransaction() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>(
-    async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-  );
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
   const { selectedOrdinal } = useNftDataSelector();
   const { refetch } = useBtcWalletData();
+  const [currentFee, setCurrentFee] = useState(fee);
+  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
 
   useEffect(() => {
     setRecipientAddress(location.state.recipientAddress);
@@ -139,6 +143,12 @@ function ConfirmOrdinalTransaction() {
   }, [txError]);
 
   const handleOnConfirmClick = (txHex: string) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const txType: LedgerTransactionType = 'ORDINALS';
+      navigate('/confirm-ledger-tx', { state: { recipients: [{ address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }], type: txType, ordinalUtxo, feeRateInput: currentFeeRate, fee: currentFee } });
+      return;
+    }
+
     mutate({ signedTx: txHex });
   };
 
@@ -146,19 +156,22 @@ function ConfirmOrdinalTransaction() {
     navigate(-1);
   };
 
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-ordinal-tx'), []);
+
   return (
     <>
       {isGalleryOpen && (
         <>
           <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          <ButtonContainer>
+          {/* <ButtonContainer>
             <Button onClick={handleOnCancelClick}>
               <>
                 <ButtonImage src={ArrowLeft} />
                 <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
               </>
             </Button>
-          </ButtonContainer>
+          </ButtonContainer> */}
         </>
       )}
       <ScrollContainer>
@@ -173,11 +186,15 @@ function ConfirmOrdinalTransaction() {
           onBackButtonClick={handleOnCancelClick}
           ordinalTxUtxo={ordinalUtxo}
           assetDetail={selectedOrdinal?.number.toString()}
+          currentFee={currentFee}
+          setCurrentFee={setCurrentFee}
+          currentFeeRate={currentFeeRate}
+          setCurrentFeeRate={setCurrentFeeRate}
         >
           <Container>
-            <NFtContainer>
-              <OrdinalImage inNftSend ordinal={selectedOrdinal!} />
-            </NFtContainer>
+            <NftContainer>
+              <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
+            </NftContainer>
           </Container>
         </ConfirmBtcTransactionComponent>
 
