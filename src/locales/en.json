@@ -21,7 +21,6 @@
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select wallet type",
     "LEDGER_IMPORT_2_SUBTITLE": "You can create multiple wallets to store Bitcoin, Ordinals and BRC-20 tokens.",
-    "LEDGER_IMPORT_2_WARNING": "Don't use a taproot address with Ledger Live if you connect to Xverse.",
     "LEDGER_IMPORT_2_FOOTNOTE": "",
     "LEDGER_IMPORT_2_SELECT": {
       "BTC_TITLE": "Bitcoin and Ordinals wallet",
@@ -279,7 +278,7 @@
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
     "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
-    "INVALID_TRANSACTION":"Invalid Transaction"
+    "INVALID_TRANSACTION": "Invalid Transaction"
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
