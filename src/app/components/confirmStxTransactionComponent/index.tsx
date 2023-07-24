@@ -33,12 +33,13 @@ const Container = styled.div`
   margin-left: 16px;
   margin-right: 16px;
   overflow-y: auto;
+
   &::-webkit-scrollbar {
     display: none;
   }
 `;
 
-const ButtonContainer = styled.div((props) => ({
+export const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginBottom: props.theme.spacing(12),
@@ -151,14 +152,15 @@ function ConfirmStxTransationComponent({
     setButtonLoading(loading);
   }, [loading]);
 
-  const getFee = () => (isSponsored
-    ? new BigNumber(0)
-    : new BigNumber(
-      initialStxTransactions
-        .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
-        .reduce((prev, curr) => prev + curr, BigInt(0))
-        .toString(10),
-    ));
+  const getFee = () =>
+    isSponsored
+      ? new BigNumber(0)
+      : new BigNumber(
+          initialStxTransactions
+            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+            .reduce((prev, curr) => prev + curr, BigInt(0))
+            .toString(10)
+        );
 
   const getTxNonce = (): string => {
     const nonce = getNonce(initialStxTransactions[0]);
@@ -189,7 +191,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions[0],
         seedPhrase,
         selectedAccount?.id ?? 0,
-        selectedNetwork,
+        selectedNetwork
       );
       signedTxs.push(signedContractCall);
     } else if (initialStxTransactions.length === 2) {
@@ -197,7 +199,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase,
+        seedPhrase
       );
     }
     onConfirmClick(signedTxs);
