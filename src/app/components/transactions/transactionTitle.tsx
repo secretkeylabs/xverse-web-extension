@@ -32,6 +32,9 @@ export default function TransactionTitle(props: TransactionTitleProps) {
   };
 
   const getBrc20TokenTitle = (tx: Brc20HistoryTransactionData): string => {
+    if (tx.txStatus === 'pending') {
+      return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
+    }
     if (tx.type === 'send' || tx.type === 'receive') {
       return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
     }
