@@ -43,7 +43,6 @@ export async function encryptSeedPhrase(seed: string, password: string): Promise
     seed,
     password,
     mnemonicEncryptionHandler: encryptMnemonic,
-    passwordHashGenerator: generatePasswordHash,
   });
 }
 
@@ -53,7 +52,6 @@ export async function decryptSeedPhrase(encryptedSeed: string, password: string)
       encryptedSeed,
       password,
       mnemonicDecryptionHandler: decryptMnemonic,
-      passwordHashGenerator: generatePasswordHash,
     });
     return seedPhrase;
   } catch (err) {
