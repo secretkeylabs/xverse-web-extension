@@ -221,6 +221,10 @@ const ConfirmationStepsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
+const InfoContainerWrapper = styled.div((props) => ({
+  marginTop: props.theme.spacing(12),
+}));
+
 interface ConfirmationStepProps {
   isCompleted: boolean;
 }
@@ -606,9 +610,9 @@ function ImportLedger(): JSX.Element {
                 <ImportStartTitle>{t('LEDGER_IMPORT_1_TITLE')}</ImportStartTitle>
                 <ImportStartText>{t('LEDGER_IMPORT_1_SUBTITLE')}</ImportStartText>
 
-                <div style={{ marginTop: 24 }}>
+                <InfoContainerWrapper>
                   <InfoContainer bodyText={t('LEDGER_IMPORT_2_WARNING')} />
-                </div>
+                </InfoContainerWrapper>
               </ImportStartContainer>
             )}
             {currentStepIndex === 1 && (
