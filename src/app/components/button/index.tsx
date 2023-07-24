@@ -12,37 +12,40 @@ const Button = styled.button<ButtonProps>((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
-  backgroundColor: props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classic,
+  backgroundColor: props.warning
+    ? props.theme.colors.feedback.error
+    : props.theme.colors.action.classic,
   width: '100%',
   height: 44,
-  opacity: props.disabled ? 0.6 : 1,
-  transition: 'all 0.2s ease',
-  ':disabled': {
-    opacity: 0.6,
-    cursor: 'initial',
-    ':hover': {
-      opacity: 0.6,
-    }
-  }
+  transition: 'all 0.1s ease',
+  ...(props.disabled
+    ? {
+        cursor: 'not-allowed',
+        opacity: 0.4,
+      }
+    : {
+        ':hover': { opacity: 0.8 },
+        ':active': { opacity: 0.6 },
+      }),
 }));
 
-const AnimatedButton = styled(Button)`
-  :hover {
-    background: ${(props) => (props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classicLight)};
-    opacity: 0.6;
-  }
-`;
-
-const TransparentButton = styled(Button)`
-  background-color: transparent;
-  border: ${(props) => `1px solid ${props.theme.colors.background.elevation6}`}
-`;
-
-const AnimatedTransparentButton = styled(TransparentButton)`
-  :hover {
-    background: ${(props) => props.theme.colors.background.elevation6_800};
-  }
-`;
+const TransparentButton = styled(Button)((props) => ({
+  border: `1px solid ${props.theme.colors.background.elevation6}`,
+  backgroundColor: 'transparent',
+  ...(props.disabled
+    ? {
+        cursor: 'not-allowed',
+        opacity: 0.4,
+      }
+    : {
+        ':hover': {
+          backgroundColor: props.theme.colors.background.elevation6_800,
+        },
+        ':active': {
+          backgroundColor: props.theme.colors.background.elevation6_600,
+        },
+      }),
+}));
 
 interface TextProps {
   warning?: boolean;
@@ -51,7 +54,9 @@ interface TextProps {
 const ButtonText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: `${props.warning ? props.theme.colors.white[0] : props.theme.colors.background.elevation0}`,
+  color: `${
+    props.warning ? props.theme.colors.white[0] : props.theme.colors.background.elevation0
+  }`,
   textAlign: 'center',
 }));
 
@@ -88,15 +93,14 @@ function ActionButton({
   warning,
 }: Props) {
   const handleOnPress = () => {
-    if (!disabled) { onPress(); }
+    if (!disabled) {
+      onPress();
+    }
   };
 
   if (transparent) {
     return (
-      <AnimatedTransparentButton
-        onClick={handleOnPress}
-        disabled={disabled}
-      >
+      <TransparentButton onClick={handleOnPress} disabled={disabled}>
         {processing ? (
           <MoonLoader color="white" size={10} />
         ) : (
@@ -105,25 +109,21 @@ function ActionButton({
             <AnimatedButtonText>{text}</AnimatedButtonText>
           </>
         )}
-      </AnimatedTransparentButton>
+      </TransparentButton>
     );
   }
 
   return (
-    <AnimatedButton
-      onClick={handleOnPress}
-      disabled={disabled}
-      warning={warning}
-    >
+    <Button onClick={handleOnPress} disabled={disabled} warning={warning}>
       {processing ? (
         <MoonLoader color="#12151E" size={12} />
       ) : (
         <>
-          { src && <ButtonImage src={src} />}
+          {src && <ButtonImage src={src} />}
           <ButtonText warning={warning}>{text}</ButtonText>
         </>
       )}
-    </AnimatedButton>
+    </Button>
   );
 }
 export default ActionButton;

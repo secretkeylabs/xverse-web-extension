@@ -61,6 +61,8 @@ import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
 import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
+import SwapScreen from '@screens/swap';
+import SwapConfirmScreen from '@screens/swap/swapConfirmation';
 
 const router = createHashRouter([
   {
@@ -148,6 +150,14 @@ const router = createHashRouter([
       //   path: 'send-ft-ledger',
       //   element: <LedgerSendFtScreen />,
       // },
+      {
+        path: 'swap',
+        element: <SwapScreen />,
+      },
+      {
+        path: 'swap-confirm',
+        element: <SwapConfirmScreen />,
+      },
       {
         path: 'confirm-stx-tx',
         element: <ConfirmStxTransaction />,

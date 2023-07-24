@@ -16,8 +16,8 @@ interface Props {
   visible: boolean;
   coins: FungibleToken[];
   title: string;
-  onSelectBitcoin: () => void;
-  onSelectStacks: () => void;
+  onSelectBitcoin?: () => void;
+  onSelectStacks?: () => void;
   onSelectCoin: (coin: FungibleToken) => void;
   onClose: () => void;
   loadingWalletData: boolean;
@@ -37,19 +37,19 @@ function CoinSelectModal({
   const theme = useTheme();
   const { btcAddress, stxAddress } = useWalletSelector();
   const handleOnBitcoinPress = () => {
-    onSelectBitcoin();
+    onSelectBitcoin?.();
     onClose();
   };
 
   const handleOnStackPress = () => {
-    onSelectStacks();
+    onSelectStacks?.();
     onClose();
   };
 
   function renderFixedCoins() {
     return (
       <>
-        {btcAddress && (
+        {btcAddress && onSelectBitcoin != null && (
           <TokenTile
             title={t('BITCOIN')}
             currency="BTC"
