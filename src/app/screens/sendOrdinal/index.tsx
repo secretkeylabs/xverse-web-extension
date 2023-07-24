@@ -109,6 +109,8 @@ function SendOrdinal() {
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
+  const [warning, setWarning] = useState('');
+
   const textContent = useTextOrdinalContent(selectedOrdinal!);
   const address: string | undefined = useMemo(
     () => (location.state ? location.state.recipientAddress : undefined),
@@ -193,11 +195,6 @@ function SendOrdinal() {
       return false;
     }
 
-    if (associatedAddress === ordinalsAddress) {
-      setError(t('ERRORS.SEND_TO_SELF'));
-      return false;
-    }
-
     return true;
   }
 
@@ -207,6 +204,13 @@ function SendOrdinal() {
       mutate(associatedAddress);
     }
   };
+
+  const handleInputChange = (inputAddress: string) => {
+    if (inputAddress === ordinalsAddress) {
+      return setWarning(t('SEND_ORDINAL_TO_SELF_WARNING'));
+    }
+    setWarning('');
+  }
 
   return (
     <>
@@ -236,6 +240,8 @@ function SendOrdinal() {
           recepientError={error}
           recipient={address}
           onPressSend={onPressNext}
+          onAddressInputChange={handleInputChange}
+          warning={warning}
         >
           <Container>
             <NftContainer>
