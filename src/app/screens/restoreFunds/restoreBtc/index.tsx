@@ -1,6 +1,7 @@
 import TopRow from '@components/topRow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
+import { getBtcFiatEquivalent, NetworkType, satsToBtc,UTXO} from '@secretkeylabs/xverse-core';
 import {
   BtcUtxoDataResponse,
   getBtcFiatEquivalent,
@@ -23,6 +24,7 @@ import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import { useEffect } from 'react';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import useSecretKey from '@hooks/useSecretKey';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
@@ -77,8 +79,11 @@ const ButtonContainer = styled.div({
 
 function RestoreBtc() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_BTC_SCREEN' });
-  const { ordinalsAddress, btcAddress, network, selectedAccount, btcFiatRate, seedPhrase } =
-    useWalletSelector();
+  const {
+    ordinalsAddress, btcAddress, network,
+    selectedAccount, btcFiatRate,
+  } = useWalletSelector();
+  const {getSeed} = useSecretKey();
   const navigate = useNavigate();
   const { unspentUtxos } = useNonOrdinalUtxos();
   let amount = new BigNumber(0);
@@ -127,7 +132,8 @@ function RestoreBtc() {
       ),
   });
 
-  const onClickTransfer = () => {
+  const onClickTransfer = async () => {
+    const seedPhrase = await getSeed();
     mutateSignNonOrdinalBtcTransaction({
       recipientAddress: btcAddress,
       nonOrdinalUtxos: unspentUtxos,

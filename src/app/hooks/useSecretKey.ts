@@ -27,7 +27,7 @@ const commonStorageAdapter: CommonStorageAdapter = {
 
 const useSecretKey = () => {
   const vault = useMemo(
-    () =>  new SeedVault({
+    () => new SeedVault({
         cryptoUtilsAdapter,
         storageAdapter: secureStorageAdapter,
         commonStorageAdapter,

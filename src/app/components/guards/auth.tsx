@@ -1,20 +1,34 @@
-import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { Navigate } from 'react-router-dom';
+/* eslint-disable no-nested-ternary */
+import useSecretKey from '@hooks/useSecretKey';
+import { ReactNode, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ChromeStorage from '@utils/storage';
 
 interface AuthGuardProps {
   children: ReactNode;
 }
 
 function AuthGuard({ children }: AuthGuardProps) {
-  const { seedPhrase, accountsList } = useWalletSelector();
-  const hydrated = useHasStateRehydrated();
+  const { getSeed } = useSecretKey();
+  const navigate = useNavigate();
 
-  if (hydrated && accountsList.length > 0 && !seedPhrase) return <Navigate to="/login" />;
+  useEffect(() => {
+    (async () => {
+      const encryptedSeed = await ChromeStorage.getItem('encryptedKey');
+      if(!encryptedSeed) {
+        navigate('/landing');
+        return
+      }
+      try {
+       await getSeed();
+      } catch (error) {
+        navigate('/login');
+      }
 
-  if (hydrated && accountsList.length === 0) return <Navigate to="/landing" />;
+    })();
+  }, []);
 
-  return children;
+  return children
 }
 
 export default AuthGuard;

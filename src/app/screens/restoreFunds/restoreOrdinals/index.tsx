@@ -14,6 +14,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import useSecretKey from '@hooks/useSecretKey';
 import styled from 'styled-components';
 import OrdinalRow from './ordinalRow';
 
@@ -53,8 +54,10 @@ const ButtonContainer = styled.div({
 
 function RestoreOrdinals() {
   const { t } = useTranslation('translation');
-  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
-    useWalletSelector();
+  const {
+    network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate,
+  } = useWalletSelector();
+  const { getSeed } = useSecretKey();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
@@ -69,20 +72,18 @@ function RestoreOrdinals() {
     isLoading,
     error: transactionError,
     mutateAsync,
-  } = useMutation<SignedBtcTx, string, BtcOrdinal>({
-    mutationFn: async (ordinal) => {
-      const tx = await signOrdinalSendTransaction(
-        ordinalsAddress,
-        ordinal.utxo,
-        btcAddress,
-        Number(selectedAccount?.id),
-        seedPhrase,
-        network.type,
-        ordinalsUtxos!,
-      );
-      return tx;
-    },
-  });
+  } = useMutation<SignedBtcTx, string, {ordinal: BtcOrdinal, seedPhrase: string}>({ mutationFn: async ({ordinal, seedPhrase}) => {
+    const tx = await signOrdinalSendTransaction(
+      ordinalsAddress,
+      ordinal.utxo,
+      btcAddress,
+      Number(selectedAccount?.id),
+      seedPhrase,
+      network.type,
+      ordinalsUtxos!,
+    );
+    return tx;
+  } });
 
   useEffect(() => {
     if (transactionError) {
@@ -104,8 +105,8 @@ function RestoreOrdinals() {
 
   const onClickTransfer = async (selectedOrdinal: BtcOrdinal, ordinalData: Inscription) => {
     setTransferringOrdinalId(selectedOrdinal.id);
-
-    const signedTx = await mutateAsync(selectedOrdinal);
+    const seedPhrase = await getSeed();
+    const signedTx = await mutateAsync({ordinal: selectedOrdinal, seedPhrase});
     setSelectedOrdinalDetails(ordinalData);
     navigate(`/confirm-ordinal-tx/${selectedOrdinal.id}`, {
       state: {

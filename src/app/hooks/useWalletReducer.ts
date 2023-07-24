@@ -1,3 +1,4 @@
+// import { generateKeyArgon2, generatePasswordHash } from '@utils/encryptionUtils';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -21,8 +22,9 @@ import {
 import { useDispatch } from 'react-redux';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
-import { SessionStorageKeys, getFromSessionStorage } from '@utils/sessionStorageUtils';
+import { getSessionItem } from '@utils/sessionStorageUtils';
 import useWalletSession from './useWalletSession';
+import useSecretKey from './useSecretKey';
 import useWalletSelector from './useWalletSelector';
 
 const useWalletReducer = () => {
@@ -109,6 +111,17 @@ const useWalletReducer = () => {
   };
 
   const unlockWallet = async (password: string) => {
+    // if (encryptedSeed) {
+    //   const salt = await localStorage.getItem('salt');
+    //    const oldHash = await generateKeyArgon2(password, salt!);
+    //   console.log("🚀 ~ file: useWalletReducer.ts:91 ~ unlockWal ~ oldHash:", oldHash)
+    //   const oldSeed = await decryptMnemonic(encryptedSeed, oldHash);
+    //   console.log("🚀 ~ file: useWalletReducer.ts:92 ~ unlockWal ~ oldSeed:", oldSeed)
+    //   await initSeedVault(password);
+    //   await storeSeed(oldSeed);
+    //   dispatch(unlockWalletAction(''));
+    //   return oldSeed;
+    // }
     const decrypted = await getSeed(password);
     try {
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);

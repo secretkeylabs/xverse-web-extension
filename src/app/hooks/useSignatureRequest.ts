@@ -14,6 +14,7 @@ import { useLocation } from 'react-router-dom';
 import { SignMessagePayload } from 'sats-connect';
 import { signBip322Message } from '@secretkeylabs/xverse-core/connect/bip322Signature';
 import useWalletSelector from './useWalletSelector';
+import useSecretKey from './useSecretKey';
 
 export type SignatureMessageType = 'utf8' | 'structured';
 
@@ -52,9 +53,11 @@ function useSignatureRequest() {
 }
 
 export function useSignMessage(messageType: SignatureMessageType) {
-  const { selectedAccount, seedPhrase, network } = useWalletSelector();
+  const { selectedAccount, network } = useWalletSelector();
+  const {getSeed} = useSecretKey();
   return useCallback(
     async ({ message, domain }: { message: string; domain?: TupleCV }) => {
+      const seedPhrase = await getSeed();
       if (!selectedAccount) return null;
       const { privateKey } = await getStxAddressKeyChain(
         seedPhrase,
@@ -82,18 +85,17 @@ export function useSignMessage(messageType: SignatureMessageType) {
 }
 
 export function useSignBip322Message(message: string, address: string) {
-  const { accountsList, seedPhrase, network } = useWalletSelector();
-  return useCallback(
-    async () =>
-      signBip322Message({
-        accounts: accountsList,
-        message,
-        signatureAddress: address,
-        seedPhrase,
-        network: network.type,
-      }),
-    [],
-  );
+  const { accountsList, network } = useWalletSelector();
+  const {getSeed} = useSecretKey();
+  return useCallback(async () => {
+    const seedPhrase = await getSeed();
+   return signBip322Message({
+    accounts: accountsList,
+    message,
+    signatureAddress: address,
+    seedPhrase,
+    network: network.type,
+  })}, []);
 }
 
 export default useSignatureRequest;

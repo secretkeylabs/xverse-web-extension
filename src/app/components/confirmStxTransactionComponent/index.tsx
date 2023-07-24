@@ -18,6 +18,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
+import useSecretKey from '@hooks/useSecretKey';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -141,8 +142,9 @@ function ConfirmStxTransationComponent({
     keyPrefix: 'SIGNATURE_REQUEST',
   });
   const selectedNetwork = useNetworkSelector();
+  const {getSeed} = useSecretKey();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const { selectedAccount, seedPhrase } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -190,11 +192,12 @@ function ConfirmStxTransationComponent({
       return;
     }
 
+    const seed = await getSeed();
     let signedTxs: StacksTransaction[] = [];
     if (initialStxTransactions.length === 1) {
       const signedContractCall = await signTransaction(
         initialStxTransactions[0],
-        seedPhrase,
+        seed,
         selectedAccount?.id ?? 0,
         selectedNetwork,
       );
@@ -204,7 +207,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase,
+        seed,
       );
     }
     onConfirmClick(signedTxs);

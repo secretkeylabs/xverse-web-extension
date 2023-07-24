@@ -27,7 +27,8 @@ import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { useSelector } from 'react-redux';
+import useWalletSelector from '@hooks/useWalletSelector';
+import useSecretKey from '@hooks/useSecretKey';
 import styled from 'styled-components';
 import TransactionDetailComponent from '../transactionDetailComponent';
 
@@ -153,9 +154,10 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
-  const { btcAddress, selectedAccount, seedPhrase, network, btcFiatRate } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const {
+    btcAddress, selectedAccount, network, btcFiatRate,
+  } = useWalletSelector();
+  const {getSeed} = useSecretKey();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
@@ -169,8 +171,9 @@ function ConfirmBtcTransactionComponent({
     SignedBtcTx,
     ResponseError,
     {
-      recipients: Recipient[];
+      txRecipients: Recipient[];
       txFee: string;
+      seedPhrase: string;
     }
   >({
     mutationFn: async ({ recipients: newRecipients, txFee }) =>
@@ -189,19 +192,17 @@ function ConfirmBtcTransactionComponent({
     error: errorSigningNonOrdial,
     data: signedNonOrdinalBtcSend,
     mutate: mutateSignNonOrdinalBtcTransaction,
-  } = useMutation<SignedBtcTx, ResponseError, string>({
-    mutationFn: async (txFee) => {
-      const signedNonOrdinalBtcTx = await signNonOrdinalBtcSendTransaction(
-        btcAddress,
-        nonOrdinalUtxos!,
-        selectedAccount?.id ?? 0,
-        seedPhrase,
-        network.type,
-        new BigNumber(txFee),
-      );
-      return signedNonOrdinalBtcTx;
-    },
-  });
+  } = useMutation<SignedBtcTx, ResponseError, {txFee: string, seedPhrase: string}>({ mutationFn: async ({txFee, seedPhrase}) => {
+    const signedNonOrdinalBtcTx = await signNonOrdinalBtcSendTransaction(
+      btcAddress,
+      nonOrdinalUtxos!,
+      selectedAccount?.id ?? 0,
+      seedPhrase,
+      network.type,
+      new BigNumber(txFee),
+    );
+    return signedNonOrdinalBtcTx;
+  } });
 
   const { ordinals, isLoading: ordinalsLoading } = useOrdinalsByAddress(btcAddress);
 
@@ -272,7 +273,7 @@ function ConfirmBtcTransactionComponent({
     setShowFeeSettings(false);
   };
 
-  const onApplyClick = ({
+  const onApplyClick = async ({
     fee: modifiedFee,
     feeRate,
   }: {
@@ -280,13 +281,14 @@ function ConfirmBtcTransactionComponent({
     feeRate?: string;
     nonce?: string;
   }) => {
+    const seed = await getSeed();
     setCurrentFee(new BigNumber(modifiedFee));
     setCurrentFeeRate(new BigNumber(feeRate));
-    if (ordinalTxUtxo) ordinalMutate(modifiedFee);
+    if (ordinalTxUtxo) ordinalMutate({txFee: modifiedFee, seedPhrase: seed});
     else if (isRestoreFundFlow) {
-      mutateSignNonOrdinalBtcTransaction(modifiedFee);
+      mutateSignNonOrdinalBtcTransaction({ txFee: modifiedFee, seedPhrase: seed });
     } else {
-      mutate({ recipients, txFee: modifiedFee });
+      mutate({ txRecipients: recipients, txFee: modifiedFee, seedPhrase: seed });
     }
     setLoading(true);
   };

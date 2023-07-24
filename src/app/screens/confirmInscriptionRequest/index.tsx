@@ -15,6 +15,7 @@ import {
 import { BtcTransactionBroadcastResponse, ResponseError } from '@secretkeylabs/xverse-core/types';
 import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
 import useBtcClient from '@hooks/useBtcClient';
+import useSecretKey from '@hooks/useSecretKey';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
@@ -151,7 +152,10 @@ function ConfirmInscriptionRequest() {
     brcContent,
     feePerVByte,
   } = location.state;
-  const { btcAddress, network, selectedAccount, seedPhrase, btcFiatRate } = useWalletSelector();
+  const {
+    btcAddress, network, selectedAccount, btcFiatRate,
+  } = useWalletSelector();
+  const { getSeed } = useSecretKey();
   const btcClient = useBtcClient();
   const [signedTx, setSignedTx] = useState<string>('');
   const [textContent, setTextContent] = useState<string>('');
@@ -200,9 +204,10 @@ function ConfirmInscriptionRequest() {
     {
       recipients: Recipient[];
       txFee: string;
+      seedPhrase: string;
     }
   >({
-    mutationFn: async ({ recipients, txFee }) =>
+    mutationFn: async ({ recipients, txFee, seedPhrase }) =>
       signBtcTransaction(
         recipients,
         btcAddress,
@@ -305,7 +310,7 @@ function ConfirmInscriptionRequest() {
     setShowFeeSettings(true);
   };
 
-  const onApplyClick = ({
+  const onApplyClick = async ({
     fee: modifiedFee,
     feeRate,
   }: {
@@ -313,8 +318,9 @@ function ConfirmInscriptionRequest() {
     feeRate?: string;
     nonce?: string;
   }) => {
+    const seedPhrase = await getSeed();
     setCurrentFeeRate(new BigNumber(feeRate));
-    mutateTxFee({ recipients: recipient, txFee: modifiedFee });
+    mutateTxFee({ recipients: recipient, txFee: modifiedFee, seedPhrase });
   };
 
   const closeTransactionSettingAlert = () => {

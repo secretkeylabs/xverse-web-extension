@@ -7,6 +7,7 @@ import { createAuthResponse, handleLedgerStxJWTAuth } from '@secretkeylabs/xvers
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { useState } from 'react';
 import useWalletSelector from '@hooks/useWalletSelector';
+import useSecretKey from '@hooks/useSecretKey';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
 import validUrl from 'valid-url';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -82,7 +83,8 @@ function AuthenticationRequest() {
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken);
-  const { seedPhrase, selectedAccount } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
+  const {getSeed} = useSecretKey();
   const isDisabled = !selectedAccount?.stxAddress;
 
   const confirmCallback = async () => {
@@ -93,6 +95,7 @@ function AuthenticationRequest() {
         return;
       }
 
+      const seedPhrase = await getSeed();
       const authResponse = await createAuthResponse(
         seedPhrase,
         selectedAccount?.id ?? 0,

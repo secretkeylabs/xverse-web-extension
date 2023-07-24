@@ -24,7 +24,7 @@ const useWalletSession = () => {
   const shouldLock = async () => {
     const pHash = await getSessionItem(SeedVaultStorageKeys.PASSWORD_HASH);
     if (!pHash) return false;
-    const startTime = await await getSessionItem(SESSION_START_TIME_KEY);
+    const startTime = await getSessionItem(SESSION_START_TIME_KEY);
     const currentTime = new Date().getTime();
     return currentTime >= addMinutes(startTime, walletLockPeriod).getTime();
   };
