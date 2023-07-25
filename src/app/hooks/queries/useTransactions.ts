@@ -1,8 +1,6 @@
 import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  fetchBtcTransactionsData,
-} from '@secretkeylabs/xverse-core/api';
+import { fetchBtcTransactionsData } from '@secretkeylabs/xverse-core/api';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
@@ -13,12 +11,11 @@ import { getStxAddressTransactions } from '@utils/transactions/transactions';
 import useNetworkSelector from '../useNetwork';
 
 export default function useTransactions(coinType: CurrencyTypes) {
-  const {
-    network, stxAddress, btcAddress, ordinalsAddress, hasActivatedOrdinalsKey
-  } = useWalletSelector();
+  const { network, stxAddress, btcAddress, ordinalsAddress, hasActivatedOrdinalsKey } =
+    useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const fetchTransactions = async (): Promise<
-  BtcTransactionData[] | (AddressTransactionWithTransfers | MempoolTransaction)[]
+    BtcTransactionData[] | (AddressTransactionWithTransfers | MempoolTransaction)[]
   > => {
     try {
       if (coinType === 'STX' || coinType === 'FT' || coinType === 'NFT') {

@@ -30,7 +30,7 @@ const BRC20Container = styled.div({
 const OrdinalContentText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[0],
-  fontSize: (props.inNftSend || props.withoutSizeIncrease) ? 15 : 'calc(0.8vw + 2vh)',
+  fontSize: props.inNftSend || props.withoutSizeIncrease ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
   textAlign: 'center',
 }));
@@ -43,7 +43,7 @@ interface TextProps {
 const BRC20Text = styled.h1<TextProps>((props) => ({
   ...props.theme.body_bold_l,
   color: props.theme.colors.white[0],
-  fontSize: (props.inNftSend || props.withoutSizeIncrease) ? 16 : 'calc(0.8vw + 2vh)',
+  fontSize: props.inNftSend || props.withoutSizeIncrease ? 16 : 'calc(0.8vw + 2vh)',
   textAlign: 'center',
 }));
 
@@ -110,7 +110,12 @@ interface Brc20TileProps {
 
 export default function Brc20Tile(props: Brc20TileProps) {
   const {
-    brcContent, isSmallImage, isNftDashboard, inNftDetail, isGalleryOpen, withoutSizeIncrease,
+    brcContent,
+    isSmallImage,
+    isNftDashboard,
+    inNftDetail,
+    isGalleryOpen,
+    withoutSizeIncrease,
   } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   function renderFTIcon(ticker: string) {
@@ -142,7 +147,9 @@ export default function Brc20Tile(props: Brc20TileProps) {
               value={content?.amt}
               displayType="text"
               thousandSeparator
-              renderText={(text) => <BRC20Text withoutSizeIncrease={withoutSizeIncrease}>{text}</BRC20Text>}
+              renderText={(text) => (
+                <BRC20Text withoutSizeIncrease={withoutSizeIncrease}>{text}</BRC20Text>
+              )}
             />
           )}
           {isNftDashboard && (
@@ -176,7 +183,9 @@ export default function Brc20Tile(props: Brc20TileProps) {
         inNftDetail={inNftDetail}
         isGalleryOpen={isGalleryOpen}
       >
-        <OrdinalContentText inNftSend={false} withoutSizeIncrease={withoutSizeIncrease}>{brcContent}</OrdinalContentText>
+        <OrdinalContentText inNftSend={false} withoutSizeIncrease={withoutSizeIncrease}>
+          {brcContent}
+        </OrdinalContentText>
         {isNftDashboard && (
           <OrdinalsTag>
             <ButtonIcon src={OrdinalsIcon} />

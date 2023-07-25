@@ -47,26 +47,26 @@ export interface Message<Methods extends ExtensionMethods, Payload = undefined>
 type AuthenticationRequestMessage = Message<ExternalMethods.authenticationRequest, string>;
 
 export type AuthenticationResponseMessage = Message<
-ExternalMethods.authenticationResponse,
-{
-  authenticationRequest: string;
-  authenticationResponse: string;
-}
+  ExternalMethods.authenticationResponse,
+  {
+    authenticationRequest: string;
+    authenticationResponse: string;
+  }
 >;
 
 type SignatureRequestMessage = Message<ExternalMethods.signatureRequest, string>;
 
 export type SignatureResponseMessage = Message<
-ExternalMethods.signatureResponse,
-{
-  signatureRequest: string;
-  signatureResponse: SignatureData | string;
-}
+  ExternalMethods.signatureResponse,
+  {
+    signatureRequest: string;
+    signatureResponse: SignatureData | string;
+  }
 >;
 
 type StructuredDataSignatureRequestMessage = Message<
-ExternalMethods.structuredDataSignatureRequest,
-string
+  ExternalMethods.structuredDataSignatureRequest,
+  string
 >;
 
 type TransactionRequestMessage = Message<ExternalMethods.transactionRequest, string>;
@@ -74,11 +74,11 @@ type TransactionRequestMessage = Message<ExternalMethods.transactionRequest, str
 export type TxResult = SponsoredFinishedTxPayload | FinishedTxPayload;
 
 export type TransactionResponseMessage = Message<
-ExternalMethods.transactionResponse,
-{
-  transactionRequest: string;
-  transactionResponse: TxResult | string;
-}
+  ExternalMethods.transactionResponse,
+  {
+    transactionRequest: string;
+    transactionResponse: TxResult | string;
+  }
 >;
 
 export type LegacyMessageFromContentScript =
@@ -110,41 +110,41 @@ export enum ExternalSatsMethods {
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
 
 export type GetAddressResponseMessage = Message<
-ExternalSatsMethods.getAddressResponse,
-{
-  addressRequest: string;
-  addressResponse: GetAddressResponse | string;
-}
+  ExternalSatsMethods.getAddressResponse,
+  {
+    addressRequest: string;
+    addressResponse: GetAddressResponse | string;
+  }
 >;
 
 type SignPsbtRequestMessage = Message<ExternalSatsMethods.signPsbtRequest, string>;
 
 export type SignPsbtResponseMessage = Message<
-ExternalSatsMethods.signPsbtResponse,
-{
-  signPsbtRequest: string;
-  signPsbtResponse: SignPsbtResponse | string;
-}
+  ExternalSatsMethods.signPsbtResponse,
+  {
+    signPsbtRequest: string;
+    signPsbtResponse: SignPsbtResponse | string;
+  }
 >;
 
 type SignMessageRequestMessage = Message<ExternalSatsMethods.signMessageRequest, string>;
 
 export type SignMessageResponseMessage = Message<
-ExternalSatsMethods.signMessageResponse,
-{
-  signMessageRequest: string;
-  signMessageResponse: string;
-}
+  ExternalSatsMethods.signMessageResponse,
+  {
+    signMessageRequest: string;
+    signMessageResponse: string;
+  }
 >;
 
 type SendBtcRequestMessage = Message<ExternalSatsMethods.sendBtcRequest, string>;
 
 export type SendBtcResponseMessage = Message<
-ExternalSatsMethods.sendBtcResponse,
-{
-  sendBtcRequest: string;
-  sendBtcResponse: string;
-}
+  ExternalSatsMethods.sendBtcResponse,
+  {
+    sendBtcRequest: string;
+    sendBtcResponse: string;
+  }
 >;
 
 export type SatsConnectMessageFromContentScript =

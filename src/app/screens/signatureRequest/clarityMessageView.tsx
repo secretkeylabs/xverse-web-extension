@@ -1,6 +1,4 @@
-import {
-  bytesToHex, ClarityType, ClarityValue, cvToString,
-} from '@stacks/transactions';
+import { bytesToHex, ClarityType, ClarityValue, cvToString } from '@stacks/transactions';
 import { principalToString } from '@stacks/transactions/dist/esm/clarity/types/principalCV';
 import styled from 'styled-components';
 
@@ -77,10 +75,7 @@ export default function ClarityMessageView(props: ClarityMessageViewProps) {
         <Container isRoot={isRoot}>
           {Object.entries(val.data).map(([key, value]) => (
             <ContentContainer>
-              <ClarityValueKey>
-                {key}
-                :
-              </ClarityValueKey>
+              <ClarityValueKey>{key}:</ClarityValueKey>
               <ClarityValueText>
                 <ClarityMessageView val={value} encoding="tryAscii" isRoot={false} />
               </ClarityValueText>

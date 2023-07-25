@@ -2,7 +2,11 @@ import { getStxAddressKeyChain } from '@secretkeylabs/xverse-core/wallet';
 import { signMessage } from '@secretkeylabs/xverse-core/connect/signature';
 import { SignaturePayload } from '@stacks/connect';
 import {
-  ChainID, TupleCV, deserializeCV, signStructuredData, createStacksPrivateKey,
+  ChainID,
+  TupleCV,
+  deserializeCV,
+  signStructuredData,
+  createStacksPrivateKey,
 } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useCallback } from 'react';
@@ -79,13 +83,17 @@ export function useSignMessage(messageType: SignatureMessageType) {
 
 export function useSignBip322Message(message: string, address: string) {
   const { accountsList, seedPhrase, network } = useWalletSelector();
-  return useCallback(async () => signBip322Message({
-    accounts: accountsList,
-    message,
-    signatureAddress: address,
-    seedPhrase,
-    network: network.type,
-  }), []);
+  return useCallback(
+    async () =>
+      signBip322Message({
+        accounts: accountsList,
+        message,
+        signatureAddress: address,
+        seedPhrase,
+        network: network.type,
+      }),
+    [],
+  );
 }
 
 export default useSignatureRequest;

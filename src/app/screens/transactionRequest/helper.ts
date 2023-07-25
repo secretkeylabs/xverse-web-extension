@@ -13,7 +13,8 @@ export async function getContractCallPromises(
   network: StacksNetwork,
   stxPublicKey: string,
 ) {
-  const [unSignedContractCall, contractInterface, coinsMetaData, showPostConditionMessage] = await createContractCallPromises(payload, stxAddress, network, stxPublicKey);
+  const [unSignedContractCall, contractInterface, coinsMetaData, showPostConditionMessage] =
+    await createContractCallPromises(payload, stxAddress, network, stxPublicKey);
   return {
     unSignedContractCall,
     contractInterface,

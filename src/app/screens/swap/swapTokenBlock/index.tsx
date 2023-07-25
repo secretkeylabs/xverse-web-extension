@@ -126,7 +126,7 @@ function SwapTokenBlock({
         <RowContainer>
           <CoinButtonContainer onClick={onSelectCoin}>
             {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-            { selectedCoin && <TokenImage {...selectedCoin?.image} /> }
+            {selectedCoin && <TokenImage {...selectedCoin?.image} />}
             <CoinText>{selectedCoin?.name ?? t('SELECT_COIN')}</CoinText>
             <CoinButtonArrow src={ChevronIcon} />
           </CoinButtonContainer>

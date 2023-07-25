@@ -18,7 +18,9 @@ const InstructionsContainer = styled.div((props) => ({
   backgroundColor: 'rgba(39, 42, 68, 0.4)',
   border: `1px solid ${props.theme.colors.background.elevation3}`,
   borderRadius: 12,
-  padding: `${props.theme.spacing(10.5)}px ${props.theme.spacing(10.5)}px ${props.theme.spacing(10.5)}px ${props.theme.spacing(10.5)}px`,
+  padding: `${props.theme.spacing(10.5)}px ${props.theme.spacing(10.5)}px ${props.theme.spacing(
+    10.5,
+  )}px ${props.theme.spacing(10.5)}px`,
 }));
 
 const RowContainer = styled.div({
@@ -91,7 +93,9 @@ function CreateWalletSuccess(): JSX.Element {
       <ContentContainer>
         <img src={CheckCircle} alt="success" />
         <Title>{action === 'restore' ? t('RESTORE_SCREEN_TITLE') : t('SCREEN_TITLE')}</Title>
-        <Subtitle>{action === 'restore' ? t('RESTORE_SCREEN_SUBTITLE') : t('SCREEN_SUBTITLE')}</Subtitle>
+        <Subtitle>
+          {action === 'restore' ? t('RESTORE_SCREEN_SUBTITLE') : t('SCREEN_SUBTITLE')}
+        </Subtitle>
       </ContentContainer>
       <ContinueButton onClick={handleOpenWallet}>{t('CLOSE_TAB')}</ContinueButton>
       <InstructionsContainer>
@@ -109,7 +113,6 @@ function CreateWalletSuccess(): JSX.Element {
           <InstructionsText>{t('OPEN_WALLET')}</InstructionsText>
         </RowContainer>
       </InstructionsContainer>
-
     </>
   );
 }

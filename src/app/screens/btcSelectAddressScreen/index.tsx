@@ -219,8 +219,8 @@ function BtcSelectAddressScreen() {
         network,
         undefined,
         account.accountType,
-        account.accountName
-      )
+        account.accountName,
+      ),
     );
     setShowAccountList(false);
   };
@@ -264,7 +264,7 @@ function BtcSelectAddressScreen() {
                   <OrdinalImage src={OrdinalsIcon} />
                   <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
                 </AddressContainer>
-              )
+              ),
             )}
           </div>
           <DappTitle>{payload.message}</DappTitle>

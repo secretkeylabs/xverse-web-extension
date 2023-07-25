@@ -10,18 +10,14 @@ import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import { StoreState } from '@stores/index';
-import {
-  convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot,
-} from '@utils/helper';
+import { convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 import useNetworkSelector from '@hooks/useNetwork';
 
 function SendFtScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const {
-    stxAddress, stxPublicKey, network, feeMultipliers,
-  } = useSelector(
+  const { stxAddress, stxPublicKey, network, feeMultipliers } = useSelector(
     (state: StoreState) => state.walletState,
   );
   const [amountError, setAmountError] = useState('');
@@ -44,40 +40,42 @@ function SendFtScreen() {
     stxMemo = location.state.stxMemo;
   }
   const { isLoading, data, mutate } = useMutation<
-  StacksTransaction,
-  Error,
-  { associatedAddress: string; amount: string; memo?: string }
-  >({ mutationFn: async ({ associatedAddress, amount, memo }) => {
-    let convertedAmount = amount;
-    if (fungibleToken?.decimals) {
-      convertedAmount = convertAmountToFtDecimalPlaces(amount, fungibleToken.decimals).toString();
-    }
-    setAmountToSend(amount);
-    setTxMemo(memo);
-    setRecepientAddress(associatedAddress);
-    const { principal } = fungibleToken;
-    const contractInfo: string[] = principal.split('.');
-    const unsginedTx: UnsignedStacksTransation = {
-      amount: convertedAmount,
-      senderAddress: stxAddress,
-      recipientAddress: associatedAddress,
-      contractAddress: contractInfo[0],
-      contractName: contractInfo[1],
-      assetName: fungibleToken?.assetName ?? '',
-      publicKey: stxPublicKey,
-      network: selectedNetwork,
-      pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
-      memo,
-    };
-    const unsignedTx: StacksTransaction = await generateUnsignedTransaction(unsginedTx);
+    StacksTransaction,
+    Error,
+    { associatedAddress: string; amount: string; memo?: string }
+  >({
+    mutationFn: async ({ associatedAddress, amount, memo }) => {
+      let convertedAmount = amount;
+      if (fungibleToken?.decimals) {
+        convertedAmount = convertAmountToFtDecimalPlaces(amount, fungibleToken.decimals).toString();
+      }
+      setAmountToSend(amount);
+      setTxMemo(memo);
+      setRecepientAddress(associatedAddress);
+      const { principal } = fungibleToken;
+      const contractInfo: string[] = principal.split('.');
+      const unsginedTx: UnsignedStacksTransation = {
+        amount: convertedAmount,
+        senderAddress: stxAddress,
+        recipientAddress: associatedAddress,
+        contractAddress: contractInfo[0],
+        contractName: contractInfo[1],
+        assetName: fungibleToken?.assetName ?? '',
+        publicKey: stxPublicKey,
+        network: selectedNetwork,
+        pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
+        memo,
+      };
+      const unsignedTx: StacksTransaction = await generateUnsignedTransaction(unsginedTx);
 
-    const fee: bigint = BigInt(unsignedTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
-    if (feeMultipliers?.stxSendTxMultiplier) {
-      unsignedTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
-    }
+      const fee: bigint = BigInt(unsignedTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
+      if (feeMultipliers?.stxSendTxMultiplier) {
+        unsignedTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
+      }
 
-    return unsignedTx;
-  }});
+      return unsignedTx;
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -129,10 +127,7 @@ function SendFtScreen() {
       return false;
     }
 
-    if (
-      fungibleToken?.decimals
-        && amount.split('.')[1]?.length > fungibleToken.decimals
-    ) {
+    if (fungibleToken?.decimals && amount.split('.')[1]?.length > fungibleToken.decimals) {
       setAmountError(t('ERRORS.INVALID_AMOUNT'));
       return false;
     }

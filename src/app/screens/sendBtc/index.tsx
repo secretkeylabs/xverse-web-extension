@@ -30,14 +30,9 @@ function SendBtcScreen() {
   const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
   const [recipient, setRecipient] = useState<Recipient[]>();
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const {
-    btcAddress,
-    network,
-    btcBalance,
-    selectedAccount,
-    seedPhrase,
-    btcFiatRate,
-  } = useSelector((state: StoreState) => state.walletState);
+  const { btcAddress, network, btcBalance, selectedAccount, seedPhrase, btcFiatRate } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 
   const navigate = useNavigate();
@@ -52,8 +47,16 @@ function SendBtcScreen() {
     {
       recipients: Recipient[];
     }
-  >({ mutationFn: async ({ recipients }) =>
-    signBtcTransaction(recipients, btcAddress, selectedAccount?.id ?? 0, seedPhrase, network.type) });
+  >({
+    mutationFn: async ({ recipients }) =>
+      signBtcTransaction(
+        recipients,
+        btcAddress,
+        selectedAccount?.id ?? 0,
+        seedPhrase,
+        network.type,
+      ),
+  });
 
   const handleBackButtonClick = () => {
     navigate('/');

@@ -159,7 +159,7 @@ function ConfirmStxTransationComponent({
           initialStxTransactions
             .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
             .reduce((prev, curr) => prev + curr, BigInt(0))
-            .toString(10)
+            .toString(10),
         );
 
   const getTxNonce = (): string => {
@@ -191,7 +191,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions[0],
         seedPhrase,
         selectedAccount?.id ?? 0,
-        selectedNetwork
+        selectedNetwork,
       );
       signedTxs.push(signedContractCall);
     } else if (initialStxTransactions.length === 2) {
@@ -199,13 +199,20 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase
+        seedPhrase,
       );
     }
     onConfirmClick(signedTxs);
   };
 
-  const applyTxSettings = ({ fee: settingFee, nonce }: { fee: string; feeRate?: string; nonce?: string }) => {
+  const applyTxSettings = ({
+    fee: settingFee,
+    nonce,
+  }: {
+    fee: string;
+    feeRate?: string;
+    nonce?: string;
+  }) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
     setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {
@@ -261,7 +268,9 @@ function ConfirmStxTransationComponent({
     <>
       <Container>
         <TitleContainer>
-          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>}
+          {!isAsset && (
+            <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>
+          )}
           {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
         {children}

@@ -6,9 +6,7 @@ import { getTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
 import useWalletSelector from './useWalletSelector';
 
 const useNonOrdinalUtxos = () => {
-  const {
-    network, ordinalsAddress,
-  } = useWalletSelector();
+  const { network, ordinalsAddress } = useWalletSelector();
 
   const fetchNonOrdinalUtxo = async () => {
     const lastTransactionTime = await getTimeForNonOrdinalTransferTransaction(ordinalsAddress);

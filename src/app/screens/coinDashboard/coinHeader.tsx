@@ -139,13 +139,13 @@ const AvailableStxContainer = styled.div((props) => ({
   },
 }));
 
-const VerifyOrViewContainer = styled.div(props => ({
+const VerifyOrViewContainer = styled.div((props) => ({
   margin: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(20),
 }));
 
-const VerifyButtonContainer = styled.div(props => ({
+const VerifyButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
@@ -318,15 +318,22 @@ export default function CoinHeader(props: CoinBalanceProps) {
   const verifyOrViewAddresses = (
     <VerifyOrViewContainer>
       <VerifyButtonContainer>
-        <ActionButton text="Verify address on Ledger" onPress={async () => {
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${coin}`),
-          });
-        }} />
+        <ActionButton
+          text="Verify address on Ledger"
+          onPress={async () => {
+            await chrome.tabs.create({
+              url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${coin}`),
+            });
+          }}
+        />
       </VerifyButtonContainer>
-      <ActionButton transparent text="View address" onPress={() => {
-        navigate(`/receive/${coin}`);
-      }} />
+      <ActionButton
+        transparent
+        text="View address"
+        onPress={() => {
+          navigate(`/receive/${coin}`);
+        }}
+      />
     </VerifyOrViewContainer>
   );
 
@@ -364,11 +371,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <SmallActionButton
-            src={ArrowUp}
-            text="Send"
-            onPress={() => goToSendScreen()}
-          />
+          <SmallActionButton src={ArrowUp} text="Send" onPress={() => goToSendScreen()} />
         </ButtonContainer>
 
         {!fungibleToken ? (
@@ -399,7 +402,11 @@ export default function CoinHeader(props: CoinBalanceProps) {
         )}
       </RowButtonContainer>
 
-      <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={handleReceiveModalClose}>
+      <BottomModal
+        visible={openReceiveModal}
+        header={t('RECEIVE')}
+        onClose={handleReceiveModalClose}
+      >
         {verifyOrViewAddresses}
       </BottomModal>
     </Container>

@@ -72,8 +72,8 @@ const ImportStartContainer = styled.div((props) => ({
 }));
 
 const ButtonContainer = styled.div((props) => ({
-  marginLeft:  3 ,
-  marginRight:  3 ,
+  marginLeft: 3,
+  marginRight: 3,
   marginTop: props.theme.spacing(4),
   width: '100%',
 }));
@@ -342,7 +342,7 @@ function ImportLedger(): JSX.Element {
     }
     await transport.close();
 
-    return {btcCreds, ordinalsCreds, newAddressIndex};
+    return { btcCreds, ordinalsCreds, newAddressIndex };
   };
 
   const importStxAccounts = async () => {
@@ -375,7 +375,9 @@ function ImportLedger(): JSX.Element {
     (i.e. either STX or BTC address already present for the account)
     */
     if (currentStepIndex === 4) {
-      const currentAccount = ledgerAccountsList.find((account) => account.id === addressIndex && account.masterPubKey === masterPubKey);
+      const currentAccount = ledgerAccountsList.find(
+        (account) => account.id === addressIndex && account.masterPubKey === masterPubKey,
+      );
       if (currentAccount && currentAccount.stxAddress && currentAccount.btcAddress) {
         handleSkipToEnd();
         return;
@@ -390,11 +392,22 @@ function ImportLedger(): JSX.Element {
     setCurrentStepIndex(currentStepIndex + 1);
   };
 
-  const saveAddressToWallet = async ({btcCreds, ordinalsCreds, masterFingerPrint, newAddressIndex}: {btcCreds?: Credential, ordinalsCreds?: Credential, masterFingerPrint?: string, newAddressIndex: number}) => {
+  const saveAddressToWallet = async ({
+    btcCreds,
+    ordinalsCreds,
+    masterFingerPrint,
+    newAddressIndex,
+  }: {
+    btcCreds?: Credential;
+    ordinalsCreds?: Credential;
+    masterFingerPrint?: string;
+    newAddressIndex: number;
+  }) => {
     setIsButtonDisabled(true);
-    const currentAccount = ledgerAccountsList.find((account) => account.id === newAddressIndex && account.masterPubKey === masterFingerPrint);
+    const currentAccount = ledgerAccountsList.find(
+      (account) => account.id === newAddressIndex && account.masterPubKey === masterFingerPrint,
+    );
     try {
-
       if (!currentAccount) {
         const ledgerAccount: Account = {
           id: newAddressIndex,
@@ -456,8 +469,8 @@ function ImportLedger(): JSX.Element {
       setCurrentStepIndex(3);
       setIsButtonDisabled(true);
       if (!isStacksSelected) {
-        const {btcCreds, ordinalsCreds, newAddressIndex} = await importBtcAccounts(true);
-        await saveAddressToWallet({btcCreds, ordinalsCreds, newAddressIndex});
+        const { btcCreds, ordinalsCreds, newAddressIndex } = await importBtcAccounts(true);
+        await saveAddressToWallet({ btcCreds, ordinalsCreds, newAddressIndex });
       }
     } catch (err) {
       console.error(err);
@@ -495,8 +508,11 @@ function ImportLedger(): JSX.Element {
       }
       handleClickNext();
       if (!isStacksSelected) {
-        const {btcCreds, ordinalsCreds, newAddressIndex} = await importBtcAccounts(true, masterFingerPrint);
-        await saveAddressToWallet({btcCreds, ordinalsCreds, masterFingerPrint, newAddressIndex});
+        const { btcCreds, ordinalsCreds, newAddressIndex } = await importBtcAccounts(
+          true,
+          masterFingerPrint,
+        );
+        await saveAddressToWallet({ btcCreds, ordinalsCreds, masterFingerPrint, newAddressIndex });
       }
     } catch (err) {
       console.error(err);
@@ -514,7 +530,9 @@ function ImportLedger(): JSX.Element {
 
     try {
       setIsButtonDisabled(true);
-      const accountToUpdate = ledgerAccountsList.find((account) => account.id === addressIndex && account.masterPubKey === masterPubKey);
+      const accountToUpdate = ledgerAccountsList.find(
+        (account) => account.id === addressIndex && account.masterPubKey === masterPubKey,
+      );
       if (!accountToUpdate) {
         throw new Error('Account not found');
       }
@@ -678,66 +696,91 @@ function ImportLedger(): JSX.Element {
                 </CreateMultipleAccountsText>
               </CreateAnotherAccountContainer>
             )}
-            {currentStepIndex === 3 && ((isConnectFailed || isBtcAddressRejected) ? (
-              <LedgerFailView title={t(isBtcAddressRejected ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED' : 'LEDGER_CONNECT.TITLE_FAILED')} text={t(isBtcAddressRejected ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED' : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED')} />
-            ) : (
-              <>
-                <AddAddressHeaderContainer>
-                  <img src={isBitcoinSelected ? BtcIconSVG : StxIconSVG} width={32} height={32} alt="bitcoin" />
-                  <SelectAssetTitle>
-                    {t(
-                      isBitcoinSelected
-                        ? 'LEDGER_ADD_ADDRESS.TITLE_VERIFY_BTC'
-                        : 'LEDGER_ADD_ADDRESS.TITLE_STX',
-                    )}
-                  </SelectAssetTitle>
-                </AddAddressHeaderContainer>
-                <AddAddressDetailsContainer>
-                  <SelectAssetText>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
-                  <LedgerAddressComponent
-                    title={t('LEDGER_ADD_ADDRESS.BTC')}
-                    address={bitcoinCredentials?.address}
-                  />
-                  <LedgerAddressComponent
-                    title={t('LEDGER_ADD_ADDRESS.STX')}
-                    address={stacksCredentials?.address}
-                  />
-                </AddAddressDetailsContainer>
-                <ConfirmationText>
-                  {t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}
-                </ConfirmationText>
-                <ConfirmationStepsContainer>
-                  <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
-                  <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
-                </ConfirmationStepsContainer>
-              </>
-            ))}
-            {currentStepIndex === 3.5 && ((isConnectFailed || isOrdinalsAddressRejected) ? (
-              <LedgerFailView title={t(isOrdinalsAddressRejected ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED' : 'LEDGER_CONNECT.TITLE_FAILED')} text={t(isOrdinalsAddressRejected ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED' : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED')} />
-            ) : (
-              <>
-                <AddAddressHeaderContainer>
-                  <img src={OrdinalsIconSVG} width={32} height={32} alt="ordinals" />
-                  <SelectAssetTitle>
-                    {t('LEDGER_ADD_ADDRESS.TITLE_VERIFY_ORDINALS')}
-                  </SelectAssetTitle>
-                </AddAddressHeaderContainer>
-                <AddAddressDetailsContainer>
-                  <SelectAssetText>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
-                  <LedgerAddressComponent
-                    title={t('LEDGER_ADD_ADDRESS.ORDINALS')}
-                    address={ordinalsCredentials?.address}
-                  />
-                </AddAddressDetailsContainer>
-                <ConfirmationText>
-                  {t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}
-                </ConfirmationText>
-                <ConfirmationStepsContainer>
-                  <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
-                  <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
-                </ConfirmationStepsContainer>
-              </>
-            ))}
+            {currentStepIndex === 3 &&
+              (isConnectFailed || isBtcAddressRejected ? (
+                <LedgerFailView
+                  title={t(
+                    isBtcAddressRejected
+                      ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
+                      : 'LEDGER_CONNECT.TITLE_FAILED',
+                  )}
+                  text={t(
+                    isBtcAddressRejected
+                      ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
+                      : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
+                  )}
+                />
+              ) : (
+                <>
+                  <AddAddressHeaderContainer>
+                    <img
+                      src={isBitcoinSelected ? BtcIconSVG : StxIconSVG}
+                      width={32}
+                      height={32}
+                      alt="bitcoin"
+                    />
+                    <SelectAssetTitle>
+                      {t(
+                        isBitcoinSelected
+                          ? 'LEDGER_ADD_ADDRESS.TITLE_VERIFY_BTC'
+                          : 'LEDGER_ADD_ADDRESS.TITLE_STX',
+                      )}
+                    </SelectAssetTitle>
+                  </AddAddressHeaderContainer>
+                  <AddAddressDetailsContainer>
+                    <SelectAssetText>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
+                    <LedgerAddressComponent
+                      title={t('LEDGER_ADD_ADDRESS.BTC')}
+                      address={bitcoinCredentials?.address}
+                    />
+                    <LedgerAddressComponent
+                      title={t('LEDGER_ADD_ADDRESS.STX')}
+                      address={stacksCredentials?.address}
+                    />
+                  </AddAddressDetailsContainer>
+                  <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
+                  <ConfirmationStepsContainer>
+                    <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
+                    <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
+                  </ConfirmationStepsContainer>
+                </>
+              ))}
+            {currentStepIndex === 3.5 &&
+              (isConnectFailed || isOrdinalsAddressRejected ? (
+                <LedgerFailView
+                  title={t(
+                    isOrdinalsAddressRejected
+                      ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
+                      : 'LEDGER_CONNECT.TITLE_FAILED',
+                  )}
+                  text={t(
+                    isOrdinalsAddressRejected
+                      ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
+                      : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
+                  )}
+                />
+              ) : (
+                <>
+                  <AddAddressHeaderContainer>
+                    <img src={OrdinalsIconSVG} width={32} height={32} alt="ordinals" />
+                    <SelectAssetTitle>
+                      {t('LEDGER_ADD_ADDRESS.TITLE_VERIFY_ORDINALS')}
+                    </SelectAssetTitle>
+                  </AddAddressHeaderContainer>
+                  <AddAddressDetailsContainer>
+                    <SelectAssetText>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
+                    <LedgerAddressComponent
+                      title={t('LEDGER_ADD_ADDRESS.ORDINALS')}
+                      address={ordinalsCredentials?.address}
+                    />
+                  </AddAddressDetailsContainer>
+                  <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
+                  <ConfirmationStepsContainer>
+                    <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
+                    <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
+                  </ConfirmationStepsContainer>
+                </>
+              ))}
             {currentStepIndex === 4 && (
               <AddressAddedContainer>
                 <img src={CheckCircleSVG} alt="Success" />
@@ -748,7 +791,11 @@ function ImportLedger(): JSX.Element {
                       : 'LEDGER_ADDRESS_ADDED.TITLE_BTC_ORDINALS',
                   )}
                 </SelectAssetTitle>
-                <SelectAssetText>{isStacksSelected ? t('LEDGER_ADDRESS_ADDED.SUBTITLE_STX') : t('LEDGER_ADDRESS_ADDED.SUBTITLE')}</SelectAssetText>
+                <SelectAssetText>
+                  {isStacksSelected
+                    ? t('LEDGER_ADDRESS_ADDED.SUBTITLE_STX')
+                    : t('LEDGER_ADDRESS_ADDED.SUBTITLE')}
+                </SelectAssetText>
               </AddressAddedContainer>
             )}
             {currentStepIndex === 5 && (
@@ -810,7 +857,6 @@ function ImportLedger(): JSX.Element {
                     transparent
                     text={t('LEDGER_IMPORT_CANCEL_BUTTON')}
                   />
-
                 </ButtonContainer>
                 <ButtonContainer>
                   <ActionButton
@@ -822,14 +868,15 @@ function ImportLedger(): JSX.Element {
                 </ButtonContainer>
               </>
             )}
-            {(currentStepIndex === 3 || currentStepIndex === 3.5) && (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) && (
-              <ActionButton
-                processing={isButtonDisabled}
-                disabled={isButtonDisabled}
-                onPress={backToAssetSelection}
-                text={t('LEDGER_IMPORT_TRY_AGAIN_BUTTON')}
-              />
-            )}
+            {(currentStepIndex === 3 || currentStepIndex === 3.5) &&
+              (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) && (
+                <ActionButton
+                  processing={isButtonDisabled}
+                  disabled={isButtonDisabled}
+                  onPress={backToAssetSelection}
+                  text={t('LEDGER_IMPORT_TRY_AGAIN_BUTTON')}
+                />
+              )}
             {currentStepIndex === 4 && (
               <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_NEXT_BUTTON')} />
             )}

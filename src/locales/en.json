@@ -279,7 +279,7 @@
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
     "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
-    "INVALID_TRANSACTION":"Invalid Transaction"
+    "INVALID_TRANSACTION": "Invalid Transaction"
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",

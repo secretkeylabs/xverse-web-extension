@@ -49,7 +49,8 @@ export default function VerifySeed(props: VerifySeedProps): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const { onBack, onVerifySuccess, seedPhrase } = props;
 
-  const cleanMnemonic = (rawSeed: string): string => rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
+  const cleanMnemonic = (rawSeed: string): string =>
+    rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
   const handleVerify = () => {
     if (seedPhrase === cleanMnemonic(seedInput)) {
@@ -70,11 +71,7 @@ export default function VerifySeed(props: VerifySeedProps): JSX.Element {
       />
       <ButtonsContainer>
         <TransparentButtonContainer>
-          <ActionButton
-            onPress={onBack}
-            transparent
-            text={t('SEED_PHRASE_BACK_BUTTON')}
-          />
+          <ActionButton onPress={onBack} transparent text={t('SEED_PHRASE_BACK_BUTTON')} />
         </TransparentButtonContainer>
         <ButtonContainer>
           <ActionButton

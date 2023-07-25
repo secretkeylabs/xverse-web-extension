@@ -53,37 +53,39 @@ function LedgerSendFtScreen() {
     StacksTransaction,
     Error,
     { associatedAddress: string; amount: string; memo?: string; fungibleToken: FungibleToken }
-  >({ mutationFn: async ({ associatedAddress, amount, memo, fungibleToken }) => {
-    let convertedAmount = amount;
-    if (fungibleToken?.decimals) {
-      convertedAmount = convertAmountToFtDecimalPlaces(amount, fungibleToken.decimals).toString();
-    }
-    setAmountToSend(amount);
-    setTxMemo(memo);
-    setRecepientAddress(associatedAddress);
-    const { principal } = fungibleToken;
-    const contractInfo: string[] = principal.split('.');
-    const unsginedTx: UnsignedStacksTransation = {
-      amount: convertedAmount,
-      senderAddress: stxAddress,
-      recipientAddress: associatedAddress,
-      contractAddress: contractInfo[0],
-      contractName: contractInfo[1],
-      assetName: fungibleToken?.assetName ?? '',
-      publicKey: stxPublicKey,
-      network: selectedNetwork,
-      pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
-      memo,
-    };
-    const unsignedTx: StacksTransaction = await generateUnsignedTransaction(unsginedTx);
+  >({
+    mutationFn: async ({ associatedAddress, amount, memo, fungibleToken }) => {
+      let convertedAmount = amount;
+      if (fungibleToken?.decimals) {
+        convertedAmount = convertAmountToFtDecimalPlaces(amount, fungibleToken.decimals).toString();
+      }
+      setAmountToSend(amount);
+      setTxMemo(memo);
+      setRecepientAddress(associatedAddress);
+      const { principal } = fungibleToken;
+      const contractInfo: string[] = principal.split('.');
+      const unsginedTx: UnsignedStacksTransation = {
+        amount: convertedAmount,
+        senderAddress: stxAddress,
+        recipientAddress: associatedAddress,
+        contractAddress: contractInfo[0],
+        contractName: contractInfo[1],
+        assetName: fungibleToken?.assetName ?? '',
+        publicKey: stxPublicKey,
+        network: selectedNetwork,
+        pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
+        memo,
+      };
+      const unsignedTx: StacksTransaction = await generateUnsignedTransaction(unsginedTx);
 
-    const fee: bigint = BigInt(unsignedTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
-    if (feeMultipliers?.stxSendTxMultiplier) {
-      unsignedTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
-    }
+      const fee: bigint = BigInt(unsignedTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
+      if (feeMultipliers?.stxSendTxMultiplier) {
+        unsignedTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
+      }
 
-    return unsignedTx;
-  } });
+      return unsignedTx;
+    },
+  });
 
   useEffect(() => {
     if (data) {
