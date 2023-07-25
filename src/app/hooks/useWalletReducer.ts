@@ -5,7 +5,6 @@ import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/x
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
 import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
-import { StoreState } from '@stores/index';
 import {
   ChangeNetworkAction,
   addAccountAction,
@@ -16,7 +15,7 @@ import {
   selectAccount,
   setWalletAction,
   storeEncryptedSeedAction,
-  addLedgerAcountAction,
+  updateLedgerAccountsAction,
   unlockWalletAction,
 } from '@stores/wallet/actions/actionCreators';
 import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
@@ -292,7 +291,7 @@ const useWalletReducer = () => {
 
   const addLedgerAccount = async (ledgerAccount: Account) => {
     try {
-      dispatch(addLedgerAcountAction([...ledgerAccountsList, ledgerAccount]));
+      dispatch(updateLedgerAccountsAction([...ledgerAccountsList, ledgerAccount]));
     } catch (err) {
       return Promise.reject(err);
     }
@@ -301,7 +300,7 @@ const useWalletReducer = () => {
   const removeLedgerAccount = async (ledgerAccount: Account) => {
     try {
       dispatch(
-        addLedgerAcountAction(
+        updateLedgerAccountsAction(
           ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
         ),
       );
@@ -315,7 +314,7 @@ const useWalletReducer = () => {
       account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account,
     );
     try {
-      dispatch(addLedgerAcountAction(newLedgerAccountsList));
+      dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
       if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
         switchAccount(updatedLedgerAccount);
       }

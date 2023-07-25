@@ -75,9 +75,11 @@ export function addAccountAction(accountsList: Account[]): actions.AddAccount {
   };
 }
 
-export function addLedgerAcountAction(ledgerAccountsList: Account[]): actions.AddLedgerAccount {
+export function updateLedgerAccountsAction(
+  ledgerAccountsList: Account[],
+): actions.AddLedgerAccount {
   return {
-    type: actions.AddLedgerAccountKey,
+    type: actions.UpdateLedgerAccountsKey,
     ledgerAccountsList,
   };
 }

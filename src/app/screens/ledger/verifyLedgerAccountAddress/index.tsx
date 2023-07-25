@@ -119,10 +119,10 @@ const ActionButtonsContainer = styled.div({
   width: '100%',
 });
 
-const ActionButtonContainer = styled.div(props => ({
+const ActionButtonContainer = styled.div((props) => ({
   '&:not(:last-of-type)': {
     marginBottom: props.theme.spacing(8),
-  }
+  },
 }));
 
 function VerifyLedger(): JSX.Element {
@@ -175,17 +175,17 @@ function VerifyLedger(): JSX.Element {
 
   const importBtcAccounts = async (showAddress: boolean, masterFingerPrint?: string) => {
     const transport = await Transport.create();
-    const addressIndex = ledgerAccountsList.filter(
-      (account) => account.masterPubKey === (masterFingerPrint || masterPubKey),
-    ).findIndex((account) => account.id === selectedAccount?.id);
+    const addressIndex = ledgerAccountsList
+      .filter((account) => account.masterPubKey === (masterFingerPrint || masterPubKey))
+      .findIndex((account) => account.id === selectedAccount?.id);
 
     if (isBitcoinSelected) {
       try {
         await importNativeSegwitAccountFromLedger(
           transport,
           network.type,
-          0,
           addressIndex,
+          0,
           showAddress,
         );
         setIsButtonDisabled(false);
@@ -202,13 +202,7 @@ function VerifyLedger(): JSX.Element {
       }
     } else {
       try {
-        await importTaprootAccountFromLedger(
-          transport,
-          network.type,
-          0,
-          addressIndex,
-          showAddress,
-        );
+        await importTaprootAccountFromLedger(transport, network.type, addressIndex, 0, showAddress);
         setIsButtonDisabled(false);
         setCurrentStepIndex(2);
       } catch (err: any) {
@@ -289,56 +283,65 @@ function VerifyLedger(): JSX.Element {
                 isConnectFailed={isConnectFailed}
               />
             )}
-            {currentStepIndex === 1 && ((isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) ? (
-              <LedgerFailView title={t((isBtcAddressRejected || isOrdinalsAddressRejected) ? 'TITLE_CANCELLED' : 'TITLE_FAILED')} text={t((isBtcAddressRejected || isOrdinalsAddressRejected) ? 'SUBTITLE_CANCELLED' : 'BTC_SUBTITLE_FAILED')} />
-            ) : (
-              <>
-                <AddAddressHeaderContainer>
-                  <img src={isBitcoinSelected ? BtcIconSVG : OrdinalsIconSVG} width={32} height={32} alt="bitcoin" />
-                  <SelectAssetTitle>
-                    {t(
-                      isBitcoinSelected
-                        ? 'TITLE_VERIFY_BTC'
-                        : 'TITLE_VERIFY_ORDINALS',
-                    )}
-                  </SelectAssetTitle>
-                </AddAddressHeaderContainer>
-                <AddAddressDetailsContainer>
-                  <SelectAssetText>{t('SUBTITLE_VERIFY')}</SelectAssetText>
-                  <Container>
-                    <QRCodeContainer>
-                      <QRCode value={getAddress()} size={130} />
-                    </QRCodeContainer>
-
-                    <CopyContainer>
-                      {isOrdinalSelected && (
-                        <InfoAlertContainer>
-                          <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
-                        </InfoAlertContainer>
-                      )}
-                      {isBitcoinSelected && (
-                        <InfoAlertContainer>
-                          <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
-                        </InfoAlertContainer>
-                      )}
-                    </CopyContainer>
-                    <LedgerAddressComponent
-                      title={t(isBitcoinSelected ? 'BTC_ADDRESS' : 'ORDINALS_ADDRESS')}
-                      address={getAddress()}
+            {currentStepIndex === 1 &&
+              (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected ? (
+                <LedgerFailView
+                  title={t(
+                    isBtcAddressRejected || isOrdinalsAddressRejected
+                      ? 'TITLE_CANCELLED'
+                      : 'TITLE_FAILED',
+                  )}
+                  text={t(
+                    isBtcAddressRejected || isOrdinalsAddressRejected
+                      ? 'SUBTITLE_CANCELLED'
+                      : 'BTC_SUBTITLE_FAILED',
+                  )}
+                />
+              ) : (
+                <>
+                  <AddAddressHeaderContainer>
+                    <img
+                      src={isBitcoinSelected ? BtcIconSVG : OrdinalsIconSVG}
+                      width={32}
+                      height={32}
+                      alt="bitcoin"
                     />
-                  </Container>
-                </AddAddressDetailsContainer>
-              </>
-            ))}
+                    <SelectAssetTitle>
+                      {t(isBitcoinSelected ? 'TITLE_VERIFY_BTC' : 'TITLE_VERIFY_ORDINALS')}
+                    </SelectAssetTitle>
+                  </AddAddressHeaderContainer>
+                  <AddAddressDetailsContainer>
+                    <SelectAssetText>{t('SUBTITLE_VERIFY')}</SelectAssetText>
+                    <Container>
+                      <QRCodeContainer>
+                        <QRCode value={getAddress()} size={130} />
+                      </QRCodeContainer>
+
+                      <CopyContainer>
+                        {isOrdinalSelected && (
+                          <InfoAlertContainer>
+                            <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
+                          </InfoAlertContainer>
+                        )}
+                        {isBitcoinSelected && (
+                          <InfoAlertContainer>
+                            <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
+                          </InfoAlertContainer>
+                        )}
+                      </CopyContainer>
+                      <LedgerAddressComponent
+                        title={t(isBitcoinSelected ? 'BTC_ADDRESS' : 'ORDINALS_ADDRESS')}
+                        address={getAddress()}
+                      />
+                    </Container>
+                  </AddAddressDetailsContainer>
+                </>
+              ))}
             {currentStepIndex === 2 && (
               <AddressAddedContainer>
                 <img src={CheckCircleSVG} alt="Success" />
                 <SelectAssetTitle>
-                  {t(
-                    isBitcoinSelected
-                      ? 'BTC_TITLE_VERIFIED'
-                      : 'ORDINALS_TITLE_VERIFIED',
-                  )}
+                  {t(isBitcoinSelected ? 'BTC_TITLE_VERIFIED' : 'ORDINALS_TITLE_VERIFIED')}
                 </SelectAssetTitle>
               </AddressAddedContainer>
             )}
@@ -349,34 +352,31 @@ function VerifyLedger(): JSX.Element {
                 processing={isButtonDisabled}
                 disabled={isButtonDisabled}
                 onPress={checkDeviceConnection}
-                text={t(
-                  isConnectFailed
-                    ? 'TRY_AGAIN_BUTTON'
-                    : 'CONNECT_BUTTON',
-                )}
+                text={t(isConnectFailed ? 'TRY_AGAIN_BUTTON' : 'CONNECT_BUTTON')}
               />
             )}
-            {(currentStepIndex === 1) && (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) && (
-              <ActionButtonsContainer>
-                <ActionButtonContainer>
-                  <ActionButton
-                    processing={isButtonDisabled}
-                    disabled={isButtonDisabled}
-                    onPress={backToAssetSelection}
-                    text={t('TRY_AGAIN_BUTTON')}
-                  />
-                </ActionButtonContainer>
-                <ActionButtonContainer>
-                  <ActionButton
-                    transparent
-                    disabled={isButtonDisabled}
-                    processing={isButtonDisabled}
-                    onPress={handleWindowClose}
-                    text={t('CLOSE_BUTTON')}
-                  />
-                </ActionButtonContainer>
-              </ActionButtonsContainer>
-            )}
+            {currentStepIndex === 1 &&
+              (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) && (
+                <ActionButtonsContainer>
+                  <ActionButtonContainer>
+                    <ActionButton
+                      processing={isButtonDisabled}
+                      disabled={isButtonDisabled}
+                      onPress={backToAssetSelection}
+                      text={t('TRY_AGAIN_BUTTON')}
+                    />
+                  </ActionButtonContainer>
+                  <ActionButtonContainer>
+                    <ActionButton
+                      transparent
+                      disabled={isButtonDisabled}
+                      processing={isButtonDisabled}
+                      onPress={handleWindowClose}
+                      text={t('CLOSE_BUTTON')}
+                    />
+                  </ActionButtonContainer>
+                </ActionButtonsContainer>
+              )}
             {currentStepIndex === 2 && (
               <ActionButtonsContainer>
                 <ActionButtonContainer>
