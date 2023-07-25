@@ -1,8 +1,11 @@
 import styled from 'styled-components';
 import { getTruncatedAddress } from '@utils/helper';
-import { ReactNode } from 'react';
+import { animated, useSpring } from '@react-spring/web';
+import { ReactNode, useState } from 'react';
 import CopyButton from '@components/copyButton';
-import useWalletSelector from '@hooks/useWalletSelector';
+import Eye from '@assets/img/createPassword/Eye.svg';
+import Cross from '@assets/img/dashboard/X.svg';
+import { bytesToHex } from '@stacks/transactions';
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -17,6 +20,11 @@ const Icon = styled.img((props) => ({
   height: 32,
   borderRadius: 30,
 }));
+
+const Button = styled.button({
+  background: 'none',
+  display: 'flex',
+});
 
 const AddressContainer = styled.div({
   display: 'flex',
@@ -46,6 +54,49 @@ const ColumnContainer = styled.div({
   flexDirection: 'column',
 });
 
+const ScriptOutputHeadingText = styled.h1((props) => ({
+  ...props.theme.headline_s,
+  color: props.theme.colors.white[0],
+  marginBottom: props.theme.spacing(12),
+}));
+
+const ScriptText = styled.h1((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white[200],
+  width: 320,
+  wordWrap: 'break-word',
+}));
+
+const CrossContainer = styled.div({
+  display: 'flex',
+  marginTop: 10,
+  justifyContent: 'flex-end',
+  alignItems: 'flex-end',
+});
+
+const TransparentButton = styled.button({
+  background: 'transparent',
+  display: 'flex',
+  alignItems: 'center',
+  marginLeft: 10,
+});
+
+const ShowScriptBackgroundContainer = styled(animated.div)({
+  width: '100%',
+  height: '100%',
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+  position: 'fixed',
+  zIndex: 10,
+  background: 'rgba(18, 21, 30, 0.8)',
+  backdropFilter: 'blur(16px)',
+  padding: 16,
+  display: 'flex',
+  flexDirection: 'column',
+});
+
 interface Props {
   icon?: string;
   title?: string;
@@ -54,26 +105,85 @@ interface Props {
   address: string;
   hideAddress?: boolean;
   hideCopyButton?: boolean;
+  outputScript?: Array<any>;
 }
 
 function TransferDetailView({
-  icon, title, amount, children, address, hideAddress, hideCopyButton,
+  icon,
+  title,
+  amount,
+  children,
+  address,
+  hideAddress,
+  hideCopyButton,
+  outputScript,
 }: Props) {
+  const [showScriptOutput, setShowScriptOutput] = useState(false);
+  const styles = useSpring({
+    from: {
+      opacity: 0,
+      y: 24,
+    },
+    to: {
+      y: 0,
+      opacity: 1,
+    },
+    delay: 100,
+  });
+
+  const onButtonClick = () => {
+    setShowScriptOutput(true);
+  };
+
+  const onCrossClick = () => {
+    setShowScriptOutput(false);
+  };
+  console.log(outputScript);
   return (
-    <RowContainer>
-      {icon && <Icon src={icon} />}
-      {amount ? (
-        <ColumnContainer>
-          <AmountText>{amount}</AmountText>
-          {children}
-        </ColumnContainer>
-      )
-        : <TitleText>{title}</TitleText>}
-      <AddressContainer>
-        {!hideAddress && <ValueText>{getTruncatedAddress(address)}</ValueText>}
-        {!hideCopyButton && <CopyButton text={address} /> }
-      </AddressContainer>
-    </RowContainer>
+    <>
+      {showScriptOutput && (
+        <ShowScriptBackgroundContainer style={styles}>
+          <CrossContainer onClick={onCrossClick}>
+            <TransparentButton>
+              <img src={Cross} alt="cross" />
+            </TransparentButton>
+          </CrossContainer>
+          <ScriptOutputHeadingText>Script output #1</ScriptOutputHeadingText>
+          <ScriptText>script: btc.Script.encode {'{['}</ScriptText>
+          {outputScript &&
+            outputScript.map((script) => {
+              if (script instanceof Uint8Array) {
+                return <ScriptText>{bytesToHex(script)},</ScriptText>;
+              } else {
+                return <ScriptText>{script},</ScriptText>;
+              }
+            })}
+
+          <ScriptText>{']}'}</ScriptText>
+        </ShowScriptBackgroundContainer>
+      )}
+
+      <RowContainer>
+        {icon && <Icon src={icon} />}
+        {amount ? (
+          <ColumnContainer>
+            <AmountText>{amount}</AmountText>
+            {children}
+          </ColumnContainer>
+        ) : (
+          <TitleText>{title}</TitleText>
+        )}
+        <AddressContainer>
+          {outputScript && (
+            <Button onClick={onButtonClick}>
+              <img src={Eye} alt="show-script" height={24} />
+            </Button>
+          )}
+          {!hideAddress && <ValueText>{getTruncatedAddress(address)}</ValueText>}
+          {!hideCopyButton && <CopyButton text={address} />}
+        </AddressContainer>
+      </RowContainer>
+    </>
   );
 }
 

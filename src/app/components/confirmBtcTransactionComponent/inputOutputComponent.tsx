@@ -2,15 +2,14 @@ import styled from 'styled-components';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import OutputIcon from '@assets/img/transactions/output.svg';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
+import ScriptIcon from '@assets/img/transactions/ScriptIcon.svg';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import BigNumber from 'bignumber.js';
 import { animated, config, useSpring } from '@react-spring/web';
 import { StoreState } from '@stores/index';
 import TransferDetailView from '@components/transferDetailView';
-import {
-  ParsedPSBT, PSBTInput, satsToBtc,
-} from '@secretkeylabs/xverse-core';
+import { ParsedPSBT, PSBTInput, satsToBtc } from '@secretkeylabs/xverse-core';
 import { getTruncatedAddress } from '@utils/helper';
 
 const Container = styled.div((props) => ({
@@ -104,9 +103,7 @@ interface Props {
   onArrowClick: () => void;
 }
 
-function InputOutputComponent({
-  address, parsedPsbt, isExpanded, onArrowClick,
-}: Props) {
+function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { btcAddress, ordinalsAddress } = useSelector((state: StoreState) => state.walletState);
 
@@ -124,21 +121,24 @@ function InputOutputComponent({
     config: { ...config.stiff },
   });
 
-  const renderAddress = (addressToBeDisplayed: string) => (
-    addressToBeDisplayed === btcAddress || addressToBeDisplayed === ordinalsAddress
-      ? (
-        <TxIdContainer>
-          <YourAddressText>(Your Address)</YourAddressText>
-          <SubValueText>{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
-        </TxIdContainer>
-      ) : <SubValueText>{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
-  );
-  const renderSubValue = (input: PSBTInput, address: string) => (input.userSigns ? renderAddress(address) : (
-    <TxIdContainer>
-      <SubValueText>{getTruncatedAddress(input.txid)}</SubValueText>
-      <TxIdText>(txid)</TxIdText>
-    </TxIdContainer>
-  ));
+  const renderAddress = (addressToBeDisplayed: string) =>
+    addressToBeDisplayed === btcAddress || addressToBeDisplayed === ordinalsAddress ? (
+      <TxIdContainer>
+        <YourAddressText>(Your Address)</YourAddressText>
+        <SubValueText>{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
+      </TxIdContainer>
+    ) : (
+      <SubValueText>{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
+    );
+  const renderSubValue = (input: PSBTInput, address: string) =>
+    input.userSigns ? (
+      renderAddress(address)
+    ) : (
+      <TxIdContainer>
+        <SubValueText>{getTruncatedAddress(input.txid)}</SubValueText>
+        <TxIdText>(txid)</TxIdText>
+      </TxIdContainer>
+    );
 
   return (
     <Container>
@@ -170,25 +170,37 @@ function InputOutputComponent({
           <OutputTitleText>{t('OUTPUT')}</OutputTitleText>
           {parsedPsbt?.outputs.map((output) => (
             <TransferDetailContainer>
-              <TransferDetailView
-                icon={OutputIcon}
-                hideAddress
-                hideCopyButton={btcAddress === output.address || ordinalsAddress === output.address}
-                amount={`${satsToBtc(new BigNumber(output ? output.amount : 0n)).toString()} BTC`}
-                address={output.address}
-              >
-                {
-                  output.address === btcAddress || output.address === ordinalsAddress
-                    ? (
-                      <TxIdContainer>
-                        <YourAddressText>(Your Address)</YourAddressText>
-                        <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
-                      </TxIdContainer>
-                    )
-                    : <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
-                }
-
-              </TransferDetailView>
+              {output.outputScript ? (
+                <TransferDetailView
+                  icon={ScriptIcon}
+                  hideAddress
+                  hideCopyButton={true}
+                  amount={`${satsToBtc(new BigNumber(output ? output.amount : 0n)).toString()} BTC`}
+                  address={output.address}
+                  outputScript={output.outputScript}
+                >
+                  <SubValueText>Script output #1</SubValueText>
+                </TransferDetailView>
+              ) : (
+                <TransferDetailView
+                  icon={OutputIcon}
+                  hideAddress
+                  hideCopyButton={
+                    btcAddress === output.address || ordinalsAddress === output.address
+                  }
+                  amount={`${satsToBtc(new BigNumber(output ? output.amount : 0n)).toString()} BTC`}
+                  address={output.address}
+                >
+                  {output.address === btcAddress || output.address === ordinalsAddress ? (
+                    <TxIdContainer>
+                      <YourAddressText>(Your Address)</YourAddressText>
+                      <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
+                    </TxIdContainer>
+                  ) : (
+                    <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
+                  )}
+                </TransferDetailView>
+              )}
             </TransferDetailContainer>
           ))}
         </ExpandedContainer>
