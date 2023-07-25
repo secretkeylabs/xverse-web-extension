@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { animated, useTransition } from '@react-spring/web';
@@ -221,6 +221,10 @@ const ConfirmationStepsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
+const InfoContainerWrapper = styled.div((props) => ({
+  marginTop: props.theme.spacing(12),
+}));
+
 interface ConfirmationStepProps {
   isCompleted: boolean;
 }
@@ -253,6 +257,7 @@ function ImportLedger(): JSX.Element {
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [addressIndex, setAddressIndex] = useState(0);
   const [accountName, setAccountName] = useState('');
+  const [accountNameError, setAccountNameError] = useState<string | undefined>();
   const [isBtcAddressConfirmed, setIsBtcAddressConfirmed] = useState(false);
   const [isOrdinalsAddressConfirmed, setIsOrdinalsAddressConfirmed] = useState(false);
   const [isBtcAddressRejected, setIsBtcAddressRejected] = useState(false);
@@ -566,6 +571,24 @@ function ImportLedger(): JSX.Element {
     }
   };
 
+  const validateAccountName = () => {
+    if (accountName.length > 20) {
+      setAccountNameError('Account name should be not longer than 20 characters.');
+      return;
+    }
+
+    if (ledgerAccountsList.find((account) => account.accountName === accountName)) {
+      setAccountNameError('Account with the same name already exists. Please choose another name.');
+      return;
+    }
+
+    setAccountNameError(undefined);
+  };
+
+  useEffect(() => {
+    validateAccountName();
+  }, [accountName]);
+
   return (
     <Container>
       <FullScreenHeader />
@@ -587,9 +610,9 @@ function ImportLedger(): JSX.Element {
                 <ImportStartTitle>{t('LEDGER_IMPORT_1_TITLE')}</ImportStartTitle>
                 <ImportStartText>{t('LEDGER_IMPORT_1_SUBTITLE')}</ImportStartText>
 
-                <div style={{ marginTop: 24 }}>
+                <InfoContainerWrapper>
                   <InfoContainer bodyText={t('LEDGER_IMPORT_2_WARNING')} />
-                </div>
+                </InfoContainerWrapper>
               </ImportStartContainer>
             )}
             {currentStepIndex === 1 && (
@@ -740,6 +763,7 @@ function ImportLedger(): JSX.Element {
                   id="account_name_input"
                   value={accountName}
                   onChange={(e) => setAccountName(e.target.value)}
+                  error={accountNameError}
                 />
               </AddAccountNameContainer>
             )}
@@ -811,7 +835,7 @@ function ImportLedger(): JSX.Element {
             )}
             {currentStepIndex === 5 && (
               <ActionButton
-                disabled={isButtonDisabled}
+                disabled={isButtonDisabled || !!accountNameError}
                 processing={isButtonDisabled}
                 onPress={updateAccountName}
                 text={t('LEDGER_IMPORT_CONFIRM_BUTTON')}

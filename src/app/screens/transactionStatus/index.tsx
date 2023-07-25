@@ -200,14 +200,11 @@ function TransactionStatus() {
 
   return (
     <TxStatusContainer>
-      {sponsored ? <OuterContainer>{renderTransactionSuccessStatus}</OuterContainer>
-        : (
-          <OuterContainer>
-            {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
-            {txid && renderLink}
-            {isBrc20TokenFlow ? <InfoMessageContainer><InfoContainer bodyText={t('BRC20_ORDINAL_MSG')} /></InfoMessageContainer> : txid && renderTransactionID}
-          </OuterContainer>
-        )}
+      <OuterContainer>
+        {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
+        {txid && renderLink}
+        {isBrc20TokenFlow ? <InfoMessageContainer><InfoContainer bodyText={t('BRC20_ORDINAL_MSG')} /></InfoMessageContainer> : txid && renderTransactionID}
+      </OuterContainer>
       <ButtonContainer>
         <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
       </ButtonContainer>

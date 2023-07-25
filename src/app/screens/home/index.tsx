@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+import styled from 'styled-components';
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
@@ -7,11 +8,11 @@ import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import OrdinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
+import Swap from '@assets/img/dashboard/swap.svg';
 import StacksIcon from '@assets/img/dashboard/stack_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
-import SmallActionButton from '@components/smallActionButton';
 import { isLedgerAccount } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
@@ -29,14 +30,14 @@ import { CurrencyTypes } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import Theme from 'theme';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import ActionButton from '@components/button';
 import BalanceCard from './balanceCard';
+import SquareButton from './squareButton';
 
-const Container = styled.div`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -101,10 +102,8 @@ const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.spacing(11),
-}));
+  columnGap: props.theme.spacing(11),
 
-const ButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(11),
 }));
 
 const TokenListButtonContainer = styled.div((props) => ({
@@ -290,6 +289,10 @@ function Home() {
     navigate('/receive/ORD');
   };
 
+  const onSwapPressed = () => {
+    navigate('/swap');
+  };
+
   const receiveContent = (
     <ReceiveContainer>
       <ReceiveCardComponent
@@ -360,19 +363,10 @@ function Home() {
           }
         />
         <RowButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
-          </ButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton
-              src={ArrowDownLeft}
-              text={t('RECEIVE')}
-              onPress={onReceiveModalOpen}
-            />
-          </ButtonContainer>
-          <ButtonContainer>
-            <SmallActionButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
-          </ButtonContainer>
+          <SquareButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
+          <SquareButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
+          <SquareButton src={Swap} text={t('SWAP')} onPress={onSwapPressed} />
+          <SquareButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
         </RowButtonContainer>
 
         <ColumnContainer>
@@ -413,6 +407,7 @@ function Home() {
               ))}
             {brcCoinsList?.map((coin) => (
               <TokenTile
+                key={coin.name}
                 title={coin.name}
                 currency="brc20"
                 loading={loadingBtcCoinData || refetchingBtcCoinData}
