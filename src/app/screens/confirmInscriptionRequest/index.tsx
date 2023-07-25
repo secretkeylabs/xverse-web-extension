@@ -300,7 +300,6 @@ function ConfirmInscriptionRequest() {
       suffix={` ${currency}`}
     />
   );
-
   return (
     <>
       {showOrdinalsDetectedAlert && (
@@ -359,6 +358,7 @@ function ConfirmInscriptionRequest() {
         <TransactionDetailComponent
           title="Inscription Service Fee"
           value={getAmountString(satsToBtc(new BigNumber(amount)), t('BTC'))}
+          subValue={getBtcFiatEquivalent(new BigNumber(amount), btcFiatRate)}
         />
         <TransferFeeView
           feePerVByte={currentFeeRate}
