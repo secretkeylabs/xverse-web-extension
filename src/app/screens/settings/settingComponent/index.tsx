@@ -9,11 +9,11 @@ interface TitleProps {
 }
 
 const CustomSwitch = styled(Switch)`
-.react-switch-handle {
-  background-color: ${({ checked }) => (checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)')} !important;
-  border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
-
-}
+  .react-switch-handle {
+    background-color: ${({ checked }) =>
+      checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'} !important;
+    border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
+  }
 `;
 
 const Button = styled.button<ButtonProps>((props) => ({
@@ -64,7 +64,7 @@ interface SettingComponentProps {
   showDivider?: boolean;
   showWarningTitle?: boolean;
   toggle?: boolean;
-  toggleValue? :boolean;
+  toggleValue?: boolean;
   toggleFunction?: () => void;
 }
 
@@ -97,14 +97,14 @@ function SettingComponent({
         {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
         {icon && <img src={icon} alt="arrow icon" />}
         {toggle && toggleFunction && (
-        <CustomSwitch
-          onColor={theme.colors.purple_main}
-          offColor={theme.colors.background.elevation3}
-          onChange={toggleFunction}
-          checked={toggleValue ?? false}
-          uncheckedIcon={false}
-          checkedIcon={false}
-        />
+          <CustomSwitch
+            onColor={theme.colors.purple_main}
+            offColor={theme.colors.background.elevation3}
+            onChange={toggleFunction}
+            checked={toggleValue ?? false}
+            uncheckedIcon={false}
+            checkedIcon={false}
+          />
         )}
       </Button>
     </ColumnContainer>

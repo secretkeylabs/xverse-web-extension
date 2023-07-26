@@ -21,7 +21,6 @@
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select wallet type",
     "LEDGER_IMPORT_2_SUBTITLE": "You can create multiple wallets to store Bitcoin, Ordinals and BRC-20 tokens.",
-    "LEDGER_IMPORT_2_WARNING": "Don't use a taproot address with Ledger Live if you connect to Xverse.",
     "LEDGER_IMPORT_2_FOOTNOTE": "",
     "LEDGER_IMPORT_2_SELECT": {
       "BTC_TITLE": "Bitcoin and Ordinals wallet",
