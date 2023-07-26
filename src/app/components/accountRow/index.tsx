@@ -11,13 +11,17 @@ import { LoaderSize } from '@utils/constants';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import {
+  ChangeShowBtcReceiveAlertAction,
+  selectAccount,
+} from '@stores/wallet/actions/actionCreators';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
 import ActionButton from '@components/button';
 import BottomModal from '@components/bottomModal';
 import useWalletReducer from '@hooks/useWalletReducer';
+import useResetUserFlow from '@hooks/useResetUserFlow';
 import OptionsDialog from './optionsDialog';
 
 const RowContainer = styled.div({
@@ -201,7 +205,7 @@ function AccountRow({
   withOptions,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const { showBtcReceiveAlert } = useWalletSelector();
+  const { showBtcReceiveAlert, accountsList, network } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
@@ -212,6 +216,7 @@ function AccountRow({
   const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
   const [optionsDialogTopIndent, setOptionsDialogTopIndent] = useState<string>('0px');
   const { removeLedgerAccount } = useWalletReducer();
+  const { broadcastResetUserFlow } = useResetUserFlow();
 
   useEffect(
     () => () => {
@@ -275,9 +280,30 @@ function AccountRow({
     setShowRemoveAccountModal(false);
   };
 
+  const handleAccountSelect = (newAccount: Account) => {
+    dispatch(
+      selectAccount(
+        newAccount,
+        newAccount.stxAddress,
+        newAccount.btcAddress,
+        newAccount.ordinalsAddress,
+        newAccount.masterPubKey,
+        newAccount.stxPublicKey,
+        newAccount.btcPublicKey,
+        newAccount.ordinalsPublicKey,
+        network,
+        undefined,
+        newAccount.accountType,
+        newAccount.accountName,
+      ),
+    );
+    broadcastResetUserFlow();
+  };
+
   const handleRemoveLedgerAccount = async () => {
     try {
       await removeLedgerAccount(account!);
+      handleAccountSelect(accountsList[0]);
       handleRemoveAccountModalClose();
     } catch (err) {
       console.error(err);
