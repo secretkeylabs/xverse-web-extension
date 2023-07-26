@@ -40,9 +40,9 @@ const RowContainer = styled.div({
 
 const ProtocolText = styled.p((props) => ({
   ...props.theme.headline_category_s,
-  fontWeight: '700',
+  fontWeight: 700,
   height: 15,
-  marginTop: 6,
+  marginTop: props.theme.spacing(3),
   textTransform: 'uppercase',
   marginLeft: props.theme.spacing(2),
   backgroundColor: props.theme.colors.white['400'],
@@ -64,7 +64,7 @@ const BalanceValuesContainer = styled.div({
 
 const CoinBalanceText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  fontSize: 24,
+  fontSize: '1.5rem',
   color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));
@@ -72,7 +72,7 @@ const CoinBalanceText = styled.h1((props) => ({
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['200'],
-  fontSize: 14,
+  fontSize: '0.875rem',
   marginTop: props.theme.spacing(2),
   textAlign: 'center',
 }));
@@ -139,13 +139,13 @@ const AvailableStxContainer = styled.div((props) => ({
   },
 }));
 
-const VerifyOrViewContainer = styled.div(props => ({
+const VerifyOrViewContainer = styled.div((props) => ({
   margin: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(20),
 }));
 
-const VerifyButtonContainer = styled.div(props => ({
+const VerifyButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
@@ -318,15 +318,22 @@ export default function CoinHeader(props: CoinBalanceProps) {
   const verifyOrViewAddresses = (
     <VerifyOrViewContainer>
       <VerifyButtonContainer>
-        <ActionButton text="Verify address on Ledger" onPress={async () => {
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${coin}`),
-          });
-        }} />
+        <ActionButton
+          text={t('VERIFY_ADDRESS_ON_LEDGER')}
+          onPress={async () => {
+            await chrome.tabs.create({
+              url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${coin}`),
+            });
+          }}
+        />
       </VerifyButtonContainer>
-      <ActionButton transparent text="View address" onPress={() => {
-        navigate(`/receive/${coin}`);
-      }} />
+      <ActionButton
+        transparent
+        text={t('VIEW_ADDRESS')}
+        onPress={() => {
+          navigate(`/receive/${coin}`);
+        }}
+      />
     </VerifyOrViewContainer>
   );
 
@@ -364,11 +371,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <SmallActionButton
-            src={ArrowUp}
-            text="Send"
-            onPress={() => goToSendScreen()}
-          />
+          <SmallActionButton src={ArrowUp} text="Send" onPress={() => goToSendScreen()} />
         </ButtonContainer>
 
         {!fungibleToken ? (
@@ -376,7 +379,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <ButtonContainer>
               <SmallActionButton
                 src={ArrowDown}
-                text="Receive"
+                text={t('RECEIVE')}
                 onPress={() => {
                   if (isReceivingAddressesVisible) {
                     navigate(`/receive/${coin}`);
@@ -392,14 +395,18 @@ export default function CoinHeader(props: CoinBalanceProps) {
           <RecieveButtonContainer>
             <SmallActionButton
               src={ArrowDown}
-              text="Receive"
+              text={t('RECEIVE')}
               onPress={() => navigate(coin === 'brc20' ? '/receive/ORD' : `/receive/${coin}`)}
             />
           </RecieveButtonContainer>
         )}
       </RowButtonContainer>
 
-      <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={handleReceiveModalClose}>
+      <BottomModal
+        visible={openReceiveModal}
+        header={t('RECEIVE')}
+        onClose={handleReceiveModalClose}
+      >
         {verifyOrViewAddresses}
       </BottomModal>
     </Container>
