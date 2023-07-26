@@ -627,7 +627,9 @@
     "TRANSACTIONS": "TRANSACTIONS",
     "CONTRACT": "CONTRACT",
     "COMING_SOON": "Coming soon",
-    "RECEIVE": "Receive"
+    "RECEIVE": "Receive",
+    "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
+    "VIEW_ADDRESS": "View address"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",
