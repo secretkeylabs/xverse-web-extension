@@ -5,7 +5,7 @@ import { ReactNode, useState } from 'react';
 import CopyButton from '@components/copyButton';
 import Eye from '@assets/img/createPassword/Eye.svg';
 import Cross from '@assets/img/dashboard/X.svg';
-import { bytesToHex } from '@stacks/transactions';
+import { useTranslation } from 'react-i18next';
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -106,6 +106,7 @@ interface Props {
   hideAddress?: boolean;
   hideCopyButton?: boolean;
   outputScript?: Array<any>;
+  outputScriptIndex?: number;
 }
 
 function TransferDetailView({
@@ -117,7 +118,9 @@ function TransferDetailView({
   hideAddress,
   hideCopyButton,
   outputScript,
+  outputScriptIndex
 }: Props) {
+  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [showScriptOutput, setShowScriptOutput] = useState(false);
   const styles = useSpring({
     from: {
@@ -138,7 +141,7 @@ function TransferDetailView({
   const onCrossClick = () => {
     setShowScriptOutput(false);
   };
-  console.log(outputScript);
+
   return (
     <>
       {showScriptOutput && (
@@ -148,12 +151,12 @@ function TransferDetailView({
               <img src={Cross} alt="cross" />
             </TransparentButton>
           </CrossContainer>
-          <ScriptOutputHeadingText>Script output #1</ScriptOutputHeadingText>
+          <ScriptOutputHeadingText>{`${t('SCRIPT_OUTPUT')} #${outputScriptIndex}`}</ScriptOutputHeadingText>
           <ScriptText>script: btc.Script.encode {'{['}</ScriptText>
           {outputScript &&
             outputScript.map((script) => {
               if (script instanceof Uint8Array) {
-                return <ScriptText>{bytesToHex(script)},</ScriptText>;
+                return <ScriptText>{new TextDecoder().decode(script)},</ScriptText>;
               } else {
                 return <ScriptText>{script},</ScriptText>;
               }

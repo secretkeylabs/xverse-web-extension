@@ -168,7 +168,7 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
           ))}
 
           <OutputTitleText>{t('OUTPUT')}</OutputTitleText>
-          {parsedPsbt?.outputs.map((output) => (
+          {parsedPsbt?.outputs.map((output, index) => (
             <TransferDetailContainer>
               {output.outputScript ? (
                 <TransferDetailView
@@ -178,8 +178,9 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
                   amount={`${satsToBtc(new BigNumber(output ? output.amount : 0n)).toString()} BTC`}
                   address={output.address}
                   outputScript={output.outputScript}
+                  outputScriptIndex={index}
                 >
-                  <SubValueText>Script output #1</SubValueText>
+                  <SubValueText>{`${t('SCRIPT_OUTPUT')} #${index}`}</SubValueText>
                 </TransferDetailView>
               ) : (
                 <TransferDetailView
