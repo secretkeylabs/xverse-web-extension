@@ -6,9 +6,7 @@ import { useTranslation } from 'react-i18next';
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ActionButton from '@components/button';
-import {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import BarLoader from '@components/barLoader';
 import { GAMMA_URL, LoaderSize } from '@utils/constants';
 import ShareDialog from '@components/shareNft';
@@ -277,7 +275,10 @@ function NftDashboard() {
   };
 
   const renderOrdinalsList = useCallback(
-    (list: InscriptionsList) => list.results.map((ordinal) => <Ordinal asset={ordinal} key={ordinal.id} isGalleryOpen={isGalleryOpen} />),
+    (list: InscriptionsList) =>
+      list.results.map((ordinal) => (
+        <Ordinal asset={ordinal} key={ordinal.id} isGalleryOpen={isGalleryOpen} />
+      )),
     [],
   );
 
@@ -290,27 +291,29 @@ function NftDashboard() {
   };
 
   const NftListView = useCallback(
-    () => (totalNfts === 0 && ordinalsLength === 0 ? (
-      <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>
-    ) : (
-      <>
-        <GridContainer isGalleryOpen={isGalleryOpen}>
-          {hasActivatedOrdinalsKey && !ordinalsError && ordinals?.pages?.map(renderOrdinalsList)}
-          {!stacksError && nfts?.map((nft) => (
-            <Nft asset={nft} key={nft.value.hex} isGalleryOpen={isGalleryOpen} />
-          ))}
-        </GridContainer>
-        {(hasNextPage || hasNextPageOrdinals) && (
-        <LoadMoreButtonContainer>
-          {isFetchingNextPage || isFetchingNextPageOrdinals ? (
-            <MoonLoader color="white" size={30} />
-          ) : (
-            <LoadMoreButton onClick={onLoadMoreButtonClick}>{t('LOAD_MORE')}</LoadMoreButton>
+    () =>
+      totalNfts === 0 && ordinalsLength === 0 ? (
+        <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>
+      ) : (
+        <>
+          <GridContainer isGalleryOpen={isGalleryOpen}>
+            {hasActivatedOrdinalsKey && !ordinalsError && ordinals?.pages?.map(renderOrdinalsList)}
+            {!stacksError &&
+              nfts?.map((nft) => (
+                <Nft asset={nft} key={nft.value.hex} isGalleryOpen={isGalleryOpen} />
+              ))}
+          </GridContainer>
+          {(hasNextPage || hasNextPageOrdinals) && (
+            <LoadMoreButtonContainer>
+              {isFetchingNextPage || isFetchingNextPageOrdinals ? (
+                <MoonLoader color="white" size={30} />
+              ) : (
+                <LoadMoreButton onClick={onLoadMoreButtonClick}>{t('LOAD_MORE')}</LoadMoreButton>
+              )}
+            </LoadMoreButtonContainer>
           )}
-        </LoadMoreButtonContainer>
-        )}
-      </>
-    )),
+        </>
+      ),
     [ordinals, nfts, hasActivatedOrdinalsKey],
   );
 
@@ -344,7 +347,9 @@ function NftDashboard() {
 
   return (
     <>
-      {isOrdinalReceiveAlertVisible && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />}
+      {isOrdinalReceiveAlertVisible && (
+        <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
+      )}
       {showActivateOrdinalsAlert && (
         <AlertMessage
           title={t('ACTIVATE_ORDINALS')}

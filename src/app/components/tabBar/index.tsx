@@ -60,24 +60,22 @@ function BottomTabBar({ tab }: Props) {
 
   const showBottomBar = !isInOptions();
 
-  return (
-    showBottomBar ? (
-      <RowContainer>
-        <Button onClick={handleDashboardButtonClick}>
-          <img src={tab === 'dashboard' ? WalletTab : UnselectedWalletTab} alt="dashboard" />
-        </Button>
-        <Button onClick={handleNftButtonClick}>
-          <img src={tab === 'nft' ? NftTab : UnselectedNftTab} alt="nft" />
-        </Button>
-        <Button onClick={handleStackingButtonClick}>
-          <img src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} alt="stacking" />
-        </Button>
-        <Button onClick={handleSettingButtonClick}>
-          <img src={tab === 'settings' ? SettingsTab : UnselectedSettingsTab} alt="settings" />
-        </Button>
-      </RowContainer>
-    ) : null
-  );
+  return showBottomBar ? (
+    <RowContainer>
+      <Button onClick={handleDashboardButtonClick}>
+        <img src={tab === 'dashboard' ? WalletTab : UnselectedWalletTab} alt="dashboard" />
+      </Button>
+      <Button onClick={handleNftButtonClick}>
+        <img src={tab === 'nft' ? NftTab : UnselectedNftTab} alt="nft" />
+      </Button>
+      <Button onClick={handleStackingButtonClick}>
+        <img src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} alt="stacking" />
+      </Button>
+      <Button onClick={handleSettingButtonClick}>
+        <img src={tab === 'settings' ? SettingsTab : UnselectedSettingsTab} alt="settings" />
+      </Button>
+    </RowContainer>
+  ) : null;
 }
 
 export default BottomTabBar;

@@ -12,7 +12,7 @@ const ScreenContainer = styled.div((props) => ({
   width: '100vw',
   flexDirection: 'column',
   alignItems: 'center',
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  backgroundColor: props.theme.colors.background.elevation_1,
   paddingTop: props.theme.spacing(80),
   paddingLeft: props.theme.spacing(9),
   paddingRight: props.theme.spacing(9),
@@ -54,17 +54,11 @@ function ErrorBoundary() {
     <ScreenContainer>
       <img src={Error} alt="Error" width={88} />
       <ScreenTitle>{t('TITLE')}</ScreenTitle>
-      <ErrorDescription>
-        {t('ERROR_DESCRIPTION')}
-      </ErrorDescription>
+      <ErrorDescription>{t('ERROR_DESCRIPTION')}</ErrorDescription>
       <SupportText>
-        {t('SUPPORT')}
-        {' '}
-        <span>{SUPPORT_EMAIL}</span>
+        {t('SUPPORT')} <span>{SUPPORT_EMAIL}</span>
       </SupportText>
-      <ErrorContent>
-        {`${t('ERROR_PREFIX')}${' '}${error.message}`}
-      </ErrorContent>
+      <ErrorContent>{`${t('ERROR_PREFIX')}${' '}${error.message}`}</ErrorContent>
     </ScreenContainer>
   );
 }

@@ -6,9 +6,7 @@ import { fetchBtcToCurrencyRate, fetchStxToBtcRate } from '@secretkeylabs/xverse
 
 export const useCoinRates = () => {
   const dispatch = useDispatch();
-  const {
-    fiatCurrency,
-  } = useWalletSelector();
+  const { fiatCurrency } = useWalletSelector();
 
   const fetchCoinRates = async () => {
     try {

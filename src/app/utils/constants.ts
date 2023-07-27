@@ -1,6 +1,9 @@
 /* eslint-disable prefer-destructuring */
 import {
-  BTC_BASE_URI_MAINNET, BTC_BASE_URI_TESTNET, HIRO_MAINNET_DEFAULT, HIRO_TESTNET_DEFAULT,
+  BTC_BASE_URI_MAINNET,
+  BTC_BASE_URI_TESTNET,
+  HIRO_MAINNET_DEFAULT,
+  HIRO_TESTNET_DEFAULT,
 } from '@secretkeylabs/xverse-core/constant';
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 
@@ -14,6 +17,7 @@ export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';
 export const BTC_TRANSACTION_TESTNET_STATUS_URL = 'https://mempool.space/testnet/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
+export const XVERSE_SPONSOR_2_URL = 'https://stacks-transaction-sponsor-swaps.onrender.com';
 
 export const TRANSAC_URL = 'https://global.transak.com';
 export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;
@@ -50,4 +54,5 @@ export const initialNetworksList: SettingsNetwork[] = [
 /**
  * contract id of send_many transaction type
  */
-export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
+export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
+  'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';

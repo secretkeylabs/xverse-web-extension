@@ -16,15 +16,15 @@ interface PasswordInputProps {
   handleContinue: () => void;
   handleBack: () => void;
   passwordError?: string;
-  checkPasswordStrength? : boolean;
-  stackButtonAlignment? : boolean;
+  checkPasswordStrength?: boolean;
+  stackButtonAlignment?: boolean;
   loading?: boolean;
   createPasswordFlow?: boolean;
 }
 
 interface StrengthBarProps {
-  strengthColor:string
-  strengthWidth: string
+  strengthColor: string;
+  strengthWidth: string;
 }
 
 const Container = styled.div({
@@ -56,7 +56,7 @@ const PasswordInputContainer = styled.div<PasswordInputContainerProps>((props) =
   border: `1px solid ${
     props.hasError ? 'rgba(211, 60, 60, 0.3)' : props.theme.colors.background.elevation3
   }`,
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  backgroundColor: props.theme.colors.background.elevation_1,
   borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(4),
   paddingRight: props.theme.spacing(4),
@@ -73,7 +73,7 @@ const PasswordInputLabel = styled.h2((props) => ({
 const Input = styled.input((props) => ({
   ...props.theme.body_medium_m,
   height: 44,
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  backgroundColor: props.theme.colors.background.elevation_1,
   color: props.theme.colors.white['0'],
   width: '100%',
   border: 'none',
@@ -189,7 +189,12 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   useEffect(() => {
     const keyDownHandler = (event) => {
-      if (event.key === 'Enter' && !!enteredPassword && enteredPasswordLength >= REQUIRED_PASSWORD_LENGTH && (checkPasswordStrength ? score >= PasswordStrength.AverageScore : true)) {
+      if (
+        event.key === 'Enter' &&
+        !!enteredPassword &&
+        enteredPasswordLength >= REQUIRED_PASSWORD_LENGTH &&
+        (checkPasswordStrength ? score >= PasswordStrength.AverageScore : true)
+      ) {
         event.preventDefault();
         handleContinue();
       }
@@ -201,8 +206,14 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
   }, [enteredPassword]);
 
   useEffect(() => {
-    if (passwordError) { setError(passwordError); return; }
-    if (enteredPassword && !!createPasswordFlow && score <= PasswordStrength.WeakScore) { setError(t('PASSWORD_STRENGTH_ERROR')); return; }
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+    if (enteredPassword && !!createPasswordFlow && score <= PasswordStrength.WeakScore) {
+      setError(t('PASSWORD_STRENGTH_ERROR'));
+      return;
+    }
     setError('');
   }, [passwordError, enteredPassword]);
 
@@ -226,7 +237,10 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
 
   const renderStrengthBar = () => {
     if (enteredPassword !== '') {
-      if (enteredPasswordLength <= REQUIRED_PASSWORD_LENGTH || score <= PasswordStrength.WeakScore) {
+      if (
+        enteredPasswordLength <= REQUIRED_PASSWORD_LENGTH ||
+        score <= PasswordStrength.WeakScore
+      ) {
         return (
           <PasswordStrengthContainer>
             <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
@@ -285,7 +299,14 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         <HeaderText>{title}</HeaderText>
       </HeaderContainer>
       <PasswordInputLabel>{inputLabel}</PasswordInputLabel>
-      <PasswordInputContainer hasError={!!error || (!!createPasswordFlow && (enteredPassword !== '' && enteredPasswordLength <= REQUIRED_PASSWORD_LENGTH))}>
+      <PasswordInputContainer
+        hasError={
+          !!error ||
+          (!!createPasswordFlow &&
+            enteredPassword !== '' &&
+            enteredPasswordLength <= REQUIRED_PASSWORD_LENGTH)
+        }
+      >
         <Input
           type={isPasswordVisible ? 'text' : 'password'}
           value={enteredPassword}
@@ -299,16 +320,14 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
       {checkPasswordStrength ? renderStrengthBar() : null}
       <ButtonsContainer stackButtonAlignment={stackButtonAlignment} ifError={error !== ''}>
         <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
-          <ActionButton
-            text={t('BACK_BUTTON')}
-            onPress={handleBack}
-            transparent
-          />
+          <ActionButton text={t('BACK_BUTTON')} onPress={handleBack} transparent />
         </ButtonContainer>
         <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
           <ActionButton
             processing={loading}
-            disabled={!enteredPassword || (!!checkPasswordStrength && score <= PasswordStrength.WeakScore)}
+            disabled={
+              !enteredPassword || (!!checkPasswordStrength && score <= PasswordStrength.WeakScore)
+            }
             text={t('CONTINUE_BUTTON')}
             onPress={handleContinue}
           />

@@ -84,7 +84,7 @@ const CopyImage = styled.img`
   margin-right: 4px;
 `;
 
-const StyledToolTip = styled(Tooltip)`
+export const StyledToolTip = styled(Tooltip)`
   background-color: #ffffff;
   color: #12151e;
   border-radius: 8px;
@@ -165,19 +165,22 @@ function AccountRow({
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
 
-  useEffect(() => () => {
-    clearTimeout(btcCopiedTooltipTimeoutRef.current);
-    clearTimeout(stxCopiedTooltipTimeoutRef.current);
-  }, []);
+  useEffect(
+    () => () => {
+      clearTimeout(btcCopiedTooltipTimeoutRef.current);
+      clearTimeout(stxCopiedTooltipTimeoutRef.current);
+    },
+    [],
+  );
 
   const getName = () => {
-    const name = (account?.accountName
-      ?? account?.bnsName
-      ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`
-    );
+    const name =
+      account?.accountName ??
+      account?.bnsName ??
+      `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
 
     return name.length > 20 ? `${name.slice(0, 20)}...` : name;
-  }
+  };
 
   const handleOnBtcAddressClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     navigator.clipboard.writeText(account?.btcAddress!);
@@ -261,8 +264,8 @@ function AccountRow({
         thirdGradient={gradient[2]}
       />
       <CurrentAcountContainer>
-        {account
-          && (isSelected ? (
+        {account &&
+          (isSelected ? (
             <TransparentSpan>
               <CurrentAccountTextContainer>
                 <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
@@ -278,9 +281,7 @@ function AccountRow({
             </TransparentSpan>
           ))}
 
-        {!!account && !isHardwareAccount(account) && (
-          displayAddress
-        )}
+        {!!account && !isHardwareAccount(account) && displayAddress}
 
         {!account && (
           <BarLoaderContainer>

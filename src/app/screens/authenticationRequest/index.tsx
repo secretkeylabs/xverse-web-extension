@@ -94,7 +94,7 @@ function AuthenticationRequest() {
       const authResponse = await createAuthResponse(
         seedPhrase,
         selectedAccount?.id ?? 0,
-        authRequest
+        authRequest,
       );
       chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
         source: MESSAGE_SOURCE,

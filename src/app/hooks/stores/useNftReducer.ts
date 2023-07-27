@@ -7,7 +7,7 @@ const useNftDataReducer = () => {
   const { nftData } = useNftDataSelector();
   const dispatch = useDispatch();
 
-  const storeNftData = (data:NftData) => {
+  const storeNftData = (data: NftData) => {
     const nftExists = nftData.find((nftItem) => nftItem?.token_id === data?.token_id);
     if (data && !nftExists) {
       const modifiedNftList = [...nftData];

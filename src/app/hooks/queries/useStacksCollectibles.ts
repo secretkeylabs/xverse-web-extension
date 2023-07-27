@@ -11,7 +11,7 @@ const useStacksCollectibles = () => {
 
   function fetchNfts({ pageParam = 0 }): Promise<NftsListData> {
     if (!stxAddress) {
-      return Promise.reject(new InvalidParamsError("stxAddress is required"));
+      return Promise.reject(new InvalidParamsError('stxAddress is required'));
     }
     return getNfts(stxAddress, selectedNetwork, pageParam);
   }

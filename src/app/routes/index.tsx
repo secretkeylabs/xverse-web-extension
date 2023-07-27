@@ -61,6 +61,8 @@ import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
 import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
+import SwapScreen from '@screens/swap';
+import SwapConfirmScreen from '@screens/swap/swapConfirmation';
 
 const router = createHashRouter([
   {
@@ -84,21 +86,21 @@ const router = createHashRouter([
         path: 'import-ledger',
         element: (
           <AuthGuard>
-            <SingleTabGuard guardName='importLedger'>
+            <SingleTabGuard guardName="importLedger">
               <ImportLedger />
             </SingleTabGuard>
           </AuthGuard>
-        )
+        ),
       },
       {
         path: 'verify-ledger',
         element: (
           <AuthGuard>
-            <SingleTabGuard guardName='verifyLedger'>
+            <SingleTabGuard guardName="verifyLedger">
               <VerifyLedger />
             </SingleTabGuard>
           </AuthGuard>
-        )
+        ),
       },
       {
         index: true,
@@ -148,6 +150,14 @@ const router = createHashRouter([
       //   path: 'send-ft-ledger',
       //   element: <LedgerSendFtScreen />,
       // },
+      {
+        path: 'swap',
+        element: <SwapScreen />,
+      },
+      {
+        path: 'swap-confirm',
+        element: <SwapConfirmScreen />,
+      },
       {
         path: 'confirm-stx-tx',
         element: <ConfirmStxTransaction />,
@@ -354,11 +364,19 @@ const router = createHashRouter([
       },
       {
         path: 'confirm-nft-tx/:id',
-        element: <AuthGuard><ConfirmNftTransaction /></AuthGuard>,
+        element: (
+          <AuthGuard>
+            <ConfirmNftTransaction />
+          </AuthGuard>
+        ),
       },
       {
         path: 'confirm-ordinal-tx/:id',
-        element: <AuthGuard><ConfirmOrdinalTransaction /></AuthGuard>,
+        element: (
+          <AuthGuard>
+            <ConfirmOrdinalTransaction />
+          </AuthGuard>
+        ),
       },
     ],
   },

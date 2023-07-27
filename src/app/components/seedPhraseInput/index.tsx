@@ -25,7 +25,9 @@ const SeedphraseInput = styled.textarea<ContainerProps>((props) => ({
   resize: 'none',
   minHeight: 140,
   padding: props.theme.spacing(8),
-  border: props.error ? `1px solid ${props.theme.colors.feedback.error_700}` : `1px solid ${props.theme.colors.background.elevation3}`,
+  border: props.error
+    ? `1px solid ${props.theme.colors.feedback.error_700}`
+    : `1px solid ${props.theme.colors.background.elevation3}`,
   outline: 'none',
   borderRadius: props.theme.radius(1),
   ':focus-within': {
@@ -48,9 +50,7 @@ interface SeedPhraseInputProps {
 
 export default function SeedPhraseInput(props: SeedPhraseInputProps): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
-  const {
-    onSeedChange, seed, seedError, setSeedError,
-  } = props;
+  const { onSeedChange, seed, seedError, setSeedError } = props;
 
   const handleSeedChange = (event: React.FormEvent<HTMLTextAreaElement>) => {
     if (seedError) {

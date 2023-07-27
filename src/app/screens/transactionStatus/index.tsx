@@ -138,7 +138,15 @@ function TransactionStatus() {
   const location = useLocation();
   const { network } = useWalletSelector();
   const {
-    txid, currency, error, sponsored, browserTx, isOrdinal, isNft, errorTitle, isBrc20TokenFlow,
+    txid,
+    currency,
+    error,
+    sponsored,
+    browserTx,
+    isOrdinal,
+    isNft,
+    errorTitle,
+    isBrc20TokenFlow,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -178,9 +186,7 @@ function TransactionStatus() {
     <RowContainer>
       <BeforeButtonText>{t('SEE_ON')}</BeforeButtonText>
       <Button onClick={openTransactionInBrowser}>
-        <ButtonText>
-          {currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}
-        </ButtonText>
+        <ButtonText>{currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}</ButtonText>
         <ButtonImage src={ArrowSquareOut} />
       </Button>
     </RowContainer>
@@ -200,14 +206,17 @@ function TransactionStatus() {
 
   return (
     <TxStatusContainer>
-      {sponsored ? <OuterContainer>{renderTransactionSuccessStatus}</OuterContainer>
-        : (
-          <OuterContainer>
-            {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
-            {txid && renderLink}
-            {isBrc20TokenFlow ? <InfoMessageContainer><InfoContainer bodyText={t('BRC20_ORDINAL_MSG')} /></InfoMessageContainer> : txid && renderTransactionID}
-          </OuterContainer>
+      <OuterContainer>
+        {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
+        {txid && renderLink}
+        {isBrc20TokenFlow ? (
+          <InfoMessageContainer>
+            <InfoContainer bodyText={t('BRC20_ORDINAL_MSG')} />
+          </InfoMessageContainer>
+        ) : (
+          txid && renderTransactionID
         )}
+      </OuterContainer>
       <ButtonContainer>
         <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
       </ButtonContainer>

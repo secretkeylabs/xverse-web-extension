@@ -33,25 +33,19 @@ function Brc20TransferInfo() {
   return (
     <Container>
       <InfoTitle>{t('SEND_INFO_TITLE')}</InfoTitle>
-      <InfoSubtitle>
-        {t('SEND_INFO_SUBTITLE')}
-      </InfoSubtitle>
+      <InfoSubtitle>{t('SEND_INFO_SUBTITLE')}</InfoSubtitle>
       <TransferStepTitle>
         1.
         {'  '}
         {t('SEND_STEP_1_TITLE')}
       </TransferStepTitle>
-      <TransferStep>
-        {t('SEND_STEP_1')}
-      </TransferStep>
+      <TransferStep>{t('SEND_STEP_1')}</TransferStep>
       <TransferStepTitle>
         2.
         {'  '}
         {t('SEND_STEP_2_TITLE')}
       </TransferStepTitle>
-      <TransferStep>
-        {t('SEND_STEP_2')}
-      </TransferStep>
+      <TransferStep>{t('SEND_STEP_2')}</TransferStep>
     </Container>
   );
 }

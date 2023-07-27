@@ -30,9 +30,7 @@ const TestnetText = styled.h1((props) => ({
 }));
 
 function ExtendedScreenContainer(): JSX.Element {
-  const {
-    network,
-  } = useWalletSelector();
+  const { network } = useWalletSelector();
   const { t } = useTranslation('translation');
 
   return (

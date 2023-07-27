@@ -16,8 +16,8 @@ interface Props {
   visible: boolean;
   coins: FungibleToken[];
   title: string;
-  onSelectBitcoin: () => void;
-  onSelectStacks: () => void;
+  onSelectBitcoin?: () => void;
+  onSelectStacks?: () => void;
   onSelectCoin: (coin: FungibleToken) => void;
   onClose: () => void;
   loadingWalletData: boolean;
@@ -37,19 +37,19 @@ function CoinSelectModal({
   const theme = useTheme();
   const { btcAddress, stxAddress } = useWalletSelector();
   const handleOnBitcoinPress = () => {
-    onSelectBitcoin();
+    onSelectBitcoin?.();
     onClose();
   };
 
   const handleOnStackPress = () => {
-    onSelectStacks();
+    onSelectStacks?.();
     onClose();
   };
 
   function renderFixedCoins() {
     return (
       <>
-        {btcAddress && (
+        {btcAddress && onSelectBitcoin != null && (
           <TokenTile
             title={t('BITCOIN')}
             currency="BTC"
@@ -81,23 +81,24 @@ function CoinSelectModal({
     return (
       <Container>
         {renderFixedCoins()}
-        {stxAddress && coins.map((coin) => (
-          <TokenTile
-            key={coin.principal}
-            title={coin.name}
-            currency="FT"
-            icon={IconStacks}
-            loading={loadingWalletData}
-            underlayColor={theme.colors.background.elevation2}
-            margin={14}
-            enlargeTicker
-            onPress={() => {
-              onSelectCoin(coin);
-              onClose();
-            }}
-            fungibleToken={coin}
-          />
-        ))}
+        {stxAddress &&
+          coins.map((coin) => (
+            <TokenTile
+              key={coin.principal}
+              title={coin.name}
+              currency="FT"
+              icon={IconStacks}
+              loading={loadingWalletData}
+              underlayColor={theme.colors.background.elevation2}
+              margin={14}
+              enlargeTicker
+              onPress={() => {
+                onSelectCoin(coin);
+                onClose();
+              }}
+              fungibleToken={coin}
+            />
+          ))}
       </Container>
     );
   }

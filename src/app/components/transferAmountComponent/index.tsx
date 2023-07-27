@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import { useTranslation } from 'react-i18next';
-import {
-  animated, config, useSpring,
-} from '@react-spring/web';
+import { animated, config, useSpring } from '@react-spring/web';
 import TransferDetailView from '@components/transferDetailView';
 import { useState } from 'react';
 
@@ -104,11 +102,16 @@ interface Props {
   subTitle?: string;
   subValue?: string;
   icon?: string;
-
 }
 
 function TransferAmountComponent({
-  title, address, value, subValue, description, icon, subTitle,
+  title,
+  address,
+  value,
+  subValue,
+  description,
+  icon,
+  subTitle,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [isExpanded, setIsExpanded] = useState(false);
@@ -153,19 +156,19 @@ function TransferAmountComponent({
       </RowContainer>
 
       {isExpanded && (
-      <ExpandedContainer style={slideInStyles}>
-        {description && <DescriptionText>{description}</DescriptionText>}
-        <RowContainer>
-          {icon && <Icon src={icon} />}
-          <TitleText>{subValue === '' ? t('AMOUNT') : t('ASSET')}</TitleText>
-          <ExpandedColumnContainer isExpanded={isExpanded}>
-            {renderAmount}
-          </ExpandedColumnContainer>
-        </RowContainer>
-        <FromContainer>
-          <TransferDetailView title={subTitle} address={address!} />
-        </FromContainer>
-      </ExpandedContainer>
+        <ExpandedContainer style={slideInStyles}>
+          {description && <DescriptionText>{description}</DescriptionText>}
+          <RowContainer>
+            {icon && <Icon src={icon} />}
+            <TitleText>{subValue === '' ? t('AMOUNT') : t('ASSET')}</TitleText>
+            <ExpandedColumnContainer isExpanded={isExpanded}>
+              {renderAmount}
+            </ExpandedColumnContainer>
+          </RowContainer>
+          <FromContainer>
+            <TransferDetailView title={subTitle} address={address!} />
+          </FromContainer>
+        </ExpandedContainer>
       )}
     </Container>
   );

@@ -8,61 +8,57 @@ import { LoaderSize } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 
-interface TokenImageProps {
+export interface TokenImageProps {
   token?: string;
   loading?: boolean;
   fungibleToken?: FungibleToken;
-  isSmallSize?: boolean;
+  size?: number;
+  loaderSize?: LoaderSize;
+  round?: boolean;
 }
 
-interface ImageProps {
-  isSmallSize?: boolean;
-}
-interface TextProps {
-  isSmallSize?: boolean;
-}
-
-const TickerImage = styled.img<ImageProps>((props) => ({
-  height: props.isSmallSize ? 32 : 44,
-  width: props.isSmallSize ? 32 : 44,
-  borderRadius: 30,
+const TickerImage = styled.img<{ size?: number; round?: boolean }>((props) => ({
+  height: props.size ?? 44,
+  width: props.size ?? 44,
+  borderRadius: props.round ? '50%' : 'none',
 }));
 
 const LoaderImageContainer = styled.div({
   flex: 0.5,
 });
 
-const TickerIconContainer = styled.div<ImageProps>((props) => ({
+const TickerIconContainer = styled.div<{ size?: number; round?: boolean }>((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: props.isSmallSize ? 32 : 40,
-  width: props.isSmallSize ? 32 : 40,
+  height: props.size ?? 44,
+  width: props.size ?? 44,
   marginRight: props.theme.spacing(3),
-  borderRadius: 30,
+  borderRadius: props.round ? '50%' : props.theme.radius(2),
   backgroundColor: props.color,
 }));
 
-const TickerIconText = styled.h1<TextProps>((props) => ({
+const TickerIconText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['0'],
   textAlign: 'center',
   wordBreak: 'break-all',
-  fontSize: props.isSmallSize ? 10 : 13,
+  fontSize: 13,
 }));
 
-export default function TokenImage(props: TokenImageProps) {
-  const {
-    token,
-    loading,
-    fungibleToken,
-    isSmallSize,
-  } = props;
-
+export default function TokenImage({
+  token,
+  loading,
+  fungibleToken,
+  size,
+  loaderSize,
+  round,
+}: TokenImageProps) {
   const getCoinIcon = useCallback(() => {
     if (token === 'STX') {
       return IconStacks;
-    } if (token === 'BTC') {
+    }
+    if (token === 'BTC') {
       return IconBitcoin;
     }
   }, [token]);
@@ -70,7 +66,7 @@ export default function TokenImage(props: TokenImageProps) {
   if (fungibleToken) {
     if (!loading) {
       if (fungibleToken?.image) {
-        return <TickerImage isSmallSize={isSmallSize} src={fungibleToken.image} />;
+        return <TickerImage size={size} src={fungibleToken.image} />;
       }
       let ticker = fungibleToken?.ticker;
       if (!ticker && fungibleToken?.name) {
@@ -79,19 +75,16 @@ export default function TokenImage(props: TokenImageProps) {
       const background = stc(ticker);
       ticker = ticker && ticker.substring(0, 4);
       return (
-        <TickerIconContainer isSmallSize={isSmallSize} color={background}>
-          <TickerIconText isSmallSize={isSmallSize}>{ticker}</TickerIconText>
+        <TickerIconContainer size={size} color={background} round={round}>
+          <TickerIconText>{ticker}</TickerIconText>
         </TickerIconContainer>
       );
     }
     return (
       <LoaderImageContainer>
-        <BarLoader loaderSize={LoaderSize.LARGE} />
+        <BarLoader loaderSize={loaderSize ?? LoaderSize.LARGE} />
       </LoaderImageContainer>
     );
   }
-
-  return (
-    <TickerImage isSmallSize={isSmallSize} src={getCoinIcon()} />
-  );
+  return <TickerImage size={size} src={getCoinIcon()} round={round} />;
 }

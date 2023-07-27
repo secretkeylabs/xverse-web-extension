@@ -33,12 +33,13 @@ const Container = styled.div`
   margin-left: 16px;
   margin-right: 16px;
   overflow-y: auto;
+
   &::-webkit-scrollbar {
     display: none;
   }
 `;
 
-const ButtonContainer = styled.div((props) => ({
+export const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginBottom: props.theme.spacing(12),
@@ -151,14 +152,15 @@ function ConfirmStxTransationComponent({
     setButtonLoading(loading);
   }, [loading]);
 
-  const getFee = () => (isSponsored
-    ? new BigNumber(0)
-    : new BigNumber(
-      initialStxTransactions
-        .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
-        .reduce((prev, curr) => prev + curr, BigInt(0))
-        .toString(10),
-    ));
+  const getFee = () =>
+    isSponsored
+      ? new BigNumber(0)
+      : new BigNumber(
+          initialStxTransactions
+            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+            .reduce((prev, curr) => prev + curr, BigInt(0))
+            .toString(10),
+        );
 
   const getTxNonce = (): string => {
     const nonce = getNonce(initialStxTransactions[0]);
@@ -203,7 +205,14 @@ function ConfirmStxTransationComponent({
     onConfirmClick(signedTxs);
   };
 
-  const applyTxSettings = ({ fee: settingFee, nonce }: { fee: string; feeRate?: string; nonce?: string }) => {
+  const applyTxSettings = ({
+    fee: settingFee,
+    nonce,
+  }: {
+    fee: string;
+    feeRate?: string;
+    nonce?: string;
+  }) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
     setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {
@@ -259,7 +268,9 @@ function ConfirmStxTransationComponent({
     <>
       <Container>
         <TitleContainer>
-          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>}
+          {!isAsset && (
+            <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>
+          )}
           {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
         {children}
