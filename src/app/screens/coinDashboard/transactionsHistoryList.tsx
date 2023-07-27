@@ -63,11 +63,11 @@ const SectionHeader = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
 }));
 
-const SectionSeparator = styled.div({
-  border: '0.5px solid  rgba(255, 255, 255, 0.6)',
+const SectionSeparator = styled.div((props) => ({
+  border: `0.5px solid ${props.theme.colors.white[400]}`,
   opacity: 0.2,
   flexGrow: 1,
-});
+}));
 
 const SectionTitle = styled.p((props) => ({
   ...props.theme.body_xs,
@@ -114,7 +114,9 @@ const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTran
     ) => {
       const date = formatDate(
         new Date(
-          transaction.tx?.burn_block_time_iso ? transaction.tx.burn_block_time_iso : Date.now(),
+          isAddressTransactionWithTransfers(transaction) && transaction.tx?.burn_block_time_iso
+            ? transaction.tx.burn_block_time_iso
+            : Date.now(),
         ),
       );
       if (!all[date]) {
@@ -134,12 +136,14 @@ const filterTxs = (
   txs.filter((atx) => {
     const tx = isAddressTransactionWithTransfers(atx) ? atx.tx : atx;
     const acceptedTypes = tx.tx_type === 'contract_call';
+    const ftTransfers = atx && isAddressTransactionWithTransfers(atx) ? atx.ft_transfers || [] : [];
+    const nftTransfers =
+      atx && isAddressTransactionWithTransfers(atx) ? atx.nft_transfers || [] : [];
+
     return (
       acceptedTypes &&
-      ((atx?.ft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
-        .length > 0 ||
-        (atx?.nft_transfers || []).filter((transfer) => transfer.asset_identifier.includes(filter))
-          .length > 0 ||
+      (ftTransfers.filter((transfer) => transfer.asset_identifier.includes(filter)).length > 0 ||
+        nftTransfers.filter((transfer) => transfer.asset_identifier.includes(filter)).length > 0 ||
         tx?.contract_call?.contract_id === filter)
     );
   });
@@ -157,22 +161,28 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   const groupedTxs = useMemo(() => {
-    if (data && data.length > 0) {
-      if (isBtcTransactionArr(data)) {
-        return groupBtcTxsByDate(data);
-      }
-      if (txFilter && coin === 'FT') {
-        const filteredTxs = filterTxs(data, txFilter);
-        return groupedTxsByDateMap(filteredTxs);
-      }
-      return groupedTxsByDateMap(data);
+    if (!data?.length) {
+      return;
     }
+
+    if (isBtcTransactionArr(data)) {
+      return groupBtcTxsByDate(data);
+    }
+
+    if (txFilter && coin === 'FT') {
+      const filteredTxs = filterTxs(data, txFilter);
+      return groupedTxsByDateMap(filteredTxs);
+    }
+
+    return groupedTxsByDateMap(data);
   }, [data, isLoading, isFetching]);
+
   return (
     <ListItemsContainer>
       <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>
       {groupedTxs &&
         !isLoading &&
+        !isFetching &&
         Object.keys(groupedTxs).map((group) => (
           <GroupContainer style={styles}>
             <SectionHeader>
@@ -195,12 +205,12 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
             })}
           </GroupContainer>
         ))}
-      {isLoading && (
+      {(isLoading || isFetching) && (
         <LoadingContainer>
           <MoonLoader color="white" size={20} />
         </LoadingContainer>
       )}
-      {!isLoading && data?.length === 0 && (
+      {!isLoading && !isFetching && data?.length === 0 && (
         <NoTransactionsContainer>{t('TRANSACTIONS_LIST_EMPTY')}</NoTransactionsContainer>
       )}
     </ListItemsContainer>

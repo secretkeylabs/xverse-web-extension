@@ -40,9 +40,9 @@ const RowContainer = styled.div({
 
 const ProtocolText = styled.p((props) => ({
   ...props.theme.headline_category_s,
-  fontWeight: '700',
+  fontWeight: 700,
   height: 15,
-  marginTop: 6,
+  marginTop: props.theme.spacing(3),
   textTransform: 'uppercase',
   marginLeft: props.theme.spacing(2),
   backgroundColor: props.theme.colors.white['400'],
@@ -64,7 +64,7 @@ const BalanceValuesContainer = styled.div({
 
 const CoinBalanceText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  fontSize: 24,
+  fontSize: '1.5rem',
   color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));
@@ -72,7 +72,7 @@ const CoinBalanceText = styled.h1((props) => ({
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['200'],
-  fontSize: 14,
+  fontSize: '0.875rem',
   marginTop: props.theme.spacing(2),
   textAlign: 'center',
 }));
@@ -319,7 +319,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
     <VerifyOrViewContainer>
       <VerifyButtonContainer>
         <ActionButton
-          text="Verify address on Ledger"
+          text={t('VERIFY_ADDRESS_ON_LEDGER')}
           onPress={async () => {
             await chrome.tabs.create({
               url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${coin}`),
@@ -329,7 +329,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
       </VerifyButtonContainer>
       <ActionButton
         transparent
-        text="View address"
+        text={t('VIEW_ADDRESS')}
         onPress={() => {
           navigate(`/receive/${coin}`);
         }}
@@ -379,7 +379,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <ButtonContainer>
               <SmallActionButton
                 src={ArrowDown}
-                text="Receive"
+                text={t('RECEIVE')}
                 onPress={() => {
                   if (isReceivingAddressesVisible) {
                     navigate(`/receive/${coin}`);
@@ -395,7 +395,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
           <RecieveButtonContainer>
             <SmallActionButton
               src={ArrowDown}
-              text="Receive"
+              text={t('RECEIVE')}
               onPress={() => navigate(coin === 'brc20' ? '/receive/ORD' : `/receive/${coin}`)}
             />
           </RecieveButtonContainer>
