@@ -118,7 +118,7 @@ function TransferDetailView({
   hideAddress,
   hideCopyButton,
   outputScript,
-  outputScriptIndex
+  outputScriptIndex,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [showScriptOutput, setShowScriptOutput] = useState(false);
@@ -151,12 +151,18 @@ function TransferDetailView({
               <img src={Cross} alt="cross" />
             </TransparentButton>
           </CrossContainer>
-          <ScriptOutputHeadingText>{`${t('SCRIPT_OUTPUT')} #${outputScriptIndex}`}</ScriptOutputHeadingText>
+          <ScriptOutputHeadingText>{`${t(
+            'SCRIPT_OUTPUT',
+          )} #${outputScriptIndex}`}</ScriptOutputHeadingText>
           <ScriptText>script: btc.Script.encode {'{['}</ScriptText>
           {outputScript &&
             outputScript.map((script) => {
               if (script instanceof Uint8Array) {
-                return <ScriptText>{new TextDecoder().decode(script)},</ScriptText>;
+                return (
+                  <ScriptText>
+                    {`new TextEncoder().encode (${new TextDecoder().decode(script)})`},
+                  </ScriptText>
+                );
               } else {
                 return <ScriptText>{script},</ScriptText>;
               }
