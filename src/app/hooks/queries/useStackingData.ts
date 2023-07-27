@@ -1,7 +1,11 @@
 import { useQueries } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import {
-  fetchDelegationState, fetchPoolStackerInfo, fetchStackingPoolInfo, getStacksInfo, StackingData,
+  fetchDelegationState,
+  fetchPoolStackerInfo,
+  fetchStackingPoolInfo,
+  getStacksInfo,
+  StackingData,
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '../useWalletSelector';
 import useNetworkSelector from '../useNetwork';

@@ -1,10 +1,7 @@
 import { SwapToken } from '@screens/swap/useSwap';
 import { Currency } from 'alex-sdk';
 import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  broadcastSignedTransaction,
-  signTransaction,
-} from '@secretkeylabs/xverse-core';
+import { broadcastSignedTransaction, signTransaction } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useNavigate } from 'react-router-dom';

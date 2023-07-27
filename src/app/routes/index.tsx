@@ -86,21 +86,21 @@ const router = createHashRouter([
         path: 'import-ledger',
         element: (
           <AuthGuard>
-            <SingleTabGuard guardName='importLedger'>
+            <SingleTabGuard guardName="importLedger">
               <ImportLedger />
             </SingleTabGuard>
           </AuthGuard>
-        )
+        ),
       },
       {
         path: 'verify-ledger',
         element: (
           <AuthGuard>
-            <SingleTabGuard guardName='verifyLedger'>
+            <SingleTabGuard guardName="verifyLedger">
               <VerifyLedger />
             </SingleTabGuard>
           </AuthGuard>
-        )
+        ),
       },
       {
         index: true,
@@ -364,11 +364,19 @@ const router = createHashRouter([
       },
       {
         path: 'confirm-nft-tx/:id',
-        element: <AuthGuard><ConfirmNftTransaction /></AuthGuard>,
+        element: (
+          <AuthGuard>
+            <ConfirmNftTransaction />
+          </AuthGuard>
+        ),
       },
       {
         path: 'confirm-ordinal-tx/:id',
-        element: <AuthGuard><ConfirmOrdinalTransaction /></AuthGuard>,
+        element: (
+          <AuthGuard>
+            <ConfirmOrdinalTransaction />
+          </AuthGuard>
+        ),
       },
     ],
   },

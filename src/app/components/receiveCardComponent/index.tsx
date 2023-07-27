@@ -82,13 +82,19 @@ interface Props {
 }
 
 function ReceiveCardComponent({
-  children, title, address, onQrAddressClick, onCopyAddressClick, showVerifyButton, currency,
+  children,
+  title,
+  address,
+  onQrAddressClick,
+  onCopyAddressClick,
+  showVerifyButton,
+  currency,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
 
   const onCopyClick = () => {
     navigator.clipboard.writeText(address);
-    if(onCopyAddressClick) onCopyAddressClick();
+    if (onCopyAddressClick) onCopyAddressClick();
   };
 
   return (
@@ -96,15 +102,25 @@ function ReceiveCardComponent({
       <ColumnContainer>
         {children}
         <TitleText>{title}</TitleText>
-        <AddressText>{showVerifyButton ? (currency === 'BTC' ? 'Receive payments in BTC' : 'Receive Ordinals & BRC20 tokens') : getShortTruncatedAddress(address)}</AddressText>
+        <AddressText>
+          {showVerifyButton
+            ? currency === 'BTC'
+              ? 'Receive payments in BTC'
+              : 'Receive Ordinals & BRC20 tokens'
+            : getShortTruncatedAddress(address)}
+        </AddressText>
       </ColumnContainer>
       {showVerifyButton ? (
         <VerifyButtonContainer>
-          <ActionButton transparent text="Verify" onPress={async () => {
-            await chrome.tabs.create({
-              url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${currency}`),
-            });
-          }} />
+          <ActionButton
+            transparent
+            text="Verify"
+            onPress={async () => {
+              await chrome.tabs.create({
+                url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${currency}`),
+              });
+            }}
+          />
         </VerifyButtonContainer>
       ) : (
         <RowContainer>

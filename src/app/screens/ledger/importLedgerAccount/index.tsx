@@ -13,7 +13,6 @@ import {
 } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { ledgerDelay } from '@common/utils/ledger';
-import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';
@@ -35,8 +34,10 @@ import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 // TODO: Add link to Ledger guide
-const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE = 'https://support.xverse.app/hc/en-us/articles/17901278165773';
-const LINK_TO_LEDGER_PASSPHRASE_GUIDE = 'https://support.xverse.app/hc/en-us/articles/17901278165773';
+const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE =
+  'https://support.xverse.app/hc/en-us/articles/17901278165773';
+const LINK_TO_LEDGER_PASSPHRASE_GUIDE =
+  'https://support.xverse.app/hc/en-us/articles/17901278165773';
 
 const Container = styled.div`
   display: flex;
@@ -756,8 +757,8 @@ function ImportLedger(): JSX.Element {
                     onClick={() => setSelectedLedgerLiveOption('using')}
                     selected={selectedLedgerLiveOption === 'using'}
                   >
-                    <OptionIcon selected={selectedLedgerLiveOption === 'using'} />I use Ledger
-                    Live with the device.
+                    <OptionIcon selected={selectedLedgerLiveOption === 'using'} />I use Ledger Live
+                    with the device.
                   </Option>
                   <Option
                     onClick={() => setSelectedLedgerLiveOption('not using')}
@@ -777,8 +778,7 @@ function ImportLedger(): JSX.Element {
                   <ImportBeforeStartText>
                     It is not recommended to use Xverse and Ledger Live, or other Bitcoin wallets
                     with the same hardware device as this could lead to unintentional transfers of
-                    Ordinals.{' '}
-                    <br />
+                    Ordinals. <br />
                     <CustomLink
                       href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
                       target="_blank"
@@ -789,7 +789,7 @@ function ImportLedger(): JSX.Element {
                     <br />
                     <br />
                     You should use a separate device for Xverse and Ordinals or set a passphrase on
-                    your Ledger to create a different set of accounts for Xverse. See {' '}
+                    your Ledger to create a different set of accounts for Xverse. See{' '}
                     <CustomLink
                       href={LINK_TO_LEDGER_PASSPHRASE_GUIDE}
                       target="_blank"
@@ -806,8 +806,7 @@ function ImportLedger(): JSX.Element {
                 ) : (
                   <ImportBeforeStartText>
                     It is not recommended to use Xverse and Ledger Live, or other Bitcoin wallets
-                    with the same device as this could lead to unintentional transfers of Ordinals.
-                    {' '}
+                    with the same device as this could lead to unintentional transfers of Ordinals.{' '}
                     <CustomLink
                       href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
                       target="_blank"
@@ -842,8 +841,8 @@ function ImportLedger(): JSX.Element {
                     <TogglerText>I understand the risks and wish to continue anyway</TogglerText>
                   ) : (
                     <TogglerText>
-                      I understand I should not use Ledger Live or other Bitcoin wallets with the same hardware
-                      device
+                      I understand I should not use Ledger Live or other Bitcoin wallets with the
+                      same hardware device
                     </TogglerText>
                   )}
                 </TogglerContainer>

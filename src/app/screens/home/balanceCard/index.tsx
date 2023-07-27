@@ -54,7 +54,8 @@ interface BalanceCardProps {
 
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } = useWalletSelector();
+  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } =
+    useWalletSelector();
   const { isLoading } = props;
 
   function calculateTotalBalance() {
@@ -67,7 +68,7 @@ function BalanceCard(props: BalanceCardProps) {
     }
     if (btcAddress) {
       const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
-        new BigNumber(btcFiatRate)
+        new BigNumber(btcFiatRate),
       );
       totalBalance = totalBalance.plus(btcFiatEquiv);
     }

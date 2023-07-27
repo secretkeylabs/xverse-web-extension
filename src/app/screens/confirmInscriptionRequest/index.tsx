@@ -7,7 +7,11 @@ import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import { NumericFormat } from 'react-number-format';
-import { Recipient, SignedBtcTx, signBtcTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
+import {
+  Recipient,
+  SignedBtcTx,
+  signBtcTransaction,
+} from '@secretkeylabs/xverse-core/transactions/btc';
 import { BtcTransactionBroadcastResponse, ResponseError } from '@secretkeylabs/xverse-core/types';
 import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
 import useBtcClient from '@hooks/useBtcClient';
@@ -137,9 +141,7 @@ function ConfirmInscriptionRequest() {
     brcContent,
     feePerVByte,
   } = location.state;
-  const {
-    btcAddress, network, selectedAccount, seedPhrase, btcFiatRate
-  } = useWalletSelector();
+  const { btcAddress, network, selectedAccount, seedPhrase, btcFiatRate } = useWalletSelector();
   const btcClient = useBtcClient();
   const [signedTx, setSignedTx] = useState<string>('');
   const [textContent, setTextContent] = useState<string>('');
@@ -159,9 +161,9 @@ function ConfirmInscriptionRequest() {
   useEffect(() => {
     axios
       .get<string>(brcContent, {
-      timeout: 30000,
-      transformResponse: [(data) => parseOrdinalTextContentData(data)],
-    })
+        timeout: 30000,
+        transformResponse: [(data) => parseOrdinalTextContentData(data)],
+      })
       .then((response) => setTextContent(response!.data))
       .catch((error) => '');
     return () => {
@@ -174,7 +176,9 @@ function ConfirmInscriptionRequest() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
+    mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  });
 
   const {
     isLoading: loadingFee,
@@ -182,20 +186,23 @@ function ConfirmInscriptionRequest() {
     error: txFeeError,
     mutate: mutateTxFee,
   } = useMutation<
-  SignedBtcTx,
-  ResponseError,
-  {
-    recipients: Recipient[];
-    txFee: string;
-  }
-  >({ mutationFn: async ({ recipients, txFee }) => signBtcTransaction(
-    recipients,
-    btcAddress,
-    selectedAccount?.id ?? 0,
-    seedPhrase,
-    network.type,
-    new BigNumber(txFee),
-  ) });
+    SignedBtcTx,
+    ResponseError,
+    {
+      recipients: Recipient[];
+      txFee: string;
+    }
+  >({
+    mutationFn: async ({ recipients, txFee }) =>
+      signBtcTransaction(
+        recipients,
+        btcAddress,
+        selectedAccount?.id ?? 0,
+        seedPhrase,
+        network.type,
+        new BigNumber(txFee),
+      ),
+  });
 
   const onContinueButtonClick = () => {
     mutate({ signedTx });
@@ -260,7 +267,9 @@ function ConfirmInscriptionRequest() {
       setShowOrdinalsDetectedAlert(true);
     } else if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'BRC-20';
-      navigate('/confirm-ledger-tx', { state: { amount: new BigNumber(amount), recipients: recipient, type: txType, fee } });
+      navigate('/confirm-ledger-tx', {
+        state: { amount: new BigNumber(amount), recipients: recipient, type: txType, fee },
+      });
     } else mutate({ signedTx: signedTxHex });
   };
 

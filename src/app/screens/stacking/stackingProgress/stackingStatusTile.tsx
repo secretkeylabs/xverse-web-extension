@@ -75,7 +75,9 @@ function StackingStatusTile() {
     if (stackingData) {
       if (!stackingData?.stackerInfo?.stacked && stackingData?.delegationInfo?.delegated) {
         setStatus('Delegated');
-      } else if (stackingData?.stackerInfo?.stacked) { setStatus('Stacking'); }
+      } else if (stackingData?.stackerInfo?.stacked) {
+        setStatus('Stacking');
+      }
     }
   }, [stackingData]);
 
@@ -95,9 +97,7 @@ function StackingStatusTile() {
 
       <StatusContainer>
         <Dot />
-        <StatusText>
-          {status === 'Stacking' ? t('IN_PROGRESS') : t('DELEGATED')}
-        </StatusText>
+        <StatusText>{status === 'Stacking' ? t('IN_PROGRESS') : t('DELEGATED')}</StatusText>
       </StatusContainer>
     </Container>
   );

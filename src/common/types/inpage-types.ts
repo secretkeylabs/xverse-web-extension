@@ -31,7 +31,7 @@ export interface TransactionRequestEventDetails {
 export type TransactionRequestEvent = CustomEvent<TransactionRequestEventDetails>;
 
 export interface GetAddressRequestEventDetails {
-  btcAddressRequest: string,
+  btcAddressRequest: string;
 }
 
 export type GetAddressRequestEvent = CustomEvent<GetAddressRequestEventDetails>;

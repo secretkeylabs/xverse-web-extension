@@ -18,7 +18,7 @@ const RowContainer = styled.button`
 `;
 
 interface ImgContainerProps {
-  color: string
+  color: string;
 }
 
 const ImgContainer = styled.div<ImgContainerProps>((props) => ({
@@ -39,15 +39,13 @@ const Text = styled.h1((props) => ({
 }));
 
 interface Props {
-  img: string,
-  text: string,
-  background: string
+  img: string;
+  text: string;
+  background: string;
   onClick?: () => void;
 }
 
-function ShareLinkRow({
-  img, text, background, onClick,
-}: Props) {
+function ShareLinkRow({ img, text, background, onClick }: Props) {
   return (
     <RowContainer onClick={onClick}>
       <ImgContainer color={background}>

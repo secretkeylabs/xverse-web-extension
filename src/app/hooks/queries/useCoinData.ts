@@ -18,7 +18,7 @@ export const useCoinsData = () => {
       if (!stxAddress) {
         throw new InvalidParamsError('No stx address');
       }
-      
+
       const fungibleTokenList: Array<FungibleToken> = await getFtData(
         stxAddress,
         currentNetworkInstance,

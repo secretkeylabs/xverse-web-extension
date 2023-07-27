@@ -104,14 +104,16 @@ function SendOrdinal() {
   const { selectedOrdinal } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
-  const {
-    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate
-  } = useWalletSelector();
+  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+    useWalletSelector();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
   const textContent = useTextOrdinalContent(selectedOrdinal!);
-  const address: string | undefined = useMemo(() => (location.state ? location.state.recipientAddress : undefined), [location.state]);
+  const address: string | undefined = useMemo(
+    () => (location.state ? location.state.recipientAddress : undefined),
+    [location.state],
+  );
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
   const {
@@ -119,23 +121,25 @@ function SendOrdinal() {
     data,
     error: txError,
     mutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>({ mutationFn: async (recipient) => {
-    const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
-    const ordUtxo = addressUtxos.find((utx) => utx.txid === selectedOrdinal?.tx_id);
-    setOrdinalUtxo(ordUtxo);
-    if (ordUtxo) {
-      const signedTx = await signOrdinalSendTransaction(
-        recipient,
-        ordUtxo,
-        btcAddress,
-        Number(selectedAccount?.id),
-        seedPhrase,
-        network.type,
-        [ordUtxo],
-      );
-      return signedTx;
-    }
-  } });
+  } = useMutation<SignedBtcTx, ResponseError, string>({
+    mutationFn: async (recipient) => {
+      const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
+      const ordUtxo = addressUtxos.find((utx) => utx.txid === selectedOrdinal?.tx_id);
+      setOrdinalUtxo(ordUtxo);
+      if (ordUtxo) {
+        const signedTx = await signOrdinalSendTransaction(
+          recipient,
+          ordUtxo,
+          btcAddress,
+          Number(selectedAccount?.id),
+          seedPhrase,
+          network.type,
+          [ordUtxo],
+        );
+        return signedTx;
+      }
+    },
+  });
 
   useEffect(() => {
     if (txError) {
@@ -170,7 +174,6 @@ function SendOrdinal() {
 
   const { subscribeToResetUserFlow } = useResetUserFlow();
   useEffect(() => subscribeToResetUserFlow('/send-ordinal'), []);
-
 
   const activeAccountOwnsOrdinal =
     selectedOrdinal && selectedAccount && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);

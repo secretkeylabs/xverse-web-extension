@@ -6,7 +6,10 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
 import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
-import { addressToString, broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
+import {
+  addressToString,
+  broadcastSignedTransaction,
+} from '@secretkeylabs/xverse-core/transactions';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
@@ -41,34 +44,31 @@ function ConfirmStxTransaction() {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
-  const {
-    unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken,
-  } = location.state;
+  const { unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken } = location.state;
   const unsignedTx = deserializeTransaction(stringHex);
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
-  const {
-    stxBtcRate, btcFiatRate, network,
-  } = useWalletSelector();
-  const {
-    refetch,
-  } = useStxWalletData();
+  const { stxBtcRate, btcFiatRate, network } = useWalletSelector();
+  const { refetch } = useStxWalletData();
   const {
     isLoading,
     error: txError,
     data: stxTxBroadcastData,
     mutate,
-  } = useMutation<
-  string,
-  Error,
-  { signedTx: StacksTransaction }>({ mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork) });
+  } = useMutation<string, Error, { signedTx: StacksTransaction }>({
+    mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
+  });
 
   useEffect(() => {
     if (stxTxBroadcastData) {
       if (isBrowserTx) {
-        finalizeTxSignature({ requestPayload: requestToken, tabId: Number(tabId), data: { txId: stxTxBroadcastData, txRaw } });
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId: Number(tabId),
+          data: { txId: stxTxBroadcastData, txRaw },
+        });
       }
       navigate('/tx-status', {
         state: {
@@ -153,8 +153,11 @@ function ConfirmStxTransaction() {
 
   return (
     <>
-      {isBrowserTx ? <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-        : <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleOnCancelClick} />}
+      {isBrowserTx ? (
+        <AccountHeaderComponent disableMenuOption disableAccountSwitch />
+      ) : (
+        <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleOnCancelClick} />
+      )}
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
@@ -172,11 +175,13 @@ function ConfirmStxTransaction() {
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         {memo && <TransferMemoView memo={memo} />}
         {hasTabClosed && (
-        <AlertContainer>
-          <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />
-        </AlertContainer>
+          <AlertContainer>
+            <InfoContainer
+              titleText={t('WINDOW_CLOSED_ALERT.TITLE')}
+              bodyText={t('WINDOW_CLOSED_ALERT.BODY')}
+            />
+          </AlertContainer>
         )}
-
       </ConfirmStxTransationComponent>
       {!isBrowserTx && <BottomBar tab="dashboard" />}
     </>

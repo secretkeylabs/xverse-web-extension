@@ -37,7 +37,11 @@ interface Props {
   onResetWalletPromptClose: () => void;
   openResetWalletScreen: () => void;
 }
-function ResetWalletPrompt({ showResetWalletPrompt, onResetWalletPromptClose, openResetWalletScreen }:Props) {
+function ResetWalletPrompt({
+  showResetWalletPrompt,
+  onResetWalletPromptClose,
+  openResetWalletScreen,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   return (
     <BottomModal
@@ -48,18 +52,10 @@ function ResetWalletPrompt({ showResetWalletPrompt, onResetWalletPromptClose, op
       <ResetWalletText>{t('RESET_WALLET_DESCRIPTION')}</ResetWalletText>
       <ButtonContainer>
         <TransparentButtonContainer>
-          <ActionButton
-            text={t('CANCEL')}
-            transparent
-            onPress={onResetWalletPromptClose}
-          />
+          <ActionButton text={t('CANCEL')} transparent onPress={onResetWalletPromptClose} />
         </TransparentButtonContainer>
         <ResetButtonContainer>
-          <ActionButton
-            text={t('RESET_WALLET')}
-            warning
-            onPress={openResetWalletScreen}
-          />
+          <ActionButton text={t('RESET_WALLET')} warning onPress={openResetWalletScreen} />
         </ResetButtonContainer>
       </ButtonContainer>
     </BottomModal>

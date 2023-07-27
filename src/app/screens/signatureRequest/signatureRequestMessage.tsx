@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import CollapsableContainer from './collapsableContainer';
 
 interface SignatureRequestMessageProps {
-  request: SignaturePayload,
+  request: SignaturePayload;
 }
 
 const RequestMessage = styled.p((props) => ({
@@ -16,9 +16,7 @@ const RequestMessage = styled.p((props) => ({
 
 export default function SignatureRequestMessage(props: SignatureRequestMessageProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
-  const {
-    request,
-  } = props;
+  const { request } = props;
 
   return (
     <CollapsableContainer text={request.message} title={t('MESSAGE_HEADER')}>

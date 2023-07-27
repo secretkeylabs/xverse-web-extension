@@ -94,16 +94,16 @@ function ConfirmOrdinalTransaction() {
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const {
-    fee, feePerVByte, signedTxHex, ordinalUtxo,
-  } = location.state;
+  const { fee, feePerVByte, signedTxHex, ordinalUtxo } = location.state;
 
   const {
     isLoading,
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
+    mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  });
   const { selectedOrdinal } = useNftDataSelector();
   const { refetch } = useBtcWalletData();
   const [currentFee, setCurrentFee] = useState(fee);
@@ -145,7 +145,15 @@ function ConfirmOrdinalTransaction() {
   const handleOnConfirmClick = (txHex: string) => {
     if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'ORDINALS';
-      navigate('/confirm-ledger-tx', { state: { recipients: [{ address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }], type: txType, ordinalUtxo, feeRateInput: currentFeeRate, fee: currentFee } });
+      navigate('/confirm-ledger-tx', {
+        state: {
+          recipients: [{ address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }],
+          type: txType,
+          ordinalUtxo,
+          feeRateInput: currentFeeRate,
+          fee: currentFee,
+        },
+      });
       return;
     }
 

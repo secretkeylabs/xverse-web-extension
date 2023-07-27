@@ -1,7 +1,7 @@
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -23,7 +23,7 @@ const TitleText = styled.h1((props) => ({
 }));
 
 interface ValueTextProps {
-  color?: string,
+  color?: string;
 }
 
 const ValueText = styled.h1<ValueTextProps>((props) => ({
@@ -92,6 +92,5 @@ function OrdinalAttributeComponent({ title, value, showOridnalTag, isAddress, va
     </Container>
   );
 }
-
 
 export default OrdinalAttributeComponent;

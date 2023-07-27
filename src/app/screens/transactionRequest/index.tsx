@@ -47,7 +47,7 @@ function TransactionRequest() {
       stxPublicKey,
       feeMultipliers!,
       selectedNetwork,
-      stxPendingTxData
+      stxPendingTxData,
     );
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
@@ -70,7 +70,7 @@ function TransactionRequest() {
     setUnsignedTx(unSignedContractCall);
     setCoinsMetaData(coinMeta);
     const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find(
-      (func) => func.name === payload.functionName
+      (func) => func.name === payload.functionName,
     );
     const txAttachment = payload.attachment ?? undefined;
     if (txAttachment) setAttachment(txAttachment);
@@ -82,8 +82,7 @@ function TransactionRequest() {
           state: {
             txid: '',
             currency: 'STX',
-            error:
-              'Contract function call missing arguments',
+            error: 'Contract function call missing arguments',
             browserTx: true,
           },
         });
@@ -97,7 +96,7 @@ function TransactionRequest() {
       selectedNetwork,
       stxPublicKey,
       feeMultipliers!,
-      stxAddress
+      stxAddress,
     );
     setUnsignedTx(response.contractDeployTx);
     setCodeBody(response.codeBody);
