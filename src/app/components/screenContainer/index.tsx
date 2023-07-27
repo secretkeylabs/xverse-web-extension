@@ -8,10 +8,23 @@ const RouteContainer = styled.div((props) => ({
   flexDirection: 'column',
   height: 600,
   width: 360,
-  margin: 'auto',
+  margin: '0 0',
   backgroundColor: props.theme.colors.background.elevation0,
   border: '1px solid rgba(126, 137,171,0.2)',
   boxShadow: '0px 8px 28px rgba(0, 0, 0, 0.35)',
+  ':hover': {
+    overflowY: 'scroll',
+  },
+  '&::-webkit-scrollbar': {
+    width: 10,
+    background: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    width: 8,
+    maxHeight: 20,
+    borderRadius: 24,
+    background: 'var(--white-800, rgba(255, 255, 255, 0.20))',
+  },
 }));
 
 const TestnetContainer = styled.div((props) => ({
@@ -30,9 +43,7 @@ const TestnetText = styled.h1((props) => ({
 }));
 
 function ScreenContainer(): JSX.Element {
-  const {
-    network,
-  } = useWalletSelector();
+  const { network } = useWalletSelector();
   const { t } = useTranslation('translation');
 
   return (

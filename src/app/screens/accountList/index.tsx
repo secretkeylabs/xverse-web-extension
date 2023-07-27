@@ -19,7 +19,15 @@ const Container = styled.div`
   flex-direction: column;
   overflow-y: auto;
   &::-webkit-scrollbar {
-    display: none;
+    width: 10px;
+    background: transparent;
+  };
+
+  &::-webkit-scrollbar-thumb {
+    width: 8px;
+    max-height: 20px;
+    border-radius: 24px;
+    background: var(--white-800, rgba(255, 255, 255, 0.20));
   }
 `;
 

@@ -43,10 +43,6 @@ export const Container = styled.div`
   flex: 1;
   margin-left: 16px;
   margin-right: 16px;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
 `;
 
 const ColumnContainer = styled.div((props) => ({

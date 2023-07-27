@@ -9,7 +9,3 @@ body {
   width: 360px;
   height: 600px;
 }
-
-::-webkit-scrollbar {
-  display: none;
-}
