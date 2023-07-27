@@ -81,23 +81,24 @@ function CoinSelectModal({
     return (
       <Container>
         {renderFixedCoins()}
-        {stxAddress && coins.map((coin) => (
-          <TokenTile
-            key={coin.principal}
-            title={coin.name}
-            currency="FT"
-            icon={IconStacks}
-            loading={loadingWalletData}
-            underlayColor={theme.colors.background.elevation2}
-            margin={14}
-            enlargeTicker
-            onPress={() => {
-              onSelectCoin(coin);
-              onClose();
-            }}
-            fungibleToken={coin}
-          />
-        ))}
+        {stxAddress &&
+          coins.map((coin) => (
+            <TokenTile
+              key={coin.principal}
+              title={coin.name}
+              currency="FT"
+              icon={IconStacks}
+              loading={loadingWalletData}
+              underlayColor={theme.colors.background.elevation2}
+              margin={14}
+              enlargeTicker
+              onPress={() => {
+                onSelectCoin(coin);
+                onClose();
+              }}
+              fungibleToken={coin}
+            />
+          ))}
       </Container>
     );
   }

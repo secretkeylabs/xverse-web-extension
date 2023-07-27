@@ -69,7 +69,11 @@ function RecipientAddressView({ recipient }: Props) {
       <ValueText>{bnsName}</ValueText>
       <RowContainer>
         <AddressContainer>
-          {bnsName ? <AssociatedAddressText>{recipient}</AssociatedAddressText> : <ValueText>{recipient}</ValueText>}
+          {bnsName ? (
+            <AssociatedAddressText>{recipient}</AssociatedAddressText>
+          ) : (
+            <ValueText>{recipient}</ValueText>
+          )}
         </AddressContainer>
         <ActionButton onClick={handleOnPress}>
           <ButtonImage src={ArrowSquareOut} />

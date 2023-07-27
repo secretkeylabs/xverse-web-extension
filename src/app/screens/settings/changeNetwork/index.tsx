@@ -149,10 +149,15 @@ function ChangeNetworkScreen() {
 
   const onSubmit = async () => {
     setIsChangingNetwork(true);
-    const isValidStacksUrl = await isValidStacksApi(url, changedNetwork.type).catch((err) => setError(err.message));
-    const isValidBtcApiUrl = await isValidBtcApi(btcUrl, changedNetwork.type).catch((err) => setBtcURLError(err.message));
+    const isValidStacksUrl = await isValidStacksApi(url, changedNetwork.type).catch((err) =>
+      setError(err.message),
+    );
+    const isValidBtcApiUrl = await isValidBtcApi(btcUrl, changedNetwork.type).catch((err) =>
+      setBtcURLError(err.message),
+    );
     if (isValidStacksUrl && isValidBtcApiUrl) {
-      const networkObject = changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
+      const networkObject =
+        changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
       const btcChangedUrl = isUrlEdited ? btcUrl : '';
       await changeNetwork(changedNetwork, networkObject, url, btcChangedUrl);
       navigate('/settings');
@@ -189,9 +194,7 @@ function ChangeNetworkScreen() {
         <ErrorMessage>{error}</ErrorMessage>
         <NodeInputHeader>
           <NodeText>BTC API URL</NodeText>
-          <NodeResetButton onClick={onResetBtcUrl}>
-            Reset URL
-          </NodeResetButton>
+          <NodeResetButton onClick={onResetBtcUrl}>Reset URL</NodeResetButton>
         </NodeInputHeader>
         <InputContainer>
           <Input onChange={onChangeBtcApiUrl} value={btcUrl} />

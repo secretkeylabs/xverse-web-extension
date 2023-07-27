@@ -20,8 +20,8 @@ const ColumnContainer = styled.h1({
 });
 
 interface Props {
-  title: string,
-  value: string
+  title: string;
+  value: string;
 }
 
 function DescriptionTile({ title, value }: Props) {

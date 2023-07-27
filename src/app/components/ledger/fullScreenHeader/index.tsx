@@ -30,10 +30,7 @@ function FullScreenHeader() {
   return (
     <HeaderRow>
       <XverseLogo src={XverseLogoSVG} />
-      <VersionText>
-        V
-        {VERSION}
-      </VersionText>
+      <VersionText>V{VERSION}</VersionText>
     </HeaderRow>
   );
 }

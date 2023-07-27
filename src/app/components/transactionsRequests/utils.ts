@@ -1,5 +1,8 @@
 import {
-  ExternalMethods, MESSAGE_SOURCE, TransactionResponseMessage, TxResult,
+  ExternalMethods,
+  MESSAGE_SOURCE,
+  TransactionResponseMessage,
+  TxResult,
 } from '@common/types/message-types';
 
 interface FormatTxSignatureResponseArgs {
@@ -26,7 +29,11 @@ interface FinalizeTxSignatureArgs {
   tabId: number;
 }
 
-export default function finalizeTxSignature({ requestPayload, data, tabId }: FinalizeTxSignatureArgs) {
+export default function finalizeTxSignature({
+  requestPayload,
+  data,
+  tabId,
+}: FinalizeTxSignatureArgs) {
   try {
     const responseMessage = formatTxSignatureResponse({ payload: requestPayload, response: data });
     chrome.tabs.sendMessage(tabId, responseMessage);

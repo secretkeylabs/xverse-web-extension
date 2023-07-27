@@ -5,9 +5,7 @@ import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
-import {
-  broadcastSignedTransaction,
-} from '@secretkeylabs/xverse-core';
+import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
 import { useNavigate } from 'react-router-dom';
 import AccountHeaderComponent from '@components/accountHeader';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
@@ -106,9 +104,7 @@ interface ContractDeployRequestProps {
 }
 
 export default function ContractDeployRequest(props: ContractDeployRequestProps) {
-  const {
-    unsignedTx, codeBody, contractName, sponsored, tabId, requestToken,
-  } = props;
+  const { unsignedTx, codeBody, contractName, sponsored, tabId, requestToken } = props;
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
@@ -125,7 +121,11 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
       setLoaderForBroadcastingTx(true);
       const broadcastResult = await broadcastSignedTransaction(tx[0], selectedNetwork);
       if (broadcastResult) {
-        finalizeTxSignature({ requestPayload: requestToken, tabId, data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') } });
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId,
+          data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') },
+        });
         navigate('/tx-status', {
           state: {
             txid: broadcastResult,
@@ -187,12 +187,14 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
     </SponsoredContainer>
   );
 
-  const postConditionAlert = unsignedTx?.postConditionMode === 2
-    && unsignedTx?.postConditions.values.length <= 0 && (
+  const postConditionAlert = unsignedTx?.postConditionMode === 2 &&
+    unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
-        <PostConditionAlertText>{t('DEPLOY_CONTRACT_REQUEST.POST_CONDITION_ALERT')}</PostConditionAlertText>
+        <PostConditionAlertText>
+          {t('DEPLOY_CONTRACT_REQUEST.POST_CONDITION_ALERT')}
+        </PostConditionAlertText>
       </PostConditionContainer>
-  );
+    );
 
   return (
     <>
@@ -205,13 +207,21 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         isSponsored={sponsored}
         title={t('DEPLOY_CONTRACT_REQUEST.DEPLOY_CONTRACT')}
       >
-        {hasTabClosed && <InfoContainer titleText={t('WINDOW_CLOSED_ALERT.TITLE')} bodyText={t('WINDOW_CLOSED_ALERT.BODY')} />}
+        {hasTabClosed && (
+          <InfoContainer
+            titleText={t('WINDOW_CLOSED_ALERT.TITLE')}
+            bodyText={t('WINDOW_CLOSED_ALERT.BODY')}
+          />
+        )}
         {postConditionAlert}
         {sponsored && showSponsoredTransactionTag}
         {unsignedTx?.postConditions?.values?.map((postCondition) => (
           <StxPostConditionCard postCondition={postCondition as PostCondition} />
         ))}
-        <TransactionDetailComponent title={t('DEPLOY_CONTRACT_REQUEST.CONTRACT_NAME')} value={contractName} />
+        <TransactionDetailComponent
+          title={t('DEPLOY_CONTRACT_REQUEST.CONTRACT_NAME')}
+          value={contractName}
+        />
         <DownloadContainer>
           <Title>{t('DEPLOY_CONTRACT_REQUEST.FUNCTION')}</Title>
           <DownloadButtonContainer>

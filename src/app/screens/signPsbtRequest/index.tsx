@@ -1,6 +1,4 @@
-import {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ActionButton from '@components/button';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -8,9 +6,7 @@ import { parsePsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { useTranslation } from 'react-i18next';
 import IconOrdinal from '@assets/img/transactions/ordinal.svg';
 import styled from 'styled-components';
-import {
-  getBtcFiatEquivalent, satsToBtc,
-} from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
@@ -73,15 +69,12 @@ const ReviewTransactionText = styled.h1((props) => ({
 }));
 
 function SignPsbtRequest() {
-  const {
-    btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate,
-  } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
+    useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const {
-    payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses,
-  } = useSignPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
 
   const handlePsbtParsing = useCallback(() => {
@@ -93,11 +86,7 @@ function SignPsbtRequest() {
   }, [selectedAccount, payload.psbtBase64]);
 
   const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
-  const {
-    loading,
-    ordinalInfoData,
-    userReceivesOrdinal,
-  } = useDetectOrdinalInSignPsbt(parsedPsbt);
+  const { loading, ordinalInfoData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
     [payload.inputsToSign],
@@ -206,21 +195,21 @@ function SignPsbtRequest() {
         <LoaderContainer>
           <MoonLoader color="white" size={50} />
         </LoaderContainer>
-      )
-        : (
-          <>
-            <OuterContainer>
-              {isLedgerAccount(selectedAccount) ? (
-                <Container>
-                  <InfoContainer bodyText="External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
-                </Container>
-              ) : (
-                <Container>
-                  <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
-                  {!payload.broadcast && (
-                    <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
-                  )}
-                  {ordinalInfoData && ordinalInfoData.map((ordinalData) => (
+      ) : (
+        <>
+          <OuterContainer>
+            {isLedgerAccount(selectedAccount) ? (
+              <Container>
+                <InfoContainer bodyText="External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
+              </Container>
+            ) : (
+              <Container>
+                <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
+                {!payload.broadcast && (
+                  <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
+                )}
+                {ordinalInfoData &&
+                  ordinalInfoData.map((ordinalData) => (
                     <OrdinalDetailComponent
                       ordinalInscription={`Inscription ${ordinalData?.number}`}
                       icon={IconOrdinal}
@@ -230,40 +219,47 @@ function SignPsbtRequest() {
                       heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
                     />
                   ))}
-                  <RecipientComponent
-                    value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
-                      .toString()
-                      .replace('-', '')}`}
-                    currencyType="BTC"
-                    title={t('AMOUNT')}
-                    heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
-                  />
-                  <InputOutputComponent
-                    parsedPsbt={parsedPsbt}
-                    isExpanded={expandInputOutputView}
-                    address={signingAddresses}
-                    onArrowClick={expandInputOutputSection}
-                  />
+                <RecipientComponent
+                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
+                    .toString()
+                    .replace('-', '')}`}
+                  currencyType="BTC"
+                  title={t('AMOUNT')}
+                  heading={
+                    parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')
+                  }
+                />
+                <InputOutputComponent
+                  parsedPsbt={parsedPsbt}
+                  isExpanded={expandInputOutputView}
+                  address={signingAddresses}
+                  onArrowClick={expandInputOutputSection}
+                />
 
-                  <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-                  {payload.broadcast ? (
-                    <TransactionDetailComponent
-                      title={t('FEES')}
-                      value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
-                      subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
-                    />
-                  ) : null}
-                </Container>
-              )}
-            </OuterContainer>
-            <ButtonContainer>
-              <TransparentButtonContainer>
-                <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
-              </TransparentButtonContainer>
-              <ActionButton text={t('CONFIRM')} onPress={onSignPsbtConfirmed} processing={isSigning} disabled={isLedgerAccount(selectedAccount)} />
-            </ButtonContainer>
-          </>
-        )}
+                <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+                {payload.broadcast ? (
+                  <TransactionDetailComponent
+                    title={t('FEES')}
+                    value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
+                    subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+                  />
+                ) : null}
+              </Container>
+            )}
+          </OuterContainer>
+          <ButtonContainer>
+            <TransparentButtonContainer>
+              <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
+            </TransparentButtonContainer>
+            <ActionButton
+              text={t('CONFIRM')}
+              onPress={onSignPsbtConfirmed}
+              processing={isSigning}
+              disabled={isLedgerAccount(selectedAccount)}
+            />
+          </ButtonContainer>
+        </>
+      )}
     </>
   );
 }

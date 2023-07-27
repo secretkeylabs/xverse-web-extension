@@ -43,9 +43,7 @@ interface Props {
   onClick: () => void;
 }
 
-function FundsRow({
-  image, title, description, onClick,
-}: Props) {
+function FundsRow({ image, title, description, onClick }: Props) {
   return (
     <RowContainer onClick={onClick}>
       <Icon src={image} />
@@ -54,7 +52,6 @@ function FundsRow({
         <ValueText>{description}</ValueText>
       </Container>
     </RowContainer>
-
   );
 }
 

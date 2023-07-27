@@ -15,11 +15,7 @@ function useSendBtcRequest() {
   const request = decodeToken(requestToken) as any as SendBtcTransactionOptions;
   const tabId = params.get('tabId') ?? '0';
 
-  const {
-    network,
-    selectedAccount,
-    seedPhrase,
-  } = useWalletSelector();
+  const { network, selectedAccount, seedPhrase } = useWalletSelector();
 
   const generateSignedTransaction = async () => {
     const recipients: Recipient[] = [];
@@ -42,7 +38,9 @@ function useSendBtcRequest() {
   };
 
   const {
-    data: signedTx, isLoading, error,
+    data: signedTx,
+    isLoading,
+    error,
   } = useQuery({
     queryKey: ['generate-signed-transaction'],
     queryFn: generateSignedTransaction,

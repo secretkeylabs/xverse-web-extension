@@ -24,7 +24,6 @@ const Text = styled.h1<TitleProps>((props) => ({
   color: props.color,
   flex: 1,
   textAlign: 'left',
-
 }));
 
 interface Props {
@@ -34,19 +33,14 @@ interface Props {
   showDivider: boolean;
 }
 
-function NetworkRow({
-  network, isSelected, onNetworkSelected, showDivider,
-}: Props) {
+function NetworkRow({ network, isSelected, onNetworkSelected, showDivider }: Props) {
   const theme = useTheme();
   const onClick = () => {
     onNetworkSelected(network);
   };
 
   return (
-    <Button
-      onClick={onClick}
-      border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}
-    >
+    <Button onClick={onClick} border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}>
       <Text color={isSelected ? theme.colors.white['0'] : theme.colors.white['200']}>
         {network.type}
       </Text>

@@ -7,7 +7,12 @@ import MoonPay from '@assets/img/dashboard/moonpay.svg';
 import Binance from '@assets/img/dashboard/binance.svg';
 import Transak from '@assets/img/dashboard/transak.svg';
 import {
-  BINANCE_MERCHANT_CODE, BINANCE_URL, MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL,
+  BINANCE_MERCHANT_CODE,
+  BINANCE_URL,
+  MOON_PAY_API_KEY,
+  MOON_PAY_URL,
+  TRANSAC_API_KEY,
+  TRANSAC_URL,
 } from '@utils/constants';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
@@ -91,20 +96,11 @@ function Buy() {
     try {
       const transacUrl = new URL(TRANSAC_URL);
       transacUrl.searchParams.append('apiKey', TRANSAC_API_KEY);
-      transacUrl.searchParams.append(
-        'cryptoCurrencyList',
-        currency!,
-      );
-      transacUrl.searchParams.append(
-        'defaultCryptoCurrency',
-        currency!,
-      );
+      transacUrl.searchParams.append('cryptoCurrencyList', currency!);
+      transacUrl.searchParams.append('defaultCryptoCurrency', currency!);
       transacUrl.searchParams.append('walletAddress', address);
       transacUrl.searchParams.append('disableWalletAddressForm', 'true');
-      transacUrl.searchParams.append(
-        'exchangeScreenTitle',
-        `Buy ${currency}`,
-      );
+      transacUrl.searchParams.append('exchangeScreenTitle', `Buy ${currency}`);
       setUrl(transacUrl.href);
       setLoading(false);
     } catch (e) {
@@ -120,15 +116,10 @@ function Buy() {
       binanceUrl.searchParams.append('cryptoNetwork', currency!);
       binanceUrl.searchParams.append('merchantCode', BINANCE_MERCHANT_CODE);
       binanceUrl.searchParams.append('timestamp', `${new Date().getTime()}`);
-      const signature = await getBinaceSignature(
-        binanceUrl.search.replace('?', ''),
-      );
+      const signature = await getBinaceSignature(binanceUrl.search.replace('?', ''));
       binanceUrl.search = signature.signedUrl;
       binanceUrl.searchParams.append('cryptoCurrency', currency!);
-      binanceUrl.searchParams.append(
-        'fiatCurrency',
-        currency === 'STX' ? 'EUR' : fiatCurrency,
-      ); // HACK: 24th Aug 2022 - Binance only supports EUR to STX
+      binanceUrl.searchParams.append('fiatCurrency', currency === 'STX' ? 'EUR' : fiatCurrency); // HACK: 24th Aug 2022 - Binance only supports EUR to STX
       setUrl(binanceUrl.toString());
     } catch (e) {
       setLoading(false);
@@ -142,9 +133,9 @@ function Buy() {
       <TopRow title={`${t('BUY')} ${currency}`} onClick={handleBackButtonClick} />
       <Container>
         {loading && (
-        <LoaderContainer>
-          <MoonLoader color="white" size={20} />
-        </LoaderContainer>
+          <LoaderContainer>
+            <MoonLoader color="white" size={20} />
+          </LoaderContainer>
         )}
         <Text>{t('PURCHASE_CRYPTO')}</Text>
         <RedirectButton text={t('MOONPAY')} src={MoonPay} onClick={getMoonPayUrl} />
@@ -154,7 +145,6 @@ function Buy() {
       </Container>
       <BottomBar tab="dashboard" />
     </>
-
   );
 }
 

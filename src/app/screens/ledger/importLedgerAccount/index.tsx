@@ -13,7 +13,6 @@ import {
 } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { ledgerDelay } from '@common/utils/ledger';
-import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';

@@ -6,9 +6,7 @@ import PQueue from 'p-queue';
 const queue = new PQueue({ concurrency: 1 });
 
 const useTextOrdinalContent = (ordinal: Inscription) => {
-  const {
-    data: textContent,
-  } = useQuery({
+  const { data: textContent } = useQuery({
     queryKey: [`ordinal-text-${ordinal?.id}`],
     queryFn: async () => queue.add(() => getTextOrdinalContent(ordinal?.id)),
     refetchOnMount: false,

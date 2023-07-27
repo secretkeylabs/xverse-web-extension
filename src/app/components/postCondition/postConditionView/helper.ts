@@ -51,15 +51,17 @@ const stacksValue = ({
     abbreviate && stxAmount > 10000
       ? abbreviateNumber(stxAmount)
       : stxAmount.toLocaleString('en-US', {
-        maximumFractionDigits: fixedDecimals ? 6 : 3,
-      })
+          maximumFractionDigits: fixedDecimals ? 6 : 3,
+        })
   }${withTicker ? ' STX' : ''}`;
 };
 
 export const getAmountFromPostCondition = (
   pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
 ) => {
-  if (pc.conditionType === PostConditionType.Fungible) { return pc.amount.toString(); }
+  if (pc.conditionType === PostConditionType.Fungible) {
+    return pc.amount.toString();
+  }
   if (pc.conditionType === PostConditionType.STX) {
     return stacksValue({ value: pc.amount.toString(), withTicker: false });
   }

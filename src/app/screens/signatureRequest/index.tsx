@@ -13,11 +13,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { bytesToHex } from '@stacks/transactions';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
-import {
-  getNetworkType,
-  isHardwareAccount,
-  getTruncatedAddress,
-} from '@utils/helper';
+import { getNetworkType, isHardwareAccount, getTruncatedAddress } from '@utils/helper';
 import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -161,7 +157,7 @@ function SignatureRequest(): JSX.Element {
       }
       return false;
     });
-    return isHardwareAccount(selectedAccount) ? (account[0] || selectedAccount) : account[0];
+    return isHardwareAccount(selectedAccount) ? account[0] || selectedAccount : account[0];
   };
 
   const switchAccountBasedOnRequest = () => {
@@ -327,7 +323,9 @@ function SignatureRequest(): JSX.Element {
             <MessageHash>{getMessageHash()}</MessageHash>
           </CollapsableContainer>
           <SigningAddressContainer>
-            <SigningAddressTitle>{t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}</SigningAddressTitle>
+            <SigningAddressTitle>
+              {t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}
+            </SigningAddressTitle>
             <SigningAddress>
               <SigningAddressType>{addressType}</SigningAddressType>
               <SigningAddressValue>
@@ -367,7 +365,7 @@ function SignatureRequest(): JSX.Element {
             text={t(
               isTxRejected || isConnectFailed
                 ? 'SIGNATURE_REQUEST.LEDGER.RETRY_BUTTON'
-                : 'SIGNATURE_REQUEST.LEDGER.CONNECT_BUTTON'
+                : 'SIGNATURE_REQUEST.LEDGER.CONNECT_BUTTON',
             )}
             disabled={isButtonDisabled}
             processing={isButtonDisabled}

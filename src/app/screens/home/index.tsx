@@ -103,7 +103,6 @@ const RowButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   marginTop: props.theme.spacing(11),
   columnGap: props.theme.spacing(11),
-
 }));
 
 const TokenListButtonContainer = styled.div((props) => ({
@@ -124,13 +123,13 @@ const MergedIcon = styled.img({
   height: 40,
 });
 
-const VerifyOrViewContainer = styled.div(props => ({
+const VerifyOrViewContainer = styled.div((props) => ({
   margin: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(20),
 }));
 
-const VerifyButtonContainer = styled.div(props => ({
+const VerifyButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
@@ -144,12 +143,23 @@ function Home() {
   const [openBuyModal, setOpenBuyModal] = useState(false);
   const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
-  const { coinsList, stxAddress, btcAddress, ordinalsAddress, selectedAccount, brcCoinsList, showBtcReceiveAlert, showOrdinalReceiveAlert } = useWalletSelector();
-  const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(!isLedgerAccount(selectedAccount));
+  const {
+    coinsList,
+    stxAddress,
+    btcAddress,
+    ordinalsAddress,
+    selectedAccount,
+    brcCoinsList,
+    showBtcReceiveAlert,
+    showOrdinalReceiveAlert,
+  } = useWalletSelector();
+  const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
+    !isLedgerAccount(selectedAccount),
+  );
   const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
   const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  stxAddress ? useStxWalletData() : { isLoading: false, isRefetching: false };
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    stxAddress ? useStxWalletData() : { isLoading: false, isRefetching: false };
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
     useBtcWalletData();
   const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
@@ -256,8 +266,7 @@ function Home() {
   };
 
   const onOrdinalReceiveAlertOpen = () => {
-    if (showOrdinalReceiveAlert)
-    setIsOrdinalReceiveAlertVisible(true);
+    if (showOrdinalReceiveAlert) setIsOrdinalReceiveAlertVisible(true);
   };
 
   const onOrdinalReceiveAlertClose = () => {
@@ -269,8 +278,7 @@ function Home() {
   };
 
   const onReceiveAlertOpen = () => {
-    if (showBtcReceiveAlert)
-    setIsBtcReceiveAlertVisible(true);
+    if (showBtcReceiveAlert) setIsBtcReceiveAlertVisible(true);
   };
 
   const handleTokenPressed = (token: {
@@ -334,25 +342,36 @@ function Home() {
   const verifyOrViewAddresses = (
     <VerifyOrViewContainer>
       <VerifyButtonContainer>
-        <ActionButton text="Verify addresses on Ledger" onPress={() => {
-          setChoseToVerifyAddresses(true);
-          setAreReceivingAddressesVisible(true);
-        }} />
+        <ActionButton
+          text="Verify addresses on Ledger"
+          onPress={() => {
+            setChoseToVerifyAddresses(true);
+            setAreReceivingAddressesVisible(true);
+          }}
+        />
       </VerifyButtonContainer>
-      <ActionButton transparent text="View addresses" onPress={() => {
-        if (choseToVerifyAddresses) {
-          setChoseToVerifyAddresses(false);
-        }
-        setAreReceivingAddressesVisible(true);
-      }} />
+      <ActionButton
+        transparent
+        text="View addresses"
+        onPress={() => {
+          if (choseToVerifyAddresses) {
+            setChoseToVerifyAddresses(false);
+          }
+          setAreReceivingAddressesVisible(true);
+        }}
+      />
     </VerifyOrViewContainer>
   );
 
   return (
     <>
       <AccountHeaderComponent />
-      {isBtcReceiveAlertVisible && <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose}/>}
-      {isOrdinalReceiveAlertVisible && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose}/>}
+      {isBtcReceiveAlertVisible && (
+        <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose} />
+      )}
+      {isOrdinalReceiveAlertVisible && (
+        <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
+      )}
       <Container>
         <BalanceCard
           isLoading={
@@ -393,18 +412,19 @@ function Home() {
         </ColumnContainer>
         {(!!coinsList?.length || !!brcCoinsList?.length) && (
           <CoinContainer>
-            {!!stxAddress && coinsList
-              ?.filter((ft) => ft.visible)
-              .map((coin) => (
-                <TokenTile
-                  title={coin.name}
-                  currency="FT"
-                  loading={loadingCoinData || refetchingCoinData}
-                  underlayColor={Theme.colors.background.elevation1}
-                  fungibleToken={coin}
-                  onPress={handleTokenPressed}
-                />
-              ))}
+            {!!stxAddress &&
+              coinsList
+                ?.filter((ft) => ft.visible)
+                .map((coin) => (
+                  <TokenTile
+                    title={coin.name}
+                    currency="FT"
+                    loading={loadingCoinData || refetchingCoinData}
+                    underlayColor={Theme.colors.background.elevation1}
+                    fungibleToken={coin}
+                    onPress={handleTokenPressed}
+                  />
+                ))}
             {brcCoinsList?.map((coin) => (
               <TokenTile
                 key={coin.name}

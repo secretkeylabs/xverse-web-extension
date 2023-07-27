@@ -105,14 +105,15 @@ function ReviewLedgerStxTransactionComponent({
     setButtonLoading(loading);
   }, [loading]);
 
-  const getFee = () => (isSponsored
-    ? new BigNumber(0)
-    : new BigNumber(
-      initialStxTransactions
-        .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
-        .reduce((prev, curr) => prev + curr, BigInt(0))
-        .toString(10),
-    ));
+  const getFee = () =>
+    isSponsored
+      ? new BigNumber(0)
+      : new BigNumber(
+          initialStxTransactions
+            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+            .reduce((prev, curr) => prev + curr, BigInt(0))
+            .toString(10),
+        );
 
   const getTxNonce = (): string => {
     const nonce = getNonce(initialStxTransactions[0]);
@@ -148,7 +149,14 @@ function ReviewLedgerStxTransactionComponent({
     onConfirmClick(signedTxs);
   };
 
-  const applyTxSettings = ({ fee: settingFee, nonce }: { fee: string; feeRate?: string; nonce?: string }) => {
+  const applyTxSettings = ({
+    fee: settingFee,
+    nonce,
+  }: {
+    fee: string;
+    feeRate?: string;
+    nonce?: string;
+  }) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
     setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {

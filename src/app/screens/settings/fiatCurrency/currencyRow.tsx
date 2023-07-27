@@ -37,18 +37,13 @@ interface Props {
   showDivider: boolean;
 }
 
-function CurrencyRow({
-  currency, isSelected, onCurrencySelected, showDivider,
-}: Props) {
+function CurrencyRow({ currency, isSelected, onCurrencySelected, showDivider }: Props) {
   const theme = useTheme();
   const onClick = () => {
     onCurrencySelected(currency.name);
   };
   return (
-    <Button
-      onClick={onClick}
-      border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}
-    >
+    <Button onClick={onClick} border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}>
       <img src={currency.flag} alt="flag" />
       <Text color={isSelected ? theme.colors.white['0'] : 'rgb(255,255,255,0.6)'}>
         {currency.name}
