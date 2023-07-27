@@ -16,7 +16,7 @@ interface LedgerInputFieldProps {
 }
 const LedgerInputField = styled.input<LedgerInputFieldProps>((props) => ({
   ...props.theme.body_medium_m,
-  background: props.theme.colors.background['elevation-1'],
+  background: props.theme.colors.background.elevation_1,
   border: `1px solid ${props.error ? props.theme.colors.feedback.error : '#303354'}`,
   borderRadius: '8px',
   padding: '10px 16px',
