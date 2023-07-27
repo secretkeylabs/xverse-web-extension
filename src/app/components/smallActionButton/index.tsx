@@ -9,25 +9,29 @@ const Button = styled.div<ButtonProps>((props) => ({
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: 16,
-  backgroundColor: props.isOpaque ? props.theme.colors.background.elevation2 : props.theme.colors.action.classic,
+  backgroundColor: props.isOpaque
+    ? props.theme.colors.background.elevation2
+    : props.theme.colors.action.classic,
   width: 48,
   height: 48,
   transition: 'all 0.2s ease',
   ':hover': {
-    background: props.isOpaque ? props.theme.colors.background.elevation2 : props.theme.colors.action.classicLight,
+    background: props.isOpaque
+      ? props.theme.colors.background.elevation2
+      : props.theme.colors.action.classicLight,
     opacity: props.isOpaque ? 0.85 : 0.6,
   },
 }));
 
 const TransparentButton = styled(Button)`
   background-color: transparent;
-  border: ${(props) => `1px solid ${props.theme.colors.background.elevation6}`}
+  border: ${(props) => `1px solid ${props.theme.colors.background.elevation6}`};
 `;
 
 const AnimatedTransparentButton = styled(TransparentButton)`
-:hover {
-  background: ${(props) => props.theme.colors.background.elevation6_800};
-}
+  :hover {
+    background: ${(props) => props.theme.colors.background.elevation6_800};
+  }
 `;
 
 const ButtonText = styled.h1((props) => ({
@@ -63,22 +67,14 @@ interface Props {
   isDisabled?: boolean;
 }
 
-function SmallActionButton({
-  src,
-  text,
-  onPress,
-  isOpaque,
-  isDisabled,
-}: Props) {
+function SmallActionButton({ src, text, onPress, isOpaque, isDisabled }: Props) {
   const handleOnPress = () => {
     if (!isDisabled) onPress();
   };
 
   return (
     <ButtonContainer isDisabled={isDisabled} onClick={handleOnPress}>
-      <Button isOpaque={isOpaque}>
-        { src && <ButtonImage src={src} />}
-      </Button>
+      <Button isOpaque={isOpaque}>{src && <ButtonImage src={src} />}</Button>
       <ButtonText>{text}</ButtonText>
     </ButtonContainer>
   );

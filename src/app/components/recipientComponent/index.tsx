@@ -103,16 +103,22 @@ interface Props {
   fungibleToken?: FungibleToken;
   heading?: string;
   showSenderAddress?: boolean;
-
 }
 function RecipientComponent({
-  recipientIndex, address, value, totalRecipient, title, fungibleToken, icon, currencyType, heading, showSenderAddress,
-} : Props) {
+  recipientIndex,
+  address,
+  value,
+  totalRecipient,
+  title,
+  fungibleToken,
+  icon,
+  currencyType,
+  heading,
+  showSenderAddress,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
-  const {
-    stxBtcRate, btcFiatRate, fiatCurrency, ordinalsAddress
-  } = useWalletSelector();
+  const { stxBtcRate, btcFiatRate, fiatCurrency, ordinalsAddress } = useWalletSelector();
 
   useEffect(() => {
     let amountInCurrency;
@@ -121,16 +127,26 @@ function RecipientComponent({
       if (amountInCurrency.isLessThan(0.01)) {
         amountInCurrency = '0.01';
       }
-    } else { amountInCurrency = getFiatEquivalent(Number(value), currencyType, stxBtcRate, btcFiatRate, fungibleToken); }
+    } else {
+      amountInCurrency = getFiatEquivalent(
+        Number(value),
+        currencyType,
+        stxBtcRate,
+        btcFiatRate,
+        fungibleToken,
+      );
+    }
     setFiatAmount(amountInCurrency);
   }, [value]);
 
   function getFtTicker() {
     if (fungibleToken?.ticker) {
       return fungibleToken?.ticker.toUpperCase();
-    } if (fungibleToken?.name) {
+    }
+    if (fungibleToken?.name) {
       return getTicker(fungibleToken.name).toUpperCase();
-    } return '';
+    }
+    return '';
   }
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
@@ -156,27 +172,25 @@ function RecipientComponent({
     <Container>
       {recipientIndex && totalRecipient && totalRecipient !== 1 && (
         <RecipientTitleText>
-          {`${t(
-            'RECIPIENT',
-          )} ${recipientIndex}/${totalRecipient}`}
-
+          {`${t('RECIPIENT')} ${recipientIndex}/${totalRecipient}`}
         </RecipientTitleText>
       )}
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       <RowContainer>
-        {icon ? <Icon src={icon} />
-          : (
-            <TokenContainer>
-              <TokenImage
-                token={currencyType}
-                loading={false}
-                size={32}
-                fungibleToken={fungibleToken}
-              />
-            </TokenContainer>
-          )}
+        {icon ? (
+          <Icon src={icon} />
+        ) : (
+          <TokenContainer>
+            <TokenImage
+              token={currencyType}
+              loading={false}
+              size={32}
+              fungibleToken={fungibleToken}
+            />
+          </TokenContainer>
+        )}
         <TitleText>{title}</TitleText>
-        { currencyType === 'NFT' || currencyType === 'Ordinal' ? (
+        {currencyType === 'NFT' || currencyType === 'Ordinal' ? (
           <ColumnContainer>
             <ValueText>{value}</ValueText>
           </ColumnContainer>
@@ -195,15 +209,15 @@ function RecipientComponent({
       </RowContainer>
       {address && (
         <AddressContainer>
-          {showSenderAddress
-            ? (
-              <MultipleAddressContainer>
-                <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
-                <DownArrowIcon src={ArrowIcon} />
-                <TransferDetailView icon={WalletIcon} title={t('To')} address={address} />
-              </MultipleAddressContainer>
-            )
-            : <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />}
+          {showSenderAddress ? (
+            <MultipleAddressContainer>
+              <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
+              <DownArrowIcon src={ArrowIcon} />
+              <TransferDetailView icon={WalletIcon} title={t('To')} address={address} />
+            </MultipleAddressContainer>
+          ) : (
+            <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
+          )}
         </AddressContainer>
       )}
     </Container>

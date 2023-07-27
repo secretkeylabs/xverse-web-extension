@@ -35,8 +35,8 @@ const ButtonContainer = styled.button((props) => ({
   paddingRight: props.theme.spacing(11),
   transition: 'background-color 0.2s ease',
   ':hover': {
-    backgroundColor: props.theme.colors.background.elevation1
-  }
+    backgroundColor: props.theme.colors.background.elevation1,
+  },
 }));
 
 const AccountContainer = styled.div((props) => ({
@@ -68,13 +68,15 @@ const AddAccountText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
-const ButtonsWrapper = styled.div(props => `
+const ButtonsWrapper = styled.div(
+  (props) => `
   position: sticky;
   bottom: 0;
   background-color: ${props.theme.colors.background.elevation0};
   margin-top: ${props.theme.spacing(8)}px;
   margin-bottom: ${props.theme.spacing(11)}px;
-`);
+`,
+);
 
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
@@ -108,8 +110,8 @@ function AccountList(): JSX.Element {
         network,
         undefined,
         account.accountType,
-        account.accountName
-      )
+        account.accountName,
+      ),
     );
     broadcastResetUserFlow();
     navigate('/');

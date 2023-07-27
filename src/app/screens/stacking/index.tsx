@@ -31,9 +31,7 @@ function Stacking() {
   const { t } = useTranslation('translation', { keyPrefix: 'STACKING_SCREEN' });
   const { isStackingLoading, stackingData } = useStackingData();
   const [isStacking, setIsStacking] = useState<boolean>(false);
-  const {
-    stxAddress,
-  } = useWalletSelector();
+  const { stxAddress } = useWalletSelector();
 
   useEffect(() => {
     if (stackingData) {
@@ -43,9 +41,7 @@ function Stacking() {
     }
   }, [stackingData]);
 
-  const showStatus = !isStackingLoading && (
-    isStacking ? <StackingProgress /> : <StartStacking />
-  );
+  const showStatus = !isStackingLoading && (isStacking ? <StackingProgress /> : <StartStacking />);
 
   return (
     <>
@@ -55,11 +51,10 @@ function Stacking() {
         <LoaderContainer>
           <MoonLoader color="white" size={30} />
         </LoaderContainer>
-      ) }
+      )}
       {showStatus}
       <BottomBar tab="stacking" />
     </>
-
   );
 }
 

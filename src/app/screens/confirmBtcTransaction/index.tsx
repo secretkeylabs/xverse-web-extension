@@ -34,11 +34,18 @@ function ConfirmBtcTransaction() {
   const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
   const location = useLocation();
   const { refetch } = useBtcWalletData();
+  const { ordinals: ordinalsInBtc } = useOrdinalsByAddress(btcAddress);
   const {
-    ordinals: ordinalsInBtc,
-  } = useOrdinalsByAddress(btcAddress);
-  const {
-    fee, amount, signedTxHex, recipient, isRestoreFundFlow, unspentUtxos, btcSendBrowserTx, requestToken, tabId, isBrc20TokenFlow,
+    fee,
+    amount,
+    signedTxHex,
+    recipient,
+    isRestoreFundFlow,
+    unspentUtxos,
+    btcSendBrowserTx,
+    requestToken,
+    tabId,
+    isBrc20TokenFlow,
     feePerVByte,
   } = location.state;
   const [currentFee, setCurrentFee] = useState(fee);
@@ -49,13 +56,17 @@ function ConfirmBtcTransaction() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
+    mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  });
 
   const {
     error: errorBtcOrdinalTransaction,
     data: btcOrdinalTxBroadcastData,
     mutate: broadcastOrdinalTransaction,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({ mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx) });
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
+    mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  });
 
   const onClick = () => {
     navigate('/recover-ordinals', {
@@ -155,7 +166,14 @@ function ConfirmBtcTransaction() {
       setShowOrdinalsDetectedAlert(true);
     } else if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'BTC';
-      navigate('/confirm-ledger-tx', { state: { recipients: recipient, type: txType, feeRateInput: currentFeeRate, fee: currentFee } });
+      navigate('/confirm-ledger-tx', {
+        state: {
+          recipients: recipient,
+          type: txType,
+          feeRateInput: currentFeeRate,
+          fee: currentFee,
+        },
+      });
     } else mutate({ signedTx: txHex });
   };
 
@@ -192,7 +210,9 @@ function ConfirmBtcTransaction() {
           isWarningAlert
         />
       )}
-      {btcSendBrowserTx && <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />}
+      {btcSendBrowserTx && (
+        <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
+      )}
       <ConfirmBtcTransactionComponent
         fee={fee}
         feePerVByte={feePerVByte}
@@ -211,19 +231,19 @@ function ConfirmBtcTransaction() {
         setCurrentFeeRate={setCurrentFeeRate}
       >
         {ordinalsInBtc && ordinalsInBtc.length > 0 && (
-        <InfoContainer
-          type="Warning"
-          showWarningBackground
-          bodyText={t('ORDINAL_DETECTED_WARNING')}
-          redirectText={t('ORDINAL_DETECTED_ACTION')}
-          onClick={onClick}
-        />
+          <InfoContainer
+            type="Warning"
+            showWarningBackground
+            bodyText={t('ORDINAL_DETECTED_WARNING')}
+            redirectText={t('ORDINAL_DETECTED_ACTION')}
+            onClick={onClick}
+          />
         )}
       </ConfirmBtcTransactionComponent>
       {!btcSendBrowserTx && (
-      <BottomBarContainer>
-        <BottomBar tab="dashboard" />
-      </BottomBarContainer>
+        <BottomBarContainer>
+          <BottomBar tab="dashboard" />
+        </BottomBarContainer>
       )}
     </>
   );

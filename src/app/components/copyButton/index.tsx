@@ -21,7 +21,6 @@ const Button = styled.button((props) => ({
 const Img = styled.img({
   width: 20,
   height: 20,
-
 });
 
 const StyledToolTip = styled(Tooltip)`

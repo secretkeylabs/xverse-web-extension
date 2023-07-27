@@ -4,10 +4,8 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
-import {  TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
-import {
-  addressToString,
-} from '@secretkeylabs/xverse-core/transactions';
+import { TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
+import { addressToString } from '@secretkeylabs/xverse-core/transactions';
 import Seperator from '@components/seperator';
 import RecipientAddressView from '@components/recipientAddressView';
 import TransferAmountView from '@components/transferAmountView';

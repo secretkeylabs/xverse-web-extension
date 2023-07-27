@@ -10,7 +10,9 @@ export function setNftDataAction(nftData: NftData[]): actions.SetNftData {
   };
 }
 
-export function setSelectedOrdinalAction(selectedOrdinal: Inscription | null): actions.SetSelectedOrdinal {
+export function setSelectedOrdinalAction(
+  selectedOrdinal: Inscription | null,
+): actions.SetSelectedOrdinal {
   return {
     type: actions.SetSelectedOrdinalKey,
     selectedOrdinal,

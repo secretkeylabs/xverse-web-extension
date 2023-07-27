@@ -1,6 +1,9 @@
 /* eslint-disable prefer-destructuring */
 import {
-  BTC_BASE_URI_MAINNET, BTC_BASE_URI_TESTNET, HIRO_MAINNET_DEFAULT, HIRO_TESTNET_DEFAULT,
+  BTC_BASE_URI_MAINNET,
+  BTC_BASE_URI_TESTNET,
+  HIRO_MAINNET_DEFAULT,
+  HIRO_TESTNET_DEFAULT,
 } from '@secretkeylabs/xverse-core/constant';
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 
@@ -51,4 +54,5 @@ export const initialNetworksList: SettingsNetwork[] = [
 /**
  * contract id of send_many transaction type
  */
-export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
+export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
+  'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';

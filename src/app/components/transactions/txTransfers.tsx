@@ -69,9 +69,10 @@ export default function TxTransfers(props: TxTransfersProps) {
     return <img src={SendIcon} alt="sent" />;
   };
 
-  const getTokenTransferTitle = (transfer): string => (selectedAccount?.stxAddress === transfer.recipient
-    ? t('TRANSACTION_RECEIVED')
-    : t('TRANSACTION_SENT'));
+  const getTokenTransferTitle = (transfer): string =>
+    selectedAccount?.stxAddress === transfer.recipient
+      ? t('TRANSACTION_RECEIVED')
+      : t('TRANSACTION_SENT');
   return (
     <>
       {transaction.stx_transfers.map((stxTransfer) => (

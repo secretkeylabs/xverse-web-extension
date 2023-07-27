@@ -72,7 +72,7 @@ function SwapScreen() {
             onSelectCoin={() => setSelecting('from')}
           />
           <DownArrowButton onClick={swap.handleClickDownArrow}>
-            <img src={ArrowDown} alt="arrow-down"/>
+            <img src={ArrowDown} alt="arrow-down" />
           </DownArrowButton>
           <SwapTokenBlock
             title={t('TO')}
