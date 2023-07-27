@@ -31,7 +31,7 @@ export type SwapConfirmationInput = {
 
 export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> & {
   onConfirm: () => Promise<void>;
-  unsignedTx: StacksTransaction; // serialized hex StacksTransaction
+  unsignedTx: StacksTransaction; // deserialized StacksTransaction
 };
 
 export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
