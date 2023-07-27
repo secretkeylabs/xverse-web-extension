@@ -64,7 +64,8 @@
     "start": "npx node webpack/utils/devServer.js",
     "clean": "rimraf build",
     "test": "jest ./src",
-    "style": "prettier --write \"src/**/*.{ts,tsx}\""
+    "style": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prepare": "husky install"
   },
   "resolutions": {
     "styled-components": "^5",
