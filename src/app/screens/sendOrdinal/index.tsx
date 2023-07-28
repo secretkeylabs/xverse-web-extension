@@ -205,12 +205,18 @@ function SendOrdinal() {
     }
   };
 
+  const currencyType = textContent?.includes('brc-20') ? 'brc20-Ordinal' : 'Ordinal';
+
   const handleInputChange = (inputAddress: string) => {
     if (inputAddress === ordinalsAddress) {
-      return setWarning(t('SEND_ORDINAL_TO_SELF_WARNING'));
+      return setWarning(
+        currencyType === 'brc20-Ordinal'
+          ? t('SEND_BRC20_ORDINAL_TO_SELF_WARNING')
+          : t('SEND_ORDINAL_TO_SELF_WARNING'),
+      );
     }
     setWarning('');
-  }
+  };
 
   return (
     <>
@@ -235,7 +241,7 @@ function SendOrdinal() {
         )}
         <SendForm
           processing={isLoading}
-          currencyType={textContent?.includes('brc-20') ? 'brc20-Ordinal' : 'Ordinal'}
+          currencyType={currencyType}
           disableAmountInput
           recepientError={error}
           recipient={address}
