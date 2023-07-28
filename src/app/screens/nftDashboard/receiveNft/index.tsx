@@ -11,13 +11,6 @@ import { useState } from 'react';
 import { isLedgerAccount } from '@utils/helper';
 import ReceiveCardComponent from '../../../components/receiveCardComponent';
 
-interface Props {
-  visible: boolean;
-  onClose: () => void;
-  setOrdinalReceiveAlert: () => void;
-  isGalleryOpen: boolean;
-}
-
 const ColumnContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -57,6 +50,17 @@ const VerifyOrViewContainer = styled.div((props) => ({
 const VerifyButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
+
+const VerifyButtonsContainer = styled.div({
+  minWidth: 300,
+});
+
+interface Props {
+  visible: boolean;
+  onClose: () => void;
+  setOrdinalReceiveAlert: () => void;
+  isGalleryOpen: boolean;
+}
 
 function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAlert }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
@@ -133,7 +137,7 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
   );
 
   return isGalleryOpen ? (
-    <>
+    <VerifyButtonsContainer>
       <RowContainer>
         <Text>{t('RECEIVE_NFT')}</Text>
         <ButtonImage onClick={onReceiveModalClose}>
@@ -141,7 +145,7 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
         </ButtonImage>
       </RowContainer>
       {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
-    </>
+    </VerifyButtonsContainer>
   ) : (
     <BottomModal visible={visible} header={t('RECEIVE_NFT')} onClose={onReceiveModalClose}>
       {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
