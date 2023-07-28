@@ -33,7 +33,6 @@ import ArrowLeftIconSVG from '@assets/img/ledger/arrow_left_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
-// TODO: Add link to Ledger guide
 const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE =
   'https://support.xverse.app/hc/en-us/articles/17901278165773';
 const LINK_TO_LEDGER_PASSPHRASE_GUIDE =
@@ -70,12 +69,12 @@ const ImportStartImage = styled.img((props) => ({
   marginLeft: props.theme.spacing(0),
 }));
 
-const ImportStartContainer = styled.div((props) => ({
+const ImportStartContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   maxWidth: '328px',
-}));
+});
 
 const ImportBeforeStartContainer = styled.div((props) => ({
   display: 'flex',
@@ -250,6 +249,7 @@ const ConfirmationStepsContainer = styled.div((props) => ({
 }));
 
 const OptionsContainer = styled.div((props) => ({
+  width: '100%',
   marginTop: props.theme.spacing(16),
 }));
 
@@ -748,24 +748,26 @@ function ImportLedger(): JSX.Element {
             )}
             {currentStepIndex === 0.5 && (
               <ImportBeforeStartContainer>
-                <ImportBeforeStartTitle>Before getting started</ImportBeforeStartTitle>
+                <ImportBeforeStartTitle>
+                  {t('LEDGER_BEFORE_GETTING_STARTED.TITLE')}
+                </ImportBeforeStartTitle>
                 <ImportBeforeStartText>
-                  Do you use Ledger Live with the hardware wallet device you wish to connect?
+                  {t('LEDGER_BEFORE_GETTING_STARTED.DESCRIPTION')}
                 </ImportBeforeStartText>
                 <OptionsContainer>
                   <Option
                     onClick={() => setSelectedLedgerLiveOption('using')}
                     selected={selectedLedgerLiveOption === 'using'}
                   >
-                    <OptionIcon selected={selectedLedgerLiveOption === 'using'} />I use Ledger Live
-                    with the device.
+                    <OptionIcon selected={selectedLedgerLiveOption === 'using'} />
+                    {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.USE_LEDGER_LIVE')}
                   </Option>
                   <Option
                     onClick={() => setSelectedLedgerLiveOption('not using')}
                     selected={selectedLedgerLiveOption === 'not using'}
                   >
-                    <OptionIcon selected={selectedLedgerLiveOption === 'not using'} />I do not use
-                    Ledger Live with the device.
+                    <OptionIcon selected={selectedLedgerLiveOption === 'not using'} />
+                    {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.DONT_USE_LEDGER_LIVE')}
                   </Option>
                 </OptionsContainer>
               </ImportBeforeStartContainer>
@@ -773,57 +775,54 @@ function ImportLedger(): JSX.Element {
             {currentStepIndex === 0.75 && (
               <ImportBeforeStartContainer>
                 <WarningIcon src={warningIcon} alt="Warning" />
-                <ImportBeforeStartTitle>Important - Please read</ImportBeforeStartTitle>
+                <ImportBeforeStartTitle>
+                  {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TITLE')}
+                </ImportBeforeStartTitle>
                 {selectedLedgerLiveOption === 'using' ? (
                   <ImportBeforeStartText>
-                    It is not recommended to use Xverse and Ledger Live, or other Bitcoin wallets
-                    with the same hardware device as this could lead to unintentional transfers of
-                    Ordinals. <br />
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_1')}
+                    <br />
                     <CustomLink
                       href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Learn More
+                      {t('LEARN_MORE')}
                     </CustomLink>
                     <br />
                     <br />
-                    You should use a separate device for Xverse and Ordinals or set a passphrase on
-                    your Ledger to create a different set of accounts for Xverse. See{' '}
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_2')}{' '}
                     <CustomLink
                       href={LINK_TO_LEDGER_PASSPHRASE_GUIDE}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      How To Set A Passphrase For Ordinals
+                      {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.PASSPHRASE_FOR_ORDINALS')}
                     </CustomLink>
                     .
                     <br />
                     <br />
-                    {`Only continue if you're an advanced user and you know what you're doing. Do not
-                    create and use a taproot address on Ledger Live if you are using Xverse.`}
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_3')}
                   </ImportBeforeStartText>
                 ) : (
                   <ImportBeforeStartText>
-                    It is not recommended to use Xverse and Ledger Live, or other Bitcoin wallets
-                    with the same device as this could lead to unintentional transfers of Ordinals.{' '}
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_1')}{' '}
                     <CustomLink
                       href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Learn More
+                      {t('LEARN_MORE')}
                     </CustomLink>
                     <br />
                     <br />
-                    You should use a separate device for Xverse and Ordinals or set a passphrase on
-                    your Ledger to create a different set of accounts for Xverse. See{' '}
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_2')}{' '}
                     <CustomLink
                       href={LINK_TO_LEDGER_PASSPHRASE_GUIDE}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      How To Set A Passphrase For Ordinals
+                      {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.PASSPHRASE_FOR_ORDINALS')}
                     </CustomLink>
                     .
                   </ImportBeforeStartText>
@@ -838,11 +837,14 @@ function ImportLedger(): JSX.Element {
                     checkedIcon={false}
                   />
                   {selectedLedgerLiveOption === 'using' ? (
-                    <TogglerText>I understand the risks and wish to continue anyway</TogglerText>
+                    <TogglerText>
+                      {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.UNDERSTAND_THE_RISKS')}
+                    </TogglerText>
                   ) : (
                     <TogglerText>
-                      I understand I should not use Ledger Live or other Bitcoin wallets with the
-                      same hardware device
+                      {t(
+                        'LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.UNDERSTAND_SHOULD_NOT_USE_LEDGER_LIVE',
+                      )}
                     </TogglerText>
                   )}
                 </TogglerContainer>
