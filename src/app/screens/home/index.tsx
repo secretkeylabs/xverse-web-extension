@@ -422,6 +422,7 @@ function Home() {
           {btcAddress && (
             <TokenTile
               title={t('BITCOIN')}
+              key="BTC"
               currency="BTC"
               icon={BitcoinIcon}
               loading={loadingBtcWalletData}
@@ -432,6 +433,7 @@ function Home() {
           {stxAddress && (
             <TokenTile
               title={t('STACKS')}
+              key="STX"
               currency="STX"
               icon={stacksIcon}
               loading={loadingStxWalletData}
@@ -449,6 +451,7 @@ function Home() {
                   <TokenTile
                     key={coin.name}
                     title={coin.name}
+                    key={coin.name}
                     currency="FT"
                     loading={loadingCoinData}
                     underlayColor={Theme.colors.background.elevation1}
