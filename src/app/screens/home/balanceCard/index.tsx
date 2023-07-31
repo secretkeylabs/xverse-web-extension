@@ -15,20 +15,20 @@ const RowContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(11),
 }));
 
-const BalanceHeadingText = styled.h1((props) => ({
+const BalanceHeadingText = styled.h3((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['200'],
   textTransform: 'uppercase',
   opacity: 0.7,
 }));
 
-const CurrencyText = styled.h1((props) => ({
+const CurrencyText = styled.label((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['0'],
   fontSize: 13,
 }));
 
-const BalanceAmountText = styled.h1((props) => ({
+const BalanceAmountText = styled.p((props) => ({
   ...props.theme.headline_xl,
   color: props.theme.colors.white['0'],
 }));
