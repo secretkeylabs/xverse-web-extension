@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -18,12 +18,12 @@ import ActionButton from '@components/button';
 import Brc20TransferForm from './brc20TransferForm';
 import Brc20TransferInfo from './brc20TransferInfo';
 
-const BRC20TokenTagContainer = styled.div({
+const BRC20TokenTagContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  marginTop: 6,
-});
+  marginTop: props.theme.spacing(3),
+}));
 
 const BRC20TokenTag = styled.div((props) => ({
   background: props.theme.colors.white[400],
@@ -96,12 +96,12 @@ function SendBrc20Screen() {
     }
   };
 
-  const checkIfEnableButton = () => {
+  const checkIfEnableButton = useMemo(() => {
     if (amountToSend !== '' || amountToSend <= fungibleToken.balance) {
       return true;
     }
     return false;
-  };
+  }, [amountToSend, fungibleToken]);
 
   const handleInscribeTransferOrder = async () => {
     try {
@@ -206,7 +206,7 @@ function SendBrc20Screen() {
       ) : (
         <Brc20TransferInfo />
       )}
-      <SendButtonContainer enabled={checkIfEnableButton()}>
+      <SendButtonContainer enabled={checkIfEnableButton}>
         <ActionButton
           text={
             showForm ? t('SEND_BRC_20.SEND_NEXT_BUTTON') : t('SEND_BRC_20.SEND_INFO_START_BUTTON')
