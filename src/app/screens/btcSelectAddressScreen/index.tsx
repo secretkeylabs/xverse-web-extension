@@ -174,6 +174,7 @@ function BtcSelectAddressScreen() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
+  const {switchAccount} = useWalletReducer();
   const { payload, approveBtcAddressRequest, cancelAddressRequest } = useBtcAddressRequest();
   const springProps = useSpring({
     transform: showAccountList ? 'translateY(0%)' : 'translateY(100%)',
@@ -213,22 +214,7 @@ function BtcSelectAddressScreen() {
     account.id === selectedAccount?.id && account.accountType === selectedAccount?.accountType;
 
   const handleAccountSelect = (account: Account) => {
-    dispatch(
-      selectAccount(
-        account,
-        account.stxAddress,
-        account.btcAddress,
-        account.ordinalsAddress,
-        account.masterPubKey,
-        account.stxPublicKey,
-        account.btcPublicKey,
-        account.ordinalsPublicKey,
-        network,
-        undefined,
-        account.accountType,
-        account.accountName,
-      ),
-    );
+    switchAccount(account);
     setShowAccountList(false);
   };
 

@@ -83,9 +83,8 @@ const ButtonsWrapper = styled.div(
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
-  const { createAccount } = useWalletReducer();
+  const { createAccount, switchAccount } = useWalletReducer();
 
   const displayedAccountsList = useMemo(() => {
     if (network.type === 'Mainnet') {
@@ -95,22 +94,7 @@ function AccountList(): JSX.Element {
   }, [accountsList, ledgerAccountsList, network]);
 
   const handleAccountSelect = (account: Account) => {
-    dispatch(
-      selectAccount(
-        account,
-        account.stxAddress,
-        account.btcAddress,
-        account.ordinalsAddress,
-        account.masterPubKey,
-        account.stxPublicKey,
-        account.btcPublicKey,
-        account.ordinalsPublicKey,
-        network,
-        undefined,
-        account.accountType,
-        account.accountName,
-      ),
-    );
+    switchAccount(account);
     broadcastResetUserFlow();
     navigate(-1);
   };
