@@ -1,4 +1,3 @@
-// import { generateKeyArgon2, generatePasswordHash } from '@utils/encryptionUtils';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -22,19 +21,16 @@ import { useDispatch } from 'react-redux';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { getSessionItem } from '@utils/sessionStorageUtils';
+import { decryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
+import { PostGuardPing } from '@components/guards/singleTab';
 import useWalletSession from './useWalletSession';
 import useSecretKey from './useSecretKey';
 import useWalletSelector from './useWalletSelector';
 
 const useWalletReducer = () => {
-  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } =
+  const { accountsList, selectedAccount, network, ledgerAccountsList, encryptedSeed } =
     useWalletSelector();
-  const {
-    getSeed,
-    storeSeed,
-    initSeedVault,
-    lockVault,
-  } = useSecretKey();
+  const { getSeed, storeSeed, initSeedVault, lockVault } = useSecretKey();
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
@@ -110,17 +106,16 @@ const useWalletReducer = () => {
   };
 
   const unlockWallet = async (password: string) => {
-    // if (encryptedSeed) {
-    //   const salt = await localStorage.getItem('salt');
-    //    const oldHash = await generateKeyArgon2(password, salt!);
-    //   console.log("🚀 ~ file: useWalletReducer.ts:91 ~ unlockWal ~ oldHash:", oldHash)
-    //   const oldSeed = await decryptMnemonic(encryptedSeed, oldHash);
-    //   console.log("🚀 ~ file: useWalletReducer.ts:92 ~ unlockWal ~ oldSeed:", oldSeed)
-    //   await initSeedVault(password);
-    //   await storeSeed(oldSeed);
-    //   dispatch(unlockWalletAction(''));
-    //   return oldSeed;
-    // }
+    if (encryptedSeed && encryptedSeed.length > 0) {
+      const pHash = await generatePasswordHash(password);
+      const decrypted = await decryptSeedPhrase(encryptedSeed, pHash.hash);
+      await initSeedVault(password);
+      await storeSeed(decrypted);
+      await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
+      dispatch(storeEncryptedSeedAction(''));
+      localStorage.removeItem('salt');
+      return decrypted;
+    }
     const decrypted = await getSeed(password);
     try {
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
@@ -136,6 +131,8 @@ const useWalletReducer = () => {
   const lockWallet = async () => {
     const passPhrase = await getSessionItem(SeedVaultStorageKeys.PASSWORD_HASH);
     await lockVault(passPhrase);
+    PostGuardPing('closeWallet');
+
   };
 
   const resetWallet = async () => {
@@ -202,7 +199,7 @@ const useWalletReducer = () => {
     }
   };
 
-  const createWallet = async (mnemonic?: string, ) => {
+  const createWallet = async (mnemonic?: string) => {
     const wallet = mnemonic
       ? await walletFromSeedPhrase({ mnemonic, index: 0n, network: 'Mainnet' })
       : await newWallet();
@@ -304,13 +301,6 @@ const useWalletReducer = () => {
     }
     await refetchStxData();
     await refetchBtcData();
-  };
-
-  /**
-   * This should only be used as a storage location when creating a new wallet
-   */
-  const storeSeedPhrase = async (seed: string) => {
-    dispatch(unlockWalletAction(seed));
   };
 
   const addLedgerAccount = async (ledgerAccount: Account) => {

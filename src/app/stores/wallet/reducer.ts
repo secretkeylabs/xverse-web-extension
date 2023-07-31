@@ -10,7 +10,6 @@ import {
   UpdateLedgerAccountsKey,
   FetchAccountKey,
   GetActiveAccountsKey,
-  LockWalletKey,
   ResetWalletKey,
   SelectAccountKey,
   SetBrcCoinsListKey,
@@ -21,9 +20,7 @@ import {
   SetStxWalletDataKey,
   SetWalletKey,
   SetWalletLockPeriodKey,
-  SetWalletSeedPhraseKey,
   StoreEncryptedSeedKey,
-  UnlockWalletKey,
   UpdateVisibleCoinListKey,
   WalletActions,
   WalletSessionPeriods,
@@ -42,7 +39,6 @@ const initialWalletState: WalletState = {
   accountsList: [],
   ledgerAccountsList: [],
   selectedAccount: null,
-  seedPhrase: '',
   encryptedSeed: '',
   fiatCurrency: 'USD',
   btcFiatRate: new BigNumber(0),
@@ -116,21 +112,6 @@ const walletReducer = (
       return {
         ...state,
         encryptedSeed: action.encryptedSeed,
-      };
-    case SetWalletSeedPhraseKey:
-      return {
-        ...state,
-        seedPhrase: action.seedPhrase,
-      };
-    case UnlockWalletKey:
-      return {
-        ...state,
-        seedPhrase: action.seed,
-      };
-    case LockWalletKey:
-      return {
-        ...state,
-        seedPhrase: '',
       };
     case SetCoinRatesKey:
       return {

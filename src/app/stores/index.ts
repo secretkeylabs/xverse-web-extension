@@ -19,7 +19,6 @@ export const WalletPersistConfig: PersistConfig<WalletState> = {
   version: 1,
   key: 'walletState',
   storage: ChromeStorage,
-  blacklist: ['seedPhrase'],
 };
 
 const appReducer = combineReducers({
@@ -38,8 +37,6 @@ const storeMiddleware = [
     // We only want to sync seedphrase data for onboarding
     whitelist: [
       actions.StoreEncryptedSeedKey,
-      actions.SetWalletSeedPhraseKey,
-      actions.UnlockWalletKey,
       actions.SelectAccountKey,
       actions.AddAccountKey,
       actions.UpdateLedgerAccountsKey,

@@ -20,32 +20,10 @@ export function setWalletAction(wallet: BaseWallet): actions.SetWallet {
   };
 }
 
-export function unlockWalletAction(seed: string) {
-  return {
-    type: actions.UnlockWalletKey,
-    seed,
-  };
-}
-
-export function lockWalletAction() {
-  // We post the closeWallet action to the guard so that any open tabs will close
-  PostGuardPing('closeWallet');
-  return {
-    type: actions.LockWalletKey,
-  };
-}
-
 export function storeEncryptedSeedAction(encryptedSeed: string): actions.StoreEncryptedSeed {
   return {
     type: actions.StoreEncryptedSeedKey,
     encryptedSeed,
-  };
-}
-
-export function setWalletSeedPhraseAction(seedPhrase: string): actions.SetWalletSeedPhrase {
-  return {
-    type: actions.SetWalletSeedPhraseKey,
-    seedPhrase,
   };
 }
 

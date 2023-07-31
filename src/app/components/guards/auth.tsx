@@ -9,13 +9,18 @@ interface AuthGuardProps {
 
 function AuthGuard({ children }: AuthGuardProps) {
   const navigate = useNavigate();
-  const {  masterPubKey } = useWalletSelector();
+  const { masterPubKey, encryptedSeed } = useWalletSelector();
   const { getSeed, hasSeed } = useSecretKey();
   const [authTested, setAuthTested] = useState(false);
 
   const restoreSession = async () => {
-    const encryptedSeed = await hasSeed();
-    if (!encryptedSeed || !masterPubKey) {
+    if (encryptedSeed) {
+      navigate('/login');
+      setAuthTested(true);
+      return;
+    }
+    const hasSeedPhrase = await hasSeed();
+    if (!hasSeedPhrase || !masterPubKey) {
       navigate('/landing');
       setAuthTested(true);
       return;
@@ -31,7 +36,7 @@ function AuthGuard({ children }: AuthGuardProps) {
 
   useEffect(() => {
     restoreSession();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!authTested) {
