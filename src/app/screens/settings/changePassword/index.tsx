@@ -5,13 +5,9 @@ import styled from 'styled-components';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
 import { useTranslation } from 'react-i18next';
-import { encryptSeedPhrase } from '@utils/encryptionUtils';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
-import { useDispatch } from 'react-redux';
 import Check from '@assets/img/settings/check_circle.svg';
 import PasswordInput from '@components/passwordInput';
-import useWalletReducer from '@hooks/useWalletReducer';
+import useSecretKey from '@hooks/useSecretKey';
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
@@ -47,16 +43,14 @@ const ToastDismissButton = styled.button((props) => ({
 
 function ChangePasswordScreen() {
   const { t } = useTranslation('translation');
-
+  const { getSeed, changePassword } = useSecretKey();
   const [password, setPassword] = useState<string>('');
+  const [oldPassword, setOldPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const { seedPhrase } = useWalletSelector();
-  const { unlockWallet } = useWalletReducer();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleBackButtonClick = () => {
     navigate('/settings');
@@ -69,7 +63,7 @@ function ChangePasswordScreen() {
   const handleConfirmCurrentPasswordNextClick = async () => {
     try {
       setLoading(true);
-      await unlockWallet(password);
+      await getSeed(oldPassword);
       setPassword('');
       setError('');
       setCurrentStepIndex(1);
@@ -95,8 +89,7 @@ function ChangePasswordScreen() {
   const handleConfirmNewPasswordNextClick = async () => {
     if (confirmPassword === password) {
       setError('');
-      const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
-      dispatch(storeEncryptedSeedAction(encryptedSeed));
+      await changePassword(oldPassword, confirmPassword);
       toast.custom(ToastContent);
       navigate('/settings');
     } else {
@@ -116,8 +109,8 @@ function ChangePasswordScreen() {
           <PasswordInput
             title={t('CREATE_PASSWORD_SCREEN.ENTER_PASSWORD')}
             inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_ENTER_PASSWORD_LABEL')}
-            enteredPassword={password}
-            setEnteredPassword={setPassword}
+            enteredPassword={oldPassword}
+            setEnteredPassword={setOldPassword}
             handleContinue={handleConfirmCurrentPasswordNextClick}
             handleBack={handleBackButtonClick}
             passwordError={error}

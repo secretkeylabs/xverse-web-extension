@@ -1,34 +1,43 @@
-/* eslint-disable no-nested-ternary */
-import useSecretKey from '@hooks/useSecretKey';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ChromeStorage from '@utils/storage';
+import useSecretKey from '@hooks/useSecretKey';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 interface AuthGuardProps {
   children: ReactNode;
 }
 
 function AuthGuard({ children }: AuthGuardProps) {
-  const { getSeed } = useSecretKey();
   const navigate = useNavigate();
+  const {  masterPubKey } = useWalletSelector();
+  const { getSeed, hasSeed } = useSecretKey();
+  const [authTested, setAuthTested] = useState(false);
+
+  const restoreSession = async () => {
+    const encryptedSeed = await hasSeed();
+    if (!encryptedSeed || !masterPubKey) {
+      navigate('/landing');
+      setAuthTested(true);
+      return;
+    }
+    try {
+      await getSeed();
+      setAuthTested(true);
+    } catch (error) {
+      navigate('/login');
+    }
+    setAuthTested(true);
+  };
 
   useEffect(() => {
-    (async () => {
-      const encryptedSeed = await ChromeStorage.getItem('encryptedKey');
-      if(!encryptedSeed) {
-        navigate('/landing');
-        return
-      }
-      try {
-       await getSeed();
-      } catch (error) {
-        navigate('/login');
-      }
-
-    })();
+    restoreSession();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return children
+  if (!authTested) {
+    return null;
+  }
+  return children;
 }
 
 export default AuthGuard;

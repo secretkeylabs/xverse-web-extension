@@ -2,14 +2,11 @@ import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
 import Steps from '@components/steps';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { StoreState } from '@stores/index';
-import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
-import { encryptSeedPhrase } from '@utils/encryptionUtils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import useSecretKey from '@hooks/useSecretKey';
 import SeedCheck from './seedCheck';
 import VerifySeed from './verifySeed';
 
@@ -39,19 +36,18 @@ export default function BackupWalletSteps(): JSX.Element {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { seedPhrase } = useSelector((state: StoreState) => ({
-    ...state.walletState,
-  }));
+  const [ seedPhrase, setSeedPhrase ] = useState<string>('');
+  const {getSeed, changePassword} = useSecretKey();
   const { createWallet } = useWalletReducer();
   const { disableWalletExistsGuard } = useWalletExistsContext();
 
   useEffect(() => {
-    if (!seedPhrase) {
-      navigate('/backup');
-    }
-  }, [seedPhrase]);
+    (async () => {
+      const seed = await getSeed('');
+      setSeedPhrase(seed);
+    })();
+  }, []);
 
   const handleSeedCheckContinue = () => {
     setCurrentActiveIndex(1);
@@ -80,9 +76,8 @@ export default function BackupWalletSteps(): JSX.Element {
   const handleConfirmPasswordContinue = async () => {
     if (confirmPassword === password) {
       disableWalletExistsGuard?.();
-      const encryptedSeed = await encryptSeedPhrase(seedPhrase, password);
-      dispatch(storeEncryptedSeedAction(encryptedSeed));
       await createWallet(seedPhrase);
+      await changePassword('', password);
       navigate('/wallet-success/create', { replace: true });
     } else {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));

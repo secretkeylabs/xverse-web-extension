@@ -1,10 +1,9 @@
 import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
+import useSecretKey from '@hooks/useSecretKey';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { StoreState } from '@stores/index';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -47,20 +46,19 @@ function CreatePassword(): JSX.Element {
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [seedPhrase, setSeedPhrase] = useState<string>('');
+  const { getSeed, changePassword } = useSecretKey();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { seedPhrase } = useSelector((state: StoreState) => ({
-    ...state.walletState,
-  }));
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const { createWallet } = useWalletReducer();
   const { disableWalletExistsGuard } = useWalletExistsContext();
 
   useEffect(() => {
-    if (!seedPhrase) {
-      navigate('/backup');
-    }
-  }, [seedPhrase]);
+    (async () => {
+      const seed = await getSeed('');
+      setSeedPhrase(seed);
+    })();
+  }, []);
 
   const handleContinuePasswordCreation = () => {
     setCurrentStepIndex(1);
@@ -69,7 +67,8 @@ function CreatePassword(): JSX.Element {
   const handleConfirmPassword = async () => {
     if (confirmPassword === password) {
       disableWalletExistsGuard?.();
-      await createWallet(password, seedPhrase);
+      await createWallet(seedPhrase);
+      await changePassword('', password);
       navigate('/wallet-success/create', { replace: true });
     } else {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));

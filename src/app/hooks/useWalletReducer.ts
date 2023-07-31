@@ -12,7 +12,6 @@ import {
   addAccountAction,
   fetchAccountAction,
   getActiveAccountsAction,
-  lockWalletAction,
   resetWalletAction,
   selectAccount,
   setWalletAction,
@@ -131,12 +130,10 @@ const useWalletReducer = () => {
     } finally {
       setSessionStartTime();
     }
-    dispatch(unlockWalletAction(decrypted));
     return decrypted;
   };
 
   const lockWallet = async () => {
-    dispatch(lockWalletAction());
     const passPhrase = await getSessionItem(SeedVaultStorageKeys.PASSWORD_HASH);
     await lockVault(passPhrase);
   };
@@ -205,7 +202,7 @@ const useWalletReducer = () => {
     }
   };
 
-  const createWallet = async (mnemonic?: string) => {
+  const createWallet = async (mnemonic?: string, ) => {
     const wallet = mnemonic
       ? await walletFromSeedPhrase({ mnemonic, index: 0n, network: 'Mainnet' })
       : await newWallet();
@@ -228,6 +225,7 @@ const useWalletReducer = () => {
   };
 
   const createAccount = async () => {
+    const seedPhrase = await getSeed();
     const newAccountsList = await createWalletAccount(
       seedPhrase,
       network,
@@ -263,6 +261,7 @@ const useWalletReducer = () => {
     networkAddress: string,
     btcApiUrl: string,
   ) => {
+    const seedPhrase = await getSeed();
     dispatch(ChangeNetworkAction(changedNetwork, networkAddress, btcApiUrl));
     const wallet = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
