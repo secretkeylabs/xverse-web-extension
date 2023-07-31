@@ -88,15 +88,13 @@ function BalanceCard(props: BalanceCardProps) {
           <BarLoader loaderSize={LoaderSize.LARGE} />
         </BarLoaderContainer>
       ) : (
-        <BalanceAmountText>
-          <NumericFormat
-            value={calculateTotalBalance()}
-            displayType="text"
-            prefix={`${currencySymbolMap[fiatCurrency]}`}
-            thousandSeparator
-            renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
-          />
-        </BalanceAmountText>
+        <NumericFormat
+          value={calculateTotalBalance()}
+          displayType="text"
+          prefix={`${currencySymbolMap[fiatCurrency]}`}
+          thousandSeparator
+          renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
+        />
       )}
     </>
   );
