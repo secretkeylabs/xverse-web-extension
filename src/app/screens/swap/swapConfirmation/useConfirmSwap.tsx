@@ -12,6 +12,7 @@ import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
+import useSecretKey from '@hooks/useSecretKey';
 import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
 import { useState } from 'react';
 import BigNumber from 'bignumber.js';
@@ -48,6 +49,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
     input.userOverrideSponsorValue,
   );
   const { currencyToToken } = useCurrencyConversion();
+  const { getSeed } = useSecretKey();
   const navigate = useNavigate();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>(
     deserializeTransaction(input.unsignedTx),
@@ -71,6 +73,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
     isSponsored,
     isSponsorDisabled,
     onConfirm: async () => {
+      const seedPhrase = await getSeed();
       const signed = await signTransaction(
         unsignedTx,
         seedPhrase,
