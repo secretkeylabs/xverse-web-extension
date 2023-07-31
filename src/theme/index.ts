@@ -15,9 +15,9 @@ const Theme = {
       900: 'rgba(255, 255, 255, 0.1)',
     },
     background: {
-      'elevation-1': '#070A13',
       elevation0: '#12151E',
-      elevation1: '#1D2032',
+      elevation1: '#1D2032', // deprecated?
+      elevation_1: '#070A13',
       elevation2: '#272A44',
       elevation3: '#303354',
       elevation6: '#4C5187',
@@ -27,6 +27,11 @@ const Theme = {
       elevation9: 'rgba(76, 81, 135, 0.2)',
       elevation10: 'rgba(76, 81, 135, 0.35)',
       modalBackdrop: 'rgba(18,21,30,0.6)',
+      selectBackground:
+        'linear-gradient(0deg, rgba(115, 131, 255, 0.05), rgba(115, 131, 255, 0.05)), #1D2032',
+    },
+    border: {
+      select: 'rgba(115, 131, 255, 0.4)',
     },
     feedback: {
       success: '#51D6A6',
@@ -88,6 +93,12 @@ const Theme = {
     fontStyle: 'normal',
     fontWeight: '400',
     fontSize: 14,
+  },
+  body_s: {
+    fontFamily: 'DMSans-Regular',
+    fontStyle: 'normal',
+    fontWeight: '400',
+    fontSize: 12,
   },
   body_xs: {
     fontFamily: 'DMSans-Regular',

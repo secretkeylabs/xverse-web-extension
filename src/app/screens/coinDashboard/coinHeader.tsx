@@ -13,7 +13,11 @@ import { CurrencyTypes } from '@utils/constants';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { isLedgerAccount } from '@utils/helper';
 import SmallActionButton from '@components/smallActionButton';
+import { useState } from 'react';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
 
 interface CoinBalanceProps {
   coin: CurrencyTypes;
@@ -36,9 +40,9 @@ const RowContainer = styled.div({
 
 const ProtocolText = styled.p((props) => ({
   ...props.theme.headline_category_s,
-  fontWeight: '700',
+  fontWeight: 700,
   height: 15,
-  marginTop: 6,
+  marginTop: props.theme.spacing(3),
   textTransform: 'uppercase',
   marginLeft: props.theme.spacing(2),
   backgroundColor: props.theme.colors.white['400'],
@@ -60,7 +64,7 @@ const BalanceValuesContainer = styled.div({
 
 const CoinBalanceText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  fontSize: 24,
+  fontSize: '1.5rem',
   color: props.theme.colors.white['0'],
   textAlign: 'center',
 }));
@@ -68,7 +72,7 @@ const CoinBalanceText = styled.h1((props) => ({
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['200'],
-  fontSize: 14,
+  fontSize: '0.875rem',
   marginTop: props.theme.spacing(2),
   textAlign: 'center',
 }));
@@ -135,6 +139,16 @@ const AvailableStxContainer = styled.div((props) => ({
   },
 }));
 
+const VerifyOrViewContainer = styled.div((props) => ({
+  margin: props.theme.spacing(8),
+  marginTop: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(20),
+}));
+
+const VerifyButtonContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(6),
+}));
+
 const StacksLockedInfoText = styled.span((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[400],
@@ -151,9 +165,20 @@ export default function CoinHeader(props: CoinBalanceProps) {
     btcFiatRate,
     stxLockedBalance,
     stxAvailableBalance,
+    selectedAccount,
   } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+  const [openReceiveModal, setOpenReceiveModal] = useState(false);
+  const isReceivingAddressesVisible = !isLedgerAccount(selectedAccount);
+
+  const handleReceiveModalOpen = () => {
+    setOpenReceiveModal(true);
+  };
+
+  const handleReceiveModalClose = () => {
+    setOpenReceiveModal(false);
+  };
 
   function getBalanceAmount() {
     switch (coin) {
@@ -236,7 +261,33 @@ export default function CoinHeader(props: CoinBalanceProps) {
     }
   };
 
-  const goToSendScreen = () => {
+  const goToSendScreen = async () => {
+    if (isLedgerAccount(selectedAccount)) {
+      switch (coin) {
+        case 'BTC':
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL('options.html#/send-btc'),
+          });
+          return;
+        case 'STX':
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL('options.html#/send-stx-ledger'),
+          });
+          return;
+        case 'FT':
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL(`options.html#/send-ft-ledger?coin=${fungibleToken?.name}`),
+          });
+          return;
+        case 'brc20':
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL(`options.html#/send-brc20?coinName=${fungibleToken?.name}`),
+          });
+          return;
+        default:
+          break;
+      }
+    }
     if (coin === 'STX' || coin === 'BTC') {
       navigate(`/send-${coin}`);
     } else if (coin === 'FT') {
@@ -263,6 +314,28 @@ export default function CoinHeader(props: CoinBalanceProps) {
     }
     return '';
   };
+
+  const verifyOrViewAddresses = (
+    <VerifyOrViewContainer>
+      <VerifyButtonContainer>
+        <ActionButton
+          text={t('VERIFY_ADDRESS_ON_LEDGER')}
+          onPress={async () => {
+            await chrome.tabs.create({
+              url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${coin}`),
+            });
+          }}
+        />
+      </VerifyButtonContainer>
+      <ActionButton
+        transparent
+        text={t('VIEW_ADDRESS')}
+        onPress={() => {
+          navigate(`/receive/${coin}`);
+        }}
+      />
+    </VerifyOrViewContainer>
+  );
 
   return (
     <Container>
@@ -298,11 +371,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <SmallActionButton
-            src={ArrowUp}
-            text="Send"
-            onPress={() => goToSendScreen()}
-          />
+          <SmallActionButton src={ArrowUp} text="Send" onPress={() => goToSendScreen()} />
         </ButtonContainer>
 
         {!fungibleToken ? (
@@ -310,8 +379,14 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <ButtonContainer>
               <SmallActionButton
                 src={ArrowDown}
-                text="Receive"
-                onPress={() => navigate(`/receive/${coin}`)}
+                text={t('RECEIVE')}
+                onPress={() => {
+                  if (isReceivingAddressesVisible) {
+                    navigate(`/receive/${coin}`);
+                  } else {
+                    handleReceiveModalOpen();
+                  }
+                }}
               />
             </ButtonContainer>
             <SmallActionButton src={Buy} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
@@ -320,12 +395,20 @@ export default function CoinHeader(props: CoinBalanceProps) {
           <RecieveButtonContainer>
             <SmallActionButton
               src={ArrowDown}
-              text="Receive"
+              text={t('RECEIVE')}
               onPress={() => navigate(coin === 'brc20' ? '/receive/ORD' : `/receive/${coin}`)}
             />
           </RecieveButtonContainer>
         )}
       </RowButtonContainer>
+
+      <BottomModal
+        visible={openReceiveModal}
+        header={t('RECEIVE')}
+        onClose={handleReceiveModalClose}
+      >
+        {verifyOrViewAddresses}
+      </BottomModal>
     </Container>
   );
 }

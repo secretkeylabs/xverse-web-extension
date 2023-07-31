@@ -19,6 +19,9 @@ import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import { isLedgerAccount } from '@utils/helper';
+import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -27,7 +30,7 @@ const ScrollContainer = styled.div`
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
-  };
+  }
   height: 600px;
   width: 360px;
   margin: auto;
@@ -95,6 +98,7 @@ const ReviewTransactionText = styled.h1((props) => ({
 function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
@@ -103,22 +107,17 @@ function ConfirmNftTransaction() {
   const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
   const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
   const unsignedTx = deserializeTransaction(unsignedTxHex);
-  const {
-    network,
-  } = useWalletSelector();
-  const {
-    refetch,
-  } = useStxWalletData();
+  const { network } = useWalletSelector();
+  const { refetch } = useStxWalletData();
   const selectedNetwork = useNetworkSelector();
   const {
     isLoading,
     error: txError,
     data: stxTxBroadcastData,
     mutate,
-  } = useMutation<
-  string,
-  Error,
-  { signedTx: StacksTransaction }>({ mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork) });
+  } = useMutation<string, Error, { signedTx: StacksTransaction }>({
+    mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
+  });
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -150,8 +149,17 @@ function ConfirmNftTransaction() {
   }, [txError]);
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const txType: LedgerTransactionType = 'STX';
+      navigate('/confirm-ledger-tx', { state: { unsignedTx, type: txType } });
+      return;
+    }
+
     mutate({ signedTx: txs[0] });
   };
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/confirm-nft-tx'), []);
 
   const handleOnCancelClick = () => {
     navigate(-1);
@@ -160,17 +168,17 @@ function ConfirmNftTransaction() {
   return (
     <>
       {isGalleryOpen && (
-      <>
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-        <ButtonContainer>
+        <>
+          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
+          {/* <ButtonContainer>
           <Button onClick={handleOnCancelClick}>
             <>
               <ButtonImage src={ArrowLeft} />
               <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
             </>
           </Button>
-        </ButtonContainer>
-      </>
+        </ButtonContainer> */}
+        </>
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
@@ -183,9 +191,7 @@ function ConfirmNftTransaction() {
         >
           <Container>
             <NFtContainer>
-              <NftImage
-                metadata={nft?.token_metadata!}
-              />
+              <NftImage metadata={nft?.token_metadata!} />
             </NFtContainer>
             <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
           </Container>
@@ -201,7 +207,6 @@ function ConfirmNftTransaction() {
         {!isGalleryOpen && <BottomBar tab="nft" />}
       </ScrollContainer>
     </>
-
   );
 }
 export default ConfirmNftTransaction;

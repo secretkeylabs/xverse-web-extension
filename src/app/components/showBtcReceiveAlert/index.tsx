@@ -1,8 +1,7 @@
-import AlertMessage from "@components/alertMessage";
-import { ChangeShowBtcReceiveAlertAction } from "@stores/wallet/actions/actionCreators";
-import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
-
+import AlertMessage from '@components/alertMessage';
+import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 interface Props {
   onReceiveAlertClose: () => void;
@@ -25,7 +24,7 @@ function ShowBtcReceiveAlert({ onReceiveAlertClose }: Props) {
       tickMarkButtonText={t('DO_NOT_SHOW_MESSAGE')}
       tickMarkButtonClick={onDontShowReceiveBtcAlert}
     />
-  )
+  );
 }
 
 export default ShowBtcReceiveAlert;

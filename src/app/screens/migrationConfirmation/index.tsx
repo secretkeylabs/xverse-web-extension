@@ -57,7 +57,7 @@ const Icon = styled.img((props) => ({
 
 interface Props {
   migrateCallback: () => Promise<void>;
-  skipCallback: () => Promise<void>
+  skipCallback: () => Promise<void>;
 }
 
 function MigrationConfirmation(props: Props): JSX.Element {

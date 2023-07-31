@@ -6,6 +6,7 @@ import { getCoinsInfo, getFtData } from '@secretkeylabs/xverse-core/api';
 import useNetworkSelector from '@hooks/useNetwork';
 import { setCoinDataAction } from '@stores/wallet/actions/actionCreators';
 import { getCoinMetaData } from '@secretkeylabs/xverse-core';
+import { InvalidParamsError, handleRetries } from '@utils/query';
 
 export const useCoinsData = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,10 @@ export const useCoinsData = () => {
 
   const fetchCoinData = async () => {
     try {
+      if (!stxAddress) {
+        throw new InvalidParamsError('No stx address');
+      }
+
       const fungibleTokenList: Array<FungibleToken> = await getFtData(
         stxAddress,
         currentNetworkInstance,
@@ -85,6 +90,7 @@ export const useCoinsData = () => {
   return useQuery({
     queryKey: ['coins_data'],
     queryFn: fetchCoinData,
+    retry: handleRetries,
   });
 };
 

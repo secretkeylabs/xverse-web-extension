@@ -7,10 +7,11 @@ const useBtcClient = () => {
   const { type, btcApiUrl: remoteBtcApiURL } = network;
 
   const esploraInstance = useMemo(
-    () => new BitcoinEsploraApiProvider({
-      url: remoteBtcApiURL,
-      network: type,
-    }),
+    () =>
+      new BitcoinEsploraApiProvider({
+        url: remoteBtcApiURL,
+        network: type,
+      }),
     [btcApiUrl, type, remoteBtcApiURL],
   );
 

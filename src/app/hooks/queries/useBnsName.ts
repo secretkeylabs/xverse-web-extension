@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StacksNetwork, validateStxAddress } from '@secretkeylabs/xverse-core';
-import {
-  fetchAddressOfBnsName, getBnsName,
-} from '@secretkeylabs/xverse-core/api';
+import { fetchAddressOfBnsName, getBnsName } from '@secretkeylabs/xverse-core/api';
 import useWalletSelector from '../useWalletSelector';
 import useNetworkSelector from '../useNetwork';
 

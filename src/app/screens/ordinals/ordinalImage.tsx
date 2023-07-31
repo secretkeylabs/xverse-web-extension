@@ -81,13 +81,15 @@ const Text = styled.h1((props) => ({
 
 interface TextProps {
   inNftSend?: boolean;
+  isSmall?: boolean;
   blur?: boolean;
+  withoutSizeIncrease?: boolean;
 }
 
 const OrdinalContentText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[0],
-  fontSize: props.inNftSend ? 15 : 'calc(0.8vw + 2vh)',
+  fontSize: props.inNftSend || props.withoutSizeIncrease ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
   textAlign: 'center',
   filter: `blur(${props.blur ? '3px' : 0})`,
@@ -109,6 +111,7 @@ interface Props {
   inNftDetail?: boolean;
   inNftSend?: boolean;
   isSmallImage?: boolean;
+  withoutSizeIncrease?: boolean;
 }
 
 function OrdinalImage({
@@ -117,8 +120,9 @@ function OrdinalImage({
   inNftDetail = false,
   inNftSend = false,
   isSmallImage = false,
+  withoutSizeIncrease = false,
 }: Props) {
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360 && !withoutSizeIncrease;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const [brc721eImage, setBrc721eImage] = useState<string | undefined>(undefined);
@@ -202,6 +206,7 @@ function OrdinalImage({
             isNftDashboard={isNftDashboard}
             inNftDetail={inNftDetail}
             isSmallImage={isSmallImage}
+            withoutSizeIncrease={withoutSizeIncrease}
           />
         </ImageContainer>
       );
@@ -220,8 +225,14 @@ function OrdinalImage({
       );
     }
     return (
-      <ImageContainer inNftDetail={inNftDetail}>
-        <OrdinalContentText inNftSend={inNftSend}>{textContent}</OrdinalContentText>
+      <ImageContainer inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
+        <OrdinalContentText
+          inNftSend={inNftSend}
+          isSmall={isSmallImage}
+          withoutSizeIncrease={withoutSizeIncrease}
+        >
+          {textContent}
+        </OrdinalContentText>
         {isNftDashboard && (
           <OrdinalsTag>
             <ButtonIcon src={OrdinalsIcon} />

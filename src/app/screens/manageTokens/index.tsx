@@ -70,7 +70,13 @@ function ManageTokens() {
       <TopRow title={t('ADD_COINS')} onClick={handleBackButtonClick} />
       <TokenContainer>
         {coins?.map((coin, index) => (
-          <CoinItem coin={coin} disabled={false} toggled={toggled} enabled={coin.visible} showDivider={showDivider(index)} />
+          <CoinItem
+            coin={coin}
+            disabled={false}
+            toggled={toggled}
+            enabled={coin.visible}
+            showDivider={showDivider(index)}
+          />
         ))}
       </TokenContainer>
     </Container>

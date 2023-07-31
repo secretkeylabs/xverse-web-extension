@@ -19,20 +19,15 @@ const Container = styled.div({
 });
 
 interface Props {
-  index:number;
-  word: string
+  index: number;
+  word: string;
 }
 
 function SeedPhraseWord({ index, word }: Props) {
   return (
     <Container>
-      <OrdinalNumber>
-        {index + 1}
-        .
-      </OrdinalNumber>
-      <SeedWord key={word}>
-        {word}
-      </SeedWord>
+      <OrdinalNumber>{index + 1}.</OrdinalNumber>
+      <SeedWord key={word}>{word}</SeedWord>
     </Container>
   );
 }

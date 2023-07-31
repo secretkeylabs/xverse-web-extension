@@ -2,20 +2,27 @@ import TopRow from '@components/topRow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import {
-  BtcUtxoDataResponse, getBtcFiatEquivalent, NetworkType, satsToBtc,
+  BtcUtxoDataResponse,
+  getBtcFiatEquivalent,
+  NetworkType,
+  satsToBtc,
   UTXO,
 } from '@secretkeylabs/xverse-core';
 import {
-  getBtcFeesForNonOrdinalBtcSend, SignedBtcTx, signNonOrdinalBtcSendTransaction, sumUnspentOutputs,
+  getBtcFeesForNonOrdinalBtcSend,
+  SignedBtcTx,
+  signNonOrdinalBtcSendTransaction,
+  sumUnspentOutputs,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import { useEffect } from 'react';
+import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
@@ -70,14 +77,10 @@ const ButtonContainer = styled.div({
 
 function RestoreBtc() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_BTC_SCREEN' });
-  const {
-    ordinalsAddress, btcAddress, network,
-    selectedAccount, btcFiatRate,
-    seedPhrase,
-  } = useWalletSelector();
+  const { ordinalsAddress, btcAddress, network, selectedAccount, btcFiatRate, seedPhrase } =
+    useWalletSelector();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { unspentUtxos } = location.state;
+  const { unspentUtxos } = useNonOrdinalUtxos();
   let amount = new BigNumber(0);
   if (unspentUtxos) {
     amount = sumUnspentOutputs(unspentUtxos);
@@ -86,26 +89,43 @@ function RestoreBtc() {
 
   const { data: ordinalsFee } = useQuery({
     queryKey: [`getFee-${ordinalsAddress}`],
-    queryFn: () => getBtcFeesForNonOrdinalBtcSend(btcAddress, unspentUtxos, ordinalsAddress, network.type),
+    queryFn: () =>
+      getBtcFeesForNonOrdinalBtcSend(btcAddress, unspentUtxos, ordinalsAddress, network.type),
   });
 
   const {
     error: errorSigningNonOrdial,
     data: signedNonOrdinalBtcSend,
     mutate: mutateSignNonOrdinalBtcTransaction,
-  } = useMutation<SignedBtcTx,
-  Error,
-  {
-    recipientAddress: string,
-    nonOrdinalUtxos: Array<UTXO>,
-    accountIndex: number,
-    seedPhrase: string,
-    network: NetworkType,
-    fee?: BigNumber
-  }
-  >(async ({
-    recipientAddress, nonOrdinalUtxos, accountIndex, seedPhrase, network, fee,
-  }) => signNonOrdinalBtcSendTransaction(recipientAddress, nonOrdinalUtxos, accountIndex, seedPhrase, network, fee));
+  } = useMutation<
+    SignedBtcTx,
+    Error,
+    {
+      recipientAddress: string;
+      nonOrdinalUtxos: Array<UTXO>;
+      accountIndex: number;
+      seedPhrase: string;
+      network: NetworkType;
+      fee?: BigNumber;
+    }
+  >({
+    mutationFn: async ({
+      recipientAddress,
+      nonOrdinalUtxos,
+      accountIndex,
+      seedPhrase,
+      network,
+      fee,
+    }) =>
+      signNonOrdinalBtcSendTransaction(
+        recipientAddress,
+        nonOrdinalUtxos,
+        accountIndex,
+        seedPhrase,
+        network,
+        fee,
+      ),
+  });
 
   const onClickTransfer = () => {
     mutateSignNonOrdinalBtcTransaction({
@@ -162,23 +182,26 @@ function RestoreBtc() {
     <>
       <TopRow title={t('TITLE')} onClick={handleOnCancelClick} />
       <Container>
-        {isNoAmount ? <RestoreFundTitle>{t('NO_FUNDS')}</RestoreFundTitle>
-          : (
-            <>
-              <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
-              <BtcCard>
-                <Icon src={IconBitcoin} />
-                <BtcContainer>
-                  <TitleText>{`${satsToBtc(amount)} BTC`}</TitleText>
-                  <ValueText>{t('BTC')}</ValueText>
-                </BtcContainer>
-              </BtcCard>
-            </>
-          )}
-
+        {isNoAmount ? (
+          <RestoreFundTitle>{t('NO_FUNDS')}</RestoreFundTitle>
+        ) : (
+          <>
+            <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
+            <BtcCard>
+              <Icon src={IconBitcoin} />
+              <BtcContainer>
+                <TitleText>{`${satsToBtc(amount)} BTC`}</TitleText>
+                <ValueText>{t('BTC')}</ValueText>
+              </BtcContainer>
+            </BtcCard>
+          </>
+        )}
       </Container>
       <ButtonContainer>
-        <ActionButton text={isNoAmount ? t('BACK') : t('TRANSFER')} onPress={isNoAmount ? handleOnCancelClick : onClickTransfer} />
+        <ActionButton
+          text={isNoAmount ? t('BACK') : t('TRANSFER')}
+          onPress={isNoAmount ? handleOnCancelClick : onClickTransfer}
+        />
       </ButtonContainer>
       <BottomTabBar tab="nft" />
     </>

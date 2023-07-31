@@ -4,12 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Plus from '@assets/img/dashboard/plus.svg';
+import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import { useDispatch } from 'react-redux';
 import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import Seperator from '@components/seperator';
 import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
+import React, { useEffect, useMemo } from 'react';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const Container = styled.div`
   display: flex;
@@ -19,12 +22,21 @@ const Container = styled.div`
     display: none;
   }
 `;
-const RowContainer = styled.button((props) => ({
+
+const ButtonContainer = styled.button((props) => ({
+  width: '100%',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   background: 'transparent',
-  marginTop: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(4),
+  paddingBottom: props.theme.spacing(4),
+  paddingLeft: props.theme.spacing(11),
+  paddingRight: props.theme.spacing(11),
+  transition: 'background-color 0.2s ease',
+  ':hover': {
+    backgroundColor: props.theme.colors.background.elevation1,
+  },
 }));
 
 const AccountContainer = styled.div((props) => ({
@@ -32,7 +44,6 @@ const AccountContainer = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(11),
   paddingRight: props.theme.spacing(11),
-  marginBottom: props.theme.spacing(11),
 }));
 
 const AddAccountContainer = styled.div((props) => ({
@@ -57,14 +68,33 @@ const AddAccountText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
+const ButtonsWrapper = styled.div(
+  (props) => `
+  position: sticky;
+  bottom: 0;
+  background-color: ${props.theme.colors.background.elevation0};
+  margin-top: ${props.theme.spacing(8)}px;
+  margin-bottom: ${props.theme.spacing(11)}px;
+`,
+);
+
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {
-    network, accountsList, selectedAccount,
-  } = useWalletSelector();
+  const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
   const { createAccount } = useWalletReducer();
+
+  const displayedAccountsList = useMemo(() => {
+    if (network.type === 'Mainnet') {
+      return [...ledgerAccountsList, ...accountsList];
+    }
+    return accountsList;
+  }, [accountsList, ledgerAccountsList, network]);
+
+  const { broadcastResetUserFlow, closeChannel } = useResetUserFlow();
+  // destructor
+  useEffect(() => closeChannel, []);
 
   const handleAccountSelect = (account: Account) => {
     dispatch(
@@ -78,12 +108,18 @@ function AccountList(): JSX.Element {
         account.btcPublicKey,
         account.ordinalsPublicKey,
         network,
+        undefined,
+        account.accountType,
+        account.accountName,
       ),
     );
+    broadcastResetUserFlow();
     navigate('/');
   };
 
-  const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;
+  const isAccountSelected = (account: Account) =>
+    account.btcAddress === selectedAccount?.btcAddress &&
+    account.stxAddress === selectedAccount?.stxAddress;
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -93,28 +129,43 @@ function AccountList(): JSX.Element {
     await createAccount();
   }
 
+  async function onImportLedgerAccount() {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL('options.html#/import-ledger'),
+    });
+  }
+
   return (
     <Container>
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
-        {accountsList.map((account) => (
-          <>
+        {displayedAccountsList.map((account) => (
+          <React.Fragment key={account.btcAddress}>
             <AccountRow
-              key={account.stxAddress}
               account={account}
               isSelected={isAccountSelected(account)}
               onAccountSelected={handleAccountSelect}
             />
             <Seperator />
-          </>
+          </React.Fragment>
         ))}
-        <RowContainer onClick={async () => onCreateAccount()}>
+      </AccountContainer>
+      <ButtonsWrapper>
+        <ButtonContainer onClick={async () => onCreateAccount()}>
           <AddAccountContainer>
             <ButtonImage src={Plus} />
           </AddAccountContainer>
           <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
-        </RowContainer>
-      </AccountContainer>
+        </ButtonContainer>
+        {network.type === 'Mainnet' && (
+          <ButtonContainer onClick={onImportLedgerAccount}>
+            <AddAccountContainer>
+              <ButtonImage src={ConnectLedger} />
+            </AddAccountContainer>
+            <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
+          </ButtonContainer>
+        )}
+      </ButtonsWrapper>
     </Container>
   );
 }

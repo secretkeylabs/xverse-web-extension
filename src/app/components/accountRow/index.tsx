@@ -4,7 +4,7 @@ import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { useTranslation } from 'react-i18next';
-import { getTruncatedAddress, getAddressDetail } from '@utils/helper';
+import { getTruncatedAddress, getAddressDetail, isHardwareAccount } from '@utils/helper';
 import BarLoader from '@components/barLoader';
 import Copy from '@assets/img/Copy.svg';
 import { LoaderSize } from '@utils/constants';
@@ -13,6 +13,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import useWalletSelector from '@hooks/useWalletSelector';
+import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 
 interface GradientCircleProps {
   firstGradient: string;
@@ -25,24 +26,32 @@ const RowContainer = styled.div({
   flexDirection: 'row',
 });
 
-const GradientCircle = styled.button<GradientCircleProps>((props) => ({
+const GradientCircle = styled.div<GradientCircleProps>((props) => ({
   height: 40,
   width: 40,
   borderRadius: 25,
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
 
-const TopSectionContainer = styled.button((props) => ({
+const TopSectionContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
+  alignItems: 'center',
   paddingTop: props.theme.spacing(8),
   backgroundColor: 'transparent',
+  cursor: 'pointer',
 }));
 
 const CurrentAcountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(6),
+}));
+
+const CurrentAccountTextContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  gap: props.theme.spacing(4),
 }));
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
@@ -61,6 +70,8 @@ const CurrentAccountDetailText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['400'],
   marginTop: props.theme.spacing(1),
+  display: 'flex',
+  justifyContent: 'flex-start',
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
@@ -73,7 +84,7 @@ const CopyImage = styled.img`
   margin-right: 4px;
 `;
 
-const StyledToolTip = styled(Tooltip)`
+export const StyledToolTip = styled(Tooltip)`
   background-color: #ffffff;
   color: #12151e;
   border-radius: 8px;
@@ -87,13 +98,13 @@ const AddressContainer = styled.div({
   justifyContent: 'center',
 });
 
-const Button = styled.button`
+const TransparentSpan = styled.span`
   background: transparent;
 `;
 
 const CopyButton = styled.button`
   opacity: 0.6;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-top: 3px;
   margin-right: 10px;
   display: flex;
@@ -146,26 +157,32 @@ function AccountRow({
   showOrdinalAddress,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const {
-    showBtcReceiveAlert,
-  } = useWalletSelector();
-  const gradient = getAccountGradient(account?.stxAddress!);
+  const { showBtcReceiveAlert } = useWalletSelector();
+  const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
   const dispatch = useDispatch();
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
 
-  useEffect(() => () => {
-    clearTimeout(btcCopiedTooltipTimeoutRef.current);
-    clearTimeout(stxCopiedTooltipTimeoutRef.current);
-  }, []);
+  useEffect(
+    () => () => {
+      clearTimeout(btcCopiedTooltipTimeoutRef.current);
+      clearTimeout(stxCopiedTooltipTimeoutRef.current);
+    },
+    [],
+  );
 
-  function getName() {
-    return account?.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
-  }
+  const getName = () => {
+    const name =
+      account?.accountName ??
+      account?.bnsName ??
+      `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
 
-  const handleOnBtcAddressClick = () => {
+    return name.length > 20 ? `${name.slice(0, 20)}...` : name;
+  };
+
+  const handleOnBtcAddressClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     navigator.clipboard.writeText(account?.btcAddress!);
     setOnBtcCopied(true);
     setOnStxCopied(false);
@@ -174,20 +191,16 @@ function AccountRow({
     if (showBtcReceiveAlert !== null) {
       dispatch(ChangeShowBtcReceiveAlertAction(true));
     }
+    event.stopPropagation();
   };
 
-  const handleOnStxAddressClick = () => {
+  const handleOnStxAddressClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     navigator.clipboard.writeText(account?.stxAddress!);
     setOnStxCopied(true);
     setOnBtcCopied(false);
     // set 'Copied' text back to 'Stacks address' after 3 seconds
     stxCopiedTooltipTimeoutRef.current = setTimeout(() => setOnStxCopied(false), 3000);
-  };
-
-  const onRowClick = () => {
-    if (!allowCopyAddress) {
-      onAccountSelected(account!);
-    }
+    event.stopPropagation();
   };
 
   const onClick = () => {
@@ -238,33 +251,43 @@ function AccountRow({
       />
     </RowContainer>
   ) : (
-    <CurrentAccountDetailText>{showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}</CurrentAccountDetailText>
+    <CurrentAccountDetailText>
+      {showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}
+    </CurrentAccountDetailText>
   );
 
   return (
-    <TopSectionContainer onClick={onRowClick}>
+    <TopSectionContainer onClick={onClick}>
       <GradientCircle
         firstGradient={gradient[0]}
         secondGradient={gradient[1]}
         thirdGradient={gradient[2]}
-        onClick={onClick}
       />
       <CurrentAcountContainer>
-        {account
-          && (isSelected ? (
-            <Button onClick={onClick}>
-              <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
-            </Button>
+        {account &&
+          (isSelected ? (
+            <TransparentSpan>
+              <CurrentAccountTextContainer>
+                <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+                {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+              </CurrentAccountTextContainer>
+            </TransparentSpan>
           ) : (
-            <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
+            <TransparentSpan onClick={onClick}>
+              <CurrentAccountTextContainer>
+                <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
+                {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+              </CurrentAccountTextContainer>
+            </TransparentSpan>
           ))}
-        {!account ? (
+
+        {!!account && !isHardwareAccount(account) && displayAddress}
+
+        {!account && (
           <BarLoaderContainer>
             <BarLoader loaderSize={LoaderSize.LARGE} />
             <BarLoader loaderSize={LoaderSize.MEDIUM} />
           </BarLoaderContainer>
-        ) : (
-          displayAddress
         )}
       </CurrentAcountContainer>
     </TopSectionContainer>

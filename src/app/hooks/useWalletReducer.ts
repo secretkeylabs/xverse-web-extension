@@ -16,18 +16,18 @@ import {
   selectAccount,
   setWalletAction,
   storeEncryptedSeedAction,
+  addLedgerAcountAction,
   unlockWalletAction,
 } from '@stores/wallet/actions/actionCreators';
 import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import useWalletSession from './useWalletSession';
+import useWalletSelector from './useWalletSelector';
 
 const useWalletReducer = () => {
-  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network } = useSelector(
-    (state: StoreState) => ({
-      ...state.walletState,
-    }),
-  );
+  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } =
+    useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
@@ -46,6 +46,7 @@ const useWalletReducer = () => {
       currentNetworkObject,
       currentAccounts,
     );
+
     walletAccounts[0] = {
       id: walletAccounts[0].id,
       btcAddress: walletAccounts[0].btcAddress,
@@ -57,31 +58,34 @@ const useWalletReducer = () => {
       stxPublicKey: walletAccounts[0].stxPublicKey,
       bnsName: walletAccounts[0].bnsName,
     };
+
+    if (!isHardwareAccount(selectedAccount)) {
+      dispatch(
+        setWalletAction(
+          selectedAccount
+            ? {
+                ...walletAccounts[selectedAccount.id],
+                seedPhrase: secretKey,
+              }
+            : {
+                ...walletAccounts[0],
+                seedPhrase: secretKey,
+              },
+        ),
+      );
+    }
+
     dispatch(
-      setWalletAction(
+      fetchAccountAction(
         selectedAccount
-          ? {
-              ...walletAccounts[selectedAccount.id],
-              seedPhrase: secretKey,
-            }
-          : {
-              ...walletAccounts[0],
-              seedPhrase: secretKey,
-            },
-      ),
-    );
-    dispatch(
-      fetchAccountAction(
-        selectedAccount ? walletAccounts[selectedAccount.id] : walletAccounts[0],
+          ? isLedgerAccount(selectedAccount)
+            ? ledgerAccountsList[selectedAccount.id]
+            : walletAccounts[selectedAccount.id]
+          : walletAccounts[0],
         walletAccounts,
       ),
     );
-    dispatch(
-      fetchAccountAction(
-        selectedAccount ? walletAccounts[selectedAccount.id] : walletAccounts[0],
-        walletAccounts,
-      ),
-    );
+
     dispatch(getActiveAccountsAction(walletAccounts));
   };
 
@@ -221,6 +225,9 @@ const useWalletReducer = () => {
         account.btcPublicKey,
         account.ordinalsPublicKey,
         network,
+        undefined,
+        account.accountType,
+        account.accountName,
       ),
     );
     dispatch(fetchAccountAction(account, accountsList));
@@ -283,6 +290,28 @@ const useWalletReducer = () => {
     dispatch(unlockWalletAction(seed));
   };
 
+  const addLedgerAccount = async (ledgerAccount: Account) => {
+    try {
+      dispatch(addLedgerAcountAction([...ledgerAccountsList, ledgerAccount]));
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const updateLedgerAccounts = async (updatedLedgerAccount: Account) => {
+    const newLedgerAccountsList = ledgerAccountsList.map((account) =>
+      account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account,
+    );
+    try {
+      dispatch(addLedgerAcountAction(newLedgerAccountsList));
+      if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
+        switchAccount(updatedLedgerAccount);
+      }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
   return {
     unlockWallet,
     lockWallet,
@@ -293,6 +322,8 @@ const useWalletReducer = () => {
     changeNetwork,
     createAccount,
     storeSeedPhrase,
+    addLedgerAccount,
+    updateLedgerAccounts,
   };
 };
 

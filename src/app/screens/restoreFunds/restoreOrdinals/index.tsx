@@ -53,9 +53,8 @@ const ButtonContainer = styled.div({
 
 function RestoreOrdinals() {
   const { t } = useTranslation('translation');
-  const {
-    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
-  } = useWalletSelector();
+  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+    useWalletSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
@@ -69,17 +68,19 @@ function RestoreOrdinals() {
     isLoading,
     error: transactionError,
     mutateAsync,
-  } = useMutation<SignedBtcTx, string, BtcOrdinal>(async (ordinal) => {
-    const tx = await signOrdinalSendTransaction(
-      ordinalsAddress,
-      ordinal.utxo,
-      btcAddress,
-      Number(selectedAccount?.id),
-      seedPhrase,
-      network.type,
-      ordinalsUtxos!,
-    );
-    return tx;
+  } = useMutation<SignedBtcTx, string, BtcOrdinal>({
+    mutationFn: async (ordinal) => {
+      const tx = await signOrdinalSendTransaction(
+        ordinalsAddress,
+        ordinal.utxo,
+        btcAddress,
+        Number(selectedAccount?.id),
+        seedPhrase,
+        network.type,
+        ordinalsUtxos!,
+      );
+      return tx;
+    },
   });
 
   useEffect(() => {

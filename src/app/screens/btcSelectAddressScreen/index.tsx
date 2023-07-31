@@ -167,11 +167,7 @@ function BtcSelectAddressScreen() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
-  const {
-    selectedAccount,
-    accountsList,
-    network,
-  } = useWalletSelector();
+  const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
   const { payload, approveBtcAddressRequest, cancelAddressRequest } = useBtcAddressRequest();
   const springProps = useSpring({
     transform: showAccountList ? 'translateY(0%)' : 'translateY(100%)',
@@ -221,6 +217,9 @@ function BtcSelectAddressScreen() {
         account.btcPublicKey,
         account.ordinalsPublicKey,
         network,
+        undefined,
+        account.accountType,
+        account.accountName,
       ),
     );
     setShowAccountList(false);
@@ -254,23 +253,25 @@ function BtcSelectAddressScreen() {
           <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            {payload.purposes.map((purpose) => (purpose === AddressPurposes.PAYMENT ? (
-              <AddressContainer>
-                <BitcoinDot />
-                <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
-              </AddressContainer>
-            ) : (
-              <AddressContainer>
-                <OrdinalImage src={OrdinalsIcon} />
-                <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
-              </AddressContainer>
-            )))}
+            {payload.purposes.map((purpose) =>
+              purpose === AddressPurposes.PAYMENT ? (
+                <AddressContainer>
+                  <BitcoinDot />
+                  <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
+                </AddressContainer>
+              ) : (
+                <AddressContainer>
+                  <OrdinalImage src={OrdinalsIcon} />
+                  <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
+                </AddressContainer>
+              ),
+            )}
           </div>
           <DappTitle>{payload.message}</DappTitle>
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
-            {accountsList.map((account) => (
+            {[...accountsList, ...ledgerAccountsList].map((account) => (
               <AccountListRow>
                 <AccountRow
                   key={account.stxAddress}

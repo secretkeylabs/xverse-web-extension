@@ -14,6 +14,8 @@ import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
+import { isInOptions } from '@utils/helper';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 function SendBtcScreen() {
   const location = useLocation();
@@ -28,14 +30,9 @@ function SendBtcScreen() {
   const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
   const [recipient, setRecipient] = useState<Recipient[]>();
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const {
-    btcAddress,
-    network,
-    btcBalance,
-    selectedAccount,
-    seedPhrase,
-    btcFiatRate,
-  } = useSelector((state: StoreState) => state.walletState);
+  const { btcAddress, network, btcBalance, selectedAccount, seedPhrase, btcFiatRate } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 
   const navigate = useNavigate();
@@ -45,18 +42,21 @@ function SendBtcScreen() {
     error: txError,
     mutate,
   } = useMutation<
-  SignedBtcTx,
-  ResponseError,
-  {
-    recipients: Recipient[];
-  }
-  >(async ({ recipients }) => signBtcTransaction(
-    recipients,
-    btcAddress,
-    selectedAccount?.id ?? 0,
-    seedPhrase,
-    network.type,
-  ));
+    SignedBtcTx,
+    ResponseError,
+    {
+      recipients: Recipient[];
+    }
+  >({
+    mutationFn: async ({ recipients }) =>
+      signBtcTransaction(
+        recipients,
+        btcAddress,
+        selectedAccount?.id ?? 0,
+        seedPhrase,
+        network.type,
+      ),
+  });
 
   const handleBackButtonClick = () => {
     navigate('/');
@@ -81,6 +81,9 @@ function SendBtcScreen() {
       });
     }
   }, [data]);
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-btc'), []);
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {
@@ -154,16 +157,20 @@ function SendBtcScreen() {
       },
     ];
     setRecipient(recipients);
-    if (validateFields(address, amountToSend)) { mutate({ recipients }); }
+    if (validateFields(address, amountToSend)) {
+      mutate({ recipients });
+    }
   };
 
   function getBalance() {
     return satsToBtc(new BigNumber(btcBalance)).toNumber();
   }
 
+  const showNavButtons = !isInOptions();
+
   return (
     <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
+      <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton={showNavButtons} />
       <SendForm
         currencyType="BTC"
         amountError={amountError}

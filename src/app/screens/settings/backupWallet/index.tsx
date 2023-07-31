@@ -86,15 +86,15 @@ function BackupWalletScreen() {
               loading={loading}
             />
           </EnterPasswordContainer>
-
         )}
         <SeedphraseContainer>
-          {showSeed && <SeedCheck showButton={false} seedPhrase={seedPhrase} onContinue={goToSettingScreen} />}
+          {showSeed && (
+            <SeedCheck showButton={false} seedPhrase={seedPhrase} onContinue={goToSettingScreen} />
+          )}
         </SeedphraseContainer>
       </Container>
       <BottomBar tab="settings" />
     </>
-
   );
 }
 

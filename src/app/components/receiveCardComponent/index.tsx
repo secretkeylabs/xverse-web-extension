@@ -6,15 +6,7 @@ import Copy from '@assets/img/nftDashboard/Copy.svg';
 import QrCode from '@assets/img/nftDashboard/QrCode.svg';
 import { useTranslation } from 'react-i18next';
 import { ReactNode } from 'react';
-
-interface Props {
-  title: string;
-  address: string;
-  onQrAddressClick: () => void;
-  children: ReactNode;
-  onCopyAddressClick?: () => void;
-  
-}
+import ActionButton from '@components/button';
 
 const ReceiveCard = styled.div((props) => ({
   background: props.theme.colors.background.elevation3,
@@ -75,14 +67,34 @@ const StyledToolTip = styled(Tooltip)`
   padding: 7px;
 `;
 
+const VerifyButtonContainer = styled.div({
+  width: 68,
+});
+
+interface Props {
+  title: string;
+  address: string;
+  onQrAddressClick: () => void;
+  children: ReactNode;
+  onCopyAddressClick?: () => void;
+  showVerifyButton?: boolean;
+  currency?: string;
+}
+
 function ReceiveCardComponent({
-  children, title, address, onQrAddressClick, onCopyAddressClick,
+  children,
+  title,
+  address,
+  onQrAddressClick,
+  onCopyAddressClick,
+  showVerifyButton,
+  currency,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
 
   const onCopyClick = () => {
     navigator.clipboard.writeText(address);
-    if(onCopyAddressClick) onCopyAddressClick();
+    if (onCopyAddressClick) onCopyAddressClick();
   };
 
   return (
@@ -90,24 +102,43 @@ function ReceiveCardComponent({
       <ColumnContainer>
         {children}
         <TitleText>{title}</TitleText>
-        <AddressText>{getShortTruncatedAddress(address)}</AddressText>
+        <AddressText>
+          {showVerifyButton
+            ? currency === 'BTC'
+              ? 'Receive payments in BTC'
+              : 'Receive Ordinals & BRC20 tokens'
+            : getShortTruncatedAddress(address)}
+        </AddressText>
       </ColumnContainer>
-      <RowContainer>
-        <Button id={`copy-address-${title}`} onClick={onCopyClick}>
-          <ButtonIcon src={Copy} />
-        </Button>
-        <StyledToolTip
-          anchorId={`copy-address-${title}`}
-          variant="light"
-          content={t('COPIED')}
-          events={['click']}
-          place="top"
-        />
-        <Button onClick={onQrAddressClick}>
-          <ButtonIcon src={QrCode} />
-        </Button>
-      </RowContainer>
-
+      {showVerifyButton ? (
+        <VerifyButtonContainer>
+          <ActionButton
+            transparent
+            text="Verify"
+            onPress={async () => {
+              await chrome.tabs.create({
+                url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${currency}`),
+              });
+            }}
+          />
+        </VerifyButtonContainer>
+      ) : (
+        <RowContainer>
+          <Button id={`copy-address-${title}`} onClick={onCopyClick}>
+            <ButtonIcon src={Copy} />
+          </Button>
+          <StyledToolTip
+            anchorId={`copy-address-${title}`}
+            variant="light"
+            content={t('COPIED')}
+            events={['click']}
+            place="top"
+          />
+          <Button onClick={onQrAddressClick}>
+            <ButtonIcon src={QrCode} />
+          </Button>
+        </RowContainer>
+      )}
     </ReceiveCard>
   );
 }

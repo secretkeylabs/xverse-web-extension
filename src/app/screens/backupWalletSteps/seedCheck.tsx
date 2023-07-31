@@ -56,8 +56,11 @@ export default function SeedCheck(props: SeedCheckPros): JSX.Element {
       <Heading>{t('SEED_PHRASE_VIEW_HEADING')}</Heading>
       <Label>{t('SEED_PHRASE_VIEW_LABEL')}</Label>
       <SeedphraseView seedPhrase={seedPhrase} isVisible={isVisible} setIsVisible={setIsVisible} />
-      {showButton && <ContinueButton enabled={isVisible} onClick={onContinue}>{t('SEED_PHRASE_VIEW_CONTINUE')}</ContinueButton>}
-
+      {showButton && (
+        <ContinueButton enabled={isVisible} onClick={onContinue}>
+          {t('SEED_PHRASE_VIEW_CONTINUE')}
+        </ContinueButton>
+      )}
     </Container>
   );
 }

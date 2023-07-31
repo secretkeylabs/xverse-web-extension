@@ -5,9 +5,7 @@ import {
   getStxFiatEquivalent,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
-import {
-  useEffect, useRef, useState,
-} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -20,6 +18,7 @@ import {
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
 import useDebounce from '@hooks/useDebounce';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -54,7 +53,9 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(6),
-  border: `1px solid ${props.withError ? props.theme.colors.feedback.error : props.theme.colors.background.elevation6}`,
+  border: `1px solid ${
+    props.withError ? props.theme.colors.feedback.error : props.theme.colors.background.elevation6
+  }`,
   backgroundColor: props.theme.colors.background.elevation1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
@@ -189,6 +190,8 @@ function EditFee({
   const inputRef = useRef(null);
   const debouncedFeeRateInput = useDebounce(feeRateInput, 500);
   const isBtcOrOrdinals = type === 'BTC' || type === 'Ordinals';
+  const { ordinals } = useOrdinalsByAddress(btcAddress);
+  const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
 
   const modifyStxFees = (mode: string) => {
     const currentFee = new BigNumber(fee);
@@ -234,7 +237,12 @@ function EditFee({
           setFeeRateInput(selectedFeeRate?.toString());
           setTotalFee(modifiedFee.toString());
         } else if (btcRecipients && selectedAccount) {
-          const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, mode);
+          const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
+            btcRecipients,
+            btcAddress,
+            network.type,
+            mode,
+          );
           setFeeRateInput(selectedFeeRate?.toString());
           setTotalFee(modifiedFee.toString());
         }
@@ -244,6 +252,7 @@ function EditFee({
           ordinalTxUtxo,
           btcAddress,
           network.type,
+          ordinalsUtxos || [],
           mode,
         );
         setFeeRateInput(selectedFeeRate?.toString());
@@ -288,7 +297,13 @@ function EditFee({
           setFeeRateInput(selectedFeeRate?.toString());
           setTotalFee(modifiedFee.toString());
         } else if (btcRecipients && selectedAccount) {
-          const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(btcRecipients, btcAddress, network.type, selectedOption, feeRateInput);
+          const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
+            btcRecipients,
+            btcAddress,
+            network.type,
+            selectedOption,
+            feeRateInput,
+          );
           setFeeRateInput(selectedFeeRate?.toString());
           setTotalFee(modifiedFee.toString());
         }
@@ -311,6 +326,7 @@ function EditFee({
           ordinalTxUtxo,
           btcAddress,
           network.type,
+          ordinalsUtxos || [],
           selectedOption,
           feeRateInput,
         );
@@ -386,10 +402,13 @@ function EditFee({
       <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
       <FeeContainer>
         <InputContainer withError={!!error}>
-          <InputField type="number" ref={inputRef} value={feeRateInput?.toString()} onChange={onInputEditFeesChange} />
-          {isBtcOrOrdinals && (
-            <FeeText>sats /vB</FeeText>
-          )}
+          <InputField
+            type="number"
+            ref={inputRef}
+            value={feeRateInput?.toString()}
+            onChange={onInputEditFeesChange}
+          />
+          {isBtcOrOrdinals && <FeeText>sats /vB</FeeText>}
           <TickerContainer>
             {isBtcOrOrdinals && (
               <NumericFormat

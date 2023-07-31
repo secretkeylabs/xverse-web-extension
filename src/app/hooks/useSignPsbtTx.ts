@@ -2,14 +2,16 @@ import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SignTransactionOptions } from 'sats-connect';
-import { InputToSign, signPsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
+import {
+  InputToSign,
+  signPsbt,
+  psbtBase64ToHex,
+} from '@secretkeylabs/xverse-core/transactions/psbt';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import useBtcClient from './useBtcClient';
 
 const useSignPsbtTx = () => {
-  const {
-    seedPhrase, accountsList, network,
-  } = useWalletSelector();
+  const { seedPhrase, accountsList, network } = useWalletSelector();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('signPsbtRequest') ?? '';
@@ -60,7 +62,7 @@ const useSignPsbtTx = () => {
   };
 
   const getSigningAddresses = (inputsToSign: Array<InputToSign>) => {
-    const signingAddresses : Array<string> = [];
+    const signingAddresses: Array<string> = [];
     inputsToSign.forEach((inputToSign) => {
       inputToSign.signingIndexes.forEach((signingIndex) => {
         signingAddresses[signingIndex] = inputToSign.address;

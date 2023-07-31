@@ -12,10 +12,11 @@ import BottomTabBar from '@components/tabBar';
 import InfoContainer from '@components/infoContainer';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
+import { isLedgerAccount } from '@utils/helper';
 
 const OuterContainer = styled.div`
   display: flex;
-  flex:1 ;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -96,7 +97,7 @@ function Receive(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
   const [addressCopied, setAddressCopied] = useState(false);
   const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
-  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible]  = useState(false);
+  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const navigate = useNavigate();
   const {
     stxAddress,
@@ -129,18 +130,10 @@ function Receive(): JSX.Element {
 
   const renderHeading = () => {
     if (currency === 'BTC') {
-      return (
-        <TopTitleText>
-          {t('BTC_ADDRESS')}
-        </TopTitleText>
-      );
+      return <TopTitleText>{t('BTC_ADDRESS')}</TopTitleText>;
     }
     if (currency === 'ORD') {
-      return (
-        <TopTitleText>
-          {t('ORDINAL_ADDRESS')}
-        </TopTitleText>
-      );
+      return <TopTitleText>{t('ORDINAL_ADDRESS')}</TopTitleText>;
     }
     return <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>;
   };
@@ -156,39 +149,44 @@ function Receive(): JSX.Element {
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
     setAddressCopied(true);
-    if (currency === 'BTC' && showBtcReceiveAlert) { setIsBtcReceiveAlertVisible(true); }
-    if (currency === 'ORD' && showOrdinalReceiveAlert ) { setIsOrdinalReceiveAlertVisible(true); }
+    if (currency === 'BTC' && showBtcReceiveAlert) {
+      setIsBtcReceiveAlertVisible(true);
+    }
+    if (currency === 'ORD' && showOrdinalReceiveAlert) {
+      setIsOrdinalReceiveAlertVisible(true);
+    }
   };
+
   return (
     <>
       <TopRow title={t('RECEIVE')} onClick={handleBackButtonClick} />
       <OuterContainer>
         <Container>
           {renderHeading()}
-          {currency !== 'BTC' && currency !== 'ORD' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
+          {currency !== 'BTC' && currency !== 'ORD' && (
+            <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>
+          )}
           <QRCodeContainer>
             <QRCode value={getAddress()} size={150} />
           </QRCodeContainer>
 
           {currency !== 'BTC' && currency !== 'ORD' && !!selectedAccount?.bnsName && (
-          <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
+            <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
           )}
           <AddressContainer>
-            <AddressText>
-              { getAddress() }
-            </AddressText>
+            <AddressText>{getAddress()}</AddressText>
           </AddressContainer>
         </Container>
         <CopyContainer>
-          { currency === 'ORD' && (
-          <InfoAlertContainer>
-            <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
-          </InfoAlertContainer>
+          {currency === 'ORD' && (
+            <InfoAlertContainer>
+              <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
+            </InfoAlertContainer>
           )}
-          { currency === 'BTC' && (
-          <InfoAlertContainer>
-            <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
-          </InfoAlertContainer>
+          {currency === 'BTC' && (
+            <InfoAlertContainer>
+              <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
+            </InfoAlertContainer>
           )}
           {addressCopied ? (
             <ActionButton
@@ -201,14 +199,16 @@ function Receive(): JSX.Element {
             <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
           )}
         </CopyContainer>
-
       </OuterContainer>
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />
       </BottomBarContainer>
-      {isBtcReceiveAlertVisible && <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose}/>}
-      {isOrdinalReceiveAlertVisible && <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose}/>}
-    
+      {isBtcReceiveAlertVisible && (
+        <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose} />
+      )}
+      {isOrdinalReceiveAlertVisible && (
+        <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
+      )}
     </>
   );
 }

@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
-  StacksTransaction, cvToHex, uintCV, UnsignedStacksTransation,
+  StacksTransaction,
+  cvToHex,
+  uintCV,
+  UnsignedStacksTransation,
 } from '@secretkeylabs/xverse-core/types';
 import { useMutation } from '@tanstack/react-query';
 import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
@@ -20,6 +23,7 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import AccountHeaderComponent from '@components/accountHeader';
 import useNetworkSelector from '@hooks/useNetwork';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -28,7 +32,7 @@ const ScrollContainer = styled.div`
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
-  };
+  }
   width: 360px;
   margin: auto;
 `;
@@ -110,7 +114,9 @@ function SendNft() {
   const [nft, setNft] = useState<NftData | undefined>(undefined);
 
   useEffect(() => {
-    const data = nftData.find((nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)));
+    const data = nftData.find(
+      (nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)),
+    );
     if (data) {
       setNft(data);
     }
@@ -118,48 +124,41 @@ function SendNft() {
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const {
-    stxAddress,
-    stxPublicKey,
-    network,
-    feeMultipliers,
-  } = useWalletSelector();
+  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
   const { isLoading, data, mutate } = useMutation<
-  StacksTransaction,
-  Error,
-  { tokenId: string; associatedAddress: string }
-  >({ mutationFn: async ({ tokenId, associatedAddress }) => {
-    const principal = nft?.fully_qualified_token_id?.split('::')!;
-    const name = principal[1].split(':')[0];
-    const contractInfo: string[] = principal[0].split('.');
-    const unsginedTx: UnsignedStacksTransation = {
-      amount: tokenId,
-      senderAddress: stxAddress,
-      recipientAddress: associatedAddress,
-      contractAddress: contractInfo[0],
-      contractName: contractInfo[1],
-      assetName: name,
-      publicKey: stxPublicKey,
-      network: selectedNetwork,
-      pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
-      memo: '',
-      isNFT: true,
-
-    };
-    const unsignedTx: StacksTransaction = await generateUnsignedTransaction(
-      unsginedTx,
-    );
-    if (feeMultipliers?.stxSendTxMultiplier) {
-      unsignedTx.setFee(
-        unsignedTx.auth.spendingCondition.fee
-          * BigInt(feeMultipliers.stxSendTxMultiplier),
-      );
-    }
-    setRecipientAddress(associatedAddress);
-    return unsignedTx;
-  }});
+    StacksTransaction,
+    Error,
+    { tokenId: string; associatedAddress: string }
+  >({
+    mutationFn: async ({ tokenId, associatedAddress }) => {
+      const principal = nft?.fully_qualified_token_id?.split('::')!;
+      const name = principal[1].split(':')[0];
+      const contractInfo: string[] = principal[0].split('.');
+      const unsginedTx: UnsignedStacksTransation = {
+        amount: tokenId,
+        senderAddress: stxAddress,
+        recipientAddress: associatedAddress,
+        contractAddress: contractInfo[0],
+        contractName: contractInfo[1],
+        assetName: name,
+        publicKey: stxPublicKey,
+        network: selectedNetwork,
+        pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
+        memo: '',
+        isNFT: true,
+      };
+      const unsignedTx: StacksTransaction = await generateUnsignedTransaction(unsginedTx);
+      if (feeMultipliers?.stxSendTxMultiplier) {
+        unsignedTx.setFee(
+          unsignedTx.auth.spendingCondition.fee * BigInt(feeMultipliers.stxSendTxMultiplier),
+        );
+      }
+      setRecipientAddress(associatedAddress);
+      return unsignedTx;
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -171,6 +170,9 @@ function SendNft() {
       });
     }
   }, [data]);
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-nft'), []);
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -211,17 +213,17 @@ function SendNft() {
   return (
     <>
       {isGalleryOpen && (
-      <>
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-        <ButtonContainer>
-          <Button onClick={handleBackButtonClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-            </>
-          </Button>
-        </ButtonContainer>
-      </>
+        <>
+          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
+          <ButtonContainer>
+            <Button onClick={handleBackButtonClick}>
+              <>
+                <ButtonImage src={ArrowLeft} />
+                <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
+              </>
+            </Button>
+          </ButtonContainer>
+        </>
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />}
@@ -235,16 +237,12 @@ function SendNft() {
         >
           <Container>
             <NFtContainer>
-              <NftImage
-                metadata={nft?.token_metadata!}
-              />
+              <NftImage metadata={nft?.token_metadata!} />
             </NFtContainer>
             <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
           </Container>
         </SendForm>
-        <BottomBarContainer>
-          {!isGalleryOpen && <BottomBar tab="nft" />}
-        </BottomBarContainer>
+        <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>
       </ScrollContainer>
     </>
   );

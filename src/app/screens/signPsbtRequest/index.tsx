@@ -1,6 +1,4 @@
-import {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ActionButton from '@components/button';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -8,9 +6,7 @@ import { parsePsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { useTranslation } from 'react-i18next';
 import IconOrdinal from '@assets/img/transactions/ordinal.svg';
 import styled from 'styled-components';
-import {
-  getBtcFiatEquivalent, satsToBtc,
-} from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
@@ -21,6 +17,7 @@ import InfoContainer from '@components/infoContainer';
 import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
 import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
+import { isLedgerAccount } from '@utils/helper';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -72,15 +69,12 @@ const ReviewTransactionText = styled.h1((props) => ({
 }));
 
 function SignPsbtRequest() {
-  const {
-    btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate,
-  } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
+    useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const {
-    payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses,
-  } = useSignPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
 
   const handlePsbtParsing = useCallback(() => {
@@ -92,11 +86,7 @@ function SignPsbtRequest() {
   }, [selectedAccount, payload.psbtBase64]);
 
   const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
-  const {
-    loading,
-    ordinalInfoData,
-    userReceivesOrdinal,
-  } = useDetectOrdinalInSignPsbt(parsedPsbt);
+  const { loading, ordinalInfoData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
     [payload.inputsToSign],
@@ -146,6 +136,10 @@ function SignPsbtRequest() {
 
   const onSignPsbtConfirmed = async () => {
     try {
+      if (isLedgerAccount(selectedAccount)) {
+        return;
+      }
+
       setIsSigning(true);
       const response = await confirmSignPsbt();
       setIsSigning(false);
@@ -201,32 +195,39 @@ function SignPsbtRequest() {
         <LoaderContainer>
           <MoonLoader color="white" size={50} />
         </LoaderContainer>
-      )
-        : (
-          <>
-            <OuterContainer>
+      ) : (
+        <>
+          <OuterContainer>
+            {isLedgerAccount(selectedAccount) ? (
+              <Container>
+                <InfoContainer bodyText="External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
+              </Container>
+            ) : (
               <Container>
                 <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
-                {!payload.broadcast ? (
+                {!payload.broadcast && (
                   <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
-                ) : null}
-                {ordinalInfoData && ordinalInfoData.map((ordinalData) => (
-                  <OrdinalDetailComponent
-                    ordinalInscription={`Inscription ${ordinalData?.number}`}
-                    icon={IconOrdinal}
-                    title={t('ORDINAL')}
-                    ordinal={ordinalData}
-                    ordinalDetail={ordinalData?.content_type}
-                    heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
-                  />
-                ))}
+                )}
+                {ordinalInfoData &&
+                  ordinalInfoData.map((ordinalData) => (
+                    <OrdinalDetailComponent
+                      ordinalInscription={`Inscription ${ordinalData?.number}`}
+                      icon={IconOrdinal}
+                      title={t('ORDINAL')}
+                      ordinal={ordinalData}
+                      ordinalDetail={ordinalData?.content_type}
+                      heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
+                    />
+                  ))}
                 <RecipientComponent
                   value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
                     .toString()
                     .replace('-', '')}`}
                   currencyType="BTC"
                   title={t('AMOUNT')}
-                  heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
+                  heading={
+                    parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')
+                  }
                 />
                 <InputOutputComponent
                   parsedPsbt={parsedPsbt}
@@ -244,15 +245,21 @@ function SignPsbtRequest() {
                   />
                 ) : null}
               </Container>
-            </OuterContainer>
-            <ButtonContainer>
-              <TransparentButtonContainer>
-                <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
-              </TransparentButtonContainer>
-              <ActionButton text={t('CONFIRM')} onPress={onSignPsbtConfirmed} processing={isSigning} />
-            </ButtonContainer>
-          </>
-        )}
+            )}
+          </OuterContainer>
+          <ButtonContainer>
+            <TransparentButtonContainer>
+              <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
+            </TransparentButtonContainer>
+            <ActionButton
+              text={t('CONFIRM')}
+              onPress={onSignPsbtConfirmed}
+              processing={isSigning}
+              disabled={isLedgerAccount(selectedAccount)}
+            />
+          </ButtonContainer>
+        </>
+      )}
     </>
   );
 }
