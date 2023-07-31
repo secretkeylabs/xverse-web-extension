@@ -1,14 +1,7 @@
 import TopRow from '@components/topRow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import { getBtcFiatEquivalent, NetworkType, satsToBtc,UTXO} from '@secretkeylabs/xverse-core';
-import {
-  BtcUtxoDataResponse,
-  getBtcFiatEquivalent,
-  NetworkType,
-  satsToBtc,
-  UTXO,
-} from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, NetworkType, satsToBtc, UTXO } from '@secretkeylabs/xverse-core';
 import {
   getBtcFeesForNonOrdinalBtcSend,
   SignedBtcTx,
@@ -79,11 +72,9 @@ const ButtonContainer = styled.div({
 
 function RestoreBtc() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_BTC_SCREEN' });
-  const {
-    ordinalsAddress, btcAddress, network,
-    selectedAccount, btcFiatRate,
-  } = useWalletSelector();
-  const {getSeed} = useSecretKey();
+  const { ordinalsAddress, btcAddress, network, selectedAccount, btcFiatRate } =
+    useWalletSelector();
+  const { getSeed } = useSecretKey();
   const navigate = useNavigate();
   const { unspentUtxos } = useNonOrdinalUtxos();
   let amount = new BigNumber(0);
