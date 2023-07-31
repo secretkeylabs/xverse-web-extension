@@ -132,7 +132,6 @@ const useWalletReducer = () => {
     const passPhrase = await getSessionItem(SeedVaultStorageKeys.PASSWORD_HASH);
     await lockVault(passPhrase);
     PostGuardPing('closeWallet');
-
   };
 
   const resetWallet = async () => {
@@ -346,7 +345,6 @@ const useWalletReducer = () => {
     switchAccount,
     changeNetwork,
     createAccount,
-    storeSeedPhrase,
     addLedgerAccount,
     removeLedgerAccount,
     updateLedgerAccounts,
