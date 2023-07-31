@@ -1,28 +1,28 @@
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useMemo, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
-import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
+import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
+import AccountHeaderComponent from '@components/accountHeader';
+import SendForm from '@components/sendForm';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useBtcClient from '@hooks/useBtcClient';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import useWalletSelector from '@hooks/useWalletSelector';
+import OrdinalImage from '@screens/ordinals/ordinalImage';
+import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core/api';
+import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
   SignedBtcTx,
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import useWalletSelector from '@hooks/useWalletSelector';
-import SendForm from '@components/sendForm';
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import AccountHeaderComponent from '@components/accountHeader';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
-import useBtcClient from '@hooks/useBtcClient';
-import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
+import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
+import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
-import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core/api';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -119,23 +119,27 @@ function SendOrdinal() {
     data,
     error: txError,
     mutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>({ mutationFn: async (recipient) => {
-    const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
-    const ordUtxo = addressUtxos.find((utx) => utx.txid === selectedOrdinal?.tx_id);
-    setOrdinalUtxo(ordUtxo);
-    if (ordUtxo) {
-      const signedTx = await signOrdinalSendTransaction(
-        recipient,
-        ordUtxo,
-        btcAddress,
-        Number(selectedAccount?.id),
-        seedPhrase,
-        network.type,
-        [ordUtxo],
+  } = useMutation<SignedBtcTx, ResponseError, string>({
+    mutationFn: async (recipient) => {
+      const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
+      const ordUtxo = addressUtxos.find(
+        (utx) => `${utx.txid}:${utx.vout}` === selectedOrdinal?.output,
       );
-      return signedTx;
-    }
-  } });
+      setOrdinalUtxo(ordUtxo);
+      if (ordUtxo) {
+        const signedTx = await signOrdinalSendTransaction(
+          recipient,
+          ordUtxo,
+          btcAddress,
+          Number(selectedAccount?.id),
+          seedPhrase,
+          network.type,
+          [ordUtxo],
+        );
+        return signedTx;
+      }
+    },
+  });
 
   useEffect(() => {
     if (txError) {
