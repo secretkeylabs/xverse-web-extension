@@ -22,7 +22,7 @@ function useSendBtcRequest() {
     request.payload?.recipients?.forEach(async (value) => {
       const recipient: Recipient = {
         address: value.address,
-        amountSats: new BigNumber(value.amountSats),
+        amountSats: new BigNumber(value.amountSats.toString()),
       };
       recipients.push(recipient);
     });
