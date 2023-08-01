@@ -151,7 +151,7 @@ export default function StxInfoBlock({ type, swap }: StxInfoCardProps) {
             </SpaceBetweenContainer>
             <EstimateUSDText>{` ~ $${token.fiatAmount} USD`}</EstimateUSDText>
           </AmountContainer>
-          <DescriptionText>{t('TO')}</DescriptionText>
+          <DescriptionText>{type === 'transfer' ? t('FROM') : t('TO')}</DescriptionText>
           <SpaceBetweenContainer>
             <ItemsCenterContainer>
               <AddressImg src={AddressIcon} />
