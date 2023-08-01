@@ -121,8 +121,11 @@ export function useSwap(): UseSwap {
   } = useWalletSelector();
   const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
 
-  const acceptableCoinList =
-    coinsList?.filter((c) => alexSDK.getCurrencyFrom(c.principal) != null) ?? [];
+  const acceptableCoinList = (coinsList || [])
+    .filter((c) => alexSDK.getCurrencyFrom(c.principal) != null)
+    // TODO tim: remove this once alexsdk fix issue here
+    // https://github.com/alexgo-io/alex-sdk/issues/2
+    .filter((c) => c.assetName !== 'brc20-db20');
 
   const [inputAmount, setInputAmount] = useState('');
   const [slippage, setSlippage] = useState(0.04);
