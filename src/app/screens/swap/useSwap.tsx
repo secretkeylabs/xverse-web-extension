@@ -46,7 +46,7 @@ export type UseSwap = {
   slippage: number;
   onSlippageChanged: (slippage: number) => void;
   minReceived?: string;
-  onSwap?: () => void;
+  onSwap?: () => Promise<void>;
 };
 
 export type SelectedCurrencyState = {
