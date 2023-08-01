@@ -48,12 +48,9 @@ const VerifyOrViewContainer = styled.div((props) => ({
 }));
 
 const VerifyButtonContainer = styled.div((props) => ({
+  minWidth: 300,
   marginBottom: props.theme.spacing(6),
 }));
-
-const VerifyButtonsContainer = styled.div({
-  minWidth: 300,
-});
 
 interface Props {
   visible: boolean;
@@ -137,7 +134,7 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
   );
 
   return isGalleryOpen ? (
-    <VerifyButtonsContainer>
+    <>
       <RowContainer>
         <Text>{t('RECEIVE_NFT')}</Text>
         <ButtonImage onClick={onReceiveModalClose}>
@@ -145,7 +142,7 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
         </ButtonImage>
       </RowContainer>
       {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
-    </VerifyButtonsContainer>
+    </>
   ) : (
     <BottomModal visible={visible} header={t('RECEIVE_NFT')} onClose={onReceiveModalClose}>
       {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -66,12 +66,14 @@ function SendBrc20Screen() {
   const [amountToSend, setAmountToSend] = useState('');
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [showForm, setShowForm] = useState(false);
-
   const location = useLocation();
 
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
   const fungibleToken =
     location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
+
+  const isSendButtonEnabled = amountToSend !== '' && amountToSend <= fungibleToken.balance;
+  const isActionButtonEnabled = showForm ? isSendButtonEnabled : true;
 
   const { subscribeToResetUserFlow } = useResetUserFlow();
   useEffect(() => subscribeToResetUserFlow('/send-brc20'), []);
@@ -95,13 +97,6 @@ function SendBrc20Screen() {
       setAmountToSend(newValue);
     }
   };
-
-  const checkIfEnableButton = useMemo(() => {
-    if (amountToSend !== '' || amountToSend <= fungibleToken.balance) {
-      return true;
-    }
-    return false;
-  }, [amountToSend, fungibleToken]);
 
   const handleInscribeTransferOrder = async () => {
     try {
@@ -206,13 +201,14 @@ function SendBrc20Screen() {
       ) : (
         <Brc20TransferInfo />
       )}
-      <SendButtonContainer enabled={checkIfEnableButton}>
+      <SendButtonContainer enabled={isActionButtonEnabled}>
         <ActionButton
           text={
             showForm ? t('SEND_BRC_20.SEND_NEXT_BUTTON') : t('SEND_BRC_20.SEND_INFO_START_BUTTON')
           }
           processing={isCreatingOrder}
           onPress={handleNext}
+          disabled={!isActionButtonEnabled}
         />
       </SendButtonContainer>
       <BottomBar tab="dashboard" />
