@@ -22,7 +22,7 @@ import ActionButton from '@components/button';
 import BottomModal from '@components/bottomModal';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useResetUserFlow from '@hooks/useResetUserFlow';
-import OptionsDialog from './optionsDialog';
+import OptionsDialog from '@components/optionsDialog/optionsDialog';
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -187,6 +187,26 @@ const ModalButtonContainer = styled.div((props) => ({
   },
 }));
 
+const ButtonRow = styled.button`
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  justify-content: flex-start;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  font: ${(props) => props.theme.body_medium_m};
+  color: ${(props) => props.theme.colors.white['0']};
+  transition: background-color 0.2s ease;
+  :hover {
+    background-color: ${(props) => props.theme.colors.background.elevation3};
+  }
+  :active {
+    background-color: ${(props) => props.theme.colors.background.elevation3};
+  }
+`;
+
 interface Props {
   account: Account | null;
   isSelected: boolean;
@@ -205,6 +225,9 @@ function AccountRow({
   withOptions,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const { t: optionsDialogTranslation } = useTranslation('translation', {
+    keyPrefix: 'OPTIONS_DIALOG',
+  });
   const { showBtcReceiveAlert, accountsList, network } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const [onStxCopied, setOnStxCopied] = useState(false);
@@ -401,9 +424,12 @@ function AccountRow({
       {showOptionsDialog && (
         <OptionsDialog
           closeDialog={closeOptionsDialog}
-          showRemoveAccountPrompt={handleRemoveAccountModalOpen}
           optionsDialogTopIndent={optionsDialogTopIndent}
-        />
+        >
+          <ButtonRow onClick={handleRemoveAccountModalClose}>
+            {optionsDialogTranslation('REMOVE_FROM_LIST')}
+          </ButtonRow>
+        </OptionsDialog>
       )}
 
       <BottomModal

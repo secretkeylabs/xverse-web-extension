@@ -393,7 +393,7 @@ function ImportLedger(): JSX.Element {
   const getDeviceNewAccountIndex = (masterKey?: string) => {
     const ledgerAccountsIndexList = ledgerAccountsList
       .filter((account) => masterKey === account.masterPubKey)
-      .map((account) => account.deviceAccountIndex);
+      .map((account, key) => account.deviceAccountIndex || key);
 
     for (let i = 0; i < ledgerAccountsIndexList.length; i += 1) {
       if (ledgerAccountsIndexList[i] !== i) {

@@ -10,7 +10,7 @@ import AccountRow from '@components/accountRow';
 
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isHardwareAccount } from '@utils/helper';
-import OptionsDialog from './optionsDialog';
+import OptionsDialog from '@components/optionsDialog/optionsDialog';
 
 const SelectedAccountContainer = styled.div((props) => ({
   paddingLeft: '5%',
@@ -36,7 +36,7 @@ const ResetWalletContainer = styled.div((props) => ({
   zIndex: 10,
   background: 'rgba(25, 25, 48, 0.5)',
   backdropFilter: 'blur(16px)',
-  padding: 16,
+  padding: props.theme.spacing(8),
   paddingTop: props.theme.spacing(30),
 }));
 
@@ -47,6 +47,30 @@ const OptionsButton = styled.button((props) => ({
   background: 'transparent',
   marginTop: props.theme.spacing(8),
 }));
+
+const ButtonRow = styled.button`
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  justify-content: flex-start;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  font: ${(props) => props.theme.body_medium_m};
+  color: ${(props) => props.theme.colors.white['0']};
+  transition: background-color 0.2s ease;
+  :hover {
+    background-color: ${(props) => props.theme.colors.background.elevation3};
+  }
+  :active {
+    background-color: ${(props) => props.theme.colors.background.elevation3};
+  }
+`;
+
+const WarningButton = styled(ButtonRow)`
+  color: ${(props) => props.theme.colors.feedback.error};
+`;
 
 interface AccountHeaderComponentProps {
   disableMenuOption?: boolean;
@@ -63,11 +87,14 @@ function AccountHeaderComponent({
   const { selectedAccount } = useWalletSelector();
 
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
+  const { t: optionsDialogTranslation } = useTranslation('translation', {
+    keyPrefix: 'OPTIONS_DIALOG',
+  });
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [showResetWalletPrompt, setShowResetWalletPrompt] = useState(false);
   const [showResetWalletDisplay, setShowResetWalletDisplay] = useState(false);
   const [password, setPassword] = useState('');
-  const { unlockWallet, resetWallet } = useWalletReducer();
+  const { unlockWallet, lockWallet, resetWallet } = useWalletReducer();
   const [error, setError] = useState('');
 
   const handleResetWallet = () => {
@@ -94,7 +121,7 @@ function AccountHeaderComponent({
     setShowResetWalletPrompt(false);
   };
 
-  const onResetWalletPromptOpen = () => {
+  const handleResetWalletPromptOpen = () => {
     setShowResetWalletPrompt(true);
   };
 
@@ -146,10 +173,15 @@ function AccountHeaderComponent({
           </OptionsButton>
         )}
         {showOptionsDialog && (
-          <OptionsDialog
-            closeDialog={closeOptionsDialog}
-            showResetWalletPrompt={onResetWalletPromptOpen}
-          />
+          <OptionsDialog closeDialog={closeOptionsDialog}>
+            <ButtonRow onClick={handleAccountSelect}>
+              {optionsDialogTranslation('SWITCH_ACCOUNT')}
+            </ButtonRow>
+            <ButtonRow onClick={lockWallet}>{optionsDialogTranslation('LOCK')}</ButtonRow>
+            <WarningButton onClick={handleResetWalletPromptOpen}>
+              {optionsDialogTranslation('RESET_WALLET')}
+            </WarningButton>
+          </OptionsDialog>
         )}
       </SelectedAccountContainer>
       <ResetWalletPrompt
