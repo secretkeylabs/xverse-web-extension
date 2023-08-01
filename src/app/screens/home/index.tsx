@@ -363,6 +363,8 @@ function Home() {
     </VerifyOrViewContainer>
   );
 
+  const showSwaps = !isLedgerAccount(selectedAccount);
+
   return (
     <>
       <AccountHeaderComponent />
@@ -384,7 +386,7 @@ function Home() {
         <RowButtonContainer>
           <SquareButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
           <SquareButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
-          {/* <SquareButton src={Swap} text={t('SWAP')} onPress={onSwapPressed} /> */}
+          {showSwaps && <SquareButton src={Swap} text={t('SWAP')} onPress={onSwapPressed} />}
           <SquareButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
         </RowButtonContainer>
 
