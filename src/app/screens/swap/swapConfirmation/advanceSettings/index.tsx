@@ -3,7 +3,7 @@ import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/c
 import TransactionSettingAlert from '@components/transactionSetting';
 import BigNumber from 'bignumber.js';
 import { setFee, setNonce } from '@secretkeylabs/xverse-core';
-import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import styled from 'styled-components';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import { useTranslation } from 'react-i18next';
@@ -31,7 +31,7 @@ const ButtonImage = styled.img((props) => ({
 }));
 
 type Props = {
-  swap: SwapConfirmationInput;
+  swap: SwapConfirmationOutput;
 };
 
 export function AdvanceSettings({ swap }: Props) {
