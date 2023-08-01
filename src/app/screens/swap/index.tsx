@@ -6,7 +6,7 @@ import BottomBar from '@components/tabBar';
 import SwapTokenBlock from '@screens/swap/swapTokenBlock';
 import ArrowDown from '@assets/img/swap/arrow_swap.svg';
 import { useSwap } from '@screens/swap/useSwap';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { SwapInfoBlock } from '@screens/swap/swapInfoBlock';
 import ActionButton from '@components/button';
 import CoinSelectModal from '@screens/home/coinSelectModal';
@@ -58,6 +58,18 @@ function SwapScreen() {
   const [selecting, setSelecting] = useState<'from' | 'to'>();
   const [loading, setLoading] = useState(false);
 
+  const handleClickContinue = useCallback(async () => {
+    if (swap.submitError || !swap.onSwap) {
+      return;
+    }
+    try {
+      setLoading(true);
+      await swap.onSwap();
+    } finally {
+      setLoading(false);
+    }
+  }, [swap, setLoading]);
+
   return (
     <>
       <TopRow title={t('SWAP')} onClick={() => navigate('/')} />
@@ -103,17 +115,7 @@ function SwapScreen() {
           warning={!!swap.submitError}
           text={swap.submitError ?? t('CONTINUE')}
           processing={loading}
-          onPress={async () => {
-            if (swap.submitError) {
-              return;
-            }
-            try {
-              setLoading(true);
-              swap.onSwap?.();
-            } finally {
-              setLoading(false);
-            }
-          }}
+          onPress={handleClickContinue}
         />
       </SendButtonContainer>
       <BottomBar tab="dashboard" />
