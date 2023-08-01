@@ -18,9 +18,9 @@ import { InscriptionsList } from '@secretkeylabs/xverse-core/types';
 import AlertMessage from '@components/alertMessage';
 import useAddressInscriptions from '@hooks/queries/ordinals/useAddressInscriptions';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
+import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
-import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 
 const Container = styled.div`
   display: flex;
@@ -241,12 +241,12 @@ function NftDashboard() {
       totalCount = ordinalsLength + totalCount;
     }
     return totalCount;
-  }, [ordinals, nftsList]);
+  }, [nftsList, hasActivatedOrdinalsKey, ordinalsLength]);
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
   useEffect(() => {
-    if (hasActivatedOrdinalsKey === undefined && ordinals && ordinalsLength) {
+    if (hasActivatedOrdinalsKey === undefined && ordinalsLength) {
       setShowActivateOrdinalsAlert(true);
     }
   }, [hasActivatedOrdinalsKey, ordinalsLength]);

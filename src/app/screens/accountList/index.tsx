@@ -122,7 +122,7 @@ function AccountList(): JSX.Element {
     account.stxAddress === selectedAccount?.stxAddress;
 
   const handleBackButtonClick = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   async function onCreateAccount() {
