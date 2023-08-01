@@ -7,7 +7,7 @@ import Plus from '@assets/img/dashboard/plus.svg';
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import { useDispatch } from 'react-redux';
 import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -145,9 +145,9 @@ function AccountList(): JSX.Element {
               account={account}
               isSelected={isAccountSelected(account)}
               onAccountSelected={handleAccountSelect}
-              withOptions
+              isAccountListView
             />
-            <Seperator />
+            <Separator />
           </React.Fragment>
         ))}
       </AccountContainer>

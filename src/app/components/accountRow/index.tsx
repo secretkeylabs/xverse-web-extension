@@ -213,7 +213,7 @@ interface Props {
   allowCopyAddress?: boolean;
   showOrdinalAddress?: boolean;
   onAccountSelected: (account: Account) => void;
-  withOptions?: boolean;
+  isAccountListView?: boolean;
 }
 
 function AccountRow({
@@ -222,7 +222,7 @@ function AccountRow({
   onAccountSelected,
   allowCopyAddress,
   showOrdinalAddress,
-  withOptions,
+  isAccountListView = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
@@ -415,7 +415,7 @@ function AccountRow({
         </CurrentAcountContainer>
       </AccountInfoContainer>
 
-      {!!withOptions && isHardwareAccount(account) && (
+      {isAccountListView && isHardwareAccount(account) && (
         <OptionsButton onClick={openOptionsDialog}>
           <img src={threeDotsIcon} alt="Options" />
         </OptionsButton>
@@ -426,7 +426,7 @@ function AccountRow({
           closeDialog={closeOptionsDialog}
           optionsDialogTopIndent={optionsDialogTopIndent}
         >
-          <ButtonRow onClick={handleRemoveAccountModalClose}>
+          <ButtonRow onClick={handleRemoveAccountModalOpen}>
             {optionsDialogTranslation('REMOVE_FROM_LIST')}
           </ButtonRow>
         </OptionsDialog>
