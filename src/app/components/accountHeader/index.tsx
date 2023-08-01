@@ -10,7 +10,7 @@ import AccountRow from '@components/accountRow';
 
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isHardwareAccount } from '@utils/helper';
-import OptionsDialog from '@components/optionsDialog/optionsDialog';
+import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 
 const SelectedAccountContainer = styled.div((props) => ({
   paddingLeft: '5%',
@@ -96,6 +96,9 @@ function AccountHeaderComponent({
   const [password, setPassword] = useState('');
   const { unlockWallet, lockWallet, resetWallet } = useWalletReducer();
   const [error, setError] = useState('');
+  const [optionsDialogIndents, setOptionsDialogIndents] = useState<
+    { top: string; left: string } | undefined
+  >();
 
   const handleResetWallet = () => {
     resetWallet();
@@ -136,8 +139,15 @@ function AccountHeaderComponent({
     }
   };
 
-  const openOptionsDialog = () => {
+  const openOptionsDialog = (event: React.MouseEvent<HTMLButtonElement>) => {
     setShowOptionsDialog(true);
+
+    setOptionsDialogIndents({
+      top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
+      left: `calc(${
+        (event.target as HTMLElement).parentElement?.getBoundingClientRect().right
+      }px - ${OPTIONS_DIALOG_WIDTH}px)`,
+    });
   };
 
   const closeOptionsDialog = () => {
@@ -173,7 +183,10 @@ function AccountHeaderComponent({
           </OptionsButton>
         )}
         {showOptionsDialog && (
-          <OptionsDialog closeDialog={closeOptionsDialog}>
+          <OptionsDialog
+            closeDialog={closeOptionsDialog}
+            optionsDialogIndents={optionsDialogIndents}
+          >
             <ButtonRow onClick={handleAccountSelect}>
               {optionsDialogTranslation('SWITCH_ACCOUNT')}
             </ButtonRow>

@@ -22,7 +22,7 @@ import ActionButton from '@components/button';
 import BottomModal from '@components/bottomModal';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useResetUserFlow from '@hooks/useResetUserFlow';
-import OptionsDialog from '@components/optionsDialog/optionsDialog';
+import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -237,7 +237,9 @@ function AccountRow({
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
-  const [optionsDialogTopIndent, setOptionsDialogTopIndent] = useState<string>('0px');
+  const [optionsDialogIndents, setOptionsDialogIndents] = useState<
+    { top: string; left: string } | undefined
+  >();
   const { removeLedgerAccount } = useWalletReducer();
   const { broadcastResetUserFlow } = useResetUserFlow();
 
@@ -286,9 +288,12 @@ function AccountRow({
   const openOptionsDialog = (event: React.MouseEvent<HTMLButtonElement>) => {
     setShowOptionsDialog(true);
 
-    setOptionsDialogTopIndent(
-      `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
-    );
+    setOptionsDialogIndents({
+      top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
+      left: `calc(${
+        (event.target as HTMLElement).parentElement?.getBoundingClientRect().right
+      }px - ${OPTIONS_DIALOG_WIDTH}px)`,
+    });
   };
 
   const closeOptionsDialog = () => {
@@ -422,10 +427,7 @@ function AccountRow({
       )}
 
       {showOptionsDialog && (
-        <OptionsDialog
-          closeDialog={closeOptionsDialog}
-          optionsDialogTopIndent={optionsDialogTopIndent}
-        >
+        <OptionsDialog closeDialog={closeOptionsDialog} optionsDialogIndents={optionsDialogIndents}>
           <ButtonRow onClick={handleRemoveAccountModalOpen}>
             {optionsDialogTranslation('REMOVE_FROM_LIST')}
           </ButtonRow>

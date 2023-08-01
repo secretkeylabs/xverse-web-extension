@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+export const OPTIONS_DIALOG_WIDTH = 179;
+
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -9,14 +11,12 @@ const Container = styled.div((props) => ({
   borderRadius: 12,
   paddingTop: 11,
   paddingBottom: 11,
-  width: 179,
+  width: OPTIONS_DIALOG_WIDTH,
   background: props.theme.colors.background.elevation2,
 }));
 
 const OuterContainer = styled.div({
   position: 'fixed',
-  width: 360,
-  height: 600,
   top: 0,
   bottom: 0,
   left: 0,
@@ -28,15 +28,13 @@ const OuterContainer = styled.div({
 interface Props {
   children: React.ReactNode;
   closeDialog: () => void;
-  optionsDialogTopIndent?: string;
+  optionsDialogIndents?: { top: string; left: string };
 }
 
-function OptionsDialog({ closeDialog, optionsDialogTopIndent, children }: Props) {
+function OptionsDialog({ closeDialog, optionsDialogIndents, children }: Props) {
   return (
     <OuterContainer onClick={closeDialog}>
-      <Container style={optionsDialogTopIndent ? { top: optionsDialogTopIndent } : undefined}>
-        {children}
-      </Container>
+      <Container style={optionsDialogIndents}>{children}</Container>
     </OuterContainer>
   );
 }
