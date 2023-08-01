@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { animated, useTransition } from '@react-spring/web';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
@@ -13,11 +13,12 @@ import {
 } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { ledgerDelay } from '@common/utils/ledger';
-import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import Switch from 'react-switch';
+import warningIcon from '@assets/img/Warning_red.svg';
 
 import LedgerImportStartSVG from '@assets/img/ledger/ledger_import_start.svg';
 import BtcOrdinalsIconSVG from '@assets/img/ledger/btc_ordinals_icon.svg';
@@ -29,9 +30,13 @@ import LedgerConnectStxSVG from '@assets/img/ledger/ledger_import_connect_stx.sv
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import LedgerAccountSwitchSVG from '@assets/img/ledger/account_switch.svg';
 import ArrowLeftIconSVG from '@assets/img/ledger/arrow_left_icon.svg';
-import InfoContainer from '@components/infoContainer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
+
+const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE =
+  'https://support.xverse.app/hc/en-us/articles/17901278165773';
+const LINK_TO_LEDGER_PASSPHRASE_GUIDE =
+  'https://support.xverse.app/hc/en-us/articles/17901278165773';
 
 const Container = styled.div`
   display: flex;
@@ -64,11 +69,19 @@ const ImportStartImage = styled.img((props) => ({
   marginLeft: props.theme.spacing(0),
 }));
 
-const ImportStartContainer = styled.div((props) => ({
+const ImportStartContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   maxWidth: '328px',
+});
+
+const ImportBeforeStartContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  maxWidth: '328px',
+  paddingTop: props.theme.spacing(16),
 }));
 
 const ButtonContainer = styled.div((props) => ({
@@ -80,13 +93,27 @@ const ButtonContainer = styled.div((props) => ({
 
 const ImportStartTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
-  marginTop: props.theme.spacing(30),
+  marginTop: props.theme.spacing(40),
   textAlign: 'center',
 }));
 const ImportStartText = styled.p((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
   marginTop: props.theme.spacing(6),
+  color: props.theme.colors.white[200],
+}));
+
+const ImportBeforeStartTitle = styled.h1((props) => ({
+  ...props.theme.headline_s,
+  marginTop: props.theme.spacing(5),
+  textAlign: 'left',
+  alignSelf: 'flex-start',
+}));
+const ImportBeforeStartText = styled.p((props) => ({
+  ...props.theme.body_m,
+  textAlign: 'left',
+  marginTop: props.theme.spacing(6),
+  color: props.theme.colors.white[200],
 }));
 
 const ImportCardContainer = styled.div((props) => ({
@@ -221,8 +248,49 @@ const ConfirmationStepsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-const InfoContainerWrapper = styled.div((props) => ({
-  marginTop: props.theme.spacing(12),
+const OptionsContainer = styled.div((props) => ({
+  width: '100%',
+  marginTop: props.theme.spacing(16),
+}));
+
+interface OptionProps {
+  selected?: boolean;
+}
+const Option = styled.div<OptionProps>((props) => ({
+  width: '100%',
+  backgroundColor: '#21253C',
+  padding: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(7),
+  paddingBottom: props.theme.spacing(7),
+  borderRadius: props.theme.radius(2),
+  fontSize: '0.75rem',
+  marginBottom: props.theme.spacing(6),
+  border: `1px solid ${props.selected ? 'rgba(115, 131, 255, 0.40)' : 'transparent'}`,
+  cursor: 'pointer',
+  userSelect: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  transition: 'border 0.2s ease',
+}));
+
+const OptionIcon = styled.div<OptionProps>((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 15,
+  height: 15,
+  borderRadius: '50%',
+  border: `1px solid ${props.theme.colors.white[0]}`,
+  marginRight: props.theme.spacing(10),
+  flex: 'none',
+  '&::after': {
+    content: '""',
+    display: props.selected ? 'block' : 'none',
+    width: 8,
+    height: 8,
+    borderRadius: 100,
+    backgroundColor: props.theme.colors.white[0],
+  },
 }));
 
 interface ConfirmationStepProps {
@@ -239,12 +307,46 @@ const ConfirmationStep = styled.div<ConfirmationStepProps>((props) => ({
   },
 }));
 
+const CustomSwitch = styled(Switch)`
+  .react-switch-handle {
+    background-color: ${({ checked }) =>
+      checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'} !important;
+    border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
+  }
+`;
+
+const TogglerContainer = styled.div((props) => ({
+  display: 'flex',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(18),
+}));
+
+const TogglerText = styled.p((props) => ({
+  marginLeft: props.theme.spacing(8),
+  fontWeight: 500,
+  fontSize: '0.875rem',
+  lineHeight: '140%',
+}));
+
+const CustomLink = styled.a((props) => ({
+  color: props.theme.colors.orange_main,
+}));
+
+const WarningIcon = styled.img({
+  width: 32,
+  height: 32,
+  alignSelf: 'flex-start',
+});
+
 interface Credential {
   publicKey: string;
   address: string;
 }
 
+type LedgerLiveOption = 'using' | 'not using';
+
 function ImportLedger(): JSX.Element {
+  const theme = useTheme();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isBitcoinSelected, setIsBitcoinSelected] = useState(true);
   const [isStacksSelected, setIsStacksSelected] = useState(false);
@@ -264,6 +366,10 @@ function ImportLedger(): JSX.Element {
   const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
   const { addLedgerAccount, updateLedgerAccounts } = useWalletReducer();
+  const [selectedLedgerLiveOption, setSelectedLedgerLiveOption] = useState<LedgerLiveOption | null>(
+    null,
+  );
+  const [isTogglerChecked, setIsTogglerChecked] = useState(false);
   const { ledgerAccountsList, network } = useWalletSelector();
   const transition = useTransition(currentStepIndex, {
     from: {
@@ -404,6 +510,17 @@ function ImportLedger(): JSX.Element {
     }
 
     if (currentStepIndex === 0) {
+      setCurrentStepIndex(0.5);
+      return;
+    }
+
+    if (currentStepIndex === 0.5) {
+      setCurrentStepIndex(0.75);
+      return;
+    }
+
+    // Skip choosing BTC / STX account
+    if (currentStepIndex === 0.75) {
       setCurrentStepIndex(2);
       return;
     }
@@ -647,13 +764,115 @@ function ImportLedger(): JSX.Element {
                 <ImportStartImage src={LedgerImportStartSVG} />
                 <ImportStartTitle>{t('LEDGER_IMPORT_1_TITLE')}</ImportStartTitle>
                 <ImportStartText>{t('LEDGER_IMPORT_1_SUBTITLE')}</ImportStartText>
-
-                <InfoContainerWrapper>
-                  <InfoContainer bodyText={t('LEDGER_IMPORT_2_WARNING')} />
-                </InfoContainerWrapper>
               </ImportStartContainer>
             )}
-            {currentStepIndex === 1 && (
+            {currentStepIndex === 0.5 && (
+              <ImportBeforeStartContainer>
+                <ImportBeforeStartTitle>
+                  {t('LEDGER_BEFORE_GETTING_STARTED.TITLE')}
+                </ImportBeforeStartTitle>
+                <ImportBeforeStartText>
+                  {t('LEDGER_BEFORE_GETTING_STARTED.DESCRIPTION')}
+                </ImportBeforeStartText>
+                <OptionsContainer>
+                  <Option
+                    onClick={() => setSelectedLedgerLiveOption('using')}
+                    selected={selectedLedgerLiveOption === 'using'}
+                  >
+                    <OptionIcon selected={selectedLedgerLiveOption === 'using'} />
+                    {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.USE_LEDGER_LIVE')}
+                  </Option>
+                  <Option
+                    onClick={() => setSelectedLedgerLiveOption('not using')}
+                    selected={selectedLedgerLiveOption === 'not using'}
+                  >
+                    <OptionIcon selected={selectedLedgerLiveOption === 'not using'} />
+                    {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.DONT_USE_LEDGER_LIVE')}
+                  </Option>
+                </OptionsContainer>
+              </ImportBeforeStartContainer>
+            )}
+            {currentStepIndex === 0.75 && (
+              <ImportBeforeStartContainer>
+                <WarningIcon src={warningIcon} alt="Warning" />
+                <ImportBeforeStartTitle>
+                  {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TITLE')}
+                </ImportBeforeStartTitle>
+                {selectedLedgerLiveOption === 'using' ? (
+                  <ImportBeforeStartText>
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_1')}
+                    <br />
+                    <CustomLink
+                      href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t('LEARN_MORE')}
+                    </CustomLink>
+                    <br />
+                    <br />
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_2')}{' '}
+                    <CustomLink
+                      href={LINK_TO_LEDGER_PASSPHRASE_GUIDE}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.PASSPHRASE_FOR_ORDINALS')}
+                    </CustomLink>
+                    .
+                    <br />
+                    <br />
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_3')}
+                  </ImportBeforeStartText>
+                ) : (
+                  <ImportBeforeStartText>
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_1')}{' '}
+                    <CustomLink
+                      href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t('LEARN_MORE')}
+                    </CustomLink>
+                    <br />
+                    <br />
+                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_2')}{' '}
+                    <CustomLink
+                      href={LINK_TO_LEDGER_PASSPHRASE_GUIDE}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.PASSPHRASE_FOR_ORDINALS')}
+                    </CustomLink>
+                    .
+                  </ImportBeforeStartText>
+                )}
+                <TogglerContainer>
+                  <CustomSwitch
+                    onColor={theme.colors.purple_main}
+                    offColor={theme.colors.background.elevation3}
+                    onChange={() => setIsTogglerChecked(!isTogglerChecked)}
+                    checked={isTogglerChecked}
+                    uncheckedIcon={false}
+                    checkedIcon={false}
+                  />
+                  {selectedLedgerLiveOption === 'using' ? (
+                    <TogglerText>
+                      {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.UNDERSTAND_THE_RISKS')}
+                    </TogglerText>
+                  ) : (
+                    <TogglerText>
+                      {t(
+                        'LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.UNDERSTAND_SHOULD_NOT_USE_LEDGER_LIVE',
+                      )}
+                    </TogglerText>
+                  )}
+                </TogglerContainer>
+              </ImportBeforeStartContainer>
+            )}
+            {/* Skip choosing BTC / STX account */}
+
+            {/* {currentStepIndex === 1 && (
               <div>
                 <SelectAssetTextContainer>
                   <SelectAssetTitle>{t('LEDGER_IMPORT_2_TITLE')}</SelectAssetTitle>
@@ -670,18 +889,18 @@ function ImportLedger(): JSX.Element {
                     onChange={handleAssetSelect}
                   />
 
-                  {/* <LedgerAssetSelectCard
+                  <LedgerAssetSelectCard
                     icon={StxIconSVG}
                     title={t('LEDGER_IMPORT_2_SELECT.STACKS_TITLE')}
                     text={t('LEDGER_IMPORT_2_SELECT.STACKS_SUBTITLE')}
                     id="stx_select_card"
                     isChecked={isStacksSelected}
                     onChange={handleAssetSelect}
-                  /> */}
+                  />
                   <SelectAssetFootNote>{t('LEDGER_IMPORT_2_FOOTNOTE')}</SelectAssetFootNote>
                 </ImportCardContainer>
               </div>
-            )}
+            )} */}
             {currentStepIndex === 2 && (
               <LedgerConnectionView
                 title={t(
@@ -848,13 +1067,27 @@ function ImportLedger(): JSX.Element {
             {currentStepIndex === 0 && (
               <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_1_BUTTON')} />
             )}
-            {currentStepIndex === 1 && (
+            {currentStepIndex === 0.5 && (
+              <ActionButton
+                onPress={handleClickNext}
+                text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
+                disabled={selectedLedgerLiveOption === null}
+              />
+            )}
+            {currentStepIndex === 0.75 && (
+              <ActionButton
+                onPress={handleClickNext}
+                text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
+                disabled={!isTogglerChecked}
+              />
+            )}
+            {/* {currentStepIndex === 1 && (
               <ActionButton
                 onPress={handleClickNext}
                 text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
                 disabled={!isBitcoinSelected && !isStacksSelected}
               />
-            )}
+            )} */}
             {currentStepIndex === 2 && (
               <ActionButton
                 processing={isButtonDisabled}

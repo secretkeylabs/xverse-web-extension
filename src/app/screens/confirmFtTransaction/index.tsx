@@ -20,27 +20,20 @@ function ConfirmFtTransaction() {
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const location = useLocation();
-  const {
-    unsignedTx: seedHex, amount, fungibleToken, memo, recepientAddress,
-  } = location.state;
+  const { unsignedTx: seedHex, amount, fungibleToken, memo, recepientAddress } = location.state;
   const unsignedTx = deserializeTransaction(seedHex);
-  const {
-    refetch,
-  } = useStxWalletData();
+  const { refetch } = useStxWalletData();
 
-  const {
-    network,
-  } = useWalletSelector();
+  const { network } = useWalletSelector();
 
   const {
     isLoading,
     error: txError,
     data: stxTxBroadcastData,
     mutate,
-  } = useMutation<
-  string,
-  Error,
-  { signedTx: StacksTransaction }>({ mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork) });
+  } = useMutation<string, Error, { signedTx: StacksTransaction }>({
+    mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
+  });
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -102,7 +95,6 @@ function ConfirmFtTransaction() {
         />
         <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
         {memo && <TransferMemoView memo={memo} />}
-
       </ConfirmStxTransationComponent>
       <BottomBar tab="dashboard" />
     </>

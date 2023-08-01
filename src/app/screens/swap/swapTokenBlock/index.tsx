@@ -16,17 +16,17 @@ export const RowContainer = styled.div({
   alignItems: 'center',
 });
 
-const TitleText = styled.h1((props) => ({
+const TitleText = styled.h3((props) => ({
   ...props.theme.body_medium_m,
   flex: 1,
   display: 'flex',
 }));
 
-const Text = styled.h1((props) => ({
+const Text = styled.p((props) => ({
   ...props.theme.body_medium_m,
 }));
 
-const BalanceText = styled.h1((props) => ({
+const BalanceText = styled.label((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white['400'],
   marginRight: props.theme.spacing(2),
@@ -90,7 +90,7 @@ const CoinText = styled.div((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
-export const EstimateUSDText = styled.h1((props) => ({
+export const EstimateUSDText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white['400'],
   marginLeft: 'auto',
@@ -126,7 +126,7 @@ function SwapTokenBlock({
         <RowContainer>
           <CoinButtonContainer onClick={onSelectCoin}>
             {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-            { selectedCoin && <TokenImage {...selectedCoin?.image} /> }
+            {selectedCoin && <TokenImage {...selectedCoin?.image} />}
             <CoinText>{selectedCoin?.name ?? t('SELECT_COIN')}</CoinText>
             <CoinButtonArrow src={ChevronIcon} />
           </CoinButtonContainer>

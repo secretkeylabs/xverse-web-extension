@@ -59,7 +59,7 @@ function LedgerSendStxScreen() {
       memo!,
       stxPendingTxData?.pendingTransactions ?? [],
       stxPublicKey,
-      selectedNetwork
+      selectedNetwork,
     );
     // increasing the fees with multiplication factor
     const fee: bigint =

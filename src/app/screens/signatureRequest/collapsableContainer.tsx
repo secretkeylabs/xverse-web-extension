@@ -1,7 +1,5 @@
 import styled from 'styled-components';
-import {
-  animated, config, useSpring,
-} from '@react-spring/web';
+import { animated, config, useSpring } from '@react-spring/web';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import { useEffect, useState } from 'react';
 
@@ -98,15 +96,13 @@ export default function CollapsableContainer(props: Props) {
       <RowContainer>
         <RequestMessageTitle>{title}</RequestMessageTitle>
         {showArrow && (
-        <Button onClick={onArrowClick}>
-          <animated.img style={arrowRotation} src={DropDownIcon} alt="Drop Down" />
-        </Button>
+          <Button onClick={onArrowClick}>
+            <animated.img style={arrowRotation} src={DropDownIcon} alt="Drop Down" />
+          </Button>
         )}
       </RowContainer>
       {!isExpanded && text !== '' && <Text>{text}</Text>}
-      <ExpandedContainer style={slideInStyles}>
-        {children}
-      </ExpandedContainer>
+      <ExpandedContainer style={slideInStyles}>{children}</ExpandedContainer>
     </ContentContainer>
   );
 }

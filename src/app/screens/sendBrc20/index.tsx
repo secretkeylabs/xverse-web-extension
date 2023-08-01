@@ -18,12 +18,12 @@ import ActionButton from '@components/button';
 import Brc20TransferForm from './brc20TransferForm';
 import Brc20TransferInfo from './brc20TransferInfo';
 
-const BRC20TokenTagContainer = styled.div({
+const BRC20TokenTagContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  marginTop: 6,
-});
+  marginTop: props.theme.spacing(3),
+}));
 
 const BRC20TokenTag = styled.div((props) => ({
   background: props.theme.colors.white[400],
@@ -54,17 +54,26 @@ function SendBrc20Screen() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
   const {
-    btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate, brcCoinsList
+    btcAddress,
+    ordinalsAddress,
+    selectedAccount,
+    seedPhrase,
+    network,
+    btcFiatRate,
+    brcCoinsList,
   } = useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [showForm, setShowForm] = useState(false);
-
   const location = useLocation();
 
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
-  const fungibleToken = location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
+  const fungibleToken =
+    location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
+
+  const isSendButtonEnabled = amountToSend !== '' && amountToSend <= fungibleToken.balance;
+  const isActionButtonEnabled = showForm ? isSendButtonEnabled : true;
 
   const { subscribeToResetUserFlow } = useResetUserFlow();
   useEffect(() => subscribeToResetUserFlow('/send-brc20'), []);
@@ -87,13 +96,6 @@ function SendBrc20Screen() {
     } else {
       setAmountToSend(newValue);
     }
-  };
-
-  const checkIfEnableButton = () => {
-    if (amountToSend !== '' || amountToSend <= fungibleToken.balance) {
-      return true;
-    }
-    return false;
   };
 
   const handleInscribeTransferOrder = async () => {
@@ -199,13 +201,14 @@ function SendBrc20Screen() {
       ) : (
         <Brc20TransferInfo />
       )}
-      <SendButtonContainer enabled={checkIfEnableButton()}>
+      <SendButtonContainer enabled={isActionButtonEnabled}>
         <ActionButton
           text={
             showForm ? t('SEND_BRC_20.SEND_NEXT_BUTTON') : t('SEND_BRC_20.SEND_INFO_START_BUTTON')
           }
           processing={isCreatingOrder}
           onPress={handleNext}
+          disabled={!isActionButtonEnabled}
         />
       </SendButtonContainer>
       <BottomBar tab="dashboard" />

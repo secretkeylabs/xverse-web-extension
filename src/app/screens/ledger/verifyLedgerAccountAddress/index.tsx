@@ -184,8 +184,8 @@ function VerifyLedger(): JSX.Element {
         await importNativeSegwitAccountFromLedger(
           transport,
           network.type,
-          addressIndex,
           0,
+          addressIndex,
           showAddress,
         );
         setIsButtonDisabled(false);
@@ -202,7 +202,7 @@ function VerifyLedger(): JSX.Element {
       }
     } else {
       try {
-        await importTaprootAccountFromLedger(transport, network.type, addressIndex, 0, showAddress);
+        await importTaprootAccountFromLedger(transport, network.type, 0, addressIndex, showAddress);
         setIsButtonDisabled(false);
         setCurrentStepIndex(2);
       } catch (err: any) {

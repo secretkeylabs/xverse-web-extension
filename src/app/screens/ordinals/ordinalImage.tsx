@@ -82,14 +82,14 @@ const Text = styled.h1((props) => ({
 interface TextProps {
   inNftSend?: boolean;
   isSmall?: boolean;
-  blur?: boolean
+  blur?: boolean;
   withoutSizeIncrease?: boolean;
 }
 
 const OrdinalContentText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[0],
-  fontSize: (props.inNftSend || props.withoutSizeIncrease) ? 15 : 'calc(0.8vw + 2vh)',
+  fontSize: props.inNftSend || props.withoutSizeIncrease ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
   textAlign: 'center',
   filter: `blur(${props.blur ? '3px' : 0})`,
@@ -226,7 +226,13 @@ function OrdinalImage({
     }
     return (
       <ImageContainer inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
-        <OrdinalContentText inNftSend={inNftSend} isSmall={isSmallImage} withoutSizeIncrease={withoutSizeIncrease}>{textContent}</OrdinalContentText>
+        <OrdinalContentText
+          inNftSend={inNftSend}
+          isSmall={isSmallImage}
+          withoutSizeIncrease={withoutSizeIncrease}
+        >
+          {textContent}
+        </OrdinalContentText>
         {isNftDashboard && (
           <OrdinalsTag>
             <ButtonIcon src={OrdinalsIcon} />

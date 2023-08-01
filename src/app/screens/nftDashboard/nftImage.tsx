@@ -60,11 +60,11 @@ function NftImage({ metadata }: Props) {
             width="100%"
             preview={false}
             src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
-            placeholder={(
+            placeholder={
               <LoaderContainer isGalleryOpen={isGalleryOpen}>
                 <MoonLoader color="white" size={25} />
               </LoaderContainer>
-          )}
+            }
             fallback={NftPlaceholderImage}
           />
         </Suspense>
@@ -73,7 +73,13 @@ function NftImage({ metadata }: Props) {
   }
   if (metadata?.asset_protocol) {
     return (
-      <Video src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')} loop playsInline controls preload="auto" />
+      <Video
+        src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')}
+        loop
+        playsInline
+        controls
+        preload="auto"
+      />
     );
   }
 

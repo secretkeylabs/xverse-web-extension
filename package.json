@@ -1,12 +1,12 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "private": true,
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "1.4.0",
+    "@secretkeylabs/xverse-core": "1.4.2",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
     "@stacks/stacks-blockchain-api-types": "^6.1.1",
@@ -64,7 +64,8 @@
     "start": "npx node webpack/utils/devServer.js",
     "clean": "rimraf build",
     "test": "jest ./src",
-    "style": "prettier --write \"src/**/*.{ts,tsx}\""
+    "style": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prepare": "husky install"
   },
   "resolutions": {
     "styled-components": "^5",
@@ -74,6 +75,14 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ]
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
     ]
   },
   "devDependencies": {
@@ -115,7 +124,9 @@
     "glob": "^7.1.6",
     "html-loader": "^4.1.0",
     "html-webpack-plugin": "^5.5.0",
+    "husky": "^8.0.3",
     "jest": "^27.2.1",
+    "lint-staged": "^13.2.3",
     "path": "^0.12.7",
     "prettier": "^2.7.1",
     "react-refresh": "^0.14.0",

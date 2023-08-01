@@ -1,21 +1,15 @@
 /* eslint-disable no-nested-ternary */
 import BottomModal from '@components/bottomModal';
 import BigNumber from 'bignumber.js';
-import {
-  useState,
-} from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
 import ActionButton from '@components/button';
-import {
-  stxToMicrostacks,
-} from '@secretkeylabs/xverse-core/currency';
+import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
 import { useSelector } from 'react-redux';
 import { StoreState } from '@stores/index';
-import {
-  isCustomFeesAllowed, Recipient,
-} from '@secretkeylabs/xverse-core/transactions/btc';
+import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
 import EditNonce from './editNonce';
 import EditFee from './editFee';
@@ -90,18 +84,16 @@ function TransactionSettingAlert({
   nonOrdinalUtxos,
   showFeeSettings,
   setShowFeeSettings,
-}:Props) {
+}: Props) {
   const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
   const [feeRate, setFeeRate] = useState<BigNumber | string | undefined>(feePerVByte);
-  const [nonceInput, setNonceInput] = useState <string | undefined >(nonce);
+  const [nonceInput, setNonceInput] = useState<string | undefined>(nonce);
   const [error, setError] = useState('');
   const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
-  const {
-    btcBalance, stxAvailableBalance,
-  } = useSelector((state: StoreState) => state.walletState);
+  const { btcBalance, stxAvailableBalance } = useSelector((state: StoreState) => state.walletState);
 
   function applyClickForStx() {
     if (stxAvailableBalance) {
@@ -194,12 +186,12 @@ function TransactionSettingAlert({
           <img src={ArrowIcon} alt="Arrow " />
         </TransactionSettingOptionButton>
         {type === 'STX' && (
-        <TransactionSettingNonceOptionButton onClick={onEditNoncePress}>
-          <TransactionSettingOptionText>
-            {t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')}
-          </TransactionSettingOptionText>
-          <img src={ArrowIcon} alt="Arrow " />
-        </TransactionSettingNonceOptionButton>
+          <TransactionSettingNonceOptionButton onClick={onEditNoncePress}>
+            <TransactionSettingOptionText>
+              {t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')}
+            </TransactionSettingOptionText>
+            <img src={ArrowIcon} alt="Arrow " />
+          </TransactionSettingNonceOptionButton>
         )}
       </>
     );
@@ -212,21 +204,21 @@ function TransactionSettingAlert({
         showFeeSettings
           ? t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')
           : showNonceSettings
-            ? t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')
-            : t('TRANSACTION_SETTING.ADVANCED_SETTING')
+          ? t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')
+          : t('TRANSACTION_SETTING.ADVANCED_SETTING')
       }
       onClose={onClosePress}
     >
       {renderContent()}
       {(showFeeSettings || showNonceSettings) && (
-      <ButtonContainer>
-        <ActionButton
-          text={t('TRANSACTION_SETTING.APPLY')}
-          processing={isLoading}
-          disabled={isLoading || !!error}
-          onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
-        />
-      </ButtonContainer>
+        <ButtonContainer>
+          <ActionButton
+            text={t('TRANSACTION_SETTING.APPLY')}
+            processing={isLoading}
+            disabled={isLoading || !!error}
+            onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
+          />
+        </ButtonContainer>
       )}
     </BottomModal>
   );

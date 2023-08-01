@@ -8,13 +8,7 @@ interface Props {
 }
 function NftPostConditionCard({ postCondition }: Props) {
   const amount = getAmountFromPostCondition(postCondition) ?? '';
-  return (
-    <PostConditionsView
-      postCondition={postCondition}
-      amount={amount}
-      icon={AssetIcon}
-    />
-  );
+  return <PostConditionsView postCondition={postCondition} amount={amount} icon={AssetIcon} />;
 }
 
 export default NftPostConditionCard;

@@ -30,7 +30,6 @@ export const currencyList: Currency[] = [
   { name: 'GBP', flag: GBP },
   { name: 'BRL', flag: BRL },
   { name: 'RUB', flag: RUB },
-
 ];
 
 export function getCurrencyFlag(currency: string) {

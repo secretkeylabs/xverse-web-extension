@@ -44,7 +44,7 @@ const ConfirmButton = styled.button((props) => ({
   ':disabled': {
     opacity: 0.6,
     cursor: 'initial',
-  }
+  },
 }));
 
 const CancelButton = styled.button((props) => ({
@@ -72,14 +72,18 @@ type Props = {
 };
 
 function ConfirmScreen({
-  children, onConfirm, onCancel, confirmText, cancelText, loading, disabled = false,
+  children,
+  onConfirm,
+  onCancel,
+  confirmText,
+  cancelText,
+  loading,
+  disabled = false,
 }: Props) {
   return (
     <>
       <MainContainer>
-        <ContentContainer>
-          {children}
-        </ContentContainer>
+        <ContentContainer>{children}</ContentContainer>
       </MainContainer>
       <ButtonsContainer>
         <CancelButton onClick={onCancel}>{cancelText}</CancelButton>

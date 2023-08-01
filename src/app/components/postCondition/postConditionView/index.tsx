@@ -10,10 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import TransferAmountComponent from '@components/transferAmountComponent';
-import {
-  getNameFromPostCondition,
-  getSymbolFromPostCondition,
-} from './helper';
+import { getNameFromPostCondition, getSymbolFromPostCondition } from './helper';
 
 type Props = {
   postCondition: PostCondition;
@@ -50,7 +47,8 @@ function PostConditionsView({ postCondition, amount, icon }: Props) {
   const title = getTitleFromConditionCode(postCondition.conditionCode) || '';
   const ticker = getSymbolFromPostCondition(postCondition);
   const name = getNameFromPostCondition(postCondition);
-  const contractName = 'contractName' in postCondition.principal && postCondition.principal.contractName.content;
+  const contractName =
+    'contractName' in postCondition.principal && postCondition.principal.contractName.content;
   const address = addressToString(postCondition?.principal?.address!);
   const isSending = address === stxAddress;
   const isContractPrincipal = !!contractName || address.includes('.');
@@ -63,11 +61,13 @@ function PostConditionsView({ postCondition, amount, icon }: Props) {
       subValue={name !== 'STX' ? name : ''}
       icon={icon}
       address={`${address}${contractName ? `.${contractName}` : ''}`}
-      subTitle={`${isContractPrincipal
-        ? t('CONTRACT_ADDRESS')
-        : isSending
+      subTitle={`${
+        isContractPrincipal
+          ? t('CONTRACT_ADDRESS')
+          : isSending
           ? t('MY_ADDRESS')
-          : t('RECIPIENT_ADDRESS')}`}
+          : t('RECIPIENT_ADDRESS')
+      }`}
     />
   );
 }

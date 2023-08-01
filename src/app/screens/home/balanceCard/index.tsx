@@ -15,20 +15,20 @@ const RowContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(11),
 }));
 
-const BalanceHeadingText = styled.h1((props) => ({
+const BalanceHeadingText = styled.h3((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['200'],
   textTransform: 'uppercase',
   opacity: 0.7,
 }));
 
-const CurrencyText = styled.h1((props) => ({
+const CurrencyText = styled.label((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white['0'],
   fontSize: 13,
 }));
 
-const BalanceAmountText = styled.h1((props) => ({
+const BalanceAmountText = styled.p((props) => ({
   ...props.theme.headline_xl,
   color: props.theme.colors.white['0'],
 }));
@@ -54,7 +54,8 @@ interface BalanceCardProps {
 
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } = useWalletSelector();
+  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } =
+    useWalletSelector();
   const { isLoading } = props;
 
   function calculateTotalBalance() {
@@ -67,7 +68,7 @@ function BalanceCard(props: BalanceCardProps) {
     }
     if (btcAddress) {
       const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
-        new BigNumber(btcFiatRate)
+        new BigNumber(btcFiatRate),
       );
       totalBalance = totalBalance.plus(btcFiatEquiv);
     }
@@ -87,15 +88,13 @@ function BalanceCard(props: BalanceCardProps) {
           <BarLoader loaderSize={LoaderSize.LARGE} />
         </BarLoaderContainer>
       ) : (
-        <BalanceAmountText>
-          <NumericFormat
-            value={calculateTotalBalance()}
-            displayType="text"
-            prefix={`${currencySymbolMap[fiatCurrency]}`}
-            thousandSeparator
-            renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
-          />
-        </BalanceAmountText>
+        <NumericFormat
+          value={calculateTotalBalance()}
+          displayType="text"
+          prefix={`${currencySymbolMap[fiatCurrency]}`}
+          thousandSeparator
+          renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
+        />
       )}
     </>
   );

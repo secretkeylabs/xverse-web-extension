@@ -54,17 +54,11 @@ function ErrorBoundary() {
     <ScreenContainer>
       <img src={Error} alt="Error" width={88} />
       <ScreenTitle>{t('TITLE')}</ScreenTitle>
-      <ErrorDescription>
-        {t('ERROR_DESCRIPTION')}
-      </ErrorDescription>
+      <ErrorDescription>{t('ERROR_DESCRIPTION')}</ErrorDescription>
       <SupportText>
-        {t('SUPPORT')}
-        {' '}
-        <span>{SUPPORT_EMAIL}</span>
+        {t('SUPPORT')} <span>{SUPPORT_EMAIL}</span>
       </SupportText>
-      <ErrorContent>
-        {`${t('ERROR_PREFIX')}${' '}${error.message}`}
-      </ErrorContent>
+      <ErrorContent>{`${t('ERROR_PREFIX')}${' '}${error.message}`}</ErrorContent>
     </ScreenContainer>
   );
 }

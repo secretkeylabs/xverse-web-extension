@@ -96,9 +96,7 @@ interface Props {
 
 function Brc20TransferForm(props: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC_20' });
-  const {
-    amountToSend, onAmountChange, amountError, token,
-  } = props;
+  const { amountToSend, onAmountChange, amountError, token } = props;
 
   function getTokenCurrency() {
     if (token) {
@@ -119,11 +117,7 @@ function Brc20TransferForm(props: Props) {
         <TitleText>{t('AMOUNT')}</TitleText>
         <BalanceText>{t('BALANCE')}:</BalanceText>
         <Text>
-          <NumericFormat
-            value={token.balance.toString()}
-            displayType="text"
-            thousandSeparator
-          />
+          <NumericFormat value={token.balance.toString()} displayType="text" thousandSeparator />
         </Text>
       </RowContainer>
       <AmountInputContainer error={amountError !== ''}>
