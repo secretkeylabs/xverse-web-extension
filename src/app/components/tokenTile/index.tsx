@@ -93,7 +93,6 @@ const LoaderImageContainer = styled.div({
 const CoinTickerText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['0'],
-  textTransform: 'uppercase',
 }));
 
 const SubText = styled.h1((props) => ({
