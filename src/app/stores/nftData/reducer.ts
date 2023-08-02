@@ -1,6 +1,6 @@
 import { NftDataAction, NftDataState, SetNftDataKey, SetSelectedOrdinalKey } from './actions/types';
 
-const initialNftDataState :NftDataState = {
+const initialNftDataState: NftDataState = {
   nftData: [],
   selectedOrdinal: null,
 };

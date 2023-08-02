@@ -11,13 +11,6 @@ import { useState } from 'react';
 import { isLedgerAccount } from '@utils/helper';
 import ReceiveCardComponent from '../../../components/receiveCardComponent';
 
-interface Props {
-  visible: boolean;
-  onClose: () => void;
-  setOrdinalReceiveAlert: () => void;
-  isGalleryOpen: boolean;
-}
-
 const ColumnContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -48,21 +41,32 @@ const Text = styled.h1((props) => ({
   flex: 1,
 }));
 
-const VerifyOrViewContainer = styled.div(props => ({
+const VerifyOrViewContainer = styled.div((props) => ({
   margin: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(20),
 }));
 
-const VerifyButtonContainer = styled.div(props => ({
+const VerifyButtonContainer = styled.div((props) => ({
+  minWidth: 300,
   marginBottom: props.theme.spacing(6),
 }));
+
+interface Props {
+  visible: boolean;
+  onClose: () => void;
+  setOrdinalReceiveAlert: () => void;
+  isGalleryOpen: boolean;
+}
 
 function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAlert }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress, ordinalsAddress, showOrdinalReceiveAlert, selectedAccount } = useWalletSelector();
-  const [isReceivingAddressesVisible, setIsReceivingAddressesVisible] = useState(!isLedgerAccount(selectedAccount));
+  const { stxAddress, ordinalsAddress, showOrdinalReceiveAlert, selectedAccount } =
+    useWalletSelector();
+  const [isReceivingAddressesVisible, setIsReceivingAddressesVisible] = useState(
+    !isLedgerAccount(selectedAccount),
+  );
 
   const onReceivePress = () => {
     navigate('/receive/STX');
@@ -73,8 +77,7 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
   };
 
   const onOrdinalReceiveAlertOpen = () => {
-    if (showOrdinalReceiveAlert)
-    setOrdinalReceiveAlert();
+    if (showOrdinalReceiveAlert) setOrdinalReceiveAlert();
   };
 
   const onReceiveModalClose = () => {
@@ -111,15 +114,22 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
   const verifyOrViewAddresses = (
     <VerifyOrViewContainer>
       <VerifyButtonContainer>
-        <ActionButton text="Verify address on Ledger" onPress={async () => {
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=ORD`),
-          });
-        }} />
+        <ActionButton
+          text="Verify address on Ledger"
+          onPress={async () => {
+            await chrome.tabs.create({
+              url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=ORD`),
+            });
+          }}
+        />
       </VerifyButtonContainer>
-      <ActionButton transparent text="View address" onPress={() => {
-        setIsReceivingAddressesVisible(true);
-      }} />
+      <ActionButton
+        transparent
+        text="View address"
+        onPress={() => {
+          setIsReceivingAddressesVisible(true);
+        }}
+      />
     </VerifyOrViewContainer>
   );
 

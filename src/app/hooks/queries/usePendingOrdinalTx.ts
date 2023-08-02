@@ -7,7 +7,8 @@ const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
   const { ordinalsAddress } = useWalletSelector();
   const btcClient = useBtcClient();
 
-  const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> => btcClient.getAddressMempoolTransactions(ordinalsAddress);
+  const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> =>
+    btcClient.getAddressMempoolTransactions(ordinalsAddress);
 
   let isPending: boolean | undefined = false;
   let pendingTxHash: string | undefined;

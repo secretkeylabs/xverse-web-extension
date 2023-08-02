@@ -143,7 +143,7 @@ export default function CoinDashboard() {
   };
 
   const ft = coinsList?.find((ftCoin) => ftCoin.principal === ftAddress);
-  let brc20Ft : FungibleToken | undefined;
+  let brc20Ft: FungibleToken | undefined;
   if (brc20FtName) {
     brc20Ft = brcCoinsList?.find((brc20FtCoin) => brc20FtCoin.name === brc20FtName);
   }
@@ -165,7 +165,9 @@ export default function CoinDashboard() {
   };
 
   function formatAddress(addr: string): string {
-    return addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
+    return addr
+      ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}`
+      : '';
   }
   const showContent = () => {
     if (ft) {
@@ -174,13 +176,10 @@ export default function CoinDashboard() {
           <TokenContractContainer>
             <h1>{t('FT_CONTRACT_PREFIX')}</h1>
             <ContractAddressCopyButton onClick={handleCopyContractAddress}>
-              <TokenContractAddress>
-                {formatAddress(ft?.principal as string)}
-              </TokenContractAddress>
+              <TokenContractAddress>{formatAddress(ft?.principal as string)}</TokenContractAddress>
               <CopyButtonContainer>
                 <CopyButton text={ft?.principal as string} />
               </CopyButtonContainer>
-
             </ContractAddressCopyButton>
             <ContractDeploymentButton onClick={openContractDeployment}>
               {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
@@ -191,7 +190,13 @@ export default function CoinDashboard() {
         );
       }
     }
-    return <TransactionsHistoryList coin={coin as CurrencyTypes} txFilter={`${ft?.principal}::${ft?.assetName}`} brc20Token={brc20FtName}/>;
+    return (
+      <TransactionsHistoryList
+        coin={coin as CurrencyTypes}
+        txFilter={`${ft?.principal}::${ft?.assetName}`}
+        brc20Token={brc20FtName}
+      />
+    );
   };
 
   return (
@@ -201,12 +206,15 @@ export default function CoinDashboard() {
         <CoinHeader coin={coin as CurrencyTypes} fungibleToken={ft || brc20Ft} />
         {ft && (
           <FtInfoContainer>
-            <Button isSelected={!showFtContractDetails} onClick={onTransactionsClick}>{t('TRANSACTIONS')}</Button>
-            <Button onClick={onContractClick} isSelected={showFtContractDetails}>{t('CONTRACT')}</Button>
+            <Button isSelected={!showFtContractDetails} onClick={onTransactionsClick}>
+              {t('TRANSACTIONS')}
+            </Button>
+            <Button onClick={onContractClick} isSelected={showFtContractDetails}>
+              {t('CONTRACT')}
+            </Button>
           </FtInfoContainer>
         )}
         {showContent()}
-
       </Container>
       <BottomBar tab="dashboard" />
     </>

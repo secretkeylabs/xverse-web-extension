@@ -21,7 +21,6 @@
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select wallet type",
     "LEDGER_IMPORT_2_SUBTITLE": "You can create multiple wallets to store Bitcoin, Ordinals and BRC-20 tokens.",
-    "LEDGER_IMPORT_2_WARNING": "Don't use a taproot address with Ledger Live if you connect to Xverse.",
     "LEDGER_IMPORT_2_FOOTNOTE": "",
     "LEDGER_IMPORT_2_SELECT": {
       "BTC_TITLE": "Bitcoin and Ordinals wallet",
@@ -81,7 +80,25 @@
     "LEDGER_IMPORT_CLOSE_BUTTON": "Close",
     "LEDGER_IMPORT_TRY_AGAIN_BUTTON": "Try again",
     "LEDGER_IMPORT_YES_BUTTON": "Add a new account",
-    "LEDGER_IMPORT_CANCEL_BUTTON": "Cancel"
+    "LEDGER_IMPORT_CANCEL_BUTTON": "Cancel",
+    "LEARN_MORE": "Learn More",
+    "LEDGER_BEFORE_GETTING_STARTED": {
+      "TITLE": "Before getting started",
+      "DESCRIPTION": "Do you use Ledger Live with the hardware wallet device you wish to connect?",
+      "OPTIONS": {
+        "USE_LEDGER_LIVE": "I use Ledger Live with the device.",
+        "DONT_USE_LEDGER_LIVE": "I do not use Ledger Live with the device."
+      },
+      "IMPORTANT_WARNING": {
+        "TITLE": "Important - Please read",
+        "TEXT_1": "It is not recommended to use Xverse and Ledger Live, or other Bitcoin wallets with the same hardware device as this could lead to unintentional transfers of Ordinals.",
+        "TEXT_2": "You should use a separate device for Xverse and Ordinals or set a passphrase on your Ledger to create a different set of accounts for Xverse. See",
+        "TEXT_3": "Only continue if you're an advanced user and you know what you're doing. Do not create and use a taproot address on Ledger Live if you are using Xverse.",
+        "PASSPHRASE_FOR_ORDINALS": "How To Set A Passphrase For Ordinals",
+        "UNDERSTAND_THE_RISKS": "I understand the risks and wish to continue anyway",
+        "UNDERSTAND_SHOULD_NOT_USE_LEDGER_LIVE": "I understand I should not use Ledger Live or other Bitcoin wallets with the same hardware device"
+      }
+    }
   },
   "LEDGER_VERIFY_SCREEN": {
     "TITLE_VERIFY_BTC": "Verify Bitcoin payment address",
@@ -279,7 +296,7 @@
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
     "INSUFFICIENT_BALANCE_FEES": "Insufficient balance when including transaction fees",
-    "INVALID_TRANSACTION":"Invalid Transaction"
+    "INVALID_TRANSACTION": "Invalid Transaction"
   },
   "TRANSACTION_SETTING": {
     "ADVANCED_SETTING": "Advanced Settings",
@@ -622,7 +639,9 @@
     "TRANSACTIONS": "TRANSACTIONS",
     "CONTRACT": "CONTRACT",
     "COMING_SOON": "Coming soon",
-    "RECEIVE": "Receive"
+    "RECEIVE": "Receive",
+    "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
+    "VIEW_ADDRESS": "View address"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",
@@ -789,6 +808,7 @@
     "YOU_WILL_RECEIVE": "You will receive",
     "AMOUNT": "Amount",
     "LESS_THAN_OR_EQUAL_TO": "Less than or equal to",
+    "FROM": "From",
     "TO": "To",
     "YOUR_ADDRESS": "Your address",
     "CANCEL": "Cancel",

@@ -1,32 +1,31 @@
-import AlertMessage from "@components/alertMessage";
-import { ChangeShowOrdinalReceiveAlertAction } from "@stores/wallet/actions/actionCreators";
-import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
-
+import AlertMessage from '@components/alertMessage';
+import { ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 interface Props {
-    onOrdinalReceiveAlertClose: () => void;
+  onOrdinalReceiveAlertClose: () => void;
 }
 function ShowOrdinalReceiveAlert({ onOrdinalReceiveAlertClose }: Props) {
-    const { t } = useTranslation('translation', { keyPrefix: 'ADDRESS_RECEIVE_ALERT_MESSAGE' });
-    const dispatch = useDispatch();
+  const { t } = useTranslation('translation', { keyPrefix: 'ADDRESS_RECEIVE_ALERT_MESSAGE' });
+  const dispatch = useDispatch();
 
-    const onDontShowReceiveOrdinalAlert = () => {
-        dispatch(ChangeShowOrdinalReceiveAlertAction(false));
-        onOrdinalReceiveAlertClose();
-    };
+  const onDontShowReceiveOrdinalAlert = () => {
+    dispatch(ChangeShowOrdinalReceiveAlertAction(false));
+    onOrdinalReceiveAlertClose();
+  };
 
-    return (
-        <AlertMessage
-            title={t('RECEIVING_ORDINALS')}
-            description={t('RECEIVING_ORDINAL_INFO')}
-            buttonText={t('I_UNDERSTAND')}
-            onClose={onOrdinalReceiveAlertClose}
-            onButtonClick={onOrdinalReceiveAlertClose}
-            tickMarkButtonText={t('DO_NOT_SHOW_MESSAGE')}
-            tickMarkButtonClick={onDontShowReceiveOrdinalAlert}
-        />
-    )
+  return (
+    <AlertMessage
+      title={t('RECEIVING_ORDINALS')}
+      description={t('RECEIVING_ORDINAL_INFO')}
+      buttonText={t('I_UNDERSTAND')}
+      onClose={onOrdinalReceiveAlertClose}
+      onButtonClick={onOrdinalReceiveAlertClose}
+      tickMarkButtonText={t('DO_NOT_SHOW_MESSAGE')}
+      tickMarkButtonClick={onDontShowReceiveOrdinalAlert}
+    />
+  );
 }
 
 export default ShowOrdinalReceiveAlert;

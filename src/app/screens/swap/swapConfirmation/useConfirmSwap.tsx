@@ -4,6 +4,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   broadcastSignedTransaction,
   signTransaction,
+  StacksTransaction,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -28,9 +29,12 @@ export type SwapConfirmationInput = {
   functionName: string;
 };
 
-export function useConfirmSwap(
-  input: SwapConfirmationInput,
-): SwapConfirmationInput & { onConfirm: () => Promise<void> } {
+export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> & {
+  onConfirm: () => Promise<void>;
+  unsignedTx: StacksTransaction; // deserialized StacksTransaction
+};
+
+export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const { isSponsored, sponsorTransaction } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
@@ -41,6 +45,7 @@ export function useConfirmSwap(
     ...input,
     lpFeeAmount: isSponsored ? 0 : input.lpFeeAmount,
     lpFeeFiatAmount: isSponsored ? 0 : input.lpFeeFiatAmount,
+    unsignedTx,
     onConfirm: async () => {
       const signed = await signTransaction(
         unsignedTx,

@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { FungibleToken, microstacksToStx } from '@secretkeylabs/xverse-core';
+import {
+  FungibleToken,
+  getNewNonce,
+  microstacksToStx,
+  setNonce,
+  getNonce,
+} from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TokenImageProps } from '@components/tokenImage';
@@ -12,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
 import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 
 // const noop = () => null;
 const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
@@ -46,7 +53,7 @@ export type UseSwap = {
   slippage: number;
   onSlippageChanged: (slippage: number) => void;
   minReceived?: string;
-  onSwap?: () => void;
+  onSwap?: () => Promise<void>;
 };
 
 export type SelectedCurrencyState = {
@@ -120,9 +127,13 @@ export function useSwap(): UseSwap {
     stxPublicKey,
   } = useWalletSelector();
   const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
+  const { data: stxPendingTxData } = useStxPendingTxData();
 
-  const acceptableCoinList =
-    coinsList?.filter((c) => alexSDK.getCurrencyFrom(c.principal) != null) ?? [];
+  const acceptableCoinList = (coinsList || [])
+    .filter((c) => alexSDK.getCurrencyFrom(c.principal) != null)
+    // TODO tim: remove this once alexsdk fix issue here
+    // https://github.com/alexgo-io/alex-sdk/issues/2
+    .filter((c) => c.assetName !== 'brc20-db20');
 
   const [inputAmount, setInputAmount] = useState('');
   const [slippage, setSlippage] = useState(0.04);
@@ -335,6 +346,12 @@ export function useSwap(): UseSwap {
               postConditions: tx.postConditions,
               sponsored: isSponsored,
             });
+
+            // bump nonce if pendingTxs
+            setNonce(
+              unsignedTx,
+              getNewNonce(stxPendingTxData?.pendingTransactions || [], getNonce(unsignedTx)),
+            );
 
             const state: SwapConfirmationInput = {
               from: selectedCurrency.from!,

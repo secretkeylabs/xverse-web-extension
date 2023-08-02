@@ -55,10 +55,7 @@ function LedgerConnectionView({
 
   return (
     <ConnectLedgerContainer>
-      <img
-        src={ledgerConnectIcon}
-        alt="connect ledger device"
-      />
+      <img src={ledgerConnectIcon} alt="connect ledger device" />
       <ConnectLedgerTitle>{isConnectFailed ? titleFailed : title}</ConnectLedgerTitle>
       <ConnectLedgerText>{isConnectFailed ? textFailed : text}</ConnectLedgerText>
     </ConnectLedgerContainer>

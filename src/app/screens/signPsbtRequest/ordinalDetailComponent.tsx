@@ -89,7 +89,6 @@ const OrdinalOuterImageContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-
 });
 
 const OrdinalImageContainer = styled.div({
@@ -155,19 +154,19 @@ function OrdinalDetailComponent({
   return (
     <>
       {showOrdinal && (
-      <OrdinalBackgroundContainer style={styles}>
-        <CrossContainer onClick={onCrossClick}>
-          <TransparentButton>
-            <img src={Cross} alt="cross" />
-          </TransparentButton>
-        </CrossContainer>
-        <OrdinalOuterImageContainer>
-          <OrdinalImageContainer>
-            <OrdinalImage ordinal={ordinal!} />
-          </OrdinalImageContainer>
-          <InscriptionText>{`Inscription ${ordinal?.number} `}</InscriptionText>
-        </OrdinalOuterImageContainer>
-      </OrdinalBackgroundContainer>
+        <OrdinalBackgroundContainer style={styles}>
+          <CrossContainer onClick={onCrossClick}>
+            <TransparentButton>
+              <img src={Cross} alt="cross" />
+            </TransparentButton>
+          </CrossContainer>
+          <OrdinalOuterImageContainer>
+            <OrdinalImageContainer>
+              <OrdinalImage ordinal={ordinal!} />
+            </OrdinalImageContainer>
+            <InscriptionText>{`Inscription ${ordinal?.number} `}</InscriptionText>
+          </OrdinalOuterImageContainer>
+        </OrdinalBackgroundContainer>
       )}
       <Container>
         {heading && <RecipientTitleText>{heading}</RecipientTitleText>}

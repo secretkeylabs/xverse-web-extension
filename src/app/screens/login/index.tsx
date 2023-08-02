@@ -160,7 +160,8 @@ function Login(): JSX.Element {
     try {
       await decryptSeedPhrase(encryptedSeed, password);
       const hasMigrated = localStorage.getItem('migrated');
-      const isReminderDue = Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
+      const isReminderDue =
+        Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
       if (!hasMigrated && isReminderDue) {
         setShowMigration(true);
       } else {
@@ -233,7 +234,10 @@ function Login(): JSX.Element {
           </ContentContainer>
         </ScreenContainer>
       ) : (
-        <MigrationConfirmation migrateCallback={handleMigrateCache} skipCallback={handleSkipMigration} />
+        <MigrationConfirmation
+          migrateCallback={handleMigrateCache}
+          skipCallback={handleSkipMigration}
+        />
       )}
     </>
   );

@@ -6,9 +6,10 @@ const useNetworkSelector = () => {
   const { network, networkAddress } = useWalletSelector();
 
   const selectedNetwork = useMemo(
-    () => (network.type === 'Mainnet'
-      ? new StacksMainnet({ url: networkAddress })
-      : new StacksTestnet({ url: networkAddress })),
+    () =>
+      network.type === 'Mainnet'
+        ? new StacksMainnet({ url: networkAddress })
+        : new StacksTestnet({ url: networkAddress }),
     [network.type, networkAddress],
   );
   return selectedNetwork;

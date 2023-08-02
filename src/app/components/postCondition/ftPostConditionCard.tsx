@@ -14,11 +14,7 @@ function FtPostConditionCard({ postCondition, ftMetaData }: Props) {
     ftMetaData?.decimals ?? 0,
   );
   return (
-    <PostConditionsView
-      postCondition={postCondition}
-      amount={amount}
-      icon={ftMetaData?.image}
-    />
+    <PostConditionsView postCondition={postCondition} amount={amount} icon={ftMetaData?.image} />
   );
 }
 

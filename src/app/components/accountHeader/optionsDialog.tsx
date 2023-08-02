@@ -60,9 +60,7 @@ interface Props {
 function OptionsDialog({ closeDialog, showResetWalletPrompt }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'OPTIONS_DIALOG' });
   const navigate = useNavigate();
-  const {
-    lockWallet,
-  } = useWalletReducer();
+  const { lockWallet } = useWalletReducer();
 
   const handleAccountSelect = () => {
     navigate('/account-list');

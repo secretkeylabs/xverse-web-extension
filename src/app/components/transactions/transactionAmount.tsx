@@ -52,7 +52,9 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
             thousandSeparator
             prefix={prefix}
             renderText={(value: string) => (
-              <TransactionValue>{`${value} ${getFtTicker(token as FungibleToken)?.toUpperCase()}`}</TransactionValue>
+              <TransactionValue>{`${value} ${getFtTicker(
+                token as FungibleToken,
+              )?.toUpperCase()}`}</TransactionValue>
             )}
           />
         );
@@ -73,8 +75,7 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
         />
       );
     }
-  }
-  else if (coin === 'brc20') {
+  } else if (coin === 'brc20') {
     const brc20Transaction = transaction as Brc20HistoryTransactionData;
     const prefix = brc20Transaction.incoming ? '' : '-';
     if (!new BigNumber(brc20Transaction.amount).isEqualTo(0)) {

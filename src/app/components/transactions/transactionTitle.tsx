@@ -43,7 +43,7 @@ export default function TransactionTitle(props: TransactionTitleProps) {
 
   const getFtName = (tx: TransactionData): string => {
     const coinDisplayName = coins?.find(
-      (coin) => coin.contract === tx.contractCall?.contract_id
+      (coin) => coin.contract === tx.contractCall?.contract_id,
     )?.name;
 
     return coinDisplayName ?? '';

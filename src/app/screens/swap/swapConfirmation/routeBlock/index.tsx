@@ -7,7 +7,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useState } from 'react';
-import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import TokenImage from '@components/tokenImage';
 
 const RouteProgress = styled.div((props) => ({
@@ -46,7 +46,7 @@ const ProgressItemText = styled.p((props) => ({
   marginTop: props.theme.spacing(4),
 }));
 
-export default function RouteBlock({ swap }: { swap: SwapConfirmationInput }) {
+export default function RouteBlock({ swap }: { swap: SwapConfirmationOutput }) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
   const [isFold, setIsFold] = useState(false);
   return (
