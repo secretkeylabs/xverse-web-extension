@@ -137,11 +137,8 @@ function SignPsbtRequest() {
 
   useEffect(() => {
     if (parsedPsbt) {
-      parsedPsbt?.outputs.forEach((output) => {
-        if (output.outputScript) {
-          setHasOutputScript(true);
-        }
-      });
+      const hasOutputScript = parsedPsbt.outputs.some((output) => !!output.outputScript);
+      setHasOutputScript(hasOutputScript);
     }
   }, [parsedPsbt]);
 
