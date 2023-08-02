@@ -122,17 +122,6 @@ function TransferDetailView({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [showScriptOutput, setShowScriptOutput] = useState(false);
-  const styles = useSpring({
-    from: {
-      opacity: 0,
-      y: 24,
-    },
-    to: {
-      y: 0,
-      opacity: 1,
-    },
-    delay: 100,
-  });
 
   const onButtonClick = () => {
     setShowScriptOutput(true);
@@ -145,7 +134,7 @@ function TransferDetailView({
   return (
     <>
       {showScriptOutput && (
-        <ShowScriptBackgroundContainer style={styles}>
+        <ShowScriptBackgroundContainer>
           <CrossContainer onClick={onCrossClick}>
             <TransparentButton>
               <img src={Cross} alt="cross" />
