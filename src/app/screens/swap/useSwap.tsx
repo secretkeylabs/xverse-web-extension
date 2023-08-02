@@ -111,7 +111,8 @@ export function useSwap(): UseSwap {
   const alexSDK = useState(() => new AlexSDK())[0];
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const {
-    coinsList,
+    coins: supportedCoins = [],
+    coinsList: visibleCoins = [],
     stxAvailableBalance,
     stxBtcRate,
     btcFiatRate,
@@ -121,11 +122,23 @@ export function useSwap(): UseSwap {
   } = useWalletSelector();
   const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
 
-  const acceptableCoinList = (coinsList || [])
-    .filter((c) => alexSDK.getCurrencyFrom(c.principal) != null)
+  const acceptableCoinList = supportedCoins
+    .filter((sc) => alexSDK.getCurrencyFrom(sc.contract) != null)
     // TODO tim: remove this once alexsdk fix issue here
     // https://github.com/alexgo-io/alex-sdk/issues/2
-    .filter((c) => c.assetName !== 'brc20-db20');
+    .filter((sc) => sc.contract !== 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.brc20-db20')
+    .map<FungibleToken>((sc) => {
+      const ft = (visibleCoins || []).find((vc) => vc.principal === sc.contract);
+      return {
+        ...ft,
+        ...sc,
+        principal: sc.contract,
+        assetName: '',
+        total_sent: ft?.total_sent ?? '0',
+        total_received: ft?.total_received ?? '0',
+        balance: ft?.balance ?? '0',
+      };
+    });
 
   const [inputAmount, setInputAmount] = useState('');
   const [slippage, setSlippage] = useState(0.04);
