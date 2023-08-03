@@ -3,7 +3,7 @@ import { ftDecimals, getTicker } from './helper';
 
 export function getFtTicker(ft: FungibleToken) {
   if (ft?.ticker) {
-    return ft.ticker.toUpperCase();
+    return ft.ticker;
   }
   if (ft?.name) {
     return getTicker(ft.name).toUpperCase();
