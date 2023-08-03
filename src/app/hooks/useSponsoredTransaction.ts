@@ -15,7 +15,7 @@ export const useSponsorInfoQuery = (sponsorUrl?: string) =>
     },
   });
 
-export const useSponsoredTransaction = (isSponsored: boolean, sponsorUrl?: string) => {
+export const useSponsoredTransaction = (isSponsorOptionSelected: boolean, sponsorUrl?: string) => {
   const [isServiceRunning, setIsServiceRunning] = useState(false);
 
   const { error, data: isActive, isLoading } = useSponsorInfoQuery(sponsorUrl);
@@ -30,7 +30,7 @@ export const useSponsoredTransaction = (isSponsored: boolean, sponsorUrl?: strin
     sponsorTransaction(signed, sponsorUrl);
 
   return {
-    isSponsored: isServiceRunning && isSponsored,
+    isSponsored: isServiceRunning && isSponsorOptionSelected,
     isServiceRunning,
     sponsorTransaction: sponsorTransactionToUrl,
   };
