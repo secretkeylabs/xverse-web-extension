@@ -58,7 +58,7 @@ export default function SwapConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
   const swap = useConfirmSwap(location.state);
-  const { isSponsored } = useSponsoredTransaction();
+  const { isSponsored } = useSponsoredTransaction(swap.isSponsorOptionSelected);
 
   const onCancel = useCallback(() => {
     navigate('/swap');
