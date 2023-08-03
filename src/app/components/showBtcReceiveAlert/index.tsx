@@ -12,7 +12,6 @@ function ShowBtcReceiveAlert({ onReceiveAlertClose }: Props) {
 
   const onDontShowReceiveBtcAlert = () => {
     dispatch(ChangeShowBtcReceiveAlertAction(false));
-    onReceiveAlertClose();
   };
 
   return (

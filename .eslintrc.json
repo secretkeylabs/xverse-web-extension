@@ -20,12 +20,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": [
-    "react",
-    "prettier",
-    "eslint-plugin-no-inline-styles",
-    "@tanstack/query"
-  ],
+  "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles", "@tanstack/query"],
   "rules": {
     "no-inline-styles/no-inline-styles": 2,
     "react/react-in-jsx-scope": "off",
@@ -47,16 +42,8 @@
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [
-          ".js",
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ],
-        "moduleDirectory": [
-          "node_modules",
-          "src/"
-        ]
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "moduleDirectory": ["node_modules", "src/"]
       }
     }
   }
