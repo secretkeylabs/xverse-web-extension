@@ -223,7 +223,7 @@ function SignatureRequest(): JSX.Element {
   const confirmCallback = async () => {
     try {
       setIsSigning(true);
-      if (isHardwareAccount(selectedAccount)) {
+      if (isHardwareAccount(selectedAccount) && isSignMessageBip322) {
         setIsModalVisible(true);
         return;
       }
