@@ -6,18 +6,31 @@ import { parsePsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { useTranslation } from 'react-i18next';
 import IconOrdinal from '@assets/img/transactions/ordinal.svg';
 import styled from 'styled-components';
-import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
+import {
+  getBtcFiatEquivalent,
+  satsToBtc,
+  signIncomingSingleSigNativeSegwitTransactionRequest,
+} from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import AccountHeaderComponent from '@components/accountHeader';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import RecipientComponent from '@components/recipientComponent';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
 import InfoContainer from '@components/infoContainer';
 import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
 import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import { isLedgerAccount } from '@utils/helper';
+import BottomModal from '@components/bottomModal';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import { ledgerDelay } from '@common/utils/ledger';
+import { decodeToken } from 'jsontokens';
+import { SignTransactionOptions } from 'sats-connect';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -68,14 +81,40 @@ const ReviewTransactionText = styled.h1((props) => ({
   textAlign: 'left',
 }));
 
+const SuccessActionsContainer = styled.div((props) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: props.theme.spacing(6),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(20),
+  marginTop: props.theme.spacing(20),
+}));
+
 function SignPsbtRequest() {
   const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
     useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t: signatureRequestTranslate } = useTranslation('translation', {
+    keyPrefix: 'SIGNATURE_REQUEST',
+  });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState(false);
+  const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isTxApproved, setIsTxApproved] = useState(false);
+  const [isTxRejected, setIsTxRejected] = useState(false);
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const tabId = params.get('tabId') ?? '0';
+  const requestToken = params.get('signPsbtRequest') ?? '';
+  const request = decodeToken(requestToken) as any as SignTransactionOptions;
 
   const handlePsbtParsing = useCallback(() => {
     try {
@@ -137,6 +176,7 @@ function SignPsbtRequest() {
   const onSignPsbtConfirmed = async () => {
     try {
       if (isLedgerAccount(selectedAccount)) {
+        setIsModalVisible(true);
         return;
       }
 
@@ -179,6 +219,69 @@ function SignPsbtRequest() {
     setExpandInputOutputView(!expandInputOutputView);
   };
 
+  const handleLedgerMessageSigning = async (transport: TransportType) => {
+    const signature = await signIncomingSingleSigNativeSegwitTransactionRequest(
+      transport,
+      network.type,
+      0,
+      [0],
+      payload.psbtBase64,
+    );
+
+    return signature;
+  };
+
+  const handleConnectAndConfirm = async () => {
+    if (!selectedAccount) {
+      console.error('No account selected');
+      return;
+    }
+    setIsButtonDisabled(true);
+
+    const transport = await Transport.create();
+
+    if (!transport) {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+      setIsButtonDisabled(false);
+      return;
+    }
+
+    setIsConnectSuccess(true);
+    await ledgerDelay(1500);
+    setCurrentStepIndex(1);
+
+    try {
+      const signature = await handleLedgerMessageSigning(transport);
+      const signingMessage = {
+        source: MESSAGE_SOURCE,
+        method: ExternalSatsMethods.signMessageResponse,
+        payload: {
+          signMessageRequest: request,
+          signMessageResponse: signature,
+        },
+      };
+      chrome.tabs.sendMessage(+tabId, signingMessage);
+      window.close();
+    } catch (e) {
+      console.error(e);
+      setIsTxRejected(true);
+    } finally {
+      await transport.close();
+      setIsButtonDisabled(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    setIsTxRejected(false);
+    setIsConnectSuccess(false);
+    setCurrentStepIndex(0);
+  };
+
+  const cancelCallback = () => {
+    window.close();
+  };
+
   const getSatsAmountString = (sats: BigNumber) => (
     <NumericFormat
       value={sats.toString()}
@@ -198,54 +301,44 @@ function SignPsbtRequest() {
       ) : (
         <>
           <OuterContainer>
-            {isLedgerAccount(selectedAccount) ? (
-              <Container>
-                <InfoContainer bodyText="External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
-              </Container>
-            ) : (
-              <Container>
-                <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
-                {!payload.broadcast && (
-                  <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
-                )}
-                {ordinalInfoData &&
-                  ordinalInfoData.map((ordinalData) => (
-                    <OrdinalDetailComponent
-                      ordinalInscription={`Inscription ${ordinalData?.number}`}
-                      icon={IconOrdinal}
-                      title={t('ORDINAL')}
-                      ordinal={ordinalData}
-                      ordinalDetail={ordinalData?.content_type}
-                      heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
-                    />
-                  ))}
-                <RecipientComponent
-                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
-                    .toString()
-                    .replace('-', '')}`}
-                  currencyType="BTC"
-                  title={t('AMOUNT')}
-                  heading={
-                    parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')
-                  }
-                />
-                <InputOutputComponent
-                  parsedPsbt={parsedPsbt}
-                  isExpanded={expandInputOutputView}
-                  address={signingAddresses}
-                  onArrowClick={expandInputOutputSection}
-                />
-
-                <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-                {payload.broadcast ? (
-                  <TransactionDetailComponent
-                    title={t('FEES')}
-                    value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
-                    subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+            <Container>
+              <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
+              {!payload.broadcast && <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
+              {ordinalInfoData &&
+                ordinalInfoData.map((ordinalData) => (
+                  <OrdinalDetailComponent
+                    ordinalInscription={`Inscription ${ordinalData?.number}`}
+                    icon={IconOrdinal}
+                    title={t('ORDINAL')}
+                    ordinal={ordinalData}
+                    ordinalDetail={ordinalData?.content_type}
+                    heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
                   />
-                ) : null}
-              </Container>
-            )}
+                ))}
+              <RecipientComponent
+                value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
+                  .toString()
+                  .replace('-', '')}`}
+                currencyType="BTC"
+                title={t('AMOUNT')}
+                heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
+              />
+              <InputOutputComponent
+                parsedPsbt={parsedPsbt}
+                isExpanded={expandInputOutputView}
+                address={signingAddresses}
+                onArrowClick={expandInputOutputSection}
+              />
+
+              <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+              {payload.broadcast ? (
+                <TransactionDetailComponent
+                  title={t('FEES')}
+                  value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
+                  subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+                />
+              ) : null}
+            </Container>
           </OuterContainer>
           <ButtonContainer>
             <TransparentButtonContainer>
@@ -255,11 +348,48 @@ function SignPsbtRequest() {
               text={t('CONFIRM')}
               onPress={onSignPsbtConfirmed}
               processing={isSigning}
-              disabled={isLedgerAccount(selectedAccount)}
             />
           </ButtonContainer>
         </>
       )}
+      <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+        {currentStepIndex === 0 ? (
+          <LedgerConnectionView
+            title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
+            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE')}
+            titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
+            textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
+            imageDefault={ledgerConnectDefaultIcon}
+            isConnectSuccess={isConnectSuccess}
+            isConnectFailed={isConnectFailed}
+          />
+        ) : currentStepIndex === 1 ? (
+          <LedgerConnectionView
+            title={signatureRequestTranslate('LEDGER.CONFIRM.TITLE')}
+            text={signatureRequestTranslate('LEDGER.CONFIRM.SUBTITLE')}
+            titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
+            textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
+            imageDefault={ledgerConnectDefaultIcon}
+            isConnectSuccess={isTxApproved}
+            isConnectFailed={isTxRejected}
+          />
+        ) : null}
+        <SuccessActionsContainer>
+          <ActionButton
+            onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+            text={signatureRequestTranslate(
+              isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
+            )}
+            disabled={isButtonDisabled}
+            processing={isButtonDisabled}
+          />
+          <ActionButton
+            onPress={cancelCallback}
+            text={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
+            transparent
+          />
+        </SuccessActionsContainer>
+      </BottomModal>
     </>
   );
 }
