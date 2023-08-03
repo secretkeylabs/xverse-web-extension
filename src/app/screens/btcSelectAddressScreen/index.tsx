@@ -271,7 +271,7 @@ function BtcSelectAddressScreen() {
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
-            {[...accountsList, ...ledgerAccountsList].map((account) => (
+            {[...ledgerAccountsList, ...accountsList].map((account) => (
               <AccountListRow>
                 <AccountRow
                   key={account.stxAddress}

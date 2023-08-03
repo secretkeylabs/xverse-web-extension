@@ -14,18 +14,23 @@ import { bytesToHex } from '@stacks/transactions';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType, isHardwareAccount, getTruncatedAddress } from '@utils/helper';
-import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
+import {
+  hashMessage,
+  signIncomingSingleSigTaprootTransactionRequest,
+  signStxMessage,
+} from '@secretkeylabs/xverse-core';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import LedgerConnectDefault from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ActionButton from '@components/button';
-import Transport from '@ledgerhq/hw-transport-webusb';
 import { ledgerDelay } from '@common/utils/ledger';
 import { signatureVrsToRsv } from '@stacks/common';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
 import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
 import { finalizeMessageSignature } from './utils';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import SignatureRequestMessage from './signatureRequestMessage';
@@ -70,7 +75,7 @@ const SigningAddressContainer = styled.div((props) => ({
   background: props.theme.colors.background.elevation1,
   borderRadius: 12,
   padding: '12px 16px',
-  marginBottom: 12,
+  marginBottom: props.theme.spacing(6),
   flex: 1,
 }));
 
@@ -140,6 +145,7 @@ function SignatureRequest(): JSX.Element {
   const { messageType, request, payload, tabId, domain, isSignMessageBip322 } =
     useSignatureRequest();
   const navigate = useNavigate();
+  const isMessageSigningDisabled = isHardwareAccount(selectedAccount) && !isSignMessageBip322;
 
   const checkAddressAvailability = () => {
     const account = accountsList.filter((acc) => {
@@ -197,6 +203,18 @@ function SignatureRequest(): JSX.Element {
 
   const handleBip322MessageSigning = useSignBip322Message(payload.message, payload.address);
 
+  const handleBip322LedgerMessageSigning = async (transport: TransportType) => {
+    const signature = await signIncomingSingleSigTaprootTransactionRequest(
+      transport,
+      network.type,
+      0,
+      [0],
+      payload.message,
+    );
+
+    return signature;
+  };
+
   const cancelCallback = () => {
     finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: 'cancel' });
     window.close();
@@ -206,7 +224,7 @@ function SignatureRequest(): JSX.Element {
     try {
       setIsSigning(true);
       if (isHardwareAccount(selectedAccount)) {
-        // setIsModalVisible(true);
+        setIsModalVisible(true);
         return;
       }
       if (!isSignMessageBip322) {
@@ -258,21 +276,35 @@ function SignatureRequest(): JSX.Element {
     setCurrentStepIndex(1);
 
     try {
-      const signature = await signStxMessage(transport, payload.message, selectedAccount.id);
-      const rsvSignature = signatureVrsToRsv(signature.signatureVRS.toString('hex'));
-      const data = {
-        signature: rsvSignature,
-        publicKey: selectedAccount.stxPublicKey,
-      };
-      if (signature) {
-        finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data });
+      if (isSignMessageBip322) {
+        const signature = await handleBip322LedgerMessageSigning(transport);
+        const signingMessage = {
+          source: MESSAGE_SOURCE,
+          method: ExternalSatsMethods.signMessageResponse,
+          payload: {
+            signMessageRequest: request,
+            signMessageResponse: signature,
+          },
+        };
+        chrome.tabs.sendMessage(+tabId, signingMessage);
+        window.close();
+      } else {
+        const signature = await signStxMessage(transport, payload.message, selectedAccount.id);
+        const rsvSignature = signatureVrsToRsv(signature.signatureVRS.toString('hex'));
+        const data = {
+          signature: rsvSignature,
+          publicKey: selectedAccount.stxPublicKey,
+        };
+        if (signature) {
+          finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data });
+        }
       }
     } catch (e) {
       console.error(e);
       setIsTxRejected(true);
-      setIsButtonDisabled(false);
     } finally {
       await transport.close();
+      setIsButtonDisabled(false);
     }
   };
 
@@ -295,10 +327,11 @@ function SignatureRequest(): JSX.Element {
       cancelText={t('SIGNATURE_REQUEST.CANCEL_BUTTON')}
       confirmText={t('SIGNATURE_REQUEST.SIGN_BUTTON')}
       loading={isSigning}
-      disabled={isHardwareAccount(selectedAccount)}
+      disabled={isMessageSigningDisabled}
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      {isHardwareAccount(selectedAccount) ? (
+
+      {isMessageSigningDisabled ? (
         <MainContainer>
           <InfoContainer bodyText="Message signing is not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
         </MainContainer>
@@ -344,7 +377,7 @@ function SignatureRequest(): JSX.Element {
             text={t('SIGNATURE_REQUEST.LEDGER.CONNECT.SUBTITLE')}
             titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_TITLE')}
             textFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={LedgerConnectDefault}
+            imageDefault={ledgerConnectDefaultIcon}
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />
@@ -354,7 +387,7 @@ function SignatureRequest(): JSX.Element {
             text={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.SUBTITLE')}
             titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_TITLE')}
             textFailed={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE')}
-            imageDefault={LedgerConnectDefault}
+            imageDefault={ledgerConnectDefaultIcon}
             isConnectSuccess={isTxApproved}
             isConnectFailed={isTxRejected}
           />

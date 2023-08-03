@@ -52,13 +52,13 @@ const TopImage = styled.img({
 const FunctionTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white['0'],
-  marginTop: 16,
+  marginTop: props.theme.spacing(8),
 }));
 
 const DappTitle = styled.h2((props) => ({
   ...props.theme.body_l,
   color: props.theme.colors.white['400'],
-  marginTop: 4,
+  marginTop: props.theme.spacing(2),
 }));
 
 const InfoContainerWrapper = styled.div((props) => ({
@@ -69,12 +69,12 @@ const InfoContainerWrapper = styled.div((props) => ({
 function AuthenticationRequest() {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-  const [isConnectSuccess, setIsConnectSuccess] = useState<boolean>(false);
-  const [isConnectFailed, setIsConnectFailed] = useState<boolean>(false);
-  const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
-  const [isTxRejected, setIsTxRejected] = useState<boolean>(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState(false);
+  const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isTxApproved, setIsTxApproved] = useState(false);
+  const [isTxRejected, setIsTxRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'AUTH_REQUEST_SCREEN' });
 
   const { search } = useLocation();

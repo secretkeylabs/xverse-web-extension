@@ -31,6 +31,8 @@ export function finalizeMessageSignature({
   tabId,
 }: FinalizeMessageSignatureArgs) {
   const responseMessage = formatMessageSigningResponse({ request: requestPayload, response: data });
+  console.log('responseMessage', responseMessage);
+  console.log('tabId', tabId);
   chrome.tabs.sendMessage(tabId, responseMessage);
   window.close();
 }
