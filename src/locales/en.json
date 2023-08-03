@@ -118,6 +118,7 @@
     "BTC_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open.",
     "BTC_TITLE_VERIFIED": "Bitcoin payment address verified successfully",
     "ORDINALS_TITLE_VERIFIED": "Ordinals address verified successfully",
+    "WRONG_DEVICE_ERROR_SUBTITLE": "The public key of the connected device did not match the wallet public key. Make sure you have the correct device connected.",
     "LEDGER_CONNECT": {
       "BTC_TITLE": "Connect Your Ledger",
       "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app."

@@ -134,6 +134,7 @@ function VerifyLedger(): JSX.Element {
   const [isBtcAddressRejected, setIsBtcAddressRejected] = useState(false);
   const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
   const { selectedAccount } = useWalletSelector();
+  const [isWrongDevice, setIsWrongDevice] = useState(false);
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const currency = params.get('currency') ?? '';
@@ -232,7 +233,22 @@ function VerifyLedger(): JSX.Element {
       setIsBtcAddressRejected(false);
       setIsOrdinalsAddressRejected(false);
       setIsButtonDisabled(true);
+
       const masterFingerPrint = await fetchMasterPubKey();
+
+      const deviceAccounts = ledgerAccountsList.filter(
+        (account) => account.masterPubKey === masterFingerPrint,
+      );
+      const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount?.id);
+
+      if (accountId === -1) {
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+        setIsWrongDevice(true);
+        setIsButtonDisabled(false);
+        return;
+      }
+
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
       handleClickNext();
@@ -277,7 +293,9 @@ function VerifyLedger(): JSX.Element {
                 title={t('LEDGER_CONNECT.BTC_TITLE')}
                 text={t('LEDGER_CONNECT.BTC_SUBTITLE')}
                 titleFailed={t('TITLE_FAILED')}
-                textFailed={t('BTC_SUBTITLE_FAILED')}
+                textFailed={t(
+                  isWrongDevice ? 'WRONG_DEVICE_ERROR_SUBTITLE' : 'BTC_SUBTITLE_FAILED',
+                )}
                 imageDefault={LedgerConnectBtcSVG}
                 isConnectSuccess={isConnectSuccess}
                 isConnectFailed={isConnectFailed}
