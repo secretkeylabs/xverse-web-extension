@@ -54,6 +54,9 @@ export type UseSwap = {
   onSlippageChanged: (slippage: number) => void;
   minReceived?: string;
   onSwap?: () => Promise<void>;
+  isSponsored: boolean;
+  isServiceRunning: boolean;
+  setIsSponsorOptionSelected: (isSponsored: boolean) => void;
 };
 
 export type SelectedCurrencyState = {
@@ -127,7 +130,11 @@ export function useSwap(): UseSwap {
     stxAddress,
     stxPublicKey,
   } = useWalletSelector();
-  const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
+  const [isSponsorOptionSelected, setIsSponsorOptionSelected] = useState(true);
+  const { isSponsored, isServiceRunning } = useSponsoredTransaction(
+    isSponsorOptionSelected,
+    XVERSE_SPONSOR_2_URL,
+  );
   const { data: stxPendingTxData } = useStxPendingTxData();
 
   const acceptableCoinList = supportedCoins
@@ -380,11 +387,15 @@ export function useSwap(): UseSwap {
               routers: info.route.map(currencyToToken).filter(isNotNull),
               unsignedTx: unsignedTx.serialize().toString('hex'),
               functionName: `${tx.contractName}\n${tx.functionName}`,
+              isSponsorOptionSelected,
             };
             navigate('/swap-confirm', {
               state,
             });
           }
         : undefined,
+    isSponsored,
+    isServiceRunning,
+    setIsSponsorOptionSelected,
   };
 }
