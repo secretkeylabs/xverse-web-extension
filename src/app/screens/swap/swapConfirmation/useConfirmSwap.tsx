@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
-import { XVERSE_SPONSOR_2_URL } from '@utils/constants';
 import { swapErrorList } from '../error';
 
 export type SwapConfirmationInput = {
@@ -41,7 +40,6 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
   const selectedNetwork = useNetworkSelector();
   const { isSponsored, sponsorTransaction } = useSponsoredTransaction(
     input.isSponsorOptionSelected,
-    XVERSE_SPONSOR_2_URL,
   );
   const navigate = useNavigate();
   const unsignedTx = deserializeTransaction(input.unsignedTx);

@@ -1,24 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getSponsorInfo, sponsorTransaction } from '@secretkeylabs/xverse-core/api';
+import { getSponsorInfo } from '@secretkeylabs/xverse-core/api';
 import { StacksTransaction } from '@secretkeylabs/xverse-core';
+import { AlexSDK } from 'alex-sdk';
 
-export const useSponsorInfoQuery = (sponsorUrl?: string) =>
+export const useSponsorInfoQuery = () =>
   useQuery({
     queryKey: ['sponsorInfo'],
     queryFn: async () => {
       try {
-        return await getSponsorInfo(sponsorUrl);
+        return await getSponsorInfo();
       } catch (e: any) {
         return Promise.reject(e);
       }
     },
   });
 
-export const useSponsoredTransaction = (isSponsorOptionSelected: boolean, sponsorUrl?: string) => {
+export const useSponsoredTransaction = (isSponsorOptionSelected: boolean) => {
   const [isServiceRunning, setIsServiceRunning] = useState(false);
-
-  const { error, data: isActive, isLoading } = useSponsorInfoQuery(sponsorUrl);
+  const alex = new AlexSDK();
+  const { error, data: isActive, isLoading } = useSponsorInfoQuery();
 
   useEffect(() => {
     if (!isLoading && !error) {
@@ -27,7 +28,7 @@ export const useSponsoredTransaction = (isSponsorOptionSelected: boolean, sponso
   }, [isActive, error, isLoading]);
 
   const sponsorTransactionToUrl = async (signed: StacksTransaction) =>
-    sponsorTransaction(signed, sponsorUrl);
+    alex.broadcastSponsoredTx(signed.serialize().toString('hex'));
 
   return {
     isSponsored: isServiceRunning && isSponsorOptionSelected,

@@ -17,7 +17,6 @@ export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';
 export const BTC_TRANSACTION_TESTNET_STATUS_URL = 'https://mempool.space/testnet/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
-export const XVERSE_SPONSOR_2_URL = 'https://stacks-transaction-sponsor-swaps.onrender.com';
 
 export const TRANSAC_URL = 'https://global.transak.com';
 export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;

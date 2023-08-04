@@ -9,7 +9,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TokenImageProps } from '@components/tokenImage';
-import { LoaderSize, XVERSE_SPONSOR_2_URL } from '@utils/constants';
+import { LoaderSize } from '@utils/constants';
 import { AlexSDK, Currency } from 'alex-sdk';
 import { ftDecimals } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -131,10 +131,7 @@ export function useSwap(): UseSwap {
     stxPublicKey,
   } = useWalletSelector();
   const [isSponsorOptionSelected, setIsSponsorOptionSelected] = useState(true);
-  const { isSponsored, isServiceRunning } = useSponsoredTransaction(
-    isSponsorOptionSelected,
-    XVERSE_SPONSOR_2_URL,
-  );
+  const { isSponsored, isServiceRunning } = useSponsoredTransaction(isSponsorOptionSelected);
   const { data: stxPendingTxData } = useStxPendingTxData();
 
   const acceptableCoinList = supportedCoins
