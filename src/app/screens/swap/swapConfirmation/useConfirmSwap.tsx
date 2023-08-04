@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
-import { swapErrorList } from '../error';
+import { SponsoredTxErrorCode, SponsoredTxError } from 'alex-sdk';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -76,7 +76,18 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
           });
         }
       } catch (e) {
-        if (e instanceof Error) {
+        if (e instanceof SponsoredTxError) {
+          navigate('/tx-status', {
+            state: {
+              txid: '',
+              currency: 'STX',
+              error: e.message,
+              sponsored: isSponsored,
+              browserTx: true,
+              isSponsorServiceError: Object.values(SponsoredTxErrorCode).includes(e.code),
+            },
+          });
+        } else if (e instanceof Error) {
           navigate('/tx-status', {
             state: {
               txid: '',
@@ -84,7 +95,6 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
               error: e instanceof ApiResponseError ? e.data.message : e.message,
               sponsored: isSponsored,
               browserTx: true,
-              isSponsorServiceError: swapErrorList.includes(e.message),
             },
           });
         }

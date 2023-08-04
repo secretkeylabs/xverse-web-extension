@@ -93,6 +93,9 @@ const BodyText = styled.h1((props) => ({
   color: props.theme.colors.white['400'],
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
+  overflowWrap: 'break-word',
+  wordWrap: 'break-word',
+  wordBreak: 'break-word',
   marginLeft: props.theme.spacing(5),
   marginRight: props.theme.spacing(5),
 }));
