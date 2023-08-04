@@ -61,15 +61,21 @@ const ToggleContainer = styled.div({
   justifyContent: 'flex-end',
 });
 
+const ChevronImage = styled.img<{ rotated: boolean }>(({ rotated }) => ({
+  transform: `rotate(${rotated ? 180 : 0}deg)`,
+  transition: 'transform 0.1s ease-in-out',
+}));
+
+const SlippageImg = styled.img(() => ({
+  width: 16,
+  height: 16,
+}));
+
 export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
   const [expandDetail, setExpandDetail] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const theme = useTheme();
-
-  const toggleFunction = () => {
-    swap.setIsSponsorOptionSelected(!swap.isSponsored);
-  };
 
   return (
     <>
@@ -77,14 +83,7 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
         <DT>
           <DetailButton onClick={() => setExpandDetail(!expandDetail)}>
             {t('DETAILS')}
-            <img
-              alt={t('DETAILS')}
-              src={ChevronIcon}
-              style={{
-                transform: `rotate(${expandDetail ? 180 : 0}deg)`,
-                transition: 'transform 0.1s ease-in-out',
-              }}
-            />
+            <ChevronImage alt={t('DETAILS')} src={ChevronIcon} rotated={expandDetail} />
           </DetailButton>
         </DT>
         <DD>{swap.swapInfo?.exchangeRate ?? '--'}</DD>
@@ -94,12 +93,9 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
             <DD>{swap.minReceived ?? '--'}</DD>
             <DT>{t('SLIPPAGE')}</DT>
             <DD>
-              <DetailButton
-                style={{ alignItems: 'center', display: 'flex' }}
-                onClick={() => setShowSlippageModal(true)}
-              >
+              <DetailButton onClick={() => setShowSlippageModal(true)}>
                 {swap.slippage * 100}%
-                <img alt={t('SLIPPAGE')} src={SlippageEditIcon} style={{ width: 16, height: 16 }} />
+                <SlippageImg alt={t('SLIPPAGE')} src={SlippageEditIcon} />
               </DetailButton>
             </DD>
             <DT>{t('LP_FEE')}</DT>
@@ -113,7 +109,7 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
                   <CustomSwitch
                     onColor={theme.colors.purple_main}
                     offColor={theme.colors.background.elevation3}
-                    onChange={toggleFunction}
+                    onChange={swap.toggleUserOverrideSponsorValue}
                     checked={swap.isSponsored}
                     uncheckedIcon={false}
                     checkedIcon={false}
@@ -143,3 +139,4 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
     </>
   );
 }
+export default SwapInfoBlock;
