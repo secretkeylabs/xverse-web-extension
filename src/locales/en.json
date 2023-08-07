@@ -334,7 +334,8 @@
     "RETRY": "Try again",
     "SPONSORED_SUCCESS_MSG": "Transaction signed",
     "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor",
-    "BRC20_ORDINAL_MSG": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer."
+    "BRC20_ORDINAL_MSG": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer.",
+    "SPONSOR_SERVICE_ERROR": "If the issue persist, try again at a later time, or uncheck the “Sponsor Transaction” option in the swap details."
   },
   "LEGAL_SCREEN": {
     "SCREEN_TITLE": "Legal",
@@ -796,6 +797,7 @@
     "SLIPPAGE_TITLE": "Slippage",
     "LP_FEE": "Liquidity Provider Fee",
     "ROUTE": "Route",
+    "SPONSOR_TRANSACTION": "Sponsor transaction (no fees)",
     "POWERED_BY_ALEX": "Powered by ALEX",
     "CONTINUE": "Continue",
     "SLIPPAGE_DESC": "Your transaction will reverse if the price changes unfavorably by more of this percentage.",

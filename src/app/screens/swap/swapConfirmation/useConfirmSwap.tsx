@@ -13,6 +13,7 @@ import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
 import { XVERSE_SPONSOR_2_URL } from '@utils/constants';
+import { swapErrorList } from '../error';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -27,6 +28,7 @@ export type SwapConfirmationInput = {
   routers: { image: TokenImageProps; name: string }[];
   unsignedTx: string; // serialized hex StacksTransaction
   functionName: string;
+  isSponsorOptionSelected: boolean;
 };
 
 export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> & {
@@ -37,7 +39,10 @@ export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> &
 export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-  const { isSponsored, sponsorTransaction } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
+  const { isSponsored, sponsorTransaction } = useSponsoredTransaction(
+    input.isSponsorOptionSelected,
+    XVERSE_SPONSOR_2_URL,
+  );
   const navigate = useNavigate();
   const unsignedTx = deserializeTransaction(input.unsignedTx);
 
@@ -46,6 +51,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
     lpFeeAmount: isSponsored ? 0 : input.lpFeeAmount,
     lpFeeFiatAmount: isSponsored ? 0 : input.lpFeeFiatAmount,
     unsignedTx,
+    isSponsorOptionSelected: input.isSponsorOptionSelected,
     onConfirm: async () => {
       const signed = await signTransaction(
         unsignedTx,
@@ -80,6 +86,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
               error: e instanceof ApiResponseError ? e.data.message : e.message,
               sponsored: isSponsored,
               browserTx: true,
+              isSponsorServiceError: swapErrorList.includes(e.message),
             },
           });
         }
