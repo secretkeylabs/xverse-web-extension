@@ -14,11 +14,7 @@ import { bytesToHex } from '@stacks/transactions';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType, isHardwareAccount, getTruncatedAddress } from '@utils/helper';
-import {
-  hashMessage,
-  signIncomingSingleSigTaprootTransactionRequest,
-  signStxMessage,
-} from '@secretkeylabs/xverse-core';
+import { hashMessage, signSimpleBip322Message, signStxMessage } from '@secretkeylabs/xverse-core';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
@@ -204,13 +200,12 @@ function SignatureRequest(): JSX.Element {
   const handleBip322MessageSigning = useSignBip322Message(payload.message, payload.address);
 
   const handleBip322LedgerMessageSigning = async (transport: TransportType) => {
-    const signature = await signIncomingSingleSigTaprootTransactionRequest(
+    const signature = await signSimpleBip322Message({
       transport,
-      network.type,
-      0,
-      [0],
-      payload.message,
-    );
+      networkType: network.type,
+      addressIndex: 0,
+      message: payload.message,
+    });
 
     return signature;
   };
