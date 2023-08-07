@@ -17,10 +17,9 @@ import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import { useNavigate } from 'react-router-dom';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
-import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import { useAlexSponsoredTransaction } from './useAlexSponsoredTransaction';
 
-// const noop = () => null;
 const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
 
 export type STXOrFungibleToken = 'STX' | FungibleToken;
@@ -56,7 +55,7 @@ export type UseSwap = {
   onSwap?: () => Promise<void>;
   isSponsored: boolean;
   isServiceRunning: boolean;
-  setIsSponsorOptionSelected: (isSponsored: boolean) => void;
+  setUserOverrideSponsorValue: (isSponsored: boolean) => void;
 };
 
 export type SelectedCurrencyState = {
@@ -126,12 +125,11 @@ export function useSwap(): UseSwap {
     stxAvailableBalance,
     stxBtcRate,
     btcFiatRate,
-    // fiatCurrency,
     stxAddress,
     stxPublicKey,
   } = useWalletSelector();
-  const [isSponsorOptionSelected, setIsSponsorOptionSelected] = useState(true);
-  const { isSponsored, isServiceRunning } = useSponsoredTransaction(isSponsorOptionSelected);
+  const [userOverrideSponsorValue, setUserOverrideSponsorValue] = useState(true);
+  const { isSponsored, isServiceRunning } = useAlexSponsoredTransaction(userOverrideSponsorValue);
   const { data: stxPendingTxData } = useStxPendingTxData();
 
   const acceptableCoinList = supportedCoins
@@ -384,7 +382,7 @@ export function useSwap(): UseSwap {
               routers: info.route.map(currencyToToken).filter(isNotNull),
               unsignedTx: unsignedTx.serialize().toString('hex'),
               functionName: `${tx.contractName}\n${tx.functionName}`,
-              isSponsorOptionSelected,
+              userOverrideSponsorValue,
             };
             navigate('/swap-confirm', {
               state,
@@ -393,6 +391,6 @@ export function useSwap(): UseSwap {
         : undefined,
     isSponsored,
     isServiceRunning,
-    setIsSponsorOptionSelected,
+    setUserOverrideSponsorValue,
   };
 }

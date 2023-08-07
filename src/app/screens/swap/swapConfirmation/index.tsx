@@ -12,8 +12,8 @@ import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useConfirmSwap } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import { AdvanceSettings } from '@screens/swap/swapConfirmation/advanceSettings';
-import { useSponsoredTransaction } from '@hooks/useSponsoredTransaction';
 import SponsoredTransactionIcon from '@assets/img/transactions/CircleWavyCheck.svg';
+import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
 
 const TitleText = styled.div((props) => ({
   fontSize: 21,
@@ -58,7 +58,7 @@ export default function SwapConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
   const swap = useConfirmSwap(location.state);
-  const { isSponsored } = useSponsoredTransaction(swap.isSponsorOptionSelected);
+  const { isSponsored } = useAlexSponsoredTransaction(swap.userOverrideSponsorValue);
 
   const onCancel = useCallback(() => {
     navigate('/swap');
