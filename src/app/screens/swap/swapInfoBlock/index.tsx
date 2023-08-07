@@ -1,11 +1,22 @@
 import { UseSwap } from '@screens/swap/useSwap';
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import ChevronIcon from '@assets/img/swap/chevron.svg';
 import BottomModal from '@components/bottomModal';
 import { SlippageModalContent } from '@screens/swap/slippageModal';
+import Switch from 'react-switch';
+
+const CustomSwitch = styled(Switch)`
+  .react-switch-handle {
+    background-color: ${({ checked }) =>
+      checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'} !important;
+    border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
+    height: 16px !important;
+    width: 16px !important;
+  }
+`;
 
 const PoweredByAlexText = styled.span((props) => ({
   ...props.theme.body_xs,
@@ -44,10 +55,21 @@ const DD = styled.dd((props) => ({
   textAlign: 'right',
 }));
 
+const ToggleContainer = styled.div({
+  flex: '30%',
+  display: 'flex',
+  justifyContent: 'flex-end',
+});
+
 export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
   const [expandDetail, setExpandDetail] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const [showSlippageModal, setShowSlippageModal] = useState(false);
+  const theme = useTheme();
+
+  const toggleFunction = () => {
+    swap.setIsSponsorOptionSelected(!swap.isSponsored);
+  };
 
   return (
     <>
@@ -84,6 +106,23 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
             <DD>{swap.swapInfo?.lpFee ?? '--'}</DD>
             <DT>{t('ROUTE')}</DT>
             <DD>{swap.swapInfo?.route ?? '--'}</DD>
+            {swap.isServiceRunning && (
+              <>
+                <DT>{t('SPONSOR_TRANSACTION')}</DT>
+                <ToggleContainer>
+                  <CustomSwitch
+                    onColor={theme.colors.purple_main}
+                    offColor={theme.colors.background.elevation3}
+                    onChange={toggleFunction}
+                    checked={swap.isSponsored}
+                    uncheckedIcon={false}
+                    checkedIcon={false}
+                    height={19}
+                    width={36}
+                  />
+                </ToggleContainer>
+              </>
+            )}
           </>
         )}
       </DL>
