@@ -45,7 +45,9 @@ const TransactionIDContainer = styled.div((props) => ({
 const ButtonContainer = styled.div((props) => ({
   flex: 1,
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'flex-end',
+  gap: props.theme.spacing(6),
   marginTop: props.theme.spacing(15),
   marginBottom: props.theme.spacing(32),
   marginLeft: props.theme.spacing(8),
@@ -141,6 +143,7 @@ function TransactionStatus() {
   const navigate = useNavigate();
   const location = useLocation();
   const { network } = useWalletSelector();
+  // TODO tim: refactor to use react context
   const {
     txid,
     currency,
@@ -152,6 +155,7 @@ function TransactionStatus() {
     errorTitle,
     isBrc20TokenFlow,
     isSponsorServiceError,
+    isSwapTransaction,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -185,6 +189,10 @@ function TransactionStatus() {
     else if (isOrdinal) navigate(-4);
     else if (isNft) navigate(-3);
     else navigate(-3);
+  };
+
+  const handleClickTrySwapAgain = () => {
+    navigate('/swap');
   };
 
   const renderLink = (
@@ -227,9 +235,16 @@ function TransactionStatus() {
           </InfoMessageContainer>
         )}
       </OuterContainer>
-      <ButtonContainer>
-        <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
-      </ButtonContainer>
+      {isSwapTransaction && isSponsorServiceError ? (
+        <ButtonContainer>
+          <ActionButton text={t('RETRY')} onPress={handleClickTrySwapAgain} />
+          <ActionButton text={t('CLOSE')} onPress={onCloseClick} transparent />
+        </ButtonContainer>
+      ) : (
+        <ButtonContainer>
+          <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
+        </ButtonContainer>
+      )}
     </TxStatusContainer>
   );
 }

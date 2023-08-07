@@ -80,10 +80,12 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
             state: {
               txid: '',
               currency: 'STX',
-              error: e.message,
+              error:
+                e.code !== SponsoredTxErrorCode.unknown_error ? e.message : 'Unknown sponsor error',
               sponsored: isSponsored,
               browserTx: true,
-              isSponsorServiceError: Object.values(SponsoredTxErrorCode).includes(e.code),
+              isSponsorServiceError: true,
+              isSwapTransaction: true,
             },
           });
         } else if (e instanceof Error) {
@@ -94,6 +96,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
               error: e instanceof ApiResponseError ? e.data.message : e.message,
               sponsored: isSponsored,
               browserTx: true,
+              isSwapTransaction: true,
             },
           });
         }
