@@ -55,7 +55,7 @@ export type UseSwap = {
   onSwap?: () => Promise<void>;
   isSponsored: boolean;
   isServiceRunning: boolean;
-  setUserOverrideSponsorValue: (isSponsored: boolean) => void;
+  toggleUserOverrideSponsorValue: () => void;
 };
 
 export type SelectedCurrencyState = {
@@ -391,6 +391,8 @@ export function useSwap(): UseSwap {
         : undefined,
     isSponsored,
     isServiceRunning,
-    setUserOverrideSponsorValue,
+    toggleUserOverrideSponsorValue: () => {
+      setUserOverrideSponsorValue((prevValue) => !prevValue);
+    },
   };
 }
