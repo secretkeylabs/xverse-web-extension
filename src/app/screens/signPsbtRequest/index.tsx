@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ActionButton from '@components/button';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { parsePsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
+import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { useTranslation } from 'react-i18next';
 import IconOrdinal from '@assets/img/transactions/ordinal.svg';
 import styled from 'styled-components';
@@ -31,6 +31,7 @@ import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.
 import { ledgerDelay } from '@common/utils/ledger';
 import { decodeToken } from 'jsontokens';
 import { SignTransactionOptions } from 'sats-connect';
+import useBtcClient from '@hooks/useBtcClient';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -115,6 +116,7 @@ function SignPsbtRequest() {
   const tabId = params.get('tabId') ?? '0';
   const requestToken = params.get('signPsbtRequest') ?? '';
   const request = decodeToken(requestToken) as any as SignTransactionOptions;
+  const btcClient = useBtcClient();
 
   const handlePsbtParsing = useCallback(() => {
     try {
@@ -220,15 +222,39 @@ function SignPsbtRequest() {
   };
 
   const handleLedgerMessageSigning = async (transport: TransportType) => {
-    const signature = await signIncomingSingleSigNativeSegwitTransactionRequest(
+    const signingResponse = await signIncomingSingleSigNativeSegwitTransactionRequest(
       transport,
       network.type,
       0,
       [0],
       payload.psbtBase64,
+      payload.broadcast,
     );
 
-    return signature;
+    let txId: string = '';
+    if (request.payload.broadcast) {
+      const txHex = psbtBase64ToHex(signingResponse);
+      const response = await btcClient.sendRawTransaction(txHex);
+      txId = response.tx.hash;
+    }
+
+    const signingMessage = {
+      source: MESSAGE_SOURCE,
+      method: ExternalSatsMethods.signPsbtResponse,
+      payload: {
+        signPsbtRequest: requestToken,
+        signPsbtResponse: {
+          psbtBase64: signingResponse,
+          txId,
+        },
+      },
+    };
+    chrome.tabs.sendMessage(+tabId, signingMessage);
+
+    return {
+      txId,
+      signingResponse,
+    };
   };
 
   const handleConnectAndConfirm = async () => {
@@ -252,19 +278,22 @@ function SignPsbtRequest() {
     setCurrentStepIndex(1);
 
     try {
-      const signature = await handleLedgerMessageSigning(transport);
-      const signingMessage = {
-        source: MESSAGE_SOURCE,
-        method: ExternalSatsMethods.signMessageResponse,
-        payload: {
-          signMessageRequest: request,
-          signMessageResponse: signature,
-        },
-      };
-      chrome.tabs.sendMessage(+tabId, signingMessage);
-      window.close();
-    } catch (e) {
-      console.error(e);
+      const response = await handleLedgerMessageSigning(transport);
+
+      if (payload.broadcast) {
+        navigate('/tx-status', {
+          state: {
+            txid: response.txId,
+            currency: 'BTC',
+            error: '',
+            browserTx: true,
+          },
+        });
+      } else {
+        window.close();
+      }
+    } catch (err) {
+      console.error(err);
       setIsTxRejected(true);
     } finally {
       await transport.close();
