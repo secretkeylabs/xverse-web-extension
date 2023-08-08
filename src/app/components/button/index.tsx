@@ -17,16 +17,6 @@ const Button = styled.button<ButtonProps>((props) => ({
     : props.theme.colors.action.classic,
   width: '100%',
   height: 44,
-  transition: 'all 0.1s ease',
-  ...(props.disabled
-    ? {
-        cursor: 'not-allowed',
-        opacity: 0.4,
-      }
-    : {
-        ':hover': { opacity: 0.8 },
-        ':active': { opacity: 0.6 },
-      }),
 }));
 
 const TransparentButton = styled(Button)((props) => ({
