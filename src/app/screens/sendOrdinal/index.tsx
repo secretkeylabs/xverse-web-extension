@@ -4,17 +4,13 @@ import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
-import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core/api';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
-import {
-  SignedBtcTx,
-  signOrdinalSendTransaction,
-} from '@secretkeylabs/xverse-core/transactions/btc';
+import { SignedBtcTx, signOrdinalTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { useMutation } from '@tanstack/react-query';
@@ -102,7 +98,6 @@ function SendOrdinal() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
   const { selectedOrdinal } = useNftDataSelector();
-  const btcClient = useBtcClient();
   const location = useLocation();
   const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
     useWalletSelector();
@@ -121,25 +116,19 @@ function SendOrdinal() {
     data,
     error: txError,
     mutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>({
+  } = useMutation<SignedBtcTx | null, ResponseError, string>({
     mutationFn: async (recipient) => {
-      const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
-      const ordUtxo = addressUtxos.find(
-        (utx) => `${utx.txid}:${utx.vout}` === selectedOrdinal?.output,
-      );
-      setOrdinalUtxo(ordUtxo);
-      if (ordUtxo) {
-        const signedTx = await signOrdinalSendTransaction(
-          recipient,
-          ordUtxo,
-          btcAddress,
-          Number(selectedAccount?.id),
-          seedPhrase,
-          network.type,
-          [ordUtxo],
-        );
-        return signedTx;
-      }
+      if (!selectedOrdinal) return null;
+      const signedTx = await signOrdinalTransaction({
+        recipientAddress: recipient,
+        ordinalsAddress,
+        btcAddress,
+        accountIndex: Number(selectedAccount?.id),
+        seedPhrase,
+        network: network.type,
+        ordinal: selectedOrdinal,
+      });
+      return signedTx;
     },
   });
 
@@ -165,6 +154,7 @@ function SendOrdinal() {
           total: data.total,
           fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),
           ordinalUtxo,
+          ordinal: selectedOrdinal,
         },
       });
     }

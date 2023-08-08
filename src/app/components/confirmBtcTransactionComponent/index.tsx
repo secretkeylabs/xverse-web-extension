@@ -15,7 +15,7 @@ import {
   Recipient,
   SignedBtcTx,
   signNonOrdinalBtcSendTransaction,
-  signOrdinalSendTransaction,
+  signOrdinalTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import {
   BtcUtxoDataResponse,
@@ -29,6 +29,7 @@ import RecipientComponent from '@components/recipientComponent';
 import TransferFeeView from '@components/transferFeeView';
 import { NumericFormat } from 'react-number-format';
 import TransactionDetailComponent from '../transactionDetailComponent';
+import { Inscription } from '@secretkeylabs/xverse-core/types';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -122,6 +123,7 @@ interface Props {
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
   isBtcSendBrowserTx?: boolean;
+  ordinal?: Inscription;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;
   setCurrentFeeRate: (feeRate: BigNumber) => void;
@@ -142,6 +144,7 @@ function ConfirmBtcTransactionComponent({
   isRestoreFundFlow,
   nonOrdinalUtxos,
   isBtcSendBrowserTx,
+  ordinal,
   currentFeeRate,
   setCurrentFee,
   setCurrentFeeRate,
@@ -152,9 +155,8 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
-  const { btcAddress, selectedAccount, seedPhrase, network, btcFiatRate } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { btcAddress, selectedAccount, seedPhrase, network, btcFiatRate, ordinalsAddress } =
+    useSelector((state: StoreState) => state.walletState);
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
@@ -207,18 +209,19 @@ function ConfirmBtcTransactionComponent({
     data: ordinalData,
     error: ordinalError,
     mutate: ordinalMutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>({
+  } = useMutation<SignedBtcTx | null, ResponseError, string>({
     mutationFn: async (txFee) => {
-      const signedTx = await signOrdinalSendTransaction(
-        recipients[0]?.address,
-        ordinalTxUtxo!,
+      if (!ordinal) return null;
+      const signedTx = await signOrdinalTransaction({
+        recipientAddress: recipients[0]?.address,
+        ordinalsAddress,
         btcAddress,
-        Number(selectedAccount?.id),
+        accountIndex: Number(selectedAccount?.id),
         seedPhrase,
-        network.type,
-        [ordinalTxUtxo!],
-        new BigNumber(txFee),
-      );
+        network: network.type,
+        ordinal,
+        fee: new BigNumber(txFee),
+      });
       return signedTx;
     },
   });
@@ -403,6 +406,7 @@ function ConfirmBtcTransactionComponent({
             isRestoreFlow={isRestoreFundFlow}
             showFeeSettings={showFeeSettings}
             setShowFeeSettings={setShowFeeSettings}
+            ordinal={ordinal}
           />
         </Container>
         <ErrorContainer>

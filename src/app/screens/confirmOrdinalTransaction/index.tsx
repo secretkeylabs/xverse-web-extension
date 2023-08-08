@@ -94,7 +94,7 @@ function ConfirmOrdinalTransaction() {
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const { fee, feePerVByte, signedTxHex, ordinalUtxo } = location.state;
+  const { fee, feePerVByte, signedTxHex, ordinalUtxo, ordinal } = location.state;
 
   const {
     isLoading,
@@ -198,6 +198,7 @@ function ConfirmOrdinalTransaction() {
           setCurrentFee={setCurrentFee}
           currentFeeRate={currentFeeRate}
           setCurrentFeeRate={setCurrentFeeRate}
+          ordinal={ordinal}
         >
           <Container>
             <NftContainer>

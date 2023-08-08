@@ -13,12 +13,13 @@ import { NumericFormat } from 'react-number-format';
 import {
   getBtcFees,
   getBtcFeesForNonOrdinalBtcSend,
-  getBtcFeesForOrdinalSend,
+  getBtcFeesForOrdinalTransaction,
   Recipient,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
 import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import { Inscription } from '@secretkeylabs/xverse-core/types';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -150,6 +151,8 @@ interface Props {
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  ordinal?: Inscription;
+  isRecover?: boolean;
   error: string;
   setIsLoading: () => void;
   setIsNotLoading: () => void;
@@ -166,6 +169,8 @@ function EditFee({
   ordinalTxUtxo,
   isRestoreFlow,
   nonOrdinalUtxos,
+  ordinal,
+  isRecover,
   error,
   setIsLoading,
   setIsNotLoading,
@@ -246,15 +251,17 @@ function EditFee({
           setFeeRateInput(selectedFeeRate?.toString());
           setTotalFee(modifiedFee.toString());
         }
-      } else if (type === 'Ordinals' && btcRecipients && ordinalTxUtxo) {
-        const { fee: modifiedFee, selectedFeeRate } = await getBtcFeesForOrdinalSend(
-          btcRecipients[0].address,
-          ordinalTxUtxo,
+      } else if (type === 'Ordinals' && btcRecipients && ordinal) {
+        const { fee: modifiedFee, selectedFeeRate } = await getBtcFeesForOrdinalTransaction({
+          recipientAddress: btcRecipients[0].address,
           btcAddress,
-          network.type,
-          ordinalsUtxos || [],
-          mode,
-        );
+          ordinalsAddress,
+          network: network.type,
+          ordinal,
+          isRecover,
+          feeMode: mode,
+        });
+
         setFeeRateInput(selectedFeeRate?.toString());
         setTotalFee(modifiedFee.toString());
       }
@@ -316,20 +323,22 @@ function EditFee({
       } finally {
         setIsNotLoading();
       }
-    } else if (type === 'Ordinals' && btcRecipients && ordinalTxUtxo) {
+    } else if (type === 'Ordinals' && btcRecipients && ordinal) {
       try {
         setIsLoading();
         setError('');
 
-        const { fee: modifiedFee, selectedFeeRate } = await getBtcFeesForOrdinalSend(
-          btcRecipients[0].address,
-          ordinalTxUtxo,
+        const { fee: modifiedFee, selectedFeeRate } = await getBtcFeesForOrdinalTransaction({
+          recipientAddress: btcRecipients[0].address,
           btcAddress,
-          network.type,
-          ordinalsUtxos || [],
-          selectedOption,
+          ordinalsAddress,
+          network: network.type,
+          ordinal,
+          isRecover,
+          feeMode: selectedOption,
           feeRateInput,
-        );
+        });
+
         setFeeRateInput(selectedFeeRate?.toString());
         setTotalFee(modifiedFee.toString());
       } catch (err: any) {

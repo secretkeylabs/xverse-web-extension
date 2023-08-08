@@ -1,13 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BtcOrdinal, ErrorCodes, Inscription } from '@secretkeylabs/xverse-core/types';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
-import {
-  SignedBtcTx,
-  signOrdinalSendTransaction,
-} from '@secretkeylabs/xverse-core/transactions/btc';
+import { SignedBtcTx, signOrdinalTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
@@ -16,6 +13,7 @@ import styled from 'styled-components';
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import OrdinalRow from './oridnalRow';
+import useOrdinalsApi from '@hooks/useOrdinalsApi';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
@@ -57,28 +55,28 @@ function RestoreOrdinals() {
     useWalletSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
+
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const [error, setError] = useState('');
   const location = useLocation();
   const isRestoreFundFlow = location.state?.isRestoreFundFlow;
-
-  const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
+  const ordinalsApi = useOrdinalsApi();
 
   const {
     isLoading,
     error: transactionError,
     mutateAsync,
-  } = useMutation<SignedBtcTx, string, BtcOrdinal>({
+  } = useMutation<SignedBtcTx, string, Inscription>({
     mutationFn: async (ordinal) => {
-      const tx = await signOrdinalSendTransaction(
+      const tx = await signOrdinalTransaction({
+        recipientAddress: ordinalsAddress,
         ordinalsAddress,
-        ordinal.utxo,
         btcAddress,
-        Number(selectedAccount?.id),
+        accountIndex: Number(selectedAccount?.id),
         seedPhrase,
-        network.type,
-        ordinalsUtxos!,
-      );
+        network: network.type,
+        ordinal,
+      });
       return tx;
     },
   });
@@ -102,20 +100,24 @@ function RestoreOrdinals() {
   };
 
   const onClickTransfer = async (selectedOrdinal: BtcOrdinal, ordinalData: Inscription) => {
-    const signedTx = await mutateAsync(selectedOrdinal);
-    setSelectedOrdinalDetails(ordinalData);
-    navigate(`/confirm-ordinal-tx/${selectedOrdinal.id}`, {
-      state: {
-        signedTxHex: signedTx.signedTx,
-        recipientAddress: ordinalsAddress,
-        fee: signedTx.fee,
-        feePerVByte: signedTx.feePerVByte,
-        fiatFee: getBtcFiatEquivalent(signedTx.fee, btcFiatRate),
-        total: signedTx.total,
-        fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),
-        ordinalUtxo: selectedOrdinal.utxo,
-      },
-    });
+    if (selectedOrdinal) {
+      const selectedInscription: Inscription = await ordinalsApi.getInscription(selectedOrdinal.id);
+      const signedTx = await mutateAsync(selectedInscription);
+      setSelectedOrdinalDetails(ordinalData);
+      navigate(`/confirm-ordinal-tx/${selectedOrdinal.id}`, {
+        state: {
+          signedTxHex: signedTx.signedTx,
+          recipientAddress: ordinalsAddress,
+          fee: signedTx.fee,
+          feePerVByte: signedTx.feePerVByte,
+          fiatFee: getBtcFiatEquivalent(signedTx.fee, btcFiatRate),
+          total: signedTx.total,
+          fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),
+          ordinalUtxo: selectedOrdinal.utxo,
+          ordinal: selectedInscription,
+        },
+      });
+    }
   };
 
   return (

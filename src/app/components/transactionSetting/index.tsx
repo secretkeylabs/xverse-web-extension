@@ -13,6 +13,7 @@ import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/trans
 import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
 import EditNonce from './editNonce';
 import EditFee from './editFee';
+import { Inscription } from '@secretkeylabs/xverse-core/types';
 
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -64,6 +65,7 @@ interface Props {
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  ordinal?: Inscription;
   showFeeSettings: boolean;
   setShowFeeSettings: (value: boolean) => void;
 }
@@ -82,6 +84,7 @@ function TransactionSettingAlert({
   ordinalTxUtxo,
   isRestoreFlow,
   nonOrdinalUtxos,
+  ordinal,
   showFeeSettings,
   setShowFeeSettings,
 }: Props) {
@@ -173,6 +176,7 @@ function TransactionSettingAlert({
           ordinalTxUtxo={ordinalTxUtxo}
           isRestoreFlow={isRestoreFlow}
           nonOrdinalUtxos={nonOrdinalUtxos}
+          ordinal={ordinal}
         />
       );
     }
