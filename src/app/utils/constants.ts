@@ -55,3 +55,8 @@ export const initialNetworksList: SettingsNetwork[] = [
  */
 export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
   'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
+
+// TODO tim: edit placeholder once article is published
+export const SWAP_SPONSOR_DISABLED_SUPPORT_URL =
+  'https://support.xverse.app/hc/en-us/categories/17760950126733-Pending-Transactions';
+export const SUPPORT_URL_TAB_TARGET = 'SupportURLTabTarget';
