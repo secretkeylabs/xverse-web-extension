@@ -83,6 +83,7 @@ export const AmountInput = styled(NumberInput)<{ error?: boolean }>((props) => (
   textAlign: 'right',
   backgroundColor: 'transparent',
   border: 'transparent',
+  width: '100%',
 }));
 
 const CoinText = styled.div((props) => ({
