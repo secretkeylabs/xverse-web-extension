@@ -27,6 +27,7 @@ import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature'
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
+import { findLedgerAccountId } from '@utils/ledger';
 import { finalizeMessageSignature } from './utils';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import SignatureRequestMessage from './signatureRequestMessage';
@@ -135,7 +136,7 @@ function SignatureRequest(): JSX.Element {
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
-  const { selectedAccount, accountsList, network } = useWalletSelector();
+  const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
   const { messageType, request, payload, tabId, domain, isSignMessageBip322 } =
@@ -200,10 +201,20 @@ function SignatureRequest(): JSX.Element {
   const handleBip322MessageSigning = useSignBip322Message(payload.message, payload.address);
 
   const handleBip322LedgerMessageSigning = async (transport: TransportType) => {
+    const accountId = await findLedgerAccountId({
+      transport,
+      selectedAccount,
+      ledgerAccountsList,
+    });
+
+    if (accountId === -1) {
+      throw new Error('Account not found');
+    }
+
     const signature = await signSimpleBip322Message({
       transport,
       networkType: network.type,
-      addressIndex: 0,
+      addressIndex: accountId,
       message: payload.message,
     });
 

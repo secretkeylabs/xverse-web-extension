@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import {
   getBtcFiatEquivalent,
   satsToBtc,
-  signIncomingSingleSigNativeSegwitTransactionRequest,
+  signIncomingSingleSigPSBT,
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
@@ -32,6 +32,7 @@ import { ledgerDelay } from '@common/utils/ledger';
 import { decodeToken } from 'jsontokens';
 import { SignTransactionOptions } from 'sats-connect';
 import useBtcClient from '@hooks/useBtcClient';
+import { findLedgerAccountId } from '@utils/ledger';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -94,7 +95,7 @@ const SuccessActionsContainer = styled.div((props) => ({
 }));
 
 function SignPsbtRequest() {
-  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
+  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate, ledgerAccountsList } =
     useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -222,11 +223,21 @@ function SignPsbtRequest() {
   };
 
   const handleLedgerMessageSigning = async (transport: TransportType) => {
-    const signingResponse = await signIncomingSingleSigNativeSegwitTransactionRequest(
+    const accountId = await findLedgerAccountId({
+      transport,
+      selectedAccount,
+      ledgerAccountsList,
+    });
+
+    if (accountId === -1) {
+      throw new Error('Account not found');
+    }
+
+    const signingResponse = await signIncomingSingleSigPSBT(
       transport,
       network.type,
-      0,
-      [0],
+      accountId,
+      payload.inputsToSign[0],
       payload.psbtBase64,
       payload.broadcast,
     );
