@@ -81,11 +81,13 @@ export default function SwapConfirmation() {
         <StxInfoBlock type="receive" swap={swap} />
         <FunctionBlock name={swap.functionName} />
         <RouteBlock swap={swap} />
-        <FeesBlock
-          lpFee={swap.lpFeeAmount}
-          lpFeeFiatAmount={swap.lpFeeFiatAmount}
-          currency={swap.fromToken.name}
-        />
+        {!isSponsored && (
+          <FeesBlock
+            lpFee={swap.lpFeeAmount}
+            lpFeeFiatAmount={swap.lpFeeFiatAmount}
+            currency={swap.fromToken.name}
+          />
+        )}
         {isSponsored ? (
           <SponsoredTransactionText>
             <Icon src={SponsoredTransactionIcon} />
