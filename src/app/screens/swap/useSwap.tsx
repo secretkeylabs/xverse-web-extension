@@ -367,7 +367,9 @@ export function useSwap(): UseSwap {
               unsignedTx,
               getNewNonce(stxPendingTxData?.pendingTransactions || [], getNonce(unsignedTx)),
             );
-
+            const fee = microstacksToStx(
+              new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
+            ).toNumber();
             const state: SwapConfirmationInput = {
               from: selectedCurrency.from!,
               to: selectedCurrency.to!,
@@ -376,9 +378,8 @@ export function useSwap(): UseSwap {
               address: stxAddress,
               fromAmount: fromAmount!,
               minToAmount: toAmount! * (1 - slippage),
-              lpFeeAmount: info.feeRate * fromAmount!,
-              lpFeeFiatAmount: currencyToToken(selectedCurrency.from!, info.feeRate * fromAmount!)
-                ?.fiatAmount,
+              lpFeeAmount: fee,
+              lpFeeFiatAmount: currencyToToken(selectedCurrency.from!, fee)?.fiatAmount,
               routers: info.route.map(currencyToToken).filter(isNotNull),
               unsignedTx: unsignedTx.serialize().toString('hex'),
               functionName: `${tx.contractName}\n${tx.functionName}`,
