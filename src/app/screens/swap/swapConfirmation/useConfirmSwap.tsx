@@ -37,12 +37,14 @@ export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> &
   onConfirm: () => Promise<void>;
   onFeeUpdate: (settingFee: bigint) => void;
   unsignedTx: StacksTransaction; // deserialized StacksTransaction
+  isSponsored: boolean;
+  isSponsorDisabled: boolean;
 };
 
 export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-  const { isSponsored, sponsorTransaction } = useAlexSponsoredTransaction(
+  const { isSponsored, sponsorTransaction, isSponsorDisabled } = useAlexSponsoredTransaction(
     input.userOverrideSponsorValue,
   );
   const { currencyToToken } = useCurrencyConversion();
@@ -66,6 +68,8 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
       setFeeAmount(Number(fee));
       setFeeFiatAmount(currencyToToken(input.from, Number(fee))?.fiatAmount);
     },
+    isSponsored,
+    isSponsorDisabled,
     onConfirm: async () => {
       const signed = await signTransaction(
         unsignedTx,

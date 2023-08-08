@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { StacksTransaction } from '@secretkeylabs/xverse-core';
 import { AlexSDK } from 'alex-sdk';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 
 const useAlexSponsorSwapEnabledQuery = (alexSDK: AlexSDK) =>
   useQuery({
@@ -23,10 +24,14 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
   const sponsorTransaction = async (signed: StacksTransaction) =>
     alexSDK.broadcastSponsoredTx(signed.serialize().toString('hex'));
 
+  const { data: stxPendingTxData } = useStxPendingTxData();
+  const hasPendingTransactions = stxPendingTxData?.pendingTransactions?.length > 0;
+
   return {
-    isSponsored: userOverrideSponsorValue && isServiceRunning,
+    isSponsored: userOverrideSponsorValue && isServiceRunning && !hasPendingTransactions,
     isServiceRunning,
     sponsorTransaction,
+    isSponsorDisabled: hasPendingTransactions,
   };
 };
 

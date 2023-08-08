@@ -53,7 +53,8 @@ export type UseSwap = {
   onSwap?: () => Promise<void>;
   isSponsored: boolean;
   isServiceRunning: boolean;
-  toggleUserOverrideSponsorValue: () => void;
+  handleChangeUserOverrideSponsorValue: (checked: boolean) => void;
+  isSponsorDisabled: boolean;
 };
 
 export type SelectedCurrencyState = {
@@ -120,8 +121,9 @@ export function useSwap(): UseSwap {
   const { stxAddress, stxPublicKey } = useWalletSelector();
   const { acceptableCoinList, currencyToToken } = useCurrencyConversion();
   const [userOverrideSponsorValue, setUserOverrideSponsorValue] = useState(true);
-  const { isSponsored, isServiceRunning } = useAlexSponsoredTransaction(userOverrideSponsorValue);
   const { data: stxPendingTxData } = useStxPendingTxData();
+  const { isSponsored, isServiceRunning, isSponsorDisabled } =
+    useAlexSponsoredTransaction(userOverrideSponsorValue);
 
   const [inputAmount, setInputAmount] = useState('');
   const [slippage, setSlippage] = useState(0.04);
@@ -331,8 +333,9 @@ export function useSwap(): UseSwap {
         : undefined,
     isSponsored,
     isServiceRunning,
-    toggleUserOverrideSponsorValue: () => {
-      setUserOverrideSponsorValue((prevValue) => !prevValue);
+    handleChangeUserOverrideSponsorValue: (checked: boolean) => {
+      setUserOverrideSponsorValue(checked);
     },
+    isSponsorDisabled,
   };
 }
