@@ -95,7 +95,7 @@ export default function TxTransfers(props: TxTransfersProps) {
               <NumericFormat
                 value={
                   isFT
-                    ? ftDecimals(BigNumber(transfer.amount), ft?.decimals!)
+                    ? ftDecimals(BigNumber(transfer.amount), ft?.decimals ?? 0)
                     : microstacksToStx(BigNumber(transfer.amount)).toString()
                 }
                 displayType="text"
