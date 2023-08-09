@@ -9,6 +9,7 @@ import { NumericFormat } from 'react-number-format';
 import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
+import { getFtTicker } from '@utils/tokens';
 
 const TransactionContainer = styled.div((props) => ({
   display: 'flex',
@@ -56,7 +57,7 @@ interface TxTransfersProps {
 
 export default function TxTransfers(props: TxTransfersProps) {
   const { transaction, coin, txFilter } = props;
-  const { selectedAccount } = useWalletSelector();
+  const { selectedAccount, coinsList } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   function formatAddress(addr: string): string {
@@ -78,8 +79,8 @@ export default function TxTransfers(props: TxTransfersProps) {
   function renderTransaction(transactionList) {
     return transactionList.map((transfer) => {
       const isFT = coin === 'FT';
+      const ft = coinsList?.find((ftCoin) => ftCoin.principal === txFilter!.split('::')[0]);
       const isRecipientNegative = selectedAccount?.stxAddress !== transfer.recipient;
-
       if (isFT && transfer.asset_identifier !== txFilter) {
         return null;
       }
@@ -97,9 +98,7 @@ export default function TxTransfers(props: TxTransfersProps) {
                 prefix={isRecipientNegative ? '-' : ''}
                 renderText={(value: string) => (
                   <TransactionValue>
-                    {`${value} ${
-                      isFT ? transfer.asset_identifier.split('::')[1].toUpperCase() : coin
-                    }`}
+                    {`${value} ${isFT && ft ? getFtTicker(ft) : coin}`}
                   </TransactionValue>
                 )}
               />
