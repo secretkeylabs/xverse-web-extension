@@ -10,6 +10,7 @@ import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { getFtTicker } from '@utils/tokens';
+import { ftDecimals } from '@utils/helper';
 
 const TransactionContainer = styled.div((props) => ({
   display: 'flex',
@@ -92,7 +93,11 @@ export default function TxTransfers(props: TxTransfersProps) {
             <TransactionRow>
               <TransactionTitleText>{getTokenTransferTitle(transfer)}</TransactionTitleText>
               <NumericFormat
-                value={microstacksToStx(BigNumber(transfer.amount)).toString()}
+                value={
+                  isFT
+                    ? ftDecimals(BigNumber(transfer.amount), ft?.decimals!)
+                    : microstacksToStx(BigNumber(transfer.amount)).toString()
+                }
                 displayType="text"
                 thousandSeparator
                 prefix={isSentTransaction ? '-' : ''}
