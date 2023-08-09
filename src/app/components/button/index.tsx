@@ -17,26 +17,32 @@ const Button = styled.button<ButtonProps>((props) => ({
     : props.theme.colors.action.classic,
   width: '100%',
   height: 44,
-  ':hover': { opacity: 0.8 },
-  ':active': { opacity: 0.6 },
+  transition: 'all 0.1s ease',
+  ':disabled': {
+    opacity: 0.4,
+    cursor: 'not-allowed',
+  },
+  ':hover:enabled': {
+    opacity: 0.8,
+  },
+  ':active:enabled': {
+    opacity: 0.6,
+  },
 }));
 
 const TransparentButton = styled(Button)((props) => ({
   border: `1px solid ${props.theme.colors.background.elevation6}`,
   backgroundColor: 'transparent',
-  ...(props.disabled
-    ? {
-        cursor: 'not-allowed',
-        opacity: 0.4,
-      }
-    : {
-        ':hover': {
-          backgroundColor: props.theme.colors.background.elevation6_800,
-        },
-        ':active': {
-          backgroundColor: props.theme.colors.background.elevation6_600,
-        },
-      }),
+  ':disabled': {
+    cursor: 'not-allowed',
+    opacity: 0.4,
+  },
+  ':hover:enabled': {
+    backgroundColor: props.theme.colors.background.elevation6_800,
+  },
+  ':active:enabled': {
+    backgroundColor: props.theme.colors.background.elevation6_600,
+  },
 }));
 
 interface TextProps {
