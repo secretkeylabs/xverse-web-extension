@@ -75,26 +75,51 @@ export default function TxTransfers(props: TxTransfersProps) {
       : t('TRANSACTION_SENT');
   return (
     <>
-      {transaction.stx_transfers.map((stxTransfer) => (
-        <TransactionContainer key={nanoid()}>
-          {renderTransactionIcon(stxTransfer)}
-          <TransactionInfoContainer>
-            <TransactionRow>
-              <TransactionTitleText>{getTokenTransferTitle(stxTransfer)}</TransactionTitleText>
-              <NumericFormat
-                value={microstacksToStx(BigNumber(stxTransfer.amount)).toString()}
-                displayType="text"
-                thousandSeparator
-                prefix={selectedAccount?.stxAddress === stxTransfer.recipient ? '' : '-'}
-                renderText={(value: string) => (
-                  <TransactionValue>{`${value} ${coin}`}</TransactionValue>
-                )}
-              />
-            </TransactionRow>
-            <RecipientAddress>{formatAddress(stxTransfer.recipient as string)}</RecipientAddress>
-          </TransactionInfoContainer>
-        </TransactionContainer>
-      ))}
+      {coin === 'FT' && transaction.ft_transfers
+        ? transaction.ft_transfers.map((ftTransfer) => (
+            <TransactionContainer key={nanoid()}>
+              {renderTransactionIcon(ftTransfer)}
+              <TransactionInfoContainer>
+                <TransactionRow>
+                  <TransactionTitleText>{getTokenTransferTitle(ftTransfer)}</TransactionTitleText>
+                  <NumericFormat
+                    value={microstacksToStx(BigNumber(ftTransfer.amount)).toString()}
+                    displayType="text"
+                    thousandSeparator
+                    prefix={selectedAccount?.stxAddress === ftTransfer.recipient ? '' : '-'}
+                    renderText={(value: string) => (
+                      <TransactionValue>{`${value} ${ftTransfer.asset_identifier
+                        .split('::')[1]
+                        .toUpperCase()}`}</TransactionValue>
+                    )}
+                  />
+                </TransactionRow>
+                <RecipientAddress>{formatAddress(ftTransfer.recipient as string)}</RecipientAddress>
+              </TransactionInfoContainer>
+            </TransactionContainer>
+          ))
+        : transaction.stx_transfers.map((stxTransfer) => (
+            <TransactionContainer key={nanoid()}>
+              {renderTransactionIcon(stxTransfer)}
+              <TransactionInfoContainer>
+                <TransactionRow>
+                  <TransactionTitleText>{getTokenTransferTitle(stxTransfer)}</TransactionTitleText>
+                  <NumericFormat
+                    value={microstacksToStx(BigNumber(stxTransfer.amount)).toString()}
+                    displayType="text"
+                    thousandSeparator
+                    prefix={selectedAccount?.stxAddress === stxTransfer.recipient ? '' : '-'}
+                    renderText={(value: string) => (
+                      <TransactionValue>{`${value} ${coin}`}</TransactionValue>
+                    )}
+                  />
+                </TransactionRow>
+                <RecipientAddress>
+                  {formatAddress(stxTransfer.recipient as string)}
+                </RecipientAddress>
+              </TransactionInfoContainer>
+            </TransactionContainer>
+          ))}
     </>
   );
 }
