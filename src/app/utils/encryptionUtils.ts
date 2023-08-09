@@ -20,16 +20,18 @@ export async function generateKeyArgon2(password: string, salt: string): Promise
     mem: 64 * 1024,
     parallelism: 4,
     hashLen: 48,
-    type: argon2.ArgonType.Argon2id,
+    type: argon2.ArgonType.Argon2i,
   });
   return result.hashHex;
 }
 
 export async function generatePasswordHash(password: string) {
   let salt = await getSessionItem(SeedVaultStorageKeys.PASSWORD_SALT);
-  if (!salt) {
+  const unMigratedSalt = localStorage.getItem('salt');
+  if (!salt && !unMigratedSalt) {
     salt = generateRandomKey(16);
-    setSessionItem(SeedVaultStorageKeys.PASSWORD_SALT, salt);
+  } else {
+    salt = unMigratedSalt || salt;
   }
   const argonHash = await generateKeyArgon2(password, salt);
   return {

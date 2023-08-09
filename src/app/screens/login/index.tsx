@@ -5,15 +5,13 @@ import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addHours, addMinutes } from 'date-fns';
+import { addMinutes } from 'date-fns';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
 import ActionButton from '@components/button';
 import useCacheMigration from '@hooks/useCacheMigration';
 import MigrationConfirmation from '@screens/migrationConfirmation';
-import { decryptSeedPhrase } from '@utils/encryptionUtils';
 import useWalletSelector from '@hooks/useWalletSelector';
-import useWalletSession from '@hooks/useWalletSession';
 
 declare const VERSION: string;
 
