@@ -74,61 +74,47 @@ export default function TxTransfers(props: TxTransfersProps) {
     selectedAccount?.stxAddress === transfer.recipient
       ? t('TRANSACTION_RECEIVED')
       : t('TRANSACTION_SENT');
+
+  function renderTransaction(transactionList) {
+    return transactionList.map((transfer) => {
+      const isFT = coin === 'FT';
+      const isRecipientNegative = selectedAccount?.stxAddress !== transfer.recipient;
+
+      if (isFT && transfer.asset_identifier !== txFilter) {
+        return null;
+      }
+
+      return (
+        <TransactionContainer key={nanoid()}>
+          {renderTransactionIcon(transfer)}
+          <TransactionInfoContainer>
+            <TransactionRow>
+              <TransactionTitleText>{getTokenTransferTitle(transfer)}</TransactionTitleText>
+              <NumericFormat
+                value={microstacksToStx(BigNumber(transfer.amount)).toString()}
+                displayType="text"
+                thousandSeparator
+                prefix={isRecipientNegative ? '-' : ''}
+                renderText={(value: string) => (
+                  <TransactionValue>
+                    {`${value} ${
+                      isFT ? transfer.asset_identifier.split('::')[1].toUpperCase() : coin
+                    }`}
+                  </TransactionValue>
+                )}
+              />
+            </TransactionRow>
+            <RecipientAddress>{formatAddress(transfer.recipient as string)}</RecipientAddress>
+          </TransactionInfoContainer>
+        </TransactionContainer>
+      );
+    });
+  }
   return (
     <>
       {coin === 'FT' && transaction.ft_transfers
-        ? transaction.ft_transfers.map((ftTransfer) => {
-            if (ftTransfer.asset_identifier === txFilter) {
-              return (
-                <TransactionContainer key={nanoid()}>
-                  {renderTransactionIcon(ftTransfer)}
-                  <TransactionInfoContainer>
-                    <TransactionRow>
-                      <TransactionTitleText>
-                        {getTokenTransferTitle(ftTransfer)}
-                      </TransactionTitleText>
-                      <NumericFormat
-                        value={microstacksToStx(BigNumber(ftTransfer.amount)).toString()}
-                        displayType="text"
-                        thousandSeparator
-                        prefix={selectedAccount?.stxAddress === ftTransfer.recipient ? '' : '-'}
-                        renderText={(value: string) => (
-                          <TransactionValue>{`${value} ${ftTransfer.asset_identifier
-                            .split('::')[1]
-                            .toUpperCase()}`}</TransactionValue>
-                        )}
-                      />
-                    </TransactionRow>
-                    <RecipientAddress>
-                      {formatAddress(ftTransfer.recipient as string)}
-                    </RecipientAddress>
-                  </TransactionInfoContainer>
-                </TransactionContainer>
-              );
-            }
-          })
-        : transaction.stx_transfers.map((stxTransfer) => (
-            <TransactionContainer key={nanoid()}>
-              {renderTransactionIcon(stxTransfer)}
-              <TransactionInfoContainer>
-                <TransactionRow>
-                  <TransactionTitleText>{getTokenTransferTitle(stxTransfer)}</TransactionTitleText>
-                  <NumericFormat
-                    value={microstacksToStx(BigNumber(stxTransfer.amount)).toString()}
-                    displayType="text"
-                    thousandSeparator
-                    prefix={selectedAccount?.stxAddress === stxTransfer.recipient ? '' : '-'}
-                    renderText={(value: string) => (
-                      <TransactionValue>{`${value} ${coin}`}</TransactionValue>
-                    )}
-                  />
-                </TransactionRow>
-                <RecipientAddress>
-                  {formatAddress(stxTransfer.recipient as string)}
-                </RecipientAddress>
-              </TransactionInfoContainer>
-            </TransactionContainer>
-          ))}
+        ? renderTransaction(transaction.ft_transfers)
+        : renderTransaction(transaction.stx_transfers)}
     </>
   );
 }
