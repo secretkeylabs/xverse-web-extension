@@ -150,8 +150,6 @@ const filterTxs = (
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, txFilter } = props;
-  console.log('txFilter');
-  console.log(txFilter);
   const { data, isLoading, isFetching } = useTransactions((coin as CurrencyTypes) || 'STX');
   const styles = useSpring({
     config: { ...config.stiff },
@@ -173,8 +171,6 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
 
     if (txFilter && coin === 'FT') {
       const filteredTxs = filterTxs(data, txFilter);
-      console.log('filteredTxs');
-      console.log(filteredTxs);
       return groupedTxsByDateMap(filteredTxs);
     }
 
@@ -204,6 +200,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
                   transaction={transaction}
                   transactionCoin={coin}
                   key={transaction.tx_id}
+                  txFilter={txFilter}
                 />
               );
             })}
