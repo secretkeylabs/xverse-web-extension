@@ -237,7 +237,7 @@ function SignPsbtRequest() {
       transport,
       network.type,
       accountId,
-      payload.inputsToSign[0],
+      payload.inputsToSign,
       payload.psbtBase64,
       payload.broadcast,
     );
