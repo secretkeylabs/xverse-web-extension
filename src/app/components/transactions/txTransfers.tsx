@@ -80,7 +80,7 @@ export default function TxTransfers(props: TxTransfersProps) {
     return transactionList.map((transfer) => {
       const isFT = coin === 'FT';
       const ft = coinsList?.find((ftCoin) => ftCoin.principal === txFilter!.split('::')[0]);
-      const isRecipientNegative = selectedAccount?.stxAddress !== transfer.recipient;
+      const isSentTransaction = selectedAccount?.stxAddress !== transfer.recipient;
       if (isFT && transfer.asset_identifier !== txFilter) {
         return null;
       }
@@ -95,7 +95,7 @@ export default function TxTransfers(props: TxTransfersProps) {
                 value={microstacksToStx(BigNumber(transfer.amount)).toString()}
                 displayType="text"
                 thousandSeparator
-                prefix={isRecipientNegative ? '-' : ''}
+                prefix={isSentTransaction ? '-' : ''}
                 renderText={(value: string) => (
                   <TransactionValue>
                     {`${value} ${isFT && ft ? getFtTicker(ft) : coin}`}
