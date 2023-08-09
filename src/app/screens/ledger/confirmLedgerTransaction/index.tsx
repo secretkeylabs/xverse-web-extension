@@ -10,7 +10,6 @@ import {
   signLedgerNativeSegwitBtcTransaction,
   signLedgerStxTransaction,
   signLedgerMixedBtcTransaction,
-  getMasterFingerPrint,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';

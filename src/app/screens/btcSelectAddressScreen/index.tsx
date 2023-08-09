@@ -203,7 +203,8 @@ function BtcSelectAddressScreen() {
     setShowAccountList(true);
   };
 
-  const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;
+  const isAccountSelected = (account: Account) =>
+    account.id === selectedAccount?.id && account.accountType === selectedAccount?.accountType;
 
   const handleAccountSelect = (account: Account) => {
     dispatch(
