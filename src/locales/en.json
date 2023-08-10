@@ -224,7 +224,10 @@
     "SWITCH_TO": "Switch to",
     "SEND_ORDINAL_TITLE": "Send Ordinal",
     "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals.",
-    "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens."
+    "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens.",
+    "SEND_ORDINAL_TO_SELF_WARNING": "You are about to transfer an Ordinal to yourself",
+    "SEND_BRC20_ORDINAL_TO_SELF_WARNING": "You are about to transfer BRC-20 tokens to yourself",
+    "SEND_BTC_TO_SELF_WARNING": "You are about to transfer BTC to yourself"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
