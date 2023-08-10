@@ -289,8 +289,10 @@ function ConfirmLedgerTransaction(): JSX.Element {
       const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount.id);
 
       if (accountId === -1) {
+        setIsConnectSuccess(false);
         setIsConnectFailed(true);
         setIsWrongDevice(true);
+        setIsButtonDisabled(false);
         return;
       }
 

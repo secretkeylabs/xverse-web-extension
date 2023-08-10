@@ -8,7 +8,7 @@ import { getTruncatedAddress } from '@utils/helper';
 import { StyledToolTip } from '@components/accountRow';
 import { useCallback, useState } from 'react';
 import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
-import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import TokenImage from '@components/tokenImage';
 
 export const Container = styled.div((props) => ({
@@ -86,13 +86,13 @@ const AddressLabelText = styled.h3((props) => ({
   marginLeft: props.theme.spacing(5),
 }));
 
-const CopyButton = styled.div((props) => ({
+const CopyButton = styled.div(() => ({
   display: 'flex',
   alignItems: 'center',
   cursor: 'pointer',
 }));
 
-const CopyImg = styled.img((props) => ({
+const CopyImg = styled.img(() => ({
   width: 20,
   height: 20,
 }));
@@ -109,7 +109,7 @@ const CurrencyText = styled.p((props) => ({
 
 interface StxInfoCardProps {
   type: 'transfer' | 'receive';
-  swap: SwapConfirmationInput;
+  swap: SwapConfirmationOutput;
 }
 
 export function FoldButton({ isFold, onSwitch }: { isFold: boolean; onSwitch: () => void }) {
@@ -151,7 +151,7 @@ export default function StxInfoBlock({ type, swap }: StxInfoCardProps) {
             </SpaceBetweenContainer>
             <EstimateUSDText>{` ~ $${token.fiatAmount} USD`}</EstimateUSDText>
           </AmountContainer>
-          <DescriptionText>{t('TO')}</DescriptionText>
+          <DescriptionText>{type === 'transfer' ? t('FROM') : t('TO')}</DescriptionText>
           <SpaceBetweenContainer>
             <ItemsCenterContainer>
               <AddressImg src={AddressIcon} />

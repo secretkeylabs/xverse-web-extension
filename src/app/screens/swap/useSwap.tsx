@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { FungibleToken, microstacksToStx } from '@secretkeylabs/xverse-core';
+import {
+  FungibleToken,
+  getNewNonce,
+  microstacksToStx,
+  setNonce,
+  getNonce,
+} from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TokenImageProps } from '@components/tokenImage';
@@ -12,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
 import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 
 // const noop = () => null;
 const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
@@ -46,7 +53,10 @@ export type UseSwap = {
   slippage: number;
   onSlippageChanged: (slippage: number) => void;
   minReceived?: string;
-  onSwap?: () => void;
+  onSwap?: () => Promise<void>;
+  isSponsored: boolean;
+  isServiceRunning: boolean;
+  setIsSponsorOptionSelected: (isSponsored: boolean) => void;
 };
 
 export type SelectedCurrencyState = {
@@ -111,7 +121,8 @@ export function useSwap(): UseSwap {
   const alexSDK = useState(() => new AlexSDK())[0];
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const {
-    coinsList,
+    coins: supportedCoins = [],
+    coinsList: visibleCoins = [],
     stxAvailableBalance,
     stxBtcRate,
     btcFiatRate,
@@ -119,10 +130,30 @@ export function useSwap(): UseSwap {
     stxAddress,
     stxPublicKey,
   } = useWalletSelector();
-  const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
+  const [isSponsorOptionSelected, setIsSponsorOptionSelected] = useState(true);
+  const { isSponsored, isServiceRunning } = useSponsoredTransaction(
+    isSponsorOptionSelected,
+    XVERSE_SPONSOR_2_URL,
+  );
+  const { data: stxPendingTxData } = useStxPendingTxData();
 
-  const acceptableCoinList =
-    coinsList?.filter((c) => alexSDK.getCurrencyFrom(c.principal) != null) ?? [];
+  const acceptableCoinList = supportedCoins
+    .filter((sc) => alexSDK.getCurrencyFrom(sc.contract) != null)
+    // TODO tim: remove this once alexsdk fix issue here
+    // https://github.com/alexgo-io/alex-sdk/issues/2
+    .filter((sc) => sc.contract !== 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.brc20-db20')
+    .map<FungibleToken>((sc) => {
+      const ft = (visibleCoins || []).find((vc) => vc.principal === sc.contract);
+      return {
+        ...ft,
+        ...sc,
+        principal: sc.contract,
+        assetName: '',
+        total_sent: ft?.total_sent ?? '0',
+        total_received: ft?.total_received ?? '0',
+        balance: ft?.balance ?? '0',
+      };
+    });
 
   const [inputAmount, setInputAmount] = useState('');
   const [slippage, setSlippage] = useState(0.04);
@@ -336,6 +367,12 @@ export function useSwap(): UseSwap {
               sponsored: isSponsored,
             });
 
+            // bump nonce if pendingTxs
+            setNonce(
+              unsignedTx,
+              getNewNonce(stxPendingTxData?.pendingTransactions || [], getNonce(unsignedTx)),
+            );
+
             const state: SwapConfirmationInput = {
               from: selectedCurrency.from!,
               to: selectedCurrency.to!,
@@ -350,11 +387,15 @@ export function useSwap(): UseSwap {
               routers: info.route.map(currencyToToken).filter(isNotNull),
               unsignedTx: unsignedTx.serialize().toString('hex'),
               functionName: `${tx.contractName}\n${tx.functionName}`,
+              isSponsorOptionSelected,
             };
             navigate('/swap-confirm', {
               state,
             });
           }
         : undefined,
+    isSponsored,
+    isServiceRunning,
+    setIsSponsorOptionSelected,
   };
 }

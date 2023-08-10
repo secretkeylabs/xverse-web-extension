@@ -100,7 +100,7 @@ function ActionButton({
 
   if (transparent) {
     return (
-      <TransparentButton onClick={handleOnPress} disabled={disabled}>
+      <TransparentButton onClick={handleOnPress} disabled={disabled || processing}>
         {processing ? (
           <MoonLoader color="white" size={10} />
         ) : (
@@ -114,7 +114,7 @@ function ActionButton({
   }
 
   return (
-    <Button onClick={handleOnPress} disabled={disabled} warning={warning}>
+    <Button onClick={handleOnPress} disabled={disabled || processing} warning={warning}>
       {processing ? (
         <MoonLoader color="#12151E" size={12} />
       ) : (

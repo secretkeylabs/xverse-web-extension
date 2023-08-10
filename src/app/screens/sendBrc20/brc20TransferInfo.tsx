@@ -13,15 +13,18 @@ const InfoTitle = styled.h1((props) => ({
   ...props.theme.headline_m,
   marginTop: props.theme.spacing(8),
 }));
+
 const InfoSubtitle = styled.h2((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
   marginTop: props.theme.spacing(6),
 }));
+
 const TransferStepTitle = styled.h3((props) => ({
   ...props.theme.body_bold_m,
   marginTop: props.theme.spacing(20),
 }));
+
 const TransferStep = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
@@ -34,17 +37,9 @@ function Brc20TransferInfo() {
     <Container>
       <InfoTitle>{t('SEND_INFO_TITLE')}</InfoTitle>
       <InfoSubtitle>{t('SEND_INFO_SUBTITLE')}</InfoSubtitle>
-      <TransferStepTitle>
-        1.
-        {'  '}
-        {t('SEND_STEP_1_TITLE')}
-      </TransferStepTitle>
+      <TransferStepTitle>1. {t('SEND_STEP_1_TITLE')}</TransferStepTitle>
       <TransferStep>{t('SEND_STEP_1')}</TransferStep>
-      <TransferStepTitle>
-        2.
-        {'  '}
-        {t('SEND_STEP_2_TITLE')}
-      </TransferStepTitle>
+      <TransferStepTitle>2. {t('SEND_STEP_2_TITLE')}</TransferStepTitle>
       <TransferStep>{t('SEND_STEP_2')}</TransferStep>
     </Container>
   );

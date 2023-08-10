@@ -1,7 +1,11 @@
 import { SwapToken } from '@screens/swap/useSwap';
 import { Currency } from 'alex-sdk';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { broadcastSignedTransaction, signTransaction } from '@secretkeylabs/xverse-core';
+import {
+  broadcastSignedTransaction,
+  signTransaction,
+  StacksTransaction,
+} from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +13,7 @@ import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
 import { XVERSE_SPONSOR_2_URL } from '@utils/constants';
+import { swapErrorList } from '../error';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -23,14 +28,21 @@ export type SwapConfirmationInput = {
   routers: { image: TokenImageProps; name: string }[];
   unsignedTx: string; // serialized hex StacksTransaction
   functionName: string;
+  isSponsorOptionSelected: boolean;
 };
 
-export function useConfirmSwap(
-  input: SwapConfirmationInput,
-): SwapConfirmationInput & { onConfirm: () => Promise<void> } {
+export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> & {
+  onConfirm: () => Promise<void>;
+  unsignedTx: StacksTransaction; // deserialized StacksTransaction
+};
+
+export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-  const { isSponsored, sponsorTransaction } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
+  const { isSponsored, sponsorTransaction } = useSponsoredTransaction(
+    input.isSponsorOptionSelected,
+    XVERSE_SPONSOR_2_URL,
+  );
   const navigate = useNavigate();
   const unsignedTx = deserializeTransaction(input.unsignedTx);
 
@@ -38,6 +50,8 @@ export function useConfirmSwap(
     ...input,
     lpFeeAmount: isSponsored ? 0 : input.lpFeeAmount,
     lpFeeFiatAmount: isSponsored ? 0 : input.lpFeeFiatAmount,
+    unsignedTx,
+    isSponsorOptionSelected: input.isSponsorOptionSelected,
     onConfirm: async () => {
       const signed = await signTransaction(
         unsignedTx,
@@ -72,6 +86,7 @@ export function useConfirmSwap(
               error: e instanceof ApiResponseError ? e.data.message : e.message,
               sponsored: isSponsored,
               browserTx: true,
+              isSponsorServiceError: swapErrorList.includes(e.message),
             },
           });
         }

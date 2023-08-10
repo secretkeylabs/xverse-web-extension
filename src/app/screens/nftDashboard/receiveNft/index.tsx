@@ -11,13 +11,6 @@ import { useState } from 'react';
 import { isLedgerAccount } from '@utils/helper';
 import ReceiveCardComponent from '../../../components/receiveCardComponent';
 
-interface Props {
-  visible: boolean;
-  onClose: () => void;
-  setOrdinalReceiveAlert: () => void;
-  isGalleryOpen: boolean;
-}
-
 const ColumnContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -55,8 +48,16 @@ const VerifyOrViewContainer = styled.div((props) => ({
 }));
 
 const VerifyButtonContainer = styled.div((props) => ({
+  minWidth: 300,
   marginBottom: props.theme.spacing(6),
 }));
+
+interface Props {
+  visible: boolean;
+  onClose: () => void;
+  setOrdinalReceiveAlert: () => void;
+  isGalleryOpen: boolean;
+}
 
 function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAlert }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });

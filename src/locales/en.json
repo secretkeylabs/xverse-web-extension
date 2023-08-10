@@ -80,7 +80,25 @@
     "LEDGER_IMPORT_CLOSE_BUTTON": "Close",
     "LEDGER_IMPORT_TRY_AGAIN_BUTTON": "Try again",
     "LEDGER_IMPORT_YES_BUTTON": "Add a new account",
-    "LEDGER_IMPORT_CANCEL_BUTTON": "Cancel"
+    "LEDGER_IMPORT_CANCEL_BUTTON": "Cancel",
+    "LEARN_MORE": "Learn More",
+    "LEDGER_BEFORE_GETTING_STARTED": {
+      "TITLE": "Before getting started",
+      "DESCRIPTION": "Do you use Ledger Live with the hardware wallet device you wish to connect?",
+      "OPTIONS": {
+        "USE_LEDGER_LIVE": "I use Ledger Live with the device.",
+        "DONT_USE_LEDGER_LIVE": "I do not use Ledger Live with the device."
+      },
+      "IMPORTANT_WARNING": {
+        "TITLE": "Important - Please read",
+        "TEXT_1": "It is not recommended to use Xverse and Ledger Live, or other Bitcoin wallets with the same hardware device as this could lead to unintentional transfers of Ordinals.",
+        "TEXT_2": "You should use a separate device for Xverse and Ordinals or set a passphrase on your Ledger to create a different set of accounts for Xverse. See",
+        "TEXT_3": "Only continue if you're an advanced user and you know what you're doing. Do not create and use a taproot address on Ledger Live if you are using Xverse.",
+        "PASSPHRASE_FOR_ORDINALS": "How To Set A Passphrase For Ordinals",
+        "UNDERSTAND_THE_RISKS": "I understand the risks and wish to continue anyway",
+        "UNDERSTAND_SHOULD_NOT_USE_LEDGER_LIVE": "I understand I should not use Ledger Live or other Bitcoin wallets with the same hardware device"
+      }
+    }
   },
   "LEDGER_VERIFY_SCREEN": {
     "TITLE_VERIFY_BTC": "Verify Bitcoin payment address",
@@ -100,6 +118,7 @@
     "BTC_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open.",
     "BTC_TITLE_VERIFIED": "Bitcoin payment address verified successfully",
     "ORDINALS_TITLE_VERIFIED": "Ordinals address verified successfully",
+    "WRONG_DEVICE_ERROR_SUBTITLE": "The public key of the connected device did not match the wallet public key. Make sure you have the correct device connected.",
     "LEDGER_CONNECT": {
       "BTC_TITLE": "Connect Your Ledger",
       "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app."
@@ -313,7 +332,8 @@
     "RETRY": "Try again",
     "SPONSORED_SUCCESS_MSG": "Transaction signed",
     "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor",
-    "BRC20_ORDINAL_MSG": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer."
+    "BRC20_ORDINAL_MSG": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer.",
+    "SPONSOR_SERVICE_ERROR": "If the issue persist, try again at a later time, or uncheck the “Sponsor Transaction” option in the swap details."
   },
   "LEGAL_SCREEN": {
     "SCREEN_TITLE": "Legal",
@@ -774,6 +794,7 @@
     "SLIPPAGE_TITLE": "Slippage",
     "LP_FEE": "Liquidity Provider Fee",
     "ROUTE": "Route",
+    "SPONSOR_TRANSACTION": "Sponsor transaction (no fees)",
     "POWERED_BY_ALEX": "Powered by ALEX",
     "CONTINUE": "Continue",
     "SLIPPAGE_DESC": "Your transaction will reverse if the price changes unfavorably by more of this percentage.",
@@ -792,6 +813,7 @@
     "YOU_WILL_RECEIVE": "You will receive",
     "AMOUNT": "Amount",
     "LESS_THAN_OR_EQUAL_TO": "Less than or equal to",
+    "FROM": "From",
     "TO": "To",
     "YOUR_ADDRESS": "Your address",
     "CANCEL": "Cancel",

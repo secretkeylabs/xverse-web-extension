@@ -15,14 +15,14 @@ export const useSponsorInfoQuery = (sponsorUrl?: string) =>
     },
   });
 
-export const useSponsoredTransaction = (sponsorUrl?: string) => {
-  const [isSponsored, setIsSponsored] = useState(false);
+export const useSponsoredTransaction = (isSponsorOptionSelected: boolean, sponsorUrl?: string) => {
+  const [isServiceRunning, setIsServiceRunning] = useState(false);
 
   const { error, data: isActive, isLoading } = useSponsorInfoQuery(sponsorUrl);
 
   useEffect(() => {
     if (!isLoading && !error) {
-      setIsSponsored(!!isActive);
+      setIsServiceRunning(!!isActive);
     }
   }, [isActive, error, isLoading]);
 
@@ -30,7 +30,8 @@ export const useSponsoredTransaction = (sponsorUrl?: string) => {
     sponsorTransaction(signed, sponsorUrl);
 
   return {
-    isSponsored,
+    isSponsored: isServiceRunning && isSponsorOptionSelected,
+    isServiceRunning,
     sponsorTransaction: sponsorTransactionToUrl,
   };
 };

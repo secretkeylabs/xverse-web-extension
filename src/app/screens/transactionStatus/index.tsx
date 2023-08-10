@@ -10,12 +10,13 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import CopyButton from '@components/copyButton';
 import InfoContainer from '@components/infoContainer';
 
-const TxStatusContainer = styled.div((props) => ({
-  background: props.theme.colors.background.elevation0,
+const TxStatusContainer = styled.div({
+  background: 'rgba(25, 25, 48, 0.74)',
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-}));
+  backdropFilter: 'blur(16px)',
+});
 
 const Container = styled.div({
   display: 'flex',
@@ -147,6 +148,7 @@ function TransactionStatus() {
     isNft,
     errorTitle,
     isBrc20TokenFlow,
+    isSponsorServiceError,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -215,6 +217,11 @@ function TransactionStatus() {
           </InfoMessageContainer>
         ) : (
           txid && renderTransactionID
+        )}
+        {isSponsorServiceError && (
+          <InfoMessageContainer>
+            <InfoContainer bodyText={t('SPONSOR_SERVICE_ERROR')} />
+          </InfoMessageContainer>
         )}
       </OuterContainer>
       <ButtonContainer>
