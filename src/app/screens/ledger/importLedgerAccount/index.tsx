@@ -324,7 +324,7 @@ function ImportLedger(): JSX.Element {
     try {
       setCurrentStepIndex(3);
       setIsButtonDisabled(true);
-      if (!isStacksSelected) {
+      if (isBitcoinSelected) {
         const { btcCreds, ordinalsCreds, newAddressIndex } = await importBtcAccounts(true);
         await saveAddressToWallet({ btcCreds, ordinalsCreds, newAddressIndex });
       }
@@ -350,10 +350,10 @@ function ImportLedger(): JSX.Element {
       setIsOrdinalsAddressRejected(false);
       setIsButtonDisabled(true);
       const masterFingerPrint = await fetchMasterPubKey();
-      if (isStacksSelected) {
-        await importStxAccounts();
-      } else {
+      if (isBitcoinSelected) {
         await importBtcAccounts(false, masterFingerPrint);
+      } else {
+        await importStxAccounts();
       }
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
@@ -363,7 +363,7 @@ function ImportLedger(): JSX.Element {
         return;
       }
       handleClickNext();
-      if (!isStacksSelected) {
+      if (isBitcoinSelected) {
         const { btcCreds, ordinalsCreds, newAddressIndex } = await importBtcAccounts(
           true,
           masterFingerPrint,
@@ -410,7 +410,6 @@ function ImportLedger(): JSX.Element {
   };
 
   const backToAssetSelection = () => {
-    setIsBitcoinSelected(true);
     setIsStacksSelected(false);
     setBitcoinCredentials(undefined);
     setOrdinalsCredentials(undefined);
@@ -425,23 +424,8 @@ function ImportLedger(): JSX.Element {
   };
 
   const handleAssetSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    switch (e.target.id) {
-      case 'stx_select_card': {
-        setIsStacksSelected(!isStacksSelected);
-        if (isBitcoinSelected) {
-          setIsBitcoinSelected(false);
-        }
-        break;
-      }
-      case 'btc_select_card': {
-        setIsBitcoinSelected(!isBitcoinSelected);
-        if (isStacksSelected) {
-          setIsStacksSelected(false);
-        }
-        break;
-      }
-      default:
-        break;
+    if (e.target.id === 'stx_select_card') {
+      setIsStacksSelected(!isStacksSelected);
     }
   };
 
@@ -621,18 +605,18 @@ function ImportLedger(): JSX.Element {
             {currentStepIndex === 2 && (
               <LedgerConnectionView
                 title={t(
-                  isStacksSelected ? 'LEDGER_CONNECT.STX_TITLE' : 'LEDGER_CONNECT.BTC_TITLE',
+                  isBitcoinSelected ? 'LEDGER_CONNECT.BTC_TITLE' : 'LEDGER_CONNECT.STX_TITLE',
                 )}
                 text={t(
-                  isStacksSelected ? 'LEDGER_CONNECT.STX_SUBTITLE' : 'LEDGER_CONNECT.BTC_SUBTITLE',
+                  isBitcoinSelected ? 'LEDGER_CONNECT.BTC_SUBTITLE' : 'LEDGER_CONNECT.STX_SUBTITLE',
                 )}
                 titleFailed={t('LEDGER_CONNECT.TITLE_FAILED')}
                 textFailed={t(
-                  isStacksSelected
-                    ? 'LEDGER_CONNECT.STX_SUBTITLE_FAILED'
-                    : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
+                  isBitcoinSelected
+                    ? 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED'
+                    : 'LEDGER_CONNECT.STX_SUBTITLE_FAILED',
                 )}
-                imageDefault={isStacksSelected ? LedgerConnectStxSVG : LedgerConnectBtcSVG}
+                imageDefault={isBitcoinSelected ? LedgerConnectBtcSVG : LedgerConnectStxSVG}
                 isConnectSuccess={isConnectSuccess}
                 isConnectFailed={isConnectFailed}
               />
@@ -742,15 +726,17 @@ function ImportLedger(): JSX.Element {
                 <img src={CheckCircleSVG} alt="Success" />
                 <SelectAssetTitle>
                   {t(
-                    isStacksSelected
-                      ? 'LEDGER_ADDRESS_ADDED.TITLE_STX'
-                      : 'LEDGER_ADDRESS_ADDED.TITLE_BTC_ORDINALS',
+                    isBitcoinSelected
+                      ? 'LEDGER_ADDRESS_ADDED.TITLE_BTC_ORDINALS'
+                      : 'LEDGER_ADDRESS_ADDED.TITLE_STX',
                   )}
                 </SelectAssetTitle>
                 <SelectAssetText>
-                  {isStacksSelected
-                    ? t('LEDGER_ADDRESS_ADDED.SUBTITLE_STX')
-                    : t('LEDGER_ADDRESS_ADDED.SUBTITLE')}
+                  {t(
+                    isBitcoinSelected
+                      ? 'LEDGER_ADDRESS_ADDED.SUBTITLE'
+                      : 'LEDGER_ADDRESS_ADDED.SUBTITLE_STX',
+                  )}
                 </SelectAssetText>
               </AddressAddedContainer>
             )}

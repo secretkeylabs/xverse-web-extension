@@ -17,16 +17,16 @@
   },
   "LEDGER_IMPORT_SCREEN": {
     "LEDGER_IMPORT_1_TITLE": "Secure Your Assets with Ledger",
-    "LEDGER_IMPORT_1_SUBTITLE": "Connecting a Ledger hardware wallet to Xverse is the most secure way to store your Bitcoin, Ordinals, BRC-20 tokens and more.",
+    "LEDGER_IMPORT_1_SUBTITLE": "Connecting a Ledger hardware wallet to Xverse is the most secure way to store your Bitcoin, Ordinals, Stacks, BRC-20 and SIP-10 tokens, and more.",
     "LEDGER_IMPORT_1_BUTTON": "Get started",
-    "LEDGER_IMPORT_2_TITLE": "Select wallet type",
-    "LEDGER_IMPORT_2_SUBTITLE": "You can create multiple wallets to store Bitcoin, Ordinals and BRC-20 tokens.",
+    "LEDGER_IMPORT_2_TITLE": "Select assets",
+    "LEDGER_IMPORT_2_SUBTITLE": "Choose the assets you want to manage with this wallet.",
     "LEDGER_IMPORT_2_FOOTNOTE": "",
     "LEDGER_IMPORT_2_SELECT": {
-      "BTC_TITLE": "Bitcoin and Ordinals wallet",
-      "BTC_SUBTITLE": "Segwit and Taproot address",
-      "STACKS_TITLE": "Stacks wallet",
-      "STACKS_SUBTITLE": "Stacks address"
+      "BTC_TITLE": "Bitcoin & Ordinals (default)",
+      "BTC_SUBTITLE": "Legacy and Taproot addresses",
+      "STACKS_TITLE": "Stacks (optional)",
+      "STACKS_SUBTITLE": "SIP-10 address"
     },
     "LEDGER_CONNECT": {
       "BTC_TITLE": "Connect Your Ledger",

@@ -104,7 +104,6 @@ export const SelectAssetTitle = styled.h1((props) => ({
 export const SelectAssetText = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
-  textAlign: 'center',
 }));
 
 export const SelectAssetFootNote = styled.p((props) => ({
