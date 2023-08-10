@@ -106,7 +106,7 @@ interface Props {
 function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { btcAddress, ordinalsAddress } = useSelector((state: StoreState) => state.walletState);
-
+  let scriptOutputCount = 1;
   const slideInStyles = useSpring({
     config: { ...config.gentle, duration: 400 },
     from: { opacity: 0, height: 0 },
@@ -159,7 +159,7 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
                 icon={IconBitcoin}
                 hideAddress
                 hideCopyButton={btcAddress === address[index] || ordinalsAddress === address[index]}
-                amount={`${satsToBtc(new BigNumber(input.value)).toString()} BTC`}
+                amount={`${satsToBtc(new BigNumber(input.value.toString())).toString()} BTC`}
                 address={input.userSigns ? address[index] : input.txid}
               >
                 {renderSubValue(input, address[index])}
@@ -168,19 +168,21 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
           ))}
 
           <OutputTitleText>{t('OUTPUT')}</OutputTitleText>
-          {parsedPsbt?.outputs.map((output, index) => (
+          {parsedPsbt?.outputs.map((output) => (
             <TransferDetailContainer>
               {output.outputScript ? (
                 <TransferDetailView
                   icon={ScriptIcon}
                   hideAddress
                   hideCopyButton={true}
-                  amount={`${satsToBtc(new BigNumber(output ? output.amount : 0n)).toString()} BTC`}
+                  amount={`${satsToBtc(
+                    new BigNumber(output ? output.amount.toString() : '0'),
+                  ).toString()} BTC`}
                   address={output.address}
                   outputScript={output.outputScript}
-                  outputScriptIndex={index}
+                  outputScriptIndex={scriptOutputCount}
                 >
-                  <SubValueText>{`${t('SCRIPT_OUTPUT')} #${index}`}</SubValueText>
+                  <SubValueText>{`${t('SCRIPT_OUTPUT')} #${scriptOutputCount++}`}</SubValueText>
                 </TransferDetailView>
               ) : (
                 <TransferDetailView
@@ -189,7 +191,9 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
                   hideCopyButton={
                     btcAddress === output.address || ordinalsAddress === output.address
                   }
-                  amount={`${satsToBtc(new BigNumber(output ? output.amount : 0n)).toString()} BTC`}
+                  amount={`${satsToBtc(
+                    new BigNumber(output ? output.amount.toString() : '0'),
+                  ).toString()} BTC`}
                   address={output.address}
                 >
                   {output.address === btcAddress || output.address === ordinalsAddress ? (

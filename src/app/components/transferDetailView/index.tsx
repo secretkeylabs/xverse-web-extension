@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { getTruncatedAddress } from '@utils/helper';
-import { animated, useSpring } from '@react-spring/web';
 import { ReactNode, useState } from 'react';
 import CopyButton from '@components/copyButton';
 import Eye from '@assets/img/createPassword/Eye.svg';
@@ -81,7 +80,7 @@ const TransparentButton = styled.button({
   marginLeft: 10,
 });
 
-const ShowScriptBackgroundContainer = styled(animated.div)({
+const ShowScriptBackgroundContainer = styled.div((props) => ({
   width: '100%',
   height: '100%',
   top: 0,
@@ -89,13 +88,12 @@ const ShowScriptBackgroundContainer = styled(animated.div)({
   bottom: 0,
   right: 0,
   position: 'fixed',
-  zIndex: 10,
-  background: 'rgba(18, 21, 30, 0.8)',
+  background: props.theme.colors.background.modalBackdrop2,
   backdropFilter: 'blur(16px)',
-  padding: 16,
+  padding: props.theme.spacing(8),
   display: 'flex',
   flexDirection: 'column',
-});
+}));
 
 interface Props {
   icon?: string;
@@ -135,8 +133,8 @@ function TransferDetailView({
     <>
       {showScriptOutput && (
         <ShowScriptBackgroundContainer>
-          <CrossContainer onClick={onCrossClick}>
-            <TransparentButton>
+          <CrossContainer>
+            <TransparentButton onClick={onCrossClick}>
               <img src={Cross} alt="cross" />
             </TransparentButton>
           </CrossContainer>

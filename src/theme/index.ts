@@ -27,6 +27,7 @@ const Theme = {
       elevation9: 'rgba(76, 81, 135, 0.2)',
       elevation10: 'rgba(76, 81, 135, 0.35)',
       modalBackdrop: 'rgba(18,21,30,0.6)',
+      modalBackdrop2: 'rgba(18, 21, 30, 0.90)',
       selectBackground:
         'linear-gradient(0deg, rgba(115, 131, 255, 0.05), rgba(115, 131, 255, 0.05)), #1D2032',
     },

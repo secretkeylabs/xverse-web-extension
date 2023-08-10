@@ -252,9 +252,7 @@ function SignPsbtRequest() {
                     subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
                   />
                 ) : null}
-                {hasOutputScript && (
-                  <InfoContainer bodyText="This transaction contains a script output. Be sure you trust the source of this transaction before confirming it." />
-                )}
+                {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
               </Container>
             )}
           </OuterContainer>
