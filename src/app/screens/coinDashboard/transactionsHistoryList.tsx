@@ -200,6 +200,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
                   transaction={transaction}
                   transactionCoin={coin}
                   key={transaction.tx_id}
+                  txFilter={txFilter}
                 />
               );
             })}
