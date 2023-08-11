@@ -80,31 +80,38 @@ interface TransactionsHistoryListProps {
   txFilter: string | null;
 }
 
+const sortTransactionsByBlockHeight = (transactions: BtcTransactionData[]) => {
+  return transactions.sort((txA, txB) => {
+    if (txB.blockHeight > txA.blockHeight) {
+      return 1;
+    }
+    return -1;
+  });
+};
+
 const groupBtcTxsByDate = (
   transactions: BtcTransactionData[],
-): { [x: string]: BtcTransactionData[] } =>
-  transactions.reduce(
-    (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
-      const txDate = formatDate(new Date(transaction.seenTime));
-      if (!all[txDate]) {
-        if (transaction.txStatus === 'pending') {
-          all.Pending = [transaction];
-        } else {
-          all[txDate] = [transaction];
-        }
-      } else {
-        all[txDate].push(transaction);
-        all[txDate].sort((txA, txB) => {
-          if (txB.blockHeight > txA.blockHeight) {
-            return 1;
-          }
-          return -1;
-        });
-      }
-      return all;
-    },
-    {},
-  );
+): { [x: string]: BtcTransactionData[] } => {
+  const pendingTransactions: BtcTransactionData[] = [];
+  const processedTransactions: { [x: string]: BtcTransactionData[] } = {};
+
+  transactions.forEach((transaction) => {
+    const txDate = formatDate(new Date(transaction.seenTime));
+    if (transaction.txStatus === 'pending') {
+      pendingTransactions.push(transaction);
+    } else {
+      processedTransactions[txDate] = [transaction] || [];
+      processedTransactions[txDate].push(transaction);
+      sortTransactionsByBlockHeight(processedTransactions[txDate]);
+    }
+  });
+  sortTransactionsByBlockHeight(pendingTransactions);
+  if (pendingTransactions.length > 0) {
+    const result = { Pending: pendingTransactions, ...processedTransactions };
+    return result;
+  }
+  return processedTransactions;
+};
 
 const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) =>
   txs.reduce(

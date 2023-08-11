@@ -30,6 +30,18 @@ export default function TransactionTitle(props: TransactionTitleProps) {
     return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
   };
 
+  const getBtcTokenTransferTitle = (tx: BtcTransactionData): string => {
+    if (tx.isOrdinal && tx.txStatus === 'pending') {
+      return tx.incoming
+        ? t('ORDINAL_TRANSACTION_PENDING_RECEIVING')
+        : t('ORDINAL_TRANSACTION_PENDING_SENDING');
+    }
+    if (tx.txStatus === 'pending') {
+      return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
+    }
+    return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
+  };
+
   const getFtName = (tx: TransactionData): string => {
     const coinDisplayName = coins?.find(
       (coin) => coin.contract === tx.contractCall?.contract_id,
@@ -74,7 +86,7 @@ export default function TransactionTitle(props: TransactionTitleProps) {
       case 'poison_microblock':
         return t('TRANSACTION_POISON_MICRO_BLOCK');
       case 'bitcoin':
-        return getTokenTransferTitle(transaction);
+        return getBtcTokenTransferTitle(transaction as BtcTransactionData);
       default:
         return t('TRANSACTION_STATUS_UNKNOWN');
     }
