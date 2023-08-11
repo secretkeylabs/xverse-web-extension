@@ -438,11 +438,10 @@
     "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"
   },
   "RESTORE_WALLET_SCREEN": {
-    "ENTER_SEED_HEADER": "Enter your 12 or 24 word seedphrase to restore your wallet",
-    "SEED_INPUT_PLACEHOLDER": "Enter your seedphrase",
-    "SEED_INPUT_LABEL": "Selected Words",
+    "ENTER_SEED_HEADER": "Enter your seedphrase to restore your wallet.",
     "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
-    "CONTINUE_BUTTON": "Continue"
+    "CONTINUE_BUTTON": "Continue",
+    "HAVE_A_24_WORDS_SEEDPHRASE?": "Have a {{number}} words seedphrase?"
   },
   "STACKING_SCREEN": {
     "STACK_AND_EARN": "Stack STX, earn BTC",
