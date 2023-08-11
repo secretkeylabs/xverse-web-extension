@@ -17,7 +17,6 @@ export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';
 export const BTC_TRANSACTION_TESTNET_STATUS_URL = 'https://mempool.space/testnet/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
-export const XVERSE_SPONSOR_2_URL = 'https://stacks-transaction-sponsor-swaps.onrender.com';
 
 export const TRANSAC_URL = 'https://global.transak.com';
 export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;
@@ -56,3 +55,7 @@ export const initialNetworksList: SettingsNetwork[] = [
  */
 export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
   'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
+
+export const SWAP_SPONSOR_DISABLED_SUPPORT_URL =
+  'https://support.xverse.app/hc/en-us/articles/18319388355981';
+export const SUPPORT_URL_TAB_TARGET = 'SupportURLTabTarget';
