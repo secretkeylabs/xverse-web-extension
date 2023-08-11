@@ -110,7 +110,7 @@ function ImportLedger(): JSX.Element {
     null,
   );
   const [isTogglerChecked, setIsTogglerChecked] = useState(false);
-  const { ledgerAccountsList, network } = useWalletSelector();
+  const { ledgerAccountsList, network, selectedAccount } = useWalletSelector();
   const transition = useTransition(currentStepIndex, {
     from: {
       x: 24,
@@ -191,43 +191,42 @@ function ImportLedger(): JSX.Element {
     return { btcCreds, ordinalsCreds, newAddressIndex };
   };
 
-  const importStxAccounts = async () => {
+  const importStxAccounts = async (showAddress: boolean) => {
+    setIsButtonDisabled(true);
     const transport = await Transport.create();
-    const newAddressIndex = ledgerAccountsList.length;
-    setAddressIndex(newAddressIndex);
-    const newDeviceAccountIndex = ledgerAccountsList.filter(
-      (account) => account.masterPubKey === masterPubKey,
-    ).length;
-    const { address, publicKey } = await importStacksAccountFromLedger(
-      transport,
-      network.type,
-      0,
-      newDeviceAccountIndex,
-    );
-    setStacksCredentials({
-      address,
-      publicKey,
-    });
-    await transport.close();
-  };
 
-  const handleSkipToEnd = () => {
-    setCurrentStepIndex(6);
+    try {
+      const stacksCreds = await importStacksAccountFromLedger(
+        transport,
+        network.type,
+        0,
+        addressIndex,
+        showAddress,
+      );
+      setStacksCredentials(stacksCreds);
+      await transport.close();
+
+      return stacksCreds;
+    } catch (err: any) {
+      console.error(err);
+      setIsConnectFailed(true);
+      setIsButtonDisabled(false);
+      await transport.close();
+    }
   };
 
   const handleClickNext = async () => {
     /*
-    Skip if Ledger account exists with the current account index
-    (i.e. either STX or BTC address already present for the account)
+      Go back to step 2 if user wants to add the stacks account as well
     */
-    if (currentStepIndex === 4) {
-      const currentAccount = ledgerAccountsList.find(
-        (account) => account.id === addressIndex && account.masterPubKey === masterPubKey,
-      );
-      if (currentAccount && currentAccount.stxAddress && currentAccount.btcAddress) {
-        handleSkipToEnd();
-        return;
-      }
+    if (currentStepIndex === 4 && isBitcoinSelected && isStacksSelected) {
+      setIsBitcoinSelected(false);
+      setIsButtonDisabled(false);
+      setIsConnectSuccess(false);
+      setIsConnectFailed(false);
+
+      setCurrentStepIndex(2);
+      return;
     }
 
     if (currentStepIndex === 1) {
@@ -251,27 +250,31 @@ function ImportLedger(): JSX.Element {
   const saveAddressToWallet = async ({
     btcCreds,
     ordinalsCreds,
+    stacksCreds,
     masterFingerPrint,
     newAddressIndex,
   }: {
     btcCreds?: Credential;
     ordinalsCreds?: Credential;
+    stacksCreds?: Credential;
     masterFingerPrint?: string;
     newAddressIndex: number;
   }) => {
     setIsButtonDisabled(true);
     const currentAccount = ledgerAccountsList.find(
-      (account) => account.id === newAddressIndex && account.masterPubKey === masterFingerPrint,
+      (account) =>
+        account.id === newAddressIndex &&
+        account.masterPubKey === (masterPubKey || masterFingerPrint),
     );
     try {
       if (!currentAccount) {
         const ledgerAccount: Account = {
           id: newAddressIndex,
-          stxAddress: stacksCredentials?.address || '',
+          stxAddress: stacksCreds?.address || '',
           btcAddress: btcCreds?.address || '',
           ordinalsAddress: ordinalsCreds?.address || '',
           masterPubKey: masterPubKey || masterFingerPrint || '',
-          stxPublicKey: stacksCredentials?.publicKey || '',
+          stxPublicKey: stacksCreds?.publicKey || '',
           btcPublicKey: btcCreds?.publicKey || '',
           ordinalsPublicKey: ordinalsCreds?.publicKey || '',
           accountType: 'ledger',
@@ -283,19 +286,6 @@ function ImportLedger(): JSX.Element {
         setIsButtonDisabled(false);
         return;
       }
-
-      // if (currentAccount && isStacksSelected) {
-      //   const ledgerAccount: Account = {
-      //     ...currentAccount,
-      //     stxAddress: stacksCredentials?.address || '',
-      //     stxPublicKey: stacksCredentials?.publicKey || '',
-      //   };
-      //   await updateLedgerAccounts(ledgerAccount);
-      //   await ledgerDelay(1000);
-      //   handleClickNext();
-      //   setIsButtonDisabled(false);
-      //   return;
-      // }
 
       if (currentAccount && isBitcoinSelected) {
         const ledgerAccount: Account = {
@@ -310,6 +300,18 @@ function ImportLedger(): JSX.Element {
         setCurrentStepIndex(4);
         setIsButtonDisabled(false);
         return;
+      }
+
+      if (currentAccount && isStacksSelected) {
+        const ledgerAccount: Account = {
+          ...currentAccount,
+          stxAddress: stacksCreds?.address || '',
+          stxPublicKey: stacksCreds?.publicKey || '',
+        };
+        await updateLedgerAccounts(ledgerAccount);
+        await ledgerDelay(1000);
+        setCurrentStepIndex(4);
+        setIsButtonDisabled(false);
       }
 
       await ledgerDelay(500);
@@ -349,15 +351,20 @@ function ImportLedger(): JSX.Element {
       setIsBtcAddressRejected(false);
       setIsOrdinalsAddressRejected(false);
       setIsButtonDisabled(true);
-      const masterFingerPrint = await fetchMasterPubKey();
+      const masterFingerPrint = isBitcoinSelected
+        ? await fetchMasterPubKey()
+        : selectedAccount?.masterPubKey || masterPubKey;
       if (isBitcoinSelected) {
         await importBtcAccounts(false, masterFingerPrint);
       } else {
-        await importStxAccounts();
+        await importStxAccounts(false);
       }
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
-      if (ledgerAccountsList?.find((account) => account.masterPubKey === masterFingerPrint)) {
+      if (
+        ledgerAccountsList?.find((account) => account.masterPubKey === masterFingerPrint) &&
+        isBitcoinSelected
+      ) {
         setIsButtonDisabled(false);
         setCurrentStepIndex(2.5);
         return;
@@ -369,6 +376,13 @@ function ImportLedger(): JSX.Element {
           masterFingerPrint,
         );
         await saveAddressToWallet({ btcCreds, ordinalsCreds, masterFingerPrint, newAddressIndex });
+      } else {
+        const stacksCreds = await importStxAccounts(true);
+        await saveAddressToWallet({
+          masterFingerPrint,
+          newAddressIndex: addressIndex,
+          stacksCreds,
+        });
       }
     } catch (err) {
       console.error(err);
@@ -623,7 +637,10 @@ function ImportLedger(): JSX.Element {
             )}
             {currentStepIndex === 2.5 && (
               <CreateAnotherAccountContainer>
-                <img src={isBitcoinSelected ? BtcOrdinalsIconSVG : StxIconSVG} alt="" />
+                <img
+                  src={isBitcoinSelected ? BtcOrdinalsIconSVG : StxIconSVG}
+                  alt={isBitcoinSelected ? 'bitcoin' : 'stacks'}
+                />
                 <SelectAssetTitle>
                   {t(
                     isBitcoinSelected
@@ -657,7 +674,7 @@ function ImportLedger(): JSX.Element {
                       src={isBitcoinSelected ? BtcIconSVG : StxIconSVG}
                       width={32}
                       height={32}
-                      alt="bitcoin"
+                      alt={isBitcoinSelected ? 'bitcoin' : 'stacks'}
                     />
                     <SelectAssetTitle>
                       {t(
@@ -668,21 +685,26 @@ function ImportLedger(): JSX.Element {
                     </SelectAssetTitle>
                   </AddAddressHeaderContainer>
                   <AddAddressDetailsContainer>
-                    <SelectAssetText>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
-                    <LedgerAddressComponent
-                      title={t('LEDGER_ADD_ADDRESS.BTC')}
-                      address={bitcoinCredentials?.address}
-                    />
-                    <LedgerAddressComponent
-                      title={t('LEDGER_ADD_ADDRESS.STX')}
-                      address={stacksCredentials?.address}
-                    />
+                    <SelectAssetText centered>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
+                    {isBitcoinSelected ? (
+                      <LedgerAddressComponent
+                        title={t('LEDGER_ADD_ADDRESS.BTC')}
+                        address={bitcoinCredentials?.address}
+                      />
+                    ) : (
+                      <LedgerAddressComponent
+                        title={t('LEDGER_ADD_ADDRESS.STX')}
+                        address={stacksCredentials?.address}
+                      />
+                    )}
                   </AddAddressDetailsContainer>
                   <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
-                  <ConfirmationStepsContainer>
-                    <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
-                    <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
-                  </ConfirmationStepsContainer>
+                  {isBitcoinSelected && (
+                    <ConfirmationStepsContainer>
+                      <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
+                      <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
+                    </ConfirmationStepsContainer>
+                  )}
                 </>
               ))}
             {currentStepIndex === 3.5 &&
@@ -731,7 +753,7 @@ function ImportLedger(): JSX.Element {
                       : 'LEDGER_ADDRESS_ADDED.TITLE_STX',
                   )}
                 </SelectAssetTitle>
-                <SelectAssetText>
+                <SelectAssetText centered>
                   {t(
                     isBitcoinSelected
                       ? 'LEDGER_ADDRESS_ADDED.SUBTITLE'

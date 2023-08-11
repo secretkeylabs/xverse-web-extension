@@ -101,9 +101,13 @@ export const SelectAssetTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
 }));
 
-export const SelectAssetText = styled.p((props) => ({
+interface SelectAssetTextProps {
+  centered?: boolean;
+}
+export const SelectAssetText = styled.p<SelectAssetTextProps>((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
+  textAlign: props.centered ? 'center' : 'left',
 }));
 
 export const SelectAssetFootNote = styled.p((props) => ({

@@ -444,7 +444,7 @@ function Home() {
           {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
         </BottomModal>
 
-        {!isLedgerAccount(selectedAccount) && (
+        {!!stxAddress && (
           <TokenListButtonContainer>
             <Button onClick={handleManageTokenListOnClick}>
               <>
@@ -454,6 +454,7 @@ function Home() {
             </Button>
           </TokenListButtonContainer>
         )}
+
         <CoinSelectModal
           onSelectBitcoin={onBtcSendClick}
           onSelectStacks={onStxSendClick}
