@@ -100,11 +100,7 @@ export default function SwapConfirmation() {
         <FunctionBlock name={swap.functionName} />
         <RouteBlock swap={swap} />
         {!swap.isSponsored && (
-          <FeesBlock
-            lpFee={swap.lpFeeAmount}
-            lpFeeFiatAmount={swap.lpFeeFiatAmount}
-            currency={swap.fromToken.name}
-          />
+          <FeesBlock lpFee={swap.lpFeeAmount} lpFeeFiatAmount={swap.lpFeeFiatAmount} />
         )}
         {swap.isSponsored ? (
           <SponsoredTransactionText>

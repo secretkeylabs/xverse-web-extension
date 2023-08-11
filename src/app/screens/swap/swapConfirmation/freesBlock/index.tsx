@@ -18,16 +18,15 @@ const FeeText = styled.p((props) => ({
 interface FeeTextProps {
   lpFee: number;
   lpFeeFiatAmount?: number;
-  currency: string;
 }
 
-export default function FeesBlock({ lpFee, lpFeeFiatAmount, currency }: FeeTextProps) {
+export default function FeesBlock({ lpFee, lpFeeFiatAmount }: FeeTextProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
   return (
     <Container>
       <RowContainer>
         <TitleText>{t('FEES')}</TitleText>
-        <FeeText>{`${lpFee.toFixed(6)} ${currency}`}</FeeText>
+        <FeeText>{`${lpFee.toFixed(6)} STX`}</FeeText>
       </RowContainer>
       <EstimateUSDText>{` ~ $${lpFeeFiatAmount} USD`}</EstimateUSDText>
     </Container>
