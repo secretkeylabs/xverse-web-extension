@@ -30,10 +30,11 @@ import StxTransferTransaction from './stxTransferTransaction';
 interface TransactionHistoryItemProps {
   transaction: AddressTransactionWithTransfers | Tx;
   transactionCoin: CurrencyTypes;
+  txFilter: string | null;
 }
 
 export default function StxTransactionHistoryItem(props: TransactionHistoryItemProps) {
-  const { transaction, transactionCoin } = props;
+  const { transaction, transactionCoin, txFilter } = props;
   const { selectedAccount } = useWalletSelector();
   // const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   if (!isAddressTransactionWithTransfers(transaction)) {
@@ -68,7 +69,7 @@ export default function StxTransactionHistoryItem(props: TransactionHistoryItemP
   }
   return (
     <>
-      <TxTransfers transaction={transaction} coin={transactionCoin} />
+      <TxTransfers transaction={transaction} coin={transactionCoin} txFilter={txFilter} />
       <StxTransferTransaction
         transaction={parseStxTransactionData({
           responseTx: transaction.tx,
