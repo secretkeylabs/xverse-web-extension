@@ -141,21 +141,14 @@ function TransferDetailView({
           <ScriptOutputHeadingText>{`${t(
             'SCRIPT_OUTPUT',
           )} #${outputScriptIndex}`}</ScriptOutputHeadingText>
-          <ScriptText>script: btc.Script.encode {'{['}</ScriptText>
           {outputScript &&
             outputScript.map((script) => {
               if (script instanceof Uint8Array) {
-                return (
-                  <ScriptText>
-                    {`new TextEncoder().encode (${new TextDecoder().decode(script)})`},
-                  </ScriptText>
-                );
+                return <ScriptText>{new TextDecoder().decode(script)},</ScriptText>;
               } else {
                 return <ScriptText>{script},</ScriptText>;
               }
             })}
-
-          <ScriptText>{']}'}</ScriptText>
         </ShowScriptBackgroundContainer>
       )}
 
