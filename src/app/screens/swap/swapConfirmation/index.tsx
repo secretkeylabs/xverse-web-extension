@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import FunctionBlock from '@screens/swap/swapConfirmation/functionBlock';
 import ActionButton from '@components/button';
-import FeesBlock from '@screens/swap/swapConfirmation/freesBlock';
+import FeesBlock from '@screens/swap/swapConfirmation/feesBlock';
 import RouteBlock from '@screens/swap/swapConfirmation/routeBlock';
 import StxInfoBlock from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { useCallback, useState } from 'react';
