@@ -29,7 +29,7 @@ const Input = styled.input`
   }
 `;
 
-const IconButton = styled.button`
+const Icon = styled.i`
   position: absolute;
   vertical-align: middle;
   background-color: transparent;
@@ -39,6 +39,10 @@ const IconButton = styled.button`
   right: 0;
   top: 0;
   margin-right: ${(props) => props.theme.spacing(8)}px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
 `;
 
 function SeedWordInput({
@@ -54,7 +58,6 @@ function SeedWordInput({
 }) {
   const [showValue, setShowValue] = useState(false);
 
-  const handleClickEye = () => setShowValue((prev) => !prev);
   const handleFocusInput = () => setShowValue(true);
   const handleBlurInput = () => setShowValue(false);
   const handlePasteInput = (e: React.ClipboardEvent<HTMLInputElement>) => {
@@ -65,6 +68,7 @@ function SeedWordInput({
     <div>
       <Label htmlFor={`input${index}`}>{`${index + 1}.`}</Label>
       <InputGroup>
+        <Icon tabIndex={-1}>{showValue ? <Eye size={20} /> : <EyeSlash size={20} />}</Icon>
         <Input
           id={`input${index}`}
           type={showValue ? 'input' : 'password'}
@@ -78,9 +82,6 @@ function SeedWordInput({
           onBlur={handleBlurInput}
           disabled={disabled}
         />
-        <IconButton onClick={handleClickEye} tabIndex={-1}>
-          {showValue ? <Eye size={20} /> : <EyeSlash size={20} />}
-        </IconButton>
       </InputGroup>
     </div>
   );
@@ -89,7 +90,7 @@ function SeedWordInput({
 const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: ${(props) => props.theme.spacing(40)}px;
+  margin-bottom: ${(props) => props.theme.spacing(12)}px;
 `;
 
 const InputGrid = styled.div<{ visible?: boolean }>`
@@ -106,12 +107,12 @@ const InputGrid = styled.div<{ visible?: boolean }>`
 `;
 
 const ErrorMessage = styled.p<{ visible: boolean }>`
-  ${(props) => props.theme.body_medium_m};
+  ${(props) => props.theme.body_s};
   visibility: ${(props) => (props.visible ? 'visible' : 'hidden')};
-  text-align: left;
+  text-align: center;
   color: ${(props) => props.theme.colors.feedback.error};
-  margin-top: ${(props) => props.theme.spacing(8)}px;
-  margin-bottom: ${(props) => props.theme.spacing(8)}px;
+  margin-top: ${(props) => props.theme.spacing(12)}px;
+  margin-bottom: ${(props) => props.theme.spacing(15)}px;
 `;
 
 const TransparentButton = styled.button`
