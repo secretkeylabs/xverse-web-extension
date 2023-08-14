@@ -7,9 +7,10 @@ import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
-import OrdinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
+import plusIcon from '@assets/img/dashboard/plus.svg';
+import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
 import Swap from '@assets/img/dashboard/swap.svg';
-import StacksIcon from '@assets/img/dashboard/stack_icon.svg';
+import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
@@ -131,6 +132,10 @@ const VerifyOrViewContainer = styled.div((props) => ({
 
 const VerifyButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
+}));
+
+const AddStxButtonContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(6),
 }));
 
 function Home() {
@@ -322,7 +327,7 @@ function Home() {
         showVerifyButton={choseToVerifyAddresses}
         currency="ORD"
       >
-        <MergedIcon src={OrdinalsIcon} />
+        <MergedIcon src={ordinalsIcon} />
       </ReceiveCardComponent>
 
       {stxAddress && (
@@ -336,6 +341,21 @@ function Home() {
           <MergedIcon src={SIP10Icon} />
         </ReceiveCardComponent>
       )}
+
+      {isLedgerAccount(selectedAccount) && !stxAddress && (
+        <AddStxButtonContainer>
+          <ActionButton
+            transparent
+            src={plusIcon}
+            text={t('ADD_STACKS_ADDRESS')}
+            onPress={async () => {
+              await chrome.tabs.create({
+                url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+              });
+            }}
+          />
+        </AddStxButtonContainer>
+      )}
     </ReceiveContainer>
   );
 
@@ -343,7 +363,7 @@ function Home() {
     <VerifyOrViewContainer>
       <VerifyButtonContainer>
         <ActionButton
-          text="Verify addresses on Ledger"
+          text={t('VERIFY_ADDRESSES_ON_LEDGER')}
           onPress={() => {
             setChoseToVerifyAddresses(true);
             setAreReceivingAddressesVisible(true);
@@ -352,7 +372,7 @@ function Home() {
       </VerifyButtonContainer>
       <ActionButton
         transparent
-        text="View addresses"
+        text={t('VIEW_ADDRESSES')}
         onPress={() => {
           if (choseToVerifyAddresses) {
             setChoseToVerifyAddresses(false);
@@ -405,7 +425,7 @@ function Home() {
             <TokenTile
               title={t('STACKS')}
               currency="STX"
-              icon={StacksIcon}
+              icon={stacksIcon}
               loading={loadingStxWalletData || refetchingStxWalletData}
               underlayColor={Theme.colors.background.elevation1}
               onPress={handleTokenPressed}

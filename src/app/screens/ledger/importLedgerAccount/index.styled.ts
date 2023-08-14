@@ -146,6 +146,7 @@ export const AddressAddedContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: auto;
   text-align: center;
   gap: 8px;
   > :first-child {

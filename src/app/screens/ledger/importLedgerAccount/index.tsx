@@ -78,7 +78,7 @@ const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE =
 const LINK_TO_LEDGER_PASSPHRASE_GUIDE =
   'https://support.xverse.app/hc/en-us/articles/17901278165773';
 
-interface Credential {
+export interface Credential {
   publicKey: string;
   address: string;
 }

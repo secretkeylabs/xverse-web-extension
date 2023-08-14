@@ -63,6 +63,7 @@ import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
 import SwapScreen from '@screens/swap';
 import SwapConfirmScreen from '@screens/swap/swapConfirmation';
+import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
 
 const router = createHashRouter([
   {
@@ -142,14 +143,18 @@ const router = createHashRouter([
         path: 'send-btc',
         element: <SendBtcScreen />,
       },
-      // {
-      //   path: 'send-stx-ledger',
-      //   element: <LedgerSendStxScreen />,
-      // },
-      // {
-      //   path: 'send-ft-ledger',
-      //   element: <LedgerSendFtScreen />,
-      // },
+      {
+        path: 'add-stx-address-ledger',
+        element: <LedgerAddStxAddress />,
+      },
+      {
+        path: 'send-stx-ledger',
+        element: <LedgerSendStxScreen />,
+      },
+      {
+        path: 'send-ft-ledger',
+        element: <LedgerSendFtScreen />,
+      },
       {
         path: 'swap',
         element: <SwapScreen />,
@@ -170,14 +175,14 @@ const router = createHashRouter([
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,
       },
-      // {
-      //   path: 'review-ledger-stx-tx',
-      //   element: <ReviewLedgerStxTransaction />,
-      // },
-      // {
-      //   path: 'review-ledger-ft-tx',
-      //   element: <ReviewLedgerFtTransaction />,
-      // },
+      {
+        path: 'review-ledger-stx-tx',
+        element: <ReviewLedgerStxTransaction />,
+      },
+      {
+        path: 'review-ledger-ft-tx',
+        element: <ReviewLedgerFtTransaction />,
+      },
       {
         path: 'confirm-ledger-tx',
         element: <ConfirmLedgerTransaction />,
