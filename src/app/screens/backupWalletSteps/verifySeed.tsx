@@ -1,8 +1,8 @@
-import ActionButton from '@components/button';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { generateMnemonic } from 'bip39';
+import ActionButton from '@components/button';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -90,9 +90,9 @@ export default function VerifySeed({
   onBack: () => void;
   onVerifySuccess: () => void;
   seedPhrase: string;
-}): JSX.Element {
-  const [err, setErr] = useState('');
+}) {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
+  const [err, setErr] = useState('');
   const [correctCounter, setCorrectCounter] = useState(0);
   const [quiz, setQuiz] = useState<{ words: string[]; answer: string; nth: string }>({
     words: [],
@@ -101,29 +101,27 @@ export default function VerifySeed({
   });
 
   const generateWords = useCallback(() => {
-    const words = generateMnemonic().split(' ');
-    const randomWordsIndex = Math.floor(Math.random() * words.length);
-    const seedPhraseIndex = Math.floor(Math.random() * seedPhrase.split(' ').length);
-    const answer = seedPhrase.split(' ')[seedPhraseIndex];
-    words[randomWordsIndex] = answer;
+    const randomWords = generateMnemonic().split(' ');
+    const seedWords = seedPhrase.split(' ');
+    const randomWordsIndex = Math.floor(Math.random() * randomWords.length);
+    const seedPhraseIndex = Math.floor(Math.random() * seedWords.length);
+    const answer = seedWords[seedPhraseIndex];
+    randomWords[randomWordsIndex] = answer;
     const nth = getOrdinal(seedPhraseIndex + 1);
-    setQuiz({ words, answer, nth });
+    setQuiz({ words: randomWords, answer, nth });
   }, [seedPhrase]);
 
   useEffect(() => {
-    generateWords();
-  }, [generateWords, correctCounter]);
-
-  useEffect(() => {
     if (correctCounter >= 3) {
-      onVerifySuccess();
+      return onVerifySuccess();
     }
-  }, [correctCounter, onVerifySuccess]);
+    generateWords();
+  }, [correctCounter, onVerifySuccess, generateWords]);
 
   const handleClickWord = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === quiz.answer) {
-      setCorrectCounter((prev) => prev + 1);
-      return setErr('');
+      setErr('');
+      return setCorrectCounter((prev) => prev + 1);
     }
     setErr(t('SEED_PHRASE_INCORRECT'));
   };
