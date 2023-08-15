@@ -86,6 +86,19 @@ const useWalletReducer = () => {
       ),
     );
 
+    if (ledgerAccountsList.some((account) => account.deviceAccountIndex === undefined)) {
+      const newLedgerAccountsList = ledgerAccountsList.map((account) => ({
+        ...account,
+        deviceAccountIndex: getDeviceAccountIndex(
+          ledgerAccountsList,
+          account.id,
+          account.masterPubKey,
+        ),
+      }));
+
+      dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
+    }
+
     dispatch(getActiveAccountsAction(walletAccounts));
   };
 
@@ -299,23 +312,10 @@ const useWalletReducer = () => {
   };
 
   const removeLedgerAccount = async (ledgerAccount: Account) => {
-    let newLedgerAccountsList = ledgerAccountsList;
-
-    if (ledgerAccountsList.some((account) => !account.deviceAccountIndex)) {
-      newLedgerAccountsList = newLedgerAccountsList.map((account) => ({
-        ...account,
-        deviceAccountIndex: getDeviceAccountIndex(
-          ledgerAccountsList,
-          account.id,
-          account.masterPubKey,
-        ),
-      }));
-    }
-
     try {
       dispatch(
         updateLedgerAccountsAction(
-          newLedgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
+          ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
         ),
       );
     } catch (err) {
