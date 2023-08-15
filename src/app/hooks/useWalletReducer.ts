@@ -21,6 +21,7 @@ import {
 import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
 import { useDispatch } from 'react-redux';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
+import { getDeviceAccountIndex } from '@common/utils/ledger';
 import useWalletSession from './useWalletSession';
 import useWalletSelector from './useWalletSelector';
 
@@ -298,10 +299,23 @@ const useWalletReducer = () => {
   };
 
   const removeLedgerAccount = async (ledgerAccount: Account) => {
+    let newLedgerAccountsList = ledgerAccountsList;
+
+    if (ledgerAccountsList.some((account) => !account.deviceAccountIndex)) {
+      newLedgerAccountsList = newLedgerAccountsList.map((account) => ({
+        ...account,
+        deviceAccountIndex: getDeviceAccountIndex(
+          ledgerAccountsList,
+          account.id,
+          account.masterPubKey,
+        ),
+      }));
+    }
+
     try {
       dispatch(
         updateLedgerAccountsAction(
-          ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
+          newLedgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
         ),
       );
     } catch (err) {

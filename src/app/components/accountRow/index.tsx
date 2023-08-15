@@ -329,8 +329,12 @@ function AccountRow({
   };
 
   const handleRemoveLedgerAccount = async () => {
+    if (!account) {
+      return;
+    }
+
     try {
-      await removeLedgerAccount(account!);
+      await removeLedgerAccount(account);
       handleAccountSelect(accountsList[0]);
       handleRemoveAccountModalClose();
     } catch (err) {

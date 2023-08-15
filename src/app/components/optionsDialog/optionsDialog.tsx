@@ -13,6 +13,7 @@ const Container = styled.div((props) => ({
   paddingBottom: 11,
   width: OPTIONS_DIALOG_WIDTH,
   background: props.theme.colors.background.elevation2,
+  userSelect: 'none',
 }));
 
 const OuterContainer = styled.div({
