@@ -123,9 +123,9 @@ export default function VerifySeed({
   const handleClickWord = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === quiz.answer) {
       setCorrectCounter((prev) => prev + 1);
-      return setErr(t('SEED_PHRASE_INCORRECT'));
+      return setErr('');
     }
-    setErr('');
+    setErr(t('SEED_PHRASE_INCORRECT'));
   };
 
   return (
