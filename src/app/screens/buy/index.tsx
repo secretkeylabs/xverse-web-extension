@@ -4,19 +4,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import BottomBar from '@components/tabBar';
 import MoonPay from '@assets/img/dashboard/moonpay.svg';
-import Binance from '@assets/img/dashboard/binance.svg';
 import Transak from '@assets/img/dashboard/transak.svg';
-import {
-  BINANCE_MERCHANT_CODE,
-  BINANCE_URL,
-  MOON_PAY_API_KEY,
-  MOON_PAY_URL,
-  TRANSAC_API_KEY,
-  TRANSAC_URL,
-} from '@utils/constants';
+import { MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL } from '@utils/constants';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
-import { getMoonPaySignedUrl, getBinaceSignature } from '@secretkeylabs/xverse-core/api';
+import { getMoonPaySignedUrl } from '@secretkeylabs/xverse-core/api';
 import { MoonLoader } from 'react-spinners';
 import InfoContainer from '@components/infoContainer';
 import RedirectButton from './redirectButton';
@@ -24,6 +16,7 @@ import RedirectButton from './redirectButton';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  height: 100%;
   padding-left: 22px;
   padding-right: 22px;
   padding-top: 26px;
@@ -59,7 +52,7 @@ function Buy() {
   const { t } = useTranslation('translation', { keyPrefix: 'BUY_SCREEN' });
   const navigate = useNavigate();
   const { currency } = useParams();
-  const { stxAddress, btcAddress, fiatCurrency } = useWalletSelector();
+  const { stxAddress, btcAddress } = useWalletSelector();
   const address = currency === 'STX' ? stxAddress : btcAddress;
   const [url, setUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -78,7 +71,7 @@ function Buy() {
     setLoading(true);
     try {
       const moonPayUrl = new URL(MOON_PAY_URL);
-      moonPayUrl.searchParams.append('apiKey', MOON_PAY_API_KEY);
+      moonPayUrl.searchParams.append('apiKey', MOON_PAY_API_KEY!);
       moonPayUrl.searchParams.append('currencyCode', currency!);
       moonPayUrl.searchParams.append('walletAddress', address);
       moonPayUrl.searchParams.append('colorCode', '#5546FF');
@@ -95,7 +88,7 @@ function Buy() {
     setLoading(true);
     try {
       const transacUrl = new URL(TRANSAC_URL);
-      transacUrl.searchParams.append('apiKey', TRANSAC_API_KEY);
+      transacUrl.searchParams.append('apiKey', TRANSAC_API_KEY!);
       transacUrl.searchParams.append('cryptoCurrencyList', currency!);
       transacUrl.searchParams.append('defaultCryptoCurrency', currency!);
       transacUrl.searchParams.append('walletAddress', address);
@@ -104,26 +97,6 @@ function Buy() {
       setUrl(transacUrl.href);
       setLoading(false);
     } catch (e) {
-      setLoading(false);
-    }
-  };
-
-  const getBinanceUrl = async () => {
-    setLoading(true);
-    try {
-      const binanceUrl = new URL(BINANCE_URL);
-      binanceUrl.searchParams.append('cryptoAddress', address);
-      binanceUrl.searchParams.append('cryptoNetwork', currency!);
-      binanceUrl.searchParams.append('merchantCode', BINANCE_MERCHANT_CODE);
-      binanceUrl.searchParams.append('timestamp', `${new Date().getTime()}`);
-      const signature = await getBinaceSignature(binanceUrl.search.replace('?', ''));
-      binanceUrl.search = signature.signedUrl;
-      binanceUrl.searchParams.append('cryptoCurrency', currency!);
-      binanceUrl.searchParams.append('fiatCurrency', currency === 'STX' ? 'EUR' : fiatCurrency); // HACK: 24th Aug 2022 - Binance only supports EUR to STX
-      setUrl(binanceUrl.toString());
-    } catch (e) {
-      setLoading(false);
-    } finally {
       setLoading(false);
     }
   };
@@ -139,7 +112,6 @@ function Buy() {
         )}
         <Text>{t('PURCHASE_CRYPTO')}</Text>
         <RedirectButton text={t('MOONPAY')} src={MoonPay} onClick={getMoonPayUrl} />
-        <RedirectButton text={t('BINANCE')} src={Binance} onClick={getBinanceUrl} />
         <RedirectButton text={t('TRANSAK')} src={Transak} onClick={getTransacUrl} />
         <InfoContainer titleText={t('DISCLAIMER')} bodyText={t('THIRD_PARTY_WARNING')} />
       </Container>
