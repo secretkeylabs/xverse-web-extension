@@ -1,21 +1,21 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { useMutation } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import BottomBar from '@components/tabBar';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
-import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
-import BigNumber from 'bignumber.js';
+import BottomBar from '@components/tabBar';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
-import { isLedgerAccount } from '@utils/helper';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import OrdinalImage from '@screens/ordinals/ordinalImage';
+import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
+import { useMutation } from '@tanstack/react-query';
+import { isLedgerAccount } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -184,7 +184,6 @@ function ConfirmOrdinalTransaction() {
       )}
       <ScrollContainer>
         <ConfirmBtcTransactionComponent
-          fee={fee}
           feePerVByte={feePerVByte}
           recipients={[{ address: recipientAddress, amountSats: new BigNumber(0) }]}
           loadingBroadcastedTx={isLoading}

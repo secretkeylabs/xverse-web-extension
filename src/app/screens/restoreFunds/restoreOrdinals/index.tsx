@@ -12,7 +12,7 @@ import TopRow from '@components/topRow';
 import styled from 'styled-components';
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
-import OrdinalRow from './oridnalRow';
+import OrdinalRow from './ordinalRow';
 import useOrdinalsApi from '@hooks/useOrdinalsApi';
 
 const RestoreFundTitle = styled.h1((props) => ({
@@ -58,6 +58,7 @@ function RestoreOrdinals() {
 
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const [error, setError] = useState('');
+  const [transferringOrdinalId, setTransferringOrdinalId] = useState<string | null>(null);
   const location = useLocation();
   const isRestoreFundFlow = location.state?.isRestoreFundFlow;
   const ordinalsApi = useOrdinalsApi();
@@ -136,7 +137,8 @@ function RestoreOrdinals() {
             <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
             {ordinals?.map((ordinal) => (
               <OrdinalRow
-                isLoading={isLoading}
+                isLoading={transferringOrdinalId === ordinal.id}
+                disableTransfer={isLoading}
                 handleOrdinalTransfer={onClickTransfer}
                 ordinal={ordinal}
                 key={ordinal.id}

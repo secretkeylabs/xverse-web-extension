@@ -224,7 +224,10 @@
     "SWITCH_TO": "Switch to",
     "SEND_ORDINAL_TITLE": "Send Ordinal",
     "SEND_ORDINAL_WALLET_WARNING": "You are about to transfer an Ordinal. Make sure the recipient wallet supports Ordinals.",
-    "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens."
+    "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens.",
+    "SEND_ORDINAL_TO_SELF_WARNING": "You are about to transfer an Ordinal to yourself",
+    "SEND_BRC20_ORDINAL_TO_SELF_WARNING": "You are about to transfer BRC-20 tokens to yourself",
+    "SEND_BTC_TO_SELF_WARNING": "You are about to transfer BTC to yourself"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -802,7 +805,9 @@
       "INVALID_AMOUNT": "Invalid amount",
       "INSUFFICIENT_BALANCE_FEES": "Insufficient balance",
       "SLIPPAGE_TOLERANCE_CANNOT_EXCEED": "The slippage tolerance cannot exceed 100%"
-    }
+    },
+    "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
+    "LEARN_MORE": "Learn more"
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",
@@ -821,6 +826,8 @@
     "COPIED": "Copied",
     "COPY_YOUR_ADDRESS": "copy your address",
     "ADVANCED_SETTING": "Advanced settings",
-    "THIS_IS_A_SPONSORED_TRANSACTION": "This is a sponsored transaction, no transaction fees will be deducted from your account."
+    "THIS_IS_A_SPONSORED_TRANSACTION": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
+    "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
+    "LEARN_MORE": "Learn more"
   }
 }

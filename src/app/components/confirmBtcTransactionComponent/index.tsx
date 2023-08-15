@@ -1,33 +1,34 @@
-import TopRow from '@components/topRow';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { ReactNode, useEffect, useState } from 'react';
-import BigNumber from 'bignumber.js';
-import ActionButton from '@components/button';
-import AssetIcon from '@assets/img/transactions/Assets.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
+import AssetIcon from '@assets/img/transactions/Assets.svg';
+import ActionButton from '@components/button';
+import RecipientComponent from '@components/recipientComponent';
+import TopRow from '@components/topRow';
 import TransactionSettingAlert from '@components/transactionSetting';
-import { useSelector } from 'react-redux';
-import { StoreState } from '@stores/index';
+import TransferFeeView from '@components/transferFeeView';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import {
+  BtcUtxoDataResponse,
+  ErrorCodes,
+  ResponseError,
+  UTXO,
+  getBtcFiatEquivalent,
+  satsToBtc,
+} from '@secretkeylabs/xverse-core';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { useMutation } from '@tanstack/react-query';
 import {
   Recipient,
   SignedBtcTx,
   signNonOrdinalBtcSendTransaction,
   signOrdinalTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import {
-  BtcUtxoDataResponse,
-  ErrorCodes,
-  getBtcFiatEquivalent,
-  ResponseError,
-  satsToBtc,
-  UTXO,
-} from '@secretkeylabs/xverse-core';
-import RecipientComponent from '@components/recipientComponent';
-import TransferFeeView from '@components/transferFeeView';
+import { StoreState } from '@stores/index';
+import { useMutation } from '@tanstack/react-query';
+import BigNumber from 'bignumber.js';
+import { ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
 import TransactionDetailComponent from '../transactionDetailComponent';
 import { Inscription } from '@secretkeylabs/xverse-core/types';
 
@@ -174,9 +175,9 @@ function ConfirmBtcTransactionComponent({
       txFee: string;
     }
   >({
-    mutationFn: async ({ recipients, txFee }) =>
+    mutationFn: async ({ recipients: newRecipients, txFee }) =>
       signBtcTransaction(
-        recipients,
+        newRecipients,
         btcAddress,
         selectedAccount?.id ?? 0,
         seedPhrase,
@@ -203,6 +204,8 @@ function ConfirmBtcTransactionComponent({
       return signedNonOrdinalBtcTx;
     },
   });
+
+  const { ordinals, isLoading: ordinalsLoading } = useOrdinalsByAddress(btcAddress);
 
   const {
     isLoading: isLoadingOrdData,
@@ -402,7 +405,7 @@ function ConfirmBtcTransactionComponent({
             onApplyClick={onApplyClick}
             onCrossClick={closeTransactionSettingAlert}
             nonOrdinalUtxos={nonOrdinalUtxos}
-            loading={loading}
+            loading={loading || ordinalsLoading}
             isRestoreFlow={isRestoreFundFlow}
             showFeeSettings={showFeeSettings}
             setShowFeeSettings={setShowFeeSettings}
@@ -420,17 +423,29 @@ function ConfirmBtcTransactionComponent({
             transparent
             onPress={onCancelClick}
             disabled={
-              loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+              loadingBroadcastedTx ||
+              isLoading ||
+              isLoadingOrdData ||
+              isLoadingNonOrdinalBtcSend ||
+              ordinalsLoading
             }
           />
         </TransparentButtonContainer>
         <ActionButton
           text={t('CONFIRM_TRANSACTION.CONFIRM')}
           disabled={
-            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+            loadingBroadcastedTx ||
+            isLoading ||
+            isLoadingOrdData ||
+            isLoadingNonOrdinalBtcSend ||
+            ordinalsLoading
           }
           processing={
-            loadingBroadcastedTx || isLoading || isLoadingOrdData || isLoadingNonOrdinalBtcSend
+            loadingBroadcastedTx ||
+            isLoading ||
+            isLoadingOrdData ||
+            isLoadingNonOrdinalBtcSend ||
+            ordinalsLoading
           }
           onPress={handleOnConfirmClick}
         />

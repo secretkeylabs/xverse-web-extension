@@ -104,6 +104,8 @@ function SendOrdinal() {
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
+  const [warning, setWarning] = useState('');
+
   const textContent = useTextOrdinalContent(selectedOrdinal!);
   const address: string | undefined = useMemo(
     () => (location.state ? location.state.recipientAddress : undefined),
@@ -185,11 +187,6 @@ function SendOrdinal() {
       return false;
     }
 
-    if (associatedAddress === ordinalsAddress) {
-      setError(t('ERRORS.SEND_TO_SELF'));
-      return false;
-    }
-
     return true;
   }
 
@@ -198,6 +195,19 @@ function SendOrdinal() {
     if (validateFields(associatedAddress)) {
       mutate(associatedAddress);
     }
+  };
+
+  const currencyType = textContent?.includes('brc-20') ? 'brc20-Ordinal' : 'Ordinal';
+
+  const handleInputChange = (inputAddress: string) => {
+    if (inputAddress === ordinalsAddress) {
+      return setWarning(
+        currencyType === 'brc20-Ordinal'
+          ? t('SEND_BRC20_ORDINAL_TO_SELF_WARNING')
+          : t('SEND_ORDINAL_TO_SELF_WARNING'),
+      );
+    }
+    setWarning('');
   };
 
   return (
@@ -223,11 +233,13 @@ function SendOrdinal() {
         )}
         <SendForm
           processing={isLoading}
-          currencyType={textContent?.includes('brc-20') ? 'brc20-Ordinal' : 'Ordinal'}
+          currencyType={currencyType}
           disableAmountInput
           recepientError={error}
           recipient={address}
           onPressSend={onPressNext}
+          onAddressInputChange={handleInputChange}
+          warning={warning}
         >
           <Container>
             <NftContainer>

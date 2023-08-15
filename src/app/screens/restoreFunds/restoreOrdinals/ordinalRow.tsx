@@ -1,9 +1,9 @@
-import styled from 'styled-components';
-import { MoonLoader } from 'react-spinners';
-import { useTranslation } from 'react-i18next';
-import { BtcOrdinal, Inscription } from '@secretkeylabs/xverse-core/types';
 import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
+import { BtcOrdinal, Inscription } from '@secretkeylabs/xverse-core/types';
+import { useTranslation } from 'react-i18next';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 
 const OrdinalCard = styled.div((props) => ({
   display: 'flex',
@@ -61,10 +61,11 @@ const LoaderContainer = styled.div({
 interface Props {
   ordinal: BtcOrdinal;
   isLoading: boolean;
+  disableTransfer: boolean;
   handleOrdinalTransfer: (ordinal: BtcOrdinal, ordinalData: Inscription) => Promise<void>;
 }
 
-function OrdinalRow({ ordinal, isLoading, handleOrdinalTransfer }: Props) {
+function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer }: Props) {
   const { t } = useTranslation('translation');
   const ordinalData = useInscriptionDetails(ordinal.id);
 
@@ -85,7 +86,7 @@ function OrdinalRow({ ordinal, isLoading, handleOrdinalTransfer }: Props) {
         <ValueText>Ordinal</ValueText>
       </ColumnContainer>
       <ButtonContainer>
-        <TransferButton onClick={onClick}>
+        <TransferButton onClick={onClick} disabled={disableTransfer}>
           {isLoading ? (
             <LoaderContainer>
               <MoonLoader color="white" size={15} />
