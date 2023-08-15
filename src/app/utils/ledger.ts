@@ -1,17 +1,21 @@
-import { Account, getMasterFingerPrint } from '@secretkeylabs/xverse-core';
+import {
+  Account,
+  NetworkType,
+  getMasterFingerPrint,
+  signSimpleBip322Message,
+} from '@secretkeylabs/xverse-core';
 import { Transport } from '@secretkeylabs/xverse-core/ledger/types';
 
-// eslint-disable-next-line import/prefer-default-export
 export const findLedgerAccountId = async ({
   transport,
-  selectedAccount,
+  id,
   ledgerAccountsList,
 }: {
   transport: Transport;
-  selectedAccount: Account | null;
+  id?: number;
   ledgerAccountsList: Account[];
 }): Promise<number> => {
-  if (!selectedAccount) {
+  if (id === undefined) {
     return -1;
   }
 
@@ -20,7 +24,40 @@ export const findLedgerAccountId = async ({
   const deviceAccounts = ledgerAccountsList.filter(
     (account) => account.masterPubKey === masterFingerPrint,
   );
-  const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount.id);
+  const accountId = deviceAccounts.findIndex((account) => account.id === id);
 
   return accountId;
+};
+
+export const handleBip322LedgerMessageSigning = async ({
+  transport,
+  id,
+  networkType,
+  ledgerAccountsList,
+  message,
+}: {
+  transport: Transport;
+  id: number;
+  networkType: NetworkType;
+  message: string;
+  ledgerAccountsList: Account[];
+}) => {
+  const accountId = await findLedgerAccountId({
+    transport,
+    id,
+    ledgerAccountsList,
+  });
+
+  if (accountId === -1) {
+    throw new Error('Account not found');
+  }
+
+  const signature = await signSimpleBip322Message({
+    transport,
+    networkType,
+    addressIndex: accountId,
+    message,
+  });
+
+  return signature;
 };

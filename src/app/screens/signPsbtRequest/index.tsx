@@ -222,10 +222,10 @@ function SignPsbtRequest() {
     setExpandInputOutputView(!expandInputOutputView);
   };
 
-  const handleLedgerMessageSigning = async (transport: TransportType) => {
+  const handleLedgerPsbtSigning = async (transport: TransportType) => {
     const accountId = await findLedgerAccountId({
       transport,
-      selectedAccount,
+      id: selectedAccount?.id,
       ledgerAccountsList,
     });
 
@@ -289,7 +289,7 @@ function SignPsbtRequest() {
     setCurrentStepIndex(1);
 
     try {
-      const response = await handleLedgerMessageSigning(transport);
+      const response = await handleLedgerPsbtSigning(transport);
 
       if (payload.broadcast) {
         navigate('/tx-status', {

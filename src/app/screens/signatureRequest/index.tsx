@@ -14,7 +14,7 @@ import { bytesToHex } from '@stacks/transactions';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { getNetworkType, isHardwareAccount, getTruncatedAddress } from '@utils/helper';
-import { hashMessage, signSimpleBip322Message, signStxMessage } from '@secretkeylabs/xverse-core';
+import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
@@ -26,8 +26,7 @@ import InfoContainer from '@components/infoContainer';
 import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
-import { findLedgerAccountId } from '@utils/ledger';
+import { handleBip322LedgerMessageSigning } from '@utils/ledger';
 import { finalizeMessageSignature } from './utils';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import SignatureRequestMessage from './signatureRequestMessage';
@@ -200,27 +199,6 @@ function SignatureRequest(): JSX.Element {
 
   const handleBip322MessageSigning = useSignBip322Message(payload.message, payload.address);
 
-  const handleBip322LedgerMessageSigning = async (transport: TransportType) => {
-    const accountId = await findLedgerAccountId({
-      transport,
-      selectedAccount,
-      ledgerAccountsList,
-    });
-
-    if (accountId === -1) {
-      throw new Error('Account not found');
-    }
-
-    const signature = await signSimpleBip322Message({
-      transport,
-      networkType: network.type,
-      addressIndex: accountId,
-      message: payload.message,
-    });
-
-    return signature;
-  };
-
   const cancelCallback = () => {
     finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: 'cancel' });
     window.close();
@@ -283,7 +261,13 @@ function SignatureRequest(): JSX.Element {
 
     try {
       if (isSignMessageBip322) {
-        const signature = await handleBip322LedgerMessageSigning(transport);
+        const signature = await handleBip322LedgerMessageSigning({
+          transport,
+          id: selectedAccount.id,
+          networkType: network.type,
+          ledgerAccountsList,
+          message: payload.message,
+        });
         const signingMessage = {
           source: MESSAGE_SOURCE,
           method: ExternalSatsMethods.signMessageResponse,
@@ -325,7 +309,7 @@ function SignatureRequest(): JSX.Element {
       return bytesToHex(hashMessage(payload.message));
     }
     return bip0322Hash(payload.message);
-  }, [isSignMessageBip322]);
+  }, [isSignMessageBip322, payload.message]);
 
   return (
     <ConfirmScreen
@@ -378,7 +362,7 @@ function SignatureRequest(): JSX.Element {
         </MainContainer>
       )}
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
-        {currentStepIndex === 0 ? (
+        {currentStepIndex === 0 && (
           <LedgerConnectionView
             title={t('SIGNATURE_REQUEST.LEDGER.CONNECT.TITLE')}
             text={t('SIGNATURE_REQUEST.LEDGER.CONNECT.SUBTITLE')}
@@ -388,7 +372,8 @@ function SignatureRequest(): JSX.Element {
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />
-        ) : currentStepIndex === 1 ? (
+        )}
+        {currentStepIndex === 1 && (
           <LedgerConnectionView
             title={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.TITLE')}
             text={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.SUBTITLE')}
@@ -398,7 +383,7 @@ function SignatureRequest(): JSX.Element {
             isConnectSuccess={isTxApproved}
             isConnectFailed={isTxRejected}
           />
-        ) : null}
+        )}
         <SuccessActionsContainer>
           <ActionButton
             onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}

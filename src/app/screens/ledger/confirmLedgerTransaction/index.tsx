@@ -283,7 +283,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
       const accountId = await findLedgerAccountId({
         transport,
-        selectedAccount,
+        id: selectedAccount?.id,
         ledgerAccountsList,
       });
 
