@@ -14,7 +14,7 @@ import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
-import { AddressPurposes } from 'sats-connect';
+import { AddressPurpose } from 'sats-connect';
 import { useNavigate } from 'react-router-dom';
 import AccountView from './accountView';
 
@@ -255,7 +255,7 @@ function BtcSelectAddressScreen() {
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {payload.purposes.map((purpose) =>
-              purpose === AddressPurposes.PAYMENT ? (
+              purpose === AddressPurpose.Payment ? (
                 <AddressContainer>
                   <BitcoinDot />
                   <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
