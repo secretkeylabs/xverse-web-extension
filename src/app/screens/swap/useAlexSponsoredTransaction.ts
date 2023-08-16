@@ -25,7 +25,16 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
     alexSDK.broadcastSponsoredTx(signed.serialize().toString('hex'));
 
   const { data: stxPendingTxData } = useStxPendingTxData();
-  const hasPendingTransactions = stxPendingTxData?.pendingTransactions?.length > 0;
+  const currentNonce =
+    (stxPendingTxData?.pendingTransactions ?? []).reduce(
+      (maxNonce, transaction) => Math.max(maxNonce, transaction?.nonce ?? 0),
+      0,
+    ) + 1;
+
+  const filteredStxPendingTxData = stxPendingTxData?.pendingTransactions.filter(
+    (transaction) => currentNonce - transaction?.nonce === 1,
+  );
+  const hasPendingTransactions = filteredStxPendingTxData?.length > 0;
 
   return {
     isSponsored: userOverrideSponsorValue && isServiceRunning && !hasPendingTransactions,
