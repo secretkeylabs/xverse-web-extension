@@ -1,5 +1,10 @@
 import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
-import { GetAddressResponse, SignPsbtResponse } from 'sats-connect';
+import {
+  CreateFileInscriptionResponse,
+  CreateTextInscriptionResponse,
+  GetAddressResponse,
+  SignPsbtResponse,
+} from 'sats-connect';
 
 export const MESSAGE_SOURCE = 'xverse-wallet' as const;
 
@@ -105,6 +110,8 @@ export enum ExternalSatsMethods {
   signMessageResponse = 'signMessageResponse',
   sendBtcRequest = 'sendBtcRequest',
   sendBtcResponse = 'sendBtcResponse',
+  createTextInscription = 'createTextInscription',
+  createFileInscription = 'createFileInscription',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -147,14 +154,44 @@ export type SendBtcResponseMessage = Message<
   }
 >;
 
+type CreateTextInscriptionRequestMessage = Message<
+  ExternalSatsMethods.createTextInscription,
+  string
+>;
+
+export type CreateTextInscriptionResponseMessage = Message<
+  ExternalSatsMethods.createTextInscription,
+  {
+    createTextInscriptionRequest: string;
+    createTextInscriptionResponse: CreateTextInscriptionResponse | string;
+  }
+>;
+
+type CreateFileInscriptionRequestMessage = Message<
+  ExternalSatsMethods.createFileInscription,
+  string
+>;
+
+export type CreateFileInscriptionResponseMessage = Message<
+  ExternalSatsMethods.createFileInscription,
+  {
+    createFileInscriptionRequest: string;
+    createFileInscriptionResponse: CreateFileInscriptionResponse | string;
+  }
+>;
+
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage
   | SignPsbtRequestMessage
   | SignMessageRequestMessage
-  | SendBtcRequestMessage;
+  | SendBtcRequestMessage
+  | CreateTextInscriptionRequestMessage
+  | CreateFileInscriptionRequestMessage;
 
 export type SatsConnectMessageToContentScript =
   | GetAddressResponseMessage
   | SignPsbtResponseMessage
   | SignMessageResponseMessage
-  | SendBtcResponseMessage;
+  | SendBtcResponseMessage
+  | CreateTextInscriptionResponseMessage
+  | CreateFileInscriptionResponseMessage;

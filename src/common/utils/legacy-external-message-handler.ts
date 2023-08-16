@@ -11,8 +11,8 @@ import {
   SignatureResponseMessage,
 } from '../types/message-types';
 import { sendMessage } from '../types/messages';
-import RequestsRoutes from './route-urls';
 import popupCenter from './popup-center';
+import RequestsRoutes from './route-urls';
 
 export function inferLegacyMessage(message: any): message is LegacyMessageFromContentScript {
   // Now that we use a RPC communication style, we can infer
@@ -84,8 +84,7 @@ function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) {
   });
 }
 
-async function triggerRequstWindowOpen(path: RequestsRoutes, urlParams: URLSearchParams) {
-  console.log(`/popup.html#${path}?${urlParams.toString()}`);
+async function triggerRequestWindowOpen(path: RequestsRoutes, urlParams: URLSearchParams) {
   return popupCenter({ url: `/popup.html#${path}?${urlParams.toString()}` });
 }
 
@@ -97,7 +96,10 @@ export async function handleLegacyExternalMethodFormat(
   switch (message.method) {
     case ExternalMethods.authenticationRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['authRequest', payload]]);
-      const { id } = await triggerRequstWindowOpen(RequestsRoutes.AuthenticationRequest, urlParams);
+      const { id } = await triggerRequestWindowOpen(
+        RequestsRoutes.AuthenticationRequest,
+        urlParams,
+      );
       listenForPopupClose({
         id,
         tabId,
@@ -117,7 +119,7 @@ export async function handleLegacyExternalMethodFormat(
     case ExternalMethods.transactionRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['request', payload]]);
 
-      const { id } = await triggerRequstWindowOpen(RequestsRoutes.TransactionRequest, urlParams);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.TransactionRequest, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -140,7 +142,7 @@ export async function handleLegacyExternalMethodFormat(
         ['messageType', 'utf8'],
       ]);
 
-      const { id } = await triggerRequstWindowOpen(RequestsRoutes.SignatureRequest, urlParams);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.SignatureRequest, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -156,7 +158,7 @@ export async function handleLegacyExternalMethodFormat(
         ['messageType', 'structured'],
       ]);
 
-      const { id } = await triggerRequstWindowOpen(RequestsRoutes.SignatureRequest, urlParams);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.SignatureRequest, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -170,7 +172,7 @@ export async function handleLegacyExternalMethodFormat(
         ['addressRequest', payload],
       ]);
 
-      const { id } = await triggerRequstWindowOpen(RequestsRoutes.AddressRequest, urlParams);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.AddressRequest, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -191,7 +193,7 @@ export async function handleLegacyExternalMethodFormat(
         ['signPsbtRequest', payload],
       ]);
 
-      const { id } = await triggerRequstWindowOpen(RequestsRoutes.SignBtcTx, urlParams);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.SignBtcTx, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -212,7 +214,7 @@ export async function handleLegacyExternalMethodFormat(
         ['signMessageRequest', payload],
       ]);
 
-      const { id } = await triggerRequstWindowOpen(RequestsRoutes.SignatureRequest, urlParams);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.SignatureRequest, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -233,7 +235,7 @@ export async function handleLegacyExternalMethodFormat(
         ['sendBtcRequest', payload],
       ]);
 
-      const { id } = await triggerRequstWindowOpen(RequestsRoutes.SendBtcTx, urlParams);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.SendBtcTx, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -244,6 +246,54 @@ export async function handleLegacyExternalMethodFormat(
             sendBtcResponse: 'cancel',
           },
           method: ExternalSatsMethods.sendBtcResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
+    case ExternalSatsMethods.createTextInscription: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['createInscription', payload],
+      ]);
+
+      const { id } = await triggerRequestWindowOpen(
+        RequestsRoutes.CreateTextInscription,
+        urlParams,
+      );
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            createTextInscriptionRequest: payload,
+            createTextInscriptionResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.createTextInscription,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
+    case ExternalSatsMethods.createFileInscription: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['createInscription', payload],
+      ]);
+
+      const { id } = await triggerRequestWindowOpen(
+        RequestsRoutes.CreateFileInscription,
+        urlParams,
+      );
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            createFileInscriptionRequest: payload,
+            createFileInscriptionResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.createFileInscription,
         },
       });
       listenForOriginTabClose({ tabId });

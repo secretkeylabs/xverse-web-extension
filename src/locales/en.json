@@ -264,7 +264,6 @@
     "To": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive",
-
     "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
@@ -728,6 +727,36 @@
       "CLOSE_BUTTON": "Close",
       "CANCEL_BUTTON": "Cancel",
       "RETRY_BUTTON": "Try again"
+    }
+  },
+  "INSCRIPTION_REQUEST": {
+    "TITLE": "Review Transaction",
+    "SUBTITLE": "Inscribe Ordinal",
+    "CANCEL_BUTTON": "Cancel",
+    "CONFIRM_BUTTON": "Confirm",
+    "SUMMARY": {
+      "TITLE": "You will inscribe",
+      "ORDINAL": "Ordinal",
+      "RECIPIENT": "Recipient"
+    },
+    "NETWORK": "Network",
+    "VALUE": "Bitcoin value",
+    "EDIT_FEES": "Edit Fees",
+    "FEES": {
+      "TITLE": "Fees",
+      "INSCRIPTION": "Inscription fees",
+      "TRANSACTION": "Transaction fees",
+      "TOTAL": "Total fees"
+    },
+    "CONTENT_TYPE": {
+      "IMAGE": "Image",
+      "HTML": "HTML",
+      "TEXT": "Text",
+      "VIDEO": "Video",
+      "AUDIO": "Audio",
+      "MODEL": "Model",
+      "JSON": "JSON",
+      "OTHER": "Unknown type"
     }
   },
   "ERROR_SCREEN": {

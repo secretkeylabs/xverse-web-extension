@@ -1,21 +1,21 @@
-import styled from 'styled-components';
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import XverseLogo from '@assets/img/settings/logo.svg';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
-import useWalletSelector from '@hooks/useWalletSelector';
 import AccountRow from '@components/accountRow';
-import { animated, useSpring } from '@react-spring/web';
-import Seperator from '@components/seperator';
-import { Account } from '@secretkeylabs/xverse-core';
-import { useDispatch } from 'react-redux';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
+import Seperator from '@components/seperator';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
-import { AddressPurposes } from 'sats-connect';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { animated, useSpring } from '@react-spring/web';
+import { Account } from '@secretkeylabs/xverse-core';
+import { selectAccount } from '@stores/wallet/actions/actionCreators';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { AddressPurpose } from 'sats-connect';
+import styled from 'styled-components';
 import AccountView from './accountView';
 
 const TitleContainer = styled.div({
@@ -254,7 +254,7 @@ function BtcSelectAddressScreen() {
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {payload.purposes.map((purpose) =>
-              purpose === AddressPurposes.PAYMENT ? (
+              purpose === AddressPurpose.Payment ? (
                 <AddressContainer>
                   <BitcoinDot />
                   <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
