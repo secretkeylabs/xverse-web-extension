@@ -73,6 +73,7 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
   const [isReceivingAddressesVisible, setIsReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
   );
+  const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
 
   const onReceivePress = () => {
     navigate('/receive/STX');
@@ -91,11 +92,20 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
       setIsReceivingAddressesVisible(false);
     }
 
+    if (choseToVerifyAddresses) {
+      setChoseToVerifyAddresses(false);
+    }
+
     onClose();
   };
 
   const handleReceiveModalOpen = () => {
     setIsReceivingAddressesVisible(true);
+  };
+
+  const handleVerifyAddresses = () => {
+    setChoseToVerifyAddresses(true);
+    handleReceiveModalOpen();
   };
 
   const receiveContent = (
@@ -105,6 +115,8 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           title={t('ORDINALS')}
           address={ordinalsAddress}
           onQrAddressClick={onOrdinalsReceivePress}
+          showVerifyButton={choseToVerifyAddresses}
+          currency="ORD"
         >
           <Icon src={ordinalsIcon} />
         </ReceiveCardComponent>
@@ -115,6 +127,8 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           title={t('STACKS_NFT')}
           address={stxAddress}
           onQrAddressClick={onReceivePress}
+          showVerifyButton={choseToVerifyAddresses}
+          currency="STX"
         >
           <Icon src={stacksIcon} />
         </ReceiveCardComponent>
@@ -149,7 +163,7 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
                     url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=ORD`),
                   });
                 }
-              : handleReceiveModalOpen
+              : handleVerifyAddresses
           }
         />
       </VerifyButtonContainer>

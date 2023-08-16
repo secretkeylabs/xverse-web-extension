@@ -108,6 +108,7 @@
   "LEDGER_VERIFY_SCREEN": {
     "TITLE_VERIFY_BTC": "Verify Bitcoin payment address",
     "TITLE_VERIFY_ORDINALS": "Verify Ordinals address",
+    "TITLE_VERIFY_STX": "Verify Stacks address",
     "SUBTITLE_VERIFY": "Verify that this address matches the address displayed on your device.",
     "CONNECT_BUTTON": "Connect",
     "CLOSE_BUTTON": "Close",
@@ -115,18 +116,24 @@
     "VERIFY_AGAIN_BUTTON": "Verify again",
     "BTC_RECEIVE_MESSAGE": "Do not send Ordinals to this address, use your Ordinals NFT receive address.",
     "ORDINALS_RECEIVE_MESSAGE": "Only send Ordinals and BRC-20 tokens to this address.",
+    "STX_RECEIVE_MESSAGE": "Only send SIP-010 tokens to this address",
     "BTC_ADDRESS": "Bitcoin payment address",
     "ORDINALS_ADDRESS": "Ordinals address",
+    "STACKS_ADDRESS": "Stacks address",
     "TITLE_CANCELLED": "Account address rejected",
     "SUBTITLE_CANCELLED": "The account address was rejected on the device.",
     "TITLE_FAILED": "Connection failed",
     "BTC_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open.",
+    "STX_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Stacks app is open.",
     "BTC_TITLE_VERIFIED": "Bitcoin payment address verified successfully",
     "ORDINALS_TITLE_VERIFIED": "Ordinals address verified successfully",
+    "STACKS_TITLE_VERIFIED": "Stacks address verified successfully",
     "WRONG_DEVICE_ERROR_SUBTITLE": "The public key of the connected device did not match the wallet public key. Make sure you have the correct device connected.",
     "LEDGER_CONNECT": {
       "BTC_TITLE": "Connect Your Ledger",
-      "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app."
+      "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app.",
+      "STX_TITLE": "Connect Your Ledger",
+      "STX_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Stacks app."
     }
   },
   "LEDGER_CONFIRM_TRANSACTION_SCREEN": {
