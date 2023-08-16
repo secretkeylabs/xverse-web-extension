@@ -215,7 +215,7 @@ function Home() {
   const onStxSendClick = async () => {
     if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/send-stx-ledger'),
+        url: chrome.runtime.getURL('options.html#/send-stx'),
       });
       return;
     }

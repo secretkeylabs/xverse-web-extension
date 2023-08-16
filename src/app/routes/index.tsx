@@ -36,7 +36,6 @@ import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
-import LedgerSendStxScreen from '@screens/ledger/ledgerSendStx';
 import ReviewLedgerStxTransaction from '@screens/ledger/reviewLedgerStxTransaction';
 import LedgerSendFtScreen from '@screens/ledger/ledgerSendFt';
 import ReviewLedgerFtTransaction from '@screens/ledger/reviewLedgerFtTransaction';
@@ -146,10 +145,6 @@ const router = createHashRouter([
       {
         path: 'add-stx-address-ledger',
         element: <LedgerAddStxAddress />,
-      },
-      {
-        path: 'send-stx-ledger',
-        element: <LedgerSendStxScreen />,
       },
       {
         path: 'send-ft-ledger',

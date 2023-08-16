@@ -116,7 +116,7 @@ function ReviewLedgerStxTransaction() {
   };
 
   const handleOnCancelClick = () => {
-    navigate('/send-stx-ledger', {
+    navigate('/send-stx', {
       state: {
         recipientAddress: recipient,
         amountToSend: getAmount().toString(),

@@ -10,10 +10,10 @@ import ActionButton from '@components/button';
 
 const ReceiveCard = styled.div((props) => ({
   background: props.theme.colors.background.elevation3,
-  borderRadius: 12,
+  borderRadius: props.theme.radius(2),
   width: 328,
   height: 104,
-  padding: 16,
+  padding: props.theme.spacing(8),
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -22,7 +22,7 @@ const ReceiveCard = styled.div((props) => ({
 
 const Button = styled.button((props) => ({
   background: '#3F4263',
-  borderRadius: 32,
+  borderRadius: props.theme.radius(7),
   width: 44,
   height: 44,
   display: 'flex',
@@ -60,7 +60,7 @@ const AddressText = styled.h1((props) => ({
   color: props.theme.colors.white[400],
 }));
 
-const StyledToolTip = styled(Tooltip)`
+const StyledTooltip = styled(Tooltip)`
   background-color: #ffffff;
   color: #12151e;
   border-radius: 8px;
@@ -127,7 +127,7 @@ function ReceiveCardComponent({
           <Button id={`copy-address-${title}`} onClick={onCopyClick}>
             <ButtonIcon src={Copy} />
           </Button>
-          <StyledToolTip
+          <StyledTooltip
             anchorId={`copy-address-${title}`}
             variant="light"
             content={t('COPIED')}
