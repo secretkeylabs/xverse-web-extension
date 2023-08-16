@@ -8,6 +8,7 @@ import { formatDate } from '@utils/date';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
+  PostConditionFungible,
 } from '@stacks/stacks-blockchain-api-types';
 import { useMemo } from 'react';
 import { animated, config, useSpring } from '@react-spring/web';
@@ -139,12 +140,14 @@ const filterTxs = (
     const ftTransfers = atx && isAddressTransactionWithTransfers(atx) ? atx.ft_transfers || [] : [];
     const nftTransfers =
       atx && isAddressTransactionWithTransfers(atx) ? atx.nft_transfers || [] : [];
-
+    const fungibleTokenPostCondition = tx?.post_conditions[0] as PostConditionFungible;
+    const contractFromPostCondition = `${fungibleTokenPostCondition?.asset?.contract_address}.${fungibleTokenPostCondition?.asset?.contract_name}::${fungibleTokenPostCondition?.asset?.asset_name}`;
     return (
       acceptedTypes &&
       (ftTransfers.filter((transfer) => transfer.asset_identifier.includes(filter)).length > 0 ||
         nftTransfers.filter((transfer) => transfer.asset_identifier.includes(filter)).length > 0 ||
-        tx?.contract_call?.contract_id === filter)
+        tx?.contract_call?.contract_id === filter ||
+        (contractFromPostCondition && contractFromPostCondition === filter))
     );
   });
 
