@@ -66,7 +66,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
       unsignedTx.setFee(settingFee);
       setUnsignedTx(unsignedTx);
       setFeeAmount(Number(fee));
-      setFeeFiatAmount(currencyToToken(input.from, Number(fee))?.fiatAmount);
+      setFeeFiatAmount(currencyToToken(Currency.STX, Number(fee))?.fiatAmount);
     },
     isSponsored,
     isSponsorDisabled,

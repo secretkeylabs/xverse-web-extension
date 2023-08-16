@@ -320,7 +320,7 @@ export function useSwap(): UseSwap {
               fromAmount: fromAmount!,
               minToAmount: toAmount! * (1 - slippage),
               txFeeAmount: fee,
-              txFeeFiatAmount: currencyToToken(selectedCurrency.from!, fee)?.fiatAmount,
+              txFeeFiatAmount: currencyToToken(Currency.STX, fee)?.fiatAmount,
               routers: info.route.map(currencyToToken).filter(isNotNull),
               unsignedTx: unsignedTx.serialize().toString('hex'),
               functionName: `${tx.contractName}\n${tx.functionName}`,
