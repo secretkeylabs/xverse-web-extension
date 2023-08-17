@@ -100,12 +100,20 @@ export default function VerifySeed({
   });
 
   const generateWords = useCallback(() => {
-    const randomWords = generateMnemonic().split(' ');
     const seedWords = seedPhrase.split(' ');
-    const randomWordsIndex = Math.floor(Math.random() * randomWords.length);
     const seedPhraseIndex = Math.floor(Math.random() * seedWords.length);
     const answer = seedWords[seedPhraseIndex];
-    randomWords[randomWordsIndex] = answer;
+
+    const randomWords = generateMnemonic().split(' ');
+
+    // check randomWords doesn't contain our answer already.
+    // only if it doesn't, do we need to insert the answer at a random index.
+    const foundAnswerIndex = randomWords.findIndex((word) => word === answer);
+    if (foundAnswerIndex === -1) {
+      const randomWordsIndex = Math.floor(Math.random() * randomWords.length);
+      randomWords[randomWordsIndex] = answer;
+    }
+
     const nth = getOrdinal(seedPhraseIndex + 1);
     setQuiz({ words: randomWords, answer, nth });
   }, [seedPhrase]);
