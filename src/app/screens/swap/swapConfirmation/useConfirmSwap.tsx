@@ -57,8 +57,8 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
 
   return {
     ...input,
-    txFeeAmount: isSponsored ? 0 : feeAmount,
-    txFeeFiatAmount: isSponsored ? 0 : feeFiatAmount,
+    txFeeAmount: feeAmount,
+    txFeeFiatAmount: feeFiatAmount,
     unsignedTx,
     userOverrideSponsorValue: input.userOverrideSponsorValue,
     onFeeUpdate: (settingFee: bigint) => {
