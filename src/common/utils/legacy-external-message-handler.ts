@@ -251,7 +251,7 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.createTextInscription: {
+    case ExternalSatsMethods.createTextInscriptionRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['createInscription', payload],
       ]);
@@ -266,16 +266,16 @@ export async function handleLegacyExternalMethodFormat(
         response: {
           source: MESSAGE_SOURCE,
           payload: {
-            createTextInscriptionRequest: payload,
-            createTextInscriptionResponse: 'cancel',
+            createInscriptionRequest: payload,
+            createInscriptionResponse: 'cancel',
           },
-          method: ExternalSatsMethods.createTextInscription,
+          method: ExternalSatsMethods.createTextInscriptionResponse,
         },
       });
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.createFileInscription: {
+    case ExternalSatsMethods.createFileInscriptionRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['createInscription', payload],
       ]);
@@ -290,10 +290,10 @@ export async function handleLegacyExternalMethodFormat(
         response: {
           source: MESSAGE_SOURCE,
           payload: {
-            createFileInscriptionRequest: payload,
-            createFileInscriptionResponse: 'cancel',
+            createInscriptionRequest: payload,
+            createInscriptionResponse: 'cancel',
           },
-          method: ExternalSatsMethods.createFileInscription,
+          method: ExternalSatsMethods.createTextInscriptionResponse,
         },
       });
       listenForOriginTabClose({ tabId });

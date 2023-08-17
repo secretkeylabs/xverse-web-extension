@@ -1,13 +1,24 @@
 import { decodeToken } from 'jsontokens';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import { useLocation } from 'react-router-dom';
+import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
+
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { useInscriptionExecute, useInscriptionFees } from '@secretkeylabs/xverse-core';
+import { CreateFileInscriptionPayload, CreateTextInscriptionPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
+import WalletIcon from '@assets/img/wallet.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
+import useBtcClient from '@hooks/useBtcClient';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { UTXO } from '@secretkeylabs/xverse-core/types';
+import { getShortTruncatedAddress } from '@utils/helper';
 
 import ContentLabel from './ContentLabel';
 
@@ -35,14 +46,15 @@ const SubTitle = styled.h1((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const CardContainer = styled.div((props) => ({
+const CardContainer = styled.div<{ bottomPadding?: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'column',
   background: props.theme.colors.background.elevation1,
   borderRadius: 12,
-  padding: '16px 16px',
+  padding: props.theme.spacing(8),
+  paddingBottom: props.bottomPadding ? props.theme.spacing(12) : props.theme.spacing(8),
   justifyContent: 'center',
-  marginBottom: 12,
+  marginBottom: props.theme.spacing(6),
   fontSize: 14,
 }));
 
@@ -57,17 +69,37 @@ const CardRow = styled.div<CardRowProps>((props) => ({
   marginTop: props.topMargin ? props.theme.spacing(8) : 0,
 }));
 
-const OrdinalIconLabel = styled.div((props) => ({
+const IconLabel = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-}));
+});
 
 const ButtonIcon = styled.img((props) => ({
   width: 32,
   height: 32,
   marginRight: props.theme.spacing(4),
+}));
+
+const InfoIconContainer = styled.div((props) => ({
+  background: props.theme.colors.background.elevation3,
+  width: 32,
+  height: 32,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 16,
+  marginRight: props.theme.spacing(5),
+}));
+
+const InfoIcon = styled.img({
+  width: 18,
+  height: 18,
+});
+
+const MutedLabel = styled.div((props) => ({
+  color: props.theme.colors.white[400],
 }));
 
 const ErrorContainer = styled.div((props) => ({
@@ -103,6 +135,19 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
+const NumberWithSuffixContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  alignItems: 'flex-end',
+  color: props.theme.colors.white[0],
+}));
+
+const NumberSuffix = styled.div((props) => ({
+  ...props.theme.body_xs,
+  color: props.theme.colors.white[400],
+}));
+
 type Props = {
   type: 'text' | 'file';
 };
@@ -110,56 +155,104 @@ type Props = {
 function CreateInscription({ type }: Props) {
   const { t } = useTranslation('translation');
   const { search } = useLocation();
-  const params = new URLSearchParams(search);
-  const requestToken = params.get('createInscription');
-  const request = decodeToken(requestToken as string);
-  const tabId = params.get('tabId');
 
+  const [payload, requestToken, tabId] = useMemo(() => {
+    const params = new URLSearchParams(search);
+    const requestEncoded = params.get('createInscription');
+    const requestBody = decodeToken(requestEncoded as string);
+    return [requestBody.payload as unknown, requestEncoded, Number(params.get('tabId'))];
+  }, [search]);
+
+  const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
+  const [feeRate, setFeeRate] = useState(8); // TODO
 
-  const { contentType, network, recipientAddress, text, dataBase64 } = request.payload as any;
+  const btcClient = useBtcClient();
 
-  const content = type === 'text' ? text : dataBase64;
+  const { ordinalsAddress, network, btcAddress, seedPhrase, selectedAccount, btcFiatRate } =
+    useWalletSelector();
 
-  const isLoading = false;
+  useEffect(() => {
+    const fetchUtxos = async () => {
+      const btcUtxos = await btcClient.getUnspentUtxos(btcAddress);
+      setUtxos(btcUtxos);
+    };
+    fetchUtxos();
+  }, [btcClient, btcAddress]);
 
-  const confirmCallback = async () => {
-    // try {
-    //   setIsSigning(true);
-    //   if (isHardwareAccount(selectedAccount)) {
-    //     // setIsModalVisible(true);
-    //     return;
-    //   }
-    //   if (!isSignMessageBip322) {
-    //     const signature = await handleMessageSigning({
-    //       message: payload.message,
-    //       domain: domain || undefined,
-    //     });
-    //     if (signature) {
-    //       finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: signature });
-    //     }
-    //   } else {
-    //     const bip322signature = await handleBip322MessageSigning();
-    //     const signingMessage = {
-    //       source: MESSAGE_SOURCE,
-    //       method: ExternalSatsMethods.signMessageResponse,
-    //       payload: {
-    //         signMessageRequest: request,
-    //         signMessageResponse: bip322signature,
-    //       },
-    //     };
-    //     chrome.tabs.sendMessage(+tabId, signingMessage);
-    //     window.close();
-    //   }
-    // } catch (err) {
-    //   console.log(err);
-    // } finally {
-    //   setIsSigning(false);
-    // }
-  };
+  const {
+    contentType,
+    network: requestedNetwork,
+    feeAddress,
+    inscriptionFee,
+  } = payload as CreateFileInscriptionPayload | CreateTextInscriptionPayload;
+
+  const content =
+    type === 'text'
+      ? (payload as CreateTextInscriptionPayload).text
+      : (payload as CreateFileInscriptionPayload).dataBase64;
+
+  const { commitValue, commitValueBreakdown, errorCode, isInitialised, isLoading } =
+    useInscriptionFees({
+      addressUtxos: utxos,
+      content,
+      contentType,
+      feeRate,
+      revealAddress: ordinalsAddress,
+      serviceFee: inscriptionFee,
+      serviceFeeAddress: feeAddress,
+    });
+
+  const {
+    complete,
+    errorCode: executeErrorCode,
+    executeMint,
+    revealTransactionId,
+    isExecuting,
+  } = useInscriptionExecute({
+    addressUtxos: utxos || [],
+    accountIndex: selectedAccount!.id,
+    changeAddress: btcAddress,
+    contentType,
+    feeRate,
+    network: requestedNetwork.type,
+    revealAddress: ordinalsAddress,
+    seedPhrase,
+    contentBase64: type === 'file' ? content : undefined,
+    contentString: type === 'text' ? content : undefined,
+  });
+
+  useEffect(() => {
+    if (!complete || !revealTransactionId) return;
+
+    const response = {
+      source: MESSAGE_SOURCE,
+      method:
+        type === 'text'
+          ? ExternalSatsMethods.createTextInscriptionResponse
+          : ExternalSatsMethods.createFileInscriptionResponse,
+      payload: {
+        createInscriptionRequest: requestToken,
+        createInscriptionResponse: {
+          txId: revealTransactionId,
+        },
+      },
+    };
+    chrome.tabs.sendMessage(tabId, response);
+    window.close();
+  }, [revealTransactionId, complete, requestToken, tabId, type]);
 
   const cancelCallback = () => {
-    // finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: 'cancel' });
+    const response = {
+      source: MESSAGE_SOURCE,
+      method:
+        type === 'text'
+          ? ExternalSatsMethods.createTextInscriptionResponse
+          : ExternalSatsMethods.createFileInscriptionResponse,
+      payload: { createInscriptionRequest: requestToken, createInscriptionResponse: 'cancel' },
+    };
+
+    chrome.tabs.sendMessage(tabId, response);
     window.close();
   };
 
@@ -167,30 +260,49 @@ function CreateInscription({ type }: Props) {
     setShowFeeSettings(true);
   };
 
+  const serviceFee =
+    (commitValueBreakdown?.revealServiceFee ?? 0) + (commitValueBreakdown?.externalServiceFee ?? 0);
+  const chainFee =
+    (commitValueBreakdown?.revealChainFee ?? 0) + (commitValueBreakdown?.commitChainFee ?? 0);
+  const totalFee = serviceFee + chainFee;
+
   return (
     <ConfirmScreen
-      onConfirm={confirmCallback}
+      onConfirm={executeMint}
       onCancel={cancelCallback}
       cancelText={t('INSCRIPTION_REQUEST.CANCEL_BUTTON')}
       confirmText={t('INSCRIPTION_REQUEST.CONFIRM_BUTTON')}
-      loading={isLoading}
+      loading={!isInitialised}
+      disabled={!!errorCode || isExecuting || complete}
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
         <Title>{t('INSCRIPTION_REQUEST.TITLE')}</Title>
         <SubTitle>{t('INSCRIPTION_REQUEST.SUBTITLE')}</SubTitle>
-        <CardContainer>
+        <CardContainer bottomPadding>
           <CardRow>
             <div>{t('INSCRIPTION_REQUEST.SUMMARY.TITLE')}</div>
           </CardRow>
           <CardRow topMargin>
-            <OrdinalIconLabel>
+            <IconLabel>
               <div>
                 <ButtonIcon src={OrdinalsIcon} />
               </div>
               <div>{t('INSCRIPTION_REQUEST.SUMMARY.ORDINAL')}</div>
-            </OrdinalIconLabel>
+            </IconLabel>
             <ContentLabel contentType={contentType} content={content} type={type} />
+          </CardRow>
+          <CardRow topMargin>
+            <MutedLabel>{t('INSCRIPTION_REQUEST.SUMMARY.TO')}</MutedLabel>
+          </CardRow>
+          <CardRow topMargin>
+            <IconLabel>
+              <InfoIconContainer>
+                <InfoIcon src={WalletIcon} />
+              </InfoIconContainer>
+              {t('INSCRIPTION_REQUEST.SUMMARY.YOUR_ADDRESS')}
+            </IconLabel>
+            <div>{getShortTruncatedAddress(ordinalsAddress)}</div>
           </CardRow>
         </CardContainer>
         <CardContainer>
@@ -202,32 +314,83 @@ function CreateInscription({ type }: Props) {
         <CardContainer>
           <CardRow>
             <div>{t('INSCRIPTION_REQUEST.VALUE')}</div>
-            <div>To Calc Bitcoin Value</div>
+            <div>
+              {isLoading && <MoonLoader color="white" size={20} />}
+              {!isLoading && (
+                <NumericFormat
+                  value={commitValue}
+                  displayType="text"
+                  thousandSeparator
+                  suffix=" sats"
+                />
+              )}
+            </div>
           </CardRow>
         </CardContainer>
-        <CardContainer>
+        <CardContainer bottomPadding>
           <CardRow>
             <div>{t('INSCRIPTION_REQUEST.FEES.TITLE')}</div>
+            <div>{isLoading && <MoonLoader color="white" size={20} />}</div>
           </CardRow>
-          <CardRow>
-            <div>{t('INSCRIPTION_REQUEST.FEES.INSCRIPTION')}</div>
-            <div>To Calc INSCRIPTION/SERVICE (ours plus from payload)</div>
-          </CardRow>
-          <CardRow>
-            <div>{t('INSCRIPTION_REQUEST.FEES.TRANSACTION')}</div>
-            <div>To Calc TXN</div>
-          </CardRow>
-          <CardRow>
-            <div>{t('INSCRIPTION_REQUEST.FEES.TOTAL')}</div>
-            <div>To Calc TOTAL fees</div>
-          </CardRow>
+          {!isLoading && (
+            <>
+              <CardRow topMargin>
+                <div>{t('INSCRIPTION_REQUEST.FEES.INSCRIPTION')}</div>
+                <NumericFormat
+                  value={serviceFee}
+                  displayType="text"
+                  thousandSeparator
+                  suffix=" sats"
+                />
+              </CardRow>
+              <CardRow topMargin>
+                <div>{t('INSCRIPTION_REQUEST.FEES.TRANSACTION')}</div>
+                <NumberWithSuffixContainer>
+                  <NumericFormat
+                    value={chainFee}
+                    displayType="text"
+                    thousandSeparator
+                    suffix=" sats"
+                  />
+                  <NumericFormat
+                    value={feeRate}
+                    displayType="text"
+                    thousandSeparator
+                    suffix=" sats/vB"
+                    renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
+                  />
+                </NumberWithSuffixContainer>
+              </CardRow>
+              <CardRow topMargin>
+                <div>{t('INSCRIPTION_REQUEST.FEES.TOTAL')}</div>
+                <div>
+                  <NumberWithSuffixContainer>
+                    <NumericFormat
+                      value={totalFee}
+                      displayType="text"
+                      thousandSeparator
+                      suffix=" sats"
+                    />
+                    <NumericFormat
+                      value={((totalFee / 100e6) * (btcFiatRate as unknown as number)).toFixed(2)} // TODO: use BigNumber and not here
+                      displayType="text"
+                      thousandSeparator
+                      suffix=" USD"
+                      prefix="~$"
+                      renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
+                    />
+                  </NumberWithSuffixContainer>
+                </div>
+              </CardRow>
+            </>
+          )}
         </CardContainer>
         <Button onClick={onAdvancedSettingClick}>
           <ButtonImage src={SettingIcon} />
           <ButtonText>{t('INSCRIPTION_REQUEST.EDIT_FEES')}</ButtonText>
         </Button>
         <ErrorContainer>
-          <ErrorText>error</ErrorText>
+          <ErrorText>{errorCode || executeErrorCode}</ErrorText>
         </ErrorContainer>
       </MainContainer>
     </ConfirmScreen>

@@ -122,7 +122,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     createTextInscriptionRequest: string,
   ): Promise<CreateTextInscriptionResponse> => {
     const event = new CustomEvent<CreateTextInscriptionEventDetails>(
-      DomEventName.createTextInscription,
+      DomEventName.createTextInscriptionRequest,
       {
         detail: { createTextInscriptionRequest },
       },
@@ -130,18 +130,16 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<CreateTextInscriptionResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.createTextInscription)) return;
-        if (
-          eventMessage.data.payload?.createTextInscriptionRequest !== createTextInscriptionRequest
-        )
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.createTextInscriptionResponse)) return;
+        if (eventMessage.data.payload?.createInscriptionRequest !== createTextInscriptionRequest)
           return;
         window.removeEventListener('message', handleMessage);
-        if (eventMessage.data.payload.createTextInscriptionResponse === 'cancel') {
-          reject(eventMessage.data.payload.createTextInscriptionResponse);
+        if (eventMessage.data.payload.createInscriptionResponse === 'cancel') {
+          reject(eventMessage.data.payload.createInscriptionResponse);
           return;
         }
-        if (typeof eventMessage.data.payload.createTextInscriptionResponse !== 'string') {
-          resolve(eventMessage.data.payload.createTextInscriptionResponse);
+        if (typeof eventMessage.data.payload.createInscriptionResponse !== 'string') {
+          resolve(eventMessage.data.payload.createInscriptionResponse);
         }
       };
       window.addEventListener('message', handleMessage);
@@ -151,7 +149,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     createFileInscriptionRequest: string,
   ): Promise<CreateFileInscriptionResponse> => {
     const event = new CustomEvent<CreateFileInscriptionEventDetails>(
-      DomEventName.createFileInscription,
+      DomEventName.createFileInscriptionRequest,
       {
         detail: { createFileInscriptionRequest },
       },
@@ -159,18 +157,16 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<CreateFileInscriptionResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.createFileInscription)) return;
-        if (
-          eventMessage.data.payload?.createFileInscriptionRequest !== createFileInscriptionRequest
-        )
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.createFileInscriptionResponse)) return;
+        if (eventMessage.data.payload?.createInscriptionRequest !== createFileInscriptionRequest)
           return;
         window.removeEventListener('message', handleMessage);
-        if (eventMessage.data.payload.createFileInscriptionResponse === 'cancel') {
-          reject(eventMessage.data.payload.createFileInscriptionResponse);
+        if (eventMessage.data.payload.createInscriptionResponse === 'cancel') {
+          reject(eventMessage.data.payload.createInscriptionResponse);
           return;
         }
-        if (typeof eventMessage.data.payload.createFileInscriptionResponse !== 'string') {
-          resolve(eventMessage.data.payload.createFileInscriptionResponse);
+        if (typeof eventMessage.data.payload.createInscriptionResponse !== 'string') {
+          resolve(eventMessage.data.payload.createInscriptionResponse);
         }
       };
       window.addEventListener('message', handleMessage);

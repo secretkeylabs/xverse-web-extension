@@ -167,26 +167,26 @@ document.addEventListener(DomEventName.sendBtcRequest, ((event: SendBtcRequestEv
 }) as EventListener);
 
 // Listen for a CustomEvent (Create Text Inscription Request) coming from the web app
-document.addEventListener(DomEventName.createTextInscription, ((
+document.addEventListener(DomEventName.createTextInscriptionRequest, ((
   event: CreateTextInscriptionEvent,
 ) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.CreateTextInscription,
     payload: event.detail.createTextInscriptionRequest,
     urlParam: 'createTextInscriptionRequest',
-    method: ExternalSatsMethods.createTextInscription,
+    method: ExternalSatsMethods.createTextInscriptionRequest,
   });
 }) as EventListener);
 
 // Listen for a CustomEvent (Create File Inscription Request) coming from the web app
-document.addEventListener(DomEventName.createFileInscription, ((
+document.addEventListener(DomEventName.createFileInscriptionRequest, ((
   event: CreateFileInscriptionEvent,
 ) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.CreateFileInscription,
     payload: event.detail.createFileInscriptionRequest,
     urlParam: 'createFileInscriptionRequest',
-    method: ExternalSatsMethods.createFileInscription,
+    method: ExternalSatsMethods.createFileInscriptionRequest,
   });
 }) as EventListener);
 

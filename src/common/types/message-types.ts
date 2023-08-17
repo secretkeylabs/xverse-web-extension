@@ -110,8 +110,10 @@ export enum ExternalSatsMethods {
   signMessageResponse = 'signMessageResponse',
   sendBtcRequest = 'sendBtcRequest',
   sendBtcResponse = 'sendBtcResponse',
-  createTextInscription = 'createTextInscription',
-  createFileInscription = 'createFileInscription',
+  createTextInscriptionRequest = 'createTextInscriptionRequest',
+  createTextInscriptionResponse = 'createTextInscriptionResponse',
+  createFileInscriptionRequest = 'createFileInscriptionRequest',
+  createFileInscriptionResponse = 'createFileInscriptionResponse',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -155,28 +157,28 @@ export type SendBtcResponseMessage = Message<
 >;
 
 type CreateTextInscriptionRequestMessage = Message<
-  ExternalSatsMethods.createTextInscription,
+  ExternalSatsMethods.createTextInscriptionRequest,
   string
 >;
 
 export type CreateTextInscriptionResponseMessage = Message<
-  ExternalSatsMethods.createTextInscription,
+  ExternalSatsMethods.createTextInscriptionResponse,
   {
-    createTextInscriptionRequest: string;
-    createTextInscriptionResponse: CreateTextInscriptionResponse | string;
+    createInscriptionRequest: string;
+    createInscriptionResponse: CreateTextInscriptionResponse | string;
   }
 >;
 
 type CreateFileInscriptionRequestMessage = Message<
-  ExternalSatsMethods.createFileInscription,
+  ExternalSatsMethods.createFileInscriptionRequest,
   string
 >;
 
 export type CreateFileInscriptionResponseMessage = Message<
-  ExternalSatsMethods.createFileInscription,
+  ExternalSatsMethods.createFileInscriptionResponse,
   {
-    createFileInscriptionRequest: string;
-    createFileInscriptionResponse: CreateFileInscriptionResponse | string;
+    createInscriptionRequest: string;
+    createInscriptionResponse: CreateFileInscriptionResponse | string;
   }
 >;
 

@@ -737,7 +737,9 @@
     "SUMMARY": {
       "TITLE": "You will inscribe",
       "ORDINAL": "Ordinal",
-      "RECIPIENT": "Recipient"
+      "RECIPIENT": "Recipient",
+      "TO": "To",
+      "YOUR_ADDRESS": "Your address"
     },
     "NETWORK": "Network",
     "VALUE": "Bitcoin value",
