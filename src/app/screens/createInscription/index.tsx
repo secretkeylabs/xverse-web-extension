@@ -23,6 +23,7 @@ import { getShortTruncatedAddress } from '@utils/helper';
 
 import CompleteScreen from './CompleteScreen';
 import ContentLabel from './ContentLabel';
+import EditFee from './EditFee';
 
 const MainContainer = styled.div((props) => ({
   display: 'flex',
@@ -155,7 +156,7 @@ type Props = {
 };
 
 function CreateInscription({ type }: Props) {
-  const { t } = useTranslation('translation');
+  const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
   const { search } = useLocation();
 
   const [payload, requestToken, tabId] = useMemo(() => {
@@ -167,7 +168,7 @@ function CreateInscription({ type }: Props) {
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const [feeRate, setFeeRate] = useState(8); // TODO
+  const [feeRate, setFeeRate] = useState(20);
 
   const btcClient = useBtcClient();
 
@@ -194,7 +195,7 @@ function CreateInscription({ type }: Props) {
       ? (payload as CreateTextInscriptionPayload).text
       : (payload as CreateFileInscriptionPayload).dataBase64;
 
-  const { commitValue, commitValueBreakdown, errorCode, isInitialised, isLoading } =
+  const { commitValue, commitValueBreakdown, errorCode, isInitialised, isLoading, errorMessage } =
     useInscriptionFees({
       addressUtxos: utxos,
       content,
@@ -262,6 +263,11 @@ function CreateInscription({ type }: Props) {
     setShowFeeSettings(true);
   };
 
+  const onNewFeeRateSet = (newFeeRate: number) => {
+    setFeeRate(newFeeRate);
+    setShowFeeSettings(false);
+  };
+
   const serviceFee =
     (commitValueBreakdown?.revealServiceFee ?? 0) + (commitValueBreakdown?.externalServiceFee ?? 0);
   const chainFee =
@@ -296,50 +302,50 @@ function CreateInscription({ type }: Props) {
     <ConfirmScreen
       onConfirm={executeMint}
       onCancel={cancelCallback}
-      cancelText={t('INSCRIPTION_REQUEST.CANCEL_BUTTON')}
-      confirmText={t('INSCRIPTION_REQUEST.CONFIRM_BUTTON')}
+      cancelText={t('CANCEL_BUTTON')}
+      confirmText={t('CONFIRM_BUTTON')}
       loading={!isInitialised || isExecuting || isLoading}
       disabled={!!errorCode || isExecuting}
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
-        <Title>{t('INSCRIPTION_REQUEST.TITLE')}</Title>
-        <SubTitle>{t('INSCRIPTION_REQUEST.SUBTITLE')}</SubTitle>
+        <Title>{t('TITLE')}</Title>
+        <SubTitle>{t('SUBTITLE')}</SubTitle>
         <CardContainer bottomPadding>
           <CardRow>
-            <div>{t('INSCRIPTION_REQUEST.SUMMARY.TITLE')}</div>
+            <div>{t('SUMMARY.TITLE')}</div>
           </CardRow>
           <CardRow topMargin>
             <IconLabel>
               <div>
                 <ButtonIcon src={OrdinalsIcon} />
               </div>
-              <div>{t('INSCRIPTION_REQUEST.SUMMARY.ORDINAL')}</div>
+              <div>{t('SUMMARY.ORDINAL')}</div>
             </IconLabel>
             <ContentLabel contentType={contentType} content={content} type={type} />
           </CardRow>
           <CardRow topMargin>
-            <MutedLabel>{t('INSCRIPTION_REQUEST.SUMMARY.TO')}</MutedLabel>
+            <MutedLabel>{t('SUMMARY.TO')}</MutedLabel>
           </CardRow>
           <CardRow topMargin>
             <IconLabel>
               <InfoIconContainer>
                 <InfoIcon src={WalletIcon} />
               </InfoIconContainer>
-              {t('INSCRIPTION_REQUEST.SUMMARY.YOUR_ADDRESS')}
+              {t('SUMMARY.YOUR_ADDRESS')}
             </IconLabel>
             <div>{getShortTruncatedAddress(ordinalsAddress)}</div>
           </CardRow>
         </CardContainer>
         <CardContainer>
           <CardRow>
-            <div>{t('INSCRIPTION_REQUEST.NETWORK')}</div>
+            <div>{t('NETWORK')}</div>
             <div>{network.type}</div>
           </CardRow>
         </CardContainer>
         <CardContainer>
           <CardRow>
-            <div>{t('INSCRIPTION_REQUEST.VALUE')}</div>
+            <div>{t('VALUE')}</div>
             <div>
               {isLoading && <MoonLoader color="white" size={20} />}
               {!isLoading && (
@@ -355,13 +361,13 @@ function CreateInscription({ type }: Props) {
         </CardContainer>
         <CardContainer bottomPadding>
           <CardRow>
-            <div>{t('INSCRIPTION_REQUEST.FEES.TITLE')}</div>
+            <div>{t('FEES.TITLE')}</div>
             <div>{isLoading && <MoonLoader color="white" size={20} />}</div>
           </CardRow>
           {!isLoading && (
             <>
               <CardRow topMargin>
-                <div>{t('INSCRIPTION_REQUEST.FEES.INSCRIPTION')}</div>
+                <div>{t('FEES.INSCRIPTION')}</div>
                 <NumericFormat
                   value={serviceFee}
                   displayType="text"
@@ -370,7 +376,7 @@ function CreateInscription({ type }: Props) {
                 />
               </CardRow>
               <CardRow topMargin>
-                <div>{t('INSCRIPTION_REQUEST.FEES.TRANSACTION')}</div>
+                <div>{t('FEES.TRANSACTION')}</div>
                 <NumberWithSuffixContainer>
                   <NumericFormat
                     value={chainFee}
@@ -388,7 +394,7 @@ function CreateInscription({ type }: Props) {
                 </NumberWithSuffixContainer>
               </CardRow>
               <CardRow topMargin>
-                <div>{t('INSCRIPTION_REQUEST.FEES.TOTAL')}</div>
+                <div>{t('FEES.TOTAL')}</div>
                 <div>
                   <NumberWithSuffixContainer>
                     <NumericFormat
@@ -398,7 +404,7 @@ function CreateInscription({ type }: Props) {
                       suffix=" sats"
                     />
                     <NumericFormat
-                      value={fiatFees} // TODO: use BigNumber and not here
+                      value={fiatFees}
                       displayType="text"
                       thousandSeparator
                       suffix=" USD"
@@ -413,10 +419,17 @@ function CreateInscription({ type }: Props) {
         </CardContainer>
         <Button onClick={onAdvancedSettingClick}>
           <ButtonImage src={SettingIcon} />
-          <ButtonText>{t('INSCRIPTION_REQUEST.EDIT_FEES')}</ButtonText>
+          <ButtonText>{t('EDIT_FEES')}</ButtonText>
         </Button>
+        {showFeeSettings && (
+          <EditFee
+            feeRate={feeRate}
+            onDone={onNewFeeRateSet}
+            onCancel={() => setShowFeeSettings(false)}
+          />
+        )}
         <ErrorContainer>
-          <ErrorText>{errorCode || executeErrorCode}</ErrorText>
+          <ErrorText>{errorCode || executeErrorCode}</ErrorText> {/* TODO: show error */}
         </ErrorContainer>
       </MainContainer>
     </ConfirmScreen>
