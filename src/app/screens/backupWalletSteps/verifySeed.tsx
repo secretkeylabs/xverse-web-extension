@@ -48,7 +48,6 @@ const WordButton = styled.button`
   align-items: center;
   padding: ${(props) => props.theme.spacing(6)}px;
   border-radius: ${(props) => props.theme.radius(1)}px;
-  text-transform: capitalize;
   transition: all 0.1s ease;
   :hover:enabled {
     opacity: 0.8;

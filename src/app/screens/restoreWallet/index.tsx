@@ -120,7 +120,7 @@ function RestoreWallet(): JSX.Element {
     <PasswordContainer>
       <PasswordInput
         title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
-        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
+        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
         enteredPassword={confirmPassword}
         setEnteredPassword={setConfirmPassword}
         handleContinue={handleConfirmPassword}
