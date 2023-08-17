@@ -10,17 +10,20 @@ const useNonOrdinalUtxos = () => {
 
   const fetchNonOrdinalUtxo = async () => {
     const lastTransactionTime = await getTimeForNonOrdinalTransferTransaction(ordinalsAddress);
-    if (!lastTransactionTime) {
-      return getNonOrdinalUtxo(ordinalsAddress, network.type);
-    }
-    const diff = new Date().getTime() - Number(lastTransactionTime);
-    if (diff > REFETCH_UNSPENT_UTXO_TIME) {
-      return getNonOrdinalUtxo(ordinalsAddress, network.type);
+    const shouldGetNonOrdinalUtxo =
+      !lastTransactionTime ||
+      new Date().getTime() - Number(lastTransactionTime) > REFETCH_UNSPENT_UTXO_TIME;
+    if (shouldGetNonOrdinalUtxo) {
+      return await getNonOrdinalUtxo(ordinalsAddress, network.type);
     }
     return [] as UTXO[];
   };
 
-  const { data: unspentUtxos, isLoading } = useQuery({
+  const {
+    data: unspentUtxos,
+    isLoading,
+    error,
+  } = useQuery({
     keepPreviousData: false,
     queryKey: [`getNonOrdinalsUtxo-${ordinalsAddress}`],
     queryFn: fetchNonOrdinalUtxo,
@@ -28,6 +31,7 @@ const useNonOrdinalUtxos = () => {
   return {
     unspentUtxos,
     isLoading,
+    error,
   };
 };
 

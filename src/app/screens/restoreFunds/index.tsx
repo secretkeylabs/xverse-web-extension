@@ -44,7 +44,12 @@ function RestoreFunds() {
       <TopRow title={t('TITLE')} onClick={handleOnCancelClick} />
       <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
       <Container>
-        {/* <FundsRow image={BitcoinIcon} title={t('RECOVER_BTC')} description={t('RECOVER_BTC_DESC')} onClick={handleOnRestoreBtcClick} /> */}
+        <FundsRow
+          image={BitcoinIcon}
+          title={t('RECOVER_BTC')}
+          description={t('RECOVER_BTC_DESC')}
+          onClick={handleOnRestoreBtcClick}
+        />
         <FundsRow
           image={OrdinalsIcon}
           title={t('RECOVER_ORDINALS')}

@@ -61,7 +61,6 @@ function Setting() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { unlockWallet, resetWallet } = useWalletReducer();
-  const { unspentUtxos } = useNonOrdinalUtxos();
 
   const openTermsOfService = () => {
     window.open(TERMS_LINK);
