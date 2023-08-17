@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +21,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { UTXO } from '@secretkeylabs/xverse-core/types';
 import { getShortTruncatedAddress } from '@utils/helper';
 
+import CompleteScreen from './CompleteScreen';
 import ContentLabel from './ContentLabel';
 
 const MainContainer = styled.div((props) => ({
@@ -266,14 +268,38 @@ function CreateInscription({ type }: Props) {
     (commitValueBreakdown?.revealChainFee ?? 0) + (commitValueBreakdown?.commitChainFee ?? 0);
   const totalFee = serviceFee + chainFee;
 
+  const fiatFees = new BigNumber(totalFee).dividedBy(100e6).multipliedBy(btcFiatRate).toFixed(2);
+
+  if (complete) {
+    const onClose = () => {
+      const response = {
+        source: MESSAGE_SOURCE,
+        method:
+          type === 'text'
+            ? ExternalSatsMethods.createTextInscriptionResponse
+            : ExternalSatsMethods.createFileInscriptionResponse,
+        payload: {
+          createInscriptionRequest: requestToken,
+          createInscriptionResponse: {
+            txId: revealTransactionId,
+          },
+        },
+      };
+      chrome.tabs.sendMessage(tabId, response);
+      window.close();
+    };
+
+    return <CompleteScreen txId={revealTransactionId!} onClose={onClose} network={network} />;
+  }
+
   return (
     <ConfirmScreen
       onConfirm={executeMint}
       onCancel={cancelCallback}
       cancelText={t('INSCRIPTION_REQUEST.CANCEL_BUTTON')}
       confirmText={t('INSCRIPTION_REQUEST.CONFIRM_BUTTON')}
-      loading={!isInitialised}
-      disabled={!!errorCode || isExecuting || complete}
+      loading={!isInitialised || isExecuting || isLoading}
+      disabled={!!errorCode || isExecuting}
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
@@ -372,7 +398,7 @@ function CreateInscription({ type }: Props) {
                       suffix=" sats"
                     />
                     <NumericFormat
-                      value={((totalFee / 100e6) * (btcFiatRate as unknown as number)).toFixed(2)} // TODO: use BigNumber and not here
+                      value={fiatFees} // TODO: use BigNumber and not here
                       displayType="text"
                       thousandSeparator
                       suffix=" USD"

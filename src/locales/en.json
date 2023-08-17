@@ -759,6 +759,14 @@
       "MODEL": "Model",
       "JSON": "JSON",
       "OTHER": "Unknown type"
+    },
+    "COMPLETE": {
+      "INSCRIBED": "Ordinal inscribed",
+      "MESSAGE": "Your ordinal have been successfully inscribed and should appear in a few minutes.",
+      "SEE_ON": "See on",
+      "BITCOIN_EXPLORER": "Explorer",
+      "TRANSACTION_ID": "Transaction ID",
+      "CLOSE": "Close"
     }
   },
   "ERROR_SCREEN": {
