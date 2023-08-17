@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
@@ -45,47 +45,48 @@ const Icon = styled.i`
   pointer-events: none;
 `;
 
-function SeedWordInput({
-  value,
-  index,
-  handleChangeInput,
-  disabled,
-}: {
+type SeedWordInputProps = {
   value: string;
   index: number;
   handleChangeInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleKeyDownInput: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   disabled?: boolean;
-}) {
-  const [showValue, setShowValue] = useState(false);
+};
+const SeedWordInput = React.forwardRef<HTMLInputElement, SeedWordInputProps>(
+  ({ value, index, handleChangeInput, handleKeyDownInput, disabled }, ref) => {
+    const [showValue, setShowValue] = useState(false);
 
-  const handleFocusInput = () => setShowValue(true);
-  const handleBlurInput = () => setShowValue(false);
-  const handlePasteInput = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-  };
+    const handleFocusInput = () => setShowValue(true);
+    const handleBlurInput = () => setShowValue(false);
+    const handlePasteInput = (e: React.ClipboardEvent<HTMLInputElement>) => {
+      e.preventDefault();
+    };
 
-  return (
-    <div>
-      <Label htmlFor={`input${index}`}>{`${index + 1}.`}</Label>
-      <InputGroup>
-        <Icon tabIndex={-1}>{showValue ? <Eye size={20} /> : <EyeSlash size={20} />}</Icon>
-        <Input
-          id={`input${index}`}
-          type={showValue ? 'input' : 'password'}
-          value={value}
-          spellCheck={false}
-          autoComplete="off"
-          autoCorrect="off"
-          onChange={handleChangeInput}
-          onPaste={handlePasteInput}
-          onFocus={handleFocusInput}
-          onBlur={handleBlurInput}
-          disabled={disabled}
-        />
-      </InputGroup>
-    </div>
-  );
-}
+    return (
+      <div>
+        <Label htmlFor={`input${index}`}>{`${index + 1}.`}</Label>
+        <InputGroup>
+          <Icon tabIndex={-1}>{showValue ? <Eye size={20} /> : <EyeSlash size={20} />}</Icon>
+          <Input
+            id={`input${index}`}
+            type={showValue ? 'input' : 'password'}
+            value={value}
+            spellCheck={false}
+            autoComplete="off"
+            autoCorrect="off"
+            onChange={handleChangeInput}
+            onKeyDown={handleKeyDownInput}
+            onPaste={handlePasteInput}
+            onFocus={handleFocusInput}
+            onBlur={handleBlurInput}
+            disabled={disabled}
+            ref={ref}
+          />
+        </InputGroup>
+      </div>
+    );
+  },
+);
 
 const InputContainer = styled.div`
   display: flex;
@@ -138,55 +139,80 @@ export default function SeedPhraseInput({
   setSeedError: (err: string) => void;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
-  const [seedInput, setSeedInput] = useState([...seedInit]);
+  const [seedInputValues, setSeedInputValues] = useState([...seedInit]);
   const [show24Words, setShow24Words] = useState(false);
+  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleKeyDownInput = (index: number) => (event: React.KeyboardEvent<HTMLInputElement>) => {
+    // disable common special characters
+    // eslint-disable-next-line no-useless-escape
+    if (event.key.match(/^[!-\/:-@[-`{-~]$/)) {
+      event.preventDefault();
+    }
+    // focus next input on space key
+    if (event.key === ' ') {
+      inputsRef.current[index + 1]?.focus();
+      event.preventDefault();
+    }
+  };
 
   const handleChangeInput = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
     if (seedError) {
       setSeedError('');
     }
 
-    setSeedInput((prevSeed) => {
+    setSeedInputValues((prevSeed) => {
       prevSeed[index] = event.target.value;
       return [...prevSeed];
     });
   };
 
   useEffect(() => {
-    const seedPhrase = seedInput
+    const seedPhrase = seedInputValues
       .slice(0, !show24Words ? 12 : 24)
       .filter(Boolean)
       .join(' ');
     onSeedChange(seedPhrase);
-  }, [seedInput, onSeedChange, show24Words]);
+  }, [seedInputValues, onSeedChange, show24Words]);
 
   const handleClickShow24Words = () => {
     setShow24Words((prev) => !prev);
-    setSeedInput((prev) => prev.slice(0, 12).concat(seedInit.slice(0, 12)));
+    setSeedInputValues((prev) => prev.slice(0, 12).concat(seedInit.slice(0, 12)));
   };
 
   return (
     <InputContainer>
       <InputGrid visible>
-        {seedInput.slice(0, 12).map((value, index) => (
+        {seedInputValues.slice(0, 12).map((value, index) => (
           <SeedWordInput
             key={index} // eslint-disable-line react/no-array-index-key
             value={value}
             index={index}
             handleChangeInput={handleChangeInput(index)}
+            handleKeyDownInput={handleKeyDownInput(index)}
+            ref={(el) => {
+              inputsRef.current[index] = el;
+            }}
           />
         ))}
       </InputGrid>
       <InputGrid visible={show24Words}>
-        {seedInput.slice(12, 24).map((value, index) => (
-          <SeedWordInput
-            key={index + 12} // eslint-disable-line react/no-array-index-key
-            value={value}
-            index={index + 12}
-            handleChangeInput={handleChangeInput(index + 12)}
-            disabled={!show24Words}
-          />
-        ))}
+        {seedInputValues.slice(12, 24).map((value, i) => {
+          const index = i + 12;
+          return (
+            <SeedWordInput
+              key={index} // eslint-disable-line react/no-array-index-key
+              value={value}
+              index={index}
+              handleChangeInput={handleChangeInput(index)}
+              handleKeyDownInput={handleKeyDownInput(index)}
+              ref={(el) => {
+                inputsRef.current[index] = el;
+              }}
+              disabled={!show24Words}
+            />
+          );
+        })}
       </InputGrid>
       <ErrorMessage visible={!!seedError}>{seedError}</ErrorMessage>
       <TransparentButton onClick={handleClickShow24Words}>

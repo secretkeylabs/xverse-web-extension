@@ -135,6 +135,7 @@ export default function VerifySeed({
 
   return (
     <Container>
+      <Heading>{t('CONFIRM_YOUR_SEEDPHRASE')}</Heading>
       <Heading>
         {t('SELECT_THE')}
         <NthSpan>{quiz.nth}</NthSpan>
