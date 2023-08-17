@@ -12,6 +12,7 @@ import {
   signLedgerMixedBtcTransaction,
   getMasterFingerPrint,
   satsToBtc,
+  microstacksToStx,
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -62,7 +63,7 @@ const SuccessActionsContainer = styled.div((props) => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
-  gap: '12px',
+  gap: props.theme.spacing(6),
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(30),
@@ -281,7 +282,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
         return;
       }
 
-      const masterFingerPrint = await getMasterFingerPrint(transport);
+      const masterFingerPrint =
+        type === 'STX' ? selectedAccount?.masterPubKey : await getMasterFingerPrint(transport);
 
       const deviceAccounts = ledgerAccountsList.filter(
         (account) => account.masterPubKey === masterFingerPrint,
@@ -386,17 +388,27 @@ function ConfirmLedgerTransaction(): JSX.Element {
       </TxDetailsRow>
       <TxDetailsRow>
         <TxDetailsTitle>{ordinalUtxo?.value ? 'Ordinal value' : 'Amount'}</TxDetailsTitle>
-        <div>
-          {ordinalUtxo?.value
-            ? satsToBtc(new BigNumber(ordinalUtxo?.value)).toString()
-            : satsToBtc(recipients[0].amountSats).toString()}{' '}
-          BTC
-        </div>
+        {type === 'STX' ? (
+          <div>{microstacksToStx(recipients[0].amountSats).toString()} STX</div>
+        ) : (
+          <div>
+            {ordinalUtxo?.value
+              ? satsToBtc(new BigNumber(ordinalUtxo?.value)).toString()
+              : satsToBtc(recipients[0].amountSats).toString()}{' '}
+            BTC
+          </div>
+        )}
       </TxDetailsRow>
-      <TxDetailsRow>
-        <TxDetailsTitle>Fees</TxDetailsTitle>
-        <div>{satsToBtc(fee).toString()} BTC</div>
-      </TxDetailsRow>
+      {fee && (
+        <TxDetailsRow>
+          <TxDetailsTitle>Fees</TxDetailsTitle>
+          {type === 'STX' ? (
+            <div>{microstacksToStx(fee).toString()} STX</div>
+          ) : (
+            <div>{satsToBtc(fee).toString()} BTC</div>
+          )}
+        </TxDetailsRow>
+      )}
     </TxDetails>
   );
 
@@ -412,6 +424,9 @@ function ConfirmLedgerTransaction(): JSX.Element {
     </>
   );
 
+  const connectErrSubtitle =
+    type === 'STX' ? 'CONNECT.STX_ERROR_SUBTITLE' : 'CONNECT.BTC_ERROR_SUBTITLE';
+
   const renderLedgerConfirmationView = () => {
     switch (currentStepIndex) {
       case 0:
@@ -419,12 +434,10 @@ function ConfirmLedgerTransaction(): JSX.Element {
           <div>
             <LedgerConnectionView
               title={t('CONNECT.TITLE')}
-              text={t('CONNECT.BTC_SUBTITLE')}
+              text={t(type === 'STX' ? 'CONNECT.STX_SUBTITLE' : 'CONNECT.BTC_SUBTITLE')}
               titleFailed={t('CONNECT.ERROR_TITLE')}
               textFailed={t(
-                isWrongDevice
-                  ? 'CONNECT.WRONG_DEVICE_ERROR_SUBTITLE'
-                  : 'CONNECT.BTC_ERROR_SUBTITLE',
+                isWrongDevice ? 'CONNECT.WRONG_DEVICE_ERROR_SUBTITLE' : connectErrSubtitle,
               )}
               imageDefault={ledgerConnectDefaultIcon}
               isConnectSuccess={isConnectSuccess}

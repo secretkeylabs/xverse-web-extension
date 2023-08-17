@@ -10,7 +10,7 @@ import { validateStxAddress } from '@secretkeylabs/xverse-core/wallet';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
-import { isLedgerAccount, replaceCommaByDot } from '@utils/helper';
+import { replaceCommaByDot } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -18,14 +18,8 @@ import useWalletSelector from '@hooks/useWalletSelector';
 function SendStxScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const {
-    stxAddress,
-    stxAvailableBalance,
-    stxPublicKey,
-    feeMultipliers,
-    network,
-    selectedAccount,
-  } = useWalletSelector();
+  const { stxAddress, stxAvailableBalance, stxPublicKey, feeMultipliers, network } =
+    useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
@@ -69,15 +63,6 @@ function SendStxScreen() {
 
   useEffect(() => {
     if (data) {
-      if (isLedgerAccount(selectedAccount)) {
-        navigate('/review-ledger-stx-tx', {
-          state: {
-            unsignedTx: data,
-          },
-        });
-        return;
-      }
-
       navigate('/confirm-stx-tx', {
         state: {
           unsignedTx: data.serialize().toString('hex'),

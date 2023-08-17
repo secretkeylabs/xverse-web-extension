@@ -321,7 +321,7 @@ function ConfirmStxTransationComponent({
         />
       </ButtonContainer>
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
-        {currentStepIndex === 0 ? (
+        {currentStepIndex === 0 && (
           <LedgerConnectionView
             title={t('LEDGER.CONNECT.TITLE')}
             text={t('LEDGER.CONNECT.SUBTITLE')}
@@ -331,7 +331,8 @@ function ConfirmStxTransationComponent({
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />
-        ) : currentStepIndex === 1 ? (
+        )}
+        {currentStepIndex === 1 && (
           <LedgerConnectionView
             title={t('LEDGER.CONFIRM.TITLE')}
             text={t('LEDGER.CONFIRM.SUBTITLE')}
@@ -341,7 +342,7 @@ function ConfirmStxTransationComponent({
             isConnectSuccess={isTxApproved}
             isConnectFailed={isTxRejected}
           />
-        ) : null}
+        )}
         <SuccessActionsContainer>
           <ActionButton
             onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}

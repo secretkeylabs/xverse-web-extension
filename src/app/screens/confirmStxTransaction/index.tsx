@@ -24,6 +24,8 @@ import TransferMemoView from '@components/confirmStxTransactionComponent/transfe
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { deserializeTransaction } from '@stacks/transactions';
+import { isLedgerAccount } from '@utils/helper';
+import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const AlertContainer = styled.div((props) => ({
@@ -50,7 +52,7 @@ function ConfirmStxTransaction() {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
-  const { stxBtcRate, btcFiatRate, network } = useWalletSelector();
+  const { stxBtcRate, btcFiatRate, network, selectedAccount } = useWalletSelector();
   const { refetch } = useStxWalletData();
   const {
     isLoading,
@@ -131,12 +133,25 @@ function ConfirmStxTransaction() {
     return microstacksToStx(amountToTransfer);
   };
 
-  const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+  const handleConfirmClick = (txs: StacksTransaction[]) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const type: LedgerTransactionType = 'STX';
+      navigate('/confirm-ledger-tx', {
+        state: {
+          unsignedTx: txs[0].serialize(),
+          type,
+          recipients: [{ address: recipient, amountSats: amount }],
+          fee,
+        },
+      });
+      return;
+    }
+
     setTxRaw(txs[0].serialize().toString('hex'));
     mutate({ signedTx: txs[0] });
   };
 
-  const handleOnCancelClick = () => {
+  const handleCancelClick = () => {
     if (isBrowserTx) {
       finalizeTxSignature({ requestPayload: requestToken, tabId: Number(tabId), data: 'cancel' });
       window.close();
@@ -156,14 +171,15 @@ function ConfirmStxTransaction() {
       {isBrowserTx ? (
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
-        <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleOnCancelClick} />
+        <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleCancelClick} />
       )}
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
-        onConfirmClick={handleOnConfirmClick}
-        onCancelClick={handleOnCancelClick}
+        onConfirmClick={handleConfirmClick}
+        onCancelClick={handleCancelClick}
         isSponsored={sponsored}
+        skipModal
       >
         <RecipientComponent
           address={recipient}
