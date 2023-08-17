@@ -360,10 +360,10 @@
     "CONFIRM_YOUR_SEEDPHRASE": "Confirm you've recorded your seed phrase correctly."
   },
   "CREATE_PASSWORD_SCREEN": {
-    "CREATE_PASSWORD_TITLE": "Enter your new password",
-    "CONFIRM_PASSWORD_TITLE": "Confirm your new password",
+    "CREATE_PASSWORD_TITLE": "Enter a password to protect your wallet",
+    "CONFIRM_PASSWORD_TITLE": "Confirm your password",
     "ENTER_PASSWORD": "Enter your current password",
-    "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
+    "TEXT_INPUT_NEW_PASSWORD_LABEL": "Password",
     "TEXT_INPUT_ENTER_PASSWORD_LABEL": "Enter your current password",
     "TEXT_INPUT_CONFIRM_PASSWORD_LABEL": "Confirm Password",
     "CONTINUE_BUTTON": "Continue",
@@ -599,7 +599,10 @@
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets",
     "LOCK_COUNTDOWN": "Auto-lock Timer",
-    "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically."
+    "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically.",
+    "ENTER_YOUR_NEW_PASSWORD": "Enter your new password",
+    "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
+    "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
