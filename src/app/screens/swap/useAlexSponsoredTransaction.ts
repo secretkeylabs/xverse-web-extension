@@ -16,7 +16,6 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
   const [isServiceRunning, setIsServiceRunning] = useState(false);
   const { error, data: isEnabled, isLoading } = useAlexSponsorSwapEnabledQuery(alexSDK);
   const { stxNonce } = useWalletSelector();
-  let hasPendingTransactions = false;
 
   useEffect(() => {
     if (!isLoading && !error) {
@@ -29,8 +28,12 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
 
   const { data: stxPendingTxData } = useStxPendingTxData();
   const pendingTransactionNonce =
-    stxPendingTxData?.pendingTransactions && stxPendingTxData?.pendingTransactions[0]?.nonce + 1;
+    (stxPendingTxData?.pendingTransactions ?? []).reduce(
+      (maxNonce, transaction) => Math.max(maxNonce, transaction?.nonce ?? 0),
+      0,
+    ) + 1;
 
+  let hasPendingTransactions = false;
   //ignore pending transactions if account nonce has advanced pass the nonce in pending transactions
   if (stxNonce > pendingTransactionNonce) {
     hasPendingTransactions = false;
