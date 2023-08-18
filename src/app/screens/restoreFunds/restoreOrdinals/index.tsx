@@ -71,8 +71,8 @@ function RestoreOrdinals() {
     mutationFn: async (ordinal) => {
       const tx = await signOrdinalTransaction({
         recipientAddress: ordinalsAddress,
-        ordinalsAddress,
         btcAddress,
+        ordinalsAddress,
         accountIndex: Number(selectedAccount?.id),
         seedPhrase,
         network: network.type,

@@ -217,8 +217,8 @@ function ConfirmBtcTransactionComponent({
       if (!ordinal) return null;
       const signedTx = await signOrdinalTransaction({
         recipientAddress: recipients[0]?.address,
-        ordinalsAddress,
         btcAddress,
+        ordinalsAddress,
         accountIndex: Number(selectedAccount?.id),
         seedPhrase,
         network: network.type,

@@ -123,8 +123,8 @@ function SendOrdinal() {
       if (!selectedOrdinal) return null;
       const signedTx = await signOrdinalTransaction({
         recipientAddress: recipient,
-        ordinalsAddress,
         btcAddress,
+        ordinalsAddress,
         accountIndex: Number(selectedAccount?.id),
         seedPhrase,
         network: network.type,
