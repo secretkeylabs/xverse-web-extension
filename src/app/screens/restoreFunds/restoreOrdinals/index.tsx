@@ -77,6 +77,7 @@ function RestoreOrdinals() {
         seedPhrase,
         network: network.type,
         ordinal,
+        isRecover: true,
       });
       return tx;
     },
