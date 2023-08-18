@@ -127,8 +127,8 @@ function ChangePasswordScreen() {
         )}
         {currentStepIndex === 1 && (
           <PasswordInput
-            title={t('CREATE_PASSWORD_SCREEN.CREATE_PASSWORD_TITLE')}
-            inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
+            title={t('SETTING_SCREEN.ENTER_YOUR_NEW_PASSWORD')}
+            inputLabel={t('SETTING_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
             enteredPassword={password}
             setEnteredPassword={setPassword}
             handleContinue={handleEnterNewPasswordNextClick}
@@ -140,8 +140,8 @@ function ChangePasswordScreen() {
         )}
         {currentStepIndex === 2 && (
           <PasswordInput
-            title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
-            inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
+            title={t('SETTING_SCREEN.CONFIRM_YOUR_NEW_PASSWORD')}
+            inputLabel={t('SETTING_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
             enteredPassword={confirmPassword}
             setEnteredPassword={setConfirmPassword}
             handleContinue={handleConfirmNewPasswordNextClick}
