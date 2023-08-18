@@ -36,7 +36,6 @@ import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
-import ReviewLedgerStxTransaction from '@screens/ledger/reviewLedgerStxTransaction';
 import LedgerSendFtScreen from '@screens/ledger/ledgerSendFt';
 import ReviewLedgerFtTransaction from '@screens/ledger/reviewLedgerFtTransaction';
 import BtcSendScreen from '@screens/btcSendScreen';
@@ -169,10 +168,6 @@ const router = createHashRouter([
       {
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,
-      },
-      {
-        path: 'review-ledger-stx-tx',
-        element: <ReviewLedgerStxTransaction />,
       },
       {
         path: 'review-ledger-ft-tx',

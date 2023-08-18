@@ -376,6 +376,10 @@ function ConfirmLedgerTransaction(): JSX.Element {
     }
   };
 
+  console.log('recipients', recipients);
+  console.log('type', type);
+  console.log('fee', fee);
+
   const renderTxDetails = () => (
     <TxDetails>
       <TxDetailsRow>
@@ -386,7 +390,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
           ))}
         </RecipientsWrapper>
       </TxDetailsRow>
-      <TxDetailsRow>
+      {/* <TxDetailsRow>
         <TxDetailsTitle>{ordinalUtxo?.value ? 'Ordinal value' : 'Amount'}</TxDetailsTitle>
         {type === 'STX' ? (
           <div>{microstacksToStx(recipients[0].amountSats).toString()} STX</div>
@@ -398,7 +402,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
             BTC
           </div>
         )}
-      </TxDetailsRow>
+      </TxDetailsRow> */}
       {fee && (
         <TxDetailsRow>
           <TxDetailsTitle>Fees</TxDetailsTitle>

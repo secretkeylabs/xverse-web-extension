@@ -141,12 +141,12 @@ function ConfirmStxTransationComponent({
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-  const [isConnectSuccess, setIsConnectSuccess] = useState<boolean>(false);
-  const [isConnectFailed, setIsConnectFailed] = useState<boolean>(false);
-  const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
-  const [isTxRejected, setIsTxRejected] = useState<boolean>(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState(false);
+  const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isTxApproved, setIsTxApproved] = useState(false);
+  const [isTxRejected, setIsTxRejected] = useState(false);
 
   useEffect(() => {
     setButtonLoading(loading);
@@ -271,7 +271,7 @@ function ConfirmStxTransationComponent({
           {!isAsset && (
             <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>
           )}
-          {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
+          {!!subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
         {children}
         <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
@@ -284,7 +284,9 @@ function ConfirmStxTransationComponent({
             title={t('TOTAL')}
           />
         )}
-        {!isSponsored && (
+        {isSponsored ? (
+          <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>
+        ) : (
           <Button onClick={onAdvancedSettingClick}>
             <>
               <ButtonImage src={SettingIcon} />
@@ -292,7 +294,6 @@ function ConfirmStxTransationComponent({
             </>
           </Button>
         )}
-        {isSponsored && <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>}
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
           fee={microstacksToStx(getFee()).toString()}
