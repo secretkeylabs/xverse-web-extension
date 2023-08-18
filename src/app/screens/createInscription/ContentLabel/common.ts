@@ -1,4 +1,5 @@
 export enum ContentType {
+  SVG = 'SVG',
   IMAGE = 'IMAGE',
   HTML = 'HTML',
   TEXT = 'TEXT',

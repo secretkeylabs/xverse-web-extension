@@ -1,9 +1,11 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import EyeIcon from '@assets/img/eye.svg';
 import ShareIcon from '@assets/img/share.svg';
+import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 
 import { ContentType } from './common';
 import Preview from './preview';
@@ -16,10 +18,11 @@ const previewableContentTypes = new Set([
   ContentType.AUDIO,
 ]);
 
-const ordiViewTypes = new Set([ContentType.HTML]);
+const ordiViewTypes = new Set([ContentType.HTML, ContentType.SVG]);
 
 const getContentType = (inputContentType: string) => {
   const contentType = inputContentType.toLowerCase();
+  if (contentType.includes('svg')) return ContentType.SVG;
   if (contentType.includes('image')) return ContentType.IMAGE;
   if (contentType.includes('html')) return ContentType.HTML;
   if (contentType.includes('text')) return ContentType.TEXT;
@@ -69,9 +72,15 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
   const canShowPreview = isPreviewable(contentType);
   const canPreviewInOrd = isOrdiPreviewable(contentType);
 
-  const onTogglePreview = () => {
+  const onTogglePreview = async () => {
     if (canShowPreview) setShowPreview((current) => !current);
-    else if (canPreviewInOrd) window.open(`https://TODO.com`, '_blank');
+    else if (canPreviewInOrd) {
+      // TODO: Error handle
+      const { data: previewId } = await axios.post(`${XVERSE_ORDIVIEW_URL}/previewHtml`, {
+        html: content,
+      });
+      window.open(`${XVERSE_ORDIVIEW_URL}/previewHtml/${previewId}`, '_blank');
+    }
   };
 
   return (

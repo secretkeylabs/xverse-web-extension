@@ -2,6 +2,7 @@ import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import { Inscription, getErc721Metadata } from '@secretkeylabs/xverse-core';
+import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getFetchableUrl } from '@utils/helper';
 import Image from 'rc-image';
 import { useEffect, useState } from 'react';
@@ -177,11 +178,11 @@ function OrdinalImage({
   );
 
   if (ordinal?.content_type.includes('image/svg')) {
-    return renderImage(t('ORDINAL'), `https://ord.xverse.app/thumbnail/${ordinal.id}`);
+    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL}/thumbnail/${ordinal.id}`);
   }
 
   if (ordinal?.content_type.includes('image')) {
-    return renderImage(t('ORDINAL'), `https://ord.xverse.app/content/${ordinal.id}`);
+    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL}/content/${ordinal.id}`);
   }
 
   if (textContent?.includes('brc-721e')) {
@@ -214,7 +215,7 @@ function OrdinalImage({
     if (ordinal?.content_type.includes('html')) {
       return (
         <ImageContainer inNftDetail={inNftDetail}>
-          <FillImg src={`https://ord.xverse.app/thumbnail/${ordinal.id}`} alt="/html/" />
+          <FillImg src={`${XVERSE_ORDIVIEW_URL}/thumbnail/${ordinal.id}`} alt="/html/" />
           {isNftDashboard && (
             <OrdinalsTag>
               <ButtonIcon src={OrdinalsIcon} />
