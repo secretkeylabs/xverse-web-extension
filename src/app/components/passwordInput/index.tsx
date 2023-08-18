@@ -119,6 +119,7 @@ const PasswordStrengthContainer = styled.div((props) => ({
 
 const StrengthBar = styled(animated.div)<StrengthBarProps>((props) => ({
   display: 'flex',
+  flex: '1 0',
   alignItems: 'center',
   backgroundColor: props.theme.colors.white[600],
   marginLeft: props.theme.spacing(6),
