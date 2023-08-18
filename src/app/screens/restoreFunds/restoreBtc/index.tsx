@@ -128,9 +128,10 @@ function RestoreBtc() {
   });
 
   const onClickTransfer = () => {
+    if (!unspentUtxos) return;
     mutateSignNonOrdinalBtcTransaction({
       recipientAddress: btcAddress,
-      nonOrdinalUtxos: unspentUtxos ?? [],
+      nonOrdinalUtxos: unspentUtxos,
       accountIndex: selectedAccount?.id ?? 0,
       seedPhrase,
       network: network.type,
@@ -201,6 +202,8 @@ function RestoreBtc() {
         <ActionButton
           text={isNoAmount ? t('BACK') : t('TRANSFER')}
           onPress={isNoAmount ? handleOnCancelClick : onClickTransfer}
+          disabled={!unspentUtxos}
+          processing={!unspentUtxos}
         />
       </ButtonContainer>
       <BottomTabBar tab="nft" />
