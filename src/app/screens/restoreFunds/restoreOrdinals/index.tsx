@@ -117,6 +117,7 @@ function RestoreOrdinals() {
           fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),
           ordinalUtxo: selectedOrdinal.utxo,
           ordinal: selectedInscription,
+          isRestoreOrdinalFlow: true,
         },
       });
     }

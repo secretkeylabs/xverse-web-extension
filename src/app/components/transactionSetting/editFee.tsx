@@ -153,6 +153,7 @@ interface Props {
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
   ordinal?: Inscription;
   isRecover?: boolean;
+  isRestoreOrdinalFlow?: boolean;
   error: string;
   setIsLoading: () => void;
   setIsNotLoading: () => void;
@@ -171,6 +172,7 @@ function EditFee({
   nonOrdinalUtxos,
   ordinal,
   isRecover,
+  isRestoreOrdinalFlow = false,
   error,
   setIsLoading,
   setIsNotLoading,
@@ -258,7 +260,7 @@ function EditFee({
           ordinalsAddress,
           network: network.type,
           ordinal,
-          isRecover,
+          isRecover: isRestoreOrdinalFlow,
           feeMode: mode,
         });
 
@@ -334,7 +336,7 @@ function EditFee({
           ordinalsAddress,
           network: network.type,
           ordinal,
-          isRecover,
+          isRecover: isRestoreOrdinalFlow,
           feeMode: selectedOption,
           feeRateInput,
         });

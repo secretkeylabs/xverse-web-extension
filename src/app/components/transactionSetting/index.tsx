@@ -66,6 +66,7 @@ interface Props {
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
   ordinal?: Inscription;
+  isRestoreOrdinalFlow?: boolean;
   showFeeSettings: boolean;
   setShowFeeSettings: (value: boolean) => void;
 }
@@ -85,6 +86,7 @@ function TransactionSettingAlert({
   isRestoreFlow,
   nonOrdinalUtxos,
   ordinal,
+  isRestoreOrdinalFlow = false,
   showFeeSettings,
   setShowFeeSettings,
 }: Props) {
@@ -177,6 +179,7 @@ function TransactionSettingAlert({
           isRestoreFlow={isRestoreFlow}
           nonOrdinalUtxos={nonOrdinalUtxos}
           ordinal={ordinal}
+          isRestoreOrdinalFlow={isRestoreOrdinalFlow}
         />
       );
     }

@@ -125,6 +125,7 @@ interface Props {
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
   isBtcSendBrowserTx?: boolean;
   ordinal?: Inscription;
+  isRestoreOrdinalFlow?: boolean;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;
   setCurrentFeeRate: (feeRate: BigNumber) => void;
@@ -146,6 +147,7 @@ function ConfirmBtcTransactionComponent({
   nonOrdinalUtxos,
   isBtcSendBrowserTx,
   ordinal,
+  isRestoreOrdinalFlow = false,
   currentFeeRate,
   setCurrentFee,
   setCurrentFeeRate,
@@ -224,6 +226,7 @@ function ConfirmBtcTransactionComponent({
         network: network.type,
         ordinal,
         fee: new BigNumber(txFee),
+        isRecover: isRestoreOrdinalFlow,
       });
       return signedTx;
     },
@@ -410,6 +413,7 @@ function ConfirmBtcTransactionComponent({
             showFeeSettings={showFeeSettings}
             setShowFeeSettings={setShowFeeSettings}
             ordinal={ordinal}
+            isRestoreOrdinalFlow={isRestoreOrdinalFlow}
           />
         </Container>
         <ErrorContainer>
