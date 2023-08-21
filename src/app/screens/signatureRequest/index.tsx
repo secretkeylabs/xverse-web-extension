@@ -77,7 +77,6 @@ const SigningAddressContainer = styled.div((props) => ({
 
 const SigningAddressTitle = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  lineHeight: 1.6,
   wordWrap: 'break-word',
   color: props.theme.colors.white[200],
   marginBottom: props.theme.spacing(4),
@@ -92,7 +91,6 @@ const SigningAddress = styled.div({
 const SigningAddressType = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
-  lineHeight: 1.6,
   wordWrap: 'break-word',
   color: props.theme.colors.white[0],
   marginBottom: props.theme.spacing(4),
@@ -101,7 +99,6 @@ const SigningAddressType = styled.p((props) => ({
 const SigningAddressValue = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
-  lineHeight: 1.6,
   wordWrap: 'break-word',
   color: props.theme.colors.white[0],
   marginBottom: props.theme.spacing(4),
@@ -362,9 +359,9 @@ function SignatureRequest(): JSX.Element {
               {t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}
             </SigningAddressTitle>
             <SigningAddress>
-              <SigningAddressType>{addressType}</SigningAddressType>
+              {addressType && <SigningAddressType>{addressType}</SigningAddressType>}
               <SigningAddressValue>
-                {getTruncatedAddress(payload.address || payload.stxAddress)}
+                {getTruncatedAddress(payload.address || payload.stxAddress, 6)}
               </SigningAddressValue>
             </SigningAddress>
           </SigningAddressContainer>
