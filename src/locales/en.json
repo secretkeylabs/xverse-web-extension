@@ -163,7 +163,7 @@
     "ACCOUNT_NAME": "Account",
     "RECEIVE": "Receive",
     "CANCEL": "Cancel",
-    "REMOVE_WALLET": "Remove wallet",
+    "REMOVE_WALLET": "Remove",
     "SEND": "Send",
     "SWAP": "Swap",
     "BUY": "Buy",
@@ -171,7 +171,7 @@
     "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
     "ORDINALS": "Ordinals & BRC-20 Tokens",
     "REMOVE_FROM_LIST_TITLE": "Remove from list",
-    "REMOVE_FROM_LIST_DESCRIPTION": "This will remove this wallet from this list. You can import it again by connecting your device."
+    "REMOVE_FROM_LIST_DESCRIPTION": "This will disconnect and remove the account from Xverse. You can import the same account again later by reconnecting your hardware wallet device."
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
