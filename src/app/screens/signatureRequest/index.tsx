@@ -289,9 +289,19 @@ function SignatureRequest(): JSX.Element {
           finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data });
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      setIsTxRejected(true);
+
+      if (e.name === 'LockedDeviceError') {
+        setCurrentStepIndex(0);
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+      } else if (e.statusCode === 28160) {
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+      } else {
+        setIsTxRejected(true);
+      }
     } finally {
       await transport.close();
       setIsButtonDisabled(false);
@@ -300,6 +310,7 @@ function SignatureRequest(): JSX.Element {
 
   const handleRetry = async () => {
     setIsTxRejected(false);
+    setIsConnectFailed(false);
     setIsConnectSuccess(false);
     setCurrentStepIndex(0);
   };
@@ -377,16 +388,19 @@ function SignatureRequest(): JSX.Element {
           <LedgerConnectionView
             title={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.TITLE')}
             text={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.SUBTITLE')}
-            titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_TITLE')}
-            textFailed={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE')}
-            infoFailed={
+            titleFailed={t(
               isTxRejected
-                ? 'Make sure you installed the updates in Ledger Live application (Bitcoin app v2.1.3 or newer is required)'
-                : undefined
-            }
+                ? 'SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_TITLE'
+                : 'SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_TITLE',
+            )}
+            textFailed={t(
+              isTxRejected
+                ? 'SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_SUBTITLE'
+                : 'SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE',
+            )}
             imageDefault={ledgerConnectDefaultIcon}
             isConnectSuccess={isTxApproved}
-            isConnectFailed={isTxRejected}
+            isConnectFailed={isTxRejected || isConnectFailed}
           />
         )}
         <SuccessActionsContainer>
