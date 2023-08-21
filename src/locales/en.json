@@ -750,17 +750,6 @@
       "TRANSACTION": "Transaction fees",
       "TOTAL": "Total fees"
     },
-    "CONTENT_TYPE": {
-      "IMAGE": "Image",
-      "SVG": "SVG",
-      "HTML": "HTML",
-      "TEXT": "Text",
-      "VIDEO": "Video",
-      "AUDIO": "Audio",
-      "MODEL": "Model",
-      "JSON": "JSON",
-      "OTHER": "Unknown type"
-    },
     "COMPLETE": {
       "INSCRIBED": "Ordinal inscribed",
       "MESSAGE": "Your ordinal have been successfully inscribed and should appear in a few minutes.",

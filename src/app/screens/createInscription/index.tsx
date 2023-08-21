@@ -276,6 +276,11 @@ function CreateInscription({ type }: Props) {
 
   const fiatFees = new BigNumber(totalFee).dividedBy(100e6).multipliedBy(btcFiatRate).toFixed(2);
 
+  const fiatValue = new BigNumber(commitValue ?? 0)
+    .dividedBy(100e6)
+    .multipliedBy(btcFiatRate)
+    .toFixed(2);
+
   if (complete) {
     const onClose = () => {
       const response = {
@@ -349,12 +354,22 @@ function CreateInscription({ type }: Props) {
             <div>
               {isLoading && <MoonLoader color="white" size={20} />}
               {!isLoading && (
-                <NumericFormat
-                  value={commitValue}
-                  displayType="text"
-                  thousandSeparator
-                  suffix=" sats"
-                />
+                <NumberWithSuffixContainer>
+                  <NumericFormat
+                    value={commitValue}
+                    displayType="text"
+                    thousandSeparator
+                    suffix=" sats"
+                  />
+                  <NumericFormat
+                    value={fiatValue}
+                    displayType="text"
+                    thousandSeparator
+                    suffix=" USD"
+                    prefix="~$"
+                    renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
+                  />
+                </NumberWithSuffixContainer>
               )}
             </div>
           </CardRow>

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import EyeIcon from '@assets/img/eye.svg';
@@ -13,6 +12,7 @@ import Preview from './preview';
 const previewableContentTypes = new Set([
   ContentType.IMAGE,
   ContentType.TEXT,
+  ContentType.HTML,
   ContentType.JSON,
   ContentType.VIDEO,
   ContentType.AUDIO,
@@ -62,31 +62,38 @@ type Props = {
   content: string;
 };
 
+// TODO: BRC-20
+// TODO: SATS DNS
+// TODO: If JSON, try parse and show error if not working
+// TODO: Display friendly json
+// TODO: Display raw HTML
 function ContentIcon({ type, content, contentType: inputContentType }: Props) {
-  const { t } = useTranslation('translation');
   const [showPreview, setShowPreview] = useState(false);
 
   const contentType = getContentType(inputContentType);
-  const icon = getIcon(contentType);
 
   const canShowPreview = isPreviewable(contentType);
   const canPreviewInOrd = isOrdiPreviewable(contentType);
 
   const onTogglePreview = async () => {
     if (canShowPreview) setShowPreview((current) => !current);
-    else if (canPreviewInOrd) {
-      // TODO: Error handle
+  };
+
+  const onOrdClick = async () => {
+    if (canPreviewInOrd) {
       const { data: previewId } = await axios.post(`${XVERSE_ORDIVIEW_URL}/previewHtml`, {
         html: content,
       });
+
       window.open(`${XVERSE_ORDIVIEW_URL}/previewHtml/${previewId}`, '_blank');
     }
   };
 
   return (
     <Container>
-      <div>{t(`INSCRIPTION_REQUEST.CONTENT_TYPE.${contentType}`)}</div>
-      {icon && <ButtonIcon src={icon} onClick={onTogglePreview} />}
+      <div>{inputContentType}</div>
+      {canShowPreview && <ButtonIcon src={EyeIcon} onClick={onTogglePreview} />}
+      {canPreviewInOrd && <ButtonIcon src={ShareIcon} onClick={onOrdClick} />}
 
       <Preview
         content={content}

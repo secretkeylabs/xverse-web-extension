@@ -106,6 +106,14 @@ function Preview({ onClick, type, content, contentType, contentTypeRaw, visible 
         </PreviewText>
       </PreviewTextContainer>
     );
+  } else if (contentType === ContentType.HTML) {
+    preview = (
+      <PreviewTextContainer>
+        <PreviewText fontSize={fontSize} ref={textRef}>
+          <pre>{content}</pre>
+        </PreviewText>
+      </PreviewTextContainer>
+    );
   } else if (contentType === ContentType.IMAGE) {
     preview = <PreviewImg src={`data:${contentTypeRaw};base64,${content}`} alt="Inscription" />;
   } else if (contentType === ContentType.VIDEO) {
