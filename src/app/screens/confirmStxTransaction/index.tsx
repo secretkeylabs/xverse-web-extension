@@ -99,7 +99,7 @@ function ConfirmStxTransaction() {
     }
   }, [txError]);
 
-  function updateUI() {
+  const updateUI = () => {
     const txPayload = unsignedTx.payload as TokenTransferPayload;
 
     if (txPayload.recipient.address) {
@@ -119,7 +119,7 @@ function ConfirmStxTransaction() {
     setTotal(txTotal);
     setFiatTotal(txFiatTotal);
     setMemo(txMemo.content);
-  }
+  };
 
   useEffect(() => {
     if (recipient === '' || !fee || !amount || !fiatAmount || !total || !fiatTotal) {

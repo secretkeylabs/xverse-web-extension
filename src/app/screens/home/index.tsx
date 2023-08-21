@@ -31,10 +31,10 @@ import { CurrencyTypes } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import Theme from 'theme';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import ActionButton from '@components/button';
+import Theme from 'theme';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
 
@@ -251,7 +251,7 @@ function Home() {
     }
     if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL(`options.html#/send-ft-ledger?coin=${coin.name}`),
+        url: chrome.runtime.getURL(`options.html#/send-ft?coinName=${coin.name}`),
       });
       return;
     }
