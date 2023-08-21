@@ -26,6 +26,7 @@ const SeedContainer = styled.div<SeedContainerProps>((props) => ({
   paddingBottom: props.theme.spacing(17),
   paddingLeft: props.theme.spacing(5),
   filter: `blur(${props.isVisible ? 0 : '3px'})`,
+  userSelect: 'none',
 }));
 
 const OuterSeedContainer = styled.div((props) => ({
