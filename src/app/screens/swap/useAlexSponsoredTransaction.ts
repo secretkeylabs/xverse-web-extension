@@ -27,7 +27,7 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
     alexSDK.broadcastSponsoredTx(signed.serialize().toString('hex'));
 
   const { data: stxPendingTxData } = useStxPendingTxData();
-  const pendingTransactionNonce =
+  const upcomingPendingTransactionNonce =
     (stxPendingTxData?.pendingTransactions ?? []).reduce(
       (maxNonce, transaction) => Math.max(maxNonce, transaction?.nonce ?? 0),
       0,
@@ -35,7 +35,7 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
 
   let hasPendingTransactions = false;
   //ignore pending transactions if account nonce has advanced pass the nonce in pending transactions
-  if (stxNonce > pendingTransactionNonce) {
+  if (stxNonce > upcomingPendingTransactionNonce) {
     hasPendingTransactions = false;
   } else {
     hasPendingTransactions = stxPendingTxData?.pendingTransactions?.length > 0;
