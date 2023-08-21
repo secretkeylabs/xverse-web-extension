@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 import ledgerConnectDoneIcon from '@assets/img/ledger/ledger_import_connect_done.svg';
 import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
+import InfoContainer from '@components/infoContainer';
 
 export const ConnectLedgerContainer = styled.div`
   display: flex;
@@ -24,6 +25,15 @@ export const ConnectLedgerText = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
   textAlign: 'center',
+  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(4),
+  paddingLeft: props.theme.spacing(6),
+  paddingRight: props.theme.spacing(6),
+}));
+
+export const ConnectLedgerInfoContainer = styled.p((props) => ({
+  paddingLeft: props.theme.spacing(6),
+  paddingRight: props.theme.spacing(6),
 }));
 
 interface LedgerConnectionProps {
@@ -34,6 +44,7 @@ interface LedgerConnectionProps {
   imageDefault: string;
   isConnectSuccess: boolean;
   isConnectFailed: boolean;
+  infoFailed?: string;
 }
 
 function LedgerConnectionView({
@@ -44,6 +55,7 @@ function LedgerConnectionView({
   imageDefault,
   isConnectSuccess,
   isConnectFailed,
+  infoFailed,
 }: LedgerConnectionProps) {
   let ledgerConnectIcon = imageDefault;
 
@@ -58,6 +70,11 @@ function LedgerConnectionView({
       <img src={ledgerConnectIcon} alt="connect ledger device" />
       <ConnectLedgerTitle>{isConnectFailed ? titleFailed : title}</ConnectLedgerTitle>
       <ConnectLedgerText>{isConnectFailed ? textFailed : text}</ConnectLedgerText>
+      {isConnectFailed && !!infoFailed && (
+        <ConnectLedgerInfoContainer>
+          <InfoContainer bodyText={infoFailed} />
+        </ConnectLedgerInfoContainer>
+      )}
     </ConnectLedgerContainer>
   );
 }

@@ -379,6 +379,11 @@ function SignatureRequest(): JSX.Element {
             text={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.SUBTITLE')}
             titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_TITLE')}
             textFailed={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE')}
+            infoFailed={
+              isTxRejected
+                ? 'Make sure you installed the updates in Ledger Live application (Bitcoin app v2.1.3 or newer is required)'
+                : undefined
+            }
             imageDefault={ledgerConnectDefaultIcon}
             isConnectSuccess={isTxApproved}
             isConnectFailed={isTxRejected}
