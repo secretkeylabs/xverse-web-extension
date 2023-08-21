@@ -85,8 +85,8 @@ const GlobalStyle = createGlobalStyle`
     text-decoration: none;
   }
   * a:hover {
-    text-decoration:none; 
-    cursor:pointer;  
+    text-decoration:none;
+    cursor:pointer;
 }
 *,
 *::after,
