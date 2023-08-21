@@ -355,13 +355,17 @@
     "SEED_PHRASE_VIEW_CONTINUE": "Continue",
     "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
     "SEED_PHRASE_VERIFY_BUTTON": "Verify",
-    "SEED_PHRASE_BACK_BUTTON": "Back"
+    "SEED_PHRASE_BACK_BUTTON": "Back to seedphrase",
+    "SEED_PHRASE_INCORRECT": "This word is not correct.",
+    "SELECT_THE": "Select the ",
+    "WORD_OF_YOUR_SEEDPHRASE": " word of your seedphrase.",
+    "CONFIRM_YOUR_SEEDPHRASE": "Confirm you've recorded your seed phrase correctly."
   },
   "CREATE_PASSWORD_SCREEN": {
-    "CREATE_PASSWORD_TITLE": "Enter your new password",
-    "CONFIRM_PASSWORD_TITLE": "Confirm your new password",
+    "CREATE_PASSWORD_TITLE": "Enter a password to protect your wallet",
+    "CONFIRM_PASSWORD_TITLE": "Confirm your password",
     "ENTER_PASSWORD": "Enter your current password",
-    "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
+    "TEXT_INPUT_NEW_PASSWORD_LABEL": "Password",
     "TEXT_INPUT_ENTER_PASSWORD_LABEL": "Enter your current password",
     "TEXT_INPUT_CONFIRM_PASSWORD_LABEL": "Confirm Password",
     "CONTINUE_BUTTON": "Continue",
@@ -440,11 +444,10 @@
     "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"
   },
   "RESTORE_WALLET_SCREEN": {
-    "ENTER_SEED_HEADER": "Enter your 12 or 24 word seedphrase to restore your wallet",
-    "SEED_INPUT_PLACEHOLDER": "Enter your seedphrase",
-    "SEED_INPUT_LABEL": "Selected Words",
+    "ENTER_SEED_HEADER": "Enter your seedphrase to restore your wallet.",
     "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
-    "CONTINUE_BUTTON": "Continue"
+    "CONTINUE_BUTTON": "Continue",
+    "HAVE_A_24_WORDS_SEEDPHRASE?": "Have a {{number}} words seedphrase?"
   },
   "STACKING_SCREEN": {
     "STACK_AND_EARN": "Stack STX, earn BTC",
@@ -598,7 +601,10 @@
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets",
     "LOCK_COUNTDOWN": "Auto-lock Timer",
-    "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically."
+    "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically.",
+    "ENTER_YOUR_NEW_PASSWORD": "Enter your new password",
+    "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
+    "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",

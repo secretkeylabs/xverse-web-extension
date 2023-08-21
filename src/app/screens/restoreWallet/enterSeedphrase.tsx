@@ -11,10 +11,11 @@ const Container = styled.div({
 });
 
 const Title = styled.h1((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.body_m,
   color: props.theme.colors.white[200],
   marginTop: props.theme.spacing(21),
   marginBottom: props.theme.spacing(16),
+  textAlign: 'center',
 }));
 
 const ButtonContainer = styled.div((props) => ({
@@ -39,12 +40,7 @@ function EnterSeedPhrase(props: Props): JSX.Element {
   return (
     <Container>
       <Title>{t('ENTER_SEED_HEADER')}</Title>
-      <SeedPhraseInput
-        seed={seed}
-        onSeedChange={setSeed}
-        seedError={seedError}
-        setSeedError={setSeedError}
-      />
+      <SeedPhraseInput onSeedChange={setSeed} seedError={seedError} setSeedError={setSeedError} />
       <ButtonContainer>
         <ActionButton onPress={onContinue} disabled={seed === ''} text={t('CONTINUE_BUTTON')} />
       </ButtonContainer>
