@@ -423,7 +423,10 @@
     "REQUEST_TOOLTIP": "Requested by",
     "CONNECT_BUTTON": "Connect",
     "CANCEL_BUTTON": "Cancel",
-    "NO_STACKS_AUTH_SUPPORT": "The selected account does not support Stacks authentication. Switch to a different account to authenticate with Stacks.",
+    "NO_STACKS_AUTH_SUPPORT": {
+      "TITLE": "This wallet does not have a Stacks address.",
+      "LINK": "Create an address here"
+    },
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect Your Ledger",

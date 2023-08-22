@@ -205,7 +205,17 @@ function AuthenticationRequest() {
         <DappTitle>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappTitle>
         {isDisabled && (
           <InfoContainerWrapper>
-            <InfoContainer bodyText={t('NO_STACKS_AUTH_SUPPORT')} />
+            <InfoContainer
+              bodyText={t('NO_STACKS_AUTH_SUPPORT.TITLE')}
+              redirectText={t('NO_STACKS_AUTH_SUPPORT.LINK')}
+              onClick={async () => {
+                await chrome.tabs.create({
+                  url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+                });
+
+                window.close();
+              }}
+            />
           </InfoContainerWrapper>
         )}
       </MainContainer>
