@@ -18,6 +18,8 @@ import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ActionButton from '@components/button';
 import { ledgerDelay } from '@common/utils/ledger';
 import { signatureVrsToRsv } from '@stacks/common';
@@ -332,7 +334,7 @@ function SignatureRequest(): JSX.Element {
 
       {isMessageSigningDisabled ? (
         <MainContainer>
-          <InfoContainer bodyText="Message signing is not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
+          <InfoContainer bodyText="Stacks message signing is not yet supported on a Ledger account. Switch to a different account to sign Stacks messages from the application." />
         </MainContainer>
       ) : (
         <MainContainer>
@@ -373,10 +375,12 @@ function SignatureRequest(): JSX.Element {
         {currentStepIndex === 0 && (
           <LedgerConnectionView
             title={t('SIGNATURE_REQUEST.LEDGER.CONNECT.TITLE')}
-            text={t('SIGNATURE_REQUEST.LEDGER.CONNECT.SUBTITLE')}
+            text={t('SIGNATURE_REQUEST.LEDGER.CONNECT.SUBTITLE', {
+              name: isSignMessageBip322 ? 'Bitcoin' : 'Stacks',
+            })}
             titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_TITLE')}
             textFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={ledgerConnectDefaultIcon}
+            imageDefault={isSignMessageBip322 ? ledgerConnectBtcIcon : ledgerConnectStxIcon}
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />

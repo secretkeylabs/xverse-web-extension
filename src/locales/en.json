@@ -718,8 +718,8 @@
     "SIGNATURE_ERROR_TITLE": "Signature Error",
     "LEDGER": {
       "CONNECT": {
-        "TITLE": "Connect your hardware wallet",
-        "SUBTITLE": "To continue, plug and unlock your device.",
+        "TITLE": "Connect Your Ledger",
+        "SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the {{name}} app.",
         "ERROR_TITLE": "Connection error",
         "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
       },
