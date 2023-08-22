@@ -757,17 +757,18 @@
   },
   "SEND_BRC_20": {
     "BRC20_TOKEN": "BRC-20",
-    "SEND_INFO_TITLE": "Sending a BRC-20 token",
-    "SEND_INFO_SUBTITLE": "To transfer BRC-20 tokens, you need to make two separate transactions:",
-    "SEND_STEP_1_TITLE": "Inscribe Transfer",
-    "SEND_STEP_1": "Create an Ordinal inscription with the token and amount you would like to send.",
-    "SEND_STEP_2_TITLE": "Send transfer inscription",
-    "SEND_STEP_2": "Once you have the transfer inscription, you can send it to your recipient to transfer the BRC-20 token.",
-    "SEND_INFO_START_BUTTON": "Start",
-    "SEND_NEXT_BUTTON": "Next",
+    "NEXT": "Next",
     "SEND": "Send",
     "AMOUNT": "Amount",
-    "BALANCE": "Balance"
+    "BALANCE": "Balance",
+    "RECIPIENT": "Recipient",
+    "ERRORS": {
+      "ADDRESS_REQUIRED": "Recipient address is required",
+      "AMOUNT_REQUIRED": "Amount is required",
+      "ADDRESS_INVALID": "Recipient address invalid",
+      "INSUFFICIENT_BALANCE": "Insufficient balance",
+      "INSUFFICIENT_BALANCE_FEES": "Insufficient BTC balance for transaction fees"
+    }
   },
   "CACHE_MIGRATION_SCREEN": {
     "TITLE": "Your wallet data store needs to be updated in order to remain secure.",

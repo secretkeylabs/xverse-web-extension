@@ -17,3 +17,7 @@ export function getFtBalance(ft: FungibleToken) {
   }
   return ft?.balance;
 }
+
+export function getBrc20Ticker(ft: FungibleToken): string {
+  return ft?.ticker?.toUpperCase() ?? (ft?.name && getTicker(ft.name)?.toUpperCase()) ?? '';
+}
