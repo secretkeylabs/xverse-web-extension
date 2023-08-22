@@ -160,6 +160,7 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
   opacity: props.enabled ? 1 : 0.6,
 }));
 
+/* --------- move to separate file ------------- */
 const SwitchToFiatButton = styled.button((props) => ({
   backgroundColor: props.theme.colors.background.elevation0,
   border: `1px solid ${props.theme.colors.background.elevation3}`,
@@ -175,6 +176,48 @@ const SwitchToFiatText = styled.h1((props) => ({
   marginLeft: props.theme.spacing(2),
   color: props.theme.colors.white['0'],
 }));
+
+export function FiatRow({
+  onClick,
+  showFiat,
+  tokenCurrency,
+  tokenAmount,
+  fiatCurrency,
+  fiatAmount,
+}: {
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  showFiat: boolean;
+  tokenCurrency: string;
+  tokenAmount: string;
+  fiatCurrency: string;
+  fiatAmount: string;
+}) {
+  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  const renderText = (value: string) => `~ ${value} ${tokenCurrency}`;
+  return (
+    <RowContainer>
+      <SubText>
+        {showFiat ? (
+          <NumericFormat
+            value={tokenAmount}
+            displayType="text"
+            thousandSeparator
+            renderText={renderText}
+          />
+        ) : (
+          `~ $ ${fiatAmount} ${fiatCurrency}`
+        )}
+      </SubText>
+      <SwitchToFiatButton onClick={onClick}>
+        <img src={Switch} alt="Switch" />
+        <SwitchToFiatText>
+          {showFiat ? `${t('SWITCH_TO')} ${tokenCurrency}` : `${t('SWITCH_TO')} ${fiatCurrency}`}
+        </SwitchToFiatText>
+      </SwitchToFiatButton>
+    </RowContainer>
+  );
+}
+/* ---------------------------------------------- */
 
 const CurrencyFlag = styled.img((props) => ({
   marginLeft: props.theme.spacing(4),
@@ -272,7 +315,7 @@ function SendForm({
     setFiatAmount(amountInCurrency);
   }, [amountToSend]);
 
-  function getTokenCurrency() {
+  function getTokenCurrency(): string {
     if (fungibleToken) {
       if (fungibleToken?.ticker) {
         return fungibleToken.ticker.toUpperCase();
@@ -280,9 +323,8 @@ function SendForm({
       if (fungibleToken?.name) {
         return getTicker(fungibleToken.name).toUpperCase();
       }
-    } else {
-      return currencyType;
     }
+    return currencyType;
   }
 
   const onSwitchPress = () => {
@@ -352,28 +394,14 @@ function SendForm({
         <Text>{getAmountLabel()}</Text>
         {switchToFiat && <CurrencyFlag src={getCurrencyFlag(fiatCurrency)} />}
       </AmountInputContainer>
-      <RowContainer>
-        <SubText>
-          {switchToFiat ? (
-            <NumericFormat
-              value={getTokenEquivalent(amount)}
-              displayType="text"
-              thousandSeparator
-              renderText={(value) => `~ ${value} ${getTokenCurrency()}`}
-            />
-          ) : (
-            `~ $ ${fiatAmount} ${fiatCurrency}`
-          )}
-        </SubText>
-        <SwitchToFiatButton onClick={onSwitchPress}>
-          <img src={Switch} alt="Switch" />
-          <SwitchToFiatText>
-            {switchToFiat
-              ? `${t('SWITCH_TO')} ${getTokenCurrency()}`
-              : `${t('SWITCH_TO')} ${fiatCurrency}`}
-          </SwitchToFiatText>
-        </SwitchToFiatButton>
-      </RowContainer>
+      <FiatRow
+        onClick={onSwitchPress}
+        showFiat={switchToFiat}
+        tokenCurrency={getTokenCurrency()}
+        tokenAmount={getTokenEquivalent(amount)}
+        fiatCurrency={fiatCurrency}
+        fiatAmount={fiatAmount ?? ''}
+      />
     </Container>
   );
 
