@@ -2,8 +2,8 @@ import { Currency, SponsoredTxErrorCode, SponsoredTxError } from 'alex-sdk';
 import { useNavigate } from 'react-router-dom';
 import { SwapToken } from '@screens/swap/useSwap';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import {
+  microstacksToStx,
   broadcastSignedTransaction,
   signTransaction,
   StacksTransaction,
@@ -13,9 +13,9 @@ import useNetworkSelector from '@hooks/useNetwork';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
 import useSecretKey from '@hooks/useSecretKey';
-import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
 import { useState } from 'react';
 import BigNumber from 'bignumber.js';
+import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
 import { useCurrencyConversion } from '../useCurrencyConversion';
 
 export type SwapConfirmationInput = {
@@ -43,7 +43,7 @@ export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> &
 };
 
 export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
-  const { selectedAccount, seedPhrase } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const { isSponsored, sponsorTransaction, isSponsorDisabled } = useAlexSponsoredTransaction(
     input.userOverrideSponsorValue,
