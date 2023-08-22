@@ -164,11 +164,9 @@ export default function CoinDashboard() {
     setShowFtContractDetails(false);
   };
 
-  function formatAddress(addr: string): string {
-    return addr
-      ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}`
-      : '';
-  }
+  const formatAddress = (addr: string): string =>
+    addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
+
   const showContent = () => {
     if (ft) {
       if (showFtContractDetails) {

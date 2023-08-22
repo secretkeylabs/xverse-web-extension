@@ -10,7 +10,6 @@ import {
   signLedgerNativeSegwitBtcTransaction,
   signLedgerStxTransaction,
   signLedgerMixedBtcTransaction,
-  getMasterFingerPrint,
   satsToBtc,
   microstacksToStx,
 } from '@secretkeylabs/xverse-core';
@@ -36,6 +35,7 @@ import InfoContainer from '@components/infoContainer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import { UTXO } from '@secretkeylabs/xverse-core/types';
 import Stepper from '@components/stepper';
+import { findLedgerAccountId } from '@utils/ledger';
 
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';
 
@@ -282,13 +282,14 @@ function ConfirmLedgerTransaction(): JSX.Element {
         return;
       }
 
-      const masterFingerPrint =
-        type === 'STX' ? selectedAccount?.masterPubKey : await getMasterFingerPrint(transport);
-
-      const deviceAccounts = ledgerAccountsList.filter(
-        (account) => account.masterPubKey === masterFingerPrint,
-      );
-      const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount.id);
+      const accountId =
+        selectedAccount?.deviceAccountIndex !== undefined
+          ? selectedAccount?.deviceAccountIndex
+          : await findLedgerAccountId({
+              transport,
+              id: selectedAccount?.id,
+              ledgerAccountsList,
+            });
 
       if (accountId === -1) {
         setIsConnectSuccess(false);
