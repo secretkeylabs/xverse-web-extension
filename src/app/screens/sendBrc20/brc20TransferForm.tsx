@@ -1,6 +1,6 @@
 import TokenImage from '@components/tokenImage';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
-import { getBrc20Ticker } from '@utils/tokens';
+import { getFtTicker } from '@utils/tokens';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -146,7 +146,7 @@ function Brc20TransferForm(props: Props) {
     isNextEnabled,
   } = props;
 
-  const tokenCurrency = getBrc20Ticker(token);
+  const tokenCurrency = getFtTicker(token);
 
   return (
     <Container>

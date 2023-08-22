@@ -3,7 +3,7 @@ import { ftDecimals, getTicker } from './helper';
 
 export function getFtTicker(ft: FungibleToken) {
   if (ft?.ticker) {
-    return ft.ticker;
+    return ft.protocol === 'brc-20' ? ft.ticker.toUpperCase() : ft.ticker;
   }
   if (ft?.name) {
     return getTicker(ft.name).toUpperCase();
@@ -16,8 +16,4 @@ export function getFtBalance(ft: FungibleToken) {
     return ftDecimals(ft.balance, ft.decimals);
   }
   return ft?.balance;
-}
-
-export function getBrc20Ticker(ft: FungibleToken): string {
-  return ft?.ticker?.toUpperCase() ?? (ft?.name && getTicker(ft.name)?.toUpperCase()) ?? '';
 }
