@@ -21,7 +21,8 @@ import useNetworkSelector from '@hooks/useNetwork';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import LedgerConnectDefault from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { ledgerDelay } from '@common/utils/ledger';
 import { isHardwareAccount } from '@utils/helper';
 
@@ -135,6 +136,9 @@ function ConfirmStxTransationComponent({
   skipModal = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t: signatureRequestTranslate } = useTranslation('translation', {
+    keyPrefix: 'SIGNATURE_REQUEST',
+  });
   const selectedNetwork = useNetworkSelector();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const { selectedAccount, seedPhrase } = useWalletSelector();
@@ -324,11 +328,11 @@ function ConfirmStxTransationComponent({
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (
           <LedgerConnectionView
-            title={t('LEDGER.CONNECT.TITLE')}
-            text={t('LEDGER.CONNECT.SUBTITLE')}
-            titleFailed={t('LEDGER.CONNECT.ERROR_TITLE')}
-            textFailed={t('LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={LedgerConnectDefault}
+            title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
+            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', { name: 'Stacks' })}
+            titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
+            textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
+            imageDefault={ledgerConnectStxIcon}
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />
@@ -339,7 +343,7 @@ function ConfirmStxTransationComponent({
             text={t('LEDGER.CONFIRM.SUBTITLE')}
             titleFailed={t('LEDGER.CONFIRM.ERROR_TITLE')}
             textFailed={t('LEDGER.CONFIRM.ERROR_SUBTITLE')}
-            imageDefault={LedgerConnectDefault}
+            imageDefault={ledgerConnectDefaultIcon}
             isConnectSuccess={isTxApproved}
             isConnectFailed={isTxRejected}
           />
