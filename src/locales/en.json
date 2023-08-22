@@ -423,10 +423,11 @@
     "REQUEST_TOOLTIP": "Requested by",
     "CONNECT_BUTTON": "Connect",
     "CANCEL_BUTTON": "Cancel",
+    "NO_STACKS_AUTH_SUPPORT": "The selected account does not support Stacks authentication. Switch to a different account to authenticate with Stacks.",
     "LEDGER": {
       "CONNECT": {
-        "TITLE": "Connect your hardware wallet",
-        "SUBTITLE": "To continue, plug and unlock your device.",
+        "TITLE": "Connect Your Ledger",
+        "SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Stacks app.",
         "ERROR_TITLE": "Connection error",
         "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
       },

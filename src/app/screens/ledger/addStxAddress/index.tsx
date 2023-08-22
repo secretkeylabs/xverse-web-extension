@@ -10,11 +10,7 @@ import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ledgerDelay } from '@common/utils/ledger';
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
-import {
-  importStacksAccountFromLedger,
-  getMasterFingerPrint,
-  Account,
-} from '@secretkeylabs/xverse-core';
+import { importStacksAccountFromLedger, Account } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
