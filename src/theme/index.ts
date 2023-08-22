@@ -15,17 +15,19 @@ const Theme = {
       900: 'rgba(255, 255, 255, 0.1)',
     },
     background: {
-      elevation0: '#12151E',
-      elevation1: '#1D2032', // deprecated?
-      elevation_1: '#070A13',
-      elevation2: '#272A44',
-      elevation3: '#303354',
-      elevation6: '#4C5187',
-      elevation6_600: 'rgba(76, 81, 135, 0.4)',
-      elevation6_800: 'rgba(76, 81, 135, 0.2)',
-      elevation8: '#7E89AB',
-      elevation9: 'rgba(76, 81, 135, 0.2)',
-      elevation10: 'rgba(76, 81, 135, 0.35)',
+      elevation_n1: '#0C0C0C',
+      elevation0: '#181818',
+      elevation1: '#1E2024',
+      elevation_1: '#1E2024', // deprecated
+      elevation2: '#24282F',
+      elevation3: '#2A2F39',
+      elevation5: '#303643',
+      elevation6: '#4C525F',
+      elevation6_600: 'rgba(76, 82, 95, 0.4)',
+      elevation6_800: 'rgba(76, 82, 95, 0.2)',
+      elevation8: '#7A7688',
+      elevation9: 'rgba(76, 81, 135, 0.2)', // deprecated
+      elevation10: 'rgba(76, 81, 135, 0.35)', // deprecated
       modalBackdrop: 'rgba(18,21,30,0.6)',
       selectBackground:
         'linear-gradient(0deg, rgba(115, 131, 255, 0.05), rgba(115, 131, 255, 0.05)), #1D2032',
