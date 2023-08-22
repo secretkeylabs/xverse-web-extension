@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
 import { TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
 import { addressToString } from '@secretkeylabs/xverse-core/transactions';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 import RecipientAddressView from '@components/recipientAddressView';
 import TransferAmountView from '@components/transferAmountView';
 import TopRow from '@components/topRow';
@@ -100,7 +100,7 @@ function ReviewLedgerStxTransaction() {
         <TitleText>{t('CONFIRM_TRANSACTION.MEMO')}</TitleText>
         <ValueText>{memo}</ValueText>
       </Container>
-      <Seperator />
+      <Separator />
     </>
   );
 
@@ -147,7 +147,7 @@ function ReviewLedgerStxTransaction() {
         )}
         <RecipientAddressView recipient={recipient} />
         {networkInfoSection}
-        <Seperator />
+        <Separator />
         {memoInfoSection}
       </ReviewLedgerStxTransactionComponent>
     </>

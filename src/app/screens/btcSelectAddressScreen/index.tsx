@@ -7,7 +7,7 @@ import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg
 import useWalletSelector from '@hooks/useWalletSelector';
 import AccountRow from '@components/accountRow';
 import { animated, useSpring } from '@react-spring/web';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useDispatch } from 'react-redux';
 import { selectAccount } from '@stores/wallet/actions/actionCreators';
@@ -281,7 +281,7 @@ function BtcSelectAddressScreen() {
                   onAccountSelected={handleAccountSelect}
                   showOrdinalAddress
                 />
-                <Seperator />
+                <Separator />
               </AccountListRow>
             ))}
           </AccountListContainer>

@@ -203,12 +203,12 @@ function AuthenticationRequest() {
         <DappTitle>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappTitle>
         {isHardwareAccount(selectedAccount) && (
           <InfoContainerWrapper>
-            <InfoContainer bodyText="Message signing is not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
+            <InfoContainer bodyText="The selected account does not support Stacks authentication. Switch to a different account to authenticate with Stacks." />
           </InfoContainerWrapper>
         )}
       </MainContainer>
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
-        {currentStepIndex === 0 ? (
+        {currentStepIndex === 0 && (
           <LedgerConnectionView
             title={t('LEDGER.CONNECT.TITLE')}
             text={t('LEDGER.CONNECT.SUBTITLE')}
@@ -218,7 +218,8 @@ function AuthenticationRequest() {
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />
-        ) : currentStepIndex === 1 ? (
+        )}
+        {currentStepIndex === 1 && (
           <LedgerConnectionView
             title={t('LEDGER.CONFIRM.TITLE')}
             text={t('LEDGER.CONFIRM.SUBTITLE')}
@@ -228,7 +229,7 @@ function AuthenticationRequest() {
             isConnectSuccess={isTxApproved}
             isConnectFailed={isTxRejected}
           />
-        ) : null}
+        )}
         <SuccessActionsContainer>
           <ActionButton
             onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}

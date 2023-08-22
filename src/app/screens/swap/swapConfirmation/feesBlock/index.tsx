@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { Container, TitleText } from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -16,20 +18,20 @@ const FeeText = styled.p((props) => ({
 }));
 
 interface FeeTextProps {
-  lpFee: number;
-  lpFeeFiatAmount?: number;
-  currency: string;
+  txFee: number;
+  txFeeFiatAmount?: number;
 }
 
-export default function FeesBlock({ lpFee, lpFeeFiatAmount, currency }: FeeTextProps) {
+export default function FeesBlock({ txFee, txFeeFiatAmount }: FeeTextProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
+  const { fiatCurrency } = useWalletSelector();
   return (
     <Container>
       <RowContainer>
         <TitleText>{t('FEES')}</TitleText>
-        <FeeText>{`${lpFee.toFixed(6)} ${currency}`}</FeeText>
+        <FeeText>{`${txFee.toFixed(6)} STX`}</FeeText>
       </RowContainer>
-      <EstimateUSDText>{` ~ $${lpFeeFiatAmount} USD`}</EstimateUSDText>
+      <EstimateUSDText>{` ~ ${currencySymbolMap[fiatCurrency]} ${txFeeFiatAmount} ${fiatCurrency}`}</EstimateUSDText>
     </Container>
   );
 }
