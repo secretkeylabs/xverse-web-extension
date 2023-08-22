@@ -5,7 +5,7 @@ import Switch from 'react-switch';
 import { Coin } from '@secretkeylabs/xverse-core/types';
 import Theme from 'theme';
 import { getTicker } from '@utils/helper';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -119,7 +119,7 @@ function CoinItem({ coin, disabled, toggled, enabled, showDivider }: Props) {
           disabled={disabled}
         />
       </RowContainer>
-      {showDivider ? <Seperator /> : <BottomContainer />}
+      {showDivider ? <Separator /> : <BottomContainer />}
     </>
   );
 }
