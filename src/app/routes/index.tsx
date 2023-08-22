@@ -324,6 +324,10 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'send-nft/:id',
+        element: <SendNft />,
+      },
+      {
         path: 'confirm-inscription-request',
         element: (
           <AuthGuard>

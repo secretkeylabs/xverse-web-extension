@@ -27,6 +27,7 @@ import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import { StacksTransaction } from '@stacks/transactions';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ledgerConfirmBtcIcon from '@assets/img/ledger/btc_icon.svg';
 import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ordinals_icon_big.svg';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
@@ -440,7 +441,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
               textFailed={t(
                 isWrongDevice ? 'CONNECT.WRONG_DEVICE_ERROR_SUBTITLE' : connectErrSubtitle,
               )}
-              imageDefault={ledgerConnectDefaultIcon}
+              imageDefault={type === 'STX' ? ledgerConnectStxIcon : ledgerConfirmBtcIcon}
               isConnectSuccess={isConnectSuccess}
               isConnectFailed={isConnectFailed}
             />
