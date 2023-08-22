@@ -179,7 +179,7 @@ function ConfirmStxTransaction() {
         onConfirmClick={handleConfirmClick}
         onCancelClick={handleCancelClick}
         isSponsored={sponsored}
-        skipModal
+        skipModal={isLedgerAccount(selectedAccount)}
       >
         <RecipientComponent
           address={recipient}

@@ -101,7 +101,7 @@ function ConfirmFtTransaction() {
         loading={isLoading}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleBackButtonClick}
-        skipModal
+        skipModal={isLedgerAccount(selectedAccount)}
       >
         <RecipientComponent
           address={recepientAddress}

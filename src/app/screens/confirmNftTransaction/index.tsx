@@ -209,7 +209,7 @@ function ConfirmNftTransaction() {
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
           isAsset
-          skipModal
+          skipModal={isLedgerAccount(selectedAccount)}
         >
           <Container>
             <NFtContainer>
