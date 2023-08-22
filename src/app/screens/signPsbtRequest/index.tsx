@@ -2,22 +2,37 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ActionButton from '@components/button';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { parsePsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
+import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { useTranslation } from 'react-i18next';
 import IconOrdinal from '@assets/img/transactions/ordinal.svg';
 import styled from 'styled-components';
-import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
+import {
+  getBtcFiatEquivalent,
+  satsToBtc,
+  signIncomingSingleSigPSBT,
+} from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import AccountHeaderComponent from '@components/accountHeader';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import RecipientComponent from '@components/recipientComponent';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
 import InfoContainer from '@components/infoContainer';
 import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
 import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import { isLedgerAccount } from '@utils/helper';
+import BottomModal from '@components/bottomModal';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import { ledgerDelay } from '@common/utils/ledger';
+import { decodeToken } from 'jsontokens';
+import { SignTransactionOptions } from 'sats-connect';
+import useBtcClient from '@hooks/useBtcClient';
+import { findLedgerAccountId } from '@utils/ledger';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -68,14 +83,41 @@ const ReviewTransactionText = styled.h1((props) => ({
   textAlign: 'left',
 }));
 
+const SuccessActionsContainer = styled.div((props) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: props.theme.spacing(6),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(20),
+  marginTop: props.theme.spacing(20),
+}));
+
 function SignPsbtRequest() {
-  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
+  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate, ledgerAccountsList } =
     useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t: signatureRequestTranslate } = useTranslation('translation', {
+    keyPrefix: 'SIGNATURE_REQUEST',
+  });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState(false);
+  const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isTxApproved, setIsTxApproved] = useState(false);
+  const [isTxRejected, setIsTxRejected] = useState(false);
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const tabId = params.get('tabId') ?? '0';
+  const requestToken = params.get('signPsbtRequest') ?? '';
+  const request = decodeToken(requestToken) as any as SignTransactionOptions;
+  const btcClient = useBtcClient();
 
   const handlePsbtParsing = useCallback(() => {
     try {
@@ -137,6 +179,7 @@ function SignPsbtRequest() {
   const onSignPsbtConfirmed = async () => {
     try {
       if (isLedgerAccount(selectedAccount)) {
+        // setIsModalVisible(true);
         return;
       }
 
@@ -177,6 +220,106 @@ function SignPsbtRequest() {
 
   const expandInputOutputSection = () => {
     setExpandInputOutputView(!expandInputOutputView);
+  };
+
+  const handleLedgerPsbtSigning = async (transport: TransportType) => {
+    const accountId = await findLedgerAccountId({
+      transport,
+      id: selectedAccount?.id,
+      ledgerAccountsList,
+    });
+
+    if (accountId === -1) {
+      throw new Error('Account not found');
+    }
+
+    const signingResponse = await signIncomingSingleSigPSBT(
+      transport,
+      network.type,
+      accountId,
+      payload.inputsToSign,
+      payload.psbtBase64,
+      payload.broadcast,
+    );
+
+    let txId: string = '';
+    if (request.payload.broadcast) {
+      const txHex = psbtBase64ToHex(signingResponse);
+      const response = await btcClient.sendRawTransaction(txHex);
+      txId = response.tx.hash;
+    }
+
+    const signingMessage = {
+      source: MESSAGE_SOURCE,
+      method: ExternalSatsMethods.signPsbtResponse,
+      payload: {
+        signPsbtRequest: requestToken,
+        signPsbtResponse: {
+          psbtBase64: signingResponse,
+          txId,
+        },
+      },
+    };
+    chrome.tabs.sendMessage(+tabId, signingMessage);
+
+    return {
+      txId,
+      signingResponse,
+    };
+  };
+
+  const handleConnectAndConfirm = async () => {
+    if (!selectedAccount) {
+      console.error('No account selected');
+      return;
+    }
+    setIsButtonDisabled(true);
+
+    const transport = await Transport.create();
+
+    if (!transport) {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+      setIsButtonDisabled(false);
+      return;
+    }
+
+    setIsConnectSuccess(true);
+    await ledgerDelay(1500);
+    setCurrentStepIndex(1);
+
+    try {
+      const response = await handleLedgerPsbtSigning(transport);
+
+      if (payload.broadcast) {
+        navigate('/tx-status', {
+          state: {
+            txid: response.txId,
+            currency: 'BTC',
+            error: '',
+            browserTx: true,
+          },
+        });
+      } else {
+        window.close();
+      }
+    } catch (err) {
+      console.error(err);
+      setIsTxRejected(true);
+    } finally {
+      await transport.close();
+      setIsButtonDisabled(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    setIsTxRejected(false);
+    setIsConnectSuccess(false);
+    setCurrentStepIndex(0);
+  };
+
+  const cancelCallback = () => {
+    window.close();
   };
 
   const getSatsAmountString = (sats: BigNumber) => (
@@ -260,6 +403,45 @@ function SignPsbtRequest() {
           </ButtonContainer>
         </>
       )}
+      <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+        {currentStepIndex === 0 && (
+          <LedgerConnectionView
+            title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
+            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE')}
+            titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
+            textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
+            imageDefault={ledgerConnectDefaultIcon}
+            isConnectSuccess={isConnectSuccess}
+            isConnectFailed={isConnectFailed}
+          />
+        )}
+        {currentStepIndex === 1 && (
+          <LedgerConnectionView
+            title={signatureRequestTranslate('LEDGER.CONFIRM.TITLE')}
+            text={signatureRequestTranslate('LEDGER.CONFIRM.SUBTITLE')}
+            titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
+            textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
+            imageDefault={ledgerConnectDefaultIcon}
+            isConnectSuccess={isTxApproved}
+            isConnectFailed={isTxRejected}
+          />
+        )}
+        <SuccessActionsContainer>
+          <ActionButton
+            onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+            text={signatureRequestTranslate(
+              isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
+            )}
+            disabled={isButtonDisabled}
+            processing={isButtonDisabled}
+          />
+          <ActionButton
+            onPress={cancelCallback}
+            text={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
+            transparent
+          />
+        </SuccessActionsContainer>
+      </BottomModal>
     </>
   );
 }
