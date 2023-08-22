@@ -740,6 +740,10 @@
     "SIGN_BUTTON": "Sign",
     "CANCEL_BUTTON": "Cancel",
     "SIGNATURE_ERROR_TITLE": "Signature Error",
+    "NO_STACKS_AUTH_SUPPORT": {
+      "TITLE": "This wallet does not have a Stacks address.",
+      "LINK": "Create an address here"
+    },
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect Your Ledger",

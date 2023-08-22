@@ -22,13 +22,12 @@ import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.s
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ActionButton from '@components/button';
 import { ledgerDelay } from '@common/utils/ledger';
-import { signatureVrsToRsv } from '@stacks/common';
 import { useNavigate } from 'react-router-dom';
 import InfoContainer from '@components/infoContainer';
 import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { handleBip322LedgerMessageSigning } from '@utils/ledger';
+import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';
 import { finalizeMessageSignature } from './utils';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import SignatureRequestMessage from './signatureRequestMessage';
@@ -140,7 +139,8 @@ function SignatureRequest(): JSX.Element {
   const { messageType, request, payload, tabId, domain, isSignMessageBip322 } =
     useSignatureRequest();
   const navigate = useNavigate();
-  const isMessageSigningDisabled = isHardwareAccount(selectedAccount) && !isSignMessageBip322;
+  const isMessageSigningDisabled =
+    isHardwareAccount(selectedAccount) && !isSignMessageBip322 && !selectedAccount?.stxAddress;
 
   const checkAddressAvailability = () => {
     const account = accountsList.filter((acc) => {
@@ -206,7 +206,7 @@ function SignatureRequest(): JSX.Element {
   const confirmCallback = async () => {
     try {
       setIsSigning(true);
-      if (isHardwareAccount(selectedAccount) && isSignMessageBip322) {
+      if (isHardwareAccount(selectedAccount) && !isMessageSigningDisabled) {
         setIsModalVisible(true);
         return;
       }
@@ -278,7 +278,12 @@ function SignatureRequest(): JSX.Element {
         chrome.tabs.sendMessage(+tabId, signingMessage);
         window.close();
       } else {
-        const signature = await signStxMessage(transport, payload.message, selectedAccount.id);
+        const signature = await signStxMessage(
+          transport,
+          payload.message,
+          0,
+          selectedAccount.deviceAccountIndex,
+        );
         const rsvSignature = signatureVrsToRsv(signature.signatureVRS.toString('hex'));
         const data = {
           signature: rsvSignature,
@@ -334,7 +339,17 @@ function SignatureRequest(): JSX.Element {
 
       {isMessageSigningDisabled ? (
         <MainContainer>
-          <InfoContainer bodyText="Stacks message signing is not yet supported on a Ledger account. Switch to a different account to sign Stacks messages from the application." />
+          <InfoContainer
+            bodyText={t('SIGNATURE_REQUEST.NO_STACKS_AUTH_SUPPORT.TITLE')}
+            redirectText={t('SIGNATURE_REQUEST.NO_STACKS_AUTH_SUPPORT.LINK')}
+            onClick={async () => {
+              await chrome.tabs.create({
+                url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+              });
+
+              window.close();
+            }}
+          />
         </MainContainer>
       ) : (
         <MainContainer>

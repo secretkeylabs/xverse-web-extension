@@ -86,7 +86,7 @@ const SuccessActionsContainer = styled.div((props) => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
-  gap: '12px',
+  gap: props.theme.spacing(6),
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(20),
@@ -247,7 +247,7 @@ function ConfirmStxTransationComponent({
     try {
       const signedTxs = await signLedgerStxTransaction(
         transport,
-        initialStxTransactions[0],
+        initialStxTransactions[0].serialize(),
         selectedAccount.id,
       );
       setIsTxApproved(true);

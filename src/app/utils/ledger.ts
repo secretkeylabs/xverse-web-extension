@@ -61,3 +61,5 @@ export const handleBip322LedgerMessageSigning = async ({
 
   return signature;
 };
+
+export const signatureVrsToRsv = (sig: string): string => sig.slice(2) + sig.slice(0, 2);
