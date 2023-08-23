@@ -25,7 +25,7 @@ const ButtonsContainer = styled.div((props) => ({
   justifyContent: 'space-between',
   alignItems: 'flex-end',
   marginBottom: props.theme.spacing(20),
-  marginTop: 43,
+  marginTop: props.theme.spacing(12),
   marginLeft: 16,
   marginRight: 16,
 }));

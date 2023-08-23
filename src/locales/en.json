@@ -747,6 +747,7 @@
     "FEES": {
       "TITLE": "Fees",
       "INSCRIPTION": "Inscription fees",
+      "DEVELOPER": "Developer fees",
       "TRANSACTION": "Transaction fees",
       "TOTAL": "Total fees"
     },

@@ -68,7 +68,7 @@ type CardRowProps = {
 const CardRow = styled.div<CardRowProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   justifyContent: 'space-between',
   marginTop: props.topMargin ? props.theme.spacing(8) : 0,
 }));
@@ -242,11 +242,11 @@ function CreateInscription({ type }: Props) {
     setShowFeeSettings(false);
   };
 
-  const serviceFee =
-    (commitValueBreakdown?.revealServiceFee ?? 0) + (commitValueBreakdown?.externalServiceFee ?? 0);
+  const revealServiceFee = commitValueBreakdown?.revealServiceFee;
+  const externalServiceFee = commitValueBreakdown?.externalServiceFee;
   const chainFee =
     (commitValueBreakdown?.revealChainFee ?? 0) + (commitValueBreakdown?.commitChainFee ?? 0);
-  const totalFee = serviceFee + chainFee;
+  const totalFee = (revealServiceFee ?? 0) + (externalServiceFee ?? 0) + chainFee;
 
   const fiatFees = new BigNumber(totalFee).dividedBy(100e6).multipliedBy(btcFiatRate).toFixed(2);
 
@@ -361,12 +361,23 @@ function CreateInscription({ type }: Props) {
               <CardRow topMargin>
                 <div>{t('FEES.INSCRIPTION')}</div>
                 <NumericFormat
-                  value={serviceFee}
+                  value={revealServiceFee ?? 0}
                   displayType="text"
                   thousandSeparator
                   suffix=" sats"
                 />
               </CardRow>
+              {externalServiceFee && (
+                <CardRow topMargin>
+                  <div>{t('FEES.DEVELOPER')}</div>
+                  <NumericFormat
+                    value={externalServiceFee}
+                    displayType="text"
+                    thousandSeparator
+                    suffix=" sats"
+                  />
+                </CardRow>
+              )}
               <CardRow topMargin>
                 <div>{t('FEES.TRANSACTION')}</div>
                 <NumberWithSuffixContainer>
