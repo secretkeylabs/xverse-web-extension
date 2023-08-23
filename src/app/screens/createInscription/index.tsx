@@ -156,9 +156,17 @@ function CreateInscription({ type }: Props) {
     return [requestBody.payload as unknown, requestEncoded, Number(params.get('tabId'))];
   }, [search]);
 
+  const {
+    contentType,
+    network: requestedNetwork,
+    feeAddress,
+    inscriptionFee,
+    initialFeeRate,
+  } = payload as CreateFileInscriptionPayload | CreateTextInscriptionPayload;
+
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const [feeRate, setFeeRate] = useState(8); // TODO: Get from endpoint
+  const [feeRate, setFeeRate] = useState(initialFeeRate ?? 8); // TODO: Get from endpoint
 
   const btcClient = useBtcClient();
 
@@ -172,13 +180,6 @@ function CreateInscription({ type }: Props) {
     };
     fetchUtxos();
   }, [btcClient, btcAddress]);
-
-  const {
-    contentType,
-    network: requestedNetwork,
-    feeAddress,
-    inscriptionFee,
-  } = payload as CreateFileInscriptionPayload | CreateTextInscriptionPayload;
 
   const content =
     type === 'text'
