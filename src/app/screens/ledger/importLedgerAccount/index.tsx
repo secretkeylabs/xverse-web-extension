@@ -19,16 +19,16 @@ import LedgerInput from '@components/ledger/ledgerInput';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import warningIcon from '@assets/img/Warning_red.svg';
 
-import LedgerImportStartSVG from '@assets/img/ledger/ledger_import_start.svg';
-import BtcOrdinalsIconSVG from '@assets/img/ledger/btc_ordinals_icon.svg';
-import BtcIconSVG from '@assets/img/ledger/btc_icon.svg';
-import OrdinalsIconSVG from '@assets/img/ledger/ordinals_icon.svg';
-import StxIconSVG from '@assets/img/ledger/stx_icon.svg';
-import LedgerConnectBtcSVG from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import LedgerConnectStxSVG from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
-import LedgerAccountSwitchSVG from '@assets/img/ledger/account_switch.svg';
-import ArrowLeftIconSVG from '@assets/img/ledger/arrow_left_icon.svg';
+import ledgerImportStartIcon from '@assets/img/ledger/ledger_import_start.svg';
+import btcOrdinalsIcon from '@assets/img/ledger/btc_ordinals_icon.svg';
+import btcIcon from '@assets/img/ledger/btc_icon.svg';
+import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
+import stxIcon from '@assets/img/ledger/stx_icon.svg';
+import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
+import ledgerAccountSwitchIcon from '@assets/img/ledger/account_switch.svg';
+import arrowLeftIcon from '@assets/img/ledger/arrow_left_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
@@ -491,7 +491,7 @@ function ImportLedger(): JSX.Element {
       <FullScreenHeader />
       {currentStepIndex > 1 && (
         <AssetSelectionButton onClick={backToAssetSelection}>
-          <img src={ArrowLeftIconSVG} alt="Go back" />
+          <img src={arrowLeftIcon} alt="Go back" />
           <AssetSelectionButtonText>{t('LEDGER_IMPORT_RETURN_BUTTON')}</AssetSelectionButtonText>
         </AssetSelectionButton>
       )}
@@ -503,7 +503,7 @@ function ImportLedger(): JSX.Element {
           >
             {currentStepIndex === 0 && (
               <ImportStartContainer>
-                <ImportStartImage src={LedgerImportStartSVG} />
+                <ImportStartImage src={ledgerImportStartIcon} />
                 <ImportStartTitle>{t('LEDGER_IMPORT_1_TITLE')}</ImportStartTitle>
                 <ImportStartText>{t('LEDGER_IMPORT_1_SUBTITLE')}</ImportStartText>
               </ImportStartContainer>
@@ -517,7 +517,7 @@ function ImportLedger(): JSX.Element {
 
                 <ImportCardContainer id="card_container">
                   <LedgerAssetSelectCard
-                    icon={BtcOrdinalsIconSVG}
+                    icon={btcOrdinalsIcon}
                     title={t('LEDGER_IMPORT_2_SELECT.BTC_TITLE')}
                     text={t('LEDGER_IMPORT_2_SELECT.BTC_SUBTITLE')}
                     id="btc_select_card"
@@ -526,7 +526,7 @@ function ImportLedger(): JSX.Element {
                   />
 
                   <LedgerAssetSelectCard
-                    icon={StxIconSVG}
+                    icon={stxIcon}
                     title={t('LEDGER_IMPORT_2_SELECT.STACKS_TITLE')}
                     text={t('LEDGER_IMPORT_2_SELECT.STACKS_SUBTITLE')}
                     id="stx_select_card"
@@ -655,7 +655,7 @@ function ImportLedger(): JSX.Element {
                     ? 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED'
                     : 'LEDGER_CONNECT.STX_SUBTITLE_FAILED',
                 )}
-                imageDefault={isBitcoinSelected ? LedgerConnectBtcSVG : LedgerConnectStxSVG}
+                imageDefault={isBitcoinSelected ? ledgerConnectBtcIcon : ledgerConnectStxIcon}
                 isConnectSuccess={isConnectSuccess}
                 isConnectFailed={isConnectFailed}
               />
@@ -663,7 +663,7 @@ function ImportLedger(): JSX.Element {
             {currentStepIndex === 2.5 && (
               <CreateAnotherAccountContainer>
                 <img
-                  src={isBitcoinSelected ? BtcOrdinalsIconSVG : StxIconSVG}
+                  src={isBitcoinSelected ? btcOrdinalsIcon : stxIcon}
                   alt={isBitcoinSelected ? 'bitcoin' : 'stacks'}
                 />
                 <SelectAssetTitle>
@@ -696,7 +696,7 @@ function ImportLedger(): JSX.Element {
                 <>
                   <AddAddressHeaderContainer>
                     <img
-                      src={isBitcoinSelected ? BtcIconSVG : StxIconSVG}
+                      src={isBitcoinSelected ? btcIcon : stxIcon}
                       width={32}
                       height={32}
                       alt={isBitcoinSelected ? 'bitcoin' : 'stacks'}
@@ -749,7 +749,7 @@ function ImportLedger(): JSX.Element {
               ) : (
                 <>
                   <AddAddressHeaderContainer>
-                    <img src={OrdinalsIconSVG} width={32} height={32} alt="ordinals" />
+                    <img src={ordinalsIcon} width={32} height={32} alt="ordinals" />
                     <SelectAssetTitle>
                       {t('LEDGER_ADD_ADDRESS.TITLE_VERIFY_ORDINALS')}
                     </SelectAssetTitle>
@@ -770,7 +770,7 @@ function ImportLedger(): JSX.Element {
               ))}
             {currentStepIndex === 4 && (
               <AddressAddedContainer>
-                <img src={CheckCircleSVG} alt="Success" />
+                <img src={checkCircleIcon} alt="Success" />
                 <SelectAssetTitle>
                   {t(
                     isBitcoinSelected
@@ -809,7 +809,7 @@ function ImportLedger(): JSX.Element {
                   <SelectAssetTitle>{t('LEDGER_IMPORT_END.TITLE')}</SelectAssetTitle>
                   <SelectAssetText>{t('LEDGER_IMPORT_END.SUBTITLE')}</SelectAssetText>
                 </EndScreenTextContainer>
-                <img src={LedgerAccountSwitchSVG} alt="Wallet created" />
+                <img src={ledgerAccountSwitchIcon} alt="Wallet created" />
               </EndScreenContainer>
             )}
           </OnBoardingContentContainer>

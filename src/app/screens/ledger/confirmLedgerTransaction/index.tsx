@@ -30,13 +30,12 @@ import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ledgerConfirmBtcIcon from '@assets/img/ledger/btc_icon.svg';
 import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ordinals_icon_big.svg';
-import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
+import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import InfoIcon from '@assets/img/info.svg';
 import InfoContainer from '@components/infoContainer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import { UTXO } from '@secretkeylabs/xverse-core/types';
 import Stepper from '@components/stepper';
-import { findLedgerAccountId } from '@utils/ledger';
 
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';
 
@@ -283,16 +282,9 @@ function ConfirmLedgerTransaction(): JSX.Element {
         return;
       }
 
-      const accountId =
-        selectedAccount?.deviceAccountIndex !== undefined
-          ? selectedAccount?.deviceAccountIndex
-          : await findLedgerAccountId({
-              transport,
-              id: selectedAccount?.id,
-              ledgerAccountsList,
-            });
+      const accountId = selectedAccount.deviceAccountIndex;
 
-      if (accountId === -1) {
+      if (accountId === undefined) {
         setIsConnectSuccess(false);
         setIsConnectFailed(true);
         setIsWrongDevice(true);
@@ -477,9 +469,9 @@ function ConfirmLedgerTransaction(): JSX.Element {
                 src={ledgerConfirmOrdinalsIcon}
                 alt="confirm ordinal transfer tx on the ledger device"
               />
-              <ConnectLedgerTitle>Confirm ordinal send</ConnectLedgerTitle>
+              <ConnectLedgerTitle>{t('CONFIRM.ORDINAL_TX.ORDINAL_TITLE')}</ConnectLedgerTitle>
               <ConnectLedgerTextAdvanced isCompleted={isTxApproved}>
-                Confirm the Ordinal inscription transfer on your device.
+                {t('CONFIRM.ORDINAL_TX.ORDINAL_SUBTITLE')}
               </ConnectLedgerTextAdvanced>
               {renderOrdinalTxDetails()}
               <div />
@@ -517,8 +509,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
               />
               <ConnectLedgerTitle>{t('CONFIRM.TITLE')}</ConnectLedgerTitle>
               <ConnectLedgerTextAdvanced isCompleted={isFinalTxApproved}>
-                Confirm the payment of transaction fees from the Bitcoin payment address on your
-                device.
+                {t('CONFIRM.ORDINAL_TX.BTC_SUBTITLE')}
               </ConnectLedgerTextAdvanced>
               {renderOrdinalTxDetails()}
               <div />
@@ -529,12 +520,12 @@ function ConfirmLedgerTransaction(): JSX.Element {
       case 2:
         return (
           <TxConfirmedContainer>
-            <img src={CheckCircleSVG} alt="Success" />
+            <img src={checkCircleIcon} alt="Success" />
             <TxConfirmedTitle>{t('SUCCESS.TITLE')}</TxConfirmedTitle>
             <TxConfirmedDescription>{t('SUCCESS.SUBTITLE')}</TxConfirmedDescription>
             {type === 'BRC-20' && (
               <InfoContainerWrapper>
-                <InfoContainer bodyText="The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer." />
+                <InfoContainer bodyText={t('SUCCESS.BRC20_INFO')} />
               </InfoContainerWrapper>
             )}
           </TxConfirmedContainer>

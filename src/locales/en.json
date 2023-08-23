@@ -156,11 +156,17 @@
       "TITLE": "Confirm transaction",
       "SUBTITLE": "Confirm the transaction on your device to continue.",
       "ERROR_TITLE": "Transaction failed",
-      "ERROR_SUBTITLE": "The transaction has been rejected. You can try again or close this tab."
+      "ERROR_SUBTITLE": "The transaction has been rejected. You can try again or close this tab.",
+      "ORDINAL_TX": {
+        "ORDINAL_TITLE": "Confirm ordinal send",
+        "ORDINAL_SUBTITLE": "Confirm the Ordinal inscription transfer on your device.",
+        "BTC_SUBTITLE": "Confirm the payment of transaction fees from the Bitcoin payment address on your device."
+      }
     },
     "SUCCESS": {
       "TITLE": "Transaction broadcasted",
-      "SUBTITLE": "Your transaction has been successfully broadcasted. You can close this tab."
+      "SUBTITLE": "Your transaction has been successfully broadcasted. You can close this tab.",
+      "BRC20_INFO": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer."
     },
     "CONFIRM_BUTTON": "Confirm",
     "CONNECT_BUTTON": "Connect",

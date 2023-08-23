@@ -263,9 +263,8 @@ function SignatureRequest(): JSX.Element {
       if (isSignMessageBip322) {
         const signature = await handleBip322LedgerMessageSigning({
           transport,
-          id: selectedAccount.id,
+          accountId: selectedAccount.deviceAccountIndex,
           networkType: network.type,
-          ledgerAccountsList,
           message: payload.message,
         });
         const signingMessage = {

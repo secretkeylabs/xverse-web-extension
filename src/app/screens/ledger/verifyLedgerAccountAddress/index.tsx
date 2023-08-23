@@ -18,13 +18,13 @@ import { useLocation } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 import InfoContainer from '@components/infoContainer';
 
-import BtcIconSVG from '@assets/img/ledger/btc_icon.svg';
-import OrdinalsIconSVG from '@assets/img/ledger/ordinals_icon.svg';
-import StxIconSVG from '@assets/img/ledger/stx_icon.svg';
-import LedgerConnectBtcSVG from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import LedgerConnectStxSVG from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import btcIcon from '@assets/img/ledger/btc_icon.svg';
+import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
+import stxIcon from '@assets/img/ledger/stx_icon.svg';
+import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
-import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 const Container = styled.div`
@@ -321,9 +321,9 @@ function VerifyLedger(): JSX.Element {
   };
 
   const getIconSrc = () => {
-    if (isBitcoinSelected) return BtcIconSVG;
-    if (isOrdinalSelected) return OrdinalsIconSVG;
-    if (isStacksSelected) return StxIconSVG;
+    if (isBitcoinSelected) return btcIcon;
+    if (isOrdinalSelected) return ordinalsIcon;
+    if (isStacksSelected) return stxIcon;
   };
 
   const connectionFailedErrorText = isStacksSelected
@@ -351,7 +351,7 @@ function VerifyLedger(): JSX.Element {
                 textFailed={t(
                   isWrongDevice ? 'WRONG_DEVICE_ERROR_SUBTITLE' : connectionFailedErrorText,
                 )}
-                imageDefault={isStacksSelected ? LedgerConnectStxSVG : LedgerConnectBtcSVG}
+                imageDefault={isStacksSelected ? ledgerConnectStxIcon : ledgerConnectBtcIcon}
                 isConnectSuccess={isConnectSuccess}
                 isConnectFailed={isConnectFailed}
               />
@@ -411,7 +411,7 @@ function VerifyLedger(): JSX.Element {
               ))}
             {currentStepIndex === 2 && (
               <AddressAddedContainer>
-                <img src={CheckCircleSVG} alt="Success" />
+                <img src={checkCircleIcon} alt="Success" />
                 <SelectAssetTitle>
                   {isBitcoinSelected && t('BTC_TITLE_VERIFIED')}
                   {isOrdinalSelected && t('ORDINALS_TITLE_VERIFIED')}

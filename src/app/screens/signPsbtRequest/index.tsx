@@ -32,7 +32,6 @@ import { ledgerDelay } from '@common/utils/ledger';
 import { decodeToken } from 'jsontokens';
 import { SignTransactionOptions } from 'sats-connect';
 import useBtcClient from '@hooks/useBtcClient';
-import { findLedgerAccountId } from '@utils/ledger';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -223,13 +222,9 @@ function SignPsbtRequest() {
   };
 
   const handleLedgerPsbtSigning = async (transport: TransportType) => {
-    const accountId = await findLedgerAccountId({
-      transport,
-      id: selectedAccount?.id,
-      ledgerAccountsList,
-    });
+    const accountId = selectedAccount?.deviceAccountIndex;
 
-    if (accountId === -1) {
+    if (accountId === undefined) {
       throw new Error('Account not found');
     }
 

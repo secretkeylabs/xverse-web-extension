@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Tooltip } from 'react-tooltip';
 import { useState } from 'react';
 
-import CopySVG from '@assets/img/Copy.svg';
+import copyIcon from '@assets/img/Copy.svg';
 
 const StyledToolTip = styled(Tooltip)`
   background-color: #ffffff;
@@ -79,7 +79,7 @@ function LedgerAddressComponent({ title, address }: Props) {
       <AddressComponentContainer>
         <AddressCompononentText>{address}</AddressCompononentText>
         <CopyButton id={`${title}_anchor`} onClick={handleClick}>
-          <CopyImage src={CopySVG} alt="copy" />
+          <CopyImage src={copyIcon} alt="copy" />
         </CopyButton>
         <StyledToolTip
           anchorId={`${title}_anchor`}
