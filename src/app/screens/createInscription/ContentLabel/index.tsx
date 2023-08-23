@@ -36,13 +36,6 @@ const getContentType = (inputContentType: string) => {
 const isPreviewable = (contentType: ContentType) => previewableContentTypes.has(contentType);
 const isOrdiPreviewable = (contentType: ContentType) => ordiViewTypes.has(contentType);
 
-const getIcon = (contentType: ContentType) => {
-  if (isPreviewable(contentType)) return EyeIcon;
-  if (isOrdiPreviewable(contentType)) return ShareIcon;
-
-  return null;
-};
-
 const Container = styled.div`
   display: flex;
   flex-direction: row;

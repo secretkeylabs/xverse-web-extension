@@ -158,7 +158,7 @@ function CreateInscription({ type }: Props) {
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const [feeRate, setFeeRate] = useState(20);
+  const [feeRate, setFeeRate] = useState(8); // TODO: Get from endpoint
 
   const btcClient = useBtcClient();
 
@@ -219,26 +219,6 @@ function CreateInscription({ type }: Props) {
     contentString: type === 'text' ? content : undefined,
   });
 
-  useEffect(() => {
-    if (!complete || !revealTransactionId) return;
-
-    const response = {
-      source: MESSAGE_SOURCE,
-      method:
-        type === 'text'
-          ? ExternalSatsMethods.createTextInscriptionResponse
-          : ExternalSatsMethods.createFileInscriptionResponse,
-      payload: {
-        createInscriptionRequest: requestToken,
-        createInscriptionResponse: {
-          txId: revealTransactionId,
-        },
-      },
-    };
-    chrome.tabs.sendMessage(tabId, response);
-    window.close();
-  }, [revealTransactionId, complete, requestToken, tabId, type]);
-
   const cancelCallback = () => {
     const response = {
       source: MESSAGE_SOURCE,
@@ -275,7 +255,7 @@ function CreateInscription({ type }: Props) {
     .multipliedBy(btcFiatRate)
     .toFixed(2);
 
-  if (complete) {
+  if (complete && revealTransactionId) {
     const onClose = () => {
       const response = {
         source: MESSAGE_SOURCE,
@@ -294,7 +274,7 @@ function CreateInscription({ type }: Props) {
       window.close();
     };
 
-    return <CompleteScreen txId={revealTransactionId!} onClose={onClose} network={network} />;
+    return <CompleteScreen txId={revealTransactionId} onClose={onClose} network={network} />;
   }
 
   const errorCode = feeErrorCode || executeErrorCode;
