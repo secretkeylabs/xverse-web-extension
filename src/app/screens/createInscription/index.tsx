@@ -105,17 +105,6 @@ const MutedLabel = styled.div((props) => ({
   color: props.theme.colors.white[400],
 }));
 
-const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(24),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
-
-const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
-}));
-
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -195,16 +184,20 @@ function CreateInscription({ type }: Props) {
       ? (payload as CreateTextInscriptionPayload).text
       : (payload as CreateFileInscriptionPayload).dataBase64;
 
-  const { commitValue, commitValueBreakdown, errorCode, isInitialised, isLoading, errorMessage } =
-    useInscriptionFees({
-      addressUtxos: utxos,
-      content,
-      contentType,
-      feeRate,
-      revealAddress: ordinalsAddress,
-      serviceFee: inscriptionFee,
-      serviceFeeAddress: feeAddress,
-    });
+  const {
+    commitValue,
+    commitValueBreakdown,
+    errorCode: feeErrorCode,
+    isLoading,
+  } = useInscriptionFees({
+    addressUtxos: utxos,
+    content,
+    contentType,
+    feeRate,
+    revealAddress: ordinalsAddress,
+    serviceFee: inscriptionFee,
+    serviceFeeAddress: feeAddress,
+  });
 
   const {
     complete,
@@ -303,14 +296,17 @@ function CreateInscription({ type }: Props) {
     return <CompleteScreen txId={revealTransactionId!} onClose={onClose} network={network} />;
   }
 
+  const errorCode = feeErrorCode || executeErrorCode;
+
   return (
     <ConfirmScreen
       onConfirm={executeMint}
       onCancel={cancelCallback}
       cancelText={t('CANCEL_BUTTON')}
-      confirmText={t('CONFIRM_BUTTON')}
-      loading={!isInitialised || isExecuting || isLoading}
+      confirmText={!errorCode ? t('CONFIRM_BUTTON') : t(`ERRORS.SHORT.${errorCode}`)}
+      loading={isExecuting || isLoading}
       disabled={!!errorCode || isExecuting}
+      isError={!!errorCode}
     >
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <MainContainer>
@@ -443,9 +439,6 @@ function CreateInscription({ type }: Props) {
             onCancel={() => setShowFeeSettings(false)}
           />
         )}
-        <ErrorContainer>
-          <ErrorText>{errorCode || executeErrorCode}</ErrorText> {/* TODO: show error */}
-        </ErrorContainer>
       </MainContainer>
     </ConfirmScreen>
   );

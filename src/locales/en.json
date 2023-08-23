@@ -754,9 +754,32 @@
       "INSCRIBED": "Ordinal inscribed",
       "MESSAGE": "Your ordinal have been successfully inscribed and should appear in a few minutes.",
       "SEE_ON": "See on",
-      "BITCOIN_EXPLORER": "Explorer",
+      "BITCOIN_EXPLORER": "mempool",
       "TRANSACTION_ID": "Transaction ID",
       "CLOSE": "Close"
+    },
+    "ERRORS": {
+      "ERROR": "Error",
+      "SHORT": {
+        "INSUFFICIENT_FUNDS": "Insufficient balance",
+        "INVALID_FEE_RATE": "Invalid fee rate",
+        "INVALID_SERVICE_FEE_CONFIG": "Invalid inputs",
+        "INVALID_CONTENT": "Invalid content",
+        "CONTENT_TOO_BIG": "Content too large",
+        "INSCRIPTION_VALUE_TOO_LOW": "Invalid inputs",
+        "FAILED_TO_FINALIZE": "Failure",
+        "SERVER_ERROR": "Server error"
+      },
+      "LONG": {
+        "INSUFFICIENT_FUNDS": "You have insufficient balance to process this transaction. Please add more funds to your wallet or try with a lower fee rate.",
+        "INVALID_FEE_RATE": "The fee applied to this transaction is too low. To apply a higher fee, select edit fees at the bottom of this screen.",
+        "INVALID_SERVICE_FEE_CONFIG": "The calling application sent an invalid payload. Please contact the application developer.",
+        "INVALID_CONTENT": "The ordinal content you are trying to inscribe is not valid. Please verify the content of your inscription.",
+        "CONTENT_TOO_BIG": "The ordinal you are trying to inscribe is too large. Try reducing the weight of your content.",
+        "INSCRIPTION_VALUE_TOO_LOW": "The calling application sent an invalid payload. Please contact the application developer.",
+        "FAILED_TO_FINALIZE": "The inscription transaction failed to finalize. Please try again or contact support.",
+        "SERVER_ERROR": "An unknown server error occurred. Please try again or contact support."
+      }
     }
   },
   "ERROR_SCREEN": {

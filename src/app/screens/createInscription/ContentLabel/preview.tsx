@@ -18,6 +18,7 @@ const Container = styled.div`
   align-items: center;
   background: rgba(18, 21, 30, 0.85);
   backdrop-filter: blur(8px);
+  z-index: 1;
 `;
 
 const PreviewImg = styled.img`

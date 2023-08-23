@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
-import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 
 const MainContainer = styled.div`
   display: flex;
@@ -30,14 +30,16 @@ const ButtonsContainer = styled.div((props) => ({
   marginRight: 16,
 }));
 
-const ConfirmButton = styled.button((props) => ({
+const ConfirmButton = styled.button<{ isError: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.background.elevation0,
+  backgroundColor: props.isError
+    ? props.theme.colors.feedback.error
+    : props.theme.colors.action.classic,
+  color: props.isError ? props.theme.colors.white[200] : props.theme.colors.background.elevation0,
   width: '50%',
   height: 44,
   marginLeft: 6,
@@ -69,6 +71,7 @@ type Props = {
   onCancel: () => void;
   loading: boolean;
   disabled?: boolean;
+  isError?: boolean;
 };
 
 function ConfirmScreen({
@@ -79,6 +82,7 @@ function ConfirmScreen({
   cancelText,
   loading,
   disabled = false,
+  isError = false,
 }: Props) {
   return (
     <>
@@ -87,7 +91,7 @@ function ConfirmScreen({
       </MainContainer>
       <ButtonsContainer>
         <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
-        <ConfirmButton onClick={onConfirm} disabled={disabled}>
+        <ConfirmButton onClick={onConfirm} disabled={disabled} isError={isError}>
           {loading ? <MoonLoader color="white" size={20} /> : confirmText}
         </ConfirmButton>
       </ButtonsContainer>
