@@ -759,6 +759,10 @@
         "DENIED": {
           "ERROR_TITLE": "Signature denied",
           "ERROR_SUBTITLE": "The signature has been rejected. You can try again or close this tab."
+        },
+        "INVALID": {
+          "ERROR_TITLE": "Data Invalid",
+          "ERROR_SUBTITLE": "Your Ledger device has rejected the message stating it is invalid."
         }
       },
       "SUCCESS": {

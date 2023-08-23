@@ -133,6 +133,7 @@ function SignatureRequest(): JSX.Element {
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
+  const [isTxInvalid, setIsTxInvalid] = useState(false);
   const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
@@ -284,6 +285,11 @@ function SignatureRequest(): JSX.Element {
           0,
           selectedAccount.deviceAccountIndex,
         );
+        if (!!signature.errorMessage && !!signature.returnCode) {
+          throw new Error(signature.errorMessage, {
+            cause: signature.returnCode,
+          });
+        }
         const rsvSignature = signatureVrsToRsv(signature.signatureVRS.toString('hex'));
         const data = {
           signature: rsvSignature,
@@ -303,6 +309,8 @@ function SignatureRequest(): JSX.Element {
       } else if (e.statusCode === 28160) {
         setIsConnectSuccess(false);
         setIsConnectFailed(true);
+      } else if (e.cause === 27012) {
+        setIsTxInvalid(true);
       } else {
         setIsTxRejected(true);
       }
@@ -314,6 +322,7 @@ function SignatureRequest(): JSX.Element {
 
   const handleRetry = async () => {
     setIsTxRejected(false);
+    setIsTxInvalid(false);
     setIsConnectFailed(false);
     setIsConnectSuccess(false);
     setCurrentStepIndex(0);
@@ -325,6 +334,30 @@ function SignatureRequest(): JSX.Element {
     }
     return bip0322Hash(payload.message);
   }, [isSignMessageBip322, payload.message]);
+
+  const getConfirmationError = (type: 'title' | 'subtitle') => {
+    if (type === 'title') {
+      if (isTxRejected) {
+        return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_TITLE');
+      }
+
+      if (isTxInvalid) {
+        return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.INVALID.ERROR_TITLE');
+      }
+
+      return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_TITLE');
+    }
+
+    if (isTxRejected) {
+      return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_SUBTITLE');
+    }
+
+    if (isTxInvalid) {
+      return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.INVALID.ERROR_SUBTITLE');
+    }
+
+    return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE');
+  };
 
   return (
     <ConfirmScreen
@@ -404,26 +437,20 @@ function SignatureRequest(): JSX.Element {
           <LedgerConnectionView
             title={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.TITLE')}
             text={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.SUBTITLE')}
-            titleFailed={t(
-              isTxRejected
-                ? 'SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_TITLE'
-                : 'SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_TITLE',
-            )}
-            textFailed={t(
-              isTxRejected
-                ? 'SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_SUBTITLE'
-                : 'SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE',
-            )}
+            titleFailed={getConfirmationError('title')}
+            textFailed={getConfirmationError('subtitle')}
             imageDefault={ledgerConnectDefaultIcon}
             isConnectSuccess={isTxApproved}
-            isConnectFailed={isTxRejected || isConnectFailed}
+            isConnectFailed={isTxRejected || isTxInvalid || isConnectFailed}
           />
         )}
         <SuccessActionsContainer>
           <ActionButton
-            onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+            onPress={
+              isTxRejected || isTxInvalid || isConnectFailed ? handleRetry : handleConnectAndConfirm
+            }
             text={t(
-              isTxRejected || isConnectFailed
+              isTxRejected || isTxInvalid || isConnectFailed
                 ? 'SIGNATURE_REQUEST.LEDGER.RETRY_BUTTON'
                 : 'SIGNATURE_REQUEST.LEDGER.CONNECT_BUTTON',
             )}
