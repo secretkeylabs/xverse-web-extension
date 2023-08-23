@@ -16,7 +16,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
 import { replaceCommaByDot } from '@utils/helper';
-import { getBrc20Ticker } from '@utils/tokens';
+import { getFtTicker } from '@utils/tokens';
 import Brc20TransferForm from './brc20TransferForm';
 
 function SendBrc20Screen() {
@@ -106,7 +106,7 @@ function SendBrc20Screen() {
       }
 
       const addressUtxos: UTXO[] = await getNonOrdinalUtxo(btcAddress, network.type);
-      const ticker = getBrc20Ticker(fungibleToken);
+      const ticker = getFtTicker(fungibleToken);
       const numberAmount = Number(replaceCommaByDot(amountToSend));
 
       // console.log(addressUtxos, ticker, numberAmount, ordinalsAddress, feeRate?.regular);
@@ -115,10 +115,10 @@ function SendBrc20Screen() {
         tick: ticker,
         amount: numberAmount,
         revealAddress: ordinalsAddress,
-        feeRate: 6, // feeRate?.regular,
+        feeRate: feeRate?.regular,
       });
 
-      navigate('confirm-brc20-transaction', {
+      navigate('/confirm-brc20-tx', {
         // TODO move to context
         state: {
           recipient: recipientAddress,
@@ -129,7 +129,7 @@ function SendBrc20Screen() {
         },
       });
     } catch (e) {
-      // console.error(e);
+      console.error(e);
       // TODO use error codes once they are exported
       if ((e as any).message === 'Not enough funds at selected fee rate') {
         setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));

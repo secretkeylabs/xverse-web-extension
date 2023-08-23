@@ -16,6 +16,7 @@ import ConfirmInscriptionRequest from '@screens/confirmInscriptionRequest';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
+import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import ErrorBoundary from '@screens/error';
@@ -165,6 +166,14 @@ const router = createHashRouter([
       {
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,
+      },
+      {
+        path: 'confirm-brc20-tx',
+        element: (
+          <AuthGuard>
+            <ConfirmBrc20Transaction />
+          </AuthGuard>
+        ),
       },
       // {
       //   path: 'review-ledger-stx-tx',
