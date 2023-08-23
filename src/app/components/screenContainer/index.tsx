@@ -6,7 +6,7 @@ import styled from 'styled-components';
 const RouteContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: '100vh',
+  height: 600,
   width: 360,
   margin: 'auto',
   backgroundColor: props.theme.colors.background.elevation0,
