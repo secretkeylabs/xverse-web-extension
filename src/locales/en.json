@@ -760,6 +760,8 @@
     },
     "ERRORS": {
       "ERROR": "Error",
+      "CLOSE": "Close",
+      "TRY_AGAIN": "Try again",
       "SHORT": {
         "INSUFFICIENT_FUNDS": "Insufficient balance",
         "INVALID_FEE_RATE": "Invalid fee rate",

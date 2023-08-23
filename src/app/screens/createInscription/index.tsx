@@ -18,12 +18,13 @@ import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useBtcClient from '@hooks/useBtcClient';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { UTXO } from '@secretkeylabs/xverse-core/types';
+import type { UTXO } from '@secretkeylabs/xverse-core/types';
 import { getShortTruncatedAddress } from '@utils/helper';
 
 import CompleteScreen from './CompleteScreen';
 import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
+import ErrorModal from './ErrorModal';
 
 const MainContainer = styled.div((props) => ({
   display: 'flex',
@@ -437,6 +438,14 @@ function CreateInscription({ type }: Props) {
             feeRate={feeRate}
             onDone={onNewFeeRateSet}
             onCancel={() => setShowFeeSettings(false)}
+          />
+        )}
+        {errorCode && (
+          <ErrorModal
+            key={errorCode}
+            errorCode={errorCode}
+            onRetrySubmit={executeMint}
+            onEnd={cancelCallback}
           />
         )}
       </MainContainer>
