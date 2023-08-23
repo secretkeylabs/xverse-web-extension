@@ -1,6 +1,8 @@
+import { Currency, SponsoredTxErrorCode, SponsoredTxError } from 'alex-sdk';
+import { useNavigate } from 'react-router-dom';
 import { SwapToken } from '@screens/swap/useSwap';
-import { Currency } from 'alex-sdk';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import {
   broadcastSignedTransaction,
   signTransaction,
@@ -8,12 +10,12 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
-import { useNavigate } from 'react-router-dom';
-import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
-import { XVERSE_SPONSOR_2_URL } from '@utils/constants';
-import { swapErrorList } from '../error';
+import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
+import { useState } from 'react';
+import BigNumber from 'bignumber.js';
+import { useCurrencyConversion } from '../useCurrencyConversion';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -22,36 +24,52 @@ export type SwapConfirmationInput = {
   toToken: SwapToken;
   fromAmount: number;
   minToAmount: number;
-  lpFeeAmount: number;
-  lpFeeFiatAmount?: number;
+  txFeeAmount: number;
+  txFeeFiatAmount?: number;
   address: string;
   routers: { image: TokenImageProps; name: string }[];
   unsignedTx: string; // serialized hex StacksTransaction
   functionName: string;
-  isSponsorOptionSelected: boolean;
+  userOverrideSponsorValue: boolean;
 };
 
 export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> & {
   onConfirm: () => Promise<void>;
+  onFeeUpdate: (settingFee: bigint) => void;
   unsignedTx: StacksTransaction; // deserialized StacksTransaction
+  isSponsored: boolean;
+  isSponsorDisabled: boolean;
 };
 
 export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-  const { isSponsored, sponsorTransaction } = useSponsoredTransaction(
-    input.isSponsorOptionSelected,
-    XVERSE_SPONSOR_2_URL,
+  const { isSponsored, sponsorTransaction, isSponsorDisabled } = useAlexSponsoredTransaction(
+    input.userOverrideSponsorValue,
   );
+  const { currencyToToken } = useCurrencyConversion();
   const navigate = useNavigate();
-  const unsignedTx = deserializeTransaction(input.unsignedTx);
+  const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>(
+    deserializeTransaction(input.unsignedTx),
+  );
+  const [feeAmount, setFeeAmount] = useState(input.txFeeAmount);
+  const [feeFiatAmount, setFeeFiatAmount] = useState(input.txFeeFiatAmount);
 
   return {
     ...input,
-    lpFeeAmount: isSponsored ? 0 : input.lpFeeAmount,
-    lpFeeFiatAmount: isSponsored ? 0 : input.lpFeeFiatAmount,
+    txFeeAmount: feeAmount,
+    txFeeFiatAmount: feeFiatAmount,
     unsignedTx,
-    isSponsorOptionSelected: input.isSponsorOptionSelected,
+    userOverrideSponsorValue: input.userOverrideSponsorValue,
+    onFeeUpdate: (settingFee: bigint) => {
+      const fee = microstacksToStx(new BigNumber(settingFee.toString()));
+      unsignedTx.setFee(settingFee);
+      setUnsignedTx(unsignedTx);
+      setFeeAmount(Number(fee));
+      setFeeFiatAmount(currencyToToken(Currency.STX, Number(fee))?.fiatAmount);
+    },
+    isSponsored,
+    isSponsorDisabled,
     onConfirm: async () => {
       const signed = await signTransaction(
         unsignedTx,
@@ -78,7 +96,20 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
           });
         }
       } catch (e) {
-        if (e instanceof Error) {
+        if (e instanceof SponsoredTxError) {
+          navigate('/tx-status', {
+            state: {
+              txid: '',
+              currency: 'STX',
+              error:
+                e.code !== SponsoredTxErrorCode.unknown_error ? e.message : 'Unknown sponsor error',
+              sponsored: isSponsored,
+              browserTx: true,
+              isSponsorServiceError: true,
+              isSwapTransaction: true,
+            },
+          });
+        } else if (e instanceof Error) {
           navigate('/tx-status', {
             state: {
               txid: '',
@@ -86,7 +117,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
               error: e instanceof ApiResponseError ? e.data.message : e.message,
               sponsored: isSponsored,
               browserTx: true,
-              isSponsorServiceError: swapErrorList.includes(e.message),
+              isSwapTransaction: true,
             },
           });
         }

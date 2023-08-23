@@ -7,14 +7,14 @@ import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg
 import useWalletSelector from '@hooks/useWalletSelector';
 import AccountRow from '@components/accountRow';
 import { animated, useSpring } from '@react-spring/web';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useDispatch } from 'react-redux';
 import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
-import { AddressPurposes } from 'sats-connect';
+import { AddressPurpose } from 'sats-connect';
 import { useNavigate } from 'react-router-dom';
 import AccountView from './accountView';
 
@@ -203,7 +203,8 @@ function BtcSelectAddressScreen() {
     setShowAccountList(true);
   };
 
-  const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;
+  const isAccountSelected = (account: Account) =>
+    account.id === selectedAccount?.id && account.accountType === selectedAccount?.accountType;
 
   const handleAccountSelect = (account: Account) => {
     dispatch(
@@ -254,7 +255,7 @@ function BtcSelectAddressScreen() {
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {payload.purposes.map((purpose) =>
-              purpose === AddressPurposes.PAYMENT ? (
+              purpose === AddressPurpose.Payment ? (
                 <AddressContainer>
                   <BitcoinDot />
                   <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
@@ -271,7 +272,7 @@ function BtcSelectAddressScreen() {
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
-            {[...accountsList, ...ledgerAccountsList].map((account) => (
+            {[...ledgerAccountsList, ...accountsList].map((account) => (
               <AccountListRow>
                 <AccountRow
                   key={account.stxAddress}
@@ -280,7 +281,7 @@ function BtcSelectAddressScreen() {
                   onAccountSelected={handleAccountSelect}
                   showOrdinalAddress
                 />
-                <Seperator />
+                <Separator />
               </AccountListRow>
             ))}
           </AccountListContainer>

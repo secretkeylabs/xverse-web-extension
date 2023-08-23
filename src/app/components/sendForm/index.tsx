@@ -246,6 +246,8 @@ interface Props {
   recipient?: string;
   amountToSend?: string;
   stxMemo?: string;
+  onAddressInputChange?: (recipientAddress: string) => void;
+  warning?: string;
 }
 
 function SendForm({
@@ -264,6 +266,8 @@ function SendForm({
   recipient,
   amountToSend,
   stxMemo,
+  onAddressInputChange,
+  warning,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   // TODO tim: use context instead of duplicated local state and parent state (as props)
@@ -405,8 +409,9 @@ function SendForm({
     </Container>
   );
 
-  const onAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRecipientAddress(e.target.value);
+    onAddressInputChange?.(e.target.value);
   };
 
   const getAddressInputPlaceholder = () => {
@@ -427,7 +432,7 @@ function SendForm({
           <InputField
             value={recipientAddress}
             placeholder={getAddressInputPlaceholder()}
-            onChange={onAddressInputChange}
+            onChange={handleAddressInputChange}
           />
         </InputFieldContainer>
       </AmountInputContainer>
@@ -476,6 +481,23 @@ function SendForm({
     } else if ((amount !== '' && recipientAddress !== '') || associatedAddress !== '') return true;
     return false;
   };
+
+  let displayedWarning = '';
+  if (warning) {
+    displayedWarning = warning;
+  } else {
+    switch (currencyType) {
+      case 'Ordinal':
+        displayedWarning = t('SEND_ORDINAL_WALLET_WARNING');
+        break;
+      case 'brc20-Ordinal':
+        displayedWarning = t('SEND_BRC20_ORDINAL_WALLET_WARNING');
+        break;
+      default:
+        break;
+    }
+  }
+
   return (
     <>
       <ScrollContainer>
@@ -527,14 +549,9 @@ function SendForm({
                 <InfoContainer bodyText={t('MEMO_INFO')} />
               </>
             )}
-          {currencyType === 'Ordinal' && (
+          {displayedWarning && (
             <OrdinalInfoContainer>
-              <InfoContainer bodyText={t('SEND_ORDINAL_WALLET_WARNING')} type="Warning" />
-            </OrdinalInfoContainer>
-          )}
-          {currencyType === 'brc20-Ordinal' && (
-            <OrdinalInfoContainer>
-              <InfoContainer bodyText={t('SEND_BRC20_ORDINAL_WALLET_WARNING')} />
+              <InfoContainer bodyText={displayedWarning} type="Warning" />
             </OrdinalInfoContainer>
           )}
         </OuterContainer>

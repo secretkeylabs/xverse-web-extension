@@ -49,18 +49,20 @@ export const useSingleTabGuard = (guardName: GuardType, broadcastOnLoad = true):
   }, []);
 };
 
-type SingleTabProps = {
-  guardName: GuardType;
-  children?: React.ReactElement | React.ReactElement[];
-};
-
 /**
  * This guard is used to ensure that only one window with the guard name is open at a time.
  * It fires off an event only once on its first render and will close the window if it receives
  * the event.
  */
-export function SingleTabGuard({ guardName, children }: SingleTabProps): React.ReactNode {
+export function SingleTabGuard({
+  guardName,
+  children,
+}: React.PropsWithChildren<{
+  guardName: GuardType;
+}>) {
   useSingleTabGuard(guardName);
 
-  return children;
+  // fragment is required here
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <>{children}</>;
 }

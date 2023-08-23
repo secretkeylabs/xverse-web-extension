@@ -30,10 +30,10 @@ import { CurrencyTypes } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import Theme from 'theme';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import ActionButton from '@components/button';
+import Theme from 'theme';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
 
