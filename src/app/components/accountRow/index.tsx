@@ -81,13 +81,13 @@ const CurrentUnSelectedAccountText = styled.h1((props) => ({
   textAlign: 'start',
 }));
 
-const CurrentAccountDetailText = styled.h1((props) => ({
+const CurrentAccountDetailText = styled.h1<{ disableClick?: boolean }>((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white['400'],
   marginTop: props.theme.spacing(1),
   display: 'flex',
   justifyContent: 'flex-start',
-  cursor: 'initial',
+  cursor: props.disableClick ? 'initial' : 'cursor',
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
@@ -389,7 +389,7 @@ function AccountRow({
       />
     </RowContainer>
   ) : (
-    <CurrentAccountDetailText>
+    <CurrentAccountDetailText disableClick={disabledAccountSelect}>
       {showOrdinalAddress ? showOrdinalBtcAddress : getAddressDetail(account!)}
     </CurrentAccountDetailText>
   );
