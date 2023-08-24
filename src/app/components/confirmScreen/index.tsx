@@ -13,12 +13,6 @@ const MainContainer = styled.div`
   }
 `;
 
-const ContentContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-});
-
 const ButtonsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -58,9 +52,7 @@ function ConfirmScreen({
 }: Props) {
   return (
     <>
-      <MainContainer>
-        <ContentContainer>{children}</ContentContainer>
-      </MainContainer>
+      <MainContainer>{children}</MainContainer>
       <ButtonsContainer>
         <ActionButton onPress={onCancel} text={cancelText} transparent />
         <ConfirmButtonContainer>

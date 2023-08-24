@@ -1,28 +1,28 @@
-import styled from 'styled-components';
-import { getAccountGradient } from '@utils/gradient';
-import { Tooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import { useTranslation } from 'react-i18next';
-import { getTruncatedAddress, getAddressDetail, isHardwareAccount } from '@utils/helper';
-import BarLoader from '@components/barLoader';
 import Copy from '@assets/img/Copy.svg';
-import { LoaderSize } from '@utils/constants';
+import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
+import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
+import BarLoader from '@components/barLoader';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
+import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import useResetUserFlow from '@hooks/useResetUserFlow';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { Account } from '@secretkeylabs/xverse-core';
-import { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import {
   ChangeShowBtcReceiveAlertAction,
   selectAccount,
 } from '@stores/wallet/actions/actionCreators';
-import useWalletSelector from '@hooks/useWalletSelector';
-import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
-import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
-import ActionButton from '@components/button';
-import BottomModal from '@components/bottomModal';
-import useWalletReducer from '@hooks/useWalletReducer';
-import useResetUserFlow from '@hooks/useResetUserFlow';
-import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import { LoaderSize } from '@utils/constants';
+import { getAccountGradient } from '@utils/gradient';
+import { getAddressDetail, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
+import styled from 'styled-components';
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -41,14 +41,14 @@ const GradientCircle = styled.div<GradientCircleProps>((props) => ({
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
 
-const TopSectionContainer = styled.div((props) => ({
+const TopSectionContainer = styled.div<{ disableClick?: boolean }>((props) => ({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   paddingTop: props.theme.spacing(8),
   backgroundColor: 'transparent',
-  cursor: 'pointer',
+  cursor: props.disableClick ? 'initial' : 'pointer',
 }));
 
 const AccountInfoContainer = styled.div({
@@ -87,6 +87,7 @@ const CurrentAccountDetailText = styled.h1((props) => ({
   marginTop: props.theme.spacing(1),
   display: 'flex',
   justifyContent: 'flex-start',
+  cursor: 'initial',
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
@@ -214,6 +215,7 @@ interface Props {
   showOrdinalAddress?: boolean;
   onAccountSelected: (account: Account) => void;
   isAccountListView?: boolean;
+  disabledAccountSelect?: boolean;
 }
 
 function AccountRow({
@@ -223,6 +225,7 @@ function AccountRow({
   allowCopyAddress,
   showOrdinalAddress,
   isAccountListView = false,
+  disabledAccountSelect = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
@@ -392,7 +395,7 @@ function AccountRow({
   );
 
   return (
-    <TopSectionContainer>
+    <TopSectionContainer disableClick={disabledAccountSelect}>
       <AccountInfoContainer onClick={handleClick}>
         <GradientCircle
           firstGradient={gradient[0]}

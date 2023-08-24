@@ -31,13 +31,19 @@ import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';
 
+const OuterContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+});
+
 const MainContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   flex: 1,
-  height: '100%',
+  overflowY: 'auto',
 }));
 
 const Title = styled.h1((props) => ({
@@ -301,125 +307,58 @@ function CreateInscription({ type }: Props) {
       disabled={!!errorCode || isExecuting}
       isError={!!errorCode}
     >
-      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      <MainContainer>
-        <Title>{t('TITLE')}</Title>
-        <SubTitle>{t('SUBTITLE')}</SubTitle>
-        <CardContainer bottomPadding>
-          <CardRow>
-            <div>{t('SUMMARY.TITLE')}</div>
-          </CardRow>
-          <CardRow topMargin>
-            <IconLabel>
-              <div>
-                <ButtonIcon src={OrdinalsIcon} />
-              </div>
-              <div>{t('SUMMARY.ORDINAL')}</div>
-            </IconLabel>
-            <ContentLabel contentType={contentType} content={content} type={type} />
-          </CardRow>
-          <CardRow topMargin>
-            <MutedLabel>{t('SUMMARY.TO')}</MutedLabel>
-          </CardRow>
-          <CardRow topMargin>
-            <IconLabel>
-              <InfoIconContainer>
-                <InfoIcon src={WalletIcon} />
-              </InfoIconContainer>
-              {t('SUMMARY.YOUR_ADDRESS')}
-            </IconLabel>
-            <div>{getShortTruncatedAddress(ordinalsAddress)}</div>
-          </CardRow>
-        </CardContainer>
-        <CardContainer>
-          <CardRow>
-            <div>{t('NETWORK')}</div>
-            <div>{network.type}</div>
-          </CardRow>
-        </CardContainer>
-        <CardContainer>
-          <CardRow>
-            <div>{t('VALUE')}</div>
-            <div>
-              {isLoading && <MoonLoader color="white" size={20} />}
-              {!isLoading && (
-                <NumberWithSuffixContainer>
-                  <NumericFormat
-                    value={commitValue}
-                    displayType="text"
-                    thousandSeparator
-                    suffix=" sats"
-                  />
-                  <NumericFormat
-                    value={fiatValue}
-                    displayType="text"
-                    thousandSeparator
-                    suffix=" USD"
-                    prefix="~$"
-                    renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
-                  />
-                </NumberWithSuffixContainer>
-              )}
-            </div>
-          </CardRow>
-        </CardContainer>
-        <CardContainer bottomPadding>
-          <CardRow>
-            <div>{t('FEES.TITLE')}</div>
-            <div>{isLoading && <MoonLoader color="white" size={20} />}</div>
-          </CardRow>
-          {!isLoading && (
-            <>
-              <CardRow topMargin>
-                <div>{t('FEES.INSCRIPTION')}</div>
-                <NumericFormat
-                  value={revealServiceFee ?? 0}
-                  displayType="text"
-                  thousandSeparator
-                  suffix=" sats"
-                />
-              </CardRow>
-              {externalServiceFee && (
-                <CardRow topMargin>
-                  <div>{t('FEES.DEVELOPER')}</div>
-                  <NumericFormat
-                    value={externalServiceFee}
-                    displayType="text"
-                    thousandSeparator
-                    suffix=" sats"
-                  />
-                </CardRow>
-              )}
-              <CardRow topMargin>
-                <div>{t('FEES.TRANSACTION')}</div>
-                <NumberWithSuffixContainer>
-                  <NumericFormat
-                    value={chainFee}
-                    displayType="text"
-                    thousandSeparator
-                    suffix=" sats"
-                  />
-                  <NumericFormat
-                    value={feeRate}
-                    displayType="text"
-                    thousandSeparator
-                    suffix=" sats/vB"
-                    renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
-                  />
-                </NumberWithSuffixContainer>
-              </CardRow>
-              <CardRow topMargin>
-                <div>{t('FEES.TOTAL')}</div>
+      <OuterContainer>
+        <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
+        <MainContainer>
+          <Title>{t('TITLE')}</Title>
+          <SubTitle>{t('SUBTITLE')}</SubTitle>
+          <CardContainer bottomPadding>
+            <CardRow>
+              <div>{t('SUMMARY.TITLE')}</div>
+            </CardRow>
+            <CardRow topMargin>
+              <IconLabel>
                 <div>
+                  <ButtonIcon src={OrdinalsIcon} />
+                </div>
+                <div>{t('SUMMARY.ORDINAL')}</div>
+              </IconLabel>
+              <ContentLabel contentType={contentType} content={content} type={type} />
+            </CardRow>
+            <CardRow topMargin>
+              <MutedLabel>{t('SUMMARY.TO')}</MutedLabel>
+            </CardRow>
+            <CardRow topMargin>
+              <IconLabel>
+                <InfoIconContainer>
+                  <InfoIcon src={WalletIcon} />
+                </InfoIconContainer>
+                {t('SUMMARY.YOUR_ADDRESS')}
+              </IconLabel>
+              <div>{getShortTruncatedAddress(ordinalsAddress)}</div>
+            </CardRow>
+          </CardContainer>
+          <CardContainer>
+            <CardRow>
+              <div>{t('NETWORK')}</div>
+              <div>{network.type}</div>
+            </CardRow>
+          </CardContainer>
+          <CardContainer>
+            <CardRow>
+              <div>{t('VALUE')}</div>
+              <div>
+                {isLoading && <MoonLoader color="white" size={20} />}
+                {!isLoading && (
                   <NumberWithSuffixContainer>
                     <NumericFormat
-                      value={totalFee}
+                      value={commitValue}
                       displayType="text"
                       thousandSeparator
                       suffix=" sats"
                     />
                     <NumericFormat
-                      value={fiatFees}
+                      value={fiatValue}
                       displayType="text"
                       thousandSeparator
                       suffix=" USD"
@@ -427,32 +366,101 @@ function CreateInscription({ type }: Props) {
                       renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
                     />
                   </NumberWithSuffixContainer>
-                </div>
-              </CardRow>
-            </>
+                )}
+              </div>
+            </CardRow>
+          </CardContainer>
+          <CardContainer bottomPadding>
+            <CardRow>
+              <div>{t('FEES.TITLE')}</div>
+              <div>{isLoading && <MoonLoader color="white" size={20} />}</div>
+            </CardRow>
+            {!isLoading && (
+              <>
+                <CardRow topMargin>
+                  <div>{t('FEES.INSCRIPTION')}</div>
+                  <NumericFormat
+                    value={revealServiceFee ?? 0}
+                    displayType="text"
+                    thousandSeparator
+                    suffix=" sats"
+                  />
+                </CardRow>
+                {externalServiceFee && (
+                  <CardRow topMargin>
+                    <div>{t('FEES.DEVELOPER')}</div>
+                    <NumericFormat
+                      value={externalServiceFee}
+                      displayType="text"
+                      thousandSeparator
+                      suffix=" sats"
+                    />
+                  </CardRow>
+                )}
+                <CardRow topMargin>
+                  <div>{t('FEES.TRANSACTION')}</div>
+                  <NumberWithSuffixContainer>
+                    <NumericFormat
+                      value={chainFee}
+                      displayType="text"
+                      thousandSeparator
+                      suffix=" sats"
+                    />
+                    <NumericFormat
+                      value={feeRate}
+                      displayType="text"
+                      thousandSeparator
+                      suffix=" sats/vB"
+                      renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
+                    />
+                  </NumberWithSuffixContainer>
+                </CardRow>
+                <CardRow topMargin>
+                  <div>{t('FEES.TOTAL')}</div>
+                  <div>
+                    <NumberWithSuffixContainer>
+                      <NumericFormat
+                        value={totalFee}
+                        displayType="text"
+                        thousandSeparator
+                        suffix=" sats"
+                      />
+                      <NumericFormat
+                        value={fiatFees}
+                        displayType="text"
+                        thousandSeparator
+                        suffix=" USD"
+                        prefix="~$"
+                        renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
+                      />
+                    </NumberWithSuffixContainer>
+                  </div>
+                </CardRow>
+              </>
+            )}
+          </CardContainer>
+          <Button onClick={onAdvancedSettingClick}>
+            <ButtonImage src={SettingIcon} />
+            <ButtonText>{t('EDIT_FEES')}</ButtonText>
+          </Button>
+          {showFeeSettings && (
+            <EditFee
+              feeRate={feeRate}
+              feeRates={feeRates}
+              onDone={onNewFeeRateSet}
+              onCancel={() => setShowFeeSettings(false)}
+            />
           )}
-        </CardContainer>
-        <Button onClick={onAdvancedSettingClick}>
-          <ButtonImage src={SettingIcon} />
-          <ButtonText>{t('EDIT_FEES')}</ButtonText>
-        </Button>
-        {showFeeSettings && (
-          <EditFee
-            feeRate={feeRate}
-            feeRates={feeRates}
-            onDone={onNewFeeRateSet}
-            onCancel={() => setShowFeeSettings(false)}
-          />
-        )}
-        {errorCode && (
-          <ErrorModal
-            key={errorCode}
-            errorCode={errorCode}
-            onRetrySubmit={executeMint}
-            onEnd={cancelCallback}
-          />
-        )}
-      </MainContainer>
+          {errorCode && (
+            <ErrorModal
+              key={errorCode}
+              errorCode={errorCode}
+              onRetrySubmit={executeMint}
+              onEnd={cancelCallback}
+            />
+          )}
+        </MainContainer>
+      </OuterContainer>
     </ConfirmScreen>
   );
 }
