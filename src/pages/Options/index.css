@@ -28,3 +28,7 @@ header h2 {
   justify-content: center;
   align-items: center;
 }
+
+#app {
+  min-height: 600px;
+}
