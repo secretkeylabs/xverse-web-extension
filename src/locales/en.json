@@ -778,6 +778,7 @@
       "CLOSE": "Close",
       "TRY_AGAIN": "Try again",
       "SHORT": {
+        "INVALID_JSON_CONTENT": "Invalid JSON content",
         "INSUFFICIENT_FUNDS": "Insufficient balance",
         "INVALID_FEE_RATE": "Invalid fee rate",
         "INVALID_SERVICE_FEE_CONFIG": "Invalid inputs",
@@ -788,6 +789,7 @@
         "SERVER_ERROR": "Server error"
       },
       "LONG": {
+        "INVALID_JSON_CONTENT": "The content is not valid JSON. Please verify the content of your inscription.",
         "INSUFFICIENT_FUNDS": "You have insufficient balance to process this transaction. Please add more funds to your wallet or try with a lower fee rate.",
         "INVALID_FEE_RATE": "The fee applied to this transaction is too low. To apply a higher fee, select edit fees at the bottom of this screen.",
         "INVALID_SERVICE_FEE_CONFIG": "The calling application sent an invalid payload. Please contact the application developer.",

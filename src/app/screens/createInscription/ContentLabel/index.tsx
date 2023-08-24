@@ -57,7 +57,6 @@ type Props = {
 
 // TODO: BRC-20
 // TODO: SATS DNS
-// TODO: If JSON, try parse and show error if not working
 function ContentIcon({ type, content, contentType: inputContentType }: Props) {
   const [showPreview, setShowPreview] = useState(false);
 

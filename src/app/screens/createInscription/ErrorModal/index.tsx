@@ -84,21 +84,23 @@ const Button = styled.div<{ isAction?: boolean }>((props) => ({
   color: props.isAction ? props.theme.colors.background.elevation0 : 'inherit',
 }));
 
-const END_ON_CLOSE_ERROR_CODES = [
+type ErrorType = InscriptionErrorCode | 'INVALID_JSON_CONTENT';
+
+const END_ON_CLOSE_ERROR_CODES: ErrorType[] = [
   InscriptionErrorCode.CONTENT_TOO_BIG,
   InscriptionErrorCode.INSCRIPTION_VALUE_TOO_LOW,
   InscriptionErrorCode.INVALID_CONTENT,
   InscriptionErrorCode.INVALID_SERVICE_FEE_CONFIG,
 ];
 
-const RESUBMIT_ERROR_CODES = [
+const RESUBMIT_ERROR_CODES: ErrorType[] = [
   InscriptionErrorCode.FAILED_TO_FINALIZE,
   InscriptionErrorCode.SERVER_ERROR,
 ];
 
 type Props = {
-  errorCode?: InscriptionErrorCode;
-  onRetrySubmit: () => void;
+  errorCode?: ErrorType;
+  onRetrySubmit?: () => void;
   onEnd: () => void;
 };
 

@@ -196,12 +196,26 @@ function CreateInscription({ type }: Props) {
         setFeeRate(feeRatesResponse.regular);
       }
     });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- we only want to run this once on load
   }, []);
 
   const content =
     type === 'text'
       ? (payload as CreateTextInscriptionPayload).text
       : (payload as CreateFileInscriptionPayload).dataBase64;
+
+  const contentIsInvalidJson = useMemo(() => {
+    // if content type is json, ensure content is valid json
+    if (contentType.startsWith('application/json')) {
+      try {
+        JSON.parse(content as string);
+        return false;
+      } catch (e) {
+        return true;
+      }
+    }
+  }, [contentType, content]);
 
   const {
     commitValue,
@@ -449,6 +463,13 @@ function CreateInscription({ type }: Props) {
               feeRates={feeRates}
               onDone={onNewFeeRateSet}
               onCancel={() => setShowFeeSettings(false)}
+            />
+          )}
+          {contentIsInvalidJson && (
+            <ErrorModal
+              key="invalid-json"
+              errorCode="INVALID_JSON_CONTENT"
+              onEnd={cancelCallback}
             />
           )}
           {errorCode && (
