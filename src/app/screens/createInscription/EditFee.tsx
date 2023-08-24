@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
 import type { BtcFeeResponse } from '@secretkeylabs/xverse-core';
-import { fetchBtcFeeRate } from '@secretkeylabs/xverse-core';
 
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -76,11 +74,6 @@ const FeeText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
-const SubText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
-}));
-
 interface ButtonProps {
   isSelected: boolean;
   isLastInRow?: boolean;
@@ -118,32 +111,30 @@ const FeeContainer = styled.div({
 
 type Options = 'standard' | 'high' | 'custom';
 
+const getInitialFeeOption = (feeRate: number, feeRates?: BtcFeeResponse): Options => {
+  if (feeRates) {
+    if (feeRate === feeRates.regular) {
+      return 'standard';
+    }
+    if (feeRate === feeRates.priority) {
+      return 'high';
+    }
+  }
+  return 'custom';
+};
+
 interface Props {
   feeRate: number;
+  feeRates?: BtcFeeResponse;
   onDone: (number) => void;
   onCancel: () => void;
 }
-function EditFee({ feeRate, onDone, onCancel }: Props) {
+function EditFee({ feeRate, feeRates, onDone, onCancel }: Props) {
   const { t } = useTranslation('translation');
 
-  const [selectedOption, setSelectedOption] = useState<Options>('standard');
-  const [isLoading, setIsLoading] = useState(true);
+  const initialOption = getInitialFeeOption(feeRate, feeRates);
+  const [selectedOption, setSelectedOption] = useState<Options>(initialOption);
   const [feeRateInput, setFeeRateInput] = useState<string>(feeRate.toString());
-  const [feeRates, setFeeRates] = useState<BtcFeeResponse | undefined>();
-
-  useEffect(() => {
-    fetchBtcFeeRate().then((feeRatesResponse: BtcFeeResponse) => {
-      setFeeRates(feeRatesResponse);
-      if (feeRate === feeRatesResponse.regular) {
-        setSelectedOption('standard');
-      } else if (feeRate === feeRatesResponse.priority) {
-        setSelectedOption('high');
-      } else {
-        setSelectedOption('custom');
-      }
-      setIsLoading(false);
-    });
-  }, []);
 
   const onInputEditFeesChange = (event) => {
     const { value } = event.target;
@@ -165,14 +156,6 @@ function EditFee({ feeRate, onDone, onCancel }: Props) {
       setFeeRateInput(feeRates?.priority.toString() ?? '');
     }
   };
-
-  if (isLoading) {
-    return (
-      <Container>
-        <MoonLoader color="white" size={20} />
-      </Container>
-    );
-  }
 
   return (
     <BottomModal
@@ -215,8 +198,7 @@ function EditFee({ feeRate, onDone, onCancel }: Props) {
       <ApplyButtonContainer>
         <ActionButton
           text={t('TRANSACTION_SETTING.APPLY')}
-          processing={isLoading}
-          disabled={isLoading || feeRateInput === ''}
+          disabled={feeRateInput === ''}
           onPress={() => onDone(+feeRateInput)}
         />
       </ApplyButtonContainer>

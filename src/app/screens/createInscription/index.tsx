@@ -7,13 +7,18 @@ import { useLocation } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
-import { useInscriptionExecute, useInscriptionFees } from '@secretkeylabs/xverse-core';
+import type { BtcFeeResponse } from '@secretkeylabs/xverse-core';
+import {
+  fetchBtcFeeRate,
+  useInscriptionExecute,
+  useInscriptionFees,
+} from '@secretkeylabs/xverse-core';
 import { CreateFileInscriptionPayload, CreateTextInscriptionPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import WalletIcon from '@assets/img/wallet.svg';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useBtcClient from '@hooks/useBtcClient';
@@ -166,7 +171,8 @@ function CreateInscription({ type }: Props) {
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const [feeRate, setFeeRate] = useState(initialFeeRate ?? 8); // TODO: Get from endpoint
+  const [feeRate, setFeeRate] = useState(initialFeeRate ?? 8);
+  const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
 
   const btcClient = useBtcClient();
 
@@ -174,12 +180,17 @@ function CreateInscription({ type }: Props) {
     useWalletSelector();
 
   useEffect(() => {
-    const fetchUtxos = async () => {
-      const btcUtxos = await btcClient.getUnspentUtxos(btcAddress);
-      setUtxos(btcUtxos);
-    };
-    fetchUtxos();
+    btcClient.getUnspentUtxos(btcAddress).then(setUtxos);
   }, [btcClient, btcAddress]);
+
+  useEffect(() => {
+    fetchBtcFeeRate().then((feeRatesResponse: BtcFeeResponse) => {
+      setFeeRates(feeRatesResponse);
+      if (initialFeeRate === undefined) {
+        setFeeRate(feeRatesResponse.regular);
+      }
+    });
+  }, []);
 
   const content =
     type === 'text'
@@ -428,6 +439,7 @@ function CreateInscription({ type }: Props) {
         {showFeeSettings && (
           <EditFee
             feeRate={feeRate}
+            feeRates={feeRates}
             onDone={onNewFeeRateSet}
             onCancel={() => setShowFeeSettings(false)}
           />

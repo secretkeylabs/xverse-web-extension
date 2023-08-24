@@ -92,7 +92,7 @@ function ConfirmScreen({
       <ButtonsContainer>
         <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
         <ConfirmButton onClick={onConfirm} disabled={disabled} isError={isError}>
-          {loading ? <MoonLoader color="white" size={20} /> : confirmText}
+          {loading ? <MoonLoader color="black" size={20} /> : confirmText}
         </ConfirmButton>
       </ButtonsContainer>
     </>

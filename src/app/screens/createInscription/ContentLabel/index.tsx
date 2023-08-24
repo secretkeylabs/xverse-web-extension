@@ -82,6 +82,10 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
     }
   };
 
+  // TODO: center in full screen
+  // TODO: get rid of scroll in popup (app height is 600px)
+  // TODO: if 2 icons, show 3 dots
+  // TODO: address selector at top should be sticky
   return (
     <Container>
       <div>{inputContentType}</div>
