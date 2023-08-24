@@ -114,7 +114,7 @@ function AccountList(): JSX.Element {
       ),
     );
     broadcastResetUserFlow();
-    navigate('/');
+    navigate(-1);
   };
 
   const isAccountSelected = (account: Account) =>
