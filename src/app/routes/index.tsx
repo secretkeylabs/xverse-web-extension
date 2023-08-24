@@ -264,14 +264,6 @@ const router = createHashRouter([
         element: <Login />,
       },
       {
-        path: 'restoreWallet',
-        element: (
-          <OnboardingGuard>
-            <RestoreWallet />
-          </OnboardingGuard>
-        ),
-      },
-      {
         path: 'forgotPassword',
         element: <ForgotPassword />,
       },
@@ -424,6 +416,14 @@ const router = createHashRouter([
           <AuthGuard>
             <SendOrdinal />
           </AuthGuard>
+        ),
+      },
+      {
+        path: 'restoreWallet',
+        element: (
+          <OnboardingGuard>
+            <RestoreWallet />
+          </OnboardingGuard>
         ),
       },
     ],

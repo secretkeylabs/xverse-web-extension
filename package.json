@@ -1,10 +1,11 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.15.0",
+  "version": "0.17.0",
   "private": true,
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
+    "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
     "@secretkeylabs/xverse-core": "^1.6.3-6cf22fb",
     "@stacks/connect": "^6.10.2",

@@ -1,5 +1,5 @@
+import ActionButton from '@components/button';
 import { ReactNode } from 'react';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
 const MainContainer = styled.div`
@@ -30,37 +30,9 @@ const ButtonsContainer = styled.div((props) => ({
   marginRight: 16,
 }));
 
-const ConfirmButton = styled.button<{ isError: boolean }>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.isError
-    ? props.theme.colors.feedback.error
-    : props.theme.colors.action.classic,
-  color: props.isError ? props.theme.colors.white[200] : props.theme.colors.background.elevation0,
-  width: '50%',
-  height: 44,
-  marginLeft: 6,
-  ':disabled': {
-    opacity: 0.6,
-    cursor: 'initial',
-  },
-}));
-
-const CancelButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: `1px solid ${props.theme.colors.background.elevation2}`,
-  color: props.theme.colors.white['0'],
-  width: '50%',
-  height: 44,
-  marginRight: 6,
+const ConfirmButtonContainer = styled.div((props) => ({
+  width: '100%',
+  marginLeft: props.theme.spacing(3),
 }));
 
 type Props = {
@@ -90,10 +62,16 @@ function ConfirmScreen({
         <ContentContainer>{children}</ContentContainer>
       </MainContainer>
       <ButtonsContainer>
-        <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
-        <ConfirmButton onClick={onConfirm} disabled={disabled} isError={isError}>
-          {loading ? <MoonLoader color="black" size={20} /> : confirmText}
-        </ConfirmButton>
+        <ActionButton onPress={onCancel} text={cancelText} transparent />
+        <ConfirmButtonContainer>
+          <ActionButton
+            onPress={onConfirm}
+            disabled={disabled}
+            processing={loading}
+            text={confirmText}
+            warning={isError}
+          />
+        </ConfirmButtonContainer>
       </ButtonsContainer>
     </>
   );

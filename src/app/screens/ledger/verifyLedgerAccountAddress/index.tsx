@@ -9,7 +9,7 @@ import {
   importNativeSegwitAccountFromLedger,
   importTaprootAccountFromLedger,
 } from '@secretkeylabs/xverse-core';
-import { ledgerDelay } from '@common/utils/ledger';
+import { getDeviceAccountIndex, ledgerDelay } from '@common/utils/ledger';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
@@ -176,9 +176,14 @@ function VerifyLedger(): JSX.Element {
 
   const importBtcAccounts = async (showAddress: boolean, masterFingerPrint?: string) => {
     const transport = await Transport.create();
-    const addressIndex = ledgerAccountsList
-      .filter((account) => account.masterPubKey === (masterFingerPrint || masterPubKey))
-      .findIndex((account) => account.id === selectedAccount?.id);
+    const addressIndex =
+      selectedAccount?.deviceAccountIndex !== undefined
+        ? selectedAccount?.deviceAccountIndex
+        : getDeviceAccountIndex(
+            ledgerAccountsList,
+            selectedAccount?.id!,
+            masterFingerPrint || masterPubKey,
+          );
 
     if (isBitcoinSelected) {
       try {

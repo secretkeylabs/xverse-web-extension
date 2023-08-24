@@ -11,36 +11,51 @@ import { LoaderSize } from '@utils/constants';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
+import {
+  ChangeShowBtcReceiveAlertAction,
+  selectAccount,
+} from '@stores/wallet/actions/actionCreators';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
-
-interface GradientCircleProps {
-  firstGradient: string;
-  secondGradient: string;
-  thirdGradient: string;
-}
+import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
+import ActionButton from '@components/button';
+import BottomModal from '@components/bottomModal';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useResetUserFlow from '@hooks/useResetUserFlow';
+import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 
 const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
 });
 
+interface GradientCircleProps {
+  firstGradient: string;
+  secondGradient: string;
+  thirdGradient: string;
+}
 const GradientCircle = styled.div<GradientCircleProps>((props) => ({
-  height: 40,
   width: 40,
+  height: 40,
   borderRadius: 25,
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
 
 const TopSectionContainer = styled.div((props) => ({
+  position: 'relative',
   display: 'flex',
-  flexDirection: 'row',
   alignItems: 'center',
+  justifyContent: 'space-between',
   paddingTop: props.theme.spacing(8),
   backgroundColor: 'transparent',
   cursor: 'pointer',
 }));
+
+const AccountInfoContainer = styled.div({
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+});
 
 const CurrentAcountContainer = styled.div((props) => ({
   display: 'flex',
@@ -80,9 +95,9 @@ const BarLoaderContainer = styled.div((props) => ({
   backgroundColor: 'transparent',
 }));
 
-const CopyImage = styled.img`
-  margin-right: 4px;
-`;
+const CopyImage = styled.img((props) => ({
+  marginRight: props.theme.spacing(2),
+}));
 
 export const StyledToolTip = styled(Tooltip)`
   background-color: #ffffff;
@@ -121,11 +136,11 @@ const CopyButton = styled.button`
   }
 `;
 
-const OrdinalImage = styled.img({
+const OrdinalImage = styled.img((props) => ({
   width: 12,
   height: 12,
-  marginRight: 4,
-});
+  marginRight: props.theme.spacing(2),
+}));
 
 const AddressText = styled.h1((props) => ({
   ...props.theme.body_m,
@@ -135,18 +150,70 @@ const AddressText = styled.h1((props) => ({
 
 const BitcoinDot = styled.div((props) => ({
   borderRadius: 20,
-  background: props.theme.colors.feedback.caution,
+  backgroundColor: props.theme.colors.feedback.caution,
   width: 10,
-  marginRight: 4,
-  marginLeft: 4,
   height: 10,
+  marginRight: props.theme.spacing(2),
+  marginLeft: props.theme.spacing(2),
 }));
+
+const OptionsButton = styled.button({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  background: 'transparent',
+});
+
+const ModalContent = styled.div((props) => ({
+  padding: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(12),
+  paddingBottom: props.theme.spacing(20),
+}));
+
+const ModalDescription = styled.div((props) => ({
+  fontSize: '0.875rem',
+  color: props.theme.colors.white['200'],
+  marginBottom: props.theme.spacing(16),
+}));
+
+const ModalControlsContainer = styled.div({
+  display: 'flex',
+});
+
+const ModalButtonContainer = styled.div((props) => ({
+  width: '100%',
+  '&:first-child': {
+    marginRight: props.theme.spacing(6),
+  },
+}));
+
+const ButtonRow = styled.button`
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  justify-content: flex-start;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  font: ${(props) => props.theme.body_medium_m};
+  color: ${(props) => props.theme.colors.white['0']};
+  transition: background-color 0.2s ease;
+  :hover {
+    background-color: ${(props) => props.theme.colors.background.elevation3};
+  }
+  :active {
+    background-color: ${(props) => props.theme.colors.background.elevation3};
+  }
+`;
+
 interface Props {
   account: Account | null;
   isSelected: boolean;
   allowCopyAddress?: boolean;
   showOrdinalAddress?: boolean;
   onAccountSelected: (account: Account) => void;
+  isAccountListView?: boolean;
 }
 
 function AccountRow({
@@ -155,15 +222,26 @@ function AccountRow({
   onAccountSelected,
   allowCopyAddress,
   showOrdinalAddress,
+  isAccountListView = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const { showBtcReceiveAlert } = useWalletSelector();
+  const { t: optionsDialogTranslation } = useTranslation('translation', {
+    keyPrefix: 'OPTIONS_DIALOG',
+  });
+  const { showBtcReceiveAlert, accountsList, network } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const [onStxCopied, setOnStxCopied] = useState(false);
   const [onBtcCopied, setOnBtcCopied] = useState(false);
   const dispatch = useDispatch();
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
+  const [showOptionsDialog, setShowOptionsDialog] = useState(false);
+  const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
+  const [optionsDialogIndents, setOptionsDialogIndents] = useState<
+    { top: string; left: string } | undefined
+  >();
+  const { removeLedgerAccount } = useWalletReducer();
+  const { broadcastResetUserFlow } = useResetUserFlow();
 
   useEffect(
     () => () => {
@@ -203,8 +281,65 @@ function AccountRow({
     event.stopPropagation();
   };
 
-  const onClick = () => {
+  const handleClick = () => {
     onAccountSelected(account!);
+  };
+
+  const openOptionsDialog = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setShowOptionsDialog(true);
+
+    setOptionsDialogIndents({
+      top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
+      left: `calc(${
+        (event.target as HTMLElement).parentElement?.getBoundingClientRect().right
+      }px - ${OPTIONS_DIALOG_WIDTH}px)`,
+    });
+  };
+
+  const closeOptionsDialog = () => {
+    setShowOptionsDialog(false);
+  };
+
+  const handleRemoveAccountModalOpen = () => {
+    setShowRemoveAccountModal(true);
+  };
+
+  const handleRemoveAccountModalClose = () => {
+    setShowRemoveAccountModal(false);
+  };
+
+  const handleAccountSelect = (newAccount: Account) => {
+    dispatch(
+      selectAccount(
+        newAccount,
+        newAccount.stxAddress,
+        newAccount.btcAddress,
+        newAccount.ordinalsAddress,
+        newAccount.masterPubKey,
+        newAccount.stxPublicKey,
+        newAccount.btcPublicKey,
+        newAccount.ordinalsPublicKey,
+        network,
+        undefined,
+        newAccount.accountType,
+        newAccount.accountName,
+      ),
+    );
+    broadcastResetUserFlow();
+  };
+
+  const handleRemoveLedgerAccount = async () => {
+    if (!account) {
+      return;
+    }
+
+    try {
+      await removeLedgerAccount(account);
+      handleAccountSelect(accountsList[0]);
+      handleRemoveAccountModalClose();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const showOrdinalBtcAddress = (
@@ -257,39 +392,73 @@ function AccountRow({
   );
 
   return (
-    <TopSectionContainer onClick={onClick}>
-      <GradientCircle
-        firstGradient={gradient[0]}
-        secondGradient={gradient[1]}
-        thirdGradient={gradient[2]}
-      />
-      <CurrentAcountContainer>
-        {account &&
-          (isSelected ? (
+    <TopSectionContainer>
+      <AccountInfoContainer onClick={handleClick}>
+        <GradientCircle
+          firstGradient={gradient[0]}
+          secondGradient={gradient[1]}
+          thirdGradient={gradient[2]}
+        />
+        <CurrentAcountContainer>
+          {account && (
             <TransparentSpan>
               <CurrentAccountTextContainer>
-                <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+                {isSelected ? (
+                  <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+                ) : (
+                  <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
+                )}
                 {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
               </CurrentAccountTextContainer>
             </TransparentSpan>
-          ) : (
-            <TransparentSpan onClick={onClick}>
-              <CurrentAccountTextContainer>
-                <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
-                {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
-              </CurrentAccountTextContainer>
-            </TransparentSpan>
-          ))}
+          )}
 
-        {!!account && !isHardwareAccount(account) && displayAddress}
+          {!!account && !isHardwareAccount(account) && displayAddress}
 
-        {!account && (
-          <BarLoaderContainer>
-            <BarLoader loaderSize={LoaderSize.LARGE} />
-            <BarLoader loaderSize={LoaderSize.MEDIUM} />
-          </BarLoaderContainer>
-        )}
-      </CurrentAcountContainer>
+          {!account && (
+            <BarLoaderContainer>
+              <BarLoader loaderSize={LoaderSize.LARGE} />
+              <BarLoader loaderSize={LoaderSize.MEDIUM} />
+            </BarLoaderContainer>
+          )}
+        </CurrentAcountContainer>
+      </AccountInfoContainer>
+
+      {isAccountListView && isHardwareAccount(account) && (
+        <OptionsButton onClick={openOptionsDialog}>
+          <img src={threeDotsIcon} alt="Options" />
+        </OptionsButton>
+      )}
+
+      {showOptionsDialog && (
+        <OptionsDialog closeDialog={closeOptionsDialog} optionsDialogIndents={optionsDialogIndents}>
+          <ButtonRow onClick={handleRemoveAccountModalOpen}>
+            {optionsDialogTranslation('REMOVE_FROM_LIST')}
+          </ButtonRow>
+        </OptionsDialog>
+      )}
+
+      <BottomModal
+        visible={showRemoveAccountModal}
+        header={t('REMOVE_FROM_LIST_TITLE')}
+        onClose={handleRemoveAccountModalClose}
+      >
+        <ModalContent>
+          <ModalDescription>{t('REMOVE_FROM_LIST_DESCRIPTION')}</ModalDescription>
+          <ModalControlsContainer>
+            <ModalButtonContainer>
+              <ActionButton
+                transparent
+                text={t('CANCEL')}
+                onPress={handleRemoveAccountModalClose}
+              />
+            </ModalButtonContainer>
+            <ModalButtonContainer>
+              <ActionButton warning text={t('REMOVE_WALLET')} onPress={handleRemoveLedgerAccount} />
+            </ModalButtonContainer>
+          </ModalControlsContainer>
+        </ModalContent>
+      </BottomModal>
     </TopSectionContainer>
   );
 }

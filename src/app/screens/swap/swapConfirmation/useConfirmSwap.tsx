@@ -24,8 +24,8 @@ export type SwapConfirmationInput = {
   toToken: SwapToken;
   fromAmount: number;
   minToAmount: number;
-  lpFeeAmount: number;
-  lpFeeFiatAmount?: number;
+  txFeeAmount: number;
+  txFeeFiatAmount?: number;
   address: string;
   routers: { image: TokenImageProps; name: string }[];
   unsignedTx: string; // serialized hex StacksTransaction
@@ -52,21 +52,21 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>(
     deserializeTransaction(input.unsignedTx),
   );
-  const [feeAmount, setFeeAmount] = useState(input.lpFeeAmount);
-  const [feeFiatAmount, setFeeFiatAmount] = useState(input.lpFeeFiatAmount);
+  const [feeAmount, setFeeAmount] = useState(input.txFeeAmount);
+  const [feeFiatAmount, setFeeFiatAmount] = useState(input.txFeeFiatAmount);
 
   return {
     ...input,
-    lpFeeAmount: isSponsored ? 0 : feeAmount,
-    lpFeeFiatAmount: isSponsored ? 0 : feeFiatAmount,
+    txFeeAmount: feeAmount,
+    txFeeFiatAmount: feeFiatAmount,
     unsignedTx,
     userOverrideSponsorValue: input.userOverrideSponsorValue,
     onFeeUpdate: (settingFee: bigint) => {
-      const fee = microstacksToStx(new BigNumber(settingFee));
+      const fee = microstacksToStx(new BigNumber(settingFee.toString()));
       unsignedTx.setFee(settingFee);
       setUnsignedTx(unsignedTx);
       setFeeAmount(Number(fee));
-      setFeeFiatAmount(currencyToToken(input.from, Number(fee))?.fiatAmount);
+      setFeeFiatAmount(currencyToToken(Currency.STX, Number(fee))?.fiatAmount);
     },
     isSponsored,
     isSponsorDisabled,

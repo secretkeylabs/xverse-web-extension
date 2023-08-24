@@ -4,7 +4,7 @@ import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
 import AccountRow from '@components/accountRow';
 import ActionButton from '@components/button';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useSpring } from '@react-spring/web';
@@ -203,7 +203,8 @@ function BtcSelectAddressScreen() {
     setShowAccountList(true);
   };
 
-  const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;
+  const isAccountSelected = (account: Account) =>
+    account.id === selectedAccount?.id && account.accountType === selectedAccount?.accountType;
 
   const handleAccountSelect = (account: Account) => {
     dispatch(
@@ -271,7 +272,7 @@ function BtcSelectAddressScreen() {
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
-            {[...accountsList, ...ledgerAccountsList].map((account) => (
+            {[...ledgerAccountsList, ...accountsList].map((account) => (
               <AccountListRow>
                 <AccountRow
                   key={account.stxAddress}
@@ -280,7 +281,7 @@ function BtcSelectAddressScreen() {
                   onAccountSelected={handleAccountSelect}
                   showOrdinalAddress
                 />
-                <Seperator />
+                <Separator />
               </AccountListRow>
             ))}
           </AccountListContainer>

@@ -39,7 +39,7 @@ export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
-export const AddLedgerAccountKey = 'AddLedgerAccountKey';
+export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
 
 export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 
@@ -129,7 +129,7 @@ export interface AddAccount {
   accountsList: Account[];
 }
 export interface AddLedgerAccount {
-  type: typeof AddLedgerAccountKey;
+  type: typeof UpdateLedgerAccountsKey;
   ledgerAccountsList: Account[];
 }
 export interface SelectAccount {
