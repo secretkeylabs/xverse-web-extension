@@ -58,8 +58,6 @@ type Props = {
 // TODO: BRC-20
 // TODO: SATS DNS
 // TODO: If JSON, try parse and show error if not working
-// TODO: Display friendly json
-// TODO: Display raw HTML
 function ContentIcon({ type, content, contentType: inputContentType }: Props) {
   const [showPreview, setShowPreview] = useState(false);
 
@@ -82,10 +80,7 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
     }
   };
 
-  // TODO: center in full screen
-  // TODO: get rid of scroll in popup (app height is 600px)
   // TODO: if 2 icons, show 3 dots
-  // TODO: address selector at top should be sticky
   return (
     <Container>
       <div>{inputContentType}</div>
