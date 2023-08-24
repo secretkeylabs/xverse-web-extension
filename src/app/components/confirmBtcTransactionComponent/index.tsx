@@ -113,7 +113,7 @@ const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => 
 
 interface Props {
   currentFee: BigNumber;
-  feePerVByte: BigNumber;
+  feePerVByte: BigNumber; // is this the same as currentFeeRate?
   loadingBroadcastedTx: boolean;
   signedTxHex: string;
   ordinalTxUtxo?: UTXO;

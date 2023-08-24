@@ -96,6 +96,12 @@ const Theme = {
     fontWeight: '400',
     fontSize: 14,
   },
+  body_medium_s: {
+    fontFamily: 'DMSans-Medium',
+    fontStyle: 'normal',
+    fontWeight: '500',
+    fontSize: 12,
+  },
   body_s: {
     fontFamily: 'DMSans-Regular',
     fontStyle: 'normal',

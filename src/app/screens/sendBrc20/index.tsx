@@ -105,6 +105,7 @@ function SendBrc20Screen() {
         return setProcessing(false);
       }
 
+      // TODO get this from store or cache?
       const addressUtxos: UTXO[] = await getNonOrdinalUtxo(btcAddress, network.type);
       const ticker = getFtTicker(fungibleToken);
       const numberAmount = Number(replaceCommaByDot(amountToSend));
@@ -121,11 +122,12 @@ function SendBrc20Screen() {
       navigate('/confirm-brc20-tx', {
         // TODO move to context
         state: {
-          recipient: recipientAddress,
+          recipientAddress,
           addressUtxos,
           ticker,
           amount: numberAmount,
-          transferFees: result,
+          estimatedFees: result,
+          feeRate,
         },
       });
     } catch (e) {

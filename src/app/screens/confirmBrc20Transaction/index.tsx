@@ -1,5 +1,4 @@
 import AccountHeaderComponent from '@components/accountHeader';
-import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import BottomBar from '@components/tabBar';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
@@ -7,15 +6,16 @@ import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
 import { useMutation } from '@tanstack/react-query';
+import { getFeeValuesForBrc20OneStepTransfer } from '@utils/brc20';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import ConfirmBrc20TransactionComponent from './confirmBrc20TransactionComponent';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -55,77 +55,35 @@ const NftContainer = styled.div((props) => ({
 }));
 
 function ConfirmBrc20Transaction() {
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
-  const btcClient = useBtcClient();
-  const [recipientAddress, setRecipientAddress] = useState('');
-  const location = useLocation();
-  const { fee, feePerVByte, signedTxHex, ordinalUtxo } = location.state;
-
   const {
-    isLoading,
-    error: txError,
-    data: btcTxBroadcastData,
-    mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
-    mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
-  });
-  const { selectedOrdinal } = useNftDataSelector();
-  const { refetch } = useBtcWalletData();
-  const [currentFee, setCurrentFee] = useState(fee);
-  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
+    recipientAddress,
+    addressUtxos: nonOrdinalUtxos,
+    ticker,
+    amount,
+    estimatedFees,
+    feeRate,
+  } = useLocation().state;
+  // const { refetch } = useBtcWalletData();
 
-  useEffect(() => {
-    setRecipientAddress(location.state.recipientAddress);
-  }, [location]);
+  const { txFee, inscriptionFee, totalFee, btcFee } = getFeeValuesForBrc20OneStepTransfer(
+    estimatedFees.valueBreakdown,
+  );
 
-  useEffect(() => {
-    if (btcTxBroadcastData) {
-      navigate('/tx-status', {
-        state: {
-          txid: btcTxBroadcastData.tx.hash,
-          currency: 'BTC',
-          error: '',
-          isOrdinal: true,
-        },
-      });
-      setTimeout(() => {
-        refetch();
-      }, 1000);
-    }
-  }, [btcTxBroadcastData, navigate, refetch]);
+  const [currentFeeRate, setCurrentFeeRate] = useState(feeRate);
 
-  useEffect(() => {
-    if (txError) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          error: txError.toString(),
-          isOrdinal: true,
-        },
-      });
-    }
-  }, [txError, navigate]);
+  // TODO useBrc20EstimateFees hook to recalculate onchange
 
-  const handleOnConfirmClick = (txHex: string) => {
+  const handleOnConfirmClick = () => {
     if (isLedgerAccount(selectedAccount)) {
-      const txType: LedgerTransactionType = 'ORDINALS';
-      navigate('/confirm-ledger-tx', {
-        state: {
-          recipients: [{ address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }],
-          type: txType,
-          ordinalUtxo,
-          feeRateInput: currentFeeRate,
-          fee: currentFee,
-        },
-      });
+      // TODO ledger
       return;
     }
 
-    mutate({ signedTx: txHex });
+    // TODO nav to custom tx screen
+    // mutate({ signedTx: txHex });
   };
 
   const handleOnCancelClick = () => {
@@ -141,28 +99,17 @@ function ConfirmBrc20Transaction() {
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       )}
       <ScrollContainer>
-        <ConfirmBtcTransactionComponent
-          feePerVByte={feePerVByte}
+        <ConfirmBrc20TransactionComponent
           recipients={[{ address: recipientAddress, amountSats: new BigNumber(0) }]}
-          loadingBroadcastedTx={isLoading}
-          signedTxHex={signedTxHex}
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
-          onBackButtonClick={handleOnCancelClick}
-          ordinalTxUtxo={ordinalUtxo}
-          assetDetail={selectedOrdinal?.number.toString()}
-          currentFee={currentFee}
-          setCurrentFee={setCurrentFee}
           currentFeeRate={currentFeeRate}
           setCurrentFeeRate={setCurrentFeeRate}
-        >
-          <Container>
-            <NftContainer>
-              <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
-            </NftContainer>
-          </Container>
-        </ConfirmBtcTransactionComponent>
-
+          transactionFee={txFee}
+          inscriptionFee={inscriptionFee}
+          totalFee={totalFee}
+          btcFee={btcFee}
+        />
         {!isGalleryOpen && (
           <BottomBarContainer>
             <BottomBar tab="nft" />
