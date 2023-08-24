@@ -14,15 +14,14 @@ import { getTruncatedAddress } from '@utils/helper';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
+  justifyContent: 'center',
   background: props.theme.colors.background.elevation1,
   borderRadius: 12,
-  paddingTop: 12,
-  paddingLeft: 16,
-  paddingRight: 16,
-  paddingBottom: 12,
-  justifyContent: 'center',
-  marginBottom: 12,
   overflowY: 'auto',
+  padding: props.theme.spacing(6),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(6),
 }));
 
 const TransferDetailContainer = styled.div((props) => ({
@@ -50,14 +49,14 @@ const TxIdText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
   color: props.theme.colors.white[0],
-  marginLeft: 4,
+  marginLeft: props.theme.spacing(2),
 }));
 
 const YourAddressText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
   color: props.theme.colors.white[0],
-  marginRight: 4,
+  marginRight: props.theme.spacing(2),
 }));
 
 const RowContainer = styled.div({

@@ -162,12 +162,16 @@
     "STACKS": "Stacks",
     "ACCOUNT_NAME": "Account",
     "RECEIVE": "Receive",
+    "CANCEL": "Cancel",
+    "REMOVE_WALLET": "Remove",
     "SEND": "Send",
     "SWAP": "Swap",
     "BUY": "Buy",
     "MANAGE_TOKEN": "Manage token list",
     "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
-    "ORDINALS": "Ordinals & BRC-20 Tokens"
+    "ORDINALS": "Ordinals & BRC-20 Tokens",
+    "REMOVE_FROM_LIST_TITLE": "Remove from list",
+    "REMOVE_FROM_LIST_DESCRIPTION": "This will disconnect and remove the account from Xverse. You can import the same account again later by reconnecting your hardware wallet device."
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -353,13 +357,17 @@
     "SEED_PHRASE_VIEW_CONTINUE": "Continue",
     "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
     "SEED_PHRASE_VERIFY_BUTTON": "Verify",
-    "SEED_PHRASE_BACK_BUTTON": "Back"
+    "SEED_PHRASE_BACK_BUTTON": "Back to seedphrase",
+    "SEED_PHRASE_INCORRECT": "This word is not correct.",
+    "SELECT_THE": "Select the ",
+    "WORD_OF_YOUR_SEEDPHRASE": " word of your seedphrase.",
+    "CONFIRM_YOUR_SEEDPHRASE": "Confirm you've recorded your seed phrase correctly."
   },
   "CREATE_PASSWORD_SCREEN": {
-    "CREATE_PASSWORD_TITLE": "Enter your new password",
-    "CONFIRM_PASSWORD_TITLE": "Confirm your new password",
+    "CREATE_PASSWORD_TITLE": "Enter a password to protect your wallet",
+    "CONFIRM_PASSWORD_TITLE": "Confirm your password",
     "ENTER_PASSWORD": "Enter your current password",
-    "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
+    "TEXT_INPUT_NEW_PASSWORD_LABEL": "Password",
     "TEXT_INPUT_ENTER_PASSWORD_LABEL": "Enter your current password",
     "TEXT_INPUT_CONFIRM_PASSWORD_LABEL": "Confirm Password",
     "CONTINUE_BUTTON": "Continue",
@@ -409,7 +417,7 @@
         "TITLE": "Confirm the signature",
         "SUBTITLE": "Authorise the signature on your device to continue.",
         "ERROR_TITLE": "Signature denied",
-        "ERROR_SUBTITLE": "The signatures has been rejected. You can try again or close this tab."
+        "ERROR_SUBTITLE": "The signature has been rejected. You can try again or close this tab."
       },
       "SUCCESS": {
         "TITLE": "Signature confirmed",
@@ -438,11 +446,10 @@
     "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"
   },
   "RESTORE_WALLET_SCREEN": {
-    "ENTER_SEED_HEADER": "Enter your 12 or 24 word seedphrase to restore your wallet",
-    "SEED_INPUT_PLACEHOLDER": "Enter your seedphrase",
-    "SEED_INPUT_LABEL": "Selected Words",
+    "ENTER_SEED_HEADER": "Enter your seedphrase to restore your wallet.",
     "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
-    "CONTINUE_BUTTON": "Continue"
+    "CONTINUE_BUTTON": "Continue",
+    "HAVE_A_24_WORDS_SEEDPHRASE?": "Have a {{number}} words seedphrase?"
   },
   "STACKING_SCREEN": {
     "STACK_AND_EARN": "Stack STX, earn BTC",
@@ -596,12 +603,16 @@
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets",
     "LOCK_COUNTDOWN": "Auto-lock Timer",
-    "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically."
+    "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically.",
+    "ENTER_YOUR_NEW_PASSWORD": "Enter your new password",
+    "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
+    "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
     "LOCK": "Lock",
-    "RESET_WALLET": "Reset Wallet"
+    "RESET_WALLET": "Reset Wallet",
+    "REMOVE_FROM_LIST": "Remove from list"
   },
   "BUY_SCREEN": {
     "BUY": "Buy",
@@ -700,7 +711,7 @@
     "HIDE_HASH_BUTTON": "Hide Hash",
     "ACTION_DISCLAIMER": "No transactions will be broadcasted and no fees will be applied.",
     "SIGNING_WARNING": "By signing this message, you prove that you are the owner of an account without broadcasting any on chain transactions. This signature cannot be used to send transactions on your behalf. You should only sign messages you trust.",
-    "SIGNING_ADDRESS_TITLE": "Signing with",
+    "SIGNING_ADDRESS_TITLE": "Signing with address",
     "SIGNING_ADDRESS_STX": "Your Stacks address",
     "SIGNING_ADDRESS_SEGWIT": "Your Bitcoin payment address",
     "SIGNING_ADDRESS_TAPROOT": "Your Ordinals address",
@@ -709,16 +720,20 @@
     "SIGNATURE_ERROR_TITLE": "Signature Error",
     "LEDGER": {
       "CONNECT": {
-        "TITLE": "Connect your hardware wallet",
-        "SUBTITLE": "To continue, plug and unlock your device.",
+        "TITLE": "Connect Your Ledger",
+        "SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the {{name}} app.",
         "ERROR_TITLE": "Connection error",
         "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
       },
       "CONFIRM": {
         "TITLE": "Confirm the signature",
         "SUBTITLE": "Authorise the signature on your device to continue.",
-        "ERROR_TITLE": "Signature denied",
-        "ERROR_SUBTITLE": "The signatures has been rejected. You can try again or close this tab."
+        "ERROR_TITLE": "Error requesting signature",
+        "ERROR_SUBTITLE": "The signature request encountered an error. Please check that your Ledger Bitcoin app is version 2.1.3 or newer.",
+        "DENIED": {
+          "ERROR_TITLE": "Signature denied",
+          "ERROR_SUBTITLE": "The signature has been rejected. You can try again or close this tab."
+        }
       },
       "SUCCESS": {
         "TITLE": "Signature confirmed",

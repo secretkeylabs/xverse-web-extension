@@ -7,7 +7,7 @@ import Plus from '@assets/img/dashboard/plus.svg';
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import { useDispatch } from 'react-redux';
 import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -125,15 +125,15 @@ function AccountList(): JSX.Element {
     navigate('/');
   };
 
-  async function onCreateAccount() {
+  const onCreateAccount = async () => {
     await createAccount();
-  }
+  };
 
-  async function onImportLedgerAccount() {
+  const onImportLedgerAccount = async () => {
     await chrome.tabs.create({
       url: chrome.runtime.getURL('options.html#/import-ledger'),
     });
-  }
+  };
 
   return (
     <Container>
@@ -145,13 +145,14 @@ function AccountList(): JSX.Element {
               account={account}
               isSelected={isAccountSelected(account)}
               onAccountSelected={handleAccountSelect}
+              isAccountListView
             />
-            <Seperator />
+            <Separator />
           </React.Fragment>
         ))}
       </AccountContainer>
       <ButtonsWrapper>
-        <ButtonContainer onClick={async () => onCreateAccount()}>
+        <ButtonContainer onClick={onCreateAccount}>
           <AddAccountContainer>
             <ButtonImage src={Plus} />
           </AddAccountContainer>
