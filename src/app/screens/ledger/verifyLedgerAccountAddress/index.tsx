@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { animated, useTransition } from '@react-spring/web';
@@ -22,6 +22,7 @@ import OrdinalsIconSVG from '@assets/img/ledger/ordinals_icon.svg';
 import LedgerConnectBtcSVG from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
+import useResetUserFlow from '@hooks/useResetUserFlow';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 const Container = styled.div`
@@ -125,6 +126,17 @@ const ActionButtonContainer = styled.div((props) => ({
   },
 }));
 
+const LedgerFailViewContainer = styled.div((props) => ({
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  margin: 'auto',
+}));
+
+const LedgerFailButtonsContainer = styled.div((props) => ({
+  width: '100%',
+  marginTop: props.theme.spacing(25),
+}));
+
 function VerifyLedger(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [masterPubKey, setMasterPubKey] = useState('');
@@ -137,6 +149,7 @@ function VerifyLedger(): JSX.Element {
   const [isWrongDevice, setIsWrongDevice] = useState(false);
   const { search } = useLocation();
   const params = new URLSearchParams(search);
+  const mismatch = params.get('mismatch') ?? '';
   const currency = params.get('currency') ?? '';
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_VERIFY_SCREEN' });
   const { ledgerAccountsList, network } = useWalletSelector();
@@ -153,6 +166,9 @@ function VerifyLedger(): JSX.Element {
 
   const isBitcoinSelected = currency === 'BTC';
   const isOrdinalSelected = currency === 'ORD' || currency === 'brc-20';
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/verify-ledger'), []);
 
   const getAddress = () => {
     switch (currency) {
@@ -283,6 +299,22 @@ function VerifyLedger(): JSX.Element {
 
     setCurrentStepIndex(0);
   };
+
+  if (mismatch) {
+    return (
+      <Container>
+        <FullScreenHeader />
+        <LedgerFailViewContainer>
+          <LedgerFailView title={t('TITLE_FAILED')} text={t('ADDRESS_MISMATCH')} />
+          <LedgerFailButtonsContainer>
+            <ActionButtonContainer>
+              <ActionButton onPress={handleWindowClose} text={t('CLOSE_BUTTON')} />
+            </ActionButtonContainer>
+          </LedgerFailButtonsContainer>
+        </LedgerFailViewContainer>
+      </Container>
+    );
+  }
 
   return (
     <Container>
