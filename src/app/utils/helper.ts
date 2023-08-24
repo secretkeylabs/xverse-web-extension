@@ -60,9 +60,12 @@ export function getTicker(name: string) {
   return name;
 }
 
-export function getTruncatedAddress(address: string) {
+export function getTruncatedAddress(address: string, lengthToShow = 4) {
   if (address) {
-    return `${address.substring(0, 4)}...${address.substring(address.length - 4, address.length)}`;
+    return `${address.substring(0, lengthToShow)}...${address.substring(
+      address.length - lengthToShow,
+      address.length,
+    )}`;
   }
 }
 

@@ -23,6 +23,7 @@
   "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles", "@tanstack/query"],
   "rules": {
     "no-inline-styles/no-inline-styles": 2,
+    "import/prefer-default-export": 1,
     "react/react-in-jsx-scope": "off",
     "no-param-reassign": "off",
     "react/require-default-props": "off",

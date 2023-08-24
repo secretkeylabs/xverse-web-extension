@@ -1,5 +1,5 @@
 import LinkIcon from '@assets/img/linkIcon.svg';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 import { saveIsTermsAccepted } from '@utils/localStorage';
 import { useTranslation } from 'react-i18next';
@@ -85,7 +85,7 @@ function LegalLinks() {
           {t('TERMS_SERVICES_LINK_BUTTON')}
           <img src={LinkIcon} alt="terms" />
         </CustomisedActionButton>
-        <Seperator />
+        <Separator />
         <CustomisedActionButton href={PRIVACY_POLICY_LINK} target="_blank">
           {t('PRIVACY_POLICY_LINK_BUTTON')}
           <img src={LinkIcon} alt="privacy" />

@@ -1,7 +1,7 @@
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
 import Cross from '@assets/img/dashboard/X.svg';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 
 const BottomModalHeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -76,7 +76,7 @@ function BottomModal({ header, children, visible, onClose }: Props) {
           <img src={Cross} alt="cross" />
         </ButtonImage>
       </RowContainer>
-      {header && <Seperator />}
+      {header && <Separator />}
       {children}
     </CustomisedModal>
   );
