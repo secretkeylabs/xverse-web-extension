@@ -22,14 +22,15 @@
   },
   "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles", "@tanstack/query"],
   "rules": {
-    "no-inline-styles/no-inline-styles": 2,
-    "import/prefer-default-export": 1,
-    "react/react-in-jsx-scope": "off",
-    "no-param-reassign": "off",
-    "react/require-default-props": "off",
     "consistent-return": "off",
+    "import/prefer-default-export": 1,
     "max-len": "off",
+    "no-inline-styles/no-inline-styles": 2,
+    "no-param-reassign": "off",
     "react-hooks/exhaustive-deps": "warn",
+    "react/jsx-key": "warn",
+    "react/react-in-jsx-scope": "off",
+    "react/require-default-props": "off",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
