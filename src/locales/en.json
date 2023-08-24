@@ -755,6 +755,19 @@
       "TO": "To",
       "YOUR_ADDRESS": "Your address"
     },
+    "SPECIAL": {
+      "SATS": {
+        "TITLE": "Sats",
+        "REG": "name",
+        "NS": "namespace"
+      },
+      "BRC20": {
+        "TITLE": "BRC-20",
+        "DEPLOY": "Deploy",
+        "MINT": "Mint",
+        "TRANSFER": "Transfer"
+      }
+    },
     "NETWORK": "Network",
     "VALUE": "Bitcoin value",
     "EDIT_FEES": "Edit Fees",

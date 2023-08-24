@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import EyeIcon from '@assets/img/eye.svg';
@@ -8,6 +9,7 @@ import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 
 import { ContentType } from './common';
 import Preview from './preview';
+import { getBrc20Details, getSatsDetails } from './utils';
 
 const previewableContentTypes = new Set([
   ContentType.IMAGE,
@@ -36,6 +38,12 @@ const getContentType = (inputContentType: string) => {
 const isPreviewable = (contentType: ContentType) => previewableContentTypes.has(contentType);
 const isOrdiPreviewable = (contentType: ContentType) => ordiViewTypes.has(contentType);
 
+const SuffixContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`;
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -49,16 +57,54 @@ const ButtonIcon = styled.img((props) => ({
   cursor: 'pointer',
 }));
 
+const Suffix = styled.div((props) => ({
+  ...props.theme.body_xs,
+  color: props.theme.colors.white[400],
+}));
+
 type Props = {
   type: 'text' | 'file';
   contentType: string;
   content: string;
 };
 
-// TODO: BRC-20
-// TODO: SATS DNS
 function ContentIcon({ type, content, contentType: inputContentType }: Props) {
+  const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST.SPECIAL' });
   const [showPreview, setShowPreview] = useState(false);
+
+  const satsDetails = useMemo(
+    () => getSatsDetails(content, inputContentType),
+    [content, inputContentType],
+  );
+
+  const brc20Details = useMemo(
+    () => getBrc20Details(content, inputContentType),
+    [content, inputContentType],
+  );
+
+  if (satsDetails) {
+    return (
+      <SuffixContainer>
+        <div>
+          {t('SATS.TITLE')} {t(`SATS.${satsDetails.op.toUpperCase()}`)}
+        </div>
+        <Suffix>{satsDetails.value}</Suffix>
+      </SuffixContainer>
+    );
+  }
+
+  if (brc20Details) {
+    return (
+      <SuffixContainer>
+        <div>
+          {t('BRC20.TITLE')} {t(`BRC20.${brc20Details.op.toUpperCase()}`)}
+        </div>
+        <Suffix>
+          {brc20Details.tick} - {brc20Details.value}
+        </Suffix>
+      </SuffixContainer>
+    );
+  }
 
   const contentType = getContentType(inputContentType);
 
