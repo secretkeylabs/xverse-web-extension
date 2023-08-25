@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js';
 import { animated, config, useSpring } from '@react-spring/web';
 import { StoreState } from '@stores/index';
 import TransferDetailView from '@components/transferDetailView';
-import { ParsedPSBT, PSBTInput, satsToBtc } from '@secretkeylabs/xverse-core';
+import { ParsedPSBT, PSBTInput, PSBTOutput, satsToBtc } from '@secretkeylabs/xverse-core';
 import { getTruncatedAddress } from '@utils/helper';
 
 const Container = styled.div((props) => ({
@@ -139,6 +139,42 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
       </TxIdContainer>
     );
 
+  function showPsbtOutput(output: PSBTOutput) {
+    const detailViewIcon = output.outputScript ? ScriptIcon : OutputIcon;
+    const detailViewHideCopyButton = output.outputScript
+      ? true
+      : btcAddress === output.address || ordinalsAddress === output.address;
+    const showAddress =
+      output.address === btcAddress || output.address === ordinalsAddress ? (
+        <TxIdContainer>
+          <YourAddressText>(Your Address)</YourAddressText>
+          <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
+        </TxIdContainer>
+      ) : (
+        <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
+      );
+    const detailViewValue = output.outputScript ? (
+      <SubValueText>{`${t('SCRIPT_OUTPUT')} #${scriptOutputCount++}`}</SubValueText>
+    ) : (
+      showAddress
+    );
+    return (
+      <TransferDetailView
+        icon={detailViewIcon}
+        hideAddress
+        hideCopyButton={detailViewHideCopyButton}
+        amount={`${satsToBtc(
+          new BigNumber(output ? output.amount.toString() : '0'),
+        ).toString()} BTC`}
+        address={output.address}
+        outputScript={output.outputScript}
+        outputScriptIndex={output.outputScript ? scriptOutputCount : undefined}
+      >
+        {detailViewValue}
+      </TransferDetailView>
+    );
+  }
+
   return (
     <Container>
       <RowContainer>
@@ -168,44 +204,7 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
 
           <OutputTitleText>{t('OUTPUT')}</OutputTitleText>
           {parsedPsbt?.outputs.map((output) => (
-            <TransferDetailContainer>
-              {output.outputScript ? (
-                <TransferDetailView
-                  icon={ScriptIcon}
-                  hideAddress
-                  hideCopyButton={true}
-                  amount={`${satsToBtc(
-                    new BigNumber(output ? output.amount.toString() : '0'),
-                  ).toString()} BTC`}
-                  address={output.address}
-                  outputScript={output.outputScript}
-                  outputScriptIndex={scriptOutputCount}
-                >
-                  <SubValueText>{`${t('SCRIPT_OUTPUT')} #${scriptOutputCount++}`}</SubValueText>
-                </TransferDetailView>
-              ) : (
-                <TransferDetailView
-                  icon={OutputIcon}
-                  hideAddress
-                  hideCopyButton={
-                    btcAddress === output.address || ordinalsAddress === output.address
-                  }
-                  amount={`${satsToBtc(
-                    new BigNumber(output ? output.amount.toString() : '0'),
-                  ).toString()} BTC`}
-                  address={output.address}
-                >
-                  {output.address === btcAddress || output.address === ordinalsAddress ? (
-                    <TxIdContainer>
-                      <YourAddressText>(Your Address)</YourAddressText>
-                      <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
-                    </TxIdContainer>
-                  ) : (
-                    <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
-                  )}
-                </TransferDetailView>
-              )}
-            </TransferDetailContainer>
+            <TransferDetailContainer>{showPsbtOutput(output)}</TransferDetailContainer>
           ))}
         </ExpandedContainer>
       )}

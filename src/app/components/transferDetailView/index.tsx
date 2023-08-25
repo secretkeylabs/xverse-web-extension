@@ -142,11 +142,15 @@ function TransferDetailView({
             'SCRIPT_OUTPUT',
           )} #${outputScriptIndex}`}</ScriptOutputHeadingText>
           {outputScript &&
-            outputScript.map((script) => {
+            outputScript.map((script, index) => {
               if (script instanceof Uint8Array) {
-                return <ScriptText>{new TextDecoder().decode(script)},</ScriptText>;
+                return (
+                  <ScriptText key={index.toString()}>
+                    {new TextDecoder().decode(script)},
+                  </ScriptText>
+                );
               } else {
-                return <ScriptText>{script},</ScriptText>;
+                return <ScriptText key={index.toString()}>{script},</ScriptText>;
               }
             })}
         </ShowScriptBackgroundContainer>
