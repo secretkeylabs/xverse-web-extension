@@ -26,7 +26,7 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  marginTop: props.theme.spacing(11),
+  marginTop: props.theme.spacing(16),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(8),
@@ -38,8 +38,8 @@ const ButtonContainer = styled.div((props) => ({
   gap: props.theme.spacing(8),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(20),
   marginTop: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(12),
 }));
 
 const EditFeesButton = styled.button((props) => ({

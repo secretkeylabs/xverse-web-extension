@@ -27,10 +27,6 @@ const ScrollContainer = styled.div`
   margin: auto;
 `;
 
-const BottomBarContainer = styled.h1((props) => ({
-  marginTop: props.theme.spacing(3),
-}));
-
 export function ConfirmBrc20Transaction() {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const { selectedAccount } = useWalletSelector();
@@ -120,11 +116,7 @@ export function ConfirmBrc20Transaction() {
           isFeeLoading={isFeeLoading}
           error={error}
         />
-        {!isGalleryOpen && (
-          <BottomBarContainer>
-            <BottomBar tab="nft" />
-          </BottomBarContainer>
-        )}
+        {!isGalleryOpen && <BottomBar tab="dashboard" />}
       </ScrollContainer>
     </>
   );
