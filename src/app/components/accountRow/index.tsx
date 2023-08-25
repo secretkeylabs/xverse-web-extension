@@ -41,14 +41,13 @@ const GradientCircle = styled.div<GradientCircleProps>((props) => ({
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
 
-const TopSectionContainer = styled.div((props) => ({
+const TopSectionContainer = styled.div<{ disableAccountSwitch: boolean }>((props) => ({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  paddingTop: props.theme.spacing(8),
   backgroundColor: 'transparent',
-  cursor: 'pointer',
+  cursor: props.disableAccountSwitch ? 'initial' : 'pointer',
 }));
 
 const AccountInfoContainer = styled.div({
@@ -207,15 +206,6 @@ const ButtonRow = styled.button`
   }
 `;
 
-interface Props {
-  account: Account | null;
-  isSelected: boolean;
-  allowCopyAddress?: boolean;
-  showOrdinalAddress?: boolean;
-  onAccountSelected: (account: Account) => void;
-  isAccountListView?: boolean;
-}
-
 function AccountRow({
   account,
   isSelected,
@@ -223,7 +213,14 @@ function AccountRow({
   allowCopyAddress,
   showOrdinalAddress,
   isAccountListView = false,
-}: Props) {
+  disableAccountSwitch = false,
+}: {
+  account: Account | null;
+  isSelected: boolean;
+  onAccountSelected: (account: Account) => void;
+  isAccountListView?: boolean;
+  disableAccountSwitch?: boolean;
+}) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
@@ -338,7 +335,7 @@ function AccountRow({
       handleAccountSelect(accountsList[0]);
       handleRemoveAccountModalClose();
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   };
 
@@ -392,7 +389,7 @@ function AccountRow({
   );
 
   return (
-    <TopSectionContainer>
+    <TopSectionContainer disableAccountSwitch={disableAccountSwitch}>
       <AccountInfoContainer onClick={handleClick}>
         <GradientCircle
           firstGradient={gradient[0]}

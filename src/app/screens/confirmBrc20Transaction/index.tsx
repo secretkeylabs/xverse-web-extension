@@ -101,9 +101,7 @@ export function ConfirmBrc20Transaction() {
 
   return (
     <>
-      {isGalleryOpen && (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      )}
+      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <ScrollContainer>
         <ConfirmBrc20TransactionComponent
           btcFee={btcFee}

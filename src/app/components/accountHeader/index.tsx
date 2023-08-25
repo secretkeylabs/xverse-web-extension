@@ -13,15 +13,12 @@ import { isHardwareAccount } from '@utils/helper';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 
 const SelectedAccountContainer = styled.div((props) => ({
-  paddingLeft: '5%',
-  paddingRight: '5%',
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'space-between',
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(10),
+  padding: `${props.theme.spacing(10)}px ${props.theme.spacing(8)}px`,
   borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
 }));
 
@@ -176,6 +173,7 @@ function AccountHeaderComponent({
           isSelected
           allowCopyAddress={!disableCopy && !isHardwareAccount(selectedAccount)}
           onAccountSelected={handleAccountSelect}
+          disableAccountSwitch={disableAccountSwitch}
         />
         {!disableMenuOption && (
           <OptionsButton onClick={openOptionsDialog}>

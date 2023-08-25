@@ -197,9 +197,11 @@ function ConfirmBtcTransactionComponent({
             <ButtonImage src={SettingIcon} />
             <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
           </EditFeesButton>
-          <ErrorContainer>
-            <ErrorText>{errorMessage}</ErrorText>
-          </ErrorContainer>
+          {errorMessage && (
+            <ErrorContainer>
+              <ErrorText>{errorMessage}</ErrorText>
+            </ErrorContainer>
+          )}
         </Container>
       </OuterContainer>
       <ButtonContainer>
