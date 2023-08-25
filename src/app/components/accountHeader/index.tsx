@@ -9,7 +9,6 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import AccountRow from '@components/accountRow';
 
 import useWalletSelector from '@hooks/useWalletSelector';
-import { isHardwareAccount } from '@utils/helper';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 
 const SelectedAccountContainer = styled.div((props) => ({
@@ -72,13 +71,11 @@ const WarningButton = styled(ButtonRow)`
 interface AccountHeaderComponentProps {
   disableMenuOption?: boolean;
   disableAccountSwitch?: boolean;
-  disableCopy?: boolean;
 }
 
 function AccountHeaderComponent({
   disableMenuOption,
   disableAccountSwitch = false,
-  disableCopy = false,
 }: AccountHeaderComponentProps) {
   const navigate = useNavigate();
   const { selectedAccount } = useWalletSelector();
@@ -171,7 +168,6 @@ function AccountHeaderComponent({
         <AccountRow
           account={selectedAccount!}
           isSelected
-          allowCopyAddress={!disableCopy && !isHardwareAccount(selectedAccount)}
           onAccountSelected={handleAccountSelect}
           disableAccountSwitch={disableAccountSwitch}
         />
