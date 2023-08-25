@@ -11,7 +11,6 @@ import { isLedgerAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import { useTranslation } from 'react-i18next';
 import ConfirmBrc20TransactionComponent from './confirmBrc20TransactionComponent';
 import { OnChangeFeeRate } from './editFees';
 
@@ -32,7 +31,7 @@ const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(3),
 }));
 
-function ConfirmBrc20Transaction() {
+export function ConfirmBrc20Transaction() {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
@@ -40,6 +39,7 @@ function ConfirmBrc20Transaction() {
     recipientAddress,
     estimateFeesParams,
     estimatedFees: initEstimatedFees,
+    token,
   }: ConfirmBrc20TransferState = useLocation().state;
   const { subscribeToResetUserFlow } = useResetUserFlow();
   useEffect(() => subscribeToResetUserFlow('/confirm-brc20-tx'), [subscribeToResetUserFlow]);
@@ -107,13 +107,16 @@ function ConfirmBrc20Transaction() {
       <ScrollContainer>
         <ConfirmBrc20TransactionComponent
           btcFee={btcFee}
-          currentFeeRate={Number(userInputFeeRate) ?? estimateFeesParams.feeRate}
+          currentFeeRate={Number(userInputFeeRate) || estimateFeesParams.feeRate}
           inscriptionFee={inscriptionFee}
           onClickApplyFee={handleClickApplyFee}
           onChangeFee={handleClickApplyFee}
           onClickCancel={handleClickCancel}
           onClickConfirm={handleClickConfirm}
-          recipients={[{ address: recipientAddress, amountSats: new BigNumber(0) }]}
+          recipients={[
+            { address: recipientAddress, amountSats: new BigNumber(estimateFeesParams.amount) },
+          ]}
+          token={token}
           totalFee={totalFee}
           transactionFee={txFee}
           isFeeLoading={isFeeLoading}

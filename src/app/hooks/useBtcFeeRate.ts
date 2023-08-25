@@ -6,6 +6,7 @@ function useBtcFeeRate() {
   return useQuery<BtcFeeResponse, Error>({
     queryKey: ['btcFeeRate'],
     queryFn: getBtcFeeRate,
+    staleTime: 5 * 60 * 1000, // 5 mins
   });
 }
 

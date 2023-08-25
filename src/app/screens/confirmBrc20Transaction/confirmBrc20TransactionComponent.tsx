@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { NumericFormat } from 'react-number-format';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import { satsToBtc, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { FungibleToken, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditFees, OnChangeFeeRate } from './editFees';
@@ -29,6 +29,7 @@ const Container = styled.div((props) => ({
   marginTop: props.theme.spacing(11),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(8),
 }));
 
 const ButtonContainer = styled.div((props) => ({
@@ -41,13 +42,14 @@ const ButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-const Button = styled.button((props) => ({
+const EditFeesButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
+  marginTop: props.theme.spacing(12),
 }));
 
 const ButtonText = styled.div((props) => ({
@@ -63,9 +65,7 @@ const ButtonImage = styled.img((props) => ({
 }));
 
 const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(24),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  marginTop: props.theme.spacing(8),
 }));
 
 const ErrorText = styled.h1((props) => ({
@@ -89,6 +89,7 @@ function ConfirmBtcTransactionComponent({
   onClickCancel,
   onClickConfirm,
   recipients,
+  token,
   totalFee,
   transactionFee,
   isFeeLoading,
@@ -102,6 +103,7 @@ function ConfirmBtcTransactionComponent({
   onClickCancel: () => void;
   onClickConfirm: () => void;
   recipients: Recipient[];
+  token: FungibleToken;
   totalFee: BigNumber;
   transactionFee: BigNumber;
   isFeeLoading: boolean;
@@ -153,7 +155,7 @@ function ConfirmBtcTransactionComponent({
       fiatCurrency,
     },
   ];
-  const errorMessage = error ? t(`BRC20.ERRORS.${error}`) : '';
+  const errorMessage = error ? t(`CONFIRM_BRC20.ERROR_CODES.${error}`) : '';
 
   return (
     <>
@@ -167,9 +169,10 @@ function ConfirmBtcTransactionComponent({
               key={address}
               address={address}
               recipientIndex={index + 1}
-              value={satsToBtc(amountSats).toString()}
+              value={amountSats.toString()}
               totalRecipient={recipients.length}
               currencyType="FT"
+              fungibleToken={token}
               title={t('CONFIRM_TRANSACTION.AMOUNT')}
               showSenderAddress={false}
             />
@@ -190,24 +193,14 @@ function ConfirmBtcTransactionComponent({
             }
           />
           <Brc20FeesComponent fees={fees} />
-          <Button onClick={handleClickAdvancedSetting}>
+          <EditFeesButton onClick={handleClickAdvancedSetting}>
             <ButtonImage src={SettingIcon} />
             <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
-          </Button>
-          <EditFees
-            visible={showFeeSettings}
-            onClose={handleClickCloseFees}
-            fee={transactionFee.toString()}
-            initialFeeRate={currentFeeRate}
-            onClickApply={onClickApplyFee}
-            onChangeFeeRate={onChangeFee}
-            isFeeLoading={isFeeLoading}
-            error={errorMessage}
-          />
+          </EditFeesButton>
+          <ErrorContainer>
+            <ErrorText>{errorMessage}</ErrorText>
+          </ErrorContainer>
         </Container>
-        <ErrorContainer>
-          <ErrorText>{errorMessage}</ErrorText>
-        </ErrorContainer>
       </OuterContainer>
       <ButtonContainer>
         <ActionButton
@@ -223,6 +216,16 @@ function ConfirmBtcTransactionComponent({
           onPress={handleClickConfirm}
         />
       </ButtonContainer>
+      <EditFees
+        visible={showFeeSettings}
+        onClose={handleClickCloseFees}
+        fee={transactionFee.toString()}
+        initialFeeRate={currentFeeRate}
+        onClickApply={onClickApplyFee}
+        onChangeFeeRate={onChangeFee}
+        isFeeLoading={isFeeLoading}
+        error={errorMessage}
+      />
     </>
   );
 }

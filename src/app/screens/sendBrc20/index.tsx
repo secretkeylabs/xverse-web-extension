@@ -122,6 +122,7 @@ function SendBrc20Screen() {
         recipientAddress,
         estimateFeesParams,
         estimatedFees,
+        token: fungibleToken,
       };
       navigate('/confirm-brc20-tx', { state });
     } catch (e) {

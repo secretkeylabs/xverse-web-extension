@@ -187,7 +187,7 @@ export function EditFees({
 }) {
   const { t } = useTranslation('translation');
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
-  const { data: feeRate } = useBtcFeeRate();
+  const { data: feeRates } = useBtcFeeRate();
 
   const [selectedOption, setSelectedOption] = useState('standard');
   const [feeRateInput, setFeeRateInput] = useState(initialFeeRate?.toString() ?? '');
@@ -204,13 +204,13 @@ export function EditFees({
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     setSelectedOption(e.currentTarget.value);
-    if (feeRate) {
+    if (feeRates) {
       switch (e.currentTarget.value) {
         case 'high':
-          setFeeRateInput(feeRate.priority.toString());
+          setFeeRateInput(feeRates.priority.toString());
           break;
         case 'standard':
-          setFeeRateInput(feeRate.regular.toString());
+          setFeeRateInput(feeRates.regular.toString());
           break;
         case 'custom':
           inputRef.current?.focus();
