@@ -787,6 +787,18 @@
       "INSUFFICIENT_BALANCE_FEES": "Insufficient BTC balance for transaction fees"
     }
   },
+  "CONFIRM_BRC20": {
+    "BITCOIN_VALUE": "Bitcoin value",
+    "ERROR_CODES": {
+      "INSUFFICIENT_FUNDS": "Insufficient BTC balance for transaction fees",
+      "FAILED_TO_FINALIZE": "",
+      "UTXOS_MISSING": "",
+      "INVALID_TICK": "",
+      "INVALID_AMOUNT": "",
+      "INVALID_FEE_RATE": "",
+      "SERVER_ERROR": ""
+    }
+  },
   "CACHE_MIGRATION_SCREEN": {
     "TITLE": "Your wallet data store needs to be updated in order to remain secure.",
     "WARNING": "Please make sure you have your seed phrase backed up securely before moving forward.",

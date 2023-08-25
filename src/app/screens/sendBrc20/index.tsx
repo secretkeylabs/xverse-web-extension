@@ -18,6 +18,7 @@ import BottomBar from '@components/tabBar';
 import { replaceCommaByDot } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
 import Brc20TransferForm from './brc20TransferForm';
+import { Brc20TransferEstimateFeesParams, ConfirmBrc20TransferState } from '@utils/brc20';
 
 function SendBrc20Screen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC_20' });
@@ -109,27 +110,20 @@ function SendBrc20Screen() {
       const addressUtxos: UTXO[] = await getNonOrdinalUtxo(btcAddress, network.type);
       const ticker = getFtTicker(fungibleToken);
       const numberAmount = Number(replaceCommaByDot(amountToSend));
-
-      // console.log(addressUtxos, ticker, numberAmount, ordinalsAddress, feeRate?.regular);
-      const result = await brc20TransferEstimateFees({
+      const estimateFeesParams: Brc20TransferEstimateFeesParams = {
         addressUtxos,
         tick: ticker,
         amount: numberAmount,
         revealAddress: ordinalsAddress,
         feeRate: feeRate?.regular,
-      });
-
-      navigate('/confirm-brc20-tx', {
-        // TODO move to context
-        state: {
-          recipientAddress,
-          addressUtxos,
-          ticker,
-          amount: numberAmount,
-          estimatedFees: result,
-          feeRate,
-        },
-      });
+      };
+      const estimatedFees = await brc20TransferEstimateFees(estimateFeesParams);
+      const state: ConfirmBrc20TransferState = {
+        recipientAddress,
+        estimateFeesParams,
+        estimatedFees,
+      };
+      navigate('/confirm-brc20-tx', { state });
     } catch (e) {
       console.error(e);
       // TODO use error codes once they are exported
@@ -144,7 +138,6 @@ function SendBrc20Screen() {
   return (
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
-      {/* TODO move to context */}
       <Brc20TransferForm
         amountToSend={amountToSend}
         onAmountChange={onInputChange}
