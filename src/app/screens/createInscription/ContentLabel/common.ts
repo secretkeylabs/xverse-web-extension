@@ -3,6 +3,7 @@ export enum ContentType {
   IMAGE = 'IMAGE',
   HTML = 'HTML',
   TEXT = 'TEXT',
+  MARKDOWN = 'MARKDOWN',
   JSON = 'JSON',
   VIDEO = 'VIDEO',
   AUDIO = 'AUDIO',

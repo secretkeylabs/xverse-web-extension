@@ -97,7 +97,11 @@ function Preview({ onClick, type, content, contentType, contentTypeRaw, visible 
 
   let preview: React.ReactElement | null = null;
 
-  if (contentType === ContentType.TEXT || contentType === ContentType.JSON) {
+  if (
+    contentType === ContentType.TEXT ||
+    contentType === ContentType.JSON ||
+    contentType === ContentType.MARKDOWN
+  ) {
     const displayContent = type === 'text' ? content : atob(content);
 
     preview = (

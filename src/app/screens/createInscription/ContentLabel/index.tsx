@@ -19,15 +19,17 @@ const previewableContentTypes = new Set([
   ContentType.JSON,
   ContentType.VIDEO,
   ContentType.AUDIO,
+  ContentType.MARKDOWN,
 ]);
 
-const ordiViewTypes = new Set([ContentType.HTML, ContentType.SVG]);
+const ordiViewTypes = new Set([ContentType.HTML, ContentType.SVG, ContentType.MARKDOWN]);
 
 const getContentType = (inputContentType: string) => {
   const contentType = inputContentType.toLowerCase();
   if (contentType.includes('svg')) return ContentType.SVG;
   if (contentType.includes('image')) return ContentType.IMAGE;
   if (contentType.includes('html')) return ContentType.HTML;
+  if (contentType.includes('markdown')) return ContentType.MARKDOWN;
   if (contentType.includes('text')) return ContentType.TEXT;
   if (contentType.includes('json')) return ContentType.JSON;
   if (contentType.includes('video')) return ContentType.VIDEO;
@@ -181,6 +183,7 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
     if (canPreviewInOrd) {
       const { data: previewId } = await axios.post(`${XVERSE_ORDIVIEW_URL}/previewHtml`, {
         html: content,
+        contentType: inputContentType,
       });
 
       window.open(`${XVERSE_ORDIVIEW_URL}/previewHtml/${previewId}`, '_blank');
