@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { useMemo, useState } from 'react';
+import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import DotsVerticalIcon from '@assets/img/dots_three_vertical.svg';
 import EyeIcon from '@assets/img/eye.svg';
 import ShareIcon from '@assets/img/share.svg';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
@@ -38,28 +39,57 @@ const getContentType = (inputContentType: string) => {
 const isPreviewable = (contentType: ContentType) => previewableContentTypes.has(contentType);
 const isOrdiPreviewable = (contentType: ContentType) => ordiViewTypes.has(contentType);
 
-const SuffixContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-`;
+const SuffixContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+});
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
+const Container = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  cursor: 'pointer',
+});
 
 const ButtonIcon = styled.img((props) => ({
   width: 20,
   height: 20,
   marginLeft: props.theme.spacing(4),
-  cursor: 'pointer',
+  position: 'relative',
 }));
 
 const Suffix = styled.div((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white[400],
+}));
+
+const MenuContainer = styled.div({
+  position: 'relative',
+  display: 'inline-flex',
+  alignItems: 'center',
+});
+
+const Menu = styled.div((props) => ({
+  position: 'absolute',
+  top: 0,
+  right: 0,
+
+  display: 'inline-flex',
+  padding: props.theme.spacing(6),
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+
+  borderRadius: 12,
+  background: props.theme.colors.background.elevation3,
+  boxShadow: '0px 4px 16px 0px rgba(0, 0, 0, 0.25)',
+}));
+
+const MenuItem = styled.div((props) => ({
+  whiteSpace: 'nowrap',
+  cursor: 'pointer',
+  width: '100%',
+  padding: props.theme.spacing(6),
 }));
 
 type Props = {
@@ -69,8 +99,26 @@ type Props = {
 };
 
 function ContentIcon({ type, content, contentType: inputContentType }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST.SPECIAL' });
+  const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST.PREVIEW' });
   const [showPreview, setShowPreview] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Close menu when clicking outside
+    if (!showMenu || !menuRef.current) return;
+
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuRef, showMenu]);
 
   const satsDetails = useMemo(
     () => getSatsDetails(content, inputContentType),
@@ -111,11 +159,25 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
   const canShowPreview = isPreviewable(contentType);
   const canPreviewInOrd = isOrdiPreviewable(contentType);
 
-  const onTogglePreview = async () => {
+  const showPreviewButton = canShowPreview && !canPreviewInOrd;
+  const showOrdButton = !canShowPreview && canPreviewInOrd;
+  const showMenuButton = canShowPreview && canPreviewInOrd;
+
+  const onTogglePreview = async (e?: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
+    setShowMenu(false);
+
+    // prevent click from going to menu parent
+    if (e) e.stopPropagation();
+
     if (canShowPreview) setShowPreview((current) => !current);
   };
 
-  const onOrdClick = async () => {
+  const onOrdClick = async (e?: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
+    setShowMenu(false);
+
+    // prevent click from going to menu parent
+    if (e) e.stopPropagation();
+
     if (canPreviewInOrd) {
       const { data: previewId } = await axios.post(`${XVERSE_ORDIVIEW_URL}/previewHtml`, {
         html: content,
@@ -125,12 +187,34 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
     }
   };
 
-  // TODO: if 2 icons, show 3 dots
+  const onMenuClick = () => {
+    setShowMenu((current) => !current);
+  };
+
+  const clickAction = () => {
+    if (showPreviewButton) onTogglePreview();
+    if (showOrdButton) onOrdClick();
+    if (showMenuButton) onMenuClick();
+  };
+
   return (
-    <Container>
-      <div>{inputContentType}</div>
-      {canShowPreview && <ButtonIcon src={EyeIcon} onClick={onTogglePreview} />}
-      {canPreviewInOrd && <ButtonIcon src={ShareIcon} onClick={onOrdClick} />}
+    <>
+      <Container onClick={clickAction}>
+        <div>{inputContentType}</div>
+        {showPreviewButton && <ButtonIcon src={EyeIcon} />}
+        {showOrdButton && <ButtonIcon src={ShareIcon} />}
+        {showMenuButton && (
+          <MenuContainer>
+            <ButtonIcon src={DotsVerticalIcon} />
+            {showMenu && (
+              <Menu ref={menuRef}>
+                <MenuItem onClick={onTogglePreview}>{t('SHOW')}</MenuItem>
+                <MenuItem onClick={onOrdClick}>{t('PREVIEW')}</MenuItem>
+              </Menu>
+            )}
+          </MenuContainer>
+        )}
+      </Container>
 
       <Preview
         content={content}
@@ -140,7 +224,7 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
         visible={showPreview}
         onClick={() => setShowPreview(false)}
       />
-    </Container>
+    </>
   );
 }
 

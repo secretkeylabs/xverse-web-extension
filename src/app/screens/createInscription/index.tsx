@@ -75,11 +75,12 @@ const CardContainer = styled.div<{ bottomPadding?: boolean }>((props) => ({
 
 type CardRowProps = {
   topMargin?: boolean;
+  center?: boolean;
 };
 const CardRow = styled.div<CardRowProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'flex-start',
+  alignItems: props.center ? 'center' : 'flex-start',
   justifyContent: 'space-between',
   marginTop: props.topMargin ? props.theme.spacing(8) : 0,
 }));
@@ -330,7 +331,7 @@ function CreateInscription({ type }: Props) {
             <CardRow>
               <div>{t('SUMMARY.TITLE')}</div>
             </CardRow>
-            <CardRow topMargin>
+            <CardRow topMargin center>
               <IconLabel>
                 <div>
                   <ButtonIcon src={OrdinalsIcon} />
@@ -342,7 +343,7 @@ function CreateInscription({ type }: Props) {
             <CardRow topMargin>
               <MutedLabel>{t('SUMMARY.TO')}</MutedLabel>
             </CardRow>
-            <CardRow topMargin>
+            <CardRow topMargin center>
               <IconLabel>
                 <InfoIconContainer>
                   <InfoIcon src={WalletIcon} />

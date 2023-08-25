@@ -755,7 +755,7 @@
       "TO": "To",
       "YOUR_ADDRESS": "Your address"
     },
-    "SPECIAL": {
+    "PREVIEW": {
       "SATS": {
         "TITLE": "Sats",
         "REG": "name",
@@ -766,7 +766,9 @@
         "DEPLOY": "Deploy",
         "MINT": "Mint",
         "TRANSFER": "Transfer"
-      }
+      },
+      "SHOW": "See contents",
+      "PREVIEW": "Open in ordinals viewer"
     },
     "NETWORK": "Network",
     "VALUE": "Bitcoin value",
