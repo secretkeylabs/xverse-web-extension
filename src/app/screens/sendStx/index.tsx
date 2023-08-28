@@ -73,7 +73,7 @@ function SendStxScreen() {
   }, [data]);
 
   const handleBackButtonClick = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   function validateFields(associatedAddress: string, amount: string, memo: string): boolean {
