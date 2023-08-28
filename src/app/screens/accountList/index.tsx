@@ -44,6 +44,8 @@ const AccountContainer = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(11),
   paddingRight: props.theme.spacing(11),
+  paddingTop: props.theme.spacing(8),
+  gap: props.theme.spacing(8),
 }));
 
 const AddAccountContainer = styled.div((props) => ({
@@ -140,7 +142,7 @@ function AccountList(): JSX.Element {
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
         {displayedAccountsList.map((account) => (
-          <React.Fragment key={account.btcAddress}>
+          <div key={account.btcAddress}>
             <AccountRow
               account={account}
               isSelected={isAccountSelected(account)}
@@ -148,7 +150,7 @@ function AccountList(): JSX.Element {
               isAccountListView
             />
             <Separator />
-          </React.Fragment>
+          </div>
         ))}
       </AccountContainer>
       <ButtonsWrapper>
