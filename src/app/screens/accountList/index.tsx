@@ -1,18 +1,18 @@
+import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
+import Plus from '@assets/img/dashboard/plus.svg';
 import AccountRow from '@components/accountRow';
+import Separator from '@components/separator';
 import TopRow from '@components/topRow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Account } from '@secretkeylabs/xverse-core/types';
+import { selectAccount } from '@stores/wallet/actions/actionCreators';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import Plus from '@assets/img/dashboard/plus.svg';
-import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
-import { useDispatch } from 'react-redux';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import Separator from '@components/separator';
-import { Account } from '@secretkeylabs/xverse-core/types';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useWalletReducer from '@hooks/useWalletReducer';
-import React, { useEffect, useMemo } from 'react';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const Container = styled.div`
   display: flex;
@@ -122,7 +122,7 @@ function AccountList(): JSX.Element {
     account.stxAddress === selectedAccount?.stxAddress;
 
   const handleBackButtonClick = () => {
-    navigate('/');
+    navigate(-1);
   };
 
   const onCreateAccount = async () => {
