@@ -13,11 +13,12 @@ declare global {
   }
 }
 
-// we keep this in case implementors call the default providers
+// we inject these in case implementors call the default providers
 window.StacksProvider = StacksMethodsProvider;
 window.BitcoinProvider = SatsMethodsProvider;
 
-// and add this
+// We also inject the providers in an Xverse object in order to have them exclusively available for Xverse wallet
+// and not clash with providers from other wallets
 window.XverseProviders = {
   StacksProvider: StacksMethodsProvider,
   BitcoinProvider: SatsMethodsProvider,
