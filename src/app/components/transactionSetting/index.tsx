@@ -7,10 +7,9 @@ import styled from 'styled-components';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
 import ActionButton from '@components/button';
 import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { useSelector } from 'react-redux';
-import { StoreState } from '@stores/index';
 import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
+import useWalletSelector from '@hooks/useWalletSelector';
 import EditNonce from './editNonce';
 import EditFee from './editFee';
 
@@ -93,13 +92,17 @@ function TransactionSettingAlert({
   const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
-  const { btcBalance, stxAvailableBalance } = useSelector((state: StoreState) => state.walletState);
+  const { btcBalance, stxAvailableBalance } = useWalletSelector();
 
-  function applyClickForStx() {
+  const applyClickForStx = () => {
     if (stxAvailableBalance) {
       const currentFee = stxToMicrostacks(new BigNumber(feeInput));
       if (currentFee.gt(stxAvailableBalance)) {
         setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
+        return;
+      }
+      if (currentFee.lte(new BigNumber(0))) {
+        setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
         return;
       }
     }
@@ -107,17 +110,17 @@ function TransactionSettingAlert({
     setShowFeeSettings(false);
     setError('');
     onApplyClick({ fee: feeInput.toString(), nonce: nonceInput });
-  }
+  };
 
-  async function applyClickForBtc() {
+  const applyClickForBtc = async () => {
     const currentFee = new BigNumber(feeInput);
     if (btcBalance && currentFee.gt(btcBalance)) {
       // show fee exceeds total balance error
       setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
       return;
     }
-    if (selectedOption === 'custom') {
-      const response = await isCustomFeesAllowed(feeInput.toString());
+    if (selectedOption === 'custom' && feeRate) {
+      const response = await isCustomFeesAllowed(feeRate.toString());
       if (!response) {
         setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
         return;
@@ -127,7 +130,7 @@ function TransactionSettingAlert({
     setShowFeeSettings(false);
     setError('');
     onApplyClick({ fee: feeInput.toString(), feeRate: feeRate?.toString() });
-  }
+  };
 
   const onEditFeesPress = () => {
     setShowFeeSettings(true);
@@ -168,6 +171,7 @@ function TransactionSettingAlert({
           setFee={setFeeInput}
           setFeeRate={setFeeRate}
           setError={setError}
+          feeMode={selectedOption}
           setFeeMode={setSelectedOption}
           btcRecipients={btcRecipients}
           ordinalTxUtxo={ordinalTxUtxo}
