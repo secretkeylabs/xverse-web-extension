@@ -180,9 +180,11 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
     // prevent click from going to menu parent
     if (e) e.stopPropagation();
 
+    const displayContent = type === 'PLAIN_TEXT' ? content : atob(content);
+
     if (canPreviewInOrd) {
       const { data: previewId } = await axios.post(`${XVERSE_ORDIVIEW_URL}/previewHtml`, {
-        html: content,
+        html: displayContent,
         contentType: inputContentType,
       });
 

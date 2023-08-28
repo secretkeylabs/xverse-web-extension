@@ -112,10 +112,12 @@ function Preview({ onClick, type, content, contentType, contentTypeRaw, visible 
       </PreviewTextContainer>
     );
   } else if (contentType === ContentType.HTML) {
+    const displayContent = type === 'PLAIN_TEXT' ? content : atob(content);
+
     preview = (
       <PreviewTextContainer>
         <PreviewText fontSize={fontSize} ref={textRef}>
-          <pre>{content}</pre>
+          <pre>{displayContent}</pre>
         </PreviewText>
       </PreviewTextContainer>
     );
