@@ -86,6 +86,7 @@ export function ConfirmBrc20Transaction() {
     if (isLedgerAccount(selectedAccount)) {
       // TODO ledger
     }
+    // TODO validate brc balance again here
     const state: ExecuteBrc20TransferState = {
       recipientAddress,
       estimateFeesParams,

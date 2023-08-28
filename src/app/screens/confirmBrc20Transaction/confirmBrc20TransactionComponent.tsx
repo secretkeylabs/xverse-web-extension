@@ -48,7 +48,6 @@ const EditFeesButton = styled.button((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
-  width: '100%',
   marginTop: props.theme.spacing(12),
 }));
 
@@ -193,10 +192,12 @@ function ConfirmBtcTransactionComponent({
             }
           />
           <Brc20FeesComponent fees={fees} />
-          <EditFeesButton onClick={handleClickAdvancedSetting}>
-            <ButtonImage src={SettingIcon} />
-            <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
-          </EditFeesButton>
+          <div>
+            <EditFeesButton onClick={handleClickAdvancedSetting}>
+              <ButtonImage src={SettingIcon} />
+              <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
+            </EditFeesButton>
+          </div>
           {errorMessage && (
             <ErrorContainer>
               <ErrorText>{errorMessage}</ErrorText>
