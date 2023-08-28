@@ -41,7 +41,6 @@ const OptionsButton = styled.button((props) => ({
   alignItems: 'center',
   justifyContent: 'flex-end',
   background: 'transparent',
-  marginTop: props.theme.spacing(8),
 }));
 
 const ButtonRow = styled.button`

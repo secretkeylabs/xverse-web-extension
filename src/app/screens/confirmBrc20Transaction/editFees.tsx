@@ -7,7 +7,7 @@ import { NumericFormat } from 'react-number-format';
 import { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 
@@ -193,13 +193,16 @@ export function EditFees({
   const [feeRateInput, setFeeRateInput] = useState(initialFeeRate?.toString() ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    onChangeFeeRate(feeRateInput);
+  }, [feeRateInput, onChangeFeeRate]);
+
   /* callbacks */
   const onChangeEditFeesInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFeeRateInput(e.target.value);
     if (selectedOption !== 'custom') {
       setSelectedOption('custom');
     }
-    onChangeFeeRate(e.target.value);
   };
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {

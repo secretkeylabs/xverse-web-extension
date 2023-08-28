@@ -68,7 +68,7 @@ const ErrorContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
-const ErrorText = styled.h1((props) => ({
+const ErrorText = styled.p((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.feedback.error,
 }));
