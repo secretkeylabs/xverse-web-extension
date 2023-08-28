@@ -19,6 +19,8 @@ import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { getCurrencyFlag } from '@utils/currency';
 import useDebounce from '@hooks/useDebounce';
+import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 interface ContainerProps {
   error: boolean;
@@ -236,18 +238,19 @@ function SendForm({
   const [addressError, setAddressError] = useState<string | undefined>(recepientError);
   const navigate = useNavigate();
 
-  const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress } = useWalletSelector();
   const network = useNetworkSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(recipientAddress, network);
   const associatedAddress = useBNSResolver(debouncedSearchTerm, stxAddress, currencyType);
+  const { isAccountSwitched } = useClearFormOnAccountSwitch();
 
   useEffect(() => {
-    setAmount('');
-    setRecipientAddress('');
-  }, [selectedAccount]);
+    if (isAccountSwitched) {
+      setAmount('');
+      setRecipientAddress('');
+    }
+  }, [isAccountSwitched]);
 
   useEffect(() => {
     if (recepientError) {
