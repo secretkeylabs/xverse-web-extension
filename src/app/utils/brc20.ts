@@ -11,7 +11,17 @@ export type Brc20TransferEstimateFeesParams = {
   revealAddress: string;
 };
 
+// TODO type this
+export type SendBrc20TransferState = {};
+
 export type ConfirmBrc20TransferState = {
+  recipientAddress: string;
+  estimateFeesParams: Brc20TransferEstimateFeesParams;
+  estimatedFees: TransferEstimateResult;
+  token: FungibleToken;
+};
+
+export type ExecuteBrc20TransferState = {
   recipientAddress: string;
   estimateFeesParams: Brc20TransferEstimateFeesParams;
   estimatedFees: TransferEstimateResult;

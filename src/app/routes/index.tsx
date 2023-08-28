@@ -60,6 +60,7 @@ import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
 import SwapScreen from '@screens/swap';
 import SwapConfirmScreen from '@screens/swap/swapConfirmation';
+import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
 
 const router = createHashRouter([
   {
@@ -172,6 +173,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <ConfirmBrc20Transaction />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'execute-brc20-tx',
+        element: (
+          <AuthGuard>
+            <ExecuteBrc20Transaction />
           </AuthGuard>
         ),
       },

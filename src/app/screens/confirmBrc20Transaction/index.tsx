@@ -6,7 +6,11 @@ import useDebounce from '@hooks/useDebounce';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
 import { brc20TransferEstimateFees, CoreError } from '@secretkeylabs/xverse-core';
-import { getFeeValuesForBrc20OneStepTransfer, ConfirmBrc20TransferState } from '@utils/brc20';
+import {
+  getFeeValuesForBrc20OneStepTransfer,
+  ConfirmBrc20TransferState,
+  ExecuteBrc20TransferState,
+} from '@utils/brc20';
 import { isLedgerAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -28,6 +32,7 @@ const ScrollContainer = styled.div`
 `;
 
 export function ConfirmBrc20Transaction() {
+  // TODO use the helper
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
@@ -64,7 +69,7 @@ export function ConfirmBrc20Transaction() {
         const e = err as Error;
         if (CoreError.isCoreError(e) && (e.code ?? '') in BRC20ErrorCode) {
           setError(e.code as BRC20ErrorCode);
-          // console.error(e.code);
+          // TODO add logic in from core hook to show what the fee would have been
         } else {
           setError(BRC20ErrorCode.SERVER_ERROR);
         }
@@ -81,8 +86,13 @@ export function ConfirmBrc20Transaction() {
     if (isLedgerAccount(selectedAccount)) {
       // TODO ledger
     }
-    // TODO nav to custom tx screen
-    // mutate({ signedTx: txHex });
+    const state: ExecuteBrc20TransferState = {
+      recipientAddress,
+      estimateFeesParams,
+      estimatedFees,
+      token,
+    };
+    navigate('/execute-brc20-tx', { state });
   };
 
   const handleClickCancel = () => {
