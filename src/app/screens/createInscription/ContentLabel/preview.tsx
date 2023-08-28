@@ -69,7 +69,7 @@ const CloseTick = styled.img((props) => ({
 
 type Props = {
   onClick: () => void;
-  type: 'text' | 'file';
+  type: 'BASE_64' | 'PLAIN_TEXT';
   content: string;
   contentType: ContentType;
   contentTypeRaw: string;
@@ -102,7 +102,7 @@ function Preview({ onClick, type, content, contentType, contentTypeRaw, visible 
     contentType === ContentType.JSON ||
     contentType === ContentType.MARKDOWN
   ) {
-    const displayContent = type === 'text' ? content : atob(content);
+    const displayContent = type === 'PLAIN_TEXT' ? content : atob(content);
 
     preview = (
       <PreviewTextContainer>

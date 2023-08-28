@@ -244,18 +244,10 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'create-text-inscription',
+        path: 'create-inscription',
         element: (
           <AuthGuard>
-            <CreateInscription type="text" />
-          </AuthGuard>
-        ),
-      },
-      {
-        path: 'create-file-inscription',
-        element: (
-          <AuthGuard>
-            <CreateInscription type="file" />
+            <CreateInscription />
           </AuthGuard>
         ),
       },

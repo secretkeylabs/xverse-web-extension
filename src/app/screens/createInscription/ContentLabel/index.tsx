@@ -95,7 +95,7 @@ const MenuItem = styled.div((props) => ({
 }));
 
 type Props = {
-  type: 'text' | 'file';
+  type: 'BASE_64' | 'PLAIN_TEXT';
   contentType: string;
   content: string;
 };

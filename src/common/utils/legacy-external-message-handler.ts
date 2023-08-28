@@ -251,15 +251,12 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.createTextInscriptionRequest: {
+    case ExternalSatsMethods.createInscriptionRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['createInscription', payload],
       ]);
 
-      const { id } = await triggerRequestWindowOpen(
-        RequestsRoutes.CreateTextInscription,
-        urlParams,
-      );
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.CreateInscription, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -269,31 +266,7 @@ export async function handleLegacyExternalMethodFormat(
             createInscriptionRequest: payload,
             createInscriptionResponse: 'cancel',
           },
-          method: ExternalSatsMethods.createTextInscriptionResponse,
-        },
-      });
-      listenForOriginTabClose({ tabId });
-      break;
-    }
-    case ExternalSatsMethods.createFileInscriptionRequest: {
-      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
-        ['createInscription', payload],
-      ]);
-
-      const { id } = await triggerRequestWindowOpen(
-        RequestsRoutes.CreateFileInscription,
-        urlParams,
-      );
-      listenForPopupClose({
-        id,
-        tabId,
-        response: {
-          source: MESSAGE_SOURCE,
-          payload: {
-            createInscriptionRequest: payload,
-            createInscriptionResponse: 'cancel',
-          },
-          method: ExternalSatsMethods.createTextInscriptionResponse,
+          method: ExternalSatsMethods.createInscriptionResponse,
         },
       });
       listenForOriginTabClose({ tabId });

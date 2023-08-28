@@ -1,5 +1,4 @@
 import {
-  CreateFileInscriptionEventDetails,
   CreateTextInscriptionEventDetails,
   DomEventName,
   GetAddressRequestEventDetails,
@@ -8,7 +7,6 @@ import {
   SignPsbtRequestEventDetails,
 } from '@common/types/inpage-types';
 import {
-  CreateFileInscriptionResponseMessage,
   CreateTextInscriptionResponseMessage,
   ExternalSatsMethods,
   GetAddressResponseMessage,
@@ -20,8 +18,7 @@ import {
 } from '@common/types/message-types';
 import {
   BitcoinProvider,
-  CreateFileInscriptionResponse,
-  CreateTextInscriptionResponse,
+  CreateInscriptionResponse,
   GetAddressResponse,
   SignTransactionResponse,
 } from 'sats-connect';
@@ -118,47 +115,20 @@ const SatsMethodsProvider: BitcoinProvider = {
       window.addEventListener('message', handleMessage);
     });
   },
-  createTextInscription: async (
-    createTextInscriptionRequest: string,
-  ): Promise<CreateTextInscriptionResponse> => {
+  createInscription: async (
+    createInscriptionRequest: string,
+  ): Promise<CreateInscriptionResponse> => {
     const event = new CustomEvent<CreateTextInscriptionEventDetails>(
-      DomEventName.createTextInscriptionRequest,
+      DomEventName.createInscriptionRequest,
       {
-        detail: { createTextInscriptionRequest },
+        detail: { createInscriptionRequest },
       },
     );
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<CreateTextInscriptionResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.createTextInscriptionResponse)) return;
-        if (eventMessage.data.payload?.createInscriptionRequest !== createTextInscriptionRequest)
-          return;
-        window.removeEventListener('message', handleMessage);
-        if (eventMessage.data.payload.createInscriptionResponse === 'cancel') {
-          reject(eventMessage.data.payload.createInscriptionResponse);
-          return;
-        }
-        if (typeof eventMessage.data.payload.createInscriptionResponse !== 'string') {
-          resolve(eventMessage.data.payload.createInscriptionResponse);
-        }
-      };
-      window.addEventListener('message', handleMessage);
-    });
-  },
-  createFileInscription: async (
-    createFileInscriptionRequest: string,
-  ): Promise<CreateFileInscriptionResponse> => {
-    const event = new CustomEvent<CreateFileInscriptionEventDetails>(
-      DomEventName.createFileInscriptionRequest,
-      {
-        detail: { createFileInscriptionRequest },
-      },
-    );
-    document.dispatchEvent(event);
-    return new Promise((resolve, reject) => {
-      const handleMessage = (eventMessage: MessageEvent<CreateFileInscriptionResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.createFileInscriptionResponse)) return;
-        if (eventMessage.data.payload?.createInscriptionRequest !== createFileInscriptionRequest)
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.createInscriptionResponse)) return;
+        if (eventMessage.data.payload?.createInscriptionRequest !== createInscriptionRequest)
           return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.createInscriptionResponse === 'cancel') {

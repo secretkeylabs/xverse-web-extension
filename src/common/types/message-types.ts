@@ -1,10 +1,5 @@
 import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
-import {
-  CreateFileInscriptionResponse,
-  CreateTextInscriptionResponse,
-  GetAddressResponse,
-  SignPsbtResponse,
-} from 'sats-connect';
+import { CreateInscriptionResponse, GetAddressResponse, SignPsbtResponse } from 'sats-connect';
 
 export const MESSAGE_SOURCE = 'xverse-wallet' as const;
 
@@ -110,10 +105,8 @@ export enum ExternalSatsMethods {
   signMessageResponse = 'signMessageResponse',
   sendBtcRequest = 'sendBtcRequest',
   sendBtcResponse = 'sendBtcResponse',
-  createTextInscriptionRequest = 'createTextInscriptionRequest',
-  createTextInscriptionResponse = 'createTextInscriptionResponse',
-  createFileInscriptionRequest = 'createFileInscriptionRequest',
-  createFileInscriptionResponse = 'createFileInscriptionResponse',
+  createInscriptionRequest = 'createInscriptionRequest',
+  createInscriptionResponse = 'createInscriptionResponse',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -156,29 +149,16 @@ export type SendBtcResponseMessage = Message<
   }
 >;
 
-type CreateTextInscriptionRequestMessage = Message<
-  ExternalSatsMethods.createTextInscriptionRequest,
+type CreateInscriptionRequestMessage = Message<
+  ExternalSatsMethods.createInscriptionRequest,
   string
 >;
 
-export type CreateTextInscriptionResponseMessage = Message<
-  ExternalSatsMethods.createTextInscriptionResponse,
+export type CreateInscriptionResponseMessage = Message<
+  ExternalSatsMethods.createInscriptionResponse,
   {
     createInscriptionRequest: string;
-    createInscriptionResponse: CreateTextInscriptionResponse | string;
-  }
->;
-
-type CreateFileInscriptionRequestMessage = Message<
-  ExternalSatsMethods.createFileInscriptionRequest,
-  string
->;
-
-export type CreateFileInscriptionResponseMessage = Message<
-  ExternalSatsMethods.createFileInscriptionResponse,
-  {
-    createInscriptionRequest: string;
-    createInscriptionResponse: CreateFileInscriptionResponse | string;
+    createInscriptionResponse: CreateInscriptionResponse | string;
   }
 >;
 
@@ -187,13 +167,11 @@ export type SatsConnectMessageFromContentScript =
   | SignPsbtRequestMessage
   | SignMessageRequestMessage
   | SendBtcRequestMessage
-  | CreateTextInscriptionRequestMessage
-  | CreateFileInscriptionRequestMessage;
+  | CreateInscriptionRequestMessage;
 
 export type SatsConnectMessageToContentScript =
   | GetAddressResponseMessage
   | SignPsbtResponseMessage
   | SignMessageResponseMessage
   | SendBtcResponseMessage
-  | CreateTextInscriptionResponseMessage
-  | CreateFileInscriptionResponseMessage;
+  | CreateInscriptionResponseMessage;

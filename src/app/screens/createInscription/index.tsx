@@ -13,7 +13,7 @@ import {
   useInscriptionExecute,
   useInscriptionFees,
 } from '@secretkeylabs/xverse-core';
-import { CreateFileInscriptionPayload, CreateTextInscriptionPayload } from 'sats-connect';
+import { CreateInscriptionPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
@@ -153,11 +153,7 @@ const NumberSuffix = styled.div((props) => ({
   color: props.theme.colors.white[400],
 }));
 
-type Props = {
-  type: 'text' | 'file';
-};
-
-function CreateInscription({ type }: Props) {
+function CreateInscription() {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
   const { search } = useLocation();
 
@@ -170,11 +166,13 @@ function CreateInscription({ type }: Props) {
 
   const {
     contentType,
+    content,
+    payloadType,
     network: requestedNetwork,
     feeAddress,
     inscriptionFee,
     initialFeeRate,
-  } = payload as CreateFileInscriptionPayload | CreateTextInscriptionPayload;
+  } = payload as CreateInscriptionPayload;
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
@@ -201,22 +199,21 @@ function CreateInscription({ type }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- we only want to run this once on load
   }, []);
 
-  const content =
-    type === 'text'
-      ? (payload as CreateTextInscriptionPayload).text
-      : (payload as CreateFileInscriptionPayload).dataBase64;
-
   const contentIsInvalidJson = useMemo(() => {
+    let stringContent = content;
+    if (payloadType === 'BASE_64') {
+      stringContent = atob(content as string);
+    }
     // if content type is json, ensure content is valid json
     if (contentType.startsWith('application/json')) {
       try {
-        JSON.parse(content as string);
+        JSON.parse(stringContent as string);
         return false;
       } catch (e) {
         return true;
       }
     }
-  }, [contentType, content]);
+  }, [contentType, content, payloadType]);
 
   const {
     commitValue,
@@ -248,17 +245,14 @@ function CreateInscription({ type }: Props) {
     network: requestedNetwork.type,
     revealAddress: ordinalsAddress,
     seedPhrase,
-    contentBase64: type === 'file' ? content : undefined,
-    contentString: type === 'text' ? content : undefined,
+    contentBase64: payloadType === 'BASE_64' ? content : undefined,
+    contentString: payloadType === 'PLAIN_TEXT' ? content : undefined,
   });
 
   const cancelCallback = () => {
     const response = {
       source: MESSAGE_SOURCE,
-      method:
-        type === 'text'
-          ? ExternalSatsMethods.createTextInscriptionResponse
-          : ExternalSatsMethods.createFileInscriptionResponse,
+      method: ExternalSatsMethods.createInscriptionResponse,
       payload: { createInscriptionRequest: requestToken, createInscriptionResponse: 'cancel' },
     };
 
@@ -292,10 +286,7 @@ function CreateInscription({ type }: Props) {
     const onClose = () => {
       const response = {
         source: MESSAGE_SOURCE,
-        method:
-          type === 'text'
-            ? ExternalSatsMethods.createTextInscriptionResponse
-            : ExternalSatsMethods.createFileInscriptionResponse,
+        method: ExternalSatsMethods.createInscriptionResponse,
         payload: {
           createInscriptionRequest: requestToken,
           createInscriptionResponse: {
@@ -338,7 +329,7 @@ function CreateInscription({ type }: Props) {
                 </div>
                 <div>{t('SUMMARY.ORDINAL')}</div>
               </IconLabel>
-              <ContentLabel contentType={contentType} content={content} type={type} />
+              <ContentLabel contentType={contentType} content={content} type={payloadType} />
             </CardRow>
             <CardRow topMargin>
               <MutedLabel>{t('SUMMARY.TO')}</MutedLabel>
