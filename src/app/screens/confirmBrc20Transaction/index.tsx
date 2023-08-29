@@ -11,10 +11,11 @@ import {
   ConfirmBrc20TransferState,
   ExecuteBrc20TransferState,
 } from '@utils/brc20';
-import { isLedgerAccount } from '@utils/helper';
+import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import { useTranslation } from 'react-i18next';
 import ConfirmBrc20TransactionComponent from './confirmBrc20TransactionComponent';
 import { OnChangeFeeRate } from './editFees';
 
@@ -32,8 +33,7 @@ const ScrollContainer = styled.div`
 `;
 
 export function ConfirmBrc20Transaction() {
-  // TODO use the helper
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_BRC_20' });
   const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const {
@@ -86,11 +86,14 @@ export function ConfirmBrc20Transaction() {
     if (isLedgerAccount(selectedAccount)) {
       // TODO ledger
     }
-    // TODO validate brc balance again here
+    // validate brc20 balance again here
+    if (estimateFeesParams.amount > Number(token.balance)) {
+      setError(t('ERRORS.INSUFFICIENT_BALANCE'));
+      return;
+    }
     const state: ExecuteBrc20TransferState = {
       recipientAddress,
       estimateFeesParams,
-      estimatedFees,
       token,
     };
     navigate('/execute-brc20-tx', { state });
@@ -127,7 +130,7 @@ export function ConfirmBrc20Transaction() {
           isFeeLoading={isFeeLoading}
           error={error}
         />
-        {!isGalleryOpen && <BottomBar tab="dashboard" />}
+        {!isInOptions && <BottomBar tab="dashboard" />}
       </ScrollContainer>
     </>
   );

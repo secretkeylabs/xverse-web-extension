@@ -131,8 +131,7 @@ interface Props {
 }
 
 function Brc20TransferForm(props: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC_20' });
-  // TODO move to context
+  const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
   const {
     token,
     amountToSend,

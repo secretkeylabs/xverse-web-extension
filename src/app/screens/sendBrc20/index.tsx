@@ -1,27 +1,30 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  validateBtcAddress,
-  UTXO,
-  getNonOrdinalUtxo,
-  brc20TransferEstimateFees,
-} from '@secretkeylabs/xverse-core';
-// import { useBrc20TransferFees } from '@secretkeylabs/xverse-core/hooks';
-// TODO get from import
-// import { ErrorCode } from '@secretkeylabs/xverse-core/dist/hooks/brc20/useBrc20TransferFees';
-import useBtcFeeRate from '@hooks/useBtcFeeRate';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useWalletSelector from '@hooks/useWalletSelector';
-import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
-import { replaceCommaByDot } from '@utils/helper';
+import TopRow from '@components/topRow';
+import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  Brc20TransferEstimateFeesParams,
+  ConfirmBrc20TransferState,
+  SendBrc20TransferState,
+} from '@utils/brc20';
+import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
+import {
+  UTXO,
+  brc20TransferEstimateFees,
+  getNonOrdinalUtxo,
+  validateBtcAddress,
+  CoreError,
+} from '@secretkeylabs/xverse-core';
 import { getFtTicker } from '@utils/tokens';
+import { replaceCommaByDot } from '@utils/helper';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import { useTranslation } from 'react-i18next';
 import Brc20TransferForm from './brc20TransferForm';
-import { Brc20TransferEstimateFeesParams, ConfirmBrc20TransferState } from '@utils/brc20';
 
 function SendBrc20Screen() {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC_20' });
+  const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
   const navigate = useNavigate();
   const location = useLocation();
   const { btcAddress, ordinalsAddress, network, brcCoinsList } = useWalletSelector();
@@ -38,9 +41,9 @@ function SendBrc20Screen() {
   const isNextEnabled =
     !amountError && !recipientError && !!recipientAddress && amountToSend !== '';
 
+  const { fungibleToken: ft }: SendBrc20TransferState = location.state;
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
-  const fungibleToken =
-    location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
+  const fungibleToken = ft || brcCoinsList?.find((coin) => coin.name === coinName);
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -48,7 +51,7 @@ function SendBrc20Screen() {
 
   const validateAmount = (amountInput: string): boolean => {
     const amount = Number(replaceCommaByDot(amountInput));
-    if (amount > fungibleToken.balance) {
+    if (amount > Number(fungibleToken.balance)) {
       setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
       return false;
     }
@@ -125,11 +128,16 @@ function SendBrc20Screen() {
         token: fungibleToken,
       };
       navigate('/confirm-brc20-tx', { state });
-    } catch (e) {
-      console.error(e);
-      // TODO use error codes once they are exported
-      if ((e as any).message === 'Not enough funds at selected fee rate') {
+    } catch (err) {
+      const e = err as Error;
+      if (
+        CoreError.isCoreError(e) &&
+        (e.code ?? '') in BRC20ErrorCode &&
+        e.code === BRC20ErrorCode.INSUFFICIENT_FUNDS
+      ) {
         setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else {
+        setAmountError(t('ERRORS.SERVER_ERROR'));
       }
     } finally {
       setProcessing(false);

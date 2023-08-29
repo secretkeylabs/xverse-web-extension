@@ -12,7 +12,7 @@ const AMOUNT_OF_STEPS = Object.keys(ExecuteTransferProgressCodes).length + 1;
 const PERCENTAGE_PER_STEP = 1 / AMOUNT_OF_STEPS;
 
 export function ExecuteBrc20Transaction() {
-  const { t } = useTranslation('translation');
+  const { t } = useTranslation('translation', { keyPrefix: 'EXECUTE_BRC20' });
   const { selectedAccount, btcAddress, network, seedPhrase } = useWalletSelector();
   const navigate = useNavigate();
   const { recipientAddress, estimateFeesParams }: ExecuteBrc20TransferState = useLocation().state;
@@ -48,22 +48,9 @@ export function ExecuteBrc20Transaction() {
     confirmationStatus = complete ? 'SUCCESS' : 'FAILURE';
   }
 
-  // TODO remove debug:
-  // useEffect(() => {
-  //   if (loadingPercentage >= 1) {
-  //     setConfirmationStatus('FAILURE');
-  //   } else if (loadingPercentage < 1) {
-  //     setConfirmationStatus('LOADING');
-  //   }
-  //   const timer = setTimeout(() => {
-  //     setLoadingPercentage((prevValue) => (prevValue >= 1 ? 0 : prevValue + 0.25));
-  //   }, 500);
-  //   return () => clearTimeout(timer);
-  // }, [loadingPercentage]);
-
   /* callbacks */
   const handleClickClose = () => {
-    navigate(`/dashboard`);
+    navigate('/');
   };
 
   const handleClickSeeTransaction = () => {
@@ -80,14 +67,14 @@ export function ExecuteBrc20Transaction() {
 
   const resultTexts = {
     SUCCESS: {
-      title: t('EXECUTE_BRC20.TRANSACTION_HEADLINE', { status: 'Broadcasted' }),
-      description: t('EXECUTE_BRC20.YOUR_TRANSACTION_HAS_BEEN'),
+      title: t('TRANSACTION_HEADLINE', { status: 'Broadcasted' }),
+      description: t('YOUR_TRANSACTION_HAS_BEEN'),
     },
     FAILURE: {
-      title: t('EXECUTE_BRC20.TRANSACTION_HEADLINE', { status: 'Failed' }),
+      title: t('TRANSACTION_HEADLINE', { status: 'Failed' }),
       description: (
         <>
-          {t('EXECUTE_BRC20.XVERSE_WALLET_ROUTER')}
+          {t('XVERSE_WALLET_ROUTER')}
           <br />
           {errorCode}
         </>
@@ -102,13 +89,13 @@ export function ExecuteBrc20Transaction() {
       status={confirmationStatus}
       resultTexts={resultTexts}
       loadingTexts={{
-        title: t('EXECUTE_BRC20.BROADCASTING_YOUR'),
-        description: t('EXECUTE_BRC20.DO_NOT_CLOSE'),
+        title: t('BROADCASTING_YOUR'),
+        description: t('DO_NOT_CLOSE'),
       }}
-      primaryAction={{ onPress: handleClickClose, text: t('EXECUTE_BRC20.CLOSE') }}
+      primaryAction={{ onPress: handleClickClose, text: t('CLOSE') }}
       secondaryAction={{
         onPress: handleClickSeeTransaction,
-        text: t('EXECUTE_BRC20.SEE_YOUR_TRANSACTION'),
+        text: t('SEE_YOUR_TRANSACTION'),
       }}
       loadingPercentage={loadingPercentageAwareOfStatus}
     />
