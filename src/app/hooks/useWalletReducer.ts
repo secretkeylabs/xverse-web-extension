@@ -13,6 +13,7 @@ import {
   resetWalletAction,
   selectAccount,
   setWalletAction,
+  storeEncryptedSeedAction,
   updateLedgerAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
@@ -112,6 +113,7 @@ const useWalletReducer = () => {
       await storeSeed(decrypted);
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
       localStorage.removeItem('salt');
+      dispatch(storeEncryptedSeedAction(''));
       return decrypted;
     }
     const decrypted = await getSeed(password);
