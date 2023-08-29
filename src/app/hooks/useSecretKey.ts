@@ -1,33 +1,34 @@
 import { useMemo } from 'react';
 import SeedVault, {
-  CommonStorageAdapter,
   CryptoUtilsAdapter,
-  SecureStorageAdapter,
+  StorageAdapter,
 } from '@secretkeylabs/xverse-core/seedVault';
+import { generateRandomKey } from '@secretkeylabs/xverse-core/encryption';
+import { getSessionItem, setSessionItem } from '@utils/sessionStorageUtils';
 import * as cryptoUtils from '@utils/encryptionUtils';
 import ChromeStorage from '@utils/storage';
-import { getSessionItem, setSessionItem } from '@utils/sessionStorageUtils';
 
 const cryptoUtilsAdapter: CryptoUtilsAdapter = {
   encrypt: cryptoUtils.encryptSeedPhrase,
   decrypt: cryptoUtils.decryptSeedPhrase,
-  generateRandomBytes: cryptoUtils.generateRandomKey,
-  hash: cryptoUtils.generateKeyArgon2,
+  generateRandomBytes: generateRandomKey,
+  hash: cryptoUtils.generateKeyArgon2id,
 };
 
-const secureStorageAdapter: SecureStorageAdapter = {
+const secureStorageAdapter: StorageAdapter = {
   get: getSessionItem,
   set: setSessionItem,
 };
 
-const commonStorageAdapter: CommonStorageAdapter = {
+const commonStorageAdapter: StorageAdapter = {
   get: async (key: string) => ChromeStorage.getItem(key),
   set: async (key: string, value: string) => ChromeStorage.setItem(key, value),
 };
 
 const useSecretKey = () => {
   const vault = useMemo(
-    () => new SeedVault({
+    () =>
+      new SeedVault({
         cryptoUtilsAdapter,
         storageAdapter: secureStorageAdapter,
         commonStorageAdapter,

@@ -5,7 +5,6 @@ import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/x
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
 import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
-import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core/seedVault';
 import {
   ChangeNetworkAction,
   addAccountAction,
@@ -15,14 +14,13 @@ import {
   selectAccount,
   setWalletAction,
   updateLedgerAccountsAction,
-  unlockWalletAction,
 } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
-import { getSessionItem } from '@utils/sessionStorageUtils';
-import { decryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
+import { generatePasswordHash } from '@utils/encryptionUtils';
 import { PostGuardPing } from '@components/guards/singleTab';
+import { decryptSeedCBC } from '@secretkeylabs/xverse-core/encryption';
 import useWalletSession from './useWalletSession';
 import useSecretKey from './useSecretKey';
 import useWalletSelector from './useWalletSelector';
@@ -80,6 +78,7 @@ const useWalletReducer = () => {
 
     dispatch(
       fetchAccountAction(
+        // eslint-disable-next-line no-nested-ternary
         selectedAccount
           ? isLedgerAccount(selectedAccount)
             ? ledgerAccountsList[selectedAccount.id]
@@ -108,11 +107,10 @@ const useWalletReducer = () => {
   const unlockWallet = async (password: string) => {
     if (encryptedSeed && encryptedSeed.length > 0) {
       const pHash = await generatePasswordHash(password);
-      const decrypted = await decryptSeedPhrase(encryptedSeed, pHash.hash);
+      const decrypted = await decryptSeedCBC(encryptedSeed, pHash.hash);
       await initSeedVault(password);
       await storeSeed(decrypted);
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
-      dispatch(storeEncryptedSeedAction(''));
       localStorage.removeItem('salt');
       return decrypted;
     }
@@ -129,8 +127,7 @@ const useWalletReducer = () => {
   };
 
   const lockWallet = async () => {
-    const passPhrase = await getSessionItem(SeedVaultStorageKeys.PASSWORD_HASH);
-    await lockVault(passPhrase);
+    await lockVault();
     PostGuardPing('closeWallet');
   };
 

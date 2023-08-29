@@ -1,18 +1,26 @@
 import argon2 from 'argon2-browser';
+import { generateRandomKey, encryptSeed, decryptSeed } from '@secretkeylabs/xverse-core/encryption';
 import {
-  decryptMnemonicWithCallback,
-  encryptMnemonicWithCallback,
-} from '@secretkeylabs/xverse-core/seedVault/encryptionUtils';
-import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core';
-import { decryptMnemonic, encryptMnemonic } from '@stacks/encryption';
-import { getSessionItem, setSessionItem } from './sessionStorageUtils';
+  encryptMnemonicWithHandler,
+  decryptMnemonicWithHandler,
+} from '@secretkeylabs/xverse-core/wallet';
+import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core/seedVault';
+import { getSessionItem } from './sessionStorageUtils';
 
-export function generateRandomKey(bytesCount: number): string {
-  const randomValues = Array.from(crypto.getRandomValues(new Uint8Array(bytesCount)));
-  return randomValues.map((val) => `00${val.toString(16)}`.slice(-2)).join('');
+export async function generateKeyArgon2id(password: string, salt: string): Promise<string> {
+  const result = await argon2.hash({
+    pass: password,
+    salt,
+    time: 3,
+    mem: 64 * 1024,
+    parallelism: 4,
+    hashLen: 16,
+    type: argon2.ArgonType.Argon2id,
+  });
+  return result.hashHex;
 }
 
-export async function generateKeyArgon2(password: string, salt: string): Promise<string> {
+export async function generateKeyArgon2i(password: string, salt: string): Promise<string> {
   const result = await argon2.hash({
     pass: password,
     salt,
@@ -33,7 +41,7 @@ export async function generatePasswordHash(password: string) {
   } else {
     salt = unMigratedSalt || salt;
   }
-  const argonHash = await generateKeyArgon2(password, salt);
+  const argonHash = await generateKeyArgon2i(password, salt);
   return {
     salt,
     hash: argonHash,
@@ -41,19 +49,19 @@ export async function generatePasswordHash(password: string) {
 }
 
 export async function encryptSeedPhrase(seed: string, password: string): Promise<string> {
-  return encryptMnemonicWithCallback({
+  return encryptMnemonicWithHandler({
     seed,
     password,
-    mnemonicEncryptionHandler: encryptMnemonic,
+    mnemonicEncryptionHandler: encryptSeed,
   });
 }
 
 export async function decryptSeedPhrase(encryptedSeed: string, password: string): Promise<string> {
   try {
-    const seedPhrase = await decryptMnemonicWithCallback({
+    const seedPhrase = await decryptMnemonicWithHandler({
       encryptedSeed,
       password,
-      mnemonicDecryptionHandler: decryptMnemonic,
+      mnemonicDecryptionHandler: decryptSeed,
     });
     return seedPhrase;
   } catch (err) {

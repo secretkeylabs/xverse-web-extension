@@ -71,7 +71,14 @@ const walletReducer = (
     case SetWalletKey:
       return {
         ...state,
-        ...action.wallet,
+        stxAddress: action.wallet.stxAddress,
+        btcAddress: action.wallet.btcAddress,
+        ordinalsAddress: action.wallet.ordinalsAddress,
+        masterPubKey: action.wallet.masterPubKey,
+        stxPublicKey: action.wallet.stxPublicKey,
+        btcPublicKey: action.wallet.btcPublicKey,
+        ordinalsPublicKey: action.wallet.ordinalsPublicKey,
+        accountType: action.wallet.accountType,
       };
     case ResetWalletKey:
       return {
