@@ -136,6 +136,11 @@ function AuthenticationRequest() {
       console.error('No account selected');
       return;
     }
+
+    if (!selectedAccount.deviceAccountIndex) {
+      console.error('No account found');
+      return;
+    }
     setIsButtonDisabled(true);
 
     const transport = await Transport.create();
@@ -162,7 +167,11 @@ function AuthenticationRequest() {
     };
 
     try {
-      const authResponse = await handleLedgerStxJWTAuth(transport, selectedAccount.id, profile);
+      const authResponse = await handleLedgerStxJWTAuth(
+        transport,
+        selectedAccount.deviceAccountIndex,
+        profile,
+      );
       setIsTxApproved(true);
       await ledgerDelay(1500);
       chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
