@@ -30,6 +30,9 @@ const Theme = {
     elevation6_600: 'rgba(76, 82, 95, 0.4)',
     elevation6_800: 'rgba(76, 82, 95, 0.2)',
     elevation8: '#7A7688',
+    success: '#51D6A6',
+    caution: '#F2A900',
+    error: '#D33C3C',
 
     // TODO tim: grep codebase and remove all
     /* deprecated: below */

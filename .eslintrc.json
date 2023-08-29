@@ -29,6 +29,7 @@
     "no-param-reassign": "off",
     "react-hooks/exhaustive-deps": "warn",
     "react/jsx-key": "warn",
+    "react/jsx-props-no-spreading": "off",
     "react/react-in-jsx-scope": "off",
     "react/require-default-props": "off",
     "@typescript-eslint/no-unused-vars": [

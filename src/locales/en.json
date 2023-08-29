@@ -799,6 +799,15 @@
       "SERVER_ERROR": ""
     }
   },
+  "EXECUTE_BRC20": {
+    "BROADCASTING_YOUR": "Broadcasting your transaction",
+    "DO_NOT_CLOSE": "Do not close your wallet",
+    "TRANSACTION_HEADLINE": "Transaction {{status}}",
+    "YOUR_TRANSACTION_HAS_BEEN": "Your transaction has been successfully submitted.",
+    "XVERSE_WALLET_ROUTER": "Xverse Wallet Router: ",
+    "SEE_YOUR_TRANSACTION": "See transaction",
+    "CLOSE": "Close"
+  },
   "CACHE_MIGRATION_SCREEN": {
     "TITLE": "Your wallet data store needs to be updated in order to remain secure.",
     "WARNING": "Please make sure you have your seed phrase backed up securely before moving forward.",
