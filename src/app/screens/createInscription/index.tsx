@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import type { BtcFeeResponse } from '@secretkeylabs/xverse-core';
 import {
   fetchBtcFeeRate,
+  getNonOrdinalUtxo,
   useInscriptionExecute,
   useInscriptionFees,
 } from '@secretkeylabs/xverse-core';
@@ -21,7 +22,6 @@ import WalletIcon from '@assets/img/wallet.svg';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
-import useBtcClient from '@hooks/useBtcClient';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { UTXO } from '@secretkeylabs/xverse-core/types';
 import { getShortTruncatedAddress } from '@utils/helper';
@@ -179,14 +179,12 @@ function CreateInscription() {
   const [feeRate, setFeeRate] = useState(initialFeeRate ?? 8);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
 
-  const btcClient = useBtcClient();
-
   const { ordinalsAddress, network, btcAddress, seedPhrase, selectedAccount, btcFiatRate } =
     useWalletSelector();
 
   useEffect(() => {
-    btcClient.getUnspentUtxos(btcAddress).then(setUtxos);
-  }, [btcClient, btcAddress]);
+    getNonOrdinalUtxo(btcAddress, requestedNetwork.type).then(setUtxos);
+  }, [btcAddress, requestedNetwork]);
 
   useEffect(() => {
     fetchBtcFeeRate().then((feeRatesResponse: BtcFeeResponse) => {
