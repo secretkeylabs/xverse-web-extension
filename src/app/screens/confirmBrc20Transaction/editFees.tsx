@@ -2,14 +2,15 @@ import ActionButton from '@components/button';
 import BigNumber from 'bignumber.js';
 import BottomModal from '@components/bottomModal';
 import styled from 'styled-components';
+import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { BetterBarLoader } from '@components/barLoader';
 import { NumericFormat } from 'react-number-format';
 import { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useBtcFeeRate from '@hooks/useBtcFeeRate';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -107,6 +108,7 @@ const TickerContainer = styled.div({
   flexDirection: 'column',
   alignItems: 'flex-end',
   flex: 1,
+  minHeight: 34,
 });
 
 const ApplyButtonContainer = styled.div`
@@ -248,21 +250,25 @@ export function EditFees({
               onChange={onChangeEditFeesInput}
             />
             <FeeText>sats /vB</FeeText>
-            {isFeeLoading ? (
-              // TODO use skeleton
-              'loading...'
-            ) : (
-              <TickerContainer>
-                <NumericFormat
-                  value={fee}
-                  displayType="text"
-                  thousandSeparator
-                  suffix=" sats"
-                  renderText={(value: string) => <FeeText>{value}</FeeText>}
-                />
-                <FiatAmount fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
-              </TickerContainer>
-            )}
+            <TickerContainer>
+              {isFeeLoading ? (
+                <>
+                  <BetterBarLoader width={75} height={16} />
+                  <BetterBarLoader width={75} height={16} />
+                </>
+              ) : (
+                <>
+                  <NumericFormat
+                    value={fee}
+                    displayType="text"
+                    thousandSeparator
+                    suffix=" sats"
+                    renderText={(value: string) => <FeeText>{value}</FeeText>}
+                  />
+                  <FiatAmount fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
+                </>
+              )}
+            </TickerContainer>
           </InputContainer>
           <ErrorText>{error}</ErrorText>
         </FeeContainer>
