@@ -72,14 +72,9 @@ function AddStxAddress(): JSX.Element {
     const transport = await Transport.create();
 
     try {
-      const deviceAccounts = ledgerAccountsList.filter(
-        (account) => account.masterPubKey === selectedAccount?.masterPubKey,
-      );
-      const accountId =
-        selectedAccount?.deviceAccountIndex ||
-        deviceAccounts.findIndex((account) => account.id === selectedAccount?.id);
+      const addressIndex = selectedAccount?.deviceAccountIndex;
 
-      if (accountId === -1) {
+      if (addressIndex === undefined) {
         throw new Error('Account not found');
       }
 
@@ -87,7 +82,7 @@ function AddStxAddress(): JSX.Element {
         transport,
         network.type,
         0,
-        accountId,
+        addressIndex,
         showAddress,
       );
       setStacksCredentials(stacksCreds);
