@@ -5,7 +5,6 @@ import {
   TransactionData,
 } from '@secretkeylabs/xverse-core';
 import { SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL } from '@utils/constants';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -16,6 +15,7 @@ interface TransactionTitleProps {
 const TransactionTitleText = styled.p((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white[0],
+  textAlign: 'left',
 }));
 
 export default function TransactionTitle(props: TransactionTitleProps) {
