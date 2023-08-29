@@ -229,6 +229,11 @@ function ConfirmStxTransationComponent({
       console.error('No account selected');
       return;
     }
+
+    if (!selectedAccount.deviceAccountIndex) {
+      console.error('No account found');
+      return;
+    }
     setIsButtonDisabled(true);
 
     const transport = await Transport.create();
@@ -247,7 +252,7 @@ function ConfirmStxTransationComponent({
       const signedTxs = await signLedgerStxTransaction(
         transport,
         initialStxTransactions[0].serialize(),
-        selectedAccount.id,
+        selectedAccount.deviceAccountIndex,
       );
       setIsTxApproved(true);
       await ledgerDelay(1500);

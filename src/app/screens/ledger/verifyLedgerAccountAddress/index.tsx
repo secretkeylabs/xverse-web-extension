@@ -5,12 +5,11 @@ import { animated, useTransition } from '@react-spring/web';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
 import {
-  getMasterFingerPrint,
   importNativeSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
 } from '@secretkeylabs/xverse-core';
-import { getDeviceAccountIndex, ledgerDelay } from '@common/utils/ledger';
+import { ledgerDelay } from '@common/utils/ledger';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
@@ -178,16 +177,9 @@ function VerifyLedger(): JSX.Element {
     setCurrentStepIndex(currentStepIndex + 1);
   };
 
-  const importBtcAccounts = async (showAddress: boolean, masterFingerPrint?: string) => {
+  const importBtcAccounts = async (showAddress: boolean) => {
     const transport = await Transport.create();
-    const addressIndex =
-      selectedAccount?.deviceAccountIndex !== undefined
-        ? selectedAccount?.deviceAccountIndex
-        : getDeviceAccountIndex(
-            ledgerAccountsList,
-            selectedAccount?.id!,
-            masterFingerPrint || masterPubKey,
-          );
+    const addressIndex = selectedAccount?.deviceAccountIndex;
 
     if (isBitcoinSelected) {
       try {
@@ -232,9 +224,7 @@ function VerifyLedger(): JSX.Element {
   const importStxAccounts = async (showAddress: boolean) => {
     setIsButtonDisabled(true);
     const transport = await Transport.create();
-    const addressIndex = ledgerAccountsList
-      .filter((account) => account.masterPubKey === (selectedAccount?.masterPubKey || masterPubKey))
-      .findIndex((account) => account.id === selectedAccount?.id);
+    const addressIndex = selectedAccount?.deviceAccountIndex;
 
     try {
       await importStacksAccountFromLedger(transport, network.type, 0, addressIndex, showAddress);
@@ -249,13 +239,6 @@ function VerifyLedger(): JSX.Element {
     await transport.close();
   };
 
-  const fetchMasterPubKey = async () => {
-    const transport = await Transport.create();
-    const masterFingerPrint = await getMasterFingerPrint(transport);
-    setMasterPubKey(masterFingerPrint);
-    return masterFingerPrint;
-  };
-
   const checkDeviceConnection = async () => {
     try {
       setIsConnectFailed(false);
@@ -263,16 +246,9 @@ function VerifyLedger(): JSX.Element {
       setIsOrdinalsAddressRejected(false);
       setIsButtonDisabled(true);
 
-      const masterFingerPrint = isStacksSelected
-        ? selectedAccount?.masterPubKey
-        : await fetchMasterPubKey();
+      const addressIndex = selectedAccount?.deviceAccountIndex;
 
-      const deviceAccounts = ledgerAccountsList.filter(
-        (account) => account.masterPubKey === masterFingerPrint,
-      );
-      const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount?.id);
-
-      if (accountId === -1) {
+      if (addressIndex === undefined) {
         setIsConnectSuccess(false);
         setIsConnectFailed(true);
         setIsWrongDevice(true);
@@ -284,7 +260,7 @@ function VerifyLedger(): JSX.Element {
       await ledgerDelay(1500);
       handleClickNext();
       if (isBitcoinSelected || isOrdinalSelected) {
-        await importBtcAccounts(true, masterFingerPrint);
+        await importBtcAccounts(true);
       } else if (isStacksSelected) {
         await importStxAccounts(true);
       }
