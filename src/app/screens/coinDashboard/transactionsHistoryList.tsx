@@ -101,7 +101,7 @@ const groupBtcTxsByDate = (
       pendingTransactions.push(transaction);
     } else {
       !processedTransactions[txDate]
-        ? (processedTransactions[txDate] = [transaction] || [])
+        ? (processedTransactions[txDate] = [transaction])
         : processedTransactions[txDate].push(transaction);
 
       sortTransactionsByBlockHeight(processedTransactions[txDate]);
