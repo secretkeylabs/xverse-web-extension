@@ -5,11 +5,11 @@ import { useEffect, useState } from 'react';
 import Theme from 'theme';
 
 const svgSize = 88;
-const circleSize = 66;
-const radius = circleSize / 2;
+const radius = 33;
 const circumference = 2 * Math.PI * radius;
 
 export type ConfirmationStatus = 'LOADING' | 'SUCCESS' | 'FAILURE';
+
 const getStrokeColorByStatus = (status: ConfirmationStatus) =>
   ({
     LOADING: Theme.colors.white_0,
@@ -29,7 +29,6 @@ const StyledSvg = styled.svg<{ status: ConfirmationStatus; loadingPercentage: nu
   .circle {
     transform-origin: 50% 50%;
     transform: rotate(180deg) scale(-1, 1);
-    // stroke-dasharray: ${(props) => props.loadingPercentage * circumference}, ${circumference};
     stroke-dasharray: ${circumference};
   }
   .check,
@@ -43,7 +42,7 @@ const StyledSvg = styled.svg<{ status: ConfirmationStatus; loadingPercentage: nu
   @keyframes slideY {
     0% {
       opacity: 0;
-      transform: translateY(16px);
+      transform: translateY(8px);
     }
     100% {
       opacity: 1;

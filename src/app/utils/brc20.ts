@@ -24,7 +24,6 @@ export type ConfirmBrc20TransferState = {
 export type ExecuteBrc20TransferState = {
   recipientAddress: string;
   estimateFeesParams: Brc20TransferEstimateFeesParams;
-  estimatedFees: TransferEstimateResult;
   token: FungibleToken;
 };
 

@@ -1,25 +1,14 @@
-import React, { useEffect } from 'react';
-// import Animated, {
-//   Easing,
-//   withTiming,
-//   useSharedValue,
-//   useAnimatedStyle,
-//   interpolate,
-//   Extrapolation,
-// } from 'react-native-reanimated';
-
-import WalletSafeArea from '../../utils/walletSafeArea';
-import PrimaryButton from '../primaryButton';
-// import {getLocalizedString} from '../../utils/helper';
-
-import { styles } from './styles';
-import { CircularSvgAnimation } from './circularSvgAnimation';
-
-export type ConfirmationStatus = 'SUCCESS' | 'FAILURE' | 'LOADING';
+import ActionButton from '@components/button';
+import className from 'classnames';
+import styled from 'styled-components';
+import { StyledP, StyledHeading, VerticalStackButtonContainer } from '@components/styledCommon';
+import { animated, easings, useSpring } from '@react-spring/web';
+import { useState } from 'react';
+import { CircularSvgAnimation, ConfirmationStatus } from './circularSvgAnimation';
 
 type Texts = {
   title: string;
-  description: string;
+  description: string | React.ReactNode;
 };
 
 type Action = {
@@ -27,127 +16,167 @@ type Action = {
   text: string;
 };
 
-interface LoadingTransactionStatusProps {
-  status: ConfirmationStatus;
-  resultTexts: Texts;
-  loadingTexts: Texts;
-  cancelAction: Action;
-  successAction: Action;
-  loadingProgress?: number;
-}
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: ${(props) => props.theme.spacing(8)}px;
+  padding-top: ${(props) => props.theme.spacing(68)}px;
+  position: relative;
+  height: 100%;
+`;
 
-const { height: screenHeight } = Dimensions.get('screen');
+const CenterAlignContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const AnimatedBodyContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: relative;
+`;
+
+const AnimatedBody = styled(animated.div)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
+const BottomFixedContainer = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: ${(props) => props.theme.spacing(8)}px;
+  padding-bottom: 0;
+  margin-bottom: ${(props) => props.theme.spacing(32)}px;
+  visibility: hidden;
+
+  &.visible {
+    visibility: visible;
+    animation: slideY 0.2s ease-in;
+  }
+  @keyframes slideY {
+    0% {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const StatusLarge = styled.div`
+  min-width: 88px;
+  min-height: 88px;
+  padding: 22px;
+  margin-bottom: 8px;
+`;
+
+const Heading = styled(StyledHeading)`
+  margin-bottom: 6px;
+`;
 
 /**
  *
  * @param status - The status of the transaction (Loading, Success, Failure)
  * @param resultText - The text to display when the transaction is complete (Success or Failure)
  * @param loadingTexts - The text to display when the transaction is loading
- * @param cancelAction - The first action to display (text and onPress)
- * @param successAction - The second action to display (text and onPress)
- * @param loadingProgress - The progress of the loading animation (0-1) when undefined, the loading animation will be indeterminate
+ * @param primaryAction - The first action to display (text and onPress)
+ * @param secondaryAction - The second action to display (text and onPress)
+ * @param loadingPercentage - The progress of the loading animation (0-1)
  */
-export const LoadingTransactionStatus: React.FC<LoadingTransactionStatusProps> = ({
+export function LoadingTransactionStatus({
   status,
   resultTexts,
   loadingTexts,
-  cancelAction,
-  successAction,
-  loadingProgress,
-}) => {
-  const resultProgressAnimation = useSharedValue(0);
-  const loadingProgressAnimation = useSharedValue(0);
-  const svgContentProgressAnimation = useSharedValue(0);
+  primaryAction,
+  secondaryAction,
+  loadingPercentage,
+}: {
+  status: ConfirmationStatus;
+  resultTexts: Texts;
+  loadingTexts: Texts;
+  primaryAction: Action;
+  secondaryAction: Action;
+  loadingPercentage: number;
+}) {
+  const [hasCircleAnimationRested, setHasCircleAnimationRested] = useState(false);
 
-  useEffect(() => {
-    if (status === 'LOADING') {
-      return;
-    }
+  const visibleClass = className({
+    visible: hasCircleAnimationRested && status !== 'LOADING',
+  });
 
-    resultProgressAnimation.value = withTiming(1, {
-      duration: 400,
-      easing: Easing.inOut(Easing.ease),
-    });
-    svgContentProgressAnimation.value = withTiming(1, {
-      duration: 200,
-      easing: Easing.inOut(Easing.ease),
-    });
-    loadingProgressAnimation.value = withTiming(1, {
-      duration: 100,
-      easing: Easing.inOut(Easing.ease),
-    });
-  }, [loadingProgressAnimation, resultProgressAnimation, svgContentProgressAnimation, status]);
-
-  const resultAnimatedStyles = useAnimatedStyle(
+  const [resultBodyProps, finishedBodyApi] = useSpring(
     () => ({
-      opacity: resultProgressAnimation.value,
-      transform: [
-        {
-          translateY: interpolate(
-            resultProgressAnimation.value,
-            [0, 1],
-            [20, 0],
-            Extrapolation.CLAMP,
-          ),
-        },
-      ],
+      from: { opacity: 0, transform: 'translateY(16px)' },
+      config: { duration: 200, easing: easings.easeInOutCubic },
     }),
-    [resultProgressAnimation.value],
+    [],
   );
-  const loadingAnimatedStyles = useAnimatedStyle(
+
+  const [loadingBodyProps, loadingBodyApi] = useSpring(
     () => ({
-      opacity: 1 - loadingProgressAnimation.value,
-      transform: [
-        {
-          translateY: interpolate(
-            loadingProgressAnimation.value,
-            [0, 1],
-            [0, 20],
-            Extrapolation.CLAMP,
-          ),
-        },
-      ],
+      from: { opacity: 1 },
+      onRest: () => finishedBodyApi.start({ opacity: 1, transform: 'translateY(0)' }),
+      config: { duration: 200, easing: easings.easeInOutCubic },
     }),
-    [loadingProgressAnimation.value],
+    [],
   );
+
+  const handleAnimationRest = () => {
+    setHasCircleAnimationRested(true);
+    loadingBodyApi.start({ to: { opacity: 0 } });
+  };
 
   return (
-    <WalletSafeArea>
-      <View style={styles.flex1}>
-        <View style={{ ...styles.transactionContainer, top: screenHeight / 4 }}>
+    <Container>
+      <CenterAlignContainer>
+        <StatusLarge>
           <CircularSvgAnimation
             status={status}
-            loadingProgress={loadingProgress}
-            resultProgressAnimation={resultProgressAnimation}
+            loadingPercentage={loadingPercentage}
+            onRest={handleAnimationRest}
           />
-          <View style={styles.textContainer}>
-            <Animated.View style={[styles.positionAbsolute, resultAnimatedStyles]}>
-              <Text style={styles.transactionStatusText}>{resultTexts?.title}</Text>
-              <Text style={styles.detailText}>{resultTexts?.description}</Text>
-            </Animated.View>
-            <Animated.View style={[styles.positionAbsolute, loadingAnimatedStyles]}>
-              <Text style={styles.transactionStatusText}>{loadingTexts.title}</Text>
-              <Text style={styles.detailText}>{loadingTexts.description}</Text>
-            </Animated.View>
-          </View>
-        </View>
-        <Animated.View style={[styles.bottomContainer, resultAnimatedStyles]}>
-          {status !== 'LOADING' && (
-            <PrimaryButton
-              onPress={cancelAction.onPress}
-              text={getLocalizedString('buttons.close')}
-            />
-          )}
+        </StatusLarge>
+        <AnimatedBodyContainer>
+          <AnimatedBody style={resultBodyProps}>
+            <Heading typography="headline_xs">{resultTexts?.title}</Heading>
+            <StyledP typography="body_medium_m" color="white_200">
+              {resultTexts?.description}
+            </StyledP>
+          </AnimatedBody>
+          <AnimatedBody style={loadingBodyProps}>
+            <Heading typography="headline_xs">{loadingTexts?.title}</Heading>
+            <StyledP typography="body_medium_m" color="white_200">
+              {loadingTexts?.description}
+            </StyledP>
+          </AnimatedBody>
+        </AnimatedBodyContainer>
+      </CenterAlignContainer>
+      <BottomFixedContainer className={visibleClass}>
+        <VerticalStackButtonContainer>
+          <ActionButton text={primaryAction.text} onPress={primaryAction.onPress} />
           {status === 'SUCCESS' && (
-            <PrimaryButton
-              onPress={successAction.onPress}
-              text={getLocalizedString('transactions.see_transaction')}
-              buttonStyle={styles.button}
-              buttonTextStyle={styles.buttonText}
+            <ActionButton
+              text={secondaryAction.text}
+              onPress={secondaryAction.onPress}
+              transparent
             />
           )}
-        </Animated.View>
-      </View>
-    </WalletSafeArea>
+        </VerticalStackButtonContainer>
+      </BottomFixedContainer>
+    </Container>
   );
-};
+}
+export default LoadingTransactionStatus;
