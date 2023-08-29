@@ -249,11 +249,11 @@ function ConfirmStxTransationComponent({
     await ledgerDelay(1500);
     setCurrentStepIndex(1);
     try {
-      const signedTxs = await signLedgerStxTransaction(
+      const signedTxs = await signLedgerStxTransaction({
         transport,
-        initialStxTransactions[0].serialize(),
-        selectedAccount.deviceAccountIndex,
-      );
+        transactionBuffer: initialStxTransactions[0].serialize(),
+        addressIndex: selectedAccount.deviceAccountIndex,
+      });
       setIsTxApproved(true);
       await ledgerDelay(1500);
       onConfirmClick([signedTxs]);

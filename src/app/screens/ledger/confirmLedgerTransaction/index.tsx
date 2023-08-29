@@ -161,7 +161,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
 
-  const { network, selectedAccount, ledgerAccountsList } = useWalletSelector();
+  const { network, selectedAccount } = useWalletSelector();
 
   const btcClient = useBtcClient();
 
@@ -176,7 +176,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     amount: BigNumber;
     recipients: Recipient[];
     type: LedgerTransactionType;
-    unsignedTx: StacksTransaction;
+    unsignedTx: Buffer;
     ordinalUtxo?: UTXO;
     feeRateInput?: string;
     fee?: BigNumber;
@@ -193,16 +193,16 @@ function ConfirmLedgerTransaction(): JSX.Element {
     },
   });
 
-  const signAndBroadcastOrdinalsTx = async (transport: Transport, accountId: number) => {
+  const signAndBroadcastOrdinalsTx = async (transport: Transport, addressIndex: number) => {
     try {
-      const result = await signLedgerMixedBtcTransaction(
+      const result = await signLedgerMixedBtcTransaction({
         transport,
-        network.type,
-        accountId,
+        network: network.type,
+        addressIndex,
         recipients,
-        feeRateInput?.toString(),
+        feeRate: feeRateInput?.toString(),
         ordinalUtxo,
-      );
+      });
       const { value: psbtCreatedValue } = await result.next();
 
       const { value: taprootSignedValue } = await result.next();
@@ -224,15 +224,15 @@ function ConfirmLedgerTransaction(): JSX.Element {
     }
   };
 
-  const signAndBroadcastBtcTx = async (transport: Transport, accountId: number) => {
+  const signAndBroadcastBtcTx = async (transport: Transport, addressIndex: number) => {
     try {
-      const result = await signLedgerNativeSegwitBtcTransaction(
+      const result = await signLedgerNativeSegwitBtcTransaction({
         transport,
-        network.type,
-        accountId,
+        network: network.type,
+        addressIndex,
         recipients,
-        feeRateInput?.toString(),
-      );
+        feeRate: feeRateInput?.toString(),
+      });
       setIsFinalTxApproved(true);
       await ledgerDelay(1500);
       const transactionId = await btcClient.sendRawTransaction(result);
@@ -247,9 +247,13 @@ function ConfirmLedgerTransaction(): JSX.Element {
     }
   };
 
-  const signAndBroadcastStxTx = async (transport: Transport, accountId: number) => {
+  const signAndBroadcastStxTx = async (transport: Transport, addressIndex: number) => {
     try {
-      const result = await signLedgerStxTransaction(transport, unsignedTx, accountId);
+      const result = await signLedgerStxTransaction({
+        transport,
+        transactionBuffer: unsignedTx,
+        addressIndex,
+      });
       setIsFinalTxApproved(true);
       await ledgerDelay(1500);
       const transactionHash = await broadcastSignedTransaction(result, selectedNetwork);
@@ -282,9 +286,9 @@ function ConfirmLedgerTransaction(): JSX.Element {
         return;
       }
 
-      const accountId = selectedAccount.deviceAccountIndex;
+      const addressIndex = selectedAccount.deviceAccountIndex;
 
-      if (accountId === undefined) {
+      if (addressIndex === undefined) {
         setIsConnectSuccess(false);
         setIsConnectFailed(true);
         setIsWrongDevice(true);
@@ -307,13 +311,13 @@ function ConfirmLedgerTransaction(): JSX.Element {
       switch (type) {
         case 'BTC':
         case 'BRC-20':
-          await signAndBroadcastBtcTx(transport as Transport, accountId);
+          await signAndBroadcastBtcTx(transport as Transport, addressIndex);
           break;
         case 'STX':
-          await signAndBroadcastStxTx(transport as Transport, accountId);
+          await signAndBroadcastStxTx(transport as Transport, addressIndex);
           break;
         case 'ORDINALS':
-          await signAndBroadcastOrdinalsTx(transport as Transport, accountId);
+          await signAndBroadcastOrdinalsTx(transport as Transport, addressIndex);
           break;
         default:
           break;

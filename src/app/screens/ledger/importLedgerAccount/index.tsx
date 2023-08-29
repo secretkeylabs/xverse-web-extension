@@ -157,13 +157,13 @@ function ImportLedger(): JSX.Element {
     const deviceNewAccountIndex = getDeviceNewAccountIndex(masterPubKey || masterFingerPrint);
     if (isBitcoinSelected) {
       try {
-        const bitcoinAccount = await importNativeSegwitAccountFromLedger(
+        const bitcoinAccount = await importNativeSegwitAccountFromLedger({
           transport,
-          network.type,
-          0,
-          deviceNewAccountIndex,
+          network: network.type,
+          accountIndex: 0,
+          addressIndex: deviceNewAccountIndex,
           showAddress,
-        );
+        });
         btcCreds = {
           address: bitcoinAccount.address,
           publicKey: bitcoinAccount.publicKey,
@@ -184,13 +184,13 @@ function ImportLedger(): JSX.Element {
         return;
       }
       try {
-        const ordinalsAccount = await importTaprootAccountFromLedger(
+        const ordinalsAccount = await importTaprootAccountFromLedger({
           transport,
-          network.type,
-          0,
-          deviceNewAccountIndex,
+          network: network.type,
+          accountIndex: 0,
+          addressIndex: deviceNewAccountIndex,
           showAddress,
-        );
+        });
         ordinalsCreds = {
           address: ordinalsAccount.address,
           publicKey: ordinalsAccount.publicKey,
@@ -220,13 +220,13 @@ function ImportLedger(): JSX.Element {
     const transport = await Transport.create();
 
     try {
-      const stacksCreds = await importStacksAccountFromLedger(
+      const stacksCreds = await importStacksAccountFromLedger({
         transport,
-        network.type,
-        0,
-        accountId,
+        network: network.type,
+        accountIndex: 0,
+        addressIndex: accountId,
         showAddress,
-      );
+      });
       setStacksCredentials(stacksCreds);
       await transport.close();
 

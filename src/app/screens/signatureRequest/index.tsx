@@ -263,7 +263,7 @@ function SignatureRequest(): JSX.Element {
       if (isSignMessageBip322) {
         const signature = await handleBip322LedgerMessageSigning({
           transport,
-          accountId: selectedAccount.deviceAccountIndex,
+          addressIndex: selectedAccount.deviceAccountIndex,
           networkType: network.type,
           message: payload.message,
         });
@@ -278,12 +278,12 @@ function SignatureRequest(): JSX.Element {
         chrome.tabs.sendMessage(+tabId, signingMessage);
         window.close();
       } else {
-        const signature = await signStxMessage(
+        const signature = await signStxMessage({
           transport,
-          payload.message,
-          0,
-          selectedAccount.deviceAccountIndex,
-        );
+          message: payload.message,
+          accountIndex: 0,
+          addressIndex: selectedAccount.deviceAccountIndex,
+        });
         if (!!signature.errorMessage && !!signature.returnCode) {
           throw new Error(signature.errorMessage, {
             cause: signature.returnCode,

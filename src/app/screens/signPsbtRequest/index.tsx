@@ -222,20 +222,21 @@ function SignPsbtRequest() {
   };
 
   const handleLedgerPsbtSigning = async (transport: TransportType) => {
-    const accountId = selectedAccount?.deviceAccountIndex;
+    const addressIndex = selectedAccount?.deviceAccountIndex;
+    const { inputsToSign, psbtBase64, broadcast } = payload;
 
-    if (accountId === undefined) {
+    if (addressIndex === undefined) {
       throw new Error('Account not found');
     }
 
-    const signingResponse = await signIncomingSingleSigPSBT(
+    const signingResponse = await signIncomingSingleSigPSBT({
       transport,
-      network.type,
-      accountId,
-      payload.inputsToSign,
-      payload.psbtBase64,
-      payload.broadcast,
-    );
+      network: network.type,
+      addressIndex,
+      inputsToSign,
+      psbtBase64,
+      finalize: broadcast,
+    });
 
     let txId: string = '';
     if (request.payload.broadcast) {

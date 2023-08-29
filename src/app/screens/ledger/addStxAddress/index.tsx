@@ -78,13 +78,13 @@ function AddStxAddress(): JSX.Element {
         throw new Error('Account not found');
       }
 
-      const stacksCreds = await importStacksAccountFromLedger(
+      const stacksCreds = await importStacksAccountFromLedger({
         transport,
-        network.type,
-        0,
+        network: network.type,
+        accountIndex: 0,
         addressIndex,
         showAddress,
-      );
+      });
       setStacksCredentials(stacksCreds);
       await transport.close();
 

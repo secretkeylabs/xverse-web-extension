@@ -129,7 +129,6 @@ const ActionButtonContainer = styled.div((props) => ({
 
 function VerifyLedger(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [masterPubKey, setMasterPubKey] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
@@ -141,7 +140,7 @@ function VerifyLedger(): JSX.Element {
   const params = new URLSearchParams(search);
   const currency = params.get('currency') ?? '';
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_VERIFY_SCREEN' });
-  const { ledgerAccountsList, network } = useWalletSelector();
+  const { network } = useWalletSelector();
   const transition = useTransition(currentStepIndex, {
     from: {
       x: 24,
@@ -183,13 +182,13 @@ function VerifyLedger(): JSX.Element {
 
     if (isBitcoinSelected) {
       try {
-        await importNativeSegwitAccountFromLedger(
+        await importNativeSegwitAccountFromLedger({
           transport,
-          network.type,
-          0,
+          network: network.type,
+          accountIndex: 0,
           addressIndex,
           showAddress,
-        );
+        });
         setIsButtonDisabled(false);
         setCurrentStepIndex(2);
       } catch (err: any) {
@@ -204,7 +203,13 @@ function VerifyLedger(): JSX.Element {
       }
     } else {
       try {
-        await importTaprootAccountFromLedger(transport, network.type, 0, addressIndex, showAddress);
+        await importTaprootAccountFromLedger({
+          transport,
+          network: network.type,
+          accountIndex: 0,
+          addressIndex,
+          showAddress,
+        });
         setIsButtonDisabled(false);
         setCurrentStepIndex(2);
       } catch (err: any) {
@@ -227,7 +232,13 @@ function VerifyLedger(): JSX.Element {
     const addressIndex = selectedAccount?.deviceAccountIndex;
 
     try {
-      await importStacksAccountFromLedger(transport, network.type, 0, addressIndex, showAddress);
+      await importStacksAccountFromLedger({
+        transport,
+        network: network.type,
+        accountIndex: 0,
+        addressIndex,
+        showAddress,
+      });
       setIsButtonDisabled(false);
       setCurrentStepIndex(2);
     } catch (err: any) {
