@@ -38,7 +38,8 @@
         "ignoreRestSiblings": true,
         "argsIgnorePattern": "^_"
       }
-    ]
+    ],
+    "no-plusplus": "off"
   },
   "settings": {
     "import/resolver": {
