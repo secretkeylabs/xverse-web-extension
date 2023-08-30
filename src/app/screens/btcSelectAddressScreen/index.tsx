@@ -203,7 +203,8 @@ function BtcSelectAddressScreen() {
     setShowAccountList(true);
   };
 
-  const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;
+  const isAccountSelected = (account: Account) =>
+    account.id === selectedAccount?.id && account.accountType === selectedAccount?.accountType;
 
   const handleAccountSelect = (account: Account) => {
     dispatch(
@@ -271,7 +272,7 @@ function BtcSelectAddressScreen() {
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
-            {[...accountsList, ...ledgerAccountsList].map((account) => (
+            {[...ledgerAccountsList, ...accountsList].map((account) => (
               <AccountListRow>
                 <AccountRow
                   key={account.stxAddress}

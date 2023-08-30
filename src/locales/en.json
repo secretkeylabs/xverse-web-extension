@@ -417,7 +417,7 @@
         "TITLE": "Confirm the signature",
         "SUBTITLE": "Authorise the signature on your device to continue.",
         "ERROR_TITLE": "Signature denied",
-        "ERROR_SUBTITLE": "The signatures has been rejected. You can try again or close this tab."
+        "ERROR_SUBTITLE": "The signature has been rejected. You can try again or close this tab."
       },
       "SUCCESS": {
         "TITLE": "Signature confirmed",
@@ -632,6 +632,8 @@
     "TRANSACTION_RECEIVED": "Received",
     "TRANSACTION_PENDING_RECEIVING": "Receiving",
     "TRANSACTION_PENDING_SENDING": "Sending",
+    "ORDINAL_TRANSACTION_PENDING_RECEIVING": "Receiving Ordinal",
+    "ORDINAL_TRANSACTION_PENDING_SENDING": "Sending Ordinal",
     "TRANSACTION_STATUS_UNKNOWN": "Unknown",
     "TRANSACTION_COINBASE": "Coinbase",
     "TRANSACTION_CONTRACT_CALL": "Smart Contract Call",
@@ -709,7 +711,7 @@
     "HIDE_HASH_BUTTON": "Hide Hash",
     "ACTION_DISCLAIMER": "No transactions will be broadcasted and no fees will be applied.",
     "SIGNING_WARNING": "By signing this message, you prove that you are the owner of an account without broadcasting any on chain transactions. This signature cannot be used to send transactions on your behalf. You should only sign messages you trust.",
-    "SIGNING_ADDRESS_TITLE": "Signing with",
+    "SIGNING_ADDRESS_TITLE": "Signing with address",
     "SIGNING_ADDRESS_STX": "Your Stacks address",
     "SIGNING_ADDRESS_SEGWIT": "Your Bitcoin payment address",
     "SIGNING_ADDRESS_TAPROOT": "Your Ordinals address",
@@ -718,16 +720,20 @@
     "SIGNATURE_ERROR_TITLE": "Signature Error",
     "LEDGER": {
       "CONNECT": {
-        "TITLE": "Connect your hardware wallet",
-        "SUBTITLE": "To continue, plug and unlock your device.",
+        "TITLE": "Connect Your Ledger",
+        "SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the {{name}} app.",
         "ERROR_TITLE": "Connection error",
         "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
       },
       "CONFIRM": {
         "TITLE": "Confirm the signature",
         "SUBTITLE": "Authorise the signature on your device to continue.",
-        "ERROR_TITLE": "Signature denied",
-        "ERROR_SUBTITLE": "The signatures has been rejected. You can try again or close this tab."
+        "ERROR_TITLE": "Error requesting signature",
+        "ERROR_SUBTITLE": "The signature request encountered an error. Please check that your Ledger Bitcoin app is version 2.1.3 or newer.",
+        "DENIED": {
+          "ERROR_TITLE": "Signature denied",
+          "ERROR_SUBTITLE": "The signature has been rejected. You can try again or close this tab."
+        }
       },
       "SUCCESS": {
         "TITLE": "Signature confirmed",
