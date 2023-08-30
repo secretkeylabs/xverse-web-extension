@@ -367,7 +367,7 @@ function ImportLedger(): JSX.Element {
     try {
       setCurrentStepIndex(Steps.ADD_ADDRESS);
       setIsButtonDisabled(true);
-      if (!isStacksSelected) {
+      if (isBitcoinSelected) {
         const { btcCreds, ordinalsCreds, newAccountId } = await importBtcAccounts(true);
         await saveAddressToWallet({ btcCreds, ordinalsCreds, newAccountId });
       }
