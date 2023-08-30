@@ -83,11 +83,28 @@ export interface Credential {
   address: string;
 }
 
-type LedgerLiveOption = 'using' | 'not using';
+enum LedgerLiveOptions {
+  USING = 'using',
+  NOT_USING = 'not using',
+}
+
+enum Steps {
+  START = 0,
+  SELECT_ASSET = 1,
+  BEFORE_START = 1.5,
+  IMPORTANT_WARNING = 1.75,
+  CONNECT_LEDGER = 2,
+  ADD_MULTIPLE_ACCOUNTS = 2.5,
+  ADD_ADDRESS = 3,
+  VERIFY_ADDRESS = 3.5,
+  ADDRESS_ADDED = 4,
+  ADD_ACCOUNT_NAME = 5,
+  IMPORT_END = 6,
+}
 
 function ImportLedger(): JSX.Element {
   const theme = useTheme();
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(Steps.START);
   const [isBitcoinSelected, setIsBitcoinSelected] = useState(true);
   const [isStacksSelected, setIsStacksSelected] = useState(false);
   const [bitcoinCredentials, setBitcoinCredentials] = useState<Credential | undefined>(undefined);
@@ -106,9 +123,8 @@ function ImportLedger(): JSX.Element {
   const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
   const { addLedgerAccount, updateLedgerAccounts } = useWalletReducer();
-  const [selectedLedgerLiveOption, setSelectedLedgerLiveOption] = useState<LedgerLiveOption | null>(
-    null,
-  );
+  const [selectedLedgerLiveOption, setSelectedLedgerLiveOption] =
+    useState<LedgerLiveOptions | null>(null);
   const [isTogglerChecked, setIsTogglerChecked] = useState(false);
   const { ledgerAccountsList, network, selectedAccount } = useWalletSelector();
   const transition = useTransition(currentStepIndex, {
@@ -171,7 +187,7 @@ function ImportLedger(): JSX.Element {
         setBitcoinCredentials(btcCreds);
         if (showAddress) {
           setIsBtcAddressConfirmed(true);
-          setCurrentStepIndex(3.5);
+          setCurrentStepIndex(Steps.VERIFY_ADDRESS);
         }
       } catch (err: any) {
         if (err.statusCode === 27013) {
@@ -243,28 +259,28 @@ function ImportLedger(): JSX.Element {
     /*
       Go back to step 2 if user wants to add the stacks account as well
     */
-    if (currentStepIndex === 4 && isBitcoinSelected && isStacksSelected) {
+    if (currentStepIndex === Steps.ADDRESS_ADDED && isBitcoinSelected && isStacksSelected) {
       setIsBitcoinSelected(false);
       setIsButtonDisabled(false);
       setIsConnectSuccess(false);
       setIsConnectFailed(false);
 
-      setCurrentStepIndex(2);
+      setCurrentStepIndex(Steps.CONNECT_LEDGER);
       return;
     }
 
-    if (currentStepIndex === 1) {
-      setCurrentStepIndex(1.5);
+    if (currentStepIndex === Steps.SELECT_ASSET) {
+      setCurrentStepIndex(Steps.BEFORE_START);
       return;
     }
 
-    if (currentStepIndex === 1.5) {
-      setCurrentStepIndex(1.75);
+    if (currentStepIndex === Steps.BEFORE_START) {
+      setCurrentStepIndex(Steps.IMPORTANT_WARNING);
       return;
     }
 
-    if (currentStepIndex === 1.75) {
-      setCurrentStepIndex(2);
+    if (currentStepIndex === Steps.IMPORTANT_WARNING) {
+      setCurrentStepIndex(Steps.CONNECT_LEDGER);
       return;
     }
 
@@ -307,7 +323,7 @@ function ImportLedger(): JSX.Element {
         };
         await addLedgerAccount(ledgerAccount);
         await ledgerDelay(1000);
-        setCurrentStepIndex(4);
+        setCurrentStepIndex(Steps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
         return;
       }
@@ -322,7 +338,7 @@ function ImportLedger(): JSX.Element {
         };
         await updateLedgerAccounts(ledgerAccount);
         await ledgerDelay(1000);
-        setCurrentStepIndex(4);
+        setCurrentStepIndex(Steps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
         return;
       }
@@ -335,7 +351,7 @@ function ImportLedger(): JSX.Element {
         };
         await updateLedgerAccounts(ledgerAccount);
         await ledgerDelay(1000);
-        setCurrentStepIndex(4);
+        setCurrentStepIndex(Steps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
       }
 
@@ -349,7 +365,7 @@ function ImportLedger(): JSX.Element {
 
   const handleClickMultipleAccounts = async () => {
     try {
-      setCurrentStepIndex(3);
+      setCurrentStepIndex(Steps.ADD_ADDRESS);
       setIsButtonDisabled(true);
       if (!isStacksSelected) {
         const { btcCreds, ordinalsCreds, newAccountId } = await importBtcAccounts(true);
@@ -391,7 +407,7 @@ function ImportLedger(): JSX.Element {
         isBitcoinSelected
       ) {
         setIsButtonDisabled(false);
-        setCurrentStepIndex(2.5);
+        setCurrentStepIndex(Steps.ADD_MULTIPLE_ACCOUNTS);
         return;
       }
       handleClickNext();
@@ -459,7 +475,7 @@ function ImportLedger(): JSX.Element {
     setAccountId(0);
     setAccountName('');
 
-    setCurrentStepIndex(0);
+    setCurrentStepIndex(Steps.START);
   };
 
   const handleAssetSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -469,13 +485,15 @@ function ImportLedger(): JSX.Element {
   };
 
   const validateAccountName = () => {
-    if (accountName.length > 20) {
-      setAccountNameError('Account name should be not longer than 20 characters.');
+    const MAX_LENGTH = 20;
+
+    if (accountName.length > MAX_LENGTH) {
+      setAccountNameError(t('LEDGER_ADD_ACCOUNT_NAME.ERRORS.MAX_LENGTH', { number: MAX_LENGTH }));
       return;
     }
 
     if (ledgerAccountsList.find((account) => account.accountName === accountName)) {
-      setAccountNameError('Account with the same name already exists. Please choose another name.');
+      setAccountNameError(t('LEDGER_ADD_ACCOUNT_NAME.ERRORS.ALREADY_EXISTS'));
       return;
     }
 
@@ -486,10 +504,438 @@ function ImportLedger(): JSX.Element {
     validateAccountName();
   }, [accountName]);
 
+  const renderContent = () => {
+    switch (currentStepIndex) {
+      case Steps.START:
+        return (
+          <ImportStartContainer>
+            <ImportStartImage src={ledgerImportStartIcon} />
+            <ImportStartTitle>{t('LEDGER_IMPORT_1_TITLE')}</ImportStartTitle>
+            <ImportStartText>{t('LEDGER_IMPORT_1_SUBTITLE')}</ImportStartText>
+          </ImportStartContainer>
+        );
+      case Steps.SELECT_ASSET:
+        return (
+          <div>
+            <SelectAssetTextContainer>
+              <SelectAssetTitle>{t('LEDGER_IMPORT_2_TITLE')}</SelectAssetTitle>
+              <SelectAssetText>{t('LEDGER_IMPORT_2_SUBTITLE')}</SelectAssetText>
+            </SelectAssetTextContainer>
+
+            <ImportCardContainer>
+              <LedgerAssetSelectCard
+                icon={btcOrdinalsIcon}
+                title={t('LEDGER_IMPORT_2_SELECT.BTC_TITLE')}
+                text={t('LEDGER_IMPORT_2_SELECT.BTC_SUBTITLE')}
+                id="btc_select_card"
+                isChecked={isBitcoinSelected}
+                onChange={handleAssetSelect}
+              />
+
+              <LedgerAssetSelectCard
+                icon={stxIcon}
+                title={t('LEDGER_IMPORT_2_SELECT.STACKS_TITLE')}
+                text={t('LEDGER_IMPORT_2_SELECT.STACKS_SUBTITLE')}
+                id="stx_select_card"
+                isChecked={isStacksSelected}
+                onChange={handleAssetSelect}
+              />
+              <SelectAssetFootNote>{t('LEDGER_IMPORT_2_FOOTNOTE')}</SelectAssetFootNote>
+            </ImportCardContainer>
+          </div>
+        );
+      case Steps.BEFORE_START:
+        return (
+          <ImportBeforeStartContainer>
+            <ImportBeforeStartTitle>
+              {t('LEDGER_BEFORE_GETTING_STARTED.TITLE')}
+            </ImportBeforeStartTitle>
+            <ImportBeforeStartText>
+              {t('LEDGER_BEFORE_GETTING_STARTED.DESCRIPTION')}
+            </ImportBeforeStartText>
+            <OptionsContainer>
+              <Option
+                onClick={() => setSelectedLedgerLiveOption(LedgerLiveOptions.USING)}
+                selected={selectedLedgerLiveOption === LedgerLiveOptions.USING}
+              >
+                <OptionIcon selected={selectedLedgerLiveOption === LedgerLiveOptions.USING} />
+                {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.USE_LEDGER_LIVE')}
+              </Option>
+              <Option
+                onClick={() => setSelectedLedgerLiveOption(LedgerLiveOptions.NOT_USING)}
+                selected={selectedLedgerLiveOption === LedgerLiveOptions.NOT_USING}
+              >
+                <OptionIcon selected={selectedLedgerLiveOption === LedgerLiveOptions.NOT_USING} />
+                {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.DONT_USE_LEDGER_LIVE')}
+              </Option>
+            </OptionsContainer>
+          </ImportBeforeStartContainer>
+        );
+      case Steps.IMPORTANT_WARNING:
+        return (
+          <ImportBeforeStartContainer>
+            <WarningIcon src={warningIcon} alt="Warning" />
+            <ImportBeforeStartTitle>
+              {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TITLE')}
+            </ImportBeforeStartTitle>
+            {selectedLedgerLiveOption === LedgerLiveOptions.USING ? (
+              <ImportBeforeStartText>
+                {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_1')}
+                <br />
+                <CustomLink
+                  href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('LEARN_MORE')}
+                </CustomLink>
+                <br />
+                <br />
+                {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_2')}{' '}
+                <CustomLink
+                  href={LINK_TO_LEDGER_PASSPHRASE_GUIDE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.PASSPHRASE_FOR_ORDINALS')}
+                </CustomLink>
+                .
+                <br />
+                <br />
+                {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_3')}
+              </ImportBeforeStartText>
+            ) : (
+              <ImportBeforeStartText>
+                {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_1')}{' '}
+                <CustomLink
+                  href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('LEARN_MORE')}
+                </CustomLink>
+                <br />
+                <br />
+                {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_2')}{' '}
+                <CustomLink
+                  href={LINK_TO_LEDGER_PASSPHRASE_GUIDE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.PASSPHRASE_FOR_ORDINALS')}
+                </CustomLink>
+                .
+              </ImportBeforeStartText>
+            )}
+            <TogglerContainer>
+              <CustomSwitch
+                onColor={theme.colors.purple_main}
+                offColor={theme.colors.background.elevation3}
+                onChange={() => setIsTogglerChecked(!isTogglerChecked)}
+                checked={isTogglerChecked}
+                uncheckedIcon={false}
+                checkedIcon={false}
+              />
+              {selectedLedgerLiveOption === LedgerLiveOptions.USING ? (
+                <TogglerText>
+                  {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.UNDERSTAND_THE_RISKS')}
+                </TogglerText>
+              ) : (
+                <TogglerText>
+                  {t(
+                    'LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.UNDERSTAND_SHOULD_NOT_USE_LEDGER_LIVE',
+                  )}
+                </TogglerText>
+              )}
+            </TogglerContainer>
+          </ImportBeforeStartContainer>
+        );
+      case Steps.CONNECT_LEDGER:
+        return (
+          <LedgerConnectionView
+            title={t(isBitcoinSelected ? 'LEDGER_CONNECT.BTC_TITLE' : 'LEDGER_CONNECT.STX_TITLE')}
+            text={t(
+              isBitcoinSelected ? 'LEDGER_CONNECT.BTC_SUBTITLE' : 'LEDGER_CONNECT.STX_SUBTITLE',
+            )}
+            titleFailed={t('LEDGER_CONNECT.TITLE_FAILED')}
+            textFailed={t(
+              isBitcoinSelected
+                ? 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED'
+                : 'LEDGER_CONNECT.STX_SUBTITLE_FAILED',
+            )}
+            imageDefault={isBitcoinSelected ? ledgerConnectBtcIcon : ledgerConnectStxIcon}
+            isConnectSuccess={isConnectSuccess}
+            isConnectFailed={isConnectFailed}
+          />
+        );
+      case Steps.ADD_MULTIPLE_ACCOUNTS:
+        return (
+          <CreateAnotherAccountContainer>
+            <img
+              src={isBitcoinSelected ? btcOrdinalsIcon : stxIcon}
+              alt={isBitcoinSelected ? 'bitcoin' : 'stacks'}
+            />
+            <SelectAssetTitle>
+              {t(
+                isBitcoinSelected ? 'LEDGER_ADD_ADDRESS.TITLE_BTC' : 'LEDGER_ADD_ADDRESS.TITLE_STX',
+              )}
+            </SelectAssetTitle>
+            <CreateMultipleAccountsText>
+              {t('LEDGER_ADD_ADDRESS.ALREADY_CONNECTED_WARNING')}
+            </CreateMultipleAccountsText>
+          </CreateAnotherAccountContainer>
+        );
+      case Steps.ADD_ADDRESS:
+        if (isConnectFailed || isBtcAddressRejected) {
+          return (
+            <LedgerFailView
+              title={t(
+                isBtcAddressRejected
+                  ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
+                  : 'LEDGER_CONNECT.TITLE_FAILED',
+              )}
+              text={t(
+                isBtcAddressRejected
+                  ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
+                  : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
+              )}
+            />
+          );
+        }
+
+        return (
+          <>
+            <AddAddressHeaderContainer>
+              <img
+                src={isBitcoinSelected ? btcIcon : stxIcon}
+                width={32}
+                height={32}
+                alt={isBitcoinSelected ? 'bitcoin' : 'stacks'}
+              />
+              <SelectAssetTitle>
+                {t(
+                  isBitcoinSelected
+                    ? 'LEDGER_ADD_ADDRESS.TITLE_VERIFY_BTC'
+                    : 'LEDGER_ADD_ADDRESS.TITLE_STX',
+                )}
+              </SelectAssetTitle>
+            </AddAddressHeaderContainer>
+            <AddAddressDetailsContainer>
+              <SelectAssetText centered>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
+              {isBitcoinSelected ? (
+                <LedgerAddressComponent
+                  title={t('LEDGER_ADD_ADDRESS.BTC')}
+                  address={bitcoinCredentials?.address}
+                />
+              ) : (
+                <LedgerAddressComponent
+                  title={t('LEDGER_ADD_ADDRESS.STX')}
+                  address={stacksCredentials?.address}
+                />
+              )}
+            </AddAddressDetailsContainer>
+            <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
+            {isBitcoinSelected && (
+              <ConfirmationStepsContainer>
+                <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
+                <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
+              </ConfirmationStepsContainer>
+            )}
+          </>
+        );
+      case Steps.VERIFY_ADDRESS:
+        if (isConnectFailed || isOrdinalsAddressRejected) {
+          return (
+            <LedgerFailView
+              title={t(
+                isOrdinalsAddressRejected
+                  ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
+                  : 'LEDGER_CONNECT.TITLE_FAILED',
+              )}
+              text={t(
+                isOrdinalsAddressRejected
+                  ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
+                  : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
+              )}
+            />
+          );
+        }
+
+        return (
+          <>
+            <AddAddressHeaderContainer>
+              <img src={ordinalsIcon} width={32} height={32} alt="ordinals" />
+              <SelectAssetTitle>{t('LEDGER_ADD_ADDRESS.TITLE_VERIFY_ORDINALS')}</SelectAssetTitle>
+            </AddAddressHeaderContainer>
+            <AddAddressDetailsContainer>
+              <SelectAssetText>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
+              <LedgerAddressComponent
+                title={t('LEDGER_ADD_ADDRESS.ORDINALS')}
+                address={ordinalsCredentials?.address}
+              />
+            </AddAddressDetailsContainer>
+            <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
+            <ConfirmationStepsContainer>
+              <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
+              <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
+            </ConfirmationStepsContainer>
+          </>
+        );
+      case Steps.ADDRESS_ADDED:
+        return (
+          <AddressAddedContainer>
+            <img src={checkCircleIcon} alt="Success" />
+            <SelectAssetTitle>
+              {t(
+                isBitcoinSelected
+                  ? 'LEDGER_ADDRESS_ADDED.TITLE_BTC_ORDINALS'
+                  : 'LEDGER_ADDRESS_ADDED.TITLE_STX',
+              )}
+            </SelectAssetTitle>
+            <SelectAssetText centered>
+              {t(
+                isBitcoinSelected
+                  ? 'LEDGER_ADDRESS_ADDED.SUBTITLE'
+                  : 'LEDGER_ADDRESS_ADDED.SUBTITLE_STX',
+              )}
+            </SelectAssetText>
+          </AddressAddedContainer>
+        );
+      case Steps.ADD_ACCOUNT_NAME:
+        return (
+          <AddAccountNameContainer>
+            <AddAccountNameTitleContainer>
+              <SelectAssetTitle>{t('LEDGER_ADD_ACCOUNT_NAME.TITLE')}</SelectAssetTitle>
+              <SelectAssetText>{t('LEDGER_ADD_ACCOUNT_NAME.SUBTITLE')}</SelectAssetText>
+            </AddAccountNameTitleContainer>
+            <LedgerInput
+              label={t('LEDGER_ADD_ACCOUNT_NAME.INPUT')}
+              placeholder={`My ledger ${accountId + 1}`}
+              id="account_name_input"
+              value={accountName}
+              onChange={(e) => setAccountName(e.target.value)}
+              error={accountNameError}
+            />
+          </AddAccountNameContainer>
+        );
+      case Steps.IMPORT_END:
+        return (
+          <EndScreenContainer>
+            <EndScreenTextContainer>
+              <SelectAssetTitle>{t('LEDGER_IMPORT_END.TITLE')}</SelectAssetTitle>
+              <SelectAssetText>{t('LEDGER_IMPORT_END.SUBTITLE')}</SelectAssetText>
+            </EndScreenTextContainer>
+            <img src={ledgerAccountSwitchIcon} alt="Wallet created" />
+          </EndScreenContainer>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderActionButton = () => {
+    switch (currentStepIndex) {
+      case Steps.START:
+        return <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_1_BUTTON')} />;
+      case Steps.SELECT_ASSET:
+        return (
+          <ActionButton
+            onPress={handleClickNext}
+            text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
+            disabled={!isBitcoinSelected && !isStacksSelected}
+          />
+        );
+      case Steps.BEFORE_START:
+        return (
+          <ActionButton
+            onPress={handleClickNext}
+            text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
+            disabled={selectedLedgerLiveOption === null}
+          />
+        );
+      case Steps.IMPORTANT_WARNING:
+        return (
+          <ActionButton
+            onPress={handleClickNext}
+            text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
+            disabled={!isTogglerChecked}
+          />
+        );
+      case Steps.CONNECT_LEDGER:
+        return (
+          <ActionButton
+            processing={isButtonDisabled}
+            disabled={isButtonDisabled}
+            onPress={checkDeviceConnection}
+            text={t(
+              isConnectFailed ? 'LEDGER_IMPORT_TRY_AGAIN_BUTTON' : 'LEDGER_IMPORT_CONNECT_BUTTON',
+            )}
+          />
+        );
+      case Steps.ADD_MULTIPLE_ACCOUNTS:
+        return (
+          <>
+            <ButtonContainer>
+              <ActionButton
+                disabled={isButtonDisabled}
+                processing={isButtonDisabled}
+                onPress={backToAssetSelection}
+                transparent
+                text={t('LEDGER_IMPORT_CANCEL_BUTTON')}
+              />
+            </ButtonContainer>
+            <ButtonContainer>
+              <ActionButton
+                disabled={isButtonDisabled}
+                processing={isButtonDisabled}
+                onPress={handleClickMultipleAccounts}
+                text={t('LEDGER_IMPORT_YES_BUTTON')}
+              />
+            </ButtonContainer>
+          </>
+        );
+      case Steps.ADD_ADDRESS:
+      case Steps.VERIFY_ADDRESS:
+        if (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) {
+          return (
+            <ActionButton
+              processing={isButtonDisabled}
+              disabled={isButtonDisabled}
+              onPress={backToAssetSelection}
+              text={t('LEDGER_IMPORT_TRY_AGAIN_BUTTON')}
+            />
+          );
+        }
+        break;
+      case Steps.ADDRESS_ADDED:
+        return <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_NEXT_BUTTON')} />;
+      case Steps.ADD_ACCOUNT_NAME:
+        return (
+          <ActionButton
+            disabled={isButtonDisabled || !!accountNameError}
+            processing={isButtonDisabled}
+            onPress={updateAccountName}
+            text={t('LEDGER_IMPORT_CONFIRM_BUTTON')}
+          />
+        );
+      case Steps.IMPORT_END:
+        return (
+          <ActionButton
+            disabled={isButtonDisabled}
+            processing={isButtonDisabled}
+            onPress={handleWindowClose}
+            text={t('LEDGER_IMPORT_CLOSE_BUTTON')}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <Container>
       <FullScreenHeader />
-      {currentStepIndex > 1 && (
+      {currentStepIndex > Steps.SELECT_ASSET && (
         <AssetSelectionButton onClick={backToAssetSelection}>
           <img src={arrowLeftIcon} alt="Go back" />
           <AssetSelectionButtonText>{t('LEDGER_IMPORT_RETURN_BUTTON')}</AssetSelectionButtonText>
@@ -498,408 +944,18 @@ function ImportLedger(): JSX.Element {
       {transition((style) => (
         <>
           <OnBoardingContentContainer
-            className={[0, 2, 4, 6].includes(currentStepIndex) ? 'center' : ''}
+            className={
+              [Steps.START, Steps.CONNECT_LEDGER, Steps.ADDRESS_ADDED, Steps.IMPORT_END].includes(
+                currentStepIndex,
+              )
+                ? 'center'
+                : ''
+            }
             style={style}
           >
-            {currentStepIndex === 0 && (
-              <ImportStartContainer>
-                <ImportStartImage src={ledgerImportStartIcon} />
-                <ImportStartTitle>{t('LEDGER_IMPORT_1_TITLE')}</ImportStartTitle>
-                <ImportStartText>{t('LEDGER_IMPORT_1_SUBTITLE')}</ImportStartText>
-              </ImportStartContainer>
-            )}
-            {currentStepIndex === 1 && (
-              <div>
-                <SelectAssetTextContainer>
-                  <SelectAssetTitle>{t('LEDGER_IMPORT_2_TITLE')}</SelectAssetTitle>
-                  <SelectAssetText>{t('LEDGER_IMPORT_2_SUBTITLE')}</SelectAssetText>
-                </SelectAssetTextContainer>
-
-                <ImportCardContainer id="card_container">
-                  <LedgerAssetSelectCard
-                    icon={btcOrdinalsIcon}
-                    title={t('LEDGER_IMPORT_2_SELECT.BTC_TITLE')}
-                    text={t('LEDGER_IMPORT_2_SELECT.BTC_SUBTITLE')}
-                    id="btc_select_card"
-                    isChecked={isBitcoinSelected}
-                    onChange={handleAssetSelect}
-                  />
-
-                  <LedgerAssetSelectCard
-                    icon={stxIcon}
-                    title={t('LEDGER_IMPORT_2_SELECT.STACKS_TITLE')}
-                    text={t('LEDGER_IMPORT_2_SELECT.STACKS_SUBTITLE')}
-                    id="stx_select_card"
-                    isChecked={isStacksSelected}
-                    onChange={handleAssetSelect}
-                  />
-                  <SelectAssetFootNote>{t('LEDGER_IMPORT_2_FOOTNOTE')}</SelectAssetFootNote>
-                </ImportCardContainer>
-              </div>
-            )}
-            {currentStepIndex === 1.5 && (
-              <ImportBeforeStartContainer>
-                <ImportBeforeStartTitle>
-                  {t('LEDGER_BEFORE_GETTING_STARTED.TITLE')}
-                </ImportBeforeStartTitle>
-                <ImportBeforeStartText>
-                  {t('LEDGER_BEFORE_GETTING_STARTED.DESCRIPTION')}
-                </ImportBeforeStartText>
-                <OptionsContainer>
-                  <Option
-                    onClick={() => setSelectedLedgerLiveOption('using')}
-                    selected={selectedLedgerLiveOption === 'using'}
-                  >
-                    <OptionIcon selected={selectedLedgerLiveOption === 'using'} />
-                    {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.USE_LEDGER_LIVE')}
-                  </Option>
-                  <Option
-                    onClick={() => setSelectedLedgerLiveOption('not using')}
-                    selected={selectedLedgerLiveOption === 'not using'}
-                  >
-                    <OptionIcon selected={selectedLedgerLiveOption === 'not using'} />
-                    {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.DONT_USE_LEDGER_LIVE')}
-                  </Option>
-                </OptionsContainer>
-              </ImportBeforeStartContainer>
-            )}
-            {currentStepIndex === 1.75 && (
-              <ImportBeforeStartContainer>
-                <WarningIcon src={warningIcon} alt="Warning" />
-                <ImportBeforeStartTitle>
-                  {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TITLE')}
-                </ImportBeforeStartTitle>
-                {selectedLedgerLiveOption === 'using' ? (
-                  <ImportBeforeStartText>
-                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_1')}
-                    <br />
-                    <CustomLink
-                      href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('LEARN_MORE')}
-                    </CustomLink>
-                    <br />
-                    <br />
-                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_2')}{' '}
-                    <CustomLink
-                      href={LINK_TO_LEDGER_PASSPHRASE_GUIDE}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.PASSPHRASE_FOR_ORDINALS')}
-                    </CustomLink>
-                    .
-                    <br />
-                    <br />
-                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_3')}
-                  </ImportBeforeStartText>
-                ) : (
-                  <ImportBeforeStartText>
-                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_1')}{' '}
-                    <CustomLink
-                      href={LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('LEARN_MORE')}
-                    </CustomLink>
-                    <br />
-                    <br />
-                    {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.TEXT_2')}{' '}
-                    <CustomLink
-                      href={LINK_TO_LEDGER_PASSPHRASE_GUIDE}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.PASSPHRASE_FOR_ORDINALS')}
-                    </CustomLink>
-                    .
-                  </ImportBeforeStartText>
-                )}
-                <TogglerContainer>
-                  <CustomSwitch
-                    onColor={theme.colors.purple_main}
-                    offColor={theme.colors.background.elevation3}
-                    onChange={() => setIsTogglerChecked(!isTogglerChecked)}
-                    checked={isTogglerChecked}
-                    uncheckedIcon={false}
-                    checkedIcon={false}
-                  />
-                  {selectedLedgerLiveOption === 'using' ? (
-                    <TogglerText>
-                      {t('LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.UNDERSTAND_THE_RISKS')}
-                    </TogglerText>
-                  ) : (
-                    <TogglerText>
-                      {t(
-                        'LEDGER_BEFORE_GETTING_STARTED.IMPORTANT_WARNING.UNDERSTAND_SHOULD_NOT_USE_LEDGER_LIVE',
-                      )}
-                    </TogglerText>
-                  )}
-                </TogglerContainer>
-              </ImportBeforeStartContainer>
-            )}
-            {currentStepIndex === 2 && (
-              <LedgerConnectionView
-                title={t(
-                  isBitcoinSelected ? 'LEDGER_CONNECT.BTC_TITLE' : 'LEDGER_CONNECT.STX_TITLE',
-                )}
-                text={t(
-                  isBitcoinSelected ? 'LEDGER_CONNECT.BTC_SUBTITLE' : 'LEDGER_CONNECT.STX_SUBTITLE',
-                )}
-                titleFailed={t('LEDGER_CONNECT.TITLE_FAILED')}
-                textFailed={t(
-                  isBitcoinSelected
-                    ? 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED'
-                    : 'LEDGER_CONNECT.STX_SUBTITLE_FAILED',
-                )}
-                imageDefault={isBitcoinSelected ? ledgerConnectBtcIcon : ledgerConnectStxIcon}
-                isConnectSuccess={isConnectSuccess}
-                isConnectFailed={isConnectFailed}
-              />
-            )}
-            {currentStepIndex === 2.5 && (
-              <CreateAnotherAccountContainer>
-                <img
-                  src={isBitcoinSelected ? btcOrdinalsIcon : stxIcon}
-                  alt={isBitcoinSelected ? 'bitcoin' : 'stacks'}
-                />
-                <SelectAssetTitle>
-                  {t(
-                    isBitcoinSelected
-                      ? 'LEDGER_ADD_ADDRESS.TITLE_BTC'
-                      : 'LEDGER_ADD_ADDRESS.TITLE_STX',
-                  )}
-                </SelectAssetTitle>
-                <CreateMultipleAccountsText>
-                  {t('LEDGER_ADD_ADDRESS.ALREADY_CONNECTED_WARNING')}
-                </CreateMultipleAccountsText>
-              </CreateAnotherAccountContainer>
-            )}
-            {currentStepIndex === 3 &&
-              (isConnectFailed || isBtcAddressRejected ? (
-                <LedgerFailView
-                  title={t(
-                    isBtcAddressRejected
-                      ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
-                      : 'LEDGER_CONNECT.TITLE_FAILED',
-                  )}
-                  text={t(
-                    isBtcAddressRejected
-                      ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
-                      : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
-                  )}
-                />
-              ) : (
-                <>
-                  <AddAddressHeaderContainer>
-                    <img
-                      src={isBitcoinSelected ? btcIcon : stxIcon}
-                      width={32}
-                      height={32}
-                      alt={isBitcoinSelected ? 'bitcoin' : 'stacks'}
-                    />
-                    <SelectAssetTitle>
-                      {t(
-                        isBitcoinSelected
-                          ? 'LEDGER_ADD_ADDRESS.TITLE_VERIFY_BTC'
-                          : 'LEDGER_ADD_ADDRESS.TITLE_STX',
-                      )}
-                    </SelectAssetTitle>
-                  </AddAddressHeaderContainer>
-                  <AddAddressDetailsContainer>
-                    <SelectAssetText centered>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
-                    {isBitcoinSelected ? (
-                      <LedgerAddressComponent
-                        title={t('LEDGER_ADD_ADDRESS.BTC')}
-                        address={bitcoinCredentials?.address}
-                      />
-                    ) : (
-                      <LedgerAddressComponent
-                        title={t('LEDGER_ADD_ADDRESS.STX')}
-                        address={stacksCredentials?.address}
-                      />
-                    )}
-                  </AddAddressDetailsContainer>
-                  <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
-                  {isBitcoinSelected && (
-                    <ConfirmationStepsContainer>
-                      <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
-                      <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
-                    </ConfirmationStepsContainer>
-                  )}
-                </>
-              ))}
-            {currentStepIndex === 3.5 &&
-              (isConnectFailed || isOrdinalsAddressRejected ? (
-                <LedgerFailView
-                  title={t(
-                    isOrdinalsAddressRejected
-                      ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
-                      : 'LEDGER_CONNECT.TITLE_FAILED',
-                  )}
-                  text={t(
-                    isOrdinalsAddressRejected
-                      ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
-                      : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
-                  )}
-                />
-              ) : (
-                <>
-                  <AddAddressHeaderContainer>
-                    <img src={ordinalsIcon} width={32} height={32} alt="ordinals" />
-                    <SelectAssetTitle>
-                      {t('LEDGER_ADD_ADDRESS.TITLE_VERIFY_ORDINALS')}
-                    </SelectAssetTitle>
-                  </AddAddressHeaderContainer>
-                  <AddAddressDetailsContainer>
-                    <SelectAssetText>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
-                    <LedgerAddressComponent
-                      title={t('LEDGER_ADD_ADDRESS.ORDINALS')}
-                      address={ordinalsCredentials?.address}
-                    />
-                  </AddAddressDetailsContainer>
-                  <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
-                  <ConfirmationStepsContainer>
-                    <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
-                    <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
-                  </ConfirmationStepsContainer>
-                </>
-              ))}
-            {currentStepIndex === 4 && (
-              <AddressAddedContainer>
-                <img src={checkCircleIcon} alt="Success" />
-                <SelectAssetTitle>
-                  {t(
-                    isBitcoinSelected
-                      ? 'LEDGER_ADDRESS_ADDED.TITLE_BTC_ORDINALS'
-                      : 'LEDGER_ADDRESS_ADDED.TITLE_STX',
-                  )}
-                </SelectAssetTitle>
-                <SelectAssetText centered>
-                  {t(
-                    isBitcoinSelected
-                      ? 'LEDGER_ADDRESS_ADDED.SUBTITLE'
-                      : 'LEDGER_ADDRESS_ADDED.SUBTITLE_STX',
-                  )}
-                </SelectAssetText>
-              </AddressAddedContainer>
-            )}
-            {currentStepIndex === 5 && (
-              <AddAccountNameContainer>
-                <AddAccountNameTitleContainer>
-                  <SelectAssetTitle>{t('LEDGER_ADD_ACCOUNT_NAME.TITLE')}</SelectAssetTitle>
-                  <SelectAssetText>{t('LEDGER_ADD_ACCOUNT_NAME.SUBTITLE')}</SelectAssetText>
-                </AddAccountNameTitleContainer>
-                <LedgerInput
-                  label={t('LEDGER_ADD_ACCOUNT_NAME.INPUT')}
-                  placeholder={`My ledger ${accountId + 1}`}
-                  id="account_name_input"
-                  value={accountName}
-                  onChange={(e) => setAccountName(e.target.value)}
-                  error={accountNameError}
-                />
-              </AddAccountNameContainer>
-            )}
-            {currentStepIndex === 6 && (
-              <EndScreenContainer>
-                <EndScreenTextContainer>
-                  <SelectAssetTitle>{t('LEDGER_IMPORT_END.TITLE')}</SelectAssetTitle>
-                  <SelectAssetText>{t('LEDGER_IMPORT_END.SUBTITLE')}</SelectAssetText>
-                </EndScreenTextContainer>
-                <img src={ledgerAccountSwitchIcon} alt="Wallet created" />
-              </EndScreenContainer>
-            )}
+            {renderContent()}
           </OnBoardingContentContainer>
-          <OnBoardingActionsContainer>
-            {currentStepIndex === 0 && (
-              <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_1_BUTTON')} />
-            )}
-            {currentStepIndex === 1 && (
-              <ActionButton
-                onPress={handleClickNext}
-                text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
-                disabled={!isBitcoinSelected && !isStacksSelected}
-              />
-            )}
-            {currentStepIndex === 1.5 && (
-              <ActionButton
-                onPress={handleClickNext}
-                text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
-                disabled={selectedLedgerLiveOption === null}
-              />
-            )}
-            {currentStepIndex === 1.75 && (
-              <ActionButton
-                onPress={handleClickNext}
-                text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
-                disabled={!isTogglerChecked}
-              />
-            )}
-            {currentStepIndex === 2 && (
-              <ActionButton
-                processing={isButtonDisabled}
-                disabled={isButtonDisabled}
-                onPress={checkDeviceConnection}
-                text={t(
-                  isConnectFailed
-                    ? 'LEDGER_IMPORT_TRY_AGAIN_BUTTON'
-                    : 'LEDGER_IMPORT_CONNECT_BUTTON',
-                )}
-              />
-            )}
-            {currentStepIndex === 2.5 && (
-              <>
-                <ButtonContainer>
-                  <ActionButton
-                    disabled={isButtonDisabled}
-                    processing={isButtonDisabled}
-                    onPress={backToAssetSelection}
-                    transparent
-                    text={t('LEDGER_IMPORT_CANCEL_BUTTON')}
-                  />
-                </ButtonContainer>
-                <ButtonContainer>
-                  <ActionButton
-                    disabled={isButtonDisabled}
-                    processing={isButtonDisabled}
-                    onPress={handleClickMultipleAccounts}
-                    text={t('LEDGER_IMPORT_YES_BUTTON')}
-                  />
-                </ButtonContainer>
-              </>
-            )}
-            {(currentStepIndex === 3 || currentStepIndex === 3.5) &&
-              (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) && (
-                <ActionButton
-                  processing={isButtonDisabled}
-                  disabled={isButtonDisabled}
-                  onPress={backToAssetSelection}
-                  text={t('LEDGER_IMPORT_TRY_AGAIN_BUTTON')}
-                />
-              )}
-            {currentStepIndex === 4 && (
-              <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_NEXT_BUTTON')} />
-            )}
-            {currentStepIndex === 5 && (
-              <ActionButton
-                disabled={isButtonDisabled || !!accountNameError}
-                processing={isButtonDisabled}
-                onPress={updateAccountName}
-                text={t('LEDGER_IMPORT_CONFIRM_BUTTON')}
-              />
-            )}
-            {currentStepIndex === 6 && (
-              <ActionButton
-                disabled={isButtonDisabled}
-                processing={isButtonDisabled}
-                onPress={handleWindowClose}
-                text={t('LEDGER_IMPORT_CLOSE_BUTTON')}
-              />
-            )}
-          </OnBoardingActionsContainer>
+          <OnBoardingActionsContainer>{renderActionButton()}</OnBoardingActionsContainer>
         </>
       ))}
     </Container>
