@@ -32,6 +32,7 @@ import arrowLeftIcon from '@assets/img/ledger/arrow_left_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
+
 import {
   AddAccountNameContainer,
   AddAccountNameTitleContainer,

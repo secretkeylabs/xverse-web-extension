@@ -321,7 +321,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
       </TxDetailsRow>
       {fee && (
         <TxDetailsRow>
-          <TxDetailsTitle>Fees</TxDetailsTitle>
+          <TxDetailsTitle>{t('FEES')}</TxDetailsTitle>
           {type === 'STX' ? (
             <div>{microstacksToStx(fee).toString()} STX</div>
           ) : (
@@ -336,8 +336,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
     <>
       <Stepper
         steps={[
-          { title: 'Send ordinal', isCompleted: isTxApproved },
-          { title: 'Confirm fees', isCompleted: isFinalTxApproved },
+          { title: t('SEND_ORDINAL'), isCompleted: isTxApproved },
+          { title: t('CONFIRM_FEES'), isCompleted: isFinalTxApproved },
         ]}
       />
       {renderTxDetails()}

@@ -75,16 +75,17 @@ const useWalletReducer = () => {
       );
     }
 
-    dispatch(
-      fetchAccountAction(
-        selectedAccount
-          ? isLedgerAccount(selectedAccount)
-            ? ledgerAccountsList[selectedAccount.id]
-            : walletAccounts[selectedAccount.id]
-          : walletAccounts[0],
-        walletAccounts,
-      ),
-    );
+    let accountToFetch = walletAccounts[0];
+
+    if (selectedAccount) {
+      if (isLedgerAccount(selectedAccount)) {
+        accountToFetch = ledgerAccountsList[selectedAccount.id];
+      } else {
+        accountToFetch = walletAccounts[selectedAccount.id];
+      }
+    }
+
+    dispatch(fetchAccountAction(accountToFetch, walletAccounts));
 
     if (ledgerAccountsList.some((account) => account.deviceAccountIndex === undefined)) {
       const newLedgerAccountsList = ledgerAccountsList.map((account) => ({

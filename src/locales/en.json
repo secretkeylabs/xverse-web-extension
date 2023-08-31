@@ -178,7 +178,10 @@
     "CLOSE_BUTTON": "Close",
     "CANCEL_BUTTON": "Cancel",
     "SEE_TRANSACTION_BUTTON": "See transaction",
-    "RETRY_BUTTON": "Try again"
+    "SEND_ORDINAL": "Send ordinal",
+    "CONFIRM_FEES": "Confirm fees",
+    "RETRY_BUTTON": "Try again",
+    "FEES": "Fees"
   },
   "DASHBOARD_SCREEN": {
     "TOTAL_BALANCE": "total balance",
