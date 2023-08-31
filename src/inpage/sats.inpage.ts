@@ -1,5 +1,5 @@
 import {
-  CreateTextInscriptionEventDetails,
+  CreateInscriptionEventDetails,
   DomEventName,
   GetAddressRequestEventDetails,
   SendBtcRequestEventDetails,
@@ -7,7 +7,7 @@ import {
   SignPsbtRequestEventDetails,
 } from '@common/types/inpage-types';
 import {
-  CreateTextInscriptionResponseMessage,
+  CreateInscriptionResponseMessage,
   ExternalSatsMethods,
   GetAddressResponseMessage,
   MESSAGE_SOURCE,
@@ -118,7 +118,7 @@ const SatsMethodsProvider: BitcoinProvider = {
   createInscription: async (
     createInscriptionRequest: string,
   ): Promise<CreateInscriptionResponse> => {
-    const event = new CustomEvent<CreateTextInscriptionEventDetails>(
+    const event = new CustomEvent<CreateInscriptionEventDetails>(
       DomEventName.createInscriptionRequest,
       {
         detail: { createInscriptionRequest },
@@ -126,7 +126,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     );
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
-      const handleMessage = (eventMessage: MessageEvent<CreateTextInscriptionResponseMessage>) => {
+      const handleMessage = (eventMessage: MessageEvent<CreateInscriptionResponseMessage>) => {
         if (!isValidEvent(eventMessage, ExternalSatsMethods.createInscriptionResponse)) return;
         if (eventMessage.data.payload?.createInscriptionRequest !== createInscriptionRequest)
           return;
