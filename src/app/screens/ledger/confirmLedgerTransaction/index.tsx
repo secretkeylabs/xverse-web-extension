@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
-import { animated, useTransition } from '@react-spring/web';
+import { useTransition } from '@react-spring/web';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
 import {
@@ -36,116 +35,36 @@ import LedgerFailView from '@components/ledger/failLedgerView';
 import { UTXO } from '@secretkeylabs/xverse-core/types';
 import Stepper from '@components/stepper';
 
+import {
+  Container,
+  OnBoardingContentContainer,
+  RecipientsWrapper,
+  ConfirmTxIconBig,
+  TxDetails,
+  TxDetailsRow,
+  TxDetailsTitle,
+  ConnectLedgerTitle,
+  ConnectLedgerTextAdvanced,
+  InfoImage,
+  SuccessActionsContainer,
+  TxConfirmedContainer,
+  TxConfirmedTitle,
+  TxConfirmedDescription,
+  InfoContainerWrapper,
+} from './index.styled';
+
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';
 
-const Container = styled.div`
-  display: flex;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  flex-direction: column;
-  flex: 1;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-const OnBoardingContentContainer = styled(animated.div)((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  justifyContent: 'center',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-}));
-
-const SuccessActionsContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.spacing(6),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(30),
-}));
-
-const TxConfirmedContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 8px;
-  > :first-child {
-    margin-bottom: 26px;
-  }
-`;
-const TxConfirmedTitle = styled.h1((props) => ({
-  ...props.theme.headline_s,
-}));
-
-const TxConfirmedDescription = styled.p((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white[200],
-}));
-
-const InfoImage = styled.img`
-  width: 64px;
-  height: 64px;
-`;
-
-export const ConnectLedgerTitle = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  marginBottom: props.theme.spacing(6),
-}));
-
-interface ConnectLedgerTextAdvancedProps {
-  isCompleted?: boolean;
+enum Steps {
+  ConnectLedger = 0,
+  ExternalInputs = 0.5,
+  ConfirmTransaction = 1,
+  ConfirmFees = 1.5,
+  TransactionConfirmed = 2,
 }
-export const ConnectLedgerTextAdvanced = styled.p<ConnectLedgerTextAdvancedProps>((props) => ({
-  ...props.theme.body_m,
-  display: 'flex',
-  alignItems: 'flex-start',
-  color: props.isCompleted ? props.theme.colors.white[400] : props.theme.colors.white[200],
-  textAlign: 'center',
-  marginBottom: props.theme.spacing(16),
-}));
-
-const InfoContainerWrapper = styled.div(
-  (props) => `
-  text-align: left;
-  margin-top: ${props.theme.spacing(8)}px;
-`,
-);
-
-const TxDetails = styled.div((props) => ({
-  marginTop: props.theme.spacing(36),
-  width: '100%',
-  fontSize: '0.875rem',
-  fontWeight: 500,
-}));
-
-const TxDetailsRow = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  marginBottom: props.theme.spacing(6),
-}));
-
-const TxDetailsTitle = styled.div((props) => ({
-  color: props.theme.colors.white[200],
-}));
-
-const RecipientsWrapper = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const ConfirmTxIconBig = styled.img((props) => ({
-  width: 32,
-  height: 32,
-  marginBottom: props.theme.spacing(8),
-}));
 
 function ConfirmLedgerTransaction(): JSX.Element {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState(Steps.ConnectLedger);
   const [txId, setTxId] = useState<string | undefined>(undefined);
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -181,7 +100,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     fee?: BigNumber;
   } = location.state;
 
-  const transition = useTransition(currentStepIndex, {
+  const transition = useTransition(currentStep, {
     from: {
       x: 24,
       opacity: 0,
@@ -206,14 +125,14 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
       const { value: taprootSignedValue } = await result.next();
       setIsTxApproved(true);
-      setCurrentStepIndex(1.5);
+      setCurrentStep(Steps.ConfirmFees);
 
       const { value: txHex } = await result.next();
       setIsFinalTxApproved(true);
       await ledgerDelay(1500);
       const transactionId = await btcClient.sendRawTransaction(txHex || taprootSignedValue);
       setTxId(transactionId.tx.hash);
-      setCurrentStepIndex(2);
+      setCurrentStep(Steps.TransactionConfirmed);
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
@@ -236,7 +155,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
       await ledgerDelay(1500);
       const transactionId = await btcClient.sendRawTransaction(result);
       setTxId(transactionId.tx.hash);
-      setCurrentStepIndex(2);
+      setCurrentStep(Steps.TransactionConfirmed);
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
@@ -257,7 +176,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
       await ledgerDelay(1500);
       const transactionHash = await broadcastSignedTransaction(result, selectedNetwork);
       setTxId(transactionHash);
-      setCurrentStepIndex(2);
+      setCurrentStep(Steps.TransactionConfirmed);
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
@@ -298,13 +217,17 @@ function ConfirmLedgerTransaction(): JSX.Element {
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
 
-      if (type === 'ORDINALS' && currentStepIndex !== 0.5 && currentStepIndex !== 1) {
-        setCurrentStepIndex(0.5);
+      if (
+        type === 'ORDINALS' &&
+        currentStep !== Steps.ExternalInputs &&
+        currentStep !== Steps.ConfirmTransaction
+      ) {
+        setCurrentStep(Steps.ExternalInputs);
         return;
       }
 
-      if (currentStepIndex !== 1) {
-        setCurrentStepIndex(1);
+      if (currentStep !== Steps.ConfirmTransaction) {
+        setCurrentStep(Steps.ConfirmTransaction);
       }
 
       switch (type) {
@@ -331,7 +254,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
   };
 
   const goToConfirmationStep = () => {
-    setCurrentStepIndex(1);
+    setCurrentStep(Steps.ConfirmTransaction);
 
     handleConnectAndConfirm();
   };
@@ -342,7 +265,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     setIsConnectFailed(false);
     setIsWrongDevice(false);
     setIsTxApproved(false);
-    setCurrentStepIndex(0);
+    setCurrentStep(Steps.ConnectLedger);
   };
 
   const handleClose = () => {
@@ -425,8 +348,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
     type === 'STX' ? 'CONNECT.STX_ERROR_SUBTITLE' : 'CONNECT.BTC_ERROR_SUBTITLE';
 
   const renderLedgerConfirmationView = () => {
-    switch (currentStepIndex) {
-      case 0:
+    switch (currentStep) {
+      case Steps.ConnectLedger:
         return (
           <div>
             <LedgerConnectionView
@@ -442,7 +365,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
             />
           </div>
         );
-      case 0.5:
+      case Steps.ExternalInputs:
         if (isTxRejected || isConnectFailed) {
           return (
             <LedgerFailView title={t('CONFIRM.ERROR_TITLE')} text={t('CONFIRM.ERROR_SUBTITLE')} />
@@ -458,7 +381,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
             </ConnectLedgerContainer>
           </div>
         );
-      case 1:
+      case Steps.ConfirmTransaction:
         if (type === 'ORDINALS') {
           if (isTxRejected || isConnectFailed) {
             return (
@@ -496,7 +419,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
             {renderTxDetails()}
           </div>
         );
-      case 1.5:
+      case Steps.ConfirmFees:
         if (type === 'ORDINALS') {
           if (isTxRejected || isConnectFailed) {
             return (
@@ -520,7 +443,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
           );
         }
         return null;
-      case 2:
+      case Steps.TransactionConfirmed:
         return (
           <TxConfirmedContainer>
             <img src={checkCircleIcon} alt="Success" />
@@ -539,8 +462,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
   };
 
   const renderLedgerConfirmationControls = () => {
-    switch (currentStepIndex) {
-      case 0.5:
+    switch (currentStep) {
+      case Steps.ExternalInputs:
         if (isTxRejected || isConnectFailed) {
           return (
             <SuccessActionsContainer>
@@ -565,8 +488,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
             <ActionButton onPress={goToConfirmationStep} text={t('CONTINUE_BUTTON')} />
           </SuccessActionsContainer>
         );
-      case 1:
-      case 1.5:
+      case Steps.ConfirmTransaction:
+      case Steps.ConfirmFees:
         if (type === 'ORDINALS' && !isTxRejected && !isConnectFailed) {
           return (
             <SuccessActionsContainer>
@@ -591,7 +514,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
             />
           </SuccessActionsContainer>
         );
-      case 2:
+      case Steps.TransactionConfirmed:
         return (
           <SuccessActionsContainer>
             <ActionButton onPress={handleClose} text={t('CLOSE_BUTTON')} />
