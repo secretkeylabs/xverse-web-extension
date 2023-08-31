@@ -169,14 +169,14 @@ function CreateInscription() {
     content,
     payloadType,
     network: requestedNetwork,
-    feeAddress,
-    inscriptionFee,
-    initialFeeRate,
+    appFeeAddress,
+    appFee,
+    suggestedMinerFeeRate,
   } = payload as CreateInscriptionPayload;
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const [feeRate, setFeeRate] = useState(initialFeeRate ?? 8);
+  const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? 8);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
 
   const { ordinalsAddress, network, btcAddress, seedPhrase, selectedAccount, btcFiatRate } =
@@ -189,7 +189,7 @@ function CreateInscription() {
   useEffect(() => {
     fetchBtcFeeRate().then((feeRatesResponse: BtcFeeResponse) => {
       setFeeRates(feeRatesResponse);
-      if (initialFeeRate === undefined) {
+      if (suggestedMinerFeeRate === undefined) {
         setFeeRate(feeRatesResponse.regular);
       }
     });
@@ -224,8 +224,8 @@ function CreateInscription() {
     contentType,
     feeRate,
     revealAddress: ordinalsAddress,
-    serviceFee: inscriptionFee,
-    serviceFeeAddress: feeAddress,
+    serviceFee: appFee,
+    serviceFeeAddress: appFeeAddress,
   });
 
   const {

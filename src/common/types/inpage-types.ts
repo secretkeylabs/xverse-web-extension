@@ -10,7 +10,7 @@ export enum DomEventName {
   signPsbtRequest = 'SatsPsbtRequest',
   signMessageRequest = 'SatsSignMessage',
   sendBtcRequest = 'SatsSendBtcRequest',
-  createInscriptionRequest = 'createInscriptionRequest',
+  createInscriptionRequest = 'SatsCreateInscriptionRequest',
 }
 
 export interface AuthenticationRequestEventDetails {
