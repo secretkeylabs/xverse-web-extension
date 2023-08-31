@@ -5,7 +5,6 @@ import {
   TransactionData,
 } from '@secretkeylabs/xverse-core';
 import { SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL } from '@utils/constants';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -16,6 +15,7 @@ interface TransactionTitleProps {
 const TransactionTitleText = styled.p((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white[0],
+  textAlign: 'left',
 }));
 
 export default function TransactionTitle(props: TransactionTitleProps) {
@@ -25,6 +25,18 @@ export default function TransactionTitle(props: TransactionTitleProps) {
 
   const getTokenTransferTitle = (tx: TransactionData): string => {
     if (tx.txStatus === 'pending') {
+      return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
+    }
+    return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
+  };
+
+  const getBtcTokenTransferTitle = (tx: BtcTransactionData): string => {
+    if (tx.txStatus === 'pending') {
+      if (tx.isOrdinal) {
+        return tx.incoming
+          ? t('ORDINAL_TRANSACTION_PENDING_RECEIVING')
+          : t('ORDINAL_TRANSACTION_PENDING_SENDING');
+      }
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
     return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
@@ -74,7 +86,7 @@ export default function TransactionTitle(props: TransactionTitleProps) {
       case 'poison_microblock':
         return t('TRANSACTION_POISON_MICRO_BLOCK');
       case 'bitcoin':
-        return getTokenTransferTitle(transaction);
+        return getBtcTokenTransferTitle(transaction as BtcTransactionData);
       default:
         return t('TRANSACTION_STATUS_UNKNOWN');
     }
