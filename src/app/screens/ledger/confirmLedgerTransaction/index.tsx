@@ -35,8 +35,7 @@ import InfoContainer from '@components/infoContainer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import { UTXO } from '@secretkeylabs/xverse-core/types';
 import Stepper from '@components/stepper';
-
-export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';
+import { LedgerTransactionType } from '@common/types/ledger';
 
 const Container = styled.div`
   display: flex;
