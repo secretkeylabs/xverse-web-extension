@@ -88,7 +88,7 @@ const Theme = {
    * ref: https://zeroheight.com/0683c9fa7/p/789eec-typography
    *
    * Usage:
-   *   import { StyledP, StyledHeading } from '@components/styledCommon';
+   *   import { StyledP, StyledHeading } from '@components/common.styled';
    *
    *   <StyledHeading typography="headling_l">My heading</StyledHeading>
    *   <StyledP typography="body_m">My paragraph text</StyledP>
