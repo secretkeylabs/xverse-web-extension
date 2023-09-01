@@ -36,7 +36,7 @@ const CardContainer = styled.div<{ error?: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'column',
   rowGap: props.theme.spacing(3),
-  background: props.theme.colors.elevation_1,
+  background: props.theme.colors.elevation_n1,
   border: '1px solid',
   'border-color': props.error
     ? props.theme.colors.feedback.error_700

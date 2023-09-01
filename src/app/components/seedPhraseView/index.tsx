@@ -30,7 +30,7 @@ const SeedContainer = styled.div<SeedContainerProps>((props) => ({
 }));
 
 const OuterSeedContainer = styled.div((props) => ({
-  backgroundColor: props.theme.colors.elevation_1,
+  backgroundColor: props.theme.colors.elevation_n1,
   border: `1px solid ${props.theme.colors.elevation3}`,
   borderRadius: props.theme.radius(1),
 }));

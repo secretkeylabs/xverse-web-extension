@@ -61,20 +61,21 @@ const Theme = {
         'linear-gradient(0deg, rgba(115, 131, 255, 0.05), rgba(115, 131, 255, 0.05)), #1D2032',
     },
 
-    /**
-     * @deprecated use success_medium
-     */
-    success: '#55B86E',
+    feedback: {
+      /**
+       * @deprecated use success_medium
+       */
+      success: '#55B86E',
+      /**
+       * @deprecated use danger_medium
+       */
+      error: '#EA4848',
 
-    /**
-     * @deprecated use danger_medium
-     */
-    error: '#EA4848',
-
-    /**
-     * @deprecated use danger_dark_600
-     */
-    error_700: 'rgba(171, 48, 48, 0.4)',
+      /**
+       * @deprecated use danger_dark_600
+       */
+      error_700: 'rgba(171, 48, 48, 0.4)',
+    },
 
     /**
      * @deprecated

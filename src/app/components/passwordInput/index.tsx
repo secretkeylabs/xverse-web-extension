@@ -54,7 +54,7 @@ const PasswordInputContainer = styled.div<PasswordInputContainerProps>((props) =
   alignItems: 'center',
   width: '100%',
   border: `1px solid ${props.hasError ? 'rgba(211, 60, 60, 0.3)' : props.theme.colors.elevation3}`,
-  backgroundColor: props.theme.colors.elevation_1,
+  backgroundColor: props.theme.colors.elevation_n1,
   borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(4),
   paddingRight: props.theme.spacing(4),
@@ -71,7 +71,7 @@ const PasswordInputLabel = styled.h2((props) => ({
 const Input = styled.input((props) => ({
   ...props.theme.body_medium_m,
   height: 44,
-  backgroundColor: props.theme.colors.elevation_1,
+  backgroundColor: props.theme.colors.elevation_n1,
   color: props.theme.colors.white_0,
   width: '100%',
   border: 'none',
