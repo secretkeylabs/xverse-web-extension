@@ -8,6 +8,7 @@ import { formatDate } from '@utils/date';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
+  PostConditionFungible,
 } from '@stacks/stacks-blockchain-api-types';
 import { useMemo } from 'react';
 import { animated, config, useSpring } from '@react-spring/web';
@@ -80,31 +81,38 @@ interface TransactionsHistoryListProps {
   txFilter: string | null;
 }
 
+const sortTransactionsByBlockHeight = (transactions: BtcTransactionData[]) =>
+  transactions.sort((txA, txB) => {
+    if (txB.blockHeight > txA.blockHeight) {
+      return 1;
+    }
+    return -1;
+  });
+
 const groupBtcTxsByDate = (
   transactions: BtcTransactionData[],
-): { [x: string]: BtcTransactionData[] } =>
-  transactions.reduce(
-    (all: { [x: string]: BtcTransactionData[] }, transaction: BtcTransactionData) => {
-      const txDate = formatDate(new Date(transaction.seenTime));
-      if (!all[txDate]) {
-        if (transaction.txStatus === 'pending') {
-          all.Pending = [transaction];
-        } else {
-          all[txDate] = [transaction];
-        }
-      } else {
-        all[txDate].push(transaction);
-        all[txDate].sort((txA, txB) => {
-          if (txB.blockHeight > txA.blockHeight) {
-            return 1;
-          }
-          return -1;
-        });
-      }
-      return all;
-    },
-    {},
-  );
+): { [x: string]: BtcTransactionData[] } => {
+  const pendingTransactions: BtcTransactionData[] = [];
+  const processedTransactions: { [x: string]: BtcTransactionData[] } = {};
+
+  transactions.forEach((transaction) => {
+    const txDate = formatDate(new Date(transaction.seenTime));
+    if (transaction.txStatus === 'pending') {
+      pendingTransactions.push(transaction);
+    } else {
+      if (!processedTransactions[txDate]) processedTransactions[txDate] = [transaction];
+      else processedTransactions[txDate].push(transaction);
+
+      sortTransactionsByBlockHeight(processedTransactions[txDate]);
+    }
+  });
+  sortTransactionsByBlockHeight(pendingTransactions);
+  if (pendingTransactions.length > 0) {
+    const result = { Pending: pendingTransactions, ...processedTransactions };
+    return result;
+  }
+  return processedTransactions;
+};
 
 const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) =>
   txs.reduce(
@@ -139,12 +147,14 @@ const filterTxs = (
     const ftTransfers = atx && isAddressTransactionWithTransfers(atx) ? atx.ft_transfers || [] : [];
     const nftTransfers =
       atx && isAddressTransactionWithTransfers(atx) ? atx.nft_transfers || [] : [];
-
+    const fungibleTokenPostCondition = tx?.post_conditions[0] as PostConditionFungible;
+    const contractFromPostCondition = `${fungibleTokenPostCondition?.asset?.contract_address}.${fungibleTokenPostCondition?.asset?.contract_name}::${fungibleTokenPostCondition?.asset?.asset_name}`;
     return (
       acceptedTypes &&
       (ftTransfers.filter((transfer) => transfer.asset_identifier.includes(filter)).length > 0 ||
         nftTransfers.filter((transfer) => transfer.asset_identifier.includes(filter)).length > 0 ||
-        tx?.contract_call?.contract_id === filter)
+        tx?.contract_call?.contract_id === filter ||
+        (contractFromPostCondition && contractFromPostCondition === filter))
     );
   });
 
