@@ -55,6 +55,15 @@ const Theme = {
     lilac_dark: '#4F34BA',
 
     background: {
+      /**
+       * @deprecated
+       */
+      elevation9: 'rgba(76, 81, 135, 0.2)',
+
+      /**
+       * @deprecated
+       */
+      elevation10: 'rgba(76, 81, 135, 0.35)',
       modalBackdrop: 'rgba(18,21,30,0.6)',
       modalBackdrop2: 'rgba(18, 21, 30, 0.90)',
       selectBackground:

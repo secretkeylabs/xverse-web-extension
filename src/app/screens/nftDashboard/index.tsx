@@ -166,10 +166,10 @@ const LoadMoreButton = styled.button((props) => ({
   borderRadius: 24,
   padding: '8px, 16px, 8px, 16px',
   ':hover': {
-    background: props.theme.colors.elevation9,
+    background: props.theme.colors.background.elevation9,
   },
   ':focus': {
-    background: props.theme.colors.elevation10,
+    background: props.theme.colors.background.elevation10,
   },
 }));
 
