@@ -7,7 +7,7 @@ import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
-import plusIcon from '@assets/img/dashboard/plus.svg';
+import { Plus } from '@phosphor-icons/react';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
 import Swap from '@assets/img/dashboard/swap.svg';
 import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
@@ -346,7 +346,7 @@ function Home() {
         <AddStxButtonContainer>
           <ActionButton
             transparent
-            src={plusIcon}
+            icon={<Plus color="white" size={20} />}
             text={t('ADD_STACKS_ADDRESS')}
             onPress={async () => {
               await chrome.tabs.create({
