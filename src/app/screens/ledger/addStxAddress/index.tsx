@@ -34,7 +34,7 @@ function AddStxAddress(): JSX.Element {
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
-  const { ledgerAccountsList, network, selectedAccount } = useWalletSelector();
+  const { network, selectedAccount } = useWalletSelector();
   const { updateLedgerAccounts } = useWalletReducer();
   const transition = useTransition(currentStepIndex, {
     from: {
@@ -48,7 +48,7 @@ function AddStxAddress(): JSX.Element {
   });
 
   const handleClickNext = async () => {
-    setCurrentStepIndex(currentStepIndex + 1);
+    setCurrentStepIndex((prevStepIndex) => prevStepIndex + 1);
   };
 
   const saveAddressToWallet = async (stacksCreds: { address: string; publicKey: string }) => {

@@ -268,7 +268,7 @@ function ImportLedger(): JSX.Element {
       return;
     }
 
-    setCurrentStepIndex(currentStepIndex + 1);
+    setCurrentStepIndex((prevStepIndex) => prevStepIndex + 1);
   };
 
   const saveAddressToWallet = async ({
