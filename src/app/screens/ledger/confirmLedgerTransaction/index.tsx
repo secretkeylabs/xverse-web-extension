@@ -161,7 +161,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
 
-  const { network, selectedAccount, ledgerAccountsList } = useWalletSelector();
+  const { network, selectedAccount } = useWalletSelector();
 
   const btcClient = useBtcClient();
 
@@ -176,7 +176,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     amount: BigNumber;
     recipients: Recipient[];
     type: LedgerTransactionType;
-    unsignedTx: StacksTransaction;
+    unsignedTx: Buffer;
     ordinalUtxo?: UTXO;
     feeRateInput?: string;
     fee?: BigNumber;

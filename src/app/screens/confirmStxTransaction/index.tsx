@@ -203,4 +203,5 @@ function ConfirmStxTransaction() {
     </>
   );
 }
+
 export default ConfirmStxTransaction;
