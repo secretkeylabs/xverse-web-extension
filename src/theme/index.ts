@@ -20,6 +20,7 @@ const Theme = {
     white_800: 'rgba(255, 255, 255, 0.20)',
     white_850: 'rgba(255, 255, 255, 0.15)',
     white_900: 'rgba(255, 255, 255, 0.1)',
+
     elevation_n1: '#0C0C0C',
     elevation0: '#181818',
     elevation1: '#1E2024',
@@ -30,31 +31,81 @@ const Theme = {
     elevation6_600: 'rgba(76, 82, 95, 0.4)',
     elevation6_800: 'rgba(76, 82, 95, 0.2)',
     elevation8: '#7A7688',
-    success: '#51D6A6',
-    caution: '#F2A900',
-    error: '#D33C3C',
-    error_700: 'rgba(211, 60, 60, 0.3)',
 
-    // TODO tim: grep codebase and remove all
-    /* deprecated: below */
-    action: {
-      classic: '#FFFFFF',
-      classicLight: 'rgba(255, 255, 255, 0.85)',
-      classic800: 'rgba(85, 101, 247, 0.2)',
-    },
+    // feedback
+    danger_light: '#FF5A5A',
+    danger_medium: '#EA4848',
+    danger_dark: '#AB3030',
+    danger_dark_100: 'rgba(171, 48, 48, 0.9)',
+    danger_dark_200: 'rgba(171, 48, 48, 0.8)',
+    danger_dark_600: 'rgba(171, 48, 48, 0.4)',
+    success_light: '#55E078',
+    success_medium: '#55B86E',
+    caution: '#F2A900',
+
+    // brand
+    emerald_light: '#55B86E',
+    emerald: '#49A15F',
+    emerald_dark: '#3E8A51',
+    tangerine_light: '#EF883B',
+    tangerine: '#EE7A30',
+    tangerine_dark: '#D96F2A',
+    lilac_light: '#6E54CB',
+    lilac: '#5E41C5',
+    lilac_dark: '#4F34BA',
+
     background: {
       modalBackdrop: 'rgba(18,21,30,0.6)',
       modalBackdrop2: 'rgba(18, 21, 30, 0.90)',
       selectBackground:
         'linear-gradient(0deg, rgba(115, 131, 255, 0.05), rgba(115, 131, 255, 0.05)), #1D2032',
     },
+
+    /**
+     * @deprecated use success_medium
+     */
+    success: '#55B86E',
+
+    /**
+     * @deprecated use danger_medium
+     */
+    error: '#EA4848',
+
+    /**
+     * @deprecated use danger_dark_600
+     */
+    error_700: 'rgba(171, 48, 48, 0.4)',
+
+    /**
+     * @deprecated
+     */
+    action: {
+      classic: '#FFFFFF',
+      classicLight: 'rgba(255, 255, 255, 0.85)',
+      classic800: 'rgba(85, 101, 247, 0.2)',
+    },
+
+    /**
+     * @deprecated
+     */
     border: {
       select: 'rgba(115, 131, 255, 0.4)',
     },
+
+    /**
+     * @deprecated
+     */
     grey: '#24252C',
+
+    /**
+     * @deprecated use lilac
+     */
     purple_main: '#5E41C5',
+
+    /**
+     * @deprecated use tangerine
+     */
     orange_main: ' #EE7A30',
-    /* above: deprecated */
   },
 
   /*
