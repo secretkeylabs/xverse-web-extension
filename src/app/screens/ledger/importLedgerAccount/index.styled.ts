@@ -113,8 +113,7 @@ export const SelectAssetText = styled.p<SelectAssetTextProps>((props) => ({
 export const SelectAssetFootNote = styled.p((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white[200],
-  marginBottom: props.theme.spacing(25),
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.spacing(6),
 }));
 
 export const AddAddressHeaderContainer = styled.div((props) => ({

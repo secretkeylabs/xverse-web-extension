@@ -21,7 +21,7 @@
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select assets",
     "LEDGER_IMPORT_2_SUBTITLE": "Choose the assets you want to manage with this wallet.",
-    "LEDGER_IMPORT_2_FOOTNOTE": "",
+    "LEDGER_IMPORT_2_FOOTNOTE": "If you don’t want to set a Stacks address now, you have the possibility to set it up later.",
     "LEDGER_IMPORT_2_SELECT": {
       "BTC_TITLE": "Bitcoin & Ordinals (default)",
       "BTC_SUBTITLE": "Legacy and Taproot addresses",

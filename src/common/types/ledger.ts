@@ -4,31 +4,28 @@ import BigNumber from 'bignumber.js';
 
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';
 
-export type ConfirmStxTransactionState = {
-  unsignedTx: Buffer;
+type ConfirmLedgerTransactionState = {
   type: LedgerTransactionType;
+  fee: BigNumber;
+};
+
+export type ConfirmStxTransactionState = ConfirmLedgerTransactionState & {
   recipients: StacksRecipient[];
-  fee: BigNumber;
+  unsignedTx: Buffer;
 };
 
-export type ConfirmBtcTransactionState = {
-  type: LedgerTransactionType;
+export type ConfirmBtcTransactionState = ConfirmLedgerTransactionState & {
   recipients: Recipient[];
   feeRateInput: string;
-  fee: BigNumber;
 };
 
-export type ConfirmOrdinalsTransactionState = {
-  type: LedgerTransactionType;
+export type ConfirmOrdinalsTransactionState = ConfirmLedgerTransactionState & {
   recipients: Recipient[];
   feeRateInput: string;
-  fee: BigNumber;
   ordinalUtxo: UTXO;
 };
 
-export type ConfirmBrc20TransactionState = {
-  type: LedgerTransactionType;
+export type ConfirmBrc20TransactionState = ConfirmLedgerTransactionState & {
   recipients: Recipient[];
   amount: BigNumber;
-  fee: BigNumber;
 };
