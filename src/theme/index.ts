@@ -33,6 +33,7 @@ const Theme = {
     success: '#51D6A6',
     caution: '#F2A900',
     error: '#D33C3C',
+    error_700: 'rgba(211, 60, 60, 0.3)',
 
     // TODO tim: grep codebase and remove all
     /* deprecated: below */
@@ -41,29 +42,7 @@ const Theme = {
       classicLight: 'rgba(255, 255, 255, 0.85)',
       classic800: 'rgba(85, 101, 247, 0.2)',
     },
-    white: {
-      0: '#FFFFFF',
-      200: 'rgba(255, 255, 255, 0.8)',
-      400: 'rgba(255, 255, 255, 0.6)',
-      600: 'rgba(255, 255, 255, 0.2)',
-      800: 'rgba(255, 255, 255, 0.20)',
-      850: 'rgba(255, 255, 255, 0.15)',
-      900: 'rgba(255, 255, 255, 0.1)',
-    },
     background: {
-      elevation_n1: '#0C0C0C',
-      elevation0: '#181818',
-      elevation1: '#1E2024',
-      elevation_1: '#1E2024', // deprecated
-      elevation2: '#24282F',
-      elevation3: '#2A2F39',
-      elevation5: '#303643',
-      elevation6: '#4C525F',
-      elevation6_600: 'rgba(76, 82, 95, 0.4)',
-      elevation6_800: 'rgba(76, 82, 95, 0.2)',
-      elevation8: '#7A7688',
-      elevation9: 'rgba(76, 81, 135, 0.2)', // deprecated
-      elevation10: 'rgba(76, 81, 135, 0.35)', // deprecated
       modalBackdrop: 'rgba(18,21,30,0.6)',
       modalBackdrop2: 'rgba(18, 21, 30, 0.90)',
       selectBackground:
@@ -71,12 +50,6 @@ const Theme = {
     },
     border: {
       select: 'rgba(115, 131, 255, 0.4)',
-    },
-    feedback: {
-      success: '#51D6A6',
-      caution: '#F2A900',
-      error: '#D33C3C',
-      error_700: 'rgba(211, 60, 60, 0.3)',
     },
     grey: '#24252C',
     purple_main: '#5E41C5',

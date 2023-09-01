@@ -58,7 +58,7 @@ const NftContainer = styled.div((props) => ({
 
 const OrdinalInscriptionNumber = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -88,7 +88,7 @@ const ButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 400,
   fontSize: 14,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 

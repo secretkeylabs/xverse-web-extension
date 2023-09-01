@@ -22,7 +22,7 @@ const Container = styled.div((props) => ({
 
 const DetailText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(8),
 }));
 
@@ -38,9 +38,9 @@ const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(6),
   border: `1px solid ${
-    props.withError ? props.theme.colors.feedback.error : props.theme.colors.background.elevation6
+    props.withError ? props.theme.colors.feedback.error : props.theme.colors.elevation6
   }`,
-  backgroundColor: props.theme.colors.background.elevation1,
+  backgroundColor: props.theme.colors.elevation1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
@@ -51,7 +51,7 @@ const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
   backgroundColor: 'transparent',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   border: 'transparent',
   width: '50%',
   '&::-webkit-outer-spin-button': {
@@ -69,7 +69,7 @@ const InputField = styled.input((props) => ({
 
 const FeeText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const ButtonContainer = styled.div`
@@ -83,13 +83,9 @@ const FeeButton = styled.button<{
   isSelected: boolean;
 }>((props) => ({
   ...props.theme.body_medium_m,
-  color: `${
-    props.isSelected ? props.theme.colors.background.elevation2 : props.theme.colors.white['400']
-  }`,
+  color: `${props.isSelected ? props.theme.colors.elevation2 : props.theme.colors.white_400}`,
   background: `${props.isSelected ? props.theme.colors.white : 'transparent'}`,
-  border: `1px solid ${
-    props.isSelected ? 'transparent' : props.theme.colors.background.elevation6
-  }`,
+  border: `1px solid ${props.isSelected ? 'transparent' : props.theme.colors.elevation6}`,
   borderRadius: 40,
   height: 40,
   display: 'flex',
@@ -126,7 +122,7 @@ const ErrorText = styled.p((props) => ({
 // TODO move this to component file
 const FiatAmountText = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 function FiatAmount({
   fiatAmount,

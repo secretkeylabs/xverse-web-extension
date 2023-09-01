@@ -54,16 +54,14 @@ interface GridContainerProps {
 const GridItemContainer = styled.button<GridContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   padding: props.showBorder ? props.theme.spacing(7) : 0,
   marginBottom: props.theme.spacing(16),
   borderRadius: props.theme.radius(3),
   background: props.showBorder
     ? 'linear-gradient(27.88deg, #1D2032 0%, rgba(29, 32, 50, 0) 100%)'
     : 'transparent',
-  border: props.showBorder
-    ? ` 1px solid ${props.theme.colors.background.elevation2}`
-    : 'transparent',
+  border: props.showBorder ? ` 1px solid ${props.theme.colors.elevation2}` : 'transparent',
 }));
 
 function Nft({ asset, isGalleryOpen }: Props) {

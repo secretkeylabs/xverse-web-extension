@@ -17,15 +17,15 @@ const Input = styled.input`
   ${(props) => props.theme.body_medium_m};
   max-width: 144px;
   min-height: ${(props) => props.theme.spacing(22)}px;
-  background-color: ${(props) => props.theme.colors.background.elevation0};
-  color: ${(props) => props.theme.colors.white['0']};
-  border: 1px solid ${(props) => props.theme.colors.background.elevation3};
+  background-color: ${(props) => props.theme.colors.elevation0};
+  color: ${(props) => props.theme.colors.white_0};
+  border: 1px solid ${(props) => props.theme.colors.elevation3};
   border-radius: ${(props) => props.theme.radius(1)}px;
   padding: ${(props) => props.theme.spacing(8)}px ${(props) => props.theme.spacing(6)}px;
   padding-right: ${(props) => props.theme.spacing(26)}px;
-  caret-color: ${(props) => props.theme.colors.background.elevation6};
+  caret-color: ${(props) => props.theme.colors.elevation6};
   :focus-within {
-    border: 1px solid ${(props) => props.theme.colors.background.elevation6};
+    border: 1px solid ${(props) => props.theme.colors.elevation6};
   }
 `;
 
@@ -33,7 +33,7 @@ const Icon = styled.i`
   position: absolute;
   vertical-align: middle;
   background-color: transparent;
-  color: ${(props) => props.theme.colors.white['0']};
+  color: ${(props) => props.theme.colors.white_0};
   border: none;
   height: 100%;
   right: 0;
@@ -120,7 +120,7 @@ const TransparentButton = styled.button`
   ${(props) => props.theme.body_m};
   background-color: transparent;
   border: none;
-  color: ${(props) => props.theme.colors.white['200']};
+  color: ${(props) => props.theme.colors.white_200};
   text-decoration: underline;
 `;
 

@@ -60,7 +60,7 @@ const ReceiveNftContainer = styled.div((props) => ({
   top: 0,
   right: 0,
   zIndex: 2000,
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.elevation2,
   borderRadius: 16,
 }));
 
@@ -114,7 +114,7 @@ const WebGalleryButton = styled.button((props) => ({
 const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -130,7 +130,7 @@ const BottomBarContainer = styled.div({
 
 const CollectiblesHeadingText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textTransform: 'uppercase',
   letterSpacing: '0.02em',
   opacity: 0.7,
@@ -138,7 +138,7 @@ const CollectiblesHeadingText = styled.h1((props) => ({
 
 const GalleryCollectiblesHeadingText = styled.h1((props) => ({
   ...props.theme.headline_category_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textTransform: 'uppercase',
   letterSpacing: '0.02em',
   opacity: 0.7,
@@ -160,22 +160,22 @@ const LoadMoreButton = styled.button((props) => ({
   fontSize: 13,
   width: 98,
   height: 34,
-  color: props.theme.colors.white['0'],
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  background: props.theme.colors.background.elevation0,
+  color: props.theme.colors.white_0,
+  border: `1px solid ${props.theme.colors.elevation3}`,
+  background: props.theme.colors.elevation0,
   borderRadius: 24,
   padding: '8px, 16px, 8px, 16px',
   ':hover': {
-    background: props.theme.colors.background.elevation9,
+    background: props.theme.colors.elevation9,
   },
   ':focus': {
-    background: props.theme.colors.background.elevation10,
+    background: props.theme.colors.elevation10,
   },
 }));
 
 const NoCollectiblesText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginTop: 'auto',
   marginBottom: 'auto',
   textAlign: 'center',

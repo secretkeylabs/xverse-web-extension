@@ -18,7 +18,7 @@ const Container = styled.button((props) => ({
   paddingBottom: props.theme.spacing(4),
   borderRadius: 12,
   width: 220,
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.elevation2,
 }));
 
 const CrossContainer = styled.button(() => ({
@@ -59,7 +59,7 @@ function ShareDialog({ url, onCrossClick }: Props) {
       <ShareLinkRow
         onClick={onCopyPress}
         img={LinkIcon}
-        background={theme.colors.white['400']}
+        background={theme.colors.white_400}
         text={t('COPY')}
       />
     </Container>

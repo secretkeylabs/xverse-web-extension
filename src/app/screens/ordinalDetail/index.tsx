@@ -92,26 +92,26 @@ const ExtensionOrdinalsContainer = styled.div((props) => ({
 
 const OrdinalTitleText = styled.h1((props) => ({
   ...props.theme.headline_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const OrdinalGalleryTitleText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(12),
 }));
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   fontSize: 24,
   marginBottom: props.theme.spacing(16),
 }));
 
 const NftOwnedByText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
@@ -180,12 +180,12 @@ const ViewInExplorerButton = styled.button((props) => ({
 const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_m,
   fontWeight: 700,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 
 const SendButton = styled.button((props) => ({
-  backgroundColor: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.white_0,
   borderRadius: props.theme.radius(3),
   display: 'flex',
   width: 100,
@@ -223,7 +223,7 @@ const AssetDeatilButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 400,
   fontSize: 14,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -246,7 +246,7 @@ const OrdinalsTag = styled.div({
 
 const CollectibleText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 

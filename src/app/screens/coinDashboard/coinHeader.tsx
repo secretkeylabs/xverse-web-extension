@@ -45,9 +45,9 @@ const ProtocolText = styled.p((props) => ({
   marginTop: props.theme.spacing(3),
   textTransform: 'uppercase',
   marginLeft: props.theme.spacing(2),
-  backgroundColor: props.theme.colors.white['400'],
+  backgroundColor: props.theme.colors.white_400,
   padding: '1px 6px 1px',
-  color: props.theme.colors.background.elevation0,
+  color: props.theme.colors.elevation0,
   borderRadius: props.theme.radius(2),
 }));
 
@@ -65,13 +65,13 @@ const BalanceValuesContainer = styled.div({
 const CoinBalanceText = styled.h1((props) => ({
   ...props.theme.headline_l,
   fontSize: '1.5rem',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   fontSize: '0.875rem',
   marginTop: props.theme.spacing(2),
   textAlign: 'center',
@@ -79,7 +79,7 @@ const FiatAmountText = styled.h1((props) => ({
 
 const BalanceTitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
   marginTop: props.theme.spacing(4),
 }));

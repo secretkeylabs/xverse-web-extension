@@ -19,7 +19,7 @@ const StackingDescriptionText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(18),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 function StackingProgress() {
   const { t } = useTranslation('translation', { keyPrefix: 'STACKING_SCREEN' });

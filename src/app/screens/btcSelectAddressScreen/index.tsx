@@ -45,11 +45,11 @@ const Container = styled.div({
 const LogoContainer = styled.div((props) => ({
   padding: props.theme.spacing(11),
   marginBottom: props.theme.spacing(16),
-  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 const AddressContainer = styled.div((props) => ({
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.elevation2,
   borderRadius: 40,
   height: 24,
   display: 'flex',
@@ -68,7 +68,7 @@ const AccountListContainer = styled(animated.div)((props) => ({
   height: 214,
   marginTop: props.theme.spacing(9.5),
   boxShadow: '0px 8px 104px rgba(0, 0, 0, 0.5)',
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.elevation2,
   '&::-webkit-scrollbar': {
     display: 'none',
   },
@@ -84,13 +84,13 @@ const TopImage = styled.img({
 
 const FunctionTitle = styled.h1((props) => ({
   ...props.theme.body_bold_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginTop: 16,
 }));
 
 const AccountContainer = styled.button((props) => ({
-  background: props.theme.colors.background.elevation1,
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  background: props.theme.colors.elevation1,
+  border: `1px solid ${props.theme.colors.elevation3}`,
   borderRadius: 8,
   width: '100%',
   padding: '12px 16px',
@@ -98,26 +98,26 @@ const AccountContainer = styled.button((props) => ({
   flexDirection: 'row',
   marginTop: props.theme.spacing(4),
   ':hover': {
-    background: props.theme.colors.background.elevation2,
+    background: props.theme.colors.elevation2,
   },
 }));
 
 const AccountText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: 24,
 }));
 
 const DappTitle = styled.h2((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginTop: 12,
   textAlign: 'center',
 }));
 
 const AddressTextTitle = styled.h1((props) => ({
   ...props.theme.body_medium_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   fontSize: 10,
   textAlign: 'center',
 }));
@@ -151,7 +151,7 @@ const AccountListRow = styled.div((props) => ({
   paddingLeft: 16,
   paddingRight: 16,
   ':hover': {
-    background: props.theme.colors.background.elevation3,
+    background: props.theme.colors.elevation3,
   },
 }));
 

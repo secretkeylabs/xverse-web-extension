@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const DescriptionHeadingText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginBottom: props.theme.spacing(2),
   letterSpacing: '0.02em',
   textTransform: 'uppercase',
@@ -10,7 +10,7 @@ const DescriptionHeadingText = styled.h1((props) => ({
 
 const DescriptionValueText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
 }));
 

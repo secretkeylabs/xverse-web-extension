@@ -16,14 +16,14 @@ import finalizeTxSignature from './utils';
 
 const Title = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textTransform: 'uppercase',
 }));
 
 const DownloadContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '12px 16px',
   justifyContent: 'center',
@@ -35,8 +35,8 @@ const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
   paddingTop: props.theme.spacing(12),
   paddingBottom: props.theme.spacing(12),
-  borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  borderTop: `0.5px solid ${props.theme.colors.elevation3}`,
+  borderBottom: `0.5px solid ${props.theme.colors.elevation3}`,
   flexDirection: 'column',
 }));
 
@@ -49,7 +49,7 @@ const DownloadButtonContainer = styled.div({
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginRight: props.theme.spacing(2),
   textAlign: 'center',
 }));
@@ -66,7 +66,7 @@ const SponsoredContainer = styled.div({
 });
 
 const SponsoredTag = styled.div((props) => ({
-  background: props.theme.colors.background.elevation3,
+  background: props.theme.colors.elevation3,
   marginTop: props.theme.spacing(7.5),
   paddingTop: props.theme.spacing(4),
   paddingBottom: props.theme.spacing(4),
@@ -77,12 +77,12 @@ const SponsoredTag = styled.div((props) => ({
 
 const SponosredText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const PostConditionAlertText = styled.h1((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const Button = styled.button((props) => ({

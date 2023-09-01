@@ -24,7 +24,7 @@ const AdvanceSettingsButton = styled.button((props) => ({
   width: 150,
   height: 20,
   marginLeft: 16,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const FeesContainer = styled.div(() => ({}));

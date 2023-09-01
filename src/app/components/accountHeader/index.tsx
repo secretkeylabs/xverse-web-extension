@@ -18,7 +18,7 @@ const SelectedAccountContainer = styled.div((props) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: `${props.theme.spacing(10)}px ${props.theme.spacing(8)}px`,
-  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: `0.5px solid ${props.theme.colors.elevation3}`,
 }));
 
 const ResetWalletContainer = styled.div((props) => ({
@@ -53,13 +53,13 @@ const ButtonRow = styled.button`
   padding-top: 11px;
   padding-bottom: 11px;
   font: ${(props) => props.theme.body_medium_m};
-  color: ${(props) => props.theme.colors.white['0']};
+  color: ${(props) => props.theme.colors.white_0};
   transition: background-color 0.2s ease;
   :hover {
-    background-color: ${(props) => props.theme.colors.background.elevation3};
+    background-color: ${(props) => props.theme.colors.elevation3};
   }
   :active {
-    background-color: ${(props) => props.theme.colors.background.elevation3};
+    background-color: ${(props) => props.theme.colors.elevation3};
   }
 `;
 

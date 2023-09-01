@@ -55,7 +55,7 @@ function CoinSelectModal({
             currency="BTC"
             icon={IconBitcoin}
             loading={loadingWalletData}
-            underlayColor={theme.colors.background.elevation2}
+            underlayColor={theme.colors.elevation2}
             margin={14}
             enlargeTicker
             onPress={handleOnBitcoinPress}
@@ -67,7 +67,7 @@ function CoinSelectModal({
             currency="STX"
             icon={IconStacks}
             loading={loadingWalletData}
-            underlayColor={theme.colors.background.elevation2}
+            underlayColor={theme.colors.elevation2}
             margin={14}
             enlargeTicker
             onPress={handleOnStackPress}
@@ -89,7 +89,7 @@ function CoinSelectModal({
               currency="FT"
               icon={IconStacks}
               loading={loadingWalletData}
-              underlayColor={theme.colors.background.elevation2}
+              underlayColor={theme.colors.elevation2}
               margin={14}
               enlargeTicker
               onPress={() => {

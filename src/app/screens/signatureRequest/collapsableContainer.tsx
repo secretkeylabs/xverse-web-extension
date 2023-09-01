@@ -13,7 +13,7 @@ interface Props {
 const ContentContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '12px 16px',
   justifyContent: 'center',

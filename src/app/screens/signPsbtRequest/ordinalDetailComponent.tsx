@@ -9,7 +9,7 @@ import OrdinalImage from '@screens/ordinals/ordinalImage';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '16px 16px',
   justifyContent: 'center',

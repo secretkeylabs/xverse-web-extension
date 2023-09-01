@@ -78,7 +78,7 @@ const MessageHash = styled.p((props) => ({
 const SigningAddressContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '12px 16px',
   marginBottom: props.theme.spacing(6),

@@ -19,7 +19,7 @@ import { SUPPORT_URL_TAB_TARGET, SWAP_SPONSOR_DISABLED_SUPPORT_URL } from '@util
 const TitleText = styled.div((props) => ({
   fontSize: 21,
   fontWeight: 700,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(12),
   marginTop: props.theme.spacing(12),
 }));
@@ -31,7 +31,7 @@ export const ButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
   position: 'sticky',
   bottom: 0,
-  background: props.theme.colors.background.elevation0,
+  background: props.theme.colors.elevation0,
   padding: `${props.theme.spacing(12)}px 0`,
 }));
 

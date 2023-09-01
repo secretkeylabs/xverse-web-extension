@@ -35,7 +35,7 @@ const ContinueButton = styled.button<ButtonProps>((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: props.theme.colors.action.classic,
   marginBottom: props.theme.spacing(30),
-  color: props.theme.colors.background.elevation0,
+  color: props.theme.colors.elevation0,
   width: '100%',
   height: 44,
   opacity: props.enabled ? 1 : 0.6,

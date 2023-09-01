@@ -16,7 +16,7 @@ const InstructionsContainer = styled.div((props) => ({
   height: 127,
   width: 278,
   backgroundColor: 'rgba(39, 42, 68, 0.4)',
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: `1px solid ${props.theme.colors.elevation3}`,
   borderRadius: 12,
   padding: `${props.theme.spacing(10.5)}px ${props.theme.spacing(10.5)}px ${props.theme.spacing(
     10.5,
@@ -49,7 +49,7 @@ const ContentContainer = styled.div((props) => ({
 
 const Title = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
   fontSize: 20,
@@ -57,14 +57,14 @@ const Title = styled.h1((props) => ({
 
 const Subtitle = styled.h2((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
 }));
 
 const ContinueButton = styled.button((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.background.elevation0,
+  color: props.theme.colors.elevation0,
   backgroundColor: props.theme.colors.action.classic,
   borderRadius: props.theme.radius(1),
   marginLeft: props.theme.spacing(8),

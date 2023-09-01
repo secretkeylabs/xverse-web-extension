@@ -39,14 +39,14 @@ const AmountInputContainer = styled.div<ContainerProps>((props) => ({
   marginBottom: props.theme.spacing(4),
   border: props.error
     ? '1px solid rgba(211, 60, 60, 0.3)'
-    : `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background.elevation_1,
+    : `1px solid ${props.theme.colors.elevation3}`,
+  backgroundColor: props.theme.colors.elevation_1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   height: 44,
   ':focus-within': {
-    border: `1px solid ${props.theme.colors.background.elevation6}`,
+    border: `1px solid ${props.theme.colors.elevation6}`,
   },
 }));
 
@@ -62,8 +62,8 @@ const InputFieldContainer = styled.div(() => ({
 
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background.elevation_1,
-  color: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.elevation_1,
+  color: props.theme.colors.white_0,
   width: '100%',
   border: 'transparent',
 }));
@@ -74,7 +74,7 @@ const Text = styled.h1((props) => ({
 
 const BalanceText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginRight: props.theme.spacing(2),
 }));
 

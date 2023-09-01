@@ -106,7 +106,7 @@ const CopyContainer = styled.div((props) => ({
 const QRCodeContainer = styled.div((props) => ({
   display: 'flex',
   aspectRatio: 1,
-  backgroundColor: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.white_0,
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,

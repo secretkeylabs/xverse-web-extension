@@ -22,7 +22,7 @@ const Button = styled.button`
 
 const ButtonText = styled.div((props) => ({
   fontFamily: 'Satoshi-Medium',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 

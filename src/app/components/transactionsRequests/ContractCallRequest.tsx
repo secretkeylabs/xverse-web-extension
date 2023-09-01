@@ -38,8 +38,8 @@ const PostConditionContainer = styled.div((props) => ({
   paddingTop: props.theme.spacing(12),
   paddingBottom: props.theme.spacing(12),
   marginBottom: props.theme.spacing(12),
-  borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  borderTop: `0.5px solid ${props.theme.colors.elevation3}`,
+  borderBottom: `0.5px solid ${props.theme.colors.elevation3}`,
   flexDirection: 'column',
 }));
 const SponsoredContainer = styled.div({
@@ -48,7 +48,7 @@ const SponsoredContainer = styled.div({
   alignItems: 'center',
 });
 const SponsoredTag = styled.div((props) => ({
-  background: props.theme.colors.background.elevation3,
+  background: props.theme.colors.elevation3,
   marginTop: props.theme.spacing(7.5),
   paddingTop: props.theme.spacing(4),
   paddingBottom: props.theme.spacing(4),
@@ -58,17 +58,17 @@ const SponsoredTag = styled.div((props) => ({
 }));
 const SponosredText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 const PostConditionAlertText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const Line = styled.div((props) => ({
   position: 'absolute',
   width: '100%',
-  border: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  border: `0.5px solid ${props.theme.colors.elevation3}`,
   marginTop: props.theme.spacing(8),
 }));
 
@@ -92,7 +92,7 @@ const ShowMoreButton = styled.button((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   flexDirection: 'row',
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 const ShowMoreButtonContainer = styled.div((props) => ({
@@ -106,14 +106,14 @@ const ButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
   marginLeft: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const ButtonSymbolText = styled.div((props) => ({
   ...props.theme.body_xs,
   marginLeft: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   fontSize: 20,
 }));

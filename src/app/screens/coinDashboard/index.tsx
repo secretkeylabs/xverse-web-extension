@@ -44,7 +44,7 @@ const TransactionHistoryContainer = styled.div((props) => ({
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   marginTop: props.theme.spacing(30),
-  borderTop: `1px solid ${props.theme.colors.background.elevation2}`,
+  borderTop: `1px solid ${props.theme.colors.elevation2}`,
   h1: {
     ...props.theme.headline_s,
     color: props.theme.colors.white[0],
@@ -75,7 +75,7 @@ const TokenContractAddress = styled.p((props) => ({
 const FtInfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  borderTop: `1px solid ${props.theme.colors.background.elevation2}`,
+  borderTop: `1px solid ${props.theme.colors.elevation2}`,
   paddingTop: props.theme.spacing(12),
   marginTop: props.theme.spacing(16),
   paddingLeft: props.theme.spacing(8),
@@ -121,7 +121,7 @@ const Button = styled.button<ButtonProps>((props) => ({
   paddingRight: props.theme.spacing(6),
   marginRight: props.theme.spacing(2),
   borderRadius: 44,
-  background: props.isSelected ? props.theme.colors.background.elevation2 : 'transparent',
+  background: props.isSelected ? props.theme.colors.elevation2 : 'transparent',
   color: props.theme.colors.white[0],
   opacity: props.isSelected ? 1 : 0.6,
 }));

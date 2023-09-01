@@ -60,13 +60,13 @@ const CurrentAccountTextContainer = styled.div((props) => ({
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'start',
 }));
 
 const CurrentUnSelectedAccountText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'start',
 }));
 
@@ -102,7 +102,7 @@ const ModalContent = styled.div((props) => ({
 
 const ModalDescription = styled.div((props) => ({
   fontSize: '0.875rem',
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(16),
 }));
 
@@ -127,13 +127,13 @@ const ButtonRow = styled.button`
   padding-top: 11px;
   padding-bottom: 11px;
   font: ${(props) => props.theme.body_medium_m};
-  color: ${(props) => props.theme.colors.white['0']};
+  color: ${(props) => props.theme.colors.white_0};
   transition: background-color 0.2s ease;
   :hover {
-    background-color: ${(props) => props.theme.colors.background.elevation3};
+    background-color: ${(props) => props.theme.colors.elevation3};
   }
   :active {
-    background-color: ${(props) => props.theme.colors.background.elevation3};
+    background-color: ${(props) => props.theme.colors.elevation3};
   }
 `;
 

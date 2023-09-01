@@ -36,7 +36,7 @@ const ProgressItem = styled.div((props) => ({
   position: 'relative',
   paddingRight: props.theme.spacing(3.5),
   paddingLeft: props.theme.spacing(3.5),
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
 }));
 
 const ProgressItemText = styled.p((props) => ({

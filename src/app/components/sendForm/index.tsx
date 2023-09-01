@@ -92,7 +92,7 @@ const SubText = styled.h1((props) => ({
   ...props.theme.body_xs,
   display: 'flex',
   flex: 1,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const AssociatedText = styled.h1((props) => ({
@@ -102,14 +102,14 @@ const AssociatedText = styled.h1((props) => ({
 
 const BalanceText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginRight: props.theme.spacing(2),
 }));
 
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background.elevation_1,
-  color: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.elevation_1,
+  color: props.theme.colors.white_0,
   width: '100%',
   border: 'transparent',
 }));
@@ -122,14 +122,14 @@ const AmountInputContainer = styled.div<ContainerProps>((props) => ({
   marginBottom: props.theme.spacing(4),
   border: props.error
     ? '1px solid rgba(211, 60, 60, 0.3)'
-    : `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background.elevation_1,
+    : `1px solid ${props.theme.colors.elevation3}`,
+  backgroundColor: props.theme.colors.elevation_1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   height: 44,
   ':focus-within': {
-    border: `1px solid ${props.theme.colors.background.elevation6}`,
+    border: `1px solid ${props.theme.colors.elevation6}`,
   },
 }));
 
@@ -140,13 +140,13 @@ const MemoInputContainer = styled.div<ContainerProps>((props) => ({
   marginBottom: props.theme.spacing(4),
   border: props.error
     ? '1px solid rgba(211, 60, 60, 0.3)'
-    : `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background.elevation_1,
+    : `1px solid ${props.theme.colors.elevation3}`,
+  backgroundColor: props.theme.colors.elevation_1,
   borderRadius: 8,
   padding: props.theme.spacing(7),
   height: 76,
   ':focus-within': {
-    border: `1px solid ${props.theme.colors.background.elevation6}`,
+    border: `1px solid ${props.theme.colors.elevation6}`,
   },
 }));
 
@@ -164,8 +164,8 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
 
 /* TODO --------- move to separate file ------------- */
 const SwitchToFiatButton = styled.button((props) => ({
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  backgroundColor: props.theme.colors.elevation0,
+  border: `1px solid ${props.theme.colors.elevation3}`,
   borderRadius: 24,
   display: 'flex',
   padding: '8px 12px',
@@ -176,7 +176,7 @@ const SwitchToFiatButton = styled.button((props) => ({
 const SwitchToFiatText = styled.h1((props) => ({
   ...props.theme.body_xs,
   marginLeft: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 export function FiatRow({

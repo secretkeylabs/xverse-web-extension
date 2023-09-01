@@ -16,7 +16,7 @@ export const Container = styled.div((props) => ({
   flexDirection: 'column',
   padding: props.theme.spacing(10),
   marginBottom: props.theme.spacing(6),
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
 }));
 

@@ -29,7 +29,7 @@ const RowContainer = styled.button((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   borderRadius: 8,
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: `1px solid ${props.theme.colors.elevation3}`,
   padding: 16,
   background: 'transparent',
   width: '100%',

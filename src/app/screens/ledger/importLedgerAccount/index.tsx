@@ -611,7 +611,7 @@ function ImportLedger(): JSX.Element {
                 <TogglerContainer>
                   <CustomSwitch
                     onColor={theme.colors.purple_main}
-                    offColor={theme.colors.background.elevation3}
+                    offColor={theme.colors.elevation3}
                     onChange={() => setIsTogglerChecked(!isTogglerChecked)}
                     checked={isTogglerChecked}
                     uncheckedIcon={false}

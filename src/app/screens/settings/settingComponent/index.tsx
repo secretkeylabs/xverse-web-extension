@@ -52,7 +52,7 @@ const ComponentText = styled.h1<TitleProps>((props) => ({
 const ComponentDescriptionText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   paddingTop: props.theme.spacing(8),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 interface SettingComponentProps {
@@ -90,7 +90,7 @@ function SettingComponent({
         border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}
       >
         <ComponentText
-          textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white['200']}
+          textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white_200}
         >
           {text}
         </ComponentText>
@@ -99,7 +99,7 @@ function SettingComponent({
         {toggle && toggleFunction && (
           <CustomSwitch
             onColor={theme.colors.purple_main}
-            offColor={theme.colors.background.elevation3}
+            offColor={theme.colors.elevation3}
             onChange={toggleFunction}
             checked={toggleValue ?? false}
             uncheckedIcon={false}

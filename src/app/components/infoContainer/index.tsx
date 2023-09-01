@@ -27,29 +27,29 @@ const TextContainer = styled.div((props) => ({
 
 const BoldText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const RedirectText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const SubText = styled.h1((props) => ({
   ...props.theme.body_xs,
   marginTop: props.theme.spacing(2),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   lineHeight: 1.4,
 }));
 
 const RedirectButton = styled.button((props) => ({
   backgroundColor: 'transparent',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   display: 'flex',
   marginTop: 4,
   justifyContent: 'flex-start',

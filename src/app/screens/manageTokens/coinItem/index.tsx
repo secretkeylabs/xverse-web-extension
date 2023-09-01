@@ -53,7 +53,7 @@ const TickerIconContainer = styled.div((props) => ({
 
 const TickerText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
   fontSize: 10,
@@ -61,13 +61,13 @@ const TickerText = styled.h1((props) => ({
 
 const SelectedCoinTitleText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const UnSelectedCoinTitleText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 

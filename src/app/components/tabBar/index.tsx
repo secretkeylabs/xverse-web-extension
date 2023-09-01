@@ -19,7 +19,7 @@ const RowContainer = styled.div((props) => ({
   justifyContent: 'space-between',
   paddingLeft: props.theme.spacing(30),
   paddingRight: props.theme.spacing(30),
-  borderTop: `1px solid ${props.theme.colors.background.elevation3}`,
+  borderTop: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 const Button = styled.button({

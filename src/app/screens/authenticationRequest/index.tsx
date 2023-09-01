@@ -52,13 +52,13 @@ const TopImage = styled.img({
 
 const FunctionTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(8),
 }));
 
 const DappTitle = styled.h2((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(2),
 }));
 

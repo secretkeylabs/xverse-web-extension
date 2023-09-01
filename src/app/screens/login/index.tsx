@@ -38,7 +38,7 @@ const ContentContainer = styled(animated.div)({
 
 const AppVersion = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'right',
   marginTop: props.theme.spacing(8),
 }));
@@ -62,7 +62,7 @@ const PasswordInputContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: `1px solid ${props.theme.colors.elevation3}`,
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   borderRadius: props.theme.radius(1),
@@ -72,8 +72,8 @@ const PasswordInputContainer = styled.div((props) => ({
 const PasswordInput = styled.input((props) => ({
   ...props.theme.body_medium_m,
   height: 44,
-  backgroundColor: props.theme.colors.background.elevation0,
-  color: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.elevation0,
+  color: props.theme.colors.white_0,
   width: '100%',
   border: 'none',
 }));
@@ -83,7 +83,7 @@ const LandingTitle = styled.h1((props) => ({
   paddingTop: props.theme.spacing(15),
   paddingLeft: props.theme.spacing(34),
   paddingRight: props.theme.spacing(34),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 
@@ -103,7 +103,7 @@ const ForgotPasswordButton = styled.a((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
   marginTop: props.theme.spacing(12),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textDecoration: 'underline',
 }));
 

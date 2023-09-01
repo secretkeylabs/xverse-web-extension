@@ -65,7 +65,7 @@ const TickerIconContainer = styled.div<TickerProps>((props) => ({
 
 const TickerIconText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
   fontSize: 10,

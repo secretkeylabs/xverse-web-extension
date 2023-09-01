@@ -45,7 +45,7 @@ const OnboardingSubTitle = styled.h1((props) => ({
   ...props.theme.body_l,
   textAlign: 'center',
   marginTop: props.theme.spacing(8),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 const OnBoardingActionsContainer = styled.div((props) => ({
   display: 'flex',

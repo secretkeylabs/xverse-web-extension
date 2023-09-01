@@ -35,7 +35,7 @@ const ReceiveScreenText = styled.h1((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
   marginTop: props.theme.spacing(3),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 const BnsNameText = styled.h1((props) => ({
@@ -69,7 +69,7 @@ const CopyContainer = styled.div((props) => ({
 const QRCodeContainer = styled.div((props) => ({
   display: 'flex',
   aspectRatio: 1,
-  backgroundColor: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.white_0,
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
@@ -81,7 +81,7 @@ const QRCodeContainer = styled.div((props) => ({
 const AddressText = styled.h1((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   wordBreak: 'break-all',
 }));
 

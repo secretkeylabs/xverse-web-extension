@@ -28,7 +28,7 @@ const Container = styled.div`
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(14),
 }));
 

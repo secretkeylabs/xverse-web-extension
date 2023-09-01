@@ -18,20 +18,20 @@ const RowContainer = styled.div((props) => ({
 
 const BalanceHeadingText = styled.h3((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textTransform: 'uppercase',
   opacity: 0.7,
 }));
 
 const CurrencyText = styled.label((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   fontSize: 13,
 }));
 
 const BalanceAmountText = styled.p((props) => ({
   ...props.theme.headline_xl,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
@@ -43,7 +43,7 @@ const BarLoaderContainer = styled.div((props) => ({
 const CurrencyCard = styled.div((props) => ({
   display: 'flex',
   justifyContent: 'center',
-  backgroundColor: props.theme.colors.background.elevation3,
+  backgroundColor: props.theme.colors.elevation3,
   width: 45,
   borderRadius: 30,
   marginLeft: props.theme.spacing(4),

@@ -6,7 +6,7 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 const Card = styled.div`
-  background: ${(props) => props.theme.colors.background.elevation1};
+  background: ${(props) => props.theme.colors.elevation1};
   border-radius: ${(props) => props.theme.radius(2)}px;
   padding: ${(props) => props.theme.spacing(8)}px;
 `;

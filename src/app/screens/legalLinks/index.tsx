@@ -17,13 +17,13 @@ const Container = styled.div((props) => ({
 
 const Title = styled.h1((props) => ({
   ...props.theme.bold_tile_text,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(20),
 }));
 
 const SubTitle = styled.h1((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(8),
 }));
 
@@ -32,7 +32,7 @@ const ActionButton = styled.a((props) => ({
   display: 'flex',
   justifyContent: 'space-between',
   marginTop: props.theme.spacing(8),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const CustomisedActionButton = styled(ActionButton)`
@@ -51,7 +51,7 @@ const ActionButtonsContainer = styled.div((props) => ({
 const AcceptButton = styled.button((props) => ({
   ...props.theme.body_bold_m,
   display: 'flex',
-  color: props.theme.colors.background.elevation0,
+  color: props.theme.colors.elevation0,
   alignItems: 'center',
   justifyContent: 'center',
   marginTop: 'auto',

@@ -16,7 +16,7 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   overflowY: 'auto',
   padding: props.theme.spacing(6),
