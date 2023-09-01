@@ -129,9 +129,9 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
     ) : (
       <SubValueText>{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
     );
-  const renderSubValue = (input: PSBTInput, address: string) =>
+  const renderSubValue = (input: PSBTInput, signedAddress: string) =>
     input.userSigns ? (
-      renderAddress(address)
+      renderAddress(signedAddress)
     ) : (
       <TxIdContainer>
         <SubValueText>{getTruncatedAddress(input.txid)}</SubValueText>

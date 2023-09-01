@@ -142,16 +142,12 @@ function TransferDetailView({
             'SCRIPT_OUTPUT',
           )} #${outputScriptIndex}`}</ScriptOutputHeadingText>
           {outputScript &&
-            outputScript.map((script, index) => {
+            outputScript.map((script) => {
+              const keyProp = script.toString().substring(0, 5);
               if (script instanceof Uint8Array) {
-                return (
-                  <ScriptText key={index.toString()}>
-                    {new TextDecoder().decode(script)},
-                  </ScriptText>
-                );
-              } else {
-                return <ScriptText key={index.toString()}>{script},</ScriptText>;
+                return <ScriptText key={keyProp}>{new TextDecoder().decode(script)},</ScriptText>;
               }
+              return <ScriptText key={keyProp}>{script},</ScriptText>;
             })}
         </ShowScriptBackgroundContainer>
       )}
