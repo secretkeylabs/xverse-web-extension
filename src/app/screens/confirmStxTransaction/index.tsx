@@ -140,7 +140,7 @@ function ConfirmStxTransaction() {
         state: {
           unsignedTx: txs[0].serialize(),
           type,
-          recipients: [{ address: recipient, amountSats: amount }],
+          recipients: [{ address: recipient, amountMicrostacks: amount }],
           fee,
         },
       });

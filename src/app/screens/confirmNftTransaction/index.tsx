@@ -6,7 +6,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { deserializeTransaction } from '@stacks/transactions';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
@@ -160,13 +159,13 @@ function ConfirmNftTransaction() {
           recipients: [
             {
               address: recipientAddress,
-              amountSats: initialStxTransactions[0]?.payload?.amount
-                ? new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10))
+              amountMicrostacks: txs[0]?.payload?.amount
+                ? new BigNumber(txs[0]?.payload.amount?.toString(10))
                 : new BigNumber(0),
             },
           ],
           fee: new BigNumber(
-            initialStxTransactions
+            txs
               .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
               .reduce((prev, curr) => prev + curr, BigInt(0))
               .toString(10),

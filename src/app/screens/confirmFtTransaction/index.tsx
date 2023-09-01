@@ -71,7 +71,7 @@ function ConfirmFtTransaction() {
         state: {
           unsignedTx: txs[0].serialize(),
           type,
-          recipients: [{ address: recepientAddress, amountSats: new BigNumber(amount) }],
+          recipients: [{ address: recepientAddress, amountMicrostacks: new BigNumber(amount) }],
           fee: new BigNumber(txs[0].auth.spendingCondition.fee.toString()),
         },
       });

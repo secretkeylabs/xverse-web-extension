@@ -15,7 +15,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import { Recipient, StacksRecipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import LedgerConnectionView, {
   ConnectLedgerContainer,
   ConnectLedgerText,
@@ -25,7 +25,6 @@ import { getBtcTxStatusUrl, getStxTxStatusUrl, getTruncatedAddress } from '@util
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
-import { StacksTransaction } from '@stacks/transactions';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ledgerConfirmBtcIcon from '@assets/img/ledger/btc_icon.svg';
@@ -174,7 +173,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     fee,
   }: {
     amount: BigNumber;
-    recipients: Recipient[];
+    recipients: Recipient[] | StacksRecipient[];
     type: LedgerTransactionType;
     unsignedTx: Buffer;
     ordinalUtxo?: UTXO;
@@ -199,7 +198,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         transport,
         network.type,
         accountId,
-        recipients,
+        recipients as Recipient[],
         feeRateInput?.toString(),
         ordinalUtxo,
       );
@@ -230,7 +229,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         transport,
         network.type,
         accountId,
-        recipients,
+        recipients as Recipient[],
         feeRateInput?.toString(),
       );
       setIsFinalTxApproved(true);
@@ -383,12 +382,14 @@ function ConfirmLedgerTransaction(): JSX.Element {
       <TxDetailsRow>
         <TxDetailsTitle>{ordinalUtxo?.value ? 'Ordinal value' : 'Amount'}</TxDetailsTitle>
         {type === 'STX' ? (
-          <div>{microstacksToStx(recipients[0].amountSats).toString()} STX</div>
+          <div>
+            {microstacksToStx((recipients[0] as StacksRecipient).amountMicrostacks).toString()} STX
+          </div>
         ) : (
           <div>
             {ordinalUtxo?.value
               ? satsToBtc(new BigNumber(ordinalUtxo?.value)).toString()
-              : satsToBtc(recipients[0].amountSats).toString()}{' '}
+              : satsToBtc((recipients[0] as Recipient).amountSats).toString()}{' '}
             BTC
           </div>
         )}
