@@ -238,7 +238,8 @@ function SendForm({
   const [addressError, setAddressError] = useState<string | undefined>(recepientError);
   const navigate = useNavigate();
 
-  const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress } = useWalletSelector();
+  const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount } =
+    useWalletSelector();
   const network = useNetworkSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(recipientAddress, network);
@@ -250,7 +251,7 @@ function SendForm({
       setAmount('');
       setRecipientAddress('');
     }
-  }, [isAccountSwitched]);
+  }, [selectedAccount, isAccountSwitched]);
 
   useEffect(() => {
     if (recepientError) {
@@ -335,6 +336,7 @@ function SendForm({
             .toFixed(fungibleToken.decimals ?? 2)
             .toString();
         }
+        break;
       default:
         return '';
     }
