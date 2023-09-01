@@ -15,13 +15,13 @@ const Container = styled.div({
 
 const Heading = styled.p((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(20),
 }));
 
 const Label = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(4),
 }));
 

@@ -253,7 +253,7 @@ const CollectibleText = styled.h1((props) => ({
 const Text = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   textTransform: 'uppercase',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   fontSize: 10,
   marginLeft: props.theme.spacing(2),
 }));

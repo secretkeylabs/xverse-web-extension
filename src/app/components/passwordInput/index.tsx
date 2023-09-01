@@ -119,7 +119,7 @@ const StrengthBar = styled(animated.div)<StrengthBarProps>((props) => ({
   display: 'flex',
   flex: '1 0',
   alignItems: 'center',
-  backgroundColor: props.theme.colors.white[600],
+  backgroundColor: props.theme.colors.white_600,
   marginLeft: props.theme.spacing(6),
   marginRight: props.theme.spacing(9),
   borderRadius: props.theme.radius(1),
@@ -282,7 +282,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
     return (
       <PasswordStrengthContainer>
         <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-        <StrengthBar strengthColor={theme.colors.white[600]} strengthWidth="0">
+        <StrengthBar strengthColor={theme.colors.white_600} strengthWidth="0">
           {transition((style) => (
             <animated.div style={style} />
           ))}

@@ -42,7 +42,7 @@ export const ActionButtonWrap = styled.div((props) => ({
 
 const SponsoredTransactionText = styled.div((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(10),
   display: 'flex',
   gap: props.theme.spacing(4),

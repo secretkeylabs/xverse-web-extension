@@ -21,17 +21,17 @@ const OrdinalImageContainer = styled.div((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const TransferButton = styled.button((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   background: 'transparent',
   width: 86,
   border: `1px solid ${props.theme.colors.elevation6}`,

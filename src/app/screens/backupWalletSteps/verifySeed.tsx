@@ -28,7 +28,7 @@ const TransparentButtonContainer = styled.div((props) => ({
 
 const Heading = styled.h3((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(16),
 }));
 

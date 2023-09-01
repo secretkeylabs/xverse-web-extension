@@ -29,7 +29,7 @@ export const TitleContainer = styled.div(() => ({
 
 export const TitleText = styled.h3((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   fontSize: 14,
   fontWeight: 500,
 }));
@@ -42,7 +42,7 @@ export const FoldArrow = styled.img(() => ({
 
 const DescriptionText = styled.h3((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   fontSize: 14,
   fontWeight: 500,
   marginTop: props.theme.spacing(8),
@@ -57,7 +57,7 @@ const AmountContainer = styled.div(() => ({
 
 const AmountLabel = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   fontSize: 14,
   fontWeight: 500,
   marginLeft: props.theme.spacing(5),
@@ -82,7 +82,7 @@ const ItemsCenterContainer = styled.div(() => ({
 
 const AddressLabelText = styled.h3((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginLeft: props.theme.spacing(5),
 }));
 

@@ -104,7 +104,7 @@ const RecieveButtonContainer = styled.div({
 });
 
 const HeaderSeparator = styled.div((props) => ({
-  border: `0.5px solid ${props.theme.colors.white[400]}`,
+  border: `0.5px solid ${props.theme.colors.white_400}`,
   width: '50%',
   alignSelf: 'center',
   marginTop: props.theme.spacing(8),
@@ -120,7 +120,7 @@ const LockedStxContainer = styled.div((props) => ({
   alignItems: 'center',
   justifyContent: 'center',
   span: {
-    color: props.theme.colors.white[400],
+    color: props.theme.colors.white_400,
     marginRight: props.theme.spacing(3),
   },
   img: {
@@ -134,7 +134,7 @@ const AvailableStxContainer = styled.div((props) => ({
   justifyContent: 'center',
   marginTop: props.theme.spacing(4),
   span: {
-    color: props.theme.colors.white[400],
+    color: props.theme.colors.white_400,
     marginRight: props.theme.spacing(3),
   },
 }));
@@ -151,7 +151,7 @@ const VerifyButtonContainer = styled.div((props) => ({
 
 const StacksLockedInfoText = styled.span((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   textAlign: 'left',
 }));
 

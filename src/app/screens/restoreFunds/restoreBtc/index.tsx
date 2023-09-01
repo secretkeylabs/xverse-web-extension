@@ -27,7 +27,7 @@ import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
   marginBottom: 32,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const BtcCard = styled.div((props) => ({
@@ -47,12 +47,12 @@ const Icon = styled.img((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const BtcContainer = styled.div({

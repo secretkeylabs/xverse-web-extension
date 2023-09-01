@@ -30,7 +30,7 @@ const RowContainer = styled.div({
 
 const RequestMessageTitle = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(2),
   opacity: 0.7,
   flex: 1,
@@ -57,7 +57,7 @@ const Text = styled.p((props) => ({
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(4),
 }));
 

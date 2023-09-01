@@ -74,7 +74,7 @@ const ErrorText = styled.p((props) => ({
 
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
   textAlign: 'left',
 }));

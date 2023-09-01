@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const RecipientAddress = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   textAlign: 'left',
 }));
 

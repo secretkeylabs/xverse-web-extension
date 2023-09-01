@@ -27,16 +27,16 @@ const ErrorDescription = styled.p((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const SupportText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(5),
   textAlign: 'center',
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   span: {
-    color: props.theme.colors.white[0],
+    color: props.theme.colors.white_0,
   },
 }));
 
@@ -44,7 +44,7 @@ const ErrorContent = styled.p((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(20),
   textAlign: 'center',
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 function ErrorBoundary() {

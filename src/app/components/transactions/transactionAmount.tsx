@@ -19,7 +19,7 @@ interface TransactionAmountProps {
 
 const TransactionValue = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 export default function TransactionAmount(props: TransactionAmountProps): JSX.Element | null {

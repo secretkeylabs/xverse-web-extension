@@ -17,12 +17,12 @@ const CardTitle = styled.div`
 
 const TextLabel = styled.label`
   ${(props) => props.theme.body_medium_m}
-  color: ${(props) => props.theme.colors.white[200]};
+  color: ${(props) => props.theme.colors.white_200};
 `;
 
 const TextValue = styled.p`
   ${(props) => props.theme.body_medium_m}
-  color: ${(props) => props.theme.colors.white[0]};
+  color: ${(props) => props.theme.colors.white_0};
 `;
 
 const Rows = styled.div`
@@ -38,7 +38,7 @@ const RowItem = styled.div`
 
 const FiatAmountText = styled.p`
   ${(props) => props.theme.body_medium_s}
-  color: ${(props) => props.theme.colors.white[400]};
+  color: ${(props) => props.theme.colors.white_400};
   display: flex;
   justify-content: flex-end;
 `;

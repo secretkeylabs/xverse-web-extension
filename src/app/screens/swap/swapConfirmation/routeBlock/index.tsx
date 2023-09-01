@@ -22,7 +22,7 @@ const RouteProgress = styled.div((props) => ({
 }));
 
 const DashLine = styled.div((props) => ({
-  borderTop: `1.5px dashed ${props.theme.colors.white[800]}`,
+  borderTop: `1.5px dashed ${props.theme.colors.white_800}`,
   width: '100%',
   position: 'absolute',
   left: 0,
@@ -42,7 +42,7 @@ const ProgressItem = styled.div((props) => ({
 const ProgressItemText = styled.p((props) => ({
   ...props.theme.body_m,
   fontWeight: 400,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(4),
 }));
 

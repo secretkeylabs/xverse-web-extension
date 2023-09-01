@@ -29,7 +29,7 @@ interface ValueTextProps {
 const ValueText = styled.h1<ValueTextProps>((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'center',
-  color: props.color || props.theme.colors.white[0],
+  color: props.color || props.theme.colors.white_0,
 }));
 
 const OrdinalsTag = styled.div({
@@ -52,7 +52,7 @@ const ButtonIcon = styled.img({
 const Text = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   textTransform: 'uppercase',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   fontSize: 10,
   marginLeft: props.theme.spacing(2),
 }));

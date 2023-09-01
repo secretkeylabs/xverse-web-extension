@@ -33,7 +33,7 @@ const TokenContractContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(16),
   h1: {
     ...props.theme.body_medium_m,
-    color: props.theme.colors.white[400],
+    color: props.theme.colors.white_400,
   },
 }));
 
@@ -47,7 +47,7 @@ const TransactionHistoryContainer = styled.div((props) => ({
   borderTop: `1px solid ${props.theme.colors.elevation2}`,
   h1: {
     ...props.theme.headline_s,
-    color: props.theme.colors.white[0],
+    color: props.theme.colors.white_0,
     marginTop: 32,
   },
   h2: {
@@ -66,7 +66,7 @@ const ContractAddressCopyButton = styled.button((props) => ({
 
 const TokenContractAddress = styled.p((props) => ({
   ...props.theme.body_medium_l,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'left',
   overflowWrap: 'break-word',
   width: 300,
@@ -97,9 +97,9 @@ const ContractDeploymentButton = styled.button((props) => ({
   alignItems: 'center',
   marginTop: props.theme.spacing(12),
   background: 'none',
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   span: {
-    color: props.theme.colors.white[0],
+    color: props.theme.colors.white_0,
     marginLeft: props.theme.spacing(3),
   },
   img: {
@@ -122,7 +122,7 @@ const Button = styled.button<ButtonProps>((props) => ({
   marginRight: props.theme.spacing(2),
   borderRadius: 44,
   background: props.isSelected ? props.theme.colors.elevation2 : 'transparent',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   opacity: props.isSelected ? 1 : 0.6,
 }));
 

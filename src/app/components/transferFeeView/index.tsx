@@ -19,7 +19,7 @@ const RowContainer = styled.div((props) => ({
 
 const FeeText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const FeeTitleContainer = styled.div({
@@ -36,13 +36,13 @@ const FeeContainer = styled.div({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 interface Props {

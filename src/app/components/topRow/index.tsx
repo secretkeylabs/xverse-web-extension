@@ -28,11 +28,11 @@ const BackButton = styled.button({
 
 const AnimatedBackButton = styled(BackButton)`
   :hover {
-    background: ${(props) => props.theme.colors.white[900]};
+    background: ${(props) => props.theme.colors.white_900};
     border-radius: 24px;
   }
   :focus {
-    background: ${(props) => props.theme.colors.white[850]};
+    background: ${(props) => props.theme.colors.white_850};
     border-radius: 24px;
   }
 `;

@@ -17,7 +17,7 @@ const Title = styled.div<StepperProps>((props) => ({
   marginTop: props.theme.spacing(8),
   fontSize: '0.875rem',
   fontWeight: 500,
-  color: props.isActive ? props.theme.colors.white[0] : props.theme.colors.white[600],
+  color: props.isActive ? props.theme.colors.white_0 : props.theme.colors.white_600,
   transition: 'color 0.3s ease',
 }));
 
@@ -25,17 +25,19 @@ const Dot = styled.div<StepperProps>((props) => ({
   height: 30,
   width: 30,
   backgroundColor: props.isCompleted
-    ? props.theme.colors.feedback.success
+    ? props.theme.colors.success_medium
     : props.isActive
     ? '#4C525F'
     : 'transparent',
   border: '2px solid',
-  borderColor: props.isCompleted ? props.theme.colors.feedback.success : '#4C525F',
+  borderColor: props.isCompleted
+    ? props.theme.colors.success_medium
+    : props.theme.colors.elevation6,
   borderRadius: '50%',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   fontWeight: 'bold',
   fontSize: '0.875rem',
   flex: '1 0 auto',
@@ -47,14 +49,14 @@ const Dot = styled.div<StepperProps>((props) => ({
     width: 8,
     height: 8,
     borderRadius: '50%',
-    backgroundColor: props.theme.colors.white[0],
+    backgroundColor: props.theme.colors.white_0,
   },
 }));
 
 const Line = styled.div<StepperProps>((props) => ({
   height: 2,
   width: '100%',
-  background: `linear-gradient(90deg, ${props.theme.colors.feedback.success} ${
+  background: `linear-gradient(90deg, ${props.theme.colors.success_medium} ${
     props.step === 0 ? '0%' : props.step > 1 ? '100%' : '50%'
   }, #4C525F ${props.step > 0 ? '50%' : '0%'})`,
   marginTop: props.theme.spacing(8),

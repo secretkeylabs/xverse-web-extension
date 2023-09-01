@@ -9,13 +9,13 @@ const Icon = styled.img((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_bold_l,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   textAlign: 'left',
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const Container = styled.div({

@@ -54,14 +54,14 @@ const MainContainer = styled.div((props) => ({
 const RequestType = styled.h1((props) => ({
   ...props.theme.headline_s,
   marginTop: props.theme.spacing(11),
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'left',
   marginBottom: props.theme.spacing(4),
 }));
 
 const RequestSource = styled.h2((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   textAlign: 'left',
   marginBottom: props.theme.spacing(12),
 }));
@@ -71,7 +71,7 @@ const MessageHash = styled.p((props) => ({
   textAlign: 'left',
   lineHeight: 1.6,
   wordWrap: 'break-word',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(4),
 }));
 
@@ -88,7 +88,7 @@ const SigningAddressContainer = styled.div((props) => ({
 const SigningAddressTitle = styled.p((props) => ({
   ...props.theme.body_medium_m,
   wordWrap: 'break-word',
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(4),
 }));
 
@@ -102,7 +102,7 @@ const SigningAddressType = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
   wordWrap: 'break-word',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(4),
 }));
 
@@ -110,13 +110,13 @@ const SigningAddressValue = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
   wordWrap: 'break-word',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(4),
 }));
 
 const ActionDisclaimer = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(8),
 }));

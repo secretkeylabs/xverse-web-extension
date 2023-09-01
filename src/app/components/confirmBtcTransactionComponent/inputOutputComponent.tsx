@@ -31,32 +31,32 @@ const TransferDetailContainer = styled.div((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const OutputTitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(6),
 }));
 
 const SubValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const TxIdText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(2),
 }));
 
 const YourAddressText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginRight: props.theme.spacing(2),
 }));
 

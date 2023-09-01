@@ -24,7 +24,7 @@ const HeaderText = styled.h1((props) => ({
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   margin: 16,
   fontSize: 16,
 }));
@@ -48,7 +48,7 @@ const TickMarkButtonContainer = styled.div((props) => ({
 
 const TickMarkButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(4.25),
 }));
 

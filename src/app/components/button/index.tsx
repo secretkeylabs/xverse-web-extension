@@ -52,14 +52,14 @@ interface TextProps {
 const ButtonText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: `${props.warning ? props.theme.colors.white[0] : props.theme.colors.elevation0}`,
+  color: `${props.warning ? props.theme.colors.white_0 : props.theme.colors.elevation0}`,
   textAlign: 'center',
 }));
 
 const AnimatedButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 

@@ -96,13 +96,13 @@ const SuccessActionsContainer = styled.div((props) => ({
 
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'left',
 }));
 
 const RequestedByText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(4),
   textAlign: 'left',
 }));

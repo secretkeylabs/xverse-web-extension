@@ -13,7 +13,7 @@ const Button = styled.button((props) => ({
   marginLeft: props.theme.spacing(3),
   padding: 3,
   ':hover': {
-    background: props.theme.colors.white[900],
+    background: props.theme.colors.white_900,
     borderRadius: 24,
   },
 }));

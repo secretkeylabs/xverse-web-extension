@@ -20,7 +20,7 @@ const LedgerInputField = styled.input<LedgerInputFieldProps>((props) => ({
   border: `1px solid ${props.error ? props.theme.colors.feedback.error : '#303354'}`,
   borderRadius: '8px',
   padding: '10px 16px',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   transition: 'border 0.2s ease',
 }));
 
