@@ -28,6 +28,7 @@ import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import { ledgerDelay } from '@common/utils/ledger';
 import { decodeToken } from 'jsontokens';
 import { SignTransactionOptions } from 'sats-connect';
@@ -178,7 +179,7 @@ function SignPsbtRequest() {
   const onSignPsbtConfirmed = async () => {
     try {
       if (isLedgerAccount(selectedAccount)) {
-        // setIsModalVisible(true);
+        setIsModalVisible(true);
         return;
       }
 
@@ -336,54 +337,44 @@ function SignPsbtRequest() {
       ) : (
         <>
           <OuterContainer>
-            {isLedgerAccount(selectedAccount) ? (
-              <Container>
-                <InfoContainer bodyText="External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
-              </Container>
-            ) : (
-              <Container>
-                <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
-                {!payload.broadcast && (
-                  <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
-                )}
-                {ordinalInfoData &&
-                  ordinalInfoData.map((ordinalData) => (
-                    <OrdinalDetailComponent
-                      ordinalInscription={`Inscription ${ordinalData?.number}`}
-                      icon={IconOrdinal}
-                      title={t('ORDINAL')}
-                      ordinal={ordinalData}
-                      ordinalDetail={ordinalData?.content_type}
-                      heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
-                    />
-                  ))}
-                <RecipientComponent
-                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
-                    .toString()
-                    .replace('-', '')}`}
-                  currencyType="BTC"
-                  title={t('AMOUNT')}
-                  heading={
-                    parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')
-                  }
-                />
-                <InputOutputComponent
-                  parsedPsbt={parsedPsbt}
-                  isExpanded={expandInputOutputView}
-                  address={signingAddresses}
-                  onArrowClick={expandInputOutputSection}
-                />
-
-                <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-                {payload.broadcast ? (
-                  <TransactionDetailComponent
-                    title={t('FEES')}
-                    value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
-                    subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+            <Container>
+              <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
+              {!payload.broadcast && <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
+              {ordinalInfoData &&
+                ordinalInfoData.map((ordinalData) => (
+                  <OrdinalDetailComponent
+                    ordinalInscription={`Inscription ${ordinalData?.number}`}
+                    icon={IconOrdinal}
+                    title={t('ORDINAL')}
+                    ordinal={ordinalData}
+                    ordinalDetail={ordinalData?.content_type}
+                    heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
                   />
-                ) : null}
-              </Container>
-            )}
+                ))}
+              <RecipientComponent
+                value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
+                  .toString()
+                  .replace('-', '')}`}
+                currencyType="BTC"
+                title={t('AMOUNT')}
+                heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
+              />
+              <InputOutputComponent
+                parsedPsbt={parsedPsbt}
+                isExpanded={expandInputOutputView}
+                address={signingAddresses}
+                onArrowClick={expandInputOutputSection}
+              />
+
+              <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+              {payload.broadcast ? (
+                <TransactionDetailComponent
+                  title={t('FEES')}
+                  value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
+                  subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+                />
+              ) : null}
+            </Container>
           </OuterContainer>
           <ButtonContainer>
             <TransparentButtonContainer>
@@ -393,7 +384,6 @@ function SignPsbtRequest() {
               text={t('CONFIRM')}
               onPress={onSignPsbtConfirmed}
               processing={isSigning}
-              disabled={isLedgerAccount(selectedAccount)}
             />
           </ButtonContainer>
         </>
@@ -402,10 +392,10 @@ function SignPsbtRequest() {
         {currentStepIndex === 0 && (
           <LedgerConnectionView
             title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
-            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE')}
+            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', { name: 'Bitcoin' })}
             titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
             textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={ledgerConnectDefaultIcon}
+            imageDefault={ledgerConnectBtcIcon}
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />
