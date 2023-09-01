@@ -14,6 +14,7 @@ import {
   useInscriptionExecute,
   useInscriptionFees,
 } from '@secretkeylabs/xverse-core';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { CreateInscriptionPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
@@ -179,8 +180,15 @@ function CreateInscription() {
   const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? 8);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
 
-  const { ordinalsAddress, network, btcAddress, seedPhrase, selectedAccount, btcFiatRate } =
-    useWalletSelector();
+  const {
+    ordinalsAddress,
+    network,
+    btcAddress,
+    seedPhrase,
+    selectedAccount,
+    btcFiatRate,
+    fiatCurrency,
+  } = useWalletSelector();
 
   useEffect(() => {
     getNonOrdinalUtxo(btcAddress, requestedNetwork.type).then(setUtxos);
@@ -365,8 +373,8 @@ function CreateInscription() {
                       value={fiatValue}
                       displayType="text"
                       thousandSeparator
-                      suffix=" USD"
-                      prefix="~$"
+                      prefix={`${currencySymbolMap[fiatCurrency]} `}
+                      suffix={` ${fiatCurrency}`}
                       renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
                     />
                   </NumberWithSuffixContainer>
@@ -433,8 +441,8 @@ function CreateInscription() {
                         value={fiatFees}
                         displayType="text"
                         thousandSeparator
-                        suffix=" USD"
-                        prefix="~$"
+                        prefix={`${currencySymbolMap[fiatCurrency]} `}
+                        suffix={` ${fiatCurrency}`}
                         renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
                       />
                     </NumberWithSuffixContainer>
