@@ -36,13 +36,8 @@ const useSecretKey = () => {
     [],
   );
   return {
-    getSeed: vault.getSeed,
+    ...vault,
     initSeedVault: vault.init,
-    storeSeed: vault.storeSeed,
-    lockVault: vault.lockVault,
-    changePassword: vault.changePassword,
-    hasSeed: vault.hasSeed,
-    unlockVault: vault.unlockVault,
   };
 };
 export default useSecretKey;

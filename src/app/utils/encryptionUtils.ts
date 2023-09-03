@@ -10,7 +10,6 @@ import {
 } from '@secretkeylabs/xverse-core/wallet';
 import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core/seedVault';
 import ChromeStorage from '@utils/storage';
-import { getSessionItem } from './sessionStorageUtils';
 
 export async function generateKeyArgon2id(password: string, salt: string): Promise<string> {
   const result = await argon2.hash({

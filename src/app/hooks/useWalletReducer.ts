@@ -118,6 +118,7 @@ const useWalletReducer = () => {
   const unlockWallet = async (password: string) => {
     if (encryptedSeed && encryptedSeed.length > 0) {
       await migrateLegacySeedStorage(password);
+      return;
     }
     const decrypted = await unlockVault(password);
     try {
