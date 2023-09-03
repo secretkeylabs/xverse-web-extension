@@ -43,7 +43,7 @@ const ToastDismissButton = styled.button((props) => ({
 
 function ChangePasswordScreen() {
   const { t } = useTranslation('translation');
-  const { getSeed, changePassword } = useSecretKey();
+  const { unlockVault, changePassword } = useSecretKey();
   const [password, setPassword] = useState<string>('');
   const [oldPassword, setOldPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -63,7 +63,7 @@ function ChangePasswordScreen() {
   const handleConfirmCurrentPasswordNextClick = async () => {
     try {
       setLoading(true);
-      await getSeed(oldPassword);
+      await unlockVault(oldPassword);
       setPassword('');
       setError('');
       setCurrentStepIndex(1);

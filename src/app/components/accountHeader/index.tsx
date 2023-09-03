@@ -147,6 +147,11 @@ function AccountHeaderComponent({
     setShowOptionsDialog(false);
   };
 
+  const handleLockWallet = async () => {
+    await lockWallet();
+    navigate('/login');
+  };
+
   return (
     <>
       {showResetWalletDisplay && (
@@ -183,7 +188,7 @@ function AccountHeaderComponent({
             <ButtonRow onClick={handleAccountSelect}>
               {optionsDialogTranslation('SWITCH_ACCOUNT')}
             </ButtonRow>
-            <ButtonRow onClick={lockWallet}>{optionsDialogTranslation('LOCK')}</ButtonRow>
+            <ButtonRow onClick={handleLockWallet}>{optionsDialogTranslation('LOCK')}</ButtonRow>
             <WarningButton onClick={handleResetWalletPromptOpen}>
               {optionsDialogTranslation('RESET_WALLET')}
             </WarningButton>

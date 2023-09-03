@@ -1,10 +1,15 @@
 import argon2 from 'argon2-browser';
-import { generateRandomKey, encryptSeed, decryptSeed } from '@secretkeylabs/xverse-core/encryption';
+import {
+  generateRandomKey,
+  encryptSeedPhrase,
+  decryptSeedPhrase,
+} from '@secretkeylabs/xverse-core/encryption';
 import {
   encryptMnemonicWithHandler,
   decryptMnemonicWithHandler,
 } from '@secretkeylabs/xverse-core/wallet';
 import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core/seedVault';
+import ChromeStorage from '@utils/storage';
 import { getSessionItem } from './sessionStorageUtils';
 
 export async function generateKeyArgon2id(password: string, salt: string): Promise<string> {
@@ -34,7 +39,7 @@ export async function generateKeyArgon2i(password: string, salt: string): Promis
 }
 
 export async function generatePasswordHash(password: string) {
-  let salt = await getSessionItem(SeedVaultStorageKeys.PASSWORD_SALT);
+  let salt = await ChromeStorage.getItem(SeedVaultStorageKeys.PASSWORD_SALT);
   const unMigratedSalt = localStorage.getItem('salt');
   if (!salt && !unMigratedSalt) {
     salt = generateRandomKey(16);
@@ -48,20 +53,23 @@ export async function generatePasswordHash(password: string) {
   };
 }
 
-export async function encryptSeedPhrase(seed: string, password: string): Promise<string> {
+export async function encryptSeedPhraseHandler(seed: string, password: string): Promise<string> {
   return encryptMnemonicWithHandler({
     seed,
     password,
-    mnemonicEncryptionHandler: encryptSeed,
+    mnemonicEncryptionHandler: encryptSeedPhrase,
   });
 }
 
-export async function decryptSeedPhrase(encryptedSeed: string, password: string): Promise<string> {
+export async function decryptSeedPhraseHandler(
+  encryptedSeed: string,
+  password: string,
+): Promise<string> {
   try {
     const seedPhrase = await decryptMnemonicWithHandler({
       encryptedSeed,
       password,
-      mnemonicDecryptionHandler: decryptSeed,
+      mnemonicDecryptionHandler: decryptSeedPhrase,
     });
     return seedPhrase;
   } catch (err) {

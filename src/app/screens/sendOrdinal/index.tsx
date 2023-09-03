@@ -6,6 +6,7 @@ import TopRow from '@components/topRow';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSecretKey from '@hooks/useSecretKey';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
@@ -104,8 +105,9 @@ function SendOrdinal() {
   const { selectedOrdinal } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
-  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+  const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
+  const { getSeed } = useSecretKey();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -125,6 +127,7 @@ function SendOrdinal() {
     mutate,
   } = useMutation<SignedBtcTx, ResponseError, string>({
     mutationFn: async (recipient) => {
+      const seedPhrase = await getSeed();
       const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
       const ordUtxo = addressUtxos.find(
         (utx) => `${utx.txid}:${utx.vout}` === selectedOrdinal?.output,

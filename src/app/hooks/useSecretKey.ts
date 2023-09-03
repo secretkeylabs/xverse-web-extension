@@ -9,8 +9,8 @@ import * as cryptoUtils from '@utils/encryptionUtils';
 import ChromeStorage from '@utils/storage';
 
 const cryptoUtilsAdapter: CryptoUtilsAdapter = {
-  encrypt: cryptoUtils.encryptSeedPhrase,
-  decrypt: cryptoUtils.decryptSeedPhrase,
+  encrypt: cryptoUtils.encryptSeedPhraseHandler,
+  decrypt: cryptoUtils.decryptSeedPhraseHandler,
   generateRandomBytes: generateRandomKey,
   hash: cryptoUtils.generateKeyArgon2id,
 };
@@ -30,7 +30,7 @@ const useSecretKey = () => {
     () =>
       new SeedVault({
         cryptoUtilsAdapter,
-        storageAdapter: secureStorageAdapter,
+        secureStorageAdapter,
         commonStorageAdapter,
       }),
     [],
@@ -42,6 +42,7 @@ const useSecretKey = () => {
     lockVault: vault.lockVault,
     changePassword: vault.changePassword,
     hasSeed: vault.hasSeed,
+    unlockVault: vault.unlockVault,
   };
 };
 export default useSecretKey;

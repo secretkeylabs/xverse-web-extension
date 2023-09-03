@@ -21,7 +21,7 @@ import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { generatePasswordHash } from '@utils/encryptionUtils';
 import { PostGuardPing } from '@components/guards/singleTab';
-import { decryptSeedCBC } from '@secretkeylabs/xverse-core/encryption';
+import { decryptSeedPhraseCBC } from '@secretkeylabs/xverse-core/encryption';
 import useWalletSession from './useWalletSession';
 import useSecretKey from './useSecretKey';
 import useWalletSelector from './useWalletSelector';
@@ -29,7 +29,7 @@ import useWalletSelector from './useWalletSelector';
 const useWalletReducer = () => {
   const { accountsList, selectedAccount, network, ledgerAccountsList, encryptedSeed } =
     useWalletSelector();
-  const { getSeed, storeSeed, initSeedVault, lockVault } = useSecretKey();
+  const { getSeed, storeSeed, initSeedVault, lockVault, unlockVault } = useSecretKey();
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
@@ -105,18 +105,21 @@ const useWalletReducer = () => {
     dispatch(getActiveAccountsAction(walletAccounts));
   };
 
-  const unlockWallet = async (password: string) => {
-    if (encryptedSeed && encryptedSeed.length > 0) {
-      const pHash = await generatePasswordHash(password);
-      const decrypted = await decryptSeedCBC(encryptedSeed, pHash.hash);
+  const migrateLegacySeedStorage = async (password: string) => {
+    const pHash = await generatePasswordHash(password);
+    decryptSeedPhraseCBC(encryptedSeed, pHash.hash).then(async (decrypted) => {
       await initSeedVault(password);
       await storeSeed(decrypted);
-      await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
       localStorage.removeItem('salt');
       dispatch(storeEncryptedSeedAction(''));
-      return decrypted;
+    });
+  };
+
+  const unlockWallet = async (password: string) => {
+    if (encryptedSeed && encryptedSeed.length > 0) {
+      await migrateLegacySeedStorage(password);
     }
-    const decrypted = await getSeed(password);
+    const decrypted = await unlockVault(password);
     try {
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
     } catch (err) {
