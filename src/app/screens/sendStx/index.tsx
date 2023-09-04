@@ -73,6 +73,7 @@ function SendStxScreen() {
   }, [data]);
 
   const handleBackButtonClick = () => {
+    // redirect to homepage to avoid looping back to confrim screen
     navigate('/');
   };
 
