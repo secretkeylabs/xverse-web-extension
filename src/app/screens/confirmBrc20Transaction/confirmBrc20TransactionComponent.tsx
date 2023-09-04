@@ -1,6 +1,5 @@
 import ActionButton from '@components/button';
 import BigNumber from 'bignumber.js';
-import Brc20FeesComponent from '@screens/confirmBrc20Transaction/brc20FeesComponent';
 import RecipientComponent from '@components/recipientComponent';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
@@ -11,6 +10,7 @@ import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import { FungibleToken, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Brc20FeesComponent from './brc20FeesComponent';
 import { EditFees, OnChangeFeeRate } from './editFees';
 
 const OuterContainer = styled.div`
