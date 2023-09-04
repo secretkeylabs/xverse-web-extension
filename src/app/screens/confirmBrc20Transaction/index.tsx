@@ -17,7 +17,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { useTranslation } from 'react-i18next';
 import ConfirmBrc20TransactionComponent from './confirmBrc20TransactionComponent';
-import { OnChangeFeeRate } from './editFees';
+import type { OnChangeFeeRate } from './editFees';
 
 const ScrollContainer = styled.div`
   display: flex;
