@@ -237,7 +237,7 @@ function ImportLedger(): JSX.Element {
 
   const handleClickNext = async () => {
     /*
-      Go back to step 2 if user wants to add the stacks account as well
+      Go back to Connect Ledger step if user wants to add the stacks account as well
     */
     if (currentStep === Steps.ADDRESS_ADDED && isBitcoinSelected && isStacksSelected) {
       setIsBitcoinSelected(false);
@@ -245,21 +245,6 @@ function ImportLedger(): JSX.Element {
       setIsConnectSuccess(false);
       setIsConnectFailed(false);
 
-      setCurrentStep(Steps.CONNECT_LEDGER);
-      return;
-    }
-
-    if (currentStep === Steps.SELECT_ASSET) {
-      setCurrentStep(Steps.BEFORE_START);
-      return;
-    }
-
-    if (currentStep === Steps.BEFORE_START) {
-      setCurrentStep(Steps.IMPORTANT_WARNING);
-      return;
-    }
-
-    if (currentStep === Steps.IMPORTANT_WARNING) {
       setCurrentStep(Steps.CONNECT_LEDGER);
       return;
     }
