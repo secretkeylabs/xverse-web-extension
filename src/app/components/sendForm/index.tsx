@@ -160,7 +160,7 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
   opacity: props.enabled ? 1 : 0.6,
 }));
 
-/* --------- move to separate file ------------- */
+/* TODO --------- move to separate file ------------- */
 const SwitchToFiatButton = styled.button((props) => ({
   backgroundColor: props.theme.colors.background.elevation0,
   border: `1px solid ${props.theme.colors.background.elevation3}`,
@@ -217,7 +217,7 @@ export function FiatRow({
     </RowContainer>
   );
 }
-/* ---------------------------------------------- */
+/* ---------------------------------------------- TODO */
 
 const CurrencyFlag = styled.img((props) => ({
   marginLeft: props.theme.spacing(4),
