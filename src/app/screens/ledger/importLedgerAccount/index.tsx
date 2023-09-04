@@ -92,20 +92,20 @@ enum LedgerLiveOptions {
 enum Steps {
   START = 0,
   SELECT_ASSET = 1,
-  BEFORE_START = 1.5,
-  IMPORTANT_WARNING = 1.75,
-  CONNECT_LEDGER = 2,
-  ADD_MULTIPLE_ACCOUNTS = 2.5,
-  ADD_ADDRESS = 3,
-  VERIFY_ADDRESS = 3.5,
-  ADDRESS_ADDED = 4,
-  ADD_ACCOUNT_NAME = 5,
-  IMPORT_END = 6,
+  BEFORE_START = 2,
+  IMPORTANT_WARNING = 3,
+  CONNECT_LEDGER = 4,
+  ADD_MULTIPLE_ACCOUNTS = 4.5,
+  ADD_ADDRESS = 5,
+  VERIFY_ORDINALS_ADDRESS = 5.5,
+  ADDRESS_ADDED = 6,
+  ADD_ACCOUNT_NAME = 7,
+  IMPORT_END = 8,
 }
 
 function ImportLedger(): JSX.Element {
   const theme = useTheme();
-  const [currentStepIndex, setCurrentStepIndex] = useState(Steps.START);
+  const [currentStep, setCurrentStep] = useState(Steps.START);
   const [isBitcoinSelected, setIsBitcoinSelected] = useState(true);
   const [isStacksSelected, setIsStacksSelected] = useState(false);
   const [bitcoinCredentials, setBitcoinCredentials] = useState<Credential | undefined>(undefined);
@@ -128,7 +128,7 @@ function ImportLedger(): JSX.Element {
     useState<LedgerLiveOptions | null>(null);
   const [isTogglerChecked, setIsTogglerChecked] = useState(false);
   const { ledgerAccountsList, network } = useWalletSelector();
-  const transition = useTransition(currentStepIndex, {
+  const transition = useTransition(currentStep, {
     from: {
       x: 24,
       opacity: 0,
@@ -165,7 +165,7 @@ function ImportLedger(): JSX.Element {
         setBitcoinCredentials(btcCreds);
         if (showAddress) {
           setIsBtcAddressConfirmed(true);
-          setCurrentStepIndex(Steps.VERIFY_ADDRESS);
+          setCurrentStep(Steps.VERIFY_ORDINALS_ADDRESS);
         }
       } catch (err: any) {
         if (err.statusCode === 27013) {
@@ -239,32 +239,32 @@ function ImportLedger(): JSX.Element {
     /*
       Go back to step 2 if user wants to add the stacks account as well
     */
-    if (currentStepIndex === Steps.ADDRESS_ADDED && isBitcoinSelected && isStacksSelected) {
+    if (currentStep === Steps.ADDRESS_ADDED && isBitcoinSelected && isStacksSelected) {
       setIsBitcoinSelected(false);
       setIsButtonDisabled(false);
       setIsConnectSuccess(false);
       setIsConnectFailed(false);
 
-      setCurrentStepIndex(Steps.CONNECT_LEDGER);
+      setCurrentStep(Steps.CONNECT_LEDGER);
       return;
     }
 
-    if (currentStepIndex === Steps.SELECT_ASSET) {
-      setCurrentStepIndex(Steps.BEFORE_START);
+    if (currentStep === Steps.SELECT_ASSET) {
+      setCurrentStep(Steps.BEFORE_START);
       return;
     }
 
-    if (currentStepIndex === Steps.BEFORE_START) {
-      setCurrentStepIndex(Steps.IMPORTANT_WARNING);
+    if (currentStep === Steps.BEFORE_START) {
+      setCurrentStep(Steps.IMPORTANT_WARNING);
       return;
     }
 
-    if (currentStepIndex === Steps.IMPORTANT_WARNING) {
-      setCurrentStepIndex(Steps.CONNECT_LEDGER);
+    if (currentStep === Steps.IMPORTANT_WARNING) {
+      setCurrentStep(Steps.CONNECT_LEDGER);
       return;
     }
 
-    setCurrentStepIndex((prevStepIndex) => prevStepIndex + 1);
+    setCurrentStep((prevStepIndex) => prevStepIndex + 1);
   };
 
   const saveAddressToWallet = async ({
@@ -306,7 +306,7 @@ function ImportLedger(): JSX.Element {
         };
         await addLedgerAccount(ledgerAccount);
         await ledgerDelay(1000);
-        setCurrentStepIndex(Steps.ADDRESS_ADDED);
+        setCurrentStep(Steps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
         return;
       }
@@ -321,7 +321,7 @@ function ImportLedger(): JSX.Element {
         };
         await updateLedgerAccounts(ledgerAccount);
         await ledgerDelay(1000);
-        setCurrentStepIndex(Steps.ADDRESS_ADDED);
+        setCurrentStep(Steps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
         return;
       }
@@ -334,7 +334,7 @@ function ImportLedger(): JSX.Element {
         };
         await updateLedgerAccounts(ledgerAccount);
         await ledgerDelay(1000);
-        setCurrentStepIndex(Steps.ADDRESS_ADDED);
+        setCurrentStep(Steps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
       }
 
@@ -348,7 +348,7 @@ function ImportLedger(): JSX.Element {
 
   const handleClickMultipleAccounts = async () => {
     try {
-      setCurrentStepIndex(Steps.ADD_ADDRESS);
+      setCurrentStep(Steps.ADD_ADDRESS);
       setIsButtonDisabled(true);
       if (isBitcoinSelected) {
         const { btcCreds, ordinalsCreds, newAccountId } = await importBtcAccounts(true);
@@ -388,7 +388,7 @@ function ImportLedger(): JSX.Element {
         ledgerAccountsList?.find((account) => account.masterPubKey === masterFingerPrint)
       ) {
         setIsButtonDisabled(false);
-        setCurrentStepIndex(Steps.ADD_MULTIPLE_ACCOUNTS);
+        setCurrentStep(Steps.ADD_MULTIPLE_ACCOUNTS);
         return;
       }
       handleClickNext();
@@ -456,7 +456,7 @@ function ImportLedger(): JSX.Element {
     setAccountId(0);
     setAccountName('');
 
-    setCurrentStepIndex(Steps.START);
+    setCurrentStep(Steps.START);
   };
 
   const handleAssetSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -486,7 +486,7 @@ function ImportLedger(): JSX.Element {
   }, [accountName]);
 
   const renderContent = () => {
-    switch (currentStepIndex) {
+    switch (currentStep) {
       case Steps.START:
         return (
           <ImportStartContainer>
@@ -724,7 +724,7 @@ function ImportLedger(): JSX.Element {
             )}
           </>
         );
-      case Steps.VERIFY_ADDRESS:
+      case Steps.VERIFY_ORDINALS_ADDRESS:
         if (isConnectFailed || isOrdinalsAddressRejected) {
           return (
             <LedgerFailView
@@ -815,7 +815,7 @@ function ImportLedger(): JSX.Element {
   };
 
   const renderActionButton = () => {
-    switch (currentStepIndex) {
+    switch (currentStep) {
       case Steps.START:
         return <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_1_BUTTON')} />;
       case Steps.SELECT_ASSET:
@@ -876,7 +876,7 @@ function ImportLedger(): JSX.Element {
           </>
         );
       case Steps.ADD_ADDRESS:
-      case Steps.VERIFY_ADDRESS:
+      case Steps.VERIFY_ORDINALS_ADDRESS:
         if (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) {
           return (
             <ActionButton
@@ -916,7 +916,7 @@ function ImportLedger(): JSX.Element {
   return (
     <Container>
       <FullScreenHeader />
-      {currentStepIndex > Steps.SELECT_ASSET && (
+      {currentStep > Steps.SELECT_ASSET && (
         <AssetSelectionButton onClick={backToAssetSelection}>
           <img src={arrowLeftIcon} alt="Go back" />
           <AssetSelectionButtonText>{t('LEDGER_IMPORT_RETURN_BUTTON')}</AssetSelectionButtonText>
@@ -927,7 +927,7 @@ function ImportLedger(): JSX.Element {
           <OnBoardingContentContainer
             className={
               [Steps.START, Steps.CONNECT_LEDGER, Steps.ADDRESS_ADDED, Steps.IMPORT_END].includes(
-                currentStepIndex,
+                currentStep,
               )
                 ? 'center'
                 : ''
