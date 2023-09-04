@@ -14,6 +14,7 @@ import { importStacksAccountFromLedger, Account } from '@secretkeylabs/xverse-co
 import useWalletReducer from '@hooks/useWalletReducer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
+import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 import {
   AddAddressDetailsContainer,
   AddAddressHeaderContainer,
@@ -39,6 +40,7 @@ function AddStxAddress(): JSX.Element {
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isAddressRejected, setIsAddressRejected] = useState(false);
   const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
   const { network, selectedAccount } = useWalletSelector();
   const { updateLedgerAccounts } = useWalletReducer();
@@ -97,6 +99,9 @@ function AddStxAddress(): JSX.Element {
       return stacksCreds;
     } catch (err: any) {
       console.error(err);
+      if (err.message === LedgerErrors.NO_PUBLIC_KEY) {
+        setIsAddressRejected(true);
+      }
       setIsConnectFailed(true);
       setIsButtonDisabled(false);
       await transport.close();
@@ -122,7 +127,7 @@ function AddStxAddress(): JSX.Element {
       if (stacksCreds) {
         await saveAddressToWallet(stacksCreds);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setIsConnectSuccess(false);
       setIsConnectFailed(true);
@@ -134,6 +139,7 @@ function AddStxAddress(): JSX.Element {
     setIsButtonDisabled(false);
     setIsConnectSuccess(false);
     setIsConnectFailed(false);
+    setIsAddressRejected(false);
 
     setCurrentStep(Steps.ConnectLedger);
   };
@@ -159,11 +165,19 @@ function AddStxAddress(): JSX.Element {
           />
         );
       case Steps.VerifyAddress:
-        if (isConnectFailed) {
+        if (isConnectFailed || isAddressRejected) {
           return (
             <LedgerFailView
-              title={t('LEDGER_CONNECT.TITLE_FAILED')}
-              text={t('LEDGER_CONNECT.BTC_SUBTITLE_FAILED')}
+              title={t(
+                isAddressRejected
+                  ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
+                  : 'LEDGER_CONNECT.TITLE_FAILED',
+              )}
+              text={t(
+                isAddressRejected
+                  ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
+                  : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
+              )}
             />
           );
         }

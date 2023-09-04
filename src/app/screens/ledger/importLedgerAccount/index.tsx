@@ -31,6 +31,7 @@ import ledgerAccountSwitchIcon from '@assets/img/ledger/account_switch.svg';
 import arrowLeftIcon from '@assets/img/ledger/arrow_left_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
+import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 import {
@@ -97,7 +98,7 @@ enum Steps {
   CONNECT_LEDGER = 4,
   ADD_MULTIPLE_ACCOUNTS = 4.5,
   ADD_ADDRESS = 5,
-  VERIFY_ORDINALS_ADDRESS = 5.5,
+  ADD_ORDINALS_ADDRESS = 5.5,
   ADDRESS_ADDED = 6,
   ADD_ACCOUNT_NAME = 7,
   IMPORT_END = 8,
@@ -122,6 +123,7 @@ function ImportLedger(): JSX.Element {
   const [isOrdinalsAddressConfirmed, setIsOrdinalsAddressConfirmed] = useState(false);
   const [isBtcAddressRejected, setIsBtcAddressRejected] = useState(false);
   const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
+  const [isStxAddressRejected, setIsStxAddressRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
   const { addLedgerAccount, updateLedgerAccounts } = useWalletReducer();
   const [selectedLedgerLiveOption, setSelectedLedgerLiveOption] =
@@ -165,9 +167,10 @@ function ImportLedger(): JSX.Element {
         setBitcoinCredentials(btcCreds);
         if (showAddress) {
           setIsBtcAddressConfirmed(true);
-          setCurrentStep(Steps.VERIFY_ORDINALS_ADDRESS);
+          setCurrentStep(Steps.ADD_ORDINALS_ADDRESS);
         }
       } catch (err: any) {
+        console.error(err);
         if (err.statusCode === 27013) {
           setIsBtcAddressRejected(true);
         } else {
@@ -194,6 +197,7 @@ function ImportLedger(): JSX.Element {
           setIsOrdinalsAddressConfirmed(true);
         }
       } catch (err: any) {
+        console.error(err);
         if (err.statusCode === 27013) {
           setIsOrdinalsAddressRejected(true);
         } else {
@@ -229,6 +233,10 @@ function ImportLedger(): JSX.Element {
       return stacksCreds;
     } catch (err: any) {
       console.error(err);
+      if (err.message === LedgerErrors.NO_PUBLIC_KEY) {
+        setIsStxAddressRejected(true);
+      }
+      setIsConnectSuccess(false);
       setIsConnectFailed(true);
       setIsButtonDisabled(false);
       await transport.close();
@@ -385,6 +393,9 @@ function ImportLedger(): JSX.Element {
         await saveAddressToWallet({ btcCreds, ordinalsCreds, masterFingerPrint, newAccountId });
       } else {
         const stacksCreds = await importStxAccounts(true);
+        if (!stacksCreds) {
+          throw new Error('No response');
+        }
         await saveAddressToWallet({
           masterFingerPrint,
           newAccountId: accountId,
@@ -431,16 +442,22 @@ function ImportLedger(): JSX.Element {
   };
 
   const backToAssetSelection = () => {
-    setIsStacksSelected(false);
     setBitcoinCredentials(undefined);
     setOrdinalsCredentials(undefined);
     setStacksCredentials(undefined);
     setIsButtonDisabled(false);
     setIsConnectSuccess(false);
     setIsConnectFailed(false);
-    setAccountId(0);
     setAccountName('');
 
+    if (isStxAddressRejected) {
+      setIsStxAddressRejected(false);
+      setCurrentStep(Steps.CONNECT_LEDGER);
+      return;
+    }
+
+    setAccountId(0);
+    setIsStacksSelected(false);
     setCurrentStep(Steps.START);
   };
 
@@ -652,16 +669,16 @@ function ImportLedger(): JSX.Element {
           </CreateAnotherAccountContainer>
         );
       case Steps.ADD_ADDRESS:
-        if (isConnectFailed || isBtcAddressRejected) {
+        if (isConnectFailed || isBtcAddressRejected || isStxAddressRejected) {
           return (
             <LedgerFailView
               title={t(
-                isBtcAddressRejected
+                isBtcAddressRejected || isStxAddressRejected
                   ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
                   : 'LEDGER_CONNECT.TITLE_FAILED',
               )}
               text={t(
-                isBtcAddressRejected
+                isBtcAddressRejected || isStxAddressRejected
                   ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
                   : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
               )}
@@ -709,7 +726,7 @@ function ImportLedger(): JSX.Element {
             )}
           </>
         );
-      case Steps.VERIFY_ORDINALS_ADDRESS:
+      case Steps.ADD_ORDINALS_ADDRESS:
         if (isConnectFailed || isOrdinalsAddressRejected) {
           return (
             <LedgerFailView
@@ -861,8 +878,13 @@ function ImportLedger(): JSX.Element {
           </>
         );
       case Steps.ADD_ADDRESS:
-      case Steps.VERIFY_ORDINALS_ADDRESS:
-        if (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) {
+      case Steps.ADD_ORDINALS_ADDRESS:
+        if (
+          isConnectFailed ||
+          isBtcAddressRejected ||
+          isOrdinalsAddressRejected ||
+          isStxAddressRejected
+        ) {
           return (
             <ActionButton
               processing={isButtonDisabled}
