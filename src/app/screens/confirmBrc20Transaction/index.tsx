@@ -24,12 +24,6 @@ const ScrollContainer = styled.div`
   flex: 1;
   flex-direction: column;
   overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  height: 600px;
-  width: 360px;
-  margin: auto;
 `;
 
 export function ConfirmBrc20Transaction() {
@@ -43,7 +37,7 @@ export function ConfirmBrc20Transaction() {
     token,
   }: ConfirmBrc20TransferState = useLocation().state;
   const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/confirm-brc20-tx'), [subscribeToResetUserFlow]);
+  useEffect(() => subscribeToResetUserFlow('/confirm-brc20-tx'), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [userInputFeeRate, setUserInputFeeRate] = useState('');
   const [estimatedFees, setEstimatedFees] = useState(initEstimatedFees);
@@ -130,7 +124,7 @@ export function ConfirmBrc20Transaction() {
           isFeeLoading={isFeeLoading}
           error={error}
         />
-        {!isInOptions && <BottomBar tab="dashboard" />}
+        {!isInOptions() && <BottomBar tab="dashboard" />}
       </ScrollContainer>
     </>
   );

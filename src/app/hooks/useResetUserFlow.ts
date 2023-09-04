@@ -52,6 +52,7 @@ export const useResetUserFlow = () => {
     navigate(userFlowConfig[path]?.resetTo);
   };
 
+  // TODO refactor into a single useEffect
   const broadcastChannel = useMemo(() => new BroadcastChannel(resetUserFlowChannel), []);
   const closeChannel = () => broadcastChannel.close();
 
