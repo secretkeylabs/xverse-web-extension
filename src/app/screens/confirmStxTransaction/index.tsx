@@ -25,7 +25,7 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { deserializeTransaction } from '@stacks/transactions';
 import { isLedgerAccount } from '@utils/helper';
-import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const AlertContainer = styled.div((props) => ({
@@ -136,14 +136,14 @@ function ConfirmStxTransaction() {
   const handleConfirmClick = (txs: StacksTransaction[]) => {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
-      navigate('/confirm-ledger-tx', {
-        state: {
-          unsignedTx: txs[0].serialize(),
-          type,
-          recipients: [{ address: recipient, amountSats: amount }],
-          fee,
-        },
-      });
+      const state: ConfirmStxTransactionState = {
+        unsignedTx: unsignedTx.serialize(),
+        type,
+        recipients: [{ address: recipient, amountMicrostacks: amount }],
+        fee,
+      };
+
+      navigate('/confirm-ledger-tx', { state });
       return;
     }
 
@@ -203,4 +203,5 @@ function ConfirmStxTransaction() {
     </>
   );
 }
+
 export default ConfirmStxTransaction;

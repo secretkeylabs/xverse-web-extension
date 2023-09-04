@@ -12,7 +12,7 @@ import {
   importTaprootAccountFromLedger,
 } from '@secretkeylabs/xverse-core';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { ledgerDelay } from '@common/utils/ledger';
+import { getDeviceNewAccountIndex, getNewAccountId, ledgerDelay } from '@common/utils/ledger';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';
@@ -127,7 +127,7 @@ function ImportLedger(): JSX.Element {
   const [selectedLedgerLiveOption, setSelectedLedgerLiveOption] =
     useState<LedgerLiveOptions | null>(null);
   const [isTogglerChecked, setIsTogglerChecked] = useState(false);
-  const { ledgerAccountsList, network, selectedAccount } = useWalletSelector();
+  const { ledgerAccountsList, network } = useWalletSelector();
   const transition = useTransition(currentStepIndex, {
     from: {
       x: 24,
@@ -139,39 +139,16 @@ function ImportLedger(): JSX.Element {
     },
   });
 
-  const getNewAccountId = () => {
-    if (ledgerAccountsList.length === 0) {
-      return 0;
-    }
-
-    return ledgerAccountsList[ledgerAccountsList.length - 1].id + 1;
-  };
-
-  const getDeviceNewAccountIndex = (masterKey?: string) => {
-    const ledgerAccountsIndexList = ledgerAccountsList
-      .filter((account) => masterKey === account.masterPubKey)
-      .map((account, key) =>
-        account.deviceAccountIndex !== undefined ? account.deviceAccountIndex : key,
-      )
-      .sort((a, b) => a - b);
-
-    for (let i = 0; i < ledgerAccountsIndexList.length; i += 1) {
-      if (ledgerAccountsIndexList[i] !== i) {
-        return i;
-      }
-    }
-
-    // If no missing number is found, return the length of the array
-    return ledgerAccountsIndexList.length;
-  };
-
   const importBtcAccounts = async (showAddress: boolean, masterFingerPrint?: string) => {
     let btcCreds;
     let ordinalsCreds;
     const transport = await Transport.create();
-    const newAccountId = getNewAccountId();
+    const newAccountId = getNewAccountId(ledgerAccountsList);
     setAccountId(newAccountId);
-    const deviceNewAccountIndex = getDeviceNewAccountIndex(masterPubKey || masterFingerPrint);
+    const deviceNewAccountIndex = getDeviceNewAccountIndex(
+      ledgerAccountsList,
+      masterPubKey || masterFingerPrint,
+    );
     if (isBitcoinSelected) {
       try {
         const bitcoinAccount = await importNativeSegwitAccountFromLedger({
@@ -233,6 +210,8 @@ function ImportLedger(): JSX.Element {
   };
 
   const importStxAccounts = async (showAddress: boolean) => {
+    const { deviceAccountIndex } = ledgerAccountsList[ledgerAccountsList.length - 1];
+
     setIsButtonDisabled(true);
     const transport = await Transport.create();
 
@@ -241,7 +220,7 @@ function ImportLedger(): JSX.Element {
         transport,
         network: network.type,
         accountIndex: 0,
-        addressIndex: accountId,
+        addressIndex: deviceAccountIndex,
         showAddress,
       });
       setStacksCredentials(stacksCreds);
@@ -285,7 +264,7 @@ function ImportLedger(): JSX.Element {
       return;
     }
 
-    setCurrentStepIndex(currentStepIndex + 1);
+    setCurrentStepIndex((prevStepIndex) => prevStepIndex + 1);
   };
 
   const saveAddressToWallet = async ({
@@ -320,7 +299,10 @@ function ImportLedger(): JSX.Element {
           ordinalsPublicKey: ordinalsCreds?.publicKey || '',
           accountType: 'ledger',
           accountName: `Ledger Account ${newAccountId + 1}`,
-          deviceAccountIndex: getDeviceNewAccountIndex(masterPubKey || masterFingerPrint),
+          deviceAccountIndex: getDeviceNewAccountIndex(
+            ledgerAccountsList,
+            masterPubKey || masterFingerPrint,
+          ),
         };
         await addLedgerAccount(ledgerAccount);
         await ledgerDelay(1000);
@@ -393,9 +375,7 @@ function ImportLedger(): JSX.Element {
       setIsBtcAddressRejected(false);
       setIsOrdinalsAddressRejected(false);
       setIsButtonDisabled(true);
-      const masterFingerPrint = isBitcoinSelected
-        ? await fetchMasterPubKey()
-        : selectedAccount?.masterPubKey || masterPubKey;
+      const masterFingerPrint = isBitcoinSelected ? await fetchMasterPubKey() : masterPubKey;
       if (isBitcoinSelected) {
         await importBtcAccounts(false, masterFingerPrint);
       } else {
@@ -404,8 +384,8 @@ function ImportLedger(): JSX.Element {
       setIsConnectSuccess(true);
       await ledgerDelay(1500);
       if (
-        ledgerAccountsList?.find((account) => account.masterPubKey === masterFingerPrint) &&
-        isBitcoinSelected
+        isBitcoinSelected &&
+        ledgerAccountsList?.find((account) => account.masterPubKey === masterFingerPrint)
       ) {
         setIsButtonDisabled(false);
         setCurrentStepIndex(Steps.ADD_MULTIPLE_ACCOUNTS);

@@ -54,7 +54,7 @@ function AddStxAddress(): JSX.Element {
   });
 
   const handleClickNext = async () => {
-    setCurrentStep(currentStep + 1);
+    setCurrentStep((prevStepIndex) => prevStepIndex + 1);
   };
 
   const saveAddressToWallet = async (stacksCreds: { address: string; publicKey: string }) => {

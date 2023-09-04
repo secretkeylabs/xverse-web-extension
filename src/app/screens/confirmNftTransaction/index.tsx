@@ -6,7 +6,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { deserializeTransaction } from '@stacks/transactions';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
@@ -20,7 +19,7 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { isLedgerAccount } from '@utils/helper';
-import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import BigNumber from 'bignumber.js';
 
@@ -153,26 +152,26 @@ function ConfirmNftTransaction() {
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
-      navigate('/confirm-ledger-tx', {
-        state: {
-          unsignedTx: txs[0].serialize(),
-          type,
-          recipients: [
-            {
-              address: recipientAddress,
-              amountSats: initialStxTransactions[0]?.payload?.amount
-                ? new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10))
-                : new BigNumber(0),
-            },
-          ],
-          fee: new BigNumber(
-            initialStxTransactions
-              .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
-              .reduce((prev, curr) => prev + curr, BigInt(0))
-              .toString(10),
-          ),
-        },
-      });
+      const state: ConfirmStxTransactionState = {
+        unsignedTx: unsignedTx.serialize(),
+        type,
+        recipients: [
+          {
+            address: recipientAddress,
+            amountMicrostacks: unsignedTx?.payload?.amount
+              ? new BigNumber(unsignedTx?.payload.amount?.toString(10))
+              : new BigNumber(0),
+          },
+        ],
+        fee: new BigNumber(
+          initialStxTransactions
+            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+            .reduce((prev, curr) => prev + curr, BigInt(0))
+            .toString(10),
+        ),
+      };
+
+      navigate('/confirm-ledger-tx', { state });
       return;
     }
 

@@ -93,7 +93,7 @@ function VerifyLedger(): JSX.Element {
   };
 
   const handleClickNext = () => {
-    setCurrentStepIndex(currentStepIndex + 1);
+    setCurrentStepIndex((prevStepIndex) => prevStepIndex + 1);
   };
 
   const importBtcAccounts = async (showAddress: boolean) => {

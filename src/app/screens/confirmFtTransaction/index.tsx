@@ -15,7 +15,7 @@ import TransferMemoView from '@components/confirmStxTransactionComponent/transfe
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isLedgerAccount } from '@utils/helper';
-import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import BigNumber from 'bignumber.js';
 
 function ConfirmFtTransaction() {
@@ -67,15 +67,14 @@ function ConfirmFtTransaction() {
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
-      navigate('/confirm-ledger-tx', {
-        state: {
-          unsignedTx: txs[0].serialize(),
-          type,
-          recipients: [{ address: recepientAddress, amountSats: new BigNumber(amount) }],
-          fee: new BigNumber(txs[0].auth.spendingCondition.fee.toString()),
-        },
-      });
+      const state: ConfirmStxTransactionState = {
+        unsignedTx: unsignedTx.serialize(),
+        type,
+        recipients: [{ address: recepientAddress, amountMicrostacks: new BigNumber(amount) }],
+        fee: new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
+      };
 
+      navigate('/confirm-ledger-tx', { state });
       return;
     }
 
