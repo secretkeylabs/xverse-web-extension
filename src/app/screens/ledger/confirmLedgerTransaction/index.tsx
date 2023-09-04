@@ -15,7 +15,8 @@ import {
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Recipient, StacksRecipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import { StacksRecipient } from '@secretkeylabs/xverse-core/transactions/stx';
 import LedgerConnectionView, {
   ConnectLedgerContainer,
   ConnectLedgerText,
