@@ -3,9 +3,7 @@ import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } f
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import DotsVerticalIcon from '@assets/img/dots_three_vertical.svg';
-import EyeIcon from '@assets/img/eye.svg';
-import ShareIcon from '@assets/img/share.svg';
+import { DotsThreeVertical, Eye, Share } from '@phosphor-icons/react';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 
 import { ContentType } from './common';
@@ -54,7 +52,7 @@ const Container = styled.div({
   cursor: 'pointer',
 });
 
-const ButtonIcon = styled.img((props) => ({
+const ButtonIcon = styled.div((props) => ({
   width: 20,
   height: 20,
   marginLeft: props.theme.spacing(4),
@@ -206,11 +204,21 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
     <>
       <Container onClick={clickAction}>
         <div>{inputContentType}</div>
-        {showPreviewButton && <ButtonIcon src={EyeIcon} />}
-        {showOrdButton && <ButtonIcon src={ShareIcon} />}
+        {showPreviewButton && (
+          <ButtonIcon>
+            <Eye size={20} />
+          </ButtonIcon>
+        )}
+        {showOrdButton && (
+          <ButtonIcon>
+            <Share size={20} />
+          </ButtonIcon>
+        )}
         {showMenuButton && (
           <MenuContainer>
-            <ButtonIcon src={DotsVerticalIcon} />
+            <ButtonIcon>
+              <DotsThreeVertical size={20} />
+            </ButtonIcon>
             {showMenu && (
               <Menu ref={menuRef}>
                 <MenuItem onClick={onTogglePreview}>{t('SHOW')}</MenuItem>
