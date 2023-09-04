@@ -15,7 +15,7 @@ const RowContainer = styled.div((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   width: '100%',
-  minHeight: '64px',
+  height: 64,
   justifyContent: 'space-between',
   paddingLeft: props.theme.spacing(30),
   paddingRight: props.theme.spacing(30),
@@ -60,26 +60,22 @@ function BottomTabBar({ tab }: Props) {
 
   const showBottomBar = !isInOptions();
 
-  return (
+  return showBottomBar ? (
     <RowContainer>
-      {showBottomBar && (
-        <>
-          <Button onClick={handleDashboardButtonClick}>
-            <img src={tab === 'dashboard' ? WalletTab : UnselectedWalletTab} alt="dashboard" />
-          </Button>
-          <Button onClick={handleNftButtonClick}>
-            <img src={tab === 'nft' ? NftTab : UnselectedNftTab} alt="nft" />
-          </Button>
-          <Button onClick={handleStackingButtonClick}>
-            <img src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} alt="stacking" />
-          </Button>
-          <Button onClick={handleSettingButtonClick}>
-            <img src={tab === 'settings' ? SettingsTab : UnselectedSettingsTab} alt="settings" />
-          </Button>
-        </>
-      )}
+      <Button onClick={handleDashboardButtonClick}>
+        <img src={tab === 'dashboard' ? WalletTab : UnselectedWalletTab} alt="dashboard" />
+      </Button>
+      <Button onClick={handleNftButtonClick}>
+        <img src={tab === 'nft' ? NftTab : UnselectedNftTab} alt="nft" />
+      </Button>
+      <Button onClick={handleStackingButtonClick}>
+        <img src={tab === 'stacking' ? StackingTab : UnselectedStackingTab} alt="stacking" />
+      </Button>
+      <Button onClick={handleSettingButtonClick}>
+        <img src={tab === 'settings' ? SettingsTab : UnselectedSettingsTab} alt="settings" />
+      </Button>
     </RowContainer>
-  );
+  ) : null;
 }
 
 export default BottomTabBar;
