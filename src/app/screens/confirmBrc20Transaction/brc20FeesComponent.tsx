@@ -92,5 +92,4 @@ function Brc20FeesComponent({
   );
 }
 
-// renderText={(value: string) => <FeeText>{value}</FeeText>}
 export default Brc20FeesComponent;
