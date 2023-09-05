@@ -233,7 +233,7 @@ function AddStxAddress(): JSX.Element {
               <ActionButton
                 processing={isButtonDisabled}
                 disabled={isButtonDisabled}
-                onPress={checkDeviceConnection}
+                onPress={isConnectFailed ? handleTryAgain : checkDeviceConnection}
                 text={t(
                   isConnectFailed
                     ? 'LEDGER_IMPORT_TRY_AGAIN_BUTTON'
