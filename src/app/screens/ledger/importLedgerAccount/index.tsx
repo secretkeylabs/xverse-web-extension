@@ -485,12 +485,6 @@ function ImportLedger(): JSX.Element {
   return (
     <Container>
       <FullScreenHeader />
-      {currentStepIndex > 1 && (
-        <AssetSelectionButton onClick={backToAssetSelection}>
-          <img src={arrowLeftIcon} alt="Go back" />
-          <AssetSelectionButtonText>{t('LEDGER_IMPORT_RETURN_BUTTON')}</AssetSelectionButtonText>
-        </AssetSelectionButton>
-      )}
       {transition((style) => (
         <>
           <OnBoardingContentContainer
