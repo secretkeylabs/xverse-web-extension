@@ -466,7 +466,7 @@ function ImportLedger(): JSX.Element {
 
   const validateAccountName = () => {
     if (accountName.length > 20) {
-      setAccountNameError('Account name should be not longer than 20 characters.');
+      setAccountNameError('Account name should not be longer than 20 characters.');
       return;
     }
 
