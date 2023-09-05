@@ -103,7 +103,10 @@
         "UNDERSTAND_THE_RISKS": "I understand the risks and wish to continue anyway",
         "UNDERSTAND_SHOULD_NOT_USE_LEDGER_LIVE": "I understand I should not use Ledger Live or other Bitcoin wallets with the same hardware device"
       }
-    }
+    },
+    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
+    "CLOSE_BUTTON": "Close",
+    "TITLE_FAILED": "Connection failed"
   },
   "LEDGER_VERIFY_SCREEN": {
     "TITLE_VERIFY_BTC": "Verify Bitcoin payment address",
@@ -291,7 +294,6 @@
     "To": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive",
-
     "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
