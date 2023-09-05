@@ -28,19 +28,6 @@ export type ExecuteBrc20TransferState = {
   token: FungibleToken;
 };
 
-export type Brc20TransferParams = {
-  recipient: string;
-  addressUtxos: UTXO[];
-  ticker: string;
-  amount: number;
-  transferFees: TransferEstimateResult;
-};
-
-export type Brc20TransactionParams = Omit<Brc20TransferParams, 'transferFees'> & {
-  seed: string;
-  feeRate: number;
-};
-
 export const getFeeValuesForBrc20OneStepTransfer = ({
   commitChainFee,
   revealChainFee,
