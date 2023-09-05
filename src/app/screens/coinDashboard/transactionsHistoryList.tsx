@@ -192,7 +192,6 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>
       {groupedTxs &&
         !isLoading &&
-        !isFetching &&
         Object.keys(groupedTxs).map((group) => (
           <GroupContainer style={styles}>
             <SectionHeader>
@@ -216,12 +215,12 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
             })}
           </GroupContainer>
         ))}
-      {(isLoading || isFetching) && (
+      {isLoading && (
         <LoadingContainer>
           <MoonLoader color="white" size={20} />
         </LoadingContainer>
       )}
-      {!isLoading && !isFetching && data?.length === 0 && (
+      {!isLoading && data?.length === 0 && (
         <NoTransactionsContainer>{t('TRANSACTIONS_LIST_EMPTY')}</NoTransactionsContainer>
       )}
     </ListItemsContainer>
