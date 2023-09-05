@@ -30,11 +30,8 @@ export function ExecuteBrc20Transaction() {
   const [loadingPercentage, setLoadingPercentage] = useState(0);
 
   useEffect(() => {
-    if (complete || errorCode) {
-      return;
-    }
     executeTransfer();
-  }, [executeTransfer, complete, errorCode]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!progress) {
