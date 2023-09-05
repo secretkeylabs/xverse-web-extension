@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
+import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 import stxIcon from '@assets/img/ledger/stx_icon.svg';
 import { useTransition } from '@react-spring/web';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
@@ -14,6 +15,8 @@ import { importStacksAccountFromLedger, Account } from '@secretkeylabs/xverse-co
 import useWalletReducer from '@hooks/useWalletReducer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
+import { Credential } from '../importLedgerAccount';
+
 import {
   AddAddressDetailsContainer,
   AddAddressHeaderContainer,
@@ -25,7 +28,6 @@ import {
   SelectAssetText,
   SelectAssetTitle,
 } from '../importLedgerAccount/index.styled';
-import { Credential } from '../importLedgerAccount';
 
 function AddStxAddress(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
@@ -33,6 +35,7 @@ function AddStxAddress(): JSX.Element {
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isAddressRejected, setIsAddressRejected] = useState(false);
   const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
   const { network, selectedAccount } = useWalletSelector();
   const { updateLedgerAccounts } = useWalletReducer();
@@ -91,6 +94,9 @@ function AddStxAddress(): JSX.Element {
       return stacksCreds;
     } catch (err: any) {
       console.error(err);
+      if (err.message === LedgerErrors.NO_PUBLIC_KEY) {
+        setIsAddressRejected(true);
+      }
       setIsConnectFailed(true);
       setIsButtonDisabled(false);
       await transport.close();
@@ -128,6 +134,7 @@ function AddStxAddress(): JSX.Element {
     setIsButtonDisabled(false);
     setIsConnectSuccess(false);
     setIsConnectFailed(false);
+    setIsAddressRejected(false);
 
     setCurrentStepIndex(0);
   };
@@ -156,10 +163,18 @@ function AddStxAddress(): JSX.Element {
               />
             )}
             {currentStepIndex === 1 &&
-              (isConnectFailed ? (
+              (isConnectFailed || isAddressRejected ? (
                 <LedgerFailView
-                  title={t('LEDGER_CONNECT.TITLE_FAILED')}
-                  text={t('LEDGER_CONNECT.BTC_SUBTITLE_FAILED')}
+                  title={t(
+                    isAddressRejected
+                      ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
+                      : 'LEDGER_CONNECT.TITLE_FAILED',
+                  )}
+                  text={t(
+                    isAddressRejected
+                      ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
+                      : 'LEDGER_CONNECT.STX_SUBTITLE_FAILED',
+                  )}
                 />
               ) : (
                 <>
@@ -198,7 +213,7 @@ function AddStxAddress(): JSX.Element {
                 )}
               />
             )}
-            {currentStepIndex === 1 && isConnectFailed && (
+            {currentStepIndex === 1 && (isConnectFailed || isAddressRejected) && (
               <ActionButton
                 processing={isButtonDisabled}
                 disabled={isButtonDisabled}

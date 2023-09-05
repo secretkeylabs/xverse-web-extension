@@ -18,6 +18,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import warningIcon from '@assets/img/Warning_red.svg';
+import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 
 import ledgerImportStartIcon from '@assets/img/ledger/ledger_import_start.svg';
 import btcOrdinalsIcon from '@assets/img/ledger/btc_ordinals_icon.svg';
@@ -32,6 +33,7 @@ import arrowLeftIcon from '@assets/img/ledger/arrow_left_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
+
 import {
   AddAccountNameContainer,
   AddAccountNameTitleContainer,
@@ -102,6 +104,7 @@ function ImportLedger(): JSX.Element {
   const [accountNameError, setAccountNameError] = useState<string | undefined>();
   const [isBtcAddressConfirmed, setIsBtcAddressConfirmed] = useState(false);
   const [isOrdinalsAddressConfirmed, setIsOrdinalsAddressConfirmed] = useState(false);
+  const [isStxAddressRejected, setIsStxAddressRejected] = useState(false);
   const [isBtcAddressRejected, setIsBtcAddressRejected] = useState(false);
   const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
@@ -212,6 +215,10 @@ function ImportLedger(): JSX.Element {
       return stacksCreds;
     } catch (err: any) {
       console.error(err);
+      if (err.message === LedgerErrors.NO_PUBLIC_KEY) {
+        setIsStxAddressRejected(true);
+      }
+      setIsConnectSuccess(false);
       setIsConnectFailed(true);
       setIsButtonDisabled(false);
       await transport.close();
@@ -383,6 +390,9 @@ function ImportLedger(): JSX.Element {
         await saveAddressToWallet({ btcCreds, ordinalsCreds, masterFingerPrint, newAccountId });
       } else {
         const stacksCreds = await importStxAccounts(true);
+        if (!stacksCreds) {
+          throw new Error('No response');
+        }
         await saveAddressToWallet({
           masterFingerPrint,
           newAccountId: accountId,
@@ -429,16 +439,22 @@ function ImportLedger(): JSX.Element {
   };
 
   const backToAssetSelection = () => {
-    setIsStacksSelected(false);
     setBitcoinCredentials(undefined);
     setOrdinalsCredentials(undefined);
     setStacksCredentials(undefined);
     setIsButtonDisabled(false);
     setIsConnectSuccess(false);
     setIsConnectFailed(false);
-    setAccountId(0);
     setAccountName('');
 
+    if (isStxAddressRejected) {
+      setIsStxAddressRejected(false);
+      setCurrentStepIndex(2);
+      return;
+    }
+
+    setAccountId(0);
+    setIsStacksSelected(false);
     setCurrentStepIndex(0);
   };
 
@@ -659,15 +675,15 @@ function ImportLedger(): JSX.Element {
               </CreateAnotherAccountContainer>
             )}
             {currentStepIndex === 3 &&
-              (isConnectFailed || isBtcAddressRejected ? (
+              (isConnectFailed || isBtcAddressRejected || isStxAddressRejected ? (
                 <LedgerFailView
                   title={t(
-                    isBtcAddressRejected
+                    isBtcAddressRejected || isStxAddressRejected
                       ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
                       : 'LEDGER_CONNECT.TITLE_FAILED',
                   )}
                   text={t(
-                    isBtcAddressRejected
+                    isBtcAddressRejected || isStxAddressRejected
                       ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
                       : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
                   )}
@@ -852,7 +868,10 @@ function ImportLedger(): JSX.Element {
               </>
             )}
             {(currentStepIndex === 3 || currentStepIndex === 3.5) &&
-              (isConnectFailed || isBtcAddressRejected || isOrdinalsAddressRejected) && (
+              (isConnectFailed ||
+                isBtcAddressRejected ||
+                isOrdinalsAddressRejected ||
+                isStxAddressRejected) && (
                 <ActionButton
                   processing={isButtonDisabled}
                   disabled={isButtonDisabled}
