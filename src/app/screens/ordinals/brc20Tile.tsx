@@ -119,7 +119,7 @@ export default function Brc20Tile(props: Brc20TileProps) {
   } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   function renderFTIcon(ticker: string) {
-    const background = stc(ticker);
+    const background = stc(ticker.toUpperCase());
     ticker = ticker && ticker.substring(0, 4);
     return (
       <TickerIconContainer color={background} enlargeTicker={isGalleryOpen}>
