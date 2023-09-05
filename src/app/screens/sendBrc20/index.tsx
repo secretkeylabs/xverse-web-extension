@@ -66,9 +66,7 @@ function SendBrc20Screen() {
   const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
     const newValue = e.currentTarget.value;
     const resultRegex = /^\d*\.?\d*$/;
-    if (!resultRegex.test(newValue)) {
-      setAmountToSend('');
-    } else {
+    if (resultRegex.test(newValue)) {
       validateAmount(newValue);
       setAmountToSend(newValue);
     }
