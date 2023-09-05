@@ -12,9 +12,9 @@ const resetUserFlowChannel = 'resetUserFlow';
 const userFlowConfig: Record<string, { resetTo: string }> = {
   '/send-btc': { resetTo: '/send-btc' },
   '/confirm-btc-tx': { resetTo: '/send-btc' },
-  '/send-brc20': { resetTo: '/account-list' },
-  '/confirm-inscription-request': { resetTo: '/account-list' },
-  '/confirm-brc20-tx': { resetTo: '/account-list' },
+  '/send-brc20': { resetTo: '/' },
+  '/confirm-brc20-tx': { resetTo: '/' },
+  '/confirm-inscription-request': { resetTo: '/' },
   '/ordinal-detail': { resetTo: '/nft-dashboard' },
   '/send-ordinal': { resetTo: '/nft-dashboard' },
   '/confirm-ordinal-tx': { resetTo: '/nft-dashboard' },

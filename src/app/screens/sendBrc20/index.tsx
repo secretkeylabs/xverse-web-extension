@@ -36,7 +36,7 @@ function SendBrc20Screen() {
   const [processing, setProcessing] = useState(false);
 
   const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/send-brc20'), [subscribeToResetUserFlow]);
+  useEffect(() => subscribeToResetUserFlow('/send-brc20'), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isNextEnabled =
     !amountError && !recipientError && !!recipientAddress && amountToSend !== '';
@@ -99,15 +99,14 @@ function SendBrc20Screen() {
 
   const handleOnPressNext = async () => {
     try {
-      setProcessing(true);
-
       if (
         !validateAmount(amountToSend) ||
         !validateRecipientAddress(recipientAddress) ||
         !feeRate
       ) {
-        return setProcessing(false);
+        return;
       }
+      setProcessing(true);
 
       // TODO get this from store or cache?
       const addressUtxos: UTXO[] = await getNonOrdinalUtxo(btcAddress, network.type);
