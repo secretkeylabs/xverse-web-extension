@@ -110,13 +110,16 @@ function ConfirmStxTransaction() {
     const txFiatAmount = getStxFiatEquivalent(amount, stxBtcRate, btcFiatRate);
     const txFiatTotal = getStxFiatEquivalent(amount, stxBtcRate, btcFiatRate);
     const { memo: txMemo } = txPayload;
+    // the txPayload returns a string of null bytes incase memo is null
+    // remove null bytes so send form treats it as an empty string
+    const modifiedMemoString = txMemo.content.split('\u0000').join('');
 
     setAmount(txAmount);
     setStateFee(txFee);
     setFiatAmount(txFiatAmount);
     setTotal(txTotal);
     setFiatTotal(txFiatTotal);
-    setMemo(txMemo.content);
+    setMemo(modifiedMemoString);
   }
 
   useEffect(() => {
