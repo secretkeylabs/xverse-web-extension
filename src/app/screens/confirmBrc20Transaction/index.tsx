@@ -5,14 +5,14 @@ import styled from 'styled-components';
 import useDebounce from '@hooks/useDebounce';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
-import { brc20TransferEstimateFees, CoreError } from '@secretkeylabs/xverse-core';
+import { useBrc20TransferFees } from '@secretkeylabs/xverse-core';
 import {
   getFeeValuesForBrc20OneStepTransfer,
   ConfirmBrc20TransferState,
   ExecuteBrc20TransferState,
 } from '@utils/brc20';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { useTranslation } from 'react-i18next';
@@ -36,43 +36,26 @@ export function ConfirmBrc20Transaction() {
     estimatedFees: initEstimatedFees,
     token,
   }: ConfirmBrc20TransferState = useLocation().state;
+
   useResetUserFlow('/confirm-brc20-tx');
 
   const [userInputFeeRate, setUserInputFeeRate] = useState('');
-  const [estimatedFees, setEstimatedFees] = useState(initEstimatedFees);
-  const [isFeeLoading, setIsFeeLoading] = useState(false);
   const [error, setError] = useState<BRC20ErrorCode | ''>('');
   const debouncedUserInputFeeRate = useDebounce(userInputFeeRate, 300);
 
-  const { txFee, inscriptionFee, totalFee, btcFee } = getFeeValuesForBrc20OneStepTransfer(
-    estimatedFees.valueBreakdown,
-  );
+  const {
+    commitValueBreakdown,
+    isLoading: isFeeLoading,
+    errorCode,
+  } = useBrc20TransferFees({
+    ...estimateFeesParams,
+    feeRate: Number(debouncedUserInputFeeRate),
+    skipInitialFetch: true,
+  });
 
-  useEffect(() => {
-    const runEstimate = async () => {
-      setIsFeeLoading(true);
-      setError('');
-      try {
-        const result = await brc20TransferEstimateFees({
-          ...estimateFeesParams,
-          feeRate: Number(debouncedUserInputFeeRate),
-        });
-        setEstimatedFees(result);
-      } catch (err) {
-        const e = err as Error;
-        if (CoreError.isCoreError(e) && (e.code ?? '') in BRC20ErrorCode) {
-          setError(e.code as BRC20ErrorCode);
-          // TODO add logic in from core hook to show what the fee would have been
-        } else {
-          setError(BRC20ErrorCode.SERVER_ERROR);
-        }
-      }
-      setIsFeeLoading(false);
-    };
-    if (debouncedUserInputFeeRate) {
-      runEstimate();
-    }
-  }, [debouncedUserInputFeeRate, estimateFeesParams]);
+  const { txFee, inscriptionFee, totalFee, btcFee } = getFeeValuesForBrc20OneStepTransfer(
+    commitValueBreakdown ?? initEstimatedFees.valueBreakdown,
+  );
 
   /* callbacks */
   const handleClickConfirm = () => {
@@ -121,7 +104,7 @@ export function ConfirmBrc20Transaction() {
           totalFee={totalFee}
           transactionFee={txFee}
           isFeeLoading={isFeeLoading}
-          error={error}
+          error={error || errorCode || ''}
         />
         {!isInOptions() && <BottomBar tab="dashboard" />}
       </ScrollContainer>
