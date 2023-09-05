@@ -74,8 +74,7 @@ function ConfirmBtcTransaction() {
     });
   };
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/confirm-btc-tx'), []);
+  useResetUserFlow('/confirm-btc-tx');
 
   const onContinueButtonClick = () => {
     mutate({ signedTx });

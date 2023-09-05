@@ -176,8 +176,7 @@ function SendOrdinal() {
     navigate(-1);
   };
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/send-ordinal'), []);
+  useResetUserFlow('/send-ordinal');
 
   const activeAccountOwnsOrdinal =
     selectedOrdinal && selectedAccount && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);

@@ -11,8 +11,8 @@ import Separator from '@components/separator';
 import { Account } from '@secretkeylabs/xverse-core/types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletReducer from '@hooks/useWalletReducer';
-import React, { useEffect, useMemo } from 'react';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import { useMemo } from 'react';
+import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 
 const Container = styled.div`
   display: flex;
@@ -93,10 +93,6 @@ function AccountList(): JSX.Element {
     }
     return accountsList;
   }, [accountsList, ledgerAccountsList, network]);
-
-  const { broadcastResetUserFlow, closeChannel } = useResetUserFlow();
-  // destructor
-  useEffect(() => closeChannel, []);
 
   const handleAccountSelect = (account: Account) => {
     dispatch(

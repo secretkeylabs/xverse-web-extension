@@ -36,8 +36,7 @@ export function ConfirmBrc20Transaction() {
     estimatedFees: initEstimatedFees,
     token,
   }: ConfirmBrc20TransferState = useLocation().state;
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/confirm-brc20-tx'), []); // eslint-disable-line react-hooks/exhaustive-deps
+  useResetUserFlow('/confirm-brc20-tx');
 
   const [userInputFeeRate, setUserInputFeeRate] = useState('');
   const [estimatedFees, setEstimatedFees] = useState(initEstimatedFees);

@@ -17,7 +17,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { getFtTicker } from '@utils/tokens';
 import { replaceCommaByDot } from '@utils/helper';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { useTranslation } from 'react-i18next';
@@ -35,8 +35,7 @@ function SendBrc20Screen() {
   const [recipientAddress, setRecipientAddress] = useState('');
   const [processing, setProcessing] = useState(false);
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/send-brc20'), []); // eslint-disable-line react-hooks/exhaustive-deps
+  useResetUserFlow('/send-brc20');
 
   const isNextEnabled =
     !amountError && !recipientError && !!recipientAddress && amountToSend !== '';

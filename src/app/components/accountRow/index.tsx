@@ -16,7 +16,7 @@ import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
 import ActionButton from '@components/button';
 import BottomModal from '@components/bottomModal';
 import useWalletReducer from '@hooks/useWalletReducer';
-import useResetUserFlow from '@hooks/useResetUserFlow';
+import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 
 interface GradientCircleProps {
@@ -165,7 +165,6 @@ function AccountRow({
     { top: string; left: string } | undefined
   >();
   const { removeLedgerAccount } = useWalletReducer();
-  const { broadcastResetUserFlow } = useResetUserFlow();
 
   useEffect(
     () => () => {
