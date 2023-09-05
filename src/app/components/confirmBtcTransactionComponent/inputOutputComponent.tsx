@@ -154,7 +154,7 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
         <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
       );
     const detailViewValue = output.outputScript ? (
-      <SubValueText>{`${t('SCRIPT_OUTPUT')} #${scriptOutputCount++}`}</SubValueText>
+      <SubValueText>{`${t('SCRIPT_OUTPUT')} #${scriptOutputCount}`}</SubValueText>
     ) : (
       showAddress
     );
@@ -168,7 +168,7 @@ function InputOutputComponent({ address, parsedPsbt, isExpanded, onArrowClick }:
         ).toString()} BTC`}
         address={output.address}
         outputScript={output.outputScript}
-        outputScriptIndex={output.outputScript ? scriptOutputCount : undefined}
+        outputScriptIndex={output.outputScript ? scriptOutputCount++ : undefined}
       >
         {detailViewValue}
       </TransferDetailView>
