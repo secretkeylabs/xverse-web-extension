@@ -284,7 +284,11 @@ function SignatureRequest(): JSX.Element {
           0,
           selectedAccount.deviceAccountIndex,
         );
-        if (!!signature.errorMessage && !!signature.returnCode) {
+        if (
+          !!signature.errorMessage &&
+          signature.errorMessage !== 'No errors' && // @zondax/ledger-stacks npm package returns this string when there are no errors
+          !!signature.returnCode
+        ) {
           throw new Error(signature.errorMessage, {
             cause: signature.returnCode,
           });
