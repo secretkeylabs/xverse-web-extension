@@ -183,7 +183,7 @@ export function EditFees({
   onClickApply: OnChangeFeeRate;
   onChangeFeeRate: OnChangeFeeRate;
   fee: string;
-  initialFeeRate: number;
+  initialFeeRate: string;
   isFeeLoading: boolean;
   error: string;
 }) {
@@ -191,8 +191,13 @@ export function EditFees({
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
   const { data: feeRates } = useBtcFeeRate();
 
-  const [selectedOption, setSelectedOption] = useState('standard');
-  const [feeRateInput, setFeeRateInput] = useState(initialFeeRate?.toString() ?? '');
+  // save the previous state in case user clicks X without applying
+  const [previousFeeRate, setPreviousFeeRate] = useState(initialFeeRate);
+  const [previousSelectedOption, setPreviousSelectedOption] = useState('standard');
+
+  const [feeRateInput, setFeeRateInput] = useState(previousFeeRate);
+  const [selectedOption, setSelectedOption] = useState(previousSelectedOption);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -226,7 +231,18 @@ export function EditFees({
     }
   };
 
+  const handleClickClose = () => {
+    // reset state
+    setFeeRateInput(previousFeeRate);
+    setSelectedOption(previousSelectedOption);
+    onClose();
+  };
+
   const handleClickApply = () => {
+    // save state
+    setPreviousFeeRate(feeRateInput);
+    setPreviousSelectedOption(selectedOption);
+    // apply state to parent
     onClickApply(feeRateInput);
     onClose();
   };
@@ -237,7 +253,7 @@ export function EditFees({
     <BottomModal
       visible={visible}
       header={t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')}
-      onClose={onClose}
+      onClose={handleClickClose}
     >
       <Container>
         <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
