@@ -240,7 +240,6 @@ export type WalletActions =
   | ChangeNetwork
   | GetActiveAccounts
   | ChangeActivateOrdinals
-  | ChangeActivateDataCollection
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
   | SetBrcCoinsData
