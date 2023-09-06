@@ -28,7 +28,6 @@ import {
   WalletActions,
   WalletSessionPeriods,
   WalletState,
-  ChangeHasActivatedDataCollection,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -60,7 +59,6 @@ const initialWalletState: WalletState = {
   networkAddress: undefined,
   btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
-  hasActivatedDataCollection: undefined,
   showBtcReceiveAlert: true,
   showOrdinalReceiveAlert: true,
   accountType: 'software',
@@ -190,11 +188,6 @@ const walletReducer = (
       return {
         ...state,
         hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
-      };
-    case ChangeHasActivatedDataCollection:
-      return {
-        ...state,
-        hasActivatedDataCollection: action.hasActivatedDataCollection,
       };
     case ChangeShowBtcReceiveAlertKey:
       return {

@@ -217,15 +217,6 @@ export function ChangeActivateOrdinalsAction(
   };
 }
 
-export function ChangeActivateDataCollectionAction(
-  hasActivatedDataCollection: boolean,
-): actions.ChangeActivateDataCollection {
-  return {
-    type: actions.ChangeHasActivatedDataCollection,
-    hasActivatedDataCollection,
-  };
-}
-
 export function ChangeShowBtcReceiveAlertAction(
   showBtcReceiveAlert: boolean | null,
 ): actions.ChangeShowBtcReceiveAlert {

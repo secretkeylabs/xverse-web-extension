@@ -22,6 +22,7 @@ import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@uti
 import { useDispatch } from 'react-redux';
 import { isHardwareAccount, isLedgerAccount, trackMixPanel } from '@utils/helper';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
+import mixpanel from 'mixpanel-browser';
 import useWalletSession from './useWalletSession';
 import useWalletSelector from './useWalletSelector';
 
@@ -127,6 +128,7 @@ const useWalletReducer = () => {
   };
 
   const resetWallet = () => {
+    mixpanel.reset();
     dispatch(resetWalletAction());
     chrome.storage.local.clear();
     chrome.storage.session.clear();

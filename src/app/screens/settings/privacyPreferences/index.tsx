@@ -7,9 +7,7 @@ import Switch from 'react-switch';
 import mixpanel from 'mixpanel-browser';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { sha256 } from 'js-sha256';
-import { ChangeActivateDataCollectionAction } from '@stores/wallet/actions/actionCreators';
-import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const Container = styled.div`
   display: flex;
@@ -36,24 +34,38 @@ function PrivacyPreferencesScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const navigate = useNavigate();
   const theme = useTheme();
-  const dispatch = useDispatch();
-  const { selectedAccount, hasActivatedDataCollection } = useWalletSelector();
+  // const { selectedAccount } = useWalletSelector();
+  const [isEnabled, setIsEnabled] = useState(true);
 
   const handleBackButtonClick = () => {
     navigate('/settings');
   };
 
   const handleSwitchChange = () => {
-    dispatch(ChangeActivateDataCollectionAction(!hasActivatedDataCollection));
+    setIsEnabled((prevEnabledState) => {
+      if (prevEnabledState) {
+        mixpanel.opt_out_tracking();
+      } else {
+        mixpanel.opt_in_tracking();
+      }
+
+      return !prevEnabledState;
+    });
+  };
+
+  const checkMixpanelTrackingStatus = async () => {
+    const hasOptedOut = await mixpanel.has_opted_out_tracking();
+
+    if (hasOptedOut) {
+      setIsEnabled(false);
+    }
   };
 
   useEffect(() => {
-    if (!selectedAccount || !hasActivatedDataCollection) {
-      return;
-    }
+    checkMixpanelTrackingStatus();
 
-    mixpanel.identify(sha256(selectedAccount.masterPubKey));
-  }, [selectedAccount, hasActivatedDataCollection]);
+    // mixpanel.identify(sha256(selectedAccount.masterPubKey)); TODO: find a place where it should be called
+  }, []);
 
   return (
     <>
@@ -69,7 +81,7 @@ function PrivacyPreferencesScreen() {
             onColor={theme.colors.purple_main}
             offColor={theme.colors.background.elevation3}
             onChange={handleSwitchChange}
-            checked={hasActivatedDataCollection ?? false}
+            checked={isEnabled}
             uncheckedIcon={false}
             checkedIcon={false}
           />

@@ -173,9 +173,5 @@ export const isLedgerAccount = (account: Account | null): boolean =>
 export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
 
 export function trackMixPanel(event: string, properties?: any) {
-  if (!mixpanel.has_opted_in_tracking) {
-    return;
-  }
-
   mixpanel.track(event, properties);
 }
