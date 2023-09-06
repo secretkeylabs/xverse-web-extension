@@ -1,10 +1,9 @@
+import { X } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { InscriptionErrorCode } from '@secretkeylabs/xverse-core';
-
-import CloseIcon from '@assets/img/x.svg';
 
 const Container = styled.div`
   width: 100vw;
@@ -43,11 +42,12 @@ const Title = styled.div((props) => ({
   paddingBottom: props.theme.spacing(8),
 }));
 
-const CloseTick = styled.img((props) => ({
+const CloseTick = styled.div((props) => ({
   width: props.theme.spacing(12),
   height: props.theme.spacing(12),
   position: 'absolute',
   right: 0,
+  top: 0,
   cursor: 'pointer',
 }));
 
@@ -127,7 +127,9 @@ function ErrorModal({ errorCode, onRetrySubmit, onEnd }: Props) {
       <CardContainer>
         <Title>
           {t('ERROR')}: {t(`SHORT.${errorCode}`)}
-          <CloseTick src={CloseIcon} onClick={onClose} />
+          <CloseTick onClick={onClose}>
+            <X size={24} />
+          </CloseTick>
         </Title>
         <Rule />
         <Body>{t(`LONG.${errorCode}`)}</Body>

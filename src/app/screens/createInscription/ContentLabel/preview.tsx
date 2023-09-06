@@ -1,7 +1,6 @@
+import { X } from '@phosphor-icons/react';
 import { useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-
-import CloseIcon from '@assets/img/x.svg';
 
 import { ContentType } from './common';
 
@@ -58,7 +57,7 @@ const PreviewText = styled.pre<PreviewTextProps>((props) => ({
   wordWrap: 'break-word',
 }));
 
-const CloseTick = styled.img((props) => ({
+const CloseTick = styled.div((props) => ({
   width: props.theme.spacing(12),
   height: props.theme.spacing(12),
   position: 'absolute',
@@ -141,7 +140,9 @@ function Preview({ onClick, type, content, contentType, contentTypeRaw, visible 
 
   return (
     <Container onClick={onClick} ref={containerRef}>
-      <CloseTick src={CloseIcon} onClick={onClick} />
+      <CloseTick onClick={onClick}>
+        <X size={24} />
+      </CloseTick>
       {preview}
     </Container>
   );
