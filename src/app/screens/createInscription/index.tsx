@@ -154,6 +154,8 @@ const NumberSuffix = styled.div((props) => ({
   color: props.theme.colors.white[400],
 }));
 
+const DEFAULT_FEE_RATE = 8;
+
 function CreateInscription() {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
   const { search } = useLocation();
@@ -177,7 +179,7 @@ function CreateInscription() {
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? 8);
+  const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? DEFAULT_FEE_RATE);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
 
   const {
@@ -199,6 +201,10 @@ function CreateInscription() {
       setFeeRates(feeRatesResponse);
       if (suggestedMinerFeeRate === undefined) {
         setFeeRate(feeRatesResponse.regular);
+      } else if (suggestedMinerFeeRate < feeRatesResponse.limits.min) {
+        setFeeRate(feeRatesResponse.limits.min);
+      } else if (suggestedMinerFeeRate > feeRatesResponse.limits.max) {
+        setFeeRate(feeRatesResponse.limits.max);
       }
     });
 

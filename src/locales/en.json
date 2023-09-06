@@ -750,6 +750,8 @@
     "SUBTITLE": "Inscribe Ordinal",
     "CANCEL_BUTTON": "Cancel",
     "CONFIRM_BUTTON": "Confirm",
+    "FEES_TOO_LOW": "Minimum fee is {{fee}}",
+    "FEES_TOO_HIGH": "Maximum fee is {{fee}}",
     "SUMMARY": {
       "TITLE": "You will inscribe",
       "ORDINAL": "Ordinal",

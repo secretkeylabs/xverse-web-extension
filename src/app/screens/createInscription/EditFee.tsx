@@ -7,6 +7,8 @@ import type { BtcFeeResponse } from '@secretkeylabs/xverse-core';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 
+const DEFAULT_MIN_FEE_RATE = 6;
+
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -44,10 +46,7 @@ const InputContainer = styled.div((props) => ({
   border: `1px solid ${props.theme.colors.background.elevation6}`,
   backgroundColor: props.theme.colors.background.elevation1,
   borderRadius: 8,
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(5),
+  padding: props.theme.spacing(5),
 }));
 
 const InputField = styled.input((props) => ({
@@ -55,7 +54,7 @@ const InputField = styled.input((props) => ({
   backgroundColor: 'transparent',
   color: props.theme.colors.white['0'],
   border: 'transparent',
-  width: '50%',
+  flex: 1,
   '&::-webkit-outer-spin-button': {
     '-webkit-appearance': 'none',
     margin: 0,
@@ -157,6 +156,19 @@ function EditFee({ feeRate, feeRates, onDone, onCancel }: Props) {
     }
   };
 
+  const feesTooLow = feeRates
+    ? +feeRateInput < feeRates.limits.min
+    : +feeRateInput < DEFAULT_MIN_FEE_RATE;
+  const feesTooHigh = feeRates ? +feeRateInput > feeRates.limits.max : false;
+  const feesAreValid = !feesTooLow && !feesTooHigh;
+
+  // eslint-disable-next-line no-nested-ternary
+  const buttonText = feesTooLow
+    ? t('INSCRIPTION_REQUEST.FEES_TOO_LOW', { fee: feeRates?.limits.min ?? DEFAULT_MIN_FEE_RATE })
+    : feesTooHigh
+    ? t('INSCRIPTION_REQUEST.FEES_TOO_HIGH', { fee: feeRates!.limits.max })
+    : t('TRANSACTION_SETTING.APPLY');
+
   return (
     <BottomModal
       visible
@@ -197,9 +209,10 @@ function EditFee({ feeRate, feeRates, onDone, onCancel }: Props) {
       </Container>
       <ApplyButtonContainer>
         <ActionButton
-          text={t('TRANSACTION_SETTING.APPLY')}
-          disabled={feeRateInput === ''}
+          text={buttonText}
+          disabled={!feesAreValid}
           onPress={() => onDone(+feeRateInput)}
+          warning={feesTooLow || feesTooHigh}
         />
       </ApplyButtonContainer>
     </BottomModal>
