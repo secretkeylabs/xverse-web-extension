@@ -29,6 +29,7 @@
     "date-fns": "^2.29.3",
     "i18next": "^21.9.1",
     "jsontokens": "^4.0.1",
+    "mixpanel-browser": "^2.47.0",
     "moment": "^2.29.4",
     "nanoid": "^4.0.0",
     "p-queue": "^7.3.4",
