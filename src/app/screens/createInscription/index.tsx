@@ -1,3 +1,4 @@
+import { Wallet } from '@phosphor-icons/react';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
@@ -19,7 +20,6 @@ import { CreateInscriptionPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import WalletIcon from '@assets/img/wallet.svg';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
@@ -109,11 +109,6 @@ const InfoIconContainer = styled.div((props) => ({
   borderRadius: 16,
   marginRight: props.theme.spacing(5),
 }));
-
-const InfoIcon = styled.img({
-  width: 18,
-  height: 18,
-});
 
 const MutedLabel = styled.div((props) => ({
   color: props.theme.colors.white[400],
@@ -349,7 +344,7 @@ function CreateInscription() {
             <CardRow topMargin center>
               <IconLabel>
                 <InfoIconContainer>
-                  <InfoIcon src={WalletIcon} />
+                  <Wallet size={18} />
                 </InfoIconContainer>
                 {t('SUMMARY.YOUR_ADDRESS')}
               </IconLabel>
