@@ -98,8 +98,7 @@ const ReviewTransactionText = styled.h1((props) => ({
   textAlign: 'left',
 }));
 
-export function ConfirmBrc20Transaction() {
-  /* hooks */
+const useConfirmBrc20Transfer = () => {
   const { t } = useTranslation('translation');
   const { network, btcFiatRate, fiatCurrency, selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
@@ -196,6 +195,47 @@ export function ConfirmBrc20Transaction() {
   const recipients: Recipient[] = [
     { address: recipientAddress, amountSats: new BigNumber(estimateFeesParams.amount) },
   ];
+
+  return {
+    btcFee,
+    errorMessage,
+    estimateFeesParams,
+    fees,
+    handleClickAdvancedSetting,
+    handleClickApplyFee,
+    handleClickCancel,
+    handleClickCloseFees,
+    handleClickConfirm,
+    isConfirmLoading,
+    isFeeLoading,
+    network,
+    recipients,
+    showFeeSettings,
+    token,
+    txFee,
+  };
+};
+
+export function ConfirmBrc20Transaction() {
+  const { t } = useTranslation('translation');
+  const {
+    btcFee,
+    errorMessage,
+    estimateFeesParams,
+    fees,
+    handleClickAdvancedSetting,
+    handleClickApplyFee,
+    handleClickCancel,
+    handleClickCloseFees,
+    handleClickConfirm,
+    isConfirmLoading,
+    isFeeLoading,
+    network,
+    recipients,
+    showFeeSettings,
+    token,
+    txFee,
+  } = useConfirmBrc20Transfer();
 
   return (
     <>
