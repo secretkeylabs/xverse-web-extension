@@ -164,7 +164,10 @@ const useConfirmBrc20Transfer = (): {
     }
     const state: ExecuteBrc20TransferState = {
       recipientAddress,
-      estimateFeesParams,
+      estimateFeesParams: {
+        ...estimateFeesParams,
+        feeRate: Number(debouncedUserInputFeeRate),
+      },
       token,
     };
     navigate('/execute-brc20-tx', { state });
