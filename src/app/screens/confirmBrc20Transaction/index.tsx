@@ -3,25 +3,27 @@ import ActionButton from '@components/button';
 import BigNumber from 'bignumber.js';
 import BottomBar from '@components/tabBar';
 import {
+  Brc20TransferEstimateFeesParams,
   ConfirmBrc20TransferState,
   ExecuteBrc20TransferState,
   getFeeValuesForBrc20OneStepTransfer,
 } from '@utils/brc20';
+import { FadersHorizontal } from '@phosphor-icons/react';
+import { getBtcFiatEquivalent, useBrc20TransferFees } from '@secretkeylabs/xverse-core';
 import RecipientComponent from '@components/recipientComponent';
-import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import styled from 'styled-components';
 import useDebounce from '@hooks/useDebounce';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
 import { NumericFormat } from 'react-number-format';
-import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import { getBtcFiatEquivalent, useBrc20TransferFees } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
+import type { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import type { FungibleToken, SettingsNetwork } from '@secretkeylabs/xverse-core';
 import Brc20FeesComponent from './brc20FeesComponent';
 import { EditFees, OnChangeFeeRate } from './editFees';
 
@@ -65,6 +67,7 @@ const EditFeesButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
+  gap: props.theme.spacing(3),
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   marginTop: props.theme.spacing(12),
@@ -76,10 +79,8 @@ const ButtonText = styled.div((props) => ({
   textAlign: 'center',
 }));
 
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
+const FadersHorizontalIcon = styled(FadersHorizontal)((props) => ({
+  color: props.theme.colors.white_0,
 }));
 
 const ErrorContainer = styled.div((props) => ({
@@ -98,7 +99,25 @@ const ReviewTransactionText = styled.h1((props) => ({
   textAlign: 'left',
 }));
 
-const useConfirmBrc20Transfer = () => {
+const useConfirmBrc20Transfer = (): {
+  btcFee: BigNumber;
+  errorMessage: string;
+  estimateFeesParams: Brc20TransferEstimateFeesParams;
+  fees: any[];
+  handleClickAdvancedSetting: () => void;
+  handleClickApplyFee: OnChangeFeeRate;
+  handleClickCancel: () => void;
+  handleClickCloseFees: () => void;
+  handleClickConfirm: () => void;
+  isConfirmLoading: boolean;
+  isFeeLoading: boolean;
+  network: SettingsNetwork;
+  recipients: Recipient[];
+  showFeeSettings: boolean;
+  token: FungibleToken;
+  txFee: BigNumber;
+} => {
+  /* hooks */
   const { t } = useTranslation('translation');
   const { network, btcFiatRate, fiatCurrency, selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
@@ -170,6 +189,7 @@ const useConfirmBrc20Transfer = () => {
     setShowFeeSettings(false);
   };
 
+  /* other */
   const fees = [
     {
       label: 'Transaction Fee',
@@ -277,7 +297,7 @@ export function ConfirmBrc20Transaction() {
             <Brc20FeesComponent fees={fees} />
             <div>
               <EditFeesButton onClick={handleClickAdvancedSetting}>
-                <ButtonImage src={SettingIcon} />
+                <FadersHorizontalIcon size={20} />
                 <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
               </EditFeesButton>
             </div>
