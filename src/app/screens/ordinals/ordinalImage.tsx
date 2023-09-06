@@ -189,6 +189,25 @@ function OrdinalImage({
     return renderImage('BRC-721e', brc721eImage);
   }
 
+  if (
+    (ordinal?.content_type.includes('text/plain') ||
+      ordinal?.content_type.includes('application/json')) &&
+    textContent?.includes('brc-20')
+  ) {
+    return (
+      <ImageContainer>
+        <Brc20Tile
+          brcContent={textContent}
+          isGalleryOpen={isGalleryOpen}
+          isNftDashboard={isNftDashboard}
+          inNftDetail={inNftDetail}
+          isSmallImage={isSmallImage}
+          withoutSizeIncrease={withoutSizeIncrease}
+        />
+      </ImageContainer>
+    );
+  }
+
   if (ordinal?.content_type.includes('text')) {
     if (!textContent) {
       return (
@@ -198,20 +217,6 @@ function OrdinalImage({
       );
     }
 
-    if (textContent.includes('brc-20')) {
-      return (
-        <ImageContainer>
-          <Brc20Tile
-            brcContent={textContent}
-            isGalleryOpen={isGalleryOpen}
-            isNftDashboard={isNftDashboard}
-            inNftDetail={inNftDetail}
-            isSmallImage={isSmallImage}
-            withoutSizeIncrease={withoutSizeIncrease}
-          />
-        </ImageContainer>
-      );
-    }
     if (ordinal?.content_type.includes('html')) {
       return (
         <ImageContainer inNftDetail={inNftDetail}>
@@ -225,6 +230,7 @@ function OrdinalImage({
         </ImageContainer>
       );
     }
+
     return (
       <ImageContainer inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
         <OrdinalContentText
