@@ -316,11 +316,11 @@ export function ConfirmBrc20Transaction() {
             text={t('CONFIRM_TRANSACTION.CANCEL')}
             transparent
             onPress={handleClickCancel}
-            disabled={isConfirmLoading}
+            disabled={isConfirmLoading || isFeeLoading}
           />
           <ActionButton
             text={t('CONFIRM_TRANSACTION.CONFIRM')}
-            disabled={isConfirmLoading}
+            disabled={isConfirmLoading || isFeeLoading}
             processing={isConfirmLoading}
             onPress={handleClickConfirm}
           />
