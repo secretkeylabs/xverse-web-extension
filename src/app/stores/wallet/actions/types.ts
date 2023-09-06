@@ -37,6 +37,8 @@ export const SetCoinDataKey = 'SetCoinDataKey';
 
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 
+export const ChangeHasActivatedDataCollection = 'ChangeHasActivatedDataCollection';
+
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
@@ -79,6 +81,7 @@ export interface WalletState {
   feeMultipliers: FeesMultipliers | null;
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
+  hasActivatedDataCollection: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
   accountType: AccountType | undefined;
@@ -199,6 +202,11 @@ export interface ChangeActivateOrdinals {
   hasActivatedOrdinalsKey: boolean;
 }
 
+export interface ChangeActivateDataCollection {
+  type: typeof ChangeHasActivatedDataCollection;
+  hasActivatedDataCollection: boolean;
+}
+
 export interface ChangeShowBtcReceiveAlert {
   type: typeof ChangeShowBtcReceiveAlertKey;
   showBtcReceiveAlert: boolean | null;
@@ -240,8 +248,8 @@ export type WalletActions =
   | ChangeNetwork
   | GetActiveAccounts
   | ChangeActivateOrdinals
+  | ChangeActivateDataCollection
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
   | SetBrcCoinsData
-  | SetWalletLockPeriod
-  | DisableWalletExistsGuard;
+  | SetWalletLockPeriod;

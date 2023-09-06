@@ -9,6 +9,7 @@ import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
 import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
 import BigNumber from 'bignumber.js';
 import { ChainID } from '@stacks/transactions';
+import mixpanel from 'mixpanel-browser';
 import {
   BTC_TRANSACTION_STATUS_URL,
   TRANSACTION_STATUS_URL,
@@ -170,3 +171,11 @@ export const isLedgerAccount = (account: Account | null): boolean =>
   account?.accountType === 'ledger';
 
 export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
+
+export function trackMixPanel(event: string, properties?: any) {
+  if (!mixpanel.has_opted_in_tracking) {
+    return;
+  }
+
+  mixpanel.track(event, properties);
+}

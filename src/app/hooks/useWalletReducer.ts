@@ -20,7 +20,7 @@ import {
 } from '@stores/wallet/actions/actionCreators';
 import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
 import { useDispatch } from 'react-redux';
-import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
+import { isHardwareAccount, isLedgerAccount, trackMixPanel } from '@utils/helper';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import useWalletSession from './useWalletSession';
 import useWalletSelector from './useWalletSelector';
@@ -151,6 +151,8 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
+    trackMixPanel('Restore wallet');
+
     const encryptSeed = await encryptSeedPhrase(seed, password);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(storeEncryptedSeedAction(encryptSeed));
@@ -210,6 +212,8 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
+    trackMixPanel('Create new wallet');
+
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
     setSessionStartTime();
