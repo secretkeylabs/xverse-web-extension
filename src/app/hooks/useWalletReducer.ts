@@ -5,6 +5,7 @@ import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/x
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
 import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
+import { decryptSeedPhraseCBC } from '@secretkeylabs/xverse-core/encryption';
 import {
   ChangeNetworkAction,
   addAccountAction,
@@ -21,7 +22,6 @@ import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { generatePasswordHash } from '@utils/encryptionUtils';
 import { PostGuardPing } from '@components/guards/singleTab';
-import { decryptSeedPhraseCBC } from '@secretkeylabs/xverse-core/encryption';
 import useWalletSession from './useWalletSession';
 import useSecretKey from './useSecretKey';
 import useWalletSelector from './useWalletSelector';
@@ -107,11 +107,12 @@ const useWalletReducer = () => {
 
   const migrateLegacySeedStorage = async (password: string) => {
     const pHash = await generatePasswordHash(password);
-    decryptSeedPhraseCBC(encryptedSeed, pHash.hash).then(async (decrypted) => {
+    await decryptSeedPhraseCBC(encryptedSeed, pHash.hash).then(async (decrypted) => {
       await initSeedVault(password);
       await storeSeed(decrypted);
       localStorage.removeItem('salt');
       dispatch(storeEncryptedSeedAction(''));
+      return decrypted;
     });
   };
 

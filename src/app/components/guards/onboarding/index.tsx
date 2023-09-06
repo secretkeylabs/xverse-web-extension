@@ -1,10 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-
 import { useSingleTabGuard } from '@components/guards/singleTab';
 import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
-import useWalletSelector from '@hooks/useWalletSelector';
-
+import useSecretKey from '@hooks/useSecretKey';
 import {
   WalletExistsContext,
   WalletExistsContextProps,
@@ -23,18 +21,29 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
   useSingleTabGuard('onboarding');
 
   const [walletExistsGuardEnabled, setWalletExistsGuardEnabled] = useState(true);
-
+  const [walletSeedPhrase, setWalletSeedPhrase] = useState<string | null>(null);
+  const { getSeed } = useSecretKey();
   const contextValue: WalletExistsContextProps = useMemo(
     () => ({
       disableWalletExistsGuard: () => setWalletExistsGuardEnabled(false),
     }),
     [],
   );
+  useEffect(() => {
+    (async () => {
+      try {
+        const seed = await getSeed();
+        setWalletSeedPhrase(seed);
+      } catch (err) {
+        setWalletSeedPhrase(null);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const { encryptedSeed } = useWalletSelector();
   const hydrated = useHasStateRehydrated();
 
-  if (walletExistsGuardEnabled && hydrated && encryptedSeed) {
+  if (walletExistsGuardEnabled && hydrated && walletSeedPhrase) {
     return <Navigate to="/wallet-exists" />;
   }
 

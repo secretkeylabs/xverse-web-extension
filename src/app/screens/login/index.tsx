@@ -11,7 +11,6 @@ import { animated, useSpring } from '@react-spring/web';
 import ActionButton from '@components/button';
 import useCacheMigration from '@hooks/useCacheMigration';
 import MigrationConfirmation from '@screens/migrationConfirmation';
-import useWalletSelector from '@hooks/useWalletSelector';
 
 declare const VERSION: string;
 
@@ -109,8 +108,6 @@ function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
-  const { encryptedSeed } = useWalletSelector();
-
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -164,7 +161,7 @@ function Login(): JSX.Element {
       } else {
         await unlockWallet(password);
         setIsVerifying(false);
-        navigate(-1);
+        navigate('/');
       }
     } catch (err) {
       setIsVerifying(false);

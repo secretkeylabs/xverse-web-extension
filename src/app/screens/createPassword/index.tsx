@@ -55,7 +55,7 @@ function CreatePassword(): JSX.Element {
 
   useEffect(() => {
     (async () => {
-      const seed = await getSeed('');
+      const seed = await getSeed();
       setSeedPhrase(seed);
     })();
   }, []);
