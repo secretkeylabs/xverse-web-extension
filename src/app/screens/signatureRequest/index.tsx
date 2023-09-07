@@ -16,23 +16,22 @@ import useSignatureRequest, {
   useSignMessage,
 } from '@hooks/useSignatureRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
-import useWalletSelector from '@hooks/useWalletSelector';
-import Transport from '@ledgerhq/hw-transport-webusb';
+import { getNetworkType, isHardwareAccount, getTruncatedAddress } from '@utils/helper';
 import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
+import { useNavigate } from 'react-router-dom';
 import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
-import { signatureVrsToRsv } from '@stacks/common';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { bytesToHex } from '@stacks/transactions';
-import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
-import { handleBip322LedgerMessageSigning } from '@utils/ledger';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import CollapsableContainer from './collapsableContainer';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
+import CollapsableContainer from './collapsableContainer';
 
 const OuterContainer = styled.div({
   display: 'flex',
@@ -143,13 +142,15 @@ function SignatureRequest(): JSX.Element {
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
+  const [isTxInvalid, setIsTxInvalid] = useState(false);
   const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
   const { messageType, request, payload, tabId, domain, isSignMessageBip322 } =
     useSignatureRequest();
   const navigate = useNavigate();
-  const isMessageSigningDisabled = isHardwareAccount(selectedAccount) && !isSignMessageBip322;
+  const isMessageSigningDisabled =
+    isHardwareAccount(selectedAccount) && !isSignMessageBip322 && !selectedAccount?.stxAddress;
 
   const checkAddressAvailability = () => {
     const account = accountsList.filter((acc) => {
@@ -215,7 +216,7 @@ function SignatureRequest(): JSX.Element {
   const confirmCallback = async () => {
     try {
       setIsSigning(true);
-      if (isHardwareAccount(selectedAccount) && isSignMessageBip322) {
+      if (isHardwareAccount(selectedAccount) && !isMessageSigningDisabled) {
         setIsModalVisible(true);
         return;
       }
@@ -271,9 +272,8 @@ function SignatureRequest(): JSX.Element {
       if (isSignMessageBip322) {
         const signature = await handleBip322LedgerMessageSigning({
           transport,
-          id: selectedAccount.id,
+          accountId: selectedAccount.deviceAccountIndex,
           networkType: network.type,
-          ledgerAccountsList,
           message: payload.message,
         });
         const signingMessage = {
@@ -287,7 +287,21 @@ function SignatureRequest(): JSX.Element {
         chrome.tabs.sendMessage(+tabId, signingMessage);
         window.close();
       } else {
-        const signature = await signStxMessage(transport, payload.message, selectedAccount.id);
+        const signature = await signStxMessage(
+          transport,
+          payload.message,
+          0,
+          selectedAccount.deviceAccountIndex,
+        );
+        if (
+          !!signature.errorMessage &&
+          signature.errorMessage !== 'No errors' && // @zondax/ledger-stacks npm package returns this string when there are no errors
+          !!signature.returnCode
+        ) {
+          throw new Error(signature.errorMessage, {
+            cause: signature.returnCode,
+          });
+        }
         const rsvSignature = signatureVrsToRsv(signature.signatureVRS.toString('hex'));
         const data = {
           signature: rsvSignature,
@@ -307,6 +321,8 @@ function SignatureRequest(): JSX.Element {
       } else if (e.statusCode === 28160) {
         setIsConnectSuccess(false);
         setIsConnectFailed(true);
+      } else if (e.cause === 27012) {
+        setIsTxInvalid(true);
       } else {
         setIsTxRejected(true);
       }
@@ -318,6 +334,7 @@ function SignatureRequest(): JSX.Element {
 
   const handleRetry = async () => {
     setIsTxRejected(false);
+    setIsTxInvalid(false);
     setIsConnectFailed(false);
     setIsConnectSuccess(false);
     setCurrentStepIndex(0);
@@ -329,6 +346,30 @@ function SignatureRequest(): JSX.Element {
     }
     return bip0322Hash(payload.message);
   }, [isSignMessageBip322, payload.message]);
+
+  const getConfirmationError = (type: 'title' | 'subtitle') => {
+    if (type === 'title') {
+      if (isTxRejected) {
+        return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_TITLE');
+      }
+
+      if (isTxInvalid) {
+        return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.INVALID.ERROR_TITLE');
+      }
+
+      return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_TITLE');
+    }
+
+    if (isTxRejected) {
+      return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_SUBTITLE');
+    }
+
+    if (isTxInvalid) {
+      return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.INVALID.ERROR_SUBTITLE');
+    }
+
+    return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE');
+  };
 
   return (
     <ConfirmScreen
@@ -345,7 +386,17 @@ function SignatureRequest(): JSX.Element {
         <InnerContainer>
           {isMessageSigningDisabled ? (
             <MainContainer>
-              <InfoContainer bodyText="Stacks message signing is not yet supported on a Ledger account. Switch to a different account to sign Stacks messages from the application." />
+              <InfoContainer
+                bodyText={t('SIGNATURE_REQUEST.NO_STACKS_AUTH_SUPPORT.TITLE')}
+                redirectText={t('SIGNATURE_REQUEST.NO_STACKS_AUTH_SUPPORT.LINK')}
+                onClick={async () => {
+                  await chrome.tabs.create({
+                    url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+                  });
+
+                  window.close();
+                }}
+              />
             </MainContainer>
           ) : (
             <MainContainer>
@@ -402,26 +453,22 @@ function SignatureRequest(): JSX.Element {
               <LedgerConnectionView
                 title={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.TITLE')}
                 text={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.SUBTITLE')}
-                titleFailed={t(
-                  isTxRejected
-                    ? 'SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_TITLE'
-                    : 'SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_TITLE',
-                )}
-                textFailed={t(
-                  isTxRejected
-                    ? 'SIGNATURE_REQUEST.LEDGER.CONFIRM.DENIED.ERROR_SUBTITLE'
-                    : 'SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE',
-                )}
+                titleFailed={getConfirmationError('title')}
+                textFailed={getConfirmationError('subtitle')}
                 imageDefault={ledgerConnectDefaultIcon}
                 isConnectSuccess={isTxApproved}
-                isConnectFailed={isTxRejected || isConnectFailed}
+                isConnectFailed={isTxRejected || isTxInvalid || isConnectFailed}
               />
             )}
             <SuccessActionsContainer>
               <ActionButton
-                onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+                onPress={
+                  isTxRejected || isTxInvalid || isConnectFailed
+                    ? handleRetry
+                    : handleConnectAndConfirm
+                }
                 text={t(
-                  isTxRejected || isConnectFailed
+                  isTxRejected || isTxInvalid || isConnectFailed
                     ? 'SIGNATURE_REQUEST.LEDGER.RETRY_BUTTON'
                     : 'SIGNATURE_REQUEST.LEDGER.CONNECT_BUTTON',
                 )}
