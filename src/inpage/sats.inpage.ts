@@ -1,20 +1,27 @@
-import { BitcoinProvider, GetAddressResponse, SignTransactionResponse } from 'sats-connect';
 import {
+  CreateInscriptionEventDetails,
   DomEventName,
   GetAddressRequestEventDetails,
+  SendBtcRequestEventDetails,
   SignMessageRequestEventDetails,
   SignPsbtRequestEventDetails,
-  SendBtcRequestEventDetails,
 } from '@common/types/inpage-types';
 import {
+  CreateInscriptionResponseMessage,
   ExternalSatsMethods,
   GetAddressResponseMessage,
   MESSAGE_SOURCE,
   SatsConnectMessageToContentScript,
+  SendBtcResponseMessage,
   SignMessageResponseMessage,
   SignPsbtResponseMessage,
-  SendBtcResponseMessage,
 } from '@common/types/message-types';
+import {
+  BitcoinProvider,
+  CreateInscriptionResponse,
+  GetAddressResponse,
+  SignTransactionResponse,
+} from 'sats-connect';
 
 const isValidEvent = (event: MessageEvent, method: SatsConnectMessageToContentScript['method']) => {
   const { data } = event;
@@ -103,6 +110,33 @@ const SatsMethodsProvider: BitcoinProvider = {
         }
         if (typeof eventMessage.data.payload.sendBtcResponse === 'string') {
           resolve(eventMessage.data.payload.sendBtcResponse);
+        }
+      };
+      window.addEventListener('message', handleMessage);
+    });
+  },
+  createInscription: async (
+    createInscriptionRequest: string,
+  ): Promise<CreateInscriptionResponse> => {
+    const event = new CustomEvent<CreateInscriptionEventDetails>(
+      DomEventName.createInscriptionRequest,
+      {
+        detail: { createInscriptionRequest },
+      },
+    );
+    document.dispatchEvent(event);
+    return new Promise((resolve, reject) => {
+      const handleMessage = (eventMessage: MessageEvent<CreateInscriptionResponseMessage>) => {
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.createInscriptionResponse)) return;
+        if (eventMessage.data.payload?.createInscriptionRequest !== createInscriptionRequest)
+          return;
+        window.removeEventListener('message', handleMessage);
+        if (eventMessage.data.payload.createInscriptionResponse === 'cancel') {
+          reject(eventMessage.data.payload.createInscriptionResponse);
+          return;
+        }
+        if (typeof eventMessage.data.payload.createInscriptionResponse !== 'string') {
+          resolve(eventMessage.data.payload.createInscriptionResponse);
         }
       };
       window.addEventListener('message', handleMessage);
