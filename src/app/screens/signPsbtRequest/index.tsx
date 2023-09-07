@@ -24,7 +24,6 @@ import {
 import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
 import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { isLedgerAccount } from '@utils/helper';
-import { findLedgerAccountId } from '@utils/ledger';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -225,13 +224,9 @@ function SignPsbtRequest() {
   };
 
   const handleLedgerPsbtSigning = async (transport: TransportType) => {
-    const accountId = await findLedgerAccountId({
-      transport,
-      id: selectedAccount?.id,
-      ledgerAccountsList,
-    });
+    const accountId = selectedAccount?.deviceAccountIndex;
 
-    if (accountId === -1) {
+    if (accountId === undefined) {
       throw new Error('Account not found');
     }
 

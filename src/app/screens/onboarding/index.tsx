@@ -99,7 +99,7 @@ function Onboarding(): JSX.Element {
   ];
 
   const handleClickNext = () => {
-    setCurrentStepIndex(currentStepIndex + 1);
+    setCurrentStepIndex((prevStepIndex) => prevStepIndex + 1);
   };
 
   const handleSkip = () => {

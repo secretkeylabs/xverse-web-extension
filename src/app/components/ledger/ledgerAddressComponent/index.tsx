@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Tooltip } from 'react-tooltip';
 import { useState } from 'react';
 
-import CopySVG from '@assets/img/Copy.svg';
+import copyIcon from '@assets/img/Copy.svg';
 
 const StyledToolTip = styled(Tooltip)`
   background-color: #ffffff;
@@ -11,22 +11,23 @@ const StyledToolTip = styled(Tooltip)`
   padding: 7px;
 `;
 
-const AddressComponent = styled.p((props) => ({
+const AddressComponent = styled.p({
   width: '100%',
-}));
+});
+
 const AddressComponentTitle = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
   marginBottom: props.theme.spacing(2),
 }));
 
-const AddressComponentContainer = styled.div((props) => ({
+const AddressComponentContainer = styled.div({
   width: '100%',
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'flex-start',
-}));
+});
 
 const AddressCompononentText = styled.p((props) => ({
   ...props.theme.body_medium_m,
@@ -49,9 +50,9 @@ const CopyButton = styled.button`
   }
 `;
 
-const CopyImage = styled.img`
-  margin-left: 4px;
-`;
+const CopyImage = styled.img((props) => ({
+  marginLeft: props.theme.spacing(2),
+}));
 
 interface Props {
   title: string;
@@ -78,7 +79,7 @@ function LedgerAddressComponent({ title, address }: Props) {
       <AddressComponentContainer>
         <AddressCompononentText>{address}</AddressCompononentText>
         <CopyButton id={`${title}_anchor`} onClick={handleClick}>
-          <CopyImage src={CopySVG} alt="copy" />
+          <CopyImage src={copyIcon} alt="copy" />
         </CopyButton>
         <StyledToolTip
           anchorId={`${title}_anchor`}

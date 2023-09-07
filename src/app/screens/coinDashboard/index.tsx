@@ -28,8 +28,8 @@ const Container = styled.div((props) => ({
 const TokenContractContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: 16,
-  paddingRight: 16,
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   h1: {
     ...props.theme.body_medium_m,
@@ -41,8 +41,8 @@ const TransactionHistoryContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  paddingLeft: 16,
-  paddingRight: 16,
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
   marginTop: props.theme.spacing(30),
   borderTop: `1px solid ${props.theme.colors.background.elevation2}`,
   h1: {
@@ -54,7 +54,7 @@ const TransactionHistoryContainer = styled.div((props) => ({
     ...props.theme.body_m,
     fontStyle: 'italic',
     color: props.theme.colors.white[200],
-    marginTop: 16,
+    marginTop: props.theme.spacing(8),
   },
 }));
 
@@ -87,9 +87,9 @@ const ShareIcon = styled.img({
   height: 18,
 });
 
-const CopyButtonContainer = styled.div({
-  marginRight: 4,
-});
+const CopyButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(2),
+}));
 
 const ContractDeploymentButton = styled.button((props) => ({
   ...props.theme.body_m,
@@ -117,13 +117,13 @@ const Button = styled.button<ButtonProps>((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   height: 31,
-  paddingLeft: 12,
-  paddingRight: 12,
+  paddingLeft: props.theme.spacing(6),
+  paddingRight: props.theme.spacing(6),
+  marginRight: props.theme.spacing(2),
   borderRadius: 44,
   background: props.isSelected ? props.theme.colors.background.elevation2 : 'transparent',
   color: props.theme.colors.white[0],
   opacity: props.isSelected ? 1 : 0.6,
-  marginRight: 4,
 }));
 
 export default function CoinDashboard() {
