@@ -226,7 +226,7 @@ function CreateInscription() {
     commitValue,
     commitValueBreakdown,
     errorCode: feeErrorCode,
-    isLoading,
+    isLoading: inscriptionFeesLoading,
   } = useInscriptionFees({
     addressUtxos: utxos,
     content,
@@ -309,6 +309,8 @@ function CreateInscription() {
   }
 
   const errorCode = feeErrorCode || executeErrorCode;
+
+  const isLoading = utxos === undefined || inscriptionFeesLoading;
 
   return (
     <ConfirmScreen
