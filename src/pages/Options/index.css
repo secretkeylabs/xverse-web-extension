@@ -20,15 +20,20 @@ header h2 {
   letter-spacing: 0em;
   text-align: right;
 }
+
 #app-container {
   height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: safe center;
+  align-items: safe center;
 }
 
 #app {
   min-height: 600px;
+}
+
+.optionsContainer {
+  height: 600px !important;
 }

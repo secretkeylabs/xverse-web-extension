@@ -34,7 +34,7 @@ function ScreenContainer(): JSX.Element {
   const { t } = useTranslation('translation');
 
   return (
-    <RouteContainer>
+    <RouteContainer className="optionsContainer">
       {network.type === 'Testnet' && (
         <TestnetContainer>
           <TestnetText>{t('SETTING_SCREEN.TESTNET')}</TestnetText>
