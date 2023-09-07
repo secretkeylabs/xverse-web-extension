@@ -26,6 +26,10 @@ const renderApp = async () => {
     buster: VERSION,
   });
   const container = document.getElementById('app');
+
+  // We need to do this after load in order for the extension popup to have the correct height on first load
+  container!.style.maxHeight = '100vh';
+
   const root = createRoot(container!);
   return root.render(<App />);
 };

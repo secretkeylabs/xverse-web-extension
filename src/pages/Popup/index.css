@@ -1,9 +1,19 @@
+html {
+  height: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
   color: #ffffff;
   position: relative;
   background-color: #12151e;
+
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 #app {
   width: 360px;
