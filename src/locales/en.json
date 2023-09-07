@@ -268,7 +268,6 @@
     "To": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive",
-
     "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
@@ -744,6 +743,81 @@
       "CLOSE_BUTTON": "Close",
       "CANCEL_BUTTON": "Cancel",
       "RETRY_BUTTON": "Try again"
+    }
+  },
+  "INSCRIPTION_REQUEST": {
+    "TITLE": "Review Transaction",
+    "SUBTITLE": "Inscribe Ordinal",
+    "CANCEL_BUTTON": "Cancel",
+    "CONFIRM_BUTTON": "Confirm",
+    "FEES_TOO_LOW": "Minimum fee is {{fee}}",
+    "FEES_TOO_HIGH": "Maximum fee is {{fee}}",
+    "SUMMARY": {
+      "TITLE": "You will inscribe",
+      "ORDINAL": "Ordinal",
+      "RECIPIENT": "Recipient",
+      "TO": "To",
+      "YOUR_ADDRESS": "Your address"
+    },
+    "PREVIEW": {
+      "SATS": {
+        "TITLE": "Sats",
+        "REG": "name",
+        "NS": "namespace"
+      },
+      "BRC20": {
+        "TITLE": "BRC-20",
+        "DEPLOY": "Deploy",
+        "MINT": "Mint",
+        "TRANSFER": "Transfer"
+      },
+      "SHOW": "See contents",
+      "PREVIEW": "Open in ordinals viewer"
+    },
+    "NETWORK": "Network",
+    "VALUE": "Bitcoin value",
+    "EDIT_FEES": "Edit Fees",
+    "FEES": {
+      "TITLE": "Fees",
+      "INSCRIPTION": "Inscription fees",
+      "DEVELOPER": "Developer fees",
+      "TRANSACTION": "Transaction fees",
+      "TOTAL": "Total fees"
+    },
+    "COMPLETE": {
+      "INSCRIBED": "Ordinal inscribed",
+      "MESSAGE": "Your ordinal have been successfully inscribed and should appear in a few minutes.",
+      "SEE_ON": "See on",
+      "BITCOIN_EXPLORER": "mempool",
+      "TRANSACTION_ID": "Transaction ID",
+      "CLOSE": "Close"
+    },
+    "ERRORS": {
+      "ERROR": "Error",
+      "CLOSE": "Close",
+      "TRY_AGAIN": "Try again",
+      "SHORT": {
+        "INVALID_JSON_CONTENT": "Invalid JSON content",
+        "INSUFFICIENT_FUNDS": "Insufficient balance",
+        "INVALID_FEE_RATE": "Invalid fee rate",
+        "INVALID_SERVICE_FEE_CONFIG": "Invalid inputs",
+        "INVALID_CONTENT": "Invalid content",
+        "CONTENT_TOO_BIG": "Content too large",
+        "INSCRIPTION_VALUE_TOO_LOW": "Invalid inputs",
+        "FAILED_TO_FINALIZE": "Failure",
+        "SERVER_ERROR": "Server error"
+      },
+      "LONG": {
+        "INVALID_JSON_CONTENT": "The content is not valid JSON. Please verify the content of your inscription.",
+        "INSUFFICIENT_FUNDS": "You have insufficient balance to process this transaction. Please add more funds to your wallet or try with a lower fee rate.",
+        "INVALID_FEE_RATE": "The fee applied to this transaction is too low. To apply a higher fee, select edit fees at the bottom of this screen.",
+        "INVALID_SERVICE_FEE_CONFIG": "The calling application sent an invalid payload. Please contact the application developer.",
+        "INVALID_CONTENT": "The ordinal content you are trying to inscribe is not valid. Please verify the content of your inscription.",
+        "CONTENT_TOO_BIG": "The ordinal you are trying to inscribe is too large. Try reducing the weight of your content.",
+        "INSCRIPTION_VALUE_TOO_LOW": "The calling application sent an invalid payload. Please contact the application developer.",
+        "FAILED_TO_FINALIZE": "The inscription transaction failed to finalize. Please try again or contact support.",
+        "SERVER_ERROR": "An unknown server error occurred. Please try again or contact support."
+      }
     }
   },
   "ERROR_SCREEN": {
