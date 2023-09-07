@@ -68,9 +68,9 @@ function SendBrc20Screen() {
   const [showForm, setShowForm] = useState(false);
   const location = useLocation();
 
-  const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
+  const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
   const fungibleToken =
-    location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
+    location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.ticker === coinTicker);
 
   const isSendButtonEnabled =
     amountToSend !== '' &&
