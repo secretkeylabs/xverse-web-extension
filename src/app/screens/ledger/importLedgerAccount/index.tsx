@@ -29,7 +29,6 @@ import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.s
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import ledgerAccountSwitchIcon from '@assets/img/ledger/account_switch.svg';
-import arrowLeftIcon from '@assets/img/ledger/arrow_left_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
@@ -40,8 +39,6 @@ import {
   AddAddressDetailsContainer,
   AddAddressHeaderContainer,
   AddressAddedContainer,
-  AssetSelectionButton,
-  AssetSelectionButtonText,
   ButtonContainer,
   ConfirmationStep,
   ConfirmationStepsContainer,
@@ -124,7 +121,6 @@ function ImportLedger(): JSX.Element {
   const [isStxAddressRejected, setIsStxAddressRejected] = useState(false);
   const [isBtcAddressRejected, setIsBtcAddressRejected] = useState(false);
   const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
-  const [isStxAddressRejected, setIsStxAddressRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
   const { addLedgerAccount, updateLedgerAccounts } = useWalletReducer();
   const [selectedLedgerLiveOption, setSelectedLedgerLiveOption] =
