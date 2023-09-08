@@ -7,6 +7,7 @@ export const ConnectLedgerContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: auto;
   > :first-child {
     margin-bottom: ${({ theme }) => theme.spacing(15)}px};
   }
