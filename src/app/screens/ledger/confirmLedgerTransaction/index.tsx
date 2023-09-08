@@ -35,8 +35,8 @@ import InfoContainer from '@components/infoContainer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import { UTXO } from '@secretkeylabs/xverse-core/types';
 import Stepper from '@components/stepper';
-
 import { LedgerTransactionType } from '@common/types/ledger';
+
 import {
   Container,
   OnBoardingContentContainer,

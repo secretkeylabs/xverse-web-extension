@@ -137,7 +137,7 @@ function AuthenticationRequest() {
       return;
     }
 
-    if (!selectedAccount.deviceAccountIndex) {
+    if (selectedAccount.deviceAccountIndex === undefined) {
       console.error('No account found');
       return;
     }

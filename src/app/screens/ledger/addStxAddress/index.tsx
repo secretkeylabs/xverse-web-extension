@@ -1,9 +1,10 @@
-import { useState } from 'react';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
+import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 import stxIcon from '@assets/img/ledger/stx_icon.svg';
 import { useTransition } from '@react-spring/web';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
@@ -14,19 +15,24 @@ import { importStacksAccountFromLedger, Account } from '@secretkeylabs/xverse-co
 import useWalletReducer from '@hooks/useWalletReducer';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
-import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
+import useResetUserFlow from '@hooks/useResetUserFlow';
+import { useLocation } from 'react-router-dom';
+import { Credential } from '../importLedgerAccount';
+
 import {
+  ActionButtonContainer,
   AddAddressDetailsContainer,
   AddAddressHeaderContainer,
   AddressAddedContainer,
   ConfirmationText,
   Container,
+  LedgerFailButtonsContainer,
+  LedgerFailViewContainer,
   OnBoardingActionsContainer,
   OnBoardingContentContainer,
   SelectAssetText,
   SelectAssetTitle,
 } from '../importLedgerAccount/index.styled';
-import { Credential } from '../importLedgerAccount';
 
 enum Steps {
   ConnectLedger = 0,
@@ -44,6 +50,9 @@ function AddStxAddress(): JSX.Element {
   const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
   const { network, selectedAccount } = useWalletSelector();
   const { updateLedgerAccounts } = useWalletReducer();
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const mismatch = params.get('mismatch') ?? '';
   const transition = useTransition(currentStep, {
     from: {
       x: 24,
@@ -54,6 +63,9 @@ function AddStxAddress(): JSX.Element {
       opacity: 1,
     },
   });
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/add-stx-address-ledger'), []);
 
   const handleClickNext = async () => {
     setCurrentStep((prevStepIndex) => prevStepIndex + 1);
@@ -249,6 +261,22 @@ function AddStxAddress(): JSX.Element {
         return null;
     }
   };
+
+  if (mismatch) {
+    return (
+      <Container>
+        <FullScreenHeader />
+        <LedgerFailViewContainer>
+          <LedgerFailView title={t('TITLE_FAILED')} text={t('ADDRESS_MISMATCH')} />
+          <LedgerFailButtonsContainer>
+            <ActionButtonContainer>
+              <ActionButton onPress={handleWindowClose} text={t('CLOSE_BUTTON')} />
+            </ActionButtonContainer>
+          </LedgerFailButtonsContainer>
+        </LedgerFailViewContainer>
+      </Container>
+    );
+  }
 
   return (
     <Container>

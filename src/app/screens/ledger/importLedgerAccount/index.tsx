@@ -18,6 +18,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import LedgerInput from '@components/ledger/ledgerInput';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import warningIcon from '@assets/img/Warning_red.svg';
+import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 
 import ledgerImportStartIcon from '@assets/img/ledger/ledger_import_start.svg';
 import btcOrdinalsIcon from '@assets/img/ledger/btc_ordinals_icon.svg';
@@ -31,7 +32,6 @@ import ledgerAccountSwitchIcon from '@assets/img/ledger/account_switch.svg';
 import arrowLeftIcon from '@assets/img/ledger/arrow_left_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
-import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 import {
@@ -121,6 +121,7 @@ function ImportLedger(): JSX.Element {
   const [accountNameError, setAccountNameError] = useState<string | undefined>();
   const [isBtcAddressConfirmed, setIsBtcAddressConfirmed] = useState(false);
   const [isOrdinalsAddressConfirmed, setIsOrdinalsAddressConfirmed] = useState(false);
+  const [isStxAddressRejected, setIsStxAddressRejected] = useState(false);
   const [isBtcAddressRejected, setIsBtcAddressRejected] = useState(false);
   const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
   const [isStxAddressRejected, setIsStxAddressRejected] = useState(false);
@@ -923,12 +924,6 @@ function ImportLedger(): JSX.Element {
   return (
     <Container>
       <FullScreenHeader />
-      {currentStep > Steps.SELECT_ASSET && (
-        <AssetSelectionButton onClick={backToAssetSelection}>
-          <img src={arrowLeftIcon} alt="Go back" />
-          <AssetSelectionButtonText>{t('LEDGER_IMPORT_RETURN_BUTTON')}</AssetSelectionButtonText>
-        </AssetSelectionButton>
-      )}
       {transition((style) => (
         <>
           <OnBoardingContentContainer

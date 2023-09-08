@@ -307,3 +307,20 @@ export const WarningIcon = styled.img({
   height: 32,
   alignSelf: 'flex-start',
 });
+
+export const LedgerFailViewContainer = styled.div((props) => ({
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  margin: 'auto',
+}));
+
+export const LedgerFailButtonsContainer = styled.div((props) => ({
+  width: '100%',
+  marginTop: props.theme.spacing(25),
+}));
+
+export const ActionButtonContainer = styled.div((props) => ({
+  '&:not(:last-of-type)': {
+    marginBottom: props.theme.spacing(8),
+  },
+}));
