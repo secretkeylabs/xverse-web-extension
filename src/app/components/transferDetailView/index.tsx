@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { getTruncatedAddress } from '@utils/helper';
 import { ReactNode } from 'react';
 import CopyButton from '@components/copyButton';
-import useWalletSelector from '@hooks/useWalletSelector';
 
 const RowContainer = styled.div({
   display: 'flex',

@@ -34,6 +34,7 @@ import { useNavigate } from 'react-router-dom';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import ActionButton from '@components/button';
+import dashboardIcon from '@assets/img/dashboard-icon.svg';
 import Theme from 'theme';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
@@ -136,6 +137,46 @@ const VerifyButtonContainer = styled.div((props) => ({
 
 const AddStxButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(6),
+}));
+
+const ModalContent = styled.div((props) => ({
+  padding: props.theme.spacing(8),
+  paddingTop: 0,
+  paddingBottom: props.theme.spacing(16),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+}));
+
+const ModalIcon = styled.img((props) => ({
+  marginBottom: props.theme.spacing(10),
+}));
+
+const ModalTitle = styled.div((props) => ({
+  fontSize: '1rem',
+  fontWeight: 700,
+  marginBottom: props.theme.spacing(4),
+  textAlign: 'center',
+}));
+
+const ModalDescription = styled.div((props) => ({
+  fontSize: '0.875rem',
+  color: props.theme.colors.white['200'],
+  marginBottom: props.theme.spacing(16),
+  textAlign: 'center',
+  lineHeight: '1.25rem',
+}));
+
+const ModalControlsContainer = styled.div({
+  display: 'flex',
+  width: '100%',
+});
+
+const ModalButtonContainer = styled.div((props) => ({
+  width: '100%',
+  '&:first-child': {
+    marginRight: props.theme.spacing(6),
+  },
 }));
 
 function Home() {
@@ -498,6 +539,39 @@ function Home() {
         />
       </Container>
       <BottomBar tab="dashboard" />
+
+      <BottomModal
+        visible={false} // TODO: Add modal logic
+        header=""
+        onClose={() => {}}
+        overlayStylesOverriding={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        contentStylesOverriding={{
+          bottom: 'initial',
+          borderRadius: 16,
+          maxWidth: 'calc(360px - 32px)',
+        }}
+      >
+        <ModalContent>
+          <ModalIcon src={dashboardIcon} alt="analytics" />
+          <ModalTitle>Help us improve Xverse!</ModalTitle>
+          <ModalDescription>
+            Help improve the app experience, by allowing Xverse to collect anonymized usage data.
+            This data cannot be used to identify your wallet individually.
+          </ModalDescription>
+          <ModalControlsContainer>
+            <ModalButtonContainer>
+              <ActionButton transparent text="Deny" onPress={() => {}} />
+            </ModalButtonContainer>
+            <ModalButtonContainer>
+              <ActionButton text="Allow" onPress={() => {}} />
+            </ModalButtonContainer>
+          </ModalControlsContainer>
+        </ModalContent>
+      </BottomModal>
     </>
   );
 }
