@@ -14,6 +14,9 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { isLedgerAccount } from '@utils/helper';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import BigNumber from 'bignumber.js';
 
 function ConfirmFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -23,8 +26,7 @@ function ConfirmFtTransaction() {
   const { unsignedTx: seedHex, amount, fungibleToken, memo, recepientAddress } = location.state;
   const unsignedTx = deserializeTransaction(seedHex);
   const { refetch } = useStxWalletData();
-
-  const { network } = useWalletSelector();
+  const { network, selectedAccount } = useWalletSelector();
 
   const {
     isLoading,
@@ -63,6 +65,19 @@ function ConfirmFtTransaction() {
   }, [txError]);
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const type: LedgerTransactionType = 'STX';
+      const state: ConfirmStxTransactionState = {
+        unsignedTx: unsignedTx.serialize(),
+        type,
+        recipients: [{ address: recepientAddress, amountMicrostacks: new BigNumber(amount) }],
+        fee: new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
+      };
+
+      navigate('/confirm-ledger-tx', { state });
+      return;
+    }
+
     mutate({ signedTx: txs[0] });
   };
 
@@ -85,6 +100,7 @@ function ConfirmFtTransaction() {
         loading={isLoading}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleBackButtonClick}
+        skipModal={isLedgerAccount(selectedAccount)}
       >
         <RecipientComponent
           address={recepientAddress}
@@ -100,4 +116,5 @@ function ConfirmFtTransaction() {
     </>
   );
 }
+
 export default ConfirmFtTransaction;

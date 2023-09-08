@@ -1,20 +1,20 @@
-import styled from 'styled-components';
+import ActionButton from '@components/button';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  ErrorCodes,
+  createBrc20TransferOrder,
+  getBtcFiatEquivalent,
+  signBtcTransaction,
+} from '@secretkeylabs/xverse-core';
+import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  createBrc20TransferOrder,
-  getBtcFiatEquivalent,
-  signBtcTransaction,
-  ErrorCodes,
-} from '@secretkeylabs/xverse-core';
-import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useWalletSelector from '@hooks/useWalletSelector';
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import ActionButton from '@components/button';
+import styled from 'styled-components';
 import Brc20TransferForm from './brc20TransferForm';
 import Brc20TransferInfo from './brc20TransferInfo';
 
@@ -72,7 +72,12 @@ function SendBrc20Screen() {
   const fungibleToken =
     location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
 
-  const isSendButtonEnabled = amountToSend !== '' && amountToSend <= fungibleToken.balance;
+  const isSendButtonEnabled =
+    amountToSend !== '' &&
+    !Number.isNaN(Number(amountToSend)) &&
+    !Number.isNaN(Number(fungibleToken.balance)) &&
+    +amountToSend > 0 &&
+    +amountToSend <= +fungibleToken.balance;
   const isActionButtonEnabled = showForm ? isSendButtonEnabled : true;
 
   const { subscribeToResetUserFlow } = useResetUserFlow();

@@ -71,8 +71,16 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
+const ButtonIconContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: props.theme.spacing(3),
+}));
+
 interface Props {
   src?: string;
+  icon?: JSX.Element;
   text: string;
   onPress: () => void;
   processing?: boolean;
@@ -83,6 +91,7 @@ interface Props {
 
 function ActionButton({
   src,
+  icon,
   text,
   onPress,
   processing = false,
@@ -104,6 +113,7 @@ function ActionButton({
         ) : (
           <>
             {src && <ButtonImage src={src} />}
+            {icon && <ButtonIconContainer>{icon}</ButtonIconContainer>}
             <AnimatedButtonText>{text}</AnimatedButtonText>
           </>
         )}
@@ -118,6 +128,7 @@ function ActionButton({
       ) : (
         <>
           {src && <ButtonImage src={src} />}
+          {icon && <ButtonIconContainer>{icon}</ButtonIconContainer>}
           <ButtonText warning={warning}>{text}</ButtonText>
         </>
       )}
