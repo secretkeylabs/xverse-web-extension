@@ -12,6 +12,8 @@ import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/o
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isHardwareAccount } from '@utils/helper';
 
+import popupCenter from '../../../common/utils/popup-center';
+
 const SelectedAccountContainer = styled.div((props) => ({
   paddingLeft: '5%',
   paddingRight: '5%',
@@ -154,6 +156,11 @@ function AccountHeaderComponent({
     setShowOptionsDialog(false);
   };
 
+  const onPopup = () => {
+    popupCenter({ url: `/popup.html#${window.location.hash}?${window.location.search}` });
+    window.close();
+  };
+
   return (
     <>
       {showResetWalletDisplay && (
@@ -191,6 +198,7 @@ function AccountHeaderComponent({
             <ButtonRow onClick={handleAccountSelect}>
               {optionsDialogTranslation('SWITCH_ACCOUNT')}
             </ButtonRow>
+            <ButtonRow onClick={onPopup}>Open in window</ButtonRow>
             <ButtonRow onClick={lockWallet}>{optionsDialogTranslation('LOCK')}</ButtonRow>
             <WarningButton onClick={handleResetWalletPromptOpen}>
               {optionsDialogTranslation('RESET_WALLET')}
