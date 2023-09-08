@@ -5,19 +5,23 @@ const CardContainer = styled.label((props) => ({
   flexDirection: 'row',
   gap: props.theme.spacing(6),
   justifyContent: 'flex-start',
-  padding: '14px 16px',
+  padding: props.theme.spacing(7),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
   cursor: 'pointer',
+  transition: 'background 0.2s ease, border 0.2s ease',
   background:
     props.className === 'checked' ? props.theme.colors.background.selectBackground : 'transparent',
   borderRadius: props.theme.radius(2),
   border: `1px solid ${
     props.className === 'checked' ? props.theme.colors.border.select : props.theme.colors.white[900]
   }`,
+  userSelect: 'none',
 }));
 
-const CardInput = styled.input((props) => ({
+const CardInput = styled.input({
   display: 'none',
-}));
+});
 
 const CardImageContainer = styled.div((props) => ({
   display: 'flex',
@@ -43,6 +47,7 @@ interface Props {
   isChecked: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
 function LedgerAssetSelectCard({
   icon,
   title,

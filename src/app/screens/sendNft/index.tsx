@@ -17,7 +17,7 @@ import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
-import { checkNftExists } from '@utils/helper';
+import { checkNftExists, isLedgerAccount } from '@utils/helper';
 import NftImage from '@screens/nftDashboard/nftImage';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
@@ -45,7 +45,7 @@ const Container = styled.div({
   flex: 1,
 });
 
-const NFtContainer = styled.div((props) => ({
+const NftContainer = styled.div((props) => ({
   maxHeight: 148,
   width: 148,
   display: 'flex',
@@ -124,7 +124,8 @@ function SendNft() {
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
+  const { stxAddress, stxPublicKey, network, feeMultipliers, selectedAccount } =
+    useWalletSelector();
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
   const { isLoading, data, mutate } = useMutation<
@@ -215,14 +216,16 @@ function SendNft() {
       {isGalleryOpen && (
         <>
           <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          <ButtonContainer>
-            <Button onClick={handleBackButtonClick}>
-              <>
-                <ButtonImage src={ArrowLeft} />
-                <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-              </>
-            </Button>
-          </ButtonContainer>
+          {!isLedgerAccount(selectedAccount) && (
+            <ButtonContainer>
+              <Button onClick={handleBackButtonClick}>
+                <>
+                  <ButtonImage src={ArrowLeft} />
+                  <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
+                </>
+              </Button>
+            </ButtonContainer>
+          )}
         </>
       )}
       <ScrollContainer>
@@ -236,9 +239,9 @@ function SendNft() {
           onPressSend={onPressSendNFT}
         >
           <Container>
-            <NFtContainer>
+            <NftContainer>
               <NftImage metadata={nft?.token_metadata!} />
-            </NFtContainer>
+            </NftContainer>
             <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
           </Container>
         </SendForm>

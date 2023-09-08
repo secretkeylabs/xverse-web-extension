@@ -37,7 +37,6 @@ const Container = styled.div`
 interface GridContainerProps {
   isGalleryOpen: boolean;
 }
-
 const GridContainer = styled.div<GridContainerProps>((props) => ({
   display: 'grid',
   columnGap: props.theme.spacing(8),
@@ -78,19 +77,19 @@ const LoaderContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-const ButtonContainer = styled.div((props) => ({
+const ButtonContainer = styled.div({
   display: 'flex',
   position: 'relative',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
   maxWidth: 400,
-}));
+});
 
-const ShareButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(3),
-  width: '100%',
-}));
+// const ShareButtonContainer = styled.div((props) => ({
+//   marginLeft: props.theme.spacing(3),
+//   width: '100%',
+// }));
 
 const ReceiveButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(3),
@@ -186,13 +185,6 @@ const BarLoaderContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(5),
   maxWidth: 300,
   display: 'flex',
-}));
-
-const MissingOrdinalsAddresText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['200'],
-  marginTop: props.theme.spacing(42),
-  textAlign: 'center',
 }));
 
 function NftDashboard() {
@@ -317,9 +309,9 @@ function NftDashboard() {
     [ordinals, nfts, hasActivatedOrdinalsKey],
   );
 
-  const onSharePress = () => {
-    setShowNftOptions(true);
-  };
+  // const onSharePress = () => {
+  //   setShowNftOptions(true);
+  // };
 
   const onCrossPress = () => {
     setShowNftOptions(false);
@@ -337,12 +329,6 @@ function NftDashboard() {
   const onActivateOrdinalsAlertActivatePress = () => {
     setShowActivateOrdinalsAlert(false);
     dispatch(ChangeActivateOrdinalsAction(true));
-  };
-
-  const handleCreateAddressCLick = async () => {
-    await chrome.tabs.create({
-      url: chrome.runtime.getURL('options.html#/import-ledger?ordinals-only=true'),
-    });
   };
 
   return (
@@ -384,19 +370,10 @@ function NftDashboard() {
               </>
             </WebGalleryButton>
           )}
-          {!ordinalsAddress && (
-            <MissingOrdinalsAddresText>
-              You need to set an Ordinals address to receive collectibles.
-            </MissingOrdinalsAddresText>
-          )}
         </CollectibleContainer>
         <ButtonContainer>
           <ReceiveButtonContainer>
-            {ordinalsAddress ? (
-              <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
-            ) : (
-              <ActionButton text="Create an address" onPress={handleCreateAddressCLick} />
-            )}
+            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
           </ReceiveButtonContainer>
           {openReceiveModal && (
             <ReceiveNftContainer>

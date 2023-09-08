@@ -1,5 +1,14 @@
-import RequestsRoutes from '@common/utils/route-urls';
-import getEventSourceWindow from '@common/utils/get-event-source-window';
+import {
+  AuthenticationRequestEvent,
+  CreateInscriptionEvent,
+  DomEventName,
+  GetAddressRequestEvent,
+  SendBtcRequestEvent,
+  SignMessageRequestEvent,
+  SignPsbtRequestEvent,
+  SignatureRequestEvent,
+  TransactionRequestEvent,
+} from '@common/types/inpage-types';
 import {
   CONTENT_SCRIPT_PORT,
   ExternalMethods,
@@ -9,16 +18,8 @@ import {
   MESSAGE_SOURCE,
   SatsConnectMessageFromContentScript,
 } from '@common/types/message-types';
-import {
-  AuthenticationRequestEvent,
-  DomEventName,
-  SignatureRequestEvent,
-  TransactionRequestEvent,
-  GetAddressRequestEvent,
-  SignPsbtRequestEvent,
-  SignMessageRequestEvent,
-  SendBtcRequestEvent,
-} from '@common/types/inpage-types';
+import getEventSourceWindow from '@common/utils/get-event-source-window';
+import RequestsRoutes from '@common/utils/route-urls';
 
 // Legacy messaging to work with older versions of Connect
 window.addEventListener('message', (event) => {
@@ -161,6 +162,18 @@ document.addEventListener(DomEventName.sendBtcRequest, ((event: SendBtcRequestEv
     payload: event.detail.sendBtcRequest,
     urlParam: 'sendBtcRequest',
     method: ExternalSatsMethods.sendBtcRequest,
+  });
+}) as EventListener);
+
+// Listen for a CustomEvent (Create Text Inscription Request) coming from the web app
+document.addEventListener(DomEventName.createInscriptionRequest, ((
+  event: CreateInscriptionEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.CreateInscription,
+    payload: event.detail.createInscriptionRequest,
+    urlParam: 'createInscriptionRequest',
+    method: ExternalSatsMethods.createInscriptionRequest,
   });
 }) as EventListener);
 
