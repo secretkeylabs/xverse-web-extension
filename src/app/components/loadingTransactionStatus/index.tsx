@@ -51,7 +51,7 @@ const AnimatedBody = styled(animated.div)`
 `;
 
 const BottomFixedContainer = styled.div`
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
