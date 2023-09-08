@@ -6,7 +6,7 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
 import { useMutation } from '@tanstack/react-query';
@@ -145,15 +145,15 @@ function ConfirmOrdinalTransaction() {
   const handleOnConfirmClick = (txHex: string) => {
     if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'ORDINALS';
-      navigate('/confirm-ledger-tx', {
-        state: {
-          recipients: [{ address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }],
-          type: txType,
-          ordinalUtxo,
-          feeRateInput: currentFeeRate,
-          fee: currentFee,
-        },
-      });
+      const state: ConfirmOrdinalsTransactionState = {
+        recipients: [{ address: recipientAddress, amountSats: new BigNumber(ordinalUtxo.value) }],
+        type: txType,
+        ordinalUtxo,
+        feeRateInput: currentFeeRate,
+        fee: currentFee,
+      };
+
+      navigate('/confirm-ledger-tx', { state });
       return;
     }
 

@@ -1,15 +1,15 @@
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { useState } from 'react';
 import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
-import ResetWalletPrompt from '@components/resetWallet';
-import PasswordInput from '@components/passwordInput';
-import useWalletReducer from '@hooks/useWalletReducer';
 import AccountRow from '@components/accountRow';
+import PasswordInput from '@components/passwordInput';
+import ResetWalletPrompt from '@components/resetWallet';
+import useWalletReducer from '@hooks/useWalletReducer';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
-import useWalletSelector from '@hooks/useWalletSelector';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 const SelectedAccountContainer = styled.div((props) => ({
   display: 'flex',
@@ -36,7 +36,7 @@ const ResetWalletContainer = styled.div((props) => ({
   paddingTop: props.theme.spacing(30),
 }));
 
-const OptionsButton = styled.button((props) => ({
+const OptionsButton = styled.button(() => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
@@ -73,7 +73,7 @@ interface AccountHeaderComponentProps {
 }
 
 function AccountHeaderComponent({
-  disableMenuOption,
+  disableMenuOption = false,
   disableAccountSwitch = false,
 }: AccountHeaderComponentProps) {
   const navigate = useNavigate();
@@ -168,7 +168,7 @@ function AccountHeaderComponent({
           account={selectedAccount!}
           isSelected
           onAccountSelected={handleAccountSelect}
-          disableAccountSwitch={disableAccountSwitch}
+          disabledAccountSelect={disableAccountSwitch}
         />
         {!disableMenuOption && (
           <OptionsButton onClick={openOptionsDialog}>

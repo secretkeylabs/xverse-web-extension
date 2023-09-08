@@ -40,7 +40,7 @@ function SendBrc20Screen() {
   const isNextEnabled =
     !amountError && !recipientError && !!recipientAddress && amountToSend !== '';
 
-  const { fungibleToken: ft }: SendBrc20TransferState = location.state;
+  const { fungibleToken: ft }: SendBrc20TransferState = location.state || {};
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
   const fungibleToken = ft || brcCoinsList?.find((coin) => coin.name === coinName);
 
@@ -50,12 +50,13 @@ function SendBrc20Screen() {
 
   const validateAmount = (amountInput: string): boolean => {
     const amount = Number(replaceCommaByDot(amountInput));
-    if (amount > Number(fungibleToken.balance)) {
-      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
-      return false;
-    }
+    const balance = Number(fungibleToken.balance);
     if (!Number.isFinite(amount) || amount === 0) {
       setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
+      return false;
+    }
+    if (!Number.isFinite(balance) || amount > Number(balance)) {
+      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
       return false;
     }
     setAmountError('');

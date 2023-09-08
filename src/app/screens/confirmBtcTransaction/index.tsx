@@ -15,7 +15,7 @@ import AlertMessage from '@components/alertMessage';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import useBtcClient from '@hooks/useBtcClient';
 import { isLedgerAccount } from '@utils/helper';
-import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { ConfirmBtcTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -160,20 +160,29 @@ function ConfirmBtcTransaction() {
   const handleOnConfirmClick = (txHex: string) => {
     if (isRestoreFundFlow) {
       broadcastOrdinalTransaction({ signedTx: txHex });
-    } else if (ordinalsInBtc && ordinalsInBtc.length > 0) {
+      return;
+    }
+
+    if (ordinalsInBtc && ordinalsInBtc.length > 0) {
       setSignedTx(txHex);
       setShowOrdinalsDetectedAlert(true);
-    } else if (isLedgerAccount(selectedAccount)) {
+      return;
+    }
+
+    if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'BTC';
-      navigate('/confirm-ledger-tx', {
-        state: {
-          recipients: recipient,
-          type: txType,
-          feeRateInput: currentFeeRate,
-          fee: currentFee,
-        },
-      });
-    } else mutate({ signedTx: txHex });
+      const state: ConfirmBtcTransactionState = {
+        recipients: recipient,
+        type: txType,
+        feeRateInput: currentFeeRate,
+        fee: currentFee,
+      };
+
+      navigate('/confirm-ledger-tx', { state });
+      return;
+    }
+
+    mutate({ signedTx: txHex });
   };
 
   const goBackToScreen = () => {

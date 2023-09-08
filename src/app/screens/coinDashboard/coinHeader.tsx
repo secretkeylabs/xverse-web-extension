@@ -271,12 +271,12 @@ export default function CoinHeader(props: CoinBalanceProps) {
           return;
         case 'STX':
           await chrome.tabs.create({
-            url: chrome.runtime.getURL('options.html#/send-stx-ledger'),
+            url: chrome.runtime.getURL('options.html#/send-stx'),
           });
           return;
         case 'FT':
           await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/send-ft-ledger?coin=${fungibleToken?.name}`),
+            url: chrome.runtime.getURL(`options.html#/send-ft?coinName=${fungibleToken?.name}`),
           });
           return;
         case 'brc20':

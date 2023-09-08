@@ -1,23 +1,23 @@
-import styled from 'styled-components';
+import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
+import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
+import BarLoader from '@components/barLoader';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
+import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Account } from '@secretkeylabs/xverse-core';
+import { selectAccount } from '@stores/wallet/actions/actionCreators';
+import { LoaderSize } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
+import { isHardwareAccount } from '@utils/helper';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
-import { useTranslation } from 'react-i18next';
-import { isHardwareAccount } from '@utils/helper';
-import BarLoader from '@components/barLoader';
-import { LoaderSize } from '@utils/constants';
-import { Account } from '@secretkeylabs/xverse-core';
-import { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import useWalletSelector from '@hooks/useWalletSelector';
-import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
-import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
-import ActionButton from '@components/button';
-import BottomModal from '@components/bottomModal';
-import useWalletReducer from '@hooks/useWalletReducer';
-import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
-import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import styled from 'styled-components';
 
 interface GradientCircleProps {
   firstGradient: string;
@@ -31,13 +31,13 @@ const GradientCircle = styled.div<GradientCircleProps>((props) => ({
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
 
-const TopSectionContainer = styled.div<{ disableAccountSwitch: boolean }>((props) => ({
+const TopSectionContainer = styled.div<{ disableClick?: boolean }>((props) => ({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   backgroundColor: 'transparent',
-  cursor: props.disableAccountSwitch ? 'initial' : 'pointer',
+  cursor: props.disableClick ? 'initial' : 'pointer',
 }));
 
 const AccountInfoContainer = styled.div({
@@ -142,13 +142,13 @@ function AccountRow({
   isSelected,
   onAccountSelected,
   isAccountListView = false,
-  disableAccountSwitch = false,
+  disabledAccountSelect = false,
 }: {
   account: Account | null;
   isSelected: boolean;
   onAccountSelected: (account: Account) => void;
   isAccountListView?: boolean;
-  disableAccountSwitch?: boolean;
+  disabledAccountSelect?: boolean;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
@@ -245,7 +245,7 @@ function AccountRow({
   };
 
   return (
-    <TopSectionContainer disableAccountSwitch={disableAccountSwitch}>
+    <TopSectionContainer disableClick={disabledAccountSelect}>
       <AccountInfoContainer onClick={handleClick}>
         <GradientCircle
           firstGradient={gradient[0]}

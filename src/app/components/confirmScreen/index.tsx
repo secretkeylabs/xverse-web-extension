@@ -1,6 +1,6 @@
+import ActionButton from '@components/button';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
-import ActionButton from '@components/button';
 
 const MainContainer = styled.div`
   display: flex;
@@ -13,19 +13,13 @@ const MainContainer = styled.div`
   }
 `;
 
-const ContentContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-});
-
 const ButtonsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'flex-end',
   marginBottom: props.theme.spacing(20),
-  marginTop: 43,
+  marginTop: props.theme.spacing(12),
   marginLeft: 16,
   marginRight: 16,
 }));
@@ -43,6 +37,7 @@ type Props = {
   onCancel: () => void;
   loading: boolean;
   disabled?: boolean;
+  isError?: boolean;
 };
 
 function ConfirmScreen({
@@ -53,12 +48,11 @@ function ConfirmScreen({
   cancelText,
   loading,
   disabled = false,
+  isError = false,
 }: Props) {
   return (
     <>
-      <MainContainer>
-        <ContentContainer>{children}</ContentContainer>
-      </MainContainer>
+      <MainContainer>{children}</MainContainer>
       <ButtonsContainer>
         <ActionButton onPress={onCancel} text={cancelText} transparent />
         <ConfirmButtonContainer>
@@ -67,6 +61,7 @@ function ConfirmScreen({
             disabled={disabled}
             processing={loading}
             text={confirmText}
+            warning={isError}
           />
         </ConfirmButtonContainer>
       </ButtonsContainer>
