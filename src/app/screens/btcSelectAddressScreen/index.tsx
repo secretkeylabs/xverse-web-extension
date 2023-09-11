@@ -1,21 +1,21 @@
-import styled from 'styled-components';
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import XverseLogo from '@assets/img/settings/logo.svg';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
-import useWalletSelector from '@hooks/useWalletSelector';
 import AccountRow from '@components/accountRow';
-import { animated, useSpring } from '@react-spring/web';
-import Separator from '@components/separator';
-import { Account } from '@secretkeylabs/xverse-core';
-import { useDispatch } from 'react-redux';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
+import Separator from '@components/separator';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
-import { AddressPurpose } from 'sats-connect';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { animated, useSpring } from '@react-spring/web';
+import { Account } from '@secretkeylabs/xverse-core';
+import { selectAccount } from '@stores/wallet/actions/actionCreators';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { AddressPurpose } from 'sats-connect';
+import styled from 'styled-components';
 import AccountView from './accountView';
 
 const TitleContainer = styled.div({
@@ -35,6 +35,11 @@ const DropDownContainer = styled.div({
   height: '100%',
   alignItems: 'center',
   justifyContent: 'flex-end',
+});
+
+const Container = styled.div({
+  display: 'flex',
+  alignItems: 'center',
 });
 
 const LogoContainer = styled.div((props) => ({
@@ -253,7 +258,7 @@ function BtcSelectAddressScreen() {
         <TitleContainer>
           <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Container>
             {payload.purposes.map((purpose) =>
               purpose === AddressPurpose.Payment ? (
                 <AddressContainer>
@@ -267,7 +272,7 @@ function BtcSelectAddressScreen() {
                 </AddressContainer>
               ),
             )}
-          </div>
+          </Container>
           <DappTitle>{payload.message}</DappTitle>
         </TitleContainer>
         {showAccountList ? (

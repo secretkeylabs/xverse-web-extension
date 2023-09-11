@@ -1,8 +1,8 @@
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
-import { GetAddressOptions, AddressPurpose, GetAddressResponse, Address } from 'sats-connect';
+import { Address, AddressPurpose, GetAddressOptions, GetAddressResponse } from 'sats-connect';
 
 const useBtcAddressRequest = () => {
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useWalletSelector();

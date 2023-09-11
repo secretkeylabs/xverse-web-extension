@@ -208,6 +208,9 @@ function TransactionSettingAlert({
           : t('TRANSACTION_SETTING.ADVANCED_SETTING')
       }
       onClose={onClosePress}
+      overlayStylesOverriding={{
+        height: 600,
+      }}
     >
       {renderContent()}
       {(showFeeSettings || showNonceSettings) && (
