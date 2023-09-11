@@ -57,7 +57,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
     props.withError ? props.theme.colors.feedback.error : props.theme.colors.background.elevation6
   }`,
   backgroundColor: props.theme.colors.background.elevation1,
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   paddingTop: props.theme.spacing(5),
@@ -191,6 +191,7 @@ function EditFee({
   const inputRef = useRef(null);
   const debouncedFeeRateInput = useDebounce(feeRateInput, 500);
   const isBtcOrOrdinals = type === 'BTC' || type === 'Ordinals';
+  const isStx = type === 'STX';
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
 
@@ -270,7 +271,7 @@ function EditFee({
   };
 
   useEffect(() => {
-    if (type === 'STX' && feeMode !== 'custom') {
+    if (isStx && feeMode !== 'custom') {
       modifyStxFees(feeMode);
     }
   }, [feeMode]);
@@ -357,7 +358,7 @@ function EditFee({
   }, [debouncedFeeRateInput]);
 
   function getFiatEquivalent() {
-    return type === 'STX'
+    return isStx
       ? getStxFiatEquivalent(stxToMicrostacks(new BigNumber(totalFee)), stxBtcRate, btcFiatRate)
       : getBtcFiatEquivalent(new BigNumber(totalFee), btcFiatRate);
   }
@@ -426,7 +427,7 @@ function EditFee({
         {error && <ErrorText>{error}</ErrorText>}
       </FeeContainer>
       <ButtonContainer>
-        {type === 'STX' && (
+        {isStx && (
           <FeeButton isSelected={feeMode === 'low'} onClick={() => modifyStxFees('low')}>
             {t('TRANSACTION_SETTING.LOW')}
           </FeeButton>
@@ -434,14 +435,14 @@ function EditFee({
         <FeeButton
           isSelected={feeMode === 'standard'}
           isBtc={isBtcOrOrdinals}
-          onClick={() => (type === 'STX' ? modifyStxFees('standard') : modifyFees('standard'))}
+          onClick={() => (isStx ? modifyStxFees('standard') : modifyFees('standard'))}
         >
           {t('TRANSACTION_SETTING.STANDARD')}
         </FeeButton>
         <FeeButton
           isSelected={feeMode === 'high'}
           isBtc={isBtcOrOrdinals}
-          onClick={() => (type === 'STX' ? modifyStxFees('high') : modifyFees('high'))}
+          onClick={() => (isStx ? modifyStxFees('high') : modifyFees('high'))}
         >
           {t('TRANSACTION_SETTING.HIGH')}
         </FeeButton>
@@ -449,7 +450,7 @@ function EditFee({
           isSelected={feeMode === 'custom'}
           isLastInRow
           isBtc={isBtcOrOrdinals}
-          onClick={() => (type === 'STX' ? modifyStxFees('custom') : modifyFees('custom'))}
+          onClick={() => (isStx ? modifyStxFees('custom') : modifyFees('custom'))}
         >
           {t('TRANSACTION_SETTING.CUSTOM')}
         </FeeButton>

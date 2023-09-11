@@ -50,6 +50,8 @@ const TransactionSettingNonceOptionButton = styled.button((props) => ({
   justifyContent: 'space-between',
 }));
 
+type TxType = 'STX' | 'BTC' | 'Ordinals';
+
 interface Props {
   visible: boolean;
   fee: string;
@@ -66,7 +68,6 @@ interface Props {
   showFeeSettings: boolean;
   setShowFeeSettings: (value: boolean) => void;
 }
-type TxType = 'STX' | 'BTC' | 'Ordinals';
 
 function TransactionSettingAlert({
   visible,
@@ -102,6 +103,14 @@ function TransactionSettingAlert({
         return;
       }
       if (currentFee.lte(new BigNumber(0))) {
+        setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
+        return;
+      }
+
+      try {
+        // `setFee` method from `@secretkeylabs/xverse-core` requires a BigInt so we should check if it is a valid BigInt
+        BigInt(currentFee.toString());
+      } catch (e) {
         setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
         return;
       }
