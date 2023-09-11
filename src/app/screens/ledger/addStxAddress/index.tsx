@@ -33,7 +33,7 @@ import {
   OnBoardingContentContainer,
   SelectAssetText,
   SelectAssetTitle,
-} from '../importLedgerAccount/index.styled';
+} from '../importLedgerAccount/steps.styled';
 
 enum Steps {
   ConnectLedger = 0,

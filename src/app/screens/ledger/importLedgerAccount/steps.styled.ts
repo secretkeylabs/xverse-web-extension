@@ -1,36 +1,5 @@
 import styled from 'styled-components';
-import { animated } from '@react-spring/web';
 import Switch from 'react-switch';
-
-export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-export const OnBoardingContentContainer = styled(animated.div)((props) => ({
-  display: 'flex',
-  width: '100%',
-  flexDirection: 'column',
-  flex: 1,
-  justifyContent: props.className === 'center' ? 'center' : 'none',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-}));
-
-export const OnBoardingActionsContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(30),
-}));
 
 export const ImportStartImage = styled.img((props) => ({
   marginLeft: props.theme.spacing(0),
@@ -49,13 +18,6 @@ export const ImportBeforeStartContainer = styled.div((props) => ({
   alignItems: 'center',
   maxWidth: '328px',
   paddingTop: props.theme.spacing(16),
-}));
-
-export const ButtonContainer = styled.div((props) => ({
-  marginLeft: 3,
-  marginRight: 3,
-  marginTop: props.theme.spacing(4),
-  width: '100%',
 }));
 
 export const ImportStartTitle = styled.h1((props) => ({
@@ -101,10 +63,9 @@ export const SelectAssetTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
 }));
 
-interface SelectAssetTextProps {
+export const SelectAssetText = styled.p<{
   centered?: boolean;
-}
-export const SelectAssetText = styled.p<SelectAssetTextProps>((props) => ({
+}>((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
   textAlign: props.centered ? 'center' : 'left',
@@ -263,10 +224,9 @@ export const OptionIcon = styled.div<OptionProps>((props) => ({
   },
 }));
 
-interface ConfirmationStepProps {
+export const ConfirmationStep = styled.div<{
   isCompleted: boolean;
-}
-export const ConfirmationStep = styled.div<ConfirmationStepProps>((props) => ({
+}>((props) => ({
   width: 32,
   height: 4,
   backgroundColor: props.isCompleted ? props.theme.colors.white[0] : props.theme.colors.white[900],
