@@ -235,7 +235,7 @@ function EditFee({
             'Mainnet',
             mode,
           );
-          setFeeRateInput(selectedFeeRate?.toString());
+          setFeeRateInput(selectedFeeRate?.toString() || '');
           setTotalFee(modifiedFee.toString());
         } else if (btcRecipients && selectedAccount) {
           const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
@@ -244,7 +244,7 @@ function EditFee({
             network.type,
             mode,
           );
-          setFeeRateInput(selectedFeeRate?.toString());
+          setFeeRateInput(selectedFeeRate?.toString() || '');
           setTotalFee(modifiedFee.toString());
         }
       } else if (type === 'Ordinals' && btcRecipients && ordinalTxUtxo) {
@@ -256,7 +256,7 @@ function EditFee({
           ordinalsUtxos || [],
           mode,
         );
-        setFeeRateInput(selectedFeeRate?.toString());
+        setFeeRateInput(selectedFeeRate?.toString() || '');
         setTotalFee(modifiedFee.toString());
       }
     } catch (err: any) {
