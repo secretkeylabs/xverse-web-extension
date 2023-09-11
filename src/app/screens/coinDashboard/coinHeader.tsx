@@ -276,12 +276,14 @@ export default function CoinHeader(props: CoinBalanceProps) {
           return;
         case 'FT':
           await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/send-ft?coinName=${fungibleToken?.name}`),
+            url: chrome.runtime.getURL(`options.html#/send-ft?coinTicker=${fungibleToken?.ticker}`),
           });
           return;
         case 'brc20':
           await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/send-brc20?coinName=${fungibleToken?.name}`),
+            url: chrome.runtime.getURL(
+              `options.html#/send-brc20?coinTicker=${fungibleToken?.ticker}`,
+            ),
           });
           return;
         default:

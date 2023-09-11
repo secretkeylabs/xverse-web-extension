@@ -251,7 +251,7 @@ function Home() {
     }
     if (isLedgerAccount(selectedAccount)) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL(`options.html#/send-ft?coinName=${coin.name}`),
+        url: chrome.runtime.getURL(`options.html#/send-ft?coinTicker=${coin.ticker}`),
       });
       return;
     }
