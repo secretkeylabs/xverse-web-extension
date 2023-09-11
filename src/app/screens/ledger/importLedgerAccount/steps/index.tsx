@@ -14,8 +14,8 @@ import ledgerAccountSwitchIcon from '@assets/img/ledger/account_switch.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
 import { useTheme } from 'styled-components';
-import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
-import { ImportLedgerSteps, LedgerLiveOptions } from './types';
+import LedgerConnectionView from '../../../../components/ledger/connectLedgerView';
+import { ImportLedgerSteps, LedgerLiveOptions } from '../types';
 
 import {
   AddAccountNameContainer,
@@ -50,7 +50,7 @@ import {
   TogglerContainer,
   TogglerText,
   WarningIcon,
-} from './steps.styled';
+} from './index.styled';
 
 const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE =
   'https://support.xverse.app/hc/en-us/articles/17901278165773';

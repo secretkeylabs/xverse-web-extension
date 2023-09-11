@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { animated, useTransition } from '@react-spring/web';
+import { useTransition } from '@react-spring/web';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import {
   Account,
@@ -15,40 +15,11 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
-import styled from 'styled-components';
 import { ImportLedgerSteps, LedgerLiveOptions } from './types';
 import StepControls from './stepControls';
 import Steps from './steps';
 
-export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-export const OnBoardingContentContainer = styled(animated.div)((props) => ({
-  display: 'flex',
-  width: '100%',
-  flexDirection: 'column',
-  flex: 1,
-  justifyContent: props.className === 'center' ? 'center' : 'none',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-}));
-
-export const OnBoardingActionsContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(30),
-}));
+import { Container, OnBoardingContentContainer, OnBoardingActionsContainer } from './index.styled';
 
 export interface Credential {
   publicKey: string;

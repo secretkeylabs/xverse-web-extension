@@ -21,19 +21,21 @@ import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { Credential } from '../importLedgerAccount';
 
 import {
+  Container,
+  OnBoardingActionsContainer,
+  OnBoardingContentContainer,
+} from '../importLedgerAccount/index.styled';
+import {
   ActionButtonContainer,
   AddAddressDetailsContainer,
   AddAddressHeaderContainer,
   AddressAddedContainer,
   ConfirmationText,
-  Container,
   LedgerFailButtonsContainer,
   LedgerFailViewContainer,
-  OnBoardingActionsContainer,
-  OnBoardingContentContainer,
   SelectAssetText,
   SelectAssetTitle,
-} from '../importLedgerAccount/steps.styled';
+} from '../importLedgerAccount/steps/index.styled';
 
 enum Steps {
   ConnectLedger = 0,
