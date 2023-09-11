@@ -14,7 +14,7 @@ import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
-import { isLedgerAccount } from '@utils/helper';
+import { isLedgerAccount, trackMixPanel } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import useAppConfig from '@hooks/queries/useAppConfig';
@@ -35,6 +35,10 @@ import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import ActionButton from '@components/button';
 import dashboardIcon from '@assets/img/dashboard-icon.svg';
+import mixpanel from 'mixpanel-browser';
+import { useDispatch } from 'react-redux';
+import { ChangeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import { sha256 } from 'js-sha256';
 import Theme from 'theme';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
@@ -184,6 +188,7 @@ function Home() {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
@@ -198,6 +203,7 @@ function Home() {
     brcCoinsList,
     showBtcReceiveAlert,
     showOrdinalReceiveAlert,
+    showDataCollectionAlert,
   } = useWalletSelector();
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
@@ -424,6 +430,23 @@ function Home() {
     </VerifyOrViewContainer>
   );
 
+  const handleDataCollectionDeny = () => {
+    trackMixPanel('Opt Out', undefined, { send_immediately: true }, () => {
+      mixpanel.opt_out_tracking();
+      mixpanel.reset();
+    });
+    dispatch(ChangeShowDataCollectionAlertAction(false));
+  };
+
+  const handleDataCollectionAllow = () => {
+    if (selectedAccount) {
+      mixpanel.identify(sha256(selectedAccount.masterPubKey));
+    }
+    mixpanel.opt_in_tracking();
+
+    dispatch(ChangeShowDataCollectionAlertAction(false));
+  };
+
   const showSwaps = !isLedgerAccount(selectedAccount);
 
   return (
@@ -541,9 +564,9 @@ function Home() {
       <BottomBar tab="dashboard" />
 
       <BottomModal
-        visible={false} // TODO: Add modal logic
+        visible={!!showDataCollectionAlert}
         header=""
-        onClose={() => {}}
+        onClose={handleDataCollectionDeny}
         overlayStylesOverriding={{
           display: 'flex',
           alignItems: 'center',
@@ -556,6 +579,7 @@ function Home() {
         }}
       >
         <ModalContent>
+          {/* TODO: Add translation keys */}
           <ModalIcon src={dashboardIcon} alt="analytics" />
           <ModalTitle>Help us improve Xverse!</ModalTitle>
           <ModalDescription>
@@ -564,10 +588,10 @@ function Home() {
           </ModalDescription>
           <ModalControlsContainer>
             <ModalButtonContainer>
-              <ActionButton transparent text="Deny" onPress={() => {}} />
+              <ActionButton transparent text="Deny" onPress={handleDataCollectionDeny} />
             </ModalButtonContainer>
             <ModalButtonContainer>
-              <ActionButton text="Allow" onPress={() => {}} />
+              <ActionButton text="Allow" onPress={handleDataCollectionAllow} />
             </ModalButtonContainer>
           </ModalControlsContainer>
         </ModalContent>

@@ -5,22 +5,35 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Switch from 'react-switch';
 import mixpanel from 'mixpanel-browser';
+import { useEffect, useState } from 'react';
+import { trackMixPanel } from '@utils/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { sha256 } from 'js-sha256';
-import { useEffect, useState } from 'react';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow-y: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-bottom: 16px;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
+const Container = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  overflowY: 'auto',
+  padding: props.theme.spacing(8),
+  fontSize: '0.875rem',
+  color: props.theme.colors.white['200'],
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+}));
+
+const TextContiner = styled.div({
+  lineHeight: '140%',
+});
+
+const SwitchContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(16),
+  fontWeight: 500,
+}));
 
 const CustomSwitch = styled(Switch)`
   .react-switch-handle {
@@ -32,10 +45,10 @@ const CustomSwitch = styled(Switch)`
 
 function PrivacyPreferencesScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
   const theme = useTheme();
-  // const { selectedAccount } = useWalletSelector();
-  const [isEnabled, setIsEnabled] = useState(true);
+  const [isEnabled, setIsEnabled] = useState(false);
 
   const handleBackButtonClick = () => {
     navigate('/settings');
@@ -44,8 +57,14 @@ function PrivacyPreferencesScreen() {
   const handleSwitchChange = () => {
     setIsEnabled((prevEnabledState) => {
       if (prevEnabledState) {
-        mixpanel.opt_out_tracking();
+        trackMixPanel('Opt Out', undefined, { send_immediately: true }, () => {
+          mixpanel.opt_out_tracking();
+          mixpanel.reset();
+        });
       } else {
+        if (selectedAccount) {
+          mixpanel.identify(sha256(selectedAccount.masterPubKey));
+        }
         mixpanel.opt_in_tracking();
       }
 
@@ -54,28 +73,27 @@ function PrivacyPreferencesScreen() {
   };
 
   const checkMixpanelTrackingStatus = async () => {
-    const hasOptedOut = await mixpanel.has_opted_out_tracking();
+    const hasOptedIn = await mixpanel.has_opted_in_tracking();
 
-    if (hasOptedOut) {
-      setIsEnabled(false);
+    if (hasOptedIn) {
+      setIsEnabled(true);
     }
   };
 
   useEffect(() => {
     checkMixpanelTrackingStatus();
-
-    // mixpanel.identify(sha256(selectedAccount.masterPubKey)); TODO: find a place where it should be called
   }, []);
 
   return (
     <>
       <TopRow title={t('PRIVACY_PREFERENCES')} onClick={handleBackButtonClick} />
       <Container>
-        <div>
+        <TextContiner>
+          {/* TODO: Add translation keys */}
           Help improve the app experience, by allowing Xverse to collect anonymized usage data. This
           data cannot be used to identify your wallet individually.
-        </div>
-        <div>
+        </TextContiner>
+        <SwitchContainer>
           <div>Authorize data collection</div>
           <CustomSwitch
             onColor={theme.colors.purple_main}
@@ -85,7 +103,7 @@ function PrivacyPreferencesScreen() {
             uncheckedIcon={false}
             checkedIcon={false}
           />
-        </div>
+        </SwitchContainer>
       </Container>
       <BottomBar tab="settings" />
     </>

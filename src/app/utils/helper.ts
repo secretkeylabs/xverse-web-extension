@@ -172,6 +172,6 @@ export const isLedgerAccount = (account: Account | null): boolean =>
 
 export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
 
-export function trackMixPanel(event: string, properties?: any) {
-  mixpanel.track(event, properties);
+export function trackMixPanel(event: string, properties?: any, options?: any, callback?: any) {
+  mixpanel.track(event, properties, options, callback);
 }
