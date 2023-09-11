@@ -43,6 +43,7 @@ import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20Screen from '@screens/sendBrc20';
+import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
 import SendFtScreen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
@@ -343,10 +344,19 @@ const router = createHashRouter([
         ),
       },
       {
+        // TODO deprecate this after brc20 one step ledger support done
         path: 'send-brc20',
         element: (
           <AuthGuard>
             <SendBrc20Screen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'send-brc20-one-step',
+        element: (
+          <AuthGuard>
+            <SendBrc20OneStepScreen />
           </AuthGuard>
         ),
       },

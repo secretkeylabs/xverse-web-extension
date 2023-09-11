@@ -242,7 +242,14 @@ function Home() {
 
   const onSendFtSelect = async (coin: FungibleToken) => {
     if (coin.protocol === 'brc-20') {
-      navigate('send-brc20', {
+      if (isLedgerAccount(selectedAccount)) {
+        await chrome.tabs.create({
+          // TODO replace with send-brc20-one-step route, when ledger support is ready
+          url: chrome.runtime.getURL(`options.html#/send-brc20?coinName=${coin.name}`),
+        });
+        return;
+      }
+      navigate('send-brc20-one-step', {
         state: {
           fungibleToken: coin,
         },
@@ -439,6 +446,7 @@ function Home() {
                 ?.filter((ft) => ft.visible)
                 .map((coin) => (
                   <TokenTile
+                    key={coin.name}
                     title={coin.name}
                     currency="FT"
                     loading={loadingCoinData || refetchingCoinData}
