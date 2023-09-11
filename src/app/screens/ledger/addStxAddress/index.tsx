@@ -136,9 +136,10 @@ function AddStxAddress(): JSX.Element {
 
       const stacksCreds = await importStxAccounts(true);
 
-      if (stacksCreds) {
-        await saveAddressToWallet(stacksCreds);
+      if (!stacksCreds) {
+        throw new Error('No response');
       }
+      await saveAddressToWallet(stacksCreds);
     } catch (err: any) {
       console.error(err);
       setIsConnectSuccess(false);

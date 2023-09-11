@@ -60,10 +60,9 @@ export const ConnectLedgerTitle = styled.h1((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
-interface ConnectLedgerTextAdvancedProps {
+export const ConnectLedgerTextAdvanced = styled.p<{
   isCompleted?: boolean;
-}
-export const ConnectLedgerTextAdvanced = styled.p<ConnectLedgerTextAdvancedProps>((props) => ({
+}>((props) => ({
   ...props.theme.body_m,
   display: 'flex',
   alignItems: 'flex-start',
