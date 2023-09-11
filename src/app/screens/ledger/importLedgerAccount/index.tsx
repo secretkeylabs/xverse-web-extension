@@ -790,7 +790,7 @@ function ImportLedger(): JSX.Element {
             </AddAccountNameTitleContainer>
             <LedgerInput
               label={t('LEDGER_ADD_ACCOUNT_NAME.INPUT')}
-              placeholder={`My ledger ${accountId + 1}`}
+              placeholder={`${t('LEDGER_ADD_ACCOUNT_NAME.PLACEHOLDER')} ${accountId + 1}`}
               id="account_name_input"
               value={accountName}
               onChange={(e) => setAccountName(e.target.value)}

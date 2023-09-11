@@ -66,6 +66,7 @@
       "TITLE": "Name your Ledger wallet",
       "SUBTITLE": "You can give your wallet a custom name.",
       "INPUT": "Wallet name",
+      "PLACEHOLDER": "My ledger",
       "ERRORS": {
         "MAX_LENGTH": "Account name should not be longer than {{number}} characters.",
         "ALREADY_EXISTS": "Account with the same name already exists. Please choose another name."
