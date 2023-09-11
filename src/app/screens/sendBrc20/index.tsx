@@ -1,161 +1,221 @@
+import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  Brc20TransferEstimateFeesParams,
-  ConfirmBrc20TransferState,
-  SendBrc20TransferState,
-} from '@utils/brc20';
-import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
-import {
-  UTXO,
-  brc20TransferEstimateFees,
-  getNonOrdinalUtxo,
-  validateBtcAddress,
-  CoreError,
+  ErrorCodes,
+  createBrc20TransferOrder,
+  getBtcFiatEquivalent,
+  signBtcTransaction,
 } from '@secretkeylabs/xverse-core';
-import { getFtTicker } from '@utils/tokens';
-import { replaceCommaByDot } from '@utils/helper';
-import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import Brc20TransferForm from './brc20TransferForm';
+import Brc20TransferInfo from './brc20TransferInfo';
+
+const BRC20TokenTagContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  marginTop: props.theme.spacing(3),
+}));
+
+const BRC20TokenTag = styled.div((props) => ({
+  background: props.theme.colors.white[400],
+  borderRadius: 40,
+  width: 54,
+  height: 19,
+  padding: '2px 6px',
+  h1: {
+    ...props.theme.body_bold_l,
+    fontSize: 11,
+    color: props.theme.colors.background.elevation0,
+  },
+}));
+
+interface ButtonProps {
+  enabled: boolean;
+}
+
+const SendButtonContainer = styled.div<ButtonProps>((props) => ({
+  paddingBottom: props.theme.spacing(12),
+  paddingTop: props.theme.spacing(4),
+  marginLeft: '5%',
+  marginRight: '5%',
+  opacity: props.enabled ? 1 : 0.6,
+}));
 
 function SendBrc20Screen() {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
+  const { t } = useTranslation('translation');
   const navigate = useNavigate();
-  const location = useLocation();
-  const { btcAddress, ordinalsAddress, network, brcCoinsList } = useWalletSelector();
-  const { data: feeRate } = useBtcFeeRate();
+  const {
+    btcAddress,
+    ordinalsAddress,
+    selectedAccount,
+    seedPhrase,
+    network,
+    btcFiatRate,
+    brcCoinsList,
+  } = useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
-  const [recipientError, setRecipientError] = useState('');
-  const [recipientAddress, setRecipientAddress] = useState('');
-  const [processing, setProcessing] = useState(false);
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const location = useLocation();
 
-  useResetUserFlow('/send-brc20');
-
-  const isNextEnabled =
-    !amountError && !recipientError && !!recipientAddress && amountToSend !== '';
-
-  const { fungibleToken: ft }: SendBrc20TransferState = location.state || {};
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
-  const fungibleToken = ft || brcCoinsList?.find((coin) => coin.name === coinName);
+  const fungibleToken =
+    location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
+
+  const isSendButtonEnabled =
+    amountToSend !== '' &&
+    !Number.isNaN(Number(amountToSend)) &&
+    !Number.isNaN(Number(fungibleToken.balance)) &&
+    +amountToSend > 0 &&
+    +amountToSend <= +fungibleToken.balance;
+  const isActionButtonEnabled = showForm ? isSendButtonEnabled : true;
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/send-brc20'), []);
 
   const handleBackButtonClick = () => {
-    navigate(-1);
-  };
-
-  const validateAmount = (amountInput: string): boolean => {
-    const amount = Number(replaceCommaByDot(amountInput));
-    const balance = Number(fungibleToken.balance);
-    if (!Number.isFinite(amount) || amount === 0) {
-      setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
-      return false;
+    if (showForm) {
+      setAmountError('');
+      setAmountToSend('');
+      setShowForm(false);
+    } else {
+      navigate(-1);
     }
-    if (!Number.isFinite(balance) || amount > Number(balance)) {
-      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
-      return false;
-    }
-    setAmountError('');
-    return true;
   };
 
   const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
     const newValue = e.currentTarget.value;
     const resultRegex = /^\d*\.?\d*$/;
-    if (resultRegex.test(newValue)) {
-      validateAmount(newValue);
+    if (!resultRegex.test(newValue)) {
+      setAmountToSend('');
+    } else {
       setAmountToSend(newValue);
     }
   };
 
-  const validateRecipientAddress = (address: string): boolean => {
-    if (!address) {
-      setRecipientError(t('ERRORS.ADDRESS_REQUIRED'));
-      return false;
-    }
-    if (
-      !validateBtcAddress({
-        btcAddress: address,
-        network: network.type,
-      })
-    ) {
-      setRecipientError(t('ERRORS.ADDRESS_INVALID'));
-      return false;
-    }
-    setRecipientError('');
-    return true;
-  };
-
-  const onAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateRecipientAddress(e.target.value);
-    setRecipientAddress(e.target.value);
-  };
-
-  const handleOnPressNext = async () => {
+  const handleInscribeTransferOrder = async () => {
     try {
-      if (
-        !validateAmount(amountToSend) ||
-        !validateRecipientAddress(recipientAddress) ||
-        !feeRate
-      ) {
-        return;
+      const order = await createBrc20TransferOrder(
+        fungibleToken.ticker,
+        amountToSend,
+        ordinalsAddress,
+      );
+      if ((order.inscriptionRequest as any).error) {
+        throw new Error((order.inscriptionRequest as any).error);
       }
-      setProcessing(true);
-
-      // TODO get this from store or cache?
-      const addressUtxos: UTXO[] = await getNonOrdinalUtxo(btcAddress, network.type);
-      const ticker = getFtTicker(fungibleToken);
-      const numberAmount = Number(replaceCommaByDot(amountToSend));
-      const estimateFeesParams: Brc20TransferEstimateFeesParams = {
-        addressUtxos,
-        tick: ticker,
-        amount: numberAmount,
-        revealAddress: ordinalsAddress,
-        feeRate: feeRate?.regular,
-      };
-      const estimatedFees = await brc20TransferEstimateFees(estimateFeesParams);
-      const state: ConfirmBrc20TransferState = {
-        recipientAddress,
-        estimateFeesParams,
-        estimatedFees,
-        token: fungibleToken,
-      };
-      navigate('/confirm-brc20-tx', { state });
-    } catch (err) {
-      const e = err as Error;
-      if (
-        CoreError.isCoreError(e) &&
-        (e.code ?? '') in BRC20ErrorCode &&
-        e.code === BRC20ErrorCode.INSUFFICIENT_FUNDS
-      ) {
-        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      return order;
+    } catch (error) {
+      if (error instanceof Error) {
+        setAmountError(error.message);
       } else {
-        setAmountError(t('ERRORS.SERVER_ERROR'));
+        console.log('Unexpected error', error);
       }
-    } finally {
-      setProcessing(false);
+      return Promise.reject(error);
+    }
+  };
+
+  const validateBrcAmount = () => {
+    if (+amountToSend > fungibleToken.balance) {
+      setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
+      throw new Error(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
+    }
+    if (!amountToSend || +amountToSend === 0) {
+      setAmountError(t('SEND.ERRORS.AMOUNT_REQUIRED'));
+      throw new Error(t('SEND.ERRORS.AMOUNT_REQUIRED'));
+    }
+  };
+
+  const createTransferRequest = async () => {
+    try {
+      setIsCreatingOrder(true);
+      validateBrcAmount();
+      const order = await handleInscribeTransferOrder();
+      const orderAmount = new BigNumber(order.inscriptionRequest.charge.amount);
+      const recipients: Recipient[] = [
+        {
+          address: order.inscriptionRequest.charge.address,
+          amountSats: orderAmount,
+        },
+      ];
+      const data = await signBtcTransaction(
+        recipients,
+        btcAddress,
+        selectedAccount?.id ?? 0,
+        seedPhrase,
+        network.type,
+      ).catch((err) => {
+        if (Number(err) === ErrorCodes.InSufficientBalance) {
+          setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
+        } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
+          setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE_FEES'));
+        } else setAmountError(err.toString());
+      });
+      navigate('/confirm-inscription-request', {
+        state: {
+          brcContent: order.inscriptionRequest.files[0].dataURL,
+          signedTxHex: data?.signedTx,
+          recipientAddress: order.inscriptionRequest.charge.address,
+          amount: order.inscriptionRequest.charge.amount.toString(),
+          recipient: recipients,
+          fiatAmount: order.inscriptionRequest.charge.fiat_value,
+          fee: data?.fee,
+          feePerVByte: data?.feePerVByte,
+          fiatFee: getBtcFiatEquivalent(data?.fee, btcFiatRate),
+          total: data?.total,
+          fiatTotal: getBtcFiatEquivalent(data?.total, btcFiatRate),
+        },
+      });
+    } catch (err) {
+      setIsCreatingOrder(false);
+    }
+  };
+
+  const handleNext = async () => {
+    if (!showForm) {
+      setShowForm(true);
+    } else {
+      await createTransferRequest();
     }
   };
 
   return (
     <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
-      <Brc20TransferForm
-        amountToSend={amountToSend}
-        onAmountChange={onInputChange}
-        amountError={amountError}
-        token={fungibleToken}
-        recipientAddress={recipientAddress}
-        recipientError={recipientError}
-        onAddressChange={onAddressInputChange}
-        onPressNext={handleOnPressNext}
-        processing={processing}
-        isNextEnabled={isNextEnabled}
-      />
+      <TopRow title={t('SEND_BRC_20.SEND')} onClick={handleBackButtonClick} />
+      <BRC20TokenTagContainer>
+        <BRC20TokenTag>
+          <h1>{t('SEND_BRC_20.BRC20_TOKEN')}</h1>
+        </BRC20TokenTag>
+      </BRC20TokenTagContainer>
+      {showForm ? (
+        <Brc20TransferForm
+          amountToSend={amountToSend}
+          onAmountChange={onInputChange}
+          amountError={amountError}
+          token={fungibleToken}
+        />
+      ) : (
+        <Brc20TransferInfo />
+      )}
+      <SendButtonContainer enabled={isActionButtonEnabled}>
+        <ActionButton
+          text={
+            showForm ? t('SEND_BRC_20.SEND_NEXT_BUTTON') : t('SEND_BRC_20.SEND_INFO_START_BUTTON')
+          }
+          processing={isCreatingOrder}
+          onPress={handleNext}
+          disabled={!isActionButtonEnabled}
+        />
+      </SendButtonContainer>
       <BottomBar tab="dashboard" />
     </>
   );
