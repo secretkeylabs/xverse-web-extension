@@ -1,16 +1,16 @@
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { useState } from 'react';
 import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
-import ResetWalletPrompt from '@components/resetWallet';
-import PasswordInput from '@components/passwordInput';
-import useWalletReducer from '@hooks/useWalletReducer';
 import AccountRow from '@components/accountRow';
+import PasswordInput from '@components/passwordInput';
+import ResetWalletPrompt from '@components/resetWallet';
+import useWalletReducer from '@hooks/useWalletReducer';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
+import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isHardwareAccount } from '@utils/helper';
-import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 
 const SelectedAccountContainer = styled.div((props) => ({
   paddingLeft: '5%',
@@ -79,7 +79,7 @@ interface AccountHeaderComponentProps {
 }
 
 function AccountHeaderComponent({
-  disableMenuOption,
+  disableMenuOption = false,
   disableAccountSwitch = false,
   disableCopy = false,
 }: AccountHeaderComponentProps) {
@@ -176,6 +176,7 @@ function AccountHeaderComponent({
           isSelected
           allowCopyAddress={!disableCopy && !isHardwareAccount(selectedAccount)}
           onAccountSelected={handleAccountSelect}
+          disabledAccountSelect={disableAccountSwitch}
         />
         {!disableMenuOption && (
           <OptionsButton onClick={openOptionsDialog}>

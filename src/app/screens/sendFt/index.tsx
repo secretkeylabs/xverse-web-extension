@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { StacksTransaction, UnsignedStacksTransation } from '@secretkeylabs/xverse-core/types';
@@ -9,17 +8,15 @@ import { validateStxAddress } from '@secretkeylabs/xverse-core/wallet';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
-import { StoreState } from '@stores/index';
 import { convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 import useNetworkSelector from '@hooks/useNetwork';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 function SendFtScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxPublicKey, network, feeMultipliers } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { stxAddress, stxPublicKey, network, feeMultipliers, coinsList } = useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
@@ -29,7 +26,11 @@ function SendFtScreen() {
   const { data: stxPendingTxData } = useStxPendingTxData();
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
-  const { fungibleToken } = location.state;
+
+  const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
+  const fungibleToken =
+    location.state?.fungibleToken || coinsList?.find((coin) => coin.ticker === coinTicker);
+
   let recipientAddress: string | undefined;
   let ftAmountToSend: string | undefined;
   let stxMemo: string | undefined;
