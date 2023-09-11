@@ -17,6 +17,7 @@ import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useResetUserFlow from '@hooks/useResetUserFlow';
 import { useLocation } from 'react-router-dom';
+import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { Credential } from '../importLedgerAccount';
 
 import {
@@ -53,16 +54,7 @@ function AddStxAddress(): JSX.Element {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const mismatch = params.get('mismatch') ?? '';
-  const transition = useTransition(currentStep, {
-    from: {
-      x: 24,
-      opacity: 0,
-    },
-    enter: {
-      x: 0,
-      opacity: 1,
-    },
-  });
+  const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
 
   const { subscribeToResetUserFlow } = useResetUserFlow();
   useEffect(() => subscribeToResetUserFlow('/add-stx-address-ledger'), []);

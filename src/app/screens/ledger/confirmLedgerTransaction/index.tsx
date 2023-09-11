@@ -36,6 +36,7 @@ import LedgerFailView from '@components/ledger/failLedgerView';
 import { UTXO } from '@secretkeylabs/xverse-core/types';
 import Stepper from '@components/stepper';
 import { LedgerTransactionType } from '@common/types/ledger';
+import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 
 import {
   Container,
@@ -100,16 +101,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     fee?: BigNumber;
   } = location.state;
 
-  const transition = useTransition(currentStep, {
-    from: {
-      x: 24,
-      opacity: 0,
-    },
-    enter: {
-      x: 0,
-      opacity: 1,
-    },
-  });
+  const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
 
   const signAndBroadcastOrdinalsTx = async (transport: Transport, addressIndex: number) => {
     try {

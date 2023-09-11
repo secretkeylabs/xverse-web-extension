@@ -31,6 +31,7 @@ import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import ledgerAccountSwitchIcon from '@assets/img/ledger/account_switch.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
+import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 import {
@@ -127,16 +128,7 @@ function ImportLedger(): JSX.Element {
     useState<LedgerLiveOptions | null>(null);
   const [isTogglerChecked, setIsTogglerChecked] = useState(false);
   const { ledgerAccountsList, network } = useWalletSelector();
-  const transition = useTransition(currentStep, {
-    from: {
-      x: 24,
-      opacity: 0,
-    },
-    enter: {
-      x: 0,
-      opacity: 1,
-    },
-  });
+  const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
 
   const importBtcAccounts = async (showAddress: boolean, masterFingerPrint?: string) => {
     let btcCreds;

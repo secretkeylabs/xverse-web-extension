@@ -23,6 +23,7 @@ import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.s
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
+import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 import {
@@ -61,16 +62,7 @@ function VerifyLedger(): JSX.Element {
   const currency = params.get('currency') ?? '';
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_VERIFY_SCREEN' });
   const { network } = useWalletSelector();
-  const transition = useTransition(currentStepIndex, {
-    from: {
-      x: 24,
-      opacity: 0,
-    },
-    enter: {
-      x: 0,
-      opacity: 1,
-    },
-  });
+  const transition = useTransition(currentStepIndex, DEFAULT_TRANSITION_OPTIONS);
 
   const isBitcoinSelected = currency === 'BTC';
   const isOrdinalSelected = currency === 'ORD' || currency === 'brc-20';
