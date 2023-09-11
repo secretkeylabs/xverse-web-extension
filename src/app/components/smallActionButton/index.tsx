@@ -14,9 +14,9 @@ const Button = styled.div<ButtonProps>((props) => ({
     : props.theme.colors.action.classic,
   width: 48,
   height: 48,
-  transition: 'all 0.2s ease',
+  transition: 'background-color 0.2s ease, opacity 0.2s ease',
   ':hover': {
-    background: props.isOpaque
+    backgroundColor: props.isOpaque
       ? props.theme.colors.background.elevation2
       : props.theme.colors.action.classicLight,
     opacity: props.isOpaque ? 0.85 : 0.6,
@@ -44,6 +44,7 @@ const ButtonText = styled.h1((props) => ({
 const ButtonImage = styled.img({
   alignSelf: 'center',
   transform: 'all',
+  transition: 'all 0.2s ease',
 });
 
 interface ButtonContainerProps {
