@@ -902,7 +902,15 @@
       "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
       "INSUFFICIENT_BALANCE_FEES": "Insufficient BTC balance for transaction fees",
       "SERVER_ERROR": "Unexpected error"
-    }
+    },
+    "SEND_INFO_TITLE": "Sending a BRC-20 token",
+    "SEND_INFO_SUBTITLE": "To transfer BRC-20 tokens, you need to make two separate transactions:",
+    "SEND_STEP_1_TITLE": "Inscribe Transfer",
+    "SEND_STEP_1": "Create an Ordinal inscription with the token and amount you would like to send.",
+    "SEND_STEP_2_TITLE": "Send transfer inscription",
+    "SEND_STEP_2": "Once you have the transfer inscription, you can send it to your recipient to transfer the BRC-20 token.",
+    "SEND_INFO_START_BUTTON": "Start",
+    "SEND_NEXT_BUTTON": "Next"
   },
   "CONFIRM_BRC20": {
     "BITCOIN_VALUE": "Bitcoin value",
