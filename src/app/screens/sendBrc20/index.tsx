@@ -11,7 +11,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -80,8 +80,7 @@ function SendBrc20Screen() {
     +amountToSend <= +fungibleToken.balance;
   const isActionButtonEnabled = showForm ? isSendButtonEnabled : true;
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/send-brc20'), []);
+  useResetUserFlow('/send-brc20');
 
   const handleBackButtonClick = () => {
     if (showForm) {
