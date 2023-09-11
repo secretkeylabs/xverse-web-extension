@@ -27,9 +27,9 @@ function SendFtScreen() {
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
 
-  const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
+  const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
   const fungibleToken =
-    location.state?.fungibleToken || coinsList?.find((coin) => coin.name === coinName);
+    location.state?.fungibleToken || coinsList?.find((coin) => coin.ticker === coinTicker);
 
   let recipientAddress: string | undefined;
   let ftAmountToSend: string | undefined;
