@@ -106,6 +106,7 @@ function SignPsbtRequest() {
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
+  const [hasOutputScript, setHasOutputScript] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -176,6 +177,13 @@ function SignPsbtRequest() {
   useEffect(() => {
     checkIfMismatch();
   }, []);
+
+  useEffect(() => {
+    if (parsedPsbt) {
+      const outputScriptDetected = parsedPsbt.outputs.some((output) => !!output.outputScript);
+      setHasOutputScript(outputScriptDetected);
+    }
+  }, [parsedPsbt]);
 
   const onSignPsbtConfirmed = async () => {
     try {
@@ -375,6 +383,7 @@ function SignPsbtRequest() {
                   subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
                 />
               ) : null}
+              {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
             </Container>
           </OuterContainer>
           <ButtonContainer>

@@ -1,5 +1,5 @@
 import InfoContainer from '@components/infoContainer';
-import { SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

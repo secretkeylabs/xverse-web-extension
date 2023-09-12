@@ -1,6 +1,9 @@
 import { Account } from '@secretkeylabs/xverse-core';
 
-export const ledgerDelay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+export const ledgerDelay = (ms: number) =>
+  new Promise((res) => {
+    setTimeout(res, ms);
+  });
 
 export const getDeviceAccountIndex = (
   ledgerAccountsList: Account[],

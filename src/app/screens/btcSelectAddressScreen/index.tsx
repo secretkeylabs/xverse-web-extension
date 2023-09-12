@@ -37,6 +37,11 @@ const DropDownContainer = styled.div({
   justifyContent: 'flex-end',
 });
 
+const Container = styled.div({
+  display: 'flex',
+  alignItems: 'center',
+});
+
 const LogoContainer = styled.div((props) => ({
   padding: props.theme.spacing(11),
   marginBottom: props.theme.spacing(16),
@@ -253,7 +258,7 @@ function BtcSelectAddressScreen() {
         <TitleContainer>
           <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Container>
             {payload.purposes.map((purpose) =>
               purpose === AddressPurpose.Payment ? (
                 <AddressContainer>
@@ -267,7 +272,7 @@ function BtcSelectAddressScreen() {
                 </AddressContainer>
               ),
             )}
-          </div>
+          </Container>
           <DappTitle>{payload.message}</DappTitle>
         </TitleContainer>
         {showAccountList ? (

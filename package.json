@@ -80,7 +80,8 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "prettier --write"
+      "prettier --write",
+      "eslint"
     ],
     "*.json": [
       "prettier --write"
