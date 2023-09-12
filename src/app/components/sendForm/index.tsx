@@ -19,8 +19,8 @@ import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { getCurrencyFlag } from '@utils/currency';
 import useDebounce from '@hooks/useDebounce';
-import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
 import useWalletSelector from '@hooks/useWalletSelector';
+import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
 
 interface ContainerProps {
   error: boolean;
