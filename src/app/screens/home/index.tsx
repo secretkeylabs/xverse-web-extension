@@ -14,7 +14,8 @@ import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ReceiveCardComponent from '@components/receiveCardComponent';
-import { isLedgerAccount, trackMixPanel } from '@utils/helper';
+import { isLedgerAccount } from '@utils/helper';
+import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import useAppConfig from '@hooks/queries/useAppConfig';
@@ -28,7 +29,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { CurrencyTypes } from '@utils/constants';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
@@ -431,19 +432,12 @@ function Home() {
   );
 
   const handleDataCollectionDeny = () => {
-    trackMixPanel('Opt Out', undefined, { send_immediately: true }, () => {
-      mixpanel.opt_out_tracking();
-      mixpanel.reset();
-    });
+    optOutMixPanel();
     dispatch(ChangeShowDataCollectionAlertAction(false));
   };
 
   const handleDataCollectionAllow = () => {
-    if (selectedAccount) {
-      mixpanel.identify(sha256(selectedAccount.masterPubKey));
-    }
-    mixpanel.opt_in_tracking();
-
+    optInMixPanel(selectedAccount?.masterPubKey);
     dispatch(ChangeShowDataCollectionAlertAction(false));
   };
 

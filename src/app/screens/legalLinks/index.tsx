@@ -4,14 +4,14 @@ import Separator from '@components/separator';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CustomSwitch } from '@screens/ledger/importLedgerAccount/index.styled';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
-import { trackMixPanel } from '@utils/helper';
+import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { saveIsTermsAccepted } from '@utils/localStorage';
-import { sha256 } from 'js-sha256';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import mixpanel from 'mixpanel-browser';
+import { ChangeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import { useDispatch } from 'react-redux';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -67,6 +67,7 @@ const SwitchContainer = styled.div((props) => ({
 function LegalLinks() {
   const { t } = useTranslation('translation', { keyPrefix: 'LEGAL_SCREEN' });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { selectedAccount } = useWalletSelector();
   const [searchParams] = useSearchParams();
   const theme = useTheme();
@@ -76,16 +77,11 @@ function LegalLinks() {
 
   const handleLegalAccept = () => {
     if (isToggleEnabled) {
-      trackMixPanel('Opt Out', undefined, { send_immediately: true }, () => {
-        mixpanel.opt_out_tracking();
-        mixpanel.reset();
-      });
+      optInMixPanel(selectedAccount?.masterPubKey);
     } else {
-      if (selectedAccount) {
-        mixpanel.identify(sha256(selectedAccount.masterPubKey));
-      }
-      mixpanel.opt_in_tracking();
+      optOutMixPanel();
     }
+    dispatch(ChangeShowDataCollectionAlertAction(false));
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {
@@ -109,6 +105,7 @@ function LegalLinks() {
             {t('PRIVACY_POLICY_LINK_BUTTON')}
             <img src={LinkIcon} alt="privacy" />
           </CustomizedLink>
+          <Separator />
           <SwitchContainer>
             <div>{t('AUTHORIZE_DATA_COLLECTION')}</div>
             <CustomSwitch

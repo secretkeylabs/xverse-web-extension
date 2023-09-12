@@ -6,9 +6,8 @@ import { useTranslation } from 'react-i18next';
 import Switch from 'react-switch';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useState } from 'react';
-import { trackMixPanel } from '@utils/helper';
+import { hasOptedInMixPanelTracking, optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { sha256 } from 'js-sha256';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -57,15 +56,9 @@ function PrivacyPreferencesScreen() {
   const handleSwitchChange = () => {
     setIsEnabled((prevEnabledState) => {
       if (prevEnabledState) {
-        trackMixPanel('Opt Out', undefined, { send_immediately: true }, () => {
-          mixpanel.opt_out_tracking();
-          mixpanel.reset();
-        });
+        optOutMixPanel();
       } else {
-        if (selectedAccount) {
-          mixpanel.identify(sha256(selectedAccount.masterPubKey));
-        }
-        mixpanel.opt_in_tracking();
+        optInMixPanel(selectedAccount?.masterPubKey);
       }
 
       return !prevEnabledState;
@@ -73,7 +66,7 @@ function PrivacyPreferencesScreen() {
   };
 
   const checkMixpanelTrackingStatus = async () => {
-    const hasOptedIn = await mixpanel.has_opted_in_tracking();
+    const hasOptedIn = await hasOptedInMixPanelTracking();
 
     if (hasOptedIn) {
       setIsEnabled(true);

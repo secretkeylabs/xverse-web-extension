@@ -19,8 +19,13 @@ import router from './routes';
 
 function App(): JSX.Element {
   useEffect(() => {
+    if (!MIX_PANEL_TOKEN) {
+      return;
+    }
+
     mixpanel.init(MIX_PANEL_TOKEN, {
       debug: process.env.NODE_ENV === 'development',
+      ip: false,
       persistence: 'localStorage',
     });
   }, []);
