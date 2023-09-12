@@ -81,14 +81,13 @@ interface TransactionsHistoryListProps {
   txFilter: string | null;
 }
 
-const sortTransactionsByBlockHeight = (transactions: BtcTransactionData[]) => {
-  return transactions.sort((txA, txB) => {
+const sortTransactionsByBlockHeight = (transactions: BtcTransactionData[]) =>
+  transactions.sort((txA, txB) => {
     if (txB.blockHeight > txA.blockHeight) {
       return 1;
     }
     return -1;
   });
-};
 
 const groupBtcTxsByDate = (
   transactions: BtcTransactionData[],
@@ -101,9 +100,8 @@ const groupBtcTxsByDate = (
     if (transaction.txStatus === 'pending') {
       pendingTransactions.push(transaction);
     } else {
-      !processedTransactions[txDate]
-        ? (processedTransactions[txDate] = [transaction])
-        : processedTransactions[txDate].push(transaction);
+      if (!processedTransactions[txDate]) processedTransactions[txDate] = [transaction];
+      else processedTransactions[txDate].push(transaction);
 
       sortTransactionsByBlockHeight(processedTransactions[txDate]);
     }
