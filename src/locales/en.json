@@ -131,6 +131,7 @@
     "ORDINALS_TITLE_VERIFIED": "Ordinals address verified successfully",
     "STACKS_TITLE_VERIFIED": "Stacks address verified successfully",
     "WRONG_DEVICE_ERROR_SUBTITLE": "The public key of the connected device did not match the wallet public key. Make sure you have the correct device connected.",
+    "ADDRESS_MISMATCH": "There’s a mismatch between the address you’re verifying and the address you’re logged with.",
     "LEDGER_CONNECT": {
       "BTC_TITLE": "Connect Your Ledger",
       "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app.",
