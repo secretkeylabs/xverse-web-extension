@@ -4,7 +4,6 @@ import TopRow from '@components/topRow';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Switch from 'react-switch';
-import mixpanel from 'mixpanel-browser';
 import { useEffect, useState } from 'react';
 import { hasOptedInMixPanelTracking, optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import useWalletSelector from '@hooks/useWalletSelector';
