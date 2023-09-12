@@ -86,15 +86,11 @@ function PrivacyPreferencesScreen() {
 
   return (
     <>
-      <TopRow title={t('PRIVACY_PREFERENCES')} onClick={handleBackButtonClick} />
+      <TopRow title={t('PRIVACY_PREFERENCES.TITLE')} onClick={handleBackButtonClick} />
       <Container>
-        <TextContiner>
-          {/* TODO: Add translation keys */}
-          Help improve the app experience, by allowing Xverse to collect anonymized usage data. This
-          data cannot be used to identify your wallet individually.
-        </TextContiner>
+        <TextContiner>{t('PRIVACY_PREFERENCES.DESCRIPTION')}</TextContiner>
         <SwitchContainer>
-          <div>Authorize data collection</div>
+          <div>{t('PRIVACY_PREFERENCES.AUTHORIZE_DATA_COLLECTION')}</div>
           <CustomSwitch
             onColor={theme.colors.purple_main}
             offColor={theme.colors.background.elevation3}

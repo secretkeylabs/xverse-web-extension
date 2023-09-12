@@ -178,7 +178,7 @@ function Setting() {
           showDivider
         />
         <SettingComponent
-          text={t('PRIVACY_PREFERENCES')}
+          text={t('PRIVACY_PREFERENCES.TITLE')}
           onClick={openPrivacyPreferencesScreen}
           icon={ArrowIcon}
           showDivider

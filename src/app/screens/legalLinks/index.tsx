@@ -110,8 +110,7 @@ function LegalLinks() {
             <img src={LinkIcon} alt="privacy" />
           </CustomizedLink>
           <SwitchContainer>
-            {/* TODO: Add translation keys */}
-            <div>Authorize data collection</div>
+            <div>{t('AUTHORIZE_DATA_COLLECTION')}</div>
             <CustomSwitch
               onColor={theme.colors.purple_main}
               offColor={theme.colors.background.elevation3}

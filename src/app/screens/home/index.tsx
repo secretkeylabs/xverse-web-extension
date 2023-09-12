@@ -579,19 +579,22 @@ function Home() {
         }}
       >
         <ModalContent>
-          {/* TODO: Add translation keys */}
           <ModalIcon src={dashboardIcon} alt="analytics" />
-          <ModalTitle>Help us improve Xverse!</ModalTitle>
-          <ModalDescription>
-            Help improve the app experience, by allowing Xverse to collect anonymized usage data.
-            This data cannot be used to identify your wallet individually.
-          </ModalDescription>
+          <ModalTitle>{t('DATA_COLLECTION_POPUP.TITLE')}</ModalTitle>
+          <ModalDescription>{t('DATA_COLLECTION_POPUP.DESCRIPTION')}</ModalDescription>
           <ModalControlsContainer>
             <ModalButtonContainer>
-              <ActionButton transparent text="Deny" onPress={handleDataCollectionDeny} />
+              <ActionButton
+                transparent
+                text={t('DATA_COLLECTION_POPUP.DENY')}
+                onPress={handleDataCollectionDeny}
+              />
             </ModalButtonContainer>
             <ModalButtonContainer>
-              <ActionButton text="Allow" onPress={handleDataCollectionAllow} />
+              <ActionButton
+                text={t('DATA_COLLECTION_POPUP.ALLOW')}
+                onPress={handleDataCollectionAllow}
+              />
             </ModalButtonContainer>
           </ModalControlsContainer>
         </ModalContent>
