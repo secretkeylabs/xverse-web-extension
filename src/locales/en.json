@@ -136,6 +136,7 @@
     "ORDINALS_TITLE_VERIFIED": "Ordinals address verified successfully",
     "STACKS_TITLE_VERIFIED": "Stacks address verified successfully",
     "WRONG_DEVICE_ERROR_SUBTITLE": "The public key of the connected device did not match the wallet public key. Make sure you have the correct device connected.",
+    "ADDRESS_MISMATCH": "There’s a mismatch between the address you’re verifying and the address you’re logged with.",
     "LEDGER_CONNECT": {
       "BTC_TITLE": "Connect Your Ledger",
       "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app.",
@@ -301,6 +302,9 @@
     "To": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive",
+    "SCRIPT_OUTPUT": "Script output",
+    "SCRIPT_OUTPUT_TX": "This transaction contains a script output. Be sure you trust the source of this transaction before confirming it.",
+
     "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",

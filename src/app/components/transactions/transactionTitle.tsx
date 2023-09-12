@@ -54,6 +54,7 @@ export default function TransactionTitle(props: TransactionTitleProps) {
     if (tx.contractCall?.contract_id === SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL) {
       return t('TRANSACTION_CONTRACT_TOKEN_TRANSFER');
     }
+    const name = tx?.contractCall?.contract_id.split('.') || [];
     switch (tx.contractCall?.function_name) {
       case 'delegate-stx':
         return t('TRANSACTION_STACKING_DELEGATION');
@@ -62,7 +63,6 @@ export default function TransactionTitle(props: TransactionTitleProps) {
       case 'allow-contract-caller':
         return t('TRANSACTION_STACKING_CONTRACT_AUTHORIZE');
       case 'transfer':
-        const name = tx.contractCall.contract_id.split('.');
         if (tx.tokenType === 'fungible') {
           return `${getFtName(tx)} ${t('TRANSACTION_FUNGIBLE_TOKEN_TRANSFER')}`;
         }
