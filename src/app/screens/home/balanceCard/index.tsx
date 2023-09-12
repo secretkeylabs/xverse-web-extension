@@ -57,9 +57,9 @@ const BalanceContainer = styled.div((props) => ({
   gap: props.theme.spacing(5),
 }));
 
-const ReloadContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(4),
-}));
+const ReloadContainer = styled.div({
+  marginBottom: 11,
+});
 
 interface BalanceCardProps {
   isLoading: boolean;
@@ -114,7 +114,7 @@ function BalanceCard(props: BalanceCardProps) {
 
         {isRefetching && !isLoading && (
           <ReloadContainer>
-            <MoonLoader color="white" size={15} />
+            <MoonLoader color="white" size={16} />
           </ReloadContainer>
         )}
       </BalanceContainer>
