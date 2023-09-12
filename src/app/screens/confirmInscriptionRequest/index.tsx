@@ -54,6 +54,16 @@ const Brc20TileContainer = styled.div({
   alignItems: 'center',
 });
 
+const TopContainer = styled.div({
+  marginBottom: 32,
+});
+
+const TransferOrdinalContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+});
+
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
@@ -175,8 +185,8 @@ function ConfirmInscriptionRequest() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
-    mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { txToBeBroadcasted: string }>({
+    mutationFn: async ({ txToBeBroadcasted }) => btcClient.sendRawTransaction(txToBeBroadcasted),
   });
 
   const {
@@ -204,7 +214,7 @@ function ConfirmInscriptionRequest() {
   });
 
   const onContinueButtonClick = () => {
-    mutate({ signedTx });
+    mutate({ txToBeBroadcasted: signedTx });
   };
 
   const onClick = () => {
@@ -280,7 +290,7 @@ function ConfirmInscriptionRequest() {
       return;
     }
 
-    mutate({ signedTx: signedTxHex });
+    mutate({ txToBeBroadcasted: signedTxHex });
   };
 
   const goBackToScreen = () => {
@@ -334,9 +344,9 @@ function ConfirmInscriptionRequest() {
         />
       )}
 
-      <div style={{ marginBottom: 32 }}>
+      <TopContainer>
         <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={goBackToScreen} />
-      </div>
+      </TopContainer>
       {ordinalsInBtc && ordinalsInBtc.length > 0 && (
         <InfoContainer
           type="Warning"
@@ -362,10 +372,10 @@ function ConfirmInscriptionRequest() {
         <ReviewTransactionText>Inscribe Transfer Ordinal</ReviewTransactionText>
         <CollapsableContainer title="You will inscribe" text="" initialValue>
           <DetailRow>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <TransferOrdinalContainer>
               <Icon src={OrdinalsIcon} />
               <TitleText>Ordinal</TitleText>
-            </div>
+            </TransferOrdinalContainer>
             <ValueText>BRC-20 Transfer</ValueText>
           </DetailRow>
           <DetailRow>

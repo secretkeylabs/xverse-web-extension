@@ -24,6 +24,7 @@
   "rules": {
     "consistent-return": "off",
     "import/prefer-default-export": 1,
+    "no-promise-executor-return": "warn",
     "max-len": "off",
     "no-inline-styles/no-inline-styles": 2,
     "no-param-reassign": "off",
@@ -40,7 +41,8 @@
         "ignoreRestSiblings": true,
         "argsIgnorePattern": "^_"
       }
-    ]
+    ],
+    "no-plusplus": "off"
   },
   "settings": {
     "import/resolver": {

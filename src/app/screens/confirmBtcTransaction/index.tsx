@@ -56,16 +56,17 @@ function ConfirmBtcTransaction() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
-    mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { txToBeBroadcasted: string }>({
+    mutationFn: async ({ txToBeBroadcasted }) => btcClient.sendRawTransaction(txToBeBroadcasted),
   });
 
   const {
     error: errorBtcOrdinalTransaction,
     data: btcOrdinalTxBroadcastData,
     mutate: broadcastOrdinalTransaction,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
-    mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { ordinalTxToBeBroadcasted: string }>({
+    mutationFn: async ({ ordinalTxToBeBroadcasted }) =>
+      btcClient.sendRawTransaction(ordinalTxToBeBroadcasted),
   });
 
   const onClick = () => {
@@ -77,7 +78,7 @@ function ConfirmBtcTransaction() {
   useResetUserFlow('/confirm-btc-tx');
 
   const onContinueButtonClick = () => {
-    mutate({ signedTx });
+    mutate({ txToBeBroadcasted: signedTx });
   };
 
   useEffect(() => {
@@ -159,7 +160,7 @@ function ConfirmBtcTransaction() {
 
   const handleOnConfirmClick = (txHex: string) => {
     if (isRestoreFundFlow) {
-      broadcastOrdinalTransaction({ signedTx: txHex });
+      broadcastOrdinalTransaction({ ordinalTxToBeBroadcasted: txHex });
       return;
     }
 
@@ -182,7 +183,7 @@ function ConfirmBtcTransaction() {
       return;
     }
 
-    mutate({ signedTx: txHex });
+    mutate({ txToBeBroadcasted: txHex });
   };
 
   const goBackToScreen = () => {
