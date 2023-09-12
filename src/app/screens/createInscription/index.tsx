@@ -254,6 +254,8 @@ function CreateInscription() {
     seedPhrase,
     contentBase64: payloadType === 'BASE_64' ? content : undefined,
     contentString: payloadType === 'PLAIN_TEXT' ? content : undefined,
+    serviceFee: appFee,
+    serviceFeeAddress: appFeeAddress,
   });
 
   const cancelCallback = () => {
