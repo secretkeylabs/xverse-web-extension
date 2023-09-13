@@ -58,7 +58,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
     props.withError ? props.theme.colors.feedback.error : props.theme.colors.background.elevation6
   }`,
   backgroundColor: props.theme.colors.background.elevation1,
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   paddingTop: props.theme.spacing(5),
@@ -154,6 +154,7 @@ interface Props {
   ordinal?: Inscription;
   isRecover?: boolean;
   isRestoreOrdinalFlow?: boolean;
+  feeMode: string;
   error: string;
   setIsLoading: () => void;
   setIsNotLoading: () => void;
@@ -173,6 +174,7 @@ function EditFee({
   ordinal,
   isRecover,
   isRestoreOrdinalFlow = false,
+  feeMode,
   error,
   setIsLoading,
   setIsNotLoading,
@@ -191,12 +193,12 @@ function EditFee({
     selectedAccount,
     ordinalsAddress,
   } = useWalletSelector();
-  const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [totalFee, setTotalFee] = useState(fee);
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
   const inputRef = useRef(null);
   const debouncedFeeRateInput = useDebounce(feeRateInput, 500);
   const isBtcOrOrdinals = type === 'BTC' || type === 'Ordinals';
+  const isStx = type === 'STX';
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
 
@@ -204,7 +206,6 @@ function EditFee({
     const currentFee = new BigNumber(fee);
     setFeeMode(mode);
     setError('');
-    setSelectedOption(mode);
     switch (mode) {
       case 'low':
         setFeeRateInput(currentFee.dividedBy(2).toString());
@@ -228,7 +229,7 @@ function EditFee({
 
   const modifyFees = async (mode: string) => {
     try {
-      setSelectedOption(mode);
+      setFeeMode(mode);
       setIsLoading();
       setError('');
       if (mode === 'custom') inputRef?.current?.focus();
@@ -241,7 +242,7 @@ function EditFee({
             'Mainnet',
             mode,
           );
-          setFeeRateInput(selectedFeeRate?.toString());
+          setFeeRateInput(selectedFeeRate?.toString() || '');
           setTotalFee(modifiedFee.toString());
         } else if (btcRecipients && selectedAccount) {
           const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
@@ -250,7 +251,7 @@ function EditFee({
             network.type,
             mode,
           );
-          setFeeRateInput(selectedFeeRate?.toString());
+          setFeeRateInput(selectedFeeRate?.toString() || '');
           setTotalFee(modifiedFee.toString());
         }
       } else if (type === 'Ordinals' && btcRecipients && ordinal) {
@@ -264,7 +265,7 @@ function EditFee({
           feeMode: mode,
         });
 
-        setFeeRateInput(selectedFeeRate?.toString());
+        setFeeRateInput(selectedFeeRate?.toString() || '');
         setTotalFee(modifiedFee.toString());
       }
     } catch (err: any) {
@@ -279,10 +280,10 @@ function EditFee({
   };
 
   useEffect(() => {
-    if (type === 'STX' && selectedOption !== 'custom') {
-      modifyStxFees(selectedOption);
+    if (isStx && feeMode !== 'custom') {
+      modifyStxFees(feeMode);
     }
-  }, [selectedOption]);
+  }, [feeMode]);
 
   useEffect(() => {
     setFee(totalFee);
@@ -300,20 +301,20 @@ function EditFee({
             nonOrdinalUtxos!,
             ordinalsAddress,
             'Mainnet',
-            selectedOption,
+            feeMode,
             feeRateInput,
           );
-          setFeeRateInput(selectedFeeRate?.toString());
+          setFeeRateInput(selectedFeeRate?.toString() || '');
           setTotalFee(modifiedFee.toString());
         } else if (btcRecipients && selectedAccount) {
           const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
             btcRecipients,
             btcAddress,
             network.type,
-            selectedOption,
+            feeMode,
             feeRateInput,
           );
-          setFeeRateInput(selectedFeeRate?.toString());
+          setFeeRateInput(selectedFeeRate?.toString() || '');
           setTotalFee(modifiedFee.toString());
         }
       } catch (err: any) {
@@ -337,11 +338,11 @@ function EditFee({
           network: network.type,
           ordinal,
           isRecover: isRestoreOrdinalFlow,
-          feeMode: selectedOption,
+          feeMode,
           feeRateInput,
         });
 
-        setFeeRateInput(selectedFeeRate?.toString());
+        setFeeRateInput(selectedFeeRate?.toString() || '');
         setTotalFee(modifiedFee.toString());
       } catch (err: any) {
         if (Number(err) === ErrorCodes.InSufficientBalance) {
@@ -368,7 +369,7 @@ function EditFee({
   }, [debouncedFeeRateInput]);
 
   function getFiatEquivalent() {
-    return type === 'STX'
+    return isStx
       ? getStxFiatEquivalent(stxToMicrostacks(new BigNumber(totalFee)), stxBtcRate, btcFiatRate)
       : getBtcFiatEquivalent(new BigNumber(totalFee), btcFiatRate);
   }
@@ -396,11 +397,12 @@ function EditFee({
     if (error) {
       setError('');
     }
-    setFeeRateInput(value);
 
-    if (selectedOption !== 'custom') {
-      setSelectedOption('custom');
+    if (feeMode !== 'custom') {
+      setFeeMode('custom');
     }
+
+    setFeeRateInput(value);
 
     if (type !== 'BTC' && type !== 'Ordinals') {
       setFeeRateInput(value);
@@ -436,30 +438,30 @@ function EditFee({
         {error && <ErrorText>{error}</ErrorText>}
       </FeeContainer>
       <ButtonContainer>
-        {type === 'STX' && (
-          <FeeButton isSelected={selectedOption === 'low'} onClick={() => modifyStxFees('low')}>
+        {isStx && (
+          <FeeButton isSelected={feeMode === 'low'} onClick={() => modifyStxFees('low')}>
             {t('TRANSACTION_SETTING.LOW')}
           </FeeButton>
         )}
         <FeeButton
-          isSelected={selectedOption === 'standard'}
+          isSelected={feeMode === 'standard'}
           isBtc={isBtcOrOrdinals}
-          onClick={() => (type === 'STX' ? modifyStxFees('standard') : modifyFees('standard'))}
+          onClick={() => (isStx ? modifyStxFees('standard') : modifyFees('standard'))}
         >
           {t('TRANSACTION_SETTING.STANDARD')}
         </FeeButton>
         <FeeButton
-          isSelected={selectedOption === 'high'}
+          isSelected={feeMode === 'high'}
           isBtc={isBtcOrOrdinals}
-          onClick={() => (type === 'STX' ? modifyStxFees('high') : modifyFees('high'))}
+          onClick={() => (isStx ? modifyStxFees('high') : modifyFees('high'))}
         >
           {t('TRANSACTION_SETTING.HIGH')}
         </FeeButton>
         <FeeButton
-          isSelected={selectedOption === 'custom'}
+          isSelected={feeMode === 'custom'}
           isLastInRow
           isBtc={isBtcOrOrdinals}
-          onClick={() => (type === 'STX' ? modifyStxFees('custom') : modifyFees('custom'))}
+          onClick={() => (isStx ? modifyStxFees('custom') : modifyFees('custom'))}
         >
           {t('TRANSACTION_SETTING.CUSTOM')}
         </FeeButton>

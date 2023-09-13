@@ -2,7 +2,6 @@ import { useMutation } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { generateUnsignedStxTokenTransferTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
@@ -11,17 +10,16 @@ import { validateStxAddress } from '@secretkeylabs/xverse-core/wallet';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
-import { StoreState } from '@stores/index';
 import { replaceCommaByDot } from '@utils/helper';
 import BottomBar from '@components/tabBar';
 import useNetworkSelector from '@hooks/useNetwork';
+import useWalletSelector from '@hooks/useWalletSelector';
 
 function SendStxScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxAvailableBalance, stxPublicKey, feeMultipliers, network } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { stxAddress, stxAvailableBalance, stxPublicKey, feeMultipliers, network } =
+    useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
@@ -37,6 +35,7 @@ function SendStxScreen() {
     amountToSend = location.state.amountToSend;
     stxMemo = location.state.stxMemo;
   }
+
   const { isLoading, data, mutate } = useMutation<
     StacksTransaction,
     Error,
@@ -73,7 +72,8 @@ function SendStxScreen() {
   }, [data]);
 
   const handleBackButtonClick = () => {
-    navigate(-1);
+    // redirect to homepage to avoid looping back to confrim screen
+    navigate('/');
   };
 
   function validateFields(associatedAddress: string, amount: string, memo: string): boolean {

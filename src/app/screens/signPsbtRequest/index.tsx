@@ -1,38 +1,38 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import IconOrdinal from '@assets/img/transactions/ordinal.svg';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { ledgerDelay } from '@common/utils/ledger';
+import AccountHeaderComponent from '@components/accountHeader';
+import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
+import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
+import InfoContainer from '@components/infoContainer';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import RecipientComponent from '@components/recipientComponent';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useBtcClient from '@hooks/useBtcClient';
+import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
-import { useTranslation } from 'react-i18next';
-import IconOrdinal from '@assets/img/transactions/ordinal.svg';
-import styled from 'styled-components';
+import Transport from '@ledgerhq/hw-transport-webusb';
 import {
   getBtcFiatEquivalent,
   satsToBtc,
   signIncomingSingleSigPSBT,
 } from '@secretkeylabs/xverse-core';
-import BigNumber from 'bignumber.js';
-import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
-import TransactionDetailComponent from '@components/transactionDetailComponent';
-import AccountHeaderComponent from '@components/accountHeader';
-import { useLocation, useNavigate } from 'react-router-dom';
-import RecipientComponent from '@components/recipientComponent';
-import Transport from '@ledgerhq/hw-transport-webusb';
 import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
-import InfoContainer from '@components/infoContainer';
-import { NumericFormat } from 'react-number-format';
-import { MoonLoader } from 'react-spinners';
-import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
+import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { isLedgerAccount } from '@utils/helper';
-import BottomModal from '@components/bottomModal';
-import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import { ledgerDelay } from '@common/utils/ledger';
+import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { MoonLoader } from 'react-spinners';
 import { SignTransactionOptions } from 'sats-connect';
-import useBtcClient from '@hooks/useBtcClient';
-import { findLedgerAccountId } from '@utils/ledger';
+import styled from 'styled-components';
 import OrdinalDetailComponent from './ordinalDetailComponent';
 
 const OuterContainer = styled.div`
@@ -68,6 +68,7 @@ const ButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(20),
+  marginTop: props.theme.spacing(12),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -105,6 +106,7 @@ function SignPsbtRequest() {
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
+  const [hasOutputScript, setHasOutputScript] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -176,10 +178,17 @@ function SignPsbtRequest() {
     checkIfMismatch();
   }, []);
 
+  useEffect(() => {
+    if (parsedPsbt) {
+      const outputScriptDetected = parsedPsbt.outputs.some((output) => !!output.outputScript);
+      setHasOutputScript(outputScriptDetected);
+    }
+  }, [parsedPsbt]);
+
   const onSignPsbtConfirmed = async () => {
     try {
       if (isLedgerAccount(selectedAccount)) {
-        // setIsModalVisible(true);
+        setIsModalVisible(true);
         return;
       }
 
@@ -223,13 +232,9 @@ function SignPsbtRequest() {
   };
 
   const handleLedgerPsbtSigning = async (transport: TransportType) => {
-    const accountId = await findLedgerAccountId({
-      transport,
-      id: selectedAccount?.id,
-      ledgerAccountsList,
-    });
+    const accountId = selectedAccount?.deviceAccountIndex;
 
-    if (accountId === -1) {
+    if (accountId === undefined) {
       throw new Error('Account not found');
     }
 
@@ -341,54 +346,45 @@ function SignPsbtRequest() {
       ) : (
         <>
           <OuterContainer>
-            {isLedgerAccount(selectedAccount) ? (
-              <Container>
-                <InfoContainer bodyText="External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
-              </Container>
-            ) : (
-              <Container>
-                <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
-                {!payload.broadcast && (
-                  <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
-                )}
-                {ordinalInfoData &&
-                  ordinalInfoData.map((ordinalData) => (
-                    <OrdinalDetailComponent
-                      ordinalInscription={`Inscription ${ordinalData?.number}`}
-                      icon={IconOrdinal}
-                      title={t('ORDINAL')}
-                      ordinal={ordinalData}
-                      ordinalDetail={ordinalData?.content_type}
-                      heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
-                    />
-                  ))}
-                <RecipientComponent
-                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
-                    .toString()
-                    .replace('-', '')}`}
-                  currencyType="BTC"
-                  title={t('AMOUNT')}
-                  heading={
-                    parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')
-                  }
-                />
-                <InputOutputComponent
-                  parsedPsbt={parsedPsbt}
-                  isExpanded={expandInputOutputView}
-                  address={signingAddresses}
-                  onArrowClick={expandInputOutputSection}
-                />
-
-                <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-                {payload.broadcast ? (
-                  <TransactionDetailComponent
-                    title={t('FEES')}
-                    value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
-                    subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+            <Container>
+              <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
+              {!payload.broadcast && <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
+              {ordinalInfoData &&
+                ordinalInfoData.map((ordinalData) => (
+                  <OrdinalDetailComponent
+                    ordinalInscription={`Inscription ${ordinalData?.number}`}
+                    icon={IconOrdinal}
+                    title={t('ORDINAL')}
+                    ordinal={ordinalData}
+                    ordinalDetail={ordinalData?.content_type}
+                    heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
                   />
-                ) : null}
-              </Container>
-            )}
+                ))}
+              <RecipientComponent
+                value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
+                  .toString()
+                  .replace('-', '')}`}
+                currencyType="BTC"
+                title={t('AMOUNT')}
+                heading={parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
+              />
+              <InputOutputComponent
+                parsedPsbt={parsedPsbt}
+                isExpanded={expandInputOutputView}
+                address={signingAddresses}
+                onArrowClick={expandInputOutputSection}
+              />
+
+              <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+              {payload.broadcast ? (
+                <TransactionDetailComponent
+                  title={t('FEES')}
+                  value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
+                  subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+                />
+              ) : null}
+              {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
+            </Container>
           </OuterContainer>
           <ButtonContainer>
             <TransparentButtonContainer>
@@ -398,7 +394,6 @@ function SignPsbtRequest() {
               text={t('CONFIRM')}
               onPress={onSignPsbtConfirmed}
               processing={isSigning}
-              disabled={isLedgerAccount(selectedAccount)}
             />
           </ButtonContainer>
         </>
@@ -407,10 +402,10 @@ function SignPsbtRequest() {
         {currentStepIndex === 0 && (
           <LedgerConnectionView
             title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
-            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE')}
+            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', { name: 'Bitcoin' })}
             titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
             textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={ledgerConnectDefaultIcon}
+            imageDefault={ledgerConnectBtcIcon}
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />

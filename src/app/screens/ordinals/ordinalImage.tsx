@@ -2,6 +2,7 @@ import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import { Inscription, getErc721Metadata } from '@secretkeylabs/xverse-core';
+import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getFetchableUrl } from '@utils/helper';
 import Image from 'rc-image';
 import { useEffect, useState } from 'react';
@@ -177,15 +178,34 @@ function OrdinalImage({
   );
 
   if (ordinal?.content_type.includes('image/svg')) {
-    return renderImage(t('ORDINAL'), `https://ord.xverse.app/thumbnail/${ordinal.id}`);
+    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL}/thumbnail/${ordinal.id}`);
   }
 
   if (ordinal?.content_type.includes('image')) {
-    return renderImage(t('ORDINAL'), `https://ord.xverse.app/content/${ordinal.id}`);
+    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL}/content/${ordinal.id}`);
   }
 
   if (textContent?.includes('brc-721e')) {
     return renderImage('BRC-721e', brc721eImage);
+  }
+
+  if (
+    (ordinal?.content_type.includes('text/plain') ||
+      ordinal?.content_type.includes('application/json')) &&
+    textContent?.includes('brc-20')
+  ) {
+    return (
+      <ImageContainer>
+        <Brc20Tile
+          brcContent={textContent}
+          isGalleryOpen={isGalleryOpen}
+          isNftDashboard={isNftDashboard}
+          inNftDetail={inNftDetail}
+          isSmallImage={isSmallImage}
+          withoutSizeIncrease={withoutSizeIncrease}
+        />
+      </ImageContainer>
+    );
   }
 
   if (ordinal?.content_type.includes('text')) {
@@ -197,24 +217,10 @@ function OrdinalImage({
       );
     }
 
-    if (textContent.includes('brc-20')) {
-      return (
-        <ImageContainer>
-          <Brc20Tile
-            brcContent={textContent}
-            isGalleryOpen={isGalleryOpen}
-            isNftDashboard={isNftDashboard}
-            inNftDetail={inNftDetail}
-            isSmallImage={isSmallImage}
-            withoutSizeIncrease={withoutSizeIncrease}
-          />
-        </ImageContainer>
-      );
-    }
     if (ordinal?.content_type.includes('html')) {
       return (
         <ImageContainer inNftDetail={inNftDetail}>
-          <FillImg src={`https://ord.xverse.app/thumbnail/${ordinal.id}`} alt="/html/" />
+          <FillImg src={`${XVERSE_ORDIVIEW_URL}/thumbnail/${ordinal.id}`} alt="/html/" />
           {isNftDashboard && (
             <OrdinalsTag>
               <ButtonIcon src={OrdinalsIcon} />
@@ -224,6 +230,7 @@ function OrdinalImage({
         </ImageContainer>
       );
     }
+
     return (
       <ImageContainer inNftDetail={inNftDetail} isGalleryOpen={isGalleryOpen}>
         <OrdinalContentText

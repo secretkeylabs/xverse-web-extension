@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { animated, useTransition } from '@react-spring/web';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import ActionButton from '@components/button';
 import {
-  getMasterFingerPrint,
   importNativeSegwitAccountFromLedger,
+  importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
 } from '@secretkeylabs/xverse-core';
-import { getDeviceAccountIndex, ledgerDelay } from '@common/utils/ledger';
+import { ledgerDelay } from '@common/utils/ledger';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
@@ -17,11 +17,14 @@ import { useLocation } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 import InfoContainer from '@components/infoContainer';
 
-import BtcIconSVG from '@assets/img/ledger/btc_icon.svg';
-import OrdinalsIconSVG from '@assets/img/ledger/ordinals_icon.svg';
-import LedgerConnectBtcSVG from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import btcIcon from '@assets/img/ledger/btc_icon.svg';
+import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
+import stxIcon from '@assets/img/ledger/stx_icon.svg';
+import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
-import CheckCircleSVG from '@assets/img/ledger/check_circle.svg';
+import useResetUserFlow from '@hooks/useResetUserFlow';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 const Container = styled.div`
@@ -125,6 +128,17 @@ const ActionButtonContainer = styled.div((props) => ({
   },
 }));
 
+const LedgerFailViewContainer = styled.div((props) => ({
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  margin: 'auto',
+}));
+
+const LedgerFailButtonsContainer = styled.div((props) => ({
+  width: '100%',
+  marginTop: props.theme.spacing(25),
+}));
+
 function VerifyLedger(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [masterPubKey, setMasterPubKey] = useState('');
@@ -137,6 +151,7 @@ function VerifyLedger(): JSX.Element {
   const [isWrongDevice, setIsWrongDevice] = useState(false);
   const { search } = useLocation();
   const params = new URLSearchParams(search);
+  const mismatch = params.get('mismatch') ?? '';
   const currency = params.get('currency') ?? '';
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_VERIFY_SCREEN' });
   const { ledgerAccountsList, network } = useWalletSelector();
@@ -153,6 +168,10 @@ function VerifyLedger(): JSX.Element {
 
   const isBitcoinSelected = currency === 'BTC';
   const isOrdinalSelected = currency === 'ORD' || currency === 'brc-20';
+  const isStacksSelected = currency === 'STX';
+
+  const { subscribeToResetUserFlow } = useResetUserFlow();
+  useEffect(() => subscribeToResetUserFlow('/verify-ledger'), []);
 
   const getAddress = () => {
     switch (currency) {
@@ -171,19 +190,12 @@ function VerifyLedger(): JSX.Element {
   };
 
   const handleClickNext = () => {
-    setCurrentStepIndex(currentStepIndex + 1);
+    setCurrentStepIndex((prevStepIndex) => prevStepIndex + 1);
   };
 
-  const importBtcAccounts = async (showAddress: boolean, masterFingerPrint?: string) => {
+  const importBtcAccounts = async (showAddress: boolean) => {
     const transport = await Transport.create();
-    const addressIndex =
-      selectedAccount?.deviceAccountIndex !== undefined
-        ? selectedAccount?.deviceAccountIndex
-        : getDeviceAccountIndex(
-            ledgerAccountsList,
-            selectedAccount?.id!,
-            masterFingerPrint || masterPubKey,
-          );
+    const addressIndex = selectedAccount?.deviceAccountIndex;
 
     if (isBitcoinSelected) {
       try {
@@ -225,11 +237,22 @@ function VerifyLedger(): JSX.Element {
     await transport.close();
   };
 
-  const fetchMasterPubKey = async () => {
+  const importStxAccounts = async (showAddress: boolean) => {
+    setIsButtonDisabled(true);
     const transport = await Transport.create();
-    const masterFingerPrint = await getMasterFingerPrint(transport);
-    setMasterPubKey(masterFingerPrint);
-    return masterFingerPrint;
+    const addressIndex = selectedAccount?.deviceAccountIndex;
+
+    try {
+      await importStacksAccountFromLedger(transport, network.type, 0, addressIndex, showAddress);
+      setIsButtonDisabled(false);
+      setCurrentStepIndex(2);
+    } catch (err: any) {
+      console.error(err);
+      setIsConnectFailed(true);
+      setIsButtonDisabled(false);
+      await transport.close();
+    }
+    await transport.close();
   };
 
   const checkDeviceConnection = async () => {
@@ -239,14 +262,9 @@ function VerifyLedger(): JSX.Element {
       setIsOrdinalsAddressRejected(false);
       setIsButtonDisabled(true);
 
-      const masterFingerPrint = await fetchMasterPubKey();
+      const addressIndex = selectedAccount?.deviceAccountIndex;
 
-      const deviceAccounts = ledgerAccountsList.filter(
-        (account) => account.masterPubKey === masterFingerPrint,
-      );
-      const accountId = deviceAccounts.findIndex((account) => account.id === selectedAccount?.id);
-
-      if (accountId === -1) {
+      if (addressIndex === undefined) {
         setIsConnectSuccess(false);
         setIsConnectFailed(true);
         setIsWrongDevice(true);
@@ -258,7 +276,9 @@ function VerifyLedger(): JSX.Element {
       await ledgerDelay(1500);
       handleClickNext();
       if (isBitcoinSelected || isOrdinalSelected) {
-        await importBtcAccounts(true, masterFingerPrint);
+        await importBtcAccounts(true);
+      } else if (isStacksSelected) {
+        await importStxAccounts(true);
       }
     } catch (err) {
       console.error(err);
@@ -284,6 +304,40 @@ function VerifyLedger(): JSX.Element {
     setCurrentStepIndex(0);
   };
 
+  const getTitle = () => {
+    if (isBitcoinSelected) return t('BTC_ADDRESS');
+    if (isOrdinalSelected) return t('ORDINALS_ADDRESS');
+    if (isStacksSelected) return t('STACKS_ADDRESS');
+
+    return '';
+  };
+
+  const getIconSrc = () => {
+    if (isBitcoinSelected) return btcIcon;
+    if (isOrdinalSelected) return ordinalsIcon;
+    if (isStacksSelected) return stxIcon;
+  };
+
+  const connectionFailedErrorText = isStacksSelected
+    ? 'STX_SUBTITLE_FAILED'
+    : 'BTC_SUBTITLE_FAILED';
+
+  if (mismatch) {
+    return (
+      <Container>
+        <FullScreenHeader />
+        <LedgerFailViewContainer>
+          <LedgerFailView title={t('TITLE_FAILED')} text={t('ADDRESS_MISMATCH')} />
+          <LedgerFailButtonsContainer>
+            <ActionButtonContainer>
+              <ActionButton onPress={handleWindowClose} text={t('CLOSE_BUTTON')} />
+            </ActionButtonContainer>
+          </LedgerFailButtonsContainer>
+        </LedgerFailViewContainer>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <FullScreenHeader />
@@ -295,13 +349,17 @@ function VerifyLedger(): JSX.Element {
           >
             {currentStepIndex === 0 && (
               <LedgerConnectionView
-                title={t('LEDGER_CONNECT.BTC_TITLE')}
-                text={t('LEDGER_CONNECT.BTC_SUBTITLE')}
+                title={t(
+                  isStacksSelected ? 'LEDGER_CONNECT.STX_TITLE' : 'LEDGER_CONNECT.BTC_TITLE',
+                )}
+                text={t(
+                  isStacksSelected ? 'LEDGER_CONNECT.STX_SUBTITLE' : 'LEDGER_CONNECT.BTC_SUBTITLE',
+                )}
                 titleFailed={t('TITLE_FAILED')}
                 textFailed={t(
-                  isWrongDevice ? 'WRONG_DEVICE_ERROR_SUBTITLE' : 'BTC_SUBTITLE_FAILED',
+                  isWrongDevice ? 'WRONG_DEVICE_ERROR_SUBTITLE' : connectionFailedErrorText,
                 )}
-                imageDefault={LedgerConnectBtcSVG}
+                imageDefault={isStacksSelected ? ledgerConnectStxIcon : ledgerConnectBtcIcon}
                 isConnectSuccess={isConnectSuccess}
                 isConnectFailed={isConnectFailed}
               />
@@ -317,20 +375,17 @@ function VerifyLedger(): JSX.Element {
                   text={t(
                     isBtcAddressRejected || isOrdinalsAddressRejected
                       ? 'SUBTITLE_CANCELLED'
-                      : 'BTC_SUBTITLE_FAILED',
+                      : connectionFailedErrorText,
                   )}
                 />
               ) : (
                 <>
                   <AddAddressHeaderContainer>
-                    <img
-                      src={isBitcoinSelected ? BtcIconSVG : OrdinalsIconSVG}
-                      width={32}
-                      height={32}
-                      alt="bitcoin"
-                    />
+                    <img src={getIconSrc()} width={32} height={32} alt={getTitle()} />
                     <SelectAssetTitle>
-                      {t(isBitcoinSelected ? 'TITLE_VERIFY_BTC' : 'TITLE_VERIFY_ORDINALS')}
+                      {isBitcoinSelected && t('TITLE_VERIFY_BTC')}
+                      {isOrdinalSelected && t('TITLE_VERIFY_ORDINALS')}
+                      {isStacksSelected && t('TITLE_VERIFY_STX')}
                     </SelectAssetTitle>
                   </AddAddressHeaderContainer>
                   <AddAddressDetailsContainer>
@@ -351,20 +406,24 @@ function VerifyLedger(): JSX.Element {
                             <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
                           </InfoAlertContainer>
                         )}
+                        {isStacksSelected && (
+                          <InfoAlertContainer>
+                            <InfoContainer bodyText={t('STX_RECEIVE_MESSAGE')} />
+                          </InfoAlertContainer>
+                        )}
                       </CopyContainer>
-                      <LedgerAddressComponent
-                        title={t(isBitcoinSelected ? 'BTC_ADDRESS' : 'ORDINALS_ADDRESS')}
-                        address={getAddress()}
-                      />
+                      <LedgerAddressComponent title={getTitle()} address={getAddress()} />
                     </Container>
                   </AddAddressDetailsContainer>
                 </>
               ))}
             {currentStepIndex === 2 && (
               <AddressAddedContainer>
-                <img src={CheckCircleSVG} alt="Success" />
+                <img src={checkCircleIcon} alt="Success" />
                 <SelectAssetTitle>
-                  {t(isBitcoinSelected ? 'BTC_TITLE_VERIFIED' : 'ORDINALS_TITLE_VERIFIED')}
+                  {isBitcoinSelected && t('BTC_TITLE_VERIFIED')}
+                  {isOrdinalSelected && t('ORDINALS_TITLE_VERIFIED')}
+                  {isStacksSelected && t('STACKS_TITLE_VERIFIED')}
                 </SelectAssetTitle>
               </AddressAddedContainer>
             )}

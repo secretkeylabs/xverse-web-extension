@@ -11,7 +11,8 @@ import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg
 import validUrl from 'valid-url';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
-import LedgerConnectDefault from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import ActionButton from '@components/button';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -82,12 +83,13 @@ function AuthenticationRequest() {
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken);
   const { seedPhrase, selectedAccount } = useWalletSelector();
+  const isDisabled = !selectedAccount?.stxAddress;
 
   const confirmCallback = async () => {
     setLoading(true);
     try {
-      if (isHardwareAccount(selectedAccount)) {
-        // setIsModalVisible(true);
+      if (isHardwareAccount(selectedAccount) && !isDisabled) {
+        setIsModalVisible(true);
         return;
       }
 
@@ -134,6 +136,11 @@ function AuthenticationRequest() {
       console.error('No account selected');
       return;
     }
+
+    if (selectedAccount.deviceAccountIndex === undefined) {
+      console.error('No account found');
+      return;
+    }
     setIsButtonDisabled(true);
 
     const transport = await Transport.create();
@@ -160,7 +167,11 @@ function AuthenticationRequest() {
     };
 
     try {
-      const authResponse = await handleLedgerStxJWTAuth(transport, selectedAccount.id, profile);
+      const authResponse = await handleLedgerStxJWTAuth(
+        transport,
+        selectedAccount.deviceAccountIndex,
+        profile,
+      );
       setIsTxApproved(true);
       await ledgerDelay(1500);
       chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
@@ -194,16 +205,26 @@ function AuthenticationRequest() {
       confirmText={t('CONNECT_BUTTON')}
       cancelText={t('CANCEL_BUTTON')}
       loading={loading}
-      disabled={isHardwareAccount(selectedAccount)}
+      disabled={isDisabled}
     >
       <AccountHeaderComponent />
       <MainContainer>
         <TopImage src={getDappLogo()} alt="Dapp Logo" />
         <FunctionTitle>{t('TITLE')}</FunctionTitle>
         <DappTitle>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappTitle>
-        {isHardwareAccount(selectedAccount) && (
+        {isDisabled && (
           <InfoContainerWrapper>
-            <InfoContainer bodyText="The selected account does not support Stacks authentication. Switch to a different account to authenticate with Stacks." />
+            <InfoContainer
+              bodyText={t('NO_STACKS_AUTH_SUPPORT.TITLE')}
+              redirectText={t('NO_STACKS_AUTH_SUPPORT.LINK')}
+              onClick={async () => {
+                await chrome.tabs.create({
+                  url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+                });
+
+                window.close();
+              }}
+            />
           </InfoContainerWrapper>
         )}
       </MainContainer>
@@ -214,7 +235,7 @@ function AuthenticationRequest() {
             text={t('LEDGER.CONNECT.SUBTITLE')}
             titleFailed={t('LEDGER.CONNECT.ERROR_TITLE')}
             textFailed={t('LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={LedgerConnectDefault}
+            imageDefault={ledgerConnectStxIcon}
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />
@@ -225,7 +246,7 @@ function AuthenticationRequest() {
             text={t('LEDGER.CONFIRM.SUBTITLE')}
             titleFailed={t('LEDGER.CONFIRM.ERROR_TITLE')}
             textFailed={t('LEDGER.CONFIRM.ERROR_SUBTITLE')}
-            imageDefault={LedgerConnectDefault}
+            imageDefault={ledgerConnectDefaultIcon}
             isConnectSuccess={isTxApproved}
             isConnectFailed={isTxRejected}
           />
