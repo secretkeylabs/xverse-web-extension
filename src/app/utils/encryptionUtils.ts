@@ -1,15 +1,9 @@
 import argon2 from 'argon2-browser';
-import {
-  generateRandomKey,
-  encryptSeedPhrase,
-  decryptSeedPhrase,
-} from '@secretkeylabs/xverse-core/encryption';
+import { encryptSeedPhrase, decryptSeedPhrase } from '@secretkeylabs/xverse-core/encryption';
 import {
   encryptMnemonicWithHandler,
   decryptMnemonicWithHandler,
 } from '@secretkeylabs/xverse-core/wallet';
-import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core/seedVault';
-import ChromeStorage from '@utils/storage';
 
 export async function generateKeyArgon2id(password: string, salt: string): Promise<string> {
   const result = await argon2.hash({
@@ -38,16 +32,13 @@ export async function generateKeyArgon2i(password: string, salt: string): Promis
 }
 
 export async function generatePasswordHash(password: string) {
-  let salt = await ChromeStorage.getItem(SeedVaultStorageKeys.PASSWORD_SALT);
   const unMigratedSalt = localStorage.getItem('salt');
-  if (!salt && !unMigratedSalt) {
-    salt = generateRandomKey(16);
-  } else {
-    salt = unMigratedSalt || salt;
+  if (!unMigratedSalt) {
+    throw new Error('No salt found');
   }
-  const argonHash = await generateKeyArgon2i(password, salt);
+  const argonHash = await generateKeyArgon2i(password, unMigratedSalt);
   return {
-    salt,
+    unMigratedSalt,
     hash: argonHash,
   };
 }

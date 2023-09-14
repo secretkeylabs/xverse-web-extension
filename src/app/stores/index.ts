@@ -1,4 +1,4 @@
-import ChromeStorage from '@utils/storage';
+import { chromeLocalStorage } from '@utils/chromeStorage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { PersistConfig, persistReducer, persistStore } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
@@ -7,18 +7,17 @@ import * as actions from './wallet/actions/types';
 import { WalletState } from './wallet/actions/types';
 import walletReducer from './wallet/reducer';
 
-
 const rootPersistConfig = {
   version: 1,
   key: 'root',
-  storage: ChromeStorage,
+  storage: chromeLocalStorage,
   blacklist: ['walletState'],
 };
 
 export const WalletPersistConfig: PersistConfig<WalletState> = {
   version: 1,
   key: 'walletState',
-  storage: ChromeStorage,
+  storage: chromeLocalStorage,
 };
 
 const appReducer = combineReducers({

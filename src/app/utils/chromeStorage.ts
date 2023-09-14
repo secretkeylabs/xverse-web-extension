@@ -30,7 +30,7 @@ class ChromeStorage {
     });
   }
 
-  getItem(key: string): Promise<any> {
+  getItem<T = any>(key: string): Promise<T> {
     return new Promise((resolve, reject) => {
       this.getDriver().get(key, (response: any) => {
         if (this.hasError()) {
@@ -52,4 +52,6 @@ class ChromeStorage {
     });
   }
 }
-export default new ChromeStorage(chrome.storage.local, chrome.runtime);
+export default ChromeStorage;
+export const chromeSessionStorage = new ChromeStorage(chrome.storage.session, chrome.runtime);
+export const chromeLocalStorage = new ChromeStorage(chrome.storage.local, chrome.runtime);
