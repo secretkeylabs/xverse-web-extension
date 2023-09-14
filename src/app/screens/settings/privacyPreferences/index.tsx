@@ -52,16 +52,14 @@ function PrivacyPreferencesScreen() {
     navigate('/settings');
   };
 
-  const handleSwitchChange = () => {
-    setIsEnabled((prevEnabledState) => {
-      if (prevEnabledState) {
-        optOutMixPanel();
-      } else {
-        optInMixPanel(selectedAccount?.masterPubKey);
-      }
+  const handleSwitchChange = (checked: boolean) => {
+    setIsEnabled(checked);
 
-      return !prevEnabledState;
-    });
+    if (checked) {
+      optInMixPanel(selectedAccount?.masterPubKey);
+    } else {
+      optOutMixPanel();
+    }
   };
 
   const checkMixpanelTrackingStatus = async () => {

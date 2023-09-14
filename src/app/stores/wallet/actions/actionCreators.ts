@@ -235,7 +235,7 @@ export function ChangeShowOrdinalReceiveAlertAction(
   };
 }
 
-export function ChangeShowDataCollectionAlertAction(
+export function changeShowDataCollectionAlertAction(
   showDataCollectionAlert: boolean | null,
 ): actions.ChangeShowDataCollectionAlert {
   return {

@@ -36,8 +36,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import dashboardIcon from '@assets/img/dashboard-icon.svg';
 import { useDispatch } from 'react-redux';
-import { ChangeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
-import styled from 'styled-components';
+import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import styled, { useTheme } from 'styled-components';
 import Theme from 'theme';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
@@ -186,6 +186,7 @@ function Home() {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
+  const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
@@ -438,12 +439,12 @@ function Home() {
 
   const handleDataCollectionDeny = () => {
     optOutMixPanel();
-    dispatch(ChangeShowDataCollectionAlertAction(false));
+    dispatch(changeShowDataCollectionAlertAction(false));
   };
 
   const handleDataCollectionAllow = () => {
     optInMixPanel(selectedAccount?.masterPubKey);
-    dispatch(ChangeShowDataCollectionAlertAction(false));
+    dispatch(changeShowDataCollectionAlertAction(false));
   };
 
   const showSwaps = !isLedgerAccount(selectedAccount);
@@ -574,9 +575,10 @@ function Home() {
           justifyContent: 'center',
         }}
         contentStylesOverriding={{
+          width: 'auto',
           bottom: 'initial',
-          borderRadius: 16,
-          maxWidth: 'calc(360px - 32px)',
+          borderRadius: theme.radius(3),
+          margin: `0 ${theme.spacing(8)}px`,
         }}
       >
         <ModalContent>

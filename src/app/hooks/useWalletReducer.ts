@@ -3,7 +3,12 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/xverse-core/account';
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
-import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
+import {
+  Account,
+  AnalyticsEvents,
+  SettingsNetwork,
+  StacksNetwork,
+} from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import {
   ChangeNetworkAction,
@@ -153,7 +158,7 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
-    trackMixPanel('Restore wallet');
+    trackMixPanel(AnalyticsEvents.RestoreWallet);
 
     const encryptSeed = await encryptSeedPhrase(seed, password);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
@@ -214,7 +219,7 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
-    trackMixPanel('Create new wallet');
+    trackMixPanel(AnalyticsEvents.CreateNewWallet);
 
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));

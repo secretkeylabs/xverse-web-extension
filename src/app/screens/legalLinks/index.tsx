@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import { ChangeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import { useDispatch } from 'react-redux';
 
 const Container = styled.div((props) => ({
@@ -81,7 +81,7 @@ function LegalLinks() {
     } else {
       optOutMixPanel();
     }
-    dispatch(ChangeShowDataCollectionAlertAction(false));
+    dispatch(changeShowDataCollectionAlertAction(false));
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {

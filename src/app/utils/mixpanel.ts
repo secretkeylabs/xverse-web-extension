@@ -1,5 +1,6 @@
 import mixpanel from 'mixpanel-browser';
 import { sha256 } from 'js-sha256';
+import { AnalyticsEvents } from '@secretkeylabs/xverse-core/types';
 import { MIX_PANEL_TOKEN } from './constants';
 
 export const isMixPanelInited = () => !!MIX_PANEL_TOKEN && !!mixpanel.config;
@@ -17,7 +18,7 @@ export const optOutMixPanel = () => {
     return;
   }
 
-  trackMixPanel('Opt Out', undefined, { send_immediately: true }, () => {
+  trackMixPanel(AnalyticsEvents.OptOut, undefined, { send_immediately: true }, () => {
     mixpanel.opt_out_tracking();
   });
 };
