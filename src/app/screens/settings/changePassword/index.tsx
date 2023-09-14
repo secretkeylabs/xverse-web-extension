@@ -7,7 +7,7 @@ import BottomBar from '@components/tabBar';
 import { useTranslation } from 'react-i18next';
 import Check from '@assets/img/settings/check_circle.svg';
 import PasswordInput from '@components/passwordInput';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
@@ -43,7 +43,7 @@ const ToastDismissButton = styled.button((props) => ({
 
 function ChangePasswordScreen() {
   const { t } = useTranslation('translation');
-  const { unlockVault, changePassword } = useSecretKey();
+  const { unlockVault, changePassword } = useSeedVault();
   const [password, setPassword] = useState<string>('');
   const [oldPassword, setOldPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');

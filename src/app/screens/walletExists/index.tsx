@@ -1,6 +1,6 @@
 import WarningIcon from '@assets/img/Warning_red.svg';
 import CheckBox from '@components/checkBox';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -69,7 +69,7 @@ const CheckBoxContainer = styled.div((props) => ({
 function WalletExists(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'WALLET_EXISTS_SCREEN' });
   const [userAccepted, setUserAccepted] = useState(false);
-  const { clearVaultStorage } = useSecretKey();
+  const { clearVaultStorage } = useSeedVault();
 
   const handleClose = async () => {
     await clearVaultStorage();

@@ -9,12 +9,12 @@ import {
 } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import useBtcClient from './useBtcClient';
-import useSecretKey from './useSecretKey';
+import useSeedVault from './useSeedVault';
 
 const useSignPsbtTx = () => {
   const { accountsList, network } = useWalletSelector();
   const { search } = useLocation();
-  const { getSeed } = useSecretKey();
+  const { getSeed } = useSeedVault();
   const params = new URLSearchParams(search);
   const requestToken = params.get('signPsbtRequest') ?? '';
   const request = decodeToken(requestToken) as any as SignTransactionOptions;

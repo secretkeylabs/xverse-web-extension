@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSingleTabGuard } from '@components/guards/singleTab';
 import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import {
   WalletExistsContext,
   WalletExistsContextProps,
@@ -22,7 +22,7 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
 
   const [walletExistsGuardEnabled, setWalletExistsGuardEnabled] = useState(true);
   const [walletSeedPhrase, setWalletSeedPhrase] = useState<string | null>(null);
-  const { getSeed } = useSecretKey();
+  const { getSeed } = useSeedVault();
   const contextValue: WalletExistsContextProps = useMemo(
     () => ({
       disableWalletExistsGuard: () => setWalletExistsGuardEnabled(false),

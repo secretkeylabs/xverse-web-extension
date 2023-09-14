@@ -12,7 +12,7 @@ import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import { useState } from 'react';
 import BigNumber from 'bignumber.js';
 import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
@@ -49,7 +49,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
     input.userOverrideSponsorValue,
   );
   const { currencyToToken } = useCurrencyConversion();
-  const { getSeed } = useSecretKey();
+  const { getSeed } = useSeedVault();
   const navigate = useNavigate();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>(
     deserializeTransaction(input.unsignedTx),

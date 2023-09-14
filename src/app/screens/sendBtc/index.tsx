@@ -13,7 +13,7 @@ import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { isInOptions } from '@utils/helper';
 
@@ -31,35 +31,32 @@ function SendBtcScreen() {
   const [warning, setWarning] = useState('');
   const [recipient, setRecipient] = useState<Recipient[]>();
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const {
-    btcAddress,
-    network,
-    btcBalance,
-    selectedAccount,
-    btcFiatRate,
-  } = useWalletSelector();
+  const { btcAddress, network, btcBalance, selectedAccount, btcFiatRate } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { getSeed } = useSecretKey();
+  const { getSeed } = useSeedVault();
   const {
     isLoading,
     data,
     error: txError,
     mutate,
   } = useMutation<
-  SignedBtcTx,
-  ResponseError,
-  {
-    recipients: Recipient[];
-    seedPhrase: string;
-  }
-  >({ mutationFn: async ({ recipients, seedPhrase }) => signBtcTransaction(
-    recipients,
-    btcAddress,
-    selectedAccount?.id ?? 0,
-    seedPhrase,
-    network.type,
-  ) });
+    SignedBtcTx,
+    ResponseError,
+    {
+      recipients: Recipient[];
+      seedPhrase: string;
+    }
+  >({
+    mutationFn: async ({ recipients, seedPhrase }) =>
+      signBtcTransaction(
+        recipients,
+        btcAddress,
+        selectedAccount?.id ?? 0,
+        seedPhrase,
+        network.type,
+      ),
+  });
 
   const handleBackButtonClick = () => {
     navigate('/');
@@ -156,7 +153,7 @@ function SendBtcScreen() {
     ];
     setRecipient(recipients);
     if (validateFields(address, amountToSend)) {
-       mutate({ recipients, seedPhrase });
+      mutate({ recipients, seedPhrase });
     }
   };
 

@@ -1,16 +1,12 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 
-interface AuthGuardProps {
-  children: ReactNode;
-}
-
-function AuthGuard({ children }: AuthGuardProps) {
+function AuthGuard({ children }: PropsWithChildren) {
   const navigate = useNavigate();
   const { masterPubKey, encryptedSeed } = useWalletSelector();
-  const { getSeed, hasSeed } = useSecretKey();
+  const { getSeed, hasSeed } = useSeedVault();
   const [authTested, setAuthTested] = useState(false);
 
   const restoreSession = async () => {
@@ -42,7 +38,9 @@ function AuthGuard({ children }: AuthGuardProps) {
   if (!authTested) {
     return null;
   }
-  return children;
+  // fragment is required here because without it, the router thinks there could be more than 1 child node
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <>{children}</>;
 }
 
 export default AuthGuard;

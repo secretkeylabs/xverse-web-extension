@@ -23,13 +23,13 @@ import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { generatePasswordHash } from '@utils/encryptionUtils';
 import { PostGuardPing } from '@components/guards/singleTab';
 import useWalletSession from './useWalletSession';
-import useSecretKey from './useSecretKey';
+import useSeedVault from './useSeedVault';
 import useWalletSelector from './useWalletSelector';
 
 const useWalletReducer = () => {
   const { accountsList, selectedAccount, network, ledgerAccountsList, encryptedSeed } =
     useWalletSelector();
-  const { getSeed, storeSeed, initSeedVault, lockVault, unlockVault } = useSecretKey();
+  const seedVault = useSeedVault();
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
@@ -108,11 +108,10 @@ const useWalletReducer = () => {
   const migrateLegacySeedStorage = async (password: string) => {
     const pHash = await generatePasswordHash(password);
     await decryptSeedPhraseCBC(encryptedSeed, pHash.hash).then(async (decrypted) => {
-      await initSeedVault(password);
-      await storeSeed(decrypted);
+      await seedVault.init(password);
+      await seedVault.storeSeed(decrypted);
       localStorage.removeItem('salt');
       dispatch(storeEncryptedSeedAction(''));
-      return decrypted;
     });
   };
 
@@ -121,8 +120,9 @@ const useWalletReducer = () => {
       await migrateLegacySeedStorage(password);
       return;
     }
-    const decrypted = await unlockVault(password);
+    await seedVault.unlockVault(password);
     try {
+      const decrypted = await seedVault.getSeed();
       await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
     } catch (err) {
       dispatch(fetchAccountAction(accountsList[0], accountsList));
@@ -130,20 +130,21 @@ const useWalletReducer = () => {
     } finally {
       setSessionStartTime();
     }
-    return decrypted;
   };
 
   const lockWallet = async () => {
-    await lockVault();
+    await seedVault.lockVault();
     PostGuardPing('closeWallet');
   };
 
   const resetWallet = async () => {
     dispatch(resetWalletAction());
-    await chrome.storage.local.clear();
-    await chrome.storage.session.clear();
     localStorage.clear();
-    clearSessionTime();
+    await Promise.all([
+      clearSessionTime(),
+      chrome.storage.local.clear(),
+      chrome.storage.session.clear(),
+    ]);
   };
 
   const restoreWallet = async (seed: string, password: string) => {
@@ -163,8 +164,8 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
-    await initSeedVault(password);
-    await storeSeed(seed);
+    await seedVault.init(password);
+    await seedVault.storeSeed(seed);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(setWalletAction(wallet));
     localStorage.setItem('migrated', 'true');
@@ -225,7 +226,7 @@ const useWalletReducer = () => {
   };
 
   const createAccount = async () => {
-    const seedPhrase = await getSeed();
+    const seedPhrase = await seedVault.getSeed();
     const newAccountsList = await createWalletAccount(
       seedPhrase,
       network,
@@ -261,7 +262,7 @@ const useWalletReducer = () => {
     networkAddress: string,
     btcApiUrl: string,
   ) => {
-    const seedPhrase = await getSeed();
+    const seedPhrase = await seedVault.getSeed();
     dispatch(ChangeNetworkAction(changedNetwork, networkAddress, btcApiUrl));
     const wallet = await walletFromSeedPhrase({
       mnemonic: seedPhrase,

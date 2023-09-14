@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import SeedCheck from './seedCheck';
 import VerifySeed from './verifySeed';
 
@@ -37,14 +37,14 @@ export default function BackupWalletSteps(): JSX.Element {
   const [error, setError] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const navigate = useNavigate();
-  const [ seedPhrase, setSeedPhrase ] = useState<string>('');
-  const {getSeed, changePassword} = useSecretKey();
+  const [seedPhrase, setSeedPhrase] = useState<string>('');
+  const { getSeed, changePassword } = useSeedVault();
   const { createWallet } = useWalletReducer();
   const { disableWalletExistsGuard } = useWalletExistsContext();
 
   useEffect(() => {
     (async () => {
-      const seed = await getSeed('');
+      const seed = await getSeed();
       setSeedPhrase(seed);
     })();
   }, []);

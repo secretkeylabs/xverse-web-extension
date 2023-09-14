@@ -17,7 +17,7 @@ import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import { useEffect } from 'react';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
@@ -74,7 +74,7 @@ function RestoreBtc() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_BTC_SCREEN' });
   const { ordinalsAddress, btcAddress, network, selectedAccount, btcFiatRate } =
     useWalletSelector();
-  const { getSeed } = useSecretKey();
+  const { getSeed } = useSeedVault();
   const navigate = useNavigate();
   const { unspentUtxos } = useNonOrdinalUtxos();
   let amount = new BigNumber(0);

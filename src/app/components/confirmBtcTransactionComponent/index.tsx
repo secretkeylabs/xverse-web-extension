@@ -27,7 +27,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import useWalletSelector from '@hooks/useWalletSelector';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import styled from 'styled-components';
 import TransactionDetailComponent from '../transactionDetailComponent';
 
@@ -154,7 +154,7 @@ function ConfirmBtcTransactionComponent({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
   const { btcAddress, selectedAccount, network, btcFiatRate } = useWalletSelector();
-  const { getSeed } = useSecretKey();
+  const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);

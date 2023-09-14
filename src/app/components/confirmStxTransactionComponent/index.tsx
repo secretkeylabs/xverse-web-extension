@@ -18,7 +18,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -142,7 +142,7 @@ function ConfirmStxTransationComponent({
     keyPrefix: 'SIGNATURE_REQUEST',
   });
   const selectedNetwork = useNetworkSelector();
-  const {getSeed} = useSecretKey();
+  const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const { selectedAccount } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);

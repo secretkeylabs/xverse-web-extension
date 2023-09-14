@@ -1,6 +1,6 @@
 import backup from '@assets/img/backupWallet/backup.svg';
 import ActionButton from '@components/button';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import { generateMnemonic } from '@secretkeylabs/xverse-core/wallet';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +57,7 @@ const TransparentButtonContainer = styled.div((props) => ({
 function BackupWallet(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const navigate = useNavigate();
-  const { initSeedVault, storeSeed } = useSecretKey();
+  const { init: initSeedVault, storeSeed } = useSeedVault();
 
   useEffect(() => {
     (async () => {

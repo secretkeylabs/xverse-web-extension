@@ -6,7 +6,7 @@ import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
 import SeedCheck from '@screens/backupWalletSteps/seedCheck';
 import styled from 'styled-components';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 
 const Container = styled.div`
   display: flex;
@@ -47,7 +47,7 @@ function BackupWalletScreen() {
   const [showSeed, setShowSeed] = useState<boolean>(false);
   const [seed, setSeed] = useState('');
   const navigate = useNavigate();
-  const { getSeed, unlockVault } = useSecretKey();
+  const { getSeed, unlockVault } = useSeedVault();
 
   useEffect(() => {
     (async () => {

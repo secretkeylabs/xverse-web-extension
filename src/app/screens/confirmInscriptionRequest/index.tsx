@@ -15,7 +15,7 @@ import {
 import { BtcTransactionBroadcastResponse, ResponseError } from '@secretkeylabs/xverse-core/types';
 import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
 import useBtcClient from '@hooks/useBtcClient';
-import useSecretKey from '@hooks/useSecretKey';
+import useSeedVault from '@hooks/useSeedVault';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
@@ -152,10 +152,8 @@ function ConfirmInscriptionRequest() {
     brcContent,
     feePerVByte,
   } = location.state;
-  const {
-    btcAddress, network, selectedAccount, btcFiatRate,
-  } = useWalletSelector();
-  const { getSeed } = useSecretKey();
+  const { btcAddress, network, selectedAccount, btcFiatRate } = useWalletSelector();
+  const { getSeed } = useSeedVault();
   const btcClient = useBtcClient();
   const [signedTx, setSignedTx] = useState<string>('');
   const [textContent, setTextContent] = useState<string>('');

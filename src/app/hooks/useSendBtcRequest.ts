@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SendBtcTransactionOptions } from 'sats-connect';
 import useWalletSelector from './useWalletSelector';
-import useSecretKey from './useSecretKey';
+import useSeedVault from './useSeedVault';
 
 function useSendBtcRequest() {
   const { search } = useLocation();
@@ -15,7 +15,7 @@ function useSendBtcRequest() {
   const requestToken = params.get('sendBtcRequest') ?? '';
   const request = decodeToken(requestToken) as any as SendBtcTransactionOptions;
   const tabId = params.get('tabId') ?? '0';
-  const { getSeed } = useSecretKey();
+  const { getSeed } = useSeedVault();
   const { network, selectedAccount } = useWalletSelector();
 
   const generateSignedTransaction = async () => {
