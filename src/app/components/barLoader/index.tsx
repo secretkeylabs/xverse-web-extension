@@ -1,66 +1,90 @@
-import { LoaderSize } from '@utils/constants';
 import ContentLoader from 'react-content-loader';
+import { LoaderSize } from '@utils/constants';
+import styled from 'styled-components';
 import Theme from 'theme';
 
-interface Props {
-  loaderSize?: LoaderSize;
+function getHeight(loaderSize?: LoaderSize) {
+  switch (loaderSize) {
+    case LoaderSize.SMALLEST:
+      return 10;
+    case LoaderSize.SMALL:
+      return 15;
+    case LoaderSize.MEDIUM:
+      return 25;
+    case LoaderSize.LARGE:
+      return 35;
+    default:
+      return 15;
+  }
 }
-function BarLoader({ loaderSize }: Props) {
-  function getHeight() {
-    switch (loaderSize) {
-      case LoaderSize.SMALLEST:
-        return 10;
-      case LoaderSize.SMALL:
-        return 15;
-      case LoaderSize.MEDIUM:
-        return 25;
-      case LoaderSize.LARGE:
-        return 35;
-      default:
-        return 15;
-    }
-  }
 
-  function getWidth() {
-    switch (loaderSize) {
-      case LoaderSize.SMALLEST:
-        return 120;
-      case LoaderSize.SMALL:
-        return 150;
-      case LoaderSize.MEDIUM:
-        return 250;
-      case LoaderSize.LARGE:
-        return 300;
-      default:
-        return 100;
-    }
+function getWidth(loaderSize?: LoaderSize) {
+  switch (loaderSize) {
+    case LoaderSize.SMALLEST:
+      return 120;
+    case LoaderSize.SMALL:
+      return 150;
+    case LoaderSize.MEDIUM:
+      return 250;
+    case LoaderSize.LARGE:
+      return 300;
+    default:
+      return 100;
   }
+}
 
-  function getRadius() {
-    switch (loaderSize) {
-      case LoaderSize.SMALL:
-        return 5;
-      case LoaderSize.MEDIUM:
-        return 10;
-      case LoaderSize.LARGE:
-        return 15;
-      default:
-        return 5;
-    }
+function getRadius(loaderSize?: LoaderSize) {
+  switch (loaderSize) {
+    case LoaderSize.SMALL:
+      return 5;
+    case LoaderSize.MEDIUM:
+      return 10;
+    case LoaderSize.LARGE:
+      return 15;
+    default:
+      return 5;
   }
+}
 
+function BarLoader({ loaderSize }: { loaderSize?: LoaderSize }) {
   return (
     <ContentLoader
       animate
       speed={1}
       interval={0.1}
       viewBox="0 0 380 40"
-      backgroundColor={Theme.colors.background.elevation3}
+      backgroundColor={Theme.colors.elevation3}
       foregroundColor={Theme.colors.grey}
     >
-      <rect y="0" x="0" rx={getRadius()} ry={getRadius()} width={getWidth()} height={getHeight()} />
+      <rect
+        y="0"
+        x="0"
+        rx={getRadius(loaderSize)}
+        ry={getRadius(loaderSize)}
+        width={getWidth(loaderSize)}
+        height={getHeight(loaderSize)}
+      />
     </ContentLoader>
   );
 }
-
 export default BarLoader;
+
+const StyledContentLoader = styled(ContentLoader)`
+  padding: ${(props) => props.theme.spacing(1)}px;
+`;
+export function BetterBarLoader({ width, height }: { width: number; height: number }) {
+  return (
+    <StyledContentLoader
+      animate
+      speed={1}
+      interval={0.1}
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      backgroundColor={Theme.colors.elevation3}
+      foregroundColor={Theme.colors.grey}
+    >
+      <rect y="0" x="0" rx="2" ry="2" width={width} height={height} />
+    </StyledContentLoader>
+  );
+}

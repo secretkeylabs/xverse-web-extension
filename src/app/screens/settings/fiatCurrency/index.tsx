@@ -11,16 +11,16 @@ import { currencyList } from '../../../utils/currency';
 import CurrencyRow from './currencyRow';
 
 const Container = styled.div`
-display: flex;
-flex-direction: column;
-flex: 1;
-overflow-y: auto;
-padding-left: 16px;
-padding-right: 16px;
-padding-bottom: 16px;
-&::-webkit-scrollbar {
-  display: none;
-}
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 16px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 function FiatCurrencyScreen() {
@@ -57,7 +57,6 @@ function FiatCurrencyScreen() {
       </Container>
       <BottomBar tab="settings" />
     </>
-
   );
 }
 

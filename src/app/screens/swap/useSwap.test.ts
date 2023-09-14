@@ -14,22 +14,22 @@ type SelectedCurrencyState = {
 
 type Side = 'from' | 'to';
 
-function updateOppositeCurrencyIfSameAsSelected(state, {newCurrency, side}) {
+function updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side }) {
   switch (side) {
     case 'from':
       if (state.to !== newCurrency) {
         return state.to;
-      } 
+      }
       if (state.to === newCurrency && state.prevTo !== newCurrency) {
-        return state.prevTo; 
+        return state.prevTo;
       }
       return undefined;
     case 'to':
       if (state.from !== newCurrency) {
         return state.from;
-      } 
+      }
       if (state.from === newCurrency && state.prevFrom !== newCurrency) {
-        return state.prevFrom; 
+        return state.prevFrom;
       }
       return undefined;
     default:
@@ -46,14 +46,14 @@ const selectedTokenReducer: (
         ...state,
         prevFrom: state.from,
         from: newCurrency,
-        to: updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side })
+        to: updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side }),
       };
     case 'to':
       return {
         ...state,
         prevTo: state.to,
         to: newCurrency,
-        from: updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side })
+        from: updateOppositeCurrencyIfSameAsSelected(state, { newCurrency, side }),
       };
     default:
       return state;

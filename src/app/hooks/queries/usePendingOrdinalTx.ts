@@ -7,12 +7,16 @@ const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
   const { ordinalsAddress } = useWalletSelector();
   const btcClient = useBtcClient();
 
-  const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> => btcClient.getAddressMempoolTransactions(ordinalsAddress);
+  const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> =>
+    btcClient.getAddressMempoolTransactions(ordinalsAddress);
 
   let isPending: boolean | undefined = false;
   let pendingTxHash: string | undefined;
 
-  const response = useQuery(['ordinal-pending-transactions'], fetchOrdinalsMempoolTxs);
+  const response = useQuery({
+    queryKey: ['ordinal-pending-transactions'],
+    queryFn: fetchOrdinalsMempoolTxs,
+  });
 
   if (response.data) {
     response.data.forEach((tx) => {

@@ -18,7 +18,7 @@ interface TileProps {
 }
 
 interface TickerProps {
-  enlargeTicker? : boolean;
+  enlargeTicker?: boolean;
 }
 const TileContainer = styled.button<TileProps>((props) => ({
   display: 'flex',
@@ -93,7 +93,6 @@ const LoaderImageContainer = styled.div({
 const CoinTickerText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['0'],
-  textTransform: 'uppercase',
 }));
 
 const SubText = styled.h1((props) => ({
@@ -174,9 +173,7 @@ function TokenTile({
   fungibleToken,
   enlargeTicker = false,
 }: Props) {
-  const {
-    fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate,
-  } = useSelector(
+  const { fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate } = useSelector(
     (state: StoreState) => state.walletState,
   );
 
@@ -329,7 +326,8 @@ function TokenTile({
   }
 
   function renderIcon() {
-    if (currency === 'STX' || currency === 'BTC') return <TickerImage src={icon} enlargeTicker={enlargeTicker} />;
+    if (currency === 'STX' || currency === 'BTC')
+      return <TickerImage src={icon} enlargeTicker={enlargeTicker} />;
     return renderFTIcon();
   }
 
@@ -351,7 +349,6 @@ function TokenTile({
       <RowContainer>
         {renderIcon()}
         <TextContainer>
-
           <CoinTickerText>{getTickerTitle()}</CoinTickerText>
           <TokenTitleContainer>
             <SubText>{title}</SubText>

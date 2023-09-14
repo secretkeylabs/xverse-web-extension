@@ -12,6 +12,7 @@ const Button = styled.button`
   border-radius: 16px;
   justify-content: center;
   align-items: center;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
   background-color: ${(props) => props.theme.colors.action.classic};
   :hover {
     background-color: ${(props) => props.theme.colors.action.classicLight};

@@ -1,7 +1,5 @@
 import styled, { useTheme } from 'styled-components';
-import {
-  FacebookShareButton, TwitterShareButton, EmailShareButton,
-} from 'react-share';
+import { FacebookShareButton, TwitterShareButton, EmailShareButton } from 'react-share';
 import { useTranslation } from 'react-i18next';
 import FBIcon from '@assets/img/nftDashboard/shareNft/facebook-f.svg';
 import EmailIcon from '@assets/img/nftDashboard/shareNft/Envelope.svg';
@@ -49,20 +47,21 @@ function ShareDialog({ url, onCrossClick }: Props) {
       <CrossContainer onClick={onCrossClick}>
         <img src={Cross} alt="cross" width={16} height={16} />
       </CrossContainer>
-      <FacebookShareButton
-        url={url}
-      >
+      <FacebookShareButton url={url}>
         <ShareLinkRow img={FBIcon} background="#4267B2" text={t('FACEBOOK')} />
       </FacebookShareButton>
-      <TwitterShareButton
-        url={url}
-      >
+      <TwitterShareButton url={url}>
         <ShareLinkRow img={TwitterIcon} background="#4D9FEB" text={t('TWITTER')} />
       </TwitterShareButton>
       <EmailShareButton url={url}>
         <ShareLinkRow img={EmailIcon} background="#4C5187" text={t('MAIL')} />
       </EmailShareButton>
-      <ShareLinkRow onClick={onCopyPress} img={LinkIcon} background={theme.colors.white['400']} text={t('COPY')} />
+      <ShareLinkRow
+        onClick={onCopyPress}
+        img={LinkIcon}
+        background={theme.colors.white['400']}
+        text={t('COPY')}
+      />
     </Container>
   );
 }

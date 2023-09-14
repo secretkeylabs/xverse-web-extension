@@ -15,20 +15,16 @@ function useSendBtcRequest() {
   const request = decodeToken(requestToken) as any as SendBtcTransactionOptions;
   const tabId = params.get('tabId') ?? '0';
 
-  const {
-    network,
-    selectedAccount,
-    seedPhrase,
-  } = useWalletSelector();
+  const { network, selectedAccount, seedPhrase } = useWalletSelector();
 
   const generateSignedTransaction = async () => {
     const recipients: Recipient[] = [];
     request.payload?.recipients?.forEach(async (value) => {
-      const recipient: Recipient = {
+      const txRecipient: Recipient = {
         address: value.address,
-        amountSats: new BigNumber(value.amountSats),
+        amountSats: new BigNumber(value.amountSats.toString()),
       };
-      recipients.push(recipient);
+      recipients.push(txRecipient);
     });
     setRecipient(recipients);
     const signedTx = await signBtcTransaction(
@@ -42,7 +38,9 @@ function useSendBtcRequest() {
   };
 
   const {
-    data: signedTx, isLoading, error,
+    data: signedTx,
+    isLoading,
+    error,
   } = useQuery({
     queryKey: ['generate-signed-transaction'],
     queryFn: generateSignedTransaction,

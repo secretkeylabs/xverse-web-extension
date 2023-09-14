@@ -2,9 +2,7 @@ import { CurrencyTypes } from '@utils/constants';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import {
-  ReactNode, SetStateAction, useEffect, useState,
-} from 'react';
+import { ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { getTicker } from '@utils/helper';
 import { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
@@ -21,13 +19,15 @@ import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { getCurrencyFlag } from '@utils/currency';
 import useDebounce from '@hooks/useDebounce';
+import useWalletSelector from '@hooks/useWalletSelector';
+import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
 
 interface ContainerProps {
   error: boolean;
 }
 const ScrollContainer = styled.div`
   display: flex;
-  flex:1;
+  flex: 1;
   flex-direction: column;
   overflow-y: auto;
   &::-webkit-scrollbar {
@@ -120,7 +120,9 @@ const AmountInputContainer = styled.div<ContainerProps>((props) => ({
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
-  border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : `1px solid ${props.theme.colors.background.elevation3}`,
+  border: props.error
+    ? '1px solid rgba(211, 60, 60, 0.3)'
+    : `1px solid ${props.theme.colors.background.elevation3}`,
   backgroundColor: props.theme.colors.background.elevation_1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
@@ -136,7 +138,9 @@ const MemoInputContainer = styled.div<ContainerProps>((props) => ({
   flexDirection: 'row',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
-  border: props.error ? '1px solid rgba(211, 60, 60, 0.3)' : `1px solid ${props.theme.colors.background.elevation3}`,
+  border: props.error
+    ? '1px solid rgba(211, 60, 60, 0.3)'
+    : `1px solid ${props.theme.colors.background.elevation3}`,
   backgroundColor: props.theme.colors.background.elevation_1,
   borderRadius: 8,
   padding: props.theme.spacing(7),
@@ -158,6 +162,7 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
   opacity: props.enabled ? 1 : 0.6,
 }));
 
+/* TODO --------- move to separate file ------------- */
 const SwitchToFiatButton = styled.button((props) => ({
   backgroundColor: props.theme.colors.background.elevation0,
   border: `1px solid ${props.theme.colors.background.elevation3}`,
@@ -173,6 +178,48 @@ const SwitchToFiatText = styled.h1((props) => ({
   marginLeft: props.theme.spacing(2),
   color: props.theme.colors.white['0'],
 }));
+
+export function FiatRow({
+  onClick,
+  showFiat,
+  tokenCurrency,
+  tokenAmount,
+  fiatCurrency,
+  fiatAmount,
+}: {
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  showFiat: boolean;
+  tokenCurrency: string;
+  tokenAmount: string;
+  fiatCurrency: string;
+  fiatAmount: string;
+}) {
+  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  const renderText = (value: string) => `~ ${value} ${tokenCurrency}`;
+  return (
+    <RowContainer>
+      <SubText>
+        {showFiat ? (
+          <NumericFormat
+            value={tokenAmount}
+            displayType="text"
+            thousandSeparator
+            renderText={renderText}
+          />
+        ) : (
+          `~ $ ${fiatAmount} ${fiatCurrency}`
+        )}
+      </SubText>
+      <SwitchToFiatButton onClick={onClick}>
+        <img src={Switch} alt="Switch" />
+        <SwitchToFiatText>
+          {showFiat ? `${t('SWITCH_TO')} ${tokenCurrency}` : `${t('SWITCH_TO')} ${fiatCurrency}`}
+        </SwitchToFiatText>
+      </SwitchToFiatButton>
+    </RowContainer>
+  );
+}
+/* ---------------------------------------------- TODO */
 
 const CurrencyFlag = styled.img((props) => ({
   marginLeft: props.theme.spacing(4),
@@ -199,8 +246,10 @@ interface Props {
   processing?: boolean;
   children?: ReactNode;
   recipient?: string;
-  amountToSend? : string;
-  stxMemo? : string;
+  amountToSend?: string;
+  stxMemo?: string;
+  onAddressInputChange?: (recipientAddress: string) => void;
+  warning?: string;
 }
 
 function SendForm({
@@ -219,6 +268,8 @@ function SendForm({
   recipient,
   amountToSend,
   stxMemo,
+  onAddressInputChange,
+  warning,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   // TODO tim: use context instead of duplicated local state and parent state (as props)
@@ -230,24 +281,20 @@ function SendForm({
   const [addressError, setAddressError] = useState<string | undefined>(recepientError);
   const navigate = useNavigate();
 
-  const {
-    stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount } =
+    useWalletSelector();
   const network = useNetworkSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(recipientAddress, network);
-  const associatedAddress = useBNSResolver(
-    debouncedSearchTerm,
-    stxAddress,
-    currencyType,
-  );
+  const associatedAddress = useBNSResolver(debouncedSearchTerm, stxAddress, currencyType);
+  const { isAccountSwitched } = useClearFormOnAccountSwitch();
 
   useEffect(() => {
-    setAmount('');
-    setRecipientAddress('');
-  }, [selectedAccount]);
+    if (isAccountSwitched) {
+      setAmount('');
+      setRecipientAddress('');
+    }
+  }, [selectedAccount, isAccountSwitched]);
 
   useEffect(() => {
     if (recepientError) {
@@ -266,11 +313,17 @@ function SendForm({
       return;
     }
 
-    const amountInCurrency = getFiatEquivalent(Number(amountToSend), currencyType, stxBtcRate, btcFiatRate, fungibleToken);
+    const amountInCurrency = getFiatEquivalent(
+      Number(amountToSend),
+      currencyType,
+      stxBtcRate,
+      btcFiatRate,
+      fungibleToken,
+    );
     setFiatAmount(amountInCurrency);
   }, [amountToSend]);
 
-  function getTokenCurrency() {
+  function getTokenCurrency(): string {
     if (fungibleToken) {
       if (fungibleToken?.ticker) {
         return fungibleToken.ticker.toUpperCase();
@@ -278,9 +331,8 @@ function SendForm({
       if (fungibleToken?.name) {
         return getTicker(fungibleToken.name).toUpperCase();
       }
-    } else {
-      return currencyType;
     }
+    return currencyType;
   }
 
   const onSwitchPress = () => {
@@ -297,36 +349,36 @@ function SendForm({
       setAmount(newValue);
     }
 
-    const amountInCurrency = getFiatEquivalent(Number(newValue), currencyType, stxBtcRate, btcFiatRate, fungibleToken);
+    const amountInCurrency = getFiatEquivalent(
+      Number(newValue),
+      currencyType,
+      stxBtcRate,
+      btcFiatRate,
+      fungibleToken,
+    );
     setFiatAmount(amountInCurrency);
   };
 
-  function getTokenEquivalent(amount: string) {
-    if (
-      (currencyType === 'FT' && !fungibleToken?.tokenFiatRate)
-      || currencyType === 'NFT'
-    ) { return ''; }
-    if (!amount) return '0';
+  function getTokenEquivalent(tokenAmount: string) {
+    if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
+      return '';
+    }
+    if (!tokenAmount) return '0';
     switch (currencyType) {
       case 'STX':
-        return getStxTokenEquivalent(
-          new BigNumber(amount),
-          stxBtcRate,
-          btcFiatRate,
-        )
+        return getStxTokenEquivalent(new BigNumber(tokenAmount), stxBtcRate, btcFiatRate)
           .toFixed(6)
           .toString();
       case 'BTC':
-        return getBtcEquivalent(new BigNumber(amount), btcFiatRate)
-          .toFixed(8)
-          .toString();
+        return getBtcEquivalent(new BigNumber(tokenAmount), btcFiatRate).toFixed(8).toString();
       case 'FT':
         if (fungibleToken?.tokenFiatRate) {
-          return new BigNumber(amount)
+          return new BigNumber(tokenAmount)
             .dividedBy(fungibleToken.tokenFiatRate)
             .toFixed(fungibleToken.decimals ?? 2)
             .toString();
         }
+        return '';
       default:
         return '';
     }
@@ -341,10 +393,7 @@ function SendForm({
     <Container>
       <RowContainer>
         <TitleText>{t('AMOUNT')}</TitleText>
-        <BalanceText>
-          {t('BALANCE')}
-          :
-        </BalanceText>
+        <BalanceText>{t('BALANCE')}:</BalanceText>
         <Text>{balance}</Text>
       </RowContainer>
       <AmountInputContainer error={amountError !== ''}>
@@ -354,39 +403,27 @@ function SendForm({
         <Text>{getAmountLabel()}</Text>
         {switchToFiat && <CurrencyFlag src={getCurrencyFlag(fiatCurrency)} />}
       </AmountInputContainer>
-      <RowContainer>
-        <SubText>
-          {switchToFiat ? (
-            <NumericFormat
-              value={getTokenEquivalent(amount)}
-              displayType="text"
-              thousandSeparator
-              renderText={(value) => (`~ ${value} ${getTokenCurrency()}`)}
-            />
-          )
-            : `~ $ ${fiatAmount} ${fiatCurrency}`}
-
-        </SubText>
-        <SwitchToFiatButton onClick={onSwitchPress}>
-          <img src={Switch} alt="Switch" />
-          <SwitchToFiatText>
-            {switchToFiat
-              ? `${t('SWITCH_TO')} ${getTokenCurrency()}`
-              : `${t('SWITCH_TO')} ${fiatCurrency}`}
-          </SwitchToFiatText>
-        </SwitchToFiatButton>
-      </RowContainer>
+      <FiatRow
+        onClick={onSwitchPress}
+        showFiat={switchToFiat}
+        tokenCurrency={getTokenCurrency()}
+        tokenAmount={getTokenEquivalent(amount)}
+        fiatCurrency={fiatCurrency}
+        fiatAmount={fiatAmount ?? ''}
+      />
     </Container>
   );
 
-  const onAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRecipientAddress(e.target.value);
+    onAddressInputChange?.(e.target.value);
   };
 
   const getAddressInputPlaceholder = () => {
     if (currencyType === 'BTC') {
       return t('BTC_RECIPIENT_PLACEHOLDER');
-    } if (currencyType === 'Ordinal' || currencyType === 'brc20-Ordinal') {
+    }
+    if (currencyType === 'Ordinal' || currencyType === 'brc20-Ordinal') {
       return t('ORDINAL_RECIPIENT_PLACEHOLDER');
     }
     return t('RECIPIENT_PLACEHOLDER');
@@ -400,27 +437,37 @@ function SendForm({
           <InputField
             value={recipientAddress}
             placeholder={getAddressInputPlaceholder()}
-            onChange={onAddressInputChange}
+            onChange={handleAddressInputChange}
           />
         </InputFieldContainer>
       </AmountInputContainer>
-      {associatedAddress && currencyType !== 'BTC' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && (
-        <>
-          <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
-          <AssociatedText>{associatedAddress}</AssociatedText>
-        </>
-      )}
-      {associatedBnsName && currencyType !== 'BTC' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && (
-      <>
-        <SubText>{t('ASSOCIATED_BNS_DOMAIN')}</SubText>
-        <AssociatedText>{associatedBnsName}</AssociatedText>
-      </>
-      )}
+      {associatedAddress &&
+        currencyType !== 'BTC' &&
+        currencyType !== 'Ordinal' &&
+        currencyType !== 'brc20-Ordinal' && (
+          <>
+            <SubText>{t('ASSOCIATED_ADDRESS')}</SubText>
+            <AssociatedText>{associatedAddress}</AssociatedText>
+          </>
+        )}
+      {associatedBnsName &&
+        currencyType !== 'BTC' &&
+        currencyType !== 'Ordinal' &&
+        currencyType !== 'brc20-Ordinal' && (
+          <>
+            <SubText>{t('ASSOCIATED_BNS_DOMAIN')}</SubText>
+            <AssociatedText>{associatedBnsName}</AssociatedText>
+          </>
+        )}
     </Container>
   );
 
   const handleOnPress = () => {
-    onPressSend(associatedAddress !== '' ? associatedAddress : debouncedSearchTerm, switchToFiat ? getTokenEquivalent(amount) : amount, memo);
+    onPressSend(
+      associatedAddress !== '' ? associatedAddress : debouncedSearchTerm,
+      switchToFiat ? getTokenEquivalent(amount) : amount,
+      memo,
+    );
   };
 
   const onBuyClick = () => {
@@ -433,22 +480,43 @@ function SendForm({
 
   const checkIfEnableButton = () => {
     if (disableAmountInput) {
-      if (recipientAddress !== '' || associatedAddress !== '') { return true; }
+      if (recipientAddress !== '' || associatedAddress !== '') {
+        return true;
+      }
     } else if ((amount !== '' && recipientAddress !== '') || associatedAddress !== '') return true;
     return false;
   };
+
+  let displayedWarning = '';
+  if (warning) {
+    displayedWarning = warning;
+  } else {
+    switch (currencyType) {
+      case 'Ordinal':
+        displayedWarning = t('SEND_ORDINAL_WALLET_WARNING');
+        break;
+      case 'brc20-Ordinal':
+        displayedWarning = t('SEND_BRC20_ORDINAL_WALLET_WARNING');
+        break;
+      default:
+        break;
+    }
+  }
+
   return (
     <>
       <ScrollContainer>
-        {currencyType !== 'NFT' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && (
-        <TokenContainer>
-          <TokenImage
-            token={currencyType || undefined}
-            loading={false}
-            fungibleToken={fungibleToken || undefined}
-          />
-        </TokenContainer>
-        )}
+        {currencyType !== 'NFT' &&
+          currencyType !== 'Ordinal' &&
+          currencyType !== 'brc20-Ordinal' && (
+            <TokenContainer>
+              <TokenImage
+                token={currencyType || undefined}
+                loading={false}
+                fungibleToken={fungibleToken || undefined}
+              />
+            </TokenContainer>
+          )}
         <OuterContainer>
           {!disableAmountInput && renderEnterAmountSection}
           <ErrorContainer>
@@ -460,42 +528,38 @@ function SendForm({
           <ErrorContainer>
             <ErrorText>{addressError}</ErrorText>
           </ErrorContainer>
-          {currencyType !== 'BTC' && currencyType !== 'NFT' && currencyType !== 'Ordinal' && currencyType !== 'brc20-Ordinal' && !hideMemo && (
-          <>
-            <Container>
-              <TitleText>{t('MEMO')}</TitleText>
-              <MemoInputContainer error={memoError !== ''}>
-                <InputFieldContainer>
-                  <InputField
-                    value={memo}
-                    placeholder={t('MEMO_PLACEHOLDER')}
-                    onChange={(e: { target: { value: SetStateAction<string>; }; }) => setMemo(e.target.value)}
-                  />
-                </InputFieldContainer>
-              </MemoInputContainer>
-            </Container>
-            <MemoContainer>
-              <ErrorText>{memoError}</ErrorText>
-            </MemoContainer>
-            <InfoContainer bodyText={t('MEMO_INFO')} />
-          </>
+          {currencyType !== 'BTC' &&
+            currencyType !== 'NFT' &&
+            currencyType !== 'Ordinal' &&
+            currencyType !== 'brc20-Ordinal' &&
+            !hideMemo && (
+              <>
+                <Container>
+                  <TitleText>{t('MEMO')}</TitleText>
+                  <MemoInputContainer error={memoError !== ''}>
+                    <InputFieldContainer>
+                      <InputField
+                        value={memo}
+                        placeholder={t('MEMO_PLACEHOLDER')}
+                        onChange={(e: { target: { value: SetStateAction<string> } }) =>
+                          setMemo(e.target.value)
+                        }
+                      />
+                    </InputFieldContainer>
+                  </MemoInputContainer>
+                </Container>
+                <MemoContainer>
+                  <ErrorText>{memoError}</ErrorText>
+                </MemoContainer>
+                <InfoContainer bodyText={t('MEMO_INFO')} />
+              </>
+            )}
+          {displayedWarning && (
+            <OrdinalInfoContainer>
+              <InfoContainer bodyText={displayedWarning} type="Warning" />
+            </OrdinalInfoContainer>
           )}
-          {
-            currencyType === 'Ordinal' && (
-              <OrdinalInfoContainer>
-                <InfoContainer bodyText={t('SEND_ORDINAL_WALLET_WARNING')} type="Warning" />
-              </OrdinalInfoContainer>
-            )
-          }
-          {
-            currencyType === 'brc20-Ordinal' && (
-              <OrdinalInfoContainer>
-                <InfoContainer bodyText={t('SEND_BRC20_ORDINAL_WALLET_WARNING')} />
-              </OrdinalInfoContainer>
-            )
-          }
         </OuterContainer>
-
       </ScrollContainer>
       <SendButtonContainer enabled={checkIfEnableButton()}>
         <ActionButton
@@ -504,7 +568,6 @@ function SendForm({
           onPress={handleOnPress}
         />
       </SendButtonContainer>
-
     </>
   );
 }

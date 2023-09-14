@@ -7,7 +7,7 @@ import {
   ChangeNetworkKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
-  AddLedgerAccountKey,
+  UpdateLedgerAccountsKey,
   FetchAccountKey,
   GetActiveAccountsKey,
   LockWalletKey,
@@ -92,7 +92,7 @@ const walletReducer = (
         ...state,
         accountsList: action.accountsList,
       };
-    case AddLedgerAccountKey:
+    case UpdateLedgerAccountsKey:
       return {
         ...state,
         ledgerAccountsList: action.ledgerAccountsList,

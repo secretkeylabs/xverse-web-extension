@@ -2,21 +2,15 @@ import BottomModal from '@components/bottomModal';
 import { useTranslation } from 'react-i18next';
 import Cross from '@assets/img/dashboard/X.svg';
 import styled from 'styled-components';
-import OrdinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
-import StacksIcon from '@assets/img/nftDashboard/stacks_icon.svg';
+import ordinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
+import stacksIcon from '@assets/img/nftDashboard/stacks_icon.svg';
+import plusIcon from '@assets/img/dashboard/plus.svg';
 import { useNavigate } from 'react-router-dom';
 import useWalletSelector from '@hooks/useWalletSelector';
 import ActionButton from '@components/button';
 import { useState } from 'react';
 import { isLedgerAccount } from '@utils/helper';
 import ReceiveCardComponent from '../../../components/receiveCardComponent';
-
-interface Props {
-  visible: boolean;
-  onClose: () => void;
-  setOrdinalReceiveAlert: () => void;
-  isGalleryOpen: boolean;
-}
 
 const ColumnContainer = styled.div((props) => ({
   display: 'flex',
@@ -32,12 +26,13 @@ const Icon = styled.img({
   height: 24,
 });
 
-const RowContainer = styled.div({
+const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'space-between',
-  margin: '24px 24px 20px 24px',
-});
+  margin: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(10),
+}));
 
 const ButtonImage = styled.button({
   backgroundColor: 'transparent',
@@ -48,21 +43,37 @@ const Text = styled.h1((props) => ({
   flex: 1,
 }));
 
-const VerifyOrViewContainer = styled.div(props => ({
+const VerifyOrViewContainer = styled.div((props) => ({
   margin: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(20),
 }));
 
-const VerifyButtonContainer = styled.div(props => ({
+const VerifyButtonContainer = styled.div((props) => ({
+  minWidth: 300,
   marginBottom: props.theme.spacing(6),
 }));
+
+const AddStxButtonContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(6),
+}));
+
+interface Props {
+  visible: boolean;
+  onClose: () => void;
+  setOrdinalReceiveAlert: () => void;
+  isGalleryOpen: boolean;
+}
 
 function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAlert }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress, ordinalsAddress, showOrdinalReceiveAlert, selectedAccount } = useWalletSelector();
-  const [isReceivingAddressesVisible, setIsReceivingAddressesVisible] = useState(!isLedgerAccount(selectedAccount));
+  const { stxAddress, ordinalsAddress, showOrdinalReceiveAlert, selectedAccount } =
+    useWalletSelector();
+  const [isReceivingAddressesVisible, setIsReceivingAddressesVisible] = useState(
+    !isLedgerAccount(selectedAccount),
+  );
+  const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
 
   const onReceivePress = () => {
     navigate('/receive/STX');
@@ -73,16 +84,28 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
   };
 
   const onOrdinalReceiveAlertOpen = () => {
-    if (showOrdinalReceiveAlert)
-    setOrdinalReceiveAlert();
+    if (showOrdinalReceiveAlert) setOrdinalReceiveAlert();
   };
 
-  const onReceiveModalClose = () => {
+  const handleReceiveModalClose = () => {
     if (isLedgerAccount(selectedAccount)) {
       setIsReceivingAddressesVisible(false);
     }
 
+    if (choseToVerifyAddresses) {
+      setChoseToVerifyAddresses(false);
+    }
+
     onClose();
+  };
+
+  const handleReceiveModalOpen = () => {
+    setIsReceivingAddressesVisible(true);
+  };
+
+  const handleVerifyAddresses = () => {
+    setChoseToVerifyAddresses(true);
+    handleReceiveModalOpen();
   };
 
   const receiveContent = (
@@ -92,18 +115,38 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           title={t('ORDINALS')}
           address={ordinalsAddress}
           onQrAddressClick={onOrdinalsReceivePress}
+          showVerifyButton={choseToVerifyAddresses}
+          currency="ORD"
         >
-          <Icon src={OrdinalsIcon} />
+          <Icon src={ordinalsIcon} />
         </ReceiveCardComponent>
       )}
+
       {stxAddress && (
         <ReceiveCardComponent
           title={t('STACKS_NFT')}
           address={stxAddress}
           onQrAddressClick={onReceivePress}
+          showVerifyButton={choseToVerifyAddresses}
+          currency="STX"
         >
-          <Icon src={StacksIcon} />
+          <Icon src={stacksIcon} />
         </ReceiveCardComponent>
+      )}
+
+      {isLedgerAccount(selectedAccount) && !stxAddress && (
+        <AddStxButtonContainer>
+          <ActionButton
+            transparent
+            src={plusIcon}
+            text={t('ADD_STACKS_ADDRESS')}
+            onPress={async () => {
+              await chrome.tabs.create({
+                url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+              });
+            }}
+          />
+        </AddStxButtonContainer>
       )}
     </ColumnContainer>
   );
@@ -111,15 +154,20 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
   const verifyOrViewAddresses = (
     <VerifyOrViewContainer>
       <VerifyButtonContainer>
-        <ActionButton text="Verify address on Ledger" onPress={async () => {
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=ORD`),
-          });
-        }} />
+        <ActionButton
+          text={t('VERIFY_ADDRESS_ON_LEDGER')}
+          onPress={
+            !stxAddress
+              ? async () => {
+                  await chrome.tabs.create({
+                    url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=ORD`),
+                  });
+                }
+              : handleVerifyAddresses
+          }
+        />
       </VerifyButtonContainer>
-      <ActionButton transparent text="View address" onPress={() => {
-        setIsReceivingAddressesVisible(true);
-      }} />
+      <ActionButton transparent text={t('VIEW_ADDRESS')} onPress={handleReceiveModalOpen} />
     </VerifyOrViewContainer>
   );
 
@@ -127,14 +175,14 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
     <>
       <RowContainer>
         <Text>{t('RECEIVE_NFT')}</Text>
-        <ButtonImage onClick={onReceiveModalClose}>
+        <ButtonImage onClick={handleReceiveModalClose}>
           <img src={Cross} alt="cross" />
         </ButtonImage>
       </RowContainer>
       {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
     </>
   ) : (
-    <BottomModal visible={visible} header={t('RECEIVE_NFT')} onClose={onReceiveModalClose}>
+    <BottomModal visible={visible} header={t('RECEIVE_NFT')} onClose={handleReceiveModalClose}>
       {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
     </BottomModal>
   );

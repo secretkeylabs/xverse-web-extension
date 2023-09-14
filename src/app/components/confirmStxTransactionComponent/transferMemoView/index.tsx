@@ -33,9 +33,7 @@ interface Props {
   memo: string;
 }
 
-function TransferMemoView({
-  memo,
-}: Props) {
+function TransferMemoView({ memo }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   return (
@@ -43,7 +41,7 @@ function TransferMemoView({
       <RowContainer>
         <TitleText>{t('MEMO')}</TitleText>
       </RowContainer>
-      <DescriptionText>{ memo}</DescriptionText>
+      <DescriptionText>{memo}</DescriptionText>
     </Container>
   );
 }

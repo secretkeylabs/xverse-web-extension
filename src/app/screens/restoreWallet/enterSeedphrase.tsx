@@ -11,10 +11,11 @@ const Container = styled.div({
 });
 
 const Title = styled.h1((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.body_m,
   color: props.theme.colors.white[200],
   marginTop: props.theme.spacing(21),
   marginBottom: props.theme.spacing(16),
+  textAlign: 'center',
 }));
 
 const ButtonContainer = styled.div((props) => ({
@@ -32,21 +33,14 @@ interface Props {
 }
 
 function EnterSeedPhrase(props: Props): JSX.Element {
-  const {
-    onContinue, seed, setSeed, seedError, setSeedError,
-  } = props;
+  const { onContinue, seed, setSeed, seedError, setSeedError } = props;
 
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
 
   return (
     <Container>
       <Title>{t('ENTER_SEED_HEADER')}</Title>
-      <SeedPhraseInput
-        seed={seed}
-        onSeedChange={setSeed}
-        seedError={seedError}
-        setSeedError={setSeedError}
-      />
+      <SeedPhraseInput onSeedChange={setSeed} seedError={seedError} setSeedError={setSeedError} />
       <ButtonContainer>
         <ActionButton onPress={onContinue} disabled={seed === ''} text={t('CONTINUE_BUTTON')} />
       </ButtonContainer>

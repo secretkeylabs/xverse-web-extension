@@ -51,9 +51,7 @@ interface Props {
   currency: string;
   title?: string;
 }
-function TransferFeeView({
-  feePerVByte, fee, currency, title,
-}: Props) {
+function TransferFeeView({ feePerVByte, fee, currency, title }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { btcFiatRate, stxBtcRate, fiatCurrency } = useSelector(
     (state: StoreState) => state.walletState,

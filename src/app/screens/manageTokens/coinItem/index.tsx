@@ -3,9 +3,9 @@ import stc from 'string-to-color';
 import styled from 'styled-components';
 import Switch from 'react-switch';
 import { Coin } from '@secretkeylabs/xverse-core/types';
-import Theme from 'theme';
 import { getTicker } from '@utils/helper';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
+import Theme from 'theme';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -33,11 +33,11 @@ const CoinIcon = styled.img((props) => ({
 }));
 
 const CustomSwitch = styled(Switch)`
-.react-switch-handle {
-  background-color: ${({ checked }) => (checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)')} !important;
-  border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
-
-}
+  .react-switch-handle {
+    background-color: ${({ checked }) =>
+      checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'} !important;
+    border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
+  }
 `;
 
 const TickerIconContainer = styled.div((props) => ({
@@ -79,9 +79,7 @@ interface Props {
   showDivider: boolean;
 }
 
-function CoinItem({
-  coin, disabled, toggled, enabled, showDivider,
-}: Props) {
+function CoinItem({ coin, disabled, toggled, enabled, showDivider }: Props) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const toggleSwitch = () => {
     setIsEnabled((previousState) => !previousState);
@@ -98,13 +96,14 @@ function CoinItem({
     <>
       <RowContainer>
         <CoinContainer>
-          {coin.image ? <CoinIcon src={coin.image} />
-            : (
-              <TickerIconContainer color={background}>
-                <TickerText>{getFtTicker()}</TickerText>
-              </TickerIconContainer>
-            )}
-          { isEnabled ? (
+          {coin.image ? (
+            <CoinIcon src={coin.image} />
+          ) : (
+            <TickerIconContainer color={background}>
+              <TickerText>{getFtTicker()}</TickerText>
+            </TickerIconContainer>
+          )}
+          {isEnabled ? (
             <SelectedCoinTitleText>{coin.name}</SelectedCoinTitleText>
           ) : (
             <UnSelectedCoinTitleText>{coin.name}</UnSelectedCoinTitleText>
@@ -120,7 +119,7 @@ function CoinItem({
           disabled={disabled}
         />
       </RowContainer>
-      {showDivider ? <Seperator /> : <BottomContainer />}
+      {showDivider ? <Separator /> : <BottomContainer />}
     </>
   );
 }

@@ -53,9 +53,7 @@ interface StxTransferTransactionProps {
 
 export default function StxTransferTransaction(props: StxTransferTransactionProps) {
   const { transaction, transactionCoin } = props;
-  const {
-    network,
-  } = useWalletSelector();
+  const { network } = useWalletSelector();
 
   const openTxStatusUrl = () => {
     window.open(getStxTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
@@ -69,7 +67,6 @@ export default function StxTransferTransaction(props: StxTransferTransactionProp
           <TransactionAmountContainer>
             <TransactionAmount transaction={transaction} coin={transactionCoin} />
           </TransactionAmountContainer>
-
         </TransactionRow>
         <TransactionRecipient transaction={transaction} />
       </TransactionInfoContainer>

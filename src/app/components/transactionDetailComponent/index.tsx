@@ -48,17 +48,13 @@ const TitleContainer = styled.div({
 interface Props {
   title: string;
   subTitle?: string;
-  value?: string;
+  value?: string | React.ReactNode;
   description?: string;
   subValue?: BigNumber;
 }
 
-function TransactionDetailComponent({
-  title, subTitle, value, subValue, description,
-}: Props) {
-  const {
-    fiatCurrency,
-  } = useSelector((state: StoreState) => state.walletState);
+function TransactionDetailComponent({ title, subTitle, value, subValue, description }: Props) {
+  const { fiatCurrency } = useSelector((state: StoreState) => state.walletState);
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (fiatAmount) {

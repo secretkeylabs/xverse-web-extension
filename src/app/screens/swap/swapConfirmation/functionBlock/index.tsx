@@ -6,7 +6,7 @@ const FunctionName = styled.div((props) => ({
   ...props.theme.body_medium_m,
   marginLeft: 10,
   color: props.theme.colors.white[0],
-  textAlign: 'right'
+  textAlign: 'right',
 }));
 
 interface FunctionBlockProps {

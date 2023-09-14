@@ -35,11 +35,11 @@ function TransactionStatusIcon(props: TransactionStatusIconPros) {
   }
   if (currency === 'BTC') {
     const tx = transaction as BtcTransactionData;
-    if (tx.isOrdinal) {
-      return <img src={OrdinalsIcon} alt="ordinals-transfer" />;
-    }
     if (tx.txStatus === 'pending') {
       return <img src={PendingIcon} alt="pending" />;
+    }
+    if (tx.isOrdinal) {
+      return <img src={OrdinalsIcon} alt="ordinals-transfer" />;
     }
     if (tx.incoming) {
       return <img src={ReceiveIcon} alt="received" />;

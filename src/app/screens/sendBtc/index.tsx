@@ -28,16 +28,12 @@ function SendBtcScreen() {
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
+  const [warning, setWarning] = useState('');
   const [recipient, setRecipient] = useState<Recipient[]>();
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const {
-    btcAddress,
-    network,
-    btcBalance,
-    selectedAccount,
-    seedPhrase,
-    btcFiatRate,
-  } = useSelector((state: StoreState) => state.walletState);
+  const { btcAddress, network, btcBalance, selectedAccount, seedPhrase, btcFiatRate } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 
   const navigate = useNavigate();
@@ -52,8 +48,16 @@ function SendBtcScreen() {
     {
       recipients: Recipient[];
     }
-  >({ mutationFn: async ({ recipients }) =>
-    signBtcTransaction(recipients, btcAddress, selectedAccount?.id ?? 0, seedPhrase, network.type) });
+  >({
+    mutationFn: async ({ recipients }) =>
+      signBtcTransaction(
+        recipients,
+        btcAddress,
+        selectedAccount?.id ?? 0,
+        seedPhrase,
+        network.type,
+      ),
+  });
 
   const handleBackButtonClick = () => {
     navigate('/');
@@ -79,8 +83,7 @@ function SendBtcScreen() {
     }
   }, [data]);
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/send-btc'), []);
+  useResetUserFlow('/send-btc');
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {
@@ -105,11 +108,6 @@ function SendBtcScreen() {
 
     if (!validateBtcAddress({ btcAddress: address, network: network.type })) {
       setAddressError(t('ERRORS.ADDRESS_INVALID'));
-      return false;
-    }
-
-    if (address === btcAddress) {
-      setAddressError(t('ERRORS.SEND_TO_SELF'));
       return false;
     }
 
@@ -165,6 +163,13 @@ function SendBtcScreen() {
 
   const showNavButtons = !isInOptions();
 
+  const handleInputChange = (inputAddress: string) => {
+    if (inputAddress === btcAddress) {
+      return setWarning(t('SEND_BTC_TO_SELF_WARNING'));
+    }
+    setWarning('');
+  };
+
   return (
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton={showNavButtons} />
@@ -177,6 +182,8 @@ function SendBtcScreen() {
         recipient={recipientAddress}
         amountToSend={amount}
         processing={recipientAddress !== '' && amount !== '' && isLoading}
+        onAddressInputChange={handleInputChange}
+        warning={warning}
       />
       <BottomBar tab="dashboard" />
     </>

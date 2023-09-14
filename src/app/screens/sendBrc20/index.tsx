@@ -1,29 +1,29 @@
-import styled from 'styled-components';
-import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import ActionButton from '@components/button';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  ErrorCodes,
   createBrc20TransferOrder,
   getBtcFiatEquivalent,
   signBtcTransaction,
-  ErrorCodes,
 } from '@secretkeylabs/xverse-core';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useWalletSelector from '@hooks/useWalletSelector';
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import ActionButton from '@components/button';
+import BigNumber from 'bignumber.js';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import Brc20TransferForm from './brc20TransferForm';
 import Brc20TransferInfo from './brc20TransferInfo';
 
-const BRC20TokenTagContainer = styled.div({
+const BRC20TokenTagContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  marginTop: 6,
-});
+  marginTop: props.theme.spacing(3),
+}));
 
 const BRC20TokenTag = styled.div((props) => ({
   background: props.theme.colors.white[400],
@@ -54,20 +54,33 @@ function SendBrc20Screen() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
   const {
-    btcAddress, ordinalsAddress, selectedAccount, seedPhrase, network, btcFiatRate, brcCoinsList
+    btcAddress,
+    ordinalsAddress,
+    selectedAccount,
+    seedPhrase,
+    network,
+    btcFiatRate,
+    brcCoinsList,
   } = useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [showForm, setShowForm] = useState(false);
-
   const location = useLocation();
 
-  const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
-  const fungibleToken = location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.name === coinName);
+  const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
+  const fungibleToken =
+    location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.ticker === coinTicker);
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/send-brc20'), []);
+  const isSendButtonEnabled =
+    amountToSend !== '' &&
+    !Number.isNaN(Number(amountToSend)) &&
+    !Number.isNaN(Number(fungibleToken.balance)) &&
+    +amountToSend > 0 &&
+    +amountToSend <= +fungibleToken.balance;
+  const isActionButtonEnabled = showForm ? isSendButtonEnabled : true;
+
+  useResetUserFlow('/send-brc20');
 
   const handleBackButtonClick = () => {
     if (showForm) {
@@ -87,13 +100,6 @@ function SendBrc20Screen() {
     } else {
       setAmountToSend(newValue);
     }
-  };
-
-  const checkIfEnableButton = () => {
-    if (amountToSend !== '' || amountToSend <= fungibleToken.balance) {
-      return true;
-    }
-    return false;
   };
 
   const handleInscribeTransferOrder = async () => {
@@ -183,10 +189,10 @@ function SendBrc20Screen() {
 
   return (
     <>
-      <TopRow title={t('SEND_BRC_20.SEND')} onClick={handleBackButtonClick} />
+      <TopRow title={t('SEND_BRC20.SEND')} onClick={handleBackButtonClick} />
       <BRC20TokenTagContainer>
         <BRC20TokenTag>
-          <h1>{t('SEND_BRC_20.BRC20_TOKEN')}</h1>
+          <h1>{t('SEND_BRC20.BRC20_TOKEN')}</h1>
         </BRC20TokenTag>
       </BRC20TokenTagContainer>
       {showForm ? (
@@ -199,13 +205,14 @@ function SendBrc20Screen() {
       ) : (
         <Brc20TransferInfo />
       )}
-      <SendButtonContainer enabled={checkIfEnableButton()}>
+      <SendButtonContainer enabled={isActionButtonEnabled}>
         <ActionButton
           text={
-            showForm ? t('SEND_BRC_20.SEND_NEXT_BUTTON') : t('SEND_BRC_20.SEND_INFO_START_BUTTON')
+            showForm ? t('SEND_BRC20.SEND_NEXT_BUTTON') : t('SEND_BRC20.SEND_INFO_START_BUTTON')
           }
           processing={isCreatingOrder}
           onPress={handleNext}
+          disabled={!isActionButtonEnabled}
         />
       </SendButtonContainer>
       <BottomBar tab="dashboard" />

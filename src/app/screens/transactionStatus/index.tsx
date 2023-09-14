@@ -10,12 +10,13 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import CopyButton from '@components/copyButton';
 import InfoContainer from '@components/infoContainer';
 
-const TxStatusContainer = styled.div((props) => ({
-  background: props.theme.colors.background.elevation0,
+const TxStatusContainer = styled.div({
+  background: 'rgba(25, 25, 48, 0.74)',
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-}));
+  backdropFilter: 'blur(16px)',
+});
 
 const Container = styled.div({
   display: 'flex',
@@ -44,7 +45,9 @@ const TransactionIDContainer = styled.div((props) => ({
 const ButtonContainer = styled.div((props) => ({
   flex: 1,
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'flex-end',
+  gap: props.theme.spacing(6),
   marginTop: props.theme.spacing(15),
   marginBottom: props.theme.spacing(32),
   marginLeft: props.theme.spacing(8),
@@ -92,6 +95,9 @@ const BodyText = styled.h1((props) => ({
   color: props.theme.colors.white['400'],
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
+  overflowWrap: 'break-word',
+  wordWrap: 'break-word',
+  wordBreak: 'break-word',
   marginLeft: props.theme.spacing(5),
   marginRight: props.theme.spacing(5),
 }));
@@ -137,8 +143,19 @@ function TransactionStatus() {
   const navigate = useNavigate();
   const location = useLocation();
   const { network } = useWalletSelector();
+  // TODO tim: refactor to use react context
   const {
-    txid, currency, error, sponsored, browserTx, isOrdinal, isNft, errorTitle, isBrc20TokenFlow,
+    txid,
+    currency,
+    error,
+    sponsored,
+    browserTx,
+    isOrdinal,
+    isNft,
+    errorTitle,
+    isBrc20TokenFlow,
+    isSponsorServiceError,
+    isSwapTransaction,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -174,13 +191,15 @@ function TransactionStatus() {
     else navigate(-3);
   };
 
+  const handleClickTrySwapAgain = () => {
+    navigate('/swap');
+  };
+
   const renderLink = (
     <RowContainer>
       <BeforeButtonText>{t('SEE_ON')}</BeforeButtonText>
       <Button onClick={openTransactionInBrowser}>
-        <ButtonText>
-          {currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}
-        </ButtonText>
+        <ButtonText>{currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}</ButtonText>
         <ButtonImage src={ArrowSquareOut} />
       </Button>
     </RowContainer>
@@ -203,11 +222,29 @@ function TransactionStatus() {
       <OuterContainer>
         {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
         {txid && renderLink}
-        {isBrc20TokenFlow ? <InfoMessageContainer><InfoContainer bodyText={t('BRC20_ORDINAL_MSG')} /></InfoMessageContainer> : txid && renderTransactionID}
+        {isBrc20TokenFlow ? (
+          <InfoMessageContainer>
+            <InfoContainer bodyText={t('BRC20_ORDINAL_MSG')} />
+          </InfoMessageContainer>
+        ) : (
+          txid && renderTransactionID
+        )}
+        {isSponsorServiceError && (
+          <InfoMessageContainer>
+            <InfoContainer bodyText={t('SPONSOR_SERVICE_ERROR')} />
+          </InfoMessageContainer>
+        )}
       </OuterContainer>
-      <ButtonContainer>
-        <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
-      </ButtonContainer>
+      {isSwapTransaction && isSponsorServiceError ? (
+        <ButtonContainer>
+          <ActionButton text={t('RETRY')} onPress={handleClickTrySwapAgain} />
+          <ActionButton text={t('CLOSE')} onPress={onCloseClick} transparent />
+        </ButtonContainer>
+      ) : (
+        <ButtonContainer>
+          <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
+        </ButtonContainer>
+      )}
     </TxStatusContainer>
   );
 }

@@ -22,6 +22,10 @@ const Logo = styled.img({
   height: 57,
 });
 
+const Button = styled.button({
+  background: 'none',
+});
+
 const ScreenContainer = styled(animated.div)({
   display: 'flex',
   flexDirection: 'column',
@@ -160,7 +164,8 @@ function Login(): JSX.Element {
     try {
       await decryptSeedPhrase(encryptedSeed, password);
       const hasMigrated = localStorage.getItem('migrated');
-      const isReminderDue = Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
+      const isReminderDue =
+        Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
       if (!hasMigrated && isReminderDue) {
         setShowMigration(true);
       } else {
@@ -211,13 +216,9 @@ function Login(): JSX.Element {
                 placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
                 autoFocus
               />
-              <button
-                type="button"
-                onClick={handleTogglePasswordView}
-                style={{ background: 'none' }}
-              >
+              <Button type="button" onClick={handleTogglePasswordView}>
                 <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
-              </button>
+              </Button>
             </PasswordInputContainer>
             {error && <ErrorMessage>{error}</ErrorMessage>}
             <ButtonContainer>
@@ -233,7 +234,10 @@ function Login(): JSX.Element {
           </ContentContainer>
         </ScreenContainer>
       ) : (
-        <MigrationConfirmation migrateCallback={handleMigrateCache} skipCallback={handleSkipMigration} />
+        <MigrationConfirmation
+          migrateCallback={handleMigrateCache}
+          skipCallback={handleSkipMigration}
+        />
       )}
     </>
   );

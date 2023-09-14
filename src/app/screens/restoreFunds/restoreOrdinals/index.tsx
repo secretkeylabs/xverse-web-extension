@@ -1,21 +1,21 @@
-import { useMutation } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { BtcOrdinal, ErrorCodes, Inscription } from '@secretkeylabs/xverse-core/types';
+import ActionButton from '@components/button';
+import BottomTabBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
   SignedBtcTx,
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
-import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
-import TopRow from '@components/topRow';
+import { BtcOrdinal, ErrorCodes, Inscription } from '@secretkeylabs/xverse-core/types';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import ActionButton from '@components/button';
-import BottomTabBar from '@components/tabBar';
-import OrdinalRow from './oridnalRow';
+import OrdinalRow from './ordinalRow';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
@@ -53,13 +53,13 @@ const ButtonContainer = styled.div({
 
 function RestoreOrdinals() {
   const { t } = useTranslation('translation');
-  const {
-    network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate,
-  } = useWalletSelector();
+  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+    useWalletSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const [error, setError] = useState('');
+  const [transferringOrdinalId, setTransferringOrdinalId] = useState<string | null>(null);
   const location = useLocation();
   const isRestoreFundFlow = location.state?.isRestoreFundFlow;
 
@@ -69,18 +69,20 @@ function RestoreOrdinals() {
     isLoading,
     error: transactionError,
     mutateAsync,
-  } = useMutation<SignedBtcTx, string, BtcOrdinal>({ mutationFn: async (ordinal) => {
-    const tx = await signOrdinalSendTransaction(
-      ordinalsAddress,
-      ordinal.utxo,
-      btcAddress,
-      Number(selectedAccount?.id),
-      seedPhrase,
-      network.type,
-      ordinalsUtxos!,
-    );
-    return tx;
-  } });
+  } = useMutation<SignedBtcTx, string, BtcOrdinal>({
+    mutationFn: async (ordinal) => {
+      const tx = await signOrdinalSendTransaction(
+        ordinalsAddress,
+        ordinal.utxo,
+        btcAddress,
+        Number(selectedAccount?.id),
+        seedPhrase,
+        network.type,
+        ordinalsUtxos!,
+      );
+      return tx;
+    },
+  });
 
   useEffect(() => {
     if (transactionError) {
@@ -101,6 +103,8 @@ function RestoreOrdinals() {
   };
 
   const onClickTransfer = async (selectedOrdinal: BtcOrdinal, ordinalData: Inscription) => {
+    setTransferringOrdinalId(selectedOrdinal.id);
+
     const signedTx = await mutateAsync(selectedOrdinal);
     setSelectedOrdinalDetails(ordinalData);
     navigate(`/confirm-ordinal-tx/${selectedOrdinal.id}`, {
@@ -133,7 +137,8 @@ function RestoreOrdinals() {
             <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
             {ordinals?.map((ordinal) => (
               <OrdinalRow
-                isLoading={isLoading}
+                isLoading={transferringOrdinalId === ordinal.id}
+                disableTransfer={isLoading}
                 handleOrdinalTransfer={onClickTransfer}
                 ordinal={ordinal}
                 key={ordinal.id}

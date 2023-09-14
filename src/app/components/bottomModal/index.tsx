@@ -1,7 +1,7 @@
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
 import Cross from '@assets/img/dashboard/X.svg';
-import Seperator from '@components/seperator';
+import Separator from '@components/separator';
 
 const BottomModalHeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -24,6 +24,7 @@ interface Props {
   visible: boolean;
   children: React.ReactNode;
   onClose: () => void;
+  overlayStylesOverriding?: {};
 }
 
 const CustomisedModal = styled(Modal)`
@@ -35,7 +36,7 @@ const CustomisedModal = styled(Modal)`
   position: absolute;
 `;
 
-function BottomModal({ header, children, visible, onClose }: Props) {
+function BottomModal({ header, children, visible, onClose, overlayStylesOverriding }: Props) {
   const theme = useTheme();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const customStyles = {
@@ -45,6 +46,7 @@ function BottomModal({ header, children, visible, onClose }: Props) {
       width: 360,
       margin: 'auto',
       zIndex: 15000,
+      ...overlayStylesOverriding,
     },
     content: {
       inset: 'auto auto 0px auto',
@@ -76,7 +78,7 @@ function BottomModal({ header, children, visible, onClose }: Props) {
           <img src={Cross} alt="cross" />
         </ButtonImage>
       </RowContainer>
-      {header && <Seperator />}
+      {header && <Separator />}
       {children}
     </CustomisedModal>
   );

@@ -21,7 +21,8 @@ import useNetworkSelector from '@hooks/useNetwork';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import BottomModal from '@components/bottomModal';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import LedgerConnectDefault from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { ledgerDelay } from '@common/utils/ledger';
 import { isHardwareAccount } from '@utils/helper';
 
@@ -42,10 +43,11 @@ const Container = styled.div`
 export const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginBottom: props.theme.spacing(12),
-  marginTop: props.theme.spacing(12),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(12),
+  paddingBottom: props.theme.spacing(12),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  backgroundColor: props.theme.colors.background.elevation0,
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -85,7 +87,7 @@ const SuccessActionsContainer = styled.div((props) => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
-  gap: '12px',
+  gap: props.theme.spacing(6),
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(20),
@@ -135,18 +137,21 @@ function ConfirmStxTransationComponent({
   skipModal = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t: signatureRequestTranslate } = useTranslation('translation', {
+    keyPrefix: 'SIGNATURE_REQUEST',
+  });
   const selectedNetwork = useNetworkSelector();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const { selectedAccount, seedPhrase } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-  const [isConnectSuccess, setIsConnectSuccess] = useState<boolean>(false);
-  const [isConnectFailed, setIsConnectFailed] = useState<boolean>(false);
-  const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
-  const [isTxRejected, setIsTxRejected] = useState<boolean>(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState(false);
+  const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isTxApproved, setIsTxApproved] = useState(false);
+  const [isTxRejected, setIsTxRejected] = useState(false);
 
   useEffect(() => {
     setButtonLoading(loading);
@@ -159,7 +164,7 @@ function ConfirmStxTransationComponent({
           initialStxTransactions
             .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
             .reduce((prev, curr) => prev + curr, BigInt(0))
-            .toString(10)
+            .toString(10),
         );
 
   const getTxNonce = (): string => {
@@ -191,7 +196,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions[0],
         seedPhrase,
         selectedAccount?.id ?? 0,
-        selectedNetwork
+        selectedNetwork,
       );
       signedTxs.push(signedContractCall);
     } else if (initialStxTransactions.length === 2) {
@@ -199,13 +204,20 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase
+        seedPhrase,
       );
     }
     onConfirmClick(signedTxs);
   };
 
-  const applyTxSettings = ({ fee: settingFee, nonce }: { fee: string; feeRate?: string; nonce?: string }) => {
+  const applyTxSettings = ({
+    fee: settingFee,
+    nonce,
+  }: {
+    fee: string;
+    feeRate?: string;
+    nonce?: string;
+  }) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
     setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {
@@ -217,6 +229,11 @@ function ConfirmStxTransationComponent({
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {
       console.error('No account selected');
+      return;
+    }
+
+    if (selectedAccount.deviceAccountIndex === undefined) {
+      console.error('No account found');
       return;
     }
     setIsButtonDisabled(true);
@@ -236,8 +253,8 @@ function ConfirmStxTransationComponent({
     try {
       const signedTxs = await signLedgerStxTransaction(
         transport,
-        initialStxTransactions[0],
-        selectedAccount.id,
+        initialStxTransactions[0].serialize(),
+        selectedAccount.deviceAccountIndex,
       );
       setIsTxApproved(true);
       await ledgerDelay(1500);
@@ -261,8 +278,10 @@ function ConfirmStxTransationComponent({
     <>
       <Container>
         <TitleContainer>
-          {!isAsset && <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>}
-          {subTitle && <RequestedByText>{subTitle}</RequestedByText>}
+          {!isAsset && (
+            <ReviewTransactionText>{title ?? t('REVIEW_TRANSACTION')}</ReviewTransactionText>
+          )}
+          {!!subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
         {children}
         <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
@@ -275,7 +294,9 @@ function ConfirmStxTransationComponent({
             title={t('TOTAL')}
           />
         )}
-        {!isSponsored && (
+        {isSponsored ? (
+          <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>
+        ) : (
           <Button onClick={onAdvancedSettingClick}>
             <>
               <ButtonImage src={SettingIcon} />
@@ -283,7 +304,6 @@ function ConfirmStxTransationComponent({
             </>
           </Button>
         )}
-        {isSponsored && <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>}
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
           fee={microstacksToStx(getFee()).toString()}
@@ -312,27 +332,28 @@ function ConfirmStxTransationComponent({
         />
       </ButtonContainer>
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
-        {currentStepIndex === 0 ? (
+        {currentStepIndex === 0 && (
           <LedgerConnectionView
-            title={t('LEDGER.CONNECT.TITLE')}
-            text={t('LEDGER.CONNECT.SUBTITLE')}
-            titleFailed={t('LEDGER.CONNECT.ERROR_TITLE')}
-            textFailed={t('LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={LedgerConnectDefault}
+            title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
+            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', { name: 'Stacks' })}
+            titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
+            textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
+            imageDefault={ledgerConnectStxIcon}
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
           />
-        ) : currentStepIndex === 1 ? (
+        )}
+        {currentStepIndex === 1 && (
           <LedgerConnectionView
             title={t('LEDGER.CONFIRM.TITLE')}
             text={t('LEDGER.CONFIRM.SUBTITLE')}
             titleFailed={t('LEDGER.CONFIRM.ERROR_TITLE')}
             textFailed={t('LEDGER.CONFIRM.ERROR_SUBTITLE')}
-            imageDefault={LedgerConnectDefault}
+            imageDefault={ledgerConnectDefaultIcon}
             isConnectSuccess={isTxApproved}
             isConnectFailed={isTxRejected}
           />
-        ) : null}
+        )}
         <SuccessActionsContainer>
           <ActionButton
             onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}

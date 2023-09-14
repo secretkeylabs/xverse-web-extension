@@ -1,18 +1,18 @@
+import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
+import Plus from '@assets/img/dashboard/plus.svg';
 import AccountRow from '@components/accountRow';
+import Separator from '@components/separator';
 import TopRow from '@components/topRow';
+import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Account } from '@secretkeylabs/xverse-core/types';
+import { selectAccount } from '@stores/wallet/actions/actionCreators';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import Plus from '@assets/img/dashboard/plus.svg';
-import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
-import { useDispatch } from 'react-redux';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import Seperator from '@components/seperator';
-import { Account } from '@secretkeylabs/xverse-core/types';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useWalletReducer from '@hooks/useWalletReducer';
-import React, { useEffect, useMemo } from 'react';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const Container = styled.div`
   display: flex;
@@ -21,13 +21,13 @@ const Container = styled.div`
   &::-webkit-scrollbar {
     width: 10px;
     background: transparent;
-  };
+  }
 
   &::-webkit-scrollbar-thumb {
     width: 8px;
     max-height: 20px;
     border-radius: 24px;
-    background: var(--white-800, rgba(255, 255, 255, 0.20));
+    background: var(--white-800, rgba(255, 255, 255, 0.2));
   }
 `;
 
@@ -43,8 +43,8 @@ const ButtonContainer = styled.button((props) => ({
   paddingRight: props.theme.spacing(11),
   transition: 'background-color 0.2s ease',
   ':hover': {
-    backgroundColor: props.theme.colors.background.elevation1
-  }
+    backgroundColor: props.theme.colors.background.elevation1,
+  },
 }));
 
 const AccountContainer = styled.div((props) => ({
@@ -52,6 +52,8 @@ const AccountContainer = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(11),
   paddingRight: props.theme.spacing(11),
+  paddingTop: props.theme.spacing(8),
+  gap: props.theme.spacing(8),
 }));
 
 const AddAccountContainer = styled.div((props) => ({
@@ -76,13 +78,15 @@ const AddAccountText = styled.h1((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
-const ButtonsWrapper = styled.div(props => `
+const ButtonsWrapper = styled.div(
+  (props) => `
   position: sticky;
   bottom: 0;
   background-color: ${props.theme.colors.background.elevation0};
   margin-top: ${props.theme.spacing(8)}px;
   margin-bottom: ${props.theme.spacing(11)}px;
-`);
+`,
+);
 
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
@@ -98,10 +102,6 @@ function AccountList(): JSX.Element {
     return accountsList;
   }, [accountsList, ledgerAccountsList, network]);
 
-  const { broadcastResetUserFlow, closeChannel } = useResetUserFlow();
-  // destructor
-  useEffect(() => closeChannel, []);
-
   const handleAccountSelect = (account: Account) => {
     dispatch(
       selectAccount(
@@ -116,11 +116,11 @@ function AccountList(): JSX.Element {
         network,
         undefined,
         account.accountType,
-        account.accountName
-      )
+        account.accountName,
+      ),
     );
     broadcastResetUserFlow();
-    navigate('/');
+    navigate(-1);
   };
 
   const isAccountSelected = (account: Account) =>
@@ -131,33 +131,34 @@ function AccountList(): JSX.Element {
     navigate(-1);
   };
 
-  async function onCreateAccount() {
+  const onCreateAccount = async () => {
     await createAccount();
-  }
+  };
 
-  async function onImportLedgerAccount() {
+  const onImportLedgerAccount = async () => {
     await chrome.tabs.create({
       url: chrome.runtime.getURL('options.html#/import-ledger'),
     });
-  }
+  };
 
   return (
     <Container>
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
         {displayedAccountsList.map((account) => (
-          <React.Fragment key={account.btcAddress}>
+          <div key={account.btcAddress}>
             <AccountRow
               account={account}
               isSelected={isAccountSelected(account)}
               onAccountSelected={handleAccountSelect}
+              isAccountListView
             />
-            <Seperator />
-          </React.Fragment>
+            <Separator />
+          </div>
         ))}
       </AccountContainer>
       <ButtonsWrapper>
-        <ButtonContainer onClick={async () => onCreateAccount()}>
+        <ButtonContainer onClick={onCreateAccount}>
           <AddAccountContainer>
             <ButtonImage src={Plus} />
           </AddAccountContainer>

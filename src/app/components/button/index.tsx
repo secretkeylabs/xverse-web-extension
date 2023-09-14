@@ -18,33 +18,31 @@ const Button = styled.button<ButtonProps>((props) => ({
   width: '100%',
   height: 44,
   transition: 'all 0.1s ease',
-  ...(props.disabled
-    ? {
-        cursor: 'not-allowed',
-        opacity: 0.4,
-      }
-    : {
-        ':hover': { opacity: 0.8 },
-        ':active': { opacity: 0.6 },
-      }),
+  ':disabled': {
+    opacity: 0.4,
+    cursor: 'not-allowed',
+  },
+  ':hover:enabled': {
+    opacity: 0.8,
+  },
+  ':active:enabled': {
+    opacity: 0.6,
+  },
 }));
 
 const TransparentButton = styled(Button)((props) => ({
   border: `1px solid ${props.theme.colors.background.elevation6}`,
   backgroundColor: 'transparent',
-  ...(props.disabled
-    ? {
-        cursor: 'not-allowed',
-        opacity: 0.4,
-      }
-    : {
-        ':hover': {
-          backgroundColor: props.theme.colors.background.elevation6_800,
-        },
-        ':active': {
-          backgroundColor: props.theme.colors.background.elevation6_600,
-        },
-      }),
+  ':disabled': {
+    cursor: 'not-allowed',
+    opacity: 0.4,
+  },
+  ':hover:enabled': {
+    backgroundColor: props.theme.colors.background.elevation6_800,
+  },
+  ':active:enabled': {
+    backgroundColor: props.theme.colors.background.elevation6_600,
+  },
 }));
 
 interface TextProps {
@@ -73,8 +71,16 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
+const ButtonIconContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: props.theme.spacing(3),
+}));
+
 interface Props {
   src?: string;
+  icon?: JSX.Element;
   text: string;
   onPress: () => void;
   processing?: boolean;
@@ -85,6 +91,7 @@ interface Props {
 
 function ActionButton({
   src,
+  icon,
   text,
   onPress,
   processing = false,
@@ -100,12 +107,13 @@ function ActionButton({
 
   if (transparent) {
     return (
-      <TransparentButton onClick={handleOnPress} disabled={disabled}>
+      <TransparentButton onClick={handleOnPress} disabled={disabled || processing}>
         {processing ? (
           <MoonLoader color="white" size={10} />
         ) : (
           <>
             {src && <ButtonImage src={src} />}
+            {icon && <ButtonIconContainer>{icon}</ButtonIconContainer>}
             <AnimatedButtonText>{text}</AnimatedButtonText>
           </>
         )}
@@ -114,12 +122,13 @@ function ActionButton({
   }
 
   return (
-    <Button onClick={handleOnPress} disabled={disabled} warning={warning}>
+    <Button onClick={handleOnPress} disabled={disabled || processing} warning={warning}>
       {processing ? (
         <MoonLoader color="#12151E" size={12} />
       ) : (
         <>
           {src && <ButtonImage src={src} />}
+          {icon && <ButtonIconContainer>{icon}</ButtonIconContainer>}
           <ButtonText warning={warning}>{text}</ButtonText>
         </>
       )}

@@ -5,7 +5,6 @@ import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/x
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
 import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
-import { StoreState } from '@stores/index';
 import {
   ChangeNetworkAction,
   addAccountAction,
@@ -16,17 +15,19 @@ import {
   selectAccount,
   setWalletAction,
   storeEncryptedSeedAction,
-  addLedgerAcountAction,
+  updateLedgerAccountsAction,
   unlockWalletAction,
 } from '@stores/wallet/actions/actionCreators';
 import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
 import { useDispatch } from 'react-redux';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
+import { getDeviceAccountIndex } from '@common/utils/ledger';
 import useWalletSession from './useWalletSession';
 import useWalletSelector from './useWalletSelector';
 
 const useWalletReducer = () => {
-  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } = useWalletSelector();
+  const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } =
+    useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
@@ -59,31 +60,48 @@ const useWalletReducer = () => {
     };
 
     if (!isHardwareAccount(selectedAccount)) {
-    dispatch(
-      setWalletAction(
-        selectedAccount
-          ? {
-              ...walletAccounts[selectedAccount.id],
-              seedPhrase: secretKey,
-            }
-          : {
-              ...walletAccounts[0],
-              seedPhrase: secretKey,
-            },
-      ),
-    );
-          }
+      dispatch(
+        setWalletAction(
+          selectedAccount
+            ? {
+                ...walletAccounts[selectedAccount.id],
+                seedPhrase: secretKey,
+              }
+            : {
+                ...walletAccounts[0],
+                seedPhrase: secretKey,
+              },
+        ),
+      );
+    }
 
-    dispatch(
-      fetchAccountAction(
-        selectedAccount
-          ? isLedgerAccount(selectedAccount)
-            ? ledgerAccountsList[selectedAccount.id]
-            : walletAccounts[selectedAccount.id]
-          : walletAccounts[0],
-        walletAccounts,
-      ),
-    );
+    let accountToFetch;
+
+    if (selectedAccount) {
+      if (isLedgerAccount(selectedAccount)) {
+        accountToFetch = ledgerAccountsList[selectedAccount.id];
+      } else {
+        accountToFetch = walletAccounts[selectedAccount.id];
+      }
+    } else {
+      const firstAccount = walletAccounts[0];
+      accountToFetch = firstAccount;
+    }
+
+    dispatch(fetchAccountAction(accountToFetch, walletAccounts));
+
+    if (ledgerAccountsList.some((account) => account.deviceAccountIndex === undefined)) {
+      const newLedgerAccountsList = ledgerAccountsList.map((account) => ({
+        ...account,
+        deviceAccountIndex: getDeviceAccountIndex(
+          ledgerAccountsList,
+          account.id,
+          account.masterPubKey,
+        ),
+      }));
+
+      dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
+    }
 
     dispatch(getActiveAccountsAction(walletAccounts));
   };
@@ -291,16 +309,30 @@ const useWalletReducer = () => {
 
   const addLedgerAccount = async (ledgerAccount: Account) => {
     try {
-      dispatch(addLedgerAcountAction([...ledgerAccountsList, ledgerAccount]));
+      dispatch(updateLedgerAccountsAction([...ledgerAccountsList, ledgerAccount]));
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const removeLedgerAccount = async (ledgerAccount: Account) => {
+    try {
+      dispatch(
+        updateLedgerAccountsAction(
+          ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
+        ),
+      );
     } catch (err) {
       return Promise.reject(err);
     }
   };
 
   const updateLedgerAccounts = async (updatedLedgerAccount: Account) => {
-    const newLedgerAccountsList = ledgerAccountsList.map((account) => (account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account));
+    const newLedgerAccountsList = ledgerAccountsList.map((account) =>
+      account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account,
+    );
     try {
-      dispatch(addLedgerAcountAction(newLedgerAccountsList));
+      dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
       if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
         switchAccount(updatedLedgerAccount);
       }
@@ -320,6 +352,7 @@ const useWalletReducer = () => {
     createAccount,
     storeSeedPhrase,
     addLedgerAccount,
+    removeLedgerAccount,
     updateLedgerAccounts,
   };
 };

@@ -24,7 +24,7 @@ export async function getTransferTransactions(reqParams: {
 }): Promise<AddressTransactionWithTransfers[]> {
   const { stxAddress, limit, network, offset } = reqParams;
   const apiUrl = `${getNetworkURL(
-    network
+    network,
   )}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
   const response = await axios.get<PaginatedResults<AddressTransactionWithTransfers>>(apiUrl, {
     params: {
@@ -62,7 +62,7 @@ export async function getStxAddressTransactions(
   address: string,
   network: StacksNetwork,
   offset: number,
-  limit: number
+  limit: number,
 ) {
   const transactionsWithTransfers = await getTransferTransactions({
     stxAddress: address,
@@ -82,19 +82,19 @@ export async function getStxAddressTransactions(
 export type Tx = MempoolTransaction | Transaction;
 
 export function isAddressTransactionWithTransfers(
-  transaction: AddressTransactionWithTransfers | Tx
+  transaction: AddressTransactionWithTransfers | Tx,
 ): transaction is AddressTransactionWithTransfers {
   return 'tx' in transaction;
 }
 
 export function isBtcTransaction(
-  tx: AddressTransactionWithTransfers | Tx | BtcTransactionData
+  tx: AddressTransactionWithTransfers | Tx | BtcTransactionData,
 ): tx is BtcTransactionData {
   return (tx as BtcTransactionData).txType === 'bitcoin';
 }
 
 export function isBtcTransactionArr(
-  txs: (AddressTransactionWithTransfers | MempoolTransaction)[] | BtcTransactionData[]
+  txs: (AddressTransactionWithTransfers | MempoolTransaction)[] | BtcTransactionData[],
 ): txs is BtcTransactionData[] {
   return (txs as BtcTransactionData[])[0].txType === 'bitcoin';
 }

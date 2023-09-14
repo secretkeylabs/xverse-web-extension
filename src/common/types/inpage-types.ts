@@ -10,6 +10,7 @@ export enum DomEventName {
   signPsbtRequest = 'SatsPsbtRequest',
   signMessageRequest = 'SatsSignMessage',
   sendBtcRequest = 'SatsSendBtcRequest',
+  createInscriptionRequest = 'SatsCreateInscriptionRequest',
 }
 
 export interface AuthenticationRequestEventDetails {
@@ -31,7 +32,7 @@ export interface TransactionRequestEventDetails {
 export type TransactionRequestEvent = CustomEvent<TransactionRequestEventDetails>;
 
 export interface GetAddressRequestEventDetails {
-  btcAddressRequest: string,
+  btcAddressRequest: string;
 }
 
 export type GetAddressRequestEvent = CustomEvent<GetAddressRequestEventDetails>;
@@ -53,3 +54,9 @@ export interface SendBtcRequestEventDetails {
 }
 
 export type SendBtcRequestEvent = CustomEvent<SendBtcRequestEventDetails>;
+
+export interface CreateInscriptionEventDetails {
+  createInscriptionRequest: string;
+}
+
+export type CreateInscriptionEvent = CustomEvent<CreateInscriptionEventDetails>;

@@ -5,8 +5,8 @@ const Line = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
-function Seperator() {
+function Separator() {
   return <Line />;
 }
 
-export default Seperator;
+export default Separator;

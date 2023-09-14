@@ -1,14 +1,9 @@
 import useSendBtcRequest from '@hooks/useSendBtcRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  ErrorCodes,
-  getBtcFiatEquivalent,
-} from '@secretkeylabs/xverse-core';
+import { ErrorCodes, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import BigNumber from 'bignumber.js';
-import {
-  useEffect,
-} from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
@@ -16,7 +11,7 @@ import styled from 'styled-components';
 
 const OuterContainer = styled.div`
   display: flex;
-  flex:1 ;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -27,21 +22,10 @@ const OuterContainer = styled.div`
 `;
 
 function BtcSendScreen() {
-  const {
-    payload,
-    signedTx,
-    isLoading,
-    tabId,
-    requestToken,
-    error,
-    recipient,
-  } = useSendBtcRequest();
+  const { payload, signedTx, isLoading, tabId, requestToken, error, recipient } =
+    useSendBtcRequest();
   const navigate = useNavigate();
-  const {
-    btcFiatRate,
-    network,
-    btcAddress,
-  } = useWalletSelector();
+  const { btcFiatRate, network, btcAddress } = useWalletSelector();
   const { t } = useTranslation('translation');
 
   const checkIfMismatch = () => {
@@ -68,8 +52,8 @@ function BtcSendScreen() {
   };
 
   const checkIfValidAmount = () => {
-    recipient.forEach((recipient)=> {
-      if (recipient.amountSats.lt(BITCOIN_DUST_AMOUNT_SATS)) {
+    recipient.forEach((txRecipient) => {
+      if (txRecipient.amountSats.lt(BITCOIN_DUST_AMOUNT_SATS)) {
         navigate('/tx-status', {
           state: {
             txid: '',
@@ -79,7 +63,7 @@ function BtcSendScreen() {
           },
         });
       }
-    })
+    });
   };
 
   useEffect(() => {
@@ -92,7 +76,10 @@ function BtcSendScreen() {
 
   useEffect(() => {
     if (error) {
-      if (Number(error) === ErrorCodes.InSufficientBalanceWithTxFee || Number(error) === ErrorCodes.InSufficientBalance) {
+      if (
+        Number(error) === ErrorCodes.InSufficientBalanceWithTxFee ||
+        Number(error) === ErrorCodes.InSufficientBalance
+      ) {
         navigate('/tx-status', {
           state: {
             txid: '',
@@ -133,11 +120,7 @@ function BtcSendScreen() {
       });
     }
   }, [signedTx]);
-  return (
-    <OuterContainer>
-      { isLoading && <MoonLoader color="white" size={50} />}
-    </OuterContainer>
-  );
+  return <OuterContainer>{isLoading && <MoonLoader color="white" size={50} />}</OuterContainer>;
 }
 
 export default BtcSendScreen;

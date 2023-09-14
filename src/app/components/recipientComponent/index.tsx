@@ -24,7 +24,7 @@ const Container = styled.div((props) => ({
   marginBottom: 12,
 }));
 
-const RecipientTitleText = styled.h1((props) => ({
+const RecipientTitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
   marginBottom: 16,
@@ -56,19 +56,19 @@ const DownArrowIcon = styled.img((props) => ({
   marginBottom: props.theme.spacing(4),
 }));
 
-const TitleText = styled.h1((props) => ({
+const TitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
   textAlign: 'center',
   marginTop: 5,
 }));
 
-const ValueText = styled.h1((props) => ({
+const ValueText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[0],
 }));
 
-const SubValueText = styled.h1((props) => ({
+const SubValueText = styled.p((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
   color: props.theme.colors.white[400],
@@ -103,16 +103,22 @@ interface Props {
   fungibleToken?: FungibleToken;
   heading?: string;
   showSenderAddress?: boolean;
-
 }
 function RecipientComponent({
-  recipientIndex, address, value, totalRecipient, title, fungibleToken, icon, currencyType, heading, showSenderAddress,
-} : Props) {
+  recipientIndex,
+  address,
+  value,
+  totalRecipient,
+  title,
+  fungibleToken,
+  icon,
+  currencyType,
+  heading,
+  showSenderAddress,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
-  const {
-    stxBtcRate, btcFiatRate, fiatCurrency, ordinalsAddress
-  } = useWalletSelector();
+  const { stxBtcRate, btcFiatRate, fiatCurrency, ordinalsAddress } = useWalletSelector();
 
   useEffect(() => {
     let amountInCurrency;
@@ -121,31 +127,40 @@ function RecipientComponent({
       if (amountInCurrency.isLessThan(0.01)) {
         amountInCurrency = '0.01';
       }
-    } else { amountInCurrency = getFiatEquivalent(Number(value), currencyType, stxBtcRate, btcFiatRate, fungibleToken); }
+    } else {
+      amountInCurrency = getFiatEquivalent(
+        Number(value),
+        currencyType,
+        stxBtcRate,
+        btcFiatRate,
+        fungibleToken,
+      );
+    }
     setFiatAmount(amountInCurrency);
   }, [value]);
 
   function getFtTicker() {
     if (fungibleToken?.ticker) {
       return fungibleToken?.ticker.toUpperCase();
-    } if (fungibleToken?.name) {
+    }
+    if (fungibleToken?.name) {
       return getTicker(fungibleToken.name).toUpperCase();
-    } return '';
+    }
+    return '';
   }
 
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (fiatAmount) {
-      if (fiatAmount.isLessThan(0.01)) {
+  const getFiatAmountString = (amount: BigNumber) => {
+    if (amount) {
+      if (amount.isLessThan(0.01)) {
         return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
       }
       return (
         <NumericFormat
-          value={fiatAmount.toFixed(2).toString()}
+          value={amount.toFixed(2).toString()}
           displayType="text"
           thousandSeparator
           prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
           suffix={` ${fiatCurrency}`}
-          renderText={(text) => <SubValueText>{text}</SubValueText>}
         />
       );
     }
@@ -156,27 +171,25 @@ function RecipientComponent({
     <Container>
       {recipientIndex && totalRecipient && totalRecipient !== 1 && (
         <RecipientTitleText>
-          {`${t(
-            'RECIPIENT',
-          )} ${recipientIndex}/${totalRecipient}`}
-
+          {`${t('RECIPIENT')} ${recipientIndex}/${totalRecipient}`}
         </RecipientTitleText>
       )}
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       <RowContainer>
-        {icon ? <Icon src={icon} />
-          : (
-            <TokenContainer>
-              <TokenImage
-                token={currencyType}
-                loading={false}
-                size={32}
-                fungibleToken={fungibleToken}
-              />
-            </TokenContainer>
-          )}
+        {icon ? (
+          <Icon src={icon} />
+        ) : (
+          <TokenContainer>
+            <TokenImage
+              token={currencyType}
+              loading={false}
+              size={32}
+              fungibleToken={fungibleToken}
+            />
+          </TokenContainer>
+        )}
         <TitleText>{title}</TitleText>
-        { currencyType === 'NFT' || currencyType === 'Ordinal' ? (
+        {currencyType === 'NFT' || currencyType === 'Ordinal' ? (
           <ColumnContainer>
             <ValueText>{value}</ValueText>
           </ColumnContainer>
@@ -195,15 +208,15 @@ function RecipientComponent({
       </RowContainer>
       {address && (
         <AddressContainer>
-          {showSenderAddress
-            ? (
-              <MultipleAddressContainer>
-                <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
-                <DownArrowIcon src={ArrowIcon} />
-                <TransferDetailView icon={WalletIcon} title={t('To')} address={address} />
-              </MultipleAddressContainer>
-            )
-            : <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />}
+          {showSenderAddress ? (
+            <MultipleAddressContainer>
+              <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
+              <DownArrowIcon src={ArrowIcon} />
+              <TransferDetailView icon={WalletIcon} title={t('To')} address={address} />
+            </MultipleAddressContainer>
+          ) : (
+            <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
+          )}
         </AddressContainer>
       )}
     </Container>

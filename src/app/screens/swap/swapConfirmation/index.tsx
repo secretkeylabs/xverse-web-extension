@@ -5,21 +5,22 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import FunctionBlock from '@screens/swap/swapConfirmation/functionBlock';
 import ActionButton from '@components/button';
-import FeesBlock from '@screens/swap/swapConfirmation/freesBlock';
+import FeesBlock from '@screens/swap/swapConfirmation/feesBlock';
 import RouteBlock from '@screens/swap/swapConfirmation/routeBlock';
 import StxInfoBlock from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useConfirmSwap } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import { AdvanceSettings } from '@screens/swap/swapConfirmation/advanceSettings';
-import { useSponsoredTransaction } from '@hooks/useSponsoredTransaction';
 import SponsoredTransactionIcon from '@assets/img/transactions/CircleWavyCheck.svg';
+import InfoContainer from '@components/infoContainer';
+import { SUPPORT_URL_TAB_TARGET, SWAP_SPONSOR_DISABLED_SUPPORT_URL } from '@utils/constants';
 
 const TitleText = styled.div((props) => ({
   fontSize: 21,
   fontWeight: 700,
   color: props.theme.colors.white['0'],
-  marginBottom: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(12),
   marginTop: props.theme.spacing(12),
 }));
 
@@ -53,12 +54,15 @@ const Icon = styled.img((props) => ({
   height: 24,
 }));
 
+const StyledInfoContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(4),
+}));
+
 export default function SwapConfirmation() {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
   const location = useLocation();
   const navigate = useNavigate();
   const swap = useConfirmSwap(location.state);
-  const { isSponsored } = useSponsoredTransaction();
 
   const onCancel = useCallback(() => {
     navigate('/swap');
@@ -72,21 +76,33 @@ export default function SwapConfirmation() {
     });
   }, [swap]);
 
+  const handleClickLearnMore = () => {
+    window.open(SWAP_SPONSOR_DISABLED_SUPPORT_URL, SUPPORT_URL_TAB_TARGET, 'noreferrer noopener');
+  };
+
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       <Container>
         <TitleText>{t('TOKEN_SWAP')}</TitleText>
+        {swap.isSponsorDisabled && (
+          <StyledInfoContainer>
+            <InfoContainer
+              bodyText={t('SWAP_TRANSACTION_CANNOT_BE_SPONSORED')}
+              type="Info"
+              redirectText={t('LEARN_MORE')}
+              onClick={handleClickLearnMore}
+            />
+          </StyledInfoContainer>
+        )}
         <StxInfoBlock type="transfer" swap={swap} />
         <StxInfoBlock type="receive" swap={swap} />
         <FunctionBlock name={swap.functionName} />
         <RouteBlock swap={swap} />
-        <FeesBlock
-          lpFee={swap.lpFeeAmount}
-          lpFeeFiatAmount={swap.lpFeeFiatAmount}
-          currency={swap.fromToken.name}
-        />
-        {isSponsored ? (
+        {!swap.isSponsored && (
+          <FeesBlock txFee={swap.txFeeAmount} txFeeFiatAmount={swap.txFeeFiatAmount} />
+        )}
+        {swap.isSponsored ? (
           <SponsoredTransactionText>
             <Icon src={SponsoredTransactionIcon} />
             {t('THIS_IS_A_SPONSORED_TRANSACTION')}

@@ -1,6 +1,9 @@
 /* eslint-disable prefer-destructuring */
 import {
-  BTC_BASE_URI_MAINNET, BTC_BASE_URI_TESTNET, HIRO_MAINNET_DEFAULT, HIRO_TESTNET_DEFAULT,
+  BTC_BASE_URI_MAINNET,
+  BTC_BASE_URI_TESTNET,
+  HIRO_MAINNET_DEFAULT,
+  HIRO_TESTNET_DEFAULT,
 } from '@secretkeylabs/xverse-core/constant';
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 
@@ -14,14 +17,12 @@ export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';
 export const BTC_TRANSACTION_TESTNET_STATUS_URL = 'https://mempool.space/testnet/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
-export const XVERSE_SPONSOR_2_URL = 'https://stacks-transaction-sponsor-swaps.onrender.com';
+export const XVERSE_ORDIVIEW_URL = 'https://ord.xverse.app';
 
 export const TRANSAC_URL = 'https://global.transak.com';
 export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;
 export const MOON_PAY_URL = 'https://buy.moonpay.com';
 export const MOON_PAY_API_KEY = process.env.MOON_PAY_API_KEY;
-export const BINANCE_URL = 'https://www.binancecnt.com/en/pre-connect';
-export const BINANCE_MERCHANT_CODE = process.env.BINANCE_MERCHANT_CODE;
 
 export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal' | 'brc20' | 'brc20-Ordinal';
 export enum LoaderSize {
@@ -51,4 +52,9 @@ export const initialNetworksList: SettingsNetwork[] = [
 /**
  * contract id of send_many transaction type
  */
-export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
+export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
+  'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
+
+export const SWAP_SPONSOR_DISABLED_SUPPORT_URL =
+  'https://support.xverse.app/hc/en-us/articles/18319388355981';
+export const SUPPORT_URL_TAB_TARGET = 'SupportURLTabTarget';

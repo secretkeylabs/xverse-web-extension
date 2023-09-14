@@ -1,5 +1,14 @@
-import RequestsRoutes from '@common/utils/route-urls';
-import getEventSourceWindow from '@common/utils/get-event-source-window';
+import {
+  AuthenticationRequestEvent,
+  CreateInscriptionEvent,
+  DomEventName,
+  GetAddressRequestEvent,
+  SendBtcRequestEvent,
+  SignMessageRequestEvent,
+  SignPsbtRequestEvent,
+  SignatureRequestEvent,
+  TransactionRequestEvent,
+} from '@common/types/inpage-types';
 import {
   CONTENT_SCRIPT_PORT,
   ExternalMethods,
@@ -9,16 +18,8 @@ import {
   MESSAGE_SOURCE,
   SatsConnectMessageFromContentScript,
 } from '@common/types/message-types';
-import {
-  AuthenticationRequestEvent,
-  DomEventName,
-  SignatureRequestEvent,
-  TransactionRequestEvent,
-  GetAddressRequestEvent,
-  SignPsbtRequestEvent,
-  SignMessageRequestEvent,
-  SendBtcRequestEvent,
-} from '@common/types/inpage-types';
+import getEventSourceWindow from '@common/utils/get-event-source-window';
+import RequestsRoutes from '@common/utils/route-urls';
 
 // Legacy messaging to work with older versions of Connect
 window.addEventListener('message', (event) => {
@@ -125,9 +126,7 @@ document.addEventListener(DomEventName.structuredDataSignatureRequest, ((
 }) as EventListener);
 
 // Listen for a CustomEvent (BTC Address request) coming from the web app
-document.addEventListener(DomEventName.getAddressRequest, ((
-  event: GetAddressRequestEvent,
-) => {
+document.addEventListener(DomEventName.getAddressRequest, ((event: GetAddressRequestEvent) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.AddressRequest,
     payload: event.detail.btcAddressRequest,
@@ -137,9 +136,7 @@ document.addEventListener(DomEventName.getAddressRequest, ((
 }) as EventListener);
 
 // Listen for a CustomEvent (PSBT Signing request) coming from the web app
-document.addEventListener(DomEventName.signPsbtRequest, ((
-  event: SignPsbtRequestEvent,
-) => {
+document.addEventListener(DomEventName.signPsbtRequest, ((event: SignPsbtRequestEvent) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.SignBtcTx,
     payload: event.detail.signPsbtRequest,
@@ -149,9 +146,7 @@ document.addEventListener(DomEventName.signPsbtRequest, ((
 }) as EventListener);
 
 // Listen for a CustomEvent (Message Signing request) coming from the web app
-document.addEventListener(DomEventName.signMessageRequest, ((
-  event: SignMessageRequestEvent,
-) => {
+document.addEventListener(DomEventName.signMessageRequest, ((event: SignMessageRequestEvent) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.SignatureRequest,
     payload: event.detail.signMessageRequest,
@@ -161,14 +156,24 @@ document.addEventListener(DomEventName.signMessageRequest, ((
 }) as EventListener);
 
 // Listen for a CustomEvent (Send BTC request) coming from the web app
-document.addEventListener(DomEventName.sendBtcRequest, ((
-  event: SendBtcRequestEvent,
-) => {
+document.addEventListener(DomEventName.sendBtcRequest, ((event: SendBtcRequestEvent) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.SendBtcTx,
     payload: event.detail.sendBtcRequest,
     urlParam: 'sendBtcRequest',
     method: ExternalSatsMethods.sendBtcRequest,
+  });
+}) as EventListener);
+
+// Listen for a CustomEvent (Create Text Inscription Request) coming from the web app
+document.addEventListener(DomEventName.createInscriptionRequest, ((
+  event: CreateInscriptionEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.CreateInscription,
+    payload: event.detail.createInscriptionRequest,
+    urlParam: 'createInscriptionRequest',
+    method: ExternalSatsMethods.createInscriptionRequest,
   });
 }) as EventListener);
 

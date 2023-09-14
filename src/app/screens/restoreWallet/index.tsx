@@ -9,20 +9,27 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import EnterSeedPhrase from './enterSeedphrase';
 
+const Body = styled.div(() => ({
+  display: 'flex',
+  height: '100%',
+  justifyContent: 'center',
+  alignItems: 'center',
+}));
+
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: 'auto',
-  marginRight: 'auto',
-  height: 600,
-  width: 360,
+  height: 'auto',
   backgroundColor: props.theme.colors.background.elevation0,
-  padding: `${props.theme.spacing(12)}px ${props.theme.spacing(8)}px 0 ${props.theme.spacing(8)}px`,
+  padding: `${props.theme.spacing(12)}px`,
+  border: `1px solid ${props.theme.colors.background.elevation2}`,
+  borderRadius: props.theme.radius(2),
 }));
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
   height: '100%',
+  width: '312px',
   marginBottom: props.theme.spacing(32),
   marginTop: props.theme.spacing(32),
 }));
@@ -30,13 +37,13 @@ const PasswordContainer = styled.div((props) => ({
 function RestoreWallet(): JSX.Element {
   const { t } = useTranslation('translation');
   const { restoreWallet } = useWalletReducer();
-  const [isRestoring, setIsRestoring] = useState<boolean>(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [seedPhrase, setSeedPhrase] = useState<string>('');
-  const [seedError, setSeedError] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [seedPhrase, setSeedPhrase] = useState('');
+  const [seedError, setSeedError] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const { disableWalletExistsGuard } = useWalletExistsContext();
 
@@ -113,7 +120,7 @@ function RestoreWallet(): JSX.Element {
     <PasswordContainer>
       <PasswordInput
         title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
-        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
+        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
         enteredPassword={confirmPassword}
         setEnteredPassword={setConfirmPassword}
         handleContinue={handleConfirmPassword}
@@ -124,10 +131,12 @@ function RestoreWallet(): JSX.Element {
     </PasswordContainer>,
   ];
   return (
-    <Container>
-      <Steps data={restoreSteps} activeIndex={currentStepIndex} />
-      {restoreSteps[currentStepIndex]}
-    </Container>
+    <Body>
+      <Container>
+        <Steps data={restoreSteps} activeIndex={currentStepIndex} />
+        {restoreSteps[currentStepIndex]}
+      </Container>
+    </Body>
   );
 }
 

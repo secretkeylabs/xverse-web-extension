@@ -5,14 +5,12 @@ import { StoreState } from '@stores/index';
 import useNetworkSelector from '../useNetwork';
 
 const useStxPendingTxData = () => {
-  const { stxAddress } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { stxAddress } = useSelector((state: StoreState) => state.walletState);
   const selectedNetwork = useNetworkSelector();
-  const result = useQuery(
-    ['stx-pending-transaction', { stxAddress, selectedNetwork }],
-    () => fetchStxPendingTxData(stxAddress, selectedNetwork),
-  );
+  const result = useQuery({
+    queryKey: ['stx-pending-transaction', { stxAddress, selectedNetwork }],
+    queryFn: () => fetchStxPendingTxData(stxAddress, selectedNetwork),
+  });
   return result;
 };
 

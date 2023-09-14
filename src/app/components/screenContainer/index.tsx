@@ -6,7 +6,7 @@ import styled from 'styled-components';
 const RouteContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: 600,
+  height: '100%',
   width: 360,
   margin: '0 0',
   backgroundColor: props.theme.colors.background.elevation0,
@@ -47,7 +47,7 @@ function ScreenContainer(): JSX.Element {
   const { t } = useTranslation('translation');
 
   return (
-    <RouteContainer>
+    <RouteContainer className="optionsContainer">
       {network.type === 'Testnet' && (
         <TestnetContainer>
           <TestnetText>{t('SETTING_SCREEN.TESTNET')}</TestnetText>

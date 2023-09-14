@@ -1,6 +1,6 @@
+import ActionButton from '@components/button';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
-import { MoonLoader } from 'react-spinners';
 
 const MainContainer = styled.div`
   display: flex;
@@ -13,52 +13,20 @@ const MainContainer = styled.div`
   }
 `;
 
-const ContentContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-});
-
 const ButtonsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'flex-end',
   marginBottom: props.theme.spacing(20),
-  marginTop: 43,
+  marginTop: props.theme.spacing(12),
   marginLeft: 16,
   marginRight: 16,
 }));
 
-const ConfirmButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.background.elevation0,
-  width: '50%',
-  height: 44,
-  marginLeft: 6,
-  ':disabled': {
-    opacity: 0.6,
-    cursor: 'initial',
-  }
-}));
-
-const CancelButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: `1px solid ${props.theme.colors.background.elevation2}`,
-  color: props.theme.colors.white['0'],
-  width: '50%',
-  height: 44,
-  marginRight: 6,
+const ConfirmButtonContainer = styled.div((props) => ({
+  width: '100%',
+  marginLeft: props.theme.spacing(3),
 }));
 
 type Props = {
@@ -69,23 +37,33 @@ type Props = {
   onCancel: () => void;
   loading: boolean;
   disabled?: boolean;
+  isError?: boolean;
 };
 
 function ConfirmScreen({
-  children, onConfirm, onCancel, confirmText, cancelText, loading, disabled = false,
+  children,
+  onConfirm,
+  onCancel,
+  confirmText,
+  cancelText,
+  loading,
+  disabled = false,
+  isError = false,
 }: Props) {
   return (
     <>
-      <MainContainer>
-        <ContentContainer>
-          {children}
-        </ContentContainer>
-      </MainContainer>
+      <MainContainer>{children}</MainContainer>
       <ButtonsContainer>
-        <CancelButton onClick={onCancel}>{cancelText}</CancelButton>
-        <ConfirmButton onClick={onConfirm} disabled={disabled}>
-          {loading ? <MoonLoader color="white" size={20} /> : confirmText}
-        </ConfirmButton>
+        <ActionButton onPress={onCancel} text={cancelText} transparent />
+        <ConfirmButtonContainer>
+          <ActionButton
+            onPress={onConfirm}
+            disabled={disabled}
+            processing={loading}
+            text={confirmText}
+            warning={isError}
+          />
+        </ConfirmButtonContainer>
       </ButtonsContainer>
     </>
   );

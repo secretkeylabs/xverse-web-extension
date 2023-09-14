@@ -31,16 +31,10 @@ interface LedgerConnectionProps {
   text: string;
 }
 
-function LedgerFailView({
-  title,
-  text,
-}: LedgerConnectionProps) {
+function LedgerFailView({ title, text }: LedgerConnectionProps) {
   return (
     <Container>
-      <img
-        src={ledgerConnectFailIcon}
-        alt=""
-      />
+      <img src={ledgerConnectFailIcon} alt="" />
       <Title>{title}</Title>
       <Text>{text}</Text>
     </Container>

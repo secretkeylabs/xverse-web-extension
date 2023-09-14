@@ -6,7 +6,6 @@ import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
-import { getBtcTxStatusUrl, isLedgerAccount } from '@utils/helper';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import BottomTabBar from '@components/tabBar';
@@ -14,16 +13,18 @@ import TopRow from '@components/topRow';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import DescriptionTile from '@screens/nftDetail/descriptionTile';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { isBrcTransferValid } from '@secretkeylabs/xverse-core/api';
+import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
+import { getBtcTxStatusUrl, isLedgerAccount } from '@utils/helper';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import OrdinalAttributeComponent from './ordinalAttributeComponent';
 
 const Container = styled.div`
@@ -288,8 +289,7 @@ function OrdinalDetailScreen() {
     [selectedOrdinal],
   );
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/ordinal-detail'), []);
+  useResetUserFlow('/ordinal-detail');
 
   useEffect(() => {
     if (selectedOrdinal) {
@@ -352,7 +352,7 @@ function OrdinalDetailScreen() {
   };
 
   const openInOrdinalsExplorer = () => {
-    window.open(`https://ord.xverse.app/inscription/${selectedOrdinal?.id}`);
+    window.open(`${XVERSE_ORDIVIEW_URL}/inscription/${selectedOrdinal?.id}`);
   };
 
   const ownedByView = (
