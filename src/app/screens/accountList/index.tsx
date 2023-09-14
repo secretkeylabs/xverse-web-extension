@@ -14,11 +14,14 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-export const Container = styled.div((props) => ({
-  ...props.theme.scrollbar,
+export const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
-}));
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+});
 
 const ButtonContainer = styled.button((props) => ({
   width: '100%',
@@ -28,8 +31,8 @@ const ButtonContainer = styled.button((props) => ({
   background: 'transparent',
   paddingTop: props.theme.spacing(4),
   paddingBottom: props.theme.spacing(4),
-  paddingLeft: props.theme.spacing(7),
-  paddingRight: props.theme.spacing(7),
+  paddingLeft: props.theme.spacing(11),
+  paddingRight: props.theme.spacing(11),
   transition: 'background-color 0.2s ease',
   ':hover': {
     backgroundColor: props.theme.colors.background.elevation1,
@@ -39,8 +42,8 @@ const ButtonContainer = styled.button((props) => ({
 const AccountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(7),
-  paddingRight: props.theme.spacing(7),
+  paddingLeft: props.theme.spacing(11),
+  paddingRight: props.theme.spacing(11),
   paddingTop: props.theme.spacing(8),
   gap: props.theme.spacing(8),
 }));
