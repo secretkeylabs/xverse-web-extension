@@ -3,12 +3,12 @@ import Plus from '@assets/img/dashboard/plus.svg';
 import AccountRow from '@components/accountRow';
 import Separator from '@components/separator';
 import TopRow from '@components/topRow';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Account } from '@secretkeylabs/xverse-core/types';
 import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import React, { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -44,6 +44,8 @@ const AccountContainer = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(11),
   paddingRight: props.theme.spacing(11),
+  paddingTop: props.theme.spacing(8),
+  gap: props.theme.spacing(8),
 }));
 
 const AddAccountContainer = styled.div((props) => ({
@@ -92,10 +94,6 @@ function AccountList(): JSX.Element {
     return accountsList;
   }, [accountsList, ledgerAccountsList, network]);
 
-  const { broadcastResetUserFlow, closeChannel } = useResetUserFlow();
-  // destructor
-  useEffect(() => closeChannel, []);
-
   const handleAccountSelect = (account: Account) => {
     dispatch(
       selectAccount(
@@ -140,7 +138,7 @@ function AccountList(): JSX.Element {
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
         {displayedAccountsList.map((account) => (
-          <React.Fragment key={account.btcAddress}>
+          <div key={account.btcAddress}>
             <AccountRow
               account={account}
               isSelected={isAccountSelected(account)}
@@ -148,7 +146,7 @@ function AccountList(): JSX.Element {
               isAccountListView
             />
             <Separator />
-          </React.Fragment>
+          </div>
         ))}
       </AccountContainer>
       <ButtonsWrapper>

@@ -178,8 +178,7 @@ function ConfirmNftTransaction() {
     mutate({ signedTx: txs[0] });
   };
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/confirm-nft-tx'), []);
+  useResetUserFlow('/confirm-nft-tx');
 
   const handleOnCancelClick = () => {
     navigate(-1);
