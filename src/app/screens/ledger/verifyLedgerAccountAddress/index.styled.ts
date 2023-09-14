@@ -101,3 +101,14 @@ export const ActionButtonContainer = styled.div((props) => ({
     marginBottom: props.theme.spacing(8),
   },
 }));
+
+export const LedgerFailViewContainer = styled.div((props) => ({
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  margin: 'auto',
+}));
+
+export const LedgerFailButtonsContainer = styled.div((props) => ({
+  width: '100%',
+  marginTop: props.theme.spacing(25),
+}));

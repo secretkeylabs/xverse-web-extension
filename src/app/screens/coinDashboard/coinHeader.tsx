@@ -280,6 +280,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
           });
           return;
         case 'brc20':
+          // TODO replace with send-brc20-one-step route, when ledger support is ready
           await chrome.tabs.create({
             url: chrome.runtime.getURL(
               `options.html#/send-brc20?coinTicker=${fungibleToken?.ticker}`,
@@ -299,7 +300,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
         },
       });
     } else if (coin === 'brc20') {
-      navigate('/send-brc20', {
+      navigate('/send-brc20-one-step', {
         state: {
           fungibleToken,
         },

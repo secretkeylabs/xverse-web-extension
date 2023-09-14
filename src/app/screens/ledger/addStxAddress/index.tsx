@@ -1,5 +1,5 @@
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -58,8 +58,7 @@ function AddStxAddress(): JSX.Element {
   const mismatch = params.get('mismatch') ?? '';
   const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/add-stx-address-ledger'), []);
+  useResetUserFlow('/add-stx-address-ledger');
 
   const handleClickNext = async () => {
     setCurrentStep((prevStepIndex) => prevStepIndex + 1);

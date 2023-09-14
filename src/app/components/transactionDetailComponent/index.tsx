@@ -48,7 +48,7 @@ const TitleContainer = styled.div({
 interface Props {
   title: string;
   subTitle?: string;
-  value?: string;
+  value?: string | React.ReactNode;
   description?: string;
   subValue?: BigNumber;
 }

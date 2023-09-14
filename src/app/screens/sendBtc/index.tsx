@@ -83,8 +83,7 @@ function SendBtcScreen() {
     }
   }, [data]);
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/send-btc'), []);
+  useResetUserFlow('/send-btc');
 
   useEffect(() => {
     if (recipientAddress && amount && txError) {

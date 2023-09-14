@@ -289,8 +289,7 @@ function OrdinalDetailScreen() {
     [selectedOrdinal],
   );
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/ordinal-detail'), []);
+  useResetUserFlow('/ordinal-detail');
 
   useEffect(() => {
     if (selectedOrdinal) {

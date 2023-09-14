@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTransition } from '@react-spring/web';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -41,6 +41,8 @@ import {
   InfoAlertContainer,
   AddressAddedContainer,
   OnBoardingActionsContainer,
+  LedgerFailViewContainer,
+  LedgerFailButtonsContainer,
 } from './index.styled';
 
 enum Steps {
@@ -48,17 +50,6 @@ enum Steps {
   VerifyAddress = 1,
   AddressVerified = 2,
 }
-
-const LedgerFailViewContainer = styled.div((props) => ({
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  margin: 'auto',
-}));
-
-const LedgerFailButtonsContainer = styled.div((props) => ({
-  width: '100%',
-  marginTop: props.theme.spacing(25),
-}));
 
 function VerifyLedger(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState(Steps.ConnectLedger);
@@ -81,8 +72,7 @@ function VerifyLedger(): JSX.Element {
   const isOrdinalSelected = currency === 'ORD' || currency === 'brc-20';
   const isStacksSelected = currency === 'STX';
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/verify-ledger'), []);
+  useResetUserFlow('/verify-ledger');
 
   const getAddress = () => {
     switch (currency) {

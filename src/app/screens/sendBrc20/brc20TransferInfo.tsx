@@ -32,7 +32,7 @@ const TransferStep = styled.p((props) => ({
 }));
 
 function Brc20TransferInfo() {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC_20' });
+  const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
   return (
     <Container>
       <InfoTitle>{t('SEND_INFO_TITLE')}</InfoTitle>
