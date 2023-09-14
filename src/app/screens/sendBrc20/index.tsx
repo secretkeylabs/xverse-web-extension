@@ -11,7 +11,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -80,8 +80,7 @@ function SendBrc20Screen() {
     +amountToSend <= +fungibleToken.balance;
   const isActionButtonEnabled = showForm ? isSendButtonEnabled : true;
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/send-brc20'), []);
+  useResetUserFlow('/send-brc20');
 
   const handleBackButtonClick = () => {
     if (showForm) {
@@ -190,10 +189,10 @@ function SendBrc20Screen() {
 
   return (
     <>
-      <TopRow title={t('SEND_BRC_20.SEND')} onClick={handleBackButtonClick} />
+      <TopRow title={t('SEND_BRC20.SEND')} onClick={handleBackButtonClick} />
       <BRC20TokenTagContainer>
         <BRC20TokenTag>
-          <h1>{t('SEND_BRC_20.BRC20_TOKEN')}</h1>
+          <h1>{t('SEND_BRC20.BRC20_TOKEN')}</h1>
         </BRC20TokenTag>
       </BRC20TokenTagContainer>
       {showForm ? (
@@ -209,7 +208,7 @@ function SendBrc20Screen() {
       <SendButtonContainer enabled={isActionButtonEnabled}>
         <ActionButton
           text={
-            showForm ? t('SEND_BRC_20.SEND_NEXT_BUTTON') : t('SEND_BRC_20.SEND_INFO_START_BUTTON')
+            showForm ? t('SEND_BRC20.SEND_NEXT_BUTTON') : t('SEND_BRC20.SEND_INFO_START_BUTTON')
           }
           processing={isCreatingOrder}
           onPress={handleNext}

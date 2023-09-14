@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-import styled from 'styled-components';
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
 import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
@@ -7,15 +6,17 @@ import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
-import { Plus } from '@phosphor-icons/react';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
-import Swap from '@assets/img/dashboard/swap.svg';
 import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
+import Swap from '@assets/img/dashboard/swap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import { isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
+import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
+import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import useAppConfig from '@hooks/queries/useAppConfig';
@@ -26,18 +27,17 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { CurrencyTypes } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
-import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
-import ActionButton from '@components/button';
 import dashboardIcon from '@assets/img/dashboard-icon.svg';
 import { useDispatch } from 'react-redux';
 import { ChangeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import styled from 'styled-components';
 import Theme from 'theme';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
@@ -288,7 +288,14 @@ function Home() {
 
   const onSendFtSelect = async (coin: FungibleToken) => {
     if (coin.protocol === 'brc-20') {
-      navigate('send-brc20', {
+      if (isLedgerAccount(selectedAccount)) {
+        await chrome.tabs.create({
+          // TODO replace with send-brc20-one-step route, when ledger support is ready
+          url: chrome.runtime.getURL(`options.html#/send-brc20?coinName=${coin.name}`),
+        });
+        return;
+      }
+      navigate('send-brc20-one-step', {
         state: {
           fungibleToken: coin,
         },
@@ -452,11 +459,12 @@ function Home() {
       )}
       <Container>
         <BalanceCard
-          isLoading={
-            loadingStxWalletData ||
-            loadingBtcWalletData ||
-            refetchingStxWalletData ||
-            refetchingBtcWalletData
+          isLoading={loadingStxWalletData || loadingBtcWalletData}
+          isRefetching={
+            refetchingBtcCoinData ||
+            refetchingBtcWalletData ||
+            refetchingCoinData ||
+            refetchingStxWalletData
           }
         />
         <RowButtonContainer>
@@ -472,7 +480,7 @@ function Home() {
               title={t('BITCOIN')}
               currency="BTC"
               icon={BitcoinIcon}
-              loading={loadingBtcWalletData || refetchingBtcWalletData}
+              loading={loadingBtcWalletData}
               underlayColor={Theme.colors.background.elevation1}
               onPress={handleTokenPressed}
             />
@@ -482,7 +490,7 @@ function Home() {
               title={t('STACKS')}
               currency="STX"
               icon={stacksIcon}
-              loading={loadingStxWalletData || refetchingStxWalletData}
+              loading={loadingStxWalletData}
               underlayColor={Theme.colors.background.elevation1}
               onPress={handleTokenPressed}
             />
@@ -495,9 +503,10 @@ function Home() {
                 ?.filter((ft) => ft.visible)
                 .map((coin) => (
                   <TokenTile
+                    key={coin.name}
                     title={coin.name}
                     currency="FT"
-                    loading={loadingCoinData || refetchingCoinData}
+                    loading={loadingCoinData}
                     underlayColor={Theme.colors.background.elevation1}
                     fungibleToken={coin}
                     onPress={handleTokenPressed}
@@ -508,7 +517,7 @@ function Home() {
                 key={coin.name}
                 title={coin.name}
                 currency="brc20"
-                loading={loadingBtcCoinData || refetchingBtcCoinData}
+                loading={loadingBtcCoinData}
                 underlayColor={Theme.colors.background.elevation1}
                 fungibleToken={coin}
                 onPress={handleTokenPressed}

@@ -17,16 +17,19 @@ import ConfirmInscriptionRequest from '@screens/confirmInscriptionRequest';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
+import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
 import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import ErrorBoundary from '@screens/error';
+import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
 import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
 import Landing from '@screens/landing';
 import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
+import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
 import LegalLinks from '@screens/legalLinks';
 import Login from '@screens/login';
 import ManageTokens from '@screens/manageTokens';
@@ -40,6 +43,7 @@ import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20Screen from '@screens/sendBrc20';
+import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
 import SendFtScreen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
@@ -61,7 +65,6 @@ import TransactionStatus from '@screens/transactionStatus';
 import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
 import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
-import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
 
 const router = createHashRouter([
   {
@@ -164,6 +167,22 @@ const router = createHashRouter([
       {
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,
+      },
+      {
+        path: 'confirm-brc20-tx',
+        element: (
+          <AuthGuard>
+            <ConfirmBrc20Transaction />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'execute-brc20-tx',
+        element: (
+          <AuthGuard>
+            <ExecuteBrc20Transaction />
+          </AuthGuard>
+        ),
       },
       {
         path: 'confirm-ledger-tx',
@@ -330,10 +349,19 @@ const router = createHashRouter([
         ),
       },
       {
+        // TODO deprecate this after brc20 one step ledger support done
         path: 'send-brc20',
         element: (
           <AuthGuard>
             <SendBrc20Screen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'send-brc20-one-step',
+        element: (
+          <AuthGuard>
+            <SendBrc20OneStepScreen />
           </AuthGuard>
         ),
       },
