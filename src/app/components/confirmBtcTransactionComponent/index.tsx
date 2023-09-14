@@ -355,17 +355,17 @@ function ConfirmBtcTransactionComponent({
           <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
         )}
         <Container>
-          {children}
-          <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
-            {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
-          </ReviewTransactionText>
-
           {showFeeWarning && (
             <InfoContainer
               type="Warning"
               bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')}
             />
           )}
+
+          {children}
+          <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
+            {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
+          </ReviewTransactionText>
 
           {ordinalTxUtxo ? (
             <RecipientComponent
