@@ -32,6 +32,10 @@ const ScreenContainer = styled(animated.div)({
   flex: 1,
   paddingLeft: 18,
   paddingRight: 18,
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
 });
 
 const ContentContainer = styled(animated.div)({

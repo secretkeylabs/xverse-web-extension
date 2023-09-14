@@ -14,22 +14,11 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    width: 10px;
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    width: 8px;
-    max-height: 20px;
-    border-radius: 24px;
-    background: var(--white-800, rgba(255, 255, 255, 0.2));
-  }
-`;
+export const Container = styled.div((props) => ({
+  ...props.theme.scrollbar,
+  display: 'flex',
+  flexDirection: 'column',
+}));
 
 const ButtonContainer = styled.button((props) => ({
   width: '100%',
@@ -39,8 +28,8 @@ const ButtonContainer = styled.button((props) => ({
   background: 'transparent',
   paddingTop: props.theme.spacing(4),
   paddingBottom: props.theme.spacing(4),
-  paddingLeft: props.theme.spacing(11),
-  paddingRight: props.theme.spacing(11),
+  paddingLeft: props.theme.spacing(7),
+  paddingRight: props.theme.spacing(7),
   transition: 'background-color 0.2s ease',
   ':hover': {
     backgroundColor: props.theme.colors.background.elevation1,
@@ -50,8 +39,8 @@ const ButtonContainer = styled.button((props) => ({
 const AccountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(11),
-  paddingRight: props.theme.spacing(11),
+  paddingLeft: props.theme.spacing(7),
+  paddingRight: props.theme.spacing(7),
   paddingTop: props.theme.spacing(8),
   gap: props.theme.spacing(8),
 }));

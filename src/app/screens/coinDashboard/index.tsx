@@ -19,6 +19,10 @@ const Container = styled.div((props) => ({
   flex: 1,
   marginTop: props.theme.spacing(4),
   flexDirection: 'column',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
 }));
 
 const TokenContractContainer = styled.div((props) => ({
