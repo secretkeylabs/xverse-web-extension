@@ -112,6 +112,10 @@ const TitleContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(16),
 }));
 
+const WarningWrapper = styled.div((props) => ({
+  marginBottom: props.theme.spacing(8),
+}));
+
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
@@ -293,7 +297,11 @@ function ConfirmStxTransationComponent({
           {!!subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
 
-        {showFeeWarning && <InfoContainer type="Warning" bodyText={t('HIGH_FEE_WARNING_TEXT')} />}
+        {showFeeWarning && (
+          <WarningWrapper>
+            <InfoContainer type="Warning" bodyText={t('HIGH_FEE_WARNING_TEXT')} />
+          </WarningWrapper>
+        )}
 
         {children}
         <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
