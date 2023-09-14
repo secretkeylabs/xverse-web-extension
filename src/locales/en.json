@@ -296,7 +296,6 @@
     "YOU_WILL_RECEIVE": "You will receive",
     "SCRIPT_OUTPUT": "Script output",
     "SCRIPT_OUTPUT_TX": "This transaction contains a script output. Be sure you trust the source of this transaction before confirming it.",
-
     "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
@@ -304,6 +303,7 @@
     "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
     "CONITNUE": "Continue",
     "BACK": "Back",
+    "HIGH_FEE_WARNING_TEXT": "The estimated transaction fees for this transaction are very high.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",

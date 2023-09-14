@@ -21,14 +21,14 @@ import {
   signNonOrdinalBtcSendTransaction,
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import { StoreState } from '@stores/index';
 import { useMutation } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import InfoContainer from '@components/infoContainer';
+import useWalletSelector from '@hooks/useWalletSelector';
 import TransactionDetailComponent from '../transactionDetailComponent';
 
 const OuterContainer = styled.div`
@@ -153,13 +153,13 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
-  const { btcAddress, selectedAccount, seedPhrase, network, btcFiatRate } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { btcAddress, selectedAccount, seedPhrase, network, btcFiatRate, feeMultipliers } =
+    useWalletSelector();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
+  const [showFeeWarning, setShowFeeWarning] = useState(false);
   const {
     isLoading,
     data,
@@ -280,7 +280,18 @@ function ConfirmBtcTransactionComponent({
     feeRate?: string;
     nonce?: string;
   }) => {
-    setCurrentFee(new BigNumber(modifiedFee));
+    const newFee = new BigNumber(modifiedFee);
+
+    if (
+      feeMultipliers &&
+      newFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighSatsFee))
+    ) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+
+    setCurrentFee(newFee);
     setCurrentFeeRate(new BigNumber(feeRate));
     if (ordinalTxUtxo) ordinalMutate(modifiedFee);
     else if (isRestoreFundFlow) {
@@ -348,6 +359,13 @@ function ConfirmBtcTransactionComponent({
           <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
             {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
           </ReviewTransactionText>
+
+          {showFeeWarning && (
+            <InfoContainer
+              type="Warning"
+              bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')}
+            />
+          )}
 
           {ordinalTxUtxo ? (
             <RecipientComponent
