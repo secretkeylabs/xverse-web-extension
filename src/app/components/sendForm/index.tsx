@@ -336,7 +336,7 @@ function SendForm({
             .toFixed(fungibleToken.decimals ?? 2)
             .toString();
         }
-        break;
+        return '';
       default:
         return '';
     }
