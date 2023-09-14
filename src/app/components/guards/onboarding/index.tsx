@@ -21,8 +21,8 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
   useSingleTabGuard('onboarding');
 
   const [walletExistsGuardEnabled, setWalletExistsGuardEnabled] = useState(true);
-  const [walletSeedPhrase, setWalletSeedPhrase] = useState<string | null>(null);
-  const { getSeed } = useSeedVault();
+  const [isWalletInitialized, setIsWalletInitialized] = useState(false);
+  const { hasSeed } = useSeedVault();
   const contextValue: WalletExistsContextProps = useMemo(
     () => ({
       disableWalletExistsGuard: () => setWalletExistsGuardEnabled(false),
@@ -31,19 +31,15 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
   );
   useEffect(() => {
     (async () => {
-      try {
-        const seed = await getSeed();
-        setWalletSeedPhrase(seed);
-      } catch (err) {
-        setWalletSeedPhrase(null);
-      }
+      const hasSeedPhrase = await hasSeed();
+      setIsWalletInitialized(hasSeedPhrase);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const hydrated = useHasStateRehydrated();
 
-  if (walletExistsGuardEnabled && hydrated && walletSeedPhrase) {
+  if (walletExistsGuardEnabled && hydrated && isWalletInitialized) {
     return <Navigate to="/wallet-exists" />;
   }
 
