@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { useEffect, useState } from 'react';
 import {
   FungibleToken,

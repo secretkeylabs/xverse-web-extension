@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, getFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
