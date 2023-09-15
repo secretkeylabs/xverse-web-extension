@@ -40,7 +40,64 @@
         "argsIgnorePattern": "^_"
       }
     ],
-    "no-plusplus": "off"
+    "no-plusplus": "off",
+    "import/newline-after-import": ["error", { "count": 1 }],
+    "import/order": [
+      "error",
+      {
+        "groups": ["external", "internal", "builtin", "parent", "sibling", "index"],
+        "pathGroups": [
+          // https://github.com/import-js/eslint-plugin-import/blob/v2.28.0/docs/rules/order.md#pathgroups-array-of-objects
+          {
+            "pattern": "@assets/**",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "@common/**",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "@components/**",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "@core/**",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "@hooks/**",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "@screens/**",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "@stores/**",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "@utils/**",
+            "group": "internal",
+            "position": "after"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["internal"], // https://github.com/import-js/eslint-plugin-import/blob/v2.28.0/docs/rules/order.md#pathgroupsexcludedimporttypes-array
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ],
+    "import/no-duplicates": "error"
   },
   "settings": {
     "import/resolver": {
