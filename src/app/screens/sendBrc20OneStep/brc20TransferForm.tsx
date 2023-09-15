@@ -175,7 +175,7 @@ function Brc20TransferForm(props: Props) {
               />
             </Text>
           </RowContainer>
-          <AmountInputContainer error={!!amountError}>
+          <AmountInputContainer error={amountError?.variant === 'danger'}>
             <InputFieldContainer>
               <InputField value={amountToSend} placeholder="0" onChange={onAmountChange} />
             </InputFieldContainer>
@@ -187,7 +187,7 @@ function Brc20TransferForm(props: Props) {
           <RowContainer>
             <Label>{t('RECIPIENT')}</Label>
           </RowContainer>
-          <AmountInputContainer error={!!recipientError}>
+          <AmountInputContainer error={recipientError?.variant === 'danger'}>
             <InputFieldContainer>
               <InputField
                 value={recipientAddress}
