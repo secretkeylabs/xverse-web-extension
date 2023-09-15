@@ -1,4 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
@@ -32,6 +33,11 @@ const TestnetText = styled.h1((props) => ({
 function ScreenContainer(): JSX.Element {
   const { network } = useWalletSelector();
   const { t } = useTranslation('translation');
+
+  useEffect(() => {
+    const container = document.getElementById('app');
+    container!.style.maxHeight = '100vh';
+  }, []);
 
   return (
     <RouteContainer className="optionsContainer">
