@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const resetUserFlowChannel = 'resetUserFlow';
@@ -7,19 +7,20 @@ const resetUserFlowChannel = 'resetUserFlow';
  * Extend UserFlowConfigKey here
  *
  * resetTo: should be a valid route
- *
  */
 const userFlowConfig: Record<string, { resetTo: string }> = {
   '/send-btc': { resetTo: '/send-btc' },
   '/confirm-btc-tx': { resetTo: '/send-btc' },
-  '/send-brc20': { resetTo: '/account-list' },
-  '/confirm-inscription-request': { resetTo: '/account-list' },
+  '/send-brc20': { resetTo: '/' },
+  '/confirm-brc20-tx': { resetTo: '/' },
+  '/confirm-inscription-request': { resetTo: '/' },
   '/ordinal-detail': { resetTo: '/nft-dashboard' },
   '/send-ordinal': { resetTo: '/nft-dashboard' },
   '/confirm-ordinal-tx': { resetTo: '/nft-dashboard' },
   '/nft-detail': { resetTo: '/nft-dashboard' },
   '/send-nft': { resetTo: '/nft-dashboard' },
   '/confirm-nft-tx': { resetTo: '/nft-dashboard' },
+  '/verify-ledger': { resetTo: '/verify-ledger?mismatch=true' },
   '/add-stx-address-ledger': { resetTo: '/add-stx-address-ledger?mismatch=true' },
 };
 type UserFlowConfigKey = keyof typeof userFlowConfig;
@@ -28,48 +29,38 @@ type UserFlowConfigKey = keyof typeof userFlowConfig;
  * Usage:
  *
  * To subscribe:
- *   const { subscribeToResetUserFlow } = useResetUserFlow();
- *   useEffect(() => subscribeToResetUserFlow('/nft-detail'), []);
+ *   useResetUserFlow('/send-brc20');
  *
- * To broadcast (once on first render):
- *   const { broadcastResetUserFlow, closeChannel } = useResetUserFlow();
- *   useEffect(() => broadcastResetUserFlow(), []);
- *
- * Both subscribe and broadcast methods return the cleanup callback,
- * but you can also use closeChannel, which only returns a close callback:
- *   const { closeChannel } = useResetUserFlow();
- *   useEffect(() => closeChannel, []);
- *
+ * To broadcast:
+ *   broadcastResetUserFlow();
  */
-export const useResetUserFlow = () => {
+export const useResetUserFlow = (path: UserFlowConfigKey) => {
   const navigate = useNavigate();
 
-  const resetUserFlow = (path: UserFlowConfigKey) => {
-    // TODO: infer UserFlowConfigKey from location?
-    if (!userFlowConfig[path]) {
-      return;
-    }
-    navigate(userFlowConfig[path]?.resetTo);
-  };
-
-  const broadcastChannel = useMemo(() => new BroadcastChannel(resetUserFlowChannel), []);
-  const closeChannel = () => broadcastChannel.close();
-
-  const broadcastResetUserFlow = () => {
-    broadcastChannel.postMessage('reset');
-    return closeChannel;
-  };
-
-  const subscribeToResetUserFlow = (path: UserFlowConfigKey) => {
+  useEffect(() => {
+    const broadcastChannel = new BroadcastChannel(resetUserFlowChannel);
     broadcastChannel.onmessage = (message) => {
       if (message.data !== 'reset') {
         return;
       }
-      resetUserFlow(path);
+
+      // TODO: infer UserFlowConfigKey from location?
+      if (!userFlowConfig[path]) {
+        return;
+      }
+      navigate(userFlowConfig[path]?.resetTo);
     };
-    return closeChannel;
-  };
-  return { subscribeToResetUserFlow, broadcastResetUserFlow, closeChannel };
+
+    return () => {
+      broadcastChannel.close();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 };
 
 export default useResetUserFlow;
+
+export const broadcastResetUserFlow = () => {
+  const broadcastChannel = new BroadcastChannel(resetUserFlowChannel);
+  broadcastChannel.postMessage('reset');
+  broadcastChannel.close();
+};

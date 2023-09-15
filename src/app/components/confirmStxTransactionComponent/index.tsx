@@ -48,9 +48,6 @@ export const ButtonContainer = styled.div((props) => ({
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   backgroundColor: props.theme.colors.background.elevation0,
-  // position: 'sticky',
-  // left: 0,
-  // bottom: 0,
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({

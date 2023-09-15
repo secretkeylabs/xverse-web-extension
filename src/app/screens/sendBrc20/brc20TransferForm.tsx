@@ -95,7 +95,7 @@ interface Props {
 }
 
 function Brc20TransferForm(props: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC_20' });
+  const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
   const { amountToSend, onAmountChange, amountError, token } = props;
 
   function getTokenCurrency() {

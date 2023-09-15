@@ -10,20 +10,16 @@ import styled from 'styled-components';
 
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { isHardwareAccount } from '@utils/helper';
 
 import popupCenter from '../../../common/utils/popup-center';
 
 const SelectedAccountContainer = styled.div((props) => ({
-  paddingLeft: '5%',
-  paddingRight: '5%',
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'space-between',
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(10),
+  padding: `${props.theme.spacing(10)}px ${props.theme.spacing(8)}px`,
   borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
 }));
 
@@ -42,12 +38,11 @@ const ResetWalletContainer = styled.div((props) => ({
   paddingTop: props.theme.spacing(30),
 }));
 
-const OptionsButton = styled.button((props) => ({
+const OptionsButton = styled.button(() => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
   background: 'transparent',
-  marginTop: props.theme.spacing(8),
 }));
 
 const ButtonRow = styled.button`
@@ -77,13 +72,11 @@ const WarningButton = styled(ButtonRow)`
 interface AccountHeaderComponentProps {
   disableMenuOption?: boolean;
   disableAccountSwitch?: boolean;
-  disableCopy?: boolean;
 }
 
 function AccountHeaderComponent({
   disableMenuOption = false,
   disableAccountSwitch = false,
-  disableCopy = false,
 }: AccountHeaderComponentProps) {
   const navigate = useNavigate();
   const { selectedAccount } = useWalletSelector();
@@ -181,7 +174,6 @@ function AccountHeaderComponent({
         <AccountRow
           account={selectedAccount!}
           isSelected
-          allowCopyAddress={!disableCopy && !isHardwareAccount(selectedAccount)}
           onAccountSelected={handleAccountSelect}
           disabledAccountSelect={disableAccountSwitch}
         />

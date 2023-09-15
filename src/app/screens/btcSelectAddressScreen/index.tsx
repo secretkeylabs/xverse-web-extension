@@ -147,6 +147,7 @@ const BitcoinDot = styled.div((props) => ({
 }));
 
 const AccountListRow = styled.div((props) => ({
+  paddingTop: props.theme.spacing(8),
   paddingLeft: 16,
   paddingRight: 16,
   ':hover': {

@@ -7,10 +7,8 @@ body {
   padding: 0;
   color: #ffffff;
   position: relative;
-  background-color: #12151e;
-
+  background-color: #181818;
   height: 100%;
-
   display: flex;
   justify-content: center;
   align-items: center;

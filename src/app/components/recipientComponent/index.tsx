@@ -24,7 +24,7 @@ const Container = styled.div((props) => ({
   marginBottom: 12,
 }));
 
-const RecipientTitleText = styled.h1((props) => ({
+const RecipientTitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
   marginBottom: 16,
@@ -56,19 +56,19 @@ const DownArrowIcon = styled.img((props) => ({
   marginBottom: props.theme.spacing(4),
 }));
 
-const TitleText = styled.h1((props) => ({
+const TitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[200],
   textAlign: 'center',
   marginTop: 5,
 }));
 
-const ValueText = styled.h1((props) => ({
+const ValueText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white[0],
 }));
 
-const SubValueText = styled.h1((props) => ({
+const SubValueText = styled.p((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
   color: props.theme.colors.white[400],
@@ -161,7 +161,6 @@ function RecipientComponent({
           thousandSeparator
           prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
           suffix={` ${fiatCurrency}`}
-          renderText={(text) => <SubValueText>{text}</SubValueText>}
         />
       );
     }

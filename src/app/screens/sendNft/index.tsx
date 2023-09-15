@@ -172,8 +172,7 @@ function SendNft() {
     }
   }, [data]);
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/send-nft'), []);
+  useResetUserFlow('/send-nft');
 
   const handleBackButtonClick = () => {
     navigate(-1);
