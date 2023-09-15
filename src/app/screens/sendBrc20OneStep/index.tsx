@@ -20,6 +20,7 @@ import { replaceCommaByDot } from '@utils/helper';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import type { InputFeedbackProps } from '@ui-library/inputFeedback';
 import { useTranslation } from 'react-i18next';
 import Brc20TransferForm from './brc20TransferForm';
 
@@ -29,9 +30,9 @@ function SendBrc20Screen() {
   const location = useLocation();
   const { btcAddress, ordinalsAddress, network, brcCoinsList } = useWalletSelector();
   const { data: feeRate } = useBtcFeeRate();
-  const [amountError, setAmountError] = useState('');
+  const [amountError, setAmountError] = useState<InputFeedbackProps | null>(null);
   const [amountToSend, setAmountToSend] = useState('');
-  const [recipientError, setRecipientError] = useState('');
+  const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
   const [recipientAddress, setRecipientAddress] = useState('');
   const [processing, setProcessing] = useState(false);
 
@@ -52,14 +53,14 @@ function SendBrc20Screen() {
     const amount = Number(replaceCommaByDot(amountInput));
     const balance = Number(fungibleToken.balance);
     if (!Number.isFinite(amount) || amount === 0) {
-      setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
+      setAmountError({ variant: 'danger', message: t('ERRORS.AMOUNT_REQUIRED') });
       return false;
     }
     if (!Number.isFinite(balance) || amount > Number(balance)) {
-      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
+      setAmountError({ variant: 'danger', message: t('ERRORS.INSUFFICIENT_BALANCE') });
       return false;
     }
-    setAmountError('');
+    setAmountError(null);
     return true;
   };
 
@@ -74,7 +75,7 @@ function SendBrc20Screen() {
 
   const validateRecipientAddress = (address: string): boolean => {
     if (!address) {
-      setRecipientError(t('ERRORS.ADDRESS_REQUIRED'));
+      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_REQUIRED') });
       return false;
     }
     if (
@@ -83,10 +84,14 @@ function SendBrc20Screen() {
         network: network.type,
       })
     ) {
-      setRecipientError(t('ERRORS.ADDRESS_INVALID'));
+      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
       return false;
     }
-    setRecipientError('');
+    if (address === ordinalsAddress) {
+      setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
+      return true;
+    }
+    setRecipientError(null);
     return true;
   };
 

@@ -914,7 +914,9 @@
     "SEND_STEP_2_TITLE": "Send transfer inscription",
     "SEND_STEP_2": "Once you have the transfer inscription, you can send it to your recipient to transfer the BRC-20 token.",
     "SEND_INFO_START_BUTTON": "Start",
-    "SEND_NEXT_BUTTON": "Next"
+    "SEND_NEXT_BUTTON": "Next",
+    "MAKE_SURE_THE_RECIPIENT": "Make sure the recipient's wallet supports BRC-20 tokens.",
+    "YOU_ARE_TRANSFERRING_TO_YOURSELF": "You are transferring to yourself"
   },
   "CONFIRM_BRC20": {
     "BITCOIN_VALUE": "Bitcoin value",

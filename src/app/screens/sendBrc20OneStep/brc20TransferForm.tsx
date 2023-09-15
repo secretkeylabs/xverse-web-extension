@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import ActionButton from '@components/button';
+import Callout from '@ui-library/callout';
+import { InputFeedback, InputFeedbackProps } from '@ui-library/inputFeedback';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -13,6 +15,10 @@ const Container = styled.div((props) => ({
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   justifyContent: 'space-between',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
 }));
 
 const BRC20TokenTagContainer = styled.div((props) => ({
@@ -105,25 +111,24 @@ const BalanceText = styled.h1((props) => ({
 
 const ErrorContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(3),
-}));
-
-const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
-  minHeight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(12),
 }));
 
 const InputGroup = styled.div`
   margin-top: ${(props) => props.theme.spacing(8)}px;
 `;
 
+const StyledCallout = styled(Callout)`
+  margin-bottom: ${(props) => props.theme.spacing(14)}px;
+`;
+
 interface Props {
   token: FungibleToken;
-  amountError: string;
+  amountError: InputFeedbackProps | null;
   amountToSend: string;
   onAmountChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   recipientAddress: string;
-  recipientError: string;
+  recipientError: InputFeedbackProps | null;
   onAddressChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onPressNext: () => void;
   processing: boolean;
@@ -176,9 +181,7 @@ function Brc20TransferForm(props: Props) {
             </InputFieldContainer>
             <Text>{tokenCurrency}</Text>
           </AmountInputContainer>
-          <ErrorContainer>
-            <ErrorText>{amountError}</ErrorText>
-          </ErrorContainer>
+          <ErrorContainer>{amountError && <InputFeedback {...amountError} />}</ErrorContainer>
         </InputGroup>
         <InputGroup>
           <RowContainer>
@@ -193,10 +196,9 @@ function Brc20TransferForm(props: Props) {
               />
             </InputFieldContainer>
           </AmountInputContainer>
-          <ErrorContainer>
-            <ErrorText>{recipientError}</ErrorText>
-          </ErrorContainer>
+          <ErrorContainer>{recipientError && <InputFeedback {...recipientError} />}</ErrorContainer>
         </InputGroup>
+        <StyledCallout bodyText={t('MAKE_SURE_THE_RECIPIENT')} />
       </div>
       <NextButtonContainer>
         <ActionButton
