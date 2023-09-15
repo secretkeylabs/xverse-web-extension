@@ -14,7 +14,6 @@ import {
   useBrc20TransferFees,
   validateBtcAddressIsTaproot,
 } from '@secretkeylabs/xverse-core';
-import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import styled from 'styled-components';
 import useDebounce from '@hooks/useDebounce';
@@ -26,11 +25,12 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
-import type { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import type { Brc20Recipient } from '@secretkeylabs/xverse-core/types';
 import type { FungibleToken, SettingsNetwork } from '@secretkeylabs/xverse-core';
 import Callout, { CalloutProps } from '@ui-library/callout';
 import Brc20FeesComponent from './brc20FeesComponent';
 import { EditFees, OnChangeFeeRate } from './editFees';
+import RecipientCard from './recipientCard';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -111,8 +111,11 @@ const StyledCallouts = styled.div`
   margin-bottom: ${(props) => props.theme.spacing(12)}px;
 `;
 
+const RecipientCardContainer = styled.div`
+  margin-bottom: ${(props) => props.theme.spacing(6)}px;
+`;
+
 const useConfirmBrc20Transfer = (): {
-  btcFee: BigNumber;
   callouts: CalloutProps[];
   errorMessage: string;
   estimateFeesParams: Brc20TransferEstimateFeesParams;
@@ -125,7 +128,7 @@ const useConfirmBrc20Transfer = (): {
   isConfirmLoading: boolean;
   isFeeLoading: boolean;
   network: SettingsNetwork;
-  recipients: Recipient[];
+  recipient: Brc20Recipient;
   showFeeSettings: boolean;
   token: FungibleToken;
   txFee: BigNumber;
@@ -161,9 +164,8 @@ const useConfirmBrc20Transfer = (): {
     skipInitialFetch: true,
   });
 
-  const { txFee, inscriptionFee, totalFee, btcFee } = getFeeValuesForBrc20OneStepTransfer(
-    commitValueBreakdown ?? initEstimatedFees.valueBreakdown,
-  );
+  const { txFee, inscriptionFee, totalFee, transferUtxoValue } =
+    getFeeValuesForBrc20OneStepTransfer(commitValueBreakdown ?? initEstimatedFees.valueBreakdown);
 
   /* callbacks */
   const handleClickConfirm = () => {
@@ -229,9 +231,11 @@ const useConfirmBrc20Transfer = (): {
 
   const errorMessage = errorCode ? t(`CONFIRM_BRC20.ERROR_CODES.${errorCode}`) : error;
 
-  const recipients: Recipient[] = [
-    { address: recipientAddress, amountSats: new BigNumber(estimateFeesParams.amount) },
-  ];
+  const recipient: Brc20Recipient = {
+    address: recipientAddress,
+    amountBrc20: new BigNumber(estimateFeesParams.amount),
+    amountSats: new BigNumber(transferUtxoValue),
+  };
 
   const callouts: CalloutProps[] = [];
   if (!validateBtcAddressIsTaproot(recipientAddress)) {
@@ -248,7 +252,6 @@ const useConfirmBrc20Transfer = (): {
   }
 
   return {
-    btcFee,
     callouts,
     errorMessage,
     estimateFeesParams,
@@ -261,7 +264,7 @@ const useConfirmBrc20Transfer = (): {
     isConfirmLoading,
     isFeeLoading,
     network,
-    recipients,
+    recipient,
     showFeeSettings,
     token,
     txFee,
@@ -271,7 +274,6 @@ const useConfirmBrc20Transfer = (): {
 export function ConfirmBrc20Transaction() {
   const { t } = useTranslation('translation');
   const {
-    btcFee,
     callouts,
     errorMessage,
     estimateFeesParams,
@@ -284,7 +286,7 @@ export function ConfirmBrc20Transaction() {
     isConfirmLoading,
     isFeeLoading,
     network,
-    recipients,
+    recipient,
     showFeeSettings,
     token,
     txFee,
@@ -306,33 +308,17 @@ export function ConfirmBrc20Transaction() {
                 ))}
               </StyledCallouts>
             )}
-            {recipients?.map(({ address, amountSats }, index) => (
-              <RecipientComponent
-                key={address}
-                address={address}
-                recipientIndex={index + 1}
-                value={amountSats.toString()}
-                totalRecipient={recipients.length}
-                currencyType="FT"
+            <RecipientCardContainer>
+              <RecipientCard
+                address={recipient.address}
+                amountBrc20={recipient.amountBrc20}
+                amountSats={recipient.amountSats}
                 fungibleToken={token}
-                title={t('CONFIRM_TRANSACTION.AMOUNT')}
-                showSenderAddress={false}
               />
-            ))}
+            </RecipientCardContainer>
             <TransactionDetailComponent
               title={t('CONFIRM_TRANSACTION.NETWORK')}
               value={network.type}
-            />
-            <TransactionDetailComponent
-              title={t('CONFIRM_BRC20.BITCOIN_VALUE')}
-              value={
-                <NumericFormat
-                  value={btcFee.toString()}
-                  displayType="text"
-                  thousandSeparator
-                  suffix={` sats`}
-                />
-              }
             />
             <Brc20FeesComponent fees={fees} />
             <div>

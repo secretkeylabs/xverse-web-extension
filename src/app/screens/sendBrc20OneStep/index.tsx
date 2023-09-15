@@ -39,7 +39,10 @@ function SendBrc20Screen() {
   useResetUserFlow('/send-brc20');
 
   const isNextEnabled =
-    !amountError && !recipientError && !!recipientAddress && amountToSend !== '';
+    !amountError &&
+    (!recipientError || recipientError.variant !== 'danger') &&
+    !!recipientAddress &&
+    amountToSend !== '';
 
   const { fungibleToken: ft }: SendBrc20TransferState = location.state || {};
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
