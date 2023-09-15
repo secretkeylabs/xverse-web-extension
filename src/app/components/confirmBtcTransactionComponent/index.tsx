@@ -264,6 +264,17 @@ function ConfirmBtcTransactionComponent({
     }
   }, [signedNonOrdinalBtcSend]);
 
+  useEffect(() => {
+    if (
+      feeMultipliers &&
+      currentFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighSatsFee))
+    ) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+  }, [currentFee, feeMultipliers]);
+
   const onAdvancedSettingClick = () => {
     setShowFeeSettings(true);
   };
@@ -281,15 +292,6 @@ function ConfirmBtcTransactionComponent({
     nonce?: string;
   }) => {
     const newFee = new BigNumber(modifiedFee);
-
-    if (
-      feeMultipliers &&
-      newFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighSatsFee))
-    ) {
-      setShowFeeWarning(true);
-    } else if (showFeeWarning) {
-      setShowFeeWarning(false);
-    }
 
     setCurrentFee(newFee);
     setCurrentFeeRate(new BigNumber(feeRate));

@@ -163,6 +163,16 @@ function ConfirmStxTransationComponent({
     setButtonLoading(loading);
   }, [loading]);
 
+  useEffect(() => {
+    const fee = new BigNumber(initialStxTransactions[0].auth.spendingCondition.fee.toString());
+
+    if (feeMultipliers && fee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighStacksFee))) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+  }, [initialStxTransactions, feeMultipliers]);
+
   const getFee = () =>
     isSponsored
       ? new BigNumber(0)
