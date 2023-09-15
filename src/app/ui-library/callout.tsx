@@ -1,5 +1,5 @@
-import { createElement } from 'react';
 import { CheckCircle, Info, Warning, WarningCircle } from '@phosphor-icons/react';
+import { createElement } from 'react';
 import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledHeading, StyledP } from './common.styled';
@@ -42,14 +42,14 @@ const TextContainer = styled.div`
   flex-direction: column;
 `;
 
-const RedirectButton = styled.button((props) => ({
-  backgroundColor: 'transparent',
-  color: props.theme.colors.white['0'],
-  display: 'flex',
-  marginTop: 4,
-  justifyContent: 'flex-start',
-  alignItems: 'flex-start',
-}));
+const RedirectButton = styled.button`
+  background-color: transparent;
+  color: ${(props) => props.theme.colors.white_0},
+  display: flex;
+  margin-top: 4;
+  justify-content: flex-start;
+  align-items: center;
+`;
 
 /**
  * ref: https://zeroheight.com/0683c9fa7/p/051ca8-callout/t/7814dc
