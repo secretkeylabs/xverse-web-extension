@@ -1,12 +1,12 @@
+import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
+import Callout from '@ui-library/callout';
+import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import { getFtTicker } from '@utils/tokens';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import ActionButton from '@components/button';
-import Callout from '@ui-library/callout';
-import { InputFeedback, InputFeedbackProps } from '@ui-library/inputFeedback';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -175,7 +175,7 @@ function Brc20TransferForm(props: Props) {
               />
             </Text>
           </RowContainer>
-          <AmountInputContainer error={amountError?.variant === 'danger'}>
+          <AmountInputContainer error={isDangerFeedback(amountError)}>
             <InputFieldContainer>
               <InputField value={amountToSend} placeholder="0" onChange={onAmountChange} />
             </InputFieldContainer>
@@ -187,7 +187,7 @@ function Brc20TransferForm(props: Props) {
           <RowContainer>
             <Label>{t('RECIPIENT')}</Label>
           </RowContainer>
-          <AmountInputContainer error={recipientError?.variant === 'danger'}>
+          <AmountInputContainer error={isDangerFeedback(recipientError)}>
             <InputFieldContainer>
               <InputField
                 value={recipientAddress}

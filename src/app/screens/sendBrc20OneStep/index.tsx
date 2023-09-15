@@ -1,27 +1,27 @@
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  brc20TransferEstimateFees,
+  CoreError,
+  getNonOrdinalUtxo,
+  UTXO,
+  validateBtcAddress,
+} from '@secretkeylabs/xverse-core';
+import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
+import type { InputFeedbackProps } from '@ui-library/inputFeedback';
 import {
   Brc20TransferEstimateFeesParams,
   ConfirmBrc20TransferState,
   SendBrc20TransferState,
 } from '@utils/brc20';
-import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
-import {
-  UTXO,
-  brc20TransferEstimateFees,
-  getNonOrdinalUtxo,
-  validateBtcAddress,
-  CoreError,
-} from '@secretkeylabs/xverse-core';
-import { getFtTicker } from '@utils/tokens';
 import { replaceCommaByDot } from '@utils/helper';
+import { getFtTicker } from '@utils/tokens';
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import type { InputFeedbackProps } from '@ui-library/inputFeedback';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Brc20TransferForm from './brc20TransferForm';
 
 function SendBrc20Screen() {
@@ -39,8 +39,8 @@ function SendBrc20Screen() {
   useResetUserFlow('/send-brc20');
 
   const isNextEnabled =
-    !amountError &&
-    (!recipientError || recipientError.variant !== 'danger') &&
+    !isDangerFeedback(amountError) &&
+    !isDangerFeedback(recipientError) &&
     !!recipientAddress &&
     amountToSend !== '';
 
