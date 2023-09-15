@@ -9,7 +9,11 @@ import {
   getFeeValuesForBrc20OneStepTransfer,
 } from '@utils/brc20';
 import { FadersHorizontal } from '@phosphor-icons/react';
-import { getBtcFiatEquivalent, useBrc20TransferFees } from '@secretkeylabs/xverse-core';
+import {
+  getBtcFiatEquivalent,
+  useBrc20TransferFees,
+  validateBtcAddressIsTaproot,
+} from '@secretkeylabs/xverse-core';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import styled from 'styled-components';
@@ -24,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import type { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
 import type { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import type { FungibleToken, SettingsNetwork } from '@secretkeylabs/xverse-core';
+import Callout, { CalloutProps } from '@ui-library/callout';
 import Brc20FeesComponent from './brc20FeesComponent';
 import { EditFees, OnChangeFeeRate } from './editFees';
 
@@ -95,12 +100,20 @@ const ErrorText = styled.p((props) => ({
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white[0],
-  marginBottom: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(10),
   textAlign: 'left',
 }));
 
+const StyledCallouts = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${(props) => props.theme.spacing(6)}px;
+  margin-bottom: ${(props) => props.theme.spacing(12)}px;
+`;
+
 const useConfirmBrc20Transfer = (): {
   btcFee: BigNumber;
+  callouts: CalloutProps[];
   errorMessage: string;
   estimateFeesParams: Brc20TransferEstimateFeesParams;
   fees: any[];
@@ -119,7 +132,8 @@ const useConfirmBrc20Transfer = (): {
 } => {
   /* hooks */
   const { t } = useTranslation('translation');
-  const { network, btcFiatRate, fiatCurrency, selectedAccount } = useWalletSelector();
+  const { network, btcFiatRate, fiatCurrency, selectedAccount, btcAddress, ordinalsAddress } =
+    useWalletSelector();
   const navigate = useNavigate();
   const {
     recipientAddress,
@@ -219,8 +233,23 @@ const useConfirmBrc20Transfer = (): {
     { address: recipientAddress, amountSats: new BigNumber(estimateFeesParams.amount) },
   ];
 
+  const callouts: CalloutProps[] = [];
+  if (!validateBtcAddressIsTaproot(recipientAddress)) {
+    callouts.push({
+      variant: 'info',
+      bodyText: t('SEND_BRC20.MAKE_SURE_THE_RECIPIENT'),
+    });
+  }
+  if (recipientAddress === ordinalsAddress || recipientAddress === btcAddress) {
+    callouts.push({
+      variant: 'info',
+      bodyText: t('SEND_BRC20.YOU_ARE_TRANSFERRING_TO_YOURSELF'),
+    });
+  }
+
   return {
     btcFee,
+    callouts,
     errorMessage,
     estimateFeesParams,
     fees,
@@ -243,6 +272,7 @@ export function ConfirmBrc20Transaction() {
   const { t } = useTranslation('translation');
   const {
     btcFee,
+    callouts,
     errorMessage,
     estimateFeesParams,
     fees,
@@ -269,6 +299,13 @@ export function ConfirmBrc20Transaction() {
             <ReviewTransactionText>
               {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
             </ReviewTransactionText>
+            {callouts?.length > 0 && (
+              <StyledCallouts>
+                {callouts.map((callout) => (
+                  <Callout key={callout.bodyText} {...callout} />
+                ))}
+              </StyledCallouts>
+            )}
             {recipients?.map(({ address, amountSats }, index) => (
               <RecipientComponent
                 key={address}

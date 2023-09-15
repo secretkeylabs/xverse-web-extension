@@ -87,7 +87,7 @@ function SendBrc20Screen() {
       setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
       return false;
     }
-    if (address === ordinalsAddress) {
+    if (address === ordinalsAddress || address === btcAddress) {
       setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
       return true;
     }
