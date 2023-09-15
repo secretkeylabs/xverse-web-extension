@@ -1,21 +1,19 @@
-import { CheckCircle, Info, Warning, WarningCircle } from '@phosphor-icons/react';
-import { createElement } from 'react';
+import { Info, Warning } from '@phosphor-icons/react';
+import { createElement, ElementType } from 'react';
 import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledP } from './common.styled';
 
 type FeedbackVariant = 'info' | 'danger';
 
-const colors = {
+const colors: Record<FeedbackVariant, string> = {
   info: Theme.colors.white_200,
   danger: Theme.colors.danger_light,
 };
 const getColorForVariant = (variant: FeedbackVariant) => colors[variant];
 
-const icons = {
+const icons: Record<FeedbackVariant, ElementType> = {
   info: Info,
-  warning: WarningCircle,
-  success: CheckCircle,
   danger: Warning,
 };
 const getIconForVariant = (variant: FeedbackVariant) =>
