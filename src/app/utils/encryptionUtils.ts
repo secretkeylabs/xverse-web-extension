@@ -31,6 +31,11 @@ export async function generateKeyArgon2i(password: string, salt: string): Promis
   return result.hashHex;
 }
 
+/**
+ * Only used by the migration function that is run once on the first login after the update to the seed vault
+ * @param password
+ * @returns Argon2i hash and salt of the password
+ */
 export async function generatePasswordHash(password: string) {
   const unMigratedSalt = localStorage.getItem('salt');
   if (!unMigratedSalt) {

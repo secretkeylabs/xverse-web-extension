@@ -12,13 +12,11 @@ function AuthGuard({ children }: PropsWithChildren) {
   const restoreSession = async () => {
     if (encryptedSeed) {
       navigate('/login');
-      setAuthTested(true);
       return;
     }
     const hasSeedPhrase = await hasSeed();
     if (!hasSeedPhrase || !masterPubKey) {
       navigate('/landing');
-      setAuthTested(true);
       return;
     }
     try {
@@ -27,7 +25,6 @@ function AuthGuard({ children }: PropsWithChildren) {
     } catch (error) {
       navigate('/login');
     }
-    setAuthTested(true);
   };
 
   useEffect(() => {
