@@ -79,6 +79,7 @@ const NextButtonContainer = styled.div((props) => ({
   bottom: 0,
   paddingBottom: props.theme.spacing(12),
   paddingTop: props.theme.spacing(12),
+  backgroundColor: props.theme.colors.elevation0,
 }));
 
 const Label = styled.label((props) => ({

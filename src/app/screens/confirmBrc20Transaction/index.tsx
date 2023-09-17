@@ -1,33 +1,32 @@
 import AccountHeaderComponent from '@components/accountHeader';
 import ActionButton from '@components/button';
-import BigNumber from 'bignumber.js';
 import BottomBar from '@components/tabBar';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useDebounce from '@hooks/useDebounce';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { FadersHorizontal } from '@phosphor-icons/react';
+import type { FungibleToken, SettingsNetwork } from '@secretkeylabs/xverse-core';
+import {
+  getBtcFiatEquivalent,
+  useBrc20TransferFees,
+  validateBtcAddressIsTaproot,
+} from '@secretkeylabs/xverse-core';
+import type { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
+import type { Brc20Recipient } from '@secretkeylabs/xverse-core/types';
+import Callout, { CalloutProps } from '@ui-library/callout';
 import {
   Brc20TransferEstimateFeesParams,
   ConfirmBrc20TransferState,
   ExecuteBrc20TransferState,
   getFeeValuesForBrc20OneStepTransfer,
 } from '@utils/brc20';
-import { FadersHorizontal } from '@phosphor-icons/react';
-import {
-  getBtcFiatEquivalent,
-  useBrc20TransferFees,
-  validateBtcAddressIsTaproot,
-} from '@secretkeylabs/xverse-core';
-import TransactionDetailComponent from '@components/transactionDetailComponent';
-import styled from 'styled-components';
-import useDebounce from '@hooks/useDebounce';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { NumericFormat } from 'react-number-format';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
-import type { Brc20Recipient } from '@secretkeylabs/xverse-core/types';
-import type { FungibleToken, SettingsNetwork } from '@secretkeylabs/xverse-core';
-import Callout, { CalloutProps } from '@ui-library/callout';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import Brc20FeesComponent from './brc20FeesComponent';
 import { EditFees, OnChangeFeeRate } from './editFees';
 import RecipientCard from './recipientCard';

@@ -1,4 +1,4 @@
-import { CheckCircle, Info, Warning, WarningCircle } from '@phosphor-icons/react';
+import { ArrowRight, CheckCircle, Info, Warning, WarningCircle } from '@phosphor-icons/react';
 import { createElement } from 'react';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -40,15 +40,17 @@ const Container = styled.div<{ variant: CalloutVariant }>`
 const TextContainer = styled.div`
   display: flex;
   flex-direction: column;
+  gap: ${(props) => props.theme.spacing(2)}px;
 `;
 
 const RedirectButton = styled.button`
   background-color: transparent;
-  color: ${(props) => props.theme.colors.white_0},
+  color: ${(props) => props.theme.colors.white_0};
   display: flex;
-  margin-top: 4;
   justify-content: flex-start;
   align-items: center;
+  gap: ${(props) => props.theme.spacing(1)}px;
+  text-transform: capitalize;
 `;
 
 /**
@@ -83,7 +85,10 @@ export function Callout({
         </StyledP>
         {redirectText && (
           <RedirectButton onClick={onClickRedirect}>
-            <StyledP typography="body_medium_m" color="white_0">{`${redirectText} →`}</StyledP>
+            <StyledP typography="body_medium_m" color="white_0">
+              {redirectText}
+            </StyledP>
+            <ArrowRight size={12} color="currentColor" />
           </RedirectButton>
         )}
       </TextContainer>

@@ -11,7 +11,7 @@ import {
   validateBtcAddress,
 } from '@secretkeylabs/xverse-core';
 import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
-import type { InputFeedbackProps } from '@ui-library/inputFeedback';
+import { InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import {
   Brc20TransferEstimateFeesParams,
   ConfirmBrc20TransferState,
