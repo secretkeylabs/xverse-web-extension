@@ -1,15 +1,15 @@
-import BigNumber from 'bignumber.js';
-import OutputIcon from '@assets/img/transactions/output.svg';
 import btcIcon from '@assets/img/ledger/btc_icon.svg';
+import OutputIcon from '@assets/img/transactions/output.svg';
+import { FiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
-import styled from 'styled-components';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
-import { NumericFormat } from 'react-number-format';
 import { getFtTicker } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
-import { FiatAmountText } from '@components/fiatAmountText';
+import { NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
 import AmountRow from './amountRow';
 
 const Container = styled.div`
@@ -21,17 +21,14 @@ const Container = styled.div`
   gap: ${(props) => props.theme.spacing(8)}px;
 `;
 
-function RecipientCard({
-  address,
-  amountBrc20,
-  amountSats,
-  fungibleToken,
-}: {
+export type RecipientCardProps = {
   address: string;
   amountBrc20: BigNumber;
   amountSats: BigNumber;
   fungibleToken: FungibleToken;
-}) {
+};
+
+function RecipientCard({ address, amountBrc20, amountSats, fungibleToken }: RecipientCardProps) {
   const { t } = useTranslation('translation');
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
 

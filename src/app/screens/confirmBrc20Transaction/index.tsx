@@ -6,14 +6,13 @@ import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FadersHorizontal } from '@phosphor-icons/react';
-import type { FungibleToken, SettingsNetwork } from '@secretkeylabs/xverse-core';
+import type { SettingsNetwork } from '@secretkeylabs/xverse-core';
 import {
   getBtcFiatEquivalent,
   useBrc20TransferFees,
   validateBtcAddressIsTaproot,
 } from '@secretkeylabs/xverse-core';
 import type { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
-import type { Brc20Recipient } from '@secretkeylabs/xverse-core/types';
 import Callout, { CalloutProps } from '@ui-library/callout';
 import {
   Brc20TransferEstimateFeesParams,
@@ -29,7 +28,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Brc20FeesComponent from './brc20FeesComponent';
 import { EditFees, OnChangeFeeRate } from './editFees';
-import RecipientCard from './recipientCard';
+import RecipientCard, { RecipientCardProps } from './recipientCard';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -127,9 +126,8 @@ const useConfirmBrc20Transfer = (): {
   isConfirmLoading: boolean;
   isFeeLoading: boolean;
   network: SettingsNetwork;
-  recipient: Brc20Recipient;
+  recipient: RecipientCardProps;
   showFeeSettings: boolean;
-  token: FungibleToken;
   txFee: BigNumber;
 } => {
   /* hooks */
@@ -230,10 +228,11 @@ const useConfirmBrc20Transfer = (): {
 
   const errorMessage = errorCode ? t(`CONFIRM_BRC20.ERROR_CODES.${errorCode}`) : error;
 
-  const recipient: Brc20Recipient = {
+  const recipient: RecipientCardProps = {
     address: recipientAddress,
     amountBrc20: new BigNumber(estimateFeesParams.amount),
     amountSats: new BigNumber(transferUtxoValue),
+    fungibleToken: token,
   };
 
   const callouts: CalloutProps[] = [];
@@ -265,7 +264,6 @@ const useConfirmBrc20Transfer = (): {
     network,
     recipient,
     showFeeSettings,
-    token,
     txFee,
   };
 };
@@ -287,7 +285,6 @@ export function ConfirmBrc20Transaction() {
     network,
     recipient,
     showFeeSettings,
-    token,
     txFee,
   } = useConfirmBrc20Transfer();
 
@@ -312,7 +309,7 @@ export function ConfirmBrc20Transaction() {
                 address={recipient.address}
                 amountBrc20={recipient.amountBrc20}
                 amountSats={recipient.amountSats}
-                fungibleToken={token}
+                fungibleToken={recipient.fungibleToken}
               />
             </RecipientCardContainer>
             <TransactionDetailComponent
