@@ -165,8 +165,7 @@ function ConfirmInscriptionRequest() {
 
   const content = useMemo(() => textContent && JSON.parse(textContent), [textContent]);
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/confirm-inscription-request'), []);
+  useResetUserFlow('/confirm-inscription-request');
 
   useEffect(() => {
     axios

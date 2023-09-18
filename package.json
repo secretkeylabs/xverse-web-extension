@@ -1,13 +1,13 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.18.0",
+  "version": "0.18.2",
   "private": true,
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "1.7.2",
+    "@secretkeylabs/xverse-core": "1.7.3",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
     "@stacks/stacks-blockchain-api-types": "^6.1.1",
@@ -25,6 +25,7 @@
     "bignumber.js": "^9.1.0",
     "bip39": "^3.0.3",
     "c32check": "^2.0.0",
+    "classnames": "^2.3.2",
     "crypto-browserify": "^3.12.0",
     "date-fns": "^2.29.3",
     "i18next": "^21.9.1",

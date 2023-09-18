@@ -165,8 +165,7 @@ function ConfirmOrdinalTransaction() {
     navigate(-1);
   };
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/confirm-ordinal-tx'), []);
+  useResetUserFlow('/confirm-ordinal-tx');
 
   return (
     <>

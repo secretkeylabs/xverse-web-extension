@@ -892,8 +892,21 @@
     "NETWORK_MISMATCH_ERROR_TITLE": "Mismatched Network",
     "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings."
   },
-  "SEND_BRC_20": {
+  "SEND_BRC20": {
     "BRC20_TOKEN": "BRC-20",
+    "NEXT": "Next",
+    "SEND": "Send",
+    "AMOUNT": "Amount",
+    "BALANCE": "Balance",
+    "RECIPIENT": "Recipient",
+    "ERRORS": {
+      "ADDRESS_REQUIRED": "Recipient address is required",
+      "AMOUNT_REQUIRED": "Amount is required",
+      "ADDRESS_INVALID": "Recipient address invalid",
+      "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
+      "INSUFFICIENT_BALANCE_FEES": "Insufficient BTC balance for transaction fees",
+      "SERVER_ERROR": "Unexpected error"
+    },
     "SEND_INFO_TITLE": "Sending a BRC-20 token",
     "SEND_INFO_SUBTITLE": "To transfer BRC-20 tokens, you need to make two separate transactions:",
     "SEND_STEP_1_TITLE": "Inscribe Transfer",
@@ -901,10 +914,29 @@
     "SEND_STEP_2_TITLE": "Send transfer inscription",
     "SEND_STEP_2": "Once you have the transfer inscription, you can send it to your recipient to transfer the BRC-20 token.",
     "SEND_INFO_START_BUTTON": "Start",
-    "SEND_NEXT_BUTTON": "Next",
-    "SEND": "Send",
-    "AMOUNT": "Amount",
-    "BALANCE": "Balance"
+    "SEND_NEXT_BUTTON": "Next"
+  },
+  "CONFIRM_BRC20": {
+    "BITCOIN_VALUE": "Bitcoin value",
+    "ERROR_CODES": {
+      "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
+      "INSUFFICIENT_FUNDS": "Insufficient BTC balance for transaction fees",
+      "FAILED_TO_FINALIZE": "Failed to finalize",
+      "UTXOS_MISSING": "UTXOs missing",
+      "INVALID_TICK": "Invalid tick",
+      "INVALID_AMOUNT": "Invalid amount",
+      "INVALID_FEE_RATE": "Invalid fee rate",
+      "SERVER_ERROR": "Server error"
+    }
+  },
+  "EXECUTE_BRC20": {
+    "BROADCASTING_YOUR": "Broadcasting your transaction",
+    "DO_NOT_CLOSE": "Do not close your wallet",
+    "TRANSACTION_HEADLINE": "Transaction {{status}}",
+    "YOUR_TRANSACTION_HAS_BEEN": "Your transaction has been successfully submitted.",
+    "XVERSE_WALLET_ROUTER": "Xverse Wallet Router: ",
+    "SEE_YOUR_TRANSACTION": "See transaction",
+    "CLOSE": "Close"
   },
   "CACHE_MIGRATION_SCREEN": {
     "TITLE": "Your wallet data store needs to be updated in order to remain secure.",

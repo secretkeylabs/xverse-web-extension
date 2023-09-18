@@ -1,12 +1,13 @@
-import BigNumber from 'bignumber.js';
-import styled from 'styled-components';
-import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
-import { NumericFormat } from 'react-number-format';
 import BarLoader from '@components/barLoader';
-import { LoaderSize } from '@utils/constants';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { LoaderSize } from '@utils/constants';
+import BigNumber from 'bignumber.js';
+import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -48,15 +49,28 @@ const CurrencyCard = styled.div((props) => ({
   marginLeft: props.theme.spacing(4),
 }));
 
+const BalanceContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
+  alignItems: 'flex-end',
+  gap: props.theme.spacing(5),
+}));
+
+const ReloadContainer = styled.div({
+  marginBottom: 11,
+});
+
 interface BalanceCardProps {
   isLoading: boolean;
+  isRefetching: boolean;
 }
 
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } =
     useWalletSelector();
-  const { isLoading } = props;
+  const { isLoading, isRefetching } = props;
 
   function calculateTotalBalance() {
     let totalBalance = new BigNumber(0);
@@ -83,19 +97,27 @@ function BalanceCard(props: BalanceCardProps) {
           <CurrencyText>{fiatCurrency}</CurrencyText>
         </CurrencyCard>
       </RowContainer>
-      {isLoading ? (
-        <BarLoaderContainer>
-          <BarLoader loaderSize={LoaderSize.LARGE} />
-        </BarLoaderContainer>
-      ) : (
-        <NumericFormat
-          value={calculateTotalBalance()}
-          displayType="text"
-          prefix={`${currencySymbolMap[fiatCurrency]}`}
-          thousandSeparator
-          renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
-        />
-      )}
+      <BalanceContainer>
+        {isLoading ? (
+          <BarLoaderContainer>
+            <BarLoader loaderSize={LoaderSize.LARGE} />
+          </BarLoaderContainer>
+        ) : (
+          <NumericFormat
+            value={calculateTotalBalance()}
+            displayType="text"
+            prefix={`${currencySymbolMap[fiatCurrency]}`}
+            thousandSeparator
+            renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
+          />
+        )}
+
+        {isRefetching && !isLoading && (
+          <ReloadContainer>
+            <MoonLoader color="white" size={16} />
+          </ReloadContainer>
+        )}
+      </BalanceContainer>
     </>
   );
 }

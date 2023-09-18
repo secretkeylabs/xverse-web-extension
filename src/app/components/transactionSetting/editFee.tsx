@@ -143,6 +143,7 @@ const ErrorText = styled.h1((props) => ({
   marginBottom: props.theme.spacing(2),
 }));
 
+// TODO tim: this component needs refactoring. separate business logic from presentation
 interface Props {
   type?: string;
   fee: string;

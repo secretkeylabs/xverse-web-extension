@@ -268,8 +268,7 @@ function NftDetailScreen() {
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/nft-detail'), []);
+  useResetUserFlow('/nft-detail');
 
   useEffect(() => {
     const data = nftData.find(

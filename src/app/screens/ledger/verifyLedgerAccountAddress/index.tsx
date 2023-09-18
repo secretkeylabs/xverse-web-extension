@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { animated, useTransition } from '@react-spring/web';
@@ -141,7 +141,6 @@ const LedgerFailButtonsContainer = styled.div((props) => ({
 
 function VerifyLedger(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [masterPubKey, setMasterPubKey] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
@@ -154,7 +153,7 @@ function VerifyLedger(): JSX.Element {
   const mismatch = params.get('mismatch') ?? '';
   const currency = params.get('currency') ?? '';
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_VERIFY_SCREEN' });
-  const { ledgerAccountsList, network } = useWalletSelector();
+  const { network } = useWalletSelector();
   const transition = useTransition(currentStepIndex, {
     from: {
       x: 24,
@@ -170,8 +169,7 @@ function VerifyLedger(): JSX.Element {
   const isOrdinalSelected = currency === 'ORD' || currency === 'brc-20';
   const isStacksSelected = currency === 'STX';
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/verify-ledger'), []);
+  useResetUserFlow('/verify-ledger');
 
   const getAddress = () => {
     switch (currency) {
