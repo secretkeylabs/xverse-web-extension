@@ -25,6 +25,10 @@ const getIconForVariant = (variant: CalloutVariant) =>
     weight: 'fill',
     size: '24',
     color: Theme.colors.white_200,
+    style: {
+      flexShrink: 0,
+      flexGrow: 0,
+    },
   });
 
 const Container = styled.div<{ variant: CalloutVariant }>`
@@ -43,12 +47,17 @@ const TextContainer = styled.div`
   gap: ${(props) => props.theme.spacing(2)}px;
 `;
 
+const BodySpan = styled.span`
+  display: inline-block;
+  vertical-align: middle;
+`;
+
 const RedirectButton = styled.button`
-  background-color: transparent;
-  color: ${(props) => props.theme.colors.white_0};
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  background-color: transparent;
+  color: ${(props) => props.theme.colors.white_0};
   gap: ${(props) => props.theme.spacing(1)}px;
   text-transform: capitalize;
 `;
@@ -73,7 +82,7 @@ export function Callout({
   const icon = getIconForVariant(variant);
   return (
     <Container variant={variant}>
-      <div>{icon}</div>
+      {icon}
       <TextContainer>
         {titleText && (
           <StyledHeading typography="body_bold_m" color="white_0">
@@ -81,7 +90,7 @@ export function Callout({
           </StyledHeading>
         )}
         <StyledP typography="body_m" color="white_200">
-          {bodyText}
+          <BodySpan>{bodyText}</BodySpan>
         </StyledP>
         {redirectText && (
           <RedirectButton onClick={onClickRedirect}>

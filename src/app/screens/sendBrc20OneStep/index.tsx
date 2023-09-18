@@ -140,9 +140,9 @@ function SendBrc20Screen() {
         (e.code ?? '') in BRC20ErrorCode &&
         e.code === BRC20ErrorCode.INSUFFICIENT_FUNDS
       ) {
-        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+        setAmountError({ variant: 'danger', message: t('ERRORS.INSUFFICIENT_BALANCE_FEES') });
       } else {
-        setAmountError(t('ERRORS.SERVER_ERROR'));
+        setAmountError({ variant: 'danger', message: t('ERRORS.SERVER_ERROR') });
       }
     } finally {
       setProcessing(false);
