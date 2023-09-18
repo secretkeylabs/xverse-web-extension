@@ -200,7 +200,7 @@ const Theme = {
     },
     '::-webkit-scrollbar': {
       width: 8,
-      background: 'var(--white-900, rgba(255, 255, 255, 0.10))',
+      background: 'rgba(255, 255, 255, 0.10)',
     },
     '::-webkit-scrollbar-thumb': {
       width: 8,
