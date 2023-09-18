@@ -147,7 +147,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const getFunctionArgs = (): Array<ArgToView> => {
     const args: Array<ArgToView> = [];
     const { funcArgs } = extractFromPayload(request);
-    funcMetaData?.args?.forEach((arg: Args, index: number) => {
+    funcMetaData?.args?.map((arg: Args, index: number) => {
       const funcArg = cvToJSON(funcArgs[index]);
 
       const argTypeIsOptionalSome = funcArgs[index].type === ClarityType.OptionalSome;
@@ -269,13 +269,12 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
 
   const renderPostConditionsCard = () => {
     const { postConds } = extractFromPayload(request);
-    let coinInfo;
     return postConds?.map((postCondition, i) => {
       switch (postCondition.conditionType) {
         case PostConditionType.STX:
-          return <StxPostConditionCard key={postCondition.type} postCondition={postCondition} />;
+          return <StxPostConditionCard key={i} postCondition={postCondition} />;
         case PostConditionType.Fungible:
-          coinInfo = coinsMetaData?.find(
+          const coinInfo = coinsMetaData?.find(
             (coin: Coin) =>
               coin.contract ===
               `${addressToString(postCondition.assetInfo.address)}.${
@@ -284,13 +283,13 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
           );
           return (
             <FtPostConditionCard
-              key={postCondition.type}
+              key={i}
               postCondition={postCondition}
               ftMetaData={coinInfo}
             />
           );
         case PostConditionType.NonFungible:
-          return <NftPostConditionCard key={postCondition.type} postCondition={postCondition} />;
+          return <NftPostConditionCard key={i} postCondition={postCondition} />;
         default:
           return '';
       }

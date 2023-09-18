@@ -88,7 +88,7 @@ function RestoreBtc() {
   const isNoAmount = amount.isEqualTo(0) || !unspentUtxos[0]?.status.confirmed;
 
   const { data: ordinalsFee } = useQuery({
-    queryKey: [`getFee-${ordinalsAddress}`, btcAddress, unspentUtxos, network.type],
+    queryKey: [`getFee-${ordinalsAddress}`],
     queryFn: () =>
       getBtcFeesForNonOrdinalBtcSend(btcAddress, unspentUtxos, ordinalsAddress, network.type),
   });
@@ -104,8 +104,8 @@ function RestoreBtc() {
       recipientAddress: string;
       nonOrdinalUtxos: Array<UTXO>;
       accountIndex: number;
-      userSeedPhrase: string;
-      currNetwork: NetworkType;
+      seedPhrase: string;
+      network: NetworkType;
       fee?: BigNumber;
     }
   >({
@@ -113,16 +113,16 @@ function RestoreBtc() {
       recipientAddress,
       nonOrdinalUtxos,
       accountIndex,
-      userSeedPhrase,
-      currNetwork,
+      seedPhrase,
+      network,
       fee,
     }) =>
       signNonOrdinalBtcSendTransaction(
         recipientAddress,
         nonOrdinalUtxos,
         accountIndex,
-        userSeedPhrase,
-        currNetwork,
+        seedPhrase,
+        network,
         fee,
       ),
   });
@@ -132,8 +132,8 @@ function RestoreBtc() {
       recipientAddress: btcAddress,
       nonOrdinalUtxos: unspentUtxos,
       accountIndex: selectedAccount?.id ?? 0,
-      userSeedPhrase: seedPhrase,
-      currNetwork: network.type,
+      seedPhrase,
+      network: network.type,
       fee: ordinalsFee?.fee,
     });
   };
