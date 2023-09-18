@@ -1,4 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
@@ -32,6 +33,14 @@ const TestnetText = styled.h1((props) => ({
 function ScreenContainer(): JSX.Element {
   const { network } = useWalletSelector();
   const { t } = useTranslation('translation');
+
+  // We need to set the max height of the app container after the layout is rendered
+  // to prevent the app from being too tall on smaller screens
+  // If we set it directly in the css, it will lock the popup to a tiny height before it has a chance to render
+  useEffect(() => {
+    const container = document.getElementById('app');
+    container!.style.maxHeight = '100vh';
+  }, []);
 
   return (
     <RouteContainer className="optionsContainer">

@@ -93,9 +93,8 @@ function AccountHeaderComponent({
     { top: string; left: string } | undefined
   >();
 
-  const handleResetWallet = () => {
-    resetWallet();
-    navigate('/');
+  const handleResetWallet = async () => {
+    await resetWallet();
   };
 
   const handlePasswordNextClick = async () => {
@@ -149,7 +148,6 @@ function AccountHeaderComponent({
 
   const handleLockWallet = async () => {
     await lockWallet();
-    navigate('/login');
   };
 
   return (

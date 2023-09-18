@@ -9,13 +9,12 @@ import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useSpring } from '@react-spring/web';
 import { Account } from '@secretkeylabs/xverse-core';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
+import useWalletReducer from '@hooks/useWalletReducer';
 import AccountView from './accountView';
 
 const TitleContainer = styled.div({
@@ -170,11 +169,10 @@ const OrdinalImage = styled.img({
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const [showAccountList, setShowAccountList] = useState(false);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
-  const {switchAccount} = useWalletReducer();
+  const { switchAccount } = useWalletReducer();
   const { payload, approveBtcAddressRequest, cancelAddressRequest } = useBtcAddressRequest();
   const springProps = useSpring({
     transform: showAccountList ? 'translateY(0%)' : 'translateY(100%)',

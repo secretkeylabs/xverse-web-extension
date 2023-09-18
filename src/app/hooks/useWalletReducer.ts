@@ -14,6 +14,7 @@ import {
   resetWalletAction,
   selectAccount,
   setWalletAction,
+  setWalletUnlockedAction,
   storeEncryptedSeedAction,
   updateLedgerAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
@@ -134,6 +135,7 @@ const useWalletReducer = () => {
 
   const lockWallet = async () => {
     await seedVault.lockVault();
+    dispatch(setWalletUnlockedAction(false));
     PostGuardPing('closeWallet');
   };
 

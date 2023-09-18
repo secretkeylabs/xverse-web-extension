@@ -1,6 +1,6 @@
 import { PostGuardPing } from '@components/guards/singleTab';
-import { AccountType } from '@secretkeylabs/xverse-core';
 import {
+  AccountType,
   Account,
   BaseWallet,
   Coin,
@@ -226,5 +226,12 @@ export function setWalletLockPeriodAction(
   return {
     type: actions.SetWalletLockPeriodKey,
     walletLockPeriod,
+  };
+}
+
+export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletUnlocked {
+  return {
+    type: actions.SetWalletUnlockedKey,
+    isUnlocked,
   };
 }

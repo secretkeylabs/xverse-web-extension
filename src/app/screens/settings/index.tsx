@@ -112,9 +112,8 @@ function Setting() {
     setShowResetWalletDisplay(false);
   };
 
-  const handleResetWallet = () => {
-    resetWallet();
-    navigate('/');
+  const handleResetWallet = async () => {
+    await resetWallet();
   };
 
   const openLockCountdownScreen = () => {

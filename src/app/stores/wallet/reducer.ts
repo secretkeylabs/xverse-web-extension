@@ -25,6 +25,7 @@ import {
   WalletActions,
   WalletSessionPeriods,
   WalletState,
+  SetWalletUnlockedKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -60,6 +61,7 @@ const initialWalletState: WalletState = {
   accountType: 'software',
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
+  isUnlocked: false,
 };
 
 const walletReducer = (
@@ -196,6 +198,11 @@ const walletReducer = (
       return {
         ...state,
         walletLockPeriod: action.walletLockPeriod,
+      };
+    case SetWalletUnlockedKey:
+      return {
+        ...state,
+        isUnlocked: action.isUnlocked,
       };
     default:
       return state;

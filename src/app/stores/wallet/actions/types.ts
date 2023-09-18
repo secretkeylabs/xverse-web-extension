@@ -42,6 +42,8 @@ export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 
+export const SetWalletUnlockedKey = 'SetWalletUnlocked';
+
 export enum WalletSessionPeriods {
   LOW = 1,
   STANDARD = 10,
@@ -81,6 +83,7 @@ export interface WalletState {
   accountName: string | undefined;
   btcApiUrl: string;
   walletLockPeriod: WalletSessionPeriods;
+  isUnlocked: boolean;
 }
 
 export interface SetWallet {
@@ -201,7 +204,10 @@ export interface SetWalletLockPeriod {
   type: typeof SetWalletLockPeriodKey;
   walletLockPeriod: WalletSessionPeriods;
 }
-
+export interface SetWalletUnlocked {
+  type: typeof SetWalletUnlockedKey;
+  isUnlocked: boolean;
+}
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -224,4 +230,4 @@ export type WalletActions =
   | ChangeShowOrdinalReceiveAlert
   | SetBrcCoinsData
   | SetWalletLockPeriod
-  | DisableWalletExistsGuard;
+  | SetWalletUnlocked;

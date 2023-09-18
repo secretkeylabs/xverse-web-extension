@@ -1,13 +1,24 @@
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { useDispatch } from 'react-redux';
+import { setWalletUnlockedAction } from '@stores/wallet/actions/actionCreators';
 
 function AuthGuard({ children }: PropsWithChildren) {
   const navigate = useNavigate();
-  const { masterPubKey, encryptedSeed } = useWalletSelector();
+  const { masterPubKey, encryptedSeed, isUnlocked } = useWalletSelector();
   const { getSeed, hasSeed } = useSeedVault();
-  const [authTested, setAuthTested] = useState(false);
+  const dispatch = useDispatch();
+
+  const tryAuthenticating = async () => {
+    try {
+      await getSeed();
+      dispatch(setWalletUnlockedAction(true));
+    } catch (error) {
+      navigate('/login');
+    }
+  };
 
   const restoreSession = async () => {
     if (encryptedSeed) {
@@ -19,20 +30,15 @@ function AuthGuard({ children }: PropsWithChildren) {
       navigate('/landing');
       return;
     }
-    try {
-      await getSeed();
-      setAuthTested(true);
-    } catch (error) {
-      navigate('/login');
-    }
+    await tryAuthenticating();
   };
 
   useEffect(() => {
     restoreSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isUnlocked]);
 
-  if (!authTested) {
+  if (!isUnlocked) {
     return null;
   }
   // fragment is required here because without it, the router thinks there could be more than 1 child node
