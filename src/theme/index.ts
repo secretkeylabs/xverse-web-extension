@@ -187,16 +187,22 @@ const Theme = {
 
     feedback: {
       /**
-       * @deprecated use success_medium
+       * @deprecated use theme.colors.success_medium
        */
       success: '#55B86E',
+
       /**
-       * @deprecated use danger_medium
+       * @deprecated use theme.colors.caution
+       */
+      caution: '#F2A900',
+
+      /**
+       * @deprecated use theme.colors.danger_medium
        */
       error: '#EA4848',
 
       /**
-       * @deprecated use danger_dark_600
+       * @deprecated use theme.colors.danger_dark_600
        */
       error_700: 'rgba(171, 48, 48, 0.4)',
     },
@@ -326,7 +332,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   headline_category_m: {
     fontFamily: 'DMSans-Medium',
@@ -338,7 +344,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   headline_category_s: {
     fontFamily: 'DMSans-Medium',
@@ -349,7 +355,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   body_bold_l: {
     fontFamily: 'DMSans-Bold',
@@ -359,7 +365,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   body_medium_l: {
     fontFamily: 'DMSans-Regular',
@@ -369,7 +375,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   body_l: {
     fontFamily: 'DMSans-Regular',
@@ -379,7 +385,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   body_bold_m: {
     fontFamily: 'DMSans-Bold',
@@ -389,7 +395,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   body_medium_m: {
     fontFamily: 'DMSans-Medium',
@@ -399,7 +405,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   body_m: {
     fontFamily: 'DMSans-Regular',
@@ -409,7 +415,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   body_medium_s: {
     fontFamily: 'DMSans-Medium',
@@ -419,7 +425,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   body_s: {
     fontFamily: 'DMSans-Regular',
@@ -429,7 +435,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   body_xs: {
     fontFamily: 'DMSans-Regular',
@@ -439,7 +445,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   headline_xl: {
     fontFamily: 'IBMPlexSans-Regular',
@@ -450,7 +456,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   tile_text: {
     fontFamily: 'Satoshi-Regular',
@@ -461,7 +467,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   bold_tile_text: {
     fontFamily: 'Satoshi-Bold',
@@ -472,7 +478,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   headline_l: {
     fontFamily: 'IBMPlexSans-Bold',
@@ -483,7 +489,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   headline_m: {
     fontFamily: 'IBMPlexSans-Bold',
@@ -494,7 +500,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated
+   * @deprecated use theme.typography
    */
   headline_s: {
     fontFamily: 'IBMPlexSans-Medium',
