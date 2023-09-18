@@ -9,7 +9,7 @@ type CalloutVariant = 'info' | 'warning' | 'danger' | 'success';
 const backgroundColors = {
   info: Theme.colors.elevation6_600,
   warning: Theme.colors.caution_800,
-  success: Theme.colors.success_medium_700,
+  success: Theme.colors.success_dark_600,
   danger: Theme.colors.danger_dark_600,
 };
 const getBackgroundForVariant = (variant: CalloutVariant) => backgroundColors[variant];
