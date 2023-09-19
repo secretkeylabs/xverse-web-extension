@@ -7,10 +7,8 @@ import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Account } from '@secretkeylabs/xverse-core/types';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -83,9 +81,8 @@ const ButtonsWrapper = styled.div(
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
-  const { createAccount } = useWalletReducer();
+  const { createAccount, switchAccount } = useWalletReducer();
 
   const displayedAccountsList = useMemo(() => {
     if (network.type === 'Mainnet') {
@@ -94,25 +91,12 @@ function AccountList(): JSX.Element {
     return accountsList;
   }, [accountsList, ledgerAccountsList, network]);
 
-  const handleAccountSelect = (account: Account) => {
-    dispatch(
-      selectAccount(
-        account,
-        account.stxAddress,
-        account.btcAddress,
-        account.ordinalsAddress,
-        account.masterPubKey,
-        account.stxPublicKey,
-        account.btcPublicKey,
-        account.ordinalsPublicKey,
-        network,
-        undefined,
-        account.accountType,
-        account.accountName,
-      ),
-    );
+  const handleAccountSelect = async (account: Account, goBack = true) => {
+    await switchAccount(account);
     broadcastResetUserFlow();
-    navigate(-1);
+    if (goBack) {
+      navigate(-1);
+    }
   };
 
   const isAccountSelected = (account: Account) =>
