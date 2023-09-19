@@ -45,6 +45,9 @@ const MainContainer = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
   flex: 1,
   overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
 }));
 
 const Title = styled.h1((props) => ({

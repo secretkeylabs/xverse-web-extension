@@ -21,7 +21,7 @@ const useStackingData = () => {
         queryFn: () => getStacksInfo(network.address),
       },
       {
-        queryKey: ['stacking-delegation-state', stxAddress, network],
+        queryKey: ['stacking-delegation-state', stxAddress, network, selectedNetwork],
         queryFn: () => fetchDelegationState(stxAddress, selectedNetwork),
       },
       {

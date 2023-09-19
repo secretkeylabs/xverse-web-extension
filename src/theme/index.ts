@@ -192,6 +192,24 @@ const Theme = {
     },
   },
 
+  scrollbar: {
+    scrollbarGutter: 'stable both-edges',
+    'overflow-y': 'hidden',
+    ':hover': {
+      'overflow-y': 'auto',
+    },
+    '::-webkit-scrollbar': {
+      width: 8,
+      background: 'rgba(255, 255, 255, 0.10)',
+    },
+    '::-webkit-scrollbar-thumb': {
+      width: 8,
+      maxHeight: 10,
+      borderRadius: 24,
+      background: 'rgba(255, 255, 255, 0.2)',
+    },
+  },
+
   // TODO tim: grep codebase and remove all
   /* deprecated: below */
   headline_category_m: {
