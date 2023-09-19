@@ -31,16 +31,17 @@ const Text = styled.h1((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
+// TODO create input component in ui-library
 const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(6),
-  border: `1px solid ${
-    props.withError ? props.theme.colors.feedback.error : props.theme.colors.background.elevation6
-  }`,
-  backgroundColor: props.theme.colors.background.elevation1,
+  border: props.withError
+    ? `1px solid ${props.theme.colors.danger_dark_200}`
+    : `1px solid ${props.theme.colors.white_800}`,
+  backgroundColor: props.theme.colors.elevation1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
@@ -117,11 +118,9 @@ const ApplyButtonContainer = styled.div`
   margin: 20px 16px 40px;
 `;
 
-const ErrorText = styled.p((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
-  marginBottom: props.theme.spacing(2),
-}));
+const StyledInputFeedback = styled(InputFeedback)`
+  margin-bottom: ${(props) => props.theme.spacing(2)}px;
+`;
 
 const StyledFiatAmountText = styled(FiatAmountText)((props) => ({
   ...props.theme.body_xs,
@@ -273,7 +272,7 @@ export function EditFees({
               )}
             </TickerContainer>
           </InputContainer>
-          <ErrorText>{error}</ErrorText>
+          <StyledInputFeedback message={error} variant="danger" />
         </FeeContainer>
         <ButtonContainer>
           {buttons.map(({ value, label }) => (

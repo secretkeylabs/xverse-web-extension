@@ -55,6 +55,7 @@ const RowContainer = styled.div({
   alignItems: 'center',
 });
 
+// TODO create input component in ui-library
 const AmountInputContainer = styled.div<{ error: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -62,16 +63,13 @@ const AmountInputContainer = styled.div<{ error: boolean }>((props) => ({
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
   border: props.error
-    ? '1px solid rgba(211, 60, 60, 0.3)'
-    : `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background.elevation_1,
+    ? `1px solid ${props.theme.colors.danger_dark_200}`
+    : `1px solid ${props.theme.colors.white_800}`,
+  backgroundColor: props.theme.colors.elevation_n1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   height: 44,
-  ':focus-within': {
-    border: `1px solid ${props.theme.colors.background.elevation6}`,
-  },
 }));
 
 const NextButtonContainer = styled.div((props) => ({
@@ -94,7 +92,7 @@ const InputFieldContainer = styled.div(() => ({
 
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background.elevation_1,
+  backgroundColor: 'transparent',
   color: props.theme.colors.white['0'],
   width: '100%',
   border: 'transparent',

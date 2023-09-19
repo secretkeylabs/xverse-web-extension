@@ -60,6 +60,7 @@ const RedirectButton = styled.button`
  * ref: https://zeroheight.com/0683c9fa7/p/051ca8-callout/t/7814dc
  */
 export type CalloutProps = {
+  className?: string;
   titleText?: string;
   bodyText: string;
   variant?: CalloutVariant;
@@ -67,6 +68,7 @@ export type CalloutProps = {
   onClickRedirect?: () => void;
 };
 export function Callout({
+  className,
   titleText,
   bodyText,
   variant = 'info',
@@ -75,7 +77,7 @@ export function Callout({
 }: CalloutProps) {
   const StyledIcon = icons[variant];
   return (
-    <Container variant={variant}>
+    <Container className={className} variant={variant}>
       <StyledIcon size={24} weight="fill" color="currentColor" />
       <TextContainer>
         {titleText && (

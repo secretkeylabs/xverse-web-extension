@@ -1,5 +1,4 @@
-import { Info, Warning } from '@phosphor-icons/react';
-import { createElement, ElementType } from 'react';
+import { Icon, Info, Warning } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledP } from './common.styled';
@@ -12,16 +11,14 @@ const colors: Record<FeedbackVariant, string> = {
 };
 const getColorForVariant = (variant: FeedbackVariant) => colors[variant];
 
-const icons: Record<FeedbackVariant, ElementType> = {
-  info: Info,
-  danger: Warning,
+const getStyledIcon = (icon: Icon) => styled(icon)`
+  flex-shrink: 0;
+  flex-grow: 0;
+`;
+const icons: Record<FeedbackVariant, ReturnType<typeof getStyledIcon>> = {
+  info: getStyledIcon(Info),
+  danger: getStyledIcon(Warning),
 };
-const getIconForVariant = (variant: FeedbackVariant) =>
-  createElement(icons[variant], {
-    weight: 'fill',
-    size: '16',
-    color: 'currentColor',
-  });
 
 const Feedback = styled.div<{ variant: FeedbackVariant }>`
   display: flex;
@@ -36,14 +33,16 @@ export const isDangerFeedback = (inputFeedback: InputFeedbackProps | null): bool
  * ref: https://zeroheight.com/0683c9fa7/p/76af35-form/t/29319e
  */
 export type InputFeedbackProps = {
+  className?: string;
   message: string;
   variant?: FeedbackVariant;
 };
 
-export function InputFeedback({ message, variant = 'info' }: InputFeedbackProps) {
+export function InputFeedback({ className, message, variant = 'info' }: InputFeedbackProps) {
+  const IconVariant = icons[variant];
   return (
-    <Feedback variant={variant}>
-      {message && <div>{getIconForVariant(variant)}</div>}
+    <Feedback className={className} variant={variant}>
+      {message && <IconVariant weight="fill" size={16} color="currentColor" />}
       <StyledP typography="body_medium_s">{message}</StyledP>
     </Feedback>
   );
