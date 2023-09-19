@@ -31,8 +31,21 @@ const Theme = {
     elevation6_800: 'rgba(76, 82, 95, 0.2)',
     elevation8: '#7A7688',
     success: '#51D6A6',
-    caution: '#F2A900',
     error: '#D33C3C',
+
+    // feedback
+    danger_light: '#FF5A5A',
+    danger_medium: '#EA4848',
+    danger_dark: '#AB3030',
+    danger_dark_100: 'rgba(171, 48, 48, 0.9)',
+    danger_dark_200: 'rgba(171, 48, 48, 0.8)',
+    danger_dark_600: 'rgba(171, 48, 48, 0.4)',
+    success_light: '#55E078',
+    success_medium: '#55B86E',
+    success_dark: '#3B884E',
+    success_dark_600: 'rgba(59,136,78,0.4)',
+    caution: '#F2A900',
+    caution_800: 'rgba(242, 169, 0, 0.2)',
 
     // TODO tim: grep codebase and remove all
     /* deprecated: below */
