@@ -4,9 +4,11 @@ import { NumericFormat } from 'react-number-format';
 import { SupportedCurrency, currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 
 export function FiatAmountText({
+  className,
   fiatAmount,
   fiatCurrency,
 }: {
+  className?: string;
   fiatAmount: BigNumber;
   fiatCurrency: SupportedCurrency;
 }) {
@@ -15,10 +17,15 @@ export function FiatAmountText({
   }
 
   if (fiatAmount.isLessThan(0.01)) {
-    return <span>{`< ${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`}</span>;
+    return (
+      <span
+        className={className}
+      >{`< ${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`}</span>
+    );
   }
   return (
     <NumericFormat
+      className={className}
       value={fiatAmount.toFixed(2).toString()}
       displayType="text"
       thousandSeparator

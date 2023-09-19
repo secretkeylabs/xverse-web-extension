@@ -6,11 +6,11 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BetterBarLoader } from '@components/barLoader';
 import { NumericFormat } from 'react-number-format';
-import { SupportedCurrency } from '@secretkeylabs/xverse-core';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import FiatAmountText from '@components/fiatAmountText';
+import InputFeedback from '@ui-library/inputFeedback';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -123,33 +123,10 @@ const ErrorText = styled.p((props) => ({
   marginBottom: props.theme.spacing(2),
 }));
 
-// TODO move this to component file
-const FiatAmountText = styled.p((props) => ({
+const StyledFiatAmountText = styled(FiatAmountText)((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white['400'],
 }));
-function FiatAmount({
-  fiatAmount,
-  fiatCurrency,
-}: {
-  fiatAmount: BigNumber;
-  fiatCurrency: SupportedCurrency;
-}) {
-  if (!fiatAmount || !fiatCurrency) {
-    return null;
-  }
-  return (
-    <FiatAmountText>
-      <NumericFormat
-        value={fiatAmount.lt(0.01) ? '0.01' : fiatAmount.toFixed(2).toString()}
-        displayType="text"
-        thousandSeparator
-        prefix={`${fiatAmount.lt(0.01) ? '<' : '~'} ${currencySymbolMap[fiatCurrency]}`}
-        suffix={` ${fiatCurrency}`}
-      />
-    </FiatAmountText>
-  );
-}
 
 const buttons = [
   {
@@ -291,7 +268,7 @@ export function EditFees({
                     suffix=" sats"
                     renderText={(value: string) => <FeeText>{value}</FeeText>}
                   />
-                  <FiatAmount fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
+                  <StyledFiatAmountText fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
                 </>
               )}
             </TickerContainer>
