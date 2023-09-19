@@ -3,16 +3,6 @@ import { animated, useSpring } from '@react-spring/web';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-const ScrollBarContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  overflowY: 'auto',
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-});
-
 const ContentContainer = styled(animated.div)({
   position: 'relative',
   display: 'flex',
@@ -130,7 +120,7 @@ function Landing(): JSX.Element {
   const handlePressRestore = async () => startWalletOnboarding(true);
 
   return (
-    <ScrollBarContainer>
+    <>
       <AppVersion>Beta</AppVersion>
       <ContentContainer style={styles}>
         <TopSectionContainer>
@@ -142,7 +132,7 @@ function Landing(): JSX.Element {
           <RestoreButton onClick={handlePressRestore}>{t('RESTORE_WALLET_BUTTON')}</RestoreButton>
         </ActionButtonsContainer>
       </ContentContainer>
-    </ScrollBarContainer>
+    </>
   );
 }
 export default Landing;
