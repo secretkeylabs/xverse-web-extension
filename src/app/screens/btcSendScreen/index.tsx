@@ -52,8 +52,8 @@ function BtcSendScreen() {
   };
 
   const checkIfValidAmount = () => {
-    recipient.forEach((recipient) => {
-      if (recipient.amountSats.lt(BITCOIN_DUST_AMOUNT_SATS)) {
+    recipient.forEach((txRecipient) => {
+      if (txRecipient.amountSats.lt(BITCOIN_DUST_AMOUNT_SATS)) {
         navigate('/tx-status', {
           state: {
             txid: '',

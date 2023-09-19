@@ -14,14 +14,14 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
+export const Container = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+});
 
 const ButtonContainer = styled.button((props) => ({
   width: '100%',

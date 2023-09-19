@@ -149,14 +149,14 @@ function RecipientComponent({
     return '';
   }
 
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (fiatAmount) {
-      if (fiatAmount.isLessThan(0.01)) {
+  const getFiatAmountString = (amount: BigNumber) => {
+    if (amount) {
+      if (amount.isLessThan(0.01)) {
         return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
       }
       return (
         <NumericFormat
-          value={fiatAmount.toFixed(2).toString()}
+          value={amount.toFixed(2).toString()}
           displayType="text"
           thousandSeparator
           prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
