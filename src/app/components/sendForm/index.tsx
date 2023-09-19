@@ -359,21 +359,21 @@ function SendForm({
     setFiatAmount(amountInCurrency);
   };
 
-  function getTokenEquivalent(amount: string) {
+  function getTokenEquivalent(tokenAmount: string) {
     if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
       return '';
     }
-    if (!amount) return '0';
+    if (!tokenAmount) return '0';
     switch (currencyType) {
       case 'STX':
-        return getStxTokenEquivalent(new BigNumber(amount), stxBtcRate, btcFiatRate)
+        return getStxTokenEquivalent(new BigNumber(tokenAmount), stxBtcRate, btcFiatRate)
           .toFixed(6)
           .toString();
       case 'BTC':
-        return getBtcEquivalent(new BigNumber(amount), btcFiatRate).toFixed(8).toString();
+        return getBtcEquivalent(new BigNumber(tokenAmount), btcFiatRate).toFixed(8).toString();
       case 'FT':
         if (fungibleToken?.tokenFiatRate) {
-          return new BigNumber(amount)
+          return new BigNumber(tokenAmount)
             .dividedBy(fungibleToken.tokenFiatRate)
             .toFixed(fungibleToken.decimals ?? 2)
             .toString();
