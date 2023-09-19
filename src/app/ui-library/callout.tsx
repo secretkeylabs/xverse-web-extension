@@ -1,5 +1,4 @@
-import { ArrowRight, CheckCircle, Info, Warning, WarningCircle } from '@phosphor-icons/react';
-import { createElement } from 'react';
+import { ArrowRight, CheckCircle, Info, Warning, WarningCircle, Icon } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledHeading, StyledP } from './common.styled';
@@ -14,22 +13,17 @@ const backgroundColors = {
 };
 const getBackgroundForVariant = (variant: CalloutVariant) => backgroundColors[variant];
 
-const icons = {
+const icons: Record<CalloutVariant, Icon> = {
   info: Info,
   warning: WarningCircle,
   success: CheckCircle,
   danger: Warning,
 };
-const getIconForVariant = (variant: CalloutVariant) =>
-  createElement(icons[variant], {
-    weight: 'fill',
-    size: '24',
-    color: Theme.colors.white_200,
-    style: {
-      flexShrink: 0,
-      flexGrow: 0,
-    },
-  });
+const getIconForVariant = (variant: CalloutVariant) => styled(icons[variant])`
+  flex-shrink: 0;
+  flex-grow: 0;
+  color: ${(props) => props.theme.colors.white_200};
+`;
 
 const Container = styled.div<{ variant: CalloutVariant }>`
   display: flex;
@@ -79,10 +73,10 @@ export function Callout({
   redirectText,
   onClickRedirect = () => {},
 }: CalloutProps) {
-  const icon = getIconForVariant(variant);
+  const IconVariant = getIconForVariant(variant);
   return (
     <Container variant={variant}>
-      {icon}
+      <IconVariant weight="fill" size={24} color="currentColor" />
       <TextContainer>
         {titleText && (
           <StyledHeading typography="body_bold_m" color="white_0">
