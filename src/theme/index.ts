@@ -199,6 +199,7 @@ const Theme = {
       'overflow-y': 'auto',
     },
     '::-webkit-scrollbar': {
+      display: 'block',
       width: 8,
       background: 'rgba(255, 255, 255, 0.10)',
     },
