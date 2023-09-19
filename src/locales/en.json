@@ -340,6 +340,7 @@
     "ADVANCED_SETTING_NONCE_OPTION": "Edit nonce",
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",
+    "FEE_RATE": "Fee Rate",
     "STANDARD": "Regular",
     "HIGH": "Fast",
     "CUSTOM": "Custom",

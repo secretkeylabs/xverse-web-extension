@@ -205,7 +205,16 @@ export function EditFees({
   }, [feeRateInput, onChangeFeeRate]);
 
   /* callbacks */
-  const onChangeEditFeesInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // only allow positive integers
+    // disable common special characters, including - and .
+    // eslint-disable-next-line no-useless-escape
+    if (e.key.match(/^[!-\/:-@[-`{-~]$/)) {
+      e.preventDefault();
+    }
+  };
+
+  const handleChangeFeeRateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFeeRateInput(e.target.value);
     if (selectedOption !== 'custom') {
       setSelectedOption('custom');
@@ -256,14 +265,15 @@ export function EditFees({
       onClose={handleClickClose}
     >
       <Container>
-        <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
+        <Text>{t('TRANSACTION_SETTING.FEE_RATE')}</Text>
         <FeeContainer>
           <InputContainer withError={!!error}>
             <InputField
               type="number"
               ref={inputRef}
               value={feeRateInput?.toString()}
-              onChange={onChangeEditFeesInput}
+              onKeyDown={handleKeyDownFeeRateInput}
+              onChange={handleChangeFeeRateInput}
             />
             <FeeText>sats /vB</FeeText>
             <TickerContainer>
