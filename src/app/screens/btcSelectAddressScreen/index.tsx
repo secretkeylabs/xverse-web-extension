@@ -6,6 +6,7 @@ import AccountRow from '@components/accountRow';
 import ActionButton from '@components/button';
 import Separator from '@components/separator';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
+import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useSpring } from '@react-spring/web';
 import { Account } from '@secretkeylabs/xverse-core';
@@ -14,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
-import useWalletReducer from '@hooks/useWalletReducer';
 import AccountView from './accountView';
 
 const TitleContainer = styled.div({
@@ -211,8 +211,8 @@ function BtcSelectAddressScreen() {
   const isAccountSelected = (account: Account) =>
     account.id === selectedAccount?.id && account.accountType === selectedAccount?.accountType;
 
-  const handleAccountSelect = (account: Account) => {
-    switchAccount(account);
+  const handleAccountSelect = async (account: Account) => {
+    await switchAccount(account);
     setShowAccountList(false);
   };
 
@@ -246,12 +246,12 @@ function BtcSelectAddressScreen() {
           <Container>
             {payload.purposes.map((purpose) =>
               purpose === AddressPurpose.Payment ? (
-                <AddressContainer>
+                <AddressContainer key={purpose}>
                   <BitcoinDot />
                   <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
                 </AddressContainer>
               ) : (
-                <AddressContainer>
+                <AddressContainer key={purpose}>
                   <OrdinalImage src={OrdinalsIcon} />
                   <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
                 </AddressContainer>
@@ -263,13 +263,12 @@ function BtcSelectAddressScreen() {
         {showAccountList ? (
           <AccountListContainer style={springProps}>
             {[...ledgerAccountsList, ...accountsList].map((account) => (
-              <AccountListRow>
+              <AccountListRow key={account.id}>
                 <AccountRow
                   key={account.stxAddress}
                   account={account}
                   isSelected={isAccountSelected(account)}
                   onAccountSelected={handleAccountSelect}
-                  showOrdinalAddress
                 />
                 <Separator />
               </AccountListRow>

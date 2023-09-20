@@ -7,21 +7,19 @@ import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Account } from '@secretkeylabs/xverse-core/types';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
+export const Container = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+});
 
 const ButtonContainer = styled.button((props) => ({
   width: '100%',
@@ -93,10 +91,12 @@ function AccountList(): JSX.Element {
     return accountsList;
   }, [accountsList, ledgerAccountsList, network]);
 
-  const handleAccountSelect = (account: Account) => {
-    switchAccount(account);
+  const handleAccountSelect = async (account: Account, goBack = true) => {
+    await switchAccount(account);
     broadcastResetUserFlow();
-    navigate(-1);
+    if (goBack) {
+      navigate(-1);
+    }
   };
 
   const isAccountSelected = (account: Account) =>

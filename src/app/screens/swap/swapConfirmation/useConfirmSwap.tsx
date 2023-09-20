@@ -10,9 +10,9 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
+import useSeedVault from '@hooks/useSeedVault';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
-import useSeedVault from '@hooks/useSeedVault';
 import { useState } from 'react';
 import BigNumber from 'bignumber.js';
 import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';

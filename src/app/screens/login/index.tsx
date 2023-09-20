@@ -19,12 +19,20 @@ const Logo = styled.img({
   height: 57,
 });
 
+const Button = styled.button({
+  background: 'none',
+});
+
 const ScreenContainer = styled(animated.div)({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
   paddingLeft: 18,
   paddingRight: 18,
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
 });
 
 const ContentContainer = styled(animated.div)({
@@ -206,13 +214,9 @@ function Login(): JSX.Element {
                 placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
                 autoFocus
               />
-              <button
-                type="button"
-                onClick={handleTogglePasswordView}
-                style={{ background: 'none' }}
-              >
+              <Button type="button" onClick={handleTogglePasswordView}>
                 <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
-              </button>
+              </Button>
             </PasswordInputContainer>
             {error && <ErrorMessage>{error}</ErrorMessage>}
             <ButtonContainer>

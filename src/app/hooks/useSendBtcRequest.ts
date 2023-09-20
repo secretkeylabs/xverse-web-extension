@@ -22,11 +22,11 @@ function useSendBtcRequest() {
     const seedPhrase = await getSeed();
     const recipients: Recipient[] = [];
     request.payload?.recipients?.forEach(async (value) => {
-      const recipient: Recipient = {
+      const txRecipient: Recipient = {
         address: value.address,
         amountSats: new BigNumber(value.amountSats.toString()),
       };
-      recipients.push(recipient);
+      recipients.push(txRecipient);
     });
     setRecipient(recipients);
     const signedTx = await signBtcTransaction(
