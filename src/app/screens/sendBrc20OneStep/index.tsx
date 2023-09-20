@@ -1,26 +1,27 @@
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  brc20TransferEstimateFees,
+  CoreError,
+  getNonOrdinalUtxo,
+  UTXO,
+  validateBtcAddress,
+} from '@secretkeylabs/xverse-core';
+import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
+import { InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import {
   Brc20TransferEstimateFeesParams,
   ConfirmBrc20TransferState,
   SendBrc20TransferState,
 } from '@utils/brc20';
-import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
-import {
-  UTXO,
-  brc20TransferEstimateFees,
-  getNonOrdinalUtxo,
-  validateBtcAddress,
-  CoreError,
-} from '@secretkeylabs/xverse-core';
-import { getFtTicker } from '@utils/tokens';
 import { replaceCommaByDot } from '@utils/helper';
+import { getFtTicker } from '@utils/tokens';
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Brc20TransferForm from './brc20TransferForm';
 
 function SendBrc20Screen() {
@@ -29,16 +30,19 @@ function SendBrc20Screen() {
   const location = useLocation();
   const { btcAddress, ordinalsAddress, network, brcCoinsList } = useWalletSelector();
   const { data: feeRate } = useBtcFeeRate();
-  const [amountError, setAmountError] = useState('');
+  const [amountError, setAmountError] = useState<InputFeedbackProps | null>(null);
   const [amountToSend, setAmountToSend] = useState('');
-  const [recipientError, setRecipientError] = useState('');
+  const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
   const [recipientAddress, setRecipientAddress] = useState('');
   const [processing, setProcessing] = useState(false);
 
   useResetUserFlow('/send-brc20');
 
   const isNextEnabled =
-    !amountError && !recipientError && !!recipientAddress && amountToSend !== '';
+    !isDangerFeedback(amountError) &&
+    !isDangerFeedback(recipientError) &&
+    !!recipientAddress &&
+    amountToSend !== '';
 
   const { fungibleToken: ft }: SendBrc20TransferState = location.state || {};
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
@@ -52,14 +56,14 @@ function SendBrc20Screen() {
     const amount = Number(replaceCommaByDot(amountInput));
     const balance = Number(fungibleToken.balance);
     if (!Number.isFinite(amount) || amount === 0) {
-      setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
+      setAmountError({ variant: 'danger', message: t('ERRORS.AMOUNT_REQUIRED') });
       return false;
     }
     if (!Number.isFinite(balance) || amount > Number(balance)) {
-      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
+      setAmountError({ variant: 'danger', message: t('ERRORS.INSUFFICIENT_BALANCE') });
       return false;
     }
-    setAmountError('');
+    setAmountError(null);
     return true;
   };
 
@@ -74,7 +78,7 @@ function SendBrc20Screen() {
 
   const validateRecipientAddress = (address: string): boolean => {
     if (!address) {
-      setRecipientError(t('ERRORS.ADDRESS_REQUIRED'));
+      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_REQUIRED') });
       return false;
     }
     if (
@@ -83,10 +87,14 @@ function SendBrc20Screen() {
         network: network.type,
       })
     ) {
-      setRecipientError(t('ERRORS.ADDRESS_INVALID'));
+      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
       return false;
     }
-    setRecipientError('');
+    if (address === ordinalsAddress || address === btcAddress) {
+      setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
+      return true;
+    }
+    setRecipientError(null);
     return true;
   };
 
@@ -132,9 +140,9 @@ function SendBrc20Screen() {
         (e.code ?? '') in BRC20ErrorCode &&
         e.code === BRC20ErrorCode.INSUFFICIENT_FUNDS
       ) {
-        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
+        setAmountError({ variant: 'danger', message: t('ERRORS.INSUFFICIENT_BALANCE_FEES') });
       } else {
-        setAmountError(t('ERRORS.SERVER_ERROR'));
+        setAmountError({ variant: 'danger', message: t('ERRORS.SERVER_ERROR') });
       }
     } finally {
       setProcessing(false);
