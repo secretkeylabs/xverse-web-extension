@@ -2,19 +2,19 @@ import { Currency, SponsoredTxErrorCode, SponsoredTxError } from 'alex-sdk';
 import { useNavigate } from 'react-router-dom';
 import { SwapToken } from '@screens/swap/useSwap';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import {
   broadcastSignedTransaction,
   signTransaction,
   StacksTransaction,
+  microstacksToStx,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import useNetworkSelector from '@hooks/useNetwork';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { TokenImageProps } from '@components/tokenImage';
-import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
 import { useState } from 'react';
 import BigNumber from 'bignumber.js';
+import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
 import { useCurrencyConversion } from '../useCurrencyConversion';
 
 export type SwapConfirmationInput = {

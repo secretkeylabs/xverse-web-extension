@@ -53,7 +53,8 @@ export const useCoinsData = () => {
 
       coinsReponse.forEach((coin) => {
         if (!coin.name) {
-          coin.name = coin.contract.split('.')[1];
+          const coinName = coin.contract.split('.')[1];
+          coin.name = coinName;
         }
       });
 

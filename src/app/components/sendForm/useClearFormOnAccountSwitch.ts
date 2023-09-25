@@ -10,7 +10,7 @@ export default function useClearFormOnAccountSwitch() {
     if (isFirstRender.current) {
       setIsAccountSwitched(true);
     } else {
-      //if first render then dont clear form input fields
+      // if first render then dont clear form input fields
       isFirstRender.current = true;
     }
   }, [selectedAccount]);
