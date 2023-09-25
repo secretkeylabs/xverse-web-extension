@@ -41,7 +41,10 @@ const Theme = {
     danger_dark_600: 'rgba(171, 48, 48, 0.4)',
     success_light: '#55E078',
     success_medium: '#55B86E',
+    success_dark: '#3B884E',
+    success_dark_600: 'rgba(59,136,78,0.4)',
     caution: '#F2A900',
+    caution_800: 'rgba(242, 169, 0, 0.2)',
 
     // brand
     emerald_light: '#55B86E',
@@ -328,6 +331,25 @@ const Theme = {
       fontStyle: 'normal',
       fontWeight: '400',
       fontSize: 12,
+    },
+  },
+
+  scrollbar: {
+    scrollbarGutter: 'stable both-edges',
+    'overflow-y': 'hidden',
+    ':hover': {
+      'overflow-y': 'auto',
+    },
+    '::-webkit-scrollbar': {
+      display: 'block',
+      width: 8,
+      background: 'rgba(255, 255, 255, 0.10)',
+    },
+    '::-webkit-scrollbar-thumb': {
+      width: 8,
+      maxHeight: 10,
+      borderRadius: 24,
+      background: 'rgba(255, 255, 255, 0.2)',
     },
   },
 

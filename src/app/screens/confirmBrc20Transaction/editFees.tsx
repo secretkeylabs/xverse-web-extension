@@ -6,11 +6,11 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BetterBarLoader } from '@components/barLoader';
 import { NumericFormat } from 'react-number-format';
-import { SupportedCurrency } from '@secretkeylabs/xverse-core';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import FiatAmountText from '@components/fiatAmountText';
+import InputFeedback from '@ui-library/inputFeedback';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -31,15 +31,16 @@ const Text = styled.h1((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
+// TODO create input component in ui-library
 const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(6),
-  border: `1px solid ${
-    props.withError ? props.theme.colors.feedback.error : props.theme.colors.elevation6
-  }`,
+  border: props.withError
+    ? `1px solid ${props.theme.colors.danger_dark_200}`
+    : `1px solid ${props.theme.colors.white_800}`,
   backgroundColor: props.theme.colors.elevation1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
@@ -113,39 +114,14 @@ const ApplyButtonContainer = styled.div`
   margin: 20px 16px 40px;
 `;
 
-const ErrorText = styled.p((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
-  marginBottom: props.theme.spacing(2),
-}));
+const StyledInputFeedback = styled(InputFeedback)`
+  margin-bottom: ${(props) => props.theme.spacing(2)}px;
+`;
 
-// TODO move this to component file
-const FiatAmountText = styled.p((props) => ({
+const StyledFiatAmountText = styled(FiatAmountText)((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white_400,
 }));
-function FiatAmount({
-  fiatAmount,
-  fiatCurrency,
-}: {
-  fiatAmount: BigNumber;
-  fiatCurrency: SupportedCurrency;
-}) {
-  if (!fiatAmount || !fiatCurrency) {
-    return null;
-  }
-  return (
-    <FiatAmountText>
-      <NumericFormat
-        value={fiatAmount.lt(0.01) ? '0.01' : fiatAmount.toFixed(2).toString()}
-        displayType="text"
-        thousandSeparator
-        prefix={`${fiatAmount.lt(0.01) ? '<' : '~'} ${currencySymbolMap[fiatCurrency]}`}
-        suffix={` ${fiatCurrency}`}
-      />
-    </FiatAmountText>
-  );
-}
 
 const buttons = [
   {
@@ -201,7 +177,16 @@ export function EditFees({
   }, [feeRateInput, onChangeFeeRate]);
 
   /* callbacks */
-  const onChangeEditFeesInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // only allow positive integers
+    // disable common special characters, including - and .
+    // eslint-disable-next-line no-useless-escape
+    if (e.key.match(/^[!-\/:-@[-`{-~]$/)) {
+      e.preventDefault();
+    }
+  };
+
+  const handleChangeFeeRateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFeeRateInput(e.target.value);
     if (selectedOption !== 'custom') {
       setSelectedOption('custom');
@@ -252,14 +237,15 @@ export function EditFees({
       onClose={handleClickClose}
     >
       <Container>
-        <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
+        <Text>{t('TRANSACTION_SETTING.FEE_RATE')}</Text>
         <FeeContainer>
           <InputContainer withError={!!error}>
             <InputField
               type="number"
               ref={inputRef}
               value={feeRateInput?.toString()}
-              onChange={onChangeEditFeesInput}
+              onKeyDown={handleKeyDownFeeRateInput}
+              onChange={handleChangeFeeRateInput}
             />
             <FeeText>sats /vB</FeeText>
             <TickerContainer>
@@ -277,12 +263,12 @@ export function EditFees({
                     suffix=" sats"
                     renderText={(value: string) => <FeeText>{value}</FeeText>}
                   />
-                  <FiatAmount fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
+                  <StyledFiatAmountText fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
                 </>
               )}
             </TickerContainer>
           </InputContainer>
-          <ErrorText>{error}</ErrorText>
+          <StyledInputFeedback message={error} variant="danger" />
         </FeeContainer>
         <ButtonContainer>
           {buttons.map(({ value, label }) => (

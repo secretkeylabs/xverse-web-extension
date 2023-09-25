@@ -79,7 +79,7 @@ function OrdinalAttributeComponent({ title, value, showOridnalTag, isAddress, va
             value={value}
             displayType="text"
             thousandSeparator
-            renderText={(value) => <ValueText>{value}</ValueText>}
+            renderText={(text) => <ValueText>{text}</ValueText>}
           />
         )}
         {showOridnalTag && (

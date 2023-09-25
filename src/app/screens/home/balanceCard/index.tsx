@@ -97,12 +97,12 @@ function BalanceCard(props: BalanceCardProps) {
           <CurrencyText>{fiatCurrency}</CurrencyText>
         </CurrencyCard>
       </RowContainer>
-      <BalanceContainer>
-        {isLoading ? (
-          <BarLoaderContainer>
-            <BarLoader loaderSize={LoaderSize.LARGE} />
-          </BarLoaderContainer>
-        ) : (
+      {isLoading ? (
+        <BarLoaderContainer>
+          <BarLoader loaderSize={LoaderSize.LARGE} />
+        </BarLoaderContainer>
+      ) : (
+        <BalanceContainer>
           <NumericFormat
             value={calculateTotalBalance()}
             displayType="text"
@@ -110,14 +110,13 @@ function BalanceCard(props: BalanceCardProps) {
             thousandSeparator
             renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
           />
-        )}
-
-        {isRefetching && !isLoading && (
-          <ReloadContainer>
-            <MoonLoader color="white" size={16} />
-          </ReloadContainer>
-        )}
-      </BalanceContainer>
+          {isRefetching && (
+            <ReloadContainer>
+              <MoonLoader color="white" size={16} />
+            </ReloadContainer>
+          )}
+        </BalanceContainer>
+      )}
     </>
   );
 }

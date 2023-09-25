@@ -282,7 +282,11 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
               }`,
           );
           return (
-            <FtPostConditionCard key={i} postCondition={postCondition} ftMetaData={coinInfo} />
+            <FtPostConditionCard
+              key={i}
+              postCondition={postCondition}
+              ftMetaData={coinInfo}
+            />
           );
         case PostConditionType.NonFungible:
           return <NftPostConditionCard key={i} postCondition={postCondition} />;

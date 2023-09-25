@@ -1,10 +1,12 @@
+import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
+import Callout from '@ui-library/callout';
+import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import { getFtTicker } from '@utils/tokens';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import ActionButton from '@components/button';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -13,6 +15,10 @@ const Container = styled.div((props) => ({
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   justifyContent: 'space-between',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
 }));
 
 const BRC20TokenTagContainer = styled.div((props) => ({
@@ -49,6 +55,7 @@ const RowContainer = styled.div({
   alignItems: 'center',
 });
 
+// TODO create input component in ui-library
 const AmountInputContainer = styled.div<{ error: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -56,16 +63,13 @@ const AmountInputContainer = styled.div<{ error: boolean }>((props) => ({
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),
   border: props.error
-    ? '1px solid rgba(211, 60, 60, 0.3)'
-    : `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background.elevation_1,
+    ? `1px solid ${props.theme.colors.danger_dark_200}`
+    : `1px solid ${props.theme.colors.white_800}`,
+  backgroundColor: props.theme.colors.elevation_n1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   height: 44,
-  ':focus-within': {
-    border: `1px solid ${props.theme.colors.background.elevation6}`,
-  },
 }));
 
 const NextButtonContainer = styled.div((props) => ({
@@ -73,6 +77,7 @@ const NextButtonContainer = styled.div((props) => ({
   bottom: 0,
   paddingBottom: props.theme.spacing(12),
   paddingTop: props.theme.spacing(12),
+  backgroundColor: props.theme.colors.elevation0,
 }));
 
 const Label = styled.label((props) => ({
@@ -87,7 +92,7 @@ const InputFieldContainer = styled.div(() => ({
 
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background.elevation_1,
+  backgroundColor: 'transparent',
   color: props.theme.colors.white['0'],
   width: '100%',
   border: 'transparent',
@@ -105,25 +110,24 @@ const BalanceText = styled.h1((props) => ({
 
 const ErrorContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(3),
-}));
-
-const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
-  minHeight: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(12),
 }));
 
 const InputGroup = styled.div`
   margin-top: ${(props) => props.theme.spacing(8)}px;
 `;
 
+const StyledCallout = styled(Callout)`
+  margin-bottom: ${(props) => props.theme.spacing(14)}px;
+`;
+
 interface Props {
   token: FungibleToken;
-  amountError: string;
+  amountError: InputFeedbackProps | null;
   amountToSend: string;
   onAmountChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   recipientAddress: string;
-  recipientError: string;
+  recipientError: InputFeedbackProps | null;
   onAddressChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onPressNext: () => void;
   processing: boolean;
@@ -170,21 +174,19 @@ function Brc20TransferForm(props: Props) {
               />
             </Text>
           </RowContainer>
-          <AmountInputContainer error={!!amountError}>
+          <AmountInputContainer error={isDangerFeedback(amountError)}>
             <InputFieldContainer>
               <InputField value={amountToSend} placeholder="0" onChange={onAmountChange} />
             </InputFieldContainer>
             <Text>{tokenCurrency}</Text>
           </AmountInputContainer>
-          <ErrorContainer>
-            <ErrorText>{amountError}</ErrorText>
-          </ErrorContainer>
+          <ErrorContainer>{amountError && <InputFeedback {...amountError} />}</ErrorContainer>
         </InputGroup>
         <InputGroup>
           <RowContainer>
             <Label>{t('RECIPIENT')}</Label>
           </RowContainer>
-          <AmountInputContainer error={!!recipientError}>
+          <AmountInputContainer error={isDangerFeedback(recipientError)}>
             <InputFieldContainer>
               <InputField
                 value={recipientAddress}
@@ -193,10 +195,9 @@ function Brc20TransferForm(props: Props) {
               />
             </InputFieldContainer>
           </AmountInputContainer>
-          <ErrorContainer>
-            <ErrorText>{recipientError}</ErrorText>
-          </ErrorContainer>
+          <ErrorContainer>{recipientError && <InputFeedback {...recipientError} />}</ErrorContainer>
         </InputGroup>
+        <StyledCallout bodyText={t('MAKE_SURE_THE_RECIPIENT')} />
       </div>
       <NextButtonContainer>
         <ActionButton

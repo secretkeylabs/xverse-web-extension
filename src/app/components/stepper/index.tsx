@@ -21,14 +21,20 @@ const Title = styled.div<StepperProps>((props) => ({
   transition: 'color 0.3s ease',
 }));
 
+const getBackgroundColor = (props) => {
+  if (props.isCompleted) {
+    return props.theme.colors.success_medium;
+  }
+  if (props.isActive) {
+    return '#4C525F';
+  }
+  return 'transparent';
+};
+
 const Dot = styled.div<StepperProps>((props) => ({
   height: 30,
   width: 30,
-  backgroundColor: props.isCompleted
-    ? props.theme.colors.success_medium
-    : props.isActive
-    ? '#4C525F'
-    : 'transparent',
+  backgroundColor: getBackgroundColor(props),
   border: '2px solid',
   borderColor: props.isCompleted
     ? props.theme.colors.success_medium
@@ -53,12 +59,23 @@ const Dot = styled.div<StepperProps>((props) => ({
   },
 }));
 
+const calculateColorStops = (props) => {
+  const successColor = props.theme.colors.success_medium;
+
+  // Calculate the color stops
+  let startStop;
+  if (props.step === 0) startStop = '0%';
+  if (props.step > 1) startStop = '100%';
+  else startStop = '50%';
+  const endStop = props.step > 0 ? '50%' : '0%';
+
+  return `${successColor} ${startStop}, #4C525F ${endStop}`;
+};
+
 const Line = styled.div<StepperProps>((props) => ({
   height: 2,
   width: '100%',
-  background: `linear-gradient(90deg, ${props.theme.colors.success_medium} ${
-    props.step === 0 ? '0%' : props.step > 1 ? '100%' : '50%'
-  }, #4C525F ${props.step > 0 ? '50%' : '0%'})`,
+  background: `linear-gradient(90deg, ${calculateColorStops(props)})`,
   marginTop: props.theme.spacing(8),
 }));
 
@@ -71,15 +88,24 @@ export default function Stepper({ steps }: Props): JSX.Element {
   const currentStepIndex = steps.findIndex((step) => !step.isCompleted);
   const currentStep = currentStepIndex > -1 ? currentStepIndex : steps.length;
 
+  function getContentForDot(stepIndex, isCompleted, currentPosition) {
+    if (isCompleted) {
+      return <img src={checkmarkIcon} alt="Check Icon" />;
+    }
+    if (currentPosition !== stepIndex) {
+      return String(stepIndex + 1);
+    }
+    return '';
+  }
   return (
     <>
       <Container>
         <Dot isCompleted={steps[0].isCompleted} isActive={currentStep === 0}>
-          {steps[0].isCompleted ? <img src={checkmarkIcon} /> : currentStep !== 0 ? '1' : ''}
+          {getContentForDot(0, steps[0].isCompleted, currentStep)}
         </Dot>
         <Line step={currentStep} />
         <Dot isCompleted={steps[1].isCompleted} isActive={currentStep === 1}>
-          {steps[1].isCompleted ? <img src={checkmarkIcon} /> : currentStep !== 1 ? '2' : ''}
+          {getContentForDot(1, steps[1].isCompleted, currentStep)}
         </Dot>
       </Container>
       <Container>

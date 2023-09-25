@@ -42,6 +42,9 @@ const OuterContainer = styled.div({
 const InnerContainer = styled.div({
   flex: 1,
   overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
 });
 
 const MainContainer = styled.div((props) => ({
