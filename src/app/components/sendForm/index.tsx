@@ -4,9 +4,6 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { getTicker } from '@utils/helper';
-import { StoreState } from '@stores/index';
-import { useSelector } from 'react-redux';
-import Switch from '@assets/img/send/switch.svg';
 import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
 import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
@@ -16,11 +13,11 @@ import useNetworkSelector from '@hooks/useNetwork';
 import TokenImage from '@components/tokenImage';
 import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
-import { NumericFormat } from 'react-number-format';
 import { getCurrencyFlag } from '@utils/currency';
 import useDebounce from '@hooks/useDebounce';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
+import { FiatRow } from './fiatRow';
 
 interface ContainerProps {
   error: boolean;
@@ -162,65 +159,6 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
   opacity: props.enabled ? 1 : 0.6,
 }));
 
-/* TODO --------- move to separate file ------------- */
-const SwitchToFiatButton = styled.button((props) => ({
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  borderRadius: 24,
-  display: 'flex',
-  padding: '8px 12px',
-  justifyContent: 'center',
-  alignItems: 'center',
-}));
-
-const SwitchToFiatText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  marginLeft: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
-}));
-
-export function FiatRow({
-  onClick,
-  showFiat,
-  tokenCurrency,
-  tokenAmount,
-  fiatCurrency,
-  fiatAmount,
-}: {
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  showFiat: boolean;
-  tokenCurrency: string;
-  tokenAmount: string;
-  fiatCurrency: string;
-  fiatAmount: string;
-}) {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const renderText = (value: string) => `~ ${value} ${tokenCurrency}`;
-  return (
-    <RowContainer>
-      <SubText>
-        {showFiat ? (
-          <NumericFormat
-            value={tokenAmount}
-            displayType="text"
-            thousandSeparator
-            renderText={renderText}
-          />
-        ) : (
-          `~ $ ${fiatAmount} ${fiatCurrency}`
-        )}
-      </SubText>
-      <SwitchToFiatButton onClick={onClick}>
-        <img src={Switch} alt="Switch" />
-        <SwitchToFiatText>
-          {showFiat ? `${t('SWITCH_TO')} ${tokenCurrency}` : `${t('SWITCH_TO')} ${fiatCurrency}`}
-        </SwitchToFiatText>
-      </SwitchToFiatButton>
-    </RowContainer>
-  );
-}
-/* ---------------------------------------------- TODO */
-
 const CurrencyFlag = styled.img((props) => ({
   marginLeft: props.theme.spacing(4),
 }));
@@ -359,21 +297,21 @@ function SendForm({
     setFiatAmount(amountInCurrency);
   };
 
-  function getTokenEquivalent(currentAmount: string) {
+  function getTokenEquivalent(tokenAmount: string): string {
     if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
       return '';
     }
-    if (!currentAmount) return '0';
+    if (!tokenAmount) return '0';
     switch (currencyType) {
       case 'STX':
-        return getStxTokenEquivalent(new BigNumber(currentAmount), stxBtcRate, btcFiatRate)
+        return getStxTokenEquivalent(new BigNumber(tokenAmount), stxBtcRate, btcFiatRate)
           .toFixed(6)
           .toString();
       case 'BTC':
-        return getBtcEquivalent(new BigNumber(currentAmount), btcFiatRate).toFixed(8).toString();
+        return getBtcEquivalent(new BigNumber(tokenAmount), btcFiatRate).toFixed(8).toString();
       case 'FT':
         if (fungibleToken?.tokenFiatRate) {
-          return new BigNumber(currentAmount)
+          return new BigNumber(tokenAmount)
             .dividedBy(fungibleToken.tokenFiatRate)
             .toFixed(fungibleToken.decimals ?? 2)
             .toString();

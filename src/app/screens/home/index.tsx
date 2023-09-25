@@ -42,17 +42,14 @@ import Theme from 'theme';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
 
-export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  margin-left: 16px;
-  margin-right: 16px;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
+export const Container = styled.div((props) => ({
+  ...props.theme.scrollbar,
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  paddingLeft: props.theme.spacing(4),
+  paddingRight: props.theme.spacing(4),
+}));
 
 const ColumnContainer = styled.div((props) => ({
   display: 'flex',
