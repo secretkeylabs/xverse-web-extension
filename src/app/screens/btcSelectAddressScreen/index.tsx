@@ -6,13 +6,12 @@ import AccountRow from '@components/accountRow';
 import ActionButton from '@components/button';
 import Separator from '@components/separator';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
+import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useSpring } from '@react-spring/web';
 import { Account } from '@secretkeylabs/xverse-core';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
@@ -170,10 +169,10 @@ const OrdinalImage = styled.img({
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const [showAccountList, setShowAccountList] = useState(false);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
+  const { switchAccount } = useWalletReducer();
   const { payload, approveBtcAddressRequest, cancelAddressRequest } = useBtcAddressRequest();
   const springProps = useSpring({
     transform: showAccountList ? 'translateY(0%)' : 'translateY(100%)',
@@ -212,23 +211,8 @@ function BtcSelectAddressScreen() {
   const isAccountSelected = (account: Account) =>
     account.id === selectedAccount?.id && account.accountType === selectedAccount?.accountType;
 
-  const handleAccountSelect = (account: Account) => {
-    dispatch(
-      selectAccount(
-        account,
-        account.stxAddress,
-        account.btcAddress,
-        account.ordinalsAddress,
-        account.masterPubKey,
-        account.stxPublicKey,
-        account.btcPublicKey,
-        account.ordinalsPublicKey,
-        network,
-        undefined,
-        account.accountType,
-        account.accountName,
-      ),
-    );
+  const handleAccountSelect = async (account: Account) => {
+    await switchAccount(account);
     setShowAccountList(false);
   };
 
@@ -262,12 +246,12 @@ function BtcSelectAddressScreen() {
           <Container>
             {payload.purposes.map((purpose) =>
               purpose === AddressPurpose.Payment ? (
-                <AddressContainer>
+                <AddressContainer key={purpose}>
                   <BitcoinDot />
                   <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
                 </AddressContainer>
               ) : (
-                <AddressContainer>
+                <AddressContainer key={purpose}>
                   <OrdinalImage src={OrdinalsIcon} />
                   <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
                 </AddressContainer>
@@ -279,13 +263,12 @@ function BtcSelectAddressScreen() {
         {showAccountList ? (
           <AccountListContainer style={springProps}>
             {[...ledgerAccountsList, ...accountsList].map((account) => (
-              <AccountListRow>
+              <AccountListRow key={account.id}>
                 <AccountRow
                   key={account.stxAddress}
                   account={account}
                   isSelected={isAccountSelected(account)}
                   onAccountSelected={handleAccountSelect}
-                  showOrdinalAddress
                 />
                 <Separator />
               </AccountListRow>
