@@ -13,7 +13,10 @@ const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
   let isPending: boolean | undefined = false;
   let pendingTxHash: string | undefined;
 
-  const response = useQuery(['ordinal-pending-transactions'], fetchOrdinalsMempoolTxs);
+  const response = useQuery({
+    queryKey: ['ordinal-pending-transactions'],
+    queryFn: fetchOrdinalsMempoolTxs,
+  });
 
   if (response.data) {
     response.data.forEach((tx) => {
