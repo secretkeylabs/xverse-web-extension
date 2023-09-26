@@ -64,6 +64,7 @@ import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
 import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
+import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 
 const router = createHashRouter([
   {
@@ -302,6 +303,10 @@ const router = createHashRouter([
       {
         path: 'fiat-currency',
         element: <FiatCurrencyScreen />,
+      },
+      {
+        path: 'privacy-preferences',
+        element: <PrivacyPreferencesScreen />,
       },
       {
         path: 'change-password',
