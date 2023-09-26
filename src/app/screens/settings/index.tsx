@@ -79,6 +79,10 @@ function Setting() {
     navigate('/fiat-currency');
   };
 
+  const openPrivacyPreferencesScreen = () => {
+    navigate('/privacy-preferences');
+  };
+
   const openChangeNetworkScreen = () => {
     navigate('/change-network');
   };
@@ -171,6 +175,12 @@ function Setting() {
           text={t('CURRENCY')}
           onClick={openFiatCurrencyScreen}
           textDetail={fiatCurrency}
+          showDivider
+        />
+        <SettingComponent
+          text={t('PRIVACY_PREFERENCES.TITLE')}
+          onClick={openPrivacyPreferencesScreen}
+          icon={ArrowIcon}
           showDivider
         />
         {!isLedgerAccount(selectedAccount) && (
