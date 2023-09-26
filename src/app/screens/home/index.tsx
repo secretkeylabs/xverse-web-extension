@@ -13,6 +13,8 @@ import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import ReceiveCardComponent from '@components/receiveCardComponent';
+import { isLedgerAccount } from '@utils/helper';
+import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomBar from '@components/tabBar';
@@ -29,11 +31,13 @@ import { Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { CurrencyTypes } from '@utils/constants';
-import { isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import dashboardIcon from '@assets/img/dashboard-icon.svg';
+import { useDispatch } from 'react-redux';
+import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import styled, { useTheme } from 'styled-components';
 import Theme from 'theme';
 import BalanceCard from './balanceCard';
 import SquareButton from './squareButton';
@@ -135,11 +139,53 @@ const AddStxButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(6),
 }));
 
+const ModalContent = styled.div((props) => ({
+  padding: props.theme.spacing(8),
+  paddingTop: 0,
+  paddingBottom: props.theme.spacing(16),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+}));
+
+const ModalIcon = styled.img((props) => ({
+  marginBottom: props.theme.spacing(10),
+}));
+
+const ModalTitle = styled.div((props) => ({
+  fontSize: '1rem',
+  fontWeight: 700,
+  marginBottom: props.theme.spacing(4),
+  textAlign: 'center',
+}));
+
+const ModalDescription = styled.div((props) => ({
+  fontSize: '0.875rem',
+  color: props.theme.colors.white['200'],
+  marginBottom: props.theme.spacing(16),
+  textAlign: 'center',
+  lineHeight: '1.25rem',
+}));
+
+const ModalControlsContainer = styled.div({
+  display: 'flex',
+  width: '100%',
+});
+
+const ModalButtonContainer = styled.div((props) => ({
+  width: '100%',
+  '&:first-child': {
+    marginRight: props.theme.spacing(6),
+  },
+}));
+
 function Home() {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
+  const theme = useTheme();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
@@ -154,6 +200,7 @@ function Home() {
     brcCoinsList,
     showBtcReceiveAlert,
     showOrdinalReceiveAlert,
+    showDataCollectionAlert,
   } = useWalletSelector();
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
@@ -387,6 +434,16 @@ function Home() {
     </VerifyOrViewContainer>
   );
 
+  const handleDataCollectionDeny = () => {
+    optOutMixPanel();
+    dispatch(changeShowDataCollectionAlertAction(false));
+  };
+
+  const handleDataCollectionAllow = () => {
+    optInMixPanel(selectedAccount?.masterPubKey);
+    dispatch(changeShowDataCollectionAlertAction(false));
+  };
+
   const showSwaps = !isLedgerAccount(selectedAccount);
 
   return (
@@ -504,6 +561,44 @@ function Home() {
         />
       </Container>
       <BottomBar tab="dashboard" />
+
+      <BottomModal
+        visible={!!showDataCollectionAlert}
+        header=""
+        onClose={handleDataCollectionDeny}
+        overlayStylesOverriding={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        contentStylesOverriding={{
+          width: 'auto',
+          bottom: 'initial',
+          borderRadius: theme.radius(3),
+          margin: `0 ${theme.spacing(8)}px`,
+        }}
+      >
+        <ModalContent>
+          <ModalIcon src={dashboardIcon} alt="analytics" />
+          <ModalTitle>{t('DATA_COLLECTION_POPUP.TITLE')}</ModalTitle>
+          <ModalDescription>{t('DATA_COLLECTION_POPUP.DESCRIPTION')}</ModalDescription>
+          <ModalControlsContainer>
+            <ModalButtonContainer>
+              <ActionButton
+                transparent
+                text={t('DATA_COLLECTION_POPUP.DENY')}
+                onPress={handleDataCollectionDeny}
+              />
+            </ModalButtonContainer>
+            <ModalButtonContainer>
+              <ActionButton
+                text={t('DATA_COLLECTION_POPUP.ALLOW')}
+                onPress={handleDataCollectionAllow}
+              />
+            </ModalButtonContainer>
+          </ModalControlsContainer>
+        </ModalContent>
+      </BottomModal>
     </>
   );
 }
