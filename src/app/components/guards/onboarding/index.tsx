@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useSingleTabGuard } from '@components/guards/singleTab';
 import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
 import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   WalletExistsContext,
   WalletExistsContextProps,
@@ -22,6 +23,7 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
 
   const [walletExistsGuardEnabled, setWalletExistsGuardEnabled] = useState(true);
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
+  const { masterPubKey } = useWalletSelector();
   const { hasSeed } = useSeedVault();
   const contextValue: WalletExistsContextProps = useMemo(
     () => ({
@@ -39,7 +41,7 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
 
   const hydrated = useHasStateRehydrated();
 
-  if (walletExistsGuardEnabled && hydrated && isWalletInitialized) {
+  if (walletExistsGuardEnabled && hydrated && isWalletInitialized && masterPubKey) {
     return <Navigate to="/wallet-exists" />;
   }
 

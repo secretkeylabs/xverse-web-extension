@@ -134,6 +134,7 @@ const useWalletReducer = () => {
   const resetWallet = async () => {
     dispatch(resetWalletAction());
     localStorage.clear();
+    queryClient.clear();
     await Promise.all([
       clearSessionTime(),
       chrome.storage.local.clear(),

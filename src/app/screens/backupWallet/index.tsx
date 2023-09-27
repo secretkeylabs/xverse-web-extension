@@ -63,7 +63,7 @@ function BackupWallet(): JSX.Element {
     (async () => {
       await initSeedVault('');
       const newSeedPhrase = generateMnemonic();
-      await storeSeed(newSeedPhrase);
+      await storeSeed(newSeedPhrase, true);
     })();
   }, []);
 
