@@ -167,7 +167,7 @@ const useWalletReducer = () => {
       bnsName: wallet.bnsName,
     };
     await seedVault.init(password);
-    await seedVault.storeSeed(seed);
+    await seedVault.storeSeed(seed, true);
     trackMixPanel(AnalyticsEvents.RestoreWallet);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(setWalletAction(wallet));
