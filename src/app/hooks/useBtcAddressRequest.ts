@@ -1,8 +1,8 @@
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
-import { GetAddressOptions, AddressPurposes, GetAddressResponse, Address } from 'sats-connect';
+import { Address, AddressPurpose, GetAddressOptions, GetAddressResponse } from 'sats-connect';
 
 const useBtcAddressRequest = () => {
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useWalletSelector();
@@ -13,22 +13,20 @@ const useBtcAddressRequest = () => {
   const tabId = params.get('tabId') ?? '0';
 
   const approveBtcAddressRequest = () => {
-    const addressesResponse: Address[] = request.payload.purposes.map(
-      (purpose: AddressPurposes) => {
-        if (purpose === AddressPurposes.ORDINALS) {
-          return {
-            address: ordinalsAddress,
-            publicKey: ordinalsPublicKey,
-            purpose: AddressPurposes.ORDINALS,
-          };
-        }
+    const addressesResponse: Address[] = request.payload.purposes.map((purpose: AddressPurpose) => {
+      if (purpose === AddressPurpose.Ordinals) {
         return {
-          address: btcAddress,
-          publicKey: btcPublicKey,
-          purpose: AddressPurposes.PAYMENT,
+          address: ordinalsAddress,
+          publicKey: ordinalsPublicKey,
+          purpose: AddressPurpose.Ordinals,
         };
-      },
-    );
+      }
+      return {
+        address: btcAddress,
+        publicKey: btcPublicKey,
+        purpose: AddressPurpose.Payment,
+      };
+    });
     const response: GetAddressResponse = {
       addresses: addressesResponse,
     };

@@ -7,6 +7,7 @@ export const ConnectLedgerContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: auto;
   > :first-child {
     margin-bottom: ${({ theme }) => theme.spacing(15)}px};
   }
@@ -24,6 +25,10 @@ export const ConnectLedgerText = styled.p((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white[200],
   textAlign: 'center',
+  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(4),
+  paddingLeft: props.theme.spacing(6),
+  paddingRight: props.theme.spacing(6),
 }));
 
 interface LedgerConnectionProps {

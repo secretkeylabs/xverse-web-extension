@@ -6,7 +6,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { deserializeTransaction } from '@stacks/transactions';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import BottomBar from '@components/tabBar';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
@@ -20,8 +19,9 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { isLedgerAccount } from '@utils/helper';
-import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import BigNumber from 'bignumber.js';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -118,6 +118,7 @@ function ConfirmNftTransaction() {
   } = useMutation<string, Error, { signedTx: StacksTransaction }>({
     mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
   });
+  const initialStxTransactions = [unsignedTx];
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -150,16 +151,34 @@ function ConfirmNftTransaction() {
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     if (isLedgerAccount(selectedAccount)) {
-      const txType: LedgerTransactionType = 'STX';
-      navigate('/confirm-ledger-tx', { state: { unsignedTx, type: txType } });
+      const type: LedgerTransactionType = 'STX';
+      const state: ConfirmStxTransactionState = {
+        unsignedTx: unsignedTx.serialize(),
+        type,
+        recipients: [
+          {
+            address: recipientAddress,
+            amountMicrostacks: unsignedTx?.payload?.amount
+              ? new BigNumber(unsignedTx?.payload.amount?.toString(10))
+              : new BigNumber(0),
+          },
+        ],
+        fee: new BigNumber(
+          initialStxTransactions
+            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+            .reduce((prev, curr) => prev + curr, BigInt(0))
+            .toString(10),
+        ),
+      };
+
+      navigate('/confirm-ledger-tx', { state });
       return;
     }
 
     mutate({ signedTx: txs[0] });
   };
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/confirm-nft-tx'), []);
+  useResetUserFlow('/confirm-nft-tx');
 
   const handleOnCancelClick = () => {
     navigate(-1);
@@ -183,11 +202,12 @@ function ConfirmNftTransaction() {
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
         <ConfirmStxTransationComponent
-          initialStxTransactions={[unsignedTx]}
+          initialStxTransactions={initialStxTransactions}
           loading={isLoading}
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
           isAsset
+          skipModal={isLedgerAccount(selectedAccount)}
         >
           <Container>
             <NFtContainer>

@@ -9,18 +9,15 @@ import {
 import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TokenImageProps } from '@components/tokenImage';
-import { LoaderSize, XVERSE_SPONSOR_2_URL } from '@utils/constants';
 import { AlexSDK, Currency } from 'alex-sdk';
-import { ftDecimals } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import { useNavigate } from 'react-router-dom';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
-import useSponsoredTransaction from '@hooks/useSponsoredTransaction';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import { useAlexSponsoredTransaction } from './useAlexSponsoredTransaction';
+import { useCurrencyConversion } from './useCurrencyConversion';
 
-// const noop = () => null;
 const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
 
 export type STXOrFungibleToken = 'STX' | FungibleToken;
@@ -54,6 +51,10 @@ export type UseSwap = {
   onSlippageChanged: (slippage: number) => void;
   minReceived?: string;
   onSwap?: () => Promise<void>;
+  isSponsored: boolean;
+  isServiceRunning: boolean;
+  handleChangeUserOverrideSponsorValue: (checked: boolean) => void;
+  isSponsorDisabled: boolean;
 };
 
 export type SelectedCurrencyState = {
@@ -117,23 +118,12 @@ export function useSwap(): UseSwap {
   const navigate = useNavigate();
   const alexSDK = useState(() => new AlexSDK())[0];
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const {
-    coinsList,
-    stxAvailableBalance,
-    stxBtcRate,
-    btcFiatRate,
-    // fiatCurrency,
-    stxAddress,
-    stxPublicKey,
-  } = useWalletSelector();
-  const { isSponsored } = useSponsoredTransaction(XVERSE_SPONSOR_2_URL);
+  const { stxAddress, stxPublicKey } = useWalletSelector();
+  const { acceptableCoinList, currencyToToken } = useCurrencyConversion();
+  const [userOverrideSponsorValue, setUserOverrideSponsorValue] = useState(true);
   const { data: stxPendingTxData } = useStxPendingTxData();
-
-  const acceptableCoinList = (coinsList || [])
-    .filter((c) => alexSDK.getCurrencyFrom(c.principal) != null)
-    // TODO tim: remove this once alexsdk fix issue here
-    // https://github.com/alexgo-io/alex-sdk/issues/2
-    .filter((c) => c.assetName !== 'brc20-db20');
+  const { isSponsored, isServiceRunning, isSponsorDisabled } =
+    useAlexSponsoredTransaction(userOverrideSponsorValue);
 
   const [inputAmount, setInputAmount] = useState('');
   const [slippage, setSlippage] = useState(0.04);
@@ -145,40 +135,6 @@ export function useSwap(): UseSwap {
   });
 
   const fromAmount = Number.isNaN(Number(inputAmount)) ? undefined : Number(inputAmount);
-
-  function currencyToToken(currency?: Currency, amount?: number): SwapToken | undefined {
-    if (currency == null) {
-      return undefined;
-    }
-    if (currency === Currency.STX) {
-      return {
-        balance: Number(microstacksToStx(BigNumber(stxAvailableBalance) as any)),
-        image: { token: 'STX', size: 28, loaderSize: LoaderSize.SMALL },
-        name: 'STX',
-        amount,
-        fiatAmount:
-          amount != null
-            ? Number(getFiatEquivalent(amount, 'STX', stxBtcRate as any, btcFiatRate as any))
-            : undefined,
-      };
-    }
-    const token = acceptableCoinList.find(
-      (c) => alexSDK.getCurrencyFrom(c.principal) === currency,
-    )!;
-    if (token == null) {
-      return undefined;
-    }
-    return {
-      amount,
-      image: { fungibleToken: token, size: 28, loaderSize: LoaderSize.SMALL },
-      name: (token.ticker ?? token.name).toUpperCase(),
-      balance: Number(ftDecimals(token.balance, token.decimals ?? 0)),
-      fiatAmount:
-        amount != null
-          ? Number(getFiatEquivalent(amount, 'FT', stxBtcRate as any, btcFiatRate as any, token))
-          : undefined,
-    };
-  }
 
   function getCurrencyName(currency: Currency) {
     if (currency === Currency.STX) {
@@ -352,7 +308,9 @@ export function useSwap(): UseSwap {
               unsignedTx,
               getNewNonce(stxPendingTxData?.pendingTransactions || [], getNonce(unsignedTx)),
             );
-
+            const fee = microstacksToStx(
+              new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
+            ).toNumber();
             const state: SwapConfirmationInput = {
               from: selectedCurrency.from!,
               to: selectedCurrency.to!,
@@ -361,17 +319,23 @@ export function useSwap(): UseSwap {
               address: stxAddress,
               fromAmount: fromAmount!,
               minToAmount: toAmount! * (1 - slippage),
-              lpFeeAmount: info.feeRate * fromAmount!,
-              lpFeeFiatAmount: currencyToToken(selectedCurrency.from!, info.feeRate * fromAmount!)
-                ?.fiatAmount,
+              txFeeAmount: fee,
+              txFeeFiatAmount: currencyToToken(Currency.STX, fee)?.fiatAmount,
               routers: info.route.map(currencyToToken).filter(isNotNull),
               unsignedTx: unsignedTx.serialize().toString('hex'),
               functionName: `${tx.contractName}\n${tx.functionName}`,
+              userOverrideSponsorValue,
             };
             navigate('/swap-confirm', {
               state,
             });
           }
         : undefined,
+    isSponsored,
+    isServiceRunning,
+    handleChangeUserOverrideSponsorValue: (checked: boolean) => {
+      setUserOverrideSponsorValue(checked);
+    },
+    isSponsorDisabled,
   };
 }

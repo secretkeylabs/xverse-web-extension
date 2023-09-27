@@ -1,27 +1,25 @@
+import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
+import Plus from '@assets/img/dashboard/plus.svg';
 import AccountRow from '@components/accountRow';
+import Separator from '@components/separator';
 import TopRow from '@components/topRow';
+import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Account } from '@secretkeylabs/xverse-core/types';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import Plus from '@assets/img/dashboard/plus.svg';
-import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
-import { useDispatch } from 'react-redux';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import Seperator from '@components/seperator';
-import { Account } from '@secretkeylabs/xverse-core/types';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useWalletReducer from '@hooks/useWalletReducer';
-import React, { useEffect, useMemo } from 'react';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
+export const Container = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+});
 
 const ButtonContainer = styled.button((props) => ({
   width: '100%',
@@ -44,6 +42,8 @@ const AccountContainer = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.spacing(11),
   paddingRight: props.theme.spacing(11),
+  paddingTop: props.theme.spacing(8),
+  gap: props.theme.spacing(8),
 }));
 
 const AddAccountContainer = styled.div((props) => ({
@@ -81,9 +81,8 @@ const ButtonsWrapper = styled.div(
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
-  const { createAccount } = useWalletReducer();
+  const { createAccount, switchAccount } = useWalletReducer();
 
   const displayedAccountsList = useMemo(() => {
     if (network.type === 'Mainnet') {
@@ -92,29 +91,12 @@ function AccountList(): JSX.Element {
     return accountsList;
   }, [accountsList, ledgerAccountsList, network]);
 
-  const { broadcastResetUserFlow, closeChannel } = useResetUserFlow();
-  // destructor
-  useEffect(() => closeChannel, []);
-
-  const handleAccountSelect = (account: Account) => {
-    dispatch(
-      selectAccount(
-        account,
-        account.stxAddress,
-        account.btcAddress,
-        account.ordinalsAddress,
-        account.masterPubKey,
-        account.stxPublicKey,
-        account.btcPublicKey,
-        account.ordinalsPublicKey,
-        network,
-        undefined,
-        account.accountType,
-        account.accountName,
-      ),
-    );
+  const handleAccountSelect = async (account: Account, goBack = true) => {
+    await switchAccount(account);
     broadcastResetUserFlow();
-    navigate('/');
+    if (goBack) {
+      navigate(-1);
+    }
   };
 
   const isAccountSelected = (account: Account) =>
@@ -122,36 +104,37 @@ function AccountList(): JSX.Element {
     account.stxAddress === selectedAccount?.stxAddress;
 
   const handleBackButtonClick = () => {
-    navigate('/');
+    navigate(-1);
   };
 
-  async function onCreateAccount() {
+  const onCreateAccount = async () => {
     await createAccount();
-  }
+  };
 
-  async function onImportLedgerAccount() {
+  const onImportLedgerAccount = async () => {
     await chrome.tabs.create({
       url: chrome.runtime.getURL('options.html#/import-ledger'),
     });
-  }
+  };
 
   return (
     <Container>
       <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
       <AccountContainer>
         {displayedAccountsList.map((account) => (
-          <React.Fragment key={account.btcAddress}>
+          <div key={account.btcAddress}>
             <AccountRow
               account={account}
               isSelected={isAccountSelected(account)}
               onAccountSelected={handleAccountSelect}
+              isAccountListView
             />
-            <Seperator />
-          </React.Fragment>
+            <Separator />
+          </div>
         ))}
       </AccountContainer>
       <ButtonsWrapper>
-        <ButtonContainer onClick={async () => onCreateAccount()}>
+        <ButtonContainer onClick={onCreateAccount}>
           <AddAccountContainer>
             <ButtonImage src={Plus} />
           </AddAccountContainer>

@@ -24,6 +24,8 @@ import TransferMemoView from '@components/confirmStxTransactionComponent/transfe
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { deserializeTransaction } from '@stacks/transactions';
+import { isLedgerAccount } from '@utils/helper';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const AlertContainer = styled.div((props) => ({
@@ -50,7 +52,7 @@ function ConfirmStxTransaction() {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
-  const { stxBtcRate, btcFiatRate, network } = useWalletSelector();
+  const { stxBtcRate, btcFiatRate, network, selectedAccount } = useWalletSelector();
   const { refetch } = useStxWalletData();
   const {
     isLoading,
@@ -97,7 +99,7 @@ function ConfirmStxTransaction() {
     }
   }, [txError]);
 
-  function updateUI() {
+  const updateUI = () => {
     const txPayload = unsignedTx.payload as TokenTransferPayload;
 
     if (txPayload.recipient.address) {
@@ -110,14 +112,17 @@ function ConfirmStxTransaction() {
     const txFiatAmount = getStxFiatEquivalent(amount, stxBtcRate, btcFiatRate);
     const txFiatTotal = getStxFiatEquivalent(amount, stxBtcRate, btcFiatRate);
     const { memo: txMemo } = txPayload;
+    // the txPayload returns a string of null bytes incase memo is null
+    // remove null bytes so send form treats it as an empty string
+    const modifiedMemoString = txMemo.content.split('\u0000').join('');
 
     setAmount(txAmount);
     setStateFee(txFee);
     setFiatAmount(txFiatAmount);
     setTotal(txTotal);
     setFiatTotal(txFiatTotal);
-    setMemo(txMemo.content);
-  }
+    setMemo(modifiedMemoString);
+  };
 
   useEffect(() => {
     if (recipient === '' || !fee || !amount || !fiatAmount || !total || !fiatTotal) {
@@ -131,12 +136,25 @@ function ConfirmStxTransaction() {
     return microstacksToStx(amountToTransfer);
   };
 
-  const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+  const handleConfirmClick = (txs: StacksTransaction[]) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const type: LedgerTransactionType = 'STX';
+      const state: ConfirmStxTransactionState = {
+        unsignedTx: unsignedTx.serialize(),
+        type,
+        recipients: [{ address: recipient, amountMicrostacks: amount }],
+        fee,
+      };
+
+      navigate('/confirm-ledger-tx', { state });
+      return;
+    }
+
     setTxRaw(txs[0].serialize().toString('hex'));
     mutate({ signedTx: txs[0] });
   };
 
-  const handleOnCancelClick = () => {
+  const handleCancelClick = () => {
     if (isBrowserTx) {
       finalizeTxSignature({ requestPayload: requestToken, tabId: Number(tabId), data: 'cancel' });
       window.close();
@@ -156,14 +174,15 @@ function ConfirmStxTransaction() {
       {isBrowserTx ? (
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
-        <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleOnCancelClick} />
+        <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleCancelClick} />
       )}
       <ConfirmStxTransationComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
-        onConfirmClick={handleOnConfirmClick}
-        onCancelClick={handleOnCancelClick}
+        onConfirmClick={handleConfirmClick}
+        onCancelClick={handleCancelClick}
         isSponsored={sponsored}
+        skipModal={isLedgerAccount(selectedAccount)}
       >
         <RecipientComponent
           address={recipient}
@@ -187,4 +206,5 @@ function ConfirmStxTransaction() {
     </>
   );
 }
+
 export default ConfirmStxTransaction;

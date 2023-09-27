@@ -9,12 +9,27 @@ import { RouterProvider } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ThemeProvider } from 'styled-components';
 import '../locales';
+import { useEffect } from 'react';
+import mixpanel from 'mixpanel-browser';
+import { MIX_PANEL_TOKEN } from '@utils/constants';
 import Theme from '../theme';
 import GlobalStyle from '../theme/global';
 import SessionGuard from './components/guards/session';
 import router from './routes';
 
 function App(): JSX.Element {
+  useEffect(() => {
+    if (!MIX_PANEL_TOKEN) {
+      return;
+    }
+
+    mixpanel.init(MIX_PANEL_TOKEN, {
+      debug: process.env.NODE_ENV === 'development',
+      ip: false,
+      persistence: 'localStorage',
+    });
+  }, []);
+
   return (
     <>
       <GlobalStyle />

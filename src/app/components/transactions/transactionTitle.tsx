@@ -3,7 +3,7 @@ import {
   Brc20HistoryTransactionData,
   BtcTransactionData,
   StxTransactionData,
-  TransactionData,
+  TransactionData
 } from '@secretkeylabs/xverse-core';
 import { SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ interface TransactionTitleProps {
 const TransactionTitleText = styled.p((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white[0],
+  textAlign: 'left',
 }));
 
 export default function TransactionTitle(props: TransactionTitleProps) {
@@ -38,6 +39,19 @@ export default function TransactionTitle(props: TransactionTitleProps) {
       return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
     }
     return tx.operation;
+
+  };
+
+  const getBtcTokenTransferTitle = (tx: BtcTransactionData): string => {
+    if (tx.txStatus === 'pending') {
+      if (tx.isOrdinal) {
+        return tx.incoming
+          ? t('ORDINAL_TRANSACTION_PENDING_RECEIVING')
+          : t('ORDINAL_TRANSACTION_PENDING_SENDING');
+      }
+      return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
+    }
+    return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
   };
 
   const getFtName = (tx: TransactionData): string => {
@@ -52,6 +66,7 @@ export default function TransactionTitle(props: TransactionTitleProps) {
     if (tx.contractCall?.contract_id === SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL) {
       return t('TRANSACTION_CONTRACT_TOKEN_TRANSFER');
     }
+    const name = tx?.contractCall?.contract_id.split('.') || [];
     switch (tx.contractCall?.function_name) {
       case 'delegate-stx':
         return t('TRANSACTION_STACKING_DELEGATION');
@@ -60,7 +75,6 @@ export default function TransactionTitle(props: TransactionTitleProps) {
       case 'allow-contract-caller':
         return t('TRANSACTION_STACKING_CONTRACT_AUTHORIZE');
       case 'transfer':
-        const name = tx.contractCall.contract_id.split('.');
         if (tx.tokenType === 'fungible') {
           return `${getFtName(tx)} ${t('TRANSACTION_FUNGIBLE_TOKEN_TRANSFER')}`;
         }
@@ -84,7 +98,7 @@ export default function TransactionTitle(props: TransactionTitleProps) {
       case 'poison_microblock':
         return t('TRANSACTION_POISON_MICRO_BLOCK');
       case 'bitcoin':
-        return getTokenTransferTitle(transaction);
+        return getBtcTokenTransferTitle(transaction as BtcTransactionData);
       case 'brc20':
         return getBrc20TokenTitle(transaction as Brc20HistoryTransactionData);
       default:

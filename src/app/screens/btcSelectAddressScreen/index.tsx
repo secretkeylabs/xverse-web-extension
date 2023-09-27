@@ -1,21 +1,20 @@
-import styled from 'styled-components';
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import XverseLogo from '@assets/img/settings/logo.svg';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
-import useWalletSelector from '@hooks/useWalletSelector';
 import AccountRow from '@components/accountRow';
-import { animated, useSpring } from '@react-spring/web';
-import Seperator from '@components/seperator';
-import { Account } from '@secretkeylabs/xverse-core';
-import { useDispatch } from 'react-redux';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
+import Separator from '@components/separator';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
-import { AddressPurposes } from 'sats-connect';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { animated, useSpring } from '@react-spring/web';
+import { Account } from '@secretkeylabs/xverse-core';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { AddressPurpose } from 'sats-connect';
+import styled from 'styled-components';
 import AccountView from './accountView';
 
 const TitleContainer = styled.div({
@@ -35,6 +34,11 @@ const DropDownContainer = styled.div({
   height: '100%',
   alignItems: 'center',
   justifyContent: 'flex-end',
+});
+
+const Container = styled.div({
+  display: 'flex',
+  alignItems: 'center',
 });
 
 const LogoContainer = styled.div((props) => ({
@@ -142,6 +146,7 @@ const BitcoinDot = styled.div((props) => ({
 }));
 
 const AccountListRow = styled.div((props) => ({
+  paddingTop: props.theme.spacing(8),
   paddingLeft: 16,
   paddingRight: 16,
   ':hover': {
@@ -164,10 +169,10 @@ const OrdinalImage = styled.img({
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const [showAccountList, setShowAccountList] = useState(false);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
+  const { switchAccount } = useWalletReducer();
   const { payload, approveBtcAddressRequest, cancelAddressRequest } = useBtcAddressRequest();
   const springProps = useSpring({
     transform: showAccountList ? 'translateY(0%)' : 'translateY(100%)',
@@ -203,25 +208,11 @@ function BtcSelectAddressScreen() {
     setShowAccountList(true);
   };
 
-  const isAccountSelected = (account: Account) => account.id === selectedAccount?.id;
+  const isAccountSelected = (account: Account) =>
+    account.id === selectedAccount?.id && account.accountType === selectedAccount?.accountType;
 
-  const handleAccountSelect = (account: Account) => {
-    dispatch(
-      selectAccount(
-        account,
-        account.stxAddress,
-        account.btcAddress,
-        account.ordinalsAddress,
-        account.masterPubKey,
-        account.stxPublicKey,
-        account.btcPublicKey,
-        account.ordinalsPublicKey,
-        network,
-        undefined,
-        account.accountType,
-        account.accountName,
-      ),
-    );
+  const handleAccountSelect = async (account: Account) => {
+    await switchAccount(account);
     setShowAccountList(false);
   };
 
@@ -252,35 +243,34 @@ function BtcSelectAddressScreen() {
         <TitleContainer>
           <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
           <FunctionTitle>{t('TITLE')}</FunctionTitle>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Container>
             {payload.purposes.map((purpose) =>
-              purpose === AddressPurposes.PAYMENT ? (
-                <AddressContainer>
+              purpose === AddressPurpose.Payment ? (
+                <AddressContainer key={purpose}>
                   <BitcoinDot />
                   <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
                 </AddressContainer>
               ) : (
-                <AddressContainer>
+                <AddressContainer key={purpose}>
                   <OrdinalImage src={OrdinalsIcon} />
                   <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
                 </AddressContainer>
               ),
             )}
-          </div>
+          </Container>
           <DappTitle>{payload.message}</DappTitle>
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
-            {[...accountsList, ...ledgerAccountsList].map((account) => (
-              <AccountListRow>
+            {[...ledgerAccountsList, ...accountsList].map((account) => (
+              <AccountListRow key={account.id}>
                 <AccountRow
                   key={account.stxAddress}
                   account={account}
                   isSelected={isAccountSelected(account)}
                   onAccountSelected={handleAccountSelect}
-                  showOrdinalAddress
                 />
-                <Seperator />
+                <Separator />
               </AccountListRow>
             ))}
           </AccountListContainer>

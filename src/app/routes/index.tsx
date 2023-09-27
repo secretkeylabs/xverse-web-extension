@@ -8,6 +8,7 @@ import AuthenticationRequest from '@screens/authenticationRequest';
 import BackupWallet from '@screens/backupWallet';
 import BackupWalletSteps from '@screens/backupWalletSteps';
 import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
+import BtcSendScreen from '@screens/btcSendScreen';
 import Buy from '@screens/buy';
 import CoinDashboard from '@screens/coinDashboard';
 import ConfirmBtcTransaction from '@screens/confirmBtcTransaction';
@@ -16,12 +17,19 @@ import ConfirmInscriptionRequest from '@screens/confirmInscriptionRequest';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
+import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
+import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import ErrorBoundary from '@screens/error';
+import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
 import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
 import Landing from '@screens/landing';
+import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
+import ImportLedger from '@screens/ledger/importLedgerAccount';
+import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
+import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
 import LegalLinks from '@screens/legalLinks';
 import Login from '@screens/login';
 import ManageTokens from '@screens/manageTokens';
@@ -33,16 +41,9 @@ import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
 import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
-import ImportLedger from '@screens/ledger/importLedgerAccount';
-import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
-import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
-import LedgerSendStxScreen from '@screens/ledger/ledgerSendStx';
-import ReviewLedgerStxTransaction from '@screens/ledger/reviewLedgerStxTransaction';
-import LedgerSendFtScreen from '@screens/ledger/ledgerSendFt';
-import ReviewLedgerFtTransaction from '@screens/ledger/reviewLedgerFtTransaction';
-import BtcSendScreen from '@screens/btcSendScreen';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20Screen from '@screens/sendBrc20';
+import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
 import SendFtScreen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
@@ -57,12 +58,13 @@ import LockCountdown from '@screens/settings/lockCountdown';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import SignatureRequest from '@screens/signatureRequest';
 import Stacking from '@screens/stacking';
+import SwapScreen from '@screens/swap';
+import SwapConfirmScreen from '@screens/swap/swapConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
 import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
-import SwapScreen from '@screens/swap';
-import SwapConfirmScreen from '@screens/swap/swapConfirmation';
+import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 
 const router = createHashRouter([
   {
@@ -142,14 +144,10 @@ const router = createHashRouter([
         path: 'send-btc',
         element: <SendBtcScreen />,
       },
-      // {
-      //   path: 'send-stx-ledger',
-      //   element: <LedgerSendStxScreen />,
-      // },
-      // {
-      //   path: 'send-ft-ledger',
-      //   element: <LedgerSendFtScreen />,
-      // },
+      {
+        path: 'add-stx-address-ledger',
+        element: <LedgerAddStxAddress />,
+      },
       {
         path: 'swap',
         element: <SwapScreen />,
@@ -170,14 +168,22 @@ const router = createHashRouter([
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,
       },
-      // {
-      //   path: 'review-ledger-stx-tx',
-      //   element: <ReviewLedgerStxTransaction />,
-      // },
-      // {
-      //   path: 'review-ledger-ft-tx',
-      //   element: <ReviewLedgerFtTransaction />,
-      // },
+      {
+        path: 'confirm-brc20-tx',
+        element: (
+          <AuthGuard>
+            <ConfirmBrc20Transaction />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'execute-brc20-tx',
+        element: (
+          <AuthGuard>
+            <ExecuteBrc20Transaction />
+          </AuthGuard>
+        ),
+      },
       {
         path: 'confirm-ledger-tx',
         element: <ConfirmLedgerTransaction />,
@@ -247,16 +253,16 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'login',
-        element: <Login />,
+        path: 'create-inscription',
+        element: (
+          <AuthGuard>
+            <CreateInscription />
+          </AuthGuard>
+        ),
       },
       {
-        path: 'restoreWallet',
-        element: (
-          <OnboardingGuard>
-            <RestoreWallet />
-          </OnboardingGuard>
-        ),
+        path: 'login',
+        element: <Login />,
       },
       {
         path: 'forgotPassword',
@@ -299,6 +305,10 @@ const router = createHashRouter([
         element: <FiatCurrencyScreen />,
       },
       {
+        path: 'privacy-preferences',
+        element: <PrivacyPreferencesScreen />,
+      },
+      {
         path: 'change-password',
         element: <ChangePasswordScreen />,
       },
@@ -339,12 +349,25 @@ const router = createHashRouter([
         ),
       },
       {
+        // TODO deprecate this after brc20 one step ledger support done
         path: 'send-brc20',
         element: (
           <AuthGuard>
             <SendBrc20Screen />
           </AuthGuard>
         ),
+      },
+      {
+        path: 'send-brc20-one-step',
+        element: (
+          <AuthGuard>
+            <SendBrc20OneStepScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'send-nft/:id',
+        element: <SendNft />,
       },
       {
         path: 'confirm-inscription-request',
@@ -411,6 +434,14 @@ const router = createHashRouter([
           <AuthGuard>
             <SendOrdinal />
           </AuthGuard>
+        ),
+      },
+      {
+        path: 'restoreWallet',
+        element: (
+          <OnboardingGuard>
+            <RestoreWallet />
+          </OnboardingGuard>
         ),
       },
     ],

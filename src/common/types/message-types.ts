@@ -1,5 +1,5 @@
 import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
-import { GetAddressResponse, SignPsbtResponse } from 'sats-connect';
+import { CreateInscriptionResponse, GetAddressResponse, SignPsbtResponse } from 'sats-connect';
 
 export const MESSAGE_SOURCE = 'xverse-wallet' as const;
 
@@ -105,6 +105,8 @@ export enum ExternalSatsMethods {
   signMessageResponse = 'signMessageResponse',
   sendBtcRequest = 'sendBtcRequest',
   sendBtcResponse = 'sendBtcResponse',
+  createInscriptionRequest = 'createInscriptionRequest',
+  createInscriptionResponse = 'createInscriptionResponse',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -147,14 +149,29 @@ export type SendBtcResponseMessage = Message<
   }
 >;
 
+type CreateInscriptionRequestMessage = Message<
+  ExternalSatsMethods.createInscriptionRequest,
+  string
+>;
+
+export type CreateInscriptionResponseMessage = Message<
+  ExternalSatsMethods.createInscriptionResponse,
+  {
+    createInscriptionRequest: string;
+    createInscriptionResponse: CreateInscriptionResponse | string;
+  }
+>;
+
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage
   | SignPsbtRequestMessage
   | SignMessageRequestMessage
-  | SendBtcRequestMessage;
+  | SendBtcRequestMessage
+  | CreateInscriptionRequestMessage;
 
 export type SatsConnectMessageToContentScript =
   | GetAddressResponseMessage
   | SignPsbtResponseMessage
   | SignMessageResponseMessage
-  | SendBtcResponseMessage;
+  | SendBtcResponseMessage
+  | CreateInscriptionResponseMessage;

@@ -1,11 +1,16 @@
+import { getDeviceAccountIndex } from '@common/utils/ledger';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/xverse-core/account';
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
-import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
+import {
+  Account,
+  AnalyticsEvents,
+  SettingsNetwork,
+  StacksNetwork,
+} from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
-import { StoreState } from '@stores/index';
 import {
   ChangeNetworkAction,
   addAccountAction,
@@ -16,14 +21,16 @@ import {
   selectAccount,
   setWalletAction,
   storeEncryptedSeedAction,
-  addLedgerAcountAction,
   unlockWalletAction,
+  updateLedgerAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
+import { useQueryClient } from '@tanstack/react-query';
 import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
-import { useDispatch } from 'react-redux';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
-import useWalletSession from './useWalletSession';
+import { resetMixPanel, trackMixPanel } from '@utils/mixpanel';
+import { useDispatch } from 'react-redux';
 import useWalletSelector from './useWalletSelector';
+import useWalletSession from './useWalletSession';
 
 const useWalletReducer = () => {
   const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } =
@@ -33,6 +40,7 @@ const useWalletReducer = () => {
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
   const { setSessionStartTime, clearSessionTime, clearSessionKey } = useWalletSession();
+  const queryClient = useQueryClient();
 
   const loadActiveAccounts = async (
     secretKey: string,
@@ -59,32 +67,38 @@ const useWalletReducer = () => {
       bnsName: walletAccounts[0].bnsName,
     };
 
-    if (!isHardwareAccount(selectedAccount)) {
+    let selectedAccountData: Account;
+    if (!selectedAccount) {
+      [selectedAccountData] = walletAccounts;
+    } else if (isLedgerAccount(selectedAccount)) {
+      selectedAccountData = ledgerAccountsList[selectedAccount.id];
+    } else {
+      selectedAccountData = walletAccounts[selectedAccount.id];
+    }
+
+    if (!isHardwareAccount(selectedAccountData)) {
       dispatch(
-        setWalletAction(
-          selectedAccount
-            ? {
-                ...walletAccounts[selectedAccount.id],
-                seedPhrase: secretKey,
-              }
-            : {
-                ...walletAccounts[0],
-                seedPhrase: secretKey,
-              },
-        ),
+        setWalletAction({
+          ...selectedAccountData,
+          seedPhrase: secretKey,
+        }),
       );
     }
 
-    dispatch(
-      fetchAccountAction(
-        selectedAccount
-          ? isLedgerAccount(selectedAccount)
-            ? ledgerAccountsList[selectedAccount.id]
-            : walletAccounts[selectedAccount.id]
-          : walletAccounts[0],
-        walletAccounts,
-      ),
-    );
+    dispatch(fetchAccountAction(selectedAccountData, walletAccounts));
+
+    if (ledgerAccountsList.some((account) => account.deviceAccountIndex === undefined)) {
+      const newLedgerAccountsList = ledgerAccountsList.map((account) => ({
+        ...account,
+        deviceAccountIndex: getDeviceAccountIndex(
+          ledgerAccountsList,
+          account.id,
+          account.masterPubKey,
+        ),
+      }));
+
+      dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
+    }
 
     dispatch(getActiveAccountsAction(walletAccounts));
   };
@@ -114,6 +128,7 @@ const useWalletReducer = () => {
   };
 
   const resetWallet = () => {
+    resetMixPanel();
     dispatch(resetWalletAction());
     chrome.storage.local.clear();
     chrome.storage.session.clear();
@@ -138,6 +153,8 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
+    trackMixPanel(AnalyticsEvents.RestoreWallet);
+
     const encryptSeed = await encryptSeedPhrase(seed, password);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(storeEncryptedSeedAction(encryptSeed));
@@ -197,6 +214,8 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
+    trackMixPanel(AnalyticsEvents.CreateNewWallet);
+
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
     setSessionStartTime();
@@ -213,7 +232,11 @@ const useWalletReducer = () => {
     dispatch(addAccountAction(newAccountsList));
   };
 
-  const switchAccount = (account: Account) => {
+  const switchAccount = async (account: Account) => {
+    // we clear the query cache to prevent data from the other account potentially being displayed
+    await queryClient.cancelQueries();
+    await queryClient.clear();
+
     dispatch(
       selectAccount(
         account,
@@ -292,7 +315,19 @@ const useWalletReducer = () => {
 
   const addLedgerAccount = async (ledgerAccount: Account) => {
     try {
-      dispatch(addLedgerAcountAction([...ledgerAccountsList, ledgerAccount]));
+      dispatch(updateLedgerAccountsAction([...ledgerAccountsList, ledgerAccount]));
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  const removeLedgerAccount = async (ledgerAccount: Account) => {
+    try {
+      dispatch(
+        updateLedgerAccountsAction(
+          ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
+        ),
+      );
     } catch (err) {
       return Promise.reject(err);
     }
@@ -303,7 +338,7 @@ const useWalletReducer = () => {
       account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account,
     );
     try {
-      dispatch(addLedgerAcountAction(newLedgerAccountsList));
+      dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
       if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
         switchAccount(updatedLedgerAccount);
       }
@@ -323,6 +358,7 @@ const useWalletReducer = () => {
     createAccount,
     storeSeedPhrase,
     addLedgerAccount,
+    removeLedgerAccount,
     updateLedgerAccounts,
   };
 };

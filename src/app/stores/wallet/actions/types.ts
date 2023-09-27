@@ -39,7 +39,8 @@ export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
-export const AddLedgerAccountKey = 'AddLedgerAccountKey';
+export const ChangeShowDataCollectionAlertKey = 'ChangeShowDataCollectionAlertKey';
+export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
 
 export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 
@@ -81,6 +82,7 @@ export interface WalletState {
   hasActivatedOrdinalsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
+  showDataCollectionAlert: boolean | null;
   accountType: AccountType | undefined;
   accountName: string | undefined;
   btcApiUrl: string;
@@ -129,7 +131,7 @@ export interface AddAccount {
   accountsList: Account[];
 }
 export interface AddLedgerAccount {
-  type: typeof AddLedgerAccountKey;
+  type: typeof UpdateLedgerAccountsKey;
   ledgerAccountsList: Account[];
 }
 export interface SelectAccount {
@@ -209,6 +211,11 @@ export interface ChangeShowOrdinalReceiveAlert {
   showOrdinalReceiveAlert: boolean | null;
 }
 
+export interface ChangeShowDataCollectionAlert {
+  type: typeof ChangeShowDataCollectionAlertKey;
+  showDataCollectionAlert: boolean | null;
+}
+
 export interface SetBrcCoinsData {
   type: typeof SetBrcCoinsListKey;
   brcCoinsList: FungibleToken[];
@@ -242,6 +249,6 @@ export type WalletActions =
   | ChangeActivateOrdinals
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
+  | ChangeShowDataCollectionAlert
   | SetBrcCoinsData
-  | SetWalletLockPeriod
-  | DisableWalletExistsGuard;
+  | SetWalletLockPeriod;

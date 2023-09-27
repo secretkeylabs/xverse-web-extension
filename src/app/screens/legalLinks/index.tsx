@@ -1,24 +1,31 @@
 import LinkIcon from '@assets/img/linkIcon.svg';
-import Seperator from '@components/seperator';
+import ActionButton from '@components/button';
+import Separator from '@components/separator';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { CustomSwitch } from '@screens/ledger/importLedgerAccount/index.styled';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
+import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { saveIsTermsAccepted } from '@utils/localStorage';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
+import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import { useDispatch } from 'react-redux';
 
 const Container = styled.div((props) => ({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(8),
+  padding: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(28),
+  paddingBottom: props.theme.spacing(28),
+  justifyContent: 'space-between',
 }));
 
 const Title = styled.h1((props) => ({
   ...props.theme.bold_tile_text,
   color: props.theme.colors.white['0'],
-  marginTop: props.theme.spacing(20),
 }));
 
 const SubTitle = styled.h1((props) => ({
@@ -27,7 +34,11 @@ const SubTitle = styled.h1((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
-const ActionButton = styled.a((props) => ({
+const LinksContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(20),
+}));
+
+const Link = styled.a((props) => ({
   ...props.theme.body_m,
   display: 'flex',
   justifyContent: 'space-between',
@@ -35,7 +46,8 @@ const ActionButton = styled.a((props) => ({
   color: props.theme.colors.white['0'],
 }));
 
-const CustomisedActionButton = styled(ActionButton)`
+const CustomizedLink = styled(Link)`
+  transition: opacity 0.1s ease;
   :hover {
     opacity: 0.8;
   }
@@ -44,30 +56,32 @@ const CustomisedActionButton = styled(ActionButton)`
   }
 `;
 
-const ActionButtonsContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(20),
-}));
-
-const AcceptButton = styled.button((props) => ({
-  ...props.theme.body_bold_m,
+const SwitchContainer = styled.div((props) => ({
   display: 'flex',
-  color: props.theme.colors.background.elevation0,
+  justifyContent: 'space-between',
   alignItems: 'center',
-  justifyContent: 'center',
-  marginTop: 'auto',
-  marginBottom: props.theme.spacing(32),
-  backgroundColor: props.theme.colors.action.classic,
-  borderRadius: props.theme.radius(1),
-  height: 44,
-  width: '100%',
+  marginTop: props.theme.spacing(8),
+  fontSize: '0.875rem',
 }));
 
 function LegalLinks() {
   const { t } = useTranslation('translation', { keyPrefix: 'LEGAL_SCREEN' });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { selectedAccount } = useWalletSelector();
   const [searchParams] = useSearchParams();
+  const theme = useTheme();
+  const [isToggleEnabled, setIsToggleEnabled] = useState(false);
+
+  const handleSwitchToggle = () => setIsToggleEnabled((prevEnabledState) => !prevEnabledState);
 
   const handleLegalAccept = () => {
+    if (isToggleEnabled) {
+      optInMixPanel(selectedAccount?.masterPubKey);
+    } else {
+      optOutMixPanel();
+    }
+    dispatch(changeShowDataCollectionAlertAction(false));
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {
@@ -78,20 +92,34 @@ function LegalLinks() {
   };
   return (
     <Container>
-      <Title>{t('SCREEN_TITLE')}</Title>
-      <SubTitle>{t('SCREEN_SUBTITLE')}</SubTitle>
-      <ActionButtonsContainer>
-        <CustomisedActionButton href={TERMS_LINK} target="_blank">
-          {t('TERMS_SERVICES_LINK_BUTTON')}
-          <img src={LinkIcon} alt="terms" />
-        </CustomisedActionButton>
-        <Seperator />
-        <CustomisedActionButton href={PRIVACY_POLICY_LINK} target="_blank">
-          {t('PRIVACY_POLICY_LINK_BUTTON')}
-          <img src={LinkIcon} alt="privacy" />
-        </CustomisedActionButton>
-      </ActionButtonsContainer>
-      <AcceptButton onClick={handleLegalAccept}>{t('ACCEPT_LEGAL_BUTTON')}</AcceptButton>
+      <div>
+        <Title>{t('SCREEN_TITLE')}</Title>
+        <SubTitle>{t('SCREEN_SUBTITLE')}</SubTitle>
+        <LinksContainer>
+          <CustomizedLink href={TERMS_LINK} target="_blank">
+            {t('TERMS_SERVICES_LINK_BUTTON')}
+            <img src={LinkIcon} alt="terms" />
+          </CustomizedLink>
+          <Separator />
+          <CustomizedLink href={PRIVACY_POLICY_LINK} target="_blank">
+            {t('PRIVACY_POLICY_LINK_BUTTON')}
+            <img src={LinkIcon} alt="privacy" />
+          </CustomizedLink>
+          <Separator />
+          <SwitchContainer>
+            <div>{t('AUTHORIZE_DATA_COLLECTION')}</div>
+            <CustomSwitch
+              onColor={theme.colors.purple_main}
+              offColor={theme.colors.background.elevation3}
+              onChange={handleSwitchToggle}
+              checked={isToggleEnabled}
+              uncheckedIcon={false}
+              checkedIcon={false}
+            />
+          </SwitchContainer>
+        </LinksContainer>
+      </div>
+      <ActionButton text={t('ACCEPT_LEGAL_BUTTON')} onPress={handleLegalAccept} />
     </Container>
   );
 }

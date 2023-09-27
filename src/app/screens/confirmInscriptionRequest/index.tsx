@@ -31,7 +31,7 @@ import TransactionSettingAlert from '@components/transactionSetting';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import { isLedgerAccount } from '@utils/helper';
-import { LedgerTransactionType } from '@screens/ledger/confirmLedgerTransaction';
+import { ConfirmBrc20TransactionState, LedgerTransactionType } from '@common/types/ledger';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 const OuterContainer = styled.div`
@@ -51,6 +51,16 @@ const Brc20TileContainer = styled.div({
   height: 112,
   alignSelf: 'center',
   display: 'flex',
+  alignItems: 'center',
+});
+
+const TopContainer = styled.div({
+  marginBottom: 32,
+});
+
+const TransferOrdinalContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
   alignItems: 'center',
 });
 
@@ -155,8 +165,7 @@ function ConfirmInscriptionRequest() {
 
   const content = useMemo(() => textContent && JSON.parse(textContent), [textContent]);
 
-  const { subscribeToResetUserFlow } = useResetUserFlow();
-  useEffect(() => subscribeToResetUserFlow('/confirm-inscription-request'), []);
+  useResetUserFlow('/confirm-inscription-request');
 
   useEffect(() => {
     axios
@@ -176,8 +185,8 @@ function ConfirmInscriptionRequest() {
     error: txError,
     data: btcTxBroadcastData,
     mutate,
-  } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
-    mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
+  } = useMutation<BtcTransactionBroadcastResponse, Error, { txToBeBroadcasted: string }>({
+    mutationFn: async ({ txToBeBroadcasted }) => btcClient.sendRawTransaction(txToBeBroadcasted),
   });
 
   const {
@@ -205,7 +214,7 @@ function ConfirmInscriptionRequest() {
   });
 
   const onContinueButtonClick = () => {
-    mutate({ signedTx });
+    mutate({ txToBeBroadcasted: signedTx });
   };
 
   const onClick = () => {
@@ -265,12 +274,23 @@ function ConfirmInscriptionRequest() {
     if (ordinalsInBtc && ordinalsInBtc.length > 0) {
       setSignedTx(signedTxHex);
       setShowOrdinalsDetectedAlert(true);
-    } else if (isLedgerAccount(selectedAccount)) {
+      return;
+    }
+
+    if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'BRC-20';
-      navigate('/confirm-ledger-tx', {
-        state: { amount: new BigNumber(amount), recipients: recipient, type: txType, fee },
-      });
-    } else mutate({ signedTx: signedTxHex });
+      const state: ConfirmBrc20TransactionState = {
+        amount: new BigNumber(amount),
+        recipients: recipient,
+        type: txType,
+        fee,
+      };
+
+      navigate('/confirm-ledger-tx', { state });
+      return;
+    }
+
+    mutate({ txToBeBroadcasted: signedTxHex });
   };
 
   const goBackToScreen = () => {
@@ -324,9 +344,9 @@ function ConfirmInscriptionRequest() {
         />
       )}
 
-      <div style={{ marginBottom: 32 }}>
+      <TopContainer>
         <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={goBackToScreen} />
-      </div>
+      </TopContainer>
       {ordinalsInBtc && ordinalsInBtc.length > 0 && (
         <InfoContainer
           type="Warning"
@@ -352,10 +372,10 @@ function ConfirmInscriptionRequest() {
         <ReviewTransactionText>Inscribe Transfer Ordinal</ReviewTransactionText>
         <CollapsableContainer title="You will inscribe" text="" initialValue>
           <DetailRow>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <TransferOrdinalContainer>
               <Icon src={OrdinalsIcon} />
               <TitleText>Ordinal</TitleText>
-            </div>
+            </TransferOrdinalContainer>
             <ValueText>BRC-20 Transfer</ValueText>
           </DetailRow>
           <DetailRow>

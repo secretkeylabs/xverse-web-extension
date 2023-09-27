@@ -4,9 +4,6 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { getTicker } from '@utils/helper';
-import { StoreState } from '@stores/index';
-import { useSelector } from 'react-redux';
-import Switch from '@assets/img/send/switch.svg';
 import ActionButton from '@components/button';
 import { useNavigate } from 'react-router-dom';
 import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
@@ -16,9 +13,11 @@ import useNetworkSelector from '@hooks/useNetwork';
 import TokenImage from '@components/tokenImage';
 import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
-import { NumericFormat } from 'react-number-format';
 import { getCurrencyFlag } from '@utils/currency';
 import useDebounce from '@hooks/useDebounce';
+import useWalletSelector from '@hooks/useWalletSelector';
+import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
+import { FiatRow } from './fiatRow';
 
 interface ContainerProps {
   error: boolean;
@@ -160,22 +159,6 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
   opacity: props.enabled ? 1 : 0.6,
 }));
 
-const SwitchToFiatButton = styled.button((props) => ({
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  borderRadius: 24,
-  display: 'flex',
-  padding: '8px 12px',
-  justifyContent: 'center',
-  alignItems: 'center',
-}));
-
-const SwitchToFiatText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  marginLeft: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
-}));
-
 const CurrencyFlag = styled.img((props) => ({
   marginLeft: props.theme.spacing(4),
 }));
@@ -203,6 +186,8 @@ interface Props {
   recipient?: string;
   amountToSend?: string;
   stxMemo?: string;
+  onAddressInputChange?: (recipientAddress: string) => void;
+  warning?: string;
 }
 
 function SendForm({
@@ -221,6 +206,8 @@ function SendForm({
   recipient,
   amountToSend,
   stxMemo,
+  onAddressInputChange,
+  warning,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   // TODO tim: use context instead of duplicated local state and parent state (as props)
@@ -232,18 +219,20 @@ function SendForm({
   const [addressError, setAddressError] = useState<string | undefined>(recepientError);
   const navigate = useNavigate();
 
-  const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount } =
+    useWalletSelector();
   const network = useNetworkSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(recipientAddress, network);
   const associatedAddress = useBNSResolver(debouncedSearchTerm, stxAddress, currencyType);
+  const { isAccountSwitched } = useClearFormOnAccountSwitch();
 
   useEffect(() => {
-    setAmount('');
-    setRecipientAddress('');
-  }, [selectedAccount]);
+    if (isAccountSwitched) {
+      setAmount('');
+      setRecipientAddress('');
+    }
+  }, [selectedAccount, isAccountSwitched]);
 
   useEffect(() => {
     if (recepientError) {
@@ -272,7 +261,7 @@ function SendForm({
     setFiatAmount(amountInCurrency);
   }, [amountToSend]);
 
-  function getTokenCurrency() {
+  function getTokenCurrency(): string {
     if (fungibleToken) {
       if (fungibleToken?.ticker) {
         return fungibleToken.ticker.toUpperCase();
@@ -280,9 +269,8 @@ function SendForm({
       if (fungibleToken?.name) {
         return getTicker(fungibleToken.name).toUpperCase();
       }
-    } else {
-      return currencyType;
     }
+    return currencyType;
   }
 
   const onSwitchPress = () => {
@@ -309,25 +297,26 @@ function SendForm({
     setFiatAmount(amountInCurrency);
   };
 
-  function getTokenEquivalent(amount: string) {
+  function getTokenEquivalent(tokenAmount: string): string {
     if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
       return '';
     }
-    if (!amount) return '0';
+    if (!tokenAmount) return '0';
     switch (currencyType) {
       case 'STX':
-        return getStxTokenEquivalent(new BigNumber(amount), stxBtcRate, btcFiatRate)
+        return getStxTokenEquivalent(new BigNumber(tokenAmount), stxBtcRate, btcFiatRate)
           .toFixed(6)
           .toString();
       case 'BTC':
-        return getBtcEquivalent(new BigNumber(amount), btcFiatRate).toFixed(8).toString();
+        return getBtcEquivalent(new BigNumber(tokenAmount), btcFiatRate).toFixed(8).toString();
       case 'FT':
         if (fungibleToken?.tokenFiatRate) {
-          return new BigNumber(amount)
+          return new BigNumber(tokenAmount)
             .dividedBy(fungibleToken.tokenFiatRate)
             .toFixed(fungibleToken.decimals ?? 2)
             .toString();
         }
+        return '';
       default:
         return '';
     }
@@ -352,33 +341,20 @@ function SendForm({
         <Text>{getAmountLabel()}</Text>
         {switchToFiat && <CurrencyFlag src={getCurrencyFlag(fiatCurrency)} />}
       </AmountInputContainer>
-      <RowContainer>
-        <SubText>
-          {switchToFiat ? (
-            <NumericFormat
-              value={getTokenEquivalent(amount)}
-              displayType="text"
-              thousandSeparator
-              renderText={(value) => `~ ${value} ${getTokenCurrency()}`}
-            />
-          ) : (
-            `~ $ ${fiatAmount} ${fiatCurrency}`
-          )}
-        </SubText>
-        <SwitchToFiatButton onClick={onSwitchPress}>
-          <img src={Switch} alt="Switch" />
-          <SwitchToFiatText>
-            {switchToFiat
-              ? `${t('SWITCH_TO')} ${getTokenCurrency()}`
-              : `${t('SWITCH_TO')} ${fiatCurrency}`}
-          </SwitchToFiatText>
-        </SwitchToFiatButton>
-      </RowContainer>
+      <FiatRow
+        onClick={onSwitchPress}
+        showFiat={switchToFiat}
+        tokenCurrency={getTokenCurrency()}
+        tokenAmount={getTokenEquivalent(amount)}
+        fiatCurrency={fiatCurrency}
+        fiatAmount={fiatAmount ?? ''}
+      />
     </Container>
   );
 
-  const onAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRecipientAddress(e.target.value);
+    onAddressInputChange?.(e.target.value);
   };
 
   const getAddressInputPlaceholder = () => {
@@ -399,7 +375,7 @@ function SendForm({
           <InputField
             value={recipientAddress}
             placeholder={getAddressInputPlaceholder()}
-            onChange={onAddressInputChange}
+            onChange={handleAddressInputChange}
           />
         </InputFieldContainer>
       </AmountInputContainer>
@@ -448,6 +424,23 @@ function SendForm({
     } else if ((amount !== '' && recipientAddress !== '') || associatedAddress !== '') return true;
     return false;
   };
+
+  let displayedWarning = '';
+  if (warning) {
+    displayedWarning = warning;
+  } else {
+    switch (currencyType) {
+      case 'Ordinal':
+        displayedWarning = t('SEND_ORDINAL_WALLET_WARNING');
+        break;
+      case 'brc20-Ordinal':
+        displayedWarning = t('SEND_BRC20_ORDINAL_WALLET_WARNING');
+        break;
+      default:
+        break;
+    }
+  }
+
   return (
     <>
       <ScrollContainer>
@@ -499,14 +492,9 @@ function SendForm({
                 <InfoContainer bodyText={t('MEMO_INFO')} />
               </>
             )}
-          {currencyType === 'Ordinal' && (
+          {displayedWarning && (
             <OrdinalInfoContainer>
-              <InfoContainer bodyText={t('SEND_ORDINAL_WALLET_WARNING')} type="Warning" />
-            </OrdinalInfoContainer>
-          )}
-          {currencyType === 'brc20-Ordinal' && (
-            <OrdinalInfoContainer>
-              <InfoContainer bodyText={t('SEND_BRC20_ORDINAL_WALLET_WARNING')} />
+              <InfoContainer bodyText={displayedWarning} type="Warning" />
             </OrdinalInfoContainer>
           )}
         </OuterContainer>

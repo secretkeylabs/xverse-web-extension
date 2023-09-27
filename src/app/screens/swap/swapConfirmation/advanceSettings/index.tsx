@@ -40,7 +40,7 @@ export function AdvanceSettings({ swap }: Props) {
 
   const onApplyClick = useCallback(({ fee, nonce }: { fee: string; nonce?: string }) => {
     const settingFee = BigInt(stxToMicrostacks(new BigNumber(fee) as any).toString());
-    swap.unsignedTx.setFee(settingFee);
+    swap.onFeeUpdate(settingFee);
     if (nonce != null) {
       swap.unsignedTx.setNonce(BigInt(nonce));
     }

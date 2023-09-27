@@ -61,11 +61,15 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
       }
     }
   } else if (coin === 'BTC') {
-    const prefix = transaction.incoming ? '' : '-';
-    if (!new BigNumber(transaction.amount).isEqualTo(0)) {
+    const btcTransaction = transaction as BtcTransactionData;
+    const prefix = btcTransaction.incoming ? '' : '-';
+    if (btcTransaction.isOrdinal && btcTransaction.txStatus === 'pending') {
+      return null;
+    }
+    if (!new BigNumber(btcTransaction.amount).isEqualTo(0)) {
       return (
         <NumericFormat
-          value={satsToBtc(BigNumber(transaction.amount)).toString()}
+          value={satsToBtc(BigNumber(btcTransaction.amount)).toString()}
           displayType="text"
           thousandSeparator
           prefix=""
