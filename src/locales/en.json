@@ -613,6 +613,7 @@
     "BUY_COIN_BUTTON": "Buy",
     "TRANSACTION_HISTORY_TITLE": "Transaction history",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
+    "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
     "TRANSACTION_PENDING_RECEIVING": "Receiving",

@@ -1,16 +1,14 @@
-import styled from 'styled-components';
-import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
-import { CurrencyTypes } from '@utils/constants';
+import BtcTransactionHistoryItem from '@components/transactions/btcTransaction';
+import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
 import useTransactions from '@hooks/queries/useTransactions';
-import { MoonLoader } from 'react-spinners';
-import { useTranslation } from 'react-i18next';
-import { formatDate } from '@utils/date';
+import { animated, config, useSpring } from '@react-spring/web';
+import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
 } from '@stacks/stacks-blockchain-api-types';
-import { useMemo } from 'react';
-import { animated, config, useSpring } from '@react-spring/web';
+import { CurrencyTypes } from '@utils/constants';
+import { formatDate } from '@utils/date';
 import {
   isAddressTransactionWithTransfers,
   isBrc20Transaction,
@@ -19,8 +17,10 @@ import {
   isBtcTransactionArr,
   Tx,
 } from '@utils/transactions/transactions';
-import BtcTransactionHistoryItem from '@components/transactions/btcTransaction';
-import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 
 const ListItemsContainer = styled.div({
   display: 'flex',
@@ -153,7 +153,7 @@ const filterTxs = (
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, txFilter, brc20Token } = props;
-  const { data, isLoading, isFetching } = useTransactions(
+  const { data, isLoading, isFetching, error } = useTransactions(
     (coin as CurrencyTypes) || 'STX',
     brc20Token,
   );
@@ -217,7 +217,10 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
           <MoonLoader color="white" size={20} />
         </LoadingContainer>
       )}
-      {!isLoading && !isFetching && data?.length === 0 && (
+      {!isLoading && !isFetching && error && (
+        <NoTransactionsContainer>{t('TRANSACTIONS_LIST_ERROR')}</NoTransactionsContainer>
+      )}
+      {!isLoading && !isFetching && data?.length === 0 && !error && (
         <NoTransactionsContainer>{t('TRANSACTIONS_LIST_EMPTY')}</NoTransactionsContainer>
       )}
     </ListItemsContainer>

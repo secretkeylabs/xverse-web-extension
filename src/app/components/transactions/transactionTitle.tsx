@@ -6,7 +6,6 @@ import {
   TransactionData,
 } from '@secretkeylabs/xverse-core';
 import { SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL } from '@utils/constants';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -35,10 +34,10 @@ export default function TransactionTitle(props: TransactionTitleProps) {
     if (tx.txStatus === 'pending') {
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
-    if (tx.type === 'send' || tx.type === 'receive') {
+    if (tx.operation === 'transfer_send') {
       return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
     }
-    return tx.type;
+    return tx.operation;
   };
 
   const getFtName = (tx: TransactionData): string => {
