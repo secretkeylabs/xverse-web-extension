@@ -39,7 +39,7 @@ export default function useTransactions(coinType: CurrencyTypes, brc20Token: str
   };
 
   return useQuery({
-    queryKey: [`transactions-${coinType}`],
+    queryKey: [`transactions-${coinType}-${brc20Token}`],
     queryFn: fetchTransactions,
     refetchInterval: 10000,
   });

@@ -6,7 +6,7 @@ import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
-  PostConditionFungible
+  PostConditionFungible,
 } from '@stacks/stacks-blockchain-api-types';
 import { CurrencyTypes } from '@utils/constants';
 import { formatDate } from '@utils/date';
@@ -16,7 +16,7 @@ import {
   isBrc20TransactionArr,
   isBtcTransaction,
   isBtcTransactionArr,
-  Tx
+  Tx,
 } from '@utils/transactions/transactions';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -187,11 +187,14 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
     }
 
     if (txFilter && coin === 'FT') {
-      const filteredTxs = filterTxs(data, txFilter);
+      const filteredTxs = filterTxs(
+        data as (AddressTransactionWithTransfers | MempoolTransaction)[],
+        txFilter,
+      );
       return groupedTxsByDateMap(filteredTxs);
     }
 
-    return groupedTxsByDateMap(data);
+    return groupedTxsByDateMap(data as (AddressTransactionWithTransfers | MempoolTransaction)[]);
   }, [data, isLoading, isFetching]);
 
   return (
@@ -230,7 +233,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       {!isLoading && error && (
         <NoTransactionsContainer>{t('TRANSACTIONS_LIST_ERROR')}</NoTransactionsContainer>
       )}
-      {!isLoading && data?.length === 0 &&  !error && (
+      {!isLoading && data?.length === 0 && !error && (
         <NoTransactionsContainer>{t('TRANSACTIONS_LIST_EMPTY')}</NoTransactionsContainer>
       )}
     </ListItemsContainer>
