@@ -213,6 +213,15 @@ export function ChangeShowOrdinalReceiveAlertAction(
   };
 }
 
+export function changeShowDataCollectionAlertAction(
+  showDataCollectionAlert: boolean | null,
+): actions.ChangeShowDataCollectionAlert {
+  return {
+    type: actions.ChangeShowDataCollectionAlertKey,
+    showDataCollectionAlert,
+  };
+}
+
 export function setBrcCoinsDataAction(brcCoinsList: FungibleToken[]): actions.SetBrcCoinsData {
   return {
     type: actions.SetBrcCoinsListKey,

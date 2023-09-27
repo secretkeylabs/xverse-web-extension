@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.18.2",
+  "version": "0.19.0",
   "private": true,
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
@@ -29,7 +29,9 @@
     "crypto-browserify": "^3.12.0",
     "date-fns": "^2.29.3",
     "i18next": "^21.9.1",
+    "js-sha256": "^0.10.1",
     "jsontokens": "^4.0.1",
+    "mixpanel-browser": "^2.47.0",
     "moment": "^2.29.4",
     "nanoid": "^4.0.0",
     "p-queue": "^7.3.4",

@@ -4,7 +4,12 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/xverse-core/account';
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
-import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
+import {
+  Account,
+  AnalyticsEvents,
+  SettingsNetwork,
+  StacksNetwork,
+} from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import { decryptSeedPhraseCBC } from '@secretkeylabs/xverse-core/encryption';
 import {
@@ -22,6 +27,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { generatePasswordHash } from '@utils/encryptionUtils';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
+import { resetMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { useDispatch } from 'react-redux';
 import useWalletSelector from './useWalletSelector';
 import useWalletSession from './useWalletSession';
@@ -132,6 +138,7 @@ const useWalletReducer = () => {
   };
 
   const resetWallet = async () => {
+    resetMixPanel();
     dispatch(resetWalletAction());
     localStorage.clear();
     queryClient.clear();
@@ -161,6 +168,7 @@ const useWalletReducer = () => {
     };
     await seedVault.init(password);
     await seedVault.storeSeed(seed);
+    trackMixPanel(AnalyticsEvents.RestoreWallet);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(setWalletAction(wallet));
     localStorage.setItem('migrated', 'true');
@@ -214,6 +222,8 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
+    trackMixPanel(AnalyticsEvents.CreateNewWallet);
+
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
     setSessionStartTime();
