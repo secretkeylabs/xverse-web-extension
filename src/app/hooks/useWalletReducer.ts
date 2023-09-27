@@ -34,8 +34,14 @@ import useWalletSession from './useWalletSession';
 import useSeedVault from './useSeedVault';
 
 const useWalletReducer = () => {
-  const { accountsList, selectedAccount, network, ledgerAccountsList, encryptedSeed } =
-    useWalletSelector();
+  const {
+    accountsList,
+    selectedAccount,
+    network,
+    ledgerAccountsList,
+    encryptedSeed,
+    masterPubKey,
+  } = useWalletSelector();
   const seedVault = useSeedVault();
   const selectedNetwork = useNetworkSelector();
   const dispatch = useDispatch();
@@ -166,8 +172,12 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
+    const hasSeed = await seedVault.hasSeed();
+    if (hasSeed && !masterPubKey) {
+      await seedVault.clearVaultStorage();
+    }
     await seedVault.init(password);
-    await seedVault.storeSeed(seed, true);
+    await seedVault.storeSeed(seed);
     trackMixPanel(AnalyticsEvents.RestoreWallet);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(setWalletAction(wallet));

@@ -1,6 +1,7 @@
 import backup from '@assets/img/backupWallet/backup.svg';
 import ActionButton from '@components/button';
 import useSeedVault from '@hooks/useSeedVault';
+import { a } from '@react-spring/web';
 import { generateMnemonic } from '@secretkeylabs/xverse-core/wallet';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,13 +58,32 @@ const TransparentButtonContainer = styled.div((props) => ({
 function BackupWallet(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const navigate = useNavigate();
-  const { init: initSeedVault, storeSeed } = useSeedVault();
+  const {
+    init: initSeedVault,
+    storeSeed,
+    unlockVault,
+    hasSeed,
+    clearVaultStorage,
+  } = useSeedVault();
+
+  const generateAndStoreSeedPhrase = async () => {
+    const newSeedPhrase = generateMnemonic();
+    await initSeedVault('');
+    await storeSeed(newSeedPhrase);
+  };
 
   useEffect(() => {
     (async () => {
-      await initSeedVault('');
-      const newSeedPhrase = generateMnemonic();
-      await storeSeed(newSeedPhrase, true);
+      const hasSeedPhrase = await hasSeed();
+      if (!hasSeedPhrase) {
+        await generateAndStoreSeedPhrase();
+      } else {
+        // attempt to unlock the wallet with an empty password (verifies the user didn't finish onboarding)
+        await unlockVault('');
+        // clear the vault storage and generate a new seed phrase
+        await clearVaultStorage();
+        await generateAndStoreSeedPhrase();
+      }
     })();
   }, []);
 

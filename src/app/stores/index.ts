@@ -37,6 +37,7 @@ const storeMiddleware = [
     whitelist: [
       actions.StoreEncryptedSeedKey,
       actions.SelectAccountKey,
+      actions.SetWalletUnlockedKey,
       actions.AddAccountKey,
       actions.UpdateLedgerAccountsKey,
     ],
