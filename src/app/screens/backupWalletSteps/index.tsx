@@ -44,8 +44,12 @@ export default function BackupWalletSteps(): JSX.Element {
 
   useEffect(() => {
     (async () => {
-      const seed = await getSeed();
-      setSeedPhrase(seed);
+      try {
+        const seed = await getSeed();
+        setSeedPhrase(seed);
+      } catch (e) {
+        navigate('/backup');
+      }
     })();
   }, []);
 
