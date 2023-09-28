@@ -38,7 +38,6 @@ export const getFeeValuesForBrc20OneStepTransfer = ({
   const txFee = new BigNumber(commitChainFee).plus(revealChainFee).plus(transferChainFee);
   const inscriptionFee = new BigNumber(revealServiceFee);
   const totalFee = new BigNumber(txFee).plus(inscriptionFee);
-  const btcFee = new BigNumber(transferUtxoValue);
 
-  return { txFee, inscriptionFee, totalFee, btcFee };
+  return { txFee, inscriptionFee, totalFee, transferUtxoValue: new BigNumber(transferUtxoValue) };
 };

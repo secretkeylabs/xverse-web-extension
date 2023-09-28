@@ -4,17 +4,14 @@ import BarLoader from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
-import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Account } from '@secretkeylabs/xverse-core';
-import { selectAccount } from '@stores/wallet/actions/actionCreators';
 import { LoaderSize } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
 import { isHardwareAccount } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import styled from 'styled-components';
@@ -146,7 +143,7 @@ function AccountRow({
 }: {
   account: Account | null;
   isSelected: boolean;
-  onAccountSelected: (account: Account) => void;
+  onAccountSelected: (account: Account, goBack?: boolean) => void;
   isAccountListView?: boolean;
   disabledAccountSelect?: boolean;
 }) {
@@ -154,9 +151,8 @@ function AccountRow({
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
-  const { accountsList, network } = useWalletSelector();
+  const { accountsList } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
-  const dispatch = useDispatch();
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
@@ -210,26 +206,6 @@ function AccountRow({
     setShowRemoveAccountModal(false);
   };
 
-  const handleAccountSelect = (newAccount: Account) => {
-    dispatch(
-      selectAccount(
-        newAccount,
-        newAccount.stxAddress,
-        newAccount.btcAddress,
-        newAccount.ordinalsAddress,
-        newAccount.masterPubKey,
-        newAccount.stxPublicKey,
-        newAccount.btcPublicKey,
-        newAccount.ordinalsPublicKey,
-        network,
-        undefined,
-        newAccount.accountType,
-        newAccount.accountName,
-      ),
-    );
-    broadcastResetUserFlow();
-  };
-
   const handleRemoveLedgerAccount = async () => {
     if (!account) {
       return;
@@ -237,7 +213,7 @@ function AccountRow({
 
     try {
       await removeLedgerAccount(account);
-      handleAccountSelect(accountsList[0]);
+      onAccountSelected(accountsList[0], false);
       handleRemoveAccountModalClose();
     } catch (err) {
       // console.error(err);

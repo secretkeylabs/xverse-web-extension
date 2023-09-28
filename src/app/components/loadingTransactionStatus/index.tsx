@@ -1,7 +1,7 @@
 import ActionButton from '@components/button';
 import className from 'classnames';
 import styled from 'styled-components';
-import { StyledP, StyledHeading, VerticalStackButtonContainer } from '@components/common.styled';
+import { StyledP, StyledHeading, VerticalStackButtonContainer } from '@ui-library/common.styled';
 import { animated, easings, useSpring } from '@react-spring/web';
 import { useState } from 'react';
 import { CircularSvgAnimation, ConfirmationStatus } from './circularSvgAnimation';

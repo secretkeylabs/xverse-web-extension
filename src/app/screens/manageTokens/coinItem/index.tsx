@@ -3,9 +3,9 @@ import stc from 'string-to-color';
 import styled from 'styled-components';
 import Switch from 'react-switch';
 import { Coin } from '@secretkeylabs/xverse-core/types';
-import Theme from 'theme';
 import { getTicker } from '@utils/helper';
 import Separator from '@components/separator';
+import Theme from 'theme';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',

@@ -34,7 +34,7 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
     ) + 1;
 
   let hasPendingTransactions = false;
-  //ignore pending transactions if account nonce has advanced pass the nonce in pending transactions
+  // ignore pending transactions if account nonce has advanced pass the nonce in pending transactions
   if (stxNonce > upcomingPendingTransactionNonce) {
     hasPendingTransactions = false;
   } else {

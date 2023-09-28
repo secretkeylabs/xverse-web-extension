@@ -1,3 +1,4 @@
+import { getDeviceAccountIndex } from '@common/utils/ledger';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -15,15 +16,15 @@ import {
   selectAccount,
   setWalletAction,
   storeEncryptedSeedAction,
-  updateLedgerAccountsAction,
   unlockWalletAction,
+  updateLedgerAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
+import { useQueryClient } from '@tanstack/react-query';
 import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
-import { useDispatch } from 'react-redux';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
-import { getDeviceAccountIndex } from '@common/utils/ledger';
-import useWalletSession from './useWalletSession';
+import { useDispatch } from 'react-redux';
 import useWalletSelector from './useWalletSelector';
+import useWalletSession from './useWalletSession';
 
 const useWalletReducer = () => {
   const { encryptedSeed, accountsList, seedPhrase, selectedAccount, network, ledgerAccountsList } =
@@ -33,6 +34,7 @@ const useWalletReducer = () => {
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
   const { setSessionStartTime, clearSessionTime, clearSessionKey } = useWalletSession();
+  const queryClient = useQueryClient();
 
   const loadActiveAccounts = async (
     secretKey: string,
@@ -59,33 +61,25 @@ const useWalletReducer = () => {
       bnsName: walletAccounts[0].bnsName,
     };
 
-    if (!isHardwareAccount(selectedAccount)) {
+    let selectedAccountData: Account;
+    if (!selectedAccount) {
+      [selectedAccountData] = walletAccounts;
+    } else if (isLedgerAccount(selectedAccount)) {
+      selectedAccountData = ledgerAccountsList[selectedAccount.id];
+    } else {
+      selectedAccountData = walletAccounts[selectedAccount.id];
+    }
+
+    if (!isHardwareAccount(selectedAccountData)) {
       dispatch(
-        setWalletAction(
-          selectedAccount
-            ? {
-                ...walletAccounts[selectedAccount.id],
-                seedPhrase: secretKey,
-              }
-            : {
-                ...walletAccounts[0],
-                seedPhrase: secretKey,
-              },
-        ),
+        setWalletAction({
+          ...selectedAccountData,
+          seedPhrase: secretKey,
+        }),
       );
     }
 
-    let accountToFetch = walletAccounts[0];
-
-    if (selectedAccount) {
-      if (isLedgerAccount(selectedAccount)) {
-        accountToFetch = ledgerAccountsList[selectedAccount.id];
-      } else {
-        accountToFetch = walletAccounts[selectedAccount.id];
-      }
-    }
-
-    dispatch(fetchAccountAction(accountToFetch, walletAccounts));
+    dispatch(fetchAccountAction(selectedAccountData, walletAccounts));
 
     if (ledgerAccountsList.some((account) => account.deviceAccountIndex === undefined)) {
       const newLedgerAccountsList = ledgerAccountsList.map((account) => ({
@@ -227,7 +221,11 @@ const useWalletReducer = () => {
     dispatch(addAccountAction(newAccountsList));
   };
 
-  const switchAccount = (account: Account) => {
+  const switchAccount = async (account: Account) => {
+    // we clear the query cache to prevent data from the other account potentially being displayed
+    await queryClient.cancelQueries();
+    await queryClient.clear();
+
     dispatch(
       selectAccount(
         account,

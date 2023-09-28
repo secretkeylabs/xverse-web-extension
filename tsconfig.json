@@ -27,7 +27,8 @@
       "@common/*": ["common/*"],
       "@stores/*": ["app/stores/*"],
       "@utils/*": ["app/utils/*"],
-      "@core/*": ["app/core/*"]
+      "@core/*": ["app/core/*"],
+      "@ui-library/*": ["app/ui-library/*"]
     }
   },
   "include": ["src", "styled.d.ts"]

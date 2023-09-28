@@ -114,11 +114,7 @@ export default function TxTransfers(props: TxTransfersProps) {
       );
     });
   }
-  return (
-    <>
-      {coin === 'FT' && transaction.ft_transfers
-        ? renderTransaction(transaction.ft_transfers)
-        : renderTransaction(transaction.stx_transfers)}
-    </>
-  );
+  return coin === 'FT' && transaction.ft_transfers
+    ? renderTransaction(transaction.ft_transfers)
+    : renderTransaction(transaction.stx_transfers);
 }
