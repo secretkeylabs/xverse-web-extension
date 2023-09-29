@@ -309,7 +309,7 @@
     "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
     "CONITNUE": "Continue",
     "BACK": "Back",
-    "HIGH_FEE_WARNING_TEXT": "The estimated transaction fees for this transaction are very high.",
+    "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
