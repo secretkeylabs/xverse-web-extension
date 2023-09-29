@@ -59,3 +59,14 @@ export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
 export const SWAP_SPONSOR_DISABLED_SUPPORT_URL =
   'https://support.xverse.app/hc/en-us/articles/18319388355981';
 export const SUPPORT_URL_TAB_TARGET = 'SupportURLTabTarget';
+
+export const DEFAULT_TRANSITION_OPTIONS = {
+  from: {
+    x: 24,
+    opacity: 0,
+  },
+  enter: {
+    x: 0,
+    opacity: 1,
+  },
+};

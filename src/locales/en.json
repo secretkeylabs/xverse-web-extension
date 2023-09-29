@@ -65,7 +65,12 @@
     "LEDGER_ADD_ACCOUNT_NAME": {
       "TITLE": "Name your Ledger wallet",
       "SUBTITLE": "You can give your wallet a custom name.",
-      "INPUT": "Wallet name"
+      "INPUT": "Wallet name",
+      "PLACEHOLDER": "My ledger",
+      "ERRORS": {
+        "MAX_LENGTH": "Account name should not be longer than {{number}} characters.",
+        "ALREADY_EXISTS": "Account with the same name already exists. Please choose another name."
+      }
     },
     "LEDGER_IMPORT_END": {
       "TITLE": "Your wallet is ready!",
@@ -177,7 +182,10 @@
     "CLOSE_BUTTON": "Close",
     "CANCEL_BUTTON": "Cancel",
     "SEE_TRANSACTION_BUTTON": "See transaction",
-    "RETRY_BUTTON": "Try again"
+    "SEND_ORDINAL": "Send ordinal",
+    "CONFIRM_FEES": "Confirm fees",
+    "RETRY_BUTTON": "Try again",
+    "FEES": "Fees"
   },
   "DASHBOARD_SCREEN": {
     "TOTAL_BALANCE": "total balance",
