@@ -90,7 +90,7 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
           thousandSeparator
           prefix=""
           renderText={(value: string) => (
-            <TransactionValue>{`${prefix}${value} ${brc20Transaction.ticker}`}</TransactionValue>
+            <TransactionValue>{`${prefix}${value} ${brc20Transaction.ticker.toUpperCase()}`}</TransactionValue>
           )}
         />
       );

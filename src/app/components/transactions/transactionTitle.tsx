@@ -3,7 +3,7 @@ import {
   Brc20HistoryTransactionData,
   BtcTransactionData,
   StxTransactionData,
-  TransactionData
+  TransactionData,
 } from '@secretkeylabs/xverse-core';
 import { SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
@@ -38,8 +38,13 @@ export default function TransactionTitle(props: TransactionTitleProps) {
     if (tx.operation === 'transfer_send') {
       return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
     }
+    if (tx.operation === 'mint') {
+      return t('MINT');
+    }
+    if (tx.operation === 'transfer') {
+      return t('INSCRIBE_TRANSFER');
+    }
     return tx.operation;
-
   };
 
   const getBtcTokenTransferTitle = (tx: BtcTransactionData): string => {

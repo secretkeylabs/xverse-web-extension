@@ -679,6 +679,8 @@
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
+    "MINT": "Mint",
+    "INSCRIBE_TRANSFER": "Inscribe Transfer",
     "TRANSACTION_PENDING_RECEIVING": "Receiving",
     "TRANSACTION_PENDING_SENDING": "Sending",
     "ORDINAL_TRANSACTION_PENDING_RECEIVING": "Receiving Ordinal",
