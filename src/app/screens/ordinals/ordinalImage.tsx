@@ -27,8 +27,11 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   position: 'relative',
   fontSize: '3em',
   wordWrap: 'break-word',
-  backgroundColor: '#1b1e2b',
+  backgroundColor: props.theme.colors.elevation1,
   borderRadius: 8,
+  '> img': {
+    width: '100%',
+  },
 }));
 
 const FillImg = styled.img(() => ({
@@ -41,12 +44,12 @@ const ButtonIcon = styled.img({
   height: 12,
 });
 
-const OrdinalsTag = styled.div({
+const OrdinalsTag = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  background: 'rgba(39, 42, 68, 0.6)',
+  background: props.theme.colors.elevation1,
   borderRadius: 40,
   width: 79,
   height: 22,
@@ -55,7 +58,7 @@ const OrdinalsTag = styled.div({
   zIndex: 1000,
   position: 'absolute',
   padding: '3px 6px',
-});
+}));
 
 const LoaderContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
@@ -85,20 +88,30 @@ interface TextProps {
   isSmall?: boolean;
   blur?: boolean;
   withoutSizeIncrease?: boolean;
+  isGalleryOpen?: boolean;
 }
 
-const OrdinalContentText = styled.h1<TextProps>((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
-  fontSize: props.inNftSend || props.withoutSizeIncrease ? 15 : 'calc(0.8vw + 2vh)',
-  overflow: 'hidden',
-  textAlign: 'center',
-  filter: `blur(${props.blur ? '3px' : 0})`,
-  textOverflow: 'ellipsis',
-  display: '-webkit-box',
-  '-webkit-line-clamp': '4',
-  '-webkit-box-orient': 'vertical',
-}));
+const OrdinalContentText = styled.p<TextProps>((props) => {
+  let fontSize = 'calc(0.8vw + 2vh)';
+  if (props.isSmall) {
+    fontSize = 'calc(2vw)';
+  } else if (props.inNftSend || props.withoutSizeIncrease) {
+    fontSize = '15px';
+  }
+  return {
+    ...props.theme.body_medium_m,
+    color: props.theme.colors.white[0],
+    fontSize,
+    overflow: 'hidden',
+    textAlign: 'center',
+    filter: `blur(${props.blur ? '3px' : 0})`,
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    '-webkit-line-clamp': '4',
+    '-webkit-box-orient': 'vertical',
+    margin: props.isGalleryOpen ? props.theme.space.xxl : props.theme.space.xs,
+  };
+});
 
 const StyledImage = styled(Image)`
   border-radius: 8px;
@@ -237,6 +250,7 @@ function OrdinalImage({
           inNftSend={inNftSend}
           isSmall={isSmallImage}
           withoutSizeIncrease={withoutSizeIncrease}
+          isGalleryOpen={isGalleryOpen}
         >
           {textContent}
         </OrdinalContentText>

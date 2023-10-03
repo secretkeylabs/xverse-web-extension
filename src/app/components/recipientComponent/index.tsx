@@ -13,6 +13,7 @@ import { CurrencyTypes } from '@utils/constants';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useEffect, useState } from 'react';
 import { getTicker } from '@utils/helper';
+import { CubeTransparent } from '@phosphor-icons/react';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -92,11 +93,24 @@ const TokenContainer = styled.div({
   marginRight: 10,
 });
 
+const IconContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 30,
+  backgroundColor: props.theme.colors.elevation3,
+  width: 32,
+  height: 32,
+  marginRight: props.theme.spacing(4),
+}));
+
 interface Props {
   address?: string;
   value: string;
   title: string;
   currencyType: CurrencyTypes;
+  valueDetail?: string;
   recipientIndex?: number;
   totalRecipient?: number;
   icon?: string;
@@ -109,6 +123,7 @@ function RecipientComponent({
   address,
   value,
   totalRecipient,
+  valueDetail,
   title,
   fungibleToken,
   icon,
@@ -167,6 +182,26 @@ function RecipientComponent({
     return '';
   };
 
+  const renderIcon = () => {
+    if (currencyType === 'RareSat') {
+      return (
+        <IconContainer>
+          <CubeTransparent size="16" weight="regular" />
+        </IconContainer>
+      );
+    }
+
+    if (icon) {
+      return <Icon src={icon} />;
+    }
+
+    return (
+      <TokenContainer>
+        <TokenImage token={currencyType} loading={false} size={32} fungibleToken={fungibleToken} />
+      </TokenContainer>
+    );
+  };
+
   return (
     <Container>
       {recipientIndex && totalRecipient && totalRecipient !== 1 && (
@@ -176,22 +211,12 @@ function RecipientComponent({
       )}
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       <RowContainer>
-        {icon ? (
-          <Icon src={icon} />
-        ) : (
-          <TokenContainer>
-            <TokenImage
-              token={currencyType}
-              loading={false}
-              size={32}
-              fungibleToken={fungibleToken}
-            />
-          </TokenContainer>
-        )}
+        {renderIcon()}
         <TitleText>{title}</TitleText>
-        {currencyType === 'NFT' || currencyType === 'Ordinal' ? (
+        {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
           <ColumnContainer>
             <ValueText>{value}</ValueText>
+            {valueDetail && <SubValueText>{valueDetail}</SubValueText>}
           </ColumnContainer>
         ) : (
           <ColumnContainer>

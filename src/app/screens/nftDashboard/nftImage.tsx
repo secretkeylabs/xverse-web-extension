@@ -13,12 +13,13 @@ interface ContainerProps {
 const ImageContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
-  alignItems: props.isGalleryOpen ? 'center' : 'flex-start',
+  alignItems: 'center',
   width: '100%',
   height: props.isGalleryOpen ? '100%' : 150,
   overflow: 'hidden',
   position: 'relative',
   borderRadius: 8,
+  aspectRatio: '1',
 }));
 
 const LoaderContainer = styled.div<ContainerProps>((props) => ({
