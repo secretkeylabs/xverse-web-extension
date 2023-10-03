@@ -3,23 +3,23 @@ import { Transport } from '@secretkeylabs/xverse-core/ledger/types';
 
 export const handleBip322LedgerMessageSigning = async ({
   transport,
-  accountId,
+  addressIndex,
   networkType,
   message,
 }: {
   transport: Transport;
-  accountId?: number;
+  addressIndex?: number;
   networkType: NetworkType;
   message: string;
 }) => {
-  if (accountId === undefined) {
+  if (addressIndex === undefined) {
     throw new Error('Account not found');
   }
 
   const signature = await signSimpleBip322Message({
     transport,
     networkType,
-    addressIndex: accountId,
+    addressIndex,
     message,
   });
 

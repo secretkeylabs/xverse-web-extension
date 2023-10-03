@@ -28,6 +28,7 @@ import {
   WalletActions,
   WalletSessionPeriods,
   WalletState,
+  ChangeShowDataCollectionAlertKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -61,6 +62,7 @@ const initialWalletState: WalletState = {
   hasActivatedOrdinalsKey: undefined,
   showBtcReceiveAlert: true,
   showOrdinalReceiveAlert: true,
+  showDataCollectionAlert: true,
   accountType: 'software',
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
@@ -198,6 +200,11 @@ const walletReducer = (
       return {
         ...state,
         showOrdinalReceiveAlert: action.showOrdinalReceiveAlert,
+      };
+    case ChangeShowDataCollectionAlertKey:
+      return {
+        ...state,
+        showDataCollectionAlert: action.showDataCollectionAlert,
       };
     case SetBrcCoinsListKey:
       return {

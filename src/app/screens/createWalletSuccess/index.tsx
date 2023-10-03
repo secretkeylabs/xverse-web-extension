@@ -84,7 +84,8 @@ const ContinueButton = styled.button((props) => ({
 function CreateWalletSuccess(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'WALLET_SUCCESS_SCREEN' });
   const { action } = useParams();
-  const handleOpenWallet = () => {
+
+  const handleCloseTab = () => {
     window.close();
   };
 
@@ -97,7 +98,7 @@ function CreateWalletSuccess(): JSX.Element {
           {action === 'restore' ? t('RESTORE_SCREEN_SUBTITLE') : t('SCREEN_SUBTITLE')}
         </Subtitle>
       </ContentContainer>
-      <ContinueButton onClick={handleOpenWallet}>{t('CLOSE_TAB')}</ContinueButton>
+      <ContinueButton onClick={handleCloseTab}>{t('CLOSE_TAB')}</ContinueButton>
       <InstructionsContainer>
         <RowContainer>
           <InstructionsText>{`1. ${t('CLICK')}`}</InstructionsText>
