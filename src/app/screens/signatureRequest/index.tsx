@@ -28,9 +28,9 @@ import { bytesToHex } from '@stacks/transactions';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
+import SignatureRequestMessage from './signatureRequestMessage';
 import CollapsableContainer from './collapsableContainer';
 
 const OuterContainer = styled.div({
@@ -275,7 +275,7 @@ function SignatureRequest(): JSX.Element {
       if (isSignMessageBip322) {
         const signature = await handleBip322LedgerMessageSigning({
           transport,
-          accountId: selectedAccount.deviceAccountIndex,
+          addressIndex: selectedAccount.deviceAccountIndex,
           networkType: network.type,
           message: payload.message,
         });
@@ -290,12 +290,12 @@ function SignatureRequest(): JSX.Element {
         chrome.tabs.sendMessage(+tabId, signingMessage);
         window.close();
       } else {
-        const signature = await signStxMessage(
+        const signature = await signStxMessage({
           transport,
-          payload.message,
-          0,
-          selectedAccount.deviceAccountIndex,
-        );
+          message: payload.message,
+          accountIndex: 0,
+          addressIndex: selectedAccount.deviceAccountIndex,
+        });
         if (
           !!signature.errorMessage &&
           signature.errorMessage !== 'No errors' && // @zondax/ledger-stacks npm package returns this string when there are no errors

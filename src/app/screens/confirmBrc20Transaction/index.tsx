@@ -22,10 +22,11 @@ import {
 } from '@utils/brc20';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import InfoContainer from '@components/infoContainer';
 import Brc20FeesComponent from './brc20FeesComponent';
 import { EditFees, OnChangeFeeRate } from './editFees';
 import RecipientCard, { RecipientCardProps } from './recipientCard';
@@ -129,11 +130,19 @@ const useConfirmBrc20Transfer = (): {
   recipient: RecipientCardProps;
   showFeeSettings: boolean;
   txFee: BigNumber;
+  showFeeWarning: boolean;
 } => {
   /* hooks */
   const { t } = useTranslation('translation');
-  const { network, btcFiatRate, fiatCurrency, selectedAccount, btcAddress, ordinalsAddress } =
-    useWalletSelector();
+  const {
+    network,
+    btcFiatRate,
+    fiatCurrency,
+    selectedAccount,
+    btcAddress,
+    ordinalsAddress,
+    feeMultipliers,
+  } = useWalletSelector();
   const navigate = useNavigate();
   const {
     recipientAddress,
@@ -141,6 +150,7 @@ const useConfirmBrc20Transfer = (): {
     estimatedFees: initEstimatedFees,
     token,
   }: ConfirmBrc20TransferState = useLocation().state;
+  const [showFeeWarning, setShowFeeWarning] = useState(false);
 
   useResetUserFlow('/confirm-brc20-tx');
 
@@ -163,6 +173,14 @@ const useConfirmBrc20Transfer = (): {
 
   const { txFee, inscriptionFee, totalFee, transferUtxoValue } =
     getFeeValuesForBrc20OneStepTransfer(commitValueBreakdown ?? initEstimatedFees.valueBreakdown);
+
+  useEffect(() => {
+    if (feeMultipliers && txFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighSatsFee))) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+  }, [txFee, feeMultipliers]);
 
   /* callbacks */
   const handleClickConfirm = () => {
@@ -265,6 +283,7 @@ const useConfirmBrc20Transfer = (): {
     recipient,
     showFeeSettings,
     txFee,
+    showFeeWarning,
   };
 };
 
@@ -286,6 +305,7 @@ export function ConfirmBrc20Transaction() {
     recipient,
     showFeeSettings,
     txFee,
+    showFeeWarning,
   } = useConfirmBrc20Transfer();
 
   return (
@@ -294,6 +314,13 @@ export function ConfirmBrc20Transaction() {
       <ScrollContainer>
         <OuterContainer>
           <Container>
+            {showFeeWarning && (
+              <InfoContainer
+                type="Warning"
+                bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')}
+              />
+            )}
+
             <ReviewTransactionText>
               {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
             </ReviewTransactionText>

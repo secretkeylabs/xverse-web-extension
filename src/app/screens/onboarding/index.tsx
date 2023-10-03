@@ -4,6 +4,7 @@ import onboarding3 from '@assets/img/onboarding/onboarding3.png';
 import ActionButton from '@components/button';
 import Steps from '@components/steps';
 import { animated, useTransition } from '@react-spring/web';
+import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { getIsTermsAccepted, saveHasFinishedOnboarding } from '@utils/localStorage';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -65,16 +66,7 @@ function Onboarding(): JSX.Element {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const { t } = useTranslation('translation', { keyPrefix: 'ONBOARDING_SCREEN' });
   const navigate = useNavigate();
-  const transition = useTransition(currentStepIndex, {
-    from: {
-      x: 24,
-      opacity: 0,
-    },
-    enter: {
-      x: 0,
-      opacity: 1,
-    },
-  });
+  const transition = useTransition(currentStepIndex, DEFAULT_TRANSITION_OPTIONS);
   const [searchParams] = useSearchParams();
 
   const onboardingViews = [

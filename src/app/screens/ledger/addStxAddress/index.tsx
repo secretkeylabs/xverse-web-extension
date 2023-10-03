@@ -17,26 +17,35 @@ import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useResetUserFlow from '@hooks/useResetUserFlow';
 import { useLocation } from 'react-router-dom';
+import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { Credential } from '../importLedgerAccount';
 
+import {
+  Container,
+  OnBoardingActionsContainer,
+  OnBoardingContentContainer,
+} from '../importLedgerAccount/index.styled';
 import {
   ActionButtonContainer,
   AddAddressDetailsContainer,
   AddAddressHeaderContainer,
   AddressAddedContainer,
   ConfirmationText,
-  Container,
   LedgerFailButtonsContainer,
   LedgerFailViewContainer,
-  OnBoardingActionsContainer,
-  OnBoardingContentContainer,
   SelectAssetText,
   SelectAssetTitle,
-} from '../importLedgerAccount/index.styled';
+} from '../importLedgerAccount/steps/index.styled';
+
+enum Steps {
+  ConnectLedger = 0,
+  VerifyAddress = 1,
+  AddressAdded = 2,
+}
 
 function AddStxAddress(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState(Steps.ConnectLedger);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -47,21 +56,12 @@ function AddStxAddress(): JSX.Element {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const mismatch = params.get('mismatch') ?? '';
-  const transition = useTransition(currentStepIndex, {
-    from: {
-      x: 24,
-      opacity: 0,
-    },
-    enter: {
-      x: 0,
-      opacity: 1,
-    },
-  });
+  const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
 
   useResetUserFlow('/add-stx-address-ledger');
 
   const handleClickNext = async () => {
-    setCurrentStepIndex((prevStepIndex) => prevStepIndex + 1);
+    setCurrentStep((prevStepIndex) => prevStepIndex + 1);
   };
 
   const saveAddressToWallet = async (stacksCreds: { address: string; publicKey: string }) => {
@@ -76,7 +76,7 @@ function AddStxAddress(): JSX.Element {
     };
     await updateLedgerAccounts(ledgerAccount);
     await ledgerDelay(1000);
-    setCurrentStepIndex(2);
+    setCurrentStep(Steps.AddressAdded);
     setIsButtonDisabled(false);
   };
 
@@ -91,13 +91,13 @@ function AddStxAddress(): JSX.Element {
         throw new Error('Account not found');
       }
 
-      const stacksCreds = await importStacksAccountFromLedger(
+      const stacksCreds = await importStacksAccountFromLedger({
         transport,
-        network.type,
-        0,
+        network: network.type,
+        accountIndex: 0,
         addressIndex,
         showAddress,
-      );
+      });
       setStacksCredentials(stacksCreds);
       await transport.close();
 
@@ -133,7 +133,7 @@ function AddStxAddress(): JSX.Element {
         throw new Error('No response');
       }
       await saveAddressToWallet(stacksCreds);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setIsConnectSuccess(false);
       setIsConnectFailed(true);
@@ -147,12 +147,112 @@ function AddStxAddress(): JSX.Element {
     setIsConnectFailed(false);
     setIsAddressRejected(false);
 
-    setCurrentStepIndex(0);
+    setCurrentStep(Steps.ConnectLedger);
   };
 
   const handleWindowClose = () => {
     if (typeof window !== 'undefined') {
       window.close();
+    }
+  };
+
+  const renderContent = () => {
+    switch (currentStep) {
+      case Steps.ConnectLedger:
+        return (
+          <LedgerConnectionView
+            title={t('LEDGER_CONNECT.STX_TITLE')}
+            text={t('LEDGER_CONNECT.STX_SUBTITLE')}
+            titleFailed={t('LEDGER_CONNECT.TITLE_FAILED')}
+            textFailed={t('LEDGER_CONNECT.STX_SUBTITLE_FAILED')}
+            imageDefault={ledgerConnectStxIcon}
+            isConnectSuccess={isConnectSuccess}
+            isConnectFailed={isConnectFailed}
+          />
+        );
+      case Steps.VerifyAddress:
+        if (isConnectFailed || isAddressRejected) {
+          return (
+            <LedgerFailView
+              title={t(
+                isAddressRejected
+                  ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
+                  : 'LEDGER_CONNECT.TITLE_FAILED',
+              )}
+              text={t(
+                isAddressRejected
+                  ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
+                  : 'LEDGER_CONNECT.BTC_SUBTITLE_FAILED',
+              )}
+            />
+          );
+        }
+
+        return (
+          <>
+            <AddAddressHeaderContainer>
+              <img src={stxIcon} width={32} height={32} alt="stacks" />
+              <SelectAssetTitle>{t('LEDGER_ADD_ADDRESS.TITLE_VERIFY_STX')}</SelectAssetTitle>
+            </AddAddressHeaderContainer>
+            <AddAddressDetailsContainer>
+              <SelectAssetText centered>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
+              <LedgerAddressComponent
+                title={t('LEDGER_ADD_ADDRESS.STX')}
+                address={stacksCredentials?.address}
+              />
+            </AddAddressDetailsContainer>
+            <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
+          </>
+        );
+      case Steps.AddressAdded:
+        return (
+          <AddressAddedContainer>
+            <img src={checkCircleIcon} alt="Success" />
+            <SelectAssetTitle>{t('LEDGER_STX_WALLET_ADDED.TITLE')}</SelectAssetTitle>
+            <SelectAssetText centered>{t('LEDGER_STX_WALLET_ADDED.SUBTITLE')}</SelectAssetText>
+          </AddressAddedContainer>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderActionButton = () => {
+    switch (currentStep) {
+      case Steps.ConnectLedger:
+        return (
+          <ActionButton
+            processing={isButtonDisabled}
+            disabled={isButtonDisabled}
+            onPress={checkDeviceConnection}
+            text={t(
+              isConnectFailed ? 'LEDGER_IMPORT_TRY_AGAIN_BUTTON' : 'LEDGER_IMPORT_CONNECT_BUTTON',
+            )}
+          />
+        );
+      case Steps.VerifyAddress:
+        if (isConnectFailed) {
+          return (
+            <ActionButton
+              processing={isButtonDisabled}
+              disabled={isButtonDisabled}
+              onPress={handleTryAgain}
+              text={t('LEDGER_IMPORT_TRY_AGAIN_BUTTON')}
+            />
+          );
+        }
+        break;
+      case Steps.AddressAdded:
+        return (
+          <ActionButton
+            disabled={isButtonDisabled}
+            processing={isButtonDisabled}
+            onPress={handleWindowClose}
+            text={t('LEDGER_IMPORT_CLOSE_BUTTON')}
+          />
+        );
+      default:
+        return null;
     }
   };
 
@@ -177,86 +277,8 @@ function AddStxAddress(): JSX.Element {
       <FullScreenHeader />
       {transition((style) => (
         <>
-          <OnBoardingContentContainer style={style}>
-            {currentStepIndex === 0 && (
-              <LedgerConnectionView
-                title={t('LEDGER_CONNECT.STX_TITLE')}
-                text={t('LEDGER_CONNECT.STX_SUBTITLE')}
-                titleFailed={t('LEDGER_CONNECT.TITLE_FAILED')}
-                textFailed={t('LEDGER_CONNECT.STX_SUBTITLE_FAILED')}
-                imageDefault={ledgerConnectStxIcon}
-                isConnectSuccess={isConnectSuccess}
-                isConnectFailed={isConnectFailed}
-              />
-            )}
-            {currentStepIndex === 1 &&
-              (isConnectFailed || isAddressRejected ? (
-                <LedgerFailView
-                  title={t(
-                    isAddressRejected
-                      ? 'LEDGER_ADD_ADDRESS.TITLE_CANCELLED'
-                      : 'LEDGER_CONNECT.TITLE_FAILED',
-                  )}
-                  text={t(
-                    isAddressRejected
-                      ? 'LEDGER_ADD_ADDRESS.SUBTITLE_CANCELLED'
-                      : 'LEDGER_CONNECT.STX_SUBTITLE_FAILED',
-                  )}
-                />
-              ) : (
-                <>
-                  <AddAddressHeaderContainer>
-                    <img src={stxIcon} width={32} height={32} alt="stacks" />
-                    <SelectAssetTitle>{t('LEDGER_ADD_ADDRESS.TITLE_VERIFY_STX')}</SelectAssetTitle>
-                  </AddAddressHeaderContainer>
-                  <AddAddressDetailsContainer>
-                    <SelectAssetText centered>{t('LEDGER_ADD_ADDRESS.SUBTITLE')}</SelectAssetText>
-                    <LedgerAddressComponent
-                      title={t('LEDGER_ADD_ADDRESS.STX')}
-                      address={stacksCredentials?.address}
-                    />
-                  </AddAddressDetailsContainer>
-                  <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
-                </>
-              ))}
-            {currentStepIndex === 2 && (
-              <AddressAddedContainer>
-                <img src={checkCircleIcon} alt="Success" />
-                <SelectAssetTitle>{t('LEDGER_STX_WALLET_ADDED.TITLE')}</SelectAssetTitle>
-                <SelectAssetText centered>{t('LEDGER_STX_WALLET_ADDED.SUBTITLE')}</SelectAssetText>
-              </AddressAddedContainer>
-            )}
-          </OnBoardingContentContainer>
-          <OnBoardingActionsContainer>
-            {currentStepIndex === 0 && (
-              <ActionButton
-                processing={isButtonDisabled}
-                disabled={isButtonDisabled}
-                onPress={isConnectFailed ? handleTryAgain : checkDeviceConnection}
-                text={t(
-                  isConnectFailed
-                    ? 'LEDGER_IMPORT_TRY_AGAIN_BUTTON'
-                    : 'LEDGER_IMPORT_CONNECT_BUTTON',
-                )}
-              />
-            )}
-            {currentStepIndex === 1 && (isConnectFailed || isAddressRejected) && (
-              <ActionButton
-                processing={isButtonDisabled}
-                disabled={isButtonDisabled}
-                onPress={handleTryAgain}
-                text={t('LEDGER_IMPORT_TRY_AGAIN_BUTTON')}
-              />
-            )}
-            {currentStepIndex === 2 && (
-              <ActionButton
-                disabled={isButtonDisabled}
-                processing={isButtonDisabled}
-                onPress={handleWindowClose}
-                text={t('LEDGER_IMPORT_CLOSE_BUTTON')}
-              />
-            )}
-          </OnBoardingActionsContainer>
+          <OnBoardingContentContainer style={style}>{renderContent()}</OnBoardingContentContainer>
+          <OnBoardingActionsContainer>{renderActionButton()}</OnBoardingActionsContainer>
         </>
       ))}
     </Container>

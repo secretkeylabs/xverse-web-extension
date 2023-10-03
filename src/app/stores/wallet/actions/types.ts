@@ -1,6 +1,7 @@
-import { AccountType } from '@secretkeylabs/xverse-core';
 import {
   Account,
+  AccountType,
+  AppInfo,
   BaseWallet,
   Coin,
   FeesMultipliers,
@@ -77,7 +78,7 @@ export interface WalletState {
   coinsList: FungibleToken[] | null;
   coins: Coin[];
   brcCoinsList: FungibleToken[] | null;
-  feeMultipliers: FeesMultipliers | null;
+  feeMultipliers: AppInfo | null;
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
