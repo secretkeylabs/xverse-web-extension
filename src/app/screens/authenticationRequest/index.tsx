@@ -167,11 +167,11 @@ function AuthenticationRequest() {
     };
 
     try {
-      const authResponse = await handleLedgerStxJWTAuth(
+      const authResponse = await handleLedgerStxJWTAuth({
         transport,
-        selectedAccount.deviceAccountIndex,
+        addressIndex: selectedAccount.deviceAccountIndex,
         profile,
-      );
+      });
       setIsTxApproved(true);
       await ledgerDelay(1500);
       chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {

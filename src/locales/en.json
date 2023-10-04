@@ -65,7 +65,12 @@
     "LEDGER_ADD_ACCOUNT_NAME": {
       "TITLE": "Name your Ledger wallet",
       "SUBTITLE": "You can give your wallet a custom name.",
-      "INPUT": "Wallet name"
+      "INPUT": "Wallet name",
+      "PLACEHOLDER": "My ledger",
+      "ERRORS": {
+        "MAX_LENGTH": "Account name should not be longer than {{number}} characters.",
+        "ALREADY_EXISTS": "Account with the same name already exists. Please choose another name."
+      }
     },
     "LEDGER_IMPORT_END": {
       "TITLE": "Your wallet is ready!",
@@ -177,7 +182,10 @@
     "CLOSE_BUTTON": "Close",
     "CANCEL_BUTTON": "Cancel",
     "SEE_TRANSACTION_BUTTON": "See transaction",
-    "RETRY_BUTTON": "Try again"
+    "SEND_ORDINAL": "Send ordinal",
+    "CONFIRM_FEES": "Confirm fees",
+    "RETRY_BUTTON": "Try again",
+    "FEES": "Fees"
   },
   "DASHBOARD_SCREEN": {
     "TOTAL_BALANCE": "total balance",
@@ -197,7 +205,13 @@
     "VIEW_ADDRESSES": "View addresses",
     "ADD_STACKS_ADDRESS": "Add a Stacks address",
     "REMOVE_FROM_LIST_TITLE": "Remove from list",
-    "REMOVE_FROM_LIST_DESCRIPTION": "This will disconnect and remove the account from Xverse. You can import the same account again later by reconnecting your hardware wallet device."
+    "REMOVE_FROM_LIST_DESCRIPTION": "This will disconnect and remove the account from Xverse. You can import the same account again later by reconnecting your hardware wallet device.",
+    "DATA_COLLECTION_POPUP": {
+      "TITLE": "Help us improve Xverse!",
+      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
+      "DENY": "Deny",
+      "ALLOW": "Allow"
+    }
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens"
@@ -296,7 +310,6 @@
     "YOU_WILL_RECEIVE": "You will receive",
     "SCRIPT_OUTPUT": "Script output",
     "SCRIPT_OUTPUT_TX": "This transaction contains a script output. Be sure you trust the source of this transaction before confirming it.",
-
     "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
@@ -304,6 +317,7 @@
     "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
     "CONITNUE": "Continue",
     "BACK": "Back",
+    "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
@@ -374,7 +388,8 @@
     "SCREEN_SUBTITLE": "Please review the Xverse Wallet Privacy Policy and Terms of Services.",
     "TERMS_SERVICES_LINK_BUTTON": "Terms of Service",
     "PRIVACY_POLICY_LINK_BUTTON": "Privacy Policy",
-    "ACCEPT_LEGAL_BUTTON": "Accept"
+    "ACCEPT_LEGAL_BUTTON": "Accept",
+    "AUTHORIZE_DATA_COLLECTION": "Authorize data collection"
   },
   "BACKUP_WALLET_SCREEN": {
     "SCREEN_TITLE": "Backup your wallet",
@@ -610,6 +625,11 @@
   "SETTING_SCREEN": {
     "GENERAL": "General",
     "CURRENCY": "Fiat Currency",
+    "PRIVACY_PREFERENCES": {
+      "TITLE": "Privacy Preferences",
+      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
+      "AUTHORIZE_DATA_COLLECTION": "Authorize data collection"
+    },
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",

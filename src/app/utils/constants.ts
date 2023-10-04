@@ -23,6 +23,7 @@ export const TRANSAC_URL = 'https://global.transak.com';
 export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;
 export const MOON_PAY_URL = 'https://buy.moonpay.com';
 export const MOON_PAY_API_KEY = process.env.MOON_PAY_API_KEY;
+export const MIX_PANEL_TOKEN = process.env.MIX_PANEL_TOKEN;
 
 export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal' | 'brc20' | 'brc20-Ordinal';
 export enum LoaderSize {
@@ -58,3 +59,14 @@ export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
 export const SWAP_SPONSOR_DISABLED_SUPPORT_URL =
   'https://support.xverse.app/hc/en-us/articles/18319388355981';
 export const SUPPORT_URL_TAB_TARGET = 'SupportURLTabTarget';
+
+export const DEFAULT_TRANSITION_OPTIONS = {
+  from: {
+    x: 24,
+    opacity: 0,
+  },
+  enter: {
+    x: 0,
+    opacity: 1,
+  },
+};

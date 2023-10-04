@@ -25,6 +25,7 @@ interface Props {
   children: React.ReactNode;
   onClose: () => void;
   overlayStylesOverriding?: {};
+  contentStylesOverriding?: {};
 }
 
 const CustomisedModal = styled(Modal)`
@@ -32,11 +33,17 @@ const CustomisedModal = styled(Modal)`
   &::-webkit-scrollbar {
     display: none;
   }
-  bottom: 0;
   position: absolute;
 `;
 
-function BottomModal({ header, children, visible, onClose, overlayStylesOverriding }: Props) {
+function BottomModal({
+  header,
+  children,
+  visible,
+  onClose,
+  overlayStylesOverriding,
+  contentStylesOverriding,
+}: Props) {
   const theme = useTheme();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const customStyles = {
@@ -61,6 +68,7 @@ function BottomModal({ header, children, visible, onClose, overlayStylesOverridi
       borderTopRightRadius: isGalleryOpen ? 12 : 20,
       borderBottomRightRadius: isGalleryOpen ? 12 : 0,
       borderBottomLeftRadius: isGalleryOpen ? 12 : 0,
+      ...contentStylesOverriding,
     },
   };
 

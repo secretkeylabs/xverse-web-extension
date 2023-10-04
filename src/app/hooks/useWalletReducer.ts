@@ -4,7 +4,12 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/xverse-core/account';
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
-import { Account, SettingsNetwork, StacksNetwork } from '@secretkeylabs/xverse-core/types';
+import {
+  Account,
+  AnalyticsEvents,
+  SettingsNetwork,
+  StacksNetwork,
+} from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import {
   ChangeNetworkAction,
@@ -22,6 +27,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { decryptSeedPhrase, encryptSeedPhrase, generatePasswordHash } from '@utils/encryptionUtils';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
+import { resetMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { useDispatch } from 'react-redux';
 import useWalletSelector from './useWalletSelector';
 import useWalletSession from './useWalletSession';
@@ -122,6 +128,7 @@ const useWalletReducer = () => {
   };
 
   const resetWallet = () => {
+    resetMixPanel();
     dispatch(resetWalletAction());
     chrome.storage.local.clear();
     chrome.storage.session.clear();
@@ -146,6 +153,8 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
+    trackMixPanel(AnalyticsEvents.RestoreWallet);
+
     const encryptSeed = await encryptSeedPhrase(seed, password);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(storeEncryptedSeedAction(encryptSeed));
@@ -205,6 +214,8 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
       bnsName: wallet.bnsName,
     };
+    trackMixPanel(AnalyticsEvents.CreateNewWallet);
+
     dispatch(setWalletAction(wallet));
     dispatch(fetchAccountAction(account, [account]));
     setSessionStartTime();
