@@ -63,7 +63,16 @@ function ConfirmOrdinalTransaction() {
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const { fee, feePerVByte, signedTxHex, ordinalUtxo, isRareSat } = location.state;
+
+  // TODO tim: refactor to not use location.state.
+  const { feePerVByte, signedTxHex, ordinalUtxo, isRareSat } = location.state;
+  // this hack is necessary because the browser back/forward buttons
+  // serialize BigNumber objects into plain objects
+  let { fee } = location.state;
+  if (!BigNumber.isBigNumber(fee)) {
+    fee = BigNumber(fee);
+  }
+
   const { selectedOrdinal, selectedSatBundle } = useNftDataSelector();
   const { refetch } = useBtcWalletData();
   const [currentFee, setCurrentFee] = useState(fee);
