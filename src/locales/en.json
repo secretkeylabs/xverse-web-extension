@@ -1078,6 +1078,8 @@
     "SATS_VALUE": "Sats value",
     "SATS_BUNDLE": "Sats Bundle",
     "RARE_SATS_BUNDLE": "Rare Sats Bundle",
-    "BUNDLE_PENDING_SEND_DESCRIPTION": "This Bundle is already in a pending transfer."
+    "BUNDLE_PENDING_SEND_DESCRIPTION": "This bundle is already in a pending transfer.",
+    "RARE_SAT": "Rare Sat",
+    "INSCRIBED_SAT": "Inscribed Sat"
   }
 }

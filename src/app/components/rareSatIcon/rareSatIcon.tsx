@@ -3,9 +3,9 @@ import Legendary from '@assets/img/nftDashboard/rareSats/legendary.svg';
 import Mythic from '@assets/img/nftDashboard/rareSats/mythic.svg';
 import Rare from '@assets/img/nftDashboard/rareSats/rare.svg';
 import Uncommon from '@assets/img/nftDashboard/rareSats/uncommon.svg';
+import Unknown from '@assets/img/nftDashboard/rareSats/unknown.svg';
 import { RareSatsType, getRareSatsColorsByRareSatsType } from '@utils/rareSats';
 import styled from 'styled-components';
-import { Question } from '@phosphor-icons/react';
 
 import Theme from '../../../theme';
 
@@ -27,9 +27,6 @@ const Image = styled.img`
   height: 100%;
   zindex: 2;
 `;
-const QuestionIcon = styled(Question)((props) => ({
-  color: props.theme.colors.white_0,
-}));
 type GlowProps = {
   color: string;
   outerColor: string;
@@ -79,27 +76,17 @@ function RareSatIcon({
     mythic: Mythic,
     rare: Rare,
     uncommon: Uncommon,
+    unknown: Unknown,
   }[type];
   const backgroundColor = bgColor ? Theme.colors.background[bgColor] : 'transparent';
   const { color, backgroundColor: outerColor } = getRareSatsColorsByRareSatsType(type);
   return (
     <Container bgColor={backgroundColor} padding={padding}>
       <ImageContainer size={size} dynamicSize={isDynamicSize}>
-        {type === 'unknown' ? (
-          <QuestionIcon size="100%" weight="thin" />
-        ) : (
-          <>
-            {glow && (
-              <Glow
-                color={color}
-                outerColor={outerColor}
-                isCollage={isCollage}
-                isGallery={isGallery}
-              />
-            )}
-            <Image src={src} alt={type} />
-          </>
+        {glow && type !== 'unknown' && (
+          <Glow color={color} outerColor={outerColor} isCollage={isCollage} isGallery={isGallery} />
         )}
+        <Image src={src} alt={type} />
       </ImageContainer>
     </Container>
   );

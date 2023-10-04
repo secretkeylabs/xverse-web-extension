@@ -3,8 +3,11 @@ import { useState } from 'react';
 import { animated, useSpring } from '@react-spring/web';
 import Cross from '@assets/img/dashboard/X.svg';
 import styled from 'styled-components';
-import { Inscription } from '@secretkeylabs/xverse-core';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
+import { BundleItem, getBundleItemSubText } from '@utils/rareSats';
+import { useTranslation } from 'react-i18next';
+import IconOrdinal from '@assets/img/transactions/ordinal.svg';
+import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
+import { getTruncatedAddress } from '@utils/helper';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -64,6 +67,9 @@ const InscriptionText = styled.h1((props) => ({
   marginTop: 24,
   textAlign: 'center',
   color: props.theme.colors.white[0],
+  overflowWrap: 'break-word',
+  wordWrap: 'break-word',
+  wordBreak: 'break-word',
 }));
 
 const ColumnContainer = styled.div({
@@ -117,21 +123,11 @@ const EyeIcon = styled.img({
 });
 
 interface Props {
-  ordinalInscription: string;
-  ordinalDetail?: string;
-  icon: string;
-  title: string;
-  heading?: string;
-  ordinal?: Inscription;
+  item: BundleItem;
+  userReceivesOrdinal: boolean;
 }
-function OrdinalDetailComponent({
-  ordinalInscription,
-  ordinalDetail,
-  icon,
-  title,
-  heading,
-  ordinal,
-}: Props) {
+function BundleItemsComponent({ item, userReceivesOrdinal }: Props) {
+  const { t } = useTranslation('translation');
   const [showOrdinal, setShowOrdinal] = useState(false);
   const styles = useSpring({
     from: {
@@ -151,6 +147,34 @@ function OrdinalDetailComponent({
   const onCrossClick = () => {
     setShowOrdinal(false);
   };
+  const getItemId = () => {
+    if (item.type === 'inscription') {
+      return item.inscription.id;
+    }
+    if (item.type === 'inscribed-sat' || item.type === 'rare-sat') {
+      return item.number;
+    }
+    return '';
+  };
+  const itemSubText = getBundleItemSubText({
+    satType: item.type,
+    rareSatsType: item.rarity_ranking,
+  });
+  const getDetail = () => {
+    if (item.type === 'inscription' || item.type === 'inscribed-sat') {
+      return item.inscription.content_type;
+    }
+    return itemSubText;
+  };
+  const getTitle = () => {
+    if (item.type === 'inscription') {
+      return t('COMMON.INSCRIPTION');
+    }
+    if (item.type === 'inscribed-sat') {
+      return t('RARE_SATS.INSCRIBED_SAT');
+    }
+    return t('RARE_SATS.RARE_SAT');
+  };
   return (
     <>
       {showOrdinal && (
@@ -162,25 +186,29 @@ function OrdinalDetailComponent({
           </CrossContainer>
           <OrdinalOuterImageContainer>
             <OrdinalImageContainer>
-              <OrdinalImage ordinal={ordinal!} />
+              <RareSatAsset item={item} />
             </OrdinalImageContainer>
-            <InscriptionText>{`Inscription ${ordinal?.number} `}</InscriptionText>
+            <InscriptionText>{`${getTitle()} ${getItemId()} `}</InscriptionText>
           </OrdinalOuterImageContainer>
         </OrdinalBackgroundContainer>
       )}
       <Container>
-        {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
+        <RecipientTitleText>
+          {userReceivesOrdinal
+            ? t('CONFIRM_TRANSACTION.YOU_WILL_RECEIVE')
+            : t('CONFIRM_TRANSACTION.YOU_WILL_TRANSFER')}
+        </RecipientTitleText>
         <RowContainer>
-          <Icon src={icon} />
-          <TitleText>{title}</TitleText>
+          <Icon src={IconOrdinal} />
+          <TitleText>{getTitle()}</TitleText>
           <ColumnContainer>
             <RowContainer>
-              <ValueText>{ordinalInscription}</ValueText>
+              <ValueText>{getTruncatedAddress(String(getItemId()))}</ValueText>
               <TransparentButton onClick={onButtonClick}>
                 <EyeIcon src={Eye} alt="show" />
               </TransparentButton>
             </RowContainer>
-            {ordinalDetail && <SubValueText>{ordinalDetail}</SubValueText>}
+            <SubValueText>{getDetail()}</SubValueText>
           </ColumnContainer>
         </RowContainer>
       </Container>
@@ -188,4 +216,4 @@ function OrdinalDetailComponent({
   );
 }
 
-export default OrdinalDetailComponent;
+export default BundleItemsComponent;

@@ -33,7 +33,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import { SignTransactionOptions } from 'sats-connect';
 import styled from 'styled-components';
-import OrdinalDetailComponent from './ordinalDetailComponent';
+import BundleItemsComponent from './bundleItemsComponent';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -130,7 +130,7 @@ function SignPsbtRequest() {
   }, [selectedAccount, payload.psbtBase64]);
 
   const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
-  const { loading, ordinalInfoData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
+  const { loading, bundleItemsData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
     [payload.inputsToSign],
@@ -357,15 +357,13 @@ function SignPsbtRequest() {
                 {!payload.broadcast && (
                   <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
                 )}
-                {ordinalInfoData &&
-                  ordinalInfoData.map((ordinalData) => (
-                    <OrdinalDetailComponent
-                      ordinalInscription={`Inscription ${ordinalData?.number}`}
-                      icon={IconOrdinal}
-                      title={t('ORDINAL')}
-                      ordinal={ordinalData}
-                      ordinalDetail={ordinalData?.content_type}
-                      heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
+                {bundleItemsData &&
+                  bundleItemsData.map((bundleItem, index) => (
+                    <BundleItemsComponent
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={index}
+                      item={bundleItem}
+                      userReceivesOrdinal={userReceivesOrdinal}
                     />
                   ))}
                 <RecipientComponent
