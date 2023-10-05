@@ -48,7 +48,12 @@ export function useCurrencyConversion() {
         fiatAmount:
           amount != null
             ? Number(
-                getFiatEquivalent(amount, 'STX', stxBtcRate as any, BigNumber(btcFiatRate) as any),
+                getFiatEquivalent(
+                  amount,
+                  'STX',
+                  BigNumber(stxBtcRate) as any,
+                  BigNumber(btcFiatRate) as any,
+                ),
               )
             : undefined,
       };
@@ -67,13 +72,7 @@ export function useCurrencyConversion() {
       fiatAmount:
         amount != null
           ? Number(
-              getFiatEquivalent(
-                amount,
-                'FT',
-                stxBtcRate as any,
-                BigNumber(btcFiatRate) as any,
-                token,
-              ),
+              getFiatEquivalent(amount, 'FT', BigNumber(stxBtcRate), BigNumber(btcFiatRate), token),
             )
           : undefined,
     };

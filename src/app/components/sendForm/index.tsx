@@ -254,7 +254,7 @@ function SendForm({
     const amountInCurrency = getFiatEquivalent(
       Number(amountToSend),
       currencyType,
-      stxBtcRate,
+      BigNumber(stxBtcRate),
       BigNumber(btcFiatRate),
       fungibleToken,
     );
@@ -290,7 +290,7 @@ function SendForm({
     const amountInCurrency = getFiatEquivalent(
       Number(newValue),
       currencyType,
-      stxBtcRate,
+      BigNumber(stxBtcRate),
       BigNumber(btcFiatRate),
       fungibleToken,
     );
@@ -304,7 +304,11 @@ function SendForm({
     if (!tokenAmount) return '0';
     switch (currencyType) {
       case 'STX':
-        return getStxTokenEquivalent(new BigNumber(tokenAmount), stxBtcRate, BigNumber(btcFiatRate))
+        return getStxTokenEquivalent(
+          new BigNumber(tokenAmount),
+          BigNumber(stxBtcRate),
+          BigNumber(btcFiatRate),
+        )
           .toFixed(6)
           .toString();
       case 'BTC':

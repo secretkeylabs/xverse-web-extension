@@ -1,5 +1,4 @@
 import { initialNetworksList } from '@utils/constants';
-import BigNumber from 'bignumber.js';
 import {
   AddAccountKey,
   ChangeFiatCurrencyKey,
@@ -47,7 +46,7 @@ const initialWalletState: WalletState = {
   encryptedSeed: '',
   fiatCurrency: 'USD',
   btcFiatRate: '0',
-  stxBtcRate: new BigNumber(0),
+  stxBtcRate: '0',
   stxBalance: '0',
   stxAvailableBalance: '0',
   stxLockedBalance: '0',

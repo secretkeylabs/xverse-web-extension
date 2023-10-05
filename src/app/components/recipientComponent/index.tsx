@@ -131,7 +131,7 @@ function RecipientComponent({
       amountInCurrency = getFiatEquivalent(
         Number(value),
         currencyType,
-        stxBtcRate,
+        BigNumber(stxBtcRate),
         BigNumber(btcFiatRate),
         fungibleToken,
       );

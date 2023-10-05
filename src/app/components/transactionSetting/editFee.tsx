@@ -362,7 +362,7 @@ function EditFee({
     return isStx
       ? getStxFiatEquivalent(
           stxToMicrostacks(new BigNumber(totalFee)),
-          stxBtcRate,
+          BigNumber(stxBtcRate),
           BigNumber(btcFiatRate),
         )
       : getBtcFiatEquivalent(new BigNumber(totalFee), BigNumber(btcFiatRate));

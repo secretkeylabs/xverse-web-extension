@@ -109,8 +109,12 @@ function ConfirmStxTransaction() {
     const txAmount = new BigNumber(txPayload.amount.toString(10));
     const txFee = new BigNumber(unsignedTx.auth.spendingCondition.fee.toString());
     const txTotal = amount.plus(fee);
-    const txFiatAmount = getStxFiatEquivalent(amount, stxBtcRate, BigNumber(btcFiatRate));
-    const txFiatTotal = getStxFiatEquivalent(amount, stxBtcRate, BigNumber(btcFiatRate));
+    const txFiatAmount = getStxFiatEquivalent(
+      amount,
+      BigNumber(stxBtcRate),
+      BigNumber(btcFiatRate),
+    );
+    const txFiatTotal = getStxFiatEquivalent(amount, BigNumber(stxBtcRate), BigNumber(btcFiatRate));
     const { memo: txMemo } = txPayload;
     // the txPayload returns a string of null bytes incase memo is null
     // remove null bytes so send form treats it as an empty string

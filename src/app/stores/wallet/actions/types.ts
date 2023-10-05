@@ -9,7 +9,6 @@ import {
   SupportedCurrency,
   TransactionData,
 } from '@secretkeylabs/xverse-core/types';
-import BigNumber from 'bignumber.js';
 
 export const SetWalletKey = 'SetWallet';
 export const ResetWalletKey = 'ResetWallet';
@@ -68,7 +67,7 @@ export interface WalletState {
   encryptedSeed: string;
   fiatCurrency: SupportedCurrency;
   btcFiatRate: string;
-  stxBtcRate: BigNumber;
+  stxBtcRate: string;
   stxBalance: string;
   stxAvailableBalance: string;
   stxLockedBalance: string;
@@ -152,7 +151,7 @@ export interface SelectAccount {
 }
 export interface SetCoinRates {
   type: typeof SetCoinRatesKey;
-  stxBtcRate: BigNumber;
+  stxBtcRate: string;
   btcFiatRate: string;
 }
 
