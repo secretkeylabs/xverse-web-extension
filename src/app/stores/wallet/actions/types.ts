@@ -4,7 +4,6 @@ import {
   AppInfo,
   BaseWallet,
   Coin,
-  FeesMultipliers,
   FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
@@ -74,7 +73,7 @@ export interface WalletState {
   stxAvailableBalance: BigNumber;
   stxLockedBalance: BigNumber;
   stxNonce: number;
-  btcBalance: BigNumber;
+  btcBalance: string;
   coinsList: FungibleToken[] | null;
   coins: Coin[];
   brcCoinsList: FungibleToken[] | null;
@@ -111,7 +110,7 @@ export interface UnlockWallet {
 
 export interface SetFeeMultiplier {
   type: typeof SetFeeMultiplierKey;
-  feeMultipliers: FeesMultipliers;
+  feeMultipliers: AppInfo;
 }
 
 export interface LockWallet {
@@ -168,7 +167,7 @@ export interface SetStxWalletData {
 
 export interface SetBtcWalletData {
   type: typeof SetBtcWalletDataKey;
-  balance: BigNumber;
+  balance: string;
 }
 
 export interface SetCoinData {

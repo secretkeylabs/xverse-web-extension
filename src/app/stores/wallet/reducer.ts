@@ -6,8 +6,8 @@ import {
   ChangeHasActivatedOrdinalsKey,
   ChangeNetworkKey,
   ChangeShowBtcReceiveAlertKey,
+  ChangeShowDataCollectionAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
-  UpdateLedgerAccountsKey,
   FetchAccountKey,
   GetActiveAccountsKey,
   LockWalletKey,
@@ -24,11 +24,11 @@ import {
   SetWalletSeedPhraseKey,
   StoreEncryptedSeedKey,
   UnlockWalletKey,
+  UpdateLedgerAccountsKey,
   UpdateVisibleCoinListKey,
   WalletActions,
   WalletSessionPeriods,
   WalletState,
-  ChangeShowDataCollectionAlertKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -52,7 +52,7 @@ const initialWalletState: WalletState = {
   stxAvailableBalance: new BigNumber(0),
   stxLockedBalance: new BigNumber(0),
   stxNonce: 0,
-  btcBalance: new BigNumber(0),
+  btcBalance: '0',
   coinsList: null,
   coins: [],
   brcCoinsList: [],

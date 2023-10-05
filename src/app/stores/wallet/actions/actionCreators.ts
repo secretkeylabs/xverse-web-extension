@@ -1,10 +1,9 @@
 import { PostGuardPing } from '@components/guards/singleTab';
-import { AccountType } from '@secretkeylabs/xverse-core';
+import { AccountType, AppInfo } from '@secretkeylabs/xverse-core';
 import {
   Account,
   BaseWallet,
   Coin,
-  FeesMultipliers,
   FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
@@ -12,6 +11,16 @@ import {
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
+
+type NumberLike = string | number | bigint | BigNumber;
+
+function numberLikeToStringOrThrow(value: NumberLike, name: string): string {
+  if (typeof value !== 'bigint' && BigNumber(value).isNaN()) {
+    throw new Error(`Invalid value for ${name}: ${value}`);
+  }
+
+  return `${value}`;
+}
 
 export function setWalletAction(wallet: BaseWallet): actions.SetWallet {
   return {
@@ -117,7 +126,7 @@ export function selectAccount(
   };
 }
 
-export function setFeeMultiplierAction(feeMultipliers: FeesMultipliers): actions.SetFeeMultiplier {
+export function setFeeMultiplierAction(feeMultipliers: AppInfo): actions.SetFeeMultiplier {
   return {
     type: actions.SetFeeMultiplierKey,
     feeMultipliers,
@@ -152,10 +161,10 @@ export function setStxWalletDataAction(
   };
 }
 
-export function SetBtcWalletDataAction(balance: BigNumber): actions.SetBtcWalletData {
+export function SetBtcWalletDataAction(balance: NumberLike): actions.SetBtcWalletData {
   return {
     type: actions.SetBtcWalletDataKey,
-    balance,
+    balance: numberLikeToStringOrThrow(balance, 'bitcoin balance'),
   };
 }
 

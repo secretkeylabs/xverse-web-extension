@@ -328,7 +328,7 @@ function CreateInscription() {
       isError={!!errorCode}
     >
       <OuterContainer>
-        <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
+        <AccountHeaderComponent disableMenuOption disableAccountSwitch />
         <MainContainer>
           <Title>{t('TITLE')}</Title>
           <SubTitle>{t('SUBTITLE')}</SubTitle>
