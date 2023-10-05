@@ -11,6 +11,7 @@ import {
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { BtcOrdinal, ErrorCodes, Inscription } from '@secretkeylabs/xverse-core/types';
 import { useMutation } from '@tanstack/react-query';
+import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -113,9 +114,9 @@ function RestoreOrdinals() {
         recipientAddress: ordinalsAddress,
         fee: signedTx.fee,
         feePerVByte: signedTx.feePerVByte,
-        fiatFee: getBtcFiatEquivalent(signedTx.fee, btcFiatRate),
+        fiatFee: getBtcFiatEquivalent(signedTx.fee, BigNumber(btcFiatRate)),
         total: signedTx.total,
-        fiatTotal: getBtcFiatEquivalent(signedTx.total, btcFiatRate),
+        fiatTotal: getBtcFiatEquivalent(signedTx.total, BigNumber(btcFiatRate)),
         ordinalUtxo: selectedOrdinal.utxo,
       },
     });

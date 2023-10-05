@@ -1,13 +1,14 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
 import TopRow from '@components/topRow';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  BtcUtxoDataResponse,
   ErrorCodes,
   ResponseError,
   UTXO,
@@ -27,8 +28,6 @@ import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import InfoContainer from '@components/infoContainer';
-import useWalletSelector from '@hooks/useWalletSelector';
 import TransactionDetailComponent from '../transactionDetailComponent';
 
 const OuterContainer = styled.div`
@@ -121,7 +120,7 @@ interface Props {
   children?: ReactNode;
   assetDetail?: string;
   isRestoreFundFlow?: boolean;
-  nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  nonOrdinalUtxos?: UTXO[];
   isBtcSendBrowserTx?: boolean;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;
@@ -294,7 +293,7 @@ function ConfirmBtcTransactionComponent({
     const newFee = new BigNumber(modifiedFee);
 
     setCurrentFee(newFee);
-    setCurrentFeeRate(new BigNumber(feeRate));
+    setCurrentFeeRate(new BigNumber(feeRate!));
     if (ordinalTxUtxo) ordinalMutate(modifiedFee);
     else if (isRestoreFundFlow) {
       mutateSignNonOrdinalBtcTransaction(modifiedFee);
@@ -404,7 +403,7 @@ function ConfirmBtcTransactionComponent({
             <TransactionDetailComponent
               title={t('CONFIRM_TRANSACTION.TOTAL')}
               value={getAmountString(satsToBtc(total), t('BTC'))}
-              subValue={getBtcFiatEquivalent(total, btcFiatRate)}
+              subValue={getBtcFiatEquivalent(total, BigNumber(btcFiatRate))}
               subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
             />
           )}

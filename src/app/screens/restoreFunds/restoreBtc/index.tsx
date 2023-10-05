@@ -1,28 +1,22 @@
-import TopRow from '@components/topRow';
-import useWalletSelector from '@hooks/useWalletSelector';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import {
-  BtcUtxoDataResponse,
-  getBtcFiatEquivalent,
-  NetworkType,
-  satsToBtc,
-  UTXO,
-} from '@secretkeylabs/xverse-core';
+import ActionButton from '@components/button';
+import BottomTabBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { getBtcFiatEquivalent, NetworkType, satsToBtc, UTXO } from '@secretkeylabs/xverse-core';
 import {
   getBtcFeesForNonOrdinalBtcSend,
   SignedBtcTx,
   signNonOrdinalBtcSendTransaction,
   sumUnspentOutputs,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import ActionButton from '@components/button';
-import BottomTabBar from '@components/tabBar';
-import { useEffect } from 'react';
-import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
@@ -81,17 +75,29 @@ function RestoreBtc() {
     useWalletSelector();
   const navigate = useNavigate();
   const { unspentUtxos } = useNonOrdinalUtxos();
+  const [ordinalsFee, setOrdinalsFee] = useState<{
+    fee: BigNumber;
+    selectedFeeRate?: BigNumber | undefined;
+  }>();
+
   let amount = new BigNumber(0);
   if (unspentUtxos) {
     amount = sumUnspentOutputs(unspentUtxos);
   }
-  const isNoAmount = amount.isEqualTo(0) || !unspentUtxos[0]?.status.confirmed;
+  const isNoAmount = amount.isEqualTo(0) || !unspentUtxos?.[0]?.status.confirmed;
 
-  const { data: ordinalsFee } = useQuery({
-    queryKey: [`getFee-${ordinalsAddress}`],
-    queryFn: () =>
-      getBtcFeesForNonOrdinalBtcSend(btcAddress, unspentUtxos, ordinalsAddress, network.type),
-  });
+  useEffect(() => {
+    async function getFee() {
+      const newOrdinalsFee = await getBtcFeesForNonOrdinalBtcSend(
+        btcAddress,
+        unspentUtxos!,
+        ordinalsAddress,
+        network.type,
+      );
+      setOrdinalsFee(newOrdinalsFee);
+    }
+    getFee();
+  }, [btcAddress, unspentUtxos, ordinalsAddress, network.type]);
 
   const {
     error: errorSigningNonOrdial,
@@ -113,16 +119,16 @@ function RestoreBtc() {
       recipientAddress,
       nonOrdinalUtxos,
       accountIndex,
-      seedPhrase,
-      network,
+      seedPhrase: inputSeedPhrase,
+      network: inputNetwork,
       fee,
     }) =>
       signNonOrdinalBtcSendTransaction(
         recipientAddress,
         nonOrdinalUtxos,
         accountIndex,
-        seedPhrase,
-        network,
+        inputSeedPhrase,
+        inputNetwork,
         fee,
       ),
   });
@@ -130,7 +136,7 @@ function RestoreBtc() {
   const onClickTransfer = () => {
     mutateSignNonOrdinalBtcTransaction({
       recipientAddress: btcAddress,
-      nonOrdinalUtxos: unspentUtxos,
+      nonOrdinalUtxos: unspentUtxos!,
       accountIndex: selectedAccount?.id ?? 0,
       seedPhrase,
       network: network.type,
@@ -163,10 +169,10 @@ function RestoreBtc() {
               amountSats: new BigNumber(amount),
             },
           ],
-          fiatAmount: getBtcFiatEquivalent(amount, btcFiatRate),
+          fiatAmount: getBtcFiatEquivalent(amount, BigNumber(btcFiatRate)),
           fee: ordinalsFee?.fee,
           feePerVByte: ordinalsFee?.selectedFeeRate,
-          fiatFee: getBtcFiatEquivalent(ordinalsFee?.fee!, btcFiatRate),
+          fiatFee: getBtcFiatEquivalent(ordinalsFee?.fee!, BigNumber(btcFiatRate)),
           isRestoreFundFlow: true,
           unspentUtxos,
         },

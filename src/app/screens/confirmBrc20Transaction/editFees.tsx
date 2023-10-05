@@ -1,16 +1,16 @@
-import ActionButton from '@components/button';
-import BigNumber from 'bignumber.js';
+import { BetterBarLoader } from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
-import styled from 'styled-components';
+import ActionButton from '@components/button';
+import FiatAmountText from '@components/fiatAmountText';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BetterBarLoader } from '@components/barLoader';
-import { NumericFormat } from 'react-number-format';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import InputFeedback from '@ui-library/inputFeedback';
+import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import FiatAmountText from '@components/fiatAmountText';
-import InputFeedback from '@ui-library/inputFeedback';
+import { NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -232,7 +232,7 @@ export function EditFees({
     onClose();
   };
 
-  const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
+  const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), BigNumber(btcFiatRate));
 
   return (
     <BottomModal

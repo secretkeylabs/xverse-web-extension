@@ -1,23 +1,23 @@
-import { CurrencyTypes } from '@utils/constants';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { ReactNode, SetStateAction, useEffect, useState } from 'react';
-import { getTicker } from '@utils/helper';
 import ActionButton from '@components/button';
-import { useNavigate } from 'react-router-dom';
-import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
-import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
-import useNetworkSelector from '@hooks/useNetwork';
 import TokenImage from '@components/tokenImage';
-import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
-import BigNumber from 'bignumber.js';
-import { getCurrencyFlag } from '@utils/currency';
+import { useBNSResolver, useBnsName } from '@hooks/queries/useBnsName';
 import useDebounce from '@hooks/useDebounce';
+import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
+import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
+import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { CurrencyTypes } from '@utils/constants';
+import { getCurrencyFlag } from '@utils/currency';
+import { getTicker } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { ReactNode, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { FiatRow } from './fiatRow';
+import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
 
 interface ContainerProps {
   error: boolean;
@@ -255,7 +255,7 @@ function SendForm({
       Number(amountToSend),
       currencyType,
       stxBtcRate,
-      btcFiatRate,
+      BigNumber(btcFiatRate),
       fungibleToken,
     );
     setFiatAmount(amountInCurrency);
@@ -291,7 +291,7 @@ function SendForm({
       Number(newValue),
       currencyType,
       stxBtcRate,
-      btcFiatRate,
+      BigNumber(btcFiatRate),
       fungibleToken,
     );
     setFiatAmount(amountInCurrency);
@@ -304,11 +304,13 @@ function SendForm({
     if (!tokenAmount) return '0';
     switch (currencyType) {
       case 'STX':
-        return getStxTokenEquivalent(new BigNumber(tokenAmount), stxBtcRate, btcFiatRate)
+        return getStxTokenEquivalent(new BigNumber(tokenAmount), stxBtcRate, BigNumber(btcFiatRate))
           .toFixed(6)
           .toString();
       case 'BTC':
-        return getBtcEquivalent(new BigNumber(tokenAmount), btcFiatRate).toFixed(8).toString();
+        return getBtcEquivalent(new BigNumber(tokenAmount), BigNumber(btcFiatRate))
+          .toFixed(8)
+          .toString();
       case 'FT':
         if (fungibleToken?.tokenFiatRate) {
           return new BigNumber(tokenAmount)

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import useOrdinalsApi from './useOrdinalsApi';
 import useWalletSelector from './useWalletSelector';
 
-const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
+const useDetectOrdinalInSignPsbt = (parsedPsbt?: ParsedPSBT) => {
   const [loading, setLoading] = useState(false);
   const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
   const [ordinalInfoData, setOrdinalInfoData] = useState<Array<Inscription>>([]);
@@ -11,7 +11,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   const OrdinalsApi = useOrdinalsApi();
 
   const getOrdinalId = async (utxoHash: string, index: number) => {
-    const utxo: UTXO = {
+    const utxo = {
       txid: utxoHash,
       vout: index,
       status: {
@@ -19,7 +19,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
       },
       value: 0,
     };
-    const data = await getOrdinalIdFromUtxo(utxo);
+    const data = await getOrdinalIdFromUtxo(utxo as UTXO);
     return data;
   };
 

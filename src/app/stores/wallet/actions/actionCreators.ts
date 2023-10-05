@@ -135,12 +135,12 @@ export function setFeeMultiplierAction(feeMultipliers: AppInfo): actions.SetFeeM
 
 export function setCoinRatesAction(
   stxBtcRate: BigNumber,
-  btcFiatRate: BigNumber,
+  btcFiatRate: NumberLike,
 ): actions.SetCoinRates {
   return {
     type: actions.SetCoinRatesKey,
     stxBtcRate,
-    btcFiatRate,
+    btcFiatRate: numberLikeToStringOrThrow(btcFiatRate, 'btc fiat rate'),
   };
 }
 

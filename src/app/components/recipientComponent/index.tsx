@@ -1,18 +1,18 @@
-import TransferDetailView from '@components/transferDetailView';
-import OutputIcon from '@assets/img/transactions/output.svg';
 import ArrowIcon from '@assets/img/transactions/ArrowDown.svg';
+import OutputIcon from '@assets/img/transactions/output.svg';
 import WalletIcon from '@assets/img/transactions/wallet.svg';
+import TokenImage from '@components/tokenImage';
+import TransferDetailView from '@components/transferDetailView';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { CurrencyTypes } from '@utils/constants';
+import { getTicker } from '@utils/helper';
 import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
-import TokenImage from '@components/tokenImage';
-import { CurrencyTypes } from '@utils/constants';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useEffect, useState } from 'react';
-import { getTicker } from '@utils/helper';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -132,7 +132,7 @@ function RecipientComponent({
         Number(value),
         currencyType,
         stxBtcRate,
-        btcFiatRate,
+        BigNumber(btcFiatRate),
         fungibleToken,
       );
     }

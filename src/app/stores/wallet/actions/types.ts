@@ -67,7 +67,7 @@ export interface WalletState {
   seedPhrase: string;
   encryptedSeed: string;
   fiatCurrency: SupportedCurrency;
-  btcFiatRate: BigNumber;
+  btcFiatRate: string;
   stxBtcRate: BigNumber;
   stxBalance: string;
   stxAvailableBalance: string;
@@ -153,7 +153,7 @@ export interface SelectAccount {
 export interface SetCoinRates {
   type: typeof SetCoinRatesKey;
   stxBtcRate: BigNumber;
-  btcFiatRate: BigNumber;
+  btcFiatRate: string;
 }
 
 export interface SetStxWalletData {

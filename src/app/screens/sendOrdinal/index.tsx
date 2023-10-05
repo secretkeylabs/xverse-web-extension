@@ -19,6 +19,7 @@ import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/type
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -123,7 +124,7 @@ function SendOrdinal() {
     data,
     error: txError,
     mutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>({
+  } = useMutation<SignedBtcTx | undefined, ResponseError, string>({
     mutationFn: async (recipient) => {
       const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
       const ordUtxo = addressUtxos.find(
@@ -163,9 +164,9 @@ function SendOrdinal() {
           recipientAddress,
           fee: data.fee,
           feePerVByte: data.feePerVByte,
-          fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
+          fiatFee: getBtcFiatEquivalent(data.fee, BigNumber(btcFiatRate)),
           total: data.total,
-          fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),
+          fiatTotal: getBtcFiatEquivalent(data.total, BigNumber(btcFiatRate)),
           ordinalUtxo,
         },
       });

@@ -1,5 +1,6 @@
 import AccountHeaderComponent from '@components/accountHeader';
 import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useDebounce from '@hooks/useDebounce';
@@ -26,7 +27,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import InfoContainer from '@components/infoContainer';
 import Brc20FeesComponent from './brc20FeesComponent';
 import { EditFees, OnChangeFeeRate } from './editFees';
 import RecipientCard, { RecipientCardProps } from './recipientCard';
@@ -239,7 +239,7 @@ const useConfirmBrc20Transfer = (): {
       label: 'Total Fee',
       value: totalFee,
       suffix: 'sats',
-      fiatValue: getBtcFiatEquivalent(totalFee, btcFiatRate),
+      fiatValue: getBtcFiatEquivalent(totalFee, BigNumber(btcFiatRate)),
       fiatCurrency,
     },
   ];

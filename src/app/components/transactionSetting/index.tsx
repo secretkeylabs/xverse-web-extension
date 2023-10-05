@@ -3,9 +3,9 @@ import ArrowIcon from '@assets/img/settings/arrow.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
+import { UTXO } from '@secretkeylabs/xverse-core';
 import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import { Recipient, isCustomFeesAllowed } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -64,7 +64,7 @@ interface Props {
   btcRecipients?: Recipient[];
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
-  nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  nonOrdinalUtxos?: UTXO[];
   showFeeSettings: boolean;
   setShowFeeSettings: (value: boolean) => void;
 }

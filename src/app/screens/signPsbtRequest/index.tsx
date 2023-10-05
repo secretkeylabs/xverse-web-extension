@@ -26,7 +26,7 @@ import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transacti
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -121,15 +121,14 @@ function SignPsbtRequest() {
   const request = decodeToken(requestToken) as any as SignTransactionOptions;
   const btcClient = useBtcClient();
 
-  const handlePsbtParsing = useCallback(() => {
+  const parsedPsbt = useMemo(() => {
     try {
       return parsePsbt(selectedAccount!, payload.inputsToSign, payload.psbtBase64, network.type);
     } catch (err) {
-      return '';
+      return undefined;
     }
-  }, [selectedAccount, payload.psbtBase64]);
+  }, [selectedAccount, payload.inputsToSign, payload.psbtBase64, network.type]);
 
-  const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
   const { loading, ordinalInfoData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
@@ -339,7 +338,7 @@ function SignPsbtRequest() {
 
   return (
     <>
-      <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
+      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       {loading ? (
         <LoaderContainer>
           <MoonLoader color="white" size={50} />
@@ -360,6 +359,7 @@ function SignPsbtRequest() {
                 {ordinalInfoData &&
                   ordinalInfoData.map((ordinalData) => (
                     <OrdinalDetailComponent
+                      key={ordinalData.id}
                       ordinalInscription={`Inscription ${ordinalData?.number}`}
                       icon={IconOrdinal}
                       title={t('ORDINAL')}
@@ -369,13 +369,15 @@ function SignPsbtRequest() {
                     />
                   ))}
                 <RecipientComponent
-                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
+                  value={`${satsToBtc(new BigNumber((parsedPsbt?.netAmount ?? 0).toString()))
                     .toString()
                     .replace('-', '')}`}
                   currencyType="BTC"
                   title={t('AMOUNT')}
                   heading={
-                    parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')
+                    (parsedPsbt?.netAmount ?? 0) < 0
+                      ? t('YOU_WILL_TRANSFER')
+                      : t('YOU_WILL_RECEIVE')
                   }
                 />
                 <InputOutputComponent
@@ -389,8 +391,11 @@ function SignPsbtRequest() {
                 {payload.broadcast ? (
                   <TransactionDetailComponent
                     title={t('FEES')}
-                    value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
-                    subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+                    value={getSatsAmountString(new BigNumber((parsedPsbt?.fees ?? 0).toString()))}
+                    subValue={getBtcFiatEquivalent(
+                      new BigNumber((parsedPsbt?.fees ?? 0).toString()),
+                      BigNumber(btcFiatRate),
+                    )}
                   />
                 ) : null}
                 {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}

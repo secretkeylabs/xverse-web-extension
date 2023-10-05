@@ -46,7 +46,7 @@ const initialWalletState: WalletState = {
   seedPhrase: '',
   encryptedSeed: '',
   fiatCurrency: 'USD',
-  btcFiatRate: new BigNumber(0),
+  btcFiatRate: '0',
   stxBtcRate: new BigNumber(0),
   stxBalance: '0',
   stxAvailableBalance: '0',

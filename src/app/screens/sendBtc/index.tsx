@@ -1,21 +1,21 @@
+import SendForm from '@components/sendForm';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
+import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
+import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
+import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
+import { StoreState } from '@stores/index';
+import { useMutation } from '@tanstack/react-query';
+import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
+import { isInOptions } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import SendForm from '@components/sendForm';
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import { StoreState } from '@stores/index';
-import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
-import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
-import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
-import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
-import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
-import { isInOptions } from '@utils/helper';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
 
 function SendBtcScreen() {
   const location = useLocation();
@@ -72,12 +72,12 @@ function SendBtcScreen() {
           recipientAddress,
           amount,
           recipient,
-          fiatAmount: getBtcFiatEquivalent(parsedAmountSats, btcFiatRate),
+          fiatAmount: getBtcFiatEquivalent(parsedAmountSats, BigNumber(btcFiatRate)),
           fee: data.fee,
           feePerVByte: data.feePerVByte,
-          fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
+          fiatFee: getBtcFiatEquivalent(data.fee, BigNumber(btcFiatRate)),
           total: data.total,
-          fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),
+          fiatTotal: getBtcFiatEquivalent(data.total, BigNumber(btcFiatRate)),
         },
       });
     }

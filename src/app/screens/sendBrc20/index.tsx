@@ -119,7 +119,7 @@ function SendBrc20Screen() {
       } else {
         console.log('Unexpected error', error);
       }
-      return Promise.reject(error);
+      throw error;
     }
   };
 
@@ -152,16 +152,11 @@ function SendBrc20Screen() {
         selectedAccount?.id ?? 0,
         seedPhrase,
         network.type,
-      ).catch((err) => {
-        if (Number(err) === ErrorCodes.InSufficientBalance) {
-          setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
-        } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
-          setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE_FEES'));
-        } else setAmountError(err.toString());
-      });
+      );
       navigate('/confirm-inscription-request', {
         state: {
-          brcContent: order.inscriptionRequest.files[0].dataURL,
+          // !NOTE: Typing below is broken. Not going to fix as this page is deprecated.
+          brcContent: (order.inscriptionRequest as any).files[0].dataURL,
           signedTxHex: data?.signedTx,
           recipientAddress: order.inscriptionRequest.charge.address,
           amount: order.inscriptionRequest.charge.amount.toString(),
@@ -169,12 +164,18 @@ function SendBrc20Screen() {
           fiatAmount: order.inscriptionRequest.charge.fiat_value,
           fee: data?.fee,
           feePerVByte: data?.feePerVByte,
-          fiatFee: getBtcFiatEquivalent(data?.fee, btcFiatRate),
+          fiatFee: getBtcFiatEquivalent(data?.fee, BigNumber(btcFiatRate)),
           total: data?.total,
-          fiatTotal: getBtcFiatEquivalent(data?.total, btcFiatRate),
+          fiatTotal: getBtcFiatEquivalent(data?.total, BigNumber(btcFiatRate)),
         },
       });
     } catch (err) {
+      if (Number(err) === ErrorCodes.InSufficientBalance) {
+        setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
+      } else if (Number(err) === ErrorCodes.InSufficientBalanceWithTxFee) {
+        setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setAmountError(`${err}`);
+
       setIsCreatingOrder(false);
     }
   };
