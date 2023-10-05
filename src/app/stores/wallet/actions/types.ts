@@ -69,9 +69,9 @@ export interface WalletState {
   fiatCurrency: SupportedCurrency;
   btcFiatRate: BigNumber;
   stxBtcRate: BigNumber;
-  stxBalance: BigNumber;
-  stxAvailableBalance: BigNumber;
-  stxLockedBalance: BigNumber;
+  stxBalance: string;
+  stxAvailableBalance: string;
+  stxLockedBalance: string;
   stxNonce: number;
   btcBalance: string;
   coinsList: FungibleToken[] | null;
@@ -158,9 +158,9 @@ export interface SetCoinRates {
 
 export interface SetStxWalletData {
   type: typeof SetStxWalletDataKey;
-  stxBalance: BigNumber;
-  stxAvailableBalance: BigNumber;
-  stxLockedBalance: BigNumber;
+  stxBalance: string;
+  stxAvailableBalance: string;
+  stxLockedBalance: string;
   stxTransactions: TransactionData[];
   stxNonce: number;
 }

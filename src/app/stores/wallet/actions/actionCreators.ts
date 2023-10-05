@@ -145,17 +145,17 @@ export function setCoinRatesAction(
 }
 
 export function setStxWalletDataAction(
-  stxBalance: BigNumber,
-  stxAvailableBalance: BigNumber,
-  stxLockedBalance: BigNumber,
+  stxBalance: NumberLike,
+  stxAvailableBalance: NumberLike,
+  stxLockedBalance: NumberLike,
   stxTransactions: TransactionData[],
   stxNonce: number,
 ): actions.SetStxWalletData {
   return {
     type: actions.SetStxWalletDataKey,
-    stxBalance,
-    stxAvailableBalance,
-    stxLockedBalance,
+    stxBalance: numberLikeToStringOrThrow(stxBalance, 'stx balance'),
+    stxAvailableBalance: numberLikeToStringOrThrow(stxAvailableBalance, 'stx available'),
+    stxLockedBalance: numberLikeToStringOrThrow(stxLockedBalance, 'stx locked'),
     stxTransactions,
     stxNonce,
   };

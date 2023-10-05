@@ -1,23 +1,23 @@
-import TokenImage from '@components/tokenImage';
 import ArrowDown from '@assets/img/dashboard/arrow_down.svg';
 import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
-import Lock from '@assets/img/transactions/Lock.svg';
 import Buy from '@assets/img/dashboard/black_plus.svg';
+import Lock from '@assets/img/transactions/Lock.svg';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
+import SmallActionButton from '@components/smallActionButton';
+import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import BigNumber from 'bignumber.js';
-import { NumericFormat } from 'react-number-format';
-import styled from 'styled-components';
 import { CurrencyTypes } from '@utils/constants';
-import { getFtBalance, getFtTicker } from '@utils/tokens';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { isLedgerAccount } from '@utils/helper';
-import SmallActionButton from '@components/smallActionButton';
+import { getFtBalance, getFtTicker } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
-import BottomModal from '@components/bottomModal';
-import ActionButton from '@components/button';
+import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 interface CoinBalanceProps {
   coin: CurrencyTypes;
@@ -231,7 +231,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   }
 
   const renderStackingBalances = () => {
-    if (stxLockedBalance && !new BigNumber(stxLockedBalance).eq(0, 10) && coin === 'STX') {
+    if (!new BigNumber(stxLockedBalance).eq(0) && coin === 'STX') {
       return (
         <>
           <HeaderSeparator />
