@@ -1,6 +1,5 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import IconOrdinal from '@assets/img/transactions/ordinal.svg';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import { ledgerDelay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -339,7 +338,7 @@ function SignPsbtRequest() {
 
   return (
     <>
-      <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
+      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       {loading ? (
         <LoaderContainer>
           <MoonLoader color="white" size={50} />
