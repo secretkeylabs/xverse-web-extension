@@ -19,6 +19,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { StyledHeading } from '@ui-library/common.styled';
 import Dialog from '@ui-library/dialog';
+import { InvalidParamsError } from '@utils/query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MoonLoader } from 'react-spinners';
@@ -286,7 +287,10 @@ const useNftDashboard = (): NftDashboardState => {
   };
 
   const NftListView = useCallback(() => {
-    if (stacksError || ordinalsError) {
+    if (
+      (stacksError && !(stacksError instanceof InvalidParamsError)) ||
+      (ordinalsError && !(ordinalsError instanceof InvalidParamsError))
+    ) {
       return (
         <ErrorContainer>
           <Wrench size={48} />
