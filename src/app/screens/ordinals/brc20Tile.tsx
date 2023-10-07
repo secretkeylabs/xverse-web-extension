@@ -11,14 +11,17 @@ interface ContainerProps {
   isSmallImage?: boolean;
 }
 
-const ImageContainer = styled.div<ContainerProps>(() => ({
+const ImageContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
   width: '100%',
   height: '100%',
-  backgroundColor: '#1b1e2b',
+  backgroundColor: props.theme.colors.elevation1,
   borderRadius: 8,
   flexDirection: 'column',
+  '> img': {
+    width: '100%',
+  },
 }));
 
 const BRC20Container = styled.div({
@@ -71,12 +74,12 @@ const TickerIconText = styled.h1((props) => ({
   fontSize: 10,
 }));
 
-const OrdinalsTag = styled.div({
+const OrdinalsTag = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  background: 'rgba(39, 42, 68, 0.6)',
+  background: props.theme.colors.elevation1,
   borderRadius: 40,
   width: 79,
   height: 22,
@@ -85,7 +88,7 @@ const OrdinalsTag = styled.div({
   zIndex: 1000,
   position: 'absolute',
   padding: '3px 6px',
-});
+}));
 const ButtonIcon = styled.img({
   width: 12,
   height: 12,

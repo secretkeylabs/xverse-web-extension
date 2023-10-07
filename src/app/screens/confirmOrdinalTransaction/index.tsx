@@ -13,9 +13,11 @@ import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { getBundleId, getBundleSubText } from '@utils/rareSats';
+import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
+import BundleAsset from '@components/bundleAsset/bundleAsset';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -29,38 +31,6 @@ const ScrollContainer = styled.div`
   width: 360px;
   margin: auto;
 `;
-
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginLeft: '15%',
-  marginTop: props.theme.spacing(40),
-}));
-
-const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  opacity: 0.8,
-  marginTop: props.theme.spacing(5),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 400,
-  fontSize: 14,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(3),
@@ -87,14 +57,29 @@ const NftContainer = styled.div((props) => ({
 }));
 
 function ConfirmOrdinalTransaction() {
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { selectedAccount } = useWalletSelector();
+  const { selectedAccount, hasActivatedRareSatsKey } = useWalletSelector();
   const navigate = useNavigate();
   const btcClient = useBtcClient();
   const [recipientAddress, setRecipientAddress] = useState('');
   const location = useLocation();
-  const { fee, feePerVByte, signedTxHex, ordinalUtxo } = location.state;
+
+  // TODO tim: refactor to not use location.state.
+  const { feePerVByte, signedTxHex, ordinalUtxo, isRareSat } = location.state;
+  // this hack is necessary because the browser back/forward buttons
+  // serialize BigNumber objects into plain objects
+  let { fee } = location.state;
+  if (!BigNumber.isBigNumber(fee)) {
+    fee = BigNumber(fee);
+  }
+
+  const { selectedOrdinal, selectedSatBundle } = useNftDataSelector();
+  const { refetch } = useBtcWalletData();
+  const [currentFee, setCurrentFee] = useState(fee);
+  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
+
+  const bundleId = selectedSatBundle ? getBundleId(selectedSatBundle) : '';
+  const bundleSubText = selectedSatBundle ? getBundleSubText(selectedSatBundle) : '';
 
   const {
     isLoading,
@@ -104,10 +89,6 @@ function ConfirmOrdinalTransaction() {
   } = useMutation<BtcTransactionBroadcastResponse, Error, { signedTx: string }>({
     mutationFn: async ({ signedTx }) => btcClient.sendRawTransaction(signedTx),
   });
-  const { selectedOrdinal } = useNftDataSelector();
-  const { refetch } = useBtcWalletData();
-  const [currentFee, setCurrentFee] = useState(fee);
-  const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
 
   useEffect(() => {
     setRecipientAddress(location.state.recipientAddress);
@@ -141,6 +122,11 @@ function ConfirmOrdinalTransaction() {
       });
     }
   }, [txError]);
+
+  const { isPartOfABundle } = useGetUtxoOrdinalBundle(
+    selectedOrdinal?.output,
+    hasActivatedRareSatsKey,
+  );
 
   const handleOnConfirmClick = (txHex: string) => {
     if (isLedgerAccount(selectedAccount)) {
@@ -191,15 +177,22 @@ function ConfirmOrdinalTransaction() {
           onCancelClick={handleOnCancelClick}
           onBackButtonClick={handleOnCancelClick}
           ordinalTxUtxo={ordinalUtxo}
-          assetDetail={selectedOrdinal?.number.toString()}
+          assetDetail={bundleSubText ?? selectedOrdinal?.number.toString()}
+          assetDetailValue={bundleId ?? ''}
           currentFee={currentFee}
           setCurrentFee={setCurrentFee}
           currentFeeRate={currentFeeRate}
           setCurrentFeeRate={setCurrentFeeRate}
+          currencyType={isRareSat ? 'RareSat' : 'Ordinal'}
+          isPartOfBundle={isPartOfABundle}
         >
           <Container>
             <NftContainer>
-              <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
+              {selectedSatBundle && isRareSat ? (
+                <BundleAsset bundle={selectedSatBundle} />
+              ) : (
+                <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
+              )}
             </NftContainer>
           </Container>
         </ConfirmBtcTransactionComponent>

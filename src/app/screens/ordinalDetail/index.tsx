@@ -7,7 +7,6 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
 import ActionButton from '@components/button';
-import InfoContainer from '@components/infoContainer';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
@@ -25,6 +24,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+import { CubeTransparent, ArrowRight } from '@phosphor-icons/react';
+import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
+import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import OrdinalAttributeComponent from './ordinalAttributeComponent';
 
 const Container = styled.div`
@@ -258,6 +260,41 @@ const Text = styled.h1((props) => ({
   marginLeft: props.theme.spacing(2),
 }));
 
+const RareSatsBundleContainer = styled.div((props) => ({
+  display: 'flex',
+  flex: 1,
+  flexDirection: 'row',
+  padding: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(8),
+  border: `1px solid ${props.theme.colors.white_800}`,
+  borderRadius: '12px',
+}));
+const CubeTransparentIcon = styled(CubeTransparent)((props) => ({
+  color: props.theme.colors.white_200,
+  marginRight: props.theme.spacing(8),
+}));
+const RareSatsBundleTextDescription = styled.div((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white_200,
+}));
+const BundleLinkContainer = styled.button((props) => ({
+  display: 'inline-flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(4),
+  backgroundColor: 'transparent',
+  color: props.theme.colors.white_0,
+  transition: 'background-color 0.2s ease, opacity 0.2s ease',
+  ':hover': {
+    color: props.theme.colors.action.classicLight,
+    opacity: 0.6,
+  },
+}));
+const BundleLinkText = styled.div((props) => ({
+  ...props.theme.body_medium_m,
+  marginRight: props.theme.spacing(1),
+}));
+
 interface DetailSectionProps {
   isGallery: boolean;
 }
@@ -277,11 +314,16 @@ function OrdinalDetailScreen() {
   const { selectedOrdinal } = useNftDataSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(selectedOrdinal?.tx_id);
-  const [notSupportedOrdinal, setNotSupportedOrdinal] = useState<boolean>(false);
   const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState<boolean>(false);
   const [isBrc20Ordinal, setIsBrc20Ordinal] = useState<boolean>(false);
   const textContent = useTextOrdinalContent(selectedOrdinal!);
   const theme = useTheme();
+  const { hasActivatedRareSatsKey } = useWalletSelector();
+  const { bundle, isPartOfABundle } = useGetUtxoOrdinalBundle(
+    selectedOrdinal?.output,
+    hasActivatedRareSatsKey,
+  );
+  const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
   const isTransferValid = useMemo(
@@ -290,18 +332,6 @@ function OrdinalDetailScreen() {
   );
 
   useResetUserFlow('/ordinal-detail');
-
-  useEffect(() => {
-    if (selectedOrdinal) {
-      if (
-        selectedOrdinal?.content_type.includes('image') ||
-        selectedOrdinal?.content_type.includes('text') ||
-        textContent?.includes('brc-721e')
-      ) {
-        setNotSupportedOrdinal(false);
-      } else setNotSupportedOrdinal(true);
-    }
-  }, [selectedOrdinal?.content_type]);
 
   useEffect(() => {
     if (textContent?.includes('brc-20')) {
@@ -404,7 +434,7 @@ function OrdinalDetailScreen() {
   const showBrc20OrdinalDetail = (isGallery: boolean) => {
     try {
       const regex = /”/g;
-      const validBrcContentValue = textContent.replace(regex, '"');
+      const validBrcContentValue = (textContent ?? '').replace(regex, '"');
       const content = JSON.parse(validBrcContentValue);
 
       switch (content.op) {
@@ -484,6 +514,29 @@ function OrdinalDetailScreen() {
     }
   };
 
+  const handleNavigationToRareSatsBundle = () => {
+    if (!bundle) {
+      return;
+    }
+    setSelectedSatBundleDetails(bundle);
+    navigate('/nft-dashboard/rare-sats-bundle');
+  };
+
+  const rareSats = isPartOfABundle && (
+    <RareSatsBundleContainer>
+      <CubeTransparentIcon size={24} />
+      <div>
+        <RareSatsBundleTextDescription>
+          {t('RARE_SATS_BUNDLE_DESCRIPTION')}
+        </RareSatsBundleTextDescription>
+        <BundleLinkContainer onClick={handleNavigationToRareSatsBundle}>
+          <BundleLinkText>{t('RARE_SATS_BUNDLE_LINK')}</BundleLinkText>
+          <ArrowRight size={12} weight="bold" />
+        </BundleLinkContainer>
+      </div>
+    </RareSatsBundleContainer>
+  );
+
   const extensionView = (
     <ExtensionContainer>
       <CollectibleText>
@@ -507,13 +560,13 @@ function OrdinalDetailScreen() {
       <ExtensionOrdinalsContainer>
         <OrdinalImage ordinal={selectedOrdinal!} />
       </ExtensionOrdinalsContainer>
-      {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
       <ButtonContainer>
         <SendButton onClick={handleSendOrdinal}>
           <img src={ArrowUp} alt="arrow" />
           <h1>{t('SEND')}</h1>
         </SendButton>
       </ButtonContainer>
+      {rareSats}
       {isBrc20Ordinal ? showBrc20OrdinalDetail(false) : ownedByView}
     </ExtensionContainer>
   );
@@ -551,7 +604,7 @@ function OrdinalDetailScreen() {
         </OrdinalsContainer>
         <DescriptionContainer>
           <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
-          {notSupportedOrdinal && <InfoContainer bodyText={t('ORDINAL_NOT_DISPLAYED')} />}
+          {rareSats}
           {isBrc20Ordinal ? showBrc20OrdinalDetail(true) : ordinalDescriptionData}
         </DescriptionContainer>
       </RowContainer>
