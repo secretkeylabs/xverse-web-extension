@@ -697,7 +697,7 @@
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
     "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
-    "ENABLE_RARE_SATS_DETAIL": "Display Rare Sats in the collectibles and allow to scan the wallet for Rare Sats. This feature can impact performance.",
+    "ENABLE_RARE_SATS_DETAIL": "Automatically scan and display rare sats in your Ordinals wallet.",
     "ADVANCED": "Advanced"
   },
   "OPTIONS_DIALOG": {
