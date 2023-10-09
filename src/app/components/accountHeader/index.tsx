@@ -11,14 +11,16 @@ import styled from 'styled-components';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 import useWalletSelector from '@hooks/useWalletSelector';
 
-const SelectedAccountContainer = styled.div((props) => ({
+const SelectedAccountContainer = styled.div<{ showBorderBottom?: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: `${props.theme.spacing(10)}px ${props.theme.spacing(8)}px`,
-  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: props.showBorderBottom
+    ? `0.5px solid ${props.theme.colors.background.elevation3}`
+    : 'none',
 }));
 
 const ResetWalletContainer = styled.div((props) => ({
@@ -70,11 +72,13 @@ const WarningButton = styled(ButtonRow)`
 interface AccountHeaderComponentProps {
   disableMenuOption?: boolean;
   disableAccountSwitch?: boolean;
+  showBorderBottom?: boolean;
 }
 
 function AccountHeaderComponent({
   disableMenuOption = false,
   disableAccountSwitch = false,
+  showBorderBottom = true,
 }: AccountHeaderComponentProps) {
   const navigate = useNavigate();
   const { selectedAccount } = useWalletSelector();
@@ -163,7 +167,7 @@ function AccountHeaderComponent({
           />
         </ResetWalletContainer>
       )}
-      <SelectedAccountContainer>
+      <SelectedAccountContainer showBorderBottom={showBorderBottom}>
         <AccountRow
           account={selectedAccount!}
           isSelected

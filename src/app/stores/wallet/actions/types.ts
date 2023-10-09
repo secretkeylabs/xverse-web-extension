@@ -37,6 +37,8 @@ export const SetCoinRatesKey = 'SetCoinRatesKey';
 export const SetCoinDataKey = 'SetCoinDataKey';
 
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
+export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
+export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
 
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
@@ -81,6 +83,8 @@ export interface WalletState {
   feeMultipliers: AppInfo | null;
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
+  hasActivatedRareSatsKey: boolean | undefined;
+  rareSatsNoticeDismissed: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
   showDataCollectionAlert: boolean | null;
@@ -200,6 +204,16 @@ export interface GetActiveAccounts {
 export interface ChangeActivateOrdinals {
   type: typeof ChangeHasActivatedOrdinalsKey;
   hasActivatedOrdinalsKey: boolean;
+}
+
+export interface ChangeActivateRareSats {
+  type: typeof ChangeHasActivatedRareSatsKey;
+  hasActivatedRareSatsKey: boolean;
+}
+
+export interface SetRareSatsNoticeDismissed {
+  type: typeof RareSatsNoticeDismissedKey;
+  rareSatsNoticeDismissed: boolean;
 }
 
 export interface ChangeShowBtcReceiveAlert {

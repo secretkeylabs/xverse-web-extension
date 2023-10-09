@@ -10,15 +10,11 @@ const useAddressInscriptions = () => {
   const PageSize = 30;
 
   const getInscriptionsByAddress = async ({ pageParam = 0 }) => {
-    try {
-      if (!ordinalsAddress) {
-        throw new InvalidParamsError('ordinalsAddress is required');
-      }
-      const response = await ordinalsApi.getInscriptions(ordinalsAddress, pageParam || 0, PageSize);
-      return response;
-    } catch (err) {
-      return Promise.reject(err);
+    if (!ordinalsAddress) {
+      throw new InvalidParamsError('ordinalsAddress is required');
     }
+    const response = await ordinalsApi.getInscriptions(ordinalsAddress, pageParam || 0, PageSize);
+    return response;
   };
 
   const { isLoading, data, isFetchingNextPage, hasNextPage, error, refetch, fetchNextPage } =

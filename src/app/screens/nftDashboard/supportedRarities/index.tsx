@@ -1,0 +1,96 @@
+import { useTranslation } from 'react-i18next';
+import { ArrowUpRight } from '@phosphor-icons/react';
+import styled from 'styled-components';
+import TopRow from '@components/topRow';
+import { useNavigate } from 'react-router-dom';
+import { StyledP } from '@ui-library/common.styled';
+import { RareSats } from '@utils/rareSats';
+import { useMemo } from 'react';
+import { BLOG_LINK } from '@utils/constants';
+import Theme from 'theme';
+import RarityTile from './rarityTile';
+
+interface ContainerProps {
+  isGallery?: boolean;
+}
+
+const ContentContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(8),
+  overflowY: 'auto',
+  paddingBottom: props.theme.spacing(12),
+  flex: 1,
+}));
+const TopText = styled.h1((props) => ({
+  ...props.theme.typography.body_m,
+  color: props.theme.colors.white_200,
+  marginTop: props.theme.spacing(8),
+}));
+
+const TypesContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(6),
+}));
+
+const ButtonImage = styled.button((props) => ({
+  backgroundColor: 'transparent',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(6),
+}));
+
+const Container = styled.div<ContainerProps>((props) => ({
+  width: props.isGallery ? 580 : '100%',
+}));
+
+const MainContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  width: '100%',
+  height: '100%',
+});
+
+const rarityTypes = RareSats.filter((rareSat) => rareSat !== 'common');
+
+function SupportedRarities() {
+  const navigate = useNavigate();
+  const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+
+  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+
+  const openLearnMoreLink = () =>
+    window.open(`${BLOG_LINK}/rare-satoshis`, '_blank', 'noopener,noreferrer');
+
+  return (
+    <MainContainer>
+      <Container isGallery={isGalleryOpen}>
+        <TopRow
+          title={t('RARITY_DETAIL.SUPPORTED_RARITIES')}
+          onClick={() => {
+            navigate(-1);
+          }}
+        />
+        <ContentContainer>
+          <TopText>{t('RARITY_DETAIL.RARITY_INFO')}</TopText>
+          <ButtonImage onClick={openLearnMoreLink}>
+            <StyledP typography="body_medium_m" color="orange_main">
+              {t('RARITY_DETAIL.LEARN_MORE')}
+            </StyledP>
+            <ArrowUpRight size="16" color={Theme.colors.orange_main} />
+          </ButtonImage>
+
+          <TypesContainer>
+            {rarityTypes.map((type) => (
+              <RarityTile type={type} key={type} />
+            ))}
+          </TypesContainer>
+        </ContentContainer>
+      </Container>
+    </MainContainer>
+  );
+}
+export default SupportedRarities;
