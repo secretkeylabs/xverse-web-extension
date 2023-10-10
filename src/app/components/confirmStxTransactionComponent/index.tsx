@@ -26,6 +26,7 @@ import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { ledgerDelay } from '@common/utils/ledger';
 import { isHardwareAccount } from '@utils/helper';
+import InfoContainer from '@components/infoContainer';
 
 const Container = styled.div`
   display: flex;
@@ -112,6 +113,10 @@ const TitleContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(16),
 }));
 
+const WarningWrapper = styled.div((props) => ({
+  marginBottom: props.theme.spacing(8),
+}));
+
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
@@ -144,7 +149,7 @@ function ConfirmStxTransationComponent({
   const selectedNetwork = useNetworkSelector();
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const { selectedAccount } = useWalletSelector();
+  const { selectedAccount, feeMultipliers } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -154,10 +159,21 @@ function ConfirmStxTransationComponent({
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
+  const [showFeeWarning, setShowFeeWarning] = useState(false);
 
   useEffect(() => {
     setButtonLoading(loading);
   }, [loading]);
+
+  useEffect(() => {
+    const fee = new BigNumber(initialStxTransactions[0].auth.spendingCondition.fee.toString());
+
+    if (feeMultipliers && fee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighStacksFee))) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+  }, [initialStxTransactions, feeMultipliers]);
 
   const getFee = () =>
     isSponsored
@@ -222,6 +238,13 @@ function ConfirmStxTransationComponent({
     nonce?: string;
   }) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
+
+    if (feeMultipliers && fee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighStacksFee))) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+
     setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {
       setNonce(initialStxTransactions[0], BigInt(nonce));
@@ -254,11 +277,11 @@ function ConfirmStxTransationComponent({
     await ledgerDelay(1500);
     setCurrentStepIndex(1);
     try {
-      const signedTxs = await signLedgerStxTransaction(
+      const signedTxs = await signLedgerStxTransaction({
         transport,
-        initialStxTransactions[0].serialize(),
-        selectedAccount.deviceAccountIndex,
-      );
+        transactionBuffer: initialStxTransactions[0].serialize(),
+        addressIndex: selectedAccount.deviceAccountIndex,
+      });
       setIsTxApproved(true);
       await ledgerDelay(1500);
       onConfirmClick([signedTxs]);
@@ -286,6 +309,13 @@ function ConfirmStxTransationComponent({
           )}
           {!!subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
+
+        {showFeeWarning && (
+          <WarningWrapper>
+            <InfoContainer type="Warning" bodyText={t('HIGH_FEE_WARNING_TEXT')} />
+          </WarningWrapper>
+        )}
+
         {children}
         <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
         {initialStxTransactions[0]?.payload?.amount && (

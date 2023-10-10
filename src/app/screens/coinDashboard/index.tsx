@@ -187,18 +187,12 @@ export default function CoinDashboard() {
           </TokenContractContainer>
         );
       }
-    } else if (brc20FtName) {
-      return (
-        <TransactionHistoryContainer>
-          <h1>{t('TRANSACTION_HISTORY_TITLE')}</h1>
-          <h2>{`${t('COMING_SOON')}!`}</h2>
-        </TransactionHistoryContainer>
-      );
     }
     return (
       <TransactionsHistoryList
         coin={coin as CurrencyTypes}
         txFilter={`${ft?.principal}::${ft?.assetName}`}
+        brc20Token={brc20FtName}
       />
     );
   };

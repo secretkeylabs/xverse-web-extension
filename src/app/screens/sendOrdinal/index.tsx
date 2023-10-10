@@ -125,7 +125,7 @@ function SendOrdinal() {
     data,
     error: txError,
     mutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>({
+  } = useMutation<SignedBtcTx | undefined, ResponseError, string>({
     mutationFn: async (recipient) => {
       const seedPhrase = await getSeed();
       const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);

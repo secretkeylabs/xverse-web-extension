@@ -180,6 +180,7 @@ interface Props {
   disableAmountInput?: boolean;
   balance?: number;
   hideMemo?: boolean;
+  hideTokenImage?: boolean;
   buttonText?: string;
   processing?: boolean;
   children?: ReactNode;
@@ -200,6 +201,7 @@ function SendForm({
   disableAmountInput,
   balance,
   hideMemo = false,
+  hideTokenImage = false,
   buttonText,
   processing,
   children,
@@ -297,7 +299,7 @@ function SendForm({
     setFiatAmount(amountInCurrency);
   };
 
-  function getTokenEquivalent(tokenAmount: string): string {
+  const getTokenEquivalent = (tokenAmount: string): string => {
     if ((currencyType === 'FT' && !fungibleToken?.tokenFiatRate) || currencyType === 'NFT') {
       return '';
     }
@@ -320,7 +322,7 @@ function SendForm({
       default:
         return '';
     }
-  }
+  };
 
   const getAmountLabel = () => {
     if (switchToFiat) return fiatCurrency;
@@ -446,7 +448,8 @@ function SendForm({
       <ScrollContainer>
         {currencyType !== 'NFT' &&
           currencyType !== 'Ordinal' &&
-          currencyType !== 'brc20-Ordinal' && (
+          currencyType !== 'brc20-Ordinal' &&
+          !hideTokenImage && (
             <TokenContainer>
               <TokenImage
                 token={currencyType || undefined}

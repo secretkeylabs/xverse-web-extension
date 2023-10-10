@@ -1,42 +1,34 @@
-import { getOrdinalIdFromUtxo, Inscription, ParsedPSBT, UTXO } from '@secretkeylabs/xverse-core';
+import { getUtxoOrdinalBundle, ParsedPSBT } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
-import useOrdinalsApi from './useOrdinalsApi';
+import { BundleItem, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
 import useWalletSelector from './useWalletSelector';
 
 const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   const [loading, setLoading] = useState(false);
   const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
-  const [ordinalInfoData, setOrdinalInfoData] = useState<Array<Inscription>>([]);
+  const [bundleItemsData, setBundleItemsData] = useState<BundleItem[]>([]);
   const { ordinalsAddress } = useWalletSelector();
-  const OrdinalsApi = useOrdinalsApi();
-
-  const getOrdinalId = async (utxoHash: string, index: number) => {
-    const utxo: UTXO = {
-      txid: utxoHash,
-      vout: index,
-      status: {
-        confirmed: false,
-      },
-      value: 0,
-    };
-    const data = await getOrdinalIdFromUtxo(utxo);
-    return data;
-  };
 
   async function handleOrdinalAndOrdinalInfo() {
-    const ordinals: Inscription[] = [];
+    const bundleItems: BundleItem[] = [];
     if (parsedPsbt) {
       setLoading(true);
       await Promise.all(
         parsedPsbt.inputs.map(async (input) => {
-          const data = await getOrdinalId(input.txid, input.index);
-          if (data) {
-            const response = await OrdinalsApi.getInscription(data);
-            ordinals.push(response);
-          }
+          const data = await getUtxoOrdinalBundle(input.txid, input.index);
+          console.log({ data });
+
+          const bundle = mapRareSatsAPIResponseToRareSats(data);
+          bundle.items.forEach((item) => {
+            // we don't show unknown items for now
+            if (item.type === 'unknown') {
+              return;
+            }
+            bundleItems.push(item);
+          });
         }),
       );
-      setOrdinalInfoData(ordinals);
+      setBundleItemsData(bundleItems);
       setLoading(false);
       parsedPsbt.outputs.forEach(async (output) => {
         if (output.address === ordinalsAddress) {
@@ -52,7 +44,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
 
   return {
     loading,
-    ordinalInfoData,
+    bundleItemsData,
     userReceivesOrdinal,
   };
 };

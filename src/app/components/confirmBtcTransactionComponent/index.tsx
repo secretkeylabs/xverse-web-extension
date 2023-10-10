@@ -22,13 +22,16 @@ import {
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation } from '@tanstack/react-query';
+import { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import useWalletSelector from '@hooks/useWalletSelector';
 import useSeedVault from '@hooks/useSeedVault';
 import styled from 'styled-components';
+import InfoContainer from '@components/infoContainer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Callout from '@ui-library/callout';
 import TransactionDetailComponent from '../transactionDetailComponent';
 
 const OuterContainer = styled.div`
@@ -111,6 +114,11 @@ const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => 
   textAlign: props.isOridnalTx ? 'center' : 'left',
 }));
 
+const CalloutContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(8),
+  marginhorizontal: props.theme.spacing(8),
+}));
+
 interface Props {
   currentFee: BigNumber;
   feePerVByte: BigNumber; // TODO tim: is this the same as currentFeeRate? refactor to be clear
@@ -120,9 +128,12 @@ interface Props {
   recipients: Recipient[];
   children?: ReactNode;
   assetDetail?: string;
+  assetDetailValue?: string;
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
   isBtcSendBrowserTx?: boolean;
+  currencyType?: CurrencyTypes;
+  isPartOfBundle?: boolean;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;
   setCurrentFeeRate: (feeRate: BigNumber) => void;
@@ -140,9 +151,12 @@ function ConfirmBtcTransactionComponent({
   recipients,
   children,
   assetDetail,
+  assetDetailValue,
   isRestoreFundFlow,
   nonOrdinalUtxos,
   isBtcSendBrowserTx,
+  isPartOfBundle,
+  currencyType,
   currentFeeRate,
   setCurrentFee,
   setCurrentFeeRate,
@@ -153,12 +167,13 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
-  const { btcAddress, selectedAccount, network, btcFiatRate } = useWalletSelector();
+  const { btcAddress, selectedAccount, network, btcFiatRate, feeMultipliers } = useWalletSelector();
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
+  const [showFeeWarning, setShowFeeWarning] = useState(false);
   const {
     isLoading,
     data,
@@ -264,6 +279,17 @@ function ConfirmBtcTransactionComponent({
     }
   }, [signedNonOrdinalBtcSend]);
 
+  useEffect(() => {
+    if (
+      feeMultipliers &&
+      currentFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighSatsFee))
+    ) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+  }, [currentFee, feeMultipliers]);
+
   const onAdvancedSettingClick = () => {
     setShowFeeSettings(true);
   };
@@ -280,8 +306,9 @@ function ConfirmBtcTransactionComponent({
     feeRate?: string;
     nonce?: string;
   }) => {
+    const newFee = new BigNumber(modifiedFee);
+    setCurrentFee(newFee);
     const seed = await getSeed();
-    setCurrentFee(new BigNumber(modifiedFee));
     setCurrentFeeRate(new BigNumber(feeRate));
     if (ordinalTxUtxo) ordinalMutate({ txFee: modifiedFee, seedPhrase: seed });
     else if (isRestoreFundFlow) {
@@ -345,17 +372,34 @@ function ConfirmBtcTransactionComponent({
           <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
         )}
         <Container>
+          {showFeeWarning && (
+            <InfoContainer
+              type="Warning"
+              bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')}
+            />
+          )}
+
           {children}
           <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
             {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
           </ReviewTransactionText>
 
+          {isPartOfBundle && (
+            <CalloutContainer>
+              <Callout
+                bodyText={t('NFT_DASHBOARD_SCREEN.FROM_RARE_SAT_BUNDLE')}
+                variant="warning"
+              />
+            </CalloutContainer>
+          )}
+
           {ordinalTxUtxo ? (
             <RecipientComponent
               address={recipients[0]?.address}
               value={assetDetail!}
+              valueDetail={assetDetailValue}
               icon={AssetIcon}
-              currencyType="Ordinal"
+              currencyType={currencyType || 'Ordinal'}
               title={t('CONFIRM_TRANSACTION.ASSET')}
             />
           ) : (

@@ -2,7 +2,7 @@ import LinkIcon from '@assets/img/linkIcon.svg';
 import ActionButton from '@components/button';
 import Separator from '@components/separator';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { CustomSwitch } from '@screens/ledger/importLedgerAccount/index.styled';
+import { CustomSwitch } from '@screens/ledger/importLedgerAccount/steps/index.styled';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { saveIsTermsAccepted } from '@utils/localStorage';

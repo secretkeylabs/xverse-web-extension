@@ -1,4 +1,8 @@
 {
+  "COMMON": {
+    "INSCRIPTION": "Inscription",
+    "SEND": "Send"
+  },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
     "CREATE_WALLET_BUTTON": "Create Wallet",
@@ -65,7 +69,12 @@
     "LEDGER_ADD_ACCOUNT_NAME": {
       "TITLE": "Name your Ledger wallet",
       "SUBTITLE": "You can give your wallet a custom name.",
-      "INPUT": "Wallet name"
+      "INPUT": "Wallet name",
+      "PLACEHOLDER": "My ledger",
+      "ERRORS": {
+        "MAX_LENGTH": "Account name should not be longer than {{number}} characters.",
+        "ALREADY_EXISTS": "Account with the same name already exists. Please choose another name."
+      }
     },
     "LEDGER_IMPORT_END": {
       "TITLE": "Your wallet is ready!",
@@ -177,7 +186,10 @@
     "CLOSE_BUTTON": "Close",
     "CANCEL_BUTTON": "Cancel",
     "SEE_TRANSACTION_BUTTON": "See transaction",
-    "RETRY_BUTTON": "Try again"
+    "SEND_ORDINAL": "Send ordinal",
+    "CONFIRM_FEES": "Confirm fees",
+    "RETRY_BUTTON": "Try again",
+    "FEES": "Fees"
   },
   "DASHBOARD_SCREEN": {
     "TOTAL_BALANCE": "total balance",
@@ -263,7 +275,8 @@
     "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens.",
     "SEND_ORDINAL_TO_SELF_WARNING": "You are about to transfer an Ordinal to yourself",
     "SEND_BRC20_ORDINAL_TO_SELF_WARNING": "You are about to transfer BRC-20 tokens to yourself",
-    "SEND_BTC_TO_SELF_WARNING": "You are about to transfer BTC to yourself"
+    "SEND_BTC_TO_SELF_WARNING": "You are about to transfer BTC to yourself",
+    "YOU_ARE_TRANSFERRING_TO_YOURSELF": "You are transferring to yourself"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -302,7 +315,6 @@
     "YOU_WILL_RECEIVE": "You will receive",
     "SCRIPT_OUTPUT": "Script output",
     "SCRIPT_OUTPUT_TX": "This transaction contains a script output. Be sure you trust the source of this transaction before confirming it.",
-
     "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
@@ -310,6 +322,7 @@
     "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
     "CONITNUE": "Continue",
     "BACK": "Back",
+    "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
@@ -509,10 +522,12 @@
     "NO_EARN_OPTION": "No Earn options currently available for this wallet type."
   },
   "NFT_DASHBOARD_SCREEN": {
-    "COLLECTIBLES": "Number of collectibles",
-    "NO_COLLECTIBLES": "No collectibles yet",
+    "COLLECTIBLES": "Collectibles",
+    "NO_COLLECTIBLES": "There's nothing here yet.",
+    "ERROR_RETRIEVING": "We are having trouble retrieving data.",
+    "TRY_AGAIN": "Please try again later.",
     "LOAD_MORE": "Load more",
-    "ITEMS": "items",
+    "TOTAL_ITEMS": "{{total}} items",
     "WEB_GALLERY": "Open gallery",
     "RECEIVE": "Receive",
     "SEND": "Send",
@@ -537,7 +552,31 @@
     "DEPLOY": "Deploy",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",
-    "ADD_STACKS_ADDRESS": "Add a Stacks address"
+    "ADD_STACKS_ADDRESS": "Add a Stacks address",
+    "RARITY_DETAIL": {
+      "TOP_TEXT": "Currently, only the default rarity scale is supported. Your sats could have other attributes.",
+      "LEARN_MORE": "Learn more",
+      "UNKNOWN": "A sat of unknown rarity.",
+      "UNCOMMON": "The first sat of each block.",
+      "RARE": "The first sat of each difficulty adjustment period.",
+      "EPIC": "The first sat of each halving epoch.",
+      "LEGENDARY": "The first sat of each cycle.",
+      "MYTHIC": "The first sat of the genesis block.",
+      "SCAN": "Scan for custom attributes",
+      "SUPPORTED_RARITIES": "Supported rarities",
+      "RARITY_INFO": "Currently, only the default rarity scale is supported. Your sats could have other attributes."
+    },
+    "NFTS": "INSCRIPTIONS & NFTs",
+    "RARE_SATS": "Rare Sats",
+    "NEW_FEATURE": "New Feature, Rare Sats",
+    "NEW_FEAT_RARE_SATS_DESCRIPTION": "Enable rare sats to display rare, interesting and unique sats in your wallet. You can change this setting at any time.",
+    "NEW_FEAT_RARE_SATS_ORDINALS_ENABLE": "Enable rare sats to display rare, interesting and unique sats in your wallet. Note than enabling rare sats will also enable Ordinals. You can change this setting at any time.",
+    "MAYBE_LATER": "Maybe Later",
+    "ENABLE": "Enable",
+    "RARE_SATS_NOTICE_TITLE": "Don't see your rare sat?",
+    "RARE_SATS_NOTICE_DETAIL": "Currently, Xverse only supports the Rodarmor rarity index. Your sats may have other attributes.",
+    "SEE_SUPPORTED": "See supported rarity scale",
+    "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle."
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Restore assets",
@@ -589,7 +628,7 @@
     "ORDINAL_PENDING_SEND_DESCRIPTION": "This Ordinal is already in a pending transfer.",
     "ORDINAL_PENDING_SEND_BUTTON": "View in Explorer",
     "INSCRIPTION": "Inscription",
-    "ID": "Id",
+    "ID": "ID",
     "CONTENT_LENGTH": "Content length",
     "ADDRESS": "Address",
     "CONTENT_TYPE": "Content type",
@@ -605,7 +644,9 @@
     "BRC20_TRANSFER_STATUS": "Status",
     "TOTAL_SUPPLY": "Total supply",
     "MINT_LIMIT": "Mint limit",
-    "VIEW_IN_ORDINALS_EXPLORER": "Open in Ordinal Viewer"
+    "VIEW_IN_ORDINALS_EXPLORER": "Open in Ordinal Viewer",
+    "RARE_SATS_BUNDLE_DESCRIPTION": "This inscription belongs to the same bundle as other assets.",
+    "RARE_SATS_BUNDLE_LINK": "See bundle"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
@@ -654,7 +695,10 @@
     "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically.",
     "ENTER_YOUR_NEW_PASSWORD": "Enter your new password",
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
-    "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password"
+    "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
+    "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
+    "ENABLE_RARE_SATS_DETAIL": "Automatically scan and display rare sats in your Ordinals wallet.",
+    "ADVANCED": "Advanced"
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
@@ -676,8 +720,11 @@
     "BUY_COIN_BUTTON": "Buy",
     "TRANSACTION_HISTORY_TITLE": "Transaction history",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
+    "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
+    "MINT": "Mint",
+    "INSCRIBE_TRANSFER": "Inscribe Transfer",
     "TRANSACTION_PENDING_RECEIVING": "Receiving",
     "TRANSACTION_PENDING_SENDING": "Sending",
     "ORDINAL_TRANSACTION_PENDING_RECEIVING": "Receiving Ordinal",
@@ -1010,5 +1057,32 @@
     "THIS_IS_A_SPONSORED_TRANSACTION": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
     "LEARN_MORE": "Learn more"
+  },
+  "RARE_SATS": {
+    "RARE_TYPES": {
+      "UNKNOWN": "Unknown",
+      "UNCOMMON": "Uncommon",
+      "COMMON": "Common",
+      "RARE": "Rare",
+      "EPIC": "Epic",
+      "LEGENDARY": "Legendary",
+      "MYTHIC": "Mythic"
+    },
+    "SAT_TYPES": {
+      "RARE_SAT": "{{type}} Sat",
+      "INSCRIBED_RARE_SAT": "Inscribed {{type}} Sat",
+      "UNKNOWN_RARE_SAT": "Unknown Rarity Sat"
+    },
+    "RARITY_RANKING_POSITION": "{{position}} quadrillion",
+    "RARE_SATS_RANKING": "Rare Sat ranking",
+    "RARITY": "Rarity",
+    "SEND_INDIVIDUAL_SAT_INFO": "Rare Sats and inscriptions in the same bundle cannot be sent separately.",
+    "RARITY_LINK_TEXT": "See supported rarity scale",
+    "SATS_VALUE": "Sats value",
+    "SATS_BUNDLE": "Sats Bundle",
+    "RARE_SATS_BUNDLE": "Rare Sats Bundle",
+    "BUNDLE_PENDING_SEND_DESCRIPTION": "This bundle is already in a pending transfer.",
+    "RARE_SAT": "Rare Sat",
+    "INSCRIBED_SAT": "Inscribed Sat"
   }
 }
