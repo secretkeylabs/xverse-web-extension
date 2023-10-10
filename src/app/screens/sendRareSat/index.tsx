@@ -7,6 +7,7 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
+import useSeedVault from '@hooks/useSeedVault';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
   SignedBtcTx,
@@ -98,8 +99,9 @@ function SendOrdinal() {
   const { selectedSatBundle } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
-  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+  const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
+  const { getSeed } = useSeedVault();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -120,6 +122,7 @@ function SendOrdinal() {
     );
     setOrdinalUtxo(ordUtxo);
     if (ordUtxo) {
+      const seedPhrase = await getSeed();
       const signedTx = await signOrdinalSendTransaction(
         recipient,
         ordUtxo,
