@@ -1,8 +1,6 @@
+import { Tab, TabList } from 'react-tabs';
 import styled from 'styled-components';
-import { TabList, Tab } from 'react-tabs';
-import Theme from 'theme';
-
-type Color = keyof typeof Theme.colors | 'currentColor';
+import type { Color, Typography } from 'theme';
 
 /**
  * Typography
@@ -13,7 +11,6 @@ type Color = keyof typeof Theme.colors | 'currentColor';
  *
  * ref: https://zeroheight.com/0683c9fa7/p/789eec-typography
  */
-type Typography = keyof typeof Theme.typography;
 type TypographyProps = { typography: Typography; color?: Color };
 
 export const StyledP = styled.p<TypographyProps>`

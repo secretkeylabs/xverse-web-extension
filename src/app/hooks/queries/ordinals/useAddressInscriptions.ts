@@ -1,45 +1,59 @@
-import useOrdinalsApi from '@hooks/useOrdinalsApi';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { getCollectionSpecificInscriptions } from '@secretkeylabs/xverse-core';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { InvalidParamsError, handleRetries } from '@utils/query';
+import { handleRetries, InvalidParamsError } from '@utils/query';
 
-const useAddressInscriptions = () => {
+const PAGE_SIZE = 30;
+
+/**
+ * Get inscriptions belonging to an address, filtered by collection id
+ */
+const useAddressInscriptions = (collectionId?: string) => {
   const { ordinalsAddress } = useWalletSelector();
-  const ordinalsApi = useOrdinalsApi();
-
-  const PageSize = 30;
 
   const getInscriptionsByAddress = async ({ pageParam = 0 }) => {
-    if (!ordinalsAddress) {
-      throw new InvalidParamsError('ordinalsAddress is required');
+    if (!ordinalsAddress || !collectionId) {
+      throw new InvalidParamsError('ordinalsAddress and collectionId are required');
     }
-    const response = await ordinalsApi.getInscriptions(ordinalsAddress, pageParam || 0, PageSize);
-    return response;
+
+    // TODO cui: remove mock data after QA
+    const testAddress = localStorage.getItem('testAddress');
+    if (testAddress) {
+      return getCollectionSpecificInscriptions(
+        testAddress,
+        collectionId,
+        pageParam || 0, // offset,
+        PAGE_SIZE, // limit
+      );
+    }
+    return getCollectionSpecificInscriptions(
+      ordinalsAddress,
+      collectionId,
+      pageParam || 0, // offset,
+      PAGE_SIZE, // limit
+    );
   };
 
-  const { isLoading, data, isFetchingNextPage, hasNextPage, error, refetch, fetchNextPage } =
-    useInfiniteQuery([`inscriptions-${ordinalsAddress}`], getInscriptionsByAddress, {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
+  return useInfiniteQuery(
+    ['inscriptions', ordinalsAddress, collectionId], // cache key
+    getInscriptionsByAddress,
+    {
+      enabled: !!(collectionId && ordinalsAddress),
       retry: handleRetries,
       getNextPageParam: (lastpage, pages) => {
-        const currentLength = pages.map((page) => page.results).flat().length;
+        const currentLength = pages
+          .map((page) => page.data)
+          .filter(Boolean)
+          .flat().length;
         if (currentLength < lastpage.total) {
           return currentLength;
         }
         return false;
       },
-    });
-
-  return {
-    isLoading,
-    data,
-    error,
-    fetchNextPage,
-    isFetchingNextPage,
-    hasNextPage,
-    refetch,
-  };
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    },
+  );
 };
 
 export default useAddressInscriptions;

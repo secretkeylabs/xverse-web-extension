@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import stc from 'string-to-color';
-import styled from 'styled-components';
-import Switch from 'react-switch';
+import Separator from '@components/separator';
 import { Coin } from '@secretkeylabs/xverse-core/types';
 import { getTicker } from '@utils/helper';
-import Separator from '@components/separator';
+import { useState } from 'react';
+import Switch from 'react-switch';
+import stc from 'string-to-color';
+import styled from 'styled-components';
 import Theme from 'theme';
 
 const RowContainer = styled.div((props) => ({
@@ -110,7 +110,7 @@ function CoinItem({ coin, disabled, toggled, enabled, showDivider }: Props) {
           )}
         </CoinContainer>
         <CustomSwitch
-          onColor={Theme.colors.purple_main}
+          onColor={Theme.colors.orange_main}
           offColor={Theme.colors.background.elevation3}
           onChange={toggleSwitch}
           checked={isEnabled!}

@@ -1,10 +1,29 @@
-const Theme = {
-  breakpoints: {
-    s: '0px',
-    md: '700px',
-    lg: '1025px',
-    xlg: '1536px',
+export const breakpoints = {
+  xs: '360',
+  s: '480',
+  md: '768',
+  lg: '920',
+  xl: '1200',
+};
+
+export const devices = {
+  min: {
+    xs: `(min-width: ${breakpoints.xs}px)`,
+    s: `(min-width: ${breakpoints.s}px)`,
+    md: `(min-width: ${breakpoints.md}px)`,
+    lg: `(min-width: ${breakpoints.lg}px)`,
+    xl: `(min-width: ${breakpoints.xl}px)`,
   },
+  max: {
+    xs: `(max-width: ${breakpoints.xs}px)`,
+    s: `(max-width: ${breakpoints.s}px)`,
+    md: `(max-width: ${breakpoints.md}px)`,
+    lg: `(max-width: ${breakpoints.lg}px)`,
+    xl: `(max-width: ${breakpoints.xl}px)`,
+  },
+};
+
+const Theme = {
   spacing: (multiple: number) => multiple * 2,
   space: {
     xxxs: '2px',
@@ -351,4 +370,8 @@ const Theme = {
   },
   /* above: deprecated */
 };
+
+export type Color = keyof typeof Theme.colors | 'currentColor';
+export type Typography = keyof typeof Theme.typography;
+
 export default Theme;

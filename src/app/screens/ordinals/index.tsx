@@ -50,7 +50,7 @@ function Ordinal({ asset, isGalleryOpen }: Props) {
 
   const handleOnClick = () => {
     setSelectedOrdinalDetails(asset);
-    navigate('/nft-dashboard/ordinal-detail');
+    navigate(`/nft-dashboard/ordinal-detail/${asset.id}`);
   };
 
   return (
