@@ -156,10 +156,10 @@ function OrdinalsCollection() {
   const collectionHeading = data?.pages?.[0].collection_name;
   const estPortfolioValue =
     data && data?.pages?.[0].portfolio_value !== 0
-      ? `${data?.pages?.[0].portfolio_value.toFixed(10)} BTC`
+      ? `${data?.pages?.[0].portfolio_value.toFixed(8)} BTC`
       : '--';
   const collectionFloorPrice = collectionMarketData?.floor_price
-    ? `${collectionMarketData?.floor_price?.toFixed(10).toString()} BTC`
+    ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
     : '--';
 
   return (

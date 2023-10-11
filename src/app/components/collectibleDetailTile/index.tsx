@@ -29,8 +29,8 @@ interface ContainerProps {
 const Container = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   flexDirection: props.isColumnAlignment ? 'column' : 'row',
-  justifyContent: 'space-between',
   width: '100%',
+  justifyContent: 'space-between',
 }));
 
 const ValueContainer = styled.h1<DetailSectionProps>((props) => ({

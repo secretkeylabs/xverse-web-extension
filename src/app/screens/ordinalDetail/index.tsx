@@ -444,7 +444,7 @@ function OrdinalDetailScreen() {
           <CollectibleDetailTile title={t('COLLECTION')} value={ordinal?.collection_name ?? ''} />
           <CollectibleDetailTile
             title={t('COLLECTION_FLOOR_PRICE')}
-            value={collectionMarketData?.floor_price?.toFixed(10).toString() ?? '--'}
+            value={collectionMarketData?.floor_price?.toFixed(8) ?? '--'}
             suffixValue="BTC"
           />
         </DetailSection>
