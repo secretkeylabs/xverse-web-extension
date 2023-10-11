@@ -1,24 +1,20 @@
-/* eslint-disable no-await-in-loop */
-import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
-import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
-import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
+import dashboardIcon from '@assets/img/dashboard-icon.svg';
 import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
-import CreditCard from '@assets/img/dashboard/credit_card.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
+import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
 import Swap from '@assets/img/dashboard/swap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import ReceiveCardComponent from '@components/receiveCardComponent';
-import { isLedgerAccount } from '@utils/helper';
-import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
+import UpdatedBottomModal from '@components/updatedBottomModal';
 import useAppConfig from '@hooks/queries/useAppConfig';
 import useBtcCoinBalance from '@hooks/queries/useBtcCoinsBalance';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -27,20 +23,21 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Plus } from '@phosphor-icons/react';
+import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import { CurrencyTypes } from '@utils/constants';
+import { isLedgerAccount } from '@utils/helper';
+import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import dashboardIcon from '@assets/img/dashboard-icon.svg';
 import { useDispatch } from 'react-redux';
-import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import Theme from 'theme';
+import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
-import SquareButton from './squareButton';
 
 export const Container = styled.div((props) => ({
   ...props.theme.scrollbar,
@@ -66,6 +63,7 @@ const ReceiveContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(16),
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
+  gap: props.theme.space.m,
 }));
 
 const CoinContainer = styled.div({
@@ -135,10 +133,6 @@ const VerifyButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
-const AddStxButtonContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(6),
-}));
-
 const ModalContent = styled.div((props) => ({
   padding: props.theme.spacing(8),
   paddingTop: 0,
@@ -153,18 +147,16 @@ const ModalIcon = styled.img((props) => ({
 }));
 
 const ModalTitle = styled.div((props) => ({
-  fontSize: '1rem',
-  fontWeight: 700,
+  ...props.theme.typography.body_bold_l,
   marginBottom: props.theme.spacing(4),
   textAlign: 'center',
 }));
 
 const ModalDescription = styled.div((props) => ({
-  fontSize: '0.875rem',
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white['200'],
   marginBottom: props.theme.spacing(16),
   textAlign: 'center',
-  lineHeight: '1.25rem',
 }));
 
 const ModalControlsContainer = styled.div({
@@ -394,18 +386,16 @@ function Home() {
       )}
 
       {isLedgerAccount(selectedAccount) && !stxAddress && (
-        <AddStxButtonContainer>
-          <ActionButton
-            transparent
-            icon={<Plus color="white" size={20} />}
-            text={t('ADD_STACKS_ADDRESS')}
-            onPress={async () => {
-              await chrome.tabs.create({
-                url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
-              });
-            }}
-          />
-        </AddStxButtonContainer>
+        <ActionButton
+          transparent
+          icon={<Plus color="white" size={20} />}
+          text={t('ADD_STACKS_ADDRESS')}
+          onPress={async () => {
+            await chrome.tabs.create({
+              url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+            });
+          }}
+        />
       )}
     </ReceiveContainer>
   );
@@ -466,10 +456,22 @@ function Home() {
           }
         />
         <RowButtonContainer>
-          <SquareButton src={ArrowUpRight} text={t('SEND')} onPress={onSendModalOpen} />
-          <SquareButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
+          <SquareButton
+            icon={<ArrowUp weight="regular" size="20" />}
+            text={t('SEND')}
+            onPress={onSendModalOpen}
+          />
+          <SquareButton
+            icon={<ArrowDown weight="regular" size="20" />}
+            text={t('RECEIVE')}
+            onPress={onReceiveModalOpen}
+          />
           {showSwaps && <SquareButton src={Swap} text={t('SWAP')} onPress={onSwapPressed} />}
-          <SquareButton src={CreditCard} text={t('BUY')} onPress={onBuyModalOpen} />
+          <SquareButton
+            icon={<Plus weight="regular" size="20" />}
+            text={t('BUY')}
+            onPress={onBuyModalOpen}
+          />
         </RowButtonContainer>
 
         <ColumnContainer>
@@ -523,9 +525,13 @@ function Home() {
             ))}
           </CoinContainer>
         )}
-        <BottomModal visible={openReceiveModal} header={t('RECEIVE')} onClose={onReceiveModalClose}>
+        <UpdatedBottomModal
+          visible={openReceiveModal}
+          header={t('RECEIVE')}
+          onClose={onReceiveModalClose}
+        >
           {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
-        </BottomModal>
+        </UpdatedBottomModal>
 
         {!!stxAddress && (
           <TokenListButtonContainer>

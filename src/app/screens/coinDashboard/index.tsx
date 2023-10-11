@@ -1,16 +1,16 @@
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import styled from 'styled-components';
-import { CurrencyTypes } from '@utils/constants';
-import { useState } from 'react';
 import linkIcon from '@assets/img/linkIcon.svg';
-import { useTranslation } from 'react-i18next';
-import { getExplorerUrl } from '@utils/helper';
 import CopyButton from '@components/copyButton';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
+import { CurrencyTypes } from '@utils/constants';
+import { getExplorerUrl } from '@utils/helper';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import styled from 'styled-components';
 import CoinHeader from './coinHeader';
 import TransactionsHistoryList from './transactionsHistoryList';
 

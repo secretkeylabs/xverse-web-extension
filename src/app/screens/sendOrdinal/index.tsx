@@ -1,15 +1,13 @@
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import SendForm from '@components/sendForm';
+import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core/api';
+import { ArrowLeft } from '@phosphor-icons/react';
+import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
   SignedBtcTx,
@@ -18,85 +16,126 @@ import {
 import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { useMutation } from '@tanstack/react-query';
+import Callout from '@ui-library/callout';
+import { StyledHeading, StyledP } from '@ui-library/common.styled';
+import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import { isLedgerAccount } from '@utils/helper';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { devices } from 'theme';
 
-const ScrollContainer = styled.div`
+const ScrollContainer = styled.div((props) => ({
+  display: 'flex',
+  flex: 1,
+  flexDirection: 'column',
+  ...props.theme.scrollbar,
+}));
+
+const Container = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  width: 360px;
   margin: auto;
+  margin-top: ${(props) => props.theme.space.xxs};
+  padding: 0 ${(props) => props.theme.space.s};
+  justify-content: space-between;
+  max-width: 360px;
+
+  @media only screen and ${devices.min.s} {
+    flex: initial;
+    max-width: 588px;
+    border: 1px solid ${(props) => props.theme.colors.elevation3};
+    border-radius: ${(props) => props.theme.space.s};
+    padding: ${(props) => props.theme.space.l} ${(props) => props.theme.space.m};
+    padding-bottom: ${(props) => props.theme.space.xxl};
+    margin-top: ${(props) => props.theme.space.xxxxl};
+    min-height: 600px;
+  }
 `;
 
-const Container = styled.div({
+const FooterContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: ${(props) => props.theme.space.xxl};
+`;
+
+const StyledSendTo = styled(StyledHeading)`
+  margin-bottom: ${(props) => props.theme.space.l};
+`;
+
+const NextButtonContainer = styled.div((props) => ({
+  position: 'sticky',
+  bottom: 0,
+  paddingBottom: props.theme.spacing(12),
+  paddingTop: props.theme.spacing(12),
+  backgroundColor: props.theme.colors.elevation0,
+}));
+
+const InputGroup = styled.div`
+  margin-top: ${(props) => props.theme.spacing(8)}px;
+`;
+
+const Label = styled.label((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white_200,
   display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
   flex: 1,
+}));
+
+const AmountInputContainer = styled.div<{ error: boolean }>((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(4),
+  border: props.error
+    ? `1px solid ${props.theme.colors.danger_dark_200}`
+    : `1px solid ${props.theme.colors.white_800}`,
+  backgroundColor: props.theme.colors.elevation_n1,
+  borderRadius: props.theme.radius(1),
+  paddingLeft: props.theme.spacing(5),
+  paddingRight: props.theme.spacing(5),
+  height: 44,
+}));
+
+const InputFieldContainer = styled.div(() => ({
+  flex: 1,
+}));
+
+const InputField = styled.input((props) => ({
+  ...props.theme.body_m,
+  backgroundColor: 'transparent',
+  color: props.theme.colors.white['0'],
+  width: '100%',
+  border: 'transparent',
+}));
+
+const ErrorContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(3),
+  marginBottom: props.theme.spacing(12),
+}));
+
+const RowContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
 });
 
-const NftContainer = styled.div((props) => ({
-  maxHeight: 148,
-  width: 148,
-  display: 'flex',
-  aspectRatio: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: 8,
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(6),
-}));
-
-const OrdinalInscriptionNumber = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
+const StyledCallout = styled(Callout)`
+  margin-bottom: ${(props) => props.theme.spacing(14)}px;
+`;
 
 const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
 
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginLeft: '15%',
-  marginTop: props.theme.spacing(40),
-}));
-
-const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  opacity: 0.8,
-  marginTop: props.theme.spacing(5),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 400,
-  fontSize: 14,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
+const Button = styled.button`
+  display: flex;
+  background-color: transparent;
+  margin-bottom: ${(props) => props.theme.space.l};
+`;
 
 function SendOrdinal() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
@@ -107,15 +146,11 @@ function SendOrdinal() {
   const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
     useWalletSelector();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
-  const [error, setError] = useState('');
-  const [recipientAddress, setRecipientAddress] = useState('');
-  const [warning, setWarning] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress ?? '');
+  const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
 
-  const textContent = useTextOrdinalContent(selectedOrdinal!);
-  const address: string | undefined = useMemo(
-    () => (location.state ? location.state.recipientAddress : undefined),
-    [location.state],
-  );
+  useResetUserFlow('/send-ordinal');
+
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
   const {
@@ -127,7 +162,7 @@ function SendOrdinal() {
     mutationFn: async (recipient) => {
       const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
       const ordUtxo = addressUtxos.find(
-        (utx) => `${utx.txid}:${utx.vout}` === selectedOrdinal?.output,
+        (utxo) => `${utxo.txid}:${utxo.vout}` === selectedOrdinal?.output,
       );
       setOrdinalUtxo(ordUtxo);
       if (ordUtxo) {
@@ -148,12 +183,14 @@ function SendOrdinal() {
   useEffect(() => {
     if (txError) {
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
-        setError(t('ERRORS.INSUFFICIENT_BALANCE'));
+        setRecipientError({ variant: 'danger', message: t('ERRORS.INSUFFICIENT_BALANCE') });
       } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
-        setError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
-      } else setError(txError.toString());
+        setRecipientError({ variant: 'danger', message: t('ERRORS.INSUFFICIENT_BALANCE_FEES') });
+      } else {
+        setRecipientError({ variant: 'danger', message: txError.toString() });
+      }
     }
-  }, [txError]);
+  }, [txError, t]);
 
   useEffect(() => {
     if (data) {
@@ -176,89 +213,103 @@ function SendOrdinal() {
     navigate(-1);
   };
 
-  useResetUserFlow('/send-ordinal');
-
   const activeAccountOwnsOrdinal =
     selectedOrdinal && selectedAccount && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);
 
-  function validateFields(associatedAddress: string): boolean {
+  const validateRecipientAddress = (address: string): boolean => {
     if (!activeAccountOwnsOrdinal) {
-      setError(t('ERRORS.ORDINAL_NOT_OWNED'));
+      setRecipientError({ variant: 'danger', message: t('ERRORS.ORDINAL_NOT_OWNED') });
       return false;
     }
-    if (!associatedAddress) {
-      setError(t('ERRORS.ADDRESS_REQUIRED'));
+    if (!address) {
+      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_REQUIRED') });
       return false;
     }
-
-    if (!validateBtcAddress({ btcAddress: associatedAddress, network: network.type })) {
-      setError(t('ERRORS.ADDRESS_INVALID'));
+    if (
+      !validateBtcAddress({
+        btcAddress: address,
+        network: network.type,
+      })
+    ) {
+      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
       return false;
     }
-
+    if (address === ordinalsAddress || address === btcAddress) {
+      setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
+      return true;
+    }
+    setRecipientError(null);
     return true;
-  }
+  };
 
-  const onPressNext = async (associatedAddress: string) => {
-    setRecipientAddress(associatedAddress);
-    if (validateFields(associatedAddress)) {
-      mutate(associatedAddress);
+  const onPressNext = async () => {
+    if (validateRecipientAddress(recipientAddress)) {
+      mutate(recipientAddress);
     }
   };
 
-  const currencyType = textContent?.includes('brc-20') ? 'brc20-Ordinal' : 'Ordinal';
-
-  const handleInputChange = (inputAddress: string) => {
-    if (inputAddress === ordinalsAddress) {
-      return setWarning(
-        currencyType === 'brc20-Ordinal'
-          ? t('SEND_BRC20_ORDINAL_TO_SELF_WARNING')
-          : t('SEND_ORDINAL_TO_SELF_WARNING'),
-      );
-    }
-    setWarning('');
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    validateRecipientAddress(e.target.value);
+    setRecipientAddress(e.target.value);
   };
+
+  const isNextEnabled = !isDangerFeedback(recipientError) && !!recipientAddress;
+  const year = new Date().getFullYear();
 
   return (
     <>
       {isGalleryOpen && (
-        <>
-          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          {!isLedgerAccount(selectedAccount) && (
-            <ButtonContainer>
-              <Button onClick={handleBackButtonClick}>
-                <>
-                  <ButtonImage src={ArrowLeft} />
-                  <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-                </>
-              </Button>
-            </ButtonContainer>
-          )}
-        </>
+        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       )}
+      {!isGalleryOpen && <TopRow title="" onClick={handleBackButtonClick} />}
       <ScrollContainer>
-        {!isGalleryOpen && (
-          <TopRow title={t('SEND_ORDINAL_TITLE')} onClick={handleBackButtonClick} />
+        <Container>
+          <div>
+            {isGalleryOpen && !isLedgerAccount(selectedAccount) && (
+              <Button onClick={handleBackButtonClick}>
+                <ArrowLeft size={20} color="white" />
+              </Button>
+            )}
+            <StyledSendTo typography="headline_xs" color="white_0">
+              {t('SEND_TO')}
+            </StyledSendTo>
+            <InputGroup>
+              <RowContainer>
+                <Label>{t('RECIPIENT')}</Label>
+              </RowContainer>
+              <AmountInputContainer error={isDangerFeedback(recipientError)}>
+                <InputFieldContainer>
+                  <InputField
+                    value={recipientAddress}
+                    placeholder={t('ORDINAL_RECIPIENT_PLACEHOLDER')}
+                    onChange={handleAddressChange}
+                  />
+                </InputFieldContainer>
+              </AmountInputContainer>
+              <ErrorContainer>
+                {recipientError && <InputFeedback {...recipientError} />}
+              </ErrorContainer>
+            </InputGroup>
+            <StyledCallout bodyText={t('MAKE_SURE_THE_RECIPIENT')} />
+          </div>
+          <NextButtonContainer>
+            <ActionButton
+              text={t('NEXT')}
+              disabled={!isNextEnabled}
+              processing={isLoading}
+              onPress={onPressNext}
+            />
+          </NextButtonContainer>
+        </Container>
+        {isGalleryOpen && (
+          <FooterContainer>
+            <StyledP typography="body_medium_m" color="white_400">
+              {t('COPYRIGHT', { year })}
+            </StyledP>
+          </FooterContainer>
         )}
-        <SendForm
-          processing={isLoading}
-          currencyType={currencyType}
-          disableAmountInput
-          recepientError={error}
-          recipient={address}
-          onPressSend={onPressNext}
-          onAddressInputChange={handleInputChange}
-          warning={warning}
-        >
-          <Container>
-            <NftContainer>
-              <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
-            </NftContainer>
-            <OrdinalInscriptionNumber>{`Inscription ${selectedOrdinal?.number}`}</OrdinalInscriptionNumber>
-          </Container>
-        </SendForm>
-        <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>
       </ScrollContainer>
+      <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>
     </>
   );
 }

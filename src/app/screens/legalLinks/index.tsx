@@ -3,15 +3,15 @@ import ActionButton from '@components/button';
 import Separator from '@components/separator';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CustomSwitch } from '@screens/ledger/importLedgerAccount/steps/index.styled';
+import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
-import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { saveIsTermsAccepted } from '@utils/localStorage';
+import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
-import { useDispatch } from 'react-redux';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -109,7 +109,7 @@ function LegalLinks() {
           <SwitchContainer>
             <div>{t('AUTHORIZE_DATA_COLLECTION')}</div>
             <CustomSwitch
-              onColor={theme.colors.purple_main}
+              onColor={theme.colors.orange_main}
               offColor={theme.colors.background.elevation3}
               onChange={handleSwitchToggle}
               checked={isToggleEnabled}

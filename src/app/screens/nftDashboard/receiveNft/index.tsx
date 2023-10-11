@@ -1,30 +1,55 @@
-import BottomModal from '@components/bottomModal';
-import { useTranslation } from 'react-i18next';
+import plusIcon from '@assets/img/dashboard/plus.svg';
 import Cross from '@assets/img/dashboard/X.svg';
-import styled from 'styled-components';
 import ordinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import stacksIcon from '@assets/img/nftDashboard/stacks_icon.svg';
-import plusIcon from '@assets/img/dashboard/plus.svg';
-import { useNavigate } from 'react-router-dom';
-import useWalletSelector from '@hooks/useWalletSelector';
 import ActionButton from '@components/button';
-import { useState } from 'react';
+import UpdatedBottomModal from '@components/updatedBottomModal';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Plus } from '@phosphor-icons/react';
 import { isLedgerAccount } from '@utils/helper';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import ReceiveCardComponent from '../../../components/receiveCardComponent';
 
 const ColumnContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(16),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  marginTop: props.theme.space.l,
+  marginBottom: props.theme.space.xl,
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  gap: props.theme.space.m,
 }));
 
 const Icon = styled.img({
   width: 24,
   height: 24,
+  position: 'absolute',
+  zIndex: 2,
+  left: 0,
+  top: 0,
 });
+
+const IconContainer = styled.div((props) => ({
+  position: 'relative',
+  marginBottom: props.theme.spacing(12),
+}));
+
+const IconBackground = styled.div((props) => ({
+  width: 24,
+  height: 24,
+  position: 'absolute',
+  zIndex: 1,
+  left: 20,
+  top: 0,
+  backgroundColor: props.theme.colors.white_900,
+  borderRadius: 30,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+}));
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -52,10 +77,6 @@ const VerifyOrViewContainer = styled.div((props) => ({
 const VerifyButtonContainer = styled.div((props) => ({
   minWidth: 300,
   marginBottom: props.theme.spacing(6),
-}));
-
-const AddStxButtonContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(6),
 }));
 
 interface Props {
@@ -118,7 +139,12 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           showVerifyButton={choseToVerifyAddresses}
           currency="ORD"
         >
-          <Icon src={ordinalsIcon} />
+          <IconContainer>
+            <Icon src={ordinalsIcon} />
+            <IconBackground>
+              <Plus weight="bold" size={12} />
+            </IconBackground>
+          </IconContainer>
         </ReceiveCardComponent>
       )}
 
@@ -130,23 +156,26 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           showVerifyButton={choseToVerifyAddresses}
           currency="STX"
         >
-          <Icon src={stacksIcon} />
+          <IconContainer>
+            <Icon src={stacksIcon} />
+            <IconBackground>
+              <Plus weight="bold" size={12} />
+            </IconBackground>
+          </IconContainer>
         </ReceiveCardComponent>
       )}
 
       {isLedgerAccount(selectedAccount) && !stxAddress && (
-        <AddStxButtonContainer>
-          <ActionButton
-            transparent
-            src={plusIcon}
-            text={t('ADD_STACKS_ADDRESS')}
-            onPress={async () => {
-              await chrome.tabs.create({
-                url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
-              });
-            }}
-          />
-        </AddStxButtonContainer>
+        <ActionButton
+          transparent
+          src={plusIcon}
+          text={t('ADD_STACKS_ADDRESS')}
+          onPress={async () => {
+            await chrome.tabs.create({
+              url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+            });
+          }}
+        />
       )}
     </ColumnContainer>
   );
@@ -182,9 +211,13 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
       {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
     </>
   ) : (
-    <BottomModal visible={visible} header={t('RECEIVE_NFT')} onClose={handleReceiveModalClose}>
+    <UpdatedBottomModal
+      visible={visible}
+      header={t('RECEIVE_NFT')}
+      onClose={handleReceiveModalClose}
+    >
       {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
-    </BottomModal>
+    </UpdatedBottomModal>
   );
 }
 

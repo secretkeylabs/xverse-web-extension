@@ -1,5 +1,4 @@
 import { t } from 'i18next';
-import type { Account } from '@secretkeylabs/xverse-core/types';
 import { getTruncatedAddress } from './helper';
 
 const RoadArmorRareSats = ['uncommon', 'rare', 'epic', 'legendary', 'mythic', 'common'] as const;
