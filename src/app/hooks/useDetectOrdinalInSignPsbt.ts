@@ -1,6 +1,6 @@
 import { getUtxoOrdinalBundle, ParsedPSBT } from '@secretkeylabs/xverse-core';
-import { useEffect, useState } from 'react';
 import { BundleItem, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
+import { useEffect, useState } from 'react';
 import useWalletSelector from './useWalletSelector';
 
 const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {

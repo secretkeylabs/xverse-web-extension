@@ -1,6 +1,6 @@
 import {
-  BtcTransactionData,
   Brc20HistoryTransactionData,
+  BtcTransactionData,
   StacksNetwork,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';

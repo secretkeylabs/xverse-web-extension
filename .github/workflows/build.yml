@@ -33,14 +33,12 @@ jobs:
         run: |
           BRANCH_NAME=$(echo ${{ github.head_ref }} | sed 's/\//-/')
           GIT_SHA_SHORT=$(git rev-parse --short ${{ github.sha }})
-          echo "FILENAME=xverse-extension.$BRANCH_NAME.$GIT_SHA_SHORT.zip" >> $GITHUB_ENV
-      - name: Create Archive
-        run: zip -r build.zip ./build
+          echo "FILENAME=xverse-extension.$BRANCH_NAME.$GIT_SHA_SHORT" >> $GITHUB_ENV
       - name: Upload Archive
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.FILENAME }}
-          path: build.zip
+          path: ./build
           retention-days: 30
           if-no-files-found: error
   comment-on-pr:
