@@ -627,6 +627,7 @@
     "DETAILS": "See detail on",
     "GAMMA": "Gamma.io",
     "MOVE_TO_ASSET_DETAIL": "Back to gallery",
+    "BACK_TO_COLLECTION": "Back to collection",
     "ORDINALS": "Ordinal",
     "ORDINAL_PENDING_SEND_TITLE": "Transfer Pending",
     "ORDINAL_PENDING_SEND_DESCRIPTION": "This Ordinal is already in a pending transfer.",

@@ -14,11 +14,14 @@ import {
   getInscriptionsCollectionGridItemSubTextColor,
 } from '@utils/inscriptions';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTheme } from 'styled-components';
 
 export default function useOrdinalDetail() {
   const navigate = useNavigate();
-  const { ordinalsAddress, network, selectedAccount } = useWalletSelector();
+  const { ordinalsAddress, network, selectedAccount, hasActivatedRareSatsKey } =
+    useWalletSelector();
   const { id } = useParams();
   const { selectedOrdinal } = useNftDataSelector();
   const { data: ordinalData, isLoading } = useAddressInscription(id!, selectedOrdinal);
@@ -29,19 +32,22 @@ export default function useOrdinalDetail() {
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(ordinalData?.tx_id);
   const textContent = useTextOrdinalContent(ordinalData!);
-  const { hasActivatedRareSatsKey } = useWalletSelector();
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
   const { bundle, isPartOfABundle } = useGetUtxoOrdinalBundle(
     ordinalData?.output,
     hasActivatedRareSatsKey,
   );
+  const theme = useTheme();
+  const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
 
   const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState(false);
   const [isBrc20Ordinal, setIsBrc20Ordinal] = useState(false);
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+
   const brc20InscriptionStatus = getInscriptionsCollectionGridItemSubText(ordinalData);
-  const brc20InscriptionStatusColor = getInscriptionsCollectionGridItemSubTextColor(ordinalData);
+  const brc20InscriptionStatusColor =
+    theme.colors[getInscriptionsCollectionGridItemSubTextColor(ordinalData)];
 
   useEffect(() => {
     if (textContent?.includes('brc-20')) {
@@ -53,7 +59,7 @@ export default function useOrdinalDetail() {
     setSelectedOrdinalDetails(null);
     if (ordinalData?.collection_id)
       navigate(`/nft-dashboard/ordinals-collection/${ordinalData?.collection_id}`);
-    else navigate('/nft-dashboard');
+    else navigate('/nft-dashboard?tab=inscriptions');
   };
 
   const openInGalleryView = async () => {
@@ -109,6 +115,10 @@ export default function useOrdinalDetail() {
     navigator.clipboard.writeText(`${XVERSE_ORDIVIEW_URL}/inscription/${ordinalData?.id}`);
   };
 
+  const backButtonText = ordinalData?.collection_id
+    ? t('BACK_TO_COLLECTION')
+    : t('MOVE_TO_ASSET_DETAIL');
+
   return {
     ordinal: ordinalData,
     collectionMarketData,
@@ -129,5 +139,6 @@ export default function useOrdinalDetail() {
     openInOrdinalsExplorer,
     handleNavigationToRareSatsBundle,
     onCopyClick,
+    backButtonText,
   };
 }

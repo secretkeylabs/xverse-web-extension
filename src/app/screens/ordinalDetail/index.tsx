@@ -416,6 +416,7 @@ function OrdinalDetailScreen() {
     openInOrdinalsExplorer,
     handleNavigationToRareSatsBundle,
     onCopyClick,
+    backButtonText,
   } = ordinalDetails;
 
   useResetUserFlow('/ordinal-detail');
@@ -682,7 +683,7 @@ function OrdinalDetailScreen() {
           <Button onClick={handleBackButtonClick}>
             <>
               <ButtonImage src={ArrowLeft} />
-              <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
+              <AssetDeatilButtonText>{backButtonText}</AssetDeatilButtonText>
             </>
           </Button>
         </BackButtonContainer>
@@ -716,7 +717,7 @@ function OrdinalDetailScreen() {
           <Button onClick={handleBackButtonClick}>
             <>
               <ButtonImage src={ArrowLeft} />
-              <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
+              <AssetDeatilButtonText>{backButtonText}</AssetDeatilButtonText>
             </>
           </Button>
         </BackButtonContainer>
