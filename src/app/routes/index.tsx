@@ -11,13 +11,13 @@ import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
 import BtcSendScreen from '@screens/btcSendScreen';
 import Buy from '@screens/buy';
 import CoinDashboard from '@screens/coinDashboard';
+import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
 import ConfirmBtcTransaction from '@screens/confirmBtcTransaction';
 import ConfirmFtTransaction from '@screens/confirmFtTransaction';
 import ConfirmInscriptionRequest from '@screens/confirmInscriptionRequest';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
-import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
 import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
@@ -26,20 +26,22 @@ import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
 import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
 import Landing from '@screens/landing';
+import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
 import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
-import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
 import LegalLinks from '@screens/legalLinks';
 import Login from '@screens/login';
 import ManageTokens from '@screens/manageTokens';
 import NftDashboard from '@screens/nftDashboard';
+import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
 import Onboarding from '@screens/onboarding';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
+import RareSatsBundle from '@screens/rareSatsBundle';
+import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
 import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
-import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20Screen from '@screens/sendBrc20';
@@ -48,14 +50,15 @@ import SendBtcScreen from '@screens/sendBtc';
 import SendFtScreen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
-import SendStxScreen from '@screens/sendStx';
 import SendRareSat from '@screens/sendRareSat';
+import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import BackupWalletScreen from '@screens/settings/backupWallet';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import ChangePasswordScreen from '@screens/settings/changePassword';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import LockCountdown from '@screens/settings/lockCountdown';
+import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import SignatureRequest from '@screens/signatureRequest';
 import Stacking from '@screens/stacking';
@@ -65,10 +68,6 @@ import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
 import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
-import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
-import SupportedRarities from '@screens/nftDashboard/supportedRarities';
-import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
-import RareSatsBundle from '@screens/rareSatsBundle';
 
 const router = createHashRouter([
   {
@@ -295,10 +294,6 @@ const router = createHashRouter([
       {
         path: 'restore-funds',
         element: <RestoreFunds />,
-      },
-      {
-        path: 'recover-btc',
-        element: <RestoreBtc />,
       },
       {
         path: 'recover-ordinals',
