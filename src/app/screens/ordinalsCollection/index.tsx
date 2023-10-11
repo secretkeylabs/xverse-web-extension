@@ -1,8 +1,10 @@
 import AccountHeaderComponent from '@components/accountHeader';
+import { BetterBarLoader } from '@components/barLoader';
 import ActionButton from '@components/button';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
 import Separator from '@components/separator';
 import BottomTabBar from '@components/tabBar';
+import { TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import TopRow from '@components/topRow';
 import WebGalleryButton from '@components/webGalleryButton';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
@@ -11,7 +13,6 @@ import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useColle
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
-import { TilesSkeletonLoader } from '@screens/nftDashboard/tilesSkeletonLoader';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +36,7 @@ const Container = styled.div`
 `;
 
 const PageHeader = styled.div<DetailSectionProps>`
-  padding: ${(props) => props.theme.space.s};
+  padding: ${(props) => props.theme.space.xs};
   padding-top: 0;
   max-width: 1224px;
   margin-top: ${(props) => (props.isGalleryOpen ? props.theme.space.xxl : props.theme.space.l)};
@@ -57,7 +58,6 @@ const AttributesContainer = styled.div<DetailSectionProps>`
   flex-direction: ${(props) => (props.isGalleryOpen ? 'column' : 'row')};
   justify-content: ${(props) => (props.isGalleryOpen ? 'space-between' : 'initial')};
   column-gap: ${(props) => props.theme.space.m};
-  max-width: 285px;
 `;
 
 const BottomBarContainer = styled.div({
@@ -70,7 +70,7 @@ const StyledSeparator = styled(Separator)`
 
 const StyledGridContainer = styled(GridContainer)`
   margin-top: ${(props) => props.theme.space.s};
-  padding: 0 ${(props) => props.theme.space.s};
+  padding: 0 ${(props) => props.theme.space.xs};
   padding-bottom: ${(props) => props.theme.space.xl};
   max-width: 1224px;
   margin-left: auto;
@@ -122,17 +122,11 @@ const LoadMoreButtonContainer = styled.div((props) => ({
   },
 }));
 
-const LoaderContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'space-between',
-  paddingLeft: props.theme.spacing(6),
-  paddingRight: props.theme.spacing(6),
+const StyledBarLoader = styled(BetterBarLoader)((props) => ({
+  padding: 0,
+  borderRadius: props.theme.radius(1),
+  marginTop: props.theme.spacing(2),
 }));
-
-const StyledTilesSkeletonLoader = styled(TilesSkeletonLoader)`
-  width: 100%;
-`;
 
 function OrdinalsCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'ORDINALS_COLLECTION_SCREEN' });
@@ -140,7 +134,8 @@ function OrdinalsCollection() {
   const { id: collectionId } = useParams();
   const { data, error, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useAddressInscriptions(collectionId);
-  const { data: collectionMarketData } = useInscriptionCollectionMarketData(collectionId);
+  const { data: collectionMarketData, isLoading: isLoadingMarketData } =
+    useInscriptionCollectionMarketData(collectionId);
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
@@ -192,7 +187,7 @@ function OrdinalsCollection() {
                 {t('COLLECTION')}
               </StyledP>
               <StyledHeading typography="headline_s" color="white_0">
-                {collectionHeading}
+                {collectionHeading || <StyledBarLoader width={200} height={28} />}
               </StyledHeading>
               {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
             </div>
@@ -201,7 +196,7 @@ function OrdinalsCollection() {
                 title={t('COLLECTION_FLOOR_PRICE')}
                 value={collectionFloorPrice}
                 isColumnAlignment={isGalleryOpen}
-                isLoading={isLoading}
+                isLoading={isLoadingMarketData}
               />
               <CollectibleDetailTile
                 title={t('EST_PORTFOLIO_VALUE')}
@@ -214,20 +209,22 @@ function OrdinalsCollection() {
         </PageHeader>
         {isGalleryOpen && <StyledSeparator />}
         <div>
-          {isLoading && (
-            <LoaderContainer>
-              <StyledTilesSkeletonLoader tileSize={159} />
-            </LoaderContainer>
-          )}
           {isEmpty && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
           {!!error && <StyledWrenchErrorMessage />}
           <StyledGridContainer isGalleryOpen={isGalleryOpen}>
-            {data?.pages
-              ?.map((page) => page?.data)
-              .flat()
-              .map((inscription) => (
-                <OrdinalsCollectionGridItem key={inscription?.id} item={inscription} />
-              ))}
+            {isLoading ? (
+              <TilesSkeletonLoader
+                isGalleryOpen={isGalleryOpen}
+                tileSize={isGalleryOpen ? 276 : 151}
+              />
+            ) : (
+              data?.pages
+                ?.map((page) => page?.data)
+                .flat()
+                .map((inscription) => (
+                  <OrdinalsCollectionGridItem key={inscription?.id} item={inscription} />
+                ))
+            )}
           </StyledGridContainer>
           {hasNextPage && (
             <LoadMoreButtonContainer>

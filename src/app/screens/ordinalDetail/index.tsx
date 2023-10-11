@@ -89,7 +89,7 @@ const ExtensionOrdinalsContainer = styled.div((props) => ({
   aspectRatio: '1',
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   marginBottom: props.theme.spacing(12),
   marginTop: props.theme.spacing(12),
 }));
@@ -127,12 +127,15 @@ const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
 
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div<{
+  withGap?: boolean;
+}>((props) => ({
   display: 'flex',
   alignItems: 'flex-start',
   marginTop: props.theme.spacing(8),
   marginBottom: props.theme.spacing(12),
   flexDirection: 'row',
+  columnGap: props.withGap ? props.theme.spacing(20) : 0,
 }));
 
 const ColumnContainer = styled.div({
@@ -163,7 +166,6 @@ const MintLimitContainer = styled.div((props) => ({
 
 const DescriptionContainer = styled.h1((props) => ({
   display: 'flex',
-  marginLeft: props.theme.spacing(20),
   flexDirection: 'column',
   marginBottom: props.theme.spacing(30),
 }));
@@ -349,11 +351,16 @@ const ExtensionLoaderContainer = styled.div({
   alignItems: 'center',
 });
 
+const GalleryLoaderContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+});
+
 const StyledBarLoader = styled(BetterBarLoader)<{
   withMarginBottom?: boolean;
 }>((props) => ({
   padding: 0,
-  borderRadius: 6,
+  borderRadius: props.theme.radius(1),
   marginBottom: props.withMarginBottom ? props.theme.spacing(6) : 0,
 }));
 
@@ -668,7 +675,7 @@ function OrdinalDetailScreen() {
     </ExtensionContainer>
   );
 
-  const galleryView = (
+  const galleryView = isLoading ? (
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
@@ -680,7 +687,41 @@ function OrdinalDetailScreen() {
           </Button>
         </BackButtonContainer>
 
-        <RowContainer>
+        <RowContainer withGap>
+          <StyledBarLoader width={376.5} height={376.5} />
+          <GalleryLoaderContainer>
+            <StyledBarLoader width={120} height={21} withMarginBottom />
+            <StyledBarLoader width={180} height={40} withMarginBottom />
+            <StyledBarLoader width={100} height={18.5} withMarginBottom />
+            <ButtonContainer>
+              <StyledBarLoader width={190} height={44} />
+              <StyledBarLoader width={190} height={44} />
+            </ButtonContainer>
+            <StyledBarLoader width={100} height={31} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={392} height={44} />
+          </GalleryLoaderContainer>
+        </RowContainer>
+      </GalleryContainer>
+    </GalleryScrollContainer>
+  ) : (
+    <GalleryScrollContainer>
+      <GalleryContainer>
+        <BackButtonContainer>
+          <Button onClick={handleBackButtonClick}>
+            <>
+              <ButtonImage src={ArrowLeft} />
+              <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
+            </>
+          </Button>
+        </BackButtonContainer>
+
+        <RowContainer withGap>
           <OrdinalsContainer>
             <OrdinalImage ordinal={ordinal!} inNftDetail />
           </OrdinalsContainer>
