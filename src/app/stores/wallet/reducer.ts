@@ -3,6 +3,7 @@ import {
   AddAccountKey,
   ChangeFiatCurrencyKey,
   ChangeHasActivatedOrdinalsKey,
+  ChangeHasActivatedRareSatsKey,
   ChangeNetworkKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
@@ -10,6 +11,7 @@ import {
   FetchAccountKey,
   GetActiveAccountsKey,
   LockWalletKey,
+  RareSatsNoticeDismissedKey,
   ResetWalletKey,
   SelectAccountKey,
   SetBrcCoinsListKey,
@@ -59,6 +61,8 @@ const initialWalletState: WalletState = {
   networkAddress: undefined,
   btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
+  hasActivatedRareSatsKey: undefined,
+  rareSatsNoticeDismissed: undefined,
   showBtcReceiveAlert: true,
   showOrdinalReceiveAlert: true,
   showDataCollectionAlert: true,
@@ -189,6 +193,16 @@ const walletReducer = (
       return {
         ...state,
         hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
+      };
+    case ChangeHasActivatedRareSatsKey:
+      return {
+        ...state,
+        hasActivatedRareSatsKey: action.hasActivatedRareSatsKey,
+      };
+    case RareSatsNoticeDismissedKey:
+      return {
+        ...state,
+        rareSatsNoticeDismissed: action.rareSatsNoticeDismissed,
       };
     case ChangeShowBtcReceiveAlertKey:
       return {

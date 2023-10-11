@@ -1,6 +1,5 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import IconOrdinal from '@assets/img/transactions/ordinal.svg';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import { ledgerDelay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -33,7 +32,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import { SignTransactionOptions } from 'sats-connect';
 import styled from 'styled-components';
-import OrdinalDetailComponent from './ordinalDetailComponent';
+import BundleItemsComponent from './bundleItemsComponent';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -129,7 +128,7 @@ function SignPsbtRequest() {
     }
   }, [selectedAccount, payload.inputsToSign, payload.psbtBase64, network.type]);
 
-  const { loading, ordinalInfoData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
+  const { loading, bundleItemsData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
     [payload.inputsToSign],
@@ -356,16 +355,13 @@ function SignPsbtRequest() {
                 {!payload.broadcast && (
                   <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
                 )}
-                {ordinalInfoData &&
-                  ordinalInfoData.map((ordinalData) => (
-                    <OrdinalDetailComponent
-                      key={ordinalData.id}
-                      ordinalInscription={`Inscription ${ordinalData?.number}`}
-                      icon={IconOrdinal}
-                      title={t('ORDINAL')}
-                      ordinal={ordinalData}
-                      ordinalDetail={ordinalData?.content_type}
-                      heading={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
+                {bundleItemsData &&
+                  bundleItemsData.map((bundleItem, index) => (
+                    <BundleItemsComponent
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={index}
+                      item={bundleItem}
+                      userReceivesOrdinal={userReceivesOrdinal}
                     />
                   ))}
                 <RecipientComponent

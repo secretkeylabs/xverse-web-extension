@@ -23,6 +23,8 @@ import {
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation } from '@tanstack/react-query';
+import Callout from '@ui-library/callout';
+import { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -110,6 +112,11 @@ const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => 
   textAlign: props.isOridnalTx ? 'center' : 'left',
 }));
 
+const CalloutContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(8),
+  marginhorizontal: props.theme.spacing(8),
+}));
+
 interface Props {
   currentFee: BigNumber;
   feePerVByte: BigNumber; // TODO tim: is this the same as currentFeeRate? refactor to be clear
@@ -119,9 +126,12 @@ interface Props {
   recipients: Recipient[];
   children?: ReactNode;
   assetDetail?: string;
+  assetDetailValue?: string;
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: UTXO[];
   isBtcSendBrowserTx?: boolean;
+  currencyType?: CurrencyTypes;
+  isPartOfBundle?: boolean;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;
   setCurrentFeeRate: (feeRate: BigNumber) => void;
@@ -139,9 +149,12 @@ function ConfirmBtcTransactionComponent({
   recipients,
   children,
   assetDetail,
+  assetDetailValue,
   isRestoreFundFlow,
   nonOrdinalUtxos,
   isBtcSendBrowserTx,
+  isPartOfBundle,
+  currencyType,
   currentFeeRate,
   setCurrentFee,
   setCurrentFeeRate,
@@ -368,12 +381,22 @@ function ConfirmBtcTransactionComponent({
             {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
           </ReviewTransactionText>
 
+          {isPartOfBundle && (
+            <CalloutContainer>
+              <Callout
+                bodyText={t('NFT_DASHBOARD_SCREEN.FROM_RARE_SAT_BUNDLE')}
+                variant="warning"
+              />
+            </CalloutContainer>
+          )}
+
           {ordinalTxUtxo ? (
             <RecipientComponent
               address={recipients[0]?.address}
               value={assetDetail!}
+              valueDetail={assetDetailValue}
               icon={AssetIcon}
-              currencyType="Ordinal"
+              currencyType={currencyType || 'Ordinal'}
               title={t('CONFIRM_TRANSACTION.ASSET')}
             />
           ) : (

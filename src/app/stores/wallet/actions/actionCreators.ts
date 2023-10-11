@@ -226,6 +226,24 @@ export function ChangeActivateOrdinalsAction(
   };
 }
 
+export function ChangeActivateRareSatsAction(
+  hasActivatedRareSatsKey: boolean,
+): actions.ChangeActivateRareSats {
+  return {
+    type: actions.ChangeHasActivatedRareSatsKey,
+    hasActivatedRareSatsKey,
+  };
+}
+
+export function SetRareSatsNoticeDismissedAction(
+  rareSatsNoticeDismissed: boolean,
+): actions.SetRareSatsNoticeDismissed {
+  return {
+    type: actions.RareSatsNoticeDismissedKey,
+    rareSatsNoticeDismissed,
+  };
+}
+
 export function ChangeShowBtcReceiveAlertAction(
   showBtcReceiveAlert: boolean | null,
 ): actions.ChangeShowBtcReceiveAlert {

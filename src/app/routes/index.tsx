@@ -49,6 +49,7 @@ import SendFtScreen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
 import SendStxScreen from '@screens/sendStx';
+import SendRareSat from '@screens/sendRareSat';
 import Setting from '@screens/settings';
 import BackupWalletScreen from '@screens/settings/backupWallet';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
@@ -65,6 +66,9 @@ import TransactionStatus from '@screens/transactionStatus';
 import WalletExists from '@screens/walletExists';
 import { createHashRouter } from 'react-router-dom';
 import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
+import SupportedRarities from '@screens/nftDashboard/supportedRarities';
+import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
+import RareSatsBundle from '@screens/rareSatsBundle';
 
 const router = createHashRouter([
   {
@@ -417,12 +421,24 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'nft-dashboard/rare-sats-bundle',
+        element: (
+          <AuthGuard>
+            <RareSatsBundle />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'nft-dashboard/nft-detail/:id',
         element: <NftDetailScreen />,
       },
       {
         path: 'nft-dashboard/ordinal-detail',
         element: <OrdinalDetailScreen />,
+      },
+      {
+        path: 'nft-dashboard/rare-sats-detail',
+        element: <RareSatsDetailScreen />,
       },
       {
         path: 'nft-dashboard/nft-detail/:id/send-nft',
@@ -435,6 +451,18 @@ const router = createHashRouter([
             <SendOrdinal />
           </AuthGuard>
         ),
+      },
+      {
+        path: 'nft-dashboard/send-rare-sat',
+        element: (
+          <AuthGuard>
+            <SendRareSat />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'nft-dashboard/supported-rarity-scale',
+        element: <SupportedRarities />,
       },
       {
         path: 'restoreWallet',

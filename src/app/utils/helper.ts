@@ -5,7 +5,7 @@ import {
   NetworkType,
 } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
-import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
+import { getStacksInfo } from '@secretkeylabs/xverse-core';
 import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
 import BigNumber from 'bignumber.js';
 import { ChainID } from '@stacks/transactions';
@@ -61,12 +61,10 @@ export function getTicker(name: string) {
 }
 
 export function getTruncatedAddress(address: string, lengthToShow = 4) {
-  if (address) {
-    return `${address.substring(0, lengthToShow)}...${address.substring(
-      address.length - lengthToShow,
-      address.length,
-    )}`;
-  }
+  return `${address.substring(0, lengthToShow)}...${address.substring(
+    address.length - lengthToShow,
+    address.length,
+  )}`;
 }
 
 export function getShortTruncatedAddress(address: string) {
