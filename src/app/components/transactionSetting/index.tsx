@@ -1,17 +1,17 @@
 /* eslint-disable no-nested-ternary */
+import ArrowIcon from '@assets/img/settings/arrow.svg';
 import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
+import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import ArrowIcon from '@assets/img/settings/arrow.svg';
-import ActionButton from '@components/button';
-import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
-import useWalletSelector from '@hooks/useWalletSelector';
-import EditNonce from './editNonce';
 import EditFee from './editFee';
+import EditNonce from './editNonce';
 
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -93,7 +93,7 @@ function TransactionSettingAlert({
   const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
-  const { btcBalance, stxAvailableBalance } = useWalletSelector();
+  const { btcBalance, stxAvailableBalance, network } = useWalletSelector();
 
   const applyClickForStx = () => {
     if (stxAvailableBalance) {
@@ -129,7 +129,7 @@ function TransactionSettingAlert({
       return;
     }
     if (selectedOption === 'custom' && feeRate) {
-      const response = await isCustomFeesAllowed(feeRate.toString());
+      const response = await isCustomFeesAllowed(network.type, feeRate.toString());
       if (!response) {
         setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
         return;

@@ -7,7 +7,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   const [loading, setLoading] = useState(false);
   const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
   const [bundleItemsData, setBundleItemsData] = useState<BundleItem[]>([]);
-  const { ordinalsAddress } = useWalletSelector();
+  const { ordinalsAddress, network } = useWalletSelector();
 
   async function handleOrdinalAndOrdinalInfo() {
     const bundleItems: BundleItem[] = [];
@@ -15,8 +15,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
       setLoading(true);
       await Promise.all(
         parsedPsbt.inputs.map(async (input) => {
-          const data = await getUtxoOrdinalBundle(input.txid, input.index);
-          console.log({ data });
+          const data = await getUtxoOrdinalBundle(network.type, input.txid, input.index);
 
           const bundle = mapRareSatsAPIResponseToRareSats(data);
           bundle.items.forEach((item) => {

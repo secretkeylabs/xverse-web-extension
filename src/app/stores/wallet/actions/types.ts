@@ -4,7 +4,6 @@ import {
   AppInfo,
   BaseWallet,
   Coin,
-  FeesMultipliers,
   FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
@@ -115,7 +114,7 @@ export interface UnlockWallet {
 
 export interface SetFeeMultiplier {
   type: typeof SetFeeMultiplierKey;
-  feeMultipliers: FeesMultipliers;
+  feeMultipliers: AppInfo;
 }
 
 export interface LockWallet {
@@ -262,8 +261,10 @@ export type WalletActions =
   | ChangeNetwork
   | GetActiveAccounts
   | ChangeActivateOrdinals
+  | ChangeActivateRareSats
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
   | ChangeShowDataCollectionAlert
   | SetBrcCoinsData
-  | SetWalletLockPeriod;
+  | SetWalletLockPeriod
+  | SetRareSatsNoticeDismissed;

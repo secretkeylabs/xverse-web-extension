@@ -1,24 +1,24 @@
-import BigNumber from 'bignumber.js';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import useDebounce from '@hooks/useDebounce';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
 import {
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { NumericFormat } from 'react-number-format';
 import {
   getBtcFees,
   getBtcFeesForNonOrdinalBtcSend,
   getBtcFeesForOrdinalSend,
   Recipient,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
-import useDebounce from '@hooks/useDebounce';
-import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import BigNumber from 'bignumber.js';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -233,7 +233,7 @@ function EditFee({
             btcAddress,
             nonOrdinalUtxos!,
             ordinalsAddress,
-            'Mainnet',
+            network.type,
             mode,
           );
           setFeeRateInput(selectedFeeRate?.toString() || '');
@@ -292,7 +292,7 @@ function EditFee({
             btcAddress,
             nonOrdinalUtxos!,
             ordinalsAddress,
-            'Mainnet',
+            network.type,
             feeMode,
             feeRateInput,
           );

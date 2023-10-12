@@ -2,6 +2,7 @@ import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { BetterBarLoader } from '@components/barLoader';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { CondensedInscription, getErc721Metadata, Inscription } from '@secretkeylabs/xverse-core';
 import { getBrc20Details } from '@utils/brc20';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
@@ -146,6 +147,7 @@ function OrdinalImage({
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const [brc721eImage, setBrc721eImage] = useState<string | undefined>(undefined);
+  const { network } = useWalletSelector();
 
   const fetchBrc721eMetadata = async () => {
     if (!textContent) {
@@ -155,6 +157,7 @@ function OrdinalImage({
     try {
       const parsedContent = JSON.parse(textContent);
       const erc721Metadata = await getErc721Metadata(
+        network.type,
         parsedContent.contract,
         parsedContent.token_id,
       );

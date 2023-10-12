@@ -1,16 +1,16 @@
-import TopRow from '@components/topRow';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import BottomBar from '@components/tabBar';
 import MoonPay from '@assets/img/dashboard/moonpay.svg';
 import Transak from '@assets/img/dashboard/transak.svg';
-import { MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL } from '@utils/constants';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useEffect, useState } from 'react';
-import { getMoonPaySignedUrl } from '@secretkeylabs/xverse-core/api';
-import { MoonLoader } from 'react-spinners';
 import InfoContainer from '@components/infoContainer';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { getMoonPaySignedUrl } from '@secretkeylabs/xverse-core/api';
+import { MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL } from '@utils/constants';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 import RedirectButton from './redirectButton';
 
 const Container = styled.div`
@@ -52,7 +52,7 @@ function Buy() {
   const { t } = useTranslation('translation', { keyPrefix: 'BUY_SCREEN' });
   const navigate = useNavigate();
   const { currency } = useParams();
-  const { stxAddress, btcAddress } = useWalletSelector();
+  const { stxAddress, btcAddress, network } = useWalletSelector();
   const address = currency === 'STX' ? stxAddress : btcAddress;
   const [url, setUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -75,7 +75,7 @@ function Buy() {
       moonPayUrl.searchParams.append('currencyCode', currency!);
       moonPayUrl.searchParams.append('walletAddress', address);
       moonPayUrl.searchParams.append('colorCode', '#5546FF');
-      const signedUrl = await getMoonPaySignedUrl(moonPayUrl.href);
+      const signedUrl = await getMoonPaySignedUrl(network.type, moonPayUrl.href);
       setUrl(signedUrl?.signedUrl ?? '');
     } catch (e) {
       setLoading(false);

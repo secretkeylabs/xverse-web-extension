@@ -1,19 +1,19 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { useDispatch } from 'react-redux';
-import { useQuery } from '@tanstack/react-query';
-import { setCoinRatesAction } from '@stores/wallet/actions/actionCreators';
 import { fetchBtcToCurrencyRate, fetchStxToBtcRate } from '@secretkeylabs/xverse-core/api';
+import { setCoinRatesAction } from '@stores/wallet/actions/actionCreators';
+import { useQuery } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
 
 export const useCoinRates = () => {
   const dispatch = useDispatch();
-  const { fiatCurrency } = useWalletSelector();
+  const { fiatCurrency, network } = useWalletSelector();
 
   const fetchCoinRates = async () => {
     try {
-      const btcFiatRate = await fetchBtcToCurrencyRate({
+      const btcFiatRate = await fetchBtcToCurrencyRate(network.type, {
         fiatCurrency,
       });
-      const stxBtcRate = await fetchStxToBtcRate();
+      const stxBtcRate = await fetchStxToBtcRate(network.type);
       dispatch(setCoinRatesAction(stxBtcRate, btcFiatRate));
       return { stxBtcRate, btcFiatRate };
     } catch (e: any) {
