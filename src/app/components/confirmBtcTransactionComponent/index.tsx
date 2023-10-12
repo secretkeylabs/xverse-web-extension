@@ -1,18 +1,20 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
 import TopRow from '@components/topRow';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   BtcUtxoDataResponse,
   ErrorCodes,
-  ResponseError,
-  UTXO,
   getBtcFiatEquivalent,
+  ResponseError,
   satsToBtc,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import {
@@ -22,16 +24,14 @@ import {
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation } from '@tanstack/react-query';
+import Callout from '@ui-library/callout';
 import { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import InfoContainer from '@components/infoContainer';
-import useWalletSelector from '@hooks/useWalletSelector';
 import TransactionDetailComponent from '../transactionDetailComponent';
-import Callout from '@ui-library/callout';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -397,7 +397,7 @@ function ConfirmBtcTransactionComponent({
               value={assetDetail!}
               valueDetail={assetDetailValue}
               icon={AssetIcon}
-              currencyType={currencyType ? currencyType : 'Ordinal'}
+              currencyType={currencyType || 'Ordinal'}
               title={t('CONFIRM_TRANSACTION.ASSET')}
             />
           ) : (

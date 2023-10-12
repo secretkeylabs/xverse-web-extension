@@ -1,8 +1,8 @@
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
 import ChevronIcon from '@assets/img/swap/chevron.svg';
-import { SwapToken } from '@screens/swap/useSwap';
 import TokenImage from '@components/tokenImage';
+import { SwapToken } from '@screens/swap/types';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
