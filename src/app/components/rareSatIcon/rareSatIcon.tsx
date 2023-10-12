@@ -4,7 +4,7 @@ import Mythic from '@assets/img/nftDashboard/rareSats/mythic.svg';
 import Rare from '@assets/img/nftDashboard/rareSats/rare.svg';
 import Uncommon from '@assets/img/nftDashboard/rareSats/uncommon.svg';
 import Unknown from '@assets/img/nftDashboard/rareSats/unknown.svg';
-import { RareSatsType, getRareSatsColorsByRareSatsType } from '@utils/rareSats';
+import { getRareSatsColorsByRareSatsType, RareSatsType } from '@utils/rareSats';
 import styled from 'styled-components';
 
 import Theme from '../../../theme';

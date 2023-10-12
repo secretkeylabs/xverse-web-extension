@@ -1,12 +1,12 @@
-import styled, { useTheme } from 'styled-components';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import Switch from 'react-switch';
-import { useEffect, useState } from 'react';
-import { hasOptedInMixPanelTracking, optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { hasOptedInMixPanelTracking, optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import Switch from 'react-switch';
+import styled, { useTheme } from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -21,7 +21,7 @@ const Container = styled.div((props) => ({
   },
 }));
 
-const TextContiner = styled.div({
+const TextContainer = styled.div({
   lineHeight: '140%',
 });
 
@@ -78,11 +78,11 @@ function PrivacyPreferencesScreen() {
     <>
       <TopRow title={t('PRIVACY_PREFERENCES.TITLE')} onClick={handleBackButtonClick} />
       <Container>
-        <TextContiner>{t('PRIVACY_PREFERENCES.DESCRIPTION')}</TextContiner>
+        <TextContainer>{t('PRIVACY_PREFERENCES.DESCRIPTION')}</TextContainer>
         <SwitchContainer>
           <div>{t('PRIVACY_PREFERENCES.AUTHORIZE_DATA_COLLECTION')}</div>
           <CustomSwitch
-            onColor={theme.colors.purple_main}
+            onColor={theme.colors.orange_main}
             offColor={theme.colors.background.elevation3}
             onChange={handleSwitchChange}
             checked={isEnabled}

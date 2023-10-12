@@ -38,6 +38,7 @@ import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
 import Onboarding from '@screens/onboarding';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
+import OrdinalsCollection from '@screens/ordinalsCollection';
 import RareSatsBundle from '@screens/rareSatsBundle';
 import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
 import Receive from '@screens/receive';
@@ -59,8 +60,8 @@ import ChangePasswordScreen from '@screens/settings/changePassword';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import LockCountdown from '@screens/settings/lockCountdown';
 import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
-import SignPsbtRequest from '@screens/signPsbtRequest';
 import SignatureRequest from '@screens/signatureRequest';
+import SignPsbtRequest from '@screens/signPsbtRequest';
 import Stacking from '@screens/stacking';
 import SwapScreen from '@screens/swap';
 import SwapConfirmScreen from '@screens/swap/swapConfirmation';
@@ -424,11 +425,19 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'nft-dashboard/ordinals-collection/:id',
+        element: (
+          <AuthGuard>
+            <OrdinalsCollection />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'nft-dashboard/nft-detail/:id',
         element: <NftDetailScreen />,
       },
       {
-        path: 'nft-dashboard/ordinal-detail',
+        path: 'nft-dashboard/ordinal-detail/:id',
         element: <OrdinalDetailScreen />,
       },
       {
@@ -440,7 +449,7 @@ const router = createHashRouter([
         element: <SendNft />,
       },
       {
-        path: 'nft-dashboard/ordinal-detail/send-ordinal',
+        path: 'nft-dashboard/ordinal-detail/:id/send-ordinal',
         element: (
           <AuthGuard>
             <SendOrdinal />

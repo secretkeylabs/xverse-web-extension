@@ -1,23 +1,23 @@
+import { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
+import BundleAsset from '@components/bundleAsset/bundleAsset';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import BottomBar from '@components/tabBar';
+import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
+import { getBundleId, getBundleSubText } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { getBundleId, getBundleSubText } from '@utils/rareSats';
-import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
-import BundleAsset from '@components/bundleAsset/bundleAsset';
 
 const ScrollContainer = styled.div`
   display: flex;

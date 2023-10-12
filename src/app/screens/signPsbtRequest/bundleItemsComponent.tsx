@@ -1,13 +1,13 @@
 import Eye from '@assets/img/createPassword/Eye.svg';
-import { useState } from 'react';
-import { animated, useSpring } from '@react-spring/web';
 import Cross from '@assets/img/dashboard/X.svg';
-import styled from 'styled-components';
-import { BundleItem, getBundleItemSubText } from '@utils/rareSats';
-import { useTranslation } from 'react-i18next';
 import IconOrdinal from '@assets/img/transactions/ordinal.svg';
 import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
+import { animated, useSpring } from '@react-spring/web';
 import { getTruncatedAddress } from '@utils/helper';
+import { BundleItem, getBundleItemSubText } from '@utils/rareSats';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',

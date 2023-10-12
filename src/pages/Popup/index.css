@@ -13,6 +13,7 @@ body {
   justify-content: center;
   align-items: center;
 }
+
 #app {
   width: 360px;
   height: 600px;
@@ -20,4 +21,10 @@ body {
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+:focus-within,
+:focus-visible,
+:focus {
+  outline: none;
 }

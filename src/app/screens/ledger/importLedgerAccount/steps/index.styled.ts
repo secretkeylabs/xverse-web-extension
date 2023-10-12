@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import Switch from 'react-switch';
+import styled from 'styled-components';
 
 export const ImportStartImage = styled.img((props) => ({
   marginLeft: props.theme.spacing(0),
@@ -189,14 +189,14 @@ interface OptionProps {
 }
 export const Option = styled.div<OptionProps>((props) => ({
   width: '100%',
-  backgroundColor: '#21253C',
+  backgroundColor: props.theme.colors.elevation3,
   padding: props.theme.spacing(8),
   paddingTop: props.theme.spacing(7),
   paddingBottom: props.theme.spacing(7),
   borderRadius: props.theme.radius(2),
   fontSize: '0.75rem',
   marginBottom: props.theme.spacing(6),
-  border: `1px solid ${props.selected ? 'rgba(115, 131, 255, 0.40)' : 'transparent'}`,
+  border: `1px solid ${props.selected ? props.theme.colors.elevation6 : 'transparent'}`,
   cursor: 'pointer',
   userSelect: 'none',
   display: 'flex',
@@ -204,12 +204,13 @@ export const Option = styled.div<OptionProps>((props) => ({
   transition: 'border 0.2s ease',
 }));
 
+// TODO create radio button in ui-library
 export const OptionIcon = styled.div<OptionProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  width: 15,
-  height: 15,
+  width: 16,
+  height: 16,
   borderRadius: '50%',
   border: `1px solid ${props.theme.colors.white[0]}`,
   marginRight: props.theme.spacing(10),
@@ -217,10 +218,10 @@ export const OptionIcon = styled.div<OptionProps>((props) => ({
   '&::after': {
     content: '""',
     display: props.selected ? 'block' : 'none',
-    width: 8,
-    height: 8,
+    width: 10,
+    height: 10,
     borderRadius: 100,
-    backgroundColor: props.theme.colors.white[0],
+    backgroundColor: props.theme.colors.orange_main,
   },
 }));
 
@@ -237,6 +238,7 @@ export const ConfirmationStep = styled.div<{
   },
 }));
 
+// TODO create custom switch in ui-library
 export const CustomSwitch = styled(Switch)`
   .react-switch-handle {
     background-color: ${({ checked }) =>

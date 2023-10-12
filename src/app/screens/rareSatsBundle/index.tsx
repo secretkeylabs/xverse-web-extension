@@ -2,23 +2,24 @@ import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
 import ActionButton from '@components/button';
+import Separator from '@components/separator';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import WebGalleryButton from '@components/webGalleryButton';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
+import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
+import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { getBtcTxStatusUrl, isLedgerAccount } from '@utils/helper';
+import { BundleItem } from '@utils/rareSats';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
-import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
-import { StyledHeading, StyledP } from '@ui-library/common.styled';
-import WebGalleryButton from '@components/webGalleryButton';
-import { BundleItem } from '@utils/rareSats';
-import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import OrdinalAttributeComponent from '../ordinalDetail/ordinalAttributeComponent';
 import { RareSatsBundleGridItem } from './rareSatsBundleGridItem';
 
@@ -53,11 +54,8 @@ const AttributesContainer = styled.div`
   max-width: 285px;
 `;
 
-const StyledSeparator = styled.hr`
-  margin-top: ${(props) => props.theme.space.m};
+const StyledSeparator = styled(Separator)`
   margin-bottom: ${(props) => props.theme.space.xxl};
-  border: none;
-  border-top: 1px solid ${(props) => props.theme.colors.elevation3};
 `;
 
 const StyledGridContainer = styled(GridContainer)`
