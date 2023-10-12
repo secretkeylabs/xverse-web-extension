@@ -120,7 +120,7 @@ function ErrorModal({ errorCode, onRetrySubmit, onEnd }: Props) {
     }
   };
 
-  const canResubmit = RESUBMIT_ERROR_CODES.includes(errorCode);
+  const canResubmit = onRetrySubmit && RESUBMIT_ERROR_CODES.includes(errorCode);
 
   return (
     <Container>

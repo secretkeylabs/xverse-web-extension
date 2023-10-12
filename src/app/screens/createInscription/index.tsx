@@ -483,7 +483,7 @@ function CreateInscription() {
             <ErrorModal
               key={errorCode}
               errorCode={errorCode}
-              onRetrySubmit={executeMint}
+              onRetrySubmit={executeErrorCode ? executeMint : undefined}
               onEnd={cancelCallback}
             />
           )}
