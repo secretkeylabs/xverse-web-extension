@@ -37,3 +37,9 @@ header h2 {
 .optionsContainer {
   height: 600px !important;
 }
+
+:focus-within,
+:focus-visible,
+:focus {
+  outline: none;
+}

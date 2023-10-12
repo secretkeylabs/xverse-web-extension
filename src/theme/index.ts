@@ -1,11 +1,42 @@
-const Theme = {
-  breakpoints: {
-    s: '0px',
-    md: '700px',
-    lg: '1025px',
-    xlg: '1536px',
+export const breakpoints = {
+  xs: '360',
+  s: '480',
+  md: '768',
+  lg: '920',
+  xl: '1200',
+};
+
+export const devices = {
+  min: {
+    xs: `(min-width: ${breakpoints.xs}px)`,
+    s: `(min-width: ${breakpoints.s}px)`,
+    md: `(min-width: ${breakpoints.md}px)`,
+    lg: `(min-width: ${breakpoints.lg}px)`,
+    xl: `(min-width: ${breakpoints.xl}px)`,
   },
+  max: {
+    xs: `(max-width: ${breakpoints.xs}px)`,
+    s: `(max-width: ${breakpoints.s}px)`,
+    md: `(max-width: ${breakpoints.md}px)`,
+    lg: `(max-width: ${breakpoints.lg}px)`,
+    xl: `(max-width: ${breakpoints.xl}px)`,
+  },
+};
+
+const Theme = {
   spacing: (multiple: number) => multiple * 2,
+  space: {
+    xxxs: '2px',
+    xxs: '4px',
+    xs: '8px',
+    s: '12px',
+    m: '16px',
+    l: '24px',
+    xl: '32px',
+    xxl: '40px',
+    xxxl: '64px',
+    xxxxl: '80px',
+  } as const,
   radius: (multiple: number) => multiple * 4 + 4,
 
   /*
@@ -16,8 +47,8 @@ const Theme = {
     white_0: '#FFFFFF',
     white_200: 'rgba(255, 255, 255, 0.8)',
     white_400: 'rgba(255, 255, 255, 0.6)',
-    white_600: 'rgba(255, 255, 255, 0.2)',
-    white_800: 'rgba(255, 255, 255, 0.20)',
+    white_600: 'rgba(255, 255, 255, 0.4)',
+    white_800: 'rgba(255, 255, 255, 0.2)',
     white_850: 'rgba(255, 255, 255, 0.15)',
     white_900: 'rgba(255, 255, 255, 0.1)',
 
@@ -92,12 +123,12 @@ const Theme = {
       /**
        * @deprecated use theme.colors.white_600
        */
-      600: 'rgba(255, 255, 255, 0.2)',
+      600: 'rgba(255, 255, 255, 0.4)',
 
       /**
        * @deprecated use theme.colors.white_800
        */
-      800: 'rgba(255, 255, 255, 0.20)',
+      800: 'rgba(255, 255, 255, 0.2)',
 
       /**
        * @deprecated use theme.colors.white_850
@@ -221,9 +252,9 @@ const Theme = {
     purple_main: '#5E41C5',
 
     /**
-     * @deprecated use tangerine
+     * @deprecated use lilac
      */
-    orange_main: ' #EE7A30',
+    orange_main: '#EE7A30',
   },
 
   /*
@@ -532,4 +563,8 @@ const Theme = {
     letterSpacing: 0.02,
   },
 };
+
+export type Color = keyof typeof Theme.colors | 'currentColor';
+export type Typography = keyof typeof Theme.typography;
+
 export default Theme;

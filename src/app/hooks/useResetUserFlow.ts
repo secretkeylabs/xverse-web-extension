@@ -22,6 +22,10 @@ const userFlowConfig: Record<string, { resetTo: string }> = {
   '/confirm-nft-tx': { resetTo: '/nft-dashboard' },
   '/verify-ledger': { resetTo: '/verify-ledger?mismatch=true' },
   '/add-stx-address-ledger': { resetTo: '/add-stx-address-ledger?mismatch=true' },
+  '/rare-sats-detail': { resetTo: '/nft-dashboard?tab=rareSats' },
+  '/rare-sats-bundle': { resetTo: '/nft-dashboard?tab=rareSats' },
+  '/send-rare-sat': { resetTo: '/nft-dashboard?tab=rareSats' },
+  '/ordinals-collection': { resetTo: '/nft-dashboard?tab=inscriptions' },
 };
 type UserFlowConfigKey = keyof typeof userFlowConfig;
 

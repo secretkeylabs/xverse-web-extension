@@ -1,5 +1,6 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  Brc20HistoryTransactionData,
   BtcTransactionData,
   StxTransactionData,
   TransactionData,
@@ -9,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 interface TransactionTitleProps {
-  transaction: StxTransactionData | BtcTransactionData;
+  transaction: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData;
 }
 
 const TransactionTitleText = styled.p((props) => ({
@@ -28,6 +29,22 @@ export default function TransactionTitle(props: TransactionTitleProps) {
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
     return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
+  };
+
+  const getBrc20TokenTitle = (tx: Brc20HistoryTransactionData): string => {
+    if (tx.txStatus === 'pending') {
+      return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
+    }
+    if (tx.operation === 'transfer_send') {
+      return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
+    }
+    if (tx.operation === 'mint') {
+      return t('MINT');
+    }
+    if (tx.operation === 'transfer') {
+      return t('INSCRIBE_TRANSFER');
+    }
+    return tx.operation;
   };
 
   const getBtcTokenTransferTitle = (tx: BtcTransactionData): string => {
@@ -87,6 +104,8 @@ export default function TransactionTitle(props: TransactionTitleProps) {
         return t('TRANSACTION_POISON_MICRO_BLOCK');
       case 'bitcoin':
         return getBtcTokenTransferTitle(transaction as BtcTransactionData);
+      case 'brc20':
+        return getBrc20TokenTitle(transaction as Brc20HistoryTransactionData);
       default:
         return t('TRANSACTION_STATUS_UNKNOWN');
     }

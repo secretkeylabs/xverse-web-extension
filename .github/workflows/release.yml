@@ -22,6 +22,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
       - name: Build
+        env:
+          TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
+          MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
+          MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
         run: npm run build --if-present
       # - name: Test
       # run: npm test --passWithNoTests
@@ -31,12 +35,7 @@ jobs:
           echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').zip" >> $GITHUB_OUTPUT
       - name: Create Archive
         run: |
-          zip -r build.zip ./build
-      - name: Upload Archive
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.save-filename.outputs.FILENAME }}
-          path: build.zip
+          zip -rj build.zip ./build
       - name: Upload Release Asset
         if: ${{ github.event.release.upload_url }}
         uses: actions/upload-release-asset@v1

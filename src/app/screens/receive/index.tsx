@@ -1,18 +1,18 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import TopRow from '@components/topRow';
-import { useNavigate, useParams } from 'react-router-dom';
-import QRCode from 'react-qr-code';
 import Copy from '@assets/img/dashboard/copy_black_icon.svg';
 import Tick from '@assets/img/dashboard/tick.svg';
-import { useState } from 'react';
 import ActionButton from '@components/button';
-import useWalletSelector from '@hooks/useWalletSelector';
-import BottomTabBar from '@components/tabBar';
 import InfoContainer from '@components/infoContainer';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
-import { isLedgerAccount } from '@utils/helper';
+import BottomTabBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import QRCode from 'react-qr-code';
+import { useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import UpdatedReceive from './updatedReceiveScreen';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -157,7 +157,10 @@ function Receive(): JSX.Element {
     }
   };
 
-  return (
+  // TODO: Shift UpdatedReceive logic in this file and handle STX & BTC UI
+  return currency === 'ORD' ? (
+    <UpdatedReceive />
+  ) : (
     <>
       <TopRow title={t('RECEIVE')} onClick={handleBackButtonClick} />
       <OuterContainer>

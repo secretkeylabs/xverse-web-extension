@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 
 interface ButtonProps {
   disabled?: boolean;
@@ -77,6 +77,7 @@ const ButtonIconContainer = styled.div((props) => ({
 }));
 
 interface Props {
+  className?: string;
   src?: string;
   icon?: JSX.Element;
   text: string;
@@ -85,9 +86,11 @@ interface Props {
   disabled?: boolean;
   transparent?: boolean;
   warning?: boolean;
+  hoverDialogId?: string;
 }
 
 function ActionButton({
+  className,
   src,
   icon,
   text,
@@ -96,6 +99,7 @@ function ActionButton({
   disabled = false,
   transparent,
   warning,
+  hoverDialogId,
 }: Props) {
   const handleOnPress = () => {
     if (!disabled) {
@@ -105,7 +109,12 @@ function ActionButton({
 
   if (transparent) {
     return (
-      <TransparentButton onClick={handleOnPress} disabled={disabled || processing}>
+      <TransparentButton
+        id={hoverDialogId}
+        className={className}
+        onClick={handleOnPress}
+        disabled={disabled || processing}
+      >
         {processing ? (
           <MoonLoader color="white" size={10} />
         ) : (
@@ -120,7 +129,12 @@ function ActionButton({
   }
 
   return (
-    <Button onClick={handleOnPress} disabled={disabled || processing} warning={warning}>
+    <Button
+      className={className}
+      onClick={handleOnPress}
+      disabled={disabled || processing}
+      warning={warning}
+    >
       {processing ? (
         <MoonLoader color="#12151E" size={12} />
       ) : (

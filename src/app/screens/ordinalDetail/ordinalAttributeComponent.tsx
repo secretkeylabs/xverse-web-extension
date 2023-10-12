@@ -8,12 +8,14 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   alignItems: 'flex-start',
   marginTop: props.theme.spacing(8),
+  width: '100%',
 }));
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'flex-start',
+  width: '100%',
 }));
 
 const TitleText = styled.h1((props) => ({
@@ -24,12 +26,17 @@ const TitleText = styled.h1((props) => ({
 
 interface ValueTextProps {
   color?: string;
+  fullWidth?: boolean;
 }
 
-const ValueText = styled.h1<ValueTextProps>((props) => ({
+const ValueText = styled.p<ValueTextProps>((props) => ({
   ...props.theme.body_medium_m,
-  textAlign: 'center',
-  color: props.color || props.theme.colors.white_0,
+  textAlign: 'left',
+  color: props.color || props.theme.colors.white[0],
+  width: props.fullWidth ? '100%' : 'auto',
+  overflowWrap: 'break-word',
+  wordWrap: 'break-word',
+  wordBreak: 'break-word',
 }));
 
 const OrdinalsTag = styled.div({
@@ -59,36 +66,51 @@ const Text = styled.h1((props) => ({
 
 interface Props {
   title: string;
-  value: string;
+  value?: string;
   isAddress?: boolean;
   showOridnalTag?: boolean;
   valueColor?: string;
+  customValue?: React.ReactNode;
+  suffix?: string;
 }
 
-function OrdinalAttributeComponent({ title, value, showOridnalTag, isAddress, valueColor }: Props) {
+function OrdinalAttributeComponent({
+  title,
+  value,
+  showOridnalTag,
+  isAddress,
+  valueColor,
+  customValue,
+  suffix,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
 
   return (
     <Container>
       <TitleText>{title}</TitleText>
-      <RowContainer>
-        {isAddress ? (
-          <ValueText color={valueColor}>{value}</ValueText>
-        ) : (
-          <NumericFormat
-            value={value}
-            displayType="text"
-            thousandSeparator
-            renderText={(text) => <ValueText>{text}</ValueText>}
-          />
-        )}
-        {showOridnalTag && (
-          <OrdinalsTag>
-            <ButtonIcon src={OrdinalsIcon} />
-            <Text>{t('ORDINALS')}</Text>
-          </OrdinalsTag>
-        )}
-      </RowContainer>
+      {customValue ?? (
+        <RowContainer>
+          {isAddress ? (
+            <ValueText color={valueColor} fullWidth={!showOridnalTag}>
+              {value}
+            </ValueText>
+          ) : (
+            <NumericFormat
+              value={value}
+              displayType="text"
+              thousandSeparator
+              renderText={(text) => <ValueText fullWidth={!showOridnalTag}>{text}</ValueText>}
+              suffix={suffix}
+            />
+          )}
+          {showOridnalTag && (
+            <OrdinalsTag>
+              <ButtonIcon src={OrdinalsIcon} />
+              <Text>{t('ORDINALS')}</Text>
+            </OrdinalsTag>
+          )}
+        </RowContainer>
+      )}
     </Container>
   );
 }

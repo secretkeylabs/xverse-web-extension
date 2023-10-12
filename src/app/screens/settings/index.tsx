@@ -11,7 +11,10 @@ import { useState } from 'react';
 import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useDispatch } from 'react-redux';
-import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
+import {
+  ChangeActivateOrdinalsAction,
+  ChangeActivateRareSatsAction,
+} from '@stores/wallet/actions/actionCreators';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import { isLedgerAccount } from '@utils/helper';
 import ResetWalletPrompt from '../../components/resetWallet';
@@ -57,7 +60,13 @@ function Setting() {
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const { fiatCurrency, network, hasActivatedOrdinalsKey, selectedAccount } = useWalletSelector();
+  const {
+    fiatCurrency,
+    network,
+    hasActivatedOrdinalsKey,
+    hasActivatedRareSatsKey,
+    selectedAccount,
+  } = useWalletSelector();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { unlockWallet, resetWallet } = useWalletReducer();
@@ -93,6 +102,12 @@ function Setting() {
 
   const switchActivateOrdinalState = () => {
     dispatch(ChangeActivateOrdinalsAction(!hasActivatedOrdinalsKey));
+    // disable rare sats if ordinal is disabled
+    dispatch(ChangeActivateRareSatsAction(false));
+  };
+
+  const switchActivateRareSatsState = () => {
+    dispatch(ChangeActivateRareSatsAction(!hasActivatedRareSatsKey));
   };
 
   const openUpdatePasswordScreen = () => {
@@ -216,7 +231,7 @@ function Setting() {
           showWarningTitle
         />
         <SettingComponent
-          title={t('ORDINALS')}
+          title={t('ADVANCED')}
           text={t('ACTIVATE_ORDINAL_NFTS')}
           toggle
           toggleFunction={switchActivateOrdinalState}
@@ -228,6 +243,16 @@ function Setting() {
           onClick={onRestoreFundClick}
           icon={ArrowIcon}
           showDivider
+          disabled={!hasActivatedOrdinalsKey}
+        />
+
+        <SettingComponent
+          text={t('ENABLE_RARE_SATS')}
+          description={t('ENABLE_RARE_SATS_DETAIL')}
+          toggle
+          toggleFunction={switchActivateRareSatsState}
+          toggleValue={hasActivatedRareSatsKey}
+          disabled={!hasActivatedOrdinalsKey}
         />
         <SettingComponent
           title={t('ABOUT')}

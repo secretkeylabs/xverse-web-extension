@@ -1,15 +1,15 @@
-import { useNavigate } from 'react-router-dom';
-import TopRow from '@components/topRow';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import { ArrowDown } from '@phosphor-icons/react';
+import CoinSelectModal from '@screens/home/coinSelectModal';
+import { SwapInfoBlock } from '@screens/swap/swapInfoBlock';
 import SwapTokenBlock from '@screens/swap/swapTokenBlock';
-import ArrowDown from '@assets/img/swap/arrow_swap.svg';
 import { useSwap } from '@screens/swap/useSwap';
 import { useCallback, useState } from 'react';
-import { SwapInfoBlock } from '@screens/swap/swapInfoBlock';
-import ActionButton from '@components/button';
-import CoinSelectModal from '@screens/home/coinSelectModal';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -34,9 +34,10 @@ const Container = styled.div((props) => ({
 
 const DownArrowButton = styled.button((props) => ({
   alignSelf: 'center',
-  borderRadius: props.theme.radius(3),
+  borderRadius: props.theme.radius(2),
   width: props.theme.spacing(18),
   height: props.theme.spacing(18),
+  background: props.theme.colors.elevation3,
   transition: 'all 0.2s ease',
   ':hover': {
     opacity: 0.8,
@@ -84,7 +85,7 @@ function SwapScreen() {
             onSelectCoin={() => setSelecting('from')}
           />
           <DownArrowButton onClick={swap.handleClickDownArrow}>
-            <img src={ArrowDown} alt="arrow-down" />
+            <ArrowDown size={20} weight="regular" color="white" />
           </DownArrowButton>
           <SwapTokenBlock
             title={t('TO')}

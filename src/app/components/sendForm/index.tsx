@@ -180,6 +180,7 @@ interface Props {
   disableAmountInput?: boolean;
   balance?: number;
   hideMemo?: boolean;
+  hideTokenImage?: boolean;
   buttonText?: string;
   processing?: boolean;
   children?: ReactNode;
@@ -200,6 +201,7 @@ function SendForm({
   disableAmountInput,
   balance,
   hideMemo = false,
+  hideTokenImage = false,
   buttonText,
   processing,
   children,
@@ -446,7 +448,8 @@ function SendForm({
       <ScrollContainer>
         {currencyType !== 'NFT' &&
           currencyType !== 'Ordinal' &&
-          currencyType !== 'brc20-Ordinal' && (
+          currencyType !== 'brc20-Ordinal' &&
+          !hideTokenImage && (
             <TokenContainer>
               <TokenImage
                 token={currencyType || undefined}

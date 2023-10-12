@@ -6,6 +6,7 @@ import ActionButton from '@components/button';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { CaretDown } from '@phosphor-icons/react';
 import { Account } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
@@ -22,8 +23,8 @@ interface GradientCircleProps {
   thirdGradient: string;
 }
 const GradientCircle = styled.div<GradientCircleProps>((props) => ({
-  width: 40,
-  height: 40,
+  width: 20,
+  height: 20,
   borderRadius: 25,
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
@@ -52,6 +53,7 @@ const CurrentAcountContainer = styled.div((props) => ({
 const CurrentAccountTextContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
+  alignItems: 'center',
   gap: props.theme.spacing(4),
 }));
 
@@ -238,6 +240,7 @@ function AccountRow({
                   <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
                 )}
                 {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+                {isSelected && !disabledAccountSelect && <CaretDown weight="bold" size={16} />}
               </CurrentAccountTextContainer>
             </TransparentSpan>
           )}

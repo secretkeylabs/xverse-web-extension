@@ -1,24 +1,30 @@
-import styled from 'styled-components';
-import { MoonLoader } from 'react-spinners';
-import useWalletSelector from '@hooks/useWalletSelector';
-import BottomTabBar from '@components/tabBar';
-import { useTranslation } from 'react-i18next';
-import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
-import ArrowDownLeft from '@assets/img/dashboard/arrow_down_left.svg';
-import ActionButton from '@components/button';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import BarLoader from '@components/barLoader';
-import { GAMMA_URL, LoaderSize } from '@utils/constants';
-import ShareDialog from '@components/shareNft';
+import FeatureIcon from '@assets/img/nftDashboard/rareSats/NewFeature.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import Ordinal from '@screens/ordinals';
-import { ChangeActivateOrdinalsAction } from '@stores/wallet/actions/actionCreators';
-import { useDispatch } from 'react-redux';
-import { InscriptionsList } from '@secretkeylabs/xverse-core/types';
-import AlertMessage from '@components/alertMessage';
-import useAddressInscriptions from '@hooks/queries/ordinals/useAddressInscriptions';
-import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
+import ActionButton from '@components/button';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
+import BottomTabBar from '@components/tabBar';
+import WebGalleryButton from '@components/webGalleryButton';
+import useAddressInscriptionCollections from '@hooks/queries/ordinals/useAddressInscriptionCollections';
+import { useAddressRareSats } from '@hooks/queries/ordinals/useAddressRareSats';
+import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { ArrowDown, Wrench } from '@phosphor-icons/react';
+import type { InscriptionCollectionsData } from '@secretkeylabs/xverse-core/types';
+import {
+  ChangeActivateOrdinalsAction,
+  ChangeActivateRareSatsAction,
+  SetRareSatsNoticeDismissedAction,
+} from '@stores/wallet/actions/actionCreators';
+import { StyledHeading } from '@ui-library/common.styled';
+import Dialog from '@ui-library/dialog';
+import { getCollectionKey } from '@utils/inscriptions';
+import { InvalidParamsError } from '@utils/query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components';
+import CollectiblesTabs, { GridContainer } from './collectiblesTabs';
+import { InscriptionsTabGridItem } from './inscriptionsTabGridItem';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
 
@@ -26,34 +32,33 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-left: 5%;
-  margin-right: 5%;
   overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  ${(props) => props.theme.scrollbar}
 `;
 
-interface GridContainerProps {
-  isGalleryOpen: boolean;
-}
-const GridContainer = styled.div<GridContainerProps>((props) => ({
-  display: 'grid',
-  columnGap: props.theme.spacing(8),
-  rowGap: props.theme.spacing(6),
-  marginTop: props.theme.spacing(14),
-  gridTemplateColumns: props.isGalleryOpen
-    ? 'repeat(auto-fill,minmax(300px,1fr))'
-    : 'repeat(auto-fill,minmax(150px,1fr))',
-  gridTemplateRows: props.isGalleryOpen ? 'repeat(minmax(300px,1fr))' : 'minmax(150px,220px)',
-}));
+const PageHeader = styled.div`
+  padding: ${(props) => props.theme.space.s};
+  padding-bottom: ${(props) => props.theme.space.xl};
+  border-bottom: 0.5px solid ${(props) => props.theme.colors.background.elevation3};
+  max-width: 1224px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+`;
 
-const ShareDialogeContainer = styled.div({
-  position: 'absolute',
-  top: 0,
-  right: 0,
-  zIndex: 2000,
-});
+const StyledCollectiblesTabs = styled(CollectiblesTabs)`
+  margin-top: ${(props) => props.theme.spacing(8)}px;
+  padding: 0 ${(props) => props.theme.space.s};
+  padding-bottom: ${(props) => props.theme.space.xl};
+  max-width: 1224px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+`;
+
+const StyledWebGalleryButton = styled(WebGalleryButton)`
+  margin-top: ${(props) => props.theme.space.s};
+`;
 
 const ReceiveNftContainer = styled.div((props) => ({
   position: 'absolute',
@@ -65,16 +70,7 @@ const ReceiveNftContainer = styled.div((props) => ({
 }));
 
 const CollectibleContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(12),
   marginBottom: props.theme.spacing(12),
-}));
-
-const LoaderContainer = styled.div((props) => ({
-  display: 'flex',
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(12),
 }));
 
 const ButtonContainer = styled.div({
@@ -83,69 +79,38 @@ const ButtonContainer = styled.div({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  maxWidth: 400,
+  maxWidth: 360,
 });
 
-// const ShareButtonContainer = styled.div((props) => ({
-//   marginLeft: props.theme.spacing(3),
-//   width: '100%',
-// }));
-
-const ReceiveButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(3),
+const ReceiveButtonContainer = styled.div(() => ({
   width: '100%',
 }));
 
-const WebGalleryButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  width: '100%',
-  marginTop: props.theme.spacing(8),
-  opacity: 0.8,
-  ':hover': {
-    opacity: 1,
-  },
-}));
-
-const WebGalleryButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 700,
-  color: props.theme.colors.white_0,
+const NoCollectiblesText = styled.h1((props) => ({
+  ...props.theme.body_bold_m,
+  color: props.theme.colors.white['200'],
+  marginTop: props.theme.spacing(16),
+  marginBottom: 'auto',
   textAlign: 'center',
 }));
 
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
+const ErrorContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(20),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
 }));
 
-const BottomBarContainer = styled.div({
-  marginTop: '5%',
-});
-
-const CollectiblesHeadingText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white_200,
-  textTransform: 'uppercase',
-  letterSpacing: '0.02em',
-  opacity: 0.7,
+const ErrorTextContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(8),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
 }));
 
-const GalleryCollectiblesHeadingText = styled.h1((props) => ({
-  ...props.theme.headline_category_m,
-  color: props.theme.colors.white_200,
-  textTransform: 'uppercase',
-  letterSpacing: '0.02em',
-  opacity: 0.7,
-}));
-
-const CollectiblesValueText = styled.h1((props) => ({
-  ...props.theme.headline_xl,
+const ErrorText = styled.div((props) => ({
+  ...props.theme.body_bold_m,
+  color: props.theme.colors.white['200'],
 }));
 
 const LoadMoreButtonContainer = styled.div((props) => ({
@@ -153,47 +118,52 @@ const LoadMoreButtonContainer = styled.div((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: props.theme.spacing(30),
-}));
-
-const LoadMoreButton = styled.button((props) => ({
-  ...props.theme.body_medium_l,
-  fontSize: 13,
-  width: 98,
-  height: 34,
-  color: props.theme.colors.white_0,
-  border: `1px solid ${props.theme.colors.elevation3}`,
-  background: props.theme.colors.elevation0,
-  borderRadius: 24,
-  padding: '8px, 16px, 8px, 16px',
-  ':hover': {
-    background: props.theme.colors.background.elevation9,
-  },
-  ':focus': {
-    background: props.theme.colors.background.elevation10,
+  marginTop: props.theme.space.xl,
+  button: {
+    width: 156,
   },
 }));
 
-const NoCollectiblesText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.white_200,
-  marginTop: 'auto',
-  marginBottom: 'auto',
-  textAlign: 'center',
-}));
+export type NftDashboardState = {
+  openReceiveModal: boolean;
+  showNewFeatureAlert: boolean;
+  isOrdinalReceiveAlertVisible: boolean;
+  isLoading: boolean;
+  isLoadingOrdinalCollections: boolean;
+  openInGalleryView: () => void;
+  onReceiveModalOpen: () => void;
+  onReceiveModalClose: () => void;
+  onOrdinalReceiveAlertOpen: () => void;
+  onOrdinalReceiveAlertClose: () => void;
+  InscriptionListView: () => JSX.Element;
+  NftListView: () => JSX.Element;
+  onActivateRareSatsAlertCrossPress: () => void;
+  onActivateRareSatsAlertDenyPress: () => void;
+  onActivateRareSatsAlertEnablePress: () => void;
+  onDismissRareSatsNotice: () => void;
+  isGalleryOpen: boolean;
+  hasActivatedOrdinalsKey?: boolean;
+  hasActivatedRareSatsKey?: boolean;
+  showNoticeAlert?: boolean;
+  rareSatsQuery: ReturnType<typeof useAddressRareSats>;
+  totalNfts: number;
+  totalInscriptions: number;
+  onLoadMoreRareSatsButtonClick: () => void;
+};
 
-const BarLoaderContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(5),
-  maxWidth: 300,
-  display: 'flex',
-}));
-
-function NftDashboard() {
+const useNftDashboard = (): NftDashboardState => {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const dispatch = useDispatch();
-  const { stxAddress, ordinalsAddress, hasActivatedOrdinalsKey } = useWalletSelector();
-  const [showShareNftOptions, setShowNftOptions] = useState(false);
+  const {
+    stxAddress,
+    ordinalsAddress,
+    hasActivatedOrdinalsKey,
+    hasActivatedRareSatsKey,
+    rareSatsNoticeDismissed,
+  } = useWalletSelector();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
-  const [showActivateOrdinalsAlert, setShowActivateOrdinalsAlert] = useState(false);
+  const [showNewFeatureAlert, setShowNewFeatureAlert] = useState(false);
+  const [showNoticeAlert, setShowNoticeAlert] = useState(false);
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const {
     data: nftsList,
@@ -205,47 +175,48 @@ function NftDashboard() {
     fetchNextPage,
   } = useStacksCollectibles();
   const {
-    data: ordinals,
-    error: ordinalsError,
-    hasNextPage: hasNextPageOrdinals,
-    isFetchingNextPage: isFetchingNextPageOrdinals,
-    isLoading: isLoadingOrdinals,
-    fetchNextPage: fetchNextOrdinalsPage,
-    refetch: refetchOrdinals,
-  } = useAddressInscriptions();
+    data: ordinalCollections,
+    error: ordinalCollectionsError,
+    hasNextPage: hasNextPageOrdinalCollections,
+    isFetchingNextPage: isFetchingNextPageOrdinalCollections,
+    isLoading: isLoadingOrdinalCollections,
+    fetchNextPage: fetchNextOrdinalsPageCollections,
+    refetch: refetchOrdinalCollections,
+  } = useAddressInscriptionCollections();
+
+  const rareSatsQuery = useAddressRareSats();
 
   const refetchCollectibles = useCallback(async () => {
     await refetch();
-    await refetchOrdinals();
-  }, [refetch]);
+    await refetchOrdinalCollections();
+  }, [refetch, refetchOrdinalCollections]);
 
   useEffect(() => {
     refetchCollectibles();
   }, [stxAddress, ordinalsAddress]);
 
   const nfts = nftsList?.pages.map((page) => page.nftsList).flat();
-
-  const ordinalsLength = ordinals?.pages[0].total;
-
-  const totalNfts = useMemo(() => {
-    let totalCount = nftsList && nftsList.pages.length > 0 ? nftsList.pages[0].total : 0;
-    if (hasActivatedOrdinalsKey && ordinalsLength) {
-      totalCount = ordinalsLength + totalCount;
-    }
-    return totalCount;
-  }, [nftsList, hasActivatedOrdinalsKey, ordinalsLength]);
+  const ordinalsLength = ordinalCollections?.pages[0].total;
+  const totalNfts = nftsList && nftsList.pages.length > 0 ? nftsList.pages[0].total : 0;
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
   useEffect(() => {
-    if (hasActivatedOrdinalsKey === undefined && ordinalsLength) {
-      setShowActivateOrdinalsAlert(true);
+    if (
+      (hasActivatedOrdinalsKey === undefined && ordinalsLength) ||
+      hasActivatedRareSatsKey === undefined
+    ) {
+      setShowNewFeatureAlert(true);
     }
-  }, [hasActivatedOrdinalsKey, ordinalsLength]);
+  }, [hasActivatedOrdinalsKey, hasActivatedRareSatsKey, ordinalsLength]);
+
+  useEffect(() => {
+    setShowNoticeAlert(rareSatsNoticeDismissed === undefined);
+  }, [rareSatsNoticeDismissed]);
 
   const onLoadMoreButtonClick = () => {
-    if (hasNextPageOrdinals) {
-      fetchNextOrdinalsPage();
+    if (hasNextPageOrdinalCollections) {
+      fetchNextOrdinalsPageCollections();
     }
     if (hasNextPage) {
       fetchNextPage();
@@ -266,14 +237,6 @@ function NftDashboard() {
     setOpenReceiveModal(false);
   };
 
-  const renderOrdinalsList = useCallback(
-    (list: InscriptionsList) =>
-      list.results.map((ordinal) => (
-        <Ordinal asset={ordinal} key={ordinal.id} isGalleryOpen={isGalleryOpen} />
-      )),
-    [],
-  );
-
   const onOrdinalReceiveAlertOpen = () => {
     setIsOrdinalReceiveAlertVisible(true);
   };
@@ -282,132 +245,235 @@ function NftDashboard() {
     setIsOrdinalReceiveAlertVisible(false);
   };
 
-  const NftListView = useCallback(
-    () =>
-      totalNfts === 0 && ordinalsLength === 0 ? (
-        <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>
-      ) : (
-        <>
-          <GridContainer isGalleryOpen={isGalleryOpen}>
-            {hasActivatedOrdinalsKey && !ordinalsError && ordinals?.pages?.map(renderOrdinalsList)}
-            {!stacksError &&
-              nfts?.map((nft) => (
-                <Nft asset={nft} key={nft.value.hex} isGalleryOpen={isGalleryOpen} />
-              ))}
-          </GridContainer>
-          {(hasNextPage || hasNextPageOrdinals) && (
-            <LoadMoreButtonContainer>
-              {isFetchingNextPage || isFetchingNextPageOrdinals ? (
-                <MoonLoader color="white" size={30} />
-              ) : (
-                <LoadMoreButton onClick={onLoadMoreButtonClick}>{t('LOAD_MORE')}</LoadMoreButton>
-              )}
-            </LoadMoreButtonContainer>
-          )}
-        </>
-      ),
-    [ordinals, nfts, hasActivatedOrdinalsKey],
-  );
+  const InscriptionListView = useCallback(() => {
+    if (ordinalCollectionsError && !(ordinalCollectionsError instanceof InvalidParamsError)) {
+      return (
+        <ErrorContainer>
+          <Wrench size={48} />
+          <ErrorTextContainer>
+            <ErrorText>{t('ERROR_RETRIEVING')}</ErrorText>
+            <ErrorText>{t('TRY_AGAIN')}</ErrorText>
+          </ErrorTextContainer>
+        </ErrorContainer>
+      );
+    }
 
-  // const onSharePress = () => {
-  //   setShowNftOptions(true);
-  // };
+    if (ordinalsLength === 0) {
+      return <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>;
+    }
 
-  const onCrossPress = () => {
-    setShowNftOptions(false);
+    return (
+      <>
+        <GridContainer isGalleryOpen={isGalleryOpen}>
+          {ordinalCollections?.pages
+            ?.map((page) => page?.results)
+            .flat()
+            .map((collection: InscriptionCollectionsData) => (
+              <InscriptionsTabGridItem key={getCollectionKey(collection)} item={collection} />
+            ))}
+        </GridContainer>
+        {hasNextPageOrdinalCollections && (
+          <LoadMoreButtonContainer>
+            <ActionButton
+              transparent
+              text={t('LOAD_MORE')}
+              processing={isFetchingNextPageOrdinalCollections}
+              disabled={isFetchingNextPageOrdinalCollections}
+              onPress={onLoadMoreButtonClick}
+            />
+          </LoadMoreButtonContainer>
+        )}
+      </>
+    );
+  }, [
+    ordinalCollections,
+    hasActivatedOrdinalsKey,
+    ordinalCollectionsError,
+    hasNextPageOrdinalCollections,
+    isFetchingNextPageOrdinalCollections,
+  ]);
+
+  const NftListView = useCallback(() => {
+    if (stacksError && !(stacksError instanceof InvalidParamsError)) {
+      return (
+        <ErrorContainer>
+          <Wrench size={48} />
+          <ErrorTextContainer>
+            <ErrorText>{t('ERROR_RETRIEVING')}</ErrorText>
+            <ErrorText>{t('TRY_AGAIN')}</ErrorText>
+          </ErrorTextContainer>
+        </ErrorContainer>
+      );
+    }
+
+    if (totalNfts === 0) {
+      return <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>;
+    }
+
+    return (
+      <>
+        <GridContainer isGalleryOpen={isGalleryOpen}>
+          {!stacksError &&
+            nfts?.map((nft) => (
+              <Nft
+                asset={nft}
+                key={`${nft.asset_identifier}${nft.value.hex}`}
+                isGalleryOpen={isGalleryOpen}
+              />
+            ))}
+        </GridContainer>
+        {hasNextPage && (
+          <LoadMoreButtonContainer>
+            <ActionButton
+              transparent
+              text={t('LOAD_MORE')}
+              processing={isFetchingNextPage}
+              disabled={isFetchingNextPage}
+              onPress={onLoadMoreButtonClick}
+            />
+          </LoadMoreButtonContainer>
+        )}
+      </>
+    );
+  }, [nfts, stacksError]);
+
+  const onActivateRareSatsAlertCrossPress = () => {
+    setShowNewFeatureAlert(false);
   };
 
-  const onActivateOrdinalsAlertCrossPress = () => {
-    setShowActivateOrdinalsAlert(false);
-  };
-
-  const onActivateOrdinalsAlertDenyPress = () => {
-    setShowActivateOrdinalsAlert(false);
-    dispatch(ChangeActivateOrdinalsAction(false));
-  };
-
-  const onActivateOrdinalsAlertActivatePress = () => {
-    setShowActivateOrdinalsAlert(false);
+  const onActivateRareSatsAlertDenyPress = () => {
+    setShowNewFeatureAlert(false);
     dispatch(ChangeActivateOrdinalsAction(true));
+    dispatch(ChangeActivateRareSatsAction(false));
   };
+
+  const onActivateRareSatsAlertEnablePress = () => {
+    setShowNewFeatureAlert(false);
+    dispatch(ChangeActivateOrdinalsAction(true));
+    dispatch(ChangeActivateRareSatsAction(true));
+  };
+
+  const onDismissRareSatsNotice = () => {
+    setShowNoticeAlert(false);
+    dispatch(SetRareSatsNoticeDismissedAction(true));
+  };
+
+  const onLoadMoreRareSatsButtonClick = () => {
+    if (rareSatsQuery?.hasNextPage) {
+      rareSatsQuery.fetchNextPage();
+    }
+  };
+
+  return {
+    openReceiveModal,
+    showNewFeatureAlert,
+    isOrdinalReceiveAlertVisible,
+    isLoading,
+    isLoadingOrdinalCollections,
+    openInGalleryView,
+    onReceiveModalOpen,
+    onReceiveModalClose,
+    onOrdinalReceiveAlertOpen,
+    onOrdinalReceiveAlertClose,
+    InscriptionListView,
+    NftListView,
+    onActivateRareSatsAlertCrossPress,
+    onActivateRareSatsAlertDenyPress,
+    onActivateRareSatsAlertEnablePress,
+    onDismissRareSatsNotice,
+    isGalleryOpen,
+    hasActivatedOrdinalsKey,
+    hasActivatedRareSatsKey,
+    showNoticeAlert,
+    rareSatsQuery,
+    totalNfts,
+    totalInscriptions: ordinalsLength,
+    onLoadMoreRareSatsButtonClick,
+  };
+};
+
+function NftDashboard() {
+  const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+  const nftDashboard = useNftDashboard();
+  const {
+    openReceiveModal,
+    showNewFeatureAlert,
+    hasActivatedOrdinalsKey,
+    isOrdinalReceiveAlertVisible,
+    openInGalleryView,
+    onReceiveModalOpen,
+    onReceiveModalClose,
+    onOrdinalReceiveAlertOpen,
+    onOrdinalReceiveAlertClose,
+    InscriptionListView,
+    NftListView,
+    onActivateRareSatsAlertCrossPress,
+    onActivateRareSatsAlertDenyPress,
+    onActivateRareSatsAlertEnablePress,
+    isGalleryOpen,
+  } = nftDashboard;
 
   return (
     <>
       {isOrdinalReceiveAlertVisible && (
         <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
       )}
-      {showActivateOrdinalsAlert && (
-        <AlertMessage
-          title={t('ACTIVATE_ORDINALS')}
-          description={t('ACTIVATE_ORDINALS_INFO')}
-          buttonText={t('DENY')}
-          onClose={onActivateOrdinalsAlertCrossPress}
-          secondButtonText={t('ACTIVATE')}
-          onButtonClick={onActivateOrdinalsAlertDenyPress}
-          onSecondButtonClick={onActivateOrdinalsAlertActivatePress}
+
+      {showNewFeatureAlert && (
+        <Dialog
+          title={t('NEW_FEATURE')}
+          description={
+            hasActivatedOrdinalsKey
+              ? t('NEW_FEAT_RARE_SATS_ORDINALS_ENABLE')
+              : t('NEW_FEAT_RARE_SATS_DESCRIPTION')
+          }
+          rightButtonText={t('ENABLE')}
+          leftButtonText={t('MAYBE_LATER')}
+          onRightButtonClick={onActivateRareSatsAlertEnablePress}
+          onLeftButtonClick={onActivateRareSatsAlertDenyPress}
+          onClose={onActivateRareSatsAlertCrossPress}
+          type="feedback"
+          icon={<img src={FeatureIcon} width="60" height="60" alt="new feature" />}
         />
       )}
-      <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
+
+      <AccountHeaderComponent disableMenuOption={isGalleryOpen} showBorderBottom={false} />
       <Container>
-        <CollectibleContainer>
-          {isGalleryOpen ? (
-            <GalleryCollectiblesHeadingText>{t('COLLECTIBLES')}</GalleryCollectiblesHeadingText>
-          ) : (
-            <CollectiblesHeadingText>{t('COLLECTIBLES')}</CollectiblesHeadingText>
-          )}
-          {ordinalsAddress && isLoadingOrdinals ? (
-            <BarLoaderContainer>
-              <BarLoader loaderSize={LoaderSize.LARGE} />
-            </BarLoaderContainer>
-          ) : (
-            <CollectiblesValueText>{`${totalNfts} ${t('ITEMS')}`}</CollectiblesValueText>
-          )}
-          {!isGalleryOpen && (
-            <WebGalleryButton onClick={openInGalleryView}>
-              <>
-                <ButtonImage src={SquaresFour} />
-                <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
-              </>
-            </WebGalleryButton>
-          )}
-        </CollectibleContainer>
-        <ButtonContainer>
-          <ReceiveButtonContainer>
-            <ActionButton src={ArrowDownLeft} text={t('RECEIVE')} onPress={onReceiveModalOpen} />
-          </ReceiveButtonContainer>
-          {openReceiveModal && (
-            <ReceiveNftContainer>
-              <ReceiveNftModal
-                visible={openReceiveModal}
-                isGalleryOpen={isGalleryOpen}
-                onClose={onReceiveModalClose}
-                setOrdinalReceiveAlert={onOrdinalReceiveAlertOpen}
+        <PageHeader>
+          <CollectibleContainer>
+            <StyledHeading typography={isGalleryOpen ? 'headline_xl' : 'headline_l'}>
+              {t('COLLECTIBLES')}
+            </StyledHeading>
+            {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
+          </CollectibleContainer>
+          <ButtonContainer>
+            <ReceiveButtonContainer>
+              <ActionButton
+                icon={<ArrowDown weight="bold" size={16} />}
+                text={t('RECEIVE')}
+                onPress={onReceiveModalOpen}
               />
-            </ReceiveNftContainer>
-          )}
-          {/* <ShareButtonContainer>
-            <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />
-          </ShareButtonContainer> */}
-          <ShareDialogeContainer>
-            {showShareNftOptions && (
-              <ShareDialog url={`${GAMMA_URL}${stxAddress}`} onCrossClick={onCrossPress} />
+            </ReceiveButtonContainer>
+            {openReceiveModal && (
+              <ReceiveNftContainer>
+                <ReceiveNftModal
+                  visible={openReceiveModal}
+                  isGalleryOpen={isGalleryOpen}
+                  onClose={onReceiveModalClose}
+                  setOrdinalReceiveAlert={onOrdinalReceiveAlertOpen}
+                />
+              </ReceiveNftContainer>
             )}
-          </ShareDialogeContainer>
-        </ButtonContainer>
-        {isLoading || isLoadingOrdinals ? (
-          <LoaderContainer>
-            <MoonLoader color="white" size={30} />
-          </LoaderContainer>
-        ) : (
-          <NftListView />
-        )}
+          </ButtonContainer>
+        </PageHeader>
+        <StyledCollectiblesTabs
+          nftListView={<NftListView />}
+          inscriptionListView={<InscriptionListView />}
+          nftDashboard={nftDashboard}
+        />
       </Container>
 
-      {!isGalleryOpen && (
-        <BottomBarContainer>
-          <BottomTabBar tab="nft" />
-        </BottomBarContainer>
-      )}
+      {!isGalleryOpen && <BottomTabBar tab="nft" />}
     </>
   );
 }

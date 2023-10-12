@@ -15,14 +15,14 @@ const NftNameText = styled.h1((props) => ({
   textAlign: 'left',
 }));
 
-const NftNameTextContainer = styled.h1((props) => ({
+const NftNameTextContainer = styled.div((props) => ({
   width: '100%',
   display: 'flex',
   justifyContent: 'flex-start',
   marginTop: props.theme.spacing(6),
 }));
 
-const NftImageContainer = styled.div({
+const NftImageContainer = styled.div((props) => ({
   flex: 1,
   display: 'flex',
   justifyContent: 'center',
@@ -30,23 +30,17 @@ const NftImageContainer = styled.div({
   width: '100%',
   aspectRatio: '1',
   overflow: 'hidden',
-});
+  borderRadius: props.theme.radius(3),
+  background: props.theme.colors.elevation1,
+}));
 
-interface GridContainerProps {
-  showBorder: boolean;
-}
-
-const GridItemContainer = styled.button<GridContainerProps>((props) => ({
+const GridItemContainer = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  color: props.theme.colors.white_0,
-  padding: props.showBorder ? props.theme.spacing(7) : 0,
-  marginBottom: props.theme.spacing(16),
+  color: props.theme.colors.white['0'],
+  padding: 0,
   borderRadius: props.theme.radius(3),
-  background: props.showBorder
-    ? 'linear-gradient(27.88deg, #1D2032 0%, rgba(29, 32, 50, 0) 100%)'
-    : 'transparent',
-  border: props.showBorder ? ` 1px solid ${props.theme.colors.elevation2}` : 'transparent',
+  background: 'transparent',
 }));
 
 function Ordinal({ asset, isGalleryOpen }: Props) {
@@ -56,11 +50,11 @@ function Ordinal({ asset, isGalleryOpen }: Props) {
 
   const handleOnClick = () => {
     setSelectedOrdinalDetails(asset);
-    navigate('ordinal-detail');
+    navigate(`/nft-dashboard/ordinal-detail/${asset.id}`);
   };
 
   return (
-    <GridItemContainer onClick={handleOnClick} showBorder={isGalleryOpen}>
+    <GridItemContainer onClick={handleOnClick}>
       {isGalleryOpen ? (
         <NftImageContainer>
           <OrdinalImage isNftDashboard ordinal={asset} />

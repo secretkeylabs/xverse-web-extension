@@ -29,6 +29,8 @@ import {
   WalletSessionPeriods,
   WalletState,
   ChangeShowDataCollectionAlertKey,
+  RareSatsNoticeDismissedKey,
+  ChangeHasActivatedRareSatsKey,
 } from './actions/types';
 
 const initialWalletState: WalletState = {
@@ -60,6 +62,8 @@ const initialWalletState: WalletState = {
   networkAddress: undefined,
   btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
+  hasActivatedRareSatsKey: undefined,
+  rareSatsNoticeDismissed: undefined,
   showBtcReceiveAlert: true,
   showOrdinalReceiveAlert: true,
   showDataCollectionAlert: true,
@@ -190,6 +194,16 @@ const walletReducer = (
       return {
         ...state,
         hasActivatedOrdinalsKey: action.hasActivatedOrdinalsKey,
+      };
+    case ChangeHasActivatedRareSatsKey:
+      return {
+        ...state,
+        hasActivatedRareSatsKey: action.hasActivatedRareSatsKey,
+      };
+    case RareSatsNoticeDismissedKey:
+      return {
+        ...state,
+        rareSatsNoticeDismissed: action.rareSatsNoticeDismissed,
       };
     case ChangeShowBtcReceiveAlertKey:
       return {

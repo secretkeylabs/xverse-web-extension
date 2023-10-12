@@ -1,5 +1,5 @@
-import ContentLoader from 'react-content-loader';
 import { LoaderSize } from '@utils/constants';
+import ContentLoader from 'react-content-loader';
 import styled from 'styled-components';
 import Theme from 'theme';
 
@@ -72,7 +72,15 @@ export default BarLoader;
 const StyledContentLoader = styled(ContentLoader)`
   padding: ${(props) => props.theme.spacing(1)}px;
 `;
-export function BetterBarLoader({ width, height }: { width: number; height: number }) {
+export function BetterBarLoader({
+  width,
+  height,
+  className,
+}: {
+  width: number;
+  height: number;
+  className?: string;
+}) {
   return (
     <StyledContentLoader
       animate
@@ -83,6 +91,7 @@ export function BetterBarLoader({ width, height }: { width: number; height: numb
       viewBox={`0 0 ${width} ${height}`}
       backgroundColor={Theme.colors.elevation3}
       foregroundColor={Theme.colors.grey}
+      className={className}
     >
       <rect y="0" x="0" rx="2" ry="2" width={width} height={height} />
     </StyledContentLoader>

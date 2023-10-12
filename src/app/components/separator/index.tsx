@@ -1,12 +1,9 @@
 import styled from 'styled-components';
 
-const Line = styled.div((props) => ({
-  border: `0.5px solid ${props.theme.colors.elevation3}`,
-  marginTop: props.theme.spacing(8),
-}));
-
-function Separator() {
-  return <Line />;
-}
+export const Separator = styled.hr`
+  margin-top: ${(props) => props.theme.space.m};
+  border: none;
+  border-top: 1px solid ${(props) => props.theme.colors.elevation3};
+`;
 
 export default Separator;

@@ -1,7 +1,7 @@
-import Modal from 'react-modal';
-import styled, { useTheme } from 'styled-components';
 import Cross from '@assets/img/dashboard/X.svg';
 import Separator from '@components/separator';
+import Modal from 'react-modal';
+import styled, { useTheme } from 'styled-components';
 
 const BottomModalHeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
