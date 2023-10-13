@@ -5,7 +5,7 @@ import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
-import Swap from '@assets/img/dashboard/swap.svg';
+import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -466,7 +466,7 @@ function Home() {
             text={t('RECEIVE')}
             onPress={onReceiveModalOpen}
           />
-          {showSwaps && <SquareButton src={Swap} text={t('SWAP')} onPress={onSwapPressed} />}
+          {showSwaps && <SquareButton src={ArrowSwap} text={t('SWAP')} onPress={onSwapPressed} />}
           <SquareButton
             icon={<Plus weight="regular" size="20" />}
             text={t('BUY')}
