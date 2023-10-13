@@ -214,11 +214,14 @@ function OrdinalImage({
   );
 
   if (contentType.includes('image/svg')) {
-    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL}/thumbnail/${ordinal.id}`);
+    return renderImage(
+      t('ORDINAL'),
+      `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`,
+    );
   }
 
   if (contentType.includes('image')) {
-    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL}/content/${ordinal.id}`);
+    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/content/${ordinal.id}`);
   }
 
   if (textContent?.includes('brc-721e')) {
@@ -249,7 +252,10 @@ function OrdinalImage({
     if (contentType.includes('html')) {
       return (
         <ImageContainer inNftDetail={inNftDetail}>
-          <FillImg src={`${XVERSE_ORDIVIEW_URL}/thumbnail/${ordinal.id}`} alt="/html/" />
+          <FillImg
+            src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`}
+            alt="/html/"
+          />
           {isNftDashboard && (
             <OrdinalsTag>
               <ButtonIcon src={OrdinalsIcon} />
