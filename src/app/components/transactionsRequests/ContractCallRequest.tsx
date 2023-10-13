@@ -57,12 +57,12 @@ const SponsoredTag = styled.div((props) => ({
 
 const SponosredText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const PostConditionAlertText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 interface ContractCallRequestProps {
@@ -218,22 +218,27 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const renderPostConditionsCard = () => {
     const { postConds } = extractFromPayload(request);
     return postConds?.map((postCondition, i) => {
+      const key = `${postCondition.conditionType}-${i}`;
+
       switch (postCondition.conditionType) {
         case PostConditionType.STX:
-          return <StxPostConditionCard key={i} postCondition={postCondition} />;
+          return <StxPostConditionCard key={key} postCondition={postCondition} />;
         case PostConditionType.Fungible:
-          const coinInfo = coinsMetaData?.find(
-            (coin: Coin) =>
-              coin.contract ===
-              `${addressToString(postCondition.assetInfo.address)}.${
-                postCondition.assetInfo.contractName.content
-              }`,
-          );
           return (
-            <FtPostConditionCard key={i} postCondition={postCondition} ftMetaData={coinInfo} />
+            <FtPostConditionCard
+              key={key}
+              postCondition={postCondition}
+              ftMetaData={coinsMetaData?.find(
+                (coin: Coin) =>
+                  coin.contract ===
+                  `${addressToString(postCondition.assetInfo.address)}.${
+                    postCondition.assetInfo.contractName.content
+                  }`,
+              )}
+            />
           );
         case PostConditionType.NonFungible:
-          return <NftPostConditionCard key={i} postCondition={postCondition} />;
+          return <NftPostConditionCard key={key} postCondition={postCondition} />;
         default:
           return '';
       }

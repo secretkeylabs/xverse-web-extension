@@ -1,6 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -26,7 +25,7 @@ const TestnetContainer = styled.div((props) => ({
 const TestnetText = styled.h1((props) => ({
   ...props.theme.body_xs,
   textAlign: 'center',
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 function ExtendedScreenContainer(): JSX.Element {

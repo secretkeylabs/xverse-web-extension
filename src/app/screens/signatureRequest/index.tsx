@@ -16,22 +16,22 @@ import useSignatureRequest, {
   useSignMessage,
 } from '@hooks/useSignatureRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { getNetworkType, isHardwareAccount, getTruncatedAddress } from '@utils/helper';
-import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
-import { useNavigate } from 'react-router-dom';
-import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
-import Transport from '@ledgerhq/hw-transport-webusb';
-import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';
 import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
+import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { bytesToHex } from '@stacks/transactions';
+import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
+import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import CollapsableContainer from './collapsableContainer';
+import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
-import SignatureRequestMessage from './signatureRequestMessage';
-import CollapsableContainer from './collapsableContainer';
 
 const OuterContainer = styled.div({
   display: 'flex',
@@ -146,7 +146,7 @@ function SignatureRequest(): JSX.Element {
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isTxInvalid, setIsTxInvalid] = useState(false);
-  const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
+  const { selectedAccount, accountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
   const { messageType, request, payload, tabId, domain, isSignMessageBip322 } =
