@@ -25,12 +25,13 @@ const Container = styled.div((props) => ({
 
 const Title = styled.h1((props) => ({
   ...props.theme.bold_tile_text,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
+  marginTop: props.theme.spacing(20),
 }));
 
 const SubTitle = styled.h1((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(8),
 }));
 
@@ -43,7 +44,7 @@ const Link = styled.a((props) => ({
   display: 'flex',
   justifyContent: 'space-between',
   marginTop: props.theme.spacing(8),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const CustomizedLink = styled(Link)`

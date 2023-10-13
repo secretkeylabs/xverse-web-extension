@@ -50,13 +50,13 @@ const ButtonIcon = styled.img({
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   marginTop: props.theme.spacing(3),
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const AddressText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(1),
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const StyledTooltip = styled(Tooltip)`

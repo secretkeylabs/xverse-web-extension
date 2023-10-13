@@ -11,7 +11,7 @@ const Container = styled.button((props) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(2),
   padding: props.theme.spacing(9),
 }));
@@ -52,18 +52,18 @@ const ColumnContainer = styled.div((props) => ({
 
 const BoldText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const SubText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const StatusText = styled.h1((props) => ({
   ...props.theme.body_xs,
   fontWeight: 500,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 function StackingStatusTile() {

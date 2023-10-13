@@ -10,13 +10,13 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-  backgroundColor: props.theme.colors.background.elevation0,
+  backgroundColor: props.theme.colors.elevation0,
   padding: `0 ${props.theme.spacing(8)}px 0 ${props.theme.spacing(8)}px`,
 }));
 
 const Paragraph = styled.p((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textAlign: 'left',
   marginTop: props.theme.spacing(12),
 }));
@@ -39,7 +39,7 @@ const ResetButton = styled.button((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: props.theme.colors.feedback.error,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   width: '48%',
   height: 44,
   '&:disabled': {
@@ -53,9 +53,9 @@ const CancelButton = styled.button((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: `1px solid ${props.theme.colors.background.elevation2}`,
-  color: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.elevation0,
+  border: `1px solid ${props.theme.colors.elevation2}`,
+  color: props.theme.colors.white_0,
   width: '48%',
   height: 44,
 }));

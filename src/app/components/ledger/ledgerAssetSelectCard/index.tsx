@@ -14,7 +14,7 @@ const CardContainer = styled.label((props) => ({
     props.className === 'checked' ? props.theme.colors.background.selectBackground : 'transparent',
   borderRadius: props.theme.radius(2),
   border: `1px solid ${
-    props.className === 'checked' ? props.theme.colors.border.select : props.theme.colors.white[900]
+    props.className === 'checked' ? props.theme.colors.border.select : props.theme.colors.white_900
   }`,
   userSelect: 'none',
 }));
@@ -36,7 +36,7 @@ const CardTitle = styled.h3((props) => ({
 
 const CardText = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 interface Props {

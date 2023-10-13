@@ -66,7 +66,7 @@ const TransferOrdinalContainer = styled.div({
 
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(16),
   textAlign: 'center',
@@ -97,7 +97,7 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -118,12 +118,12 @@ const DetailRow = styled.div((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const Icon = styled.img((props) => ({

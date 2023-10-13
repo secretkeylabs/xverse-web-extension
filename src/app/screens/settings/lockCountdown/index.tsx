@@ -42,8 +42,8 @@ interface TimeSelectionBoxProps {
 const TimeSelectionBox = styled.button<TimeSelectionBoxProps>((props) => ({
   ...props.theme.body_medium_m,
   backgroundColor: 'transparent',
-  border: `1px solid ${props.selected ? props.theme.colors.white[0] : props.theme.colors.grey}`,
-  color: props.theme.colors.white[0],
+  border: `1px solid ${props.selected ? props.theme.colors.white_0 : props.theme.colors.grey}`,
+  color: props.theme.colors.white_0,
   borderRadius: props.theme.radius(1),
   height: 44,
   display: 'flex',

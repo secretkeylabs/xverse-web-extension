@@ -12,7 +12,7 @@ const NonceContainer = styled.div((props) => ({
 
 const DetailText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(8),
 }));
 
@@ -27,8 +27,8 @@ const InputContainer = styled.div((props) => ({
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(6),
-  border: `1px solid ${props.theme.colors.background.elevation6}`,
-  backgroundColor: props.theme.colors.background.elevation1,
+  border: `1px solid ${props.theme.colors.elevation6}`,
+  backgroundColor: props.theme.colors.elevation1,
   borderRadius: 8,
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
@@ -38,8 +38,8 @@ const InputContainer = styled.div((props) => ({
 
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background.elevation1,
-  color: props.theme.colors.white['400'],
+  backgroundColor: props.theme.colors.elevation1,
+  color: props.theme.colors.white_400,
   width: '100%',
   border: 'transparent',
 }));

@@ -45,14 +45,14 @@ const RowContainer = styled.div({
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'start',
 }));
 
 const AddressText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginTop: props.theme.spacing(1),
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const BitcoinDot = styled.div((props) => ({

@@ -18,8 +18,8 @@ import StxTransferTransaction from './stxTransferTransaction';
 //   background: 'none',
 //   paddingLeft: props.theme.spacing(8),
 //   paddingRight: props.theme.spacing(8),
-//   color: props.theme.colors.white[0],
-//   border: `0.5px solid ${props.theme.colors.background.elevation3}`,
+//   color: props.theme.colors.white_0,
+//   border: `0.5px solid ${props.theme.colors.elevation3}`,
 //   height: 34,
 //   borderRadius: props.theme.radius(3),
 //   img: {
