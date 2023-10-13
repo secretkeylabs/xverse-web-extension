@@ -108,7 +108,7 @@ const OrdinalGalleryTitleText = styled.h1((props) => ({
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   fontSize: 24,
   marginBottom: props.theme.spacing(8),
 }));
@@ -221,7 +221,7 @@ const StyledTooltip = styled(Tooltip)`
 const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_m,
   fontWeight: 700,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 
@@ -244,7 +244,7 @@ const AssetDeatilButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 400,
   fontSize: 14,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -267,7 +267,7 @@ const OrdinalsTag = styled.div({
 
 const CollectibleText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
@@ -279,7 +279,7 @@ const GalleryCollectibleText = styled.h1((props) => ({
 const Text = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   textTransform: 'uppercase',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   fontSize: 10,
   marginLeft: props.theme.spacing(2),
 }));

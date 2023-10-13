@@ -28,7 +28,7 @@ const TransparentButtonContainer = styled.div((props) => ({
 
 const Heading = styled.h3((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(16),
 }));
 
@@ -41,8 +41,8 @@ const WordGrid = styled.div`
 
 const WordButton = styled.button`
   ${(props) => props.theme.body_medium_m};
-  color: ${(props) => props.theme.colors.white['0']};
-  background-color: ${(props) => props.theme.colors.background.elevation3};
+  color: ${(props) => props.theme.colors.white_0};
+  background-color: ${(props) => props.theme.colors.elevation3};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -59,7 +59,7 @@ const WordButton = styled.button`
 
 const NthSpan = styled.span`
   ${(props) => props.theme.body_bold_l};
-  color: ${(props) => props.theme.colors.white['0']};
+  color: ${(props) => props.theme.colors.white_0};
 `;
 
 const ErrorMessage = styled.p<{ visible: boolean }>`

@@ -33,7 +33,7 @@ const ButtonContainer = styled.button((props) => ({
   paddingRight: props.theme.spacing(11),
   transition: 'background-color 0.2s ease',
   ':hover': {
-    backgroundColor: props.theme.colors.background.elevation1,
+    backgroundColor: props.theme.colors.elevation1,
   },
 }));
 
@@ -53,7 +53,7 @@ const AddAccountContainer = styled.div((props) => ({
   borderRadius: 25,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: props.theme.colors.background.elevation1,
+  backgroundColor: props.theme.colors.elevation1,
   marginRight: props.theme.spacing(8),
 }));
 
@@ -65,14 +65,14 @@ const ButtonImage = styled.img({
 const AddAccountText = styled.h1((props) => ({
   ...props.theme.body_m,
   opacity: 0.8,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const ButtonsWrapper = styled.div(
   (props) => `
   position: sticky;
   bottom: 0;
-  background-color: ${props.theme.colors.background.elevation0};
+  background-color: ${props.theme.colors.elevation0};
   margin-top: ${props.theme.spacing(8)}px;
   margin-bottom: ${props.theme.spacing(11)}px;
 `,

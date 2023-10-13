@@ -26,17 +26,17 @@ const ResetButton = styled.button((props) => ({
 
 const Title = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const Input = styled.input<{ error: boolean }>((props) => ({
   ...props.theme.body_medium_m,
   height: 48,
-  backgroundColor: props.theme.colors.background.elevation1,
+  backgroundColor: props.theme.colors.elevation1,
   borderStyle: 'solid',
   borderWidth: 1,
   borderRadius: 8,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   padding: '14px 16px',
   outline: 'none',
   borderColor: props.error ? props.theme.colors.feedback.error_700 : 'transparent',
@@ -44,7 +44,7 @@ const Input = styled.input<{ error: boolean }>((props) => ({
     border: '1px solid',
     'border-color': props.error
       ? props.theme.colors.feedback.error_700
-      : props.theme.colors.background.elevation6,
+      : props.theme.colors.elevation6,
   },
 }));
 
@@ -61,7 +61,7 @@ const InputRow = styled.div((props) => ({
 
 const Description = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const DEFAULT_SLIPPAGE = '4%';

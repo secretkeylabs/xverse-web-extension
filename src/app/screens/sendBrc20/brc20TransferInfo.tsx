@@ -16,7 +16,7 @@ const InfoTitle = styled.h1((props) => ({
 
 const InfoSubtitle = styled.h2((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(6),
 }));
 
@@ -27,7 +27,7 @@ const TransferStepTitle = styled.h3((props) => ({
 
 const TransferStep = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(2),
 }));
 

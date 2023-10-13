@@ -34,7 +34,7 @@ const ImgContainer = styled.div<ImgContainerProps>((props) => ({
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(6),
 }));
 

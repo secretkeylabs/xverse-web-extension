@@ -36,18 +36,18 @@ const TransactionRow = styled.div((props) => ({
 
 const TransactionTitleText = styled.p((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const RecipientAddress = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   textAlign: 'left',
 }));
 
 const TransactionValue = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 interface TxTransfersProps {

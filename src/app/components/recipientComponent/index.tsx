@@ -18,7 +18,7 @@ import { CubeTransparent } from '@phosphor-icons/react';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '16px 16px',
   justifyContent: 'center',
@@ -27,7 +27,7 @@ const Container = styled.div((props) => ({
 
 const RecipientTitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: 16,
 }));
 
@@ -59,20 +59,20 @@ const DownArrowIcon = styled.img((props) => ({
 
 const TitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
   marginTop: 5,
 }));
 
 const ValueText = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const SubValueText = styled.p((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const ColumnContainer = styled.div({

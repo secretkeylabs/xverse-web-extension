@@ -6,7 +6,7 @@ const TitleText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   textTransform: 'uppercase',
   letterSpacing: '0.02em',
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const Container = styled.div((props) => ({
@@ -18,7 +18,7 @@ const Container = styled.div((props) => ({
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_bold_l,
   marginTop: props.theme.spacing(2),
-  color: props.color ?? props.theme.colors.white['0'],
+  color: props.color ?? props.theme.colors.white_0,
 }));
 
 const BarLoaderContainer = styled.div((props) => ({

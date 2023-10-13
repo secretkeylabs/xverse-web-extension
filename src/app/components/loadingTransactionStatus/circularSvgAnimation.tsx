@@ -1,7 +1,7 @@
-import className from 'classnames';
-import styled from 'styled-components';
 import { animated, easings, useSpring } from '@react-spring/web';
+import className from 'classnames';
 import { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import Theme from 'theme';
 
 const svgSize = 88;
@@ -13,8 +13,8 @@ export type ConfirmationStatus = 'LOADING' | 'SUCCESS' | 'FAILURE';
 const getStrokeColorByStatus = (status: ConfirmationStatus) =>
   ({
     LOADING: Theme.colors.white_0,
-    SUCCESS: Theme.colors.success,
-    FAILURE: Theme.colors.error,
+    SUCCESS: Theme.colors.success_medium,
+    FAILURE: Theme.colors.danger_dark_600,
   }[status]);
 
 const StyledSvg = styled.svg<{ status: ConfirmationStatus; loadingPercentage: number }>`

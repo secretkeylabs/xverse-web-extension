@@ -15,7 +15,7 @@ interface TransactionTitleProps {
 
 const TransactionTitleText = styled.p((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'left',
 }));
 

@@ -36,7 +36,7 @@ const ToastContainer = styled.div((props) => ({
 
 const ToastMessage = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.background.elevation0,
+  color: props.theme.colors.elevation0,
   marginLeft: props.theme.spacing(7),
 }));
 

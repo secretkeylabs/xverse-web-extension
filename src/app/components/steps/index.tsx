@@ -11,9 +11,7 @@ const StepsDot = styled.div<StepDotProps>((props) => ({
   width: 8,
   height: 8,
   borderRadius: 4,
-  backgroundColor: props.active
-    ? props.theme.colors.action.classic
-    : props.theme.colors.background.elevation3,
+  backgroundColor: props.active ? props.theme.colors.action.classic : props.theme.colors.elevation3,
   marginRight: props.theme.spacing(4),
 }));
 
