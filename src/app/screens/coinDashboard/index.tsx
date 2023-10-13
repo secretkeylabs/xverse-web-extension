@@ -37,27 +37,6 @@ const TokenContractContainer = styled.div((props) => ({
   },
 }));
 
-const TransactionHistoryContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginTop: props.theme.spacing(30),
-  borderTop: `1px solid ${props.theme.colors.background.elevation2}`,
-  h1: {
-    ...props.theme.headline_s,
-    color: props.theme.colors.white[0],
-    marginTop: 32,
-  },
-  h2: {
-    ...props.theme.body_m,
-    fontStyle: 'italic',
-    color: props.theme.colors.white[200],
-    marginTop: props.theme.spacing(8),
-  },
-}));
-
 const ContractAddressCopyButton = styled.button((props) => ({
   display: 'flex',
   marginTop: props.theme.spacing(2),

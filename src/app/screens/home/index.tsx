@@ -193,6 +193,7 @@ function Home() {
     showBtcReceiveAlert,
     showOrdinalReceiveAlert,
     showDataCollectionAlert,
+    network,
   } = useWalletSelector();
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
@@ -434,7 +435,7 @@ function Home() {
     dispatch(changeShowDataCollectionAlertAction(false));
   };
 
-  const showSwaps = !isLedgerAccount(selectedAccount);
+  const showSwaps = !isLedgerAccount(selectedAccount) && network.type !== 'Testnet';
 
   return (
     <>
