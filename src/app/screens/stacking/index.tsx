@@ -19,7 +19,7 @@ const LoaderContainer = styled.div((props) => ({
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginTop: 'auto',
   marginBottom: 'auto',
   textAlign: 'center',

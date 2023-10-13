@@ -47,7 +47,7 @@ export const TxConfirmedTitle = styled.h1((props) => ({
 
 export const TxConfirmedDescription = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 export const InfoImage = styled.img({
@@ -66,7 +66,7 @@ export const ConnectLedgerTextAdvanced = styled.p<{
   ...props.theme.body_m,
   display: 'flex',
   alignItems: 'flex-start',
-  color: props.isCompleted ? props.theme.colors.white[400] : props.theme.colors.white[200],
+  color: props.isCompleted ? props.theme.colors.white_400 : props.theme.colors.white_200,
   textAlign: 'center',
   marginBottom: props.theme.spacing(16),
 }));
@@ -90,7 +90,7 @@ export const TxDetailsRow = styled.div((props) => ({
 }));
 
 export const TxDetailsTitle = styled.div((props) => ({
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 export const RecipientsWrapper = styled.div({

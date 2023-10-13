@@ -50,7 +50,7 @@ const ResetWalletContainer = styled.div((props) => ({
 
 const LogoContainer = styled.div((props) => ({
   padding: props.theme.spacing(11),
-  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 function Setting() {

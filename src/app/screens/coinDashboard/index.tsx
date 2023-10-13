@@ -32,8 +32,8 @@ const TokenContractContainer = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   h1: {
-    ...props.theme.body_medium_m,
-    color: props.theme.colors.white[400],
+    ...props.theme.typography.body_medium_m,
+    color: props.theme.colors.white_400,
   },
 }));
 
@@ -44,8 +44,8 @@ const ContractAddressCopyButton = styled.button((props) => ({
 }));
 
 const TokenContractAddress = styled.p((props) => ({
-  ...props.theme.body_medium_l,
-  color: props.theme.colors.white[0],
+  ...props.theme.typography.body_medium_l,
+  color: props.theme.colors.white_0,
   textAlign: 'left',
   overflowWrap: 'break-word',
   width: 300,
@@ -54,7 +54,7 @@ const TokenContractAddress = styled.p((props) => ({
 const FtInfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  borderTop: `1px solid ${props.theme.colors.background.elevation2}`,
+  borderTop: `1px solid ${props.theme.colors.elevation2}`,
   paddingTop: props.theme.spacing(12),
   marginTop: props.theme.spacing(16),
   paddingLeft: props.theme.spacing(8),
@@ -71,14 +71,14 @@ const CopyButtonContainer = styled.div((props) => ({
 }));
 
 const ContractDeploymentButton = styled.button((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   display: 'flex',
   alignItems: 'center',
   marginTop: props.theme.spacing(12),
   background: 'none',
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   span: {
-    color: props.theme.colors.white[0],
+    color: props.theme.colors.white_0,
     marginLeft: props.theme.spacing(3),
   },
   img: {
@@ -90,7 +90,7 @@ interface ButtonProps {
   isSelected: boolean;
 }
 const Button = styled.button<ButtonProps>((props) => ({
-  ...props.theme.body_bold_l,
+  ...props.theme.typography.body_bold_l,
   fontSize: 11,
   display: 'flex',
   justifyContent: 'center',
@@ -100,8 +100,8 @@ const Button = styled.button<ButtonProps>((props) => ({
   paddingRight: props.theme.spacing(6),
   marginRight: props.theme.spacing(2),
   borderRadius: 44,
-  background: props.isSelected ? props.theme.colors.background.elevation2 : 'transparent',
-  color: props.theme.colors.white[0],
+  background: props.isSelected ? props.theme.colors.elevation2 : 'transparent',
+  color: props.theme.colors.white_0,
   opacity: props.isSelected ? 1 : 0.6,
 }));
 

@@ -17,7 +17,7 @@ const ContentContainer = styled.div({
 
 const RequestMessageTitle = styled.p((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(2),
   opacity: 0.7,
 }));

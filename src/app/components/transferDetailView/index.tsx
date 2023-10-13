@@ -35,17 +35,17 @@ const AddressContainer = styled.div({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const AmountText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const ColumnContainer = styled.div({

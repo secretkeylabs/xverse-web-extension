@@ -28,7 +28,7 @@ const Text = styled.p((props) => ({
 
 const BalanceText = styled.label((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginRight: props.theme.spacing(2),
 }));
 
@@ -36,18 +36,18 @@ const CardContainer = styled.div<{ error?: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'column',
   rowGap: props.theme.spacing(3),
-  background: props.theme.colors.background.elevation_1,
+  background: props.theme.colors.elevation_n1,
   border: '1px solid',
   'border-color': props.error
     ? props.theme.colors.feedback.error_700
-    : props.theme.colors.background.elevation2,
+    : props.theme.colors.elevation2,
   borderRadius: 8,
   padding: props.theme.spacing(8),
   ':focus-within': {
     border: '1px solid',
     'border-color': props.error
       ? props.theme.colors.feedback.error_700
-      : props.theme.colors.background.elevation6,
+      : props.theme.colors.elevation6,
   },
 }));
 
@@ -78,7 +78,7 @@ export const NumberInput = styled.input`
 export const AmountInput = styled(NumberInput)<{ error?: boolean }>((props) => ({
   ...props.theme.body_bold_l,
   flex: 1,
-  color: props.error ? props.theme.colors.feedback.error : props.theme.colors.white['0'],
+  color: props.error ? props.theme.colors.feedback.error : props.theme.colors.white_0,
   marginLeft: props.theme.spacing(2),
   textAlign: 'right',
   backgroundColor: 'transparent',
@@ -88,12 +88,12 @@ export const AmountInput = styled(NumberInput)<{ error?: boolean }>((props) => (
 
 const CoinText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 export const EstimateUSDText = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginLeft: 'auto',
 }));
 

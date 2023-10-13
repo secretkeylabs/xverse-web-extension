@@ -20,7 +20,7 @@ const Container = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(12),
-  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 const StackingInfoContainer = styled.div((props) => ({
@@ -51,7 +51,7 @@ const StackingDescriptionText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(12),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 function StartStacking() {

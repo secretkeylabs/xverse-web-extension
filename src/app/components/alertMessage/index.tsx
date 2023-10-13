@@ -12,7 +12,7 @@ const Container = styled.div((props) => ({
   width: 312,
   borderRadius: 12,
   zIndex: 16000,
-  background: props.theme.colors.background.elevation3,
+  background: props.theme.colors.elevation3,
   filter: 'drop-shadow(0px 16px 36px rgba(0, 0, 0, 0.5))',
 }));
 
@@ -24,7 +24,7 @@ const HeaderText = styled.h1((props) => ({
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   margin: 16,
   fontSize: 16,
 }));
@@ -34,7 +34,7 @@ const RowContainer = styled.div((props) => ({
   flexDirection: 'row',
   padding: '20px 16px 16px 16px',
   alignItems: 'space-between',
-  borderBottom: `1px solid ${props.theme.colors.background.elevation6}`,
+  borderBottom: `1px solid ${props.theme.colors.elevation6}`,
 }));
 
 const TickMarkButtonContainer = styled.div((props) => ({
@@ -48,7 +48,7 @@ const TickMarkButtonContainer = styled.div((props) => ({
 
 const TickMarkButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(4.25),
 }));
 
@@ -101,7 +101,7 @@ const OuterContainer = styled.div((props) => ({
   bottom: 0,
   right: 0,
   position: 'fixed',
-  backgroundColor: props.theme.colors.background.elevation0,
+  backgroundColor: props.theme.colors.elevation0,
   zIndex: 1000,
   opacity: 0.6,
 }));

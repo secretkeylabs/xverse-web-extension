@@ -17,7 +17,7 @@ const SendAmountContainer = styled.div({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textTransform: 'uppercase',
 }));
 
@@ -29,7 +29,7 @@ const AmountText = styled.h1((props) => ({
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 interface Props {

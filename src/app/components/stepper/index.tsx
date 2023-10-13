@@ -17,13 +17,13 @@ const Title = styled.div<StepperProps>((props) => ({
   marginTop: props.theme.spacing(8),
   fontSize: '0.875rem',
   fontWeight: 500,
-  color: props.isActive ? props.theme.colors.white[0] : props.theme.colors.white[600],
+  color: props.isActive ? props.theme.colors.white_0 : props.theme.colors.white_600,
   transition: 'color 0.3s ease',
 }));
 
 const getBackgroundColor = (props) => {
   if (props.isCompleted) {
-    return props.theme.colors.feedback.success;
+    return props.theme.colors.success_medium;
   }
   if (props.isActive) {
     return '#4C525F';
@@ -36,12 +36,14 @@ const Dot = styled.div<StepperProps>((props) => ({
   width: 30,
   backgroundColor: getBackgroundColor(props),
   border: '2px solid',
-  borderColor: props.isCompleted ? props.theme.colors.feedback.success : '#4C525F',
+  borderColor: props.isCompleted
+    ? props.theme.colors.success_medium
+    : props.theme.colors.elevation6,
   borderRadius: '50%',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   fontWeight: 'bold',
   fontSize: '0.875rem',
   flex: '1 0 auto',
@@ -53,12 +55,12 @@ const Dot = styled.div<StepperProps>((props) => ({
     width: 8,
     height: 8,
     borderRadius: '50%',
-    backgroundColor: props.theme.colors.white[0],
+    backgroundColor: props.theme.colors.white_0,
   },
 }));
 
 const calculateColorStops = (props) => {
-  const successColor = props.theme.colors.feedback.success;
+  const successColor = props.theme.colors.success_medium;
 
   // Calculate the color stops
   let startStop;

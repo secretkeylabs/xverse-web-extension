@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '12px 16px',
   justifyContent: 'center',
@@ -13,13 +13,13 @@ const Container = styled.div((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(2),
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const RowContainer = styled.div({

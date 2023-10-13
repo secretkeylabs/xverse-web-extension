@@ -54,7 +54,7 @@ const TickerIconContainer = styled.div<TickerProps>((props) => ({
 
 const TickerIconText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
   fontSize: 10,
@@ -92,26 +92,26 @@ const LoaderImageContainer = styled.div({
 
 const CoinTickerText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const SubText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   fontSize: 12,
   textAlign: 'left',
 }));
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   fontSize: 12,
   textAlign: 'end',
 }));
 
 const CoinBalanceText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'end',
 }));
 
@@ -132,7 +132,7 @@ const ProtocolText = styled.p((props) => ({
   fontWeight: '700',
   textTransform: 'uppercase',
   marginLeft: props.theme.spacing(5),
-  backgroundColor: props.theme.colors.white['400'],
+  backgroundColor: props.theme.colors.white_400,
   padding: '2px 6px 1px',
   borderRadius: props.theme.radius(2),
   whiteSpace: 'nowrap',

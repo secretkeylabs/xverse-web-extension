@@ -85,14 +85,14 @@ const Image = styled.img({
 
 const HeadingText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   marginTop: props.theme.spacing(8),
 }));
 
 const BodyText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
   overflowWrap: 'break-word',
@@ -104,19 +104,19 @@ const BodyText = styled.h1((props) => ({
 
 const TxIDText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textTransform: 'uppercase',
 }));
 
 const BeforeButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const IDText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(2),
   wordBreak: 'break-all',
 }));
@@ -124,7 +124,7 @@ const IDText = styled.h1((props) => ({
 const ButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginRight: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const ButtonImage = styled.img((props) => ({

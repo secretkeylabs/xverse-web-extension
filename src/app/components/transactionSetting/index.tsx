@@ -24,7 +24,7 @@ const ButtonContainer = styled.div((props) => ({
 
 const TransactionSettingOptionText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const TransactionSettingOptionButton = styled.button((props) => ({
