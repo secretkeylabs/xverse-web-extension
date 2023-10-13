@@ -1,22 +1,22 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import FoldIconUp from '@assets/img/swap/fold_arrow_up.svg';
-import FoldDownIcon from '@assets/img/swap/fold_arrow_down.svg';
 import AddressIcon from '@assets/img/swap/address.svg';
 import CopyIcon from '@assets/img/swap/copy.svg';
-import { getTruncatedAddress } from '@utils/helper';
+import FoldDownIcon from '@assets/img/swap/fold_arrow_down.svg';
+import FoldIconUp from '@assets/img/swap/fold_arrow_up.svg';
 import { StyledToolTip } from '@components/accountRow';
-import { useCallback, useState } from 'react';
-import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
-import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import TokenImage from '@components/tokenImage';
+import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
+import { getTruncatedAddress } from '@utils/helper';
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 export const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   padding: props.theme.spacing(10),
   marginBottom: props.theme.spacing(6),
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
 }));
 
@@ -29,7 +29,7 @@ export const TitleContainer = styled.div(() => ({
 
 export const TitleText = styled.h3((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   fontSize: 14,
   fontWeight: 500,
 }));
@@ -42,7 +42,7 @@ export const FoldArrow = styled.img(() => ({
 
 const DescriptionText = styled.h3((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   fontSize: 14,
   fontWeight: 500,
   marginTop: props.theme.spacing(8),
@@ -57,7 +57,7 @@ const AmountContainer = styled.div(() => ({
 
 const AmountLabel = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   fontSize: 14,
   fontWeight: 500,
   marginLeft: props.theme.spacing(5),
@@ -82,7 +82,7 @@ const ItemsCenterContainer = styled.div(() => ({
 
 const AddressLabelText = styled.h3((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginLeft: props.theme.spacing(5),
 }));
 

@@ -12,7 +12,7 @@ const Container = styled.div((props) => ({
   paddingTop: 11,
   paddingBottom: 11,
   width: OPTIONS_DIALOG_WIDTH,
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.elevation2,
   userSelect: 'none',
 }));
 

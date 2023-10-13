@@ -1,17 +1,17 @@
 /* eslint-disable no-nested-ternary */
+import ArrowIcon from '@assets/img/settings/arrow.svg';
 import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
+import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import ArrowIcon from '@assets/img/settings/arrow.svg';
-import ActionButton from '@components/button';
-import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
-import useWalletSelector from '@hooks/useWalletSelector';
-import EditNonce from './editNonce';
 import EditFee from './editFee';
+import EditNonce from './editNonce';
 
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -24,7 +24,7 @@ const ButtonContainer = styled.div((props) => ({
 
 const TransactionSettingOptionText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const TransactionSettingOptionButton = styled.button((props) => ({

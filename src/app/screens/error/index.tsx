@@ -1,9 +1,9 @@
-import React from 'react';
-import { useRouteError } from 'react-router-dom';
 import Error from '@assets/img/ErrorBoundary/error.svg';
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
 import { SUPPORT_EMAIL } from '@utils/constants';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useRouteError } from 'react-router-dom';
+import styled from 'styled-components';
 
 const ScreenContainer = styled.div((props) => ({
   display: 'flex',
@@ -12,7 +12,7 @@ const ScreenContainer = styled.div((props) => ({
   width: '100vw',
   flexDirection: 'column',
   alignItems: 'center',
-  backgroundColor: props.theme.colors.background.elevation_1,
+  backgroundColor: props.theme.colors.elevation_n1,
   paddingTop: props.theme.spacing(80),
   paddingLeft: props.theme.spacing(9),
   paddingRight: props.theme.spacing(9),
@@ -27,16 +27,16 @@ const ErrorDescription = styled.p((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const SupportText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(5),
   textAlign: 'center',
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   span: {
-    color: props.theme.colors.white[0],
+    color: props.theme.colors.white_0,
   },
 }));
 
@@ -44,7 +44,7 @@ const ErrorContent = styled.p((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(20),
   textAlign: 'center',
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 function ErrorBoundary() {

@@ -1,14 +1,14 @@
-import styled from 'styled-components';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import { useTranslation } from 'react-i18next';
-import { animated, config, useSpring } from '@react-spring/web';
 import TransferDetailView from '@components/transferDetailView';
+import { animated, config, useSpring } from '@react-spring/web';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '12px 16px',
   justifyContent: 'center',
@@ -21,25 +21,25 @@ const FromContainer = styled.div((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(6),
   marginBottom: props.theme.spacing(4),
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const SubValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const Icon = styled.img((props) => ({

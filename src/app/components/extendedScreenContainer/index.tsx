@@ -8,8 +8,8 @@ const ExtendedScreenRouteContainer = styled.div((props) => ({
   flexDirection: 'column',
   height: '100vh',
   width: '100vw',
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: `1px solid ${props.theme.colors.background.elevation2}`,
+  backgroundColor: props.theme.colors.elevation0,
+  border: `1px solid ${props.theme.colors.elevation2}`,
   boxShadow: '0px 8px 28px rgba(0, 0, 0, 0.35)',
 }));
 
@@ -17,7 +17,7 @@ const TestnetContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   paddingTop: props.theme.spacing(3),
   paddingBottom: props.theme.spacing(3),
 }));

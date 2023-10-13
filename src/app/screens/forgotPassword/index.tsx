@@ -11,7 +11,7 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-  backgroundColor: props.theme.colors.background.elevation0,
+  backgroundColor: props.theme.colors.elevation0,
   padding: `0 ${props.theme.spacing(8)}px 0 ${props.theme.spacing(8)}px`,
 }));
 

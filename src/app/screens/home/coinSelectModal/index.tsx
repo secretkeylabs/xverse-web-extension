@@ -1,11 +1,11 @@
-import BottomModal from '@components/bottomModal';
-import TokenTile from '@components/tokenTile';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import BottomModal from '@components/bottomModal';
+import TokenTile from '@components/tokenTile';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
-import useWalletSelector from '@hooks/useWalletSelector';
 
 const Container = styled.div((props) => ({
   marginTop: props.theme.spacing(6),
@@ -55,7 +55,7 @@ function CoinSelectModal({
             currency="BTC"
             icon={IconBitcoin}
             loading={loadingWalletData}
-            underlayColor={theme.colors.background.elevation2}
+            underlayColor={theme.colors.elevation2}
             margin={14}
             enlargeTicker
             onPress={handleOnBitcoinPress}
@@ -67,7 +67,7 @@ function CoinSelectModal({
             currency="STX"
             icon={IconStacks}
             loading={loadingWalletData}
-            underlayColor={theme.colors.background.elevation2}
+            underlayColor={theme.colors.elevation2}
             margin={14}
             enlargeTicker
             onPress={handleOnStackPress}
@@ -89,7 +89,7 @@ function CoinSelectModal({
               currency="FT"
               icon={IconStacks}
               loading={loadingWalletData}
-              underlayColor={theme.colors.background.elevation2}
+              underlayColor={theme.colors.elevation2}
               margin={14}
               enlargeTicker
               onPress={() => {

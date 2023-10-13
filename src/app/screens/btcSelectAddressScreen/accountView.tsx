@@ -1,8 +1,8 @@
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { Account } from '@secretkeylabs/xverse-core';
 import { getAccountGradient } from '@utils/gradient';
 import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import styled from 'styled-components';
 
 interface GradientCircleProps {
@@ -45,14 +45,14 @@ const RowContainer = styled.div({
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'start',
 }));
 
 const AddressText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginTop: props.theme.spacing(1),
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const BitcoinDot = styled.div((props) => ({

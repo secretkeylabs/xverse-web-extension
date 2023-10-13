@@ -1,12 +1,12 @@
-import styled from 'styled-components';
-import { StxTransactionData } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
-import TransactionStatusIcon from '@components/transactions/transactionStatusIcon';
-import TransactionTitle from '@components/transactions/transactionTitle';
 import TransactionAmount from '@components/transactions/transactionAmount';
 import TransactionRecipient from '@components/transactions/transactionRecipient';
-import { getStxTxStatusUrl } from '@utils/helper';
+import TransactionStatusIcon from '@components/transactions/transactionStatusIcon';
+import TransactionTitle from '@components/transactions/transactionTitle';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { StxTransactionData } from '@secretkeylabs/xverse-core';
+import { CurrencyTypes } from '@utils/constants';
+import { getStxTxStatusUrl } from '@utils/helper';
+import styled from 'styled-components';
 
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
@@ -17,10 +17,10 @@ const TransactionContainer = styled.button((props) => ({
   paddingRight: props.theme.spacing(8),
   background: 'none',
   ':hover': {
-    background: props.theme.colors.white[900],
+    background: props.theme.colors.white_900,
   },
   ':focus': {
-    background: props.theme.colors.white[850],
+    background: props.theme.colors.white_850,
   },
 }));
 

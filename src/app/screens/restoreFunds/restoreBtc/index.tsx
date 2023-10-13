@@ -27,7 +27,7 @@ const RestoreFundTitle = styled.h1((props) => ({
 const BtcCard = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(1),
   padding: '16px 12px',
 }));
