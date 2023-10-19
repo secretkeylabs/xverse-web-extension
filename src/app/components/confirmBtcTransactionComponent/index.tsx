@@ -197,6 +197,16 @@ function ConfirmBtcTransactionComponent({
       ),
   });
 
+  if (typeof feePerVByte !== 'string' && !BigNumber.isBigNumber(feePerVByte)) {
+    Object.setPrototypeOf(feePerVByte, BigNumber.prototype);
+  }
+
+  recipients.forEach((recipient) => {
+    if (typeof recipient.amountSats !== 'string' && !BigNumber.isBigNumber(recipient.amountSats)) {
+      Object.setPrototypeOf(recipient.amountSats, BigNumber.prototype);
+    }
+  });
+
   const {
     isLoading: isLoadingNonOrdinalBtcSend,
     error: errorSigningNonOrdial,
@@ -259,10 +269,9 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     let sum: BigNumber = new BigNumber(0);
-    if (recipients) {
-      recipients.map((recipient) => {
+    if (recipients?.length) {
+      recipients.forEach((recipient) => {
         sum = sum.plus(recipient.amountSats);
-        return sum;
       });
       sum = sum?.plus(currentFee);
     }

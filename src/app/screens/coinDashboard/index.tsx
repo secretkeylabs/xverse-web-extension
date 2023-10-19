@@ -32,29 +32,8 @@ const TokenContractContainer = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   h1: {
-    ...props.theme.body_medium_m,
+    ...props.theme.typography.body_medium_m,
     color: props.theme.colors.white_400,
-  },
-}));
-
-const TransactionHistoryContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginTop: props.theme.spacing(30),
-  borderTop: `1px solid ${props.theme.colors.elevation2}`,
-  h1: {
-    ...props.theme.headline_s,
-    color: props.theme.colors.white_0,
-    marginTop: 32,
-  },
-  h2: {
-    ...props.theme.body_m,
-    fontStyle: 'italic',
-    color: props.theme.colors.white[200],
-    marginTop: props.theme.spacing(8),
   },
 }));
 
@@ -65,7 +44,7 @@ const ContractAddressCopyButton = styled.button((props) => ({
 }));
 
 const TokenContractAddress = styled.p((props) => ({
-  ...props.theme.body_medium_l,
+  ...props.theme.typography.body_medium_l,
   color: props.theme.colors.white_0,
   textAlign: 'left',
   overflowWrap: 'break-word',
@@ -92,7 +71,7 @@ const CopyButtonContainer = styled.div((props) => ({
 }));
 
 const ContractDeploymentButton = styled.button((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   display: 'flex',
   alignItems: 'center',
   marginTop: props.theme.spacing(12),
@@ -111,7 +90,7 @@ interface ButtonProps {
   isSelected: boolean;
 }
 const Button = styled.button<ButtonProps>((props) => ({
-  ...props.theme.body_bold_l,
+  ...props.theme.typography.body_bold_l,
   fontSize: 11,
   display: 'flex',
   justifyContent: 'center',

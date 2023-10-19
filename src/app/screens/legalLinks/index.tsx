@@ -65,6 +65,12 @@ const SwitchContainer = styled.div((props) => ({
   fontSize: '0.875rem',
 }));
 
+const DataCollectionDescription = styled.p((props) => ({
+  ...props.theme.body_m,
+  color: props.theme.colors.white_200,
+  marginTop: props.theme.spacing(32),
+}));
+
 function LegalLinks() {
   const { t } = useTranslation('translation', { keyPrefix: 'LEGAL_SCREEN' });
   const navigate = useNavigate();
@@ -72,7 +78,7 @@ function LegalLinks() {
   const { selectedAccount } = useWalletSelector();
   const [searchParams] = useSearchParams();
   const theme = useTheme();
-  const [isToggleEnabled, setIsToggleEnabled] = useState(false);
+  const [isToggleEnabled, setIsToggleEnabled] = useState(true);
 
   const handleSwitchToggle = () => setIsToggleEnabled((prevEnabledState) => !prevEnabledState);
 
@@ -106,9 +112,11 @@ function LegalLinks() {
             {t('PRIVACY_POLICY_LINK_BUTTON')}
             <img src={LinkIcon} alt="privacy" />
           </CustomizedLink>
-          <Separator />
+          <DataCollectionDescription>
+            {t('AUTHORIZE_DATA_COLLECTION.DESCRIPTION')}
+          </DataCollectionDescription>
           <SwitchContainer>
-            <div>{t('AUTHORIZE_DATA_COLLECTION')}</div>
+            <div>{t('AUTHORIZE_DATA_COLLECTION.TITLE')}</div>
             <CustomSwitch
               onColor={theme.colors.orange_main}
               offColor={theme.colors.background.elevation3}
