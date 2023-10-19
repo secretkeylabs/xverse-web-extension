@@ -7,12 +7,8 @@ const useInscriptionDetails = (id: string) => {
   return useQuery({
     queryKey: [`inscription-${id}`],
     queryFn: async () => {
-      try {
-        const response = await OrdinalsApi.getInscription(id);
-        return response;
-      } catch (err) {
-        return Promise.reject(err);
-      }
+      const response = await OrdinalsApi.getInscription(id);
+      return response;
     },
   });
 };
