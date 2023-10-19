@@ -11,16 +11,13 @@ const useAppConfig = () => {
   return useQuery({
     queryKey: ['app-config'],
     queryFn: async () => {
-      try {
-        const response = await getAppConfig();
-        if (response.data.btcApiURL && network.type === 'Mainnet' && !btcApiUrl) {
-          const updatedNetwork = { ...network, btcApiUrl: response.data.btcApiURL };
-          dispatch(ChangeNetworkAction(updatedNetwork, networkAddress, ''));
-        }
-        return response;
-      } catch (err) {
-        return Promise.reject(err);
+      const response = await getAppConfig();
+      if (response.data.btcApiURL && network.type === 'Mainnet' && !btcApiUrl) {
+        const updatedNetwork = { ...network, btcApiUrl: response.data.btcApiURL };
+        dispatch(ChangeNetworkAction(updatedNetwork, networkAddress, ''));
       }
+      return response;
+
     },
   });
 };
