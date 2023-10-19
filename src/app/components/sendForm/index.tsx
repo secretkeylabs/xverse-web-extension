@@ -1,23 +1,24 @@
-import { CurrencyTypes } from '@utils/constants';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { ReactNode, SetStateAction, useEffect, useState } from 'react';
-import { getTicker } from '@utils/helper';
 import ActionButton from '@components/button';
-import { useNavigate } from 'react-router-dom';
-import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
-import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
-import useNetworkSelector from '@hooks/useNetwork';
 import TokenImage from '@components/tokenImage';
-import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
-import BigNumber from 'bignumber.js';
-import { getCurrencyFlag } from '@utils/currency';
+import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
 import useDebounce from '@hooks/useDebounce';
+import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
+import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
+import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import InputFeedback from '@ui-library/inputFeedback';
+import { CurrencyTypes } from '@utils/constants';
+import { getCurrencyFlag } from '@utils/currency';
+import { getTicker } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { ReactNode, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { FiatRow } from './fiatRow';
+import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
 
 interface ContainerProps {
   error: boolean;
@@ -147,16 +148,11 @@ const MemoInputContainer = styled.div<ContainerProps>((props) => ({
   },
 }));
 
-interface ButtonProps {
-  enabled: boolean;
-}
-
-const SendButtonContainer = styled.div<ButtonProps>((props) => ({
+const SendButtonContainer = styled.div((props) => ({
   paddingBottom: props.theme.spacing(12),
   paddingTop: props.theme.spacing(4),
   marginLeft: '5%',
   marginRight: '5%',
-  opacity: props.enabled ? 1 : 0.6,
 }));
 
 const CurrencyFlag = styled.img((props) => ({
@@ -170,6 +166,10 @@ const TokenContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
+const StyledInputFeedback = styled(InputFeedback)((props) => ({
+  marginBottom: props.theme.spacing(4),
+}));
+
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
@@ -181,6 +181,7 @@ interface Props {
   balance?: number;
   hideMemo?: boolean;
   hideTokenImage?: boolean;
+  hideDefaultWarning?: boolean;
   buttonText?: string;
   processing?: boolean;
   children?: ReactNode;
@@ -189,6 +190,7 @@ interface Props {
   stxMemo?: string;
   onAddressInputChange?: (recipientAddress: string) => void;
   warning?: string;
+  info?: string;
 }
 
 function SendForm({
@@ -202,6 +204,7 @@ function SendForm({
   balance,
   hideMemo = false,
   hideTokenImage = false,
+  hideDefaultWarning = false,
   buttonText,
   processing,
   children,
@@ -210,6 +213,7 @@ function SendForm({
   stxMemo,
   onAddressInputChange,
   warning,
+  info,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   // TODO tim: use context instead of duplicated local state and parent state (as props)
@@ -430,7 +434,7 @@ function SendForm({
   let displayedWarning = '';
   if (warning) {
     displayedWarning = warning;
-  } else {
+  } else if (!hideDefaultWarning) {
     switch (currencyType) {
       case 'Ordinal':
         displayedWarning = t('SEND_ORDINAL_WALLET_WARNING');
@@ -466,9 +470,8 @@ function SendForm({
           {buyCryptoMessage}
           {children}
           {renderEnterRecipientSection}
-          <ErrorContainer>
-            <ErrorText>{addressError}</ErrorText>
-          </ErrorContainer>
+          {addressError && <StyledInputFeedback message={addressError} variant="danger" />}
+          {info && <InputFeedback message={info} />}
           {currencyType !== 'BTC' &&
             currencyType !== 'NFT' &&
             currencyType !== 'Ordinal' &&
@@ -502,10 +505,11 @@ function SendForm({
           )}
         </OuterContainer>
       </ScrollContainer>
-      <SendButtonContainer enabled={checkIfEnableButton()}>
+      <SendButtonContainer>
         <ActionButton
           text={buttonText ?? t('NEXT')}
           processing={processing}
+          disabled={!checkIfEnableButton()}
           onPress={handleOnPress}
         />
       </SendButtonContainer>
