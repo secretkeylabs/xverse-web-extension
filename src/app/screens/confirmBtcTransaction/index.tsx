@@ -15,6 +15,7 @@ import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/type
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
+import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -29,7 +30,6 @@ function ConfirmBtcTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
   const btcClient = useBtcClient();
-  const [recipientAddress, setRecipientAddress] = useState('');
   const [signedTx, setSignedTx] = useState<string>('');
   const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
   const location = useLocation();
@@ -40,6 +40,7 @@ function ConfirmBtcTransaction() {
     amount,
     signedTxHex,
     recipient,
+    recipientAddress,
     isRestoreFundFlow,
     unspentUtxos,
     btcSendBrowserTx,
@@ -48,6 +49,10 @@ function ConfirmBtcTransaction() {
     isBrc20TokenFlow,
     feePerVByte,
   } = location.state;
+  if (typeof fee !== 'string' && !BigNumber.isBigNumber(fee)) {
+    Object.setPrototypeOf(fee, BigNumber.prototype);
+  }
+
   const [currentFee, setCurrentFee] = useState(fee);
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
 
@@ -93,10 +98,6 @@ function ConfirmBtcTransaction() {
       });
     }
   }, [errorBtcOrdinalTransaction]);
-
-  useEffect(() => {
-    setRecipientAddress(location.state.recipientAddress);
-  }, [location]);
 
   useEffect(() => {
     if (btcTxBroadcastData) {

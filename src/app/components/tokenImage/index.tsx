@@ -1,12 +1,12 @@
-import styled from 'styled-components';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import { useCallback } from 'react';
 import BarLoader from '@components/barLoader';
-import stc from 'string-to-color';
+import { FungibleToken } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
 import { getTicker } from '@utils/helper';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import { useCallback } from 'react';
+import stc from 'string-to-color';
+import styled from 'styled-components';
 
 export interface TokenImageProps {
   token?: string;
@@ -39,7 +39,7 @@ const TickerIconContainer = styled.div<{ size?: number; round?: boolean }>((prop
 
 const TickerIconText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
   fontSize: 13,

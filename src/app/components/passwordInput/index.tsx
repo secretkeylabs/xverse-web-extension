@@ -1,11 +1,11 @@
-import { useTranslation } from 'react-i18next';
-import styled, { useTheme } from 'styled-components';
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import PasswordIcon from '@assets/img/createPassword/Password.svg';
-import { useEffect, useState } from 'react';
 import ActionButton from '@components/button';
 import { animated, useTransition } from '@react-spring/web';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled, { useTheme } from 'styled-components';
 import zxcvbn from 'zxcvbn';
 
 interface PasswordInputProps {
@@ -53,10 +53,8 @@ const PasswordInputContainer = styled.div<PasswordInputContainerProps>((props) =
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  border: `1px solid ${
-    props.hasError ? 'rgba(211, 60, 60, 0.3)' : props.theme.colors.background.elevation3
-  }`,
-  backgroundColor: props.theme.colors.background.elevation_1,
+  border: `1px solid ${props.hasError ? 'rgba(211, 60, 60, 0.3)' : props.theme.colors.elevation3}`,
+  backgroundColor: props.theme.colors.elevation_n1,
   borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(4),
   paddingRight: props.theme.spacing(4),
@@ -73,8 +71,8 @@ const PasswordInputLabel = styled.h2((props) => ({
 const Input = styled.input((props) => ({
   ...props.theme.body_medium_m,
   height: 44,
-  backgroundColor: props.theme.colors.background.elevation_1,
-  color: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.elevation_n1,
+  color: props.theme.colors.white_0,
   width: '100%',
   border: 'none',
 }));
@@ -121,7 +119,7 @@ const StrengthBar = styled(animated.div)<StrengthBarProps>((props) => ({
   display: 'flex',
   flex: '1 0',
   alignItems: 'center',
-  backgroundColor: props.theme.colors.white[600],
+  backgroundColor: props.theme.colors.white_600,
   marginLeft: props.theme.spacing(6),
   marginRight: props.theme.spacing(9),
   borderRadius: props.theme.radius(1),
@@ -284,7 +282,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
     return (
       <PasswordStrengthContainer>
         <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-        <StrengthBar strengthColor={theme.colors.white[600]} strengthWidth="0">
+        <StrengthBar strengthColor={theme.colors.white_600} strengthWidth="0">
           {transition((style) => (
             <animated.div style={style} />
           ))}

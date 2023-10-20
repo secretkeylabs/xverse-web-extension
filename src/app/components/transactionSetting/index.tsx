@@ -5,7 +5,7 @@ import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { UTXO } from '@secretkeylabs/xverse-core';
 import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { Recipient, isCustomFeesAllowed } from '@secretkeylabs/xverse-core/transactions/btc';
+import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +24,7 @@ const ButtonContainer = styled.div((props) => ({
 
 const TransactionSettingOptionText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const TransactionSettingOptionButton = styled.button((props) => ({

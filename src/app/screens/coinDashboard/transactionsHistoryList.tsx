@@ -50,7 +50,7 @@ const NoTransactionsContainer = styled.div((props) => ({
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const GroupContainer = styled(animated.div)((props) => ({
@@ -67,14 +67,14 @@ const SectionHeader = styled.div((props) => ({
 }));
 
 const SectionSeparator = styled.div((props) => ({
-  border: `0.5px solid ${props.theme.colors.white[400]}`,
+  border: `0.5px solid ${props.theme.colors.white_400}`,
   opacity: 0.2,
   flexGrow: 1,
 }));
 
 const SectionTitle = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginRight: props.theme.spacing(4),
 }));
 

@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import Timer from '@assets/img/settings/Timer.svg';
+import TimerFull from '@assets/img/settings/TimerFull.svg';
+import TimerHalf from '@assets/img/settings/TimerHalf.svg';
+import ActionButton from '@components/button';
+import TopRow from '@components/topRow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletSession from '@hooks/useWalletSession';
 import { WalletSessionPeriods } from '@stores/wallet/actions/types';
-import TopRow from '@components/topRow';
-import ActionButton from '@components/button';
-import TimerHalf from '@assets/img/settings/TimerHalf.svg';
-import Timer from '@assets/img/settings/Timer.svg';
-import TimerFull from '@assets/img/settings/TimerFull.svg';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -42,8 +42,8 @@ interface TimeSelectionBoxProps {
 const TimeSelectionBox = styled.button<TimeSelectionBoxProps>((props) => ({
   ...props.theme.body_medium_m,
   backgroundColor: 'transparent',
-  border: `1px solid ${props.selected ? props.theme.colors.white[0] : props.theme.colors.grey}`,
-  color: props.theme.colors.white[0],
+  border: `1px solid ${props.selected ? props.theme.colors.white_0 : props.theme.colors.grey}`,
+  color: props.theme.colors.white_0,
   borderRadius: props.theme.radius(1),
   height: 44,
   display: 'flex',

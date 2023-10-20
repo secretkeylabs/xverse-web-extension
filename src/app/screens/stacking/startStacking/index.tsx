@@ -1,13 +1,13 @@
-import styled, { useTheme } from 'styled-components';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { microstacksToStx } from '@secretkeylabs/xverse-core';
-import { Pool } from '@secretkeylabs/xverse-core/types';
-import BigNumber from 'bignumber.js';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import ActionButton from '@components/button';
 import useStackingData from '@hooks/queries/useStackingData';
+import { microstacksToStx } from '@secretkeylabs/xverse-core';
+import { Pool } from '@secretkeylabs/xverse-core/types';
 import { XVERSE_WEB_POOL_URL } from '@utils/constants';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled, { useTheme } from 'styled-components';
 import StackingInfoTile from './stackInfoTile';
 
 const OuterContainer = styled.div({
@@ -20,7 +20,7 @@ const Container = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(12),
-  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 const StackingInfoContainer = styled.div((props) => ({
@@ -51,7 +51,7 @@ const StackingDescriptionText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(12),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 function StartStacking() {

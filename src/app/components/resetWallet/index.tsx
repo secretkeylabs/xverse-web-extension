@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 const ResetWalletText = styled.h1((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   paddingTop: props.theme.spacing(12),

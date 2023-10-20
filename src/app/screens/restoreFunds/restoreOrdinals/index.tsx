@@ -21,7 +21,7 @@ import OrdinalRow from './ordinalRow';
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
   marginBottom: 32,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const ErrorContainer = styled.div({

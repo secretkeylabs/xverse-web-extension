@@ -1,14 +1,14 @@
-import styled from 'styled-components';
-import { NumericFormat } from 'react-number-format';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import { useSelector } from 'react-redux';
-import BigNumber from 'bignumber.js';
 import { StoreState } from '@stores/index';
+import BigNumber from 'bignumber.js';
+import { NumericFormat } from 'react-number-format';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '12px 16px',
   justifyContent: 'center',
@@ -18,19 +18,19 @@ const Container = styled.div((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const SubValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
   textAlign: 'right',
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const ColumnContainer = styled.div({

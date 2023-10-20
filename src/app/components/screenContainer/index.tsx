@@ -9,7 +9,7 @@ const RouteContainer = styled.div((props) => ({
   height: '100%',
   width: 360,
   margin: 'auto',
-  backgroundColor: props.theme.colors.background.elevation0,
+  backgroundColor: props.theme.colors.elevation0,
   border: '1px solid rgba(126, 137,171,0.2)',
   boxShadow: '0px 8px 28px rgba(0, 0, 0, 0.35)',
 }));
@@ -18,7 +18,7 @@ const TestnetContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   paddingTop: props.theme.spacing(3),
   paddingBottom: props.theme.spacing(3),
 }));
@@ -26,7 +26,7 @@ const TestnetContainer = styled.div((props) => ({
 const TestnetText = styled.h1((props) => ({
   ...props.theme.body_xs,
   textAlign: 'center',
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 function ScreenContainer(): JSX.Element {

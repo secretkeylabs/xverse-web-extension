@@ -1,5 +1,5 @@
-import styled, { useTheme } from 'styled-components';
 import Switch from 'react-switch';
+import styled, { useTheme } from 'styled-components';
 
 interface ButtonProps {
   border: string;
@@ -52,7 +52,7 @@ const ComponentText = styled.h1<TitleProps>((props) => ({
 const ComponentDescriptionText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   paddingTop: props.theme.spacing(8),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const DescriptionText = styled.p((props) => ({

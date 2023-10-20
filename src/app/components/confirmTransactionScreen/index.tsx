@@ -1,10 +1,10 @@
-import ConfirmScreen from '@components/confirmScreen';
-import SwapImage from '@assets/img/swap-illustration.svg';
 import BNSImage from '@assets/img/bns-illustration.svg';
 import NFTImage from '@assets/img/nft-illustration.svg';
-import styled from 'styled-components';
+import SwapImage from '@assets/img/swap-illustration.svg';
+import ConfirmScreen from '@components/confirmScreen';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const headerImageMapping = {
   'purchase-asset': NFTImage,
@@ -24,7 +24,7 @@ const AdvanceSettingsButton = styled.button((props) => ({
   width: 150,
   height: 20,
   marginLeft: 16,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const FeesContainer = styled.div(() => ({}));

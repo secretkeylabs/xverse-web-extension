@@ -10,10 +10,10 @@ import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   ErrorCodes,
-  ResponseError,
-  UTXO,
   getBtcFiatEquivalent,
+  ResponseError,
   satsToBtc,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import {
@@ -81,7 +81,7 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -107,7 +107,7 @@ interface ReviewTransactionTitleProps {
 }
 const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
   textAlign: props.isOridnalTx ? 'center' : 'left',
 }));
@@ -196,6 +196,16 @@ function ConfirmBtcTransactionComponent({
       ),
   });
 
+  if (typeof feePerVByte !== 'string' && !BigNumber.isBigNumber(feePerVByte)) {
+    Object.setPrototypeOf(feePerVByte, BigNumber.prototype);
+  }
+
+  recipients.forEach((recipient) => {
+    if (typeof recipient.amountSats !== 'string' && !BigNumber.isBigNumber(recipient.amountSats)) {
+      Object.setPrototypeOf(recipient.amountSats, BigNumber.prototype);
+    }
+  });
+
   const {
     isLoading: isLoadingNonOrdinalBtcSend,
     error: errorSigningNonOrdial,
@@ -258,10 +268,9 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     let sum: BigNumber = new BigNumber(0);
-    if (recipients) {
-      recipients.map((recipient) => {
+    if (recipients?.length) {
+      recipients.forEach((recipient) => {
         sum = sum.plus(recipient.amountSats);
-        return sum;
       });
       sum = sum?.plus(currentFee);
     }

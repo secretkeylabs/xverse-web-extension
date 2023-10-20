@@ -12,7 +12,7 @@ const RestoreFundTitle = styled.h1((props) => ({
   marginTop: 24,
   marginLeft: 16,
   marginRight: 16,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const Container = styled.div({

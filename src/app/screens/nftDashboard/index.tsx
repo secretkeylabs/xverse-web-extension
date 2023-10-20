@@ -65,7 +65,7 @@ const ReceiveNftContainer = styled.div((props) => ({
   top: 0,
   right: 0,
   zIndex: 2000,
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.elevation2,
   borderRadius: 16,
 }));
 

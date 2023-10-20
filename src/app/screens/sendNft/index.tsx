@@ -1,29 +1,29 @@
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
+import AccountHeaderComponent from '@components/accountHeader';
+import SendForm from '@components/sendForm';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useNetworkSelector from '@hooks/useNetwork';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import NftImage from '@screens/nftDashboard/nftImage';
+import { validateStxAddress } from '@secretkeylabs/xverse-core';
+import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import {
-  StacksTransaction,
   cvToHex,
+  StacksTransaction,
   uintCV,
   UnsignedStacksTransation,
 } from '@secretkeylabs/xverse-core/types';
-import { useMutation } from '@tanstack/react-query';
-import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { validateStxAddress } from '@secretkeylabs/xverse-core';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import SendForm from '@components/sendForm';
-import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
-import useWalletSelector from '@hooks/useWalletSelector';
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import { checkNftExists, isLedgerAccount } from '@utils/helper';
-import NftImage from '@screens/nftDashboard/nftImage';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
-import AccountHeaderComponent from '@components/accountHeader';
-import useNetworkSelector from '@hooks/useNetwork';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import { useMutation } from '@tanstack/react-query';
+import { checkNftExists, isLedgerAccount } from '@utils/helper';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -59,7 +59,7 @@ const NftContainer = styled.div((props) => ({
 
 const NftTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -89,7 +89,7 @@ const ButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 400,
   fontSize: 14,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 

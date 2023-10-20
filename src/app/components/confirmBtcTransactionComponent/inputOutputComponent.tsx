@@ -1,10 +1,10 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import ScriptIcon from '@assets/img/transactions/ScriptIcon.svg';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import OutputIcon from '@assets/img/transactions/output.svg';
+import ScriptIcon from '@assets/img/transactions/ScriptIcon.svg';
 import TransferDetailView from '@components/transferDetailView';
 import { animated, config, useSpring } from '@react-spring/web';
-import { PSBTInput, PSBTOutput, ParsedPSBT, satsToBtc } from '@secretkeylabs/xverse-core';
+import { ParsedPSBT, PSBTInput, PSBTOutput, satsToBtc } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import { getTruncatedAddress } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -16,7 +16,7 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   overflowY: 'auto',
   padding: props.theme.spacing(6),
@@ -31,32 +31,32 @@ const TransferDetailContainer = styled.div((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const OutputTitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(6),
 }));
 
 const SubValueText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const TxIdText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(2),
 }));
 
 const YourAddressText = styled.h1((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginRight: props.theme.spacing(2),
 }));
 

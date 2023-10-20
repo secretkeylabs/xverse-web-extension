@@ -108,33 +108,33 @@ const ExtensionNFtContainer = styled.div((props) => ({
 
 const NftTitleText = styled.h1((props) => ({
   ...props.theme.headline_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(12),
   textAlign: 'center',
 }));
 
 const CollectibleText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
 const NftGalleryTitleText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(12),
 }));
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   fontSize: 24,
   marginBottom: props.theme.spacing(16),
 }));
 
 const NftOwnedByText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
@@ -162,7 +162,7 @@ const GridContainer = styled.div((props) => ({
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
   paddingBottom: props.theme.spacing(16),
   marginBottom: props.theme.spacing(12),
-  borderBottom: `1px solid ${props.theme.colors.background.elevation2}`,
+  borderBottom: `1px solid ${props.theme.colors.elevation2}`,
 }));
 
 const ShareButtonContainer = styled.div((props) => ({
@@ -179,7 +179,7 @@ const DescriptionContainer = styled.h1((props) => ({
 
 const AttributeText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginBottom: props.theme.spacing(2),
   letterSpacing: '0.02em',
   textTransform: 'uppercase',
@@ -199,7 +199,7 @@ const WebGalleryButton = styled.button((props) => ({
 const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_m,
   fontWeight: 700,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 
@@ -220,20 +220,20 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const AssetDeatilButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 400,
   fontSize: 14,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const ButtonHiglightedText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(2),
   marginRight: props.theme.spacing(2),
 }));

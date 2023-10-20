@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import styled from 'styled-components';
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import { useTranslation } from 'react-i18next';
-import { encryptSeedPhrase } from '@utils/encryptionUtils';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
-import { useDispatch } from 'react-redux';
 import Check from '@assets/img/settings/check_circle.svg';
 import PasswordInput from '@components/passwordInput';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
 import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { storeEncryptedSeedAction } from '@stores/wallet/actions/actionCreators';
+import { encryptSeedPhrase } from '@utils/encryptionUtils';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
@@ -36,7 +36,7 @@ const ToastContainer = styled.div((props) => ({
 
 const ToastMessage = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.background.elevation0,
+  color: props.theme.colors.elevation0,
   marginLeft: props.theme.spacing(7),
 }));
 

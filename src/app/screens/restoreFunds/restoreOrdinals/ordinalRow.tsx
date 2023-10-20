@@ -8,7 +8,7 @@ import styled from 'styled-components';
 const OrdinalCard = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 8,
   padding: '16px 12px',
 }));
@@ -16,25 +16,25 @@ const OrdinalCard = styled.div((props) => ({
 const OrdinalImageContainer = styled.div((props) => ({
   width: 48,
   height: 48,
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.elevation2,
 }));
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const TransferButton = styled.button((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   background: 'transparent',
   width: 86,
-  border: `1px solid ${props.theme.colors.background.elevation6}`,
+  border: `1px solid ${props.theme.colors.elevation6}`,
   borderRadius: 8,
   padding: '12px 16px',
 }));
