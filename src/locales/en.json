@@ -733,9 +733,9 @@
     "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider."
   },
   "COIN_DASHBOARD_SCREEN": {
-    "SEND_COIN_BUTTON": "SEND",
-    "RECEIVE_COIN_BUTTON": "Receive",
-    "BUY_COIN_BUTTON": "Buy",
+    "SEND": "Send",
+    "RECEIVE": "Receive",
+    "BUY": "Buy",
     "TRANSACTION_HISTORY_TITLE": "Transaction history",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
@@ -769,7 +769,6 @@
     "TRANSACTIONS": "TRANSACTIONS",
     "CONTRACT": "CONTRACT",
     "COMING_SOON": "Coming soon",
-    "RECEIVE": "Receive",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address"
   },

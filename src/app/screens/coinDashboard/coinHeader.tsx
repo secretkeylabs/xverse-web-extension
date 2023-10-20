@@ -1,23 +1,23 @@
-import TokenImage from '@components/tokenImage';
 import ArrowDown from '@assets/img/dashboard/arrow_down.svg';
 import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
-import Lock from '@assets/img/transactions/Lock.svg';
 import Buy from '@assets/img/dashboard/black_plus.svg';
+import Lock from '@assets/img/transactions/Lock.svg';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
+import SmallActionButton from '@components/smallActionButton';
+import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import BigNumber from 'bignumber.js';
-import { NumericFormat } from 'react-number-format';
-import styled from 'styled-components';
 import { CurrencyTypes } from '@utils/constants';
-import { getFtBalance, getFtTicker } from '@utils/tokens';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { isLedgerAccount } from '@utils/helper';
-import SmallActionButton from '@components/smallActionButton';
+import { getFtBalance, getFtTicker } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
-import BottomModal from '@components/bottomModal';
-import ActionButton from '@components/button';
+import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 interface CoinBalanceProps {
   coin: CurrencyTypes;
@@ -374,7 +374,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <SmallActionButton src={ArrowUp} text="Send" onPress={() => goToSendScreen()} />
+          <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
         </ButtonContainer>
 
         {!fungibleToken ? (
@@ -392,7 +392,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
                 }}
               />
             </ButtonContainer>
-            <SmallActionButton src={Buy} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
+            <SmallActionButton src={Buy} text={t('BUY')} onPress={() => navigate(`/buy/${coin}`)} />
           </>
         ) : (
           <RecieveButtonContainer>
