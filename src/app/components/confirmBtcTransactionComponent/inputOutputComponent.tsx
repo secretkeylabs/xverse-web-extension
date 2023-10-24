@@ -1,16 +1,16 @@
-import styled from 'styled-components';
+import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import OutputIcon from '@assets/img/transactions/output.svg';
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import ScriptIcon from '@assets/img/transactions/ScriptIcon.svg';
+import TransferDetailView from '@components/transferDetailView';
+import { animated, config, useSpring } from '@react-spring/web';
+import { ParsedPSBT, PSBTInput, PSBTOutput, satsToBtc } from '@secretkeylabs/xverse-core';
+import { StoreState } from '@stores/index';
+import { getTruncatedAddress } from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import BigNumber from 'bignumber.js';
-import { animated, config, useSpring } from '@react-spring/web';
-import { StoreState } from '@stores/index';
-import TransferDetailView from '@components/transferDetailView';
-import { ParsedPSBT, PSBTInput, PSBTOutput, satsToBtc } from '@secretkeylabs/xverse-core';
-import { getTruncatedAddress } from '@utils/helper';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',

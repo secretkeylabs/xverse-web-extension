@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import { nanoid } from 'nanoid';
+import styled from 'styled-components';
 
 const StepsContainer = styled.div({
   display: 'flex',

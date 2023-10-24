@@ -1,6 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 

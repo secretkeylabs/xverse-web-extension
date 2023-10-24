@@ -1,20 +1,20 @@
-import BottomBar from '@components/tabBar';
+import SponsoredTransactionIcon from '@assets/img/transactions/CircleWavyCheck.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import { Container } from '@screens/home';
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import FunctionBlock from '@screens/swap/swapConfirmation/functionBlock';
 import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
+import BottomBar from '@components/tabBar';
+import { Container } from '@screens/home';
+import { AdvanceSettings } from '@screens/swap/swapConfirmation/advanceSettings';
 import FeesBlock from '@screens/swap/swapConfirmation/feesBlock';
+import FunctionBlock from '@screens/swap/swapConfirmation/functionBlock';
 import RouteBlock from '@screens/swap/swapConfirmation/routeBlock';
 import StxInfoBlock from '@screens/swap/swapConfirmation/stxInfoBlock';
-import { useCallback, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useConfirmSwap } from '@screens/swap/swapConfirmation/useConfirmSwap';
-import { AdvanceSettings } from '@screens/swap/swapConfirmation/advanceSettings';
-import SponsoredTransactionIcon from '@assets/img/transactions/CircleWavyCheck.svg';
-import InfoContainer from '@components/infoContainer';
 import { SUPPORT_URL_TAB_TARGET, SWAP_SPONSOR_DISABLED_SUPPORT_URL } from '@utils/constants';
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const TitleText = styled.div((props) => ({
   fontSize: 21,

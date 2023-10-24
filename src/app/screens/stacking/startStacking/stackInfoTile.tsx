@@ -1,6 +1,6 @@
-import styled from 'styled-components';
 import BarLoader from '@components/barLoader';
 import { LoaderSize } from '@utils/constants';
+import styled from 'styled-components';
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.headline_category_s,

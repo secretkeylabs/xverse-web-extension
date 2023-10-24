@@ -1,11 +1,11 @@
-import { MoonLoader } from 'react-spinners';
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import useStackingData from '@hooks/queries/useStackingData';
-import BottomBar from '@components/tabBar';
 import AccountHeaderComponent from '@components/accountHeader';
+import BottomBar from '@components/tabBar';
+import useStackingData from '@hooks/queries/useStackingData';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 import StackingProgress from './stackingProgress';
 import StartStacking from './startStacking';
 

@@ -1,14 +1,14 @@
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
-import ActionButton from '@components/button';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
-import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
-import useWalletSelector from '@hooks/useWalletSelector';
+import ActionButton from '@components/button';
 import CopyButton from '@components/copyButton';
 import InfoContainer from '@components/infoContainer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const TxStatusContainer = styled.div({
   background: 'rgba(25, 25, 48, 0.74)',

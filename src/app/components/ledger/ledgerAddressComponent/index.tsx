@@ -1,6 +1,6 @@
-import styled from 'styled-components';
-import { Tooltip } from 'react-tooltip';
 import { useState } from 'react';
+import { Tooltip } from 'react-tooltip';
+import styled from 'styled-components';
 
 import copyIcon from '@assets/img/Copy.svg';
 

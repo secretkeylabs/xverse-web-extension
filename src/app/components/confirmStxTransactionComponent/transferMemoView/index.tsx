@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',

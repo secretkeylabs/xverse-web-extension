@@ -1,6 +1,6 @@
+import { Container, TitleContainer, TitleText } from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { Container, TitleContainer, TitleText } from '@screens/swap/swapConfirmation/stxInfoBlock';
 
 const FunctionName = styled.div((props) => ({
   ...props.theme.body_medium_m,

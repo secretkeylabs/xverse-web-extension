@@ -1,14 +1,14 @@
+import TokenImage from '@components/tokenImage';
 import {
   Container,
   FoldButton,
   TitleContainer,
   TitleText,
 } from '@screens/swap/swapConfirmation/stxInfoBlock';
+import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useState } from 'react';
-import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
-import TokenImage from '@components/tokenImage';
 
 const RouteProgress = styled.div((props) => ({
   position: 'relative',

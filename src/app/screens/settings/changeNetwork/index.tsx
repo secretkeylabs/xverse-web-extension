@@ -1,16 +1,16 @@
-import styled from 'styled-components';
+import Cross from '@assets/img/settings/x.svg';
+import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { useTranslation } from 'react-i18next';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useNavigate } from 'react-router-dom';
-import { initialNetworksList } from '@utils/constants';
-import Cross from '@assets/img/settings/x.svg';
-import { useState } from 'react';
-import ActionButton from '@components/button';
-import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
-import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core/types';
 import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core/types';
+import { initialNetworksList } from '@utils/constants';
+import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import NetworkRow from './networkRow';
 
 const Container = styled.div`
