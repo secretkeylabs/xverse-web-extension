@@ -14,6 +14,7 @@ import { getTicker } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { FiatRow } from './fiatRow';
@@ -334,7 +335,12 @@ function SendForm({
       <RowContainer>
         <TitleText>{t('AMOUNT')}</TitleText>
         <BalanceText>{t('BALANCE')}:</BalanceText>
-        <Text>{balance}</Text>
+        <NumericFormat
+          value={balance}
+          displayType="text"
+          thousandSeparator
+          renderText={(value: string) => <Text>{value}</Text>}
+        />
       </RowContainer>
       <AmountInputContainer error={amountError !== ''}>
         <InputFieldContainer>
