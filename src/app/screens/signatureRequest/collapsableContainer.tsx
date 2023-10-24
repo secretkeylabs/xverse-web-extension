@@ -1,7 +1,7 @@
-import styled from 'styled-components';
-import { animated, config, useSpring } from '@react-spring/web';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
+import { animated, config, useSpring } from '@react-spring/web';
 import { useEffect, useState } from 'react';
+import styled from 'styled-components';
 
 interface Props {
   title: string;

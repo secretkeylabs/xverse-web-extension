@@ -1,15 +1,15 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import FoldIconUp from '@assets/img/swap/fold_arrow_up.svg';
-import FoldDownIcon from '@assets/img/swap/fold_arrow_down.svg';
 import AddressIcon from '@assets/img/swap/address.svg';
 import CopyIcon from '@assets/img/swap/copy.svg';
-import { getTruncatedAddress } from '@utils/helper';
+import FoldDownIcon from '@assets/img/swap/fold_arrow_down.svg';
+import FoldIconUp from '@assets/img/swap/fold_arrow_up.svg';
 import { StyledToolTip } from '@components/accountRow';
-import { useCallback, useState } from 'react';
-import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
-import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import TokenImage from '@components/tokenImage';
+import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
+import { getTruncatedAddress } from '@utils/helper';
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 export const Container = styled.div((props) => ({
   display: 'flex',

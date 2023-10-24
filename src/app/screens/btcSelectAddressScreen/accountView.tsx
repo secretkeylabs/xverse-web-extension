@@ -1,8 +1,8 @@
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { Account } from '@secretkeylabs/xverse-core';
 import { getAccountGradient } from '@utils/gradient';
 import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import styled from 'styled-components';
 
 interface GradientCircleProps {

@@ -1,13 +1,13 @@
-import styled, { useTheme } from 'styled-components';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { microstacksToStx } from '@secretkeylabs/xverse-core';
-import { Pool } from '@secretkeylabs/xverse-core/types';
-import BigNumber from 'bignumber.js';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import ActionButton from '@components/button';
 import useStackingData from '@hooks/queries/useStackingData';
+import { microstacksToStx } from '@secretkeylabs/xverse-core';
+import { Pool } from '@secretkeylabs/xverse-core/types';
 import { XVERSE_WEB_POOL_URL } from '@utils/constants';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled, { useTheme } from 'styled-components';
 import StackingInfoTile from './stackInfoTile';
 
 const OuterContainer = styled.div({
@@ -72,16 +72,10 @@ function StartStacking() {
     }
   }, [stackingData]);
 
-  function getMinimum() {
+  const getMinimum = () => {
     const min = poolAvailable ? pool!.minimum : 0;
     return microstacksToStx(new BigNumber(min)).toString();
-  }
-
-  function getCycles() {
-    const minCycles = poolAvailable ? Math.min(...pool!.available_cycle_durations) : 0;
-    const maxCycles = poolAvailable ? Math.max(...pool!.available_cycle_durations) : 0;
-    return `${minCycles}-${maxCycles}`;
-  }
+  };
 
   const handleOnClick = () => {
     window.open(XVERSE_WEB_POOL_URL);

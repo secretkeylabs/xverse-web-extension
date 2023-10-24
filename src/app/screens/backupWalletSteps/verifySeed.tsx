@@ -1,8 +1,8 @@
+import ActionButton from '@components/button';
+import { generateMnemonic } from 'bip39';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { generateMnemonic } from 'bip39';
-import ActionButton from '@components/button';
 
 const Container = styled.div((props) => ({
   display: 'flex',

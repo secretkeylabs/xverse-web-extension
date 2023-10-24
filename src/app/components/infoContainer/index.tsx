@@ -1,6 +1,6 @@
-import styled from 'styled-components';
 import InfoIcon from '@assets/img/info.svg';
 import WarningIcon from '@assets/img/Warning.svg';
+import styled from 'styled-components';
 
 interface ContainerProps {
   type: 'Info' | 'Warning' | undefined;

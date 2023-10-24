@@ -1,23 +1,23 @@
-import { CurrencyTypes } from '@utils/constants';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { ReactNode, SetStateAction, useEffect, useState } from 'react';
-import { getTicker } from '@utils/helper';
 import ActionButton from '@components/button';
-import { useNavigate } from 'react-router-dom';
-import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
-import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
 import InfoContainer from '@components/infoContainer';
-import useNetworkSelector from '@hooks/useNetwork';
 import TokenImage from '@components/tokenImage';
-import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
-import BigNumber from 'bignumber.js';
-import { getCurrencyFlag } from '@utils/currency';
+import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
 import useDebounce from '@hooks/useDebounce';
+import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
+import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
+import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { CurrencyTypes } from '@utils/constants';
+import { getCurrencyFlag } from '@utils/currency';
+import { getTicker } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { ReactNode, SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { FiatRow } from './fiatRow';
+import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
 
 interface ContainerProps {
   error: boolean;

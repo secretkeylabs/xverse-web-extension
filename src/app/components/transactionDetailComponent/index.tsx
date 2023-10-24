@@ -1,9 +1,9 @@
-import styled from 'styled-components';
-import { NumericFormat } from 'react-number-format';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import { useSelector } from 'react-redux';
-import BigNumber from 'bignumber.js';
 import { StoreState } from '@stores/index';
+import BigNumber from 'bignumber.js';
+import { NumericFormat } from 'react-number-format';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
