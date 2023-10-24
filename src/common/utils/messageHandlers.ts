@@ -11,7 +11,6 @@ async function internalBackgroundMessageHandler(
   sendResponse: (response?: any) => void,
 ) {
   if (!validateMessagesAreFromExtension(sender)) {
-    sendResponse();
     return;
   }
   sendResponse();
