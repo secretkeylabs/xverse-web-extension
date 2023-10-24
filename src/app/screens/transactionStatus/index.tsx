@@ -1,14 +1,14 @@
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
-import ActionButton from '@components/button';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
-import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
-import useWalletSelector from '@hooks/useWalletSelector';
+import ActionButton from '@components/button';
 import CopyButton from '@components/copyButton';
 import InfoContainer from '@components/infoContainer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const TxStatusContainer = styled.div({
   background: 'rgba(25, 25, 48, 0.74)',
@@ -85,14 +85,14 @@ const Image = styled.img({
 
 const HeadingText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   marginTop: props.theme.spacing(8),
 }));
 
 const BodyText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
   overflowWrap: 'break-word',
@@ -104,19 +104,19 @@ const BodyText = styled.h1((props) => ({
 
 const TxIDText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textTransform: 'uppercase',
 }));
 
 const BeforeButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const IDText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(2),
   wordBreak: 'break-all',
 }));
@@ -124,7 +124,7 @@ const IDText = styled.h1((props) => ({
 const ButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginRight: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const ButtonImage = styled.img((props) => ({

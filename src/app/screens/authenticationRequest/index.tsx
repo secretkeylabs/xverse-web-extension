@@ -1,26 +1,26 @@
-import styled from 'styled-components';
-import { useLocation } from 'react-router-dom';
-import ConfirmScreen from '@components/confirmScreen';
-import { decodeToken } from 'jsontokens';
-import { useTranslation } from 'react-i18next';
-import { createAuthResponse, handleLedgerStxJWTAuth } from '@secretkeylabs/xverse-core';
-import { MESSAGE_SOURCE } from '@common/types/message-types';
-import { useState } from 'react';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useSeedVault from '@hooks/useSeedVault';
-import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
-import validUrl from 'valid-url';
-import AccountHeaderComponent from '@components/accountHeader';
-import BottomModal from '@components/bottomModal';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import ActionButton from '@components/button';
-import Transport from '@ledgerhq/hw-transport-webusb';
+import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
+import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { ledgerDelay } from '@common/utils/ledger';
-import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
-import { isHardwareAccount } from '@utils/helper';
+import AccountHeaderComponent from '@components/accountHeader';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
+import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { createAuthResponse, handleLedgerStxJWTAuth } from '@secretkeylabs/xverse-core';
+import { AddressVersion, publicKeyToAddress, StacksMessageType } from '@stacks/transactions';
+import { isHardwareAccount } from '@utils/helper';
+import { decodeToken } from 'jsontokens';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+import styled from 'styled-components';
+import validUrl from 'valid-url';
 
 const MainContainer = styled.div({
   display: 'flex',
@@ -53,13 +53,13 @@ const TopImage = styled.img({
 
 const FunctionTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(8),
 }));
 
 const DappTitle = styled.h2((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(2),
 }));
 

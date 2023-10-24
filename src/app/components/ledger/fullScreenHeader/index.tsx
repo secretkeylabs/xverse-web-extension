@@ -23,7 +23,7 @@ const XverseLogo = styled.img((props) => ({
 const VersionText = styled.p((props) => ({
   ...props.theme.body_xs,
   fontSize: '18px',
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 function FullScreenHeader() {

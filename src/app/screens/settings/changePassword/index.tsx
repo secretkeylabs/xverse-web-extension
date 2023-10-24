@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import styled from 'styled-components';
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import { useTranslation } from 'react-i18next';
 import Check from '@assets/img/settings/check_circle.svg';
 import PasswordInput from '@components/passwordInput';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
 import useSeedVault from '@hooks/useSeedVault';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
@@ -32,7 +32,7 @@ const ToastContainer = styled.div((props) => ({
 
 const ToastMessage = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.background.elevation0,
+  color: props.theme.colors.elevation0,
   marginLeft: props.theme.spacing(7),
 }));
 

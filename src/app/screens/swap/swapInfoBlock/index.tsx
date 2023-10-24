@@ -21,7 +21,7 @@ const CustomSwitch = styled(Switch)`
 
 const PoweredByAlexText = styled.span((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const DetailButton = styled.button((props) => ({
@@ -31,7 +31,7 @@ const DetailButton = styled.button((props) => ({
   background: 'transparent',
   alignItems: 'center',
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 const DL = styled.dl((props) => ({
@@ -43,13 +43,13 @@ const DL = styled.dl((props) => ({
 
 const DT = styled.dt((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   flex: '50%',
 }));
 
 const DD = styled.dd((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   flex: '50%',
   display: 'flex',
   justifyContent: 'flex-end',
@@ -68,11 +68,11 @@ const SlippageImg = styled.img(() => ({
 
 const CannotBeSponsored = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 const SponsorTransactionSwitchLabel = styled(DT)<{ disabled: boolean }>((props) => ({
-  color: props.disabled ? props.theme.colors.white['400'] : props.theme.colors.white['200'],
+  color: props.disabled ? props.theme.colors.white_400 : props.theme.colors.white_200,
 }));
 
 const ToggleContainer = styled(DD)({
@@ -81,7 +81,7 @@ const ToggleContainer = styled(DD)({
 
 const LearnMoreAnchor = styled.a((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(2),
   display: 'block',
 }));

@@ -20,9 +20,9 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   height: 'auto',
-  backgroundColor: props.theme.colors.background.elevation0,
+  backgroundColor: props.theme.colors.elevation0,
   padding: `${props.theme.spacing(12)}px`,
-  border: `1px solid ${props.theme.colors.background.elevation2}`,
+  border: `1px solid ${props.theme.colors.elevation2}`,
   borderRadius: props.theme.radius(2),
 }));
 

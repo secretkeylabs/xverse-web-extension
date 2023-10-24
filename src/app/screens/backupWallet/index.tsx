@@ -39,7 +39,7 @@ const SubTitle = styled.h2((props) => ({
   ...props.theme.body_l,
   textAlign: 'center',
   marginTop: props.theme.spacing(4),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 const BackupActionsContainer = styled.div((props) => ({

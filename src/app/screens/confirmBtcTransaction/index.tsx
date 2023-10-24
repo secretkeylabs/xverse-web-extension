@@ -1,24 +1,25 @@
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
-import BottomBar from '@components/tabBar';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useWalletSelector from '@hooks/useWalletSelector';
-import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
-import styled from 'styled-components';
-import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
-import InfoContainer from '@components/infoContainer';
-import { useTranslation } from 'react-i18next';
-import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
-import AlertMessage from '@components/alertMessage';
-import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import useBtcClient from '@hooks/useBtcClient';
-import { isLedgerAccount } from '@utils/helper';
 import { ConfirmBtcTransactionState, LedgerTransactionType } from '@common/types/ledger';
-import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
+import AlertMessage from '@components/alertMessage';
+import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
+import InfoContainer from '@components/infoContainer';
+import BottomBar from '@components/tabBar';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useBtcClient from '@hooks/useBtcClient';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
+import { useMutation } from '@tanstack/react-query';
+import { isLedgerAccount } from '@utils/helper';
+import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
@@ -29,7 +30,6 @@ function ConfirmBtcTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
   const btcClient = useBtcClient();
-  const [recipientAddress, setRecipientAddress] = useState('');
   const [signedTx, setSignedTx] = useState<string>('');
   const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);
   const location = useLocation();
@@ -40,6 +40,7 @@ function ConfirmBtcTransaction() {
     amount,
     signedTxHex,
     recipient,
+    recipientAddress,
     isRestoreFundFlow,
     unspentUtxos,
     btcSendBrowserTx,
@@ -48,6 +49,10 @@ function ConfirmBtcTransaction() {
     isBrc20TokenFlow,
     feePerVByte,
   } = location.state;
+  if (typeof fee !== 'string' && !BigNumber.isBigNumber(fee)) {
+    Object.setPrototypeOf(fee, BigNumber.prototype);
+  }
+
   const [currentFee, setCurrentFee] = useState(fee);
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
 
@@ -93,10 +98,6 @@ function ConfirmBtcTransaction() {
       });
     }
   }, [errorBtcOrdinalTransaction]);
-
-  useEffect(() => {
-    setRecipientAddress(location.state.recipientAddress);
-  }, [location]);
 
   useEffect(() => {
     if (btcTxBroadcastData) {
@@ -219,11 +220,8 @@ function ConfirmBtcTransaction() {
           isWarningAlert
         />
       )}
-      {btcSendBrowserTx && (
-        <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
-      )}
+      {btcSendBrowserTx && <AccountHeaderComponent disableMenuOption disableAccountSwitch />}
       <ConfirmBtcTransactionComponent
-        fee={fee}
         feePerVByte={feePerVByte}
         recipients={recipient as Recipient[]}
         loadingBroadcastedTx={isLoading}

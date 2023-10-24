@@ -1,12 +1,11 @@
-import { useCallback, useState } from 'react';
-import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import TransactionSettingAlert from '@components/transactionSetting';
-import BigNumber from 'bignumber.js';
-import { setFee, setNonce } from '@secretkeylabs/xverse-core';
-import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
-import styled from 'styled-components';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
+import TransactionSettingAlert from '@components/transactionSetting';
+import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import BigNumber from 'bignumber.js';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Button = styled.button((props) => ({
   display: 'flex',
@@ -20,7 +19,7 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 

@@ -33,7 +33,7 @@ const BRC20Container = styled.div({
 
 const OrdinalContentText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   fontSize: props.inNftSend || props.withoutSizeIncrease ? 15 : 'calc(0.8vw + 2vh)',
   overflow: 'hidden',
   textAlign: 'center',
@@ -133,7 +133,7 @@ const ButtonIcon = styled.img({
 const Text = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   textTransform: 'uppercase',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   fontSize: 10,
   marginLeft: props.theme.spacing(4),
 }));

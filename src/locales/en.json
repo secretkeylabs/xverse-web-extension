@@ -397,7 +397,10 @@
     "TERMS_SERVICES_LINK_BUTTON": "Terms of Service",
     "PRIVACY_POLICY_LINK_BUTTON": "Privacy Policy",
     "ACCEPT_LEGAL_BUTTON": "Accept",
-    "AUTHORIZE_DATA_COLLECTION": "Authorize data collection"
+    "AUTHORIZE_DATA_COLLECTION": {
+      "TITLE": "Authorize data collection",
+      "DESCRIPTION": "We would like to collect anonymous usage data to better understand users and improve the app. You can change this setting at any time."
+    }
   },
   "BACKUP_WALLET_SCREEN": {
     "SCREEN_TITLE": "Backup your wallet",
@@ -499,7 +502,9 @@
     "TITLE": "Forgot Password",
     "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seedphrase you used when you generated your wallet.",
     "PARAGRAPH2": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
-    "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase"
+    "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase",
+    "CANCEL": "Cancel",
+    "RESET": "Reset"
   },
   "RESTORE_WALLET_SCREEN": {
     "ENTER_SEED_HEADER": "Enter your seedphrase to restore your wallet.",

@@ -1,18 +1,16 @@
-import { useTranslation } from 'react-i18next';
-import logo from '@assets/img/xverse_logo.svg';
-import styled from 'styled-components';
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { addMinutes } from 'date-fns';
-import useWalletReducer from '@hooks/useWalletReducer';
-import { animated, useSpring } from '@react-spring/web';
+import logo from '@assets/img/xverse_logo.svg';
 import ActionButton from '@components/button';
 import useCacheMigration from '@hooks/useCacheMigration';
+import useWalletReducer from '@hooks/useWalletReducer';
+import { animated, useSpring } from '@react-spring/web';
 import MigrationConfirmation from '@screens/migrationConfirmation';
-
-declare const VERSION: string;
+import { addMinutes } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Logo = styled.img({
   width: 57,
@@ -23,17 +21,17 @@ const Button = styled.button({
   background: 'none',
 });
 
-const ScreenContainer = styled(animated.div)({
+const ScreenContainer = styled(animated.div)((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  paddingLeft: 18,
-  paddingRight: 18,
+  paddingLeft: props.theme.spacing(9),
+  paddingRight: props.theme.spacing(9),
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
     display: 'none',
   },
-});
+}));
 
 const ContentContainer = styled(animated.div)({
   display: 'flex',
@@ -43,7 +41,7 @@ const ContentContainer = styled(animated.div)({
 
 const AppVersion = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'right',
   marginTop: props.theme.spacing(8),
 }));
@@ -67,7 +65,7 @@ const PasswordInputContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: `1px solid ${props.theme.colors.elevation3}`,
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   borderRadius: props.theme.radius(1),
@@ -77,8 +75,8 @@ const PasswordInputContainer = styled.div((props) => ({
 const PasswordInput = styled.input((props) => ({
   ...props.theme.body_medium_m,
   height: 44,
-  backgroundColor: props.theme.colors.background.elevation0,
-  color: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.elevation0,
+  color: props.theme.colors.white_0,
   width: '100%',
   border: 'none',
 }));
@@ -88,7 +86,7 @@ const LandingTitle = styled.h1((props) => ({
   paddingTop: props.theme.spacing(15),
   paddingLeft: props.theme.spacing(34),
   paddingRight: props.theme.spacing(34),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 
@@ -108,7 +106,7 @@ const ForgotPasswordButton = styled.a((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
   marginTop: props.theme.spacing(12),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textDecoration: 'underline',
 }));
 

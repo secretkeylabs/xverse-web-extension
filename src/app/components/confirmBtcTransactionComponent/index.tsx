@@ -1,18 +1,21 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
 import TopRow from '@components/topRow';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   BtcUtxoDataResponse,
   ErrorCodes,
-  ResponseError,
-  UTXO,
   getBtcFiatEquivalent,
+  ResponseError,
   satsToBtc,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import {
@@ -22,16 +25,13 @@ import {
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation } from '@tanstack/react-query';
+import Callout from '@ui-library/callout';
 import { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import useSeedVault from '@hooks/useSeedVault';
 import styled from 'styled-components';
-import InfoContainer from '@components/infoContainer';
-import useWalletSelector from '@hooks/useWalletSelector';
-import Callout from '@ui-library/callout';
 import TransactionDetailComponent from '../transactionDetailComponent';
 
 const OuterContainer = styled.div`
@@ -83,7 +83,7 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -109,7 +109,7 @@ interface ReviewTransactionTitleProps {
 }
 const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
   textAlign: props.isOridnalTx ? 'center' : 'left',
 }));
@@ -199,6 +199,16 @@ function ConfirmBtcTransactionComponent({
       ),
   });
 
+  if (typeof feePerVByte !== 'string' && !BigNumber.isBigNumber(feePerVByte)) {
+    Object.setPrototypeOf(feePerVByte, BigNumber.prototype);
+  }
+
+  recipients.forEach((recipient) => {
+    if (typeof recipient.amountSats !== 'string' && !BigNumber.isBigNumber(recipient.amountSats)) {
+      Object.setPrototypeOf(recipient.amountSats, BigNumber.prototype);
+    }
+  });
+
   const {
     isLoading: isLoadingNonOrdinalBtcSend,
     error: errorSigningNonOrdial,
@@ -261,10 +271,9 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     let sum: BigNumber = new BigNumber(0);
-    if (recipients) {
-      recipients.map((recipient) => {
+    if (recipients?.length) {
+      recipients.forEach((recipient) => {
         sum = sum.plus(recipient.amountSats);
-        return sum;
       });
       sum = sum?.plus(currentFee);
     }

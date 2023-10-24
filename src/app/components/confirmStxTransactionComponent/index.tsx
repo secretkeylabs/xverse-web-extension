@@ -1,32 +1,32 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { ReactNode, useEffect, useState } from 'react';
-import BigNumber from 'bignumber.js';
-import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
-import TransactionSettingAlert from '@components/transactionSetting';
-import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
-import TransferFeeView from '@components/transferFeeView';
-import {
-  setFee,
-  setNonce,
-  getNonce,
-  signMultiStxTransactions,
-  signTransaction,
-  signLedgerStxTransaction,
-} from '@secretkeylabs/xverse-core';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useNetworkSelector from '@hooks/useNetwork';
-import useSeedVault from '@hooks/useSeedVault';
-import Transport from '@ledgerhq/hw-transport-webusb';
-import BottomModal from '@components/bottomModal';
-import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { ledgerDelay } from '@common/utils/ledger';
-import { isHardwareAccount } from '@utils/helper';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import TransactionSettingAlert from '@components/transactionSetting';
+import TransferFeeView from '@components/transferFeeView';
+import useNetworkSelector from '@hooks/useNetwork';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import {
+  getNonce,
+  setFee,
+  setNonce,
+  signLedgerStxTransaction,
+  signMultiStxTransactions,
+  signTransaction,
+} from '@secretkeylabs/xverse-core';
+import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
+import { isHardwareAccount } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Container = styled.div`
   display: flex;
@@ -70,7 +70,7 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -82,7 +82,7 @@ const ButtonImage = styled.img((props) => ({
 
 const SponsoredInfoText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const SuccessActionsContainer = styled.div((props) => ({
@@ -98,13 +98,13 @@ const SuccessActionsContainer = styled.div((props) => ({
 
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'left',
 }));
 
 const RequestedByText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(4),
   textAlign: 'left',
 }));

@@ -3,6 +3,7 @@ import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
@@ -14,14 +15,13 @@ import { useMutation } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import useSeedVault from '@hooks/useSeedVault';
 import styled from 'styled-components';
 import OrdinalRow from './ordinalRow';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
   marginBottom: 32,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const ErrorContainer = styled.div({
