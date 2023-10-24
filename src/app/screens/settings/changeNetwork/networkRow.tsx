@@ -1,6 +1,6 @@
-import styled, { useTheme } from 'styled-components';
 import TickIcon from '@assets/img/settings/tick.svg';
 import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
+import styled, { useTheme } from 'styled-components';
 
 interface TitleProps {
   color: string;

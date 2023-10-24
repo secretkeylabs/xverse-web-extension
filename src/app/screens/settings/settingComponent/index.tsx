@@ -1,5 +1,5 @@
-import styled, { useTheme } from 'styled-components';
 import Switch from 'react-switch';
+import styled, { useTheme } from 'styled-components';
 
 interface ButtonProps {
   border: string;

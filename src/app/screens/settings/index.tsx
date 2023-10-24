@@ -1,22 +1,22 @@
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import useWalletSelector from '@hooks/useWalletSelector';
-import XverseLogo from '@assets/img/settings/logo.svg';
-import ArrowIcon from '@assets/img/settings/arrow.svg';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
-import BottomBar from '@components/tabBar';
-import { PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK } from '@utils/constants';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import ArrowIcon from '@assets/img/settings/arrow.svg';
+import XverseLogo from '@assets/img/settings/logo.svg';
 import PasswordInput from '@components/passwordInput';
+import BottomBar from '@components/tabBar';
+import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { useDispatch } from 'react-redux';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   ChangeActivateOrdinalsAction,
   ChangeActivateRareSatsAction,
 } from '@stores/wallet/actions/actionCreators';
-import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import { PRIVACY_POLICY_LINK, SUPPORT_LINK, TERMS_LINK } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import ResetWalletPrompt from '../../components/resetWallet';
 import SettingComponent from './settingComponent';
 

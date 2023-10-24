@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
+import styled from 'styled-components';
 
 const TopSectionContainer = styled.div((props) => ({
   display: 'flex',
@@ -42,11 +42,12 @@ interface Props {
   title: string;
   onClick: () => void;
   showBackButton?: boolean;
+  className?: string;
 }
 
-function TopRow({ title, onClick, showBackButton = true }: Props) {
+function TopRow({ title, onClick, showBackButton = true, className }: Props) {
   return (
-    <TopSectionContainer>
+    <TopSectionContainer className={className}>
       {showBackButton && (
         <AnimatedBackButton onClick={onClick}>
           <img src={ArrowLeft} alt="back button" />

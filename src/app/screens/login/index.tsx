@@ -1,21 +1,18 @@
-import { useTranslation } from 'react-i18next';
-import logo from '@assets/img/xverse_logo.svg';
-import styled from 'styled-components';
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { addHours, addMinutes } from 'date-fns';
-import useWalletReducer from '@hooks/useWalletReducer';
-import { animated, useSpring } from '@react-spring/web';
+import logo from '@assets/img/xverse_logo.svg';
 import ActionButton from '@components/button';
 import useCacheMigration from '@hooks/useCacheMigration';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { animated, useSpring } from '@react-spring/web';
 import MigrationConfirmation from '@screens/migrationConfirmation';
 import { decryptSeedPhrase } from '@utils/encryptionUtils';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useWalletSession from '@hooks/useWalletSession';
-
-declare const VERSION: string;
+import { addMinutes } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Logo = styled.img({
   width: 57,
@@ -26,17 +23,17 @@ const Button = styled.button({
   background: 'none',
 });
 
-const ScreenContainer = styled(animated.div)({
+const ScreenContainer = styled(animated.div)((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  paddingLeft: 18,
-  paddingRight: 18,
+  paddingLeft: props.theme.spacing(9),
+  paddingRight: props.theme.spacing(9),
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
     display: 'none',
   },
-});
+}));
 
 const ContentContainer = styled(animated.div)({
   display: 'flex',

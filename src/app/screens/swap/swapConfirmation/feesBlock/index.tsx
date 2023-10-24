@@ -1,15 +1,15 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { Container, TitleText } from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
-import useWalletSelector from '@hooks/useWalletSelector';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-}));
+});
 
 const FeeText = styled.p((props) => ({
   ...props.theme.body_m,

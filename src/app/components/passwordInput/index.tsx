@@ -1,11 +1,11 @@
-import { useTranslation } from 'react-i18next';
-import styled, { useTheme } from 'styled-components';
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import PasswordIcon from '@assets/img/createPassword/Password.svg';
-import { useEffect, useState } from 'react';
 import ActionButton from '@components/button';
 import { animated, useTransition } from '@react-spring/web';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled, { useTheme } from 'styled-components';
 import zxcvbn from 'zxcvbn';
 
 interface PasswordInputProps {

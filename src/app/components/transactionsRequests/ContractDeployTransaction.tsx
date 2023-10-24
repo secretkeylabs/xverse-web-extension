@@ -1,17 +1,17 @@
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
-import { PostCondition, StacksTransaction } from '@stacks/transactions';
-import styled from 'styled-components';
 import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
-import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
-import { useNavigate } from 'react-router-dom';
 import AccountHeaderComponent from '@components/accountHeader';
-import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import InfoContainer from '@components/infoContainer';
-import useNetworkSelector from '@hooks/useNetwork';
+import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useNetworkSelector from '@hooks/useNetwork';
+import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
+import { PostCondition, StacksTransaction } from '@stacks/transactions';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import finalizeTxSignature from './utils';
 
 const Title = styled.h1((props) => ({

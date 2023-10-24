@@ -1,9 +1,9 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
-import { getExplorerUrl } from '@utils/helper';
 import { useBnsName } from '@hooks/queries/useBnsName';
 import useNetworkSelector from '@hooks/useNetwork';
+import { getExplorerUrl } from '@utils/helper';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const InfoContainer = styled.div((props) => ({
   display: 'flex',

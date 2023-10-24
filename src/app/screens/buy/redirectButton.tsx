@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import CaretRight from '@assets/img/dashboard/caret_right.svg';
+import styled from 'styled-components';
 
 const Button = styled.button((props) => ({
   display: 'flex',

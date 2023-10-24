@@ -1,27 +1,27 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { useMutation } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { deserializeTransaction } from '@stacks/transactions';
-import BottomBar from '@components/tabBar';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
-import NftImage from '@screens/nftDashboard/nftImage';
-import AccountHeaderComponent from '@components/accountHeader';
-import TopRow from '@components/topRow';
-import useNetworkSelector from '@hooks/useNetwork';
-import RecipientComponent from '@components/recipientComponent';
-import TransactionDetailComponent from '@components/transactionDetailComponent';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useStxWalletData from '@hooks/queries/useStxWalletData';
-import { isLedgerAccount } from '@utils/helper';
 import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import AccountHeaderComponent from '@components/accountHeader';
+import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import RecipientComponent from '@components/recipientComponent';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import NftImage from '@screens/nftDashboard/nftImage';
+import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
+import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
+import { deserializeTransaction } from '@stacks/transactions';
+import { useMutation } from '@tanstack/react-query';
+import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -35,38 +35,6 @@ const ScrollContainer = styled.div`
   width: 360px;
   margin: auto;
 `;
-
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginLeft: '15%',
-  marginTop: props.theme.spacing(40),
-}));
-
-const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  opacity: 0.8,
-  marginTop: props.theme.spacing(5),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 400,
-  fontSize: 14,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
 
 const Container = styled.div({
   display: 'flex',
@@ -83,7 +51,7 @@ const NFtContainer = styled.div((props) => ({
   aspectRatio: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   padding: props.theme.spacing(5),
   marginBottom: props.theme.spacing(6),
 }));
@@ -187,17 +155,7 @@ function ConfirmNftTransaction() {
   return (
     <>
       {isGalleryOpen && (
-        <>
-          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          {/* <ButtonContainer>
-          <Button onClick={handleOnCancelClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-            </>
-          </Button>
-        </ButtonContainer> */}
-        </>
+        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
