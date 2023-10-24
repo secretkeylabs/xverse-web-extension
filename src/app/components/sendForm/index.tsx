@@ -58,10 +58,6 @@ const OrdinalInfoContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(6),
 }));
 
-const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(3),
-}));
-
 const MemoContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(3),
   marginBottom: props.theme.spacing(6),
@@ -122,7 +118,7 @@ const AmountInputContainer = styled.div<ContainerProps>((props) => ({
     ? '1px solid rgba(211, 60, 60, 0.3)'
     : `1px solid ${props.theme.colors.elevation3}`,
   backgroundColor: props.theme.colors.elevation_n1,
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   height: 44,
@@ -140,7 +136,7 @@ const MemoInputContainer = styled.div<ContainerProps>((props) => ({
     ? '1px solid rgba(211, 60, 60, 0.3)'
     : `1px solid ${props.theme.colors.elevation3}`,
   backgroundColor: props.theme.colors.elevation_n1,
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   padding: props.theme.spacing(7),
   height: 76,
   ':focus-within': {
@@ -464,9 +460,7 @@ function SendForm({
           )}
         <OuterContainer>
           {!disableAmountInput && renderEnterAmountSection}
-          <ErrorContainer>
-            <ErrorText>{amountError}</ErrorText>
-          </ErrorContainer>
+          {amountError && <StyledInputFeedback message={amountError} variant="danger" />}
           {buyCryptoMessage}
           {children}
           {renderEnterRecipientSection}
