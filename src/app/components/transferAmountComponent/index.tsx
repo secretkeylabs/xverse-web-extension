@@ -1,9 +1,9 @@
-import styled from 'styled-components';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import { useTranslation } from 'react-i18next';
-import { animated, config, useSpring } from '@react-spring/web';
 import TransferDetailView from '@components/transferDetailView';
+import { animated, config, useSpring } from '@react-spring/web';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',

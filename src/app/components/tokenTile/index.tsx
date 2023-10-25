@@ -1,16 +1,16 @@
-import BigNumber from 'bignumber.js';
-import styled from 'styled-components';
-import { NumericFormat } from 'react-number-format';
-import { CurrencyTypes, LoaderSize } from '@utils/constants';
 import BarLoader from '@components/barLoader';
-import { getTicker } from '@utils/helper';
-import stc from 'string-to-color';
+import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
-import { useSelector } from 'react-redux';
-import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { CurrencyTypes, LoaderSize } from '@utils/constants';
+import { getTicker } from '@utils/helper';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
+import { NumericFormat } from 'react-number-format';
+import { useSelector } from 'react-redux';
+import stc from 'string-to-color';
+import styled from 'styled-components';
 
 interface TileProps {
   margin?: number;

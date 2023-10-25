@@ -1,31 +1,31 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { ReactNode, useEffect, useState } from 'react';
-import BigNumber from 'bignumber.js';
-import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
-import TransactionSettingAlert from '@components/transactionSetting';
-import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
-import TransferFeeView from '@components/transferFeeView';
-import {
-  setFee,
-  setNonce,
-  getNonce,
-  signMultiStxTransactions,
-  signTransaction,
-  signLedgerStxTransaction,
-} from '@secretkeylabs/xverse-core';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useNetworkSelector from '@hooks/useNetwork';
-import Transport from '@ledgerhq/hw-transport-webusb';
-import BottomModal from '@components/bottomModal';
-import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { ledgerDelay } from '@common/utils/ledger';
-import { isHardwareAccount } from '@utils/helper';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import TransactionSettingAlert from '@components/transactionSetting';
+import TransferFeeView from '@components/transferFeeView';
+import useNetworkSelector from '@hooks/useNetwork';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import {
+  getNonce,
+  setFee,
+  setNonce,
+  signLedgerStxTransaction,
+  signMultiStxTransactions,
+  signTransaction,
+} from '@secretkeylabs/xverse-core';
+import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
+import { isHardwareAccount } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Container = styled.div`
   display: flex;

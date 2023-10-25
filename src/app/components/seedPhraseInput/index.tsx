@@ -1,7 +1,7 @@
+import { Eye, EyeSlash } from '@phosphor-icons/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { Eye, EyeSlash } from '@phosphor-icons/react';
 
 const Label = styled.label`
   ${(props) => props.theme.body_medium_m};

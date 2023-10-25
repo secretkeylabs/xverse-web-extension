@@ -1,16 +1,16 @@
-import useWalletSelector from '@hooks/useWalletSelector';
-import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
 import ReceiveIcon from '@assets/img/transactions/received.svg';
 import SendIcon from '@assets/img/transactions/sent.svg';
-import { CurrencyTypes } from '@utils/constants';
-import styled from 'styled-components';
-import { nanoid } from 'nanoid';
-import { NumericFormat } from 'react-number-format';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { microstacksToStx } from '@secretkeylabs/xverse-core';
-import BigNumber from 'bignumber.js';
-import { useTranslation } from 'react-i18next';
-import { getFtTicker } from '@utils/tokens';
+import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
+import { CurrencyTypes } from '@utils/constants';
 import { ftDecimals } from '@utils/helper';
+import { getFtTicker } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
+import { nanoid } from 'nanoid';
+import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
 
 const TransactionContainer = styled.div((props) => ({
   display: 'flex',

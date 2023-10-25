@@ -1,9 +1,9 @@
-import React from 'react';
-import { useRouteError } from 'react-router-dom';
 import Error from '@assets/img/ErrorBoundary/error.svg';
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
 import { SUPPORT_EMAIL } from '@utils/constants';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useRouteError } from 'react-router-dom';
+import styled from 'styled-components';
 
 const ScreenContainer = styled.div((props) => ({
   display: 'flex',

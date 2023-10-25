@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import checkmarkIcon from '@assets/img/checkmarkIcon.svg';
+import styled from 'styled-components';
 
 interface StepperProps {
   isActive?: boolean;

@@ -1,5 +1,6 @@
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import AccountHeaderComponent from '@components/accountHeader';
+import BundleAsset from '@components/bundleAsset/bundleAsset';
 import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
@@ -15,14 +16,13 @@ import {
 import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { useMutation } from '@tanstack/react-query';
+import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { isLedgerAccount } from '@utils/helper';
-import { getBundleSubText, getBundleId } from '@utils/rareSats';
+import { getBundleId, getBundleSubText } from '@utils/rareSats';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import styled from 'styled-components';
-import BundleAsset from '@components/bundleAsset/bundleAsset';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -234,8 +234,10 @@ function SendOrdinal() {
           onPressSend={onPressNext}
           onAddressInputChange={handleInputChange}
           warning={warning}
+          info={t('SEND.INFO.ADDRESS_SUPPORTS_RARE_SATS')}
           hideMemo
           hideTokenImage
+          hideDefaultWarning
         >
           <Container>
             <BundleAssetContainer>

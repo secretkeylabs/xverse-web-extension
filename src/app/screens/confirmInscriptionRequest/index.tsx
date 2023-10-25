@@ -1,38 +1,38 @@
-import styled from 'styled-components';
-import axios from 'axios';
-import BigNumber from 'bignumber.js';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
-import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
-import { NumericFormat } from 'react-number-format';
-import {
-  Recipient,
-  SignedBtcTx,
-  signBtcTransaction,
-} from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcTransactionBroadcastResponse, ResponseError } from '@secretkeylabs/xverse-core/types';
-import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
-import useBtcClient from '@hooks/useBtcClient';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
+import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
+import { ConfirmBrc20TransactionState, LedgerTransactionType } from '@common/types/ledger';
+import AlertMessage from '@components/alertMessage';
+import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
-import TransferFeeView from '@components/transferFeeView';
-import AlertMessage from '@components/alertMessage';
-import Brc20Tile from '@screens/ordinals/brc20Tile';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
-import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
-import ActionButton from '@components/button';
 import TransactionSettingAlert from '@components/transactionSetting';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
-import { isLedgerAccount } from '@utils/helper';
-import { ConfirmBrc20TransactionState, LedgerTransactionType } from '@common/types/ledger';
+import TransferFeeView from '@components/transferFeeView';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useBtcClient from '@hooks/useBtcClient';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Brc20Tile from '@screens/ordinals/brc20Tile';
+import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
+import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
+import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import {
+  Recipient,
+  signBtcTransaction,
+  SignedBtcTx,
+} from '@secretkeylabs/xverse-core/transactions/btc';
+import { BtcTransactionBroadcastResponse, ResponseError } from '@secretkeylabs/xverse-core/types';
+import { useMutation } from '@tanstack/react-query';
+import { isLedgerAccount } from '@utils/helper';
+import axios from 'axios';
+import BigNumber from 'bignumber.js';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const OuterContainer = styled.div`
   display: flex;

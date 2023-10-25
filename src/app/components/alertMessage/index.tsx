@@ -1,6 +1,6 @@
-import styled from 'styled-components';
 import Cross from '@assets/img/dashboard/X.svg';
 import ActionButton from '@components/button';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
