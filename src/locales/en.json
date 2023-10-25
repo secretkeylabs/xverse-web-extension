@@ -269,6 +269,9 @@
       "ORDINAL_NOT_OWNED": "This ordinal is not owned by your active account",
       "INVALID_TRANSACTION": "Invalid Transaction"
     },
+    "INFO": {
+      "ADDRESS_SUPPORTS_RARE_SATS": "Make sure the recipient address supports Rare Sats."
+    },
     "SEND_NFT": "Send NFT",
     "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
     "SWITCH_TO": "Switch to",
@@ -374,7 +377,7 @@
     "SAME_FEE_ERROR": "New fee must be greater than current fee",
     "GREATER_FEE_ERROR": "Fee is more than available balance",
     "LOWER_THAN_MINIMUM": "Set fee is below minimum",
-    "NONCE_WARNING": "Entering an erronous nonce can result in a failed transaction. Only apply changes if you know what you are doing."
+    "NONCE_WARNING": "Entering an erroneous nonce can result in a failed transaction. Only apply changes if you know what you are doing."
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",
@@ -735,9 +738,9 @@
     "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider."
   },
   "COIN_DASHBOARD_SCREEN": {
-    "SEND_COIN_BUTTON": "SEND",
-    "RECEIVE_COIN_BUTTON": "Receive",
-    "BUY_COIN_BUTTON": "Buy",
+    "SEND": "Send",
+    "RECEIVE": "Receive",
+    "BUY": "Buy",
     "TRANSACTION_HISTORY_TITLE": "Transaction history",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
@@ -771,7 +774,6 @@
     "TRANSACTIONS": "TRANSACTIONS",
     "CONTRACT": "CONTRACT",
     "COMING_SOON": "Coming soon",
-    "RECEIVE": "Receive",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address"
   },
