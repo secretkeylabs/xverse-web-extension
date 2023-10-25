@@ -1,4 +1,4 @@
-import checkmarkIcon from '@assets/img/checkmarkIcon.svg';
+import CheckmarkIcon from '@assets/img/checkmarkIcon.svg';
 import styled from 'styled-components';
 
 interface StepperProps {
@@ -63,7 +63,7 @@ const calculateColorStops = (props) => {
   const successColor = props.theme.colors.success_medium;
 
   // Calculate the color stops
-  let startStop;
+  let startStop: string;
   if (props.step === 0) startStop = '0%';
   if (props.step > 1) startStop = '100%';
   else startStop = '50%';
@@ -90,7 +90,7 @@ export default function Stepper({ steps }: Props): JSX.Element {
 
   function getContentForDot(stepIndex, isCompleted, currentPosition) {
     if (isCompleted) {
-      return <img src={checkmarkIcon} alt="Check Icon" />;
+      return <CheckmarkIcon />;
     }
     if (currentPosition !== stepIndex) {
       return String(stepIndex + 1);
@@ -103,7 +103,7 @@ export default function Stepper({ steps }: Props): JSX.Element {
         <Dot isCompleted={steps[0].isCompleted} isActive={currentStep === 0}>
           {getContentForDot(0, steps[0].isCompleted, currentStep)}
         </Dot>
-        <Line step={currentStep} />
+        <Line />
         <Dot isCompleted={steps[1].isCompleted} isActive={currentStep === 1}>
           {getContentForDot(1, steps[1].isCompleted, currentStep)}
         </Dot>
