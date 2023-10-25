@@ -29,7 +29,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
             });
           } catch (e) {
             // we get back a 404 if the UTXO is not found, so it is likely this is a UTXO from an unpublished txn
-            if (!isAxiosError(e) || e.status !== 404) {
+            if (!isAxiosError(e) || e.response?.status !== 404) {
               // rethrow error if response was not 404
               throw e;
             }
