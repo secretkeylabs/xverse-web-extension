@@ -1,4 +1,4 @@
-import CheckmarkIcon from '@assets/img/checkmarkIcon.svg';
+import checkmarkIcon from '@assets/img/checkmarkIcon.svg';
 import styled from 'styled-components';
 
 interface StepperProps {
@@ -72,7 +72,8 @@ const calculateColorStops = (props) => {
   return `${successColor} ${startStop}, #4C525F ${endStop}`;
 };
 
-const Line = styled.div<StepperProps>((props) => ({
+type LineProps = { step: number };
+const Line = styled.div<LineProps>((props) => ({
   height: 2,
   width: '100%',
   background: `linear-gradient(90deg, ${calculateColorStops(props)})`,
@@ -88,9 +89,9 @@ export default function Stepper({ steps }: Props): JSX.Element {
   const currentStepIndex = steps.findIndex((step) => !step.isCompleted);
   const currentStep = currentStepIndex > -1 ? currentStepIndex : steps.length;
 
-  function getContentForDot(stepIndex, isCompleted, currentPosition) {
+  function getContentForDot(stepIndex: number, isCompleted: boolean, currentPosition: number) {
     if (isCompleted) {
-      return <CheckmarkIcon />;
+      return <img src={checkmarkIcon} alt="Check Icon" />;
     }
     if (currentPosition !== stepIndex) {
       return String(stepIndex + 1);
@@ -103,7 +104,7 @@ export default function Stepper({ steps }: Props): JSX.Element {
         <Dot isCompleted={steps[0].isCompleted} isActive={currentStep === 0}>
           {getContentForDot(0, steps[0].isCompleted, currentStep)}
         </Dot>
-        <Line />
+        <Line step={currentStep} />
         <Dot isCompleted={steps[1].isCompleted} isActive={currentStep === 1}>
           {getContentForDot(1, steps[1].isCompleted, currentStep)}
         </Dot>
