@@ -269,6 +269,9 @@
       "ORDINAL_NOT_OWNED": "This ordinal is not owned by your active account",
       "INVALID_TRANSACTION": "Invalid Transaction"
     },
+    "INFO": {
+      "ADDRESS_SUPPORTS_RARE_SATS": "Make sure the recipient address supports Rare Sats."
+    },
     "SEND_NFT": "Send NFT",
     "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
     "SWITCH_TO": "Switch to",
@@ -374,7 +377,7 @@
     "SAME_FEE_ERROR": "New fee must be greater than current fee",
     "GREATER_FEE_ERROR": "Fee is more than available balance",
     "LOWER_THAN_MINIMUM": "Set fee is below minimum",
-    "NONCE_WARNING": "Entering an erronous nonce can result in a failed transaction. Only apply changes if you know what you are doing."
+    "NONCE_WARNING": "Entering an erroneous nonce can result in a failed transaction. Only apply changes if you know what you are doing."
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",

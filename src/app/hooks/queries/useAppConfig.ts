@@ -17,7 +17,6 @@ const useAppConfig = () => {
         dispatch(ChangeNetworkAction(updatedNetwork, networkAddress, ''));
       }
       return response;
-
     },
   });
 };
