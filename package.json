@@ -86,7 +86,8 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "prettier --write",
-      "eslint"
+      "eslint",
+      "tsc-files --noEmit"
     ],
     "*.json": [
       "prettier --write"
@@ -145,6 +146,7 @@
     "terser-webpack-plugin": "^5.3.6",
     "ts-jest": "^27.0.5",
     "ts-loader": "^8.4.0",
+    "tsc-files": "^1.1.4",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "type-fest": "^2.19.0",
     "typescript": "^4.8.2",
