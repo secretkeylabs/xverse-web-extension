@@ -1,15 +1,15 @@
-import styled from 'styled-components';
-import { Tooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css';
-import { getShortTruncatedAddress } from '@utils/helper';
 import Copy from '@assets/img/nftDashboard/Copy.svg';
 import QrCode from '@assets/img/nftDashboard/QrCode.svg';
-import { useTranslation } from 'react-i18next';
-import { ReactNode } from 'react';
 import ActionButton from '@components/button';
+import { getShortTruncatedAddress } from '@utils/helper';
+import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
+import styled from 'styled-components';
 
 const ReceiveCard = styled.div((props) => ({
-  background: props.theme.colors.background.elevation3,
+  background: props.theme.colors.background.elevation6_600,
   borderRadius: props.theme.radius(2),
   width: 328,
   height: 104,
@@ -17,14 +17,13 @@ const ReceiveCard = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  marginBottom: props.theme.spacing(6),
 }));
 
 const Button = styled.button((props) => ({
-  background: '#3F4263',
+  background: props.theme.colors.elevation6,
   borderRadius: props.theme.radius(7),
-  width: 44,
-  height: 44,
+  width: 40,
+  height: 40,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -51,13 +50,13 @@ const ButtonIcon = styled.img({
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   marginTop: props.theme.spacing(3),
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const AddressText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(1),
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const StyledTooltip = styled(Tooltip)`
@@ -72,6 +71,7 @@ const VerifyButtonContainer = styled.div({
 });
 
 interface Props {
+  className?: string;
   title: string;
   address: string;
   onQrAddressClick: () => void;
@@ -82,6 +82,7 @@ interface Props {
 }
 
 function ReceiveCardComponent({
+  className,
   children,
   title,
   address,
@@ -102,7 +103,7 @@ function ReceiveCardComponent({
   };
 
   return (
-    <ReceiveCard>
+    <ReceiveCard className={className}>
       <ColumnContainer>
         {children}
         <TitleText>{title}</TitleText>

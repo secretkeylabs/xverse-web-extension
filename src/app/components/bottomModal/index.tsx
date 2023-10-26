@@ -1,7 +1,7 @@
-import Modal from 'react-modal';
-import styled, { useTheme } from 'styled-components';
 import Cross from '@assets/img/dashboard/X.svg';
 import Separator from '@components/separator';
+import Modal from 'react-modal';
+import styled, { useTheme } from 'styled-components';
 
 const BottomModalHeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -61,7 +61,7 @@ function BottomModal({
       maxWidth: 360,
       maxHeight: '90%',
       border: 'transparent',
-      background: theme.colors.background.elevation2,
+      background: theme.colors.elevation2,
       margin: 0,
       padding: 0,
       borderTopLeftRadius: isGalleryOpen ? 12 : 20,

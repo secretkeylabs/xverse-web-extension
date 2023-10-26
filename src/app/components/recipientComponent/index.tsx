@@ -1,23 +1,24 @@
-import TransferDetailView from '@components/transferDetailView';
-import OutputIcon from '@assets/img/transactions/output.svg';
 import ArrowIcon from '@assets/img/transactions/ArrowDown.svg';
+import OutputIcon from '@assets/img/transactions/output.svg';
 import WalletIcon from '@assets/img/transactions/wallet.svg';
+import TokenImage from '@components/tokenImage';
+import TransferDetailView from '@components/transferDetailView';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { CubeTransparent } from '@phosphor-icons/react';
+import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { CurrencyTypes } from '@utils/constants';
+import { getTicker } from '@utils/helper';
 import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
-import TokenImage from '@components/tokenImage';
-import { CurrencyTypes } from '@utils/constants';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useEffect, useState } from 'react';
-import { getTicker } from '@utils/helper';
 
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '16px 16px',
   justifyContent: 'center',
@@ -26,7 +27,7 @@ const Container = styled.div((props) => ({
 
 const RecipientTitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: 16,
 }));
 
@@ -58,20 +59,20 @@ const DownArrowIcon = styled.img((props) => ({
 
 const TitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
   marginTop: 5,
 }));
 
 const ValueText = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const SubValueText = styled.p((props) => ({
   ...props.theme.body_m,
   fontSize: 12,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const ColumnContainer = styled.div({
@@ -92,11 +93,24 @@ const TokenContainer = styled.div({
   marginRight: 10,
 });
 
+const IconContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 30,
+  backgroundColor: props.theme.colors.elevation3,
+  width: 32,
+  height: 32,
+  marginRight: props.theme.spacing(4),
+}));
+
 interface Props {
   address?: string;
   value: string;
   title: string;
   currencyType: CurrencyTypes;
+  valueDetail?: string;
   recipientIndex?: number;
   totalRecipient?: number;
   icon?: string;
@@ -109,6 +123,7 @@ function RecipientComponent({
   address,
   value,
   totalRecipient,
+  valueDetail,
   title,
   fungibleToken,
   icon,
@@ -167,6 +182,26 @@ function RecipientComponent({
     return '';
   };
 
+  const renderIcon = () => {
+    if (currencyType === 'RareSat') {
+      return (
+        <IconContainer>
+          <CubeTransparent size="16" weight="regular" />
+        </IconContainer>
+      );
+    }
+
+    if (icon) {
+      return <Icon src={icon} />;
+    }
+
+    return (
+      <TokenContainer>
+        <TokenImage token={currencyType} loading={false} size={32} fungibleToken={fungibleToken} />
+      </TokenContainer>
+    );
+  };
+
   return (
     <Container>
       {recipientIndex && totalRecipient && totalRecipient !== 1 && (
@@ -176,22 +211,12 @@ function RecipientComponent({
       )}
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       <RowContainer>
-        {icon ? (
-          <Icon src={icon} />
-        ) : (
-          <TokenContainer>
-            <TokenImage
-              token={currencyType}
-              loading={false}
-              size={32}
-              fungibleToken={fungibleToken}
-            />
-          </TokenContainer>
-        )}
+        {renderIcon()}
         <TitleText>{title}</TitleText>
-        {currencyType === 'NFT' || currencyType === 'Ordinal' ? (
+        {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
           <ColumnContainer>
             <ValueText>{value}</ValueText>
+            {valueDetail && <SubValueText>{valueDetail}</SubValueText>}
           </ColumnContainer>
         ) : (
           <ColumnContainer>

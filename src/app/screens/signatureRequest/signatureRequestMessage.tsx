@@ -1,6 +1,6 @@
 import { SignaturePayload } from '@stacks/connect';
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import CollapsableContainer from './collapsableContainer';
 
 interface SignatureRequestMessageProps {
@@ -11,7 +11,7 @@ const RequestMessage = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
   wordWrap: 'break-word',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 export default function SignatureRequestMessage(props: SignatureRequestMessageProps) {

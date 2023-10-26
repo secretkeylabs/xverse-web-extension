@@ -6,9 +6,10 @@ import styled from 'styled-components';
 import { DotsThreeVertical, Eye, Share } from '@phosphor-icons/react';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 
+import { getBrc20Details } from '@utils/brc20';
 import { ContentType } from './common';
 import Preview from './preview';
-import { getBrc20Details, getSatsDetails } from './utils';
+import getSatsDetails from './utils';
 
 const previewableContentTypes = new Set([
   ContentType.IMAGE,

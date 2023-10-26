@@ -1,25 +1,27 @@
-import styled from 'styled-components';
-import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
-import { CurrencyTypes } from '@utils/constants';
+import BtcTransactionHistoryItem from '@components/transactions/btcTransaction';
+import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
 import useTransactions from '@hooks/queries/useTransactions';
-import { MoonLoader } from 'react-spinners';
-import { useTranslation } from 'react-i18next';
-import { formatDate } from '@utils/date';
+import { animated, config, useSpring } from '@react-spring/web';
+import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
   PostConditionFungible,
 } from '@stacks/stacks-blockchain-api-types';
-import { useMemo } from 'react';
-import { animated, config, useSpring } from '@react-spring/web';
+import { CurrencyTypes } from '@utils/constants';
+import { formatDate } from '@utils/date';
 import {
   isAddressTransactionWithTransfers,
+  isBrc20Transaction,
+  isBrc20TransactionArr,
   isBtcTransaction,
   isBtcTransactionArr,
   Tx,
 } from '@utils/transactions/transactions';
-import BtcTransactionHistoryItem from '@components/transactions/btcTransaction';
-import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 
 const ListItemsContainer = styled.div({
   display: 'flex',
@@ -48,7 +50,7 @@ const NoTransactionsContainer = styled.div((props) => ({
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const GroupContainer = styled(animated.div)((props) => ({
@@ -65,20 +67,21 @@ const SectionHeader = styled.div((props) => ({
 }));
 
 const SectionSeparator = styled.div((props) => ({
-  border: `0.5px solid ${props.theme.colors.white[400]}`,
+  border: `0.5px solid ${props.theme.colors.white_400}`,
   opacity: 0.2,
   flexGrow: 1,
 }));
 
 const SectionTitle = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginRight: props.theme.spacing(4),
 }));
 
 interface TransactionsHistoryListProps {
   coin: CurrencyTypes;
   txFilter: string | null;
+  brc20Token: string | null;
 }
 
 const sortTransactionsByBlockHeight = (transactions: BtcTransactionData[]) =>
@@ -159,8 +162,11 @@ const filterTxs = (
   });
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
-  const { coin, txFilter } = props;
-  const { data, isLoading, isFetching } = useTransactions((coin as CurrencyTypes) || 'STX');
+  const { coin, txFilter, brc20Token } = props;
+  const { data, isLoading, isFetching, error } = useTransactions(
+    (coin as CurrencyTypes) || 'STX',
+    brc20Token,
+  );
   const styles = useSpring({
     config: { ...config.stiff },
     from: { opacity: 0 },
@@ -168,6 +174,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       opacity: 1,
     },
   });
+
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   const groupedTxs = useMemo(() => {
@@ -175,16 +182,19 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       return;
     }
 
-    if (isBtcTransactionArr(data)) {
+    if (isBtcTransactionArr(data) || isBrc20TransactionArr(data)) {
       return groupBtcTxsByDate(data);
     }
 
     if (txFilter && coin === 'FT') {
-      const filteredTxs = filterTxs(data, txFilter);
+      const filteredTxs = filterTxs(
+        data as (AddressTransactionWithTransfers | MempoolTransaction)[],
+        txFilter,
+      );
       return groupedTxsByDateMap(filteredTxs);
     }
 
-    return groupedTxsByDateMap(data);
+    return groupedTxsByDateMap(data as (AddressTransactionWithTransfers | MempoolTransaction)[]);
   }, [data, isLoading, isFetching]);
 
   return (
@@ -199,7 +209,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
               <SectionSeparator />
             </SectionHeader>
             {groupedTxs[group].map((transaction) => {
-              if (isBtcTransaction(transaction)) {
+              if (isBtcTransaction(transaction) || isBrc20Transaction(transaction)) {
                 return (
                   <BtcTransactionHistoryItem transaction={transaction} key={transaction.txid} />
                 );
@@ -220,7 +230,10 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
           <MoonLoader color="white" size={20} />
         </LoadingContainer>
       )}
-      {!isLoading && data?.length === 0 && (
+      {!isLoading && error && (
+        <NoTransactionsContainer>{t('TRANSACTIONS_LIST_ERROR')}</NoTransactionsContainer>
+      )}
+      {!isLoading && data?.length === 0 && !error && (
         <NoTransactionsContainer>{t('TRANSACTIONS_LIST_EMPTY')}</NoTransactionsContainer>
       )}
     </ListItemsContainer>

@@ -1,5 +1,5 @@
-import styled, { useTheme } from 'styled-components';
 import Switch from 'react-switch';
+import styled, { useTheme } from 'styled-components';
 
 interface ButtonProps {
   border: string;
@@ -52,8 +52,38 @@ const ComponentText = styled.h1<TitleProps>((props) => ({
 const ComponentDescriptionText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
   paddingTop: props.theme.spacing(8),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
+
+const DescriptionText = styled.p((props) => ({
+  ...props.theme.body_m,
+  marginTop: props.theme.spacing(2),
+  color: props.theme.colors.white_400,
+  textAlign: 'left',
+  paddingRight: props.theme.spacing(8),
+}));
+
+const Column = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+}));
+
+const DisabledOverlay = styled.div((props) => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+  zIndex: 10,
+  backgroundColor: props.theme.colors.elevation0,
+  opacity: 0.5,
+}));
+
+const Wrapper = styled.div({
+  position: 'relative',
+  display: 'inline-block', // This makes sure the wrapper size fits the content
+});
 
 interface SettingComponentProps {
   title?: string;
@@ -65,6 +95,8 @@ interface SettingComponentProps {
   showWarningTitle?: boolean;
   toggle?: boolean;
   toggleValue?: boolean;
+  description?: string;
+  disabled?: boolean;
   toggleFunction?: () => void;
 }
 
@@ -78,36 +110,45 @@ function SettingComponent({
   showWarningTitle,
   toggle,
   toggleValue,
+  description,
+  disabled,
   toggleFunction,
 }: SettingComponentProps) {
   const theme = useTheme();
 
   return (
-    <ColumnContainer>
-      {title && <TitleText>{title}</TitleText>}
-      <Button
-        onClick={onClick}
-        border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}
-      >
-        <ComponentText
-          textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white['200']}
+    <Wrapper>
+      <ColumnContainer>
+        {title && <TitleText>{title}</TitleText>}
+
+        <Button
+          onClick={onClick}
+          border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}
         >
-          {text}
-        </ComponentText>
-        {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
-        {icon && <img src={icon} alt="arrow icon" />}
-        {toggle && toggleFunction && (
-          <CustomSwitch
-            onColor={theme.colors.purple_main}
-            offColor={theme.colors.background.elevation3}
-            onChange={toggleFunction}
-            checked={toggleValue ?? false}
-            uncheckedIcon={false}
-            checkedIcon={false}
-          />
-        )}
-      </Button>
-    </ColumnContainer>
+          <Column>
+            <ComponentText
+              textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white['200']}
+            >
+              {text}
+            </ComponentText>
+            {description && <DescriptionText>{description}</DescriptionText>}
+          </Column>
+          {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
+          {icon && <img src={icon} alt="arrow icon" />}
+          {toggle && toggleFunction && (
+            <CustomSwitch
+              onColor={theme.colors.orange_main}
+              offColor={theme.colors.elevation3}
+              onChange={toggleFunction}
+              checked={toggleValue ?? false}
+              uncheckedIcon={false}
+              checkedIcon={false}
+            />
+          )}
+        </Button>
+      </ColumnContainer>
+      {disabled && <DisabledOverlay />}
+    </Wrapper>
   );
 }
 

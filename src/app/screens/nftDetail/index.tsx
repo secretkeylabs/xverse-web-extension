@@ -1,32 +1,32 @@
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
-import NftImage from '@screens/nftDashboard/nftImage';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
-import TopRow from '@components/topRow';
-import BottomTabBar from '@components/tabBar';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import ShareNetwork from '@assets/img/nftDashboard/share.svg';
+import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
+import AccountHeaderComponent from '@components/accountHeader';
 import ActionButton from '@components/button';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useEffect, useState } from 'react';
+import CollectibleDetailTile from '@components/collectibleDetailTile';
 import ShareDialog from '@components/shareNft';
-import { GAMMA_URL } from '@utils/constants';
-import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
+import SmallActionButton from '@components/smallActionButton';
+import BottomTabBar from '@components/tabBar';
+import TopRow from '@components/topRow';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useNftDataReducer from '@hooks/stores/useNftReducer';
-import { useMutation } from '@tanstack/react-query';
-import { getNftDetail } from '@secretkeylabs/xverse-core/api';
-import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
-import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
-import { MoonLoader } from 'react-spinners';
-import AccountHeaderComponent from '@components/accountHeader';
-import SmallActionButton from '@components/smallActionButton';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import NftImage from '@screens/nftDashboard/nftImage';
+import { getNftDetail } from '@secretkeylabs/xverse-core/api';
+import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
+import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+import { useMutation } from '@tanstack/react-query';
+import { GAMMA_URL } from '@utils/constants';
+import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 import NftAttribute from './nftAttribute';
-import DescriptionTile from './descriptionTile';
 
 const Container = styled.div`
   display: flex;
@@ -108,33 +108,33 @@ const ExtensionNFtContainer = styled.div((props) => ({
 
 const NftTitleText = styled.h1((props) => ({
   ...props.theme.headline_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(12),
   textAlign: 'center',
 }));
 
 const CollectibleText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
 const NftGalleryTitleText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(12),
 }));
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   fontSize: 24,
   marginBottom: props.theme.spacing(16),
 }));
 
 const NftOwnedByText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
@@ -162,7 +162,7 @@ const GridContainer = styled.div((props) => ({
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
   paddingBottom: props.theme.spacing(16),
   marginBottom: props.theme.spacing(12),
-  borderBottom: `1px solid ${props.theme.colors.background.elevation2}`,
+  borderBottom: `1px solid ${props.theme.colors.elevation2}`,
 }));
 
 const ShareButtonContainer = styled.div((props) => ({
@@ -179,7 +179,7 @@ const DescriptionContainer = styled.h1((props) => ({
 
 const AttributeText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginBottom: props.theme.spacing(2),
   letterSpacing: '0.02em',
   textTransform: 'uppercase',
@@ -199,7 +199,7 @@ const WebGalleryButton = styled.button((props) => ({
 const WebGalleryButtonText = styled.div((props) => ({
   ...props.theme.body_m,
   fontWeight: 700,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 
@@ -220,20 +220,20 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const AssetDeatilButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 400,
   fontSize: 14,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const ButtonHiglightedText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(2),
   marginRight: props.theme.spacing(2),
 }));
@@ -289,7 +289,7 @@ function NftDetailScreen() {
   }, [nftDetailsData]);
 
   const handleBackButtonClick = () => {
-    navigate('/nft-dashboard');
+    navigate('/nft-dashboard?tab=nfts');
   };
 
   const onSharePress = () => {
@@ -412,9 +412,11 @@ function NftDetailScreen() {
           </NFtContainer>
           <DescriptionContainer>
             <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
-            <DescriptionTile title={t('NAME')} value={nft?.token_metadata.name ?? ''} />
-            {nft?.rarity_score && <DescriptionTile title={t('RARITY')} value={nft?.rarity_score} />}
-            <DescriptionTile
+            <CollectibleDetailTile title={t('NAME')} value={nft?.token_metadata.name ?? ''} />
+            {nft?.rarity_score && (
+              <CollectibleDetailTile title={t('RARITY')} value={nft?.rarity_score} />
+            )}
+            <CollectibleDetailTile
               title={t('CONTRACT_ID')}
               value={nft?.token_metadata?.contract_id ?? ''}
             />

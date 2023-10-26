@@ -1,9 +1,9 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { useQuery } from '@tanstack/react-query';
 import {} from '@secretkeylabs/xverse-core/';
-import { useDispatch } from 'react-redux';
 import { getOrdinalsFtBalance } from '@secretkeylabs/xverse-core/api';
 import { setBrcCoinsDataAction } from '@stores/wallet/actions/actionCreators';
+import { useQuery } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
 
 const useBtcCoinBalance = () => {
   const dispatch = useDispatch();
@@ -12,7 +12,11 @@ const useBtcCoinBalance = () => {
   const fetchBrcCoinsBalances = async () => {
     try {
       const list = await getOrdinalsFtBalance(ordinalsAddress);
-      dispatch(setBrcCoinsDataAction(list));
+      dispatch(
+        setBrcCoinsDataAction(
+          list.map((brcToken) => ({ ...brcToken, ticker: brcToken.ticker?.toUpperCase() })),
+        ),
+      );
       return list;
     } catch (e: any) {
       return Promise.reject(e);

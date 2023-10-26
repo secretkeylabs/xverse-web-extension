@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import CaretRight from '@assets/img/dashboard/caret_right.svg';
+import styled from 'styled-components';
 
 const Button = styled.button((props) => ({
   display: 'flex',
@@ -10,12 +10,12 @@ const Button = styled.button((props) => ({
   backgroundColor: 'transparent',
   padding: props.theme.spacing(8),
   marginBottom: props.theme.spacing(8),
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  border: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_bold_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   marginLeft: props.theme.spacing(8),
   marginTop: props.theme.spacing(4),

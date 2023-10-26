@@ -3,6 +3,7 @@ import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
@@ -14,13 +15,14 @@ import { useMutation } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import OrdinalRow from './ordinalRow';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
   marginBottom: 32,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
 }));
 
 const ErrorContainer = styled.div({
@@ -38,6 +40,13 @@ const Container = styled.div({
   marginRight: 16,
 });
 
+const LoaderContainer = styled.div({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  flex: 1,
+});
+
 const ErrorText = styled.h1((props) => ({
   ...props.theme.body_xs,
   marginBottom: 20,
@@ -53,8 +62,9 @@ const ButtonContainer = styled.div({
 
 function RestoreOrdinals() {
   const { t } = useTranslation('translation');
-  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+  const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
+  const { getSeed } = useSeedVault();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
@@ -69,8 +79,8 @@ function RestoreOrdinals() {
     isLoading,
     error: transactionError,
     mutateAsync,
-  } = useMutation<SignedBtcTx, string, BtcOrdinal>({
-    mutationFn: async (ordinal) => {
+  } = useMutation<SignedBtcTx, string, { ordinal: BtcOrdinal; seedPhrase: string }>({
+    mutationFn: async ({ ordinal, seedPhrase }) => {
       const tx = await signOrdinalSendTransaction(
         ordinalsAddress,
         ordinal.utxo,
@@ -104,8 +114,8 @@ function RestoreOrdinals() {
 
   const onClickTransfer = async (selectedOrdinal: BtcOrdinal, ordinalData: Inscription) => {
     setTransferringOrdinalId(selectedOrdinal.id);
-
-    const signedTx = await mutateAsync(selectedOrdinal);
+    const seedPhrase = await getSeed();
+    const signedTx = await mutateAsync({ ordinal: selectedOrdinal, seedPhrase });
     setSelectedOrdinalDetails(ordinalData);
     navigate(`/confirm-ordinal-tx/${selectedOrdinal.id}`, {
       state: {
@@ -121,33 +131,42 @@ function RestoreOrdinals() {
     });
   };
 
+  const showContent =
+    ordinals?.length === 0 ? (
+      <>
+        <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
+        <ButtonContainer>
+          <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
+        </ButtonContainer>
+      </>
+    ) : (
+      <>
+        <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
+        {ordinals?.map((ordinal) => (
+          <OrdinalRow
+            isLoading={transferringOrdinalId === ordinal.id}
+            disableTransfer={isLoading}
+            handleOrdinalTransfer={onClickTransfer}
+            ordinal={ordinal}
+            key={ordinal.id}
+          />
+        ))}
+        <ErrorContainer>
+          <ErrorText>{error}</ErrorText>
+        </ErrorContainer>
+      </>
+    );
+
   return (
     <>
       <TopRow title={t('RESTORE_ORDINAL_SCREEN.TITLE')} onClick={handleOnCancelClick} />
       <Container>
-        {ordinals?.length === 0 ? (
-          <>
-            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
-            <ButtonContainer>
-              <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
-            </ButtonContainer>
-          </>
+        {!ordinals ? (
+          <LoaderContainer>
+            <MoonLoader color="white" size={25} />
+          </LoaderContainer>
         ) : (
-          <>
-            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
-            {ordinals?.map((ordinal) => (
-              <OrdinalRow
-                isLoading={transferringOrdinalId === ordinal.id}
-                disableTransfer={isLoading}
-                handleOrdinalTransfer={onClickTransfer}
-                ordinal={ordinal}
-                key={ordinal.id}
-              />
-            ))}
-            <ErrorContainer>
-              <ErrorText>{error}</ErrorText>
-            </ErrorContainer>
-          </>
+          showContent
         )}
       </Container>
       <BottomTabBar tab="nft" />

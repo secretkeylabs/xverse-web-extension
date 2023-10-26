@@ -15,13 +15,13 @@ const ContentContainer = styled.div({
 
 const ClarityValueText = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   wordWrap: 'break-word',
 }));
 
 const ClarityValueKey = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginRight: props.theme.spacing(4),
   wordWrap: 'break-word',
 }));

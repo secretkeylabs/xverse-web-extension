@@ -1,30 +1,32 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { ReactNode, useEffect, useState } from 'react';
-import BigNumber from 'bignumber.js';
-import ActionButton from '@components/button';
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
-import TransactionSettingAlert from '@components/transactionSetting';
-import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
-import TransferFeeView from '@components/transferFeeView';
-import {
-  setFee,
-  setNonce,
-  getNonce,
-  signMultiStxTransactions,
-  signTransaction,
-  signLedgerStxTransaction,
-} from '@secretkeylabs/xverse-core';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useNetworkSelector from '@hooks/useNetwork';
-import Transport from '@ledgerhq/hw-transport-webusb';
-import BottomModal from '@components/bottomModal';
-import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { ledgerDelay } from '@common/utils/ledger';
+import BottomModal from '@components/bottomModal';
+import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import TransactionSettingAlert from '@components/transactionSetting';
+import TransferFeeView from '@components/transferFeeView';
+import useNetworkSelector from '@hooks/useNetwork';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import {
+  getNonce,
+  setFee,
+  setNonce,
+  signLedgerStxTransaction,
+  signMultiStxTransactions,
+  signTransaction,
+} from '@secretkeylabs/xverse-core';
+import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { isHardwareAccount } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Container = styled.div`
   display: flex;
@@ -68,7 +70,7 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -80,7 +82,7 @@ const ButtonImage = styled.img((props) => ({
 
 const SponsoredInfoText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const SuccessActionsContainer = styled.div((props) => ({
@@ -96,19 +98,23 @@ const SuccessActionsContainer = styled.div((props) => ({
 
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'left',
 }));
 
 const RequestedByText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(4),
   textAlign: 'left',
 }));
 
 const TitleContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(16),
+}));
+
+const WarningWrapper = styled.div((props) => ({
+  marginBottom: props.theme.spacing(8),
 }));
 
 interface Props {
@@ -141,8 +147,9 @@ function ConfirmStxTransationComponent({
     keyPrefix: 'SIGNATURE_REQUEST',
   });
   const selectedNetwork = useNetworkSelector();
+  const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const { selectedAccount, seedPhrase } = useWalletSelector();
+  const { selectedAccount, feeMultipliers } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -152,10 +159,21 @@ function ConfirmStxTransationComponent({
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
+  const [showFeeWarning, setShowFeeWarning] = useState(false);
 
   useEffect(() => {
     setButtonLoading(loading);
   }, [loading]);
+
+  useEffect(() => {
+    const fee = new BigNumber(initialStxTransactions[0].auth.spendingCondition.fee.toString());
+
+    if (feeMultipliers && fee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighStacksFee))) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+  }, [initialStxTransactions, feeMultipliers]);
 
   const getFee = () =>
     isSponsored
@@ -190,11 +208,12 @@ function ConfirmStxTransationComponent({
       return;
     }
 
+    const seed = await getSeed();
     let signedTxs: StacksTransaction[] = [];
     if (initialStxTransactions.length === 1) {
       const signedContractCall = await signTransaction(
         initialStxTransactions[0],
-        seedPhrase,
+        seed,
         selectedAccount?.id ?? 0,
         selectedNetwork,
       );
@@ -204,7 +223,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase,
+        seed,
       );
     }
     onConfirmClick(signedTxs);
@@ -219,6 +238,13 @@ function ConfirmStxTransationComponent({
     nonce?: string;
   }) => {
     const fee = stxToMicrostacks(new BigNumber(settingFee));
+
+    if (feeMultipliers && fee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighStacksFee))) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+
     setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {
       setNonce(initialStxTransactions[0], BigInt(nonce));
@@ -251,11 +277,11 @@ function ConfirmStxTransationComponent({
     await ledgerDelay(1500);
     setCurrentStepIndex(1);
     try {
-      const signedTxs = await signLedgerStxTransaction(
+      const signedTxs = await signLedgerStxTransaction({
         transport,
-        initialStxTransactions[0].serialize(),
-        selectedAccount.deviceAccountIndex,
-      );
+        transactionBuffer: initialStxTransactions[0].serialize(),
+        addressIndex: selectedAccount.deviceAccountIndex,
+      });
       setIsTxApproved(true);
       await ledgerDelay(1500);
       onConfirmClick([signedTxs]);
@@ -283,6 +309,13 @@ function ConfirmStxTransationComponent({
           )}
           {!!subTitle && <RequestedByText>{subTitle}</RequestedByText>}
         </TitleContainer>
+
+        {showFeeWarning && (
+          <WarningWrapper>
+            <InfoContainer type="Warning" bodyText={t('HIGH_FEE_WARNING_TEXT')} />
+          </WarningWrapper>
+        )}
+
         {children}
         <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
         {initialStxTransactions[0]?.payload?.amount && (

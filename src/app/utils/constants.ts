@@ -12,12 +12,14 @@ export const GAMMA_URL = 'https://gamma.io/';
 export const TERMS_LINK = 'https://xverse.app/terms';
 export const PRIVACY_POLICY_LINK = 'https://xverse.app/privacy';
 export const SUPPORT_LINK = 'https://support.xverse.app/hc/en-us';
+export const BLOG_LINK = 'https:/xverse.app/blog';
 export const SUPPORT_EMAIL = 'support@xverse.app';
 export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';
 export const BTC_TRANSACTION_TESTNET_STATUS_URL = 'https://mempool.space/testnet/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
 export const XVERSE_ORDIVIEW_URL = 'https://ord.xverse.app';
+export const MAGISAT_IO_RARITY_SCAN_URL = 'https://magisat.io/wallet?walletAddress=';
 
 export const TRANSAC_URL = 'https://global.transak.com';
 export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;
@@ -25,7 +27,15 @@ export const MOON_PAY_URL = 'https://buy.moonpay.com';
 export const MOON_PAY_API_KEY = process.env.MOON_PAY_API_KEY;
 export const MIX_PANEL_TOKEN = process.env.MIX_PANEL_TOKEN;
 
-export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal' | 'brc20' | 'brc20-Ordinal';
+export type CurrencyTypes =
+  | 'STX'
+  | 'BTC'
+  | 'FT'
+  | 'NFT'
+  | 'Ordinal'
+  | 'brc20'
+  | 'brc20-Ordinal'
+  | 'RareSat';
 export enum LoaderSize {
   SMALLEST,
   SMALL,
@@ -59,3 +69,14 @@ export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
 export const SWAP_SPONSOR_DISABLED_SUPPORT_URL =
   'https://support.xverse.app/hc/en-us/articles/18319388355981';
 export const SUPPORT_URL_TAB_TARGET = 'SupportURLTabTarget';
+
+export const DEFAULT_TRANSITION_OPTIONS = {
+  from: {
+    x: 24,
+    opacity: 0,
+  },
+  enter: {
+    x: 0,
+    opacity: 1,
+  },
+};

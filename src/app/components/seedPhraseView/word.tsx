@@ -10,7 +10,7 @@ const OrdinalNumber = styled.p((props) => ({
   marginLeft: props.theme.spacing(7),
   marginRight: props.theme.spacing(1.5),
   marginTop: props.theme.spacing(16),
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const Container = styled.div({

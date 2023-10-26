@@ -1,10 +1,11 @@
-import { Suspense } from 'react';
-import styled from 'styled-components';
-import { MoonLoader } from 'react-spinners';
-import Image from 'rc-image';
+import NftPlaceholderImage from '@assets/img/nftDashboard/ic_nft_diamond.svg';
+import { BetterBarLoader } from '@components/barLoader';
 import { TokenMetaData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getFetchableUrl } from '@utils/helper';
-import NftPlaceholderImage from '@assets/img/nftDashboard/ic_nft_diamond.svg';
+import Image from 'rc-image';
+import { Suspense } from 'react';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 
 interface ContainerProps {
   isGalleryOpen: boolean;
@@ -13,15 +14,16 @@ interface ContainerProps {
 const ImageContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
-  alignItems: props.isGalleryOpen ? 'center' : 'flex-start',
+  alignItems: 'center',
   width: '100%',
   height: props.isGalleryOpen ? '100%' : 150,
   overflow: 'hidden',
   position: 'relative',
   borderRadius: 8,
+  aspectRatio: '1',
 }));
 
-const LoaderContainer = styled.div<ContainerProps>((props) => ({
+const LoaderContainer = styled.div({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -31,7 +33,11 @@ const LoaderContainer = styled.div<ContainerProps>((props) => ({
   bottom: 0,
   right: 0,
   top: 0,
-  height: props.isGalleryOpen ? '100%' : 150,
+});
+
+const StyledBarLoader = styled(BetterBarLoader)((props) => ({
+  padding: 0,
+  borderRadius: props.theme.radius(1),
 }));
 
 const Video = styled.video({
@@ -61,8 +67,11 @@ function NftImage({ metadata }: Props) {
             preview={false}
             src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
             placeholder={
-              <LoaderContainer isGalleryOpen={isGalleryOpen}>
-                <MoonLoader color="white" size={25} />
+              <LoaderContainer>
+                <StyledBarLoader
+                  width={isGalleryOpen ? 276 : 151}
+                  height={isGalleryOpen ? 276 : 151}
+                />
               </LoaderContainer>
             }
             fallback={NftPlaceholderImage}

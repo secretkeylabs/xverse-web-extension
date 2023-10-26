@@ -1,16 +1,16 @@
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import useWalletSelector from '@hooks/useWalletSelector';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import styled from 'styled-components';
-import { CurrencyTypes } from '@utils/constants';
-import { useState } from 'react';
 import linkIcon from '@assets/img/linkIcon.svg';
-import { useTranslation } from 'react-i18next';
-import { getExplorerUrl } from '@utils/helper';
 import CopyButton from '@components/copyButton';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
+import { CurrencyTypes } from '@utils/constants';
+import { getExplorerUrl } from '@utils/helper';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import styled from 'styled-components';
 import CoinHeader from './coinHeader';
 import TransactionsHistoryList from './transactionsHistoryList';
 
@@ -32,29 +32,8 @@ const TokenContractContainer = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   h1: {
-    ...props.theme.body_medium_m,
-    color: props.theme.colors.white[400],
-  },
-}));
-
-const TransactionHistoryContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginTop: props.theme.spacing(30),
-  borderTop: `1px solid ${props.theme.colors.background.elevation2}`,
-  h1: {
-    ...props.theme.headline_s,
-    color: props.theme.colors.white[0],
-    marginTop: 32,
-  },
-  h2: {
-    ...props.theme.body_m,
-    fontStyle: 'italic',
-    color: props.theme.colors.white[200],
-    marginTop: props.theme.spacing(8),
+    ...props.theme.typography.body_medium_m,
+    color: props.theme.colors.white_400,
   },
 }));
 
@@ -65,8 +44,8 @@ const ContractAddressCopyButton = styled.button((props) => ({
 }));
 
 const TokenContractAddress = styled.p((props) => ({
-  ...props.theme.body_medium_l,
-  color: props.theme.colors.white[0],
+  ...props.theme.typography.body_medium_l,
+  color: props.theme.colors.white_0,
   textAlign: 'left',
   overflowWrap: 'break-word',
   width: 300,
@@ -75,7 +54,7 @@ const TokenContractAddress = styled.p((props) => ({
 const FtInfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  borderTop: `1px solid ${props.theme.colors.background.elevation2}`,
+  borderTop: `1px solid ${props.theme.colors.elevation2}`,
   paddingTop: props.theme.spacing(12),
   marginTop: props.theme.spacing(16),
   paddingLeft: props.theme.spacing(8),
@@ -92,14 +71,14 @@ const CopyButtonContainer = styled.div((props) => ({
 }));
 
 const ContractDeploymentButton = styled.button((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   display: 'flex',
   alignItems: 'center',
   marginTop: props.theme.spacing(12),
   background: 'none',
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   span: {
-    color: props.theme.colors.white[0],
+    color: props.theme.colors.white_0,
     marginLeft: props.theme.spacing(3),
   },
   img: {
@@ -107,11 +86,10 @@ const ContractDeploymentButton = styled.button((props) => ({
   },
 }));
 
-interface ButtonProps {
+const Button = styled.button<{
   isSelected: boolean;
-}
-const Button = styled.button<ButtonProps>((props) => ({
-  ...props.theme.body_bold_l,
+}>((props) => ({
+  ...props.theme.typography.body_bold_l,
   fontSize: 11,
   display: 'flex',
   justifyContent: 'center',
@@ -121,8 +99,8 @@ const Button = styled.button<ButtonProps>((props) => ({
   paddingRight: props.theme.spacing(6),
   marginRight: props.theme.spacing(2),
   borderRadius: 44,
-  background: props.isSelected ? props.theme.colors.background.elevation2 : 'transparent',
-  color: props.theme.colors.white[0],
+  background: props.isSelected ? props.theme.colors.elevation2 : 'transparent',
+  color: props.theme.colors.white_0,
   opacity: props.isSelected ? 1 : 0.6,
 }));
 
@@ -167,42 +145,6 @@ export default function CoinDashboard() {
   const formatAddress = (addr: string): string =>
     addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
 
-  const showContent = () => {
-    if (ft) {
-      if (showFtContractDetails) {
-        return (
-          <TokenContractContainer>
-            <h1>{t('FT_CONTRACT_PREFIX')}</h1>
-            <ContractAddressCopyButton onClick={handleCopyContractAddress}>
-              <TokenContractAddress>{formatAddress(ft?.principal as string)}</TokenContractAddress>
-              <CopyButtonContainer>
-                <CopyButton text={ft?.principal as string} />
-              </CopyButtonContainer>
-            </ContractAddressCopyButton>
-            <ContractDeploymentButton onClick={openContractDeployment}>
-              {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
-              <span>{t('STACKS_EXPLORER')}</span>
-              <ShareIcon src={linkIcon} alt="link" />
-            </ContractDeploymentButton>
-          </TokenContractContainer>
-        );
-      }
-    } else if (brc20FtName) {
-      return (
-        <TransactionHistoryContainer>
-          <h1>{t('TRANSACTION_HISTORY_TITLE')}</h1>
-          <h2>{`${t('COMING_SOON')}!`}</h2>
-        </TransactionHistoryContainer>
-      );
-    }
-    return (
-      <TransactionsHistoryList
-        coin={coin as CurrencyTypes}
-        txFilter={`${ft?.principal}::${ft?.assetName}`}
-      />
-    );
-  };
-
   return (
     <>
       <TopRow title="" onClick={handleBack} />
@@ -218,7 +160,28 @@ export default function CoinDashboard() {
             </Button>
           </FtInfoContainer>
         )}
-        {showContent()}
+        {ft && showFtContractDetails ? (
+          <TokenContractContainer>
+            <h1>{t('FT_CONTRACT_PREFIX')}</h1>
+            <ContractAddressCopyButton onClick={handleCopyContractAddress}>
+              <TokenContractAddress>{formatAddress(ft?.principal as string)}</TokenContractAddress>
+              <CopyButtonContainer>
+                <CopyButton text={ft?.principal as string} />
+              </CopyButtonContainer>
+            </ContractAddressCopyButton>
+            <ContractDeploymentButton onClick={openContractDeployment}>
+              {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
+              <span>{t('STACKS_EXPLORER')}</span>
+              <ShareIcon src={linkIcon} alt="link" />
+            </ContractDeploymentButton>
+          </TokenContractContainer>
+        ) : (
+          <TransactionsHistoryList
+            coin={coin as CurrencyTypes}
+            txFilter={`${ft?.principal}::${ft?.assetName}`}
+            brc20Token={brc20FtName}
+          />
+        )}
       </Container>
       <BottomBar tab="dashboard" />
     </>

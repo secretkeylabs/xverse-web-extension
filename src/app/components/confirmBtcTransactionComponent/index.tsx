@@ -1,18 +1,21 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
 import TopRow from '@components/topRow';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   BtcUtxoDataResponse,
   ErrorCodes,
-  ResponseError,
-  UTXO,
   getBtcFiatEquivalent,
+  ResponseError,
   satsToBtc,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import {
@@ -21,13 +24,13 @@ import {
   signNonOrdinalBtcSendTransaction,
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import { StoreState } from '@stores/index';
 import { useMutation } from '@tanstack/react-query';
+import Callout from '@ui-library/callout';
+import { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import TransactionDetailComponent from '../transactionDetailComponent';
 
@@ -80,7 +83,7 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -106,9 +109,14 @@ interface ReviewTransactionTitleProps {
 }
 const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
   textAlign: props.isOridnalTx ? 'center' : 'left',
+}));
+
+const CalloutContainer = styled.div((props) => ({
+  marginBottom: props.theme.spacing(8),
+  marginhorizontal: props.theme.spacing(8),
 }));
 
 interface Props {
@@ -120,9 +128,12 @@ interface Props {
   recipients: Recipient[];
   children?: ReactNode;
   assetDetail?: string;
+  assetDetailValue?: string;
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: BtcUtxoDataResponse[];
   isBtcSendBrowserTx?: boolean;
+  currencyType?: CurrencyTypes;
+  isPartOfBundle?: boolean;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;
   setCurrentFeeRate: (feeRate: BigNumber) => void;
@@ -140,9 +151,12 @@ function ConfirmBtcTransactionComponent({
   recipients,
   children,
   assetDetail,
+  assetDetailValue,
   isRestoreFundFlow,
   nonOrdinalUtxos,
   isBtcSendBrowserTx,
+  isPartOfBundle,
+  currencyType,
   currentFeeRate,
   setCurrentFee,
   setCurrentFeeRate,
@@ -153,13 +167,13 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
-  const { btcAddress, selectedAccount, seedPhrase, network, btcFiatRate } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { btcAddress, selectedAccount, network, btcFiatRate, feeMultipliers } = useWalletSelector();
+  const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
+  const [showFeeWarning, setShowFeeWarning] = useState(false);
   const {
     isLoading,
     data,
@@ -169,11 +183,12 @@ function ConfirmBtcTransactionComponent({
     SignedBtcTx,
     ResponseError,
     {
-      recipients: Recipient[];
+      txRecipients: Recipient[];
       txFee: string;
+      seedPhrase: string;
     }
   >({
-    mutationFn: async ({ recipients: newRecipients, txFee }) =>
+    mutationFn: async ({ txRecipients: newRecipients, txFee, seedPhrase }) =>
       signBtcTransaction(
         newRecipients,
         btcAddress,
@@ -184,13 +199,23 @@ function ConfirmBtcTransactionComponent({
       ),
   });
 
+  if (typeof feePerVByte !== 'string' && !BigNumber.isBigNumber(feePerVByte)) {
+    Object.setPrototypeOf(feePerVByte, BigNumber.prototype);
+  }
+
+  recipients.forEach((recipient) => {
+    if (typeof recipient.amountSats !== 'string' && !BigNumber.isBigNumber(recipient.amountSats)) {
+      Object.setPrototypeOf(recipient.amountSats, BigNumber.prototype);
+    }
+  });
+
   const {
     isLoading: isLoadingNonOrdinalBtcSend,
     error: errorSigningNonOrdial,
     data: signedNonOrdinalBtcSend,
     mutate: mutateSignNonOrdinalBtcTransaction,
-  } = useMutation<SignedBtcTx, ResponseError, string>({
-    mutationFn: async (txFee) => {
+  } = useMutation<SignedBtcTx, ResponseError, { txFee: string; seedPhrase: string }>({
+    mutationFn: async ({ txFee, seedPhrase }) => {
       const signedNonOrdinalBtcTx = await signNonOrdinalBtcSendTransaction(
         btcAddress,
         nonOrdinalUtxos!,
@@ -210,8 +235,8 @@ function ConfirmBtcTransactionComponent({
     data: ordinalData,
     error: ordinalError,
     mutate: ordinalMutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>({
-    mutationFn: async (txFee) => {
+  } = useMutation<SignedBtcTx, ResponseError, { txFee: string; seedPhrase: string }>({
+    mutationFn: async ({ txFee, seedPhrase }) => {
       const ordinalsUtxos = ordinals!.map((ord) => ord.utxo);
 
       const newSignedTx = await signOrdinalSendTransaction(
@@ -246,10 +271,9 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     let sum: BigNumber = new BigNumber(0);
-    if (recipients) {
-      recipients.map((recipient) => {
+    if (recipients?.length) {
+      recipients.forEach((recipient) => {
         sum = sum.plus(recipient.amountSats);
-        return sum;
       });
       sum = sum?.plus(currentFee);
     }
@@ -264,6 +288,17 @@ function ConfirmBtcTransactionComponent({
     }
   }, [signedNonOrdinalBtcSend]);
 
+  useEffect(() => {
+    if (
+      feeMultipliers &&
+      currentFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighSatsFee))
+    ) {
+      setShowFeeWarning(true);
+    } else if (showFeeWarning) {
+      setShowFeeWarning(false);
+    }
+  }, [currentFee, feeMultipliers]);
+
   const onAdvancedSettingClick = () => {
     setShowFeeSettings(true);
   };
@@ -272,7 +307,7 @@ function ConfirmBtcTransactionComponent({
     setShowFeeSettings(false);
   };
 
-  const onApplyClick = ({
+  const onApplyClick = async ({
     fee: modifiedFee,
     feeRate,
   }: {
@@ -280,13 +315,15 @@ function ConfirmBtcTransactionComponent({
     feeRate?: string;
     nonce?: string;
   }) => {
-    setCurrentFee(new BigNumber(modifiedFee));
+    const newFee = new BigNumber(modifiedFee);
+    setCurrentFee(newFee);
+    const seed = await getSeed();
     setCurrentFeeRate(new BigNumber(feeRate));
-    if (ordinalTxUtxo) ordinalMutate(modifiedFee);
+    if (ordinalTxUtxo) ordinalMutate({ txFee: modifiedFee, seedPhrase: seed });
     else if (isRestoreFundFlow) {
-      mutateSignNonOrdinalBtcTransaction(modifiedFee);
+      mutateSignNonOrdinalBtcTransaction({ txFee: modifiedFee, seedPhrase: seed });
     } else {
-      mutate({ recipients, txFee: modifiedFee });
+      mutate({ txRecipients: recipients, txFee: modifiedFee, seedPhrase: seed });
     }
     setLoading(true);
   };
@@ -344,17 +381,34 @@ function ConfirmBtcTransactionComponent({
           <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
         )}
         <Container>
+          {showFeeWarning && (
+            <InfoContainer
+              type="Warning"
+              bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')}
+            />
+          )}
+
           {children}
           <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
             {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
           </ReviewTransactionText>
 
+          {isPartOfBundle && (
+            <CalloutContainer>
+              <Callout
+                bodyText={t('NFT_DASHBOARD_SCREEN.FROM_RARE_SAT_BUNDLE')}
+                variant="warning"
+              />
+            </CalloutContainer>
+          )}
+
           {ordinalTxUtxo ? (
             <RecipientComponent
               address={recipients[0]?.address}
               value={assetDetail!}
+              valueDetail={assetDetailValue}
               icon={AssetIcon}
-              currencyType="Ordinal"
+              currencyType={currencyType || 'Ordinal'}
               title={t('CONFIRM_TRANSACTION.ASSET')}
             />
           ) : (

@@ -1,13 +1,11 @@
-import TopRow from '@components/topRow';
-import useWalletSelector from '@hooks/useWalletSelector';
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import {
-  BtcUtxoDataResponse,
-  getBtcFiatEquivalent,
-  NetworkType,
-  satsToBtc,
-  UTXO,
-} from '@secretkeylabs/xverse-core';
+import ActionButton from '@components/button';
+import BottomTabBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { getBtcFiatEquivalent, NetworkType, satsToBtc, UTXO } from '@secretkeylabs/xverse-core';
 import {
   getBtcFeesForNonOrdinalBtcSend,
   SignedBtcTx,
@@ -16,25 +14,22 @@ import {
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import ActionButton from '@components/button';
-import BottomTabBar from '@components/tabBar';
-import { useEffect } from 'react';
-import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 
 const RestoreFundTitle = styled.h1((props) => ({
   ...props.theme.body_l,
-  marginBottom: 32,
-  color: props.theme.colors.white[200],
+  marginBottom: props.theme.spacing(16),
+  color: props.theme.colors.white_200,
 }));
 
 const BtcCard = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  background: props.theme.colors.background.elevation1,
-  borderRadius: 8,
+  background: props.theme.colors.elevation1,
+  borderRadius: props.theme.radius(1),
   padding: '16px 12px',
 }));
 
@@ -47,12 +42,12 @@ const Icon = styled.img((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const ValueText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
 }));
 
 const BtcContainer = styled.div({
@@ -60,25 +55,26 @@ const BtcContainer = styled.div({
   flexDirection: 'column',
 });
 
-const Container = styled.div({
+const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'column',
-  marginLeft: 16,
-  marginTop: 32,
-  marginRight: 16,
-});
+  marginLeft: props.theme.spacing(8),
+  marginTop: props.theme.spacing(16),
+  marginRight: props.theme.spacing(8),
+}));
 
-const ButtonContainer = styled.div({
-  marginLeft: 16,
-  marginBottom: 32,
-  marginRight: 16,
-});
+const ButtonContainer = styled.div((props) => ({
+  marginLeft: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(16),
+  marginRight: props.theme.spacing(8),
+}));
 
 function RestoreBtc() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_BTC_SCREEN' });
-  const { ordinalsAddress, btcAddress, network, selectedAccount, btcFiatRate, seedPhrase } =
+  const { ordinalsAddress, btcAddress, network, selectedAccount, btcFiatRate } =
     useWalletSelector();
+  const { getSeed } = useSeedVault();
   const navigate = useNavigate();
   const { unspentUtxos } = useNonOrdinalUtxos();
   let amount = new BigNumber(0);
@@ -113,21 +109,22 @@ function RestoreBtc() {
       recipientAddress,
       nonOrdinalUtxos,
       accountIndex,
-      seedPhrase,
-      network,
+      seedPhrase: currentSeedPhrase,
+      network: currentNetwork,
       fee,
     }) =>
       signNonOrdinalBtcSendTransaction(
         recipientAddress,
         nonOrdinalUtxos,
         accountIndex,
-        seedPhrase,
-        network,
+        currentSeedPhrase,
+        currentNetwork,
         fee,
       ),
   });
 
-  const onClickTransfer = () => {
+  const onClickTransfer = async () => {
+    const seedPhrase = await getSeed();
     mutateSignNonOrdinalBtcTransaction({
       recipientAddress: btcAddress,
       nonOrdinalUtxos: unspentUtxos,

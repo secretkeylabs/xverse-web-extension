@@ -1,19 +1,20 @@
-import { Currency, SponsoredTxErrorCode, SponsoredTxError } from 'alex-sdk';
-import { useNavigate } from 'react-router-dom';
-import { SwapToken } from '@screens/swap/useSwap';
+import { TokenImageProps } from '@components/tokenImage';
+import useNetworkSelector from '@hooks/useNetwork';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { SwapToken } from '@screens/swap/types';
 import {
   broadcastSignedTransaction,
+  microstacksToStx,
   signTransaction,
   StacksTransaction,
-  microstacksToStx,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction } from '@stacks/transactions';
-import useNetworkSelector from '@hooks/useNetwork';
 import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
-import { TokenImageProps } from '@components/tokenImage';
-import { useState } from 'react';
+import { deserializeTransaction } from '@stacks/transactions';
+import { Currency, SponsoredTxError, SponsoredTxErrorCode } from 'alex-sdk';
 import BigNumber from 'bignumber.js';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
 import { useCurrencyConversion } from '../useCurrencyConversion';
 
@@ -42,12 +43,13 @@ export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> &
 };
 
 export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
-  const { selectedAccount, seedPhrase } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const { isSponsored, sponsorTransaction, isSponsorDisabled } = useAlexSponsoredTransaction(
     input.userOverrideSponsorValue,
   );
   const { currencyToToken } = useCurrencyConversion();
+  const { getSeed } = useSeedVault();
   const navigate = useNavigate();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>(
     deserializeTransaction(input.unsignedTx),
@@ -71,6 +73,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
     isSponsored,
     isSponsorDisabled,
     onConfirm: async () => {
+      const seedPhrase = await getSeed();
       const signed = await signTransaction(
         unsignedTx,
         seedPhrase,

@@ -2,20 +2,20 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SendForm from '@components/sendForm';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
-import { StoreState } from '@stores/index';
 import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
 import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
-import { isInOptions } from '@utils/helper';
+import useWalletSelector from '@hooks/useWalletSelector';
+import useSeedVault from '@hooks/useSeedVault';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import { isInOptions } from '@utils/helper';
 
 function SendBtcScreen() {
   const location = useLocation();
@@ -31,12 +31,10 @@ function SendBtcScreen() {
   const [warning, setWarning] = useState('');
   const [recipient, setRecipient] = useState<Recipient[]>();
   const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const { btcAddress, network, btcBalance, selectedAccount, seedPhrase, btcFiatRate } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { btcAddress, network, btcBalance, selectedAccount, btcFiatRate } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-
   const navigate = useNavigate();
+  const { getSeed } = useSeedVault();
   const {
     isLoading,
     data,
@@ -47,9 +45,10 @@ function SendBtcScreen() {
     ResponseError,
     {
       recipients: Recipient[];
+      seedPhrase: string;
     }
   >({
-    mutationFn: async ({ recipients }) =>
+    mutationFn: async ({ recipients, seedPhrase }) =>
       signBtcTransaction(
         recipients,
         btcAddress,
@@ -145,6 +144,7 @@ function SendBtcScreen() {
   const handleNextClick = async (address: string, amountToSend: string) => {
     setRecipientAddress(address);
     setAmount(amountToSend);
+    const seedPhrase = await getSeed();
     const recipients: Recipient[] = [
       {
         address,
@@ -153,7 +153,7 @@ function SendBtcScreen() {
     ];
     setRecipient(recipients);
     if (validateFields(address, amountToSend)) {
-      mutate({ recipients });
+      mutate({ recipients, seedPhrase });
     }
   };
 

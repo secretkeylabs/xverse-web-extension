@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 
 interface ButtonProps {
   disabled?: boolean;
@@ -31,17 +31,17 @@ const Button = styled.button<ButtonProps>((props) => ({
 }));
 
 const TransparentButton = styled(Button)((props) => ({
-  border: `1px solid ${props.theme.colors.background.elevation6}`,
+  border: `1px solid ${props.theme.colors.elevation6}`,
   backgroundColor: 'transparent',
   ':disabled': {
     cursor: 'not-allowed',
     opacity: 0.4,
   },
   ':hover:enabled': {
-    backgroundColor: props.theme.colors.background.elevation6_800,
+    backgroundColor: props.theme.colors.elevation6_800,
   },
   ':active:enabled': {
-    backgroundColor: props.theme.colors.background.elevation6_600,
+    backgroundColor: props.theme.colors.elevation6_600,
   },
 }));
 
@@ -52,16 +52,14 @@ interface TextProps {
 const ButtonText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: `${
-    props.warning ? props.theme.colors.white[0] : props.theme.colors.background.elevation0
-  }`,
+  color: `${props.warning ? props.theme.colors.white_0 : props.theme.colors.elevation0}`,
   textAlign: 'center',
 }));
 
 const AnimatedButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -79,6 +77,7 @@ const ButtonIconContainer = styled.div((props) => ({
 }));
 
 interface Props {
+  className?: string;
   src?: string;
   icon?: JSX.Element;
   text: string;
@@ -87,9 +86,11 @@ interface Props {
   disabled?: boolean;
   transparent?: boolean;
   warning?: boolean;
+  hoverDialogId?: string;
 }
 
 function ActionButton({
+  className,
   src,
   icon,
   text,
@@ -98,6 +99,7 @@ function ActionButton({
   disabled = false,
   transparent,
   warning,
+  hoverDialogId,
 }: Props) {
   const handleOnPress = () => {
     if (!disabled) {
@@ -107,7 +109,12 @@ function ActionButton({
 
   if (transparent) {
     return (
-      <TransparentButton onClick={handleOnPress} disabled={disabled || processing}>
+      <TransparentButton
+        id={hoverDialogId}
+        className={className}
+        onClick={handleOnPress}
+        disabled={disabled || processing}
+      >
         {processing ? (
           <MoonLoader color="white" size={10} />
         ) : (
@@ -122,7 +129,12 @@ function ActionButton({
   }
 
   return (
-    <Button onClick={handleOnPress} disabled={disabled || processing} warning={warning}>
+    <Button
+      className={className}
+      onClick={handleOnPress}
+      disabled={disabled || processing}
+      warning={warning}
+    >
       {processing ? (
         <MoonLoader color="#12151E" size={12} />
       ) : (

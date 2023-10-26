@@ -1,16 +1,16 @@
-import BigNumber from 'bignumber.js';
-import styled from 'styled-components';
-import { NumericFormat } from 'react-number-format';
-import { CurrencyTypes, LoaderSize } from '@utils/constants';
-import BarLoader from '@components/barLoader';
-import { getTicker } from '@utils/helper';
-import stc from 'string-to-color';
+import { BetterBarLoader } from '@components/barLoader';
+import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import { FungibleToken } from '@secretkeylabs/xverse-core/types';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
-import { useSelector } from 'react-redux';
-import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
+import { CurrencyTypes } from '@utils/constants';
+import { getTicker } from '@utils/helper';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
+import { NumericFormat } from 'react-number-format';
+import { useSelector } from 'react-redux';
+import stc from 'string-to-color';
+import styled from 'styled-components';
 
 interface TileProps {
   margin?: number;
@@ -54,14 +54,14 @@ const TickerIconContainer = styled.div<TickerProps>((props) => ({
 
 const TickerIconText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
   fontSize: 10,
 }));
 
 const RowContainer = styled.div({
-  flex: 1,
+  flex: '1 0 auto',
   display: 'flex',
 });
 
@@ -76,42 +76,45 @@ const AmountContainer = styled.div({
   alignContent: 'flex-end',
 });
 
-const LoaderMainContainer = styled.div((props) => ({
-  flex: 1,
-  maxWidth: 200,
+const LoaderMainContainer = styled.div({
+  flex: '1 1 auto',
+  display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-end',
-  justifyContent: 'flex-end',
-  marginLeft: props.theme.spacing(15),
-}));
-
-const LoaderImageContainer = styled.div({
-  flex: 0.5,
-  maxWidth: 40,
 });
+
+const LoaderImageContainer = styled.div((props) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginRight: props.theme.spacing(3),
+}));
 
 const CoinTickerText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const SubText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   fontSize: 12,
   textAlign: 'left',
+  maxWidth: 100,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 }));
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   fontSize: 12,
   textAlign: 'end',
 }));
 
 const CoinBalanceText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'end',
 }));
 
@@ -132,20 +135,29 @@ const ProtocolText = styled.p((props) => ({
   fontWeight: '700',
   textTransform: 'uppercase',
   marginLeft: props.theme.spacing(5),
-  backgroundColor: props.theme.colors.white['400'],
+  backgroundColor: props.theme.colors.white_400,
   padding: '2px 6px 1px',
   borderRadius: props.theme.radius(2),
   whiteSpace: 'nowrap',
 }));
 
+const StyledBarLoader = styled(BetterBarLoader)<{
+  withMarginBottom?: boolean;
+}>((props) => ({
+  padding: 0,
+  borderRadius: props.theme.radius(1),
+  marginBottom: props.withMarginBottom ? props.theme.spacing(2) : 0,
+}));
+
 function TokenLoader() {
   return (
     <LoaderMainContainer>
-      <BarLoader loaderSize={LoaderSize.LARGE} />
-      <BarLoader loaderSize={LoaderSize.MEDIUM} />
+      <StyledBarLoader width={80} height={16} withMarginBottom />
+      <StyledBarLoader width={70} height={14} />
     </LoaderMainContainer>
   );
 }
+
 interface Props {
   title: string;
   icon?: string;
@@ -320,7 +332,7 @@ function TokenTile({
     }
     return (
       <LoaderImageContainer>
-        <BarLoader loaderSize={LoaderSize.LARGE} />
+        <StyledBarLoader width={enlargeTicker ? 40 : 32} height={enlargeTicker ? 40 : 32} />
       </LoaderImageContainer>
     );
   }

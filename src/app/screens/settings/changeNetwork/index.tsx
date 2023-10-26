@@ -1,16 +1,16 @@
-import styled from 'styled-components';
+import Cross from '@assets/img/settings/x.svg';
+import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { useTranslation } from 'react-i18next';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useNavigate } from 'react-router-dom';
-import { initialNetworksList } from '@utils/constants';
-import Cross from '@assets/img/settings/x.svg';
-import { useState } from 'react';
-import ActionButton from '@components/button';
-import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
-import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core/types';
 import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core/types';
+import { initialNetworksList } from '@utils/constants';
+import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import NetworkRow from './networkRow';
 
 const Container = styled.div`
@@ -49,8 +49,8 @@ const InputContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background.elevation_1,
+  border: `1px solid ${props.theme.colors.elevation3}`,
+  backgroundColor: props.theme.colors.elevation_n1,
   borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(4),
   paddingRight: props.theme.spacing(4),
@@ -75,8 +75,8 @@ const Input = styled.input((props) => ({
   height: 44,
   display: 'flex',
   flex: 1,
-  backgroundColor: props.theme.colors.background.elevation_1,
-  color: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.elevation_n1,
+  color: props.theme.colors.white_0,
   border: 'none',
 }));
 

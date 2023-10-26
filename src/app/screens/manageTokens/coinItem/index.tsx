@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import stc from 'string-to-color';
-import styled from 'styled-components';
-import Switch from 'react-switch';
+import Separator from '@components/separator';
 import { Coin } from '@secretkeylabs/xverse-core/types';
 import { getTicker } from '@utils/helper';
-import Separator from '@components/separator';
+import { useState } from 'react';
+import Switch from 'react-switch';
+import stc from 'string-to-color';
+import styled from 'styled-components';
 import Theme from 'theme';
 
 const RowContainer = styled.div((props) => ({
@@ -53,7 +53,7 @@ const TickerIconContainer = styled.div((props) => ({
 
 const TickerText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
   fontSize: 10,
@@ -61,13 +61,13 @@ const TickerText = styled.h1((props) => ({
 
 const SelectedCoinTitleText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const UnSelectedCoinTitleText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
@@ -110,7 +110,7 @@ function CoinItem({ coin, disabled, toggled, enabled, showDivider }: Props) {
           )}
         </CoinContainer>
         <CustomSwitch
-          onColor={Theme.colors.purple_main}
+          onColor={Theme.colors.orange_main}
           offColor={Theme.colors.background.elevation3}
           onChange={toggleSwitch}
           checked={isEnabled!}

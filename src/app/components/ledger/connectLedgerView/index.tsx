@@ -23,7 +23,7 @@ export const ConnectLedgerTitle = styled.h1((props) => ({
 
 export const ConnectLedgerText = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(4),

@@ -6,6 +6,7 @@ import ActionButton from '@components/button';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { CaretDown } from '@phosphor-icons/react';
 import { Account } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
@@ -22,8 +23,8 @@ interface GradientCircleProps {
   thirdGradient: string;
 }
 const GradientCircle = styled.div<GradientCircleProps>((props) => ({
-  width: 40,
-  height: 40,
+  width: 20,
+  height: 20,
   borderRadius: 25,
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
@@ -52,18 +53,19 @@ const CurrentAcountContainer = styled.div((props) => ({
 const CurrentAccountTextContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
+  alignItems: 'center',
   gap: props.theme.spacing(4),
 }));
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'start',
 }));
 
 const CurrentUnSelectedAccountText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'start',
 }));
 
@@ -99,7 +101,7 @@ const ModalContent = styled.div((props) => ({
 
 const ModalDescription = styled.div((props) => ({
   fontSize: '0.875rem',
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(16),
 }));
 
@@ -124,13 +126,13 @@ const ButtonRow = styled.button`
   padding-top: 11px;
   padding-bottom: 11px;
   font: ${(props) => props.theme.body_medium_m};
-  color: ${(props) => props.theme.colors.white['0']};
+  color: ${(props) => props.theme.colors.white_0};
   transition: background-color 0.2s ease;
   :hover {
-    background-color: ${(props) => props.theme.colors.background.elevation3};
+    background-color: ${(props) => props.theme.colors.elevation3};
   }
   :active {
-    background-color: ${(props) => props.theme.colors.background.elevation3};
+    background-color: ${(props) => props.theme.colors.elevation3};
   }
 `;
 
@@ -238,6 +240,7 @@ function AccountRow({
                   <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
                 )}
                 {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+                {isSelected && !disabledAccountSelect && <CaretDown weight="bold" size={16} />}
               </CurrentAccountTextContainer>
             </TransparentSpan>
           )}

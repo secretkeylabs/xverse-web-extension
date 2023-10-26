@@ -1,13 +1,13 @@
-import { CurrencyTypes } from '@utils/constants';
-import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
-import { isAddressTransactionWithTransfers, Tx } from '@utils/transactions/transactions';
-import { parseStxTransactionData } from '@secretkeylabs/xverse-core/api/helper';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { parseStxTransactionData } from '@secretkeylabs/xverse-core/api/helper';
+import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
+import { CurrencyTypes } from '@utils/constants';
+import { isAddressTransactionWithTransfers, Tx } from '@utils/transactions/transactions';
 // import IncreaseFeeIcon from '@assets/img/transactions/increaseFee.svg';
 // import styled from 'styled-components';
 // import { useTranslation } from 'react-i18next';
-import TxTransfers from './txTransfers';
 import StxTransferTransaction from './stxTransferTransaction';
+import TxTransfers from './txTransfers';
 
 // const IncreaseFeeButton = styled.button((props) => ({
 //   ...props.theme.body_xs,
@@ -18,8 +18,8 @@ import StxTransferTransaction from './stxTransferTransaction';
 //   background: 'none',
 //   paddingLeft: props.theme.spacing(8),
 //   paddingRight: props.theme.spacing(8),
-//   color: props.theme.colors.white[0],
-//   border: `0.5px solid ${props.theme.colors.background.elevation3}`,
+//   color: props.theme.colors.white_0,
+//   border: `0.5px solid ${props.theme.colors.elevation3}`,
 //   height: 34,
 //   borderRadius: props.theme.radius(3),
 //   img: {

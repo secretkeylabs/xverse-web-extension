@@ -16,7 +16,7 @@ const NftNameText = styled.h1((props) => ({
   textAlign: 'left',
 }));
 
-const NftNameTextContainer = styled.h1((props) => ({
+const NftNameTextContainer = styled.div((props) => ({
   width: '100%',
   display: 'flex',
   justifyContent: 'flex-start',
@@ -35,35 +35,27 @@ const GradientContainer = styled.div<ContainerProps>((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
-  background: 'linear-gradient(to bottom,#E5A78E, #EA603E, #4D52EF)',
+  background: props.theme.colors.elevation1,
 }));
 
-const NftImageContainer = styled.div({
-  flex: 1,
+const NftImageContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   width: '100%',
   overflow: 'hidden',
-});
+  borderRadius: 8,
+  background: props.theme.colors.elevation1,
+  flexGrow: props.isGalleryView ? 1 : 'initial',
+}));
 
-interface GridContainerProps {
-  showBorder: boolean;
-}
-
-const GridItemContainer = styled.button<GridContainerProps>((props) => ({
+const GridItemContainer = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'column',
   color: props.theme.colors.white['0'],
-  padding: props.showBorder ? props.theme.spacing(7) : 0,
-  marginBottom: props.theme.spacing(16),
+  padding: 0,
   borderRadius: props.theme.radius(3),
-  background: props.showBorder
-    ? 'linear-gradient(27.88deg, #1D2032 0%, rgba(29, 32, 50, 0) 100%)'
-    : 'transparent',
-  border: props.showBorder
-    ? ` 1px solid ${props.theme.colors.background.elevation2}`
-    : 'transparent',
+  background: 'transparent',
 }));
 
 function Nft({ asset, isGalleryOpen }: Props) {
@@ -89,22 +81,19 @@ function Nft({ asset, isGalleryOpen }: Props) {
       navigate(`nft-detail/${url}`);
     }
   };
-  const showNftImg = isGalleryOpen ? (
-    <NftImageContainer>
-      <NftImage metadata={asset?.data?.token_metadata!} />
-    </NftImageContainer>
-  ) : (
-    <NftImage metadata={asset?.data?.token_metadata!} />
-  );
 
   return (
-    <GridItemContainer onClick={handleOnClick} showBorder={isGalleryOpen}>
+    <GridItemContainer onClick={handleOnClick}>
       {asset.asset_identifier === BNS_CONTRACT ? (
         <GradientContainer isGalleryView={isGalleryOpen}>
-          <img src={NftUser} alt="user" />
+          <NftImageContainer isGalleryView={isGalleryOpen}>
+            <img src={NftUser} alt="user" />
+          </NftImageContainer>
         </GradientContainer>
       ) : (
-        showNftImg
+        <NftImageContainer isGalleryView={isGalleryOpen}>
+          <NftImage metadata={asset?.data?.token_metadata!} />
+        </NftImageContainer>
       )}
       <NftNameTextContainer>
         <NftNameText>{getName()}</NftNameText>

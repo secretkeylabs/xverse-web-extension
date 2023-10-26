@@ -1,43 +1,45 @@
-import { getOrdinalIdFromUtxo, Inscription, ParsedPSBT, UTXO } from '@secretkeylabs/xverse-core';
+import { getUtxoOrdinalBundle, ParsedPSBT } from '@secretkeylabs/xverse-core';
+import { BundleItem, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
+import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
-import useOrdinalsApi from './useOrdinalsApi';
 import useWalletSelector from './useWalletSelector';
 
 const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
   const [loading, setLoading] = useState(false);
   const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
-  const [ordinalInfoData, setOrdinalInfoData] = useState<Array<Inscription>>([]);
+  const [bundleItemsData, setBundleItemsData] = useState<BundleItem[]>([]);
   const { ordinalsAddress } = useWalletSelector();
-  const OrdinalsApi = useOrdinalsApi();
-
-  const getOrdinalId = async (utxoHash: string, index: number) => {
-    const utxo: UTXO = {
-      txid: utxoHash,
-      vout: index,
-      status: {
-        confirmed: false,
-      },
-      value: 0,
-    };
-    const data = await getOrdinalIdFromUtxo(utxo);
-    return data;
-  };
 
   async function handleOrdinalAndOrdinalInfo() {
-    const ordinals: Inscription[] = [];
+    const bundleItems: BundleItem[] = [];
     if (parsedPsbt) {
       setLoading(true);
       await Promise.all(
         parsedPsbt.inputs.map(async (input) => {
-          const data = await getOrdinalId(input.txid, input.index);
-          if (data) {
-            const response = await OrdinalsApi.getInscription(data);
-            ordinals.push(response);
+          try {
+            const data = await getUtxoOrdinalBundle(input.txid, input.index);
+
+            const bundle = mapRareSatsAPIResponseToRareSats(data);
+            bundle.items.forEach((item) => {
+              // we don't show unknown items for now
+              if (item.type === 'unknown') {
+                return;
+              }
+              bundleItems.push(item);
+            });
+          } catch (e) {
+            // we get back a 404 if the UTXO is not found, so it is likely this is a UTXO from an unpublished txn
+            if (!isAxiosError(e) || e.response?.status !== 404) {
+              // rethrow error if response was not 404
+              throw e;
+            }
           }
         }),
       );
-      setOrdinalInfoData(ordinals);
+
+      setBundleItemsData(bundleItems);
       setLoading(false);
+
       parsedPsbt.outputs.forEach(async (output) => {
         if (output.address === ordinalsAddress) {
           setUserReceivesOrdinal(true);
@@ -52,7 +54,7 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
 
   return {
     loading,
-    ordinalInfoData,
+    bundleItemsData,
     userReceivesOrdinal,
   };
 };
