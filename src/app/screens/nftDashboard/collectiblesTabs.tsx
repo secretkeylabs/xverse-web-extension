@@ -119,11 +119,11 @@ export default function CollectiblesTabs({
   const [tabIndex, setTabIndex] = useState(tabKeyToIndex(searchParams?.get('tab')));
   const {
     isGalleryOpen,
-    hasActivatedOrdinalsKey,
     rareSatsQuery,
     totalNfts,
     totalInscriptions,
     hasActivatedRareSatsKey,
+    hasActivatedOrdinalsKey,
     showNoticeAlert,
     onDismissRareSatsNotice,
     onLoadMoreRareSatsButtonClick,
@@ -147,6 +147,9 @@ export default function CollectiblesTabs({
     if (tab.key === 'rareSats' && !hasActivatedRareSatsKey) {
       return false;
     }
+    if (tab.key === 'inscriptions' && !hasActivatedOrdinalsKey) {
+      return false;
+    }
     return true;
   };
 
@@ -157,20 +160,22 @@ export default function CollectiblesTabs({
           <StyledTab key={key}>{t(label)}</StyledTab>
         ))}
       </StyledTabList>
-      <TabPanel>
-        {inscriptionsQuery.isLoading ? (
-          <SkeletonLoader isGalleryOpen={isGalleryOpen} />
-        ) : (
-          <>
-            {totalInscriptions > 0 && (
-              <StyledTotalItems typography="body_medium_m" color="white_200">
-                {t('TOTAL_ITEMS', { total: totalInscriptions || 0 })}
-              </StyledTotalItems>
-            )}
-            {inscriptionListView}
-          </>
-        )}
-      </TabPanel>
+      {hasActivatedOrdinalsKey && (
+        <TabPanel>
+          {inscriptionsQuery.isLoading ? (
+            <SkeletonLoader isGalleryOpen={isGalleryOpen} />
+          ) : (
+            <>
+              {totalInscriptions > 0 && (
+                <StyledTotalItems typography="body_medium_m" color="white_200">
+                  {t('TOTAL_ITEMS', { total: totalInscriptions || 0 })}
+                </StyledTotalItems>
+              )}
+              {inscriptionListView}
+            </>
+          )}
+        </TabPanel>
+      )}
       <TabPanel>
         {stacksNftsQuery.isLoading ? (
           <SkeletonLoader isGalleryOpen={isGalleryOpen} />
@@ -185,56 +190,59 @@ export default function CollectiblesTabs({
           </>
         )}
       </TabPanel>
-      <TabPanel>
-        {!rareSatsQuery.isLoading && ordinalBundleCount > 0 && (
-          <StyledTotalItems typography="body_medium_m" color="white_200">
-            {t('TOTAL_ITEMS', { total: ordinalBundleCount })}
-          </StyledTotalItems>
-        )}
+      {hasActivatedRareSatsKey && (
+        <TabPanel>
+          {!rareSatsQuery.isLoading && ordinalBundleCount > 0 && (
+            <StyledTotalItems typography="body_medium_m" color="white_200">
+              {t('TOTAL_ITEMS', { total: ordinalBundleCount })}
+            </StyledTotalItems>
+          )}
 
-        {!rareSatsQuery.isLoading && showNoticeAlert && (
-          <NoticeContainer>
-            <Notice
-              title={t('RARE_SATS_NOTICE_TITLE')}
-              description={t('RARE_SATS_NOTICE_DETAIL')}
-              onClose={() => {
-                onDismissRareSatsNotice();
-              }}
-              seeRarities={() => {
-                navigate('supported-rarity-scale');
-              }}
-            />
-          </NoticeContainer>
-        )}
-        {showNoBundlesNotice && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
+          {!rareSatsQuery.isLoading && showNoticeAlert && (
+            <NoticeContainer>
+              <Notice
+                title={t('RARE_SATS_NOTICE_TITLE')}
+                description={t('RARE_SATS_NOTICE_DETAIL')}
+                onClose={() => {
+                  onDismissRareSatsNotice();
+                }}
+                seeRarities={() => {
+                  navigate('supported-rarity-scale');
+                }}
+              />
+            </NoticeContainer>
+          )}
+          {showNoBundlesNotice && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
 
-        {!!rareSatsQuery.error && <StyledWrenchErrorMessage />}
-        {rareSatsQuery.isLoading ? (
-          <SkeletonLoader isGalleryOpen={isGalleryOpen} />
-        ) : (
-          <GridContainer isGalleryOpen={isGalleryOpen}>
-            {hasActivatedOrdinalsKey &&
-              !rareSatsQuery.error &&
-              !rareSatsQuery.isLoading &&
-              rareSatsQuery.data?.pages
-                ?.map((page) => page?.results)
-                .flat()
-                .map((utxo: ApiBundle) => mapRareSatsAPIResponseToRareSats(utxo))
-                .map((bundle: Bundle) => <RareSatsTabGridItem key={bundle.txid} bundle={bundle} />)}
-          </GridContainer>
-        )}
-        {rareSatsQuery.hasNextPage && (
-          <LoadMoreButtonContainer>
-            <ActionButton
-              transparent
-              text={t('LOAD_MORE')}
-              processing={rareSatsQuery.isFetchingNextPage}
-              disabled={rareSatsQuery.isFetchingNextPage}
-              onPress={onLoadMoreRareSatsButtonClick}
-            />
-          </LoadMoreButtonContainer>
-        )}
-      </TabPanel>
+          {!!rareSatsQuery.error && <StyledWrenchErrorMessage />}
+          {rareSatsQuery.isLoading ? (
+            <SkeletonLoader isGalleryOpen={isGalleryOpen} />
+          ) : (
+            <GridContainer isGalleryOpen={isGalleryOpen}>
+              {!rareSatsQuery.error &&
+                !rareSatsQuery.isLoading &&
+                rareSatsQuery.data?.pages
+                  ?.map((page) => page?.results)
+                  .flat()
+                  .map((utxo: ApiBundle) => mapRareSatsAPIResponseToRareSats(utxo))
+                  .map((bundle: Bundle) => (
+                    <RareSatsTabGridItem key={bundle.txid} bundle={bundle} />
+                  ))}
+            </GridContainer>
+          )}
+          {rareSatsQuery.hasNextPage && (
+            <LoadMoreButtonContainer>
+              <ActionButton
+                transparent
+                text={t('LOAD_MORE')}
+                processing={rareSatsQuery.isFetchingNextPage}
+                disabled={rareSatsQuery.isFetchingNextPage}
+                onPress={onLoadMoreRareSatsButtonClick}
+              />
+            </LoadMoreButtonContainer>
+          )}
+        </TabPanel>
+      )}
     </Tabs>
   );
 }
