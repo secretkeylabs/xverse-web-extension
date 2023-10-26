@@ -9,6 +9,7 @@ import ActionButton from '@components/button';
 import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { createAuthResponse, handleLedgerStxJWTAuth } from '@secretkeylabs/xverse-core';
@@ -82,7 +83,8 @@ function AuthenticationRequest() {
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken);
-  const { seedPhrase, selectedAccount } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
+  const { getSeed } = useSeedVault();
   const isDisabled = !selectedAccount?.stxAddress;
 
   const confirmCallback = async () => {
@@ -93,6 +95,7 @@ function AuthenticationRequest() {
         return;
       }
 
+      const seedPhrase = await getSeed();
       const authResponse = await createAuthResponse(
         seedPhrase,
         selectedAccount?.id ?? 0,

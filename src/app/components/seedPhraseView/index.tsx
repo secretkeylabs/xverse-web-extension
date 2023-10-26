@@ -65,7 +65,7 @@ const ShowSeedButton = styled.button((props) => ({
 
 export default function SeedphraseView(props: SeedPhraseViewProps) {
   const { seedPhrase, isVisible, setIsVisible } = props;
-  const seedPhraseWords = useMemo(() => seedPhrase?.split(' '), [seedPhrase]);
+  const seedPhraseWords = seedPhrase?.split(' ');
 
   const handleToggleVisibility = () => {
     setIsVisible(!isVisible);

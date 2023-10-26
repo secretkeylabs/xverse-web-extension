@@ -3,6 +3,7 @@ import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
@@ -53,8 +54,9 @@ const ButtonContainer = styled.div({
 
 function RestoreOrdinals() {
   const { t } = useTranslation('translation');
-  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+  const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
+  const { getSeed } = useSeedVault();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
@@ -69,8 +71,8 @@ function RestoreOrdinals() {
     isLoading,
     error: transactionError,
     mutateAsync,
-  } = useMutation<SignedBtcTx, string, BtcOrdinal>({
-    mutationFn: async (ordinal) => {
+  } = useMutation<SignedBtcTx, string, { ordinal: BtcOrdinal; seedPhrase: string }>({
+    mutationFn: async ({ ordinal, seedPhrase }) => {
       const tx = await signOrdinalSendTransaction(
         ordinalsAddress,
         ordinal.utxo,
@@ -104,8 +106,8 @@ function RestoreOrdinals() {
 
   const onClickTransfer = async (selectedOrdinal: BtcOrdinal, ordinalData: Inscription) => {
     setTransferringOrdinalId(selectedOrdinal.id);
-
-    const signedTx = await mutateAsync(selectedOrdinal);
+    const seedPhrase = await getSeed();
+    const signedTx = await mutateAsync({ ordinal: selectedOrdinal, seedPhrase });
     setSelectedOrdinalDetails(ordinalData);
     navigate(`/confirm-ordinal-tx/${selectedOrdinal.id}`, {
       state: {

@@ -46,7 +46,7 @@ const BundleLinkContainer = styled.button((props) => ({
   color: props.theme.colors.white_0,
   transition: 'background-color 0.2s ease, opacity 0.2s ease',
   ':hover': {
-    color: props.theme.colors.white_200
+    color: props.theme.colors.white_200,
   },
 }));
 const BundleLinkText = styled.div((props) => ({

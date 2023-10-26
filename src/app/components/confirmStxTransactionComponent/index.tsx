@@ -9,6 +9,7 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useNetworkSelector from '@hooks/useNetwork';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import {
@@ -146,8 +147,9 @@ function ConfirmStxTransationComponent({
     keyPrefix: 'SIGNATURE_REQUEST',
   });
   const selectedNetwork = useNetworkSelector();
+  const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const { selectedAccount, seedPhrase, feeMultipliers } = useWalletSelector();
+  const { selectedAccount, feeMultipliers } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -206,11 +208,12 @@ function ConfirmStxTransationComponent({
       return;
     }
 
+    const seed = await getSeed();
     let signedTxs: StacksTransaction[] = [];
     if (initialStxTransactions.length === 1) {
       const signedContractCall = await signTransaction(
         initialStxTransactions[0],
-        seedPhrase,
+        seed,
         selectedAccount?.id ?? 0,
         selectedNetwork,
       );
@@ -220,7 +223,7 @@ function ConfirmStxTransationComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seedPhrase,
+        seed,
       );
     }
     onConfirmClick(signedTxs);

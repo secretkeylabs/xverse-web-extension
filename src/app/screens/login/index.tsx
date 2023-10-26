@@ -4,10 +4,8 @@ import logo from '@assets/img/xverse_logo.svg';
 import ActionButton from '@components/button';
 import useCacheMigration from '@hooks/useCacheMigration';
 import useWalletReducer from '@hooks/useWalletReducer';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useSpring } from '@react-spring/web';
 import MigrationConfirmation from '@screens/migrationConfirmation';
-import { decryptSeedPhrase } from '@utils/encryptionUtils';
 import { addMinutes } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -116,8 +114,6 @@ function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
-  const { encryptedSeed } = useWalletSelector();
-
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -163,7 +159,6 @@ function Login(): JSX.Element {
   const handleVerifyPassword = async () => {
     setIsVerifying(true);
     try {
-      await decryptSeedPhrase(encryptedSeed, password);
       const hasMigrated = localStorage.getItem('migrated');
       const isReminderDue =
         Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
@@ -172,7 +167,7 @@ function Login(): JSX.Element {
       } else {
         await unlockWallet(password);
         setIsVerifying(false);
-        navigate(-1);
+        navigate('/');
       }
     } catch (err) {
       setIsVerifying(false);

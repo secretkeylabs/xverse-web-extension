@@ -4,6 +4,7 @@ import XverseLogo from '@assets/img/settings/logo.svg';
 import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -69,8 +70,8 @@ function Setting() {
   } = useWalletSelector();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { unlockWallet, resetWallet } = useWalletReducer();
-  const { unspentUtxos } = useNonOrdinalUtxos();
+  const { resetWallet } = useWalletReducer();
+  const { unlockVault } = useSeedVault();
 
   const openTermsOfService = () => {
     window.open(TERMS_LINK);
@@ -131,11 +132,6 @@ function Setting() {
     setShowResetWalletDisplay(false);
   };
 
-  const handleResetWallet = () => {
-    resetWallet();
-    navigate('/');
-  };
-
   const openLockCountdownScreen = () => {
     navigate('/lockCountdown');
   };
@@ -153,10 +149,10 @@ function Setting() {
   const handlePasswordNextClick = async () => {
     try {
       setLoading(true);
-      await unlockWallet(password);
+      await unlockVault(password);
       setPassword('');
       setError('');
-      handleResetWallet();
+      await resetWallet();
     } catch (e) {
       setError(t('INCORRECT_PASSWORD_ERROR'));
     } finally {
