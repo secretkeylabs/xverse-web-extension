@@ -40,8 +40,8 @@ const StyledWrenchErrorMessage = styled(WrenchErrorMessage)`
 `;
 
 const NoCollectiblesText = styled.div((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.white['200'],
+  ...props.theme.typography.body_bold_m,
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(16),
   textAlign: 'center',
 }));
@@ -78,10 +78,11 @@ function SkeletonLoader({ isGalleryOpen }: { isGalleryOpen: boolean }) {
   );
 }
 
-const tabs: {
+type TabButton = {
   key: string;
   label: string;
-}[] = [
+};
+const tabs: TabButton[] = [
   {
     key: 'inscriptions',
     label: 'INSCRIPTIONS',
@@ -126,8 +127,8 @@ export default function CollectiblesTabs({
     showNoticeAlert,
     onDismissRareSatsNotice,
     onLoadMoreRareSatsButtonClick,
-    isLoading,
-    isLoadingOrdinalCollections,
+    stacksNftsQuery,
+    inscriptionsQuery,
   } = nftDashboard;
 
   const handleSelectTab = (index: number) => {
@@ -142,17 +143,22 @@ export default function CollectiblesTabs({
   const showNoBundlesNotice =
     ordinalBundleCount === 0 && !rareSatsQuery.isLoading && !rareSatsQuery.error;
 
+  const filterActivatedTabs = (tab: TabButton): boolean => {
+    if (tab.key === 'rareSats' && !hasActivatedRareSatsKey) {
+      return false;
+    }
+    return true;
+  };
+
   return (
     <Tabs className={className} selectedIndex={tabIndex} onSelect={handleSelectTab}>
-      {hasActivatedRareSatsKey && (
-        <StyledTabList>
-          {tabs.map(({ key, label }) => (
-            <StyledTab key={key}>{t(label)}</StyledTab>
-          ))}
-        </StyledTabList>
-      )}
+      <StyledTabList>
+        {tabs.filter(filterActivatedTabs).map(({ key, label }) => (
+          <StyledTab key={key}>{t(label)}</StyledTab>
+        ))}
+      </StyledTabList>
       <TabPanel>
-        {isLoadingOrdinalCollections ? (
+        {inscriptionsQuery.isLoading ? (
           <SkeletonLoader isGalleryOpen={isGalleryOpen} />
         ) : (
           <>
@@ -166,7 +172,7 @@ export default function CollectiblesTabs({
         )}
       </TabPanel>
       <TabPanel>
-        {isLoading ? (
+        {stacksNftsQuery.isLoading ? (
           <SkeletonLoader isGalleryOpen={isGalleryOpen} />
         ) : (
           <>
