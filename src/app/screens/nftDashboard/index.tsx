@@ -305,7 +305,7 @@ const useNftDashboard = (): NftDashboardState => {
               text={t('LOAD_MORE')}
               processing={stacksNftsQuery.isFetchingNextPage}
               disabled={stacksNftsQuery.isFetchingNextPage}
-              onPress={onClickLoadMoreStacksNfts}
+              onPress={stacksNftsQuery.fetchNextPage}
             />
           </LoadMoreButtonContainer>
         )}
