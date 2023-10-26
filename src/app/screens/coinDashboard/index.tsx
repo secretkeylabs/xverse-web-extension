@@ -86,10 +86,9 @@ const ContractDeploymentButton = styled.button((props) => ({
   },
 }));
 
-interface ButtonProps {
+const Button = styled.button<{
   isSelected: boolean;
-}
-const Button = styled.button<ButtonProps>((props) => ({
+}>((props) => ({
   ...props.theme.typography.body_bold_l,
   fontSize: 11,
   display: 'flex',
@@ -146,36 +145,6 @@ export default function CoinDashboard() {
   const formatAddress = (addr: string): string =>
     addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
 
-  const showContent = () => {
-    if (ft) {
-      if (showFtContractDetails) {
-        return (
-          <TokenContractContainer>
-            <h1>{t('FT_CONTRACT_PREFIX')}</h1>
-            <ContractAddressCopyButton onClick={handleCopyContractAddress}>
-              <TokenContractAddress>{formatAddress(ft?.principal as string)}</TokenContractAddress>
-              <CopyButtonContainer>
-                <CopyButton text={ft?.principal as string} />
-              </CopyButtonContainer>
-            </ContractAddressCopyButton>
-            <ContractDeploymentButton onClick={openContractDeployment}>
-              {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
-              <span>{t('STACKS_EXPLORER')}</span>
-              <ShareIcon src={linkIcon} alt="link" />
-            </ContractDeploymentButton>
-          </TokenContractContainer>
-        );
-      }
-    }
-    return (
-      <TransactionsHistoryList
-        coin={coin as CurrencyTypes}
-        txFilter={`${ft?.principal}::${ft?.assetName}`}
-        brc20Token={brc20FtName}
-      />
-    );
-  };
-
   return (
     <>
       <TopRow title="" onClick={handleBack} />
@@ -191,7 +160,28 @@ export default function CoinDashboard() {
             </Button>
           </FtInfoContainer>
         )}
-        {showContent()}
+        {ft && showFtContractDetails ? (
+          <TokenContractContainer>
+            <h1>{t('FT_CONTRACT_PREFIX')}</h1>
+            <ContractAddressCopyButton onClick={handleCopyContractAddress}>
+              <TokenContractAddress>{formatAddress(ft?.principal as string)}</TokenContractAddress>
+              <CopyButtonContainer>
+                <CopyButton text={ft?.principal as string} />
+              </CopyButtonContainer>
+            </ContractAddressCopyButton>
+            <ContractDeploymentButton onClick={openContractDeployment}>
+              {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
+              <span>{t('STACKS_EXPLORER')}</span>
+              <ShareIcon src={linkIcon} alt="link" />
+            </ContractDeploymentButton>
+          </TokenContractContainer>
+        ) : (
+          <TransactionsHistoryList
+            coin={coin as CurrencyTypes}
+            txFilter={`${ft?.principal}::${ft?.assetName}`}
+            brc20Token={brc20FtName}
+          />
+        )}
       </Container>
       <BottomBar tab="dashboard" />
     </>

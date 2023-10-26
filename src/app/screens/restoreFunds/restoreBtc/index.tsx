@@ -3,6 +3,7 @@ import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent, NetworkType, satsToBtc, UTXO } from '@secretkeylabs/xverse-core';
 import {
@@ -71,8 +72,9 @@ const ButtonContainer = styled.div((props) => ({
 
 function RestoreBtc() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_BTC_SCREEN' });
-  const { ordinalsAddress, btcAddress, network, selectedAccount, btcFiatRate, seedPhrase } =
+  const { ordinalsAddress, btcAddress, network, selectedAccount, btcFiatRate } =
     useWalletSelector();
+  const { getSeed } = useSeedVault();
   const navigate = useNavigate();
   const { unspentUtxos } = useNonOrdinalUtxos();
   let amount = new BigNumber(0);
@@ -121,7 +123,8 @@ function RestoreBtc() {
       ),
   });
 
-  const onClickTransfer = () => {
+  const onClickTransfer = async () => {
+    const seedPhrase = await getSeed();
     mutateSignNonOrdinalBtcTransaction({
       recipientAddress: btcAddress,
       nonOrdinalUtxos: unspentUtxos,

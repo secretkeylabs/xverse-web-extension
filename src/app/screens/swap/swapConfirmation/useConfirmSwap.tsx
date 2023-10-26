@@ -1,5 +1,6 @@
 import { TokenImageProps } from '@components/tokenImage';
 import useNetworkSelector from '@hooks/useNetwork';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SwapToken } from '@screens/swap/types';
 import {
@@ -42,12 +43,13 @@ export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> &
 };
 
 export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
-  const { selectedAccount, seedPhrase } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const { isSponsored, sponsorTransaction, isSponsorDisabled } = useAlexSponsoredTransaction(
     input.userOverrideSponsorValue,
   );
   const { currencyToToken } = useCurrencyConversion();
+  const { getSeed } = useSeedVault();
   const navigate = useNavigate();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>(
     deserializeTransaction(input.unsignedTx),
@@ -71,6 +73,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
     isSponsored,
     isSponsorDisabled,
     onConfirm: async () => {
+      const seedPhrase = await getSeed();
       const signed = await signTransaction(
         unsignedTx,
         seedPhrase,

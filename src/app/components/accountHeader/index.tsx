@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 
 const SelectedAccountContainer = styled.div<{ showBorderBottom?: boolean }>((props) => ({
@@ -91,23 +92,19 @@ function AccountHeaderComponent({
   const [showResetWalletPrompt, setShowResetWalletPrompt] = useState(false);
   const [showResetWalletDisplay, setShowResetWalletDisplay] = useState(false);
   const [password, setPassword] = useState('');
-  const { unlockWallet, lockWallet, resetWallet } = useWalletReducer();
+  const { lockWallet, resetWallet } = useWalletReducer();
+  const { unlockVault } = useSeedVault();
   const [error, setError] = useState('');
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
     { top: string; left: string } | undefined
   >();
 
-  const handleResetWallet = () => {
-    resetWallet();
-    navigate('/');
-  };
-
   const handlePasswordNextClick = async () => {
     try {
-      await unlockWallet(password);
+      await unlockVault(password);
       setPassword('');
       setError('');
-      handleResetWallet();
+      await resetWallet();
     } catch (e) {
       setError(t('INCORRECT_PASSWORD_ERROR'));
     }
@@ -151,6 +148,10 @@ function AccountHeaderComponent({
     setShowOptionsDialog(false);
   };
 
+  const handleLockWallet = async () => {
+    await lockWallet();
+  };
+
   return (
     <>
       {showResetWalletDisplay && (
@@ -187,7 +188,7 @@ function AccountHeaderComponent({
             <ButtonRow onClick={handleAccountSelect}>
               {optionsDialogTranslation('SWITCH_ACCOUNT')}
             </ButtonRow>
-            <ButtonRow onClick={lockWallet}>{optionsDialogTranslation('LOCK')}</ButtonRow>
+            <ButtonRow onClick={handleLockWallet}>{optionsDialogTranslation('LOCK')}</ButtonRow>
             <WarningButton onClick={handleResetWalletPromptOpen}>
               {optionsDialogTranslation('RESET_WALLET')}
             </WarningButton>

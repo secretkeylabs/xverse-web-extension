@@ -52,8 +52,8 @@ function ForgotPassword(): JSX.Element {
     setHasBackedUp(!hasBackedUp);
   };
 
-  const handleResetWallet = () => {
-    resetWallet();
+  const handleResetWallet = async () => {
+    await resetWallet();
     navigate('/');
   };
 

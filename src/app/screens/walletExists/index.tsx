@@ -69,7 +69,7 @@ function WalletExists(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'WALLET_EXISTS_SCREEN' });
   const [userAccepted, setUserAccepted] = useState(false);
 
-  const handleClose = () => {
+  const handleClose = async () => {
     window.close();
   };
 
