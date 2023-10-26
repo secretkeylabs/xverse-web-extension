@@ -148,7 +148,6 @@ export type NftDashboardState = {
   showNoticeAlert?: boolean;
   totalNfts: number;
   totalInscriptions: number;
-  onLoadMoreRareSatsButtonClick: () => void;
 };
 
 const useNftDashboard = (): NftDashboardState => {
@@ -218,10 +217,6 @@ const useNftDashboard = (): NftDashboardState => {
   };
 
   const InscriptionListView = useCallback(() => {
-    const onClickLoadMoreInscriptions = () => {
-      inscriptionsQuery.fetchNextPage();
-    };
-
     if (inscriptionsQuery.error && !(inscriptionsQuery.error instanceof InvalidParamsError)) {
       return (
         <ErrorContainer>
@@ -255,7 +250,7 @@ const useNftDashboard = (): NftDashboardState => {
               text={t('LOAD_MORE')}
               processing={inscriptionsQuery.isFetchingNextPage}
               disabled={inscriptionsQuery.isFetchingNextPage}
-              onPress={onClickLoadMoreInscriptions}
+              onPress={inscriptionsQuery.fetchNextPage}
             />
           </LoadMoreButtonContainer>
         )}
@@ -264,10 +259,6 @@ const useNftDashboard = (): NftDashboardState => {
   }, [inscriptionsQuery, isGalleryOpen, ordinalsLength, t]);
 
   const NftListView = useCallback(() => {
-    const onClickLoadMoreStacksNfts = () => {
-      stacksNftsQuery.fetchNextPage();
-    };
-
     if (stacksNftsQuery.error && !(stacksNftsQuery.error instanceof InvalidParamsError)) {
       return (
         <ErrorContainer>
@@ -334,12 +325,6 @@ const useNftDashboard = (): NftDashboardState => {
     dispatch(SetRareSatsNoticeDismissedAction(true));
   };
 
-  const onLoadMoreRareSatsButtonClick = () => {
-    if (rareSatsQuery?.hasNextPage) {
-      rareSatsQuery.fetchNextPage();
-    }
-  };
-
   return {
     openReceiveModal,
     showNewFeatureAlert,
@@ -364,7 +349,6 @@ const useNftDashboard = (): NftDashboardState => {
     rareSatsQuery,
     totalNfts,
     totalInscriptions: ordinalsLength,
-    onLoadMoreRareSatsButtonClick,
   };
 };
 

@@ -126,7 +126,6 @@ export default function CollectiblesTabs({
     hasActivatedOrdinalsKey,
     showNoticeAlert,
     onDismissRareSatsNotice,
-    onLoadMoreRareSatsButtonClick,
     stacksNftsQuery,
     inscriptionsQuery,
   } = nftDashboard;
@@ -237,7 +236,7 @@ export default function CollectiblesTabs({
                 text={t('LOAD_MORE')}
                 processing={rareSatsQuery.isFetchingNextPage}
                 disabled={rareSatsQuery.isFetchingNextPage}
-                onPress={onLoadMoreRareSatsButtonClick}
+                onPress={rareSatsQuery.fetchNextPage}
               />
             </LoadMoreButtonContainer>
           )}
