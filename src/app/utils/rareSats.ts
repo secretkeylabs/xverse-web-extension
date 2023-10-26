@@ -198,6 +198,9 @@ export const mapRareSatsAPIResponseToRareSats = (apiBundles: ApiBundle): Bundle 
   };
 };
 
+const getFormattedTxIdVoutFromBundle = (bundle: Bundle) =>
+  `${getTruncatedAddress(bundle.txid, 6)}:${bundle.vout}`;
+
 export const getBundleId = (bundle: Bundle): string => {
   if (
     bundle.items.length === 1 &&
@@ -207,7 +210,7 @@ export const getBundleId = (bundle: Bundle): string => {
     return bundle.items[0].number;
   }
 
-  return getTruncatedAddress(bundle.txid, 6);
+  return getFormattedTxIdVoutFromBundle(bundle);
 };
 
 export const getBundleSubText = (bundle: Bundle): string => {
@@ -222,7 +225,7 @@ export const getBundleSubText = (bundle: Bundle): string => {
 export const getBundleItemId = (bundle: Bundle, index: number): string => {
   const item = bundle.items[index];
   if (item.type === 'unknown') {
-    return getTruncatedAddress(bundle.txid, 6);
+    return getFormattedTxIdVoutFromBundle(bundle);
   }
   if (item.type === 'inscription' || item.type === 'inscribed-sat') {
     return getTruncatedAddress(item.inscription.id, 6);

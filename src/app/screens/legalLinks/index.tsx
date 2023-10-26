@@ -18,19 +18,18 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   padding: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(28),
-  paddingBottom: props.theme.spacing(28),
+  paddingTop: props.theme.spacing(20),
+  paddingBottom: props.theme.spacing(32),
   justifyContent: 'space-between',
 }));
 
 const Title = styled.h1((props) => ({
   ...props.theme.bold_tile_text,
   color: props.theme.colors.white_0,
-  marginTop: props.theme.spacing(20),
 }));
 
 const SubTitle = styled.h1((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(8),
 }));
@@ -40,7 +39,7 @@ const LinksContainer = styled.div((props) => ({
 }));
 
 const Link = styled.a((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_medium_m,
   display: 'flex',
   justifyContent: 'space-between',
   marginTop: props.theme.spacing(8),
@@ -58,6 +57,7 @@ const CustomizedLink = styled(Link)`
 `;
 
 const SwitchContainer = styled.div((props) => ({
+  ...props.theme.typography.body_medium_m,
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
