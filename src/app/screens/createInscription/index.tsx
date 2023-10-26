@@ -195,7 +195,7 @@ function CreateInscription() {
   }, [btcAddress, requestedNetwork]);
 
   useEffect(() => {
-    fetchBtcFeeRate().then((feeRatesResponse: BtcFeeResponse) => {
+    fetchBtcFeeRate(network.type).then((feeRatesResponse: BtcFeeResponse) => {
       setFeeRates(feeRatesResponse);
       if (suggestedMinerFeeRate === undefined) {
         setFeeRate(feeRatesResponse.regular);
@@ -238,6 +238,7 @@ function CreateInscription() {
     revealAddress: ordinalsAddress,
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
+    network: network.type,
   });
 
   const {
@@ -328,7 +329,7 @@ function CreateInscription() {
       isError={!!errorCode}
     >
       <OuterContainer>
-        <AccountHeaderComponent disableMenuOption disableAccountSwitch disableCopy />
+        <AccountHeaderComponent disableMenuOption disableAccountSwitch />
         <MainContainer>
           <Title>{t('TITLE')}</Title>
           <SubTitle>{t('SUBTITLE')}</SubTitle>
@@ -482,7 +483,7 @@ function CreateInscription() {
             <ErrorModal
               key={errorCode}
               errorCode={errorCode}
-              onRetrySubmit={executeMint}
+              onRetrySubmit={executeErrorCode ? executeMint : undefined}
               onEnd={cancelCallback}
             />
           )}

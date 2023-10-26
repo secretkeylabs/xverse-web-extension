@@ -229,7 +229,7 @@ function EditFee({
             btcAddress,
             nonOrdinalUtxos!,
             ordinalsAddress,
-            'Mainnet',
+            network.type,
             mode,
           );
           setFeeRateInput(selectedFeeRate?.toString() || '');
@@ -288,7 +288,7 @@ function EditFee({
             btcAddress,
             nonOrdinalUtxos!,
             ordinalsAddress,
-            'Mainnet',
+            network.type,
             feeMode,
             feeRateInput,
           );

@@ -5,7 +5,7 @@ import {
   HIRO_MAINNET_DEFAULT,
   HIRO_TESTNET_DEFAULT,
 } from '@secretkeylabs/xverse-core/constant';
-import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
+import { NetworkType, SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 
 export const BNS_CONTRACT = 'SP000000000000000000002Q6VF78.bns::names';
 export const GAMMA_URL = 'https://gamma.io/';
@@ -18,7 +18,10 @@ export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';
 export const BTC_TRANSACTION_TESTNET_STATUS_URL = 'https://mempool.space/testnet/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
-export const XVERSE_ORDIVIEW_URL = 'https://ord.xverse.app';
+
+export const XVERSE_ORDIVIEW_URL = (network: NetworkType) =>
+  `https://ord${network === 'Mainnet' ? '' : '-testnet'}.xverse.app`;
+
 export const MAGISAT_IO_RARITY_SCAN_URL = 'https://magisat.io/wallet?walletAddress=';
 
 export const TRANSAC_URL = 'https://global.transak.com';
