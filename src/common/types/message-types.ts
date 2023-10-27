@@ -100,7 +100,9 @@ export enum ExternalSatsMethods {
   getAddressRequest = 'getAddressRequest',
   getAddressResponse = 'getAddressResponse',
   signPsbtRequest = 'signPsbtRequest',
+  signBatchPsbtRequest = 'signBatchPsbtRequest',
   signPsbtResponse = 'signPsbtResponse',
+  signBatchPsbtResponse = 'signBatchPsbtResponse',
   signMessageRequest = 'signMessageRequest',
   signMessageResponse = 'signMessageResponse',
   sendBtcRequest = 'sendBtcRequest',
@@ -121,8 +123,18 @@ export type GetAddressResponseMessage = Message<
 
 type SignPsbtRequestMessage = Message<ExternalSatsMethods.signPsbtRequest, string>;
 
+type SignBatchPsbtRequestMessage = Message<ExternalSatsMethods.signBatchPsbtRequest, string>;
+
 export type SignPsbtResponseMessage = Message<
   ExternalSatsMethods.signPsbtResponse,
+  {
+    signPsbtRequest: string;
+    signPsbtResponse: SignPsbtResponse | string;
+  }
+>;
+
+export type SignBatchPsbtResponseMessage = Message<
+  ExternalSatsMethods.signBatchPsbtResponse,
   {
     signPsbtRequest: string;
     signPsbtResponse: SignPsbtResponse | string;
@@ -165,6 +177,7 @@ export type CreateInscriptionResponseMessage = Message<
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage
   | SignPsbtRequestMessage
+  | SignBatchPsbtRequestMessage
   | SignMessageRequestMessage
   | SendBtcRequestMessage
   | CreateInscriptionRequestMessage;
@@ -172,6 +185,7 @@ export type SatsConnectMessageFromContentScript =
 export type SatsConnectMessageToContentScript =
   | GetAddressResponseMessage
   | SignPsbtResponseMessage
+  | SignBatchPsbtResponseMessage
   | SignMessageResponseMessage
   | SendBtcResponseMessage
   | CreateInscriptionResponseMessage;

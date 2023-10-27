@@ -1,13 +1,13 @@
-import { decodeToken } from 'jsontokens';
-import { useLocation } from 'react-router-dom';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { SignTransactionOptions } from 'sats-connect';
 import {
   InputToSign,
-  signPsbt,
   psbtBase64ToHex,
+  signPsbt,
 } from '@secretkeylabs/xverse-core/transactions/psbt';
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { decodeToken } from 'jsontokens';
+import { useLocation } from 'react-router-dom';
+import { SignTransactionOptions } from 'sats-connect';
 import useBtcClient from './useBtcClient';
 import useSeedVault from './useSeedVault';
 

@@ -209,6 +209,27 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
+    case ExternalSatsMethods.signBatchPsbtRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['signPsbtRequest', payload],
+      ]);
+
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.SignBatchBtcTx, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            signPsbtRequest: payload,
+            signPsbtResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.signPsbtResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
     case ExternalSatsMethods.signMessageRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['signMessageRequest', payload],

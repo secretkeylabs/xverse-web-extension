@@ -11,10 +11,11 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useBtcClient from '@hooks/useBtcClient';
-import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
-import useSignPsbtTx from '@hooks/useSignPsbtTx';
+import useDetectOrdinalInSignBatchPsbt from '@hooks/useDetectOrdinalInSignBatchPsbt';
+import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { ArrowRight } from '@phosphor-icons/react';
 import {
   getBtcFiatEquivalent,
   satsToBtc,
@@ -93,7 +94,23 @@ const SuccessActionsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(20),
 }));
 
-function SignPsbtRequest() {
+const BundleLinkContainer = styled.button((props) => ({
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: 'transparent',
+  color: props.theme.colors.tangerine,
+  transition: 'color 0.2s ease',
+  marginBottom: props.theme.spacing(6),
+  ':hover': {
+    color: props.theme.colors.tangerine_light,
+  },
+}));
+const BundleLinkText = styled.div((props) => ({
+  ...props.theme.body_medium_m,
+  marginRight: props.theme.spacing(2),
+}));
+
+function SignBatchPsbtRequest() {
   const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
     useWalletSelector();
   const navigate = useNavigate();
@@ -102,7 +119,7 @@ function SignPsbtRequest() {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignBatchPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
   const [hasOutputScript, setHasOutputScript] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -119,57 +136,69 @@ function SignPsbtRequest() {
   const request = decodeToken(requestToken) as any as SignTransactionOptions;
   const btcClient = useBtcClient();
 
-  const handlePsbtParsing = useCallback(() => {
-    try {
-      return parsePsbt(selectedAccount!, payload.inputsToSign, payload.psbtBase64, network.type);
-    } catch (err) {
-      return '';
-    }
-  }, [selectedAccount, payload.psbtBase64]);
-
-  const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
-  const { loading, bundleItemsData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
-  const signingAddresses = useMemo(
-    () => getSigningAddresses(payload.inputsToSign),
-    [payload.inputsToSign],
+  const handlePsbtParsing = useCallback(
+    (item) => {
+      try {
+        return parsePsbt(selectedAccount!, item.inputsToSign, item.psbtBase64, network.type);
+      } catch (err) {
+        return '';
+      }
+    },
+    [selectedAccount, network.type],
   );
 
+  // const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
+  const parsedPsbts = useMemo(
+    () => payload.psbts.map(handlePsbtParsing),
+    [handlePsbtParsing, payload.psbts],
+  );
+
+  console.log('parsedPsbts', parsedPsbts);
+
+  const { loading, bundleItemsData, userReceivesOrdinal } =
+    useDetectOrdinalInSignBatchPsbt(parsedPsbts)[0]; // TODO: make it work with an array of psbts, not just one
+
+  // const signingAddresses = useMemo(
+  //   () => getSigningAddresses(payload.inputsToSign),
+  //   [payload.inputsToSign],
+  // );
+
   const checkIfMismatch = () => {
-    if (!parsedPsbt) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
-          error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
-          browserTx: true,
-        },
-      });
-    }
-    if (payload.network.type !== network.type) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          error: t('NETWORK_MISMATCH'),
-          browserTx: true,
-        },
-      });
-    }
-    if (payload.inputsToSign) {
-      payload.inputsToSign.forEach((input) => {
-        if (input.address !== btcAddress && input.address !== ordinalsAddress) {
-          navigate('/tx-status', {
-            state: {
-              txid: '',
-              currency: 'STX',
-              error: t('ADDRESS_MISMATCH'),
-              browserTx: true,
-            },
-          });
-        }
-      });
-    }
+    // if (!parsedPsbt) {
+    //   navigate('/tx-status', {
+    //     state: {
+    //       txid: '',
+    //       currency: 'BTC',
+    //       errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
+    //       error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
+    //       browserTx: true,
+    //     },
+    //   });
+    // }
+    // if (payload.network.type !== network.type) {
+    //   navigate('/tx-status', {
+    //     state: {
+    //       txid: '',
+    //       currency: 'BTC',
+    //       error: t('NETWORK_MISMATCH'),
+    //       browserTx: true,
+    //     },
+    //   });
+    // }
+    // if (payload.inputsToSign) {
+    //   payload.inputsToSign.forEach((input) => {
+    //     if (input.address !== btcAddress && input.address !== ordinalsAddress) {
+    //       navigate('/tx-status', {
+    //         state: {
+    //           txid: '',
+    //           currency: 'STX',
+    //           error: t('ADDRESS_MISMATCH'),
+    //           browserTx: true,
+    //         },
+    //       });
+    //     }
+    //   });
+    // }
   };
 
   useEffect(() => {
@@ -177,47 +206,57 @@ function SignPsbtRequest() {
   }, []);
 
   useEffect(() => {
-    if (parsedPsbt) {
-      const outputScriptDetected = parsedPsbt.outputs.some((output) => !!output.outputScript);
+    if (parsedPsbts) {
+      let outputScriptDetected = false;
+
+      parsedPsbts.forEach((psbt) => {
+        if (!psbt) {
+          return;
+        }
+
+        if (psbt.outputs.some((output) => !!output.outputScript)) {
+          outputScriptDetected = true;
+        }
+      });
+
       setHasOutputScript(outputScriptDetected);
     }
-  }, [parsedPsbt]);
+  }, [parsedPsbts]);
 
   const onSignPsbtConfirmed = async () => {
-    try {
-      if (isLedgerAccount(selectedAccount)) {
-        // setIsModalVisible(true);
-        return;
-      }
-
-      setIsSigning(true);
-      const response = await confirmSignPsbt();
-      setIsSigning(false);
-      if (payload.broadcast) {
-        navigate('/tx-status', {
-          state: {
-            txid: response.txId,
-            currency: 'BTC',
-            error: '',
-            browserTx: true,
-          },
-        });
-      } else {
-        window.close();
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'BTC',
-            errorTitle: !payload.broadcast ? t('PSBT_CANT_SIGN_ERROR_TITLE') : '',
-            error: err.message,
-            browserTx: true,
-          },
-        });
-      }
-    }
+    // try {
+    //   if (isLedgerAccount(selectedAccount)) {
+    //     // setIsModalVisible(true);
+    //     return;
+    //   }
+    //   setIsSigning(true);
+    //   const response = await confirmSignPsbt();
+    //   setIsSigning(false);
+    //   if (payload.broadcast) {
+    //     navigate('/tx-status', {
+    //       state: {
+    //         txid: response.txId,
+    //         currency: 'BTC',
+    //         error: '',
+    //         browserTx: true,
+    //       },
+    //     });
+    //   } else {
+    //     window.close();
+    //   }
+    // } catch (err) {
+    //   if (err instanceof Error) {
+    //     navigate('/tx-status', {
+    //       state: {
+    //         txid: '',
+    //         currency: 'BTC',
+    //         errorTitle: !payload.broadcast ? t('PSBT_CANT_SIGN_ERROR_TITLE') : '',
+    //         error: err.message,
+    //         browserTx: true,
+    //       },
+    //     });
+    //   }
+    // }
   };
 
   const onCancelClick = async () => {
@@ -230,90 +269,80 @@ function SignPsbtRequest() {
   };
 
   const handleLedgerPsbtSigning = async (transport: TransportType) => {
-    const addressIndex = selectedAccount?.deviceAccountIndex;
-    const { inputsToSign, psbtBase64, broadcast } = payload;
-
-    if (addressIndex === undefined) {
-      throw new Error('Account not found');
-    }
-
-    const signingResponse = await signIncomingSingleSigPSBT({
-      transport,
-      network: network.type,
-      addressIndex,
-      inputsToSign,
-      psbtBase64,
-      finalize: broadcast,
-    });
-
-    let txId: string = '';
-    if (request.payload.broadcast) {
-      const txHex = psbtBase64ToHex(signingResponse);
-      const response = await btcClient.sendRawTransaction(txHex);
-      txId = response.tx.hash;
-    }
-
-    const signingMessage = {
-      source: MESSAGE_SOURCE,
-      method: ExternalSatsMethods.signPsbtResponse,
-      payload: {
-        signPsbtRequest: requestToken,
-        signPsbtResponse: {
-          psbtBase64: signingResponse,
-          txId,
-        },
-      },
-    };
-    chrome.tabs.sendMessage(+tabId, signingMessage);
-
-    return {
-      txId,
-      signingResponse,
-    };
+    // const addressIndex = selectedAccount?.deviceAccountIndex;
+    // const { inputsToSign, psbtBase64, broadcast } = payload;
+    // if (addressIndex === undefined) {
+    //   throw new Error('Account not found');
+    // }
+    // const signingResponse = await signIncomingSingleSigPSBT({
+    //   transport,
+    //   network: network.type,
+    //   addressIndex,
+    //   inputsToSign,
+    //   psbtBase64,
+    //   finalize: broadcast,
+    // });
+    // let txId: string = '';
+    // if (request.payload.broadcast) {
+    //   const txHex = psbtBase64ToHex(signingResponse);
+    //   const response = await btcClient.sendRawTransaction(txHex);
+    //   txId = response.tx.hash;
+    // }
+    // const signingMessage = {
+    //   source: MESSAGE_SOURCE,
+    //   method: ExternalSatsMethods.signPsbtResponse,
+    //   payload: {
+    //     signPsbtRequest: requestToken,
+    //     signPsbtResponse: {
+    //       psbtBase64: signingResponse,
+    //       txId,
+    //     },
+    //   },
+    // };
+    // chrome.tabs.sendMessage(+tabId, signingMessage);
+    // return {
+    //   txId,
+    //   signingResponse,
+    // };
   };
 
   const handleConnectAndConfirm = async () => {
-    if (!selectedAccount) {
-      console.error('No account selected');
-      return;
-    }
-    setIsButtonDisabled(true);
-
-    const transport = await Transport.create();
-
-    if (!transport) {
-      setIsConnectSuccess(false);
-      setIsConnectFailed(true);
-      setIsButtonDisabled(false);
-      return;
-    }
-
-    setIsConnectSuccess(true);
-    await ledgerDelay(1500);
-    setCurrentStepIndex(1);
-
-    try {
-      const response = await handleLedgerPsbtSigning(transport);
-
-      if (payload.broadcast) {
-        navigate('/tx-status', {
-          state: {
-            txid: response.txId,
-            currency: 'BTC',
-            error: '',
-            browserTx: true,
-          },
-        });
-      } else {
-        window.close();
-      }
-    } catch (err) {
-      console.error(err);
-      setIsTxRejected(true);
-    } finally {
-      await transport.close();
-      setIsButtonDisabled(false);
-    }
+    // if (!selectedAccount) {
+    //   console.error('No account selected');
+    //   return;
+    // }
+    // setIsButtonDisabled(true);
+    // const transport = await Transport.create();
+    // if (!transport) {
+    //   setIsConnectSuccess(false);
+    //   setIsConnectFailed(true);
+    //   setIsButtonDisabled(false);
+    //   return;
+    // }
+    // setIsConnectSuccess(true);
+    // await ledgerDelay(1500);
+    // setCurrentStepIndex(1);
+    // try {
+    //   const response = await handleLedgerPsbtSigning(transport);
+    //   if (payload.broadcast) {
+    //     navigate('/tx-status', {
+    //       state: {
+    //         txid: response.txId,
+    //         currency: 'BTC',
+    //         error: '',
+    //         browserTx: true,
+    //       },
+    //     });
+    //   } else {
+    //     window.close();
+    //   }
+    // } catch (err) {
+    //   console.error(err);
+    //   setIsTxRejected(true);
+    // } finally {
+    //   await transport.close();
+    //   setIsButtonDisabled(false);
+    // }
   };
 
   const handleRetry = async () => {
@@ -335,6 +364,21 @@ function SignPsbtRequest() {
     />
   );
 
+  const totalNetAmount = parsedPsbts.reduce(
+    (sum, psbt) => (psbt ? sum.plus(new BigNumber(psbt.netAmount)) : sum),
+    new BigNumber(0),
+  );
+
+  const totalFees = parsedPsbts.reduce((sum, psbt) => {
+    if (psbt && psbt.fees) {
+      return sum.plus(new BigNumber(psbt.fees));
+    }
+    return sum;
+  }, new BigNumber(0));
+  const totalFeesInFiat = getBtcFiatEquivalent(totalFees, btcFiatRate);
+
+  const shouldBroadcast = payload.psbts.every((psbt) => psbt && psbt.broadcast);
+
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
@@ -351,10 +395,19 @@ function SignPsbtRequest() {
               </Container>
             ) : (
               <Container>
-                <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
-                {!payload.broadcast && (
-                  <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
+                <ReviewTransactionText>
+                  {t('SIGN_TRANSACTIONS', { count: parsedPsbts.length })}
+                </ReviewTransactionText>
+
+                <BundleLinkContainer>
+                  <BundleLinkText>{t('REVIEW_ALL')}</BundleLinkText>
+                  <ArrowRight size={12} weight="bold" />
+                </BundleLinkContainer>
+
+                {!shouldBroadcast && (
+                  <InfoContainer bodyText={t('PSBTS_NO_BROADCAST_DISCLAIMER')} />
                 )}
+
                 {bundleItemsData &&
                   bundleItemsData.map((bundleItem, index) => (
                     <BundleItemsComponent
@@ -364,31 +417,27 @@ function SignPsbtRequest() {
                       userReceivesOrdinal={userReceivesOrdinal}
                     />
                   ))}
+
                 <RecipientComponent
-                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
-                    .toString()
-                    .replace('-', '')}`}
+                  value={`${satsToBtc(totalNetAmount).toString().replace('-', '')}`}
                   currencyType="BTC"
                   title={t('AMOUNT')}
                   heading={
-                    parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')
+                    totalNetAmount.isLessThan(0)
+                      ? t('YOU_WILL_TRANSFER_IN_TOTAL')
+                      : t('YOU_WILL_RECEIVE_IN_TOTAL')
                   }
-                />
-                <InputOutputComponent
-                  parsedPsbt={parsedPsbt}
-                  isExpanded={expandInputOutputView}
-                  address={signingAddresses}
-                  onArrowClick={expandInputOutputSection}
                 />
 
                 <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-                {payload.broadcast ? (
+
+                {shouldBroadcast && (
                   <TransactionDetailComponent
                     title={t('FEES')}
-                    value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
-                    subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+                    value={getSatsAmountString(totalFees)}
+                    subValue={totalFeesInFiat}
                   />
-                ) : null}
+                )}
                 {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
               </Container>
             )}
@@ -398,7 +447,7 @@ function SignPsbtRequest() {
               <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
             </TransparentButtonContainer>
             <ActionButton
-              text={t('CONFIRM')}
+              text={t('CONFIRM_ALL')}
               onPress={onSignPsbtConfirmed}
               processing={isSigning}
               disabled={isLedgerAccount(selectedAccount)}
@@ -449,4 +498,4 @@ function SignPsbtRequest() {
   );
 }
 
-export default SignPsbtRequest;
+export default SignBatchPsbtRequest;
