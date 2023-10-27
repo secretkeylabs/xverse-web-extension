@@ -27,7 +27,7 @@
     "import/no-internal-modules": [
       "warn",
       {
-        "allow": ["./**/*", "../**/*"]
+        "allow": ["\./**/*", "\.\./**/*"]
       }
     ],
     "no-promise-executor-return": "warn",
