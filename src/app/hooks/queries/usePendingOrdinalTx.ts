@@ -1,6 +1,6 @@
-import { BtcAddressMempool } from '@secretkeylabs/xverse-core/types/api/esplora';
-import { useQuery } from '@tanstack/react-query';
 import useBtcClient from '@hooks/useBtcClient';
+import type { BtcAddressMempool } from '@secretkeylabs/xverse-core';
+import { useQuery } from '@tanstack/react-query';
 import useWalletSelector from '../useWalletSelector';
 
 const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
