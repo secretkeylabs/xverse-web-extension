@@ -24,10 +24,10 @@
   "rules": {
     "consistent-return": "off",
     "import/prefer-default-export": 1,
-    "import/no-internal-modules": [
+    "no-restricted-imports": [
       "warn",
       {
-        "allow": ["\./**/*", "\.\./**/*"]
+        "patterns": ["@secretkeylabs/xverse-core/**/*"]
       }
     ],
     "no-promise-executor-return": "warn",
