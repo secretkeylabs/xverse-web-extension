@@ -142,7 +142,7 @@ export default function CollectiblesTabs({
   const showNoBundlesNotice =
     ordinalBundleCount === 0 && !rareSatsQuery.isLoading && !rareSatsQuery.error;
 
-  const filterActivatedTabs = (tab: TabButton): boolean => {
+  const visibleTabButtons = tabs.filter((tab: TabButton) => {
     if (tab.key === 'rareSats' && !hasActivatedRareSatsKey) {
       return false;
     }
@@ -150,15 +150,17 @@ export default function CollectiblesTabs({
       return false;
     }
     return true;
-  };
+  });
 
   return (
     <Tabs className={className} selectedIndex={tabIndex} onSelect={handleSelectTab}>
-      <StyledTabList>
-        {tabs.filter(filterActivatedTabs).map(({ key, label }) => (
-          <StyledTab key={key}>{t(label)}</StyledTab>
-        ))}
-      </StyledTabList>
+      {visibleTabButtons.length > 1 && (
+        <StyledTabList>
+          {visibleTabButtons.map(({ key, label }) => (
+            <StyledTab key={key}>{t(label)}</StyledTab>
+          ))}
+        </StyledTabList>
+      )}
       {hasActivatedOrdinalsKey && (
         <TabPanel>
           {inscriptionsQuery.isLoading ? (
