@@ -9,11 +9,12 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import {
   addressToString,
+  Args,
   broadcastSignedTransaction,
   Coin,
+  ContractFunction,
   extractFromPayload,
 } from '@secretkeylabs/xverse-core';
-import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,
