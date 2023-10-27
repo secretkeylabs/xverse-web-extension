@@ -110,6 +110,17 @@ const BundleLinkText = styled.div((props) => ({
   marginRight: props.theme.spacing(2),
 }));
 
+const CustomizedModal = styled(BottomModal)`
+  height: 100%;
+  max-height: 100% !important;
+  background-color: #181818 !important;
+`;
+
+const CustomizedModalContent = styled.div((props) => ({
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+}));
+
 function SignBatchPsbtRequest() {
   const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
     useWalletSelector();
@@ -130,6 +141,7 @@ function SignBatchPsbtRequest() {
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const { search } = useLocation();
+  const [reviewTransaction, setReviewTransaction] = useState(false);
   const params = new URLSearchParams(search);
   const tabId = params.get('tabId') ?? '0';
   const requestToken = params.get('signPsbtRequest') ?? '';
@@ -399,7 +411,7 @@ function SignBatchPsbtRequest() {
                   {t('SIGN_TRANSACTIONS', { count: parsedPsbts.length })}
                 </ReviewTransactionText>
 
-                <BundleLinkContainer>
+                <BundleLinkContainer onClick={() => setReviewTransaction(true)}>
                   <BundleLinkText>{t('REVIEW_ALL')}</BundleLinkText>
                   <ArrowRight size={12} weight="bold" />
                 </BundleLinkContainer>
@@ -455,6 +467,52 @@ function SignBatchPsbtRequest() {
           </ButtonContainer>
         </>
       )}
+      <CustomizedModal
+        header=""
+        visible={reviewTransaction}
+        onClose={() => setReviewTransaction(false)}
+      >
+        {/* TODO: set the correct transaction content instead of [0] */}
+        <CustomizedModalContent>
+          <ReviewTransactionText>Transaction 1/3</ReviewTransactionText>
+          {bundleItemsData &&
+            bundleItemsData.map((bundleItem, index) => (
+              <BundleItemsComponent
+                // eslint-disable-next-line react/no-array-index-key
+                key={index}
+                item={bundleItem}
+                userReceivesOrdinal={userReceivesOrdinal}
+              />
+            ))}
+          <RecipientComponent
+            value={`${satsToBtc(new BigNumber(parsedPsbts[0]?.netAmount))
+              .toString()
+              .replace('-', '')}`}
+            currencyType="BTC"
+            title={t('AMOUNT')}
+            heading={parsedPsbts[0]?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
+          />
+          <InputOutputComponent
+            parsedPsbt={parsedPsbts[0]}
+            isExpanded={expandInputOutputView}
+            address={['123']} // TODO: set the correct signing addresses array
+            onArrowClick={expandInputOutputSection}
+          />
+
+          <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+          {payload.psbts[0].broadcast ? (
+            <TransactionDetailComponent
+              title={t('FEES')}
+              value={getSatsAmountString(new BigNumber(parsedPsbts[0]?.fees))}
+              subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbts[0]?.fees), btcFiatRate)}
+            />
+          ) : null}
+          {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
+          <ActionButton text="Previous" transparent onPress={() => {}} />
+          <ActionButton text="Next" transparent onPress={() => {}} />
+          <ActionButton text="Done" onPress={() => {}} />
+        </CustomizedModalContent>
+      </CustomizedModal>
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (
           <LedgerConnectionView
