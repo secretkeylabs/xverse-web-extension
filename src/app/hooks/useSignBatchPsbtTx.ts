@@ -65,13 +65,13 @@ const useSignPsbtTx = () => {
   };
 
   const getSigningAddresses = (inputsToSign: Array<InputToSign>) => {
-    // const signingAddresses: Array<string> = [];
-    // inputsToSign.forEach((inputToSign) => {
-    //   inputToSign.signingIndexes.forEach((signingIndex) => {
-    //     signingAddresses[signingIndex] = inputToSign.address;
-    //   });
-    // });
-    // return signingAddresses;
+    const signingAddresses: Array<string> = [];
+    inputsToSign.forEach((inputToSign) => {
+      inputToSign.signingIndexes.forEach((signingIndex) => {
+        signingAddresses[signingIndex] = inputToSign.address;
+      });
+    });
+    return signingAddresses;
   };
 
   return {

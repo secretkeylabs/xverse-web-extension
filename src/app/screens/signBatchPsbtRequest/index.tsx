@@ -170,21 +170,12 @@ function SignBatchPsbtRequest() {
     [selectedAccount, network.type],
   );
 
-  // const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
   const parsedPsbts = useMemo(
     () => payload.psbts.map(handlePsbtParsing),
     [handlePsbtParsing, payload.psbts],
   );
 
-  console.log('parsedPsbts', parsedPsbts);
-
-  const { loading, bundleItemsData, userReceivesOrdinal } =
-    useDetectOrdinalInSignBatchPsbt(parsedPsbts)[0]; // TODO: make it work with an array of psbts, not just one
-
-  // const signingAddresses = useMemo(
-  //   () => getSigningAddresses(payload.inputsToSign),
-  //   [payload.inputsToSign],
-  // );
+  const userReceivesOrdinalArr = useDetectOrdinalInSignBatchPsbt(parsedPsbts);
 
   const checkIfMismatch = () => {
     // if (!parsedPsbt) {
@@ -405,7 +396,7 @@ function SignBatchPsbtRequest() {
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      {loading ? (
+      {userReceivesOrdinalArr.some((item) => item.loading) ? (
         <LoaderContainer>
           <MoonLoader color="white" size={50} />
         </LoaderContainer>
@@ -431,15 +422,16 @@ function SignBatchPsbtRequest() {
                   <InfoContainer bodyText={t('PSBTS_NO_BROADCAST_DISCLAIMER')} />
                 )}
 
-                {bundleItemsData &&
-                  bundleItemsData.map((bundleItem, index) => (
+                {userReceivesOrdinalArr?.map((userReceivesOrdinal, index) =>
+                  userReceivesOrdinal.bundleItemsData?.map((bundleItem) => (
                     <BundleItemsComponent
                       // eslint-disable-next-line react/no-array-index-key
                       key={index}
                       item={bundleItem}
-                      userReceivesOrdinal={userReceivesOrdinal}
+                      userReceivesOrdinal={userReceivesOrdinal.userReceivesOrdinal}
                     />
-                  ))}
+                  )),
+                )}
 
                 <RecipientComponent
                   value={`${satsToBtc(totalNetAmount).toString().replace('-', '')}`}
@@ -489,17 +481,18 @@ function SignBatchPsbtRequest() {
         <CustomizedModalContent>
           <div>
             <ReviewTransactionText>
-              Transaction {currentPsbtIndex + 1}/{parsedPsbts.length}
+              {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
             </ReviewTransactionText>
-            {bundleItemsData &&
-              bundleItemsData.map((bundleItem, index) => (
-                <BundleItemsComponent
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  item={bundleItem}
-                  userReceivesOrdinal={userReceivesOrdinal}
-                />
-              ))}
+
+            {userReceivesOrdinalArr[currentPsbtIndex]?.bundleItemsData?.map((bundleItem, index) => (
+              <BundleItemsComponent
+                // eslint-disable-next-line react/no-array-index-key
+                key={index}
+                item={bundleItem}
+                userReceivesOrdinal={userReceivesOrdinalArr[currentPsbtIndex].userReceivesOrdinal}
+              />
+            ))}
+
             <RecipientComponent
               value={`${satsToBtc(new BigNumber(parsedPsbts[currentPsbtIndex]?.netAmount))
                 .toString()
@@ -512,14 +505,14 @@ function SignBatchPsbtRequest() {
                   : t('YOU_WILL_RECEIVE')
               }
             />
+
             <InputOutputComponent
               parsedPsbt={parsedPsbts[currentPsbtIndex]}
               isExpanded={expandInputOutputView}
-              address={['123']} // TODO: set the correct signing addresses array
+              address={getSigningAddresses(payload.psbts[currentPsbtIndex].inputsToSign)}
               onArrowClick={expandInputOutputSection}
             />
 
-            <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
             {payload.psbts[currentPsbtIndex].broadcast ? (
               <TransactionDetailComponent
                 title={t('FEES')}
@@ -535,7 +528,7 @@ function SignBatchPsbtRequest() {
           <TxReviewModalControls>
             {currentPsbtIndex > 0 && (
               <ActionButton
-                text="Previous"
+                text={t('PREVIOUS')}
                 transparent
                 onPress={() => {
                   setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
@@ -545,7 +538,7 @@ function SignBatchPsbtRequest() {
             )}
             {currentPsbtIndex < parsedPsbts.length - 1 && (
               <ActionButton
-                text="Next"
+                text={t('NEXT')}
                 transparent
                 onPress={() => {
                   setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
@@ -556,7 +549,7 @@ function SignBatchPsbtRequest() {
             )}
             {currentPsbtIndex === parsedPsbts.length - 1 && (
               <ActionButton
-                text="Done"
+                text={t('DONE')}
                 onPress={() => {
                   setReviewTransaction(false);
                   setCurrentPsbtIndex(0);
