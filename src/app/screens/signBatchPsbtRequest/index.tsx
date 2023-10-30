@@ -15,7 +15,7 @@ import useDetectOrdinalInSignBatchPsbt from '@hooks/useDetectOrdinalInSignBatchP
 import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { ArrowRight } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import {
   getBtcFiatEquivalent,
   satsToBtc,
@@ -117,8 +117,18 @@ const CustomizedModal = styled(BottomModal)`
 `;
 
 const CustomizedModalContent = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  height: 'calc(100% - 67.5px)',
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
+  paddingBottom: props.theme.spacing(20),
+}));
+
+const TxReviewModalControls = styled.div((props) => ({
+  display: 'flex',
+  columnGap: props.theme.spacing(6),
 }));
 
 function SignBatchPsbtRequest() {
@@ -140,6 +150,7 @@ function SignBatchPsbtRequest() {
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
+  const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
   const { search } = useLocation();
   const [reviewTransaction, setReviewTransaction] = useState(false);
   const params = new URLSearchParams(search);
@@ -470,47 +481,89 @@ function SignBatchPsbtRequest() {
       <CustomizedModal
         header=""
         visible={reviewTransaction}
-        onClose={() => setReviewTransaction(false)}
+        onClose={() => {
+          setReviewTransaction(false);
+          setCurrentPsbtIndex(0);
+        }}
       >
-        {/* TODO: set the correct transaction content instead of [0] */}
         <CustomizedModalContent>
-          <ReviewTransactionText>Transaction 1/3</ReviewTransactionText>
-          {bundleItemsData &&
-            bundleItemsData.map((bundleItem, index) => (
-              <BundleItemsComponent
-                // eslint-disable-next-line react/no-array-index-key
-                key={index}
-                item={bundleItem}
-                userReceivesOrdinal={userReceivesOrdinal}
-              />
-            ))}
-          <RecipientComponent
-            value={`${satsToBtc(new BigNumber(parsedPsbts[0]?.netAmount))
-              .toString()
-              .replace('-', '')}`}
-            currencyType="BTC"
-            title={t('AMOUNT')}
-            heading={parsedPsbts[0]?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
-          />
-          <InputOutputComponent
-            parsedPsbt={parsedPsbts[0]}
-            isExpanded={expandInputOutputView}
-            address={['123']} // TODO: set the correct signing addresses array
-            onArrowClick={expandInputOutputSection}
-          />
-
-          <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-          {payload.psbts[0].broadcast ? (
-            <TransactionDetailComponent
-              title={t('FEES')}
-              value={getSatsAmountString(new BigNumber(parsedPsbts[0]?.fees))}
-              subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbts[0]?.fees), btcFiatRate)}
+          <div>
+            <ReviewTransactionText>
+              Transaction {currentPsbtIndex + 1}/{parsedPsbts.length}
+            </ReviewTransactionText>
+            {bundleItemsData &&
+              bundleItemsData.map((bundleItem, index) => (
+                <BundleItemsComponent
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  item={bundleItem}
+                  userReceivesOrdinal={userReceivesOrdinal}
+                />
+              ))}
+            <RecipientComponent
+              value={`${satsToBtc(new BigNumber(parsedPsbts[currentPsbtIndex]?.netAmount))
+                .toString()
+                .replace('-', '')}`}
+              currencyType="BTC"
+              title={t('AMOUNT')}
+              heading={
+                parsedPsbts[currentPsbtIndex]?.netAmount < 0
+                  ? t('YOU_WILL_TRANSFER')
+                  : t('YOU_WILL_RECEIVE')
+              }
             />
-          ) : null}
-          {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
-          <ActionButton text="Previous" transparent onPress={() => {}} />
-          <ActionButton text="Next" transparent onPress={() => {}} />
-          <ActionButton text="Done" onPress={() => {}} />
+            <InputOutputComponent
+              parsedPsbt={parsedPsbts[currentPsbtIndex]}
+              isExpanded={expandInputOutputView}
+              address={['123']} // TODO: set the correct signing addresses array
+              onArrowClick={expandInputOutputSection}
+            />
+
+            <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+            {payload.psbts[currentPsbtIndex].broadcast ? (
+              <TransactionDetailComponent
+                title={t('FEES')}
+                value={getSatsAmountString(new BigNumber(parsedPsbts[currentPsbtIndex]?.fees))}
+                subValue={getBtcFiatEquivalent(
+                  new BigNumber(parsedPsbts[currentPsbtIndex]?.fees),
+                  btcFiatRate,
+                )}
+              />
+            ) : null}
+            {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
+          </div>
+          <TxReviewModalControls>
+            {currentPsbtIndex > 0 && (
+              <ActionButton
+                text="Previous"
+                transparent
+                onPress={() => {
+                  setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
+                }}
+                icon={<ArrowLeft color="white" size={16} weight="bold" />}
+              />
+            )}
+            {currentPsbtIndex < parsedPsbts.length - 1 && (
+              <ActionButton
+                text="Next"
+                transparent
+                onPress={() => {
+                  setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
+                }}
+                icon={<ArrowRight color="white" size={16} weight="bold" />}
+                iconPosition="right"
+              />
+            )}
+            {currentPsbtIndex === parsedPsbts.length - 1 && (
+              <ActionButton
+                text="Done"
+                onPress={() => {
+                  setReviewTransaction(false);
+                  setCurrentPsbtIndex(0);
+                }}
+              />
+            )}
+          </TxReviewModalControls>
         </CustomizedModalContent>
       </CustomizedModal>
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
