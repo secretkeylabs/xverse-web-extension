@@ -169,11 +169,15 @@ const useNftDashboard = (): NftDashboardState => {
   const rareSatsQuery = useAddressRareSats();
 
   useEffect(() => {
-    stacksNftsQuery.refetch();
+    if (stxAddress && !stacksNftsQuery.error) {
+      stacksNftsQuery.refetch();
+    }
   }, [stxAddress, stacksNftsQuery]);
 
   useEffect(() => {
-    inscriptionsQuery.refetch();
+    if (ordinalsAddress && !inscriptionsQuery.error) {
+      inscriptionsQuery.refetch();
+    }
   }, [ordinalsAddress, inscriptionsQuery]);
 
   const ordinalsLength = inscriptionsQuery.data?.pages?.[0]?.total ?? 0;
