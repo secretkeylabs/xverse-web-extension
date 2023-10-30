@@ -3,7 +3,7 @@ import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import BottomModal from '@components/bottomModal';
 import TokenTile from '@components/tokenTile';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 

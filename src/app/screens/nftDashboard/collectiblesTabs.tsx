@@ -1,4 +1,5 @@
 import ActionButton from '@components/button';
+import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import { StyledP, StyledTab, StyledTabList } from '@ui-library/common.styled';
 import { ApiBundle, Bundle, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
@@ -8,7 +9,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TabPanel, Tabs } from 'react-tabs';
 import styled from 'styled-components';
 import type { NftDashboardState } from '.';
-import { StyledBarLoader, TilesSkeletonLoader } from '../../components/tilesSkeletonLoader';
 import Notice from './notice';
 import RareSatsTabGridItem from './rareSatsTabGridItem';
 
@@ -142,7 +142,7 @@ export default function CollectiblesTabs({
   const showNoBundlesNotice =
     ordinalBundleCount === 0 && !rareSatsQuery.isLoading && !rareSatsQuery.error;
 
-  const filterActivatedTabs = (tab: TabButton): boolean => {
+  const visibleTabButtons = tabs.filter((tab: TabButton) => {
     if (tab.key === 'rareSats' && !hasActivatedRareSatsKey) {
       return false;
     }
@@ -150,15 +150,17 @@ export default function CollectiblesTabs({
       return false;
     }
     return true;
-  };
+  });
 
   return (
     <Tabs className={className} selectedIndex={tabIndex} onSelect={handleSelectTab}>
-      <StyledTabList>
-        {tabs.filter(filterActivatedTabs).map(({ key, label }) => (
-          <StyledTab key={key}>{t(label)}</StyledTab>
-        ))}
-      </StyledTabList>
+      {visibleTabButtons.length > 1 && (
+        <StyledTabList>
+          {visibleTabButtons.map(({ key, label }) => (
+            <StyledTab key={key}>{t(label)}</StyledTab>
+          ))}
+        </StyledTabList>
+      )}
       {hasActivatedOrdinalsKey && (
         <TabPanel>
           {inscriptionsQuery.isLoading ? (

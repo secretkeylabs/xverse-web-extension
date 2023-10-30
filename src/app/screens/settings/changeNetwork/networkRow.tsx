@@ -1,5 +1,5 @@
 import TickIcon from '@assets/img/settings/tick.svg';
-import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
+import type { SettingsNetwork } from '@secretkeylabs/xverse-core';
 import styled, { useTheme } from 'styled-components';
 
 interface TitleProps {

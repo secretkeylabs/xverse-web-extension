@@ -87,7 +87,7 @@
     "*.{ts,tsx}": [
       "prettier --write",
       "eslint",
-      "tsc-files --noEmit"
+      "tsc-files --noEmit src/styled.d.ts src/react-app-env.d.ts"
     ],
     "*.json": [
       "prettier --write"

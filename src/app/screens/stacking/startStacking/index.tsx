@@ -1,8 +1,8 @@
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import ActionButton from '@components/button';
 import useStackingData from '@hooks/queries/useStackingData';
+import type { Pool } from '@secretkeylabs/xverse-core';
 import { microstacksToStx } from '@secretkeylabs/xverse-core';
-import { Pool } from '@secretkeylabs/xverse-core/types';
 import { XVERSE_WEB_POOL_URL } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
