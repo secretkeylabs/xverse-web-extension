@@ -154,8 +154,6 @@ const useNftDashboard = (): NftDashboardState => {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const dispatch = useDispatch();
   const {
-    stxAddress,
-    ordinalsAddress,
     hasActivatedOrdinalsKey,
     hasActivatedRareSatsKey,
     rareSatsNoticeDismissed,
@@ -167,18 +165,6 @@ const useNftDashboard = (): NftDashboardState => {
   const stacksNftsQuery = useStacksCollectibles();
   const inscriptionsQuery = useAddressInscriptionCollections();
   const rareSatsQuery = useAddressRareSats();
-
-  useEffect(() => {
-    if (stxAddress && !stacksNftsQuery.error) {
-      stacksNftsQuery.refetch();
-    }
-  }, [stxAddress, stacksNftsQuery]);
-
-  useEffect(() => {
-    if (ordinalsAddress && !inscriptionsQuery.error) {
-      inscriptionsQuery.refetch();
-    }
-  }, [ordinalsAddress, inscriptionsQuery]);
 
   const ordinalsLength = inscriptionsQuery.data?.pages?.[0]?.total ?? 0;
   const totalNfts = stacksNftsQuery.data?.pages?.[0]?.total ?? 0;
