@@ -65,10 +65,9 @@ const LoaderContainer = styled.div((props) => ({
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(20),
-  marginTop: props.theme.spacing(12),
+  padding: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(12),
+  paddingBottom: props.theme.spacing(20),
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
@@ -111,24 +110,23 @@ const BundleLinkText = styled.div((props) => ({
 }));
 
 const CustomizedModal = styled(BottomModal)`
+  display: flex;
+  flex-direction: column;
   height: 100%;
   max-height: 100% !important;
   background-color: #181818 !important;
 `;
 
-const CustomizedModalContent = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  height: 'calc(100% - 67.5px)',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  paddingBottom: props.theme.spacing(20),
-}));
+const CustomizedModalContainer = styled(Container)`
+  margin-top: 0;
+`;
 
 const TxReviewModalControls = styled.div((props) => ({
   display: 'flex',
   columnGap: props.theme.spacing(6),
+  padding: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(12),
+  paddingBottom: props.theme.spacing(20),
 }));
 
 function SignBatchPsbtRequest() {
@@ -478,8 +476,8 @@ function SignBatchPsbtRequest() {
           setCurrentPsbtIndex(0);
         }}
       >
-        <CustomizedModalContent>
-          <div>
+        <OuterContainer>
+          <CustomizedModalContainer>
             <ReviewTransactionText>
               {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
             </ReviewTransactionText>
@@ -524,40 +522,40 @@ function SignBatchPsbtRequest() {
               />
             ) : null}
             {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
-          </div>
-          <TxReviewModalControls>
-            {currentPsbtIndex > 0 && (
-              <ActionButton
-                text={t('PREVIOUS')}
-                transparent
-                onPress={() => {
-                  setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
-                }}
-                icon={<ArrowLeft color="white" size={16} weight="bold" />}
-              />
-            )}
-            {currentPsbtIndex < parsedPsbts.length - 1 && (
-              <ActionButton
-                text={t('NEXT')}
-                transparent
-                onPress={() => {
-                  setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
-                }}
-                icon={<ArrowRight color="white" size={16} weight="bold" />}
-                iconPosition="right"
-              />
-            )}
-            {currentPsbtIndex === parsedPsbts.length - 1 && (
-              <ActionButton
-                text={t('DONE')}
-                onPress={() => {
-                  setReviewTransaction(false);
-                  setCurrentPsbtIndex(0);
-                }}
-              />
-            )}
-          </TxReviewModalControls>
-        </CustomizedModalContent>
+          </CustomizedModalContainer>
+        </OuterContainer>
+        <TxReviewModalControls>
+          {currentPsbtIndex > 0 && (
+            <ActionButton
+              text={t('PREVIOUS')}
+              transparent
+              onPress={() => {
+                setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
+              }}
+              icon={<ArrowLeft color="white" size={16} weight="bold" />}
+            />
+          )}
+          {currentPsbtIndex < parsedPsbts.length - 1 && (
+            <ActionButton
+              text={t('NEXT')}
+              transparent
+              onPress={() => {
+                setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
+              }}
+              icon={<ArrowRight color="white" size={16} weight="bold" />}
+              iconPosition="right"
+            />
+          )}
+          {currentPsbtIndex === parsedPsbts.length - 1 && (
+            <ActionButton
+              text={t('DONE')}
+              onPress={() => {
+                setReviewTransaction(false);
+                setCurrentPsbtIndex(0);
+              }}
+            />
+          )}
+        </TxReviewModalControls>
       </CustomizedModal>
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (
