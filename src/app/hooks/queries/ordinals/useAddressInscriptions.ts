@@ -9,13 +9,14 @@ const PAGE_SIZE = 30;
  * Get inscriptions belonging to an address, filtered by collection id
  */
 const useAddressInscriptions = (collectionId?: string) => {
-  const { ordinalsAddress } = useWalletSelector();
+  const { ordinalsAddress, network } = useWalletSelector();
 
   const getInscriptionsByAddress = async ({ pageParam = 0 }) => {
     if (!ordinalsAddress || !collectionId) {
       throw new InvalidParamsError('ordinalsAddress and collectionId are required');
     }
     return getCollectionSpecificInscriptions(
+      network.type,
       ordinalsAddress,
       collectionId,
       pageParam || 0, // offset,

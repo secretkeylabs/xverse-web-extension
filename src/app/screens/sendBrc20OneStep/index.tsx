@@ -124,6 +124,7 @@ function SendBrc20Screen() {
         amount: numberAmount,
         revealAddress: ordinalsAddress,
         feeRate: feeRate?.regular,
+        network: network.type,
       };
       const estimatedFees = await brc20TransferEstimateFees(estimateFeesParams);
       const state: ConfirmBrc20TransferState = {

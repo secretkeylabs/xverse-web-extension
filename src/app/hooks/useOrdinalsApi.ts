@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import OrdinalsApi from '@secretkeylabs/xverse-core/api/ordinals/provider';
+import { useMemo } from 'react';
 import useWalletSelector from './useWalletSelector';
 
 const useOrdinalsApi = () => {
@@ -9,7 +9,7 @@ const useOrdinalsApi = () => {
       new OrdinalsApi({
         network: network.type,
       }),
-    [],
+    [network.type],
   );
 };
 

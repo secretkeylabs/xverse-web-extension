@@ -1,5 +1,5 @@
 /* eslint-disable prefer-destructuring */
-import type { SettingsNetwork } from '@secretkeylabs/xverse-core';
+import type { NetworkType, SettingsNetwork } from '@secretkeylabs/xverse-core';
 import {
   BTC_BASE_URI_MAINNET,
   BTC_BASE_URI_TESTNET,
@@ -18,7 +18,10 @@ export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';
 export const BTC_TRANSACTION_TESTNET_STATUS_URL = 'https://mempool.space/testnet/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
-export const XVERSE_ORDIVIEW_URL = 'https://ord.xverse.app';
+
+export const XVERSE_ORDIVIEW_URL = (network: NetworkType) =>
+  `https://ord${network === 'Mainnet' ? '' : '-testnet'}.xverse.app`;
+
 export const MAGISAT_IO_RARITY_SCAN_URL = 'https://magisat.io/wallet?walletAddress=';
 
 export const TRANSAC_URL = 'https://global.transak.com';
