@@ -177,41 +177,42 @@ function SignBatchPsbtRequest() {
   const userReceivesOrdinalArr = useDetectOrdinalInSignBatchPsbt(parsedPsbts);
 
   const checkIfMismatch = () => {
-    // if (!parsedPsbt) {
-    //   navigate('/tx-status', {
-    //     state: {
-    //       txid: '',
-    //       currency: 'BTC',
-    //       errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
-    //       error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
-    //       browserTx: true,
-    //     },
-    //   });
-    // }
-    // if (payload.network.type !== network.type) {
-    //   navigate('/tx-status', {
-    //     state: {
-    //       txid: '',
-    //       currency: 'BTC',
-    //       error: t('NETWORK_MISMATCH'),
-    //       browserTx: true,
-    //     },
-    //   });
-    // }
-    // if (payload.inputsToSign) {
-    //   payload.inputsToSign.forEach((input) => {
-    //     if (input.address !== btcAddress && input.address !== ordinalsAddress) {
-    //       navigate('/tx-status', {
-    //         state: {
-    //           txid: '',
-    //           currency: 'STX',
-    //           error: t('ADDRESS_MISMATCH'),
-    //           browserTx: true,
-    //         },
-    //       });
-    //     }
-    //   });
-    // }
+    if (!parsedPsbts?.length) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
+          error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
+          browserTx: true,
+        },
+      });
+    }
+    if (payload.network.type !== network.type) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error: t('NETWORK_MISMATCH'),
+          browserTx: true,
+        },
+      });
+    }
+
+    const checkAddressMismatch = (input) => {
+      if (input.address !== btcAddress && input.address !== ordinalsAddress) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'STX',
+            error: t('ADDRESS_MISMATCH'),
+            browserTx: true,
+          },
+        });
+      }
+    };
+
+    payload.psbts.forEach((psbt) => psbt.inputsToSign.forEach(checkAddressMismatch));
   };
 
   useEffect(() => {
@@ -237,6 +238,7 @@ function SignBatchPsbtRequest() {
   }, [parsedPsbts]);
 
   const onSignPsbtConfirmed = async () => {
+    // TODO: implement this logic for the array of txs
     // try {
     //   if (isLedgerAccount(selectedAccount)) {
     //     // setIsModalVisible(true);
