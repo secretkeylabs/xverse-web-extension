@@ -33,6 +33,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import { SignTransactionOptions } from 'sats-connect';
 import styled from 'styled-components';
+import BundleItemComponent from './bundleItemComponent';
 import BundleItemsComponent from './bundleItemsComponent';
 
 const OuterContainer = styled.div`
@@ -391,6 +392,16 @@ function SignBatchPsbtRequest() {
 
   const shouldBroadcast = payload.psbts.every((psbt) => psbt && psbt.broadcast);
 
+  const userReceivesOrdinals = userReceivesOrdinalArr
+    .filter((item) => item.userReceivesOrdinal)
+    .map((item) => item.bundleItemsData)
+    .flat();
+
+  const userTransfersOrdinals = userReceivesOrdinalArr
+    .filter((item) => !item.userReceivesOrdinal)
+    .map((item) => item.bundleItemsData)
+    .flat();
+
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
@@ -420,15 +431,12 @@ function SignBatchPsbtRequest() {
                   <InfoContainer bodyText={t('PSBTS_NO_BROADCAST_DISCLAIMER')} />
                 )}
 
-                {userReceivesOrdinalArr?.map((userReceivesOrdinal, index) =>
-                  userReceivesOrdinal.bundleItemsData?.map((bundleItem) => (
-                    <BundleItemsComponent
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={index}
-                      item={bundleItem}
-                      userReceivesOrdinal={userReceivesOrdinal.userReceivesOrdinal}
-                    />
-                  )),
+                {userTransfersOrdinals.length > 0 && (
+                  <BundleItemsComponent items={userReceivesOrdinals} />
+                )}
+
+                {userReceivesOrdinals.length > 0 && (
+                  <BundleItemsComponent items={userReceivesOrdinals} userReceivesOrdinal />
                 )}
 
                 <RecipientComponent
@@ -483,7 +491,7 @@ function SignBatchPsbtRequest() {
             </ReviewTransactionText>
 
             {userReceivesOrdinalArr[currentPsbtIndex]?.bundleItemsData?.map((bundleItem, index) => (
-              <BundleItemsComponent
+              <BundleItemComponent
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
                 item={bundleItem}

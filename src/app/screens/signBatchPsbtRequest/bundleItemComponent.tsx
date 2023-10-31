@@ -72,14 +72,14 @@ const InscriptionText = styled.h1((props) => ({
   wordBreak: 'break-word',
 }));
 
-const ColumnContainer = styled.div((props) => ({
+const ColumnContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
   justifyContent: 'flex-end',
   alignItems: 'flex-end',
-  marginTop: props.theme.spacing(8),
-}));
+  marginTop: 12,
+});
 
 const CrossContainer = styled.div({
   display: 'flex',
@@ -123,13 +123,12 @@ const EyeIcon = styled.img({
 });
 
 interface Props {
-  items: BundleItem[];
-  userReceivesOrdinal?: boolean;
+  item: BundleItem;
+  userReceivesOrdinal: boolean;
 }
-function BundleItemsComponent({ items, userReceivesOrdinal = false }: Props) {
+function BundleItemComponent({ item, userReceivesOrdinal }: Props) {
   const { t } = useTranslation('translation');
   const [showOrdinal, setShowOrdinal] = useState(false);
-  const [chosenOrdinal, setChosenOrdinal] = useState(0);
   const styles = useSpring({
     from: {
       opacity: 0,
@@ -141,12 +140,14 @@ function BundleItemsComponent({ items, userReceivesOrdinal = false }: Props) {
     },
     delay: 100,
   });
-
-  const onCloseClick = () => {
-    setShowOrdinal(false);
+  const onButtonClick = () => {
+    setShowOrdinal(true);
   };
 
-  const getItemId = (item) => {
+  const onCrossClick = () => {
+    setShowOrdinal(false);
+  };
+  const getItemId = () => {
     if (item.type === 'inscription') {
       return item.inscription.id;
     }
@@ -155,19 +156,17 @@ function BundleItemsComponent({ items, userReceivesOrdinal = false }: Props) {
     }
     return '';
   };
-
-  const getDetail = (item) => {
+  const itemSubText = getBundleItemSubText({
+    satType: item.type,
+    rareSatsType: item.rarity_ranking,
+  });
+  const getDetail = () => {
     if (item.type === 'inscription' || item.type === 'inscribed-sat') {
       return item.inscription.content_type;
     }
-
-    return getBundleItemSubText({
-      satType: item.type,
-      rareSatsType: item.rarity_ranking,
-    });
+    return itemSubText;
   };
-
-  const getTitle = (item) => {
+  const getTitle = () => {
     if (item.type === 'inscription') {
       return t('COMMON.INSCRIPTION');
     }
@@ -176,58 +175,45 @@ function BundleItemsComponent({ items, userReceivesOrdinal = false }: Props) {
     }
     return t('RARE_SATS.RARE_SAT');
   };
-
   return (
     <>
-      <Container>
-        <RecipientTitleText>
-          {userReceivesOrdinal
-            ? t('CONFIRM_TRANSACTION.YOU_WILL_RECEIVE_IN_TOTAL')
-            : t('CONFIRM_TRANSACTION.YOU_WILL_TRANSFER_IN_TOTAL')}
-        </RecipientTitleText>
-
-        {items.map((item, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <RowContainer key={index}>
-            <Icon src={IconOrdinal} />
-            <TitleText>{getTitle(item)}</TitleText>
-            <ColumnContainer>
-              <RowContainer>
-                <ValueText>{getTruncatedAddress(String(getItemId(item)))}</ValueText>
-                <TransparentButton
-                  onClick={() => {
-                    setChosenOrdinal(index);
-                    setShowOrdinal(true);
-                  }}
-                >
-                  <EyeIcon src={Eye} alt="show" />
-                </TransparentButton>
-              </RowContainer>
-              <SubValueText>{getDetail(item)}</SubValueText>
-            </ColumnContainer>
-          </RowContainer>
-        ))}
-      </Container>
-
       {showOrdinal && (
         <OrdinalBackgroundContainer style={styles}>
-          <CrossContainer onClick={onCloseClick}>
+          <CrossContainer onClick={onCrossClick}>
             <TransparentButton>
               <img src={Cross} alt="cross" />
             </TransparentButton>
           </CrossContainer>
           <OrdinalOuterImageContainer>
             <OrdinalImageContainer>
-              <RareSatAsset item={items[chosenOrdinal]} />
+              <RareSatAsset item={item} />
             </OrdinalImageContainer>
-            <InscriptionText>{`${getTitle(items[chosenOrdinal])} ${getItemId(
-              items[chosenOrdinal],
-            )} `}</InscriptionText>
+            <InscriptionText>{`${getTitle()} ${getItemId()} `}</InscriptionText>
           </OrdinalOuterImageContainer>
         </OrdinalBackgroundContainer>
       )}
+      <Container>
+        <RecipientTitleText>
+          {userReceivesOrdinal
+            ? t('CONFIRM_TRANSACTION.YOU_WILL_RECEIVE')
+            : t('CONFIRM_TRANSACTION.YOU_WILL_TRANSFER')}
+        </RecipientTitleText>
+        <RowContainer>
+          <Icon src={IconOrdinal} />
+          <TitleText>{getTitle()}</TitleText>
+          <ColumnContainer>
+            <RowContainer>
+              <ValueText>{getTruncatedAddress(String(getItemId()))}</ValueText>
+              <TransparentButton onClick={onButtonClick}>
+                <EyeIcon src={Eye} alt="show" />
+              </TransparentButton>
+            </RowContainer>
+            <SubValueText>{getDetail()}</SubValueText>
+          </ColumnContainer>
+        </RowContainer>
+      </Container>
     </>
   );
 }
 
-export default BundleItemsComponent;
+export default BundleItemComponent;
