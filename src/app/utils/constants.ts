@@ -1,11 +1,11 @@
 /* eslint-disable prefer-destructuring */
+import type { NetworkType, SettingsNetwork } from '@secretkeylabs/xverse-core';
 import {
   BTC_BASE_URI_MAINNET,
   BTC_BASE_URI_TESTNET,
   HIRO_MAINNET_DEFAULT,
   HIRO_TESTNET_DEFAULT,
 } from '@secretkeylabs/xverse-core/constant';
-import { NetworkType, SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 
 export const BNS_CONTRACT = 'SP000000000000000000002Q6VF78.bns::names';
 export const GAMMA_URL = 'https://gamma.io/';

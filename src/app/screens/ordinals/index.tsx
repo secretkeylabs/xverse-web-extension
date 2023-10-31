@@ -1,5 +1,5 @@
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
-import { Inscription } from '@secretkeylabs/xverse-core/types/index';
+import type { Inscription } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';

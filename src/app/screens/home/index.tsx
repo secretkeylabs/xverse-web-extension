@@ -12,6 +12,7 @@ import ActionButton from '@components/button';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
+import SquareButton from '@components/squareButton';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import UpdatedBottomModal from '@components/updatedBottomModal';
@@ -25,7 +26,7 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import { CurrencyTypes } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
@@ -36,7 +37,6 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import Theme from 'theme';
-import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
 
 export const Container = styled.div((props) => ({

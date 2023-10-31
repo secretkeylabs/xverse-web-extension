@@ -1,4 +1,4 @@
-import {
+import type {
   Account,
   AccountType,
   AppInfo,
@@ -8,7 +8,7 @@ import {
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
-} from '@secretkeylabs/xverse-core/types';
+} from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 
 export const SetWalletKey = 'SetWallet';

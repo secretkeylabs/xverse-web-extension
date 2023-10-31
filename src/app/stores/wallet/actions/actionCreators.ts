@@ -1,15 +1,15 @@
 import { PostGuardPing } from '@components/guards/singleTab';
-import {
-  AccountType,
+import type {
   Account,
   AppInfo,
+  AccountType,
   BaseWallet,
   Coin,
   FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
-} from '@secretkeylabs/xverse-core/types';
+} from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
 

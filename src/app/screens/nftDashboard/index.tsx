@@ -9,7 +9,7 @@ import { useAddressRareSats } from '@hooks/queries/ordinals/useAddressRareSats';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, Wrench } from '@phosphor-icons/react';
-import type { InscriptionCollectionsData } from '@secretkeylabs/xverse-core/types';
+import type { InscriptionCollectionsData } from '@secretkeylabs/xverse-core';
 import {
   ChangeActivateOrdinalsAction,
   ChangeActivateRareSatsAction,
