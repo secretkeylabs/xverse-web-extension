@@ -1,5 +1,3 @@
-import { useQueries } from '@tanstack/react-query';
-import { useCallback } from 'react';
 import {
   fetchDelegationState,
   fetchPoolStackerInfo,
@@ -7,8 +5,10 @@ import {
   getStacksInfo,
   StackingData,
 } from '@secretkeylabs/xverse-core';
-import useWalletSelector from '../useWalletSelector';
+import { useQueries } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import useNetworkSelector from '../useNetwork';
+import useWalletSelector from '../useWalletSelector';
 
 const useStackingData = () => {
   const { stxAddress, network } = useWalletSelector();
@@ -25,12 +25,12 @@ const useStackingData = () => {
         queryFn: () => fetchDelegationState(stxAddress, selectedNetwork),
       },
       {
-        queryKey: ['stacking-pool-info'],
-        queryFn: () => fetchStackingPoolInfo(),
+        queryKey: ['stacking-pool-info', network.type],
+        queryFn: () => fetchStackingPoolInfo(network.type),
       },
       {
-        queryKey: ['pool-stacker-info', stxAddress],
-        queryFn: () => fetchPoolStackerInfo(stxAddress),
+        queryKey: ['pool-stacker-info', stxAddress, network.type],
+        queryFn: () => fetchPoolStackerInfo(network.type, stxAddress),
       },
     ],
   });
@@ -47,7 +47,7 @@ const useStackingData = () => {
   }, [results]);
 
   const stackingData: StackingData = {
-    poolInfo: poolInfoData,
+    poolInfo: poolInfoData!,
     delegationInfo: delegationStateData!,
     coreInfo: coreInfoData!,
     stackerInfo: stackerInfoData,

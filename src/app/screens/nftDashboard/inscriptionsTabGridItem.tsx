@@ -1,4 +1,4 @@
-import RareSatsCollage from '@components/bundleAsset/rareSatsCollage';
+import CollectibleCollage from '@components/collectibleCollage/collectibleCollage';
 import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { InscriptionCollectionsData } from '@secretkeylabs/xverse-core/types';
@@ -81,7 +81,7 @@ export function InscriptionsTabGridItem({
         ) : collection.category === 'brc-20' ? (
           <OrdinalImage ordinal={collection.thumbnail_inscriptions[0]} withoutTitles />
         ) : (
-          <RareSatsCollage
+          <CollectibleCollage
             items={collection.thumbnail_inscriptions.map(mapCondensedInscriptionToBundleItem)}
           />
         )}

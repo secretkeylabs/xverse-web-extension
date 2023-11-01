@@ -1,4 +1,7 @@
+/* eslint-disable no-nested-ternary */
 import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
+import Nft from '@screens/nftDashboard/nft';
+import { NonFungibleToken } from '@secretkeylabs/xverse-core';
 import { BundleItem } from '@utils/rareSats';
 import styled from 'styled-components';
 
@@ -37,9 +40,10 @@ const RemainingAmountOfAssets = styled.div((props) => ({
   },
 }));
 
-function RareSatsCollage({ items }: { items: Array<BundleItem> }) {
+function CollectibleCollage({ items }: { items: Array<BundleItem | NonFungibleToken> }) {
   const moreThanFourItems = items.length > 4;
 
+  const isBundleItem = (item: any): boolean => (item as BundleItem).rarity_ranking !== undefined;
   return (
     <CollageContainer>
       {items.slice(0, 4).map((item, index) => (
@@ -49,8 +53,11 @@ function RareSatsCollage({ items }: { items: Array<BundleItem> }) {
             <RemainingAmountOfAssets>
               <p>+{items.length - 4}</p>
             </RemainingAmountOfAssets>
+          ) : // Conditionally render RareSatAsset if item is a BundleItem otherwise render Nft
+          isBundleItem(item) ? (
+            <RareSatAsset item={item as BundleItem} isCollage />
           ) : (
-            <RareSatAsset item={item} isCollage />
+            <Nft asset={item as NonFungibleToken} isGalleryOpen={false} />
           )}
         </CollageItem>
       ))}
@@ -58,4 +65,4 @@ function RareSatsCollage({ items }: { items: Array<BundleItem> }) {
   );
 }
 
-export default RareSatsCollage;
+export default CollectibleCollage;

@@ -9,9 +9,9 @@ const useAppConfig = () => {
   const dispatch = useDispatch();
 
   return useQuery({
-    queryKey: ['app-config'],
+    queryKey: ['app-config', network.type, btcApiUrl],
     queryFn: async () => {
-      const response = await getAppConfig();
+      const response = await getAppConfig(network.type);
       if (response.data.btcApiURL && network.type === 'Mainnet' && !btcApiUrl) {
         const updatedNetwork = { ...network, btcApiUrl: response.data.btcApiURL };
         dispatch(ChangeNetworkAction(updatedNetwork, networkAddress, ''));

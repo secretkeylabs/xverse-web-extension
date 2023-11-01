@@ -54,13 +54,14 @@ const StyledImg = styled(Image)`
 `;
 interface Props {
   metadata: TokenMetaData;
+  isInCollage?: boolean;
 }
 
-function NftImage({ metadata }: Props) {
+function NftImage({ metadata, isInCollage = false }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   if (metadata?.image_protocol) {
     return (
-      <ImageContainer isGalleryOpen={isGalleryOpen}>
+      <ImageContainer isGalleryOpen={isGalleryOpen || isInCollage}>
         <Suspense>
           <StyledImg
             width="100%"

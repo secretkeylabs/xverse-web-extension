@@ -3,6 +3,7 @@ import {
   Inscription,
   InscriptionCollectionsData,
   isBrcTransferValid,
+  StacksCollectionData,
 } from '@secretkeylabs/xverse-core';
 import type { Color } from 'theme';
 import { BundleItem } from './rareSats';
@@ -53,3 +54,6 @@ export const mapCondensedInscriptionToBundleItem = (
   type: 'inscription',
   rarity_ranking: 'common', // TODO eventually want to fetch this rarity and display it
 });
+
+export const getNftsTabGridItemSubText = (collection: StacksCollectionData) =>
+  collection.total_nft > 1 ? `${collection.total_nft} Items` : '1 Item';
