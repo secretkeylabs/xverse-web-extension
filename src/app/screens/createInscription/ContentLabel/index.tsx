@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { DotsThreeVertical, Eye, Share } from '@phosphor-icons/react';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 
+import useWalletSelector from '@hooks/useWalletSelector';
 import { getBrc20Details } from '@utils/brc20';
 import { ContentType } from './common';
 import Preview from './preview';
@@ -104,6 +105,7 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
   const [showPreview, setShowPreview] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const { network } = useWalletSelector();
 
   useEffect(() => {
     // Close menu when clicking outside
@@ -182,12 +184,15 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
     const displayContent = type === 'PLAIN_TEXT' ? content : atob(content);
 
     if (canPreviewInOrd) {
-      const { data: previewId } = await axios.post(`${XVERSE_ORDIVIEW_URL}/previewHtml`, {
-        html: displayContent,
-        contentType: inputContentType,
-      });
+      const { data: previewId } = await axios.post(
+        `${XVERSE_ORDIVIEW_URL(network.type)}/previewHtml`,
+        {
+          html: displayContent,
+          contentType: inputContentType,
+        },
+      );
 
-      window.open(`${XVERSE_ORDIVIEW_URL}/previewHtml/${previewId}`, '_blank');
+      window.open(`${XVERSE_ORDIVIEW_URL(network.type)}/previewHtml/${previewId}`, '_blank');
     }
   };
 
