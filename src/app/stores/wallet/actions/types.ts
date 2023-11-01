@@ -4,7 +4,6 @@ import type {
   AppInfo,
   BaseWallet,
   Coin,
-  FeesMultipliers,
   FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
@@ -104,7 +103,7 @@ export interface StoreEncryptedSeed {
 }
 export interface SetFeeMultiplier {
   type: typeof SetFeeMultiplierKey;
-  feeMultipliers: FeesMultipliers;
+  feeMultipliers: AppInfo;
 }
 
 export interface ResetWallet {
@@ -248,9 +247,11 @@ export type WalletActions =
   | ChangeNetwork
   | GetActiveAccounts
   | ChangeActivateOrdinals
+  | ChangeActivateRareSats
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
   | ChangeShowDataCollectionAlert
   | SetBrcCoinsData
   | SetWalletLockPeriod
+  | SetRareSatsNoticeDismissed
   | SetWalletUnlocked;

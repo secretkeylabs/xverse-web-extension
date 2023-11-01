@@ -7,13 +7,13 @@ import { handleRetries, InvalidParamsError } from '@utils/query';
  * Get inscriptions details by collection id
  */
 const useAddressInscription = (ordinalId: string, ordinal: Inscription | null) => {
-  const { ordinalsAddress } = useWalletSelector();
+  const { ordinalsAddress, network } = useWalletSelector();
   const fetchOrdinals = async (): Promise<Inscription> => {
     if (ordinal) return ordinal;
     if (!ordinalsAddress || !ordinalId) {
       throw new InvalidParamsError('ordinalsAddress and ordinalId are required');
     }
-    return getInscription(ordinalsAddress, ordinalId);
+    return getInscription(network.type, ordinalsAddress, ordinalId);
   };
 
   return useQuery({
