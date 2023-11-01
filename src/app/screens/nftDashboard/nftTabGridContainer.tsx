@@ -43,10 +43,8 @@ export function NftTabGridItem({ item: collection }: { item: StacksCollectionDat
   const navigate = useNavigate();
   const { storeNftData } = useNftDataReducer();
 
-  // TODO: Naviagte to collection page
-  const handleClickCollectionId = (e: React.MouseEvent<HTMLButtonElement>) => {};
-
-  const handleClickInscriptionId = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClickCollection = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // TODO: Naviagte to collection page
     if (collection.collection_id !== 'bns') {
       storeNftData(collection.thumbnail_nfts[0].data);
       navigate(`nft-detail/${collection.thumbnail_nfts[0].data.fully_qualified_token_id}`);
@@ -61,9 +59,7 @@ export function NftTabGridItem({ item: collection }: { item: StacksCollectionDat
 
   return (
     <CollectionContainer>
-      <ThumbnailContainer
-        onClick={collection.total_nft > 1 ? handleClickCollectionId : handleClickInscriptionId}
-      >
+      <ThumbnailContainer onClick={handleClickCollection}>
         {collection.total_nft > 1 ? (
           <CollectibleCollage items={collection.thumbnail_nfts} />
         ) : (
