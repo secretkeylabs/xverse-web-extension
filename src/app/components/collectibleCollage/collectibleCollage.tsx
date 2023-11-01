@@ -43,6 +43,7 @@ const RemainingAmountOfAssets = styled.div((props) => ({
 function CollectibleCollage({ items }: { items: Array<BundleItem | NonFungibleToken> }) {
   const moreThanFourItems = items.length > 4;
 
+  const isBundleItem = (item: any): boolean => (item as BundleItem).rarity_ranking !== undefined;
   return (
     <CollageContainer>
       {items.slice(0, 4).map((item, index) => (
@@ -52,8 +53,8 @@ function CollectibleCollage({ items }: { items: Array<BundleItem | NonFungibleTo
             <RemainingAmountOfAssets>
               <p>+{items.length - 4}</p>
             </RemainingAmountOfAssets>
-          ) : // Conditionally render RareSatAsset if item is a BundleItem
-          item.type ? (
+          ) : // Conditionally render RareSatAsset if item is a BundleItem otherwise render Nft
+          isBundleItem(item) ? (
             <RareSatAsset item={item as BundleItem} isCollage />
           ) : (
             <Nft asset={item as NonFungibleToken} isGalleryOpen={false} />

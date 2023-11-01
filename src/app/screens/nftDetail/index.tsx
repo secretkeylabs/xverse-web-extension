@@ -271,9 +271,7 @@ function NftDetailScreen() {
   useResetUserFlow('/nft-detail');
 
   useEffect(() => {
-    const data = nftData.find(
-      (nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)),
-    );
+    const data = nftData.find((nftItem) => nftItem.fully_qualified_token_id === id);
     if (!data) {
       mutate({ principal: nftIdDetails[0] });
     } else {

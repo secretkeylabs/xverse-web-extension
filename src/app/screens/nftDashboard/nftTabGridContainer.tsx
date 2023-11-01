@@ -1,4 +1,5 @@
 import CollectibleCollage from '@components/collectibleCollage/collectibleCollage';
+import useNftDataReducer from '@hooks/stores/useNftReducer';
 import { StacksCollectionData } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getNftsTabGridItemSubText } from '@utils/inscriptions';
@@ -40,24 +41,27 @@ const StyledItemSub = styled(StyledP)`
 
 export function NftTabGridItem({ item: collection }: { item: StacksCollectionData }) {
   const navigate = useNavigate();
+  const { storeNftData } = useNftDataReducer();
 
-  const handleClickCollectionId = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const collectionId = e.currentTarget.value;
-    navigate(`/nft-dashboard/ordinals-collection/${collectionId}`);
-  };
+  // TODO: Naviagte to collection page
+  const handleClickCollectionId = (e: React.MouseEvent<HTMLButtonElement>) => {};
 
   const handleClickInscriptionId = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const inscriptionId = e.currentTarget.value;
-    navigate(`/nft-dashboard/ordinal-detail/${inscriptionId}`);
+    if (collection.collection_id !== 'bns') {
+      storeNftData(collection.thumbnail_nfts[0].data);
+      navigate(`nft-detail/${collection.thumbnail_nfts[0].data.fully_qualified_token_id}`);
+    } else {
+      storeNftData(collection.thumbnail_nfts[0].asset_identifier);
+      navigate(`nft-detail/${collection.thumbnail_nfts[0].asset_identifier}`);
+    }
   };
 
-  const itemId = collection.collection_id;
+  const itemId = collection.collection_name;
   const itemSubText = getNftsTabGridItemSubText(collection);
 
   return (
     <CollectionContainer>
       <ThumbnailContainer
-        value={collection.collection_id}
         onClick={collection.total_nft > 1 ? handleClickCollectionId : handleClickInscriptionId}
       >
         {collection.total_nft > 1 ? (
