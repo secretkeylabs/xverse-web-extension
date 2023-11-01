@@ -3,6 +3,9 @@
   "description": "A Bitcoin wallet for Web3",
   "version": "0.22.0",
   "private": true,
+  "engines": {
+    "node": "^18.18.2"
+  },
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
