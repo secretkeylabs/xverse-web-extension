@@ -52,7 +52,7 @@ function Buy() {
   const { t } = useTranslation('translation', { keyPrefix: 'BUY_SCREEN' });
   const navigate = useNavigate();
   const { currency } = useParams();
-  const { stxAddress, btcAddress } = useWalletSelector();
+  const { stxAddress, btcAddress, network } = useWalletSelector();
   const address = currency === 'STX' ? stxAddress : btcAddress;
   const [url, setUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -75,7 +75,7 @@ function Buy() {
       moonPayUrl.searchParams.append('currencyCode', currency!);
       moonPayUrl.searchParams.append('walletAddress', address);
       moonPayUrl.searchParams.append('colorCode', '#5546FF');
-      const signedUrl = await getMoonPaySignedUrl(moonPayUrl.href);
+      const signedUrl = await getMoonPaySignedUrl(network.type, moonPayUrl.href);
       setUrl(signedUrl?.signedUrl ?? '');
     } catch (e) {
       setLoading(false);

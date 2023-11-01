@@ -488,7 +488,7 @@ const Theme = {
   },
 
   /**
-   * @deprecated use theme.typography
+   * @deprecated use theme.typography.body_s
    */
   body_xs: {
     fontFamily: 'DMSans-Regular',

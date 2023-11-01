@@ -100,7 +100,7 @@ export default function useOrdinalDetail() {
   };
 
   const openInOrdinalsExplorer = () => {
-    window.open(`${XVERSE_ORDIVIEW_URL}/inscription/${ordinalData?.id}`);
+    window.open(`${XVERSE_ORDIVIEW_URL(network.type)}/inscription/${ordinalData?.id}`);
   };
 
   const handleNavigationToRareSatsBundle = () => {
@@ -112,7 +112,9 @@ export default function useOrdinalDetail() {
   };
 
   const onCopyClick = () => {
-    navigator.clipboard.writeText(`${XVERSE_ORDIVIEW_URL}/inscription/${ordinalData?.id}`);
+    navigator.clipboard.writeText(
+      `${XVERSE_ORDIVIEW_URL(network.type)}/inscription/${ordinalData?.id}`,
+    );
   };
 
   const backButtonText = ordinalData?.collection_id

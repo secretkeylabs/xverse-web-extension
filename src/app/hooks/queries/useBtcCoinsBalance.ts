@@ -7,11 +7,11 @@ import { useDispatch } from 'react-redux';
 
 const useBtcCoinBalance = () => {
   const dispatch = useDispatch();
-  const { ordinalsAddress } = useWalletSelector();
+  const { ordinalsAddress, network } = useWalletSelector();
 
   const fetchBrcCoinsBalances = async () => {
     try {
-      const list = await getOrdinalsFtBalance(ordinalsAddress);
+      const list = await getOrdinalsFtBalance(network.type, ordinalsAddress);
       dispatch(
         setBrcCoinsDataAction(
           list.map((brcToken) => ({ ...brcToken, ticker: brcToken.ticker?.toUpperCase() })),

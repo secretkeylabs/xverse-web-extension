@@ -15,9 +15,9 @@ import {
   getBtcFiatEquivalent,
   ResponseError,
   satsToBtc,
+  signBtcTransaction,
   UTXO,
 } from '@secretkeylabs/xverse-core';
-import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import {
   Recipient,
   SignedBtcTx,
@@ -82,7 +82,7 @@ const Button = styled.button((props) => ({
 }));
 
 const ButtonText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
@@ -100,15 +100,15 @@ const ErrorContainer = styled.div((props) => ({
 }));
 
 const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
+  ...props.theme.typography.body_s,
+  color: props.theme.colors.danger_medium,
 }));
 
 interface ReviewTransactionTitleProps {
   isOridnalTx: boolean;
 }
 const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
-  ...props.theme.headline_s,
+  ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
   textAlign: props.isOridnalTx ? 'center' : 'left',
@@ -318,7 +318,7 @@ function ConfirmBtcTransactionComponent({
     const newFee = new BigNumber(modifiedFee);
     setCurrentFee(newFee);
     const seed = await getSeed();
-    setCurrentFeeRate(new BigNumber(feeRate));
+    setCurrentFeeRate(new BigNumber(feeRate ?? ''));
     if (ordinalTxUtxo) ordinalMutate({ txFee: modifiedFee, seedPhrase: seed });
     else if (isRestoreFundFlow) {
       mutateSignNonOrdinalBtcTransaction({ txFee: modifiedFee, seedPhrase: seed });
@@ -414,6 +414,7 @@ function ConfirmBtcTransactionComponent({
           ) : (
             recipients?.map((recipient, index) => (
               <RecipientComponent
+                key={recipient.address}
                 recipientIndex={index + 1}
                 address={recipient.address}
                 value={satsToBtc(recipient.amountSats).toString()}

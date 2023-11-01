@@ -32,7 +32,7 @@ export default function useTransactions(coinType: CurrencyTypes, brc20Token: str
       return btcData;
     }
     if (coinType === 'brc20' && brc20Token) {
-      const brc20Data = await getBrc20History(ordinalsAddress, brc20Token);
+      const brc20Data = await getBrc20History(network.type, ordinalsAddress, brc20Token);
       return brc20Data;
     }
     return [];
