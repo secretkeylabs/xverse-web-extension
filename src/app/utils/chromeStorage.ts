@@ -19,7 +19,7 @@ class ChromeStorage {
     return runtimeMap.get(this).lastError;
   }
 
-  setItem(key: string, item: any) {
+  setItem(key: string, item: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.getDriver().set({ [key]: item }, () => {
         if (this.hasError()) {
@@ -30,7 +30,7 @@ class ChromeStorage {
     });
   }
 
-  getItem(key: string) {
+  getItem<T = any>(key: string): Promise<T> {
     return new Promise((resolve, reject) => {
       this.getDriver().get(key, (response: any) => {
         if (this.hasError()) {
@@ -53,3 +53,5 @@ class ChromeStorage {
   }
 }
 export default ChromeStorage;
+export const chromeSessionStorage = new ChromeStorage(chrome.storage.session, chrome.runtime);
+export const chromeLocalStorage = new ChromeStorage(chrome.storage.local, chrome.runtime);

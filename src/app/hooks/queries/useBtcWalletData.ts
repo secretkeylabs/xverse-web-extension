@@ -1,5 +1,5 @@
 import useBtcClient from '@hooks/useBtcClient';
-import { BtcAddressData } from '@secretkeylabs/xverse-core/types';
+import type { BtcAddressData } from '@secretkeylabs/xverse-core';
 import { SetBtcWalletDataAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';

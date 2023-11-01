@@ -374,7 +374,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <ButtonContainer>
-          <SmallActionButton src={ArrowUp} text="Send" onPress={() => goToSendScreen()} />
+          <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
         </ButtonContainer>
 
         {!fungibleToken ? (
@@ -392,7 +392,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
                 }}
               />
             </ButtonContainer>
-            <SmallActionButton src={Buy} text="Buy" onPress={() => navigate(`/buy/${coin}`)} />
+            <SmallActionButton src={Buy} text={t('BUY')} onPress={() => navigate(`/buy/${coin}`)} />
           </>
         ) : (
           <RecieveButtonContainer>

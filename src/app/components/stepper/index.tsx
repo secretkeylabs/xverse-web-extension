@@ -63,7 +63,7 @@ const calculateColorStops = (props) => {
   const successColor = props.theme.colors.success_medium;
 
   // Calculate the color stops
-  let startStop;
+  let startStop: string;
   if (props.step === 0) startStop = '0%';
   if (props.step > 1) startStop = '100%';
   else startStop = '50%';
@@ -72,7 +72,8 @@ const calculateColorStops = (props) => {
   return `${successColor} ${startStop}, #4C525F ${endStop}`;
 };
 
-const Line = styled.div<StepperProps>((props) => ({
+type LineProps = { step: number };
+const Line = styled.div<LineProps>((props) => ({
   height: 2,
   width: '100%',
   background: `linear-gradient(90deg, ${calculateColorStops(props)})`,
@@ -88,7 +89,7 @@ export default function Stepper({ steps }: Props): JSX.Element {
   const currentStepIndex = steps.findIndex((step) => !step.isCompleted);
   const currentStep = currentStepIndex > -1 ? currentStepIndex : steps.length;
 
-  function getContentForDot(stepIndex, isCompleted, currentPosition) {
+  function getContentForDot(stepIndex: number, isCompleted: boolean, currentPosition: number) {
     if (isCompleted) {
       return <img src={checkmarkIcon} alt="Check Icon" />;
     }

@@ -290,7 +290,11 @@ const router = createHashRouter([
       },
       {
         path: 'settings',
-        element: <Setting />,
+        element: (
+          <AuthGuard>
+            <Setting />
+          </AuthGuard>
+        ),
       },
       {
         path: 'restore-funds',

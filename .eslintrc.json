@@ -24,6 +24,12 @@
   "rules": {
     "consistent-return": "off",
     "import/prefer-default-export": 1,
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": ["@secretkeylabs/xverse-core/**/*"]
+      }
+    ],
     "no-promise-executor-return": "warn",
     "max-len": "off",
     "no-inline-styles/no-inline-styles": 2,
@@ -42,7 +48,8 @@
         "argsIgnorePattern": "^_"
       }
     ],
-    "no-plusplus": "off"
+    "no-plusplus": "off",
+    "@tanstack/query/exhaustive-deps": 1
   },
   "settings": {
     "import/resolver": {

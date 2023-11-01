@@ -1,17 +1,17 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "private": true,
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "1.9.1",
+    "@secretkeylabs/xverse-core": "2.3.0",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
-    "@stacks/stacks-blockchain-api-types": "^6.1.1",
-    "@stacks/transactions": "^4.3.8",
+    "@stacks/stacks-blockchain-api-types": "6.1.1",
+    "@stacks/transactions": "4.3.8",
     "@tanstack/query-sync-storage-persister": "^4.29.1",
     "@tanstack/react-query": "^4.29.3",
     "@tanstack/react-query-devtools": "^4.29.3",
@@ -86,7 +86,8 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "prettier --write",
-      "eslint"
+      "eslint",
+      "tsc-files --noEmit src/styled.d.ts src/react-app-env.d.ts"
     ],
     "*.json": [
       "prettier --write"
@@ -145,6 +146,7 @@
     "terser-webpack-plugin": "^5.3.6",
     "ts-jest": "^27.0.5",
     "ts-loader": "^8.4.0",
+    "tsc-files": "^1.1.4",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "type-fest": "^2.19.0",
     "typescript": "^4.8.2",

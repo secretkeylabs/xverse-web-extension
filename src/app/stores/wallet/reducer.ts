@@ -10,7 +10,6 @@ import {
   ChangeShowOrdinalReceiveAlertKey,
   FetchAccountKey,
   GetActiveAccountsKey,
-  LockWalletKey,
   RareSatsNoticeDismissedKey,
   ResetWalletKey,
   SelectAccountKey,
@@ -22,9 +21,8 @@ import {
   SetStxWalletDataKey,
   SetWalletKey,
   SetWalletLockPeriodKey,
-  SetWalletSeedPhraseKey,
+  SetWalletUnlockedKey,
   StoreEncryptedSeedKey,
-  UnlockWalletKey,
   UpdateLedgerAccountsKey,
   UpdateVisibleCoinListKey,
   WalletActions,
@@ -44,7 +42,6 @@ const initialWalletState: WalletState = {
   accountsList: [],
   ledgerAccountsList: [],
   selectedAccount: null,
-  seedPhrase: '',
   encryptedSeed: '',
   fiatCurrency: 'USD',
   btcFiatRate: '0',
@@ -69,6 +66,7 @@ const initialWalletState: WalletState = {
   accountType: 'software',
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
+  isUnlocked: false,
 };
 
 const walletReducer = (
@@ -80,7 +78,14 @@ const walletReducer = (
     case SetWalletKey:
       return {
         ...state,
-        ...action.wallet,
+        stxAddress: action.wallet.stxAddress,
+        btcAddress: action.wallet.btcAddress,
+        ordinalsAddress: action.wallet.ordinalsAddress,
+        masterPubKey: action.wallet.masterPubKey,
+        stxPublicKey: action.wallet.stxPublicKey,
+        btcPublicKey: action.wallet.btcPublicKey,
+        ordinalsPublicKey: action.wallet.ordinalsPublicKey,
+        accountType: action.wallet.accountType,
       };
     case ResetWalletKey:
       return {
@@ -121,21 +126,6 @@ const walletReducer = (
       return {
         ...state,
         encryptedSeed: action.encryptedSeed,
-      };
-    case SetWalletSeedPhraseKey:
-      return {
-        ...state,
-        seedPhrase: action.seedPhrase,
-      };
-    case UnlockWalletKey:
-      return {
-        ...state,
-        seedPhrase: action.seed,
-      };
-    case LockWalletKey:
-      return {
-        ...state,
-        seedPhrase: '',
       };
     case SetCoinRatesKey:
       return {
@@ -228,6 +218,11 @@ const walletReducer = (
       return {
         ...state,
         walletLockPeriod: action.walletLockPeriod,
+      };
+    case SetWalletUnlockedKey:
+      return {
+        ...state,
+        isUnlocked: action.isUnlocked,
       };
     default:
       return state;

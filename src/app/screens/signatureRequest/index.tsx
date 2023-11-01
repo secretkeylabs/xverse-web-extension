@@ -39,19 +39,16 @@ const OuterContainer = styled.div({
   height: '100%',
 });
 
-const InnerContainer = styled.div({
+const InnerContainer = styled.div((props) => ({
   flex: 1,
-  overflowY: 'auto',
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-});
+  ...props.theme.scrollbar,
+}));
 
-const MainContainer = styled.div((props) => ({
+export const MainContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.spacing(4),
+  paddingRight: props.theme.spacing(4),
 }));
 
 const RequestType = styled.h1((props) => ({
@@ -146,7 +143,7 @@ function SignatureRequest(): JSX.Element {
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isTxInvalid, setIsTxInvalid] = useState(false);
-  const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
+  const { selectedAccount, accountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
   const { messageType, request, payload, tabId, domain, isSignMessageBip322 } =

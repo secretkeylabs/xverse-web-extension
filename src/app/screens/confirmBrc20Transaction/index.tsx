@@ -167,6 +167,7 @@ const useConfirmBrc20Transfer = (): {
     errorCode,
   } = useBrc20TransferFees({
     ...estimateFeesParams,
+    network: network.type,
     feeRate: Number(debouncedUserInputFeeRate),
     skipInitialFetch: true,
   });

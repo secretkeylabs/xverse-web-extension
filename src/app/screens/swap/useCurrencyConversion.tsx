@@ -4,7 +4,7 @@ import { LoaderSize } from '@utils/constants';
 import { ftDecimals } from '@utils/helper';
 import { AlexSDK, Currency } from 'alex-sdk';
 import BigNumber from 'bignumber.js';
-import type { SwapToken } from './useSwap';
+import { SwapToken } from './types';
 
 // eslint-disable-next-line import/prefer-default-export
 export function useCurrencyConversion() {

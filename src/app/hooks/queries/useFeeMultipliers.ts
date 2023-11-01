@@ -1,14 +1,17 @@
-import { fetchAppInfo } from '@secretkeylabs/xverse-core/api';
-import { AppInfo } from '@secretkeylabs/xverse-core/types';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { AppInfo, fetchAppInfo } from '@secretkeylabs/xverse-core/';
 import { setFeeMultiplierAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 
 export const useFeeMultipliers = () => {
+  const { network } = useWalletSelector();
   const dispatch = useDispatch();
 
   const fetchFeeMultiplierData = async (): Promise<AppInfo> => {
-    const response: AppInfo = await fetchAppInfo();
+    const response = await fetchAppInfo(network.type);
+    if (!response) throw new Error('Failed to fetch fee multipliers');
+
     dispatch(setFeeMultiplierAction(response));
     return response;
   };

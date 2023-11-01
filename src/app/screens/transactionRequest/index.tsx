@@ -1,18 +1,22 @@
-import useDappRequest from '@hooks/useTransationRequest';
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useEffect, useState } from 'react';
-import { StacksTransaction } from '@stacks/transactions';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useNetworkSelector from '@hooks/useNetwork';
+import useDappRequest from '@hooks/useTransationRequest';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  Coin,
+  ContractFunction,
+  createDeployContractRequest,
+  extractFromPayload,
+} from '@secretkeylabs/xverse-core';
+import { StacksTransaction } from '@stacks/transactions';
+import { getNetworkType, isHardwareAccount } from '@utils/helper';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
-import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
-import { Coin, createDeployContractRequest, extractFromPayload } from '@secretkeylabs/xverse-core';
-import useWalletReducer from '@hooks/useWalletReducer';
-import { getNetworkType, isHardwareAccount } from '@utils/helper';
-import useNetworkSelector from '@hooks/useNetwork';
 import { getContractCallPromises, getTokenTransferRequest } from './helper';
 
 const LoaderContainer = styled.div((props) => ({

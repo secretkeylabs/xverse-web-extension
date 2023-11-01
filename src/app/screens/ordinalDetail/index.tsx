@@ -152,6 +152,7 @@ const OrdinalDetailsContainer = styled.div<DetailSectionProps>((props) => ({
   wordBreak: 'break-all',
   whiteSpace: 'pre-wrap',
   width: props.isGallery ? 400 : '100%',
+  marginTop: props.theme.spacing(8),
 }));
 
 const Row = styled.div({
@@ -330,7 +331,7 @@ const RowButtonContainer = styled.div((props) => ({
   justifyContent: 'center',
   columnGap: props.theme.spacing(11),
   paddingBottom: props.theme.spacing(16),
-  marginBottom: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(4),
   marginTop: props.theme.spacing(4),
   width: '100%',
   borderBottom: `1px solid ${props.theme.colors.elevation3}`,

@@ -9,11 +9,12 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import {
   addressToString,
+  Args,
   broadcastSignedTransaction,
   Coin,
+  ContractFunction,
   extractFromPayload,
 } from '@secretkeylabs/xverse-core';
-import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,
@@ -38,11 +39,13 @@ const PostConditionContainer = styled.div((props) => ({
   borderBottom: `0.5px solid ${props.theme.colors.elevation3}`,
   flexDirection: 'column',
 }));
+
 const SponsoredContainer = styled.div({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
 });
+
 const SponsoredTag = styled.div((props) => ({
   background: props.theme.colors.elevation3,
   marginTop: props.theme.spacing(7.5),
@@ -52,10 +55,12 @@ const SponsoredTag = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
   borderRadius: 30,
 }));
+
 const SponosredText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white_0,
 }));
+
 const PostConditionAlertText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
   color: props.theme.colors.white_0,
@@ -87,38 +92,40 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
 
   type ArgToView = { name: string; value: string; type: any };
   const getFunctionArgs = (): Array<ArgToView> => {
-    const args: Array<ArgToView> = [];
     const { funcArgs } = extractFromPayload(request);
-    funcMetaData?.args?.forEach((arg: Args, index: number) => {
-      const funcArg = cvToJSON(funcArgs[index]);
+    const args: Array<ArgToView> = funcMetaData?.args
+      ? funcMetaData?.args?.map((arg: Args, index: number) => {
+          const funcArg = cvToJSON(funcArgs[index]);
 
-      const argTypeIsOptionalSome = funcArgs[index].type === ClarityType.OptionalSome;
+          const argTypeIsOptionalSome = funcArgs[index].type === ClarityType.OptionalSome;
 
-      const funcArgType = argTypeIsOptionalSome
-        ? (funcArgs[index] as SomeCV).value?.type
-        : funcArgs[index]?.type;
+          const funcArgType = argTypeIsOptionalSome
+            ? (funcArgs[index] as SomeCV).value?.type
+            : funcArgs[index]?.type;
 
-      const funcArgValString = argTypeIsOptionalSome
-        ? cvToString((funcArgs[index] as SomeCV).value, 'tryAscii')
-        : cvToString(funcArgs[index]);
+          const funcArgValString = argTypeIsOptionalSome
+            ? cvToString((funcArgs[index] as SomeCV).value, 'tryAscii')
+            : cvToString(funcArgs[index]);
 
-      const normalizedValue = (() => {
-        switch (funcArgType) {
-          case ClarityType.UInt:
-            return funcArgValString.split('u').join('');
-          case ClarityType.Buffer:
-            return funcArgValString.substring(1, funcArgValString.length - 1);
-          default:
-            return funcArgValString;
-        }
-      })();
-      const argToView: ArgToView = {
-        name: arg.name,
-        value: normalizedValue,
-        type: funcArg.type,
-      };
-      args.push(argToView);
-    });
+          const normalizedValue = (() => {
+            switch (funcArgType) {
+              case ClarityType.UInt:
+                return funcArgValString.split('u').join('');
+              case ClarityType.Buffer:
+                return funcArgValString.substring(1, funcArgValString.length - 1);
+              default:
+                return funcArgValString;
+            }
+          })();
+          const argToView: ArgToView = {
+            name: arg.name,
+            value: normalizedValue,
+            type: funcArg.type,
+          };
+
+          return argToView;
+        })
+      : [];
     return args;
   };
 
@@ -213,10 +220,11 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const renderPostConditionsCard = () => {
     const { postConds } = extractFromPayload(request);
     return postConds?.map((postCondition, i) => {
+      const key = `${postCondition.conditionType}-${i}`;
+
       switch (postCondition.conditionType) {
         case PostConditionType.STX:
-          // eslint-disable-next-line react/no-array-index-key
-          return <StxPostConditionCard key={i} postCondition={postCondition} />;
+          return <StxPostConditionCard key={key} postCondition={postCondition} />;
         case PostConditionType.Fungible: {
           const coinInfo = coinsMetaData?.find(
             (coin: Coin) =>
@@ -226,13 +234,11 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
               }`,
           );
           return (
-            // eslint-disable-next-line react/no-array-index-key
-            <FtPostConditionCard key={i} postCondition={postCondition} ftMetaData={coinInfo} />
+            <FtPostConditionCard key={key} postCondition={postCondition} ftMetaData={coinInfo} />
           );
         }
         case PostConditionType.NonFungible:
-          // eslint-disable-next-line react/no-array-index-key
-          return <NftPostConditionCard key={i} postCondition={postCondition} />;
+          return <NftPostConditionCard key={key} postCondition={postCondition} />;
         default:
           return '';
       }

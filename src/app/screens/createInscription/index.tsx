@@ -27,6 +27,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import type { UTXO } from '@secretkeylabs/xverse-core/types';
 import { getShortTruncatedAddress } from '@utils/helper';
 
+import useSeedVault from '@hooks/useSeedVault';
 import CompleteScreen from './CompleteScreen';
 import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
@@ -179,23 +180,17 @@ function CreateInscription() {
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? DEFAULT_FEE_RATE);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
+  const { getSeed } = useSeedVault();
 
-  const {
-    ordinalsAddress,
-    network,
-    btcAddress,
-    seedPhrase,
-    selectedAccount,
-    btcFiatRate,
-    fiatCurrency,
-  } = useWalletSelector();
+  const { ordinalsAddress, network, btcAddress, selectedAccount, btcFiatRate, fiatCurrency } =
+    useWalletSelector();
 
   useEffect(() => {
     getNonOrdinalUtxo(btcAddress, requestedNetwork.type).then(setUtxos);
   }, [btcAddress, requestedNetwork]);
 
   useEffect(() => {
-    fetchBtcFeeRate().then((feeRatesResponse: BtcFeeResponse) => {
+    fetchBtcFeeRate(network.type).then((feeRatesResponse: BtcFeeResponse) => {
       setFeeRates(feeRatesResponse);
       if (suggestedMinerFeeRate === undefined) {
         setFeeRate(feeRatesResponse.regular);
@@ -238,6 +233,7 @@ function CreateInscription() {
     revealAddress: ordinalsAddress,
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
+    network: network.type,
   });
 
   const {
@@ -254,7 +250,7 @@ function CreateInscription() {
     feeRate,
     network: requestedNetwork.type,
     revealAddress: ordinalsAddress,
-    seedPhrase,
+    getSeedPhrase: getSeed,
     contentBase64: payloadType === 'BASE_64' ? content : undefined,
     contentString: payloadType === 'PLAIN_TEXT' ? content : undefined,
     serviceFee: appFee,
@@ -482,7 +478,7 @@ function CreateInscription() {
             <ErrorModal
               key={errorCode}
               errorCode={errorCode}
-              onRetrySubmit={executeMint}
+              onRetrySubmit={executeErrorCode ? executeMint : undefined}
               onEnd={cancelCallback}
             />
           )}

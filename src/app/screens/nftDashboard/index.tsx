@@ -9,7 +9,7 @@ import { useAddressRareSats } from '@hooks/queries/ordinals/useAddressRareSats';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, Wrench } from '@phosphor-icons/react';
-import type { InscriptionCollectionsData } from '@secretkeylabs/xverse-core/types';
+import type { InscriptionCollectionsData } from '@secretkeylabs/xverse-core';
 import {
   ChangeActivateOrdinalsAction,
   ChangeActivateRareSatsAction,
@@ -39,7 +39,7 @@ const Container = styled.div`
 const PageHeader = styled.div`
   padding: ${(props) => props.theme.space.s};
   padding-bottom: ${(props) => props.theme.space.xl};
-  border-bottom: 0.5px solid ${(props) => props.theme.colors.background.elevation3};
+  border-bottom: 0.5px solid ${(props) => props.theme.colors.elevation3};
   max-width: 1224px;
   margin-left: auto;
   margin-right: auto;
@@ -87,8 +87,8 @@ const ReceiveButtonContainer = styled.div(() => ({
 }));
 
 const NoCollectiblesText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.white['200'],
+  ...props.theme.typography.body_bold_m,
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(16),
   marginBottom: 'auto',
   textAlign: 'center',
@@ -109,8 +109,8 @@ const ErrorTextContainer = styled.div((props) => ({
 }));
 
 const ErrorText = styled.div((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.white['200'],
+  ...props.theme.typography.body_bold_m,
+  color: props.theme.colors.white_200,
 }));
 
 const LoadMoreButtonContainer = styled.div((props) => ({
@@ -128,8 +128,9 @@ export type NftDashboardState = {
   openReceiveModal: boolean;
   showNewFeatureAlert: boolean;
   isOrdinalReceiveAlertVisible: boolean;
-  isLoading: boolean;
-  isLoadingOrdinalCollections: boolean;
+  stacksNftsQuery: ReturnType<typeof useStacksCollectibles>;
+  inscriptionsQuery: ReturnType<typeof useAddressInscriptionCollections>;
+  rareSatsQuery: ReturnType<typeof useAddressRareSats>;
   openInGalleryView: () => void;
   onReceiveModalOpen: () => void;
   onReceiveModalClose: () => void;
@@ -145,18 +146,14 @@ export type NftDashboardState = {
   hasActivatedOrdinalsKey?: boolean;
   hasActivatedRareSatsKey?: boolean;
   showNoticeAlert?: boolean;
-  rareSatsQuery: ReturnType<typeof useAddressRareSats>;
   totalNfts: number;
   totalInscriptions: number;
-  onLoadMoreRareSatsButtonClick: () => void;
 };
 
 const useNftDashboard = (): NftDashboardState => {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const dispatch = useDispatch();
   const {
-    stxAddress,
-    ordinalsAddress,
     hasActivatedOrdinalsKey,
     hasActivatedRareSatsKey,
     rareSatsNoticeDismissed,
@@ -165,39 +162,12 @@ const useNftDashboard = (): NftDashboardState => {
   const [showNewFeatureAlert, setShowNewFeatureAlert] = useState(false);
   const [showNoticeAlert, setShowNoticeAlert] = useState(false);
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
-  const {
-    data: nftsList,
-    error: stacksError,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    refetch,
-    fetchNextPage,
-  } = useStacksCollectibles();
-  const {
-    data: ordinalCollections,
-    error: ordinalCollectionsError,
-    hasNextPage: hasNextPageOrdinalCollections,
-    isFetchingNextPage: isFetchingNextPageOrdinalCollections,
-    isLoading: isLoadingOrdinalCollections,
-    fetchNextPage: fetchNextOrdinalsPageCollections,
-    refetch: refetchOrdinalCollections,
-  } = useAddressInscriptionCollections();
-
+  const stacksNftsQuery = useStacksCollectibles();
+  const inscriptionsQuery = useAddressInscriptionCollections();
   const rareSatsQuery = useAddressRareSats();
 
-  const refetchCollectibles = useCallback(async () => {
-    await refetch();
-    await refetchOrdinalCollections();
-  }, [refetch, refetchOrdinalCollections]);
-
-  useEffect(() => {
-    refetchCollectibles();
-  }, [stxAddress, ordinalsAddress]);
-
-  const nfts = nftsList?.pages.map((page) => page.nftsList).flat();
-  const ordinalsLength = ordinalCollections?.pages[0].total;
-  const totalNfts = nftsList && nftsList.pages.length > 0 ? nftsList.pages[0].total : 0;
+  const ordinalsLength = inscriptionsQuery.data?.pages?.[0]?.total ?? 0;
+  const totalNfts = stacksNftsQuery.data?.pages?.[0]?.total ?? 0;
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
@@ -213,15 +183,6 @@ const useNftDashboard = (): NftDashboardState => {
   useEffect(() => {
     setShowNoticeAlert(rareSatsNoticeDismissed === undefined);
   }, [rareSatsNoticeDismissed]);
-
-  const onLoadMoreButtonClick = () => {
-    if (hasNextPageOrdinalCollections) {
-      fetchNextOrdinalsPageCollections();
-    }
-    if (hasNextPage) {
-      fetchNextPage();
-    }
-  };
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
@@ -246,7 +207,7 @@ const useNftDashboard = (): NftDashboardState => {
   };
 
   const InscriptionListView = useCallback(() => {
-    if (ordinalCollectionsError && !(ordinalCollectionsError instanceof InvalidParamsError)) {
+    if (inscriptionsQuery.error && !(inscriptionsQuery.error instanceof InvalidParamsError)) {
       return (
         <ErrorContainer>
           <Wrench size={48} />
@@ -265,36 +226,30 @@ const useNftDashboard = (): NftDashboardState => {
     return (
       <>
         <GridContainer isGalleryOpen={isGalleryOpen}>
-          {ordinalCollections?.pages
+          {inscriptionsQuery.data?.pages
             ?.map((page) => page?.results)
             .flat()
             .map((collection: InscriptionCollectionsData) => (
               <InscriptionsTabGridItem key={getCollectionKey(collection)} item={collection} />
             ))}
         </GridContainer>
-        {hasNextPageOrdinalCollections && (
+        {inscriptionsQuery.hasNextPage && (
           <LoadMoreButtonContainer>
             <ActionButton
               transparent
               text={t('LOAD_MORE')}
-              processing={isFetchingNextPageOrdinalCollections}
-              disabled={isFetchingNextPageOrdinalCollections}
-              onPress={onLoadMoreButtonClick}
+              processing={inscriptionsQuery.isFetchingNextPage}
+              disabled={inscriptionsQuery.isFetchingNextPage}
+              onPress={inscriptionsQuery.fetchNextPage}
             />
           </LoadMoreButtonContainer>
         )}
       </>
     );
-  }, [
-    ordinalCollections,
-    hasActivatedOrdinalsKey,
-    ordinalCollectionsError,
-    hasNextPageOrdinalCollections,
-    isFetchingNextPageOrdinalCollections,
-  ]);
+  }, [inscriptionsQuery, isGalleryOpen, ordinalsLength, t]);
 
   const NftListView = useCallback(() => {
-    if (stacksError && !(stacksError instanceof InvalidParamsError)) {
+    if (stacksNftsQuery.error && !(stacksNftsQuery.error instanceof InvalidParamsError)) {
       return (
         <ErrorContainer>
           <Wrench size={48} />
@@ -313,8 +268,10 @@ const useNftDashboard = (): NftDashboardState => {
     return (
       <>
         <GridContainer isGalleryOpen={isGalleryOpen}>
-          {!stacksError &&
-            nfts?.map((nft) => (
+          {stacksNftsQuery.data?.pages
+            ?.map((page) => page.nftsList)
+            .flat()
+            .map((nft) => (
               <Nft
                 asset={nft}
                 key={`${nft.asset_identifier}${nft.value.hex}`}
@@ -322,20 +279,20 @@ const useNftDashboard = (): NftDashboardState => {
               />
             ))}
         </GridContainer>
-        {hasNextPage && (
+        {stacksNftsQuery.hasNextPage && (
           <LoadMoreButtonContainer>
             <ActionButton
               transparent
               text={t('LOAD_MORE')}
-              processing={isFetchingNextPage}
-              disabled={isFetchingNextPage}
-              onPress={onLoadMoreButtonClick}
+              processing={stacksNftsQuery.isFetchingNextPage}
+              disabled={stacksNftsQuery.isFetchingNextPage}
+              onPress={stacksNftsQuery.fetchNextPage}
             />
           </LoadMoreButtonContainer>
         )}
       </>
     );
-  }, [nfts, stacksError]);
+  }, [stacksNftsQuery, isGalleryOpen, totalNfts, t]);
 
   const onActivateRareSatsAlertCrossPress = () => {
     setShowNewFeatureAlert(false);
@@ -358,18 +315,12 @@ const useNftDashboard = (): NftDashboardState => {
     dispatch(SetRareSatsNoticeDismissedAction(true));
   };
 
-  const onLoadMoreRareSatsButtonClick = () => {
-    if (rareSatsQuery?.hasNextPage) {
-      rareSatsQuery.fetchNextPage();
-    }
-  };
-
   return {
     openReceiveModal,
     showNewFeatureAlert,
     isOrdinalReceiveAlertVisible,
-    isLoading,
-    isLoadingOrdinalCollections,
+    stacksNftsQuery,
+    inscriptionsQuery,
     openInGalleryView,
     onReceiveModalOpen,
     onReceiveModalClose,
@@ -388,7 +339,6 @@ const useNftDashboard = (): NftDashboardState => {
     rareSatsQuery,
     totalNfts,
     totalInscriptions: ordinalsLength,
-    onLoadMoreRareSatsButtonClick,
   };
 };
 

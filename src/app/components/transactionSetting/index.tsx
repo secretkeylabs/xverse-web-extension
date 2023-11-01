@@ -93,7 +93,7 @@ function TransactionSettingAlert({
   const [selectedOption, setSelectedOption] = useState<string>('standard');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
-  const { btcBalance, stxAvailableBalance } = useWalletSelector();
+  const { btcBalance, stxAvailableBalance, network } = useWalletSelector();
 
   const applyClickForStx = () => {
     if (stxAvailableBalance) {
@@ -129,7 +129,7 @@ function TransactionSettingAlert({
       return;
     }
     if (selectedOption === 'custom' && feeRate) {
-      const response = await isCustomFeesAllowed(feeRate.toString());
+      const response = await isCustomFeesAllowed(network.type, feeRate.toString());
       if (!response) {
         setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
         return;

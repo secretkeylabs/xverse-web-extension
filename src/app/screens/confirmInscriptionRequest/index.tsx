@@ -13,6 +13,7 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Brc20Tile from '@screens/ordinals/brc20Tile';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
@@ -151,7 +152,8 @@ function ConfirmInscriptionRequest() {
     brcContent,
     feePerVByte,
   } = location.state;
-  const { btcAddress, network, selectedAccount, seedPhrase, btcFiatRate } = useWalletSelector();
+  const { btcAddress, network, selectedAccount, btcFiatRate } = useWalletSelector();
+  const { getSeed } = useSeedVault();
   const btcClient = useBtcClient();
   const [signedTx, setSignedTx] = useState<string>('');
   const [textContent, setTextContent] = useState<string>('');
@@ -200,9 +202,10 @@ function ConfirmInscriptionRequest() {
     {
       recipients: Recipient[];
       txFee: string;
+      seedPhrase: string;
     }
   >({
-    mutationFn: async ({ recipients, txFee }) =>
+    mutationFn: async ({ recipients, txFee, seedPhrase }) =>
       signBtcTransaction(
         recipients,
         btcAddress,
@@ -305,7 +308,7 @@ function ConfirmInscriptionRequest() {
     setShowFeeSettings(true);
   };
 
-  const onApplyClick = ({
+  const onApplyClick = async ({
     fee: modifiedFee,
     feeRate,
   }: {
@@ -313,8 +316,9 @@ function ConfirmInscriptionRequest() {
     feeRate?: string;
     nonce?: string;
   }) => {
+    const seedPhrase = await getSeed();
     setCurrentFeeRate(new BigNumber(feeRate!));
-    mutateTxFee({ recipients: recipient, txFee: modifiedFee });
+    mutateTxFee({ recipients: recipient, txFee: modifiedFee, seedPhrase });
   };
 
   const closeTransactionSettingAlert = () => {

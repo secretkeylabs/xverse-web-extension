@@ -36,38 +36,6 @@ const ScrollContainer = styled.div`
   margin: auto;
 `;
 
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginLeft: '15%',
-  marginTop: props.theme.spacing(40),
-}));
-
-const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  opacity: 0.8,
-  marginTop: props.theme.spacing(5),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 400,
-  fontSize: 14,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
-
 const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -83,7 +51,7 @@ const NFtContainer = styled.div((props) => ({
   aspectRatio: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   padding: props.theme.spacing(5),
   marginBottom: props.theme.spacing(6),
 }));
@@ -187,17 +155,7 @@ function ConfirmNftTransaction() {
   return (
     <>
       {isGalleryOpen && (
-        <>
-          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          {/* <ButtonContainer>
-          <Button onClick={handleOnCancelClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-            </>
-          </Button>
-        </ButtonContainer> */}
-        </>
+        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}

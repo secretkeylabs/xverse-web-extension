@@ -42,11 +42,12 @@ interface Props {
   title: string;
   onClick: () => void;
   showBackButton?: boolean;
+  className?: string;
 }
 
-function TopRow({ title, onClick, showBackButton = true }: Props) {
+function TopRow({ title, onClick, showBackButton = true, className }: Props) {
   return (
-    <TopSectionContainer>
+    <TopSectionContainer className={className}>
       {showBackButton && (
         <AnimatedBackButton onClick={onClick}>
           <img src={ArrowLeft} alt="back button" />

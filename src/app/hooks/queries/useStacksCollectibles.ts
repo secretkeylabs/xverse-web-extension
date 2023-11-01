@@ -1,9 +1,8 @@
-import { NftsListData } from '@secretkeylabs/xverse-core/types';
-import { getNfts } from '@secretkeylabs/xverse-core/api/stacks';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import useWalletSelector from '@hooks/useWalletSelector';
 import useNetworkSelector from '@hooks/useNetwork';
-import { InvalidParamsError, handleRetries } from '@utils/query';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { getNfts, NftsListData } from '@secretkeylabs/xverse-core';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { handleRetries, InvalidParamsError } from '@utils/query';
 
 const useStacksCollectibles = () => {
   const { stxAddress } = useWalletSelector();

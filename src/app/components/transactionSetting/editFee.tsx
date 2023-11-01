@@ -1,12 +1,13 @@
 import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
 import {
+  ErrorCodes,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
-} from '@secretkeylabs/xverse-core/currency';
+  UTXO,
+} from '@secretkeylabs/xverse-core';
 import {
   getBtcFees,
   getBtcFeesForNonOrdinalBtcSend,
@@ -229,7 +230,7 @@ function EditFee({
             btcAddress,
             nonOrdinalUtxos!,
             ordinalsAddress,
-            'Mainnet',
+            network.type,
             mode,
           );
           setFeeRateInput(selectedFeeRate?.toString() || '');
@@ -288,7 +289,7 @@ function EditFee({
             btcAddress,
             nonOrdinalUtxos!,
             ordinalsAddress,
-            'Mainnet',
+            network.type,
             feeMode,
             feeRateInput,
           );
