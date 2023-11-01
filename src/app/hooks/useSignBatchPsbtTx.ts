@@ -21,47 +21,47 @@ const useSignPsbtTx = () => {
   const tabId = params.get('tabId') ?? '0';
   const btcClient = useBtcClient();
 
-  const confirmSignPsbt = async () => {
-    // const seedPhrase = await getSeed();
-    // const signingResponse = await signPsbt(
-    //   seedPhrase,
-    //   accountsList,
-    //   request.payload.inputsToSign,
-    //   request.payload.psbtBase64,
-    //   request.payload.broadcast,
-    //   network.type,
-    // );
-    // let txId: string = '';
-    // if (request.payload.broadcast) {
-    //   const txHex = psbtBase64ToHex(signingResponse);
-    //   const response = await btcClient.sendRawTransaction(txHex);
-    //   txId = response.tx.hash;
-    // }
-    // const signingMessage = {
-    //   source: MESSAGE_SOURCE,
-    //   method: ExternalSatsMethods.signPsbtResponse,
-    //   payload: {
-    //     signPsbtRequest: requestToken,
-    //     signPsbtResponse: {
-    //       psbtBase64: signingResponse,
-    //       txId,
-    //     },
-    //   },
-    // };
-    // chrome.tabs.sendMessage(+tabId, signingMessage);
-    // return {
-    //   txId,
-    //   signingResponse,
-    // };
+  const confirmSignPsbt = async (psbt) => {
+    const seedPhrase = await getSeed();
+    const signingResponse = await signPsbt(
+      seedPhrase,
+      accountsList,
+      psbt.inputsToSign,
+      psbt.psbtBase64,
+      psbt.broadcast,
+      network.type,
+    );
+    let txId: string = '';
+    if (psbt.broadcast) {
+      const txHex = psbtBase64ToHex(signingResponse);
+      const response = await btcClient.sendRawTransaction(txHex);
+      txId = response.tx.hash;
+    }
+    const signingMessage = {
+      source: MESSAGE_SOURCE,
+      method: ExternalSatsMethods.signPsbtResponse,
+      payload: {
+        signPsbtRequest: requestToken,
+        signPsbtResponse: {
+          psbtBase64: signingResponse,
+          txId,
+        },
+      },
+    };
+    chrome.tabs.sendMessage(+tabId, signingMessage);
+    return {
+      txId,
+      signingResponse,
+    };
   };
 
   const cancelSignPsbt = () => {
-    // const signingMessage = {
-    //   source: MESSAGE_SOURCE,
-    //   method: ExternalSatsMethods.signPsbtResponse,
-    //   payload: { signPsbtRequest: requestToken, signPsbtResponse: 'cancel' },
-    // };
-    // chrome.tabs.sendMessage(+tabId, signingMessage);
+    const signingMessage = {
+      source: MESSAGE_SOURCE,
+      method: ExternalSatsMethods.signPsbtResponse,
+      payload: { signPsbtRequest: requestToken, signPsbtResponse: 'cancel' },
+    };
+    chrome.tabs.sendMessage(+tabId, signingMessage);
   };
 
   const getSigningAddresses = (inputsToSign: Array<InputToSign>) => {
