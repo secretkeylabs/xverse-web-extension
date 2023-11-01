@@ -1,9 +1,9 @@
-import styled from 'styled-components';
-import { NonFungibleToken, getBnsNftName } from '@secretkeylabs/xverse-core/types/index';
-import { BNS_CONTRACT } from '@utils/constants';
 import NftUser from '@assets/img/nftDashboard/nft_user.svg';
-import { useNavigate } from 'react-router-dom';
 import useNftDataReducer from '@hooks/stores/useNftReducer';
+import { getBnsNftName, NonFungibleToken } from '@secretkeylabs/xverse-core/types/index';
+import { BNS_CONTRACT } from '@utils/constants';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import NftImage from './nftImage';
 
 interface Props {
@@ -29,9 +29,9 @@ interface ContainerProps {
 
 const GradientContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
-  width: props.isGalleryView ? '100%' : 150,
-  minHeight: props.isGalleryView ? 200 : 150,
-  height: props.isGalleryView ? '100%' : 150,
+  width: props.isGalleryView ? '100%' : 57,
+  minHeight: props.isGalleryView ? 200 : 57,
+  height: props.isGalleryView ? '100%' : 57,
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,

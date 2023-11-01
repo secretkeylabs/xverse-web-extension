@@ -7,9 +7,10 @@ import WebGalleryButton from '@components/webGalleryButton';
 import useAddressInscriptionCollections from '@hooks/queries/ordinals/useAddressInscriptionCollections';
 import { useAddressRareSats } from '@hooks/queries/ordinals/useAddressRareSats';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
+
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, Wrench } from '@phosphor-icons/react';
-import type { InscriptionCollectionsData } from '@secretkeylabs/xverse-core';
+import type { InscriptionCollectionsData, StacksCollectionData } from '@secretkeylabs/xverse-core';
 import {
   ChangeActivateOrdinalsAction,
   ChangeActivateRareSatsAction,
@@ -25,7 +26,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import CollectiblesTabs, { GridContainer } from './collectiblesTabs';
 import { InscriptionsTabGridItem } from './inscriptionsTabGridItem';
-import Nft from './nft';
+import NftTabGridItem from './nftTabGridContainer';
 import ReceiveNftModal from './receiveNft';
 
 const Container = styled.div`
@@ -279,14 +280,10 @@ const useNftDashboard = (): NftDashboardState => {
       <>
         <GridContainer isGalleryOpen={isGalleryOpen}>
           {stacksNftsQuery.data?.pages
-            ?.map((page) => page.nftsList)
+            ?.map((page) => page?.results)
             .flat()
-            .map((nft) => (
-              <Nft
-                asset={nft}
-                key={`${nft.asset_identifier}${nft.value.hex}`}
-                isGalleryOpen={isGalleryOpen}
-              />
+            .map((collection: StacksCollectionData) => (
+              <NftTabGridItem key={collection.collection_id} item={collection} />
             ))}
         </GridContainer>
         {stacksNftsQuery.hasNextPage && (

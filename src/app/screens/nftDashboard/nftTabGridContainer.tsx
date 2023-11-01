@@ -1,17 +1,10 @@
 import CollectibleCollage from '@components/collectibleCollage/collectibleCollage';
-import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { InscriptionCollectionsData } from '@secretkeylabs/xverse-core/types';
+import { StacksCollectionData } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import {
-  getCollectionKey,
-  getInscriptionsTabGridItemId,
-  getInscriptionsTabGridItemSubText,
-  isCollection,
-  mapCondensedInscriptionToBundleItem,
-} from '@utils/inscriptions';
+import { getNftsTabGridItemSubText } from '@utils/inscriptions';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import Nft from './nft';
 
 const CollectionContainer = styled.div((props) => ({
   display: 'flex',
@@ -45,11 +38,7 @@ const StyledItemSub = styled(StyledP)`
   width: 100%;
 `;
 
-export function InscriptionsTabGridItem({
-  item: collection,
-}: {
-  item: InscriptionCollectionsData;
-}) {
+export function NftTabGridItem({ item: collection }: { item: StacksCollectionData }) {
   const navigate = useNavigate();
 
   const handleClickCollectionId = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -62,28 +51,19 @@ export function InscriptionsTabGridItem({
     navigate(`/nft-dashboard/ordinal-detail/${inscriptionId}`);
   };
 
-  const itemId = getInscriptionsTabGridItemId(collection);
-  const itemSubText = getInscriptionsTabGridItemSubText(collection);
+  const itemId = collection.collection_id;
+  const itemSubText = getNftsTabGridItemSubText(collection);
 
   return (
     <CollectionContainer>
       <ThumbnailContainer
-        type="button"
-        value={getCollectionKey(collection)}
-        onClick={isCollection(collection) ? handleClickCollectionId : handleClickInscriptionId}
+        value={collection.collection_id}
+        onClick={collection.total_nft > 1 ? handleClickCollectionId : handleClickInscriptionId}
       >
-        {!collection.thumbnail_inscriptions ? ( // eslint-disable-line no-nested-ternary
-          <OrdinalImage ordinal={{ id: '', content_type: 'unknown' }} />
-        ) : !isCollection(collection) || collection.thumbnail_inscriptions.length === 1 ? ( // eslint-disable-line no-nested-ternary
-          <RareSatAsset
-            item={mapCondensedInscriptionToBundleItem(collection.thumbnail_inscriptions[0])}
-          />
-        ) : collection.category === 'brc-20' ? (
-          <OrdinalImage ordinal={collection.thumbnail_inscriptions[0]} withoutTitles />
+        {collection.total_nft > 1 ? (
+          <CollectibleCollage items={collection.thumbnail_nfts} />
         ) : (
-          <CollectibleCollage
-            items={collection.thumbnail_inscriptions.map(mapCondensedInscriptionToBundleItem)}
-          />
+          <Nft asset={collection.thumbnail_nfts[0]} isGalleryOpen />
         )}
       </ThumbnailContainer>
       <InfoContainer>
@@ -97,4 +77,4 @@ export function InscriptionsTabGridItem({
     </CollectionContainer>
   );
 }
-export default InscriptionsTabGridItem;
+export default NftTabGridItem;
