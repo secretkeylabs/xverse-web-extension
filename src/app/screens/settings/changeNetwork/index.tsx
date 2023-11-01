@@ -4,7 +4,7 @@ import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import type { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core';
+import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core';
 import { initialNetworksList } from '@utils/constants';
 import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { useState } from 'react';
