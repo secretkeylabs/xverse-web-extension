@@ -181,7 +181,11 @@ function NftCollection() {
                 <CollectibleCollectionGridItem
                   key={nft.asset_identifier}
                   item={nft}
-                  itemId={`${collectionData?.collection_name} #${nft?.data?.token_id}`}
+                  itemId={
+                    nft?.data?.token_id
+                      ? `${collectionData?.collection_name} #${nft?.data?.token_id}`
+                      : `${collectionData?.collection_name}`
+                  }
                   onClick={handleOnClick}
                 >
                   <Nft asset={nft} isGalleryOpen={isGalleryOpen} />

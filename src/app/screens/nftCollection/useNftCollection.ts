@@ -32,7 +32,9 @@ export default function useNftCollection() {
 
   const handleOnClick = (nft: NonFungibleToken) => {
     if (nft.data) storeNftData(nft.data);
-    navigate(`/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`);
+    if (collectionData?.collection_id !== 'bns') {
+      navigate(`/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`);
+    }
   };
 
   return {
