@@ -7,11 +7,11 @@ import {
 } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
-import { SignMultipleTransactionOptions, SignTransactionOptions } from 'sats-connect';
+import { SignMultipleTransactionOptions } from 'sats-connect';
 import useBtcClient from './useBtcClient';
 import useSeedVault from './useSeedVault';
 
-const useSignPsbtTx = () => {
+const useSignBatchPsbtTx = () => {
   const { accountsList, network } = useWalletSelector();
   const { search } = useLocation();
   const { getSeed } = useSeedVault();
@@ -84,4 +84,4 @@ const useSignPsbtTx = () => {
   };
 };
 
-export default useSignPsbtTx;
+export default useSignBatchPsbtTx;
