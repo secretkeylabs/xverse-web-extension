@@ -1,13 +1,5 @@
-import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
-import type { Inscription } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import {
-  getInscriptionsCollectionGridItemId,
-  getInscriptionsCollectionGridItemSubText,
-  getInscriptionsCollectionGridItemSubTextColor,
-} from '@utils/inscriptions';
-import { useNavigate } from 'react-router-dom';
+import { ReactNode } from 'react';
 import styled from 'styled-components';
 
 const InfoContainer = styled.div`
@@ -51,33 +43,40 @@ const GridItemContainer = styled.button`
   gap: ${(props) => props.theme.space.s};
 `;
 
-export function OrdinalsCollectionGridItem({ item }: { item: Inscription }) {
-  const navigate = useNavigate();
-  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
-
+interface Props {
+  item: any;
+  itemId: string;
+  itemSubText?: string;
+  itemSubTextColor?: string;
+  children: ReactNode;
+  onClick: (collectible: any) => void;
+}
+export function CollectibleCollectionGridItem({
+  item,
+  itemId,
+  itemSubText,
+  itemSubTextColor,
+  children,
+  onClick,
+}: Props) {
   const handleOnClick = () => {
-    setSelectedOrdinalDetails(item);
-    navigate(`/nft-dashboard/ordinal-detail/${item.id}`);
+    onClick(item);
   };
-
-  const itemId = getInscriptionsCollectionGridItemId(item);
-  const itemSubText = getInscriptionsCollectionGridItemSubText(item);
-  const itemSubTextColor = getInscriptionsCollectionGridItemSubTextColor(item);
 
   return (
     <GridItemContainer onClick={handleOnClick}>
-      <ImageContainer>
-        <OrdinalImage ordinal={item} />
-      </ImageContainer>
+      <ImageContainer>{children}</ImageContainer>
       <InfoContainer>
         <StyledItemId typography="body_bold_m" color="white_0">
           {itemId}
         </StyledItemId>
-        <StyledItemSub typography="body_medium_m" color={itemSubTextColor}>
-          {itemSubText}
-        </StyledItemSub>
+        {itemSubText && (
+          <StyledItemSub typography="body_medium_m" color={itemSubTextColor ?? 'white_400'}>
+            {itemSubText}
+          </StyledItemSub>
+        )}
       </InfoContainer>
     </GridItemContainer>
   );
 }
-export default OrdinalsCollectionGridItem;
+export default CollectibleCollectionGridItem;
