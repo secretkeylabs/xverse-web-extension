@@ -1,3 +1,4 @@
+import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useNftDataReducer from '@hooks/stores/useNftReducer';
 import useResetUserFlow from '@hooks/useResetUserFlow';
@@ -13,8 +14,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 export default function useNftDetail() {
   const navigate = useNavigate();
   const { stxAddress, selectedAccount } = useWalletSelector();
+  const stacksNftsQuery = useStacksCollectibles();
+
   const { id } = useParams();
   const nftIdDetails = id!.split('::');
+  const collectionInfo = stacksNftsQuery.data?.pages
+    ?.map((page) => page?.results)
+    .flat()
+    .find((collection) => collection.collection_id === nftIdDetails[0]);
+
   const { nftData } = useNftDataSelector();
   const { storeNftData } = useNftDataReducer();
   const [nft, setNft] = useState<NftData | undefined>(undefined);
@@ -33,9 +41,7 @@ export default function useNftDetail() {
   useResetUserFlow('/nft-detail');
 
   useEffect(() => {
-    const data = nftData.find(
-      (nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)),
-    );
+    const data = nftData.find((nftItem) => nftItem.fully_qualified_token_id === id);
     if (!data) {
       mutate({ principal: nftIdDetails[0] });
     } else {
@@ -91,6 +97,7 @@ export default function useNftDetail() {
 
   return {
     nft,
+    collectionInfo,
     stxAddress,
     isLoading,
     isGalleryOpen,

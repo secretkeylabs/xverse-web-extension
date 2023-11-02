@@ -337,6 +337,7 @@ function NftDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const {
     nft,
+    collectionInfo,
     stxAddress,
     isLoading,
     isGalleryOpen,
@@ -364,16 +365,17 @@ function NftDetailScreen() {
   );
   const nftDetails = (
     <NftDetailsContainer isGallery={isGalleryOpen}>
-      <DetailSection isGallery={isGalleryOpen}>
-        {/* TODO Imamah: Update this  */}
-        <CollectibleDetailTile title={t('COLLECTION')} value="Satoshible" />
-        <CollectibleDetailTile
-          title={t('COLLECTION_FLOOR_PRICE')}
-          value={'200' ?? '--'}
-          suffixValue="STX"
-        />
-      </DetailSection>
-      <CollectibleDetailTile title={t('EST_ITEM_VALUE')} value={'200' ?? '--'} suffixValue="STX" />
+      {collectionInfo?.collection_name && (
+        <DetailSection isGallery={isGalleryOpen}>
+          <CollectibleDetailTile title={t('COLLECTION')} value={collectionInfo?.collection_name} />
+          <CollectibleDetailTile
+            title={t('COLLECTION_FLOOR_PRICE')}
+            value={
+              collectionInfo?.floor_price ? `${collectionInfo?.floor_price.toString()} STX` : '--'
+            }
+          />
+        </DetailSection>
+      )}
       {!isGalleryOpen && nftAttributes}
       <DetailSection isGallery={isGalleryOpen}>
         <CollectibleDetailTile title={t('NAME')} value={nft?.token_metadata?.name!} />
