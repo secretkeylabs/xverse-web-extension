@@ -63,7 +63,7 @@ export default function useNftDetail() {
   }, [nftDetailsData]);
 
   const handleBackButtonClick = () => {
-    navigate('/nft-dashboard?tab=nfts');
+    navigate(`/nft-dashboard/nft-collection/${collectionInfo?.collection_id}`);
   };
 
   const onGammaPress = () => {

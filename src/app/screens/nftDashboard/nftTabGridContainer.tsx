@@ -44,7 +44,6 @@ export function NftTabGridItem({ item: collection }: { item: StacksCollectionDat
   const { storeNftData } = useNftDataReducer();
 
   const handleClickCollection = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // TODO: Naviagte to collection page
     if (collection.collection_id !== 'bns') {
       storeNftData(collection.thumbnail_nfts[0].asset_identifier);
       navigate(`nft-collection/${collection.collection_id}`);
