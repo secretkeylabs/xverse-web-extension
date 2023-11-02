@@ -177,7 +177,7 @@ function SignBatchPsbtRequest() {
   const [hasOutputScript, setHasOutputScript] = useState(false);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
   const [reviewTransaction, setReviewTransaction] = useState(false);
-  const shouldBroadcast = payload.psbts.every((psbt) => psbt && psbt.broadcast);
+  const shouldBroadcast = payload.psbts.every((psbt) => psbt && psbt.broadcast); // TODO: The `broadcast` boolean property should be common across all psbts
   // const [isModalVisible, setIsModalVisible] = useState(false);
   // const [currentStepIndex, setCurrentStepIndex] = useState(0);
   // const [isButtonDisabled, setIsButtonDisabled] = useState(false);
