@@ -44,7 +44,11 @@ export interface SignPsbtRequestEventDetails {
 
 export type SignPsbtRequestEvent = CustomEvent<SignPsbtRequestEventDetails>;
 
-export type SignBatchPsbtRequestEvent = CustomEvent<SignPsbtRequestEventDetails>;
+export interface SignBatchPsbtRequestEventDetails {
+  signBatchPsbtRequest: string;
+}
+
+export type SignBatchPsbtRequestEvent = CustomEvent<SignBatchPsbtRequestEventDetails>;
 
 export interface SignMessageRequestEventDetails {
   signMessageRequest: string;

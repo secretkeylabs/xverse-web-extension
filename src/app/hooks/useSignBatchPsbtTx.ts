@@ -16,7 +16,7 @@ const useSignBatchPsbtTx = () => {
   const { search } = useLocation();
   const { getSeed } = useSeedVault();
   const params = new URLSearchParams(search);
-  const requestToken = params.get('signPsbtRequest') ?? '';
+  const requestToken = params.get('signBatchPsbtRequest') ?? '';
   const request = decodeToken(requestToken) as any as SignMultipleTransactionOptions;
   const tabId = params.get('tabId') ?? '0';
   const btcClient = useBtcClient();
@@ -37,18 +37,7 @@ const useSignBatchPsbtTx = () => {
       const response = await btcClient.sendRawTransaction(txHex);
       txId = response.tx.hash;
     }
-    const signingMessage = {
-      source: MESSAGE_SOURCE,
-      method: ExternalSatsMethods.signPsbtResponse,
-      payload: {
-        signPsbtRequest: requestToken,
-        signPsbtResponse: {
-          psbtBase64: signingResponse,
-          txId,
-        },
-      },
-    };
-    chrome.tabs.sendMessage(+tabId, signingMessage);
+
     return {
       txId,
       signingResponse,
@@ -58,8 +47,8 @@ const useSignBatchPsbtTx = () => {
   const cancelSignPsbt = () => {
     const signingMessage = {
       source: MESSAGE_SOURCE,
-      method: ExternalSatsMethods.signPsbtResponse,
-      payload: { signPsbtRequest: requestToken, signPsbtResponse: 'cancel' },
+      method: ExternalSatsMethods.signBatchPsbtResponse,
+      payload: { signBatchPsbtRequest: requestToken, signBatchPsbtResponse: 'cancel' },
     };
     chrome.tabs.sendMessage(+tabId, signingMessage);
   };

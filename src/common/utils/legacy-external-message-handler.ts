@@ -211,7 +211,7 @@ export async function handleLegacyExternalMethodFormat(
     }
     case ExternalSatsMethods.signBatchPsbtRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
-        ['signPsbtRequest', payload],
+        ['signBatchPsbtRequest', payload],
       ]);
 
       const { id } = await triggerRequestWindowOpen(RequestsRoutes.SignBatchBtcTx, urlParams);
@@ -221,10 +221,10 @@ export async function handleLegacyExternalMethodFormat(
         response: {
           source: MESSAGE_SOURCE,
           payload: {
-            signPsbtRequest: payload,
-            signPsbtResponse: 'cancel',
+            signBatchPsbtRequest: payload,
+            signBatchPsbtResponse: 'cancel',
           },
-          method: ExternalSatsMethods.signPsbtResponse,
+          method: ExternalSatsMethods.signBatchPsbtResponse,
         },
       });
       listenForOriginTabClose({ tabId });

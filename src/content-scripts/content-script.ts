@@ -152,8 +152,8 @@ document.addEventListener(DomEventName.signBatchPsbtRequest, ((
 ) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.SignBatchBtcTx,
-    payload: event.detail.signPsbtRequest,
-    urlParam: 'signPsbtRequest',
+    payload: event.detail.signBatchPsbtRequest,
+    urlParam: 'signBatchPsbtRequest',
     method: ExternalSatsMethods.signBatchPsbtRequest,
   });
 }) as EventListener);

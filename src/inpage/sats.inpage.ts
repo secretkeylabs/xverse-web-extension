@@ -3,6 +3,7 @@ import {
   DomEventName,
   GetAddressRequestEventDetails,
   SendBtcRequestEventDetails,
+  SignBatchPsbtRequestEventDetails,
   SignMessageRequestEventDetails,
   SignPsbtRequestEventDetails,
 } from '@common/types/inpage-types';
@@ -76,23 +77,26 @@ const SatsMethodsProvider: BitcoinProvider = {
     });
   },
   signMultipleTransactions: async (
-    signPsbtRequest: string,
+    signBatchPsbtRequest: string,
   ): Promise<SignMultipleTransactionsResponse> => {
-    const event = new CustomEvent<SignPsbtRequestEventDetails>(DomEventName.signBatchPsbtRequest, {
-      detail: { signPsbtRequest },
-    });
+    const event = new CustomEvent<SignBatchPsbtRequestEventDetails>(
+      DomEventName.signBatchPsbtRequest,
+      {
+        detail: { signBatchPsbtRequest },
+      },
+    );
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<SignBatchPsbtResponseMessage>) => {
         if (!isValidEvent(eventMessage, ExternalSatsMethods.signBatchPsbtResponse)) return;
-        if (eventMessage.data.payload?.signPsbtRequest !== signPsbtRequest) return;
+        if (eventMessage.data.payload?.signBatchPsbtRequest !== signBatchPsbtRequest) return;
         window.removeEventListener('message', handleMessage);
-        if (eventMessage.data.payload.signPsbtResponse === 'cancel') {
-          reject(eventMessage.data.payload.signPsbtResponse);
+        if (eventMessage.data.payload.signBatchPsbtResponse === 'cancel') {
+          reject(eventMessage.data.payload.signBatchPsbtResponse);
           return;
         }
-        if (typeof eventMessage.data.payload.signPsbtResponse !== 'string') {
-          resolve(eventMessage.data.payload.signPsbtResponse);
+        if (typeof eventMessage.data.payload.signBatchPsbtResponse !== 'string') {
+          resolve(eventMessage.data.payload.signBatchPsbtResponse);
         }
       };
       window.addEventListener('message', handleMessage);

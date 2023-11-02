@@ -1,3 +1,4 @@
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -15,7 +16,7 @@ import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import BundleItemComponent from './bundleItemComponent';
@@ -168,7 +169,8 @@ function SignBatchPsbtRequest() {
   //   keyPrefix: 'SIGNATURE_REQUEST',
   // });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignBatchPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses, requestToken } =
+    useSignBatchPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(0);
@@ -183,10 +185,9 @@ function SignBatchPsbtRequest() {
   // const [isConnectFailed, setIsConnectFailed] = useState(false);
   // const [isTxApproved, setIsTxApproved] = useState(false);
   // const [isTxRejected, setIsTxRejected] = useState(false);
-  // const { search } = useLocation();
-  // const params = new URLSearchParams(search);
-  // const tabId = params.get('tabId') ?? '0';
-  // const requestToken = params.get('signPsbtRequest') ?? '';
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const tabId = params.get('tabId') ?? '0';
   // const request = decodeToken(requestToken) as any as SignTransactionOptions;
   // const btcClient = useBtcClient();
 
@@ -280,6 +281,7 @@ function SignBatchPsbtRequest() {
       }
       setIsSigning(true);
 
+      const responses: any[] = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const psbt of payload.psbts) {
         // eslint-disable-next-line no-await-in-loop
@@ -287,15 +289,27 @@ function SignBatchPsbtRequest() {
 
         // eslint-disable-next-line no-await-in-loop
         const response = await confirmSignPsbt(psbt);
+        responses.push({
+          txId: response.txId,
+          psbtBase64: response.signingResponse,
+        });
         setSigningPsbtIndex((prevIndex) => prevIndex + 1);
-        console.log(response);
       }
+
+      const signingMessage = {
+        source: MESSAGE_SOURCE,
+        method: ExternalSatsMethods.signBatchPsbtResponse,
+        payload: {
+          signBatchPsbtRequest: requestToken,
+          signBatchPsbtResponse: responses,
+        },
+      };
+
+      chrome.tabs.sendMessage(+tabId, signingMessage);
 
       setIsSigning(false);
       setSigningPsbtIndex(0);
       setIsSigningComplete(true);
-
-      console.log('Signing complete');
     } catch (err) {
       setIsSigning(false);
       setSigningPsbtIndex(0);
