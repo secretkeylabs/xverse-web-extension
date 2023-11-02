@@ -12,12 +12,7 @@ const useStacksCollectibles = () => {
     if (!stxAddress) {
       return Promise.reject(new InvalidParamsError('stxAddress is required'));
     }
-    return getNftCollections(
-      'SP1XZ7KEMJT5V8ATRYZB0XWJ20KMGM37JXJZG9D6S',
-      selectedNetwork,
-      pageParam || 0,
-      150,
-    );
+    return getNftCollections(stxAddress, selectedNetwork, pageParam || 0, 150);
   }
 
   return useInfiniteQuery([`nft-collection-data-${stxAddress}`], fetchNfts, {
