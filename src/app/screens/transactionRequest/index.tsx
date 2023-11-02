@@ -148,6 +148,16 @@ function TransactionRequest() {
           await handleContractCallRequest();
         } else if (payload.txType === 'smart_contract') {
           await handleContractDeployRequest();
+        } else if (payload.txHex) {
+          navigate('/confirm-stx-tx', {
+            state: {
+              unsignedTx: payload.txHex,
+              sponosred: payload.sponsored,
+              isBrowserTx: true,
+              tabId,
+              requestToken,
+            },
+          });
         }
       }
     } catch (e: unknown) {
