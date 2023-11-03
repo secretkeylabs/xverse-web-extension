@@ -2,7 +2,7 @@ import CollectibleCollage from '@components/collectibleCollage/collectibleCollag
 import useNftDataReducer from '@hooks/stores/useNftReducer';
 import { StacksCollectionData } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { getNftsTabGridItemSubText } from '@utils/inscriptions';
+import { getNftsTabGridItemSubText } from '@utils/nfts';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Nft from './nft';

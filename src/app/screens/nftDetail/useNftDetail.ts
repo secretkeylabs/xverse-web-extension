@@ -8,6 +8,7 @@ import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { useMutation } from '@tanstack/react-query';
 import { GAMMA_URL } from '@utils/constants';
 import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
+import { getNftFromStore } from '@utils/nfts';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -41,13 +42,15 @@ export default function useNftDetail() {
   useResetUserFlow('/nft-detail');
 
   useEffect(() => {
-    const data = nftData.find((nftItem) => nftItem.fully_qualified_token_id === id);
-    if (!data) {
-      mutate({ principal: nftIdDetails[0] });
-    } else {
-      setNft(data);
+    if (id) {
+      const data = getNftFromStore(nftData, id);
+      if (!data) {
+        mutate({ principal: nftIdDetails[0] });
+      } else {
+        setNft(data);
+      }
     }
-  }, []);
+  }, [nftData, id, nftIdDetails, mutate]);
 
   const onSharePress = () => {
     navigator.clipboard.writeText(

@@ -20,6 +20,7 @@ import {
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { useMutation } from '@tanstack/react-query';
 import { checkNftExists, isLedgerAccount } from '@utils/helper';
+import { getNftFromStore } from '@utils/nfts';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -113,11 +114,13 @@ function SendNft() {
   const [nft, setNft] = useState<NftData | undefined>(undefined);
 
   useEffect(() => {
-    const data = nftData.find((nftItem) => nftItem.fully_qualified_token_id === id);
-    if (data) {
-      setNft(data);
+    if (id) {
+      const data = getNftFromStore(nftData, id);
+      if (data) {
+        setNft(data);
+      }
     }
-  }, []);
+  }, [id, nftData]);
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
