@@ -15,7 +15,7 @@ const useStacksCollectibles = () => {
     return getNftCollections(stxAddress, selectedNetwork, pageParam || 0, 150);
   }
 
-  return useInfiniteQuery([`nft-collection-data-${stxAddress}`], fetchNfts, {
+  return useInfiniteQuery(['nft-collection-data', stxAddress], fetchNfts, {
     retry: handleRetries,
     keepPreviousData: false,
     getNextPageParam: (lastpage, pages) => {
