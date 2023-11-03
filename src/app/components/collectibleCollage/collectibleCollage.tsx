@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
 import Nft from '@screens/nftDashboard/nft';
 import { NonFungibleToken } from '@secretkeylabs/xverse-core';
