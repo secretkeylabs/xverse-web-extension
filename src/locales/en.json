@@ -630,7 +630,7 @@
     "RARITY": "Overall rarity",
     "CONTRACT_ID": "Contract ID",
     "ATTRIBUTES": "Attributes",
-    "VIEW_CONTRACT": "View the contract on",
+    "VIEW_CONTRACT": "View on",
     "STACKS_EXPLORER": "Stacks Explorer",
     "DETAILS": "See detail on",
     "GAMMA": "Gamma.io",
@@ -1107,7 +1107,7 @@
     "RARE_SAT": "Rare Sat",
     "INSCRIBED_SAT": "Inscribed Sat"
   },
-  "ORDINALS_COLLECTION_SCREEN": {
+  "COLLECTIBLE_COLLECTION_SCREEN": {
     "BACK_TO_GALLERY": "Back to gallery",
     "COLLECTION_FLOOR_PRICE": "Collection floor price",
     "EST_PORTFOLIO_VALUE": "Est. portfolio value",
