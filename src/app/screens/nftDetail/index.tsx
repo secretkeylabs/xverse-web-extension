@@ -79,19 +79,19 @@ const ExtensionNFtContainer = styled.div((props) => ({
 }));
 
 const NftTitleText = styled.h1((props) => ({
-  ...props.theme.headline_m,
+  ...props.theme.typography.headline_m,
   color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const CollectibleText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
 const NftGalleryTitleText = styled.h1((props) => ({
-  ...props.theme.headline_l,
+  ...props.theme.typography.headline_l,
   color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(4),
 }));
@@ -103,7 +103,7 @@ const NftOwnedByText = styled.h1((props) => ({
 }));
 
 const OwnerAddressText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   textAlign: 'center',
   marginLeft: props.theme.spacing(3),
 }));
@@ -157,7 +157,7 @@ const WebGalleryButton = styled.button((props) => ({
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   fontWeight: 700,
   color: props.theme.colors.white_200,
   textAlign: 'center',
@@ -233,7 +233,7 @@ const GalleryScrollContainer = styled.div((props) => ({
 }));
 
 const ButtonHiglightedText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(2),
   marginRight: props.theme.spacing(2),
@@ -339,7 +339,7 @@ function NftDetailScreen() {
     nft,
     collectionInfo,
     stxAddress,
-    isLoading,
+    // isLoading,
     isGalleryOpen,
     onSharePress,
     handleBackButtonClick,
@@ -390,188 +390,186 @@ function NftDetailScreen() {
     </NftDetailsContainer>
   );
 
-  const extensionView =
-    isLoading || !nft ? (
-      <ExtensionLoaderContainer>
-        <TitleLoader>
-          <StyledBarLoader width={100} height={18.5} withMarginBottom />
-          <StyledBarLoader width={100} height={30} />
-        </TitleLoader>
-        <StyledBarLoader width={100} height={18.5} />
-        <StyledBarLoader width={136} height={136} />
-        <ActionButtonsLoader>
-          <ActionButtonLoader>
-            <StyledBarLoader width={48} height={48} />
-            <StyledBarLoader width={30} height={15.5} />
-          </ActionButtonLoader>
-          <ActionButtonLoader>
-            <StyledBarLoader width={48} height={48} />
-            <StyledBarLoader width={30} height={15.5} />
-          </ActionButtonLoader>
-        </ActionButtonsLoader>
-        <StyledSeparator />
-        <InfoContainer>
-          <div>
-            <StyledBarLoader width={100} height={18.5} />
-            <StyledBarLoader width={80} height={18.5} />
-          </div>
-          <div>
-            <StyledBarLoader width={100} height={18.5} />
-            <StyledBarLoader width={80} height={18.5} />
-          </div>
-        </InfoContainer>
-      </ExtensionLoaderContainer>
-    ) : (
-      <ExtensionContainer>
-        <CollectibleText>{t('COLLECTIBLE')}</CollectibleText>
-        <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
-        <WebGalleryButton onClick={openInGalleryView}>
-          <>
-            <ButtonImage src={SquaresFour} />
-            <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
-          </>
-        </WebGalleryButton>
-        <ExtensionNFtContainer>
-          <NftImage metadata={nft?.token_metadata!} />
-        </ExtensionNFtContainer>
-        <ButtonContainer>
-          <SquareButton
-            icon={<ArrowUp weight="regular" size="20" />}
-            text={t('SEND')}
-            onPress={handleOnSendClick}
-          />
-          <SquareButton
-            icon={<Share weight="regular" color="white" size="20" />}
-            text={t('SHARE')}
-            onPress={onSharePress}
-            hoverDialogId={`copy-nft-url-${nft?.asset_id}`}
-            isTransparent
-          />
-          <StyledTooltip
-            anchorId={`copy-nft-url-${nft?.asset_id}`}
-            variant="light"
-            content={t('COPIED')}
-            events={['click']}
-            place="top"
-          />
-        </ButtonContainer>
-        {nftDetails}
-        <SeeDetailsButtonContainer>
-          <Button isGallery={isGalleryOpen} onClick={onExplorerPress}>
-            <ButtonText>{t('VIEW_CONTRACT')}</ButtonText>
-            <ButtonHiglightedText>{t('STACKS_EXPLORER')}</ButtonHiglightedText>
-          </Button>
-          <Button isGallery={isGalleryOpen} onClick={onGammaPress}>
-            <ButtonText>{t('DETAILS')}</ButtonText>
-            <ButtonHiglightedText>{t('GAMMA')}</ButtonHiglightedText>
-          </Button>
-        </SeeDetailsButtonContainer>
-      </ExtensionContainer>
-    );
+  const extensionView = !nft ? (
+    <ExtensionLoaderContainer>
+      <TitleLoader>
+        <StyledBarLoader width={100} height={18.5} withMarginBottom />
+        <StyledBarLoader width={100} height={30} />
+      </TitleLoader>
+      <StyledBarLoader width={100} height={18.5} />
+      <StyledBarLoader width={136} height={136} />
+      <ActionButtonsLoader>
+        <ActionButtonLoader>
+          <StyledBarLoader width={48} height={48} />
+          <StyledBarLoader width={30} height={15.5} />
+        </ActionButtonLoader>
+        <ActionButtonLoader>
+          <StyledBarLoader width={48} height={48} />
+          <StyledBarLoader width={30} height={15.5} />
+        </ActionButtonLoader>
+      </ActionButtonsLoader>
+      <StyledSeparator />
+      <InfoContainer>
+        <div>
+          <StyledBarLoader width={100} height={18.5} />
+          <StyledBarLoader width={80} height={18.5} />
+        </div>
+        <div>
+          <StyledBarLoader width={100} height={18.5} />
+          <StyledBarLoader width={80} height={18.5} />
+        </div>
+      </InfoContainer>
+    </ExtensionLoaderContainer>
+  ) : (
+    <ExtensionContainer>
+      <CollectibleText>{t('COLLECTIBLE')}</CollectibleText>
+      <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+      <WebGalleryButton onClick={openInGalleryView}>
+        <>
+          <ButtonImage src={SquaresFour} />
+          <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
+        </>
+      </WebGalleryButton>
+      <ExtensionNFtContainer>
+        <NftImage metadata={nft?.token_metadata!} />
+      </ExtensionNFtContainer>
+      <ButtonContainer>
+        <SquareButton
+          icon={<ArrowUp weight="regular" size="20" />}
+          text={t('SEND')}
+          onPress={handleOnSendClick}
+        />
+        <SquareButton
+          icon={<Share weight="regular" color="white" size="20" />}
+          text={t('SHARE')}
+          onPress={onSharePress}
+          hoverDialogId={`copy-nft-url-${nft?.asset_id}`}
+          isTransparent
+        />
+        <StyledTooltip
+          anchorId={`copy-nft-url-${nft?.asset_id}`}
+          variant="light"
+          content={t('COPIED')}
+          events={['click']}
+          place="top"
+        />
+      </ButtonContainer>
+      {nftDetails}
+      <SeeDetailsButtonContainer>
+        <Button isGallery={isGalleryOpen} onClick={onExplorerPress}>
+          <ButtonText>{t('VIEW_CONTRACT')}</ButtonText>
+          <ButtonHiglightedText>{t('STACKS_EXPLORER')}</ButtonHiglightedText>
+        </Button>
+        <Button isGallery={isGalleryOpen} onClick={onGammaPress}>
+          <ButtonText>{t('DETAILS')}</ButtonText>
+          <ButtonHiglightedText>{t('GAMMA')}</ButtonHiglightedText>
+        </Button>
+      </SeeDetailsButtonContainer>
+    </ExtensionContainer>
+  );
 
-  const galleryView =
-    isLoading || !nft ? (
-      <GalleryScrollContainer>
-        <GalleryContainer>
-          <BackButtonContainer>
-            <BackButton onClick={handleBackButtonClick}>
-              <>
-                <ArrowLeft weight="regular" size="20" color="white" />
-                <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
-              </>
-            </BackButton>
-          </BackButtonContainer>
-
-          <GalleryRowContainer withGap>
-            <StyledBarLoader width={376.5} height={376.5} />
-            <GalleryLoaderContainer>
-              <StyledBarLoader width={120} height={21} withMarginBottom />
-              <StyledBarLoader width={180} height={40} withMarginBottom />
-              <StyledBarLoader width={100} height={18.5} withMarginBottom />
-              <ButtonContainer>
-                <StyledBarLoader width={190} height={44} />
-                <StyledBarLoader width={190} height={44} />
-              </ButtonContainer>
-              <StyledBarLoader width={100} height={31} withMarginBottom />
-              <StyledBarLoader width={400} height={18.5} withMarginBottom />
-              <StyledBarLoader width={400} height={18.5} withMarginBottom />
-              <StyledBarLoader width={400} height={18.5} withMarginBottom />
-              <StyledBarLoader width={400} height={18.5} withMarginBottom />
-              <StyledBarLoader width={400} height={18.5} withMarginBottom />
-              <StyledBarLoader width={400} height={18.5} withMarginBottom />
-              <StyledBarLoader width={392} height={44} />
-            </GalleryLoaderContainer>
-          </GalleryRowContainer>
-        </GalleryContainer>
-      </GalleryScrollContainer>
-    ) : (
-      <GalleryScrollContainer>
-        <GalleryContainer>
-          <BackButtonContainer>
-            <BackButton onClick={handleBackButtonClick}>
+  const galleryView = !nft ? (
+    <GalleryScrollContainer>
+      <GalleryContainer>
+        <BackButtonContainer>
+          <BackButton onClick={handleBackButtonClick}>
+            <>
               <ArrowLeft weight="regular" size="20" color="white" />
               <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
-            </BackButton>
-          </BackButtonContainer>
-          <GalleryRowContainer>
-            <ColumnContainer>
-              <NFtContainer>
-                <NftImage metadata={nft?.token_metadata!} />
-              </NFtContainer>
-              {nftAttributes}
-            </ColumnContainer>
-            <DescriptionContainer>
-              <GalleryCollectibleText>{t('COLLECTIBLE')}</GalleryCollectibleText>
-              <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
-              <RowContainer>
-                <NftOwnedByText>{t('OWNED_BY')}</NftOwnedByText>
-                <OwnerAddressText>
-                  {`${stxAddress.substring(0, 4)}...${stxAddress.substring(
-                    stxAddress.length - 4,
-                    stxAddress.length,
-                  )}`}
-                </OwnerAddressText>
-              </RowContainer>
-              <GalleryRowContainer>
-                <GalleryReceiveButtonContainer>
-                  <ActionButton
-                    icon={<ArrowUp weight="bold" size="16" />}
-                    text={t('SEND')}
-                    onPress={handleOnSendClick}
-                  />
-                </GalleryReceiveButtonContainer>
+            </>
+          </BackButton>
+        </BackButtonContainer>
 
-                <ShareButtonContainer>
-                  <ActionButton
-                    icon={<Share weight="bold" color="white" size="16" />}
-                    text={t('SHARE')}
-                    onPress={onSharePress}
-                    hoverDialogId={`copy-nft-url-${nft?.asset_id}`}
-                    transparent
-                  />
-                  <StyledTooltip
-                    anchorId={`copy-nft-url-${nft?.asset_id}`}
-                    variant="light"
-                    content={t('COPIED')}
-                    events={['click']}
-                    place="top"
-                  />
-                </ShareButtonContainer>
-              </GalleryRowContainer>
-              {nftDetails}
-              <Button isGallery={isGalleryOpen} onClick={onExplorerPress}>
-                <ButtonText>{t('VIEW_CONTRACT')}</ButtonText>
-                <ButtonHiglightedText>{t('STACKS_EXPLORER')}</ButtonHiglightedText>
-              </Button>
-              <Button isGallery={isGalleryOpen} onClick={onGammaPress}>
-                <ButtonText>{t('DETAILS')}</ButtonText>
-                <ButtonHiglightedText>{t('GAMMA')}</ButtonHiglightedText>
-              </Button>
-            </DescriptionContainer>
-          </GalleryRowContainer>
-        </GalleryContainer>
-      </GalleryScrollContainer>
-    );
+        <GalleryRowContainer withGap>
+          <StyledBarLoader width={376.5} height={376.5} />
+          <GalleryLoaderContainer>
+            <StyledBarLoader width={120} height={21} withMarginBottom />
+            <StyledBarLoader width={180} height={40} withMarginBottom />
+            <StyledBarLoader width={100} height={18.5} withMarginBottom />
+            <ButtonContainer>
+              <StyledBarLoader width={190} height={44} />
+              <StyledBarLoader width={190} height={44} />
+            </ButtonContainer>
+            <StyledBarLoader width={100} height={31} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={400} height={18.5} withMarginBottom />
+            <StyledBarLoader width={392} height={44} />
+          </GalleryLoaderContainer>
+        </GalleryRowContainer>
+      </GalleryContainer>
+    </GalleryScrollContainer>
+  ) : (
+    <GalleryScrollContainer>
+      <GalleryContainer>
+        <BackButtonContainer>
+          <BackButton onClick={handleBackButtonClick}>
+            <ArrowLeft weight="regular" size="20" color="white" />
+            <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
+          </BackButton>
+        </BackButtonContainer>
+        <GalleryRowContainer>
+          <ColumnContainer>
+            <NFtContainer>
+              <NftImage metadata={nft?.token_metadata!} />
+            </NFtContainer>
+            {nftAttributes}
+          </ColumnContainer>
+          <DescriptionContainer>
+            <GalleryCollectibleText>{t('COLLECTIBLE')}</GalleryCollectibleText>
+            <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
+            <RowContainer>
+              <NftOwnedByText>{t('OWNED_BY')}</NftOwnedByText>
+              <OwnerAddressText>
+                {`${stxAddress.substring(0, 4)}...${stxAddress.substring(
+                  stxAddress.length - 4,
+                  stxAddress.length,
+                )}`}
+              </OwnerAddressText>
+            </RowContainer>
+            <GalleryRowContainer>
+              <GalleryReceiveButtonContainer>
+                <ActionButton
+                  icon={<ArrowUp weight="bold" size="16" />}
+                  text={t('SEND')}
+                  onPress={handleOnSendClick}
+                />
+              </GalleryReceiveButtonContainer>
+
+              <ShareButtonContainer>
+                <ActionButton
+                  icon={<Share weight="bold" color="white" size="16" />}
+                  text={t('SHARE')}
+                  onPress={onSharePress}
+                  hoverDialogId={`copy-nft-url-${nft?.asset_id}`}
+                  transparent
+                />
+                <StyledTooltip
+                  anchorId={`copy-nft-url-${nft?.asset_id}`}
+                  variant="light"
+                  content={t('COPIED')}
+                  events={['click']}
+                  place="top"
+                />
+              </ShareButtonContainer>
+            </GalleryRowContainer>
+            {nftDetails}
+            <Button isGallery={isGalleryOpen} onClick={onExplorerPress}>
+              <ButtonText>{t('VIEW_CONTRACT')}</ButtonText>
+              <ButtonHiglightedText>{t('STACKS_EXPLORER')}</ButtonHiglightedText>
+            </Button>
+            <Button isGallery={isGalleryOpen} onClick={onGammaPress}>
+              <ButtonText>{t('DETAILS')}</ButtonText>
+              <ButtonHiglightedText>{t('GAMMA')}</ButtonHiglightedText>
+            </Button>
+          </DescriptionContainer>
+        </GalleryRowContainer>
+      </GalleryContainer>
+    </GalleryScrollContainer>
+  );
 
   return (
     <>

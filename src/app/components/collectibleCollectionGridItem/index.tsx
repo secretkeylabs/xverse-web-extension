@@ -1,6 +1,7 @@
 import { StyledP } from '@ui-library/common.styled';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
+import { Color } from 'theme';
 
 const InfoContainer = styled.div`
   display: flex;
@@ -14,6 +15,7 @@ const StyledItemId = styled(StyledP)`
   text-wrap: nowrap;
   overflow: hidden;
   width: 100%;
+  text-overflow: ellipsis;
 `;
 
 const StyledItemSub = styled(StyledP)`
@@ -47,7 +49,7 @@ interface Props {
   item: any;
   itemId: string;
   itemSubText?: string;
-  itemSubTextColor?: string;
+  itemSubTextColor?: Color;
   children: ReactNode;
   onClick: (collectible: any) => void;
 }

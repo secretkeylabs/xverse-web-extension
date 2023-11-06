@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Container = styled.h1((props) => ({
+const Container = styled.div((props) => ({
   display: 'flex',
   borderRadius: 12,
   border: `1px solid ${props.theme.colors.elevation3}`,
@@ -10,12 +10,12 @@ const Container = styled.h1((props) => ({
 }));
 
 const TypeText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_400,
 }));
 
 const ValueText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   wordBreak: 'break-all',
 }));

@@ -26,7 +26,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import CollectiblesTabs, { GridContainer } from './collectiblesTabs';
 import { InscriptionsTabGridItem } from './inscriptionsTabGridItem';
-import { NftTabGridItem } from './nftTabGridContainer';
+import { NftTabGridItem } from './nftTabGridItem';
 
 import ReceiveNftModal from './receiveNft';
 

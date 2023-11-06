@@ -29,6 +29,7 @@ const StyledItemId = styled(StyledP)`
   text-wrap: nowrap;
   overflow: hidden;
   width: 100%;
+  text-overflow: ellipsis;
 `;
 
 const StyledItemSub = styled(StyledP)`

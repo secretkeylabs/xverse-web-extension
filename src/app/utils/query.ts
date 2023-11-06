@@ -15,6 +15,13 @@ export function handleRetries(failureCount: number, error: unknown): boolean {
   return failureCount < 3;
 }
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      cacheTime: 5 * 60 * 1000, // 5mins
+      staleTime: 0,
+    },
+  },
+});
 
 export const offlineStorage = createSyncStoragePersister({ storage: window.localStorage });

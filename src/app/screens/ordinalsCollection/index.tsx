@@ -158,7 +158,7 @@ function OrdinalsCollection() {
     });
   };
 
-  const isEmpty = !isLoading && !error && data?.pages?.[0]?.data?.total === 0;
+  const isEmpty = !isLoading && !error && data?.pages?.[0]?.total === 0;
 
   const collectionHeading = data?.pages?.[0].collection_name;
   const estPortfolioValue =
