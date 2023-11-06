@@ -177,7 +177,6 @@ function SignBatchPsbtRequest() {
   const [hasOutputScript, setHasOutputScript] = useState(false);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
   const [reviewTransaction, setReviewTransaction] = useState(false);
-  const shouldBroadcast = payload.psbts.every((psbt) => psbt && psbt.broadcast); // TODO: The `broadcast` boolean property should be common across all psbts
   // const [isModalVisible, setIsModalVisible] = useState(false);
   // const [currentStepIndex, setCurrentStepIndex] = useState(0);
   // const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -319,7 +318,7 @@ function SignBatchPsbtRequest() {
           state: {
             txid: '',
             currency: 'BTC',
-            errorTitle: !shouldBroadcast ? t('PSBT_CANT_SIGN_ERROR_TITLE') : '',
+            errorTitle: !payload.broadcast ? t('PSBT_CANT_SIGN_ERROR_TITLE') : '',
             error: err.message,
             browserTx: true,
           },
@@ -513,7 +512,7 @@ function SignBatchPsbtRequest() {
                   <ArrowRight size={12} weight="bold" />
                 </BundleLinkContainer>
 
-                {!shouldBroadcast && (
+                {!payload.broadcast && (
                   <InfoContainer bodyText={t('PSBTS_NO_BROADCAST_DISCLAIMER')} />
                 )}
 
@@ -538,7 +537,7 @@ function SignBatchPsbtRequest() {
 
                 <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
 
-                {shouldBroadcast && (
+                {payload.broadcast && (
                   <TransactionDetailComponent
                     title={t('FEES')}
                     value={getSatsAmountString(totalFees)}
@@ -605,7 +604,7 @@ function SignBatchPsbtRequest() {
               onArrowClick={expandInputOutputSection}
             />
 
-            {payload.psbts[currentPsbtIndex].broadcast ? (
+            {payload.broadcast ? (
               <TransactionDetailComponent
                 title={t('FEES')}
                 value={getSatsAmountString(new BigNumber(parsedPsbts[currentPsbtIndex]?.fees))}
