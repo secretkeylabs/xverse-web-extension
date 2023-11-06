@@ -320,7 +320,6 @@
     "SIGNING_TRANSACTIONS": "Signing transactions",
     "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep your wallet open.",
     "TRANSACTIONS_SIGNED": "Transactions signed",
-    "TRANSACTIONS_HAVE_BEEN_SUBMITTED": "Your transactions have been successfully submitted.",
     "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
     "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
     "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",

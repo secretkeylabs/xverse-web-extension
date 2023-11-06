@@ -462,7 +462,6 @@ function SignBatchPsbtRequest() {
         <SigningLoaderContainer>
           <CheckCircle size={80} weight="thin" color="#55E078" />
           <HeadingText>{t('TRANSACTIONS_SIGNED')}</HeadingText>
-          <BodyText>{t('TRANSACTIONS_HAVE_BEEN_SUBMITTED')}</BodyText>
           <CloseButton text={t('CLOSE')} onPress={closeCallback} />
         </SigningLoaderContainer>
       </OuterContainer>
