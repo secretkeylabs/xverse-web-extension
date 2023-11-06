@@ -1,5 +1,6 @@
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useNftDataReducer from '@hooks/stores/useNftReducer';
+import useResetUserFlow from '@hooks/useResetUserFlow';
 import { NonFungibleToken } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -19,6 +20,8 @@ export default function useNftCollection() {
     : null;
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+
+  useResetUserFlow('/nft-collection');
 
   const handleBackButtonClick = () => {
     navigate('/nft-dashboard?tab=nfts');
