@@ -339,7 +339,7 @@ function NftDetailScreen() {
     nft,
     collection,
     stxAddress,
-    // isLoading,
+    isLoading,
     isGalleryOpen,
     onSharePress,
     handleBackButtonClick,
@@ -388,7 +388,7 @@ function NftDetailScreen() {
     </NftDetailsContainer>
   );
 
-  const extensionView = !nft ? (
+  const extensionView = isLoading ? (
     <ExtensionLoaderContainer>
       <TitleLoader>
         <StyledBarLoader width={100} height={18.5} withMarginBottom />
@@ -466,7 +466,7 @@ function NftDetailScreen() {
     </ExtensionContainer>
   );
 
-  const galleryView = !nft ? (
+  const galleryView = isLoading ? (
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>

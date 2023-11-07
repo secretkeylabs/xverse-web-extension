@@ -7,7 +7,6 @@ import {
 } from './actions/types';
 
 const initialNftDataState: NftDataState = {
-  nftData: [],
   selectedOrdinal: null,
   selectedSatBundle: null,
   selectedSatBundleItemIndex: null,

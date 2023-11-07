@@ -11,8 +11,8 @@ export default function useNftDetail() {
   const navigate = useNavigate();
   const { stxAddress, selectedAccount } = useWalletSelector();
   const { id } = useParams();
-  const stacksNftsQuery = useStacksCollectibles();
-  const nftCollections = stacksNftsQuery.data?.pages?.map((page) => page?.results).flat();
+  const { data, isLoading } = useStacksCollectibles();
+  const nftCollections = data?.pages?.map((page) => page?.results).flat();
   const { collectionId, collection, nft } = getNftDataFromNftsCollectionData(id, nftCollections);
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
@@ -62,7 +62,7 @@ export default function useNftDetail() {
     nft,
     collection,
     stxAddress,
-    // isLoading,
+    isLoading,
     isGalleryOpen,
     onSharePress,
     handleBackButtonClick,
