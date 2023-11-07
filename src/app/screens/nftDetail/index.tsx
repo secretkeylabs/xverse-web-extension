@@ -84,7 +84,7 @@ const NftTitleText = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
-const CollectibleText = styled.h1((props) => ({
+const CollectibleText = styled.p((props) => ({
   ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_400,
   textAlign: 'center',
@@ -96,13 +96,13 @@ const NftGalleryTitleText = styled.h1((props) => ({
   marginBottom: props.theme.spacing(4),
 }));
 
-const NftOwnedByText = styled.h1((props) => ({
+const NftOwnedByText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
-const OwnerAddressText = styled.h1((props) => ({
+const OwnerAddressText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   textAlign: 'center',
   marginLeft: props.theme.spacing(3),
@@ -112,7 +112,7 @@ const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
 
-const RowContainer = styled.h1({
+const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
 });
@@ -132,14 +132,14 @@ const ShareButtonContainer = styled.div((props) => ({
   width: '100%',
 }));
 
-const DescriptionContainer = styled.h1((props) => ({
+const DescriptionContainer = styled.div((props) => ({
   display: 'flex',
   marginLeft: props.theme.spacing(20),
   flexDirection: 'column',
   marginBottom: props.theme.spacing(30),
 }));
 
-const AttributeText = styled.h1((props) => ({
+const AttributeText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
 }));
@@ -157,8 +157,7 @@ const WebGalleryButton = styled.button((props) => ({
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_m,
-  fontWeight: 700,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
@@ -205,21 +204,19 @@ const Button = styled.button<DetailSectionProps>((props) => ({
   border: `1px solid ${props.theme.colors.white_800}`,
 }));
 
-const ButtonText = styled.h1((props) => ({
+const ButtonText = styled.p((props) => ({
   ...props.theme.typography.body_m,
   color: props.theme.colors.white_400,
 }));
 
 const AssetDeatilButtonText = styled.div((props) => ({
   ...props.theme.typography.body_m,
-  fontWeight: 400,
-  fontSize: 14,
-  marginLeft: 2,
   color: props.theme.colors.white_0,
+  marginLeft: 2,
   textAlign: 'center',
 }));
 
-const GalleryCollectibleText = styled.h1((props) => ({
+const GalleryCollectibleText = styled.p((props) => ({
   ...props.theme.typography.body_bold_l,
   color: props.theme.colors.white_400,
 }));
@@ -232,7 +229,7 @@ const GalleryScrollContainer = styled.div((props) => ({
   alignItems: 'center',
 }));
 
-const ButtonHiglightedText = styled.h1((props) => ({
+const ButtonHiglightedText = styled.p((props) => ({
   ...props.theme.typography.body_m,
   color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(2),

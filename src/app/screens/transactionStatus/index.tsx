@@ -152,6 +152,7 @@ function TransactionStatus() {
     browserTx,
     isOrdinal,
     isNft,
+    isRareSat,
     errorTitle,
     isBrc20TokenFlow,
     isSponsorServiceError,
@@ -186,8 +187,9 @@ function TransactionStatus() {
 
   const onCloseClick = () => {
     if (browserTx) window.close();
-    else if (isOrdinal) navigate(-4);
-    else if (isNft) navigate(-3);
+    else if (isRareSat) navigate('/nftDashboard?tab=rareSats');
+    else if (isOrdinal) navigate('nftDashboard?tab=inscriptions');
+    else if (isNft) navigate('/nftDashboard?tab=nfts');
     else navigate(-3);
   };
 
