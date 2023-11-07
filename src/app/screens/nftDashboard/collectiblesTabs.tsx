@@ -24,6 +24,14 @@ export const GridContainer = styled.div<{
     : 'repeat(auto-fill,minmax(150px,1fr))',
 }));
 
+const StickyStyledTabList = styled(StyledTabList)`
+  position: sticky;
+  background: ${(props) => props.theme.colors.elevation0};
+  top: -1px;
+  z-index: 5;
+  padding: ${(props) => props.theme.space.m} 0;
+`;
+
 const StyledTotalItems = styled(StyledP)`
   margin-top: ${(props) => props.theme.space.s};
 `;
@@ -155,11 +163,11 @@ export default function CollectiblesTabs({
   return (
     <Tabs className={className} selectedIndex={tabIndex} onSelect={handleSelectTab}>
       {visibleTabButtons.length > 1 && (
-        <StyledTabList>
+        <StickyStyledTabList>
           {visibleTabButtons.map(({ key, label }) => (
             <StyledTab key={key}>{t(label)}</StyledTab>
           ))}
-        </StyledTabList>
+        </StickyStyledTabList>
       )}
       {hasActivatedOrdinalsKey && (
         <TabPanel>

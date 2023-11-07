@@ -49,7 +49,6 @@ const PageHeader = styled.div`
 `;
 
 const StyledCollectiblesTabs = styled(CollectiblesTabs)`
-  margin-top: ${(props) => props.theme.spacing(8)}px;
   padding: 0 ${(props) => props.theme.space.s};
   padding-bottom: ${(props) => props.theme.space.xl};
   max-width: 1224px;
