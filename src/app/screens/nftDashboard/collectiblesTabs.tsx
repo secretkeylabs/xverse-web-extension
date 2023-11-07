@@ -8,9 +8,9 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TabPanel, Tabs } from 'react-tabs';
 import styled from 'styled-components';
-import type { NftDashboardState } from '.';
 import Notice from './notice';
 import RareSatsTabGridItem from './rareSatsTabGridItem';
+import type { NftDashboardState } from './useNftDashboard';
 
 export const GridContainer = styled.div<{
   isGalleryOpen: boolean;
