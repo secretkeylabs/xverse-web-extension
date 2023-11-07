@@ -169,11 +169,20 @@ function SignBatchPsbtRequest() {
   //   keyPrefix: 'SIGNATURE_REQUEST',
   // });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses, requestToken } =
-    useSignBatchPsbtTx();
+  const {
+    payload,
+    confirmSignPsbt,
+    broadcastPsbt,
+    cancelSignPsbt,
+    getSigningAddresses,
+    requestToken,
+  } = useSignBatchPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [isBroadcastingComplete, setIsBroadcastingComplete] = useState(false);
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(0);
+  const [broadcastingPsbtIndex, setBroadcastingPsbtIndex] = useState(0);
   const [hasOutputScript, setHasOutputScript] = useState(false);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
   const [reviewTransaction, setReviewTransaction] = useState(false);
@@ -280,19 +289,42 @@ function SignBatchPsbtRequest() {
       }
       setIsSigning(true);
 
-      const responses: any[] = [];
+      const signedPsbts: any[] = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const psbt of payload.psbts) {
         // eslint-disable-next-line no-await-in-loop
         await delay(5000);
 
         // eslint-disable-next-line no-await-in-loop
-        const response = await confirmSignPsbt(psbt);
-        responses.push({
-          txId: response.txId,
-          psbtBase64: response.signingResponse,
+        const psbtBase64 = await confirmSignPsbt(psbt);
+        signedPsbts.push({
+          psbtBase64,
         });
         setSigningPsbtIndex((prevIndex) => prevIndex + 1);
+      }
+
+      setIsSigningComplete(true);
+      setIsSigning(false);
+
+      if (payload.broadcast) {
+        setIsSigning(false);
+        setIsBroadcasting(true);
+
+        let index = 0;
+        // eslint-disable-next-line no-restricted-syntax
+        for (const psbt of payload.psbts) {
+          // eslint-disable-next-line no-await-in-loop
+          await delay(5000);
+
+          // eslint-disable-next-line no-await-in-loop
+          const txId = await broadcastPsbt(signedPsbts[index].psbtBase64);
+          signedPsbts[index].txId = txId;
+          index += 1;
+          setBroadcastingPsbtIndex((prevIndex) => prevIndex + 1);
+        }
+
+        setIsBroadcastingComplete(true);
+        setIsBroadcasting(false);
       }
 
       const signingMessage = {
@@ -300,18 +332,21 @@ function SignBatchPsbtRequest() {
         method: ExternalSatsMethods.signBatchPsbtResponse,
         payload: {
           signBatchPsbtRequest: requestToken,
-          signBatchPsbtResponse: responses,
+          signBatchPsbtResponse: signedPsbts,
         },
       };
 
       chrome.tabs.sendMessage(+tabId, signingMessage);
 
-      setIsSigning(false);
       setSigningPsbtIndex(0);
-      setIsSigningComplete(true);
+      setBroadcastingPsbtIndex(0);
     } catch (err) {
       setIsSigning(false);
+      setIsBroadcasting(false);
+      setIsSigningComplete(false);
+      setIsBroadcastingComplete(false);
       setSigningPsbtIndex(0);
+      setBroadcastingPsbtIndex(0);
 
       if (err instanceof Error) {
         navigate('/tx-status', {
@@ -455,6 +490,18 @@ function SignBatchPsbtRequest() {
     .map((item) => item.bundleItemsData)
     .flat();
 
+  if (isBroadcastingComplete) {
+    return (
+      <OuterContainer>
+        <SigningLoaderContainer>
+          <CheckCircle size={80} weight="thin" color="#55E078" />
+          <HeadingText>{t('TRANSACTIONS_BROADCASTED')}</HeadingText>
+          <CloseButton text={t('CLOSE')} onPress={closeCallback} />
+        </SigningLoaderContainer>
+      </OuterContainer>
+    );
+  }
+
   if (isSigningComplete) {
     return (
       <OuterContainer>
@@ -462,6 +509,26 @@ function SignBatchPsbtRequest() {
           <CheckCircle size={80} weight="thin" color="#55E078" />
           <HeadingText>{t('TRANSACTIONS_SIGNED')}</HeadingText>
           <CloseButton text={t('CLOSE')} onPress={closeCallback} />
+        </SigningLoaderContainer>
+      </OuterContainer>
+    );
+  }
+
+  if (isBroadcasting) {
+    return (
+      <OuterContainer>
+        <SigningLoaderContainer>
+          <CircularProgressContainer>
+            <CircularProgress
+              size={66}
+              strokeWidth={2}
+              percentage={(broadcastingPsbtIndex / payload.psbts.length) * 100}
+            />
+          </CircularProgressContainer>
+          <HeadingText>
+            {t('BROADCASTING_TRANSACTIONS')} {broadcastingPsbtIndex + 1}/{payload.psbts.length}...
+          </HeadingText>
+          <BodyText>{t('THIS_MAY_TAKE_A_FEW_MINUTES')}</BodyText>
         </SigningLoaderContainer>
       </OuterContainer>
     );

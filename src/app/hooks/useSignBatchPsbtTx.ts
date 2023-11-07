@@ -22,6 +22,7 @@ const useSignBatchPsbtTx = () => {
   const btcClient = useBtcClient();
 
   const confirmSignPsbt = async (psbt) => {
+    const txId = '';
     const seedPhrase = await getSeed();
     const signingResponse = await signPsbt(
       seedPhrase,
@@ -31,17 +32,20 @@ const useSignBatchPsbtTx = () => {
       psbt.broadcast,
       network.type,
     );
-    let txId: string = '';
-    if (psbt.broadcast) {
-      const txHex = psbtBase64ToHex(signingResponse);
-      const response = await btcClient.sendRawTransaction(txHex);
-      txId = response.tx.hash;
-    }
 
     return {
       txId,
       signingResponse,
     };
+  };
+
+  const broadcastPsbt = async (psbtBase64: string) => {
+    let txId = '';
+    const txHex = psbtBase64ToHex(psbtBase64);
+    const response = await btcClient.sendRawTransaction(txHex);
+    txId = response.tx.hash;
+
+    return txId;
   };
 
   const cancelSignPsbt = () => {
@@ -69,6 +73,7 @@ const useSignBatchPsbtTx = () => {
     requestToken,
     getSigningAddresses,
     confirmSignPsbt,
+    broadcastPsbt,
     cancelSignPsbt,
   };
 };
