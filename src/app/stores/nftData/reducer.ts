@@ -1,7 +1,6 @@
 import {
   NftDataAction,
   NftDataState,
-  SetNftDataKey,
   SetSelectedOrdinalKey,
   SetSelectedSatBundleItemIndexKey,
   SetSelectedSatBundleKey,
@@ -20,11 +19,6 @@ const NftDataStateReducer = (
   action: NftDataAction,
 ): NftDataState => {
   switch (action.type) {
-    case SetNftDataKey:
-      return {
-        ...state,
-        nftData: action.nftData,
-      };
     case SetSelectedOrdinalKey:
       return {
         ...state,

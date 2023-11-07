@@ -1,5 +1,4 @@
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
-import useNftDataReducer from '@hooks/stores/useNftReducer';
 import useResetUserFlow from '@hooks/useResetUserFlow';
 import { NonFungibleToken } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
@@ -7,7 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 export default function useNftCollection() {
   const navigate = useNavigate();
-  const { storeNftData } = useNftDataReducer();
   const { id: collectionId } = useParams();
   const stacksNftsQuery = useStacksCollectibles();
   const collectionData = stacksNftsQuery.data?.pages
@@ -34,7 +32,6 @@ export default function useNftCollection() {
   };
 
   const handleOnClick = (nft: NonFungibleToken) => {
-    if (nft.data) storeNftData(nft.data);
     if (collectionData?.collection_id !== 'bns') {
       navigate(`/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`);
     }

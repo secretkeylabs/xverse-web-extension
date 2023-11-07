@@ -3,24 +3,23 @@ import AccountHeaderComponent from '@components/accountHeader';
 import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
-import { validateStxAddress } from '@secretkeylabs/xverse-core';
-import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import {
   cvToHex,
+  generateUnsignedTransaction,
   StacksTransaction,
   uintCV,
   UnsignedStacksTransation,
-} from '@secretkeylabs/xverse-core/types';
-import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+  validateStxAddress,
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { checkNftExists, isLedgerAccount } from '@utils/helper';
-import { getNftFromStore } from '@utils/nfts';
+import { getNftDataFromNftsCollectionData } from '@utils/nfts';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -59,7 +58,7 @@ const NftContainer = styled.div((props) => ({
 }));
 
 const NftTitleText = styled.h1((props) => ({
-  ...props.theme.headline_s,
+  ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
@@ -87,9 +86,7 @@ const Button = styled.button((props) => ({
 }));
 
 const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 400,
-  fontSize: 14,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
@@ -103,24 +100,17 @@ const ButtonImage = styled.img((props) => ({
 function SendNft() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { id } = useParams();
   const location = useLocation();
   let address: string | undefined;
-
   if (location.state) {
     address = location.state.recipientAddress;
   }
-  const { nftData } = useNftDataSelector();
-  const [nft, setNft] = useState<NftData | undefined>(undefined);
 
-  useEffect(() => {
-    if (id) {
-      const data = getNftFromStore(nftData, id);
-      if (data) {
-        setNft(data);
-      }
-    }
-  }, [id, nftData]);
+  const { id } = useParams();
+  const stacksNftsQuery = useStacksCollectibles();
+  const nftCollections = stacksNftsQuery.data?.pages?.map((page) => page?.results).flat();
+  const { nft } = getNftDataFromNftsCollectionData(id, nftCollections);
+
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;

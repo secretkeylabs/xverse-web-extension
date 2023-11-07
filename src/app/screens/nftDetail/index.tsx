@@ -337,7 +337,7 @@ function NftDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const {
     nft,
-    collectionInfo,
+    collection,
     stxAddress,
     // isLoading,
     isGalleryOpen,
@@ -349,7 +349,7 @@ function NftDetailScreen() {
     handleOnSendClick,
   } = useNftDetail();
 
-  const nftAttributes = nft?.nft_token_attributes.length !== 0 && (
+  const nftAttributes = nft?.nft_token_attributes?.length !== 0 && (
     <>
       <AttributeText>{t('ATTRIBUTES')}</AttributeText>
       <GridContainer>
@@ -365,14 +365,12 @@ function NftDetailScreen() {
   );
   const nftDetails = (
     <NftDetailsContainer isGallery={isGalleryOpen}>
-      {collectionInfo?.collection_name && (
+      {collection?.collection_name && (
         <DetailSection isGallery={isGalleryOpen}>
-          <CollectibleDetailTile title={t('COLLECTION')} value={collectionInfo?.collection_name} />
+          <CollectibleDetailTile title={t('COLLECTION')} value={collection?.collection_name} />
           <CollectibleDetailTile
             title={t('COLLECTION_FLOOR_PRICE')}
-            value={
-              collectionInfo?.floor_price ? `${collectionInfo?.floor_price.toString()} STX` : '--'
-            }
+            value={collection?.floor_price ? `${collection?.floor_price.toString()} STX` : '--'}
           />
         </DetailSection>
       )}

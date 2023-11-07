@@ -6,17 +6,17 @@ import RecipientComponent from '@components/recipientComponent';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
+import { broadcastSignedTransaction, StacksTransaction } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
+import { getNftDataFromNftsCollectionData } from '@utils/nfts';
 import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +57,7 @@ const NFtContainer = styled.div((props) => ({
 }));
 
 const ReviewTransactionText = styled.h1((props) => ({
-  ...props.theme.headline_s,
+  ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
   textAlign: 'center',
@@ -70,9 +70,9 @@ function ConfirmNftTransaction() {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
-  const { nftData } = useNftDataSelector();
-  const nftIdDetails = id!.split('::');
-  const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
+  const stacksNftsQuery = useStacksCollectibles();
+  const nftCollections = stacksNftsQuery.data?.pages?.map((page) => page?.results).flat();
+  const { nft } = getNftDataFromNftsCollectionData(id, nftCollections);
   const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
   const unsignedTx = deserializeTransaction(unsignedTxHex);
   const { network } = useWalletSelector();

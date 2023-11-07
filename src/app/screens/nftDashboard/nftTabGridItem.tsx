@@ -1,5 +1,4 @@
 import CollectibleCollage from '@components/collectibleCollage/collectibleCollage';
-import useNftDataReducer from '@hooks/stores/useNftReducer';
 import { StacksCollectionData } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getNftsTabGridItemSubText } from '@utils/nfts';
@@ -42,10 +41,8 @@ const StyledItemSub = styled(StyledP)`
 
 export function NftTabGridItem({ item: collection }: { item: StacksCollectionData }) {
   const navigate = useNavigate();
-  const { storeNftData } = useNftDataReducer();
 
   const handleClickCollection = () => {
-    storeNftData(collection.thumbnail_nfts[0].asset_identifier);
     navigate(`nft-collection/${collection.collection_id}`);
   };
 
