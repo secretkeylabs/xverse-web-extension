@@ -72,7 +72,7 @@ function ConfirmNftTransaction() {
   const { id } = useParams();
   const stacksNftsQuery = useStacksCollectibles();
   const nftCollections = stacksNftsQuery.data?.pages?.map((page) => page?.results).flat();
-  const { nft } = getNftDataFromNftsCollectionData(id, nftCollections);
+  const { nftData: nft } = getNftDataFromNftsCollectionData(id, nftCollections);
   const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
   const unsignedTx = deserializeTransaction(unsignedTxHex);
   const { network } = useWalletSelector();

@@ -1,6 +1,7 @@
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useResetUserFlow from '@hooks/useResetUserFlow';
 import { NonFungibleToken } from '@secretkeylabs/xverse-core';
+import { isBnsCollection } from '@utils/nfts';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -32,7 +33,9 @@ export default function useNftCollection() {
   };
 
   const handleOnClick = (nft: NonFungibleToken) => {
-    if (collectionData?.collection_id !== 'bns') {
+    if (isBnsCollection(collectionData?.collection_id || '')) {
+      navigate(`/nft-dashboard/nft-detail/${nft.asset_identifier}`);
+    } else {
       navigate(`/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`);
     }
   };

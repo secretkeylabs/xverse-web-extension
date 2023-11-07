@@ -30,9 +30,11 @@ const NftImageContainer = styled.div<ContainerProps>((props) => ({
 const GridItemContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   padding: 0,
   borderRadius: props.theme.radius(3),
+  flex: 1,
+  aspectRatio: '1',
 }));
 
 const BnsImage = styled.img({

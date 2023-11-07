@@ -109,7 +109,7 @@ function SendNft() {
   const { id } = useParams();
   const stacksNftsQuery = useStacksCollectibles();
   const nftCollections = stacksNftsQuery.data?.pages?.map((page) => page?.results).flat();
-  const { nft } = getNftDataFromNftsCollectionData(id, nftCollections);
+  const { nftData: nft } = getNftDataFromNftsCollectionData(id, nftCollections);
 
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();

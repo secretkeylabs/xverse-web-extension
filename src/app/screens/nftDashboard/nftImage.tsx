@@ -1,6 +1,6 @@
 import NftPlaceholderImage from '@assets/img/nftDashboard/ic_nft_diamond.svg';
 import { BetterBarLoader } from '@components/barLoader';
-import { TokenMetaData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+import { TokenMetaData } from '@secretkeylabs/xverse-core';
 import { getFetchableUrl } from '@utils/helper';
 import Image from 'rc-image';
 import { Suspense } from 'react';

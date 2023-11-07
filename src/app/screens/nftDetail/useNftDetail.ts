@@ -1,6 +1,7 @@
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useResetUserFlow from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { getBnsNftName } from '@secretkeylabs/xverse-core';
 import { GAMMA_URL } from '@utils/constants';
 import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
 import { getNftDataFromNftsCollectionData } from '@utils/nfts';
@@ -13,15 +14,20 @@ export default function useNftDetail() {
   const { id } = useParams();
   const { data, isLoading } = useStacksCollectibles();
   const nftCollections = data?.pages?.map((page) => page?.results).flat();
-  const { collectionId, collection, nft } = getNftDataFromNftsCollectionData(id, nftCollections);
-
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const { collectionId, collection, nft, nftData } = getNftDataFromNftsCollectionData(
+    id,
+    nftCollections,
+  );
 
   useResetUserFlow('/nft-detail');
 
+  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const galleryTitle =
+    collectionId === 'bns' && nft ? getBnsNftName(nft) : nft?.data?.token_metadata.name;
+
   const onSharePress = () => {
     navigator.clipboard.writeText(
-      `${GAMMA_URL}collections/${nft?.token_metadata?.contract_id}/${nft?.token_id}`,
+      `${GAMMA_URL}collections/${nft?.data?.token_metadata?.contract_id}/${nft?.data?.token_id}`,
     );
   };
 
@@ -30,11 +36,11 @@ export default function useNftDetail() {
   };
 
   const onGammaPress = () => {
-    window.open(`${GAMMA_URL}collections/${nft?.token_metadata?.contract_id}`);
+    window.open(`${GAMMA_URL}collections/${nft?.data?.token_metadata?.contract_id}`);
   };
 
   const onExplorerPress = () => {
-    const address = nft?.token_metadata?.contract_id?.split('.')!;
+    const address = nft?.data?.token_metadata?.contract_id?.split('.')!;
     window.open(getExplorerUrl(address[0]));
   };
 
@@ -51,15 +57,12 @@ export default function useNftDetail() {
       });
       return;
     }
-    navigate('send-nft', {
-      state: {
-        nft,
-      },
-    });
+    navigate(`/nft-dashboard/nft-detail/${id}/send-nft`);
   };
 
   return {
     nft,
+    nftData,
     collection,
     stxAddress,
     isLoading,
@@ -70,5 +73,6 @@ export default function useNftDetail() {
     onExplorerPress,
     openInGalleryView,
     handleOnSendClick,
+    galleryTitle,
   };
 }

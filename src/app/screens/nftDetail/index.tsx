@@ -8,7 +8,7 @@ import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { ArrowLeft, ArrowUp, Share } from '@phosphor-icons/react';
-import NftImage from '@screens/nftDashboard/nftImage';
+import Nft from '@screens/nftDashboard/nft';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
@@ -55,7 +55,7 @@ const ColumnContainer = styled.div({
   flexDirection: 'column',
 });
 
-const NFtContainer = styled.div((props) => ({
+const NftContainer = styled.div((props) => ({
   width: 376.5,
   height: 376.5,
   display: 'flex',
@@ -67,7 +67,7 @@ const NFtContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const ExtensionNFtContainer = styled.div((props) => ({
+const ExtensionNftContainer = styled.div((props) => ({
   maxHeight: 148,
   width: 148,
   display: 'flex',
@@ -334,6 +334,7 @@ function NftDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const {
     nft,
+    nftData,
     collection,
     stxAddress,
     isLoading,
@@ -344,13 +345,14 @@ function NftDetailScreen() {
     onExplorerPress,
     openInGalleryView,
     handleOnSendClick,
+    galleryTitle,
   } = useNftDetail();
 
-  const nftAttributes = nft?.nft_token_attributes?.length !== 0 && (
+  const nftAttributes = nftData?.nft_token_attributes?.length !== 0 && (
     <>
       <AttributeText>{t('ATTRIBUTES')}</AttributeText>
       <GridContainer>
-        {nft?.nft_token_attributes.map((attribute) => (
+        {nftData?.nft_token_attributes.map((attribute) => (
           <NftAttribute
             key={attribute.trait_type}
             type={attribute.trait_type}
@@ -373,14 +375,14 @@ function NftDetailScreen() {
       )}
       {!isGalleryOpen && nftAttributes}
       <DetailSection isGallery={isGalleryOpen}>
-        <CollectibleDetailTile title={t('NAME')} value={nft?.token_metadata?.name!} />
-        {nft?.rarity_score && (
-          <CollectibleDetailTile title={t('RARITY')} value={nft?.rarity_score} />
+        <CollectibleDetailTile title={t('NAME')} value={nftData?.token_metadata?.name!} />
+        {nftData?.rarity_score && (
+          <CollectibleDetailTile title={t('RARITY')} value={nftData?.rarity_score} />
         )}
       </DetailSection>
       <CollectibleDetailTile
         title={t('CONTRACT_ID')}
-        value={nft?.token_metadata?.contract_id ?? ''}
+        value={nftData?.token_metadata?.contract_id ?? ''}
       />
     </NftDetailsContainer>
   );
@@ -418,16 +420,16 @@ function NftDetailScreen() {
   ) : (
     <ExtensionContainer>
       <CollectibleText>{t('COLLECTIBLE')}</CollectibleText>
-      <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+      <NftTitleText>{nftData?.token_metadata.name}</NftTitleText>
       <WebGalleryButton onClick={openInGalleryView}>
         <>
           <ButtonImage src={SquaresFour} />
           <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
         </>
       </WebGalleryButton>
-      <ExtensionNFtContainer>
-        <NftImage metadata={nft?.token_metadata!} />
-      </ExtensionNFtContainer>
+      <ExtensionNftContainer>
+        {nft && <Nft asset={nft} isGalleryOpen={isGalleryOpen} />}
+      </ExtensionNftContainer>
       <ButtonContainer>
         <SquareButton
           icon={<ArrowUp weight="regular" size="20" />}
@@ -438,11 +440,11 @@ function NftDetailScreen() {
           icon={<Share weight="regular" color="white" size="20" />}
           text={t('SHARE')}
           onPress={onSharePress}
-          hoverDialogId={`copy-nft-url-${nft?.asset_id}`}
+          hoverDialogId={`copy-nft-url-${nftData?.asset_id}`}
           isTransparent
         />
         <StyledTooltip
-          anchorId={`copy-nft-url-${nft?.asset_id}`}
+          anchorId={`copy-nft-url-${nftData?.asset_id}`}
           variant="light"
           content={t('COPIED')}
           events={['click']}
@@ -508,14 +510,12 @@ function NftDetailScreen() {
         </BackButtonContainer>
         <GalleryRowContainer>
           <ColumnContainer>
-            <NFtContainer>
-              <NftImage metadata={nft?.token_metadata!} />
-            </NFtContainer>
+            <NftContainer>{nft && <Nft asset={nft} isGalleryOpen={isGalleryOpen} />}</NftContainer>
             {nftAttributes}
           </ColumnContainer>
           <DescriptionContainer>
             <GalleryCollectibleText>{t('COLLECTIBLE')}</GalleryCollectibleText>
-            <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
+            <NftGalleryTitleText>{galleryTitle}</NftGalleryTitleText>
             <RowContainer>
               <NftOwnedByText>{t('OWNED_BY')}</NftOwnedByText>
               <OwnerAddressText>
@@ -539,11 +539,11 @@ function NftDetailScreen() {
                   icon={<Share weight="bold" color="white" size="16" />}
                   text={t('SHARE')}
                   onPress={onSharePress}
-                  hoverDialogId={`copy-nft-url-${nft?.asset_id}`}
+                  hoverDialogId={`copy-nft-url-${nftData?.asset_id}`}
                   transparent
                 />
                 <StyledTooltip
-                  anchorId={`copy-nft-url-${nft?.asset_id}`}
+                  anchorId={`copy-nft-url-${nftData?.asset_id}`}
                   variant="light"
                   content={t('COPIED')}
                   events={['click']}
