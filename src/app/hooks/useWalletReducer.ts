@@ -254,7 +254,7 @@ const useWalletReducer = () => {
   const switchAccount = async (account: Account) => {
     // we clear the query cache to prevent data from the other account potentially being displayed
     await queryClient.cancelQueries();
-    await queryClient.clear();
+    queryClient.clear();
 
     dispatch(
       selectAccount(

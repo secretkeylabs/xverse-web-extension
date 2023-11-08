@@ -1,5 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getAppConfig } from '@secretkeylabs/xverse-core/api/xverse';
+import { getAppConfig } from '@secretkeylabs/xverse-core';
 import { ChangeNetworkAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
