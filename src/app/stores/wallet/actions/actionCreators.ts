@@ -1,10 +1,11 @@
+import { PostGuardPing } from '@components/guards/singleTab';
 import {
+  AccountType,
   Account,
-  BtcTransactionData,
+  AppInfo,
+  BaseWallet,
   Coin,
-  FeesMultipliers,
   FungibleToken,
-  NetworkType,
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
@@ -12,23 +13,10 @@ import {
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
 
-export function setWalletAction(wallet: actions.WalletData): actions.SetWallet {
+export function setWalletAction(wallet: BaseWallet): actions.SetWallet {
   return {
     type: actions.SetWalletKey,
     wallet,
-  };
-}
-
-export function unlockWalletAction(seed: string) {
-  return {
-    type: actions.UnlockWalletKey,
-    seed,
-  };
-}
-
-export function lockWalletAction() {
-  return {
-    type: actions.LockWalletKey,
   };
 }
 
@@ -39,14 +27,9 @@ export function storeEncryptedSeedAction(encryptedSeed: string): actions.StoreEn
   };
 }
 
-export function setWalletSeedPhraseAction(seedPhrase: string) : actions.SetWalletSeedPhrase {
-  return {
-    type: actions.SetWalletSeedPhraseKey,
-    seedPhrase,
-  };
-}
-
 export function resetWalletAction(): actions.ResetWallet {
+  // We post the closeWallet action to the guard so that any open tabs will close
+  PostGuardPing('closeWallet');
   return {
     type: actions.ResetWalletKey,
   };
@@ -63,10 +46,19 @@ export function fetchAccountAction(
   };
 }
 
-export function addAccoutAction(accountsList: Account[]): actions.AddAccount {
+export function addAccountAction(accountsList: Account[]): actions.AddAccount {
   return {
     type: actions.AddAccountKey,
     accountsList,
+  };
+}
+
+export function updateLedgerAccountsAction(
+  ledgerAccountsList: Account[],
+): actions.AddLedgerAccount {
+  return {
+    type: actions.UpdateLedgerAccountsKey,
+    ledgerAccountsList,
   };
 }
 
@@ -74,83 +66,62 @@ export function selectAccount(
   selectedAccount: Account,
   stxAddress: string,
   btcAddress: string,
+  ordinalsAddress: string,
   masterPubKey: string,
   stxPublicKey: string,
   btcPublicKey: string,
+  ordinalsPublicKey: string,
   network: SettingsNetwork,
   // stackingState: StackingStateData,
   bnsName?: string,
+  accountType?: AccountType,
+  accountName?: string,
 ): actions.SelectAccount {
   return {
     type: actions.SelectAccountKey,
     selectedAccount,
     stxAddress,
     btcAddress,
+    ordinalsAddress,
     masterPubKey,
     stxPublicKey,
     btcPublicKey,
+    ordinalsPublicKey,
     network,
     // stackingState,
     bnsName,
+    accountType,
+    accountName,
   };
 }
 
-export function FetchFeeMultiplierAction(feeMultipliers: FeesMultipliers): actions.FetchFeeMultiplier {
+export function setFeeMultiplierAction(feeMultipliers: AppInfo): actions.SetFeeMultiplier {
   return {
-    type: actions.FetchFeeMultiplierKey,
+    type: actions.SetFeeMultiplierKey,
     feeMultipliers,
   };
 }
 
-export function fetchRatesAction(fiatCurrency: SupportedCurrency): actions.FetchRates {
-  return {
-    type: actions.FetchRatesKey,
-    fiatCurrency,
-  };
-}
-
-export function fetchRatesSuccessAction(
+export function setCoinRatesAction(
   stxBtcRate: BigNumber,
   btcFiatRate: BigNumber,
-): actions.FetchRatesSuccess {
+): actions.SetCoinRates {
   return {
-    type: actions.FetchRatesSuccessKey,
+    type: actions.SetCoinRatesKey,
     stxBtcRate,
     btcFiatRate,
   };
 }
 
-export function fetchRatesFailAction(error: string): actions.FetchRatesFail {
-  return {
-    type: actions.FetchRatesFailureKey,
-    error,
-  };
-}
-
-export function fetchStxWalletDataRequestAction(
-  stxAddress: string,
-  network: SettingsNetwork,
-  fiatCurrency: string,
-  stxBtcRate: BigNumber,
-): actions.FetchStxWalletDataRequest {
-  return {
-    type: actions.FetchStxWalletDataRequestKey,
-    stxAddress,
-    network,
-    fiatCurrency,
-    stxBtcRate,
-  };
-}
-
-export function fetchStxWalletDataSuccessAction(
+export function setStxWalletDataAction(
   stxBalance: BigNumber,
   stxAvailableBalance: BigNumber,
   stxLockedBalance: BigNumber,
   stxTransactions: TransactionData[],
   stxNonce: number,
-): actions.FetchStxWalletDataSuccess {
+): actions.SetStxWalletData {
   return {
-    type: actions.FetchStxWalletDataSuccessKey,
+    type: actions.SetStxWalletDataKey,
     stxBalance,
     stxAvailableBalance,
     stxLockedBalance,
@@ -159,71 +130,21 @@ export function fetchStxWalletDataSuccessAction(
   };
 }
 
-export function fetchStxWalletDataFailureAction() {
+export function SetBtcWalletDataAction(balance: BigNumber): actions.SetBtcWalletData {
   return {
-    type: actions.FetchStxWalletDataFailureKey,
-  };
-}
-
-export function fetchBtcWalletDataRequestAction(
-  btcAddress: string,
-  network: NetworkType,
-  stxBtcRate: BigNumber,
-  btcFiatRate: BigNumber,
-): actions.FetchBtcWalletDataRequest {
-  return {
-    type: actions.FetchBtcWalletDataRequestKey,
-    btcAddress,
-    network,
-    stxBtcRate,
-    btcFiatRate,
-  };
-}
-
-export function fetchBtcWalletDataSuccess(balance: BigNumber, btctransactions: BtcTransactionData[]): actions.FetchBtcWalletDataSuccess {
-  return {
-    type: actions.FetchBtcWalletDataSuccessKey,
+    type: actions.SetBtcWalletDataKey,
     balance,
-    btctransactions,
   };
 }
 
-export function fetchBtcWalletDataFail(): actions.FetchBtcWalletDataFail {
-  return {
-    type: actions.FetchBtcWalletDataFailureKey,
-  };
-}
-
-export function fetchCoinDataRequestAction(
-  stxAddress: string,
-  network: SettingsNetwork,
-  fiatCurrency: string,
-  coinsList: FungibleToken[] | null,
-): actions.FetchCoinDataRequest {
-  return {
-    type: actions.FetchCoinDataRequestKey,
-    stxAddress,
-    network,
-    fiatCurrency,
-    coinsList,
-  };
-}
-
-export function FetchCoinDataSuccessAction(
+export function setCoinDataAction(
   coinsList: FungibleToken[],
   supportedCoins: Coin[],
-): actions.FetchCoinDataSuccess {
+): actions.SetCoinData {
   return {
-    type: actions.FetchCoinDataSuccessKey,
+    type: actions.SetCoinDataKey,
     coinsList,
     supportedCoins,
-  };
-}
-
-export function FetchCoinDataFailureAction(error: string): actions.FetchCoinDataFailure {
-  return {
-    type: actions.FetchCoinDataFailureKey,
-    error,
   };
 }
 
@@ -236,25 +157,108 @@ export function FetchUpdatedVisibleCoinListAction(
   };
 }
 
-export function ChangeFiatCurrencyAction(fiatCurrency: SupportedCurrency): actions.ChangeFiatCurrency {
+export function ChangeFiatCurrencyAction(
+  fiatCurrency: SupportedCurrency,
+): actions.ChangeFiatCurrency {
   return {
     type: actions.ChangeFiatCurrencyKey,
     fiatCurrency,
   };
 }
 
-export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNetwork {
+export function ChangeNetworkAction(
+  network: SettingsNetwork,
+  networkAddress: string | undefined,
+  btcApiUrl: string,
+): actions.ChangeNetwork {
   return {
     type: actions.ChangeNetworkKey,
     network,
+    networkAddress,
+    btcApiUrl,
   };
 }
 
-export function getActiveAccountsAction(
-  accountsList: Account[],
-): actions.GetActiveAccounts {
+export function getActiveAccountsAction(accountsList: Account[]): actions.GetActiveAccounts {
   return {
     type: actions.GetActiveAccountsKey,
     accountsList,
+  };
+}
+
+export function ChangeActivateOrdinalsAction(
+  hasActivatedOrdinalsKey: boolean,
+): actions.ChangeActivateOrdinals {
+  return {
+    type: actions.ChangeHasActivatedOrdinalsKey,
+    hasActivatedOrdinalsKey,
+  };
+}
+
+export function ChangeActivateRareSatsAction(
+  hasActivatedRareSatsKey: boolean,
+): actions.ChangeActivateRareSats {
+  return {
+    type: actions.ChangeHasActivatedRareSatsKey,
+    hasActivatedRareSatsKey,
+  };
+}
+
+export function SetRareSatsNoticeDismissedAction(
+  rareSatsNoticeDismissed: boolean,
+): actions.SetRareSatsNoticeDismissed {
+  return {
+    type: actions.RareSatsNoticeDismissedKey,
+    rareSatsNoticeDismissed,
+  };
+}
+
+export function ChangeShowBtcReceiveAlertAction(
+  showBtcReceiveAlert: boolean | null,
+): actions.ChangeShowBtcReceiveAlert {
+  return {
+    type: actions.ChangeShowBtcReceiveAlertKey,
+    showBtcReceiveAlert,
+  };
+}
+
+export function ChangeShowOrdinalReceiveAlertAction(
+  showOrdinalReceiveAlert: boolean | null,
+): actions.ChangeShowOrdinalReceiveAlert {
+  return {
+    type: actions.ChangeShowOrdinalReceiveAlertKey,
+    showOrdinalReceiveAlert,
+  };
+}
+
+export function changeShowDataCollectionAlertAction(
+  showDataCollectionAlert: boolean | null,
+): actions.ChangeShowDataCollectionAlert {
+  return {
+    type: actions.ChangeShowDataCollectionAlertKey,
+    showDataCollectionAlert,
+  };
+}
+
+export function setBrcCoinsDataAction(brcCoinsList: FungibleToken[]): actions.SetBrcCoinsData {
+  return {
+    type: actions.SetBrcCoinsListKey,
+    brcCoinsList,
+  };
+}
+
+export function setWalletLockPeriodAction(
+  walletLockPeriod: actions.WalletSessionPeriods,
+): actions.SetWalletLockPeriod {
+  return {
+    type: actions.SetWalletLockPeriodKey,
+    walletLockPeriod,
+  };
+}
+
+export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletUnlocked {
+  return {
+    type: actions.SetWalletUnlockedKey,
+    isUnlocked,
   };
 }

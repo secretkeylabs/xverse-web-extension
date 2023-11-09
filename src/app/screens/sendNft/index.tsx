@@ -1,25 +1,29 @@
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import {
-  StacksTransaction, cvToHex, uintCV, UnsignedStacksTransation,
-} from '@secretkeylabs/xverse-core/types';
-import { useMutation } from '@tanstack/react-query';
-import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { validateStxAddress } from '@secretkeylabs/xverse-core';
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import SendForm from '@components/sendForm';
-import useStxPendingTxData from '@hooks/useStxPendingTxData';
-import useWalletSelector from '@hooks/useWalletSelector';
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import { checkNftExists } from '@utils/helper';
-import NftImage from '@screens/nftDashboard/nftImage';
-import useNftDataSelector from '@hooks/useNftDataSelector';
-import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import AccountHeaderComponent from '@components/accountHeader';
-import Seperator from '@components/seperator';
+import SendForm from '@components/sendForm';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useNetworkSelector from '@hooks/useNetwork';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import NftImage from '@screens/nftDashboard/nftImage';
+import { validateStxAddress } from '@secretkeylabs/xverse-core';
+import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
+import {
+  cvToHex,
+  StacksTransaction,
+  uintCV,
+  UnsignedStacksTransation,
+} from '@secretkeylabs/xverse-core/types';
+import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+import { useMutation } from '@tanstack/react-query';
+import { checkNftExists, isLedgerAccount } from '@utils/helper';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -28,7 +32,7 @@ const ScrollContainer = styled.div`
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
-  };
+  }
   width: 360px;
   margin: auto;
 `;
@@ -41,7 +45,7 @@ const Container = styled.div({
   flex: 1,
 });
 
-const NFtContainer = styled.div((props) => ({
+const NftContainer = styled.div((props) => ({
   maxHeight: 148,
   width: 148,
   display: 'flex',
@@ -53,13 +57,9 @@ const NFtContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const SendFormContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(5),
-}));
-
 const NftTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -89,7 +89,7 @@ const ButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 400,
   fontSize: 14,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -114,67 +114,65 @@ function SendNft() {
   const [nft, setNft] = useState<NftData | undefined>(undefined);
 
   useEffect(() => {
-    const data = nftData.find((nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)));
+    const data = nftData.find(
+      (nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)),
+    );
     if (data) {
       setNft(data);
     }
   }, []);
-
+  const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const {
-    stxAddress,
-    stxPublicKey,
-    network,
-    feeMultipliers,
-  } = useWalletSelector();
+  const { stxAddress, stxPublicKey, network, feeMultipliers, selectedAccount } =
+    useWalletSelector();
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
   const { isLoading, data, mutate } = useMutation<
-  StacksTransaction,
-  Error,
-  { tokenId: string; associatedAddress: string }
-  >(async ({ tokenId, associatedAddress }) => {
-    const principal = nft?.fully_qualified_token_id?.split('::')!;
-    const name = principal[1].split(':')[0];
-    const contractInfo: string[] = principal[0].split('.');
-    const unsginedTx: UnsignedStacksTransation = {
-      amount: tokenId,
-      senderAddress: stxAddress,
-      recipientAddress: associatedAddress,
-      contractAddress: contractInfo[0],
-      contractName: contractInfo[1],
-      assetName: name,
-      publicKey: stxPublicKey,
-      network,
-      pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
-      memo: '',
-      isNFT: true,
-
-    };
-    const unsignedTx: StacksTransaction = await generateUnsignedTransaction(
-      unsginedTx,
-    );
-    if (feeMultipliers?.stxSendTxMultiplier) {
-      unsignedTx.setFee(
-        unsignedTx.auth.spendingCondition.fee
-          * BigInt(feeMultipliers.stxSendTxMultiplier),
-      );
-    }
-    return unsignedTx;
+    StacksTransaction,
+    Error,
+    { tokenId: string; associatedAddress: string }
+  >({
+    mutationFn: async ({ tokenId, associatedAddress }) => {
+      const principal = nft?.fully_qualified_token_id?.split('::')!;
+      const name = principal[1].split(':')[0];
+      const contractInfo: string[] = principal[0].split('.');
+      const unsginedTx: UnsignedStacksTransation = {
+        amount: tokenId,
+        senderAddress: stxAddress,
+        recipientAddress: associatedAddress,
+        contractAddress: contractInfo[0],
+        contractName: contractInfo[1],
+        assetName: name,
+        publicKey: stxPublicKey,
+        network: selectedNetwork,
+        pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
+        memo: '',
+        isNFT: true,
+      };
+      const unsignedTx: StacksTransaction = await generateUnsignedTransaction(unsginedTx);
+      if (feeMultipliers?.stxSendTxMultiplier) {
+        unsignedTx.setFee(
+          unsignedTx.auth.spendingCondition.fee * BigInt(feeMultipliers.stxSendTxMultiplier),
+        );
+      }
+      setRecipientAddress(associatedAddress);
+      return unsignedTx;
+    },
   });
 
   useEffect(() => {
     if (data) {
       navigate(`/confirm-nft-tx/${id}`, {
         state: {
-          unsignedTx: data,
+          unsignedTx: data.serialize().toString('hex'),
           recipientAddress,
-          nft,
         },
       });
     }
   }, [data]);
+
+  useResetUserFlow('/send-nft');
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -206,54 +204,47 @@ function SendNft() {
         return;
       }
     }
-    setRecipientAddress(associatedAddress);
     if (validateFields(associatedAddress.trim()) && nft) {
       setError('');
-      const tokenId = nft?.value?.hex
-        ?? cvToHex(uintCV(nft.token_id.toString()));
+      const tokenId = cvToHex(uintCV(nft?.token_id.toString()!));
       mutate({ tokenId, associatedAddress });
     }
   };
   return (
     <>
       {isGalleryOpen && (
-      <>
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-        <ButtonContainer>
-          <Button onClick={handleBackButtonClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-            </>
-          </Button>
-        </ButtonContainer>
-      </>
+        <>
+          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
+          {!isLedgerAccount(selectedAccount) && (
+            <ButtonContainer>
+              <Button onClick={handleBackButtonClick}>
+                <>
+                  <ButtonImage src={ArrowLeft} />
+                  <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
+                </>
+              </Button>
+            </ButtonContainer>
+          )}
+        </>
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />}
-        <SendFormContainer>
-          <SendForm
-            processing={isLoading}
-            currencyType="NFT"
-            disableAmountInput
-            error={error}
-            recipient={address}
-            onPressSend={onPressSendNFT}
-          >
-            <Container>
-              <NFtContainer>
-                <NftImage
-                  metadata={nft?.token_metadata!}
-                />
-              </NFtContainer>
-              <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
-            </Container>
-          </SendForm>
-        </SendFormContainer>
-        <BottomBarContainer>
-          {!isGalleryOpen && <BottomBar tab="nft" />}
-        </BottomBarContainer>
-
+        <SendForm
+          processing={isLoading}
+          currencyType="NFT"
+          disableAmountInput
+          recepientError={error}
+          recipient={address}
+          onPressSend={onPressSendNFT}
+        >
+          <Container>
+            <NftContainer>
+              <NftImage metadata={nft?.token_metadata!} />
+            </NftContainer>
+            <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
+          </Container>
+        </SendForm>
+        <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>
       </ScrollContainer>
     </>
   );

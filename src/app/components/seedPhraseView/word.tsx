@@ -10,7 +10,7 @@ const OrdinalNumber = styled.p((props) => ({
   marginLeft: props.theme.spacing(7),
   marginRight: props.theme.spacing(1.5),
   marginTop: props.theme.spacing(16),
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const Container = styled.div({
@@ -19,20 +19,15 @@ const Container = styled.div({
 });
 
 interface Props {
-  index:number;
-  word: string
+  index: number;
+  word: string;
 }
 
 function SeedPhraseWord({ index, word }: Props) {
   return (
     <Container>
-      <OrdinalNumber>
-        {index + 1}
-        .
-      </OrdinalNumber>
-      <SeedWord key={word}>
-        {word}
-      </SeedWord>
+      <OrdinalNumber>{index + 1}.</OrdinalNumber>
+      <SeedWord key={word}>{word}</SeedWord>
     </Container>
   );
 }

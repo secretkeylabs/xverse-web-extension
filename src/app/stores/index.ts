@@ -1,23 +1,23 @@
-import ChromeStorage from '@utils/storage';
-import { createStore, applyMiddleware, combineReducers } from 'redux';
-import { persistReducer, persistStore } from 'redux-persist';
-import createSagaMiddleware from 'redux-saga';
-import walletReducer from './wallet/walletReducer';
-import rootSaga from './root/saga';
+import { chromeLocalStorage } from '@utils/chromeStorage';
+import { applyMiddleware, combineReducers, createStore } from 'redux';
+import { PersistConfig, persistReducer, persistStore } from 'redux-persist';
+import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
-
-export const storage = new ChromeStorage(chrome.storage.local, chrome.runtime);
+import * as actions from './wallet/actions/types';
+import { WalletState } from './wallet/actions/types';
+import walletReducer from './wallet/reducer';
 
 const rootPersistConfig = {
+  version: 1,
   key: 'root',
-  storage,
-  blacklist: ['nftDataState', 'walletState'],
+  storage: chromeLocalStorage,
+  blacklist: ['walletState'],
 };
 
-const WalletPersistConfig = {
+export const WalletPersistConfig: PersistConfig<WalletState> = {
+  version: 1,
   key: 'walletState',
-  storage,
-  blacklist: ['seedPhrase', 'hasRestoredMemoryKey'],
+  storage: chromeLocalStorage,
 };
 
 const appReducer = combineReducers({
@@ -31,12 +31,22 @@ const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
 
 export type StoreState = ReturnType<typeof rootReducer>;
 
-const rootStore = (() => {
-  const sagaMiddleware = createSagaMiddleware();
-  const store = createStore(persistedReducer, applyMiddleware(sagaMiddleware));
-  sagaMiddleware.run(rootSaga);
-  const persistedStore = persistStore(store);
-  return { store, persistedStore };
-})();
+const storeMiddleware = [
+  createStateSyncMiddleware({
+    // We only want to sync seedphrase data for onboarding
+    whitelist: [
+      actions.StoreEncryptedSeedKey,
+      actions.SelectAccountKey,
+      actions.SetWalletUnlockedKey,
+      actions.AddAccountKey,
+      actions.UpdateLedgerAccountsKey,
+    ],
+  }),
+];
+const store = createStore(persistedReducer, applyMiddleware(...storeMiddleware));
+const persistedStore = persistStore(store);
+initMessageListener(store);
+
+const rootStore = { store, persistedStore };
 
 export default rootStore;

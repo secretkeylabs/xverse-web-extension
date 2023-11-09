@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          always-auth: true
+          node-version: '16.x'
+          registry-url: https://npm.pkg.github.com
+          scope: '@secretkeylabs'
+      - name: Install dependencies
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
+      - name: Test
+        run: npx eslint .
+      # run: npx tsc --noEmit
+      # run: npm test --passWithNoTests
+      - name: Build
+        env:
+          TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
+          MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
+          MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
+        run: npm run build --if-present
+      - name: Save Filename
+        id: save-filename
+        run: |
+          echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').zip" >> $GITHUB_OUTPUT
+      - name: Create Archive
+        run: |
+          zip -rj build.zip ./build
+      - name: Upload Release Asset
+        if: ${{ github.event.release.upload_url }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build.zip
+          asset_name: ${{ steps.save-filename.outputs.FILENAME }}
+          asset_content_type: application/zip

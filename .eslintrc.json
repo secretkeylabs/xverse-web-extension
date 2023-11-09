@@ -3,7 +3,14 @@
     "browser": true,
     "es2021": true
   },
-  "extends": ["plugin:react/recommended", "airbnb", "airbnb-typescript", "airbnb/hooks"],
+  "extends": [
+    "plugin:react/recommended",
+    "airbnb",
+    "airbnb-typescript",
+    "airbnb/hooks",
+    "prettier",
+    "plugin:@tanstack/eslint-plugin-query/recommended"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -13,15 +20,30 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles"],
+  "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles", "@tanstack/query"],
   "rules": {
+    "consistent-return": "off",
+    "import/prefer-default-export": 1,
+    "no-promise-executor-return": "warn",
+    "max-len": "off",
     "no-inline-styles/no-inline-styles": 2,
+    "no-param-reassign": "off",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/jsx-key": "warn",
+    "react/jsx-props-no-spreading": "off",
     "react/react-in-jsx-scope": "off",
-    "no-param-reassign":"off",
-    "react/require-default-props":"off",
-    "consistent-return":"off",
-    "max-len":"off",
-    "react-hooks/exhaustive-deps":"off"
+    "react/require-default-props": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "args": "after-used",
+        "ignoreRestSiblings": true,
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "no-plusplus": "off",
+    "@tanstack/query/exhaustive-deps": 1
   },
   "settings": {
     "import/resolver": {

@@ -1,7 +1,12 @@
 import backup from '@assets/img/backupWallet/backup.svg';
-import styled from 'styled-components';
+import ActionButton from '@components/button';
+import useSeedVault from '@hooks/useSeedVault';
+import { a } from '@react-spring/web';
+import { generateMnemonic } from '@secretkeylabs/xverse-core/wallet';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -34,7 +39,7 @@ const SubTitle = styled.h2((props) => ({
   ...props.theme.body_l,
   textAlign: 'center',
   marginTop: props.theme.spacing(4),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 const BackupActionsContainer = styled.div((props) => ({
@@ -45,41 +50,49 @@ const BackupActionsContainer = styled.div((props) => ({
   width: '100%',
 }));
 
-const BackupButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
-  width: '48%',
-  height: 44,
-}));
-
-const SkipBackupButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: '1px solid #272A44',
-  color: props.theme.colors.white['0'],
-  width: '48%',
-  height: 44,
+const TransparentButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(8),
+  width: '100%',
 }));
 
 function BackupWallet(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const navigate = useNavigate();
+  const {
+    init: initSeedVault,
+    storeSeed,
+    unlockVault,
+    hasSeed,
+    clearVaultStorage,
+  } = useSeedVault();
+
+  const generateAndStoreSeedPhrase = async () => {
+    const newSeedPhrase = generateMnemonic();
+    await initSeedVault('');
+    await storeSeed(newSeedPhrase);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const hasSeedPhrase = await hasSeed();
+      if (!hasSeedPhrase) {
+        await generateAndStoreSeedPhrase();
+      } else {
+        // attempt to unlock the wallet with an empty password (verifies the user didn't finish onboarding)
+        await unlockVault('');
+        // clear the vault storage and generate a new seed phrase
+        await clearVaultStorage();
+        await generateAndStoreSeedPhrase();
+      }
+    })();
+  }, []);
 
   const handleBackup = () => {
-    navigate('/backupWalletSteps');
+    navigate('/backupWalletSteps', { replace: true });
   };
 
   const handleSkip = () => {
-    navigate('/create-password');
+    navigate('/create-password', { replace: true });
   };
 
   return (
@@ -91,8 +104,10 @@ function BackupWallet(): JSX.Element {
         <Title>{t('SCREEN_TITLE')}</Title>
         <SubTitle>{t('SCREEN_SUBTITLE')}</SubTitle>
         <BackupActionsContainer>
-          <SkipBackupButton onClick={handleSkip}>{t('BACKUP_SKIP_BUTTON')}</SkipBackupButton>
-          <BackupButton onClick={handleBackup}>{t('BACKUP_BUTTON')}</BackupButton>
+          <TransparentButtonContainer>
+            <ActionButton onPress={handleSkip} transparent text={t('BACKUP_SKIP_BUTTON')} />
+          </TransparentButtonContainer>
+          <ActionButton onPress={handleBackup} text={t('BACKUP_BUTTON')} />
         </BackupActionsContainer>
       </ContentContainer>
     </Container>

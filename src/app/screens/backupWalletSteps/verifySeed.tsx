@@ -1,5 +1,6 @@
-import SeedPhraseInput from '@components/seedPhraseInput';
-import { useState } from 'react';
+import ActionButton from '@components/button';
+import { generateMnemonic } from 'bip39';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -10,82 +11,148 @@ const Container = styled.div((props) => ({
   flex: 1,
 }));
 
-const Heading = styled.p((props) => ({
-  ...props.theme.body_l,
-  color: props.theme.colors.white[200],
-  marginBottom: props.theme.spacing(15),
-}));
-
 const ButtonsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
   flex: 1,
   alignItems: 'flex-end',
-  marginBottom: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(30),
   width: '100%',
 }));
 
-const VerifyButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
-  width: '48%',
-  height: 44,
+const TransparentButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(2),
+  width: '100%',
 }));
 
-const BackButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.background.elevation0,
-  border: '1px solid #272A44',
-  color: props.theme.colors.white['0'],
-  width: '48%',
-  height: 44,
+const Heading = styled.h3((props) => ({
+  ...props.theme.body_l,
+  color: props.theme.colors.white_200,
+  marginBottom: props.theme.spacing(16),
 }));
 
-interface VerifySeedProps {
-  onVerifySuccess: () => void;
+const WordGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: ${(props) => props.theme.spacing(5)}px;
+  margin-bottom: ${(props) => props.theme.spacing(12)}px;
+`;
+
+const WordButton = styled.button`
+  ${(props) => props.theme.body_medium_m};
+  color: ${(props) => props.theme.colors.white_0};
+  background-color: ${(props) => props.theme.colors.elevation3};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: ${(props) => props.theme.spacing(6)}px;
+  border-radius: ${(props) => props.theme.radius(1)}px;
+  transition: all 0.1s ease;
+  :hover:enabled {
+    opacity: 0.8;
+  }
+  :active:enabled {
+    opacity: 0.6;
+  }
+`;
+
+const NthSpan = styled.span`
+  ${(props) => props.theme.body_bold_l};
+  color: ${(props) => props.theme.colors.white_0};
+`;
+
+const ErrorMessage = styled.p<{ visible: boolean }>`
+  ${(props) => props.theme.body_s};
+  color: ${(props) => props.theme.colors.feedback.error};
+  visibility: ${(props) => (props.visible ? 'initial' : 'hidden')};
+`;
+
+const getOrdinal = (num: number): string => {
+  switch (num) {
+    case 1:
+      return '1st';
+    case 2:
+      return '2nd';
+    case 3:
+      return '3rd';
+    default:
+      return `${num}th`;
+  }
+};
+
+export default function VerifySeed({
+  onBack,
+  onVerifySuccess,
+  seedPhrase,
+}: {
   onBack: () => void;
+  onVerifySuccess: () => void;
   seedPhrase: string;
-}
-
-export default function VerifySeed(props: VerifySeedProps): JSX.Element {
-  const [seedInput, setSeedInput] = useState<string>('');
-  const [err, setErr] = useState('');
+}) {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
-  const { onBack, onVerifySuccess, seedPhrase } = props;
+  const [err, setErr] = useState('');
+  const [correctCounter, setCorrectCounter] = useState(0);
+  const [quiz, setQuiz] = useState<{ words: string[]; answer: string; nth: string }>({
+    words: [],
+    answer: '',
+    nth: '',
+  });
 
-  const cleanMnemonic = (rawSeed: string): string =>
-    rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
+  const generateWords = useCallback(() => {
+    const seedWords = seedPhrase.split(' ');
+    const seedPhraseIndex = Math.floor(Math.random() * seedWords.length);
+    const answer = seedWords[seedPhraseIndex];
 
-  const handleVerify = () => {
-    if (seedPhrase === cleanMnemonic(seedInput)) {
-      onVerifySuccess();
-    } else {
-      setErr('Seedphrase does not match');
+    const randomWords = generateMnemonic().split(' ');
+
+    // check randomWords doesn't contain our answer already.
+    // only if it doesn't, do we need to insert the answer at a random index.
+    const foundAnswerIndex = randomWords.findIndex((word) => word === answer);
+    if (foundAnswerIndex === -1) {
+      const randomWordsIndex = Math.floor(Math.random() * randomWords.length);
+      randomWords[randomWordsIndex] = answer;
     }
+
+    const nth = getOrdinal(seedPhraseIndex + 1);
+    setQuiz({ words: randomWords, answer, nth });
+  }, [seedPhrase]);
+
+  useEffect(() => {
+    if (correctCounter >= 3) {
+      return onVerifySuccess();
+    }
+    generateWords();
+  }, [correctCounter, onVerifySuccess, generateWords]);
+
+  const handleClickWord = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (e.currentTarget.value === quiz.answer) {
+      setErr('');
+      return setCorrectCounter((prev) => prev + 1);
+    }
+    setErr(t('SEED_PHRASE_INCORRECT'));
   };
 
   return (
     <Container>
-      <Heading>{t('SEED_PHRASE_VERIFY_HEADING')}</Heading>
-      <SeedPhraseInput
-        seed={seedInput}
-        onSeedChange={setSeedInput}
-        seedError={err}
-        setSeedError={setErr}
-      />
+      <Heading>{t('CONFIRM_YOUR_SEEDPHRASE')}</Heading>
+      <Heading>
+        {t('SELECT_THE')}
+        <NthSpan>{quiz.nth}</NthSpan>
+        {t('WORD_OF_YOUR_SEEDPHRASE')}
+      </Heading>
+      <WordGrid>
+        {quiz.words.map((word) => (
+          <WordButton key={word} onClick={handleClickWord} value={word}>
+            {word}
+          </WordButton>
+        ))}
+      </WordGrid>
+      <ErrorMessage visible={!!err}>{err}</ErrorMessage>
       <ButtonsContainer>
-        <BackButton onClick={onBack}>{t('SEED_PHRASE_BACK_BUTTON')}</BackButton>
-        <VerifyButton onClick={handleVerify}>{t('SEED_PHRASE_VERIFY_BUTTON')}</VerifyButton>
+        <TransparentButtonContainer>
+          <ActionButton onPress={onBack} transparent text={t('SEED_PHRASE_BACK_BUTTON')} />
+        </TransparentButtonContainer>
       </ButtonsContainer>
     </Container>
   );

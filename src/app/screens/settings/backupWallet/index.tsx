@@ -1,13 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import PasswordInput from '@components/passwordInput';
 import TopRow from '@components/topRow';
 import BottomBar from '@components/tabBar';
-import useWalletReducer from '@hooks/useWalletReducer';
 import SeedCheck from '@screens/backupWalletSteps/seedCheck';
-import useWalletSelector from '@hooks/useWalletSelector';
 import styled from 'styled-components';
+import useSeedVault from '@hooks/useSeedVault';
 
 const Container = styled.div`
   display: flex;
@@ -42,12 +41,24 @@ const SeedphraseContainer = styled.div((props) => ({
 
 function BackupWalletScreen() {
   const { t } = useTranslation('translation');
-  const { seedPhrase } = useWalletSelector();
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [showSeed, setShowSeed] = useState<boolean>(false);
+  const [seed, setSeed] = useState('');
   const navigate = useNavigate();
-  const { unlockWallet } = useWalletReducer();
+  const { getSeed, unlockVault } = useSeedVault();
+
+  useEffect(() => {
+    (async () => {
+      const seedPhrase = await getSeed();
+      setSeed(seedPhrase);
+    })();
+
+    return () => {
+      setSeed('');
+    };
+  }, []);
 
   const goToSettingScreen = () => {
     navigate('/settings');
@@ -55,12 +66,15 @@ function BackupWalletScreen() {
 
   const handlePasswordNextClick = async () => {
     try {
-      await unlockWallet(password);
+      setLoading(true);
+      await unlockVault(password);
       setPassword('');
       setError('');
       setShowSeed(true);
     } catch (e) {
       setError(t('CREATE_PASSWORD_SCREEN.INCORRECT_PASSWORD_ERROR'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,17 +93,18 @@ function BackupWalletScreen() {
               handleBack={goToSettingScreen}
               passwordError={error}
               stackButtonAlignment
+              loading={loading}
             />
           </EnterPasswordContainer>
-
         )}
         <SeedphraseContainer>
-          {showSeed && <SeedCheck showButton={false} seedPhrase={seedPhrase} onContinue={goToSettingScreen} />}
+          {showSeed && (
+            <SeedCheck showButton={false} seedPhrase={seed} onContinue={goToSettingScreen} />
+          )}
         </SeedphraseContainer>
       </Container>
       <BottomBar tab="settings" />
     </>
-
   );
 }
 

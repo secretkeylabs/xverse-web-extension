@@ -6,7 +6,9 @@ const RowContainer = styled.button`
   align-items: center;
   background: transparent;
   justify-content: center;
-  padding: 8px;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-bottom: 8px;
   :hover {
     opacity: 0.8;
   }
@@ -16,7 +18,7 @@ const RowContainer = styled.button`
 `;
 
 interface ImgContainerProps {
-  color: string
+  color: string;
 }
 
 const ImgContainer = styled.div<ImgContainerProps>((props) => ({
@@ -32,20 +34,18 @@ const ImgContainer = styled.div<ImgContainerProps>((props) => ({
 
 const Text = styled.h1((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(6),
 }));
 
 interface Props {
-  img: string,
-  text: string,
-  background: string
+  img: string;
+  text: string;
+  background: string;
   onClick?: () => void;
 }
 
-function ShareLinkRow({
-  img, text, background, onClick,
-}: Props) {
+function ShareLinkRow({ img, text, background, onClick }: Props) {
   return (
     <RowContainer onClick={onClick}>
       <ImgContainer color={background}>

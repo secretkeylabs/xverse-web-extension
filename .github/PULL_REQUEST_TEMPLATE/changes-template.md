@@ -26,9 +26,9 @@ What kind of change does this PR introduce?
 
 (Optional) Resolved: #`Insert issue number`
 
-
 # What is the new behavior?
 
+# Screenshot / Video
 
 # Does this PR introduce a breaking change?
 

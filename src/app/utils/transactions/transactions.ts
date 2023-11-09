@@ -1,4 +1,10 @@
-import { BtcTransactionData, SettingsNetwork } from '@secretkeylabs/xverse-core';
+import {
+  Brc20HistoryTransactionData,
+  BtcTransactionData,
+  StacksNetwork,
+  StxTransactionData,
+} from '@secretkeylabs/xverse-core';
+import { getNetworkURL } from '@secretkeylabs/xverse-core/api/helper';
 import { API_TIMEOUT_MILLI } from '@secretkeylabs/xverse-core/constant';
 import {
   AddressTransactionWithTransfers,
@@ -17,14 +23,14 @@ export interface PaginatedResults<T> {
 
 export async function getTransferTransactions(reqParams: {
   stxAddress: string;
-  network: SettingsNetwork;
+  network: StacksNetwork;
   limit: number;
   offset: number;
 }): Promise<AddressTransactionWithTransfers[]> {
-  const {
-    stxAddress, limit, network, offset,
-  } = reqParams;
-  const apiUrl = `${network.address}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
+  const { stxAddress, limit, network, offset } = reqParams;
+  const apiUrl = `${getNetworkURL(
+    network,
+  )}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
   const response = await axios.get<PaginatedResults<AddressTransactionWithTransfers>>(apiUrl, {
     params: {
       limit,
@@ -42,11 +48,11 @@ async function getMempoolTransactions({
   limit,
 }: {
   stxAddress: string;
-  network: SettingsNetwork;
+  network: StacksNetwork;
   offset: number;
   limit: number;
 }): Promise<MempoolTransactionListResponse> {
-  const apiUrl = `${network.address}/extended/v1/tx/mempool?address=${stxAddress}`;
+  const apiUrl = `${network.coreApiUrl}/extended/v1/tx/mempool?address=${stxAddress}`;
   const results = await axios.get<MempoolTransactionListResponse>(apiUrl, {
     timeout: API_TIMEOUT_MILLI,
     params: {
@@ -59,7 +65,7 @@ async function getMempoolTransactions({
 
 export async function getStxAddressTransactions(
   address: string,
-  network: SettingsNetwork,
+  network: StacksNetwork,
   offset: number,
   limit: number,
 ) {
@@ -87,13 +93,31 @@ export function isAddressTransactionWithTransfers(
 }
 
 export function isBtcTransaction(
-  tx: AddressTransactionWithTransfers | Tx | BtcTransactionData,
+  tx: AddressTransactionWithTransfers | Tx | BtcTransactionData | Brc20HistoryTransactionData,
 ): tx is BtcTransactionData {
-  return (tx as BtcTransactionData).addresses !== undefined;
+  return (tx as BtcTransactionData).txType === 'bitcoin';
 }
 
 export function isBtcTransactionArr(
-  txs: (AddressTransactionWithTransfers | MempoolTransaction)[] | BtcTransactionData[],
+  txs:
+    | (AddressTransactionWithTransfers | MempoolTransaction)[]
+    | BtcTransactionData[]
+    | Brc20HistoryTransactionData[],
 ): txs is BtcTransactionData[] {
-  return (txs as BtcTransactionData[])[0].addresses !== undefined;
+  return (txs as BtcTransactionData[])[0].txType === 'bitcoin';
+}
+
+export function isBrc20TransactionArr(
+  txs:
+    | (AddressTransactionWithTransfers | MempoolTransaction)[]
+    | BtcTransactionData[]
+    | Brc20HistoryTransactionData[],
+): txs is BtcTransactionData[] {
+  return (txs as Brc20HistoryTransactionData[])[0].txType === 'brc20';
+}
+
+export function isBrc20Transaction(
+  tx: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData,
+): tx is Brc20HistoryTransactionData {
+  return (tx as Brc20HistoryTransactionData).txType === 'brc20';
 }

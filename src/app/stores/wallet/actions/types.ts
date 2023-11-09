@@ -1,13 +1,13 @@
 import {
-  BtcTransactionData,
+  Account,
+  AccountType,
+  AppInfo,
+  BaseWallet,
   Coin,
-  FeesMultipliers,
   FungibleToken,
-  NetworkType,
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
-  Account,
 } from '@secretkeylabs/xverse-core/types';
 import BigNumber from 'bignumber.js';
 
@@ -15,46 +15,57 @@ export const SetWalletKey = 'SetWallet';
 export const ResetWalletKey = 'ResetWallet';
 export const FetchAccountKey = 'FetchAccount';
 export const SelectAccountKey = 'SelectAccount';
-export const UnlockWalletKey = 'UnlockWallet';
-export const LockWalletKey = 'LockWallet';
 export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
 export const UpdateVisibleCoinListKey = 'UpdateVisibleCoinList';
 export const AddAccountKey = 'AddAccount';
-export const FetchFeeMultiplierKey = 'FetchFeeMultiplier';
+export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
 export const GetActiveAccountsKey = 'GetActiveAccounts';
-export const SetWalletSeedPhraseKey = 'SetWalletSeed';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
-export const FetchStxWalletDataSuccessKey = 'FetchStxWalletDataSuccess';
-export const FetchStxWalletDataFailureKey = 'FetchStxWalletDataFailure';
+export const SetStxWalletDataKey = 'SetStxWalletDataKey';
 
-export const FetchBtcWalletDataRequestKey = 'FetchBtcWalletDataRequest';
-export const FetchBtcWalletDataSuccessKey = 'FetchBtcWalletDataSuccess';
-export const FetchBtcWalletDataFailureKey = 'FetchBtcWalletDataFailure';
+export const SetBtcWalletDataKey = 'SetBtcWalletData';
 
-export const FetchRatesKey = 'FetchRates';
-export const FetchRatesSuccessKey = 'FetchRatesSuccess';
-export const FetchRatesFailureKey = 'FetchRatesFailure';
+export const SetCoinRatesKey = 'SetCoinRatesKey';
 
-export const FetchCoinDataRequestKey = 'FetchCoinDataRequest';
-export const FetchCoinDataSuccessKey = 'FetchCoinDataSuccess';
-export const FetchCoinDataFailureKey = 'FetchCoinDataFailure';
+export const SetCoinDataKey = 'SetCoinDataKey';
+
+export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
+export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
+export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
+
+export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
+export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
+export const ChangeShowDataCollectionAlertKey = 'ChangeShowDataCollectionAlertKey';
+export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
+
+export const SetBrcCoinsListKey = 'SetBrcCoinsList';
+
+export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
+
+export const SetWalletUnlockedKey = 'SetWalletUnlocked';
+
+export enum WalletSessionPeriods {
+  LOW = 1,
+  STANDARD = 10,
+  LONG = 30,
+}
+
 export interface WalletState {
   stxAddress: string;
   btcAddress: string;
+  ordinalsAddress: string;
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
+  ordinalsPublicKey: string;
   accountsList: Account[];
+  ledgerAccountsList: Account[];
   selectedAccount: Account | null;
-  hasRestoredMemoryKey: boolean;
   network: SettingsNetwork;
-  seedPhrase: string;
   encryptedSeed: string;
-  loadingWalletData: boolean;
-  loadingBtcData: boolean;
   fiatCurrency: SupportedCurrency;
   btcFiatRate: BigNumber;
   stxBtcRate: BigNumber;
@@ -65,45 +76,36 @@ export interface WalletState {
   btcBalance: BigNumber;
   coinsList: FungibleToken[] | null;
   coins: Coin[];
-  feeMultipliers: FeesMultipliers | null;
-}
-
-export interface WalletData {
-  stxAddress: string;
-  btcAddress: string;
-  masterPubKey: string;
-  stxPublicKey: string;
-  btcPublicKey: string;
-  seedPhrase: string;
+  brcCoinsList: FungibleToken[] | null;
+  feeMultipliers: AppInfo | null;
+  networkAddress: string | undefined;
+  hasActivatedOrdinalsKey: boolean | undefined;
+  hasActivatedRareSatsKey: boolean | undefined;
+  rareSatsNoticeDismissed: boolean | undefined;
+  showBtcReceiveAlert: boolean | null;
+  showOrdinalReceiveAlert: boolean | null;
+  showDataCollectionAlert: boolean | null;
+  accountType: AccountType | undefined;
+  accountName: string | undefined;
+  btcApiUrl: string;
+  walletLockPeriod: WalletSessionPeriods;
+  isUnlocked: boolean;
 }
 
 export interface SetWallet {
   type: typeof SetWalletKey;
-  wallet: WalletData;
+  wallet: BaseWallet;
 }
 
 export interface StoreEncryptedSeed {
   type: typeof StoreEncryptedSeedKey;
   encryptedSeed: string;
 }
-
-export interface SetWalletSeedPhrase {
-  type: typeof SetWalletSeedPhraseKey;
-  seedPhrase: string;
-}
-export interface UnlockWallet {
-  type: typeof UnlockWalletKey;
-  seed: string;
+export interface SetFeeMultiplier {
+  type: typeof SetFeeMultiplierKey;
+  feeMultipliers: AppInfo;
 }
 
-export interface FetchFeeMultiplier {
-  type: typeof FetchFeeMultiplierKey;
-  feeMultipliers: FeesMultipliers;
-}
-
-export interface LockWallet {
-  type: typeof LockWalletKey;
-}
 export interface ResetWallet {
   type: typeof ResetWalletKey;
 }
@@ -118,45 +120,34 @@ export interface AddAccount {
   type: typeof AddAccountKey;
   accountsList: Account[];
 }
+export interface AddLedgerAccount {
+  type: typeof UpdateLedgerAccountsKey;
+  ledgerAccountsList: Account[];
+}
 export interface SelectAccount {
   type: typeof SelectAccountKey;
   selectedAccount: Account | null;
   stxAddress: string;
   btcAddress: string;
+  ordinalsAddress: string;
   masterPubKey: string;
   stxPublicKey: string;
   btcPublicKey: string;
+  ordinalsPublicKey: string;
   bnsName?: string;
   network: SettingsNetwork;
   // stackingState: StackingStateData;
+  accountType?: AccountType;
+  accountName: string | undefined;
 }
-
-export interface FetchRates {
-  type: typeof FetchRatesKey;
-  fiatCurrency: SupportedCurrency;
-}
-
-export interface FetchRatesSuccess {
-  type: typeof FetchRatesSuccessKey;
+export interface SetCoinRates {
+  type: typeof SetCoinRatesKey;
   stxBtcRate: BigNumber;
   btcFiatRate: BigNumber;
 }
 
-export interface FetchRatesFail {
-  type: typeof FetchRatesFailureKey;
-  error: string;
-}
-
-export interface FetchStxWalletDataRequest {
-  type: typeof FetchStxWalletDataRequestKey;
-  stxAddress: string;
-  network: SettingsNetwork;
-  fiatCurrency: string;
-  stxBtcRate: BigNumber;
-}
-
-export interface FetchStxWalletDataSuccess {
-  type: typeof FetchStxWalletDataSuccessKey;
+export interface SetStxWalletData {
+  type: typeof SetStxWalletDataKey;
   stxBalance: BigNumber;
   stxAvailableBalance: BigNumber;
   stxLockedBalance: BigNumber;
@@ -164,45 +155,15 @@ export interface FetchStxWalletDataSuccess {
   stxNonce: number;
 }
 
-export interface FetchStxWalletDataFail {
-  type: typeof FetchStxWalletDataFailureKey;
-}
-
-export interface FetchBtcWalletDataRequest {
-  type: typeof FetchBtcWalletDataRequestKey;
-  btcAddress: string;
-  network: NetworkType;
-  stxBtcRate: BigNumber;
-  btcFiatRate: BigNumber;
-}
-
-export interface FetchBtcWalletDataSuccess {
-  type: typeof FetchBtcWalletDataSuccessKey;
+export interface SetBtcWalletData {
+  type: typeof SetBtcWalletDataKey;
   balance: BigNumber;
-  btctransactions: BtcTransactionData[];
 }
 
-export interface FetchBtcWalletDataFail {
-  type: typeof FetchBtcWalletDataFailureKey;
-}
-
-export interface FetchCoinDataRequest {
-  type: typeof FetchCoinDataRequestKey;
-  stxAddress: string;
-  network: SettingsNetwork;
-  fiatCurrency: string;
-  coinsList: FungibleToken[] | null;
-}
-
-export interface FetchCoinDataSuccess {
-  type: typeof FetchCoinDataSuccessKey;
+export interface SetCoinData {
+  type: typeof SetCoinDataKey;
   coinsList: FungibleToken[];
   supportedCoins: Coin[];
-}
-
-export interface FetchCoinDataFailure {
-  type: typeof FetchCoinDataFailureKey;
-  error: string;
 }
 export interface UpdateVisibleCoinList {
   type: typeof UpdateVisibleCoinListKey;
@@ -216,6 +177,8 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
+  networkAddress: string | undefined;
+  btcApiUrl: string;
 }
 
 export interface GetActiveAccounts {
@@ -223,30 +186,72 @@ export interface GetActiveAccounts {
   accountsList: Account[];
 }
 
+export interface ChangeActivateOrdinals {
+  type: typeof ChangeHasActivatedOrdinalsKey;
+  hasActivatedOrdinalsKey: boolean;
+}
+
+export interface ChangeActivateRareSats {
+  type: typeof ChangeHasActivatedRareSatsKey;
+  hasActivatedRareSatsKey: boolean;
+}
+
+export interface SetRareSatsNoticeDismissed {
+  type: typeof RareSatsNoticeDismissedKey;
+  rareSatsNoticeDismissed: boolean;
+}
+
+export interface ChangeShowBtcReceiveAlert {
+  type: typeof ChangeShowBtcReceiveAlertKey;
+  showBtcReceiveAlert: boolean | null;
+}
+
+export interface ChangeShowOrdinalReceiveAlert {
+  type: typeof ChangeShowOrdinalReceiveAlertKey;
+  showOrdinalReceiveAlert: boolean | null;
+}
+
+export interface ChangeShowDataCollectionAlert {
+  type: typeof ChangeShowDataCollectionAlertKey;
+  showDataCollectionAlert: boolean | null;
+}
+
+export interface SetBrcCoinsData {
+  type: typeof SetBrcCoinsListKey;
+  brcCoinsList: FungibleToken[];
+}
+
+export interface SetWalletLockPeriod {
+  type: typeof SetWalletLockPeriodKey;
+  walletLockPeriod: WalletSessionPeriods;
+}
+export interface SetWalletUnlocked {
+  type: typeof SetWalletUnlockedKey;
+  isUnlocked: boolean;
+}
 export type WalletActions =
   | SetWallet
   | ResetWallet
   | FetchAccount
   | AddAccount
+  | AddLedgerAccount
   | SelectAccount
   | StoreEncryptedSeed
-  | SetWalletSeedPhrase
-  | UnlockWallet
-  | LockWallet
-  | FetchFeeMultiplier
-  | FetchRates
-  | FetchRatesSuccess
-  | FetchRatesFail
-  | FetchStxWalletDataRequest
-  | FetchStxWalletDataSuccess
-  | FetchStxWalletDataFail
-  | FetchBtcWalletDataFail
-  | FetchBtcWalletDataSuccess
-  | FetchBtcWalletDataRequest
-  | FetchCoinDataRequest
-  | FetchCoinDataSuccess
-  | FetchCoinDataFailure
+  | SetFeeMultiplier
+  | SetCoinRates
+  | SetStxWalletData
+  | SetBtcWalletData
+  | SetCoinData
   | UpdateVisibleCoinList
   | ChangeFiatCurrency
   | ChangeNetwork
-  | GetActiveAccounts;
+  | GetActiveAccounts
+  | ChangeActivateOrdinals
+  | ChangeActivateRareSats
+  | ChangeShowBtcReceiveAlert
+  | ChangeShowOrdinalReceiveAlert
+  | ChangeShowDataCollectionAlert
+  | SetBrcCoinsData
+  | SetWalletLockPeriod
+  | SetRareSatsNoticeDismissed
+  | SetWalletUnlocked;

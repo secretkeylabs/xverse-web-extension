@@ -1,3 +1,4 @@
+import ActionButton from '@components/button';
 import SeedPhraseInput from '@components/seedPhraseInput';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,18 +11,15 @@ const Container = styled.div({
 });
 
 const Title = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  ...props.theme.body_m,
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(21),
   marginBottom: props.theme.spacing(16),
+  textAlign: 'center',
 }));
 
-const ContinueButton = styled.button((props) => ({
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
+const ButtonContainer = styled.div((props) => ({
   width: '100%',
-  height: 44,
   marginTop: 'auto',
   marginBottom: props.theme.spacing(30),
 }));
@@ -35,22 +33,17 @@ interface Props {
 }
 
 function EnterSeedPhrase(props: Props): JSX.Element {
-  const {
-    onContinue, seed, setSeed, seedError, setSeedError,
-  } = props;
+  const { onContinue, seed, setSeed, seedError, setSeedError } = props;
 
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
 
   return (
     <Container>
       <Title>{t('ENTER_SEED_HEADER')}</Title>
-      <SeedPhraseInput
-        seed={seed}
-        onSeedChange={setSeed}
-        seedError={seedError}
-        setSeedError={setSeedError}
-      />
-      <ContinueButton onClick={onContinue}>{t('CONTINUE_BUTTON')}</ContinueButton>
+      <SeedPhraseInput onSeedChange={setSeed} seedError={seedError} setSeedError={setSeedError} />
+      <ButtonContainer>
+        <ActionButton onPress={onContinue} disabled={seed === ''} text={t('CONTINUE_BUTTON')} />
+      </ButtonContainer>
     </Container>
   );
 }

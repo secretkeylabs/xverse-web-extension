@@ -1,16 +1,16 @@
-import styled from 'styled-components';
+import Cross from '@assets/img/settings/x.svg';
+import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { useTranslation } from 'react-i18next';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useNavigate } from 'react-router-dom';
-import { initialNetworksList } from '@utils/constants';
-import Cross from '@assets/img/settings/x.svg';
-import { useState } from 'react';
-import ActionButton from '@components/button';
-import { isValidURL } from '@utils/helper';
-import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
 import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core/types';
+import { initialNetworksList } from '@utils/constants';
+import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import NetworkRow from './networkRow';
 
 const Container = styled.div`
@@ -26,17 +26,31 @@ const Container = styled.div`
   }
 `;
 
+const NodeInputHeader = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingLeft: props.theme.spacing(1),
+  paddingRight: props.theme.spacing(1),
+}));
+
 const NodeText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   marginTop: props.theme.spacing(6),
+}));
+
+const NodeResetButton = styled.button((props) => ({
+  background: 'none',
+  color: props.theme.colors.action.classicLight,
 }));
 
 const InputContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  backgroundColor: props.theme.colors.background['elevation-1'],
+  border: `1px solid ${props.theme.colors.elevation3}`,
+  backgroundColor: props.theme.colors.elevation_n1,
   borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(4),
   paddingRight: props.theme.spacing(4),
@@ -61,8 +75,8 @@ const Input = styled.input((props) => ({
   height: 44,
   display: 'flex',
   flex: 1,
-  backgroundColor: props.theme.colors.background['elevation-1'],
-  color: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.elevation_n1,
+  color: props.theme.colors.white_0,
   border: 'none',
 }));
 
@@ -72,11 +86,14 @@ const Button = styled.button({
 
 function ChangeNetworkScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
-  const { network } = useWalletSelector();
+  const { network, btcApiUrl, networkAddress } = useWalletSelector();
   const [changedNetwork, setChangedNetwork] = useState<SettingsNetwork>(network);
   const [error, setError] = useState<string>('');
-  const [url, setUrl] = useState<string>(network.address);
+  const [btcURLError, setBtcURLError] = useState('');
+  const [btcUrl, setBtcUrl] = useState(btcApiUrl || network.btcApiUrl);
+  const [url, setUrl] = useState<string>(networkAddress || network.address);
   const [isChangingNetwork, setIsChangingNetwork] = useState<boolean>(false);
+  const [isUrlEdited, setIsUrlEdited] = useState(false);
   const navigate = useNavigate();
   const { changeNetwork } = useWalletReducer();
 
@@ -84,27 +101,66 @@ function ChangeNetworkScreen() {
     navigate('/settings');
   };
 
-  const onNetworkSelected = (selectedNetwork: SettingsNetwork) => {
-    setUrl(selectedNetwork.address);
-    setChangedNetwork(selectedNetwork);
+  const onNetworkSelected = (networkSelected: SettingsNetwork) => {
+    setIsUrlEdited(false);
+    setUrl(networkSelected.address);
+    setChangedNetwork(networkSelected);
+    setBtcUrl(networkSelected.btcApiUrl);
+    setError('');
+    setBtcURLError('');
   };
 
-  const onChange = (event: React.FormEvent<HTMLInputElement>) => {
+  const onChangeStacksUrl = (event: React.FormEvent<HTMLInputElement>) => {
+    setError('');
     setUrl(event.currentTarget.value);
   };
 
-  const onCrossClick = () => {
+  const onChangeBtcApiUrl = (event: React.FormEvent<HTMLInputElement>) => {
+    setBtcURLError('');
+    setIsUrlEdited(true);
+    setBtcUrl(event.currentTarget.value);
+  };
+
+  const onClearStacksUrl = () => {
     setUrl('');
+  };
+
+  const onClearBtcUrl = () => {
+    setBtcUrl('');
+  };
+
+  const onResetBtcUrl = async () => {
+    if (changedNetwork.type !== network.type) {
+      setBtcUrl(changedNetwork.btcApiUrl);
+    } else {
+      setBtcUrl(network.btcApiUrl);
+    }
+    setBtcURLError('');
+  };
+
+  const onResetStacks = async () => {
+    if (changedNetwork.type !== network.type) {
+      setUrl(changedNetwork.address);
+    } else {
+      setUrl(networkAddress || network.address);
+    }
+    setError('');
   };
 
   const onSubmit = async () => {
     setIsChangingNetwork(true);
-    const response = await isValidURL(url);
-    if (response) {
-      await changeNetwork(changedNetwork);
+    const isValidStacksUrl = await isValidStacksApi(url, changedNetwork.type).catch((err) =>
+      setError(err.message),
+    );
+    const isValidBtcApiUrl = await isValidBtcApi(btcUrl, changedNetwork.type).catch((err) =>
+      setBtcURLError(err.message),
+    );
+    if (isValidStacksUrl && isValidBtcApiUrl) {
+      const networkObject =
+        changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
+      const btcChangedUrl = isUrlEdited ? btcUrl : '';
+      await changeNetwork(changedNetwork, networkObject, url, btcChangedUrl);
       navigate('/settings');
-    } else {
-      setError(t('INVALID_URL'));
     }
     setIsChangingNetwork(false);
   };
@@ -125,17 +181,36 @@ function ChangeNetworkScreen() {
           onNetworkSelected={onNetworkSelected}
           showDivider={false}
         />
-        <NodeText>{t('NODE')}</NodeText>
+        <NodeInputHeader>
+          <NodeText>{t('NODE')}</NodeText>
+          <NodeResetButton onClick={onResetStacks}>Reset URL</NodeResetButton>
+        </NodeInputHeader>
         <InputContainer>
-          <Input onChange={onChange} value={url} />
-          <Button onClick={onCrossClick}>
+          <Input onChange={onChangeStacksUrl} value={url} />
+          <Button onClick={onClearStacksUrl}>
             <img width={22} height={22} src={Cross} alt="cross" />
           </Button>
         </InputContainer>
         <ErrorMessage>{error}</ErrorMessage>
+        <NodeInputHeader>
+          <NodeText>BTC API URL</NodeText>
+          <NodeResetButton onClick={onResetBtcUrl}>Reset URL</NodeResetButton>
+        </NodeInputHeader>
+        <InputContainer>
+          <Input onChange={onChangeBtcApiUrl} value={btcUrl} />
+          <Button onClick={onClearBtcUrl}>
+            <img width={22} height={22} src={Cross} alt="cross" />
+          </Button>
+        </InputContainer>
+        <ErrorMessage>{btcURLError}</ErrorMessage>
       </Container>
       <ButtonContainer>
-        <ActionButton text={t('SAVE')} onPress={onSubmit} processing={isChangingNetwork} disabled={isChangingNetwork} />
+        <ActionButton
+          text={t('SAVE')}
+          onPress={onSubmit}
+          processing={isChangingNetwork}
+          disabled={isChangingNetwork}
+        />
       </ButtonContainer>
 
       <BottomBar tab="settings" />

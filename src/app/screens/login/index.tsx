@@ -1,23 +1,37 @@
-import { useTranslation } from 'react-i18next';
-import logo from '@assets/img/full_logo_vertical.svg';
-import styled from 'styled-components';
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Ring } from 'react-spinners-css';
+import logo from '@assets/img/xverse_logo.svg';
+import ActionButton from '@components/button';
+import useCacheMigration from '@hooks/useCacheMigration';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
+import MigrationConfirmation from '@screens/migrationConfirmation';
+import { addMinutes } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
-declare const VERSION: string;
+const Logo = styled.img({
+  width: 57,
+  height: 57,
+});
 
-const ScreenContainer = styled(animated.div)({
+const Button = styled.button({
+  background: 'none',
+});
+
+const ScreenContainer = styled(animated.div)((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  paddingLeft: 18,
-  paddingRight: 18,
-});
+  paddingLeft: props.theme.spacing(9),
+  paddingRight: props.theme.spacing(9),
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+}));
 
 const ContentContainer = styled(animated.div)({
   display: 'flex',
@@ -27,7 +41,7 @@ const ContentContainer = styled(animated.div)({
 
 const AppVersion = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'right',
   marginTop: props.theme.spacing(8),
 }));
@@ -37,8 +51,8 @@ const TopSectionContainer = styled.div((props) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: props.theme.spacing(50),
-  marginBottom: props.theme.spacing(15),
+  marginTop: props.theme.spacing(60),
+  marginBottom: props.theme.spacing(30),
 }));
 
 const PasswordInputLabel = styled.h2((props) => ({
@@ -51,7 +65,7 @@ const PasswordInputContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  border: '1px solid #303354;',
+  border: `1px solid ${props.theme.colors.elevation3}`,
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   borderRadius: props.theme.radius(1),
@@ -61,8 +75,8 @@ const PasswordInputContainer = styled.div((props) => ({
 const PasswordInput = styled.input((props) => ({
   ...props.theme.body_medium_m,
   height: 44,
-  backgroundColor: props.theme.colors.background.elevation0,
-  color: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.elevation0,
+  color: props.theme.colors.white_0,
   width: '100%',
   border: 'none',
 }));
@@ -72,21 +86,13 @@ const LandingTitle = styled.h1((props) => ({
   paddingTop: props.theme.spacing(15),
   paddingLeft: props.theme.spacing(34),
   paddingRight: props.theme.spacing(34),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 
-const VerifyButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
-  color: props.theme.colors.white['0'],
+const ButtonContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(8),
   width: '100%',
-  height: 44,
 }));
 
 const ErrorMessage = styled.h2((props) => ({
@@ -100,7 +106,7 @@ const ForgotPasswordButton = styled.a((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
   marginTop: props.theme.spacing(12),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textDecoration: 'underline',
 }));
 
@@ -112,6 +118,7 @@ function Login(): JSX.Element {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showMigration, setShowMigration] = useState(false);
   const styles = useSpring({
     from: {
       opacity: 0,
@@ -123,6 +130,21 @@ function Login(): JSX.Element {
     },
     delay: 100,
   });
+  const { migrateCachedStorage } = useCacheMigration();
+
+  const handleSkipMigration = async () => {
+    await unlockWallet(password);
+    setIsVerifying(false);
+    const skipTime = new Date().getTime();
+    const migrationReminder = addMinutes(skipTime, 10).getTime();
+    localStorage.setItem('migrationReminder', migrationReminder.toString());
+    navigate(-1);
+  };
+
+  const handleMigrateCache = async () => {
+    await migrateCachedStorage(password);
+    setIsVerifying(false);
+  };
 
   const handleTogglePasswordView = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -137,9 +159,16 @@ function Login(): JSX.Element {
   const handleVerifyPassword = async () => {
     setIsVerifying(true);
     try {
-      await unlockWallet(password);
-      setIsVerifying(false);
-      navigate(-1);
+      const hasMigrated = localStorage.getItem('migrated');
+      const isReminderDue =
+        Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
+      if (!hasMigrated && isReminderDue) {
+        setShowMigration(true);
+      } else {
+        await unlockWallet(password);
+        setIsVerifying(false);
+        navigate('/');
+      }
     } catch (err) {
       setIsVerifying(false);
       setError(t('VERIFY_PASSWORD_ERROR'));
@@ -164,35 +193,49 @@ function Login(): JSX.Element {
   };
 
   return (
-    <ScreenContainer>
-      <AppVersion>Beta</AppVersion>
-      <ContentContainer style={styles}>
-        <TopSectionContainer>
-          <img src={logo} width={100} alt="logo" />
-          <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
-        </TopSectionContainer>
-        <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
-        <PasswordInputContainer>
-          <PasswordInput
-            type={isPasswordVisible ? 'text' : 'password'}
-            value={password}
-            onChange={handlePasswordChange}
-            placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
-            autoFocus
-          />
-          <button type="button" onClick={handleTogglePasswordView} style={{ background: 'none' }}>
-            <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
-          </button>
-        </PasswordInputContainer>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <VerifyButton onClick={handleVerifyPassword}>
-          {!isVerifying ? t('VERIFY_PASSWORD_BUTTON') : <Ring color="white" size={20} />}
-        </VerifyButton>
-        <ForgotPasswordButton onClick={handleForgotPassword}>
-          {t('FORGOT_PASSWORD_BUTTON')}
-        </ForgotPasswordButton>
-      </ContentContainer>
-    </ScreenContainer>
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    <>
+      {!showMigration ? (
+        <ScreenContainer>
+          <AppVersion>Beta</AppVersion>
+          <ContentContainer style={styles}>
+            <TopSectionContainer>
+              <Logo src={logo} />
+              <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
+            </TopSectionContainer>
+            <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
+            <PasswordInputContainer>
+              <PasswordInput
+                type={isPasswordVisible ? 'text' : 'password'}
+                value={password}
+                onChange={handlePasswordChange}
+                placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
+                autoFocus
+              />
+              <Button type="button" onClick={handleTogglePasswordView}>
+                <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
+              </Button>
+            </PasswordInputContainer>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+            <ButtonContainer>
+              <ActionButton
+                onPress={handleVerifyPassword}
+                text={t('VERIFY_PASSWORD_BUTTON')}
+                processing={isVerifying}
+              />
+            </ButtonContainer>
+            <ForgotPasswordButton onClick={handleForgotPassword}>
+              {t('FORGOT_PASSWORD_BUTTON')}
+            </ForgotPasswordButton>
+          </ContentContainer>
+        </ScreenContainer>
+      ) : (
+        <MigrationConfirmation
+          migrateCallback={handleMigrateCache}
+          skipCallback={handleSkipMigration}
+        />
+      )}
+    </>
   );
 }
 export default Login;

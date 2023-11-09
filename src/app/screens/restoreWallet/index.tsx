@@ -1,28 +1,35 @@
+import { useWalletExistsContext } from '@components/guards/onboarding';
+import PasswordInput from '@components/passwordInput';
+import Steps from '@components/steps';
+import useWalletReducer from '@hooks/useWalletReducer';
 import * as bip39 from 'bip39';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import useWalletReducer from '@hooks/useWalletReducer';
-import Steps from '@components/steps';
-import PasswordInput from '@components/passwordInput';
 import EnterSeedPhrase from './enterSeedphrase';
+
+const Body = styled.div(() => ({
+  display: 'flex',
+  height: '100%',
+  justifyContent: 'center',
+  alignItems: 'center',
+}));
 
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: 'auto',
-  marginRight: 'auto',
-  height: 600,
-  width: 360,
-  backgroundColor: props.theme.colors.background.elevation0,
-  padding: `${props.theme.spacing(12)}px ${props.theme.spacing(8)}px 0 ${props.theme.spacing(8)}px`,
-
+  height: 'auto',
+  backgroundColor: props.theme.colors.elevation0,
+  padding: `${props.theme.spacing(12)}px`,
+  border: `1px solid ${props.theme.colors.elevation2}`,
+  borderRadius: props.theme.radius(2),
 }));
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
   height: '100%',
+  width: '312px',
   marginBottom: props.theme.spacing(32),
   marginTop: props.theme.spacing(32),
 }));
@@ -30,16 +37,18 @@ const PasswordContainer = styled.div((props) => ({
 function RestoreWallet(): JSX.Element {
   const { t } = useTranslation('translation');
   const { restoreWallet } = useWalletReducer();
-  const [isRestoring, setIsRestoring] = useState<boolean>(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [seedPhrase, setSeedPhrase] = useState<string>('');
-  const [seedError, setSeedError] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [seedPhrase, setSeedPhrase] = useState('');
+  const [seedError, setSeedError] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { disableWalletExistsGuard } = useWalletExistsContext();
 
-  const cleanMnemonic = (rawSeed: string): string => rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
+  const cleanMnemonic = (rawSeed: string): string =>
+    rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
   const handleNewPasswordBack = () => {
     setCurrentStepIndex(0);
@@ -74,11 +83,14 @@ function RestoreWallet(): JSX.Element {
     setIsRestoring(true);
     if (confirmPassword === password) {
       setError('');
+
+      disableWalletExistsGuard?.();
+
       const seed = cleanMnemonic(seedPhrase);
       await restoreWallet(seed, password);
       setIsRestoring(false);
 
-      navigate('/wallet-success/restore');
+      navigate('/wallet-success/restore', { replace: true });
     } else {
       setIsRestoring(false);
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));
@@ -102,12 +114,13 @@ function RestoreWallet(): JSX.Element {
         handleContinue={handleContinuePasswordCreation}
         handleBack={handleNewPasswordBack}
         checkPasswordStrength
+        createPasswordFlow
       />
     </PasswordContainer>,
     <PasswordContainer>
       <PasswordInput
         title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
-        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_CONFIRM_PASSWORD_LABEL')}
+        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
         enteredPassword={confirmPassword}
         setEnteredPassword={setConfirmPassword}
         handleContinue={handleConfirmPassword}
@@ -118,10 +131,12 @@ function RestoreWallet(): JSX.Element {
     </PasswordContainer>,
   ];
   return (
-    <Container>
-      <Steps data={restoreSteps} activeIndex={currentStepIndex} />
-      {restoreSteps[currentStepIndex]}
-    </Container>
+    <Body>
+      <Container>
+        <Steps data={restoreSteps} activeIndex={currentStepIndex} />
+        {restoreSteps[currentStepIndex]}
+      </Container>
+    </Body>
   );
 }
 

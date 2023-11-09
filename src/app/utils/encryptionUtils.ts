@@ -1,70 +1,73 @@
 import argon2 from 'argon2-browser';
-import { encryptMnemonic, decryptMnemonic } from '@stacks/encryption';
+import { encryptSeedPhrase, decryptSeedPhrase } from '@secretkeylabs/xverse-core/encryption';
 import {
-  encryptMnemonicWithCallback,
-  decryptMnemonicWithCallback,
+  encryptMnemonicWithHandler,
+  decryptMnemonicWithHandler,
 } from '@secretkeylabs/xverse-core/wallet';
-import { getSalt, saveSalt } from './localStorage';
 
-function generateRandomKey(bytesCount: number): string {
-  const randomValues = Array.from(crypto.getRandomValues(new Uint8Array(bytesCount)));
-  return randomValues.map((val) => `00${val.toString(16)}`.slice(-2)).join('');
+export async function generateKeyArgon2id(password: string, salt: string): Promise<string> {
+  const result = await argon2.hash({
+    pass: password,
+    salt,
+    time: 3,
+    mem: 64 * 1024,
+    parallelism: 4,
+    hashLen: 16,
+    type: argon2.ArgonType.Argon2id,
+  });
+  return result.hashHex;
 }
 
-async function generateKeyArgon2(password: string, salt: string): Promise<string> {
-  try {
-    const result = await argon2.hash({
-      pass: password,
-      salt,
-      time: 3,
-      mem: 64 * 1024,
-      parallelism: 4,
-      hashLen: 48,
-      type: argon2.ArgonType.Argon2i,
-    });
-    return result.hashHex;
-  } catch (e) {
-    return Promise.reject(e);
-  }
+export async function generateKeyArgon2i(password: string, salt: string): Promise<string> {
+  const result = await argon2.hash({
+    pass: password,
+    salt,
+    time: 3,
+    mem: 64 * 1024,
+    parallelism: 4,
+    hashLen: 48,
+    type: argon2.ArgonType.Argon2i,
+  });
+  return result.hashHex;
 }
 
-async function generatePasswordHash(password: string) {
-  const existingSalt = getSalt();
-  if (existingSalt) {
-    const argonHash = await generateKeyArgon2(password, existingSalt);
-    return {
-      salt: existingSalt,
-      hash: argonHash,
-    };
+/**
+ * Only used by the migration function that is run once on the first login after the update to the seed vault
+ * @param password
+ * @returns Argon2i hash and salt of the password
+ */
+export async function generatePasswordHash(password: string) {
+  const unMigratedSalt = localStorage.getItem('salt');
+  if (!unMigratedSalt) {
+    throw new Error('No salt found');
   }
-  const newSalt = generateRandomKey(16);
-  saveSalt(newSalt);
-  const argonHash = await generateKeyArgon2(password, newSalt);
+  const argonHash = await generateKeyArgon2i(password, unMigratedSalt);
   return {
-    salt: newSalt,
+    unMigratedSalt,
     hash: argonHash,
   };
 }
 
-export async function encryptSeedPhrase(seed: string, password: string): Promise<string> {
-  return encryptMnemonicWithCallback({
+export async function encryptSeedPhraseHandler(seed: string, password: string): Promise<string> {
+  return encryptMnemonicWithHandler({
     seed,
     password,
-    mnemonicEncryptionHandler: encryptMnemonic,
-    passwordHashGenerator: generatePasswordHash,
+    mnemonicEncryptionHandler: encryptSeedPhrase,
   });
 }
 
-export async function decryptSeedPhrase(encryptedSeed: string, password: string): Promise<string> {
+export async function decryptSeedPhraseHandler(
+  encryptedSeed: string,
+  password: string,
+): Promise<string> {
   try {
-    const seedPhrase = await decryptMnemonicWithCallback({
+    const seedPhrase = await decryptMnemonicWithHandler({
       encryptedSeed,
       password,
-      mnemonicDecryptionHandler: decryptMnemonic,
-      passwordHashGenerator: generatePasswordHash,
+      mnemonicDecryptionHandler: decryptSeedPhrase,
     });
     return seedPhrase;
   } catch (err) {
-    return Promise.reject(Error('Invalid Password'));
+    throw new Error('Invalid Password');
   }
 }

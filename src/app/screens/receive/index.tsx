@@ -1,18 +1,22 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import TopRow from '@components/topRow';
-import { useNavigate, useParams } from 'react-router-dom';
-import QRCode from 'react-qr-code';
-import Copy from '@assets/img/dashboard/Copy.svg';
+import Copy from '@assets/img/dashboard/copy_black_icon.svg';
 import Tick from '@assets/img/dashboard/tick.svg';
-import { useState } from 'react';
 import ActionButton from '@components/button';
-import useWalletSelector from '@hooks/useWalletSelector';
+import InfoContainer from '@components/infoContainer';
+import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
+import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import QRCode from 'react-qr-code';
+import { useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import UpdatedReceive from './updatedReceiveScreen';
 
 const OuterContainer = styled.div`
   display: flex;
-  flex:1 ;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -25,18 +29,19 @@ const OuterContainer = styled.div`
 const TopTitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
   textAlign: 'center',
-  marginBottom: props.theme.spacing(4),
 }));
 
 const ReceiveScreenText = styled.h1((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
-  color: props.theme.colors.white['200'],
+  marginTop: props.theme.spacing(3),
+  color: props.theme.colors.white_200,
 }));
 
 const BnsNameText = styled.h1((props) => ({
   ...props.theme.body_bold_l,
   textAlign: 'center',
+  marginBottom: 2,
 }));
 
 const Container = styled.div({
@@ -47,8 +52,7 @@ const Container = styled.div({
   flex: 1,
 });
 
-const InfoContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
+const AddressContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(24),
   marginRight: props.theme.spacing(24),
 }));
@@ -65,7 +69,7 @@ const CopyContainer = styled.div((props) => ({
 const QRCodeContainer = styled.div((props) => ({
   display: 'flex',
   aspectRatio: 1,
-  backgroundColor: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.white_0,
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: 8,
@@ -77,22 +81,31 @@ const QRCodeContainer = styled.div((props) => ({
 const AddressText = styled.h1((props) => ({
   ...props.theme.body_m,
   textAlign: 'center',
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   wordBreak: 'break-all',
 }));
 
 const BottomBarContainer = styled.div({
-  marginTop: 32,
+  marginTop: 22,
+});
+
+const InfoAlertContainer = styled.div({
+  width: '100%',
 });
 
 function Receive(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
   const [addressCopied, setAddressCopied] = useState(false);
+  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
+  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const navigate = useNavigate();
   const {
     stxAddress,
     btcAddress,
+    ordinalsAddress,
     selectedAccount,
+    showBtcReceiveAlert,
+    showOrdinalReceiveAlert,
   } = useWalletSelector();
 
   const { currency } = useParams();
@@ -105,6 +118,8 @@ function Receive(): JSX.Element {
         return btcAddress;
       case 'FT':
         return stxAddress;
+      case 'ORD':
+        return ordinalsAddress;
       default:
         return '';
     }
@@ -113,56 +128,90 @@ function Receive(): JSX.Element {
     navigate(-1);
   };
 
-  const renderHeading = () => (currency === 'BTC' ? (
-    <TopTitleText>
-      {t('BTC_ADDRESS')}
-    </TopTitleText>
-  ) : (
-    <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>
-  ));
+  const renderHeading = () => {
+    if (currency === 'BTC') {
+      return <TopTitleText>{t('BTC_ADDRESS')}</TopTitleText>;
+    }
+    if (currency === 'ORD') {
+      return <TopTitleText>{t('ORDINAL_ADDRESS')}</TopTitleText>;
+    }
+    return <TopTitleText>{t('STX_ADDRESS')}</TopTitleText>;
+  };
+
+  const onReceiveAlertClose = () => {
+    setIsBtcReceiveAlertVisible(false);
+  };
+
+  const onOrdinalReceiveAlertClose = () => {
+    setIsOrdinalReceiveAlertVisible(false);
+  };
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(getAddress());
     setAddressCopied(true);
+    if (currency === 'BTC' && showBtcReceiveAlert) {
+      setIsBtcReceiveAlertVisible(true);
+    }
+    if (currency === 'ORD' && showOrdinalReceiveAlert) {
+      setIsOrdinalReceiveAlertVisible(true);
+    }
   };
-  return (
+
+  // TODO: Shift UpdatedReceive logic in this file and handle STX & BTC UI
+  return currency === 'ORD' ? (
+    <UpdatedReceive />
+  ) : (
     <>
       <TopRow title={t('RECEIVE')} onClick={handleBackButtonClick} />
       <OuterContainer>
         <Container>
           {renderHeading()}
-          {currency !== 'BTC' && <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>}
+          {currency !== 'BTC' && currency !== 'ORD' && (
+            <ReceiveScreenText>{t('STX_ADDRESS_DESC')}</ReceiveScreenText>
+          )}
           <QRCodeContainer>
             <QRCode value={getAddress()} size={150} />
           </QRCodeContainer>
 
-          {currency !== 'BTC' && !!selectedAccount?.bnsName && (
-          <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
+          {currency !== 'BTC' && currency !== 'ORD' && !!selectedAccount?.bnsName && (
+            <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>
           )}
-          <InfoContainer>
-            <AddressText>
-              { getAddress() }
-            </AddressText>
-          </InfoContainer>
+          <AddressContainer>
+            <AddressText>{getAddress()}</AddressText>
+          </AddressContainer>
         </Container>
-        {addressCopied ? (
-          <CopyContainer>
+        <CopyContainer>
+          {currency === 'ORD' && (
+            <InfoAlertContainer>
+              <InfoContainer bodyText={t('ORDINALS_RECEIVE_MESSAGE')} />
+            </InfoAlertContainer>
+          )}
+          {currency === 'BTC' && (
+            <InfoAlertContainer>
+              <InfoContainer bodyText={t('BTC_RECEIVE_MESSAGE')} />
+            </InfoAlertContainer>
+          )}
+          {addressCopied ? (
             <ActionButton
               src={Tick}
               text={t('COPIED_ADDRESS')}
               onPress={handleOnClick}
               transparent
             />
-          </CopyContainer>
-        ) : (
-          <CopyContainer>
+          ) : (
             <ActionButton src={Copy} text={t('COPY_ADDRESS')} onPress={handleOnClick} />
-          </CopyContainer>
-        )}
+          )}
+        </CopyContainer>
       </OuterContainer>
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />
       </BottomBarContainer>
+      {isBtcReceiveAlertVisible && (
+        <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose} />
+      )}
+      {isOrdinalReceiveAlertVisible && (
+        <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
+      )}
     </>
   );
 }

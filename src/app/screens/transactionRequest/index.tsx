@@ -1,17 +1,18 @@
-import useDappRequest from '@hooks/useTransationRequest';
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useEffect, useState } from 'react';
-import { StacksTransaction } from '@stacks/transactions';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
-import useStxPendingTxData from '@hooks/useStxPendingTxData';
-import { useNavigate } from 'react-router-dom';
-import { Ring } from 'react-spinners-css';
-import styled from 'styled-components';
-import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
-import { Coin, createDeployContractRequest } from '@secretkeylabs/xverse-core';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useNetworkSelector from '@hooks/useNetwork';
+import useDappRequest from '@hooks/useTransationRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { getNetworkType } from '@utils/helper';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Coin, createDeployContractRequest, extractFromPayload } from '@secretkeylabs/xverse-core';
+import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
+import { StacksTransaction } from '@stacks/transactions';
+import { getNetworkType, isHardwareAccount } from '@utils/helper';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 import { getContractCallPromises, getTokenTransferRequest } from './helper';
 
 const LoaderContainer = styled.div((props) => ({
@@ -25,17 +26,10 @@ const LoaderContainer = styled.div((props) => ({
 function TransactionRequest() {
   const { payload, tabId, requestToken } = useDappRequest();
   const navigate = useNavigate();
-  const {
-    stxAddress,
-    network,
-    stxPublicKey,
-    feeMultipliers,
-    accountsList,
-    selectedAccount,
-  } = useWalletSelector();
-  const {
-    switchAccount,
-  } = useWalletReducer();
+  const { stxAddress, network, stxPublicKey, feeMultipliers, accountsList, selectedAccount } =
+    useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
+  const { switchAccount } = useWalletReducer();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>();
   const [funcMetaData, setFuncMetaData] = useState<ContractFunction | undefined>(undefined);
   const [coinsMetaData, setCoinsMetaData] = useState<Coin[] | null>(null);
@@ -43,6 +37,7 @@ function TransactionRequest() {
   const [contractName, setContractName] = useState(undefined);
   const stxPendingTxData = useStxPendingTxData();
   const [hasSwitchedAccount, setHasSwitchedAccount] = useState(false);
+  const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
 
   const handleTokenTransferRequest = async () => {
     const unsignedSendStxTx = await getTokenTransferRequest(
@@ -51,13 +46,13 @@ function TransactionRequest() {
       payload.memo!,
       stxPublicKey,
       feeMultipliers!,
-      network,
+      selectedNetwork,
       stxPendingTxData,
     );
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
       state: {
-        unsignedTx: unsignedSendStxTx,
+        unsignedTx: unsignedSendStxTx.serialize().toString('hex'),
         sponosred: payload.sponsored,
         isBrowserTx: true,
         tabId,
@@ -71,19 +66,34 @@ function TransactionRequest() {
       unSignedContractCall,
       contractInterface,
       coinsMetaData: coinMeta,
-    } = await getContractCallPromises(payload, stxAddress, network, stxPublicKey);
+    } = await getContractCallPromises(payload, stxAddress, selectedNetwork, stxPublicKey);
     setUnsignedTx(unSignedContractCall);
     setCoinsMetaData(coinMeta);
-    const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find((func) => func.name === payload.functionName);
+    const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find(
+      (func) => func.name === payload.functionName,
+    );
+    const txAttachment = payload.attachment ?? undefined;
+    if (txAttachment) setAttachment(txAttachment);
     if (invokedFuncMetaData) {
       setFuncMetaData(invokedFuncMetaData);
+      const { funcArgs } = extractFromPayload(payload);
+      if (invokedFuncMetaData?.args.length !== funcArgs.length) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'STX',
+            error: 'Contract function call missing arguments',
+            browserTx: true,
+          },
+        });
+      }
     }
   };
 
   const handleContractDeployRequest = async () => {
     const response = await createDeployContractRequest(
       payload,
-      network,
+      selectedNetwork,
       stxPublicKey,
       feeMultipliers!,
       stxAddress,
@@ -106,7 +116,7 @@ function TransactionRequest() {
       });
       return;
     }
-    if (payload.stxAddress !== selectedAccount?.stxAddress) {
+    if (payload.stxAddress !== selectedAccount?.stxAddress && !isHardwareAccount(selectedAccount)) {
       const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
       if (account) {
         switchAccount(account);
@@ -150,7 +160,7 @@ function TransactionRequest() {
     <>
       {!unsignedTx ? (
         <LoaderContainer>
-          <Ring color="white" size={50} />
+          <MoonLoader color="white" size={50} />
         </LoaderContainer>
       ) : null}
       {payload.txType === 'contract_call' && unsignedTx ? (
@@ -158,6 +168,7 @@ function TransactionRequest() {
           request={payload}
           unsignedTx={unsignedTx}
           funcMetaData={funcMetaData}
+          attachment={attachment}
           coinsMetaData={coinsMetaData}
           tabId={Number(tabId)}
           requestToken={requestToken}

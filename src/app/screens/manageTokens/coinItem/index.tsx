@@ -1,11 +1,11 @@
+import Separator from '@components/separator';
+import { Coin } from '@secretkeylabs/xverse-core/types';
+import { getTicker } from '@utils/helper';
 import { useState } from 'react';
+import Switch from 'react-switch';
 import stc from 'string-to-color';
 import styled from 'styled-components';
-import Switch from 'react-switch';
-import { Coin } from '@secretkeylabs/xverse-core/types';
 import Theme from 'theme';
-import { getTicker } from '@utils/helper';
-import Seperator from '@components/seperator';
 
 const RowContainer = styled.div((props) => ({
   display: 'flex',
@@ -21,12 +21,24 @@ const CoinContainer = styled.div({
   alignItems: 'center',
 });
 
+const BottomContainer = styled.div({
+  marginBottom: 30,
+});
+
 const CoinIcon = styled.img((props) => ({
   marginRight: props.theme.spacing(7),
   width: 32,
   height: 32,
   resizeMode: 'stretch',
 }));
+
+const CustomSwitch = styled(Switch)`
+  .react-switch-handle {
+    background-color: ${({ checked }) =>
+      checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'} !important;
+    border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
+  }
+`;
 
 const TickerIconContainer = styled.div((props) => ({
   display: 'flex',
@@ -41,7 +53,7 @@ const TickerIconContainer = styled.div((props) => ({
 
 const TickerText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
   fontSize: 10,
@@ -49,13 +61,13 @@ const TickerText = styled.h1((props) => ({
 
 const SelectedCoinTitleText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const UnSelectedCoinTitleText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
@@ -64,11 +76,10 @@ interface Props {
   disabled: boolean;
   toggled(enabled: boolean, coin: Coin): void;
   enabled?: boolean;
+  showDivider: boolean;
 }
 
-function CoinItem({
-  coin, disabled, toggled, enabled,
-}: Props) {
+function CoinItem({ coin, disabled, toggled, enabled, showDivider }: Props) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const toggleSwitch = () => {
     setIsEnabled((previousState) => !previousState);
@@ -85,20 +96,21 @@ function CoinItem({
     <>
       <RowContainer>
         <CoinContainer>
-          {coin.image ? <CoinIcon src={coin.image} />
-            : (
-              <TickerIconContainer color={background}>
-                <TickerText>{getFtTicker()}</TickerText>
-              </TickerIconContainer>
-            )}
-          { isEnabled ? (
+          {coin.image ? (
+            <CoinIcon src={coin.image} />
+          ) : (
+            <TickerIconContainer color={background}>
+              <TickerText>{getFtTicker()}</TickerText>
+            </TickerIconContainer>
+          )}
+          {isEnabled ? (
             <SelectedCoinTitleText>{coin.name}</SelectedCoinTitleText>
           ) : (
             <UnSelectedCoinTitleText>{coin.name}</UnSelectedCoinTitleText>
           )}
         </CoinContainer>
-        <Switch
-          onColor={Theme.colors.action.classic}
+        <CustomSwitch
+          onColor={Theme.colors.orange_main}
           offColor={Theme.colors.background.elevation3}
           onChange={toggleSwitch}
           checked={isEnabled!}
@@ -107,7 +119,7 @@ function CoinItem({
           disabled={disabled}
         />
       </RowContainer>
-      <Seperator />
+      {showDivider ? <Separator /> : <BottomContainer />}
     </>
   );
 }

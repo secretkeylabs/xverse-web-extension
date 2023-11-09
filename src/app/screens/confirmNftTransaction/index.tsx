@@ -1,22 +1,27 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { useMutation } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import Seperator from '@components/seperator';
-import { StoreState } from '@stores/index';
-import BottomBar from '@components/tabBar';
-import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
-import RecipientAddressView from '@components/recipinetAddressView';
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
-import useNftDataSelector from '@hooks/useNftDataSelector';
-import NftImage from '@screens/nftDashboard/nftImage';
+import AssetIcon from '@assets/img/transactions/Assets.svg';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
+import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import RecipientComponent from '@components/recipientComponent';
+import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useNetworkSelector from '@hooks/useNetwork';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import NftImage from '@screens/nftDashboard/nftImage';
+import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
+import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
+import { deserializeTransaction } from '@stacks/transactions';
+import { useMutation } from '@tanstack/react-query';
+import { isLedgerAccount } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -25,68 +30,11 @@ const ScrollContainer = styled.div`
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
-  };
+  }
   height: 600px;
   width: 360px;
   margin: auto;
 `;
-
-const InfoContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-}));
-
-const TitleText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-}));
-
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginLeft: '15%',
-  marginTop: props.theme.spacing(20),
-}));
-
-const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  opacity: 0.8,
-  marginTop: props.theme.spacing(5),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 400,
-  fontSize: 14,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
-
-const IndicationText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-  fontSize: 14,
-}));
-
-const ValueText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(2),
-  wordBreak: 'break-all',
-}));
 
 const Container = styled.div({
   display: 'flex',
@@ -103,43 +51,42 @@ const NFtContainer = styled.div((props) => ({
   aspectRatio: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   padding: props.theme.spacing(5),
   marginBottom: props.theme.spacing(6),
 }));
 
-const NftTitleText = styled.h1((props) => ({
+const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
+  marginBottom: props.theme.spacing(16),
   textAlign: 'center',
 }));
 
 function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const { selectedAccount } = useWalletSelector();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const location = useLocation();
   const { id } = useParams();
   const { nftData } = useNftDataSelector();
   const nftIdDetails = id!.split('::');
   const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
-  const { unsignedTx, recipientAddress } = location.state;
-  const {
-    stxBtcRate, network, stxAddress, fiatCurrency,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
-
+  const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
+  const unsignedTx = deserializeTransaction(unsignedTxHex);
+  const { network } = useWalletSelector();
+  const { refetch } = useStxWalletData();
+  const selectedNetwork = useNetworkSelector();
   const {
     isLoading,
     error: txError,
     data: stxTxBroadcastData,
     mutate,
-  } = useMutation<
-  string,
-  Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network.type));
+  } = useMutation<string, Error, { signedTx: StacksTransaction }>({
+    mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
+  });
+  const initialStxTransactions = [unsignedTx];
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -148,10 +95,11 @@ function ConfirmNftTransaction() {
           txid: stxTxBroadcastData,
           currency: 'STX',
           error: '',
+          isNft: true,
         },
       });
       setTimeout(() => {
-        dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
+        refetch();
       }, 1000);
     }
   }, [stxTxBroadcastData]);
@@ -163,21 +111,42 @@ function ConfirmNftTransaction() {
           txid: '',
           currency: 'STX',
           error: txError.toString(),
+          isNft: true,
         },
       });
     }
   }, [txError]);
 
-  const networkInfoSection = (
-    <InfoContainer>
-      <TitleText>{t('NETWORK')}</TitleText>
-      <ValueText>{network.type}</ValueText>
-    </InfoContainer>
-  );
-
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const type: LedgerTransactionType = 'STX';
+      const state: ConfirmStxTransactionState = {
+        unsignedTx: unsignedTx.serialize(),
+        type,
+        recipients: [
+          {
+            address: recipientAddress,
+            amountMicrostacks: unsignedTx?.payload?.amount
+              ? new BigNumber(unsignedTx?.payload.amount?.toString(10))
+              : new BigNumber(0),
+          },
+        ],
+        fee: new BigNumber(
+          initialStxTransactions
+            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+            .reduce((prev, curr) => prev + curr, BigInt(0))
+            .toString(10),
+        ),
+      };
+
+      navigate('/confirm-ledger-tx', { state });
+      return;
+    }
+
     mutate({ signedTx: txs[0] });
   };
+
+  useResetUserFlow('/confirm-nft-tx');
 
   const handleOnCancelClick = () => {
     navigate(-1);
@@ -186,44 +155,36 @@ function ConfirmNftTransaction() {
   return (
     <>
       {isGalleryOpen && (
-      <>
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-        <ButtonContainer>
-          <Button onClick={handleOnCancelClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-            </>
-          </Button>
-        </ButtonContainer>
-      </>
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
         <ConfirmStxTransationComponent
-          initialStxTransactions={[unsignedTx]}
+          initialStxTransactions={initialStxTransactions}
           loading={isLoading}
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
+          isAsset
+          skipModal={isLedgerAccount(selectedAccount)}
         >
           <Container>
-            <IndicationText>{t('INDICATION')}</IndicationText>
             <NFtContainer>
-
-              <NftImage
-                metadata={nft?.token_metadata!}
-              />
+              <NftImage metadata={nft?.token_metadata!} />
             </NFtContainer>
-            <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+            <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
           </Container>
-          <RecipientAddressView recipient={recipientAddress} />
-          {networkInfoSection}
-          <Seperator />
+          <RecipientComponent
+            address={recipientAddress}
+            value={nft?.token_metadata.name!}
+            icon={AssetIcon}
+            currencyType="NFT"
+            title={t('ASSET')}
+          />
+          <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
         </ConfirmStxTransationComponent>
         {!isGalleryOpen && <BottomBar tab="nft" />}
       </ScrollContainer>
     </>
-
   );
 }
 export default ConfirmNftTransaction;

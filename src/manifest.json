@@ -21,11 +21,11 @@
   "host_permissions": ["*://*/*"],
   "permissions": ["storage"],
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-src 'none'; frame-ancestors 'none';"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; default-src 'none'; connect-src *; style-src 'unsafe-inline'; frame-src 'none'; frame-ancestors 'none'; img-src 'self' data: https:;  media-src 'self' data: https:; "
   },
   "content_scripts": [
     {
-      "js": ["browser-polyfill.js","content-script.js"],
+      "js": ["browser-polyfill.js", "content-script.js"],
       "matches": ["*://*/*"],
       "all_frames": true
     }

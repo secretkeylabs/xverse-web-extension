@@ -1,6 +1,4 @@
-import {
-  bytesToHex, ClarityType, ClarityValue, cvToString,
-} from '@stacks/transactions';
+import { bytesToHex, ClarityType, ClarityValue, cvToString } from '@stacks/transactions';
 import { principalToString } from '@stacks/transactions/dist/esm/clarity/types/principalCV';
 import styled from 'styled-components';
 
@@ -12,18 +10,20 @@ const Container = styled.div<{ isRoot: boolean }>((props) => ({
 const ContentContainer = styled.div({
   display: 'flex',
   alignItems: 'center',
+  overflow: 'hidden',
 });
 
 const ClarityValueText = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   wordWrap: 'break-word',
 }));
 
 const ClarityValueKey = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginRight: props.theme.spacing(4),
+  wordWrap: 'break-word',
 }));
 
 function wrapText(text: string): JSX.Element {
@@ -75,10 +75,7 @@ export default function ClarityMessageView(props: ClarityMessageViewProps) {
         <Container isRoot={isRoot}>
           {Object.entries(val.data).map(([key, value]) => (
             <ContentContainer>
-              <ClarityValueKey>
-                {key}
-                :
-              </ClarityValueKey>
+              <ClarityValueKey>{key}:</ClarityValueKey>
               <ClarityValueText>
                 <ClarityMessageView val={value} encoding="tryAscii" isRoot={false} />
               </ClarityValueText>

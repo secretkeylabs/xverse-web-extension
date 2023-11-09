@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 const ResetWalletText = styled.h1((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   paddingTop: props.theme.spacing(12),
@@ -23,8 +23,12 @@ const ButtonContainer = styled.div((props) => ({
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(2),
+  width: '100%',
+}));
+
+const ResetButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(2),
-  marginRight: props.theme.spacing(6),
   width: '100%',
 }));
 
@@ -33,7 +37,11 @@ interface Props {
   onResetWalletPromptClose: () => void;
   openResetWalletScreen: () => void;
 }
-function ResetWalletPrompt({ showResetWalletPrompt, onResetWalletPromptClose, openResetWalletScreen }:Props) {
+function ResetWalletPrompt({
+  showResetWalletPrompt,
+  onResetWalletPromptClose,
+  openResetWalletScreen,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   return (
     <BottomModal
@@ -44,18 +52,11 @@ function ResetWalletPrompt({ showResetWalletPrompt, onResetWalletPromptClose, op
       <ResetWalletText>{t('RESET_WALLET_DESCRIPTION')}</ResetWalletText>
       <ButtonContainer>
         <TransparentButtonContainer>
-          <ActionButton
-            text={t('CANCEL')}
-            transparent
-            onPress={onResetWalletPromptClose}
-          />
+          <ActionButton text={t('CANCEL')} transparent onPress={onResetWalletPromptClose} />
         </TransparentButtonContainer>
-
-        <ActionButton
-          text={t('RESET_WALLET')}
-          warning
-          onPress={openResetWalletScreen}
-        />
+        <ResetButtonContainer>
+          <ActionButton text={t('RESET_WALLET')} warning onPress={openResetWalletScreen} />
+        </ResetButtonContainer>
       </ButtonContainer>
     </BottomModal>
   );

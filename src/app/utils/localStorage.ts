@@ -1,7 +1,7 @@
 const userPrefBackupRemindKey = 'UserPref:BackupRemind';
 const isTermsAccepted = 'isTermsAccepted';
 const hasFinishedOnboardingKey = 'hasFinishedOnboarding';
-const saltKey = 'salt';
+const nonOrdinalTransferTime = 'nonOrdinalTransferTime';
 
 export function saveMultiple(items: { [x: string]: string }) {
   const itemKeys = Object.keys(items);
@@ -42,10 +42,11 @@ export function getUserPrefBackupRemind(): string | null {
   return localStorage.getItem(userPrefBackupRemindKey);
 }
 
-export function saveSalt(salt: string) {
-  localStorage.setItem(saltKey, salt);
+export async function saveTimeForNonOrdinalTransferTransaction(ordinalAddress: string) {
+  const currentTime = new Date().getTime().toString();
+  return localStorage.setItem(nonOrdinalTransferTime + ordinalAddress, currentTime);
 }
 
-export function getSalt() {
-  return localStorage.getItem(saltKey);
+export async function getTimeForNonOrdinalTransferTransaction(ordinalAddress: string) {
+  return localStorage.getItem(nonOrdinalTransferTime + ordinalAddress);
 }

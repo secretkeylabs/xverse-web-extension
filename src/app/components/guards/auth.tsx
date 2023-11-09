@@ -1,19 +1,47 @@
-import useHasStateRehydrated from '@hooks/useHasRehydrated';
+import { PropsWithChildren, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setWalletUnlockedAction } from '@stores/wallet/actions/actionCreators';
 
-interface AuthGuardProps {
-  children: ReactNode;
-}
+function AuthGuard({ children }: PropsWithChildren) {
+  const navigate = useNavigate();
+  const { masterPubKey, encryptedSeed, isUnlocked } = useWalletSelector();
+  const { getSeed, hasSeed } = useSeedVault();
+  const dispatch = useDispatch();
 
-function AuthGuard({ children }: AuthGuardProps) {
-  const { encryptedSeed, seedPhrase } = useWalletSelector();
-  const hydrated = useHasStateRehydrated();
-  if (hydrated && encryptedSeed && !seedPhrase) return <Navigate to="/login" />;
+  const tryAuthenticating = async () => {
+    try {
+      await getSeed();
+      dispatch(setWalletUnlockedAction(true));
+    } catch (error) {
+      navigate('/login');
+    }
+  };
 
-  if (hydrated && !encryptedSeed) return <Navigate to="/landing" />;
+  const restoreSession = async () => {
+    if (encryptedSeed) {
+      navigate('/login');
+      return;
+    }
+    const hasSeedPhrase = await hasSeed();
+    if (!hasSeedPhrase || !masterPubKey) {
+      navigate('/landing');
+      return;
+    }
+    await tryAuthenticating();
+  };
 
+  useEffect(() => {
+    restoreSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUnlocked]);
+
+  if (!isUnlocked) {
+    return null;
+  }
+  // fragment is required here because without it, the router thinks there could be more than 1 child node
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 }

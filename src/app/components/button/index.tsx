@@ -1,5 +1,5 @@
+import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
-import { Ring } from 'react-spinners-css';
 
 interface ButtonProps {
   disabled?: boolean;
@@ -7,47 +7,59 @@ interface ButtonProps {
 }
 
 const Button = styled.button<ButtonProps>((props) => ({
-
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
-  backgroundColor: props.warning ? props.theme.colors.feedback.error : props.theme.colors.action.classic,
+  backgroundColor: props.warning
+    ? props.theme.colors.feedback.error
+    : props.theme.colors.action.classic,
   width: '100%',
-  padding: '12px 16px 12px 10px',
-  opacity: props.disabled ? 0.6 : 1,
-  transition: 'all 0.2s ease',
+  height: 44,
+  transition: 'all 0.1s ease',
+  ':disabled': {
+    opacity: 0.4,
+    cursor: 'not-allowed',
+  },
+  ':hover:enabled': {
+    opacity: 0.8,
+  },
+  ':active:enabled': {
+    opacity: 0.6,
+  },
 }));
 
-const AnimatedButton = styled(Button)`
-:hover {
-  background: #6977F8;
-}
-:focus {
-  background: #6977F8;
-  opacity:0.6;
-}
-`;
+const TransparentButton = styled(Button)((props) => ({
+  border: `1px solid ${props.theme.colors.elevation6}`,
+  backgroundColor: 'transparent',
+  ':disabled': {
+    cursor: 'not-allowed',
+    opacity: 0.4,
+  },
+  ':hover:enabled': {
+    backgroundColor: props.theme.colors.elevation6_800,
+  },
+  ':active:enabled': {
+    backgroundColor: props.theme.colors.elevation6_600,
+  },
+}));
 
-const TransparentButton = styled(Button)`
-  background-color: transparent;
-  border: 1px solid #4C5187;
-`;
-
-const AnimatedTransparentButton = styled(TransparentButton)`
-:hover {
-  background: rgba(76, 81, 135, 0.2);
+interface TextProps {
+  warning?: boolean;
 }
-:focus {
-  background: rgba(85, 101, 247, 0.2);
-}
-`;
 
-const ButtonText = styled.div((props) => ({
+const ButtonText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white['0'],
+  color: `${props.warning ? props.theme.colors.white_0 : props.theme.colors.elevation0}`,
+  textAlign: 'center',
+}));
+
+const AnimatedButtonText = styled.div((props) => ({
+  ...props.theme.body_xs,
+  fontWeight: 700,
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -57,61 +69,82 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
+const ButtonIconContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: props.theme.spacing(3),
+}));
+
 interface Props {
+  className?: string;
   src?: string;
+  icon?: JSX.Element;
   text: string;
   onPress: () => void;
   processing?: boolean;
   disabled?: boolean;
   transparent?: boolean;
   warning?: boolean;
+  hoverDialogId?: string;
 }
 
 function ActionButton({
+  className,
   src,
+  icon,
   text,
   onPress,
   processing = false,
   disabled = false,
   transparent,
   warning,
+  hoverDialogId,
 }: Props) {
   const handleOnPress = () => {
-    if (!disabled) { onPress(); }
+    if (!disabled) {
+      onPress();
+    }
   };
+
   if (transparent) {
     return (
-      <AnimatedTransparentButton
+      <TransparentButton
+        id={hoverDialogId}
+        className={className}
         onClick={handleOnPress}
-        disabled={disabled}
+        disabled={disabled || processing}
       >
         {processing ? (
-          <Ring color="white" size={20} />
+          <MoonLoader color="white" size={10} />
         ) : (
           <>
-            <ButtonImage src={src} />
-            <ButtonText>{text}</ButtonText>
+            {src && <ButtonImage src={src} />}
+            {icon && <ButtonIconContainer>{icon}</ButtonIconContainer>}
+            <AnimatedButtonText>{text}</AnimatedButtonText>
           </>
         )}
-      </AnimatedTransparentButton>
+      </TransparentButton>
     );
   }
 
   return (
-    <AnimatedButton
+    <Button
+      className={className}
       onClick={handleOnPress}
-      disabled={disabled}
+      disabled={disabled || processing}
       warning={warning}
     >
       {processing ? (
-        <Ring color="white" size={20} />
+        <MoonLoader color="#12151E" size={12} />
       ) : (
         <>
-          <ButtonImage src={src} />
-          <ButtonText>{text}</ButtonText>
+          {src && <ButtonImage src={src} />}
+          {icon && <ButtonIconContainer>{icon}</ButtonIconContainer>}
+          <ButtonText warning={warning}>{text}</ButtonText>
         </>
       )}
-    </AnimatedButton>
+    </Button>
   );
 }
 export default ActionButton;

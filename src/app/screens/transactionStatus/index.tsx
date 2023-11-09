@@ -1,17 +1,21 @@
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
-import ActionButton from '@components/button';
-import Copy from '@assets/img/dashboard/Copy.svg';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
-import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
+import ActionButton from '@components/button';
+import CopyButton from '@components/copyButton';
+import InfoContainer from '@components/infoContainer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const TxStatusContainer = styled.div({
-  background: 'rgba(25, 25, 48, 0.5)',
+  background: 'rgba(25, 25, 48, 0.74)',
+  display: 'flex',
+  flexDirection: 'column',
   height: '100%',
+  backdropFilter: 'blur(16px)',
 });
 
 const Container = styled.div({
@@ -39,6 +43,11 @@ const TransactionIDContainer = styled.div((props) => ({
 }));
 
 const ButtonContainer = styled.div((props) => ({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  gap: props.theme.spacing(6),
   marginTop: props.theme.spacing(15),
   marginBottom: props.theme.spacing(32),
   marginLeft: props.theme.spacing(8),
@@ -58,6 +67,17 @@ const TxIDContainer = styled.div({
   flexDirection: 'row',
 });
 
+const CopyButtonContainer = styled.div({
+  marginLeft: 8,
+  padding: 2,
+});
+
+const InfoMessageContainer = styled.div({
+  marginLeft: 8,
+  marginRight: 8,
+  marginTop: 20,
+});
+
 const Image = styled.img({
   alignSelf: 'center',
   transform: 'all',
@@ -65,35 +85,38 @@ const Image = styled.img({
 
 const HeadingText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   marginTop: props.theme.spacing(8),
 }));
 
 const BodyText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
+  overflowWrap: 'break-word',
+  wordWrap: 'break-word',
+  wordBreak: 'break-word',
   marginLeft: props.theme.spacing(5),
   marginRight: props.theme.spacing(5),
 }));
 
 const TxIDText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textTransform: 'uppercase',
 }));
 
 const BeforeButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const IDText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(2),
   wordBreak: 'break-all',
 }));
@@ -101,20 +124,17 @@ const IDText = styled.h1((props) => ({
 const ButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
   marginRight: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
 }));
 
 const Button = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   backgroundColor: 'transparent',
-  marginTop: props.theme.spacing(2),
   marginLeft: props.theme.spacing(3),
 }));
 
@@ -123,8 +143,19 @@ function TransactionStatus() {
   const navigate = useNavigate();
   const location = useLocation();
   const { network } = useWalletSelector();
+  // TODO tim: refactor to use react context
   const {
-    txid, currency, error, sponsored, browserTx,
+    txid,
+    currency,
+    error,
+    sponsored,
+    browserTx,
+    isOrdinal,
+    isNft,
+    errorTitle,
+    isBrc20TokenFlow,
+    isSponsorServiceError,
+    isSwapTransaction,
   } = location.state;
 
   const renderTransactionSuccessStatus = (
@@ -138,7 +169,7 @@ function TransactionStatus() {
   const renderTransactionFailureStatus = (
     <Container>
       <Image src={Failure} />
-      <HeadingText>{t('FAILED')}</HeadingText>
+      <HeadingText>{errorTitle || t('FAILED')}</HeadingText>
       <BodyText>{error}</BodyText>
     </Container>
   );
@@ -155,20 +186,20 @@ function TransactionStatus() {
 
   const onCloseClick = () => {
     if (browserTx) window.close();
+    else if (isOrdinal) navigate(-4);
+    else if (isNft) navigate(-3);
     else navigate(-3);
   };
 
-  const onCopyClick = () => {
-    navigator.clipboard.writeText(txid!);
+  const handleClickTrySwapAgain = () => {
+    navigate('/swap');
   };
 
   const renderLink = (
     <RowContainer>
       <BeforeButtonText>{t('SEE_ON')}</BeforeButtonText>
       <Button onClick={openTransactionInBrowser}>
-        <ButtonText>
-          {currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}
-        </ButtonText>
+        <ButtonText>{currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}</ButtonText>
         <ButtonImage src={ArrowSquareOut} />
       </Button>
     </RowContainer>
@@ -179,26 +210,41 @@ function TransactionStatus() {
       <TxIDText>{t('TRANSACTION_ID')}</TxIDText>
       <TxIDContainer>
         <IDText>{txid}</IDText>
-        <Button onClick={onCopyClick}>
-          <img src={Copy} alt="copy" />
-        </Button>
+        <CopyButtonContainer>
+          <CopyButton text={txid} />
+        </CopyButtonContainer>
       </TxIDContainer>
     </TransactionIDContainer>
   );
 
   return (
     <TxStatusContainer>
-      {sponsored ? <OuterContainer>{renderTransactionSuccessStatus}</OuterContainer>
-        : (
-          <OuterContainer>
-            {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
-            {txid && renderLink}
-            {txid && renderTransactionID}
-          </OuterContainer>
+      <OuterContainer>
+        {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
+        {txid && renderLink}
+        {isBrc20TokenFlow ? (
+          <InfoMessageContainer>
+            <InfoContainer bodyText={t('BRC20_ORDINAL_MSG')} />
+          </InfoMessageContainer>
+        ) : (
+          txid && renderTransactionID
         )}
-      <ButtonContainer>
-        <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
-      </ButtonContainer>
+        {isSponsorServiceError && (
+          <InfoMessageContainer>
+            <InfoContainer bodyText={t('SPONSOR_SERVICE_ERROR')} />
+          </InfoMessageContainer>
+        )}
+      </OuterContainer>
+      {isSwapTransaction && isSponsorServiceError ? (
+        <ButtonContainer>
+          <ActionButton text={t('RETRY')} onPress={handleClickTrySwapAgain} />
+          <ActionButton text={t('CLOSE')} onPress={onCloseClick} transparent />
+        </ButtonContainer>
+      ) : (
+        <ButtonContainer>
+          <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
+        </ButtonContainer>
+      )}
     </TxStatusContainer>
   );
 }

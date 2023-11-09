@@ -7,6 +7,7 @@ var webpack = require('webpack'),
 var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 const aliases = {
   // alias stacks.js packages to their esm (default prefers /dist/polyfill)
@@ -30,7 +31,7 @@ var options = {
 
   entry: {
     background: path.join(SRC_ROOT_PATH, 'background', 'background.ts'),
-    inpage: path.join(SRC_ROOT_PATH, 'inpage', 'inpage.ts'),
+    inpage: path.join(SRC_ROOT_PATH, 'inpage', 'index.ts'),
     'content-script': path.join(SRC_ROOT_PATH, 'content-scripts', 'content-script.ts'),
     options: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.tsx'),
     popup: path.join(SRC_ROOT_PATH, 'pages', 'Popup', 'index.tsx'),
@@ -96,7 +97,9 @@ var options = {
     ],
   },
   resolve: {
-    plugins: [new TsconfigPathsPlugin()],
+    plugins: [new TsconfigPathsPlugin({
+      configFile: path.join(__dirname, '../', 'tsconfig.json')
+    })],
     extensions: fileExtensions
       .map((extension) => '.' + extension)
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
@@ -108,6 +111,7 @@ var options = {
     },
   },
   plugins: [
+    new Dotenv({ safe: true, systemvars: true }),
     new CleanWebpackPlugin({ verbose: false }),
     new webpack.ProgressPlugin(),
     // expose and write the allowed env vars on the compiled bundle

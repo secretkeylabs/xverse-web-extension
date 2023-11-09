@@ -1,44 +1,75 @@
-import { createHashRouter } from 'react-router-dom';
+import ExtendedScreenContainer from '@components/extendedScreenContainer';
+import AuthGuard from '@components/guards/auth';
+import OnboardingGuard from '@components/guards/onboarding';
+import { SingleTabGuard } from '@components/guards/singleTab';
+import ScreenContainer from '@components/screenContainer';
+import AccountList from '@screens/accountList';
+import AuthenticationRequest from '@screens/authenticationRequest';
+import BackupWallet from '@screens/backupWallet';
+import BackupWalletSteps from '@screens/backupWalletSteps';
+import BtcSelectAddressScreen from '@screens/btcSelectAddressScreen';
+import BtcSendScreen from '@screens/btcSendScreen';
+import Buy from '@screens/buy';
+import CoinDashboard from '@screens/coinDashboard';
+import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
+import ConfirmBtcTransaction from '@screens/confirmBtcTransaction';
+import ConfirmFtTransaction from '@screens/confirmFtTransaction';
+import ConfirmInscriptionRequest from '@screens/confirmInscriptionRequest';
+import ConfirmNftTransaction from '@screens/confirmNftTransaction';
+import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
+import ConfirmStxTransaction from '@screens/confirmStxTransaction';
+import CreateInscription from '@screens/createInscription';
+import CreatePassword from '@screens/createPassword';
+import CreateWalletSuccess from '@screens/createWalletSuccess';
+import ErrorBoundary from '@screens/error';
+import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
+import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
 import Landing from '@screens/landing';
-import Onboarding from '@screens/onboarding';
-import ScreenContainer from '@components/screenContainer';
+import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
+import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
+import ImportLedger from '@screens/ledger/importLedgerAccount';
+import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import LegalLinks from '@screens/legalLinks';
-import ManageTokens from '@screens/manageTokens';
-import AccountList from '@screens/accountList';
-import Receive from '@screens/receive';
-import ConfirmStxTransaction from '@screens/confirmStxTransaction';
-import SendStxScreen from '@screens/sendStx';
-import TransactionStatus from '@screens/transactionStatus';
-import SendBtcScreen from '@screens/sendBtc';
-import ConfirmBtcTransaction from '@screens/confrimBtcTransaction';
-import BackupWallet from '@screens/backupWallet';
-import CreateWalletSuccess from '@screens/createWalletSuccess';
-import CreatePassword from '@screens/createPassword';
-import AuthenticationRequest from '@screens/authenticationRequest';
-import AuthGuard from '@components/guards/auth';
 import Login from '@screens/login';
-import RestoreWallet from '@screens/restoreWallet';
-import ForgotPassword from '@screens/forgotPassword';
-import BackupWalletSteps from '@screens/backupWalletSteps';
-import Stacking from '@screens/stacking';
+import ManageTokens from '@screens/manageTokens';
 import NftDashboard from '@screens/nftDashboard';
+import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
-import Setting from '@screens/settings';
-import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
-import ChangePasswordScreen from '@screens/settings/changePassword';
-import ChangeNetworkScreen from '@screens/settings/changeNetwork';
-import BackupWalletScreen from '@screens/settings/backupWallet';
+import Onboarding from '@screens/onboarding';
+import OrdinalDetailScreen from '@screens/ordinalDetail';
+import OrdinalsCollection from '@screens/ordinalsCollection';
+import RareSatsBundle from '@screens/rareSatsBundle';
+import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
+import Receive from '@screens/receive';
+import RestoreFunds from '@screens/restoreFunds';
+import RestoreBtc from '@screens/restoreFunds/restoreBtc';
+import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
+import RestoreWallet from '@screens/restoreWallet';
+import SendBrc20Screen from '@screens/sendBrc20';
+import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
+import SendBtcScreen from '@screens/sendBtc';
 import SendFtScreen from '@screens/sendFt';
-import ConfirmFtTransaction from '@screens/confirmFtTransaction';
-import Buy from '@screens/buy';
 import SendNft from '@screens/sendNft';
-import ConfirmNftTransaction from '@screens/confirmNftTransaction';
-import CoinDashboard from '@screens/coinDashboard';
-import ExtendedScreenContainer from '@components/extendedScreenContainer';
+import SendOrdinal from '@screens/sendOrdinal';
+import SendRareSat from '@screens/sendRareSat';
+import SendStxScreen from '@screens/sendStx';
+import Setting from '@screens/settings';
+import BackupWalletScreen from '@screens/settings/backupWallet';
+import ChangeNetworkScreen from '@screens/settings/changeNetwork';
+import ChangePasswordScreen from '@screens/settings/changePassword';
+import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
+import LockCountdown from '@screens/settings/lockCountdown';
+import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 import SignatureRequest from '@screens/signatureRequest';
+import SignPsbtRequest from '@screens/signPsbtRequest';
+import Stacking from '@screens/stacking';
+import SwapScreen from '@screens/swap';
+import SwapConfirmScreen from '@screens/swap/swapConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
-import ErrorBoundary from '@screens/error';
+import TransactionStatus from '@screens/transactionStatus';
+import WalletExists from '@screens/walletExists';
+import { createHashRouter } from 'react-router-dom';
 
 const router = createHashRouter([
   {
@@ -52,7 +83,31 @@ const router = createHashRouter([
       },
       {
         path: 'onboarding',
-        element: <Onboarding />,
+        element: (
+          <OnboardingGuard>
+            <Onboarding />
+          </OnboardingGuard>
+        ),
+      },
+      {
+        path: 'import-ledger',
+        element: (
+          <AuthGuard>
+            <SingleTabGuard guardName="importLedger">
+              <ImportLedger />
+            </SingleTabGuard>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'verify-ledger',
+        element: (
+          <AuthGuard>
+            <SingleTabGuard guardName="verifyLedger">
+              <VerifyLedger />
+            </SingleTabGuard>
+          </AuthGuard>
+        ),
       },
       {
         index: true,
@@ -64,7 +119,11 @@ const router = createHashRouter([
       },
       {
         path: 'legal',
-        element: <LegalLinks />,
+        element: (
+          <OnboardingGuard>
+            <LegalLinks />
+          </OnboardingGuard>
+        ),
       },
       {
         path: 'manage-tokens',
@@ -91,6 +150,18 @@ const router = createHashRouter([
         element: <SendBtcScreen />,
       },
       {
+        path: 'add-stx-address-ledger',
+        element: <LedgerAddStxAddress />,
+      },
+      {
+        path: 'swap',
+        element: <SwapScreen />,
+      },
+      {
+        path: 'swap-confirm',
+        element: <SwapConfirmScreen />,
+      },
+      {
         path: 'confirm-stx-tx',
         element: <ConfirmStxTransaction />,
       },
@@ -103,16 +174,48 @@ const router = createHashRouter([
         element: <ConfirmBtcTransaction />,
       },
       {
+        path: 'confirm-brc20-tx',
+        element: (
+          <AuthGuard>
+            <ConfirmBrc20Transaction />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'execute-brc20-tx',
+        element: (
+          <AuthGuard>
+            <ExecuteBrc20Transaction />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'confirm-ledger-tx',
+        element: <ConfirmLedgerTransaction />,
+      },
+      {
         path: 'backup',
-        element: <BackupWallet />,
+        element: (
+          <OnboardingGuard>
+            <BackupWallet />
+          </OnboardingGuard>
+        ),
       },
       {
         path: 'create-password',
-        element: <CreatePassword />,
+        element: (
+          <OnboardingGuard>
+            <CreatePassword />
+          </OnboardingGuard>
+        ),
       },
       {
         path: 'wallet-success/:action',
         element: <CreateWalletSuccess />,
+      },
+      {
+        path: 'wallet-exists',
+        element: <WalletExists />,
       },
       {
         path: 'transaction-request',
@@ -131,12 +234,40 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'login',
-        element: <Login />,
+        path: 'btc-select-address-request',
+        element: (
+          <AuthGuard>
+            <BtcSelectAddressScreen />
+          </AuthGuard>
+        ),
       },
       {
-        path: 'restoreWallet',
-        element: <RestoreWallet />,
+        path: 'psbt-signing-request',
+        element: (
+          <AuthGuard>
+            <SignPsbtRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'btc-send-request',
+        element: (
+          <AuthGuard>
+            <BtcSendScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'create-inscription',
+        element: (
+          <AuthGuard>
+            <CreateInscription />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'login',
+        element: <Login />,
       },
       {
         path: 'forgotPassword',
@@ -144,7 +275,11 @@ const router = createHashRouter([
       },
       {
         path: 'backupWalletSteps',
-        element: <BackupWalletSteps />,
+        element: (
+          <OnboardingGuard>
+            <BackupWalletSteps />
+          </OnboardingGuard>
+        ),
       },
       {
         path: 'stacking',
@@ -156,11 +291,31 @@ const router = createHashRouter([
       },
       {
         path: 'settings',
-        element: <Setting />,
+        element: (
+          <AuthGuard>
+            <Setting />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'restore-funds',
+        element: <RestoreFunds />,
+      },
+      {
+        path: 'recover-btc',
+        element: <RestoreBtc />,
+      },
+      {
+        path: 'recover-ordinals',
+        element: <RestoreOrdinals />,
       },
       {
         path: 'fiat-currency',
         element: <FiatCurrencyScreen />,
+      },
+      {
+        path: 'privacy-preferences',
+        element: <PrivacyPreferencesScreen />,
       },
       {
         path: 'change-password',
@@ -194,6 +349,67 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
+      {
+        path: 'send-ordinal',
+        element: (
+          <AuthGuard>
+            <SendOrdinal />
+          </AuthGuard>
+        ),
+      },
+      {
+        // TODO deprecate this after brc20 one step ledger support done
+        path: 'send-brc20',
+        element: (
+          <AuthGuard>
+            <SendBrc20Screen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'send-brc20-one-step',
+        element: (
+          <AuthGuard>
+            <SendBrc20OneStepScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'send-nft/:id',
+        element: <SendNft />,
+      },
+      {
+        path: 'confirm-inscription-request',
+        element: (
+          <AuthGuard>
+            <ConfirmInscriptionRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'lockCountdown',
+        element: (
+          <AuthGuard>
+            <LockCountdown />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'confirm-nft-tx/:id',
+        element: (
+          <AuthGuard>
+            <ConfirmNftTransaction />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'confirm-ordinal-tx/:id',
+        element: (
+          <AuthGuard>
+            <ConfirmOrdinalTransaction />
+          </AuthGuard>
+        ),
+      },
     ],
   },
   {
@@ -210,16 +426,64 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'nft-dashboard/rare-sats-bundle',
+        element: (
+          <AuthGuard>
+            <RareSatsBundle />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'nft-dashboard/ordinals-collection/:id',
+        element: (
+          <AuthGuard>
+            <OrdinalsCollection />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'nft-dashboard/nft-detail/:id',
         element: <NftDetailScreen />,
+      },
+      {
+        path: 'nft-dashboard/ordinal-detail/:id',
+        element: <OrdinalDetailScreen />,
+      },
+      {
+        path: 'nft-dashboard/rare-sats-detail',
+        element: <RareSatsDetailScreen />,
       },
       {
         path: 'nft-dashboard/nft-detail/:id/send-nft',
         element: <SendNft />,
       },
       {
-        path: 'confirm-nft-tx/:id',
-        element: <ConfirmNftTransaction />,
+        path: 'nft-dashboard/ordinal-detail/:id/send-ordinal',
+        element: (
+          <AuthGuard>
+            <SendOrdinal />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'nft-dashboard/send-rare-sat',
+        element: (
+          <AuthGuard>
+            <SendRareSat />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'nft-dashboard/supported-rarity-scale',
+        element: <SupportedRarities />,
+      },
+      {
+        path: 'restoreWallet',
+        element: (
+          <OnboardingGuard>
+            <RestoreWallet />
+          </OnboardingGuard>
+        ),
       },
     ],
   },

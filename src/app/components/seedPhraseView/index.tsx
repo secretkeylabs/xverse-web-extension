@@ -1,6 +1,6 @@
+import Eye from '@assets/img/createPassword/Eye.svg';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import Eye from '@assets/img/createPassword/Eye.svg';
 import SeedPhraseWord from './word';
 
 interface SeedPhraseViewProps {
@@ -26,21 +26,23 @@ const SeedContainer = styled.div<SeedContainerProps>((props) => ({
   paddingBottom: props.theme.spacing(17),
   paddingLeft: props.theme.spacing(5),
   filter: `blur(${props.isVisible ? 0 : '3px'})`,
+  userSelect: 'none',
 }));
 
 const OuterSeedContainer = styled.div((props) => ({
-  backgroundColor: props.theme.colors.background['elevation-1'],
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
+  backgroundColor: props.theme.colors.elevation_n1,
+  border: `1px solid ${props.theme.colors.elevation3}`,
   borderRadius: props.theme.radius(1),
 }));
 
 const ShowSeedButton = styled.button((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[0],
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  color: props.theme.colors.white_0,
+  backgroundColor: props.theme.colors.white_900,
+  border: `1px solid ${props.theme.colors.white_600}`,
   height: 36,
   width: 110,
-  borderRadius: props.theme.radius(3),
+  borderRadius: 48,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -51,11 +53,19 @@ const ShowSeedButton = styled.button((props) => ({
   img: {
     marginRight: props.theme.spacing(4),
   },
+  ':hover': {
+    backgroundColor: props.theme.colors.white_850,
+    border: `1px solid ${props.theme.colors.white_800}`,
+  },
+  ':focus': {
+    backgroundColor: props.theme.colors.white_600,
+    border: `1px solid ${props.theme.colors.white_800}`,
+  },
 }));
 
 export default function SeedphraseView(props: SeedPhraseViewProps) {
   const { seedPhrase, isVisible, setIsVisible } = props;
-  const seedPhraseWords = useMemo(() => seedPhrase?.split(' '), [seedPhrase]);
+  const seedPhraseWords = seedPhrase?.split(' ');
 
   const handleToggleVisibility = () => {
     setIsVisible(!isVisible);
@@ -66,7 +76,8 @@ export default function SeedphraseView(props: SeedPhraseViewProps) {
       <OuterSeedContainer>
         <SeedContainer isVisible={isVisible}>
           {seedPhraseWords.map((word, index) => (
-            <SeedPhraseWord index={index} word={word} />
+            // eslint-disable-next-line react/no-array-index-key
+            <SeedPhraseWord key={index} index={index} word={word} />
           ))}
         </SeedContainer>
       </OuterSeedContainer>

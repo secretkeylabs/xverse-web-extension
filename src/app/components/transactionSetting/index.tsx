@@ -1,429 +1,241 @@
+/* eslint-disable no-nested-ternary */
+import ArrowIcon from '@assets/img/settings/arrow.svg';
 import BottomModal from '@components/bottomModal';
-import BigNumber from 'bignumber.js';
-import {
-  SetStateAction, useEffect, useRef, useState,
-} from 'react';
-import { useTranslation } from 'react-i18next';
-import Select, { SingleValue } from 'react-select';
-import styled, { useTheme } from 'styled-components';
-import IconSats from '@assets/img/send/ic_sats_ticker.svg';
-import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import { NumericFormat } from 'react-number-format';
 import ActionButton from '@components/button';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import {
-  getBtcFiatEquivalent, getStxFiatEquivalent, stxToMicrostacks,
-} from '@secretkeylabs/xverse-core/currency';
-import { useSelector } from 'react-redux';
-import { StoreState } from '@stores/index';
-import { getBtcFees, isCustomFeesAllowed } from '@secretkeylabs/xverse-core/transactions/btc';
-
-const Text = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-}));
-
-const TickerContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row-reverse',
-  alignItems: 'center',
-});
-
-const FiatAmountText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
-}));
-
-const SubText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
-}));
-
-const DetailText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
-  marginTop: props.theme.spacing(8),
-}));
-
-const TickerImage = styled.img((props) => ({
-  marginLeft: props.theme.spacing(5),
-  alignSelf: 'center',
-  height: 24,
-  width: 24,
-}));
-
-const RowContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-});
-
-const SelectorContainer = styled.div({
-  display: 'flex',
-  alignItems: 'flex-end',
-  width: 148,
-  justifyContent: 'flex-end',
-});
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(8),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
-
-const NonceContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(16),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
+import useWalletSelector from '@hooks/useWalletSelector';
+import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
+import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
+import BigNumber from 'bignumber.js';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+import EditFee from './editFee';
+import EditNonce from './editNonce';
 
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(22),
+  marginTop: props.theme.spacing(10),
   marginBottom: props.theme.spacing(20),
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
 }));
 
-const FeeContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
-  backgroundColor: props.theme.colors.background.elevation1,
-  color: props.theme.colors.white['400'],
-  width: '100%',
-  border: 'transparent',
+const TransactionSettingOptionText = styled.h1((props) => ({
+  ...props.theme.body_medium_l,
+  color: props.theme.colors.white_200,
 }));
 
-const InputContainer = styled.div((props) => ({
+const TransactionSettingOptionButton = styled.button((props) => ({
+  background: 'transparent',
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(4),
-  border: `1px solid ${props.theme.colors.background.elevation6}`,
-  backgroundColor: props.theme.colors.background.elevation1,
-  borderRadius: 8,
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(5),
+  width: '100%',
+  marginTop: props.theme.spacing(16),
+  marginBottom: props.theme.spacing(16),
+  paddingLeft: props.theme.spacing(12),
+  paddingRight: props.theme.spacing(12),
+  justifyContent: 'space-between',
 }));
 
-const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
-  marginLeft: props.theme.spacing(10),
-  marginRight: props.theme.spacing(10),
+const TransactionSettingNonceOptionButton = styled.button((props) => ({
+  background: 'transparent',
+  display: 'flex',
+  flexDirection: 'row',
+  width: '100%',
+  marginBottom: props.theme.spacing(20),
+  paddingLeft: props.theme.spacing(12),
+  paddingRight: props.theme.spacing(12),
+  justifyContent: 'space-between',
 }));
 
-const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
-}));
+type TxType = 'STX' | 'BTC' | 'Ordinals';
+
 interface Props {
   visible: boolean;
   fee: string;
+  feePerVByte?: BigNumber;
   loading?: boolean;
   nonce?: string;
-  onApplyClick: (fee: string, nonce?: string) => void;
+  onApplyClick: (params: { fee: string; feeRate?: string; nonce?: string }) => void;
   onCrossClick: () => void;
-  previousFee?: string;
-  availableBalance?: BigNumber;
-  allowEditNonce?: boolean;
   type?: TxType;
-  btcRecepientAddress?: string;
-  amount?: BigNumber;
+  btcRecipients?: Recipient[];
+  ordinalTxUtxo?: UTXO;
+  isRestoreFlow?: boolean;
+  nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  showFeeSettings: boolean;
+  setShowFeeSettings: (value: boolean) => void;
 }
-type TxType = 'STX' | 'BTC';
-type FeeModeType = 'low' | 'standard' | 'high' | 'custom';
 
 function TransactionSettingAlert({
   visible,
   fee,
+  feePerVByte,
   loading,
   nonce,
   onApplyClick,
   onCrossClick,
-  previousFee,
-  availableBalance,
-  allowEditNonce = true,
   type = 'STX',
-  btcRecepientAddress,
-  amount,
-}:Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
+  btcRecipients,
+  ordinalTxUtxo,
+  isRestoreFlow,
+  nonOrdinalUtxos,
+  showFeeSettings,
+  setShowFeeSettings,
+}: Props) {
+  const { t } = useTranslation('translation');
   const [feeInput, setFeeInput] = useState(fee);
-  const theme = useTheme();
-  const [nonceInput, setNonceInput] = useState < string | undefined >(nonce);
+  const [feeRate, setFeeRate] = useState<BigNumber | string | undefined>(feePerVByte);
+  const [nonceInput, setNonceInput] = useState<string | undefined>(nonce);
   const [error, setError] = useState('');
-  const [selectedOption, setSelectedOption] = useState({
-    label: t('STANDARD'),
-    value: 'standard',
-  });
-  const {
-    network,
-    btcAddress, stxBtcRate, btcFiatRate, fiatCurrency, btcBalance, selectedAccount, seedPhrase,
-  } = useSelector((state: StoreState) => state.walletState);
-  const inputRef = useRef(null);
-  const customStyles = {
-    control: (base: any, state: { isFocused: boolean, isSelected: boolean }) => ({
-      ...base,
-      ...theme.body_medium_m,
-      background: theme.colors.background.elevation1,
-      borderRadius: 8,
-      color: theme.colors.white['400'],
-      borderColor: theme.colors.background.elevation6,
-      boxShadow: state.isFocused ? null : null,
-      '&:hover': {
-        borderColor: theme.colors.background.elevation2,
-      },
-      height: 45,
-    }),
-    option: (base: any, state: { isFocused: boolean, isSelected: boolean }) => ({
-      ...base,
-      background: state.isFocused ? 'rgba(255, 255, 255, 0.09)' : '#3C3F60',
-    }),
-    menuList: (base: any) => ({
-      ...base,
-      padding: 0,
-      ...theme.body_medium_m,
-      color: theme.colors.white['0'],
-      background: '#3C3F60',
-      '&:hover': {
-        color: theme.colors.white['0'],
-      },
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      ...theme.body_medium_m,
-      height: '100%',
-      color: theme.colors.white['200'],
-      paddingTop: '3px',
-    }),
-  };
+  const [selectedOption, setSelectedOption] = useState<string>('standard');
+  const [showNonceSettings, setShowNonceSettings] = useState(false);
+  const [isLoading, setIsLoading] = useState(loading);
+  const { btcBalance, stxAvailableBalance, network } = useWalletSelector();
 
-  const StxFeeModes: { label: string; value: FeeModeType }[] = [
-    {
-      label: t('LOW'),
-      value: 'low',
-    },
-    {
-      label: t('STANDARD'),
-      value: 'standard',
-    },
-    {
-      label: t('HIGH'),
-      value: 'high',
-    },
-    {
-      label: t('CUSTOM'),
-      value: 'custom',
-    },
-  ];
-  const BtcFeeModes = [
-    {
-      label: t('STANDARD'),
-      value: 'standard',
-    },
-    {
-      label: t('HIGH'),
-      value: 'high',
-    },
-    {
-      label: t('CUSTOM'),
-      value: 'custom',
-    },
-  ];
-
-  const modifyStxFees = (mode: SingleValue<{ label: string; value: string; }>) => {
-    const currentFee = new BigNumber(fee);
-
-    switch (mode?.value) {
-      case 'low':
-        setFeeInput(currentFee.dividedBy(2).toString());
-        break;
-      case 'standard':
-        setFeeInput(currentFee.toString());
-        break;
-      case 'high':
-        setFeeInput(currentFee.multipliedBy(2).toString());
-        break;
-      case 'custom':
-        inputRef.current?.focus();
-        break;
-      default:
-        break;
-    }
-  };
-
-  useEffect(() => {
-    if (type === 'STX' && selectedOption.value !== 'custom') {
-      modifyStxFees(selectedOption);
-    }
-  }, [selectedOption]);
-
-  const modifyBtcFees = async (mode: SingleValue<{ label: string; value: string; }>) => {
-    try {
-      setSelectedOption(mode!);
-      if (mode?.value === 'custom') inputRef?.current?.focus();
-      else {
-        const btcFee = await getBtcFees(
-          btcRecepientAddress!,
-          btcAddress,
-          amount?.toString()!,
-          selectedAccount?.id ?? 0,
-          network.type,
-          seedPhrase,
-          mode?.value,
-        );
-        setFeeInput(btcFee.toString());
-      }
-    } catch (err: any) {
-      setError(err.toString());
-    }
-  };
-
-  function getFiatEquivalent() {
-    return type === 'STX'
-      ? getStxFiatEquivalent(stxToMicrostacks(new BigNumber(feeInput)), stxBtcRate, btcFiatRate)
-      : getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
-  }
-
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (fiatAmount) {
-      if (fiatAmount.isLessThan(0.01)) {
-        return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      }
-      return (
-        <NumericFormat
-          value={fiatAmount.toFixed(2).toString()}
-          displayType="text"
-          thousandSeparator
-          prefix={`${currencySymbolMap[fiatCurrency]} `}
-          suffix={` ${fiatCurrency}`}
-          renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
-        />
-      );
-    }
-    return '';
-  };
-  function getTokenIcon() {
-    if (type === 'STX') {
-      return <TickerImage src={IconStacks} />;
-    } if (type === 'BTC') {
-      return <TickerImage src={IconSats} />;
-    }
-  }
-  function applyClickForStx() {
-    if (previousFee && availableBalance) {
-      const prevFee = stxToMicrostacks(new BigNumber(previousFee));
+  const applyClickForStx = () => {
+    if (stxAvailableBalance) {
       const currentFee = stxToMicrostacks(new BigNumber(feeInput));
-      if (currentFee.isEqualTo(prevFee)) {
-        setError(t('SAME_FEE_ERROR'));
+      if (currentFee.gt(stxAvailableBalance)) {
+        setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
         return;
-      } if (currentFee.gt(availableBalance)) {
-        setError(t('GREATER_FEE_ERROR'));
+      }
+      if (currentFee.lte(new BigNumber(0))) {
+        setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
+        return;
+      }
+
+      try {
+        // `setFee` method from `@secretkeylabs/xverse-core` requires a BigInt so we should check if it is a valid BigInt
+        BigInt(currentFee.toString());
+      } catch (e) {
+        setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
         return;
       }
     }
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
     setError('');
-    onApplyClick(feeInput.toString(), nonceInput);
-  }
+    onApplyClick({ fee: feeInput.toString(), nonce: nonceInput });
+  };
 
-  async function applyClickForBtc() {
+  const applyClickForBtc = async () => {
     const currentFee = new BigNumber(feeInput);
     if (btcBalance && currentFee.gt(btcBalance)) {
       // show fee exceeds total balance error
-      setError(t('GREATER_FEE_ERROR'));
+      setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
       return;
     }
-    if (selectedOption.value === 'custom') {
-      const response = await isCustomFeesAllowed(feeInput.toString());
+    if (selectedOption === 'custom' && feeRate) {
+      const response = await isCustomFeesAllowed(network.type, feeRate.toString());
       if (!response) {
-        setError(t('LOWER_THAN_MINIMUM'));
+        setError(t('TRANSACTION_SETTING.LOWER_THAN_MINIMUM'));
         return;
       }
     }
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
     setError('');
-    onApplyClick(feeInput.toString());
-  }
-
-  const onInputEditFeesChange = (e: { target: { value: SetStateAction<string> } }) => {
-    setFeeInput(e.target.value);
+    onApplyClick({ fee: feeInput.toString(), feeRate: feeRate?.toString() });
   };
 
-  const onFeeOptionChange = (value: { label: string; value: string } | null) => (type === 'STX' ? modifyStxFees(value) : modifyBtcFees(value));
-
-  const editFeesSection = (
-    <Container>
-      <Text>{t('FEE')}</Text>
-      <RowContainer>
-        <FeeContainer>
-          <RowContainer>
-            <InputContainer>
-              <InputField ref={inputRef} value={feeInput} onChange={onInputEditFeesChange} />
-              <TickerContainer>
-                {getTokenIcon()}
-                <Text>{type === 'STX' ? 'STX' : 'SATS'}</Text>
-              </TickerContainer>
-            </InputContainer>
-            <SelectorContainer>
-              <Select
-                defaultValue={selectedOption}
-                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                onChange={onFeeOptionChange}
-                styles={customStyles}
-                options={type === 'STX' ? StxFeeModes : BtcFeeModes}
-              />
-            </SelectorContainer>
-          </RowContainer>
-          <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
-        </FeeContainer>
-      </RowContainer>
-      <DetailText>{t('FEE_INFO')}</DetailText>
-    </Container>
-  );
-
-  const errorText = !!error && (
-    <ErrorContainer>
-      <ErrorText>{error}</ErrorText>
-    </ErrorContainer>
-  );
-
-  const onInputEditNonceChange = (e: { target: { value: SetStateAction<string> } }) => {
-    setNonceInput(e.target.value);
+  const onEditFeesPress = () => {
+    setShowFeeSettings(true);
   };
 
-  const editNonceSection = (
-    <NonceContainer>
-      <Text>{t('NONCE')}</Text>
-      <InputContainer>
-        <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
-      </InputContainer>
-      <DetailText>{t('NONCE_INFO')}</DetailText>
-    </NonceContainer>
-  );
+  const onEditNoncePress = () => {
+    setShowNonceSettings(true);
+  };
+
+  const onLoading = () => {
+    setIsLoading(true);
+  };
+
+  const onComplete = () => {
+    setIsLoading(false);
+  };
+
+  const onClosePress = () => {
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
+    onCrossClick();
+  };
+
+  const renderContent = () => {
+    if (showNonceSettings) {
+      return <EditNonce nonce={nonce!} setNonce={setNonceInput} />;
+    }
+
+    if (showFeeSettings) {
+      return (
+        <EditFee
+          fee={fee}
+          feeRate={feeRate}
+          type={type}
+          error={error}
+          setIsLoading={onLoading}
+          setIsNotLoading={onComplete}
+          setFee={setFeeInput}
+          setFeeRate={setFeeRate}
+          setError={setError}
+          feeMode={selectedOption}
+          setFeeMode={setSelectedOption}
+          btcRecipients={btcRecipients}
+          ordinalTxUtxo={ordinalTxUtxo}
+          isRestoreFlow={isRestoreFlow}
+          nonOrdinalUtxos={nonOrdinalUtxos}
+        />
+      );
+    }
+
+    return (
+      <>
+        <TransactionSettingOptionButton onClick={onEditFeesPress}>
+          <TransactionSettingOptionText>
+            {t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')}
+          </TransactionSettingOptionText>
+          <img src={ArrowIcon} alt="Arrow " />
+        </TransactionSettingOptionButton>
+        {type === 'STX' && (
+          <TransactionSettingNonceOptionButton onClick={onEditNoncePress}>
+            <TransactionSettingOptionText>
+              {t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')}
+            </TransactionSettingOptionText>
+            <img src={ArrowIcon} alt="Arrow " />
+          </TransactionSettingNonceOptionButton>
+        )}
+      </>
+    );
+  };
 
   return (
-    <BottomModal visible={visible} header={type === 'STX' ? t('ADVANCED_SETTING') : t('EDIT_FEE')} onClose={onCrossClick}>
-      {editFeesSection}
-      {errorText}
-      {allowEditNonce && type === 'STX' && editNonceSection}
-      <ButtonContainer>
-        <ActionButton
-          text={t('APPLY')}
-          processing={loading}
-          disabled={loading}
-          onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
-        />
-      </ButtonContainer>
+    <BottomModal
+      visible={visible}
+      header={
+        showFeeSettings
+          ? t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')
+          : showNonceSettings
+          ? t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')
+          : t('TRANSACTION_SETTING.ADVANCED_SETTING')
+      }
+      onClose={onClosePress}
+      overlayStylesOverriding={{
+        height: 600,
+      }}
+    >
+      {renderContent()}
+      {(showFeeSettings || showNonceSettings) && (
+        <ButtonContainer>
+          <ActionButton
+            text={t('TRANSACTION_SETTING.APPLY')}
+            processing={isLoading}
+            disabled={isLoading || !!error}
+            onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
+          />
+        </ButtonContainer>
+      )}
     </BottomModal>
   );
 }

@@ -1,9 +1,19 @@
-import { Account, StxMempoolTransactionData, SettingsNetwork } from '@secretkeylabs/xverse-core/types';
+import {
+  Account,
+  StxMempoolTransactionData,
+  SettingsNetwork,
+  NetworkType,
+} from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
-import { getStacksInfo } from '@secretkeylabs/xverse-core/api';
+import { getStacksInfo } from '@secretkeylabs/xverse-core';
+import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
 import BigNumber from 'bignumber.js';
 import { ChainID } from '@stacks/transactions';
-import { BTC_TRANSACTION_STATUS_URL, TRANSACTION_STATUS_URL, BTC_TRANSACTION_TESTNET_STATUS_URL } from './constants';
+import {
+  BTC_TRANSACTION_STATUS_URL,
+  TRANSACTION_STATUS_URL,
+  BTC_TRANSACTION_TESTNET_STATUS_URL,
+} from './constants';
 
 const validUrl = require('valid-url');
 
@@ -50,15 +60,28 @@ export function getTicker(name: string) {
   return name;
 }
 
+export function getTruncatedAddress(address: string, lengthToShow = 4) {
+  return `${address.substring(0, lengthToShow)}...${address.substring(
+    address.length - lengthToShow,
+    address.length,
+  )}`;
+}
+
+export function getShortTruncatedAddress(address: string) {
+  if (address) {
+    return `${address.substring(0, 8)}...${address.substring(address.length - 8, address.length)}`;
+  }
+}
+
 export function getAddressDetail(account: Account) {
-  if (account) {
-    return `${account.btcAddress.substring(0, 4)}...${account.btcAddress.substring(
-      account.btcAddress.length - 4,
-      account.btcAddress.length,
-    )} / ${account.stxAddress.substring(0, 4)}...${account.stxAddress.substring(
-      account.stxAddress.length - 4,
-      account.stxAddress.length,
+  if (account.btcAddress && account.stxAddress) {
+    return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(
+      account.stxAddress,
     )}`;
+  }
+  if (account.btcAddress || account.stxAddress) {
+    const existingAddress = account.btcAddress || account.stxAddress;
+    return getTruncatedAddress(existingAddress);
   }
   return '';
 }
@@ -99,22 +122,49 @@ export function checkNftExists(
 ): boolean {
   const principal: string[] = nft?.fully_qualified_token_id?.split('::');
   const transaction = pendingTransactions.find(
-    (tx) => tx.contractCall?.contract_id === principal[0]
-      && tx.contractCall.function_args[0].repr.substring(1)
-      === nft.token_id.toString(),
+    (tx) =>
+      tx.contractCall?.contract_id === principal[0] &&
+      tx.contractCall.function_args[0].repr.substring(1) === nft.token_id.toString(),
   );
   if (transaction) return true;
   return false;
 }
 
-export async function isValidURL(str: string): Promise<boolean> {
-  if (validUrl.isUri(str)) {
-    const response = await getStacksInfo(str);
+export async function isValidStacksApi(url: string, type: NetworkType): Promise<boolean> {
+  const networkChainId = type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet;
+  if (validUrl.isUri(url)) {
+    const response = await getStacksInfo(url);
+    if (response) {
+      if (response.network_id !== networkChainId) {
+        throw new Error('URL not compatible with current Network');
+      }
+      return true;
+    }
+  }
+  throw new Error('Invalid URL');
+}
+
+export async function isValidBtcApi(url: string, network: NetworkType) {
+  if (validUrl.isUri(url)) {
+    const btcClient = new BitcoinEsploraApiProvider({
+      network,
+      url,
+    });
+    const response = await btcClient.getLatestBlockHeight();
     if (response) {
       return true;
     }
   }
-  return false;
+  throw new Error('Invalid URL');
 }
 
-export const getNetworkType = (stxNetwork) => (stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet');
+export const getNetworkType = (stxNetwork) =>
+  stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
+
+export const isHardwareAccount = (account: Account | null): boolean =>
+  !!account?.accountType && account?.accountType !== 'software';
+
+export const isLedgerAccount = (account: Account | null): boolean =>
+  account?.accountType === 'ledger';
+
+export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);

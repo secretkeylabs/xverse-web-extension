@@ -1,65 +1,41 @@
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { StoreState } from '@stores/index';
+import { deserializeTransaction } from '@stacks/transactions';
 import BottomBar from '@components/tabBar';
-import { fetchStxWalletDataRequestAction } from '@stores/wallet/actions/actionCreators';
-import RecipientAddressView from '@components/recipinetAddressView';
-import TransferAmountView from '@components/transferAmountView';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
 import TopRow from '@components/topRow';
+import useNetworkSelector from '@hooks/useNetwork';
+import RecipientComponent from '@components/recipientComponent';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { isLedgerAccount } from '@utils/helper';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import BigNumber from 'bignumber.js';
-
-const InfoContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(12),
-  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
-}));
-
-const TitleText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
-  textTransform: 'uppercase',
-}));
-
-const ValueText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(2),
-  wordBreak: 'break-all',
-}));
 
 function ConfirmFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const selectedNetwork = useNetworkSelector();
   const location = useLocation();
-  const {
-    unsignedTx, amount, fungibleToken, memo, recepientAddress,
-  } = location.state;
-
-  const {
-    stxBtcRate, network, stxAddress, fiatCurrency,
-  } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { unsignedTx: seedHex, amount, fungibleToken, memo, recepientAddress } = location.state;
+  const unsignedTx = deserializeTransaction(seedHex);
+  const { refetch } = useStxWalletData();
+  const { network, selectedAccount } = useWalletSelector();
 
   const {
     isLoading,
     error: txError,
     data: stxTxBroadcastData,
     mutate,
-  } = useMutation<
-  string,
-  Error,
-  { signedTx: StacksTransaction }>(async ({ signedTx }) => broadcastSignedTransaction(signedTx, network));
+  } = useMutation<string, Error, { signedTx: StacksTransaction }>({
+    mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
+  });
 
   useEffect(() => {
     if (stxTxBroadcastData) {
@@ -71,7 +47,7 @@ function ConfirmFtTransaction() {
         },
       });
       setTimeout(() => {
-        dispatch(fetchStxWalletDataRequestAction(stxAddress, network, fiatCurrency, stxBtcRate));
+        refetch();
       }, 1000);
     }
   }, [stxTxBroadcastData]);
@@ -89,6 +65,19 @@ function ConfirmFtTransaction() {
   }, [txError]);
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+    if (isLedgerAccount(selectedAccount)) {
+      const type: LedgerTransactionType = 'STX';
+      const state: ConfirmStxTransactionState = {
+        unsignedTx: unsignedTx.serialize(),
+        type,
+        recipients: [{ address: recepientAddress, amountMicrostacks: new BigNumber(amount) }],
+        fee: new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
+      };
+
+      navigate('/confirm-ledger-tx', { state });
+      return;
+    }
+
     mutate({ signedTx: txs[0] });
   };
 
@@ -111,23 +100,21 @@ function ConfirmFtTransaction() {
         loading={isLoading}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleBackButtonClick}
+        skipModal={isLedgerAccount(selectedAccount)}
       >
-        <TransferAmountView currency="FT" amount={new BigNumber(amount)} fungibleToken={fungibleToken} />
-        <RecipientAddressView recipient={recepientAddress} />
-        <InfoContainer>
-          <TitleText>{t('NETWORK')}</TitleText>
-          <ValueText>{network.type}</ValueText>
-        </InfoContainer>
-        {!!memo && (
-        <InfoContainer>
-          <TitleText>{t('MEMO')}</TitleText>
-          <ValueText>{memo}</ValueText>
-        </InfoContainer>
-        )}
-
+        <RecipientComponent
+          address={recepientAddress}
+          value={`${amount}`}
+          fungibleToken={fungibleToken}
+          title={t('AMOUNT')}
+          currencyType="FT"
+        />
+        <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+        {memo && <TransferMemoView memo={memo} />}
       </ConfirmStxTransationComponent>
       <BottomBar tab="dashboard" />
     </>
   );
 }
+
 export default ConfirmFtTransaction;

@@ -1,74 +1,42 @@
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
-import { PostCondition, StacksTransaction } from '@stacks/transactions';
-import styled from 'styled-components';
 import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
-import DeployContractImage from '@assets/img/webInteractions/deploy_contract.svg';
-import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import useWalletSelector from '@hooks/useWalletSelector';
-import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
-import {
-  broadcastSignedTransaction,
-} from '@secretkeylabs/xverse-core';
-import { useNavigate } from 'react-router-dom';
 import AccountHeaderComponent from '@components/accountHeader';
+import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import InfoContainer from '@components/infoContainer';
+import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useNetworkSelector from '@hooks/useNetwork';
+import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
+import { PostCondition, StacksTransaction } from '@stacks/transactions';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import finalizeTxSignature from './utils';
-
-const Container = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-});
-
-const TopImage = styled.img({
-  width: 88,
-  height: 88,
-});
-
-const FunctionTitle = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
-  marginTop: 16,
-}));
 
 const Title = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textTransform: 'uppercase',
-}));
-
-const Value = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
-  marginTop: props.theme.spacing(2),
-}));
-
-const InfoContainer = styled.div((props) => ({
-  display: 'flex',
-  marginTop: props.theme.spacing(6),
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(12),
-  borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  flexDirection: 'column',
 }));
 
 const DownloadContainer = styled.div((props) => ({
   display: 'flex',
-  marginTop: props.theme.spacing(13.5),
   flexDirection: 'row',
+  background: props.theme.colors.elevation1,
+  borderRadius: 12,
+  padding: '12px 16px',
   justifyContent: 'center',
   alignItems: 'center',
+  marginBottom: 12,
 }));
 
 const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
-  marginTop: props.theme.spacing(12),
   paddingTop: props.theme.spacing(12),
   paddingBottom: props.theme.spacing(12),
-  borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  borderTop: `0.5px solid ${props.theme.colors.elevation3}`,
+  borderBottom: `0.5px solid ${props.theme.colors.elevation3}`,
   flexDirection: 'column',
 }));
 
@@ -81,7 +49,7 @@ const DownloadButtonContainer = styled.div({
 
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginRight: props.theme.spacing(2),
   textAlign: 'center',
 }));
@@ -98,7 +66,7 @@ const SponsoredContainer = styled.div({
 });
 
 const SponsoredTag = styled.div((props) => ({
-  background: props.theme.colors.background.elevation3,
+  background: props.theme.colors.elevation3,
   marginTop: props.theme.spacing(7.5),
   paddingTop: props.theme.spacing(4),
   paddingBottom: props.theme.spacing(4),
@@ -109,12 +77,12 @@ const SponsoredTag = styled.div((props) => ({
 
 const SponosredText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const PostConditionAlertText = styled.h1((props) => ({
   ...props.theme.body_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const Button = styled.button((props) => ({
@@ -136,21 +104,28 @@ interface ContractDeployRequestProps {
 }
 
 export default function ContractDeployRequest(props: ContractDeployRequestProps) {
-  const {
-    unsignedTx, codeBody, contractName, sponsored, tabId, requestToken,
-  } = props;
-  const { network } = useWalletSelector();
-  const { t } = useTranslation('translation', { keyPrefix: 'DEPLOY_CONTRACT_REQUEST' });
+  const { unsignedTx, codeBody, contractName, sponsored, tabId, requestToken } = props;
+  const selectedNetwork = useNetworkSelector();
+  const [hasTabClosed, setHasTabClosed] = useState(false);
+  const { t } = useTranslation('translation');
   const [loaderForBroadcastingTx, setLoaderForBroadcastingTx] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  useOnOriginTabClose(tabId, () => {
+    setHasTabClosed(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   const broadcastTx = async (tx: StacksTransaction[]) => {
     try {
       setLoaderForBroadcastingTx(true);
-      const networkType = network?.type ?? 'Mainnet';
-      const broadcastResult = await broadcastSignedTransaction(tx[0], networkType);
+      const broadcastResult = await broadcastSignedTransaction(tx[0], selectedNetwork);
       if (broadcastResult) {
-        finalizeTxSignature({ requestPayload: requestToken, tabId, data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') } });
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId,
+          data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') },
+        });
         navigate('/tx-status', {
           state: {
             txid: broadcastResult,
@@ -207,17 +182,19 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   const showSponsoredTransactionTag = (
     <SponsoredContainer>
       <SponsoredTag>
-        <SponosredText>{t('SPONSORED')}</SponosredText>
+        <SponosredText>{t('DEPLOY_CONTRACT_REQUEST.SPONSORED')}</SponosredText>
       </SponsoredTag>
     </SponsoredContainer>
   );
 
-  const postConditionAlert = unsignedTx?.postConditionMode === 2
-    && unsignedTx?.postConditions.values.length <= 0 && (
+  const postConditionAlert = unsignedTx?.postConditionMode === 2 &&
+    unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
-        <PostConditionAlertText>{t('POST_CONDITION_ALERT')}</PostConditionAlertText>
+        <PostConditionAlertText>
+          {t('DEPLOY_CONTRACT_REQUEST.POST_CONDITION_ALERT')}
+        </PostConditionAlertText>
       </PostConditionContainer>
-  );
+    );
 
   return (
     <>
@@ -228,31 +205,34 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         onCancelClick={cancelCallback}
         loading={loaderForBroadcastingTx}
         isSponsored={sponsored}
+        title={t('DEPLOY_CONTRACT_REQUEST.DEPLOY_CONTRACT')}
       >
-        <Container>
-          <TopImage src={DeployContractImage} alt="deploy_contract" />
-          <FunctionTitle>{t('DEPLOY_CONTRACT')}</FunctionTitle>
-        </Container>
+        {hasTabClosed && (
+          <InfoContainer
+            titleText={t('WINDOW_CLOSED_ALERT.TITLE')}
+            bodyText={t('WINDOW_CLOSED_ALERT.BODY')}
+          />
+        )}
         {postConditionAlert}
         {sponsored && showSponsoredTransactionTag}
         {unsignedTx?.postConditions?.values?.map((postCondition) => (
           <StxPostConditionCard postCondition={postCondition as PostCondition} />
         ))}
-        <InfoContainer>
-          <Title>{t('CONTRACT_NAME')}</Title>
-          <Value>{contractName}</Value>
-          <DownloadContainer>
-            <Title>{t('FUNCTION')}</Title>
-            <DownloadButtonContainer>
-              <Button onClick={downloadCode}>
-                <>
-                  <ButtonText>{t('DOWNLOAD')}</ButtonText>
-                  <ButtonImage src={DownloadImage} />
-                </>
-              </Button>
-            </DownloadButtonContainer>
-          </DownloadContainer>
-        </InfoContainer>
+        <TransactionDetailComponent
+          title={t('DEPLOY_CONTRACT_REQUEST.CONTRACT_NAME')}
+          value={contractName}
+        />
+        <DownloadContainer>
+          <Title>{t('DEPLOY_CONTRACT_REQUEST.FUNCTION')}</Title>
+          <DownloadButtonContainer>
+            <Button onClick={downloadCode}>
+              <>
+                <ButtonText>{t('DEPLOY_CONTRACT_REQUEST.DOWNLOAD')}</ButtonText>
+                <ButtonImage src={DownloadImage} />
+              </>
+            </Button>
+          </DownloadButtonContainer>
+        </DownloadContainer>
       </ConfirmStxTransationComponent>
     </>
   );

@@ -1,18 +1,23 @@
-import useWalletSelector from '@hooks/useWalletSelector';
-import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
 import ReceiveIcon from '@assets/img/transactions/received.svg';
 import SendIcon from '@assets/img/transactions/sent.svg';
-import { CurrencyTypes } from '@utils/constants';
-import styled from 'styled-components';
-import { nanoid } from 'nanoid';
-import { NumericFormat } from 'react-number-format';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { microstacksToStx } from '@secretkeylabs/xverse-core';
+import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
+import { CurrencyTypes } from '@utils/constants';
+import { ftDecimals } from '@utils/helper';
+import { getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
+import { nanoid } from 'nanoid';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
 
 const TransactionContainer = styled.div((props) => ({
   display: 'flex',
-  marginBottom: props.theme.spacing(10),
+  paddingTop: props.theme.spacing(5),
+  paddingBottom: props.theme.spacing(5),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
 }));
 
 const TransactionInfoContainer = styled.div((props) => ({
@@ -31,28 +36,29 @@ const TransactionRow = styled.div((props) => ({
 
 const TransactionTitleText = styled.p((props) => ({
   ...props.theme.body_bold_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 const RecipientAddress = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   textAlign: 'left',
 }));
 
 const TransactionValue = styled.p((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
 }));
 
 interface TxTransfersProps {
   transaction: AddressTransactionWithTransfers;
   coin: CurrencyTypes;
+  txFilter: string | null;
 }
 
 export default function TxTransfers(props: TxTransfersProps) {
-  const { transaction, coin } = props;
-  const { selectedAccount } = useWalletSelector();
+  const { transaction, coin, txFilter } = props;
+  const { selectedAccount, coinsList } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   function formatAddress(addr: string): string {
@@ -66,31 +72,49 @@ export default function TxTransfers(props: TxTransfersProps) {
     return <img src={SendIcon} alt="sent" />;
   };
 
-  const getTokenTransferTitle = (transfer): string => (selectedAccount?.stxAddress === transfer.recipient
-    ? t('TRANSACTION_RECEIVED')
-    : t('TRANSACTION_SENT'));
-  return (
-    <>
-      {transaction.stx_transfers.map((stxTransfer) => (
+  const getTokenTransferTitle = (transfer): string =>
+    selectedAccount?.stxAddress === transfer.recipient
+      ? t('TRANSACTION_RECEIVED')
+      : t('TRANSACTION_SENT');
+
+  function renderTransaction(transactionList) {
+    return transactionList.map((transfer) => {
+      const isFT = coin === 'FT';
+      const ft = coinsList?.find((ftCoin) => ftCoin.principal === txFilter!.split('::')[0]);
+      const isSentTransaction = selectedAccount?.stxAddress !== transfer.recipient;
+      if (isFT && transfer.asset_identifier !== txFilter) {
+        return null;
+      }
+
+      return (
         <TransactionContainer key={nanoid()}>
-          {renderTransactionIcon(stxTransfer)}
+          {renderTransactionIcon(transfer)}
           <TransactionInfoContainer>
             <TransactionRow>
-              <TransactionTitleText>{getTokenTransferTitle(stxTransfer)}</TransactionTitleText>
+              <TransactionTitleText>{getTokenTransferTitle(transfer)}</TransactionTitleText>
               <NumericFormat
-                value={microstacksToStx(BigNumber(stxTransfer.amount)).toString()}
+                value={
+                  isFT
+                    ? ftDecimals(BigNumber(transfer.amount), ft?.decimals ?? 0)
+                    : microstacksToStx(BigNumber(transfer.amount)).toString()
+                }
                 displayType="text"
                 thousandSeparator
-                prefix={selectedAccount?.stxAddress === stxTransfer.recipient ? '' : '-'}
+                prefix={isSentTransaction ? '-' : ''}
                 renderText={(value: string) => (
-                  <TransactionValue>{`${value} ${coin}`}</TransactionValue>
+                  <TransactionValue>
+                    {`${value} ${isFT && ft ? getFtTicker(ft) : coin}`}
+                  </TransactionValue>
                 )}
               />
             </TransactionRow>
-            <RecipientAddress>{formatAddress(stxTransfer.recipient as string)}</RecipientAddress>
+            <RecipientAddress>{formatAddress(transfer.recipient as string)}</RecipientAddress>
           </TransactionInfoContainer>
         </TransactionContainer>
-      ))}
-    </>
-  );
+      );
+    });
+  }
+  return coin === 'FT' && transaction.ft_transfers
+    ? renderTransaction(transaction.ft_transfers)
+    : renderTransaction(transaction.stx_transfers);
 }

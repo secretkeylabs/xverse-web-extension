@@ -1,44 +1,50 @@
-import styled from 'styled-components';
+import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
+import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
+import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
+import ShareNetwork from '@assets/img/nftDashboard/share.svg';
+import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
+import AccountHeaderComponent from '@components/accountHeader';
+import ActionButton from '@components/button';
+import CollectibleDetailTile from '@components/collectibleDetailTile';
+import ShareDialog from '@components/shareNft';
+import SmallActionButton from '@components/smallActionButton';
+import BottomTabBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useNftDataReducer from '@hooks/stores/useNftReducer';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useWalletSelector from '@hooks/useWalletSelector';
+import NftImage from '@screens/nftDashboard/nftImage';
+import { getNftDetail } from '@secretkeylabs/xverse-core/api';
+import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
+import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+import { useMutation } from '@tanstack/react-query';
+import { GAMMA_URL } from '@utils/constants';
+import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import NftImage from '@screens/nftDashboard/nftImage';
-import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
-import TopRow from '@components/topRow';
-import BottomTabBar from '@components/tabBar';
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
-import ArrowUpRight from '@assets/img/dashboard/arrow_up_right.svg';
-import ShareNetwork from '@assets/img/nftDashboard/share_network.svg';
-import ActionButton from '@components/button';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useEffect, useState } from 'react';
-import ShareDialog from '@components/shareNft';
-import { GAMMA_URL } from '@utils/constants';
-import { getExplorerUrl } from '@utils/helper';
-import useNftDataSelector from '@hooks/useNftDataSelector';
-import useNftDataReducer from '@hooks/useNftReducer';
-import { useMutation } from '@tanstack/react-query';
-import { getNftDetail } from '@secretkeylabs/xverse-core/api';
-import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
-import { NftDetailResponse } from '@secretkeylabs/xverse-core/types';
-import { Ring } from 'react-spinners-css';
-import AccountHeaderComponent from '@components/accountHeader';
-import Seperator from '@components/seperator';
+import { MoonLoader } from 'react-spinners';
+import styled from 'styled-components';
 import NftAttribute from './nftAttribute';
-import DescriptionTile from './descriptionTile';
 
 const Container = styled.div`
-display: flex;
-flex-direction: column;
-flex: 1;
-overflow-y: auto;
-margin-left: 5%;
-margin-right: 5%;
-&::-webkit-scrollbar {
-  display: none;
-}`;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  margin-left: 5%;
+  margin-right: 5%;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 const ReceiveButtonContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(12),
+}));
+
+const GalleryReceiveButtonContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(3),
   width: '100%',
 }));
@@ -54,12 +60,12 @@ const ButtonContainer = styled.div((props) => ({
   position: 'relative',
   flexDirection: 'row',
   maxWidth: 400,
-  marginBottom: props.theme.spacing(20),
+  marginBottom: props.theme.spacing(13.5),
 }));
 
 const ShareDialogeContainer = styled.div({
   position: 'absolute',
-  bottom: 0,
+  top: 0,
   right: 0,
 });
 
@@ -73,7 +79,7 @@ const GalleryShareDialogeContainer = styled.div({
 const ExtensionContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: 32,
+  marginTop: 8,
   alignItems: 'center',
   flex: 1,
 });
@@ -101,27 +107,34 @@ const ExtensionNFtContainer = styled.div((props) => ({
 }));
 
 const NftTitleText = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  ...props.theme.headline_m,
+  color: props.theme.colors.white_0,
+  marginBottom: props.theme.spacing(12),
+  textAlign: 'center',
+}));
+
+const CollectibleText = styled.h1((props) => ({
+  ...props.theme.body_bold_m,
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
 const NftGalleryTitleText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(12),
 }));
 
 const DescriptionText = styled.h1((props) => ({
   ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   fontSize: 24,
   marginBottom: props.theme.spacing(16),
 }));
 
 const NftOwnedByText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
@@ -149,7 +162,7 @@ const GridContainer = styled.div((props) => ({
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
   paddingBottom: props.theme.spacing(16),
   marginBottom: props.theme.spacing(12),
-  borderBottom: '1px solid #272A44',
+  borderBottom: `1px solid ${props.theme.colors.elevation2}`,
 }));
 
 const ShareButtonContainer = styled.div((props) => ({
@@ -166,7 +179,7 @@ const DescriptionContainer = styled.h1((props) => ({
 
 const AttributeText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginBottom: props.theme.spacing(2),
   letterSpacing: '0.02em',
   textTransform: 'uppercase',
@@ -180,15 +193,14 @@ const WebGalleryButton = styled.button((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.spacing(29),
 }));
 
 const WebGalleryButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.body_m,
   fontWeight: 700,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
-
 }));
 
 const ButtonImage = styled.img((props) => ({
@@ -208,20 +220,20 @@ const Button = styled.button((props) => ({
 
 const ButtonText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const AssetDeatilButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 400,
   fontSize: 14,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
 const ButtonHiglightedText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(2),
   marginRight: props.theme.spacing(2),
 }));
@@ -236,7 +248,7 @@ const LoaderContainer = styled.div({
 function NftDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress } = useWalletSelector();
+  const { stxAddress, selectedAccount } = useWalletSelector();
   const { id } = useParams();
   const nftIdDetails = id!.split('::');
   const { nftData } = useNftDataSelector();
@@ -246,23 +258,22 @@ function NftDetailScreen() {
     isLoading,
     data: nftDetailsData,
     mutate,
-  } = useMutation<
-  NftDetailResponse | undefined,
-  Error,
-  { principal: string }>(async ({ principal }) => {
-    const contractInfo: string[] = principal.split('.');
-    return getNftDetail(
-      nftIdDetails[2].replace('u', ''),
-      contractInfo[0],
-      contractInfo[1],
-    );
+  } = useMutation<NftDetailResponse | undefined, Error, { principal: string }>({
+    mutationFn: async ({ principal }) => {
+      const contractInfo: string[] = principal.split('.');
+      return getNftDetail(nftIdDetails[2].replace('u', ''), contractInfo[0], contractInfo[1]);
+    },
   });
 
   const [showShareNftOptions, setShowNftOptions] = useState<boolean>(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
+  useResetUserFlow('/nft-detail');
+
   useEffect(() => {
-    const data = nftData.find((nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)));
+    const data = nftData.find(
+      (nftItem) => Number(nftItem?.token_id) === Number(nftIdDetails[2].slice(1)),
+    );
     if (!data) {
       mutate({ principal: nftIdDetails[0] });
     } else {
@@ -278,7 +289,7 @@ function NftDetailScreen() {
   }, [nftDetailsData]);
 
   const handleBackButtonClick = () => {
-    navigate('/nft-dashboard');
+    navigate('/nft-dashboard?tab=nfts');
   };
 
   const onSharePress = () => {
@@ -304,7 +315,14 @@ function NftDetailScreen() {
     });
   };
 
-  const handleOnSendClick = () => {
+  const handleOnSendClick = async () => {
+    if (isLedgerAccount(selectedAccount)) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL(`options.html#/send-nft/${id}`),
+      });
+      return;
+    }
+
     navigate('send-nft', {
       state: {
         nft,
@@ -325,125 +343,122 @@ function NftDetailScreen() {
   );
 
   const extensionView = (
-    <>
-      <ExtensionContainer>
-        <ExtensionNFtContainer>
-          <NftImage
-            metadata={nft?.token_metadata!}
-          />
-        </ExtensionNFtContainer>
-        <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
-        {ownedByView}
-        <WebGalleryButton onClick={openInGalleryView}>
-          <>
-            <ButtonImage src={SquaresFour} />
-            <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
-          </>
-        </WebGalleryButton>
-      </ExtensionContainer>
+    <ExtensionContainer>
+      <CollectibleText>{t('COLLECTIBLE')}</CollectibleText>
+      <NftTitleText>{nft?.token_metadata.name}</NftTitleText>
+      <ExtensionNFtContainer>
+        <NftImage metadata={nft?.token_metadata!} />
+      </ExtensionNFtContainer>
       <ButtonContainer>
         <ReceiveButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
+          <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={handleOnSendClick} />
         </ReceiveButtonContainer>
-        <ShareButtonContainer>
-          <ActionButton
-            src={ShareNetwork}
-            text={t('SHARE')}
-            onPress={onSharePress}
-            transparent
-          />
-        </ShareButtonContainer>
+        <SmallActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} isOpaque />
         <ShareDialogeContainer>
-          {showShareNftOptions && <ShareDialog url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`} onCrossClick={onCrossPress} />}
+          {showShareNftOptions && (
+            <ShareDialog
+              url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`}
+              onCrossClick={onCrossPress}
+            />
+          )}
         </ShareDialogeContainer>
       </ButtonContainer>
-    </>
+      {ownedByView}
+      <WebGalleryButton onClick={openInGalleryView}>
+        <>
+          <ButtonImage src={SquaresFour} />
+          <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
+        </>
+      </WebGalleryButton>
+    </ExtensionContainer>
   );
 
-  const galleryView = isLoading || !nft ? (
-    <LoaderContainer>
-      <Ring color="white" size={30} />
-    </LoaderContainer>
-  ) : (
-    <Container>
-      <BackButtonContainer>
-        <Button onClick={handleBackButtonClick}>
-          <>
-            <ButtonImage src={ArrowLeft} />
-            <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
-          </>
-        </Button>
-      </BackButtonContainer>
-      <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
-      <ButtonContainer>
-        <ReceiveButtonContainer>
-          <ActionButton src={ArrowUpRight} text={t('SEND')} onPress={handleOnSendClick} />
-        </ReceiveButtonContainer>
+  const galleryView =
+    isLoading || !nft ? (
+      <LoaderContainer>
+        <MoonLoader color="white" size={30} />
+      </LoaderContainer>
+    ) : (
+      <Container>
+        <BackButtonContainer>
+          <Button onClick={handleBackButtonClick}>
+            <>
+              <ButtonImage src={ArrowLeft} />
+              <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
+            </>
+          </Button>
+        </BackButtonContainer>
+        <NftGalleryTitleText>{nft?.token_metadata.name}</NftGalleryTitleText>
+        <ButtonContainer>
+          <GalleryReceiveButtonContainer>
+            <ActionButton src={ArrowUp} text={t('SEND')} onPress={handleOnSendClick} />
+          </GalleryReceiveButtonContainer>
 
-        <ShareButtonContainer>
-          <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />
-        </ShareButtonContainer>
-        <GalleryShareDialogeContainer>
-          {showShareNftOptions && (
-          <ShareDialog
-            url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`}
-            onCrossClick={onCrossPress}
-          />
-          )}
-        </GalleryShareDialogeContainer>
-      </ButtonContainer>
-      <RowContainer>
-        <NFtContainer>
-          <NftImage metadata={nft?.token_metadata!} />
-        </NFtContainer>
-        <DescriptionContainer>
-          <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
-          <DescriptionTile title={t('NAME')} value={nft?.token_metadata.name ?? ''} />
-          {nft?.rarity_score && <DescriptionTile title={t('RARITY')} value={nft?.rarity_score} />}
-          <DescriptionTile
-            title={t('CONTRACT_ID')}
-            value={nft?.token_metadata?.contract_id ?? ''}
-          />
-          {nft?.nft_token_attributes.length !== 0 && (
-          <>
-            <AttributeText>{t('ATTRIBUTES')}</AttributeText>
-            <GridContainer>
-              {nft?.nft_token_attributes.map((attribute) => (
-                <NftAttribute type={attribute.trait_type} value={attribute.value} />
-              ))}
-            </GridContainer>
-          </>
-          )}
-          <Button onClick={onExplorerPress}>
-            <ButtonText>{t('VIEW_CONTRACT')}</ButtonText>
-            <ButtonHiglightedText>{t('STACKS_EXPLORER')}</ButtonHiglightedText>
-            <img src={ArrowSquareOut} alt="arrow out" />
-          </Button>
-          <Button onClick={onGammaPress}>
-            <ButtonText>{t('DETAILS')}</ButtonText>
-            <ButtonHiglightedText>{t('GAMMA')}</ButtonHiglightedText>
-            <img src={ArrowSquareOut} alt="arrow out" />
-          </Button>
-        </DescriptionContainer>
-      </RowContainer>
-    </Container>
-  );
+          <ShareButtonContainer>
+            <ActionButton src={ShareNetwork} text={t('SHARE')} onPress={onSharePress} transparent />
+          </ShareButtonContainer>
+          <GalleryShareDialogeContainer>
+            {showShareNftOptions && (
+              <ShareDialog
+                url={`${GAMMA_URL}collections/${nft?.token_metadata.contract_id}`}
+                onCrossClick={onCrossPress}
+              />
+            )}
+          </GalleryShareDialogeContainer>
+        </ButtonContainer>
+        <RowContainer>
+          <NFtContainer>
+            <NftImage metadata={nft?.token_metadata!} />
+          </NFtContainer>
+          <DescriptionContainer>
+            <DescriptionText>{t('DESCRIPTION')}</DescriptionText>
+            <CollectibleDetailTile title={t('NAME')} value={nft?.token_metadata.name ?? ''} />
+            {nft?.rarity_score && (
+              <CollectibleDetailTile title={t('RARITY')} value={nft?.rarity_score} />
+            )}
+            <CollectibleDetailTile
+              title={t('CONTRACT_ID')}
+              value={nft?.token_metadata?.contract_id ?? ''}
+            />
+            {nft?.nft_token_attributes.length !== 0 && (
+              <>
+                <AttributeText>{t('ATTRIBUTES')}</AttributeText>
+                <GridContainer>
+                  {nft?.nft_token_attributes.map((attribute) => (
+                    <NftAttribute type={attribute.trait_type} value={attribute.value} />
+                  ))}
+                </GridContainer>
+              </>
+            )}
+            <Button onClick={onExplorerPress}>
+              <ButtonText>{t('VIEW_CONTRACT')}</ButtonText>
+              <ButtonHiglightedText>{t('STACKS_EXPLORER')}</ButtonHiglightedText>
+              <img src={ArrowSquareOut} alt="arrow out" />
+            </Button>
+            <Button onClick={onGammaPress}>
+              <ButtonText>{t('DETAILS')}</ButtonText>
+              <ButtonHiglightedText>{t('GAMMA')}</ButtonHiglightedText>
+              <img src={ArrowSquareOut} alt="arrow out" />
+            </Button>
+          </DescriptionContainer>
+        </RowContainer>
+      </Container>
+    );
 
   return (
     <>
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      ) : <TopRow title={t('NFT_DETAIL')} onClick={handleBackButtonClick} />}
-      <Container>
-        {isGalleryOpen ? galleryView : extensionView}
-      </Container>
+      ) : (
+        <TopRow title="" onClick={handleBackButtonClick} />
+      )}
+      <Container>{isGalleryOpen ? galleryView : extensionView}</Container>
       {!isGalleryOpen && (
-      <BottomBarContainer>
-        <BottomTabBar tab="nft" />
-      </BottomBarContainer>
+        <BottomBarContainer>
+          <BottomTabBar tab="nft" />
+        </BottomBarContainer>
       )}
     </>
-
   );
 }
 

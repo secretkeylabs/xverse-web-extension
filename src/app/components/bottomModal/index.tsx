@@ -1,7 +1,7 @@
+import Cross from '@assets/img/dashboard/X.svg';
+import Separator from '@components/separator';
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
-import Cross from '@assets/img/dashboard/X.svg';
-import Seperator from '@components/seperator';
 
 const BottomModalHeaderText = styled.h1((props) => ({
   ...props.theme.body_bold_m,
@@ -24,6 +24,8 @@ interface Props {
   visible: boolean;
   children: React.ReactNode;
   onClose: () => void;
+  overlayStylesOverriding?: {};
+  contentStylesOverriding?: {};
 }
 
 const CustomisedModal = styled(Modal)`
@@ -31,20 +33,27 @@ const CustomisedModal = styled(Modal)`
   &::-webkit-scrollbar {
     display: none;
   }
-  bottom: 0;
   position: absolute;
 `;
 
 function BottomModal({
-  header, children, visible, onClose,
+  header,
+  children,
+  visible,
+  onClose,
+  overlayStylesOverriding,
+  contentStylesOverriding,
 }: Props) {
   const theme = useTheme();
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const customStyles = {
     overlay: {
-      backgroundColor: theme.colors.background.modalBackdrop,
-      height: 600,
+      backgroundColor: isGalleryOpen ? 'transparent' : theme.colors.background.modalBackdrop,
+      height: '100%',
       width: 360,
       margin: 'auto',
+      zIndex: 15000,
+      ...overlayStylesOverriding,
     },
     content: {
       inset: 'auto auto 0px auto',
@@ -52,18 +61,21 @@ function BottomModal({
       maxWidth: 360,
       maxHeight: '90%',
       border: 'transparent',
-      background: theme.colors.background.elevation2,
+      background: theme.colors.elevation2,
       margin: 0,
       padding: 0,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
+      borderTopLeftRadius: isGalleryOpen ? 12 : 20,
+      borderTopRightRadius: isGalleryOpen ? 12 : 20,
+      borderBottomRightRadius: isGalleryOpen ? 12 : 0,
+      borderBottomLeftRadius: isGalleryOpen ? 12 : 0,
+      ...contentStylesOverriding,
     },
   };
 
   return (
     <CustomisedModal
       isOpen={visible}
-      parentSelector={() => (document.getElementById('app') as HTMLElement)}
+      parentSelector={() => document.getElementById('app') as HTMLElement}
       ariaHideApp={false}
       style={customStyles}
       contentLabel="Example Modal"
@@ -74,8 +86,7 @@ function BottomModal({
           <img src={Cross} alt="cross" />
         </ButtonImage>
       </RowContainer>
-      <Seperator />
-
+      {header && <Separator />}
       {children}
     </CustomisedModal>
   );

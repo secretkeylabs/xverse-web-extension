@@ -17,7 +17,7 @@ const SendAmountContainer = styled.div({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   textTransform: 'uppercase',
 }));
 
@@ -29,28 +29,28 @@ const AmountText = styled.h1((props) => ({
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 interface Props {
   amount: BigNumber;
-  currency : string;
-  fungibleToken?: FungibleToken
+  currency: string;
+  fungibleToken?: FungibleToken;
 }
 
 function TransferAmountView({ amount, currency, fungibleToken }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
-  const {
-    stxBtcRate, btcFiatRate, fiatCurrency,
-  } = useWalletSelector();
+  const { stxBtcRate, btcFiatRate, fiatCurrency } = useWalletSelector();
 
   function getFtTicker() {
     if (fungibleToken?.ticker) {
       return fungibleToken?.ticker.toUpperCase();
-    } if (fungibleToken?.name) {
+    }
+    if (fungibleToken?.name) {
       return getTicker(fungibleToken.name).toUpperCase();
-    } return '';
+    }
+    return '';
   }
 
   useEffect(() => {
@@ -60,7 +60,15 @@ function TransferAmountView({ amount, currency, fungibleToken }: Props) {
       if (amountInCurrency.isLessThan(0.01)) {
         amountInCurrency = '0.01';
       }
-    } else { amountInCurrency = getFiatEquivalent(Number(amount), currency, new BigNumber(stxBtcRate), new BigNumber(btcFiatRate), fungibleToken); }
+    } else {
+      amountInCurrency = getFiatEquivalent(
+        Number(amount),
+        currency,
+        new BigNumber(stxBtcRate),
+        new BigNumber(btcFiatRate),
+        fungibleToken,
+      );
+    }
     setFiatAmount(amountInCurrency);
   }, [amount]);
 

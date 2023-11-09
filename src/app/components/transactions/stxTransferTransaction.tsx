@@ -1,17 +1,27 @@
-import styled from 'styled-components';
-import { StxTransactionData } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
-import TransactionStatusIcon from '@components/transactions/transactionStatusIcon';
-import TransactionTitle from '@components/transactions/transactionTitle';
 import TransactionAmount from '@components/transactions/transactionAmount';
 import TransactionRecipient from '@components/transactions/transactionRecipient';
-import { getStxTxStatusUrl } from '@utils/helper';
+import TransactionStatusIcon from '@components/transactions/transactionStatusIcon';
+import TransactionTitle from '@components/transactions/transactionTitle';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { StxTransactionData } from '@secretkeylabs/xverse-core';
+import { CurrencyTypes } from '@utils/constants';
+import { getStxTxStatusUrl } from '@utils/helper';
+import styled from 'styled-components';
 
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
-  marginBottom: props.theme.spacing(10),
+  width: '100%',
+  paddingTop: props.theme.spacing(5),
+  paddingBottom: props.theme.spacing(5),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
   background: 'none',
+  ':hover': {
+    background: props.theme.colors.white_900,
+  },
+  ':focus': {
+    background: props.theme.colors.white_850,
+  },
 }));
 
 const TransactionInfoContainer = styled.div((props) => ({
@@ -21,8 +31,16 @@ const TransactionInfoContainer = styled.div((props) => ({
   flex: 1,
 }));
 
+const TransactionAmountContainer = styled.div({
+  display: 'flex',
+  flex: 1,
+  width: '100%',
+  justifyContent: 'flex-end',
+});
+
 const TransactionRow = styled.div((props) => ({
   display: 'flex',
+  width: '100%',
   alignItems: 'center',
   justifyContent: 'space-between',
   ...props.theme.body_bold_m,
@@ -35,9 +53,7 @@ interface StxTransferTransactionProps {
 
 export default function StxTransferTransaction(props: StxTransferTransactionProps) {
   const { transaction, transactionCoin } = props;
-  const {
-    network,
-  } = useWalletSelector();
+  const { network } = useWalletSelector();
 
   const openTxStatusUrl = () => {
     window.open(getStxTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
@@ -48,7 +64,9 @@ export default function StxTransferTransaction(props: StxTransferTransactionProp
       <TransactionInfoContainer>
         <TransactionRow>
           <TransactionTitle transaction={transaction} />
-          <TransactionAmount transaction={transaction} coin={transactionCoin} />
+          <TransactionAmountContainer>
+            <TransactionAmount transaction={transaction} coin={transactionCoin} />
+          </TransactionAmountContainer>
         </TransactionRow>
         <TransactionRecipient transaction={transaction} />
       </TransactionInfoContainer>
