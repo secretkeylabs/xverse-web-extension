@@ -196,7 +196,7 @@ const Button = styled.button<DetailSectionProps>((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   backgroundColor: 'transparent',
-  width: props.isGallery ? 288 : 328,
+  width: props.isGallery ? 400 : 328,
   height: 44,
   padding: 12,
   borderRadius: 12,
