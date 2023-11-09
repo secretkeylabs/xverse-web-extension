@@ -64,7 +64,7 @@ const useSignPsbtTx = () => {
     chrome.tabs.sendMessage(+tabId, signingMessage);
   };
 
-  const getSigningAddresses = (inputsToSign: Array<InputToSign>) => {
+  const getSigningAddresses = (inputsToSign: InputToSign[]) => {
     const signingAddresses: Array<string> = [];
     inputsToSign.forEach((inputToSign) => {
       inputToSign.signingIndexes.forEach((signingIndex) => {

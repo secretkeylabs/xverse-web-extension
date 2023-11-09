@@ -7,7 +7,7 @@ import {
 } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
-import { SignMultipleTransactionOptions } from 'sats-connect';
+import { SignMultiplePsbtPayload, SignMultipleTransactionOptions } from 'sats-connect';
 import useBtcClient from './useBtcClient';
 import useSeedVault from './useSeedVault';
 
@@ -21,7 +21,7 @@ const useSignBatchPsbtTx = () => {
   const tabId = params.get('tabId') ?? '0';
   const btcClient = useBtcClient();
 
-  const confirmSignPsbt = async (psbt) => {
+  const confirmSignPsbt = async (psbt: SignMultiplePsbtPayload) => {
     const txId = '';
     const seedPhrase = await getSeed();
     const signingResponse = await signPsbt(
@@ -29,7 +29,7 @@ const useSignBatchPsbtTx = () => {
       accountsList,
       psbt.inputsToSign,
       psbt.psbtBase64,
-      psbt.broadcast,
+      request.payload.broadcast,
       network.type,
     );
 
@@ -57,7 +57,7 @@ const useSignBatchPsbtTx = () => {
     chrome.tabs.sendMessage(+tabId, signingMessage);
   };
 
-  const getSigningAddresses = (inputsToSign: Array<InputToSign>) => {
+  const getSigningAddresses = (inputsToSign: InputToSign[]) => {
     const signingAddresses: Array<string> = [];
     inputsToSign.forEach((inputToSign) => {
       inputToSign.signingIndexes.forEach((signingIndex) => {

@@ -136,11 +136,19 @@ function SignBatchPsbtRequest() {
   const tabId = params.get('tabId') ?? '0';
 
   const handlePsbtParsing = useCallback(
-    (item: SignMultiplePsbtPayload) => {
+    (psbt: SignMultiplePsbtPayload, index: number) => {
       try {
-        return parsePsbt(selectedAccount!, item.inputsToSign, item.psbtBase64, network.type);
+        return parsePsbt(selectedAccount!, psbt.inputsToSign, psbt.psbtBase64, network.type);
       } catch (err) {
-        return '';
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'BTC',
+            errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
+            error: t('PSBT_INDEX_CANT_PARSE_ERROR_DESCRIPTION', { index }),
+            browserTx: true,
+          },
+        });
       }
     },
     [selectedAccount, network.type],
@@ -154,17 +162,6 @@ function SignBatchPsbtRequest() {
   const userReceivesOrdinalArr = useDetectOrdinalInSignBatchPsbt(parsedPsbts);
 
   const checkIfMismatch = () => {
-    if (!parsedPsbts?.length || parsedPsbts.some((psbt) => !psbt)) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
-          error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
-          browserTx: true,
-        },
-      });
-    }
     if (payload.network.type !== network.type) {
       navigate('/tx-status', {
         state: {
