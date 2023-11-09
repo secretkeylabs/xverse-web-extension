@@ -153,11 +153,8 @@ export type NftDashboardState = {
 const useNftDashboard = (): NftDashboardState => {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const dispatch = useDispatch();
-  const {
-    hasActivatedOrdinalsKey,
-    hasActivatedRareSatsKey,
-    rareSatsNoticeDismissed,
-  } = useWalletSelector();
+  const { hasActivatedOrdinalsKey, hasActivatedRareSatsKey, rareSatsNoticeDismissed } =
+    useWalletSelector();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [showNewFeatureAlert, setShowNewFeatureAlert] = useState(false);
   const [showNoticeAlert, setShowNoticeAlert] = useState(false);

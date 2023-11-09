@@ -1,7 +1,7 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getAddressUtxoOrdinalBundles, getUtxoOrdinalBundle } from '@secretkeylabs/xverse-core';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { InvalidParamsError, handleRetries } from '@utils/query';
+import { handleRetries, InvalidParamsError } from '@utils/query';
 import { mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
 
 const PAGE_SIZE = 30;
