@@ -78,8 +78,8 @@ function ConfirmOrdinalTransaction() {
   const [currentFee, setCurrentFee] = useState(fee);
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
 
-  const bundleId = selectedSatBundle ? getBundleId(selectedSatBundle) : '';
-  const bundleSubText = selectedSatBundle ? getBundleSubText(selectedSatBundle) : '';
+  const bundleId = isRareSat && selectedSatBundle ? getBundleId(selectedSatBundle) : '';
+  const bundleSubText = isRareSat && selectedSatBundle ? getBundleSubText(selectedSatBundle) : '';
 
   const {
     isLoading,

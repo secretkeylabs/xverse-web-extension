@@ -1,16 +1,16 @@
-import useWalletSelector from '@hooks/useWalletSelector';
-import { useDispatch } from 'react-redux';
-import { useQuery } from '@tanstack/react-query';
-import { CoinsResponse, FungibleToken } from '@secretkeylabs/xverse-core/types';
-import { getCoinsInfo, getFtData } from '@secretkeylabs/xverse-core/api';
 import useNetworkSelector from '@hooks/useNetwork';
-import { setCoinDataAction } from '@stores/wallet/actions/actionCreators';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { getCoinMetaData } from '@secretkeylabs/xverse-core';
-import { InvalidParamsError, handleRetries } from '@utils/query';
+import { getCoinsInfo, getFtData } from '@secretkeylabs/xverse-core/api';
+import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import { setCoinDataAction } from '@stores/wallet/actions/actionCreators';
+import { useQuery } from '@tanstack/react-query';
+import { handleRetries, InvalidParamsError } from '@utils/query';
+import { useDispatch } from 'react-redux';
 
 export const useCoinsData = () => {
   const dispatch = useDispatch();
-  const { stxAddress, coinsList, fiatCurrency } = useWalletSelector();
+  const { stxAddress, coinsList, fiatCurrency, network } = useWalletSelector();
   const currentNetworkInstance = useNetworkSelector();
 
   const fetchCoinData = async () => {
@@ -46,12 +46,12 @@ export const useCoinsData = () => {
       fungibleTokenList.forEach((ft) => {
         contractids.push(ft.principal);
       });
-      let coinsReponse: CoinsResponse = await getCoinsInfo(contractids, fiatCurrency);
-      if (!coinsReponse) {
-        coinsReponse = await getCoinMetaData(contractids, currentNetworkInstance);
+      let coinsResponse = await getCoinsInfo(network.type, contractids, fiatCurrency);
+      if (!coinsResponse) {
+        coinsResponse = await getCoinMetaData(contractids, currentNetworkInstance);
       }
 
-      coinsReponse.forEach((coin) => {
+      coinsResponse.forEach((coin) => {
         if (!coin.name) {
           const coinName = coin.contract.split('.')[1];
           coin.name = coinName;
@@ -60,7 +60,7 @@ export const useCoinsData = () => {
 
       // update attributes of fungible token list
       fungibleTokenList.forEach((ft) => {
-        coinsReponse.forEach((coin) => {
+        coinsResponse!.forEach((coin) => {
           if (ft.principal === coin.contract) {
             ft.ticker = coin.ticker;
             ft.decimals = coin.decimals;
@@ -81,8 +81,8 @@ export const useCoinsData = () => {
         else unSupportedFts.push(ft);
       });
       const sortedFtList: FungibleToken[] = [...supportedFts, ...unSupportedFts];
-      dispatch(setCoinDataAction(sortedFtList, coinsReponse));
-      return { sortedFtList, coinsReponse };
+      dispatch(setCoinDataAction(sortedFtList, coinsResponse));
+      return { sortedFtList, coinsResponse };
     } catch (error: any) {
       return Promise.reject(error);
     }

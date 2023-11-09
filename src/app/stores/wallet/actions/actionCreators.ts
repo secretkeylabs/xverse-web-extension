@@ -2,9 +2,9 @@ import { PostGuardPing } from '@components/guards/singleTab';
 import type {
   Account,
   AccountType,
+  AppInfo,
   BaseWallet,
   Coin,
-  FeesMultipliers,
   FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
@@ -95,7 +95,7 @@ export function selectAccount(
   };
 }
 
-export function setFeeMultiplierAction(feeMultipliers: FeesMultipliers): actions.SetFeeMultiplier {
+export function setFeeMultiplierAction(feeMultipliers: AppInfo): actions.SetFeeMultiplier {
   return {
     type: actions.SetFeeMultiplierKey,
     feeMultipliers,

@@ -11,22 +11,22 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Circle, ArrowRight, ArrowUp } from '@phosphor-icons/react';
+import { ArrowRight, ArrowUp, Circle } from '@phosphor-icons/react';
 import Callout from '@ui-library/callout';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getBtcTxStatusUrl, getTruncatedAddress, isLedgerAccount } from '@utils/helper';
-import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
 import {
+  BundleItem,
   getBundleItemId,
+  getBundleItemSubText,
   getRareSatsColorsByRareSatsType,
   getRareSatsLabelByType,
   getRarityLabelByRareSatsType,
-  getBundleItemSubText,
-  BundleItem,
 } from '@utils/rareSats';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import OrdinalAttributeComponent from '../ordinalDetail/ordinalAttributeComponent';
 
 interface DetailSectionProps {
@@ -316,7 +316,7 @@ function RareSatsDetailScreen() {
     if (!isInscription) {
       return;
     }
-    window.open(`${XVERSE_ORDIVIEW_URL}/inscription/${item.inscription.id}`);
+    window.open(`${XVERSE_ORDIVIEW_URL(network.type)}/inscription/${item.inscription.id}`);
   };
 
   const { color, backgroundColor } = getRareSatsColorsByRareSatsType(item.rarity_ranking);

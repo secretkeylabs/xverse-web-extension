@@ -439,7 +439,7 @@ function SendForm({
   } else if (!hideDefaultWarning) {
     switch (currencyType) {
       case 'Ordinal':
-        displayedWarning = t('SEND_ORDINAL_WALLET_WARNING');
+        displayedWarning = t('MAKE_SURE_THE_RECIPIENT');
         break;
       case 'brc20-Ordinal':
         displayedWarning = t('SEND_BRC20_ORDINAL_WALLET_WARNING');
