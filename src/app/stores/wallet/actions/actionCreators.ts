@@ -1,8 +1,8 @@
 import { PostGuardPing } from '@components/guards/singleTab';
 import type {
   Account,
-  AppInfo,
   AccountType,
+  AppInfo,
   BaseWallet,
   Coin,
   FungibleToken,

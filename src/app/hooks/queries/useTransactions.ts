@@ -1,6 +1,6 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { fetchBtcTransactionsData, getBrc20History } from '@secretkeylabs/xverse-core/api';
-import { Brc20HistoryTransactionData, BtcTransactionData } from '@secretkeylabs/xverse-core/types';
+import type { Brc20HistoryTransactionData, BtcTransactionData } from '@secretkeylabs/xverse-core';
+import { fetchBtcTransactionsData, getBrc20History } from '@secretkeylabs/xverse-core';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
