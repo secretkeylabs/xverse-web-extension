@@ -19,7 +19,7 @@ export default function useNftDetail() {
     nftCollections,
   );
   const metaData = nft?.data?.token_metadata;
-  const gammaUrl = `${GAMMA_URL}collections/${nft?.data?.token_metadata?.contract_id}/${nft?.data?.token_id}`;
+  const gammaUrl = `${GAMMA_URL}collections/${metaData?.contract_id}/${nft?.data?.token_id}`;
 
   useResetUserFlow('/nft-detail');
 
