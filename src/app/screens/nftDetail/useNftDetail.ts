@@ -18,6 +18,7 @@ export default function useNftDetail() {
     id,
     nftCollections,
   );
+  const metaData = nft?.data?.token_metadata;
 
   useResetUserFlow('/nft-detail');
 
@@ -36,7 +37,8 @@ export default function useNftDetail() {
   };
 
   const onGammaPress = () => {
-    window.open(`${GAMMA_URL}collections/${nft?.data?.token_metadata?.contract_id}`);
+    const number = metaData?.name.split('#')[1];
+    window.open(`${GAMMA_URL}collections/${metaData?.asset_id}/${number}`);
   };
 
   const onExplorerPress = () => {
