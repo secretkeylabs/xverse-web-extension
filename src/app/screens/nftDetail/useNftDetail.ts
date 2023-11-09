@@ -19,6 +19,7 @@ export default function useNftDetail() {
     nftCollections,
   );
   const metaData = nft?.data?.token_metadata;
+  const gammaUrl = `${GAMMA_URL}collections/${nft?.data?.token_metadata?.contract_id}/${nft?.data?.token_id}`;
 
   useResetUserFlow('/nft-detail');
 
@@ -27,9 +28,7 @@ export default function useNftDetail() {
     collectionId === 'bns' && nft ? getBnsNftName(nft) : nft?.data?.token_metadata.name;
 
   const onSharePress = () => {
-    navigator.clipboard.writeText(
-      `${GAMMA_URL}collections/${nft?.data?.token_metadata?.contract_id}/${nft?.data?.token_id}`,
-    );
+    navigator.clipboard.writeText(gammaUrl);
   };
 
   const handleBackButtonClick = () => {
@@ -37,8 +36,7 @@ export default function useNftDetail() {
   };
 
   const onGammaPress = () => {
-    const number = metaData?.name.split('#')[1];
-    window.open(`${GAMMA_URL}collections/${metaData?.asset_id}/${number}`);
+    window.open(gammaUrl);
   };
 
   const onExplorerPress = () => {
