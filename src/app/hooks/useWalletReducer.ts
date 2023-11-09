@@ -13,8 +13,8 @@ import {
 } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import {
-  ChangeNetworkAction,
   addAccountAction,
+  ChangeNetworkAction,
   fetchAccountAction,
   getActiveAccountsAction,
   resetWalletAction,
@@ -22,7 +22,7 @@ import {
   setWalletAction,
   setWalletUnlockedAction,
   storeEncryptedSeedAction,
-  updateLedgerAccountsAction
+  updateLedgerAccountsAction,
 } from '@stores/wallet/actions/actionCreators';
 import { useQueryClient } from '@tanstack/react-query';
 import { generatePasswordHash } from '@utils/encryptionUtils';
