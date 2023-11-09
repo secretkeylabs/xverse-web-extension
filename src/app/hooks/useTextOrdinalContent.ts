@@ -1,5 +1,5 @@
-import { getTextOrdinalContent } from '@secretkeylabs/xverse-core/api/index';
-import type { CondensedInscription, Inscription } from '@secretkeylabs/xverse-core/types';
+import type { CondensedInscription, Inscription } from '@secretkeylabs/xverse-core';
+import { getTextOrdinalContent } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import PQueue from 'p-queue';
 import useWalletSelector from './useWalletSelector';
@@ -11,8 +11,7 @@ const useTextOrdinalContent = (ordinal: Inscription | CondensedInscription) => {
   const { data: textContent } = useQuery({
     queryKey: [`ordinal-text-${ordinal?.id}`],
     queryFn: async () => queue.add(() => getTextOrdinalContent(network.type, ordinal?.id)),
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 min
   });
 
   return textContent?.toString();

@@ -1,5 +1,5 @@
-import { fetchStxAddressData } from '@secretkeylabs/xverse-core/api';
-import { StxAddressData } from '@secretkeylabs/xverse-core/types';
+import type { StxAddressData } from '@secretkeylabs/xverse-core';
+import { fetchStxAddressData } from '@secretkeylabs/xverse-core';
 import { setStxWalletDataAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { PAGINATION_LIMIT } from '@utils/constants';
@@ -32,9 +32,10 @@ export const useStxWalletData = () => {
   };
 
   return useQuery({
-    queryKey: [`wallet-data-${stxAddress}`],
+    queryKey: ['stx-wallet-data', stxAddress],
     queryFn: fetchStxWalletData,
     enabled: !!stxAddress,
+    staleTime: 10 * 1000, // 10 secs
   });
 };
 
