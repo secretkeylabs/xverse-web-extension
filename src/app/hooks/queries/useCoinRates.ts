@@ -1,5 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { fetchBtcToCurrencyRate, fetchStxToBtcRate } from '@secretkeylabs/xverse-core/api';
+import { fetchBtcToCurrencyRate, fetchStxToBtcRate } from '@secretkeylabs/xverse-core';
 import { setCoinRatesAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
@@ -24,6 +24,7 @@ export const useCoinRates = () => {
   return useQuery({
     queryKey: ['coin_rates'],
     queryFn: fetchCoinRates,
+    staleTime: 5 * 60 * 1000, // 5 min
   });
 };
 

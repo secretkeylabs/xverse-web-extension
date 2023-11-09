@@ -1,9 +1,9 @@
 import dashboardIcon from '@assets/img/dashboard-icon.svg';
+import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
-import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -12,7 +12,6 @@ import ActionButton from '@components/button';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
-import SquareButton from '@components/squareButton';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import UpdatedBottomModal from '@components/updatedBottomModal';
@@ -37,6 +36,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import Theme from 'theme';
+import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
 
 export const Container = styled.div((props) => ({

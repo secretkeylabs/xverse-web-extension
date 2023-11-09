@@ -13,8 +13,8 @@ import {
 } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
 import {
-  addAccountAction,
   ChangeNetworkAction,
+  addAccountAction,
   fetchAccountAction,
   getActiveAccountsAction,
   resetWalletAction,
@@ -22,7 +22,7 @@ import {
   setWalletAction,
   setWalletUnlockedAction,
   storeEncryptedSeedAction,
-  updateLedgerAccountsAction,
+  updateLedgerAccountsAction
 } from '@stores/wallet/actions/actionCreators';
 import { useQueryClient } from '@tanstack/react-query';
 import { generatePasswordHash } from '@utils/encryptionUtils';
@@ -170,6 +170,7 @@ const useWalletReducer = () => {
       ordinalsPublicKey: wallet.ordinalsPublicKey,
       stxAddress: wallet.stxAddress,
       stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
     };
     const hasSeed = await seedVault.hasSeed();
     if (hasSeed && !masterPubKey) {
@@ -229,6 +230,7 @@ const useWalletReducer = () => {
       ordinalsPublicKey: wallet.ordinalsPublicKey,
       stxAddress: wallet.stxAddress,
       stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
     };
     trackMixPanel(AnalyticsEvents.CreateNewWallet);
 
@@ -252,7 +254,7 @@ const useWalletReducer = () => {
   const switchAccount = async (account: Account) => {
     // we clear the query cache to prevent data from the other account potentially being displayed
     await queryClient.cancelQueries();
-    await queryClient.clear();
+    queryClient.clear();
 
     dispatch(
       selectAccount(
@@ -295,6 +297,7 @@ const useWalletReducer = () => {
       ordinalsPublicKey: wallet.ordinalsPublicKey,
       stxAddress: wallet.stxAddress,
       stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
     };
     dispatch(setWalletAction(wallet));
     try {
