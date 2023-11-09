@@ -8,14 +8,18 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft } from '@phosphor-icons/react';
-import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import {
+  ErrorCodes,
+  getBtcFiatEquivalent,
+  isOrdinalOwnedByAccount,
+  ResponseError,
+  UTXO,
+  validateBtcAddress,
+} from '@secretkeylabs/xverse-core';
 import {
   SignedBtcTx,
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
-import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
