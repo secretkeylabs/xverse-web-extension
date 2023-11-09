@@ -7,9 +7,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 export default function useNftCollection() {
   const navigate = useNavigate();
+  useResetUserFlow('/nft-collection');
+
   const { id: collectionId } = useParams();
-  const stacksNftsQuery = useStacksCollectibles();
-  const collectionData = stacksNftsQuery.data?.pages
+  const { data, isLoading, error } = useStacksCollectibles();
+
+  const collectionData = data?.pages
     ?.map((page) => page?.results)
     .flat()
     .find((collection) => collection.collection_id === collectionId);
@@ -19,8 +22,6 @@ export default function useNftCollection() {
     : null;
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
-
-  useResetUserFlow('/nft-collection');
 
   const handleBackButtonClick = () => {
     navigate('/nft-dashboard?tab=nfts');
@@ -32,21 +33,18 @@ export default function useNftCollection() {
     });
   };
 
-  const handleOnClick = (nft: NonFungibleToken) => {
-    if (isBnsCollection(collectionData?.collection_id || '')) {
-      navigate(`/nft-dashboard/nft-detail/${nft.asset_identifier}`);
-    } else {
-      navigate(`/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`);
-    }
-  };
+  const handleOnClick = isBnsCollection(collectionData?.collection_id)
+    ? undefined
+    : (nft: NonFungibleToken) => {
+        navigate(`/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`);
+      };
 
   return {
     collectionData,
     portfolioValue,
-    isLoading: stacksNftsQuery.isLoading,
-    isError: stacksNftsQuery.error,
-    isEmpty:
-      !stacksNftsQuery.isLoading && !stacksNftsQuery.error && collectionData?.total_nft === 0,
+    isLoading,
+    isError: error,
+    isEmpty: !isLoading && !error && collectionData?.total_nft === 0,
     isGalleryOpen,
     handleBackButtonClick,
     openInGalleryView,

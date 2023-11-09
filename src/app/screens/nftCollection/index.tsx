@@ -9,6 +9,7 @@ import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import Nft from '@screens/nftDashboard/nft';
+import { getNftCollectionsGridItemId } from '@utils/nfts';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import useNftCollection from './useNftCollection';
@@ -181,11 +182,7 @@ function NftCollection() {
                 <CollectibleCollectionGridItem
                   key={nft.asset_identifier}
                   item={nft}
-                  itemId={
-                    nft?.data?.token_id
-                      ? `${collectionData?.collection_name} #${nft?.data?.token_id}`
-                      : `${collectionData?.collection_name}`
-                  }
+                  itemId={getNftCollectionsGridItemId(nft, collectionData)}
                   onClick={handleOnClick}
                 >
                   <Nft asset={nft} isGalleryOpen={isGalleryOpen} />

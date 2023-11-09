@@ -43,6 +43,7 @@ const GridItemContainer = styled.button`
   flex-direction: column;
   background: transparent;
   gap: ${(props) => props.theme.space.s};
+  cursor: ${(props) => (props.onClick ? 'pointer' : 'initial')};
 `;
 
 interface Props {
@@ -51,7 +52,7 @@ interface Props {
   itemSubText?: string;
   itemSubTextColor?: Color;
   children: ReactNode;
-  onClick: (collectible: any) => void;
+  onClick?: (collectible: any) => void;
 }
 export function CollectibleCollectionGridItem({
   item,
@@ -61,9 +62,11 @@ export function CollectibleCollectionGridItem({
   children,
   onClick,
 }: Props) {
-  const handleOnClick = () => {
-    onClick(item);
-  };
+  const handleOnClick = onClick
+    ? () => {
+        onClick(item);
+      }
+    : undefined;
 
   return (
     <GridItemContainer onClick={handleOnClick}>

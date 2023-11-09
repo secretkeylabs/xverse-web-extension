@@ -1,9 +1,14 @@
-import { NftData, NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
+import {
+  getBnsNftName,
+  NftData,
+  NonFungibleToken,
+  StacksCollectionData,
+} from '@secretkeylabs/xverse-core';
 
 export const getNftsTabGridItemSubText = (collection: StacksCollectionData) =>
   collection.total_nft > 1 ? `${collection.total_nft} Items` : '1 Item';
 
-export const isBnsCollection = (collectionId: string): boolean =>
+export const isBnsCollection = (collectionId?: string | null): boolean =>
   collectionId === 'SP000000000000000000002Q6VF78.bns';
 
 // fully_qualified_token_id like:
@@ -32,3 +37,13 @@ export const getNftDataFromNftsCollectionData = (
     nftData: nft?.data,
   };
 };
+
+export const getNftCollectionsGridItemId = (
+  nft: NonFungibleToken,
+  collectionData: StacksCollectionData,
+) =>
+  isBnsCollection(collectionData?.collection_id)
+    ? getBnsNftName(nft)
+    : nft?.data?.token_id
+    ? `${collectionData?.collection_name} #${nft?.data?.token_id}`
+    : `${collectionData?.collection_name}`;
