@@ -162,7 +162,7 @@ function SignPsbtRequest() {
           navigate('/tx-status', {
             state: {
               txid: '',
-              currency: 'STX',
+              currency: 'BTC',
               error: t('ADDRESS_MISMATCH'),
               browserTx: true,
             },
