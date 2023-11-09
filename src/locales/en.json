@@ -1112,6 +1112,9 @@
     "COLLECTION_FLOOR_PRICE": "Collection floor price",
     "EST_PORTFOLIO_VALUE": "Est. portfolio value",
     "COLLECTION": "Collection",
-    "LOAD_MORE": "Load more"
+    "LOAD_MORE": "Load more",
+    "ERRORS": {
+      "FAILED_TO_FETCH": "Failed to fetch data"
+    }
   }
 }

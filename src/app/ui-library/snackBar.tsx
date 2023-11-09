@@ -1,0 +1,72 @@
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+
+type ToastType = 'success' | 'error' | 'neutral';
+
+interface ToastProps {
+  text: string;
+  type: ToastType;
+}
+
+const getBackgroundColor = (type: ToastType, theme: any): string => {
+  const colors = {
+    success: theme.colors.feedback.success,
+    error: theme.colors.feedback.error,
+    neutral: theme.colors.feedback.neutral,
+  };
+  return colors[type] || theme.colors.feedback.neutral;
+};
+
+const getTextColor = (type: ToastType, theme: any): string => {
+  const colors = {
+    success: theme.colors.elevation0,
+    error: theme.colors.white_0,
+    neutral: theme.colors.white_0,
+  };
+  return colors[type] || theme.colors.elevation0;
+};
+
+const ToastContainer = styled.div<{ type: ToastType }>`
+  display: flex;
+  flex-direction: row;
+  background: ${(props) => getBackgroundColor(props.type, props.theme)};
+  border-radius: 12px;
+  box-shadow: 0px 7px 16px -4px rgba(25, 25, 48, 0.25);
+  height: 44px;
+  padding: 12px 20px;
+  width: 306px;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const ToastMessage = styled.h1<{ type: ToastType }>`
+  ${({ theme }) => theme.typography.body_medium_m};
+  color: ${(props) => getTextColor(props.type, props.theme)};
+`;
+
+const ToastDismissButton = styled.h1<{ type: ToastType }>`
+  ${({ theme }) => theme.typography.body_medium_m};
+  color: ${(props) => getTextColor(props.type, props.theme)};
+  background: transparent;
+  cursor: pointer;
+`;
+
+export function SnackBar({ text, type }: ToastProps) {
+  const { t } = useTranslation('translation');
+
+  const dismissToast = () => {
+    toast.dismiss();
+  };
+
+  return (
+    <ToastContainer type={type}>
+      <ToastMessage type={type}>{text}</ToastMessage>
+      <ToastDismissButton onClick={dismissToast} type={type}>
+        {t('OK')}
+      </ToastDismissButton>
+    </ToastContainer>
+  );
+}
+
+export default SnackBar;
