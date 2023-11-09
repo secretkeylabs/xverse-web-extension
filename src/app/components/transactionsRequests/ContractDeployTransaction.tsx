@@ -1,6 +1,6 @@
 import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import InfoContainer from '@components/infoContainer';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
@@ -199,7 +199,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      <ConfirmStxTransationComponent
+      <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx!]}
         onConfirmClick={confirmCallback}
         onCancelClick={cancelCallback}
@@ -233,7 +233,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
             </Button>
           </DownloadButtonContainer>
         </DownloadContainer>
-      </ConfirmStxTransationComponent>
+      </ConfirmStxTransactionComponent>
     </>
   );
 }

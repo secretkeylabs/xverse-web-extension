@@ -128,9 +128,10 @@ interface Props {
   isAsset?: boolean;
   title?: string;
   subTitle?: string;
+  hasSignatures?: boolean;
 }
 
-function ConfirmStxTransationComponent({
+function ConfirmStxTransactionComponent({
   initialStxTransactions,
   loading,
   isSponsored,
@@ -141,6 +142,7 @@ function ConfirmStxTransationComponent({
   onConfirmClick,
   onCancelClick,
   skipModal = false,
+  hasSignatures = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: signatureRequestTranslate } = useTranslation('translation', {
@@ -330,12 +332,14 @@ function ConfirmStxTransationComponent({
         {isSponsored ? (
           <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>
         ) : (
-          <Button onClick={onAdvancedSettingClick}>
-            <>
-              <ButtonImage src={SettingIcon} />
-              <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
-            </>
-          </Button>
+          !hasSignatures && (
+            <Button onClick={onAdvancedSettingClick}>
+              <>
+                <ButtonImage src={SettingIcon} />
+                <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
+              </>
+            </Button>
+          )
         )}
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
@@ -403,4 +407,4 @@ function ConfirmStxTransationComponent({
   );
 }
 
-export default ConfirmStxTransationComponent;
+export default ConfirmStxTransactionComponent;

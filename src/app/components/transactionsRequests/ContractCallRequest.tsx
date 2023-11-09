@@ -1,5 +1,5 @@
 import AccountHeaderComponent from '@components/accountHeader';
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import InfoContainer from '@components/infoContainer';
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
 import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
@@ -249,7 +249,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      <ConfirmStxTransationComponent
+      <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx]}
         onConfirmClick={confirmCallback}
         onCancelClick={cancelCallback}
@@ -273,7 +273,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
           />
           {functionArgsView()}
         </>
-      </ConfirmStxTransationComponent>
+      </ConfirmStxTransactionComponent>
     </>
   );
 }

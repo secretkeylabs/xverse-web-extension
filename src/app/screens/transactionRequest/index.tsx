@@ -11,13 +11,13 @@ import {
   createDeployContractRequest,
   extractFromPayload,
 } from '@secretkeylabs/xverse-core';
-import { StacksTransaction } from '@stacks/transactions';
+import { deserializeTransaction, StacksTransaction } from '@stacks/transactions';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
-import { getContractCallPromises, getTokenTransferRequest } from './helper';
+import { getContractCallPromises, getTokenTransferRequest, isMultiSig } from './helper';
 
 const LoaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -139,6 +139,22 @@ function TransactionRequest() {
     setHasSwitchedAccount(true);
   };
 
+  const handleTxSigningRequest = () => {
+    const stacksTransaction = deserializeTransaction(payload.txHex!);
+    const { hashMode } = stacksTransaction.auth.spendingCondition;
+    const isMultiSigTx = isMultiSig(hashMode);
+    navigate('/confirm-stx-tx', {
+      state: {
+        unsignedTx: payload.txHex,
+        sponosred: payload.sponsored,
+        isBrowserTx: true,
+        tabId,
+        requestToken,
+        isMultiSig: isMultiSigTx,
+      },
+    });
+  };
+
   const createRequestTx = async () => {
     try {
       if (hasSwitchedAccount) {
@@ -149,15 +165,7 @@ function TransactionRequest() {
         } else if (payload.txType === 'smart_contract') {
           await handleContractDeployRequest();
         } else if (payload.txHex) {
-          navigate('/confirm-stx-tx', {
-            state: {
-              unsignedTx: payload.txHex,
-              sponosred: payload.sponsored,
-              isBrowserTx: true,
-              tabId,
-              requestToken,
-            },
-          });
+          handleTxSigningRequest();
         }
       }
     } catch (e: unknown) {

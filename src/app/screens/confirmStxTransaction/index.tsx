@@ -1,32 +1,32 @@
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { useMutation } from '@tanstack/react-query';
-import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import AccountHeaderComponent from '@components/accountHeader';
+import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
+import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
+import InfoContainer from '@components/infoContainer';
+import RecipientComponent from '@components/recipientComponent';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import finalizeTxSignature from '@components/transactionsRequests/utils';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useNetworkSelector from '@hooks/useNetwork';
+import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
-import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
 import {
   addressToString,
   broadcastSignedTransaction,
 } from '@secretkeylabs/xverse-core/transactions';
-import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import BottomBar from '@components/tabBar';
-import TopRow from '@components/topRow';
-import AccountHeaderComponent from '@components/accountHeader';
-import finalizeTxSignature from '@components/transactionsRequests/utils';
-import InfoContainer from '@components/infoContainer';
-import useOnOriginTabClose from '@hooks/useOnTabClosed';
-import useNetworkSelector from '@hooks/useNetwork';
-import TransactionDetailComponent from '@components/transactionDetailComponent';
-import RecipientComponent from '@components/recipientComponent';
-import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
-import useStxWalletData from '@hooks/queries/useStxWalletData';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { deserializeTransaction } from '@stacks/transactions';
+import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
+import { deserializeTransaction, MultiSigSpendingCondition } from '@stacks/transactions';
+import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
-import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
-import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const AlertContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
@@ -46,8 +46,18 @@ function ConfirmStxTransaction() {
   const navigate = useNavigate();
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
-  const { unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken } = location.state;
+  const {
+    unsignedTx: stringHex,
+    sponsored,
+    isBrowserTx,
+    tabId,
+    requestToken,
+    isMultiSig,
+  } = location.state;
   const unsignedTx = deserializeTransaction(stringHex);
+  const hasSignatures =
+    isMultiSig &&
+    (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0;
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -149,9 +159,19 @@ function ConfirmStxTransaction() {
       navigate('/confirm-ledger-tx', { state });
       return;
     }
+    const rawTx = txs[0].serialize().toString('hex');
+    setTxRaw(rawTx);
 
-    setTxRaw(txs[0].serialize().toString('hex'));
-    mutate({ signedTx: txs[0] });
+    if (isMultiSig && isBrowserTx) {
+      finalizeTxSignature({
+        requestPayload: requestToken,
+        tabId: Number(tabId),
+        data: { txId: '', txRaw: rawTx },
+      });
+      window.close();
+    } else {
+      mutate({ signedTx: txs[0] });
+    }
   };
 
   const handleCancelClick = () => {
@@ -176,13 +196,14 @@ function ConfirmStxTransaction() {
       ) : (
         <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleCancelClick} />
       )}
-      <ConfirmStxTransationComponent
+      <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
         onConfirmClick={handleConfirmClick}
         onCancelClick={handleCancelClick}
         isSponsored={sponsored}
         skipModal={isLedgerAccount(selectedAccount)}
+        hasSignatures={hasSignatures}
       >
         <RecipientComponent
           address={recipient}
@@ -201,7 +222,7 @@ function ConfirmStxTransaction() {
             />
           </AlertContainer>
         )}
-      </ConfirmStxTransationComponent>
+      </ConfirmStxTransactionComponent>
       {!isBrowserTx && <BottomBar tab="dashboard" />}
     </>
   );

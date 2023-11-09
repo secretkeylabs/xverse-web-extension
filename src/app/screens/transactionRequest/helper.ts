@@ -1,11 +1,12 @@
 import {
   createContractCallPromises,
   FeesMultipliers,
-  StacksTransaction,
   generateUnsignedStxTokenTransferTransaction,
   StacksNetwork,
+  StacksTransaction,
 } from '@secretkeylabs/xverse-core';
 import { TransactionPayload } from '@stacks/connect';
+import { AddressHashMode, MultiSigHashMode, SingleSigHashMode } from '@stacks/transactions';
 
 export async function getContractCallPromises(
   payload: TransactionPayload,
@@ -47,3 +48,6 @@ export async function getTokenTransferRequest(
   }
   return unsignedSendStxTx;
 }
+
+export const isMultiSig = (hashMode: SingleSigHashMode | MultiSigHashMode) =>
+  hashMode === AddressHashMode.SerializeP2SH || AddressHashMode.SerializeP2WSH;
