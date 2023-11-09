@@ -23,6 +23,7 @@ import {
 import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
 import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { isLedgerAccount } from '@utils/helper';
+import { BundleItem } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -128,7 +129,10 @@ function SignPsbtRequest() {
   }, [selectedAccount, payload.psbtBase64]);
 
   const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
-  const { loading, bundleItemsData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
+  const handleOrdinalAndOrdinalInfo = useDetectOrdinalInSignPsbt();
+  const [isLoading, setIsLoading] = useState(true);
+  const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
+  const [bundleItemsData, setBundleItemsData] = useState<BundleItem[]>([]);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
     [payload.inputsToSign],
@@ -171,6 +175,30 @@ function SignPsbtRequest() {
       });
     }
   };
+
+  const checkIfUserReceivesOrdinal = async () => {
+    try {
+      const result = await handleOrdinalAndOrdinalInfo(parsedPsbt);
+      setBundleItemsData(result.bundleItemsData);
+      setUserReceivesOrdinal(result.userReceivesOrdinal);
+    } catch {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
+          error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
+          browserTx: true,
+        },
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkIfUserReceivesOrdinal();
+  }, []);
 
   useEffect(() => {
     checkIfMismatch();
@@ -338,7 +366,7 @@ function SignPsbtRequest() {
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      {loading ? (
+      {isLoading ? (
         <LoaderContainer>
           <MoonLoader color="white" size={50} />
         </LoaderContainer>

@@ -7,12 +7,13 @@ import InfoContainer from '@components/infoContainer';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
-import useDetectOrdinalInSignBatchPsbt from '@hooks/useDetectOrdinalInSignBatchPsbt';
+import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import { getBtcFiatEquivalent, parsePsbt, satsToBtc } from '@secretkeylabs/xverse-core';
 import { isLedgerAccount } from '@utils/helper';
+import { BundleItem } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -134,6 +135,11 @@ function SignBatchPsbtRequest() {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const tabId = params.get('tabId') ?? '0';
+  const handleOrdinalAndOrdinalInfo = useDetectOrdinalInSignPsbt();
+  const [userReceivesOrdinalArr, setUserReceivesOrdinalArr] = useState<
+    { bundleItemsData: BundleItem[]; userReceivesOrdinal: boolean }[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handlePsbtParsing = useCallback(
     (psbt: SignMultiplePsbtPayload, index: number) => {
@@ -149,6 +155,7 @@ function SignBatchPsbtRequest() {
             browserTx: true,
           },
         });
+        return '';
       }
     },
     [selectedAccount, network.type],
@@ -158,8 +165,6 @@ function SignBatchPsbtRequest() {
     () => payload.psbts.map(handlePsbtParsing),
     [handlePsbtParsing, payload.psbts],
   );
-
-  const userReceivesOrdinalArr = useDetectOrdinalInSignBatchPsbt(parsedPsbts);
 
   const checkIfMismatch = () => {
     if (payload.network.type !== network.type) {
@@ -188,6 +193,29 @@ function SignBatchPsbtRequest() {
 
     payload.psbts.forEach((psbt) => psbt.inputsToSign.forEach(checkAddressMismatch));
   };
+
+  const checkIfUserReceivesOrdinals = async () => {
+    try {
+      const results = await Promise.all(parsedPsbts.map(handleOrdinalAndOrdinalInfo));
+      setUserReceivesOrdinalArr(results);
+    } catch {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
+          error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
+          browserTx: true,
+        },
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkIfUserReceivesOrdinals();
+  }, []);
 
   useEffect(() => {
     checkIfMismatch();
@@ -401,7 +429,7 @@ function SignBatchPsbtRequest() {
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      {userReceivesOrdinalArr.some((item) => item.loading) ? (
+      {isLoading ? (
         <LoaderContainer>
           <MoonLoader color="white" size={50} />
         </LoaderContainer>

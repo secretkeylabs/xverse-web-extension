@@ -1,19 +1,16 @@
 import { getUtxoOrdinalBundle, ParsedPSBT } from '@secretkeylabs/xverse-core';
 import { BundleItem, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
 import { isAxiosError } from 'axios';
-import { useEffect, useState } from 'react';
 import useWalletSelector from './useWalletSelector';
 
-const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
-  const [loading, setLoading] = useState(false);
-  const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
-  const [bundleItemsData, setBundleItemsData] = useState<BundleItem[]>([]);
+const useDetectOrdinalInSignPsbt = () => {
   const { ordinalsAddress, network } = useWalletSelector();
 
-  async function handleOrdinalAndOrdinalInfo() {
+  const handleOrdinalAndOrdinalInfo = async (parsedPsbt: '' | ParsedPSBT) => {
     const bundleItems: BundleItem[] = [];
+    let userReceivesOrdinal = false;
+
     if (parsedPsbt) {
-      setLoading(true);
       await Promise.all(
         parsedPsbt.inputs.map(async (input) => {
           try {
@@ -37,26 +34,20 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
         }),
       );
 
-      setBundleItemsData(bundleItems);
-      setLoading(false);
-
-      parsedPsbt.outputs.forEach(async (output) => {
+      parsedPsbt.outputs.forEach((output) => {
         if (output.address === ordinalsAddress) {
-          setUserReceivesOrdinal(true);
+          userReceivesOrdinal = true;
         }
       });
     }
-  }
 
-  useEffect(() => {
-    handleOrdinalAndOrdinalInfo();
-  }, []);
-
-  return {
-    loading,
-    bundleItemsData,
-    userReceivesOrdinal,
+    return {
+      bundleItemsData: bundleItems,
+      userReceivesOrdinal,
+    };
   };
+
+  return handleOrdinalAndOrdinalInfo;
 };
 
 export default useDetectOrdinalInSignPsbt;
