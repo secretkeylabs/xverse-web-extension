@@ -3,13 +3,13 @@ import ArrowIcon from '@assets/img/settings/arrow.svg';
 import XverseLogo from '@assets/img/settings/logo.svg';
 import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
-import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   ChangeActivateOrdinalsAction,
   ChangeActivateRareSatsAction,
+  ChangeActivateRBFAction,
 } from '@stores/wallet/actions/actionCreators';
 import { PRIVACY_POLICY_LINK, SUPPORT_LINK, TERMS_LINK } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
@@ -44,8 +44,8 @@ const ResetWalletContainer = styled.div((props) => ({
   zIndex: 10,
   background: 'rgba(25, 25, 48, 0.5)',
   backdropFilter: 'blur(10px)',
-  paddingLeft: 16,
-  paddingRight: 16,
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
   paddingTop: props.theme.spacing(50),
 }));
 
@@ -66,6 +66,7 @@ function Setting() {
     network,
     hasActivatedOrdinalsKey,
     hasActivatedRareSatsKey,
+    hasActivatedRBFKey,
     selectedAccount,
   } = useWalletSelector();
   const navigate = useNavigate();
@@ -109,6 +110,10 @@ function Setting() {
 
   const switchActivateRareSatsState = () => {
     dispatch(ChangeActivateRareSatsAction(!hasActivatedRareSatsKey));
+  };
+
+  const switchActivateRBFState = () => {
+    dispatch(ChangeActivateRBFAction(!hasActivatedRBFKey));
   };
 
   const openUpdatePasswordScreen = () => {
@@ -249,7 +254,17 @@ function Setting() {
           toggleFunction={switchActivateRareSatsState}
           toggleValue={hasActivatedRareSatsKey}
           disabled={!hasActivatedOrdinalsKey}
+          showDivider
         />
+
+        <SettingComponent
+          text={t('ENABLE_SPEED_UP_TRANSACTIONS')}
+          description={t('ENABLE_SPEED_UP_TRANSACTIONS_DETAIL')}
+          toggle
+          toggleFunction={switchActivateRBFState}
+          toggleValue={hasActivatedRBFKey}
+        />
+
         <SettingComponent
           title={t('ABOUT')}
           text={t('TERMS_OF_SERVICE')}

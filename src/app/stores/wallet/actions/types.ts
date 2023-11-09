@@ -35,6 +35,7 @@ export const SetCoinDataKey = 'SetCoinDataKey';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
+export const ChangeHasActivatedRBFKey = 'ChangeHasActivatedRBFKey';
 
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
@@ -81,6 +82,7 @@ export interface WalletState {
   networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
   hasActivatedRareSatsKey: boolean | undefined;
+  hasActivatedRBFKey: boolean | undefined;
   rareSatsNoticeDismissed: boolean | undefined;
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
@@ -196,6 +198,11 @@ export interface ChangeActivateRareSats {
   hasActivatedRareSatsKey: boolean;
 }
 
+export interface ChangeActivateRBF {
+  type: typeof ChangeHasActivatedRBFKey;
+  hasActivatedRBFKey: boolean;
+}
+
 export interface SetRareSatsNoticeDismissed {
   type: typeof RareSatsNoticeDismissedKey;
   rareSatsNoticeDismissed: boolean;
@@ -248,6 +255,7 @@ export type WalletActions =
   | GetActiveAccounts
   | ChangeActivateOrdinals
   | ChangeActivateRareSats
+  | ChangeActivateRBF
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
   | ChangeShowDataCollectionAlert

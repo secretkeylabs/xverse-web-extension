@@ -721,6 +721,8 @@
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
     "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
     "ENABLE_RARE_SATS_DETAIL": "Automatically scan and display rare sats in your Ordinals wallet.",
+    "ENABLE_SPEED_UP_TRANSACTIONS": "Enable speed up transactions",
+    "ENABLE_SPEED_UP_TRANSACTIONS_DETAIL": "Allows the payment of a higher fee to accelerate an unconfirmed transaction.",
     "ADVANCED": "Advanced"
   },
   "OPTIONS_DIALOG": {

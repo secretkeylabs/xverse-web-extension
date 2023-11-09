@@ -18,6 +18,7 @@ const Button = styled.button<ButtonProps>((props) => ({
   width: '100%',
   height: 44,
   transition: 'all 0.1s ease',
+  columnGap: props.theme.spacing(3),
   ':disabled': {
     opacity: 0.4,
     cursor: 'not-allowed',
@@ -63,25 +64,24 @@ const AnimatedButtonText = styled.div((props) => ({
   textAlign: 'center',
 }));
 
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
+const ButtonImage = styled.img({
   alignSelf: 'center',
   transform: 'all',
-}));
+});
 
-const ButtonIconContainer = styled.div((props) => ({
+const ButtonIconContainer = styled.div({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  marginRight: props.theme.spacing(3),
-}));
+});
 
 interface Props {
   className?: string;
   src?: string;
   icon?: JSX.Element;
+  iconPosition?: 'left' | 'right';
   text: string;
-  onPress: () => void;
+  onPress: (e: React.MouseEvent) => void;
   processing?: boolean;
   disabled?: boolean;
   transparent?: boolean;
@@ -93,6 +93,7 @@ function ActionButton({
   className,
   src,
   icon,
+  iconPosition = 'left',
   text,
   onPress,
   processing = false,
@@ -101,9 +102,9 @@ function ActionButton({
   warning,
   hoverDialogId,
 }: Props) {
-  const handleOnPress = () => {
+  const handleOnPress = (e: React.MouseEvent) => {
     if (!disabled) {
-      onPress();
+      onPress(e);
     }
   };
 
@@ -120,8 +121,9 @@ function ActionButton({
         ) : (
           <>
             {src && <ButtonImage src={src} />}
-            {icon && <ButtonIconContainer>{icon}</ButtonIconContainer>}
+            {icon && iconPosition === 'left' && <ButtonIconContainer>{icon}</ButtonIconContainer>}
             <AnimatedButtonText>{text}</AnimatedButtonText>
+            {icon && iconPosition === 'right' && <ButtonIconContainer>{icon}</ButtonIconContainer>}
           </>
         )}
       </TransparentButton>
@@ -140,8 +142,9 @@ function ActionButton({
       ) : (
         <>
           {src && <ButtonImage src={src} />}
-          {icon && <ButtonIconContainer>{icon}</ButtonIconContainer>}
+          {icon && iconPosition === 'left' && <ButtonIconContainer>{icon}</ButtonIconContainer>}
           <ButtonText warning={warning}>{text}</ButtonText>
+          {icon && iconPosition === 'right' && <ButtonIconContainer>{icon}</ButtonIconContainer>}
         </>
       )}
     </Button>

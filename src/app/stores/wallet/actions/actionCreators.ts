@@ -1,8 +1,8 @@
 import { PostGuardPing } from '@components/guards/singleTab';
 import type {
   Account,
-  AppInfo,
   AccountType,
+  AppInfo,
   BaseWallet,
   Coin,
   FungibleToken,
@@ -201,6 +201,13 @@ export function ChangeActivateRareSatsAction(
   return {
     type: actions.ChangeHasActivatedRareSatsKey,
     hasActivatedRareSatsKey,
+  };
+}
+
+export function ChangeActivateRBFAction(hasActivatedRBFKey: boolean): actions.ChangeActivateRBF {
+  return {
+    type: actions.ChangeHasActivatedRBFKey,
+    hasActivatedRBFKey,
   };
 }
 

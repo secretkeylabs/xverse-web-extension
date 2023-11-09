@@ -1,9 +1,11 @@
+import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { Lightning } from '@phosphor-icons/react';
 import { Brc20HistoryTransactionData, BtcTransactionData } from '@secretkeylabs/xverse-core';
 import { getBtcTxStatusUrl } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';
 import { useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import TransactionAmount from './transactionAmount';
 import TransactionRecipient from './transactionRecipient';
 import TransactionStatusIcon from './transactionStatusIcon';
@@ -30,10 +32,11 @@ const TransactionContainer = styled.button((props) => ({
 }));
 
 const TransactionAmountContainer = styled.div({
-  display: 'flex',
-  flex: 1,
   width: '100%',
-  justifyContent: 'flex-end',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  flex: 1,
 });
 
 const TransactionInfoContainer = styled.div((props) => ({
@@ -50,10 +53,28 @@ const TransactionRow = styled.div((props) => ({
   ...props.theme.body_bold_m,
 }));
 
+const StyledButton = styled(ActionButton)((props) => ({
+  padding: 0,
+  border: 'none',
+  width: 'auto',
+  height: 'auto',
+  div: {
+    color: props.theme.colors.tangerine,
+  },
+  ':hover:enabled': {
+    backgroundColor: 'transparent',
+  },
+  ':active:enabled': {
+    backgroundColor: 'transparent',
+  },
+}));
+
 export default function BtcTransactionHistoryItem(props: TransactionHistoryItemProps) {
   const { transaction } = props;
   const { network } = useWalletSelector();
   const isBtc = isBtcTransaction(transaction) ? 'BTC' : 'brc20';
+  const theme = useTheme();
+
   const openBtcTxStatusLink = useCallback(() => {
     window.open(getBtcTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
   }, []);
@@ -63,13 +84,22 @@ export default function BtcTransactionHistoryItem(props: TransactionHistoryItemP
       <TransactionStatusIcon transaction={transaction} currency={isBtc} />
       <TransactionInfoContainer>
         <TransactionRow>
-          <TransactionTitle transaction={transaction} />
+          <div>
+            <TransactionTitle transaction={transaction} />
+            <TransactionRecipient transaction={transaction} />
+          </div>
           <TransactionAmountContainer>
             <TransactionAmount transaction={transaction} coin={isBtc} />
+            <StyledButton
+              transparent
+              text="Accelerate"
+              onPress={(e) => {
+                e.stopPropagation();
+              }}
+              icon={<Lightning size={16} color={theme.colors.tangerine} weight="fill" />}
+              iconPosition="right"
+            />
           </TransactionAmountContainer>
-        </TransactionRow>
-        <TransactionRow>
-          <TransactionRecipient transaction={transaction} />
         </TransactionRow>
       </TransactionInfoContainer>
     </TransactionContainer>

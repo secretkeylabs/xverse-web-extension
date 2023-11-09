@@ -2,7 +2,7 @@ import BtcTransactionHistoryItem from '@components/transactions/btcTransaction';
 import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
 import useTransactions from '@hooks/queries/useTransactions';
 import { animated, config, useSpring } from '@react-spring/web';
-import { BtcTransactionData } from '@secretkeylabs/xverse-core/types';
+import type { BtcTransactionData } from '@secretkeylabs/xverse-core';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
@@ -230,7 +230,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
           <MoonLoader color="white" size={20} />
         </LoadingContainer>
       )}
-      {!isLoading && error && (
+      {!isLoading && !!error && (
         <NoTransactionsContainer>{t('TRANSACTIONS_LIST_ERROR')}</NoTransactionsContainer>
       )}
       {!isLoading && data?.length === 0 && !error && (

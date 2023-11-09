@@ -51,6 +51,7 @@ interface Props {
 function EditNonce({ nonce, setNonce }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
   const [nonceInput, setNonceInput] = useState(nonce);
+
   const onInputEditNonceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNonceInput(e.target.value);
   };
