@@ -5,8 +5,14 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { handleRetries, InvalidParamsError } from '@utils/query';
 
 const useStacksCollectibles = () => {
-  const { stxAddress } = useWalletSelector();
+  let { stxAddress } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
+
+  // TODO remove this after testing
+  const testAddress = localStorage.getItem('stxAddress');
+  if (testAddress) {
+    stxAddress = testAddress;
+  }
 
   function fetchNfts({ pageParam = 0 }): Promise<StacksCollectionList> {
     if (!stxAddress) {
