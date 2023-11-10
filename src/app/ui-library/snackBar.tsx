@@ -35,14 +35,17 @@ const ToastContainer = styled.div<{ type: ToastType }>`
   box-shadow: 0px 7px 16px -4px rgba(25, 25, 48, 0.25);
   height: 44px;
   padding: 12px 20px;
-  width: 306px;
+  width: auto;
+  max-width: 306px;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 80px;
 `;
 
 const ToastMessage = styled.h1<{ type: ToastType }>`
   ${({ theme }) => theme.typography.body_medium_m};
   color: ${(props) => getTextColor(props.type, props.theme)};
+  margin-right: 24px;
 `;
 
 const ToastDismissButton = styled.h1<{ type: ToastType }>`

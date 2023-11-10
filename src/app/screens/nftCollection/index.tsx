@@ -188,14 +188,19 @@ function NftCollection() {
                   key={nft.asset_identifier}
                   item={nft}
                   itemId={getNftCollectionsGridItemId(nft, collectionData)}
-                  onClick={() => {
-                    if (isBnsCollection(nft.asset_identifier)) return;
-                    if (nft.data?.token_metadata) {
-                      navigate(`/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`);
-                    } else {
-                      toast.custom(ToastContent);
-                    }
-                  }}
+                  onClick={
+                    isBnsCollection(nft.asset_identifier)
+                      ? undefined
+                      : () => {
+                          if (nft.data?.token_metadata) {
+                            navigate(
+                              `/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`,
+                            );
+                          } else {
+                            toast.custom(ToastContent);
+                          }
+                        }
+                  }
                 >
                   <Nft asset={nft} isGalleryOpen={isGalleryOpen} />
                 </CollectibleCollectionGridItem>
