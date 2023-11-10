@@ -14,7 +14,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
-import { getBtcTxStatusUrl, isLedgerAccount } from '@utils/helper';
+import { getBtcTxStatusUrl, isInOptions, isLedgerAccount } from '@utils/helper';
 import { BundleItem } from '@utils/rareSats';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -171,7 +171,7 @@ function RareSatsBundle() {
       return setShowSendOrdinalsAlert(true);
     }
 
-    if (isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL('options.html#/nft-dashboard/send-rare-sat'),
       });

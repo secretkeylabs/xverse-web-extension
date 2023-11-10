@@ -3,7 +3,7 @@ import useResetUserFlow from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBnsNftName } from '@secretkeylabs/xverse-core';
 import { GAMMA_URL } from '@utils/constants';
-import { getExplorerUrl, isLedgerAccount } from '@utils/helper';
+import { getExplorerUrl, isInOptions, isLedgerAccount } from '@utils/helper';
 import { getNftDataFromNftsCollectionData } from '@utils/nfts';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -51,7 +51,7 @@ export default function useNftDetail() {
   };
 
   const handleOnSendClick = async () => {
-    if (isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#/send-nft/${id}`),
       });

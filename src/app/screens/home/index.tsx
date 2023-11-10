@@ -29,7 +29,7 @@ import CoinSelectModal from '@screens/home/coinSelectModal';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import { CurrencyTypes } from '@utils/constants';
-import { isLedgerAccount } from '@utils/helper';
+import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -250,7 +250,7 @@ function Home() {
   };
 
   const onStxSendClick = async () => {
-    if (isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL('options.html#/send-stx'),
       });
@@ -260,7 +260,7 @@ function Home() {
   };
 
   const onBtcSendClick = async () => {
-    if (isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL('options.html#/send-btc'),
       });
@@ -280,10 +280,14 @@ function Home() {
   const onSendFtSelect = async (coin: FungibleToken) => {
     if (coin.protocol === 'brc-20') {
       if (isLedgerAccount(selectedAccount)) {
-        await chrome.tabs.create({
-          // TODO replace with send-brc20-one-step route, when ledger support is ready
-          url: chrome.runtime.getURL(`options.html#/send-brc20?coinName=${coin.name}`),
-        });
+        if (!isInOptions()) {
+          await chrome.tabs.create({
+            // TODO replace with send-brc20-one-step route, when ledger support is ready
+            url: chrome.runtime.getURL(`options.html#/send-brc20?coinName=${coin.name}`),
+          });
+          return;
+        }
+        navigate(`send-brc20?coinName=${coin.name}`);
         return;
       }
       navigate('send-brc20-one-step', {
@@ -293,7 +297,7 @@ function Home() {
       });
       return;
     }
-    if (isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#/send-ft?coinTicker=${coin.ticker}`),
       });
@@ -392,9 +396,13 @@ function Home() {
           icon={<Plus color="white" size={20} />}
           text={t('ADD_STACKS_ADDRESS')}
           onPress={async () => {
-            await chrome.tabs.create({
-              url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
-            });
+            if (!isInOptions()) {
+              await chrome.tabs.create({
+                url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+              });
+            } else {
+              navigate('/add-stx-address-ledger');
+            }
           }}
         />
       )}
