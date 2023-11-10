@@ -50,7 +50,7 @@ const TransactionRow = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
 }));
 
 const StyledButton = styled(ActionButton)((props) => ({
@@ -59,6 +59,7 @@ const StyledButton = styled(ActionButton)((props) => ({
   width: 'auto',
   height: 'auto',
   div: {
+    ...props.theme.typography.body_medium_m,
     color: props.theme.colors.tangerine,
   },
   ':hover:enabled': {
@@ -79,6 +80,11 @@ export default function BtcTransactionHistoryItem(props: TransactionHistoryItemP
     window.open(getBtcTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
   }, []);
 
+  const showAccelerateButton =
+    transaction.txStatus === 'pending' &&
+    !transaction.incoming &&
+    (transaction.txType === 'bitcoin' || transaction.txType === 'brc20');
+
   return (
     <TransactionContainer onClick={openBtcTxStatusLink}>
       <TransactionStatusIcon transaction={transaction} currency={isBtc} />
@@ -90,15 +96,17 @@ export default function BtcTransactionHistoryItem(props: TransactionHistoryItemP
           </div>
           <TransactionAmountContainer>
             <TransactionAmount transaction={transaction} coin={isBtc} />
-            <StyledButton
-              transparent
-              text="Accelerate"
-              onPress={(e) => {
-                e.stopPropagation();
-              }}
-              icon={<Lightning size={16} color={theme.colors.tangerine} weight="fill" />}
-              iconPosition="right"
-            />
+            {showAccelerateButton && (
+              <StyledButton
+                transparent
+                text="Accelerate"
+                onPress={(e) => {
+                  e.stopPropagation();
+                }}
+                icon={<Lightning size={16} color={theme.colors.tangerine} weight="fill" />}
+                iconPosition="right"
+              />
+            )}
           </TransactionAmountContainer>
         </TransactionRow>
       </TransactionInfoContainer>
