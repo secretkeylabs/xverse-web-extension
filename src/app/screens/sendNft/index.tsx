@@ -1,6 +1,8 @@
 import ActionButton from '@components/button';
+import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useDebounce from '@hooks/useDebounce';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -13,7 +15,7 @@ import {
   validateStxAddress,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
-import { StyledHeading } from '@ui-library/common.styled';
+import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import { checkNftExists } from '@utils/helper';
 import { getNftDataFromNftsCollectionData } from '@utils/nfts';
@@ -108,8 +110,10 @@ function SendNft() {
 
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
-  const { stxAddress, stxPublicKey, network, feeMultipliers, selectedAccount } =
-    useWalletSelector();
+  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
+  const debouncedSearchTerm = useDebounce(recipientAddress, 300);
+  const associatedBnsName = useBnsName(recipientAddress);
+  const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);
 
   const { isLoading, data, mutate } = useMutation<
     StacksTransaction,
@@ -159,23 +163,6 @@ function SendNft() {
     navigate(-1);
   };
 
-  const validateRecipientAddress = (address: string): boolean => {
-    if (!address) {
-      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_REQUIRED') });
-      return false;
-    }
-    if (!validateStxAddress({ stxAddress: address, network: network.type })) {
-      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
-      return false;
-    }
-    if (address === stxAddress) {
-      setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
-      return true;
-    }
-    setRecipientError(null);
-    return true;
-  };
-
   const onPressNext = async () => {
     if (stxPendingTxData) {
       if (checkNftExists(stxPendingTxData?.pendingTransactions, nft!)) {
@@ -183,16 +170,39 @@ function SendNft() {
         return;
       }
     }
-    if (validateRecipientAddress(recipientAddress.trim()) && nft) {
+    if (!recipientError && nft) {
       const tokenId = cvToHex(uintCV(nft?.token_id.toString()!));
-      mutate({ tokenId, address: recipientAddress });
+      mutate({ tokenId, address: associatedAddress || recipientAddress });
     }
   };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateRecipientAddress(e.target.value);
-    setRecipientAddress(e.target.value);
+    setRecipientAddress(e.target.value.trim());
   };
+
+  useEffect(() => {
+    const validateRecipientAddress = (address: string): boolean => {
+      if (!address) {
+        setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_REQUIRED') });
+        return false;
+      }
+      if (!validateStxAddress({ stxAddress: address, network: network.type })) {
+        setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
+        return false;
+      }
+      if (address === stxAddress) {
+        setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
+        return true;
+      }
+      setRecipientError(null);
+      return true;
+    };
+    if (associatedAddress) {
+      validateRecipientAddress(associatedAddress);
+    } else if (recipientAddress) {
+      validateRecipientAddress(recipientAddress);
+    }
+  }, [associatedAddress, recipientAddress, network.type, stxAddress, t]);
 
   const isNextEnabled = !isDangerFeedback(recipientError) && !!recipientAddress;
 
@@ -218,11 +228,31 @@ function SendNft() {
               <InputFieldContainer>
                 <InputField
                   value={recipientAddress}
-                  placeholder={t('ORDINAL_RECIPIENT_PLACEHOLDER')}
+                  placeholder={t('RECIPIENT_PLACEHOLDER')}
                   onChange={handleAddressChange}
                 />
               </InputFieldContainer>
             </AmountInputContainer>
+            {associatedAddress && (
+              <>
+                <StyledP typography="body_s" color="white_400">
+                  {t('ASSOCIATED_ADDRESS')}
+                </StyledP>
+                <StyledP typography="body_s" color="white">
+                  {associatedAddress}
+                </StyledP>
+              </>
+            )}
+            {associatedBnsName && (
+              <>
+                <StyledP typography="body_s" color="white_400">
+                  {t('ASSOCIATED_BNS_DOMAIN')}
+                </StyledP>
+                <StyledP typography="body_s" color="white">
+                  {associatedBnsName}
+                </StyledP>
+              </>
+            )}
             <ErrorContainer>
               {recipientError && <InputFeedback {...recipientError} />}
             </ErrorContainer>
