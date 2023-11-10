@@ -31,7 +31,7 @@ const Button = styled.button({
   zIndex: 2,
 });
 
-type Tab = 'dashboard' | 'nft' | 'stacking' | 'settings';
+export type Tab = 'dashboard' | 'nft' | 'stacking' | 'settings';
 
 interface Props {
   tab: Tab;

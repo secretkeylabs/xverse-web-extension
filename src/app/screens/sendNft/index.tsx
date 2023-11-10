@@ -1,13 +1,9 @@
-import AccountHeaderComponent from '@components/accountHeader';
 import ActionButton from '@components/button';
-import BottomBar from '@components/tabBar';
-import TopRow from '@components/topRow';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArrowLeft } from '@phosphor-icons/react';
 import {
   cvToHex,
   generateUnsignedTransaction,
@@ -17,50 +13,21 @@ import {
   validateStxAddress,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
-import Callout from '@ui-library/callout';
-import { StyledHeading, StyledP } from '@ui-library/common.styled';
+import { StyledHeading } from '@ui-library/common.styled';
 import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
-import { checkNftExists, isLedgerAccount } from '@utils/helper';
+import { checkNftExists } from '@utils/helper';
 import { getNftDataFromNftsCollectionData } from '@utils/nfts';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { devices } from 'theme';
-
-const ScrollContainer = styled.div((props) => ({
-  display: 'flex',
-  flex: 1,
-  flexDirection: 'column',
-  ...props.theme.scrollbar,
-}));
+import SendLayout from '../../layouts/sendLayout';
 
 const Container = styled.div`
   display: flex;
-  flex: 1;
   flex-direction: column;
-  margin: auto;
-  margin-top: ${(props) => props.theme.space.xxs};
-  padding: 0 ${(props) => props.theme.space.s};
   justify-content: space-between;
-  max-width: 360px;
-
-  @media only screen and ${devices.min.s} {
-    flex: initial;
-    max-width: 588px;
-    border: 1px solid ${(props) => props.theme.colors.elevation3};
-    border-radius: ${(props) => props.theme.space.s};
-    padding: ${(props) => props.theme.space.l} ${(props) => props.theme.space.m};
-    padding-bottom: ${(props) => props.theme.space.xxl};
-    margin-top: ${(props) => props.theme.space.xxxxl};
-    min-height: 600px;
-  }
-`;
-
-const FooterContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: ${(props) => props.theme.space.xxl};
+  flex-grow: 1;
 `;
 
 const StyledSendTo = styled(StyledHeading)`
@@ -80,7 +47,7 @@ const InputGroup = styled.div`
 `;
 
 const Label = styled.label((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   display: 'flex',
   flex: 1,
@@ -107,9 +74,9 @@ const InputFieldContainer = styled.div(() => ({
 }));
 
 const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   backgroundColor: 'transparent',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   width: '100%',
   border: 'transparent',
 }));
@@ -124,20 +91,6 @@ const RowContainer = styled.div({
   flexDirection: 'row',
   alignItems: 'center',
 });
-
-const StyledCallout = styled(Callout)`
-  margin-bottom: ${(props) => props.theme.spacing(14)}px;
-`;
-
-const BottomBarContainer = styled.div({
-  marginTop: 'auto',
-});
-
-const Button = styled.button`
-  display: flex;
-  background-color: transparent;
-  margin-bottom: ${(props) => props.theme.space.l};
-`;
 
 function SendNft() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
@@ -155,7 +108,6 @@ function SendNft() {
 
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const { stxAddress, stxPublicKey, network, feeMultipliers, selectedAccount } =
     useWalletSelector();
 
@@ -243,63 +195,49 @@ function SendNft() {
   };
 
   const isNextEnabled = !isDangerFeedback(recipientError) && !!recipientAddress;
-  const year = new Date().getFullYear();
+
+  // hide back button if there is no history
+  const hideBackButton = location.key === 'default';
 
   return (
-    <>
-      {isGalleryOpen && (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      )}
-      {!isGalleryOpen && <TopRow title="" onClick={handleBackButtonClick} />}
-      <ScrollContainer>
-        <Container>
-          <div>
-            {isGalleryOpen && !isLedgerAccount(selectedAccount) && (
-              <Button onClick={handleBackButtonClick}>
-                <ArrowLeft size={20} color="white" />
-              </Button>
-            )}
-            <StyledSendTo typography="headline_xs" color="white_0">
-              {t('SEND_TO')}
-            </StyledSendTo>
-            <InputGroup>
-              <RowContainer>
-                <Label>{t('RECIPIENT')}</Label>
-              </RowContainer>
-              <AmountInputContainer error={isDangerFeedback(recipientError)}>
-                <InputFieldContainer>
-                  <InputField
-                    value={recipientAddress}
-                    placeholder={t('ORDINAL_RECIPIENT_PLACEHOLDER')}
-                    onChange={handleAddressChange}
-                  />
-                </InputFieldContainer>
-              </AmountInputContainer>
-              <ErrorContainer>
-                {recipientError && <InputFeedback {...recipientError} />}
-              </ErrorContainer>
-            </InputGroup>
-            <StyledCallout bodyText={t('MAKE_SURE_THE_RECIPIENT')} />
-          </div>
-          <NextButtonContainer>
-            <ActionButton
-              text={t('NEXT')}
-              disabled={!isNextEnabled}
-              processing={isLoading}
-              onPress={onPressNext}
-            />
-          </NextButtonContainer>
-        </Container>
-        {isGalleryOpen && (
-          <FooterContainer>
-            <StyledP typography="body_medium_m" color="white_400">
-              {t('COPYRIGHT', { year })}
-            </StyledP>
-          </FooterContainer>
-        )}
-      </ScrollContainer>
-      <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>
-    </>
+    <SendLayout
+      selectedBottomTab="nft"
+      onClickBack={handleBackButtonClick}
+      hideBackButton={hideBackButton}
+    >
+      <Container>
+        <div>
+          <StyledSendTo typography="headline_xs" color="white_0">
+            {t('SEND_TO')}
+          </StyledSendTo>
+          <InputGroup>
+            <RowContainer>
+              <Label>{t('RECIPIENT')}</Label>
+            </RowContainer>
+            <AmountInputContainer error={isDangerFeedback(recipientError)}>
+              <InputFieldContainer>
+                <InputField
+                  value={recipientAddress}
+                  placeholder={t('ORDINAL_RECIPIENT_PLACEHOLDER')}
+                  onChange={handleAddressChange}
+                />
+              </InputFieldContainer>
+            </AmountInputContainer>
+            <ErrorContainer>
+              {recipientError && <InputFeedback {...recipientError} />}
+            </ErrorContainer>
+          </InputGroup>
+        </div>
+        <NextButtonContainer>
+          <ActionButton
+            text={t('NEXT')}
+            disabled={!isNextEnabled}
+            processing={isLoading}
+            onPress={onPressNext}
+          />
+        </NextButtonContainer>
+      </Container>
+    </SendLayout>
   );
 }
 

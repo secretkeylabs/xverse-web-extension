@@ -40,7 +40,7 @@ const AnimatedBackButton = styled(BackButton)`
 
 interface Props {
   title: string;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   showBackButton?: boolean;
   className?: string;
 }
