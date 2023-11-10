@@ -9,7 +9,7 @@ import { useAddressRareSats } from '@hooks/queries/ordinals/useAddressRareSats';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, Wrench } from '@phosphor-icons/react';
-import type { InscriptionCollectionsData } from '@secretkeylabs/xverse-core/types';
+import type { InscriptionCollectionsData } from '@secretkeylabs/xverse-core';
 import {
   ChangeActivateOrdinalsAction,
   ChangeActivateRareSatsAction,
@@ -153,11 +153,8 @@ export type NftDashboardState = {
 const useNftDashboard = (): NftDashboardState => {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const dispatch = useDispatch();
-  const {
-    hasActivatedOrdinalsKey,
-    hasActivatedRareSatsKey,
-    rareSatsNoticeDismissed,
-  } = useWalletSelector();
+  const { hasActivatedOrdinalsKey, hasActivatedRareSatsKey, rareSatsNoticeDismissed } =
+    useWalletSelector();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [showNewFeatureAlert, setShowNewFeatureAlert] = useState(false);
   const [showNoticeAlert, setShowNoticeAlert] = useState(false);

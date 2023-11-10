@@ -1,16 +1,16 @@
-import UsFlag from '@assets/img/settings/ic_usa.svg';
+import ARG from '@assets/img/settings/ars.svg';
+import BRL from '@assets/img/settings/brl.svg';
+import CNY from '@assets/img/settings/cny.svg';
+import GBP from '@assets/img/settings/gbp.svg';
+import HKD from '@assets/img/settings/hkd.svg';
 import CanFlag from '@assets/img/settings/ic_can.svg';
 import EurFlag from '@assets/img/settings/ic_eu.svg';
 import JapanFlag from '@assets/img/settings/ic_jp.svg';
-import CNY from '@assets/img/settings/cny.svg';
-import ARG from '@assets/img/settings/ars.svg';
-import HKD from '@assets/img/settings/hkd.svg';
+import UsFlag from '@assets/img/settings/ic_usa.svg';
 import KRW from '@assets/img/settings/krw.svg';
-import SGD from '@assets/img/settings/sgd.svg';
-import GBP from '@assets/img/settings/gbp.svg';
-import BRL from '@assets/img/settings/brl.svg';
 import RUB from '@assets/img/settings/rub.svg';
-import { SupportedCurrency } from '@secretkeylabs/xverse-core/types';
+import SGD from '@assets/img/settings/sgd.svg';
+import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
 
 export interface Currency {
   name: SupportedCurrency;

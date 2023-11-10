@@ -4,6 +4,7 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/xverse-core/account';
 import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
+import { decryptSeedPhraseCBC } from '@secretkeylabs/xverse-core/encryption';
 import {
   Account,
   AnalyticsEvents,
@@ -11,10 +12,9 @@ import {
   StacksNetwork,
 } from '@secretkeylabs/xverse-core/types';
 import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
-import { decryptSeedPhraseCBC } from '@secretkeylabs/xverse-core/encryption';
 import {
-  ChangeNetworkAction,
   addAccountAction,
+  ChangeNetworkAction,
   fetchAccountAction,
   getActiveAccountsAction,
   resetWalletAction,
@@ -29,9 +29,9 @@ import { generatePasswordHash } from '@utils/encryptionUtils';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
 import { resetMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { useDispatch } from 'react-redux';
+import useSeedVault from './useSeedVault';
 import useWalletSelector from './useWalletSelector';
 import useWalletSession from './useWalletSession';
-import useSeedVault from './useSeedVault';
 
 const useWalletReducer = () => {
   const {
@@ -254,7 +254,7 @@ const useWalletReducer = () => {
   const switchAccount = async (account: Account) => {
     // we clear the query cache to prevent data from the other account potentially being displayed
     await queryClient.cancelQueries();
-    await queryClient.clear();
+    queryClient.clear();
 
     dispatch(
       selectAccount(

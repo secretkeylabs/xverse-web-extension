@@ -1,7 +1,7 @@
 import TickIcon from '@assets/img/settings/tick.svg';
-import { SupportedCurrency } from '@secretkeylabs/xverse-core/types';
+import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
+import { Currency } from '@utils/currency';
 import styled, { useTheme } from 'styled-components';
-import { Currency } from '../../../utils/currency';
 
 interface TitleProps {
   color: string;

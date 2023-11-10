@@ -25,7 +25,7 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import { CurrencyTypes } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
