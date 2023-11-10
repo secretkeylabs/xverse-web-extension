@@ -749,6 +749,16 @@
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
     "MINT": "Mint",
+    "SPEED_UP": "Speed up",
+    "SPEED_UP_TRANSACTION_POPUP": {
+      "TITLE": "Speed up transaction",
+      "FEE_INFO": "Apply a higher fee to help your transaction confirm quickly, especially when the network is congested.",
+      "CANCEL": "Cancel",
+      "APPLY": "Apply",
+      "HIGH_PRIORITY": "High priority",
+      "MED_PRIORITY": "Medium priority",
+      "LOW_PRIORITY": "Low priority"
+    },
     "INSCRIBE_TRANSFER": "Inscribe Transfer",
     "TRANSACTION_PENDING_RECEIVING": "Receiving",
     "TRANSACTION_PENDING_SENDING": "Sending",

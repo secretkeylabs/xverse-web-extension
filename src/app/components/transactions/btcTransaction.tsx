@@ -4,22 +4,20 @@ import { Lightning } from '@phosphor-icons/react';
 import { Brc20HistoryTransactionData, BtcTransactionData } from '@secretkeylabs/xverse-core';
 import { getBtcTxStatusUrl } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
+import { EditFees } from './editFees';
 import TransactionAmount from './transactionAmount';
 import TransactionRecipient from './transactionRecipient';
 import TransactionStatusIcon from './transactionStatusIcon';
 import TransactionTitle from './transactionTitle';
 
-interface TransactionHistoryItemProps {
-  transaction: BtcTransactionData | Brc20HistoryTransactionData;
-}
-
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
+  alignItems: 'center',
   width: '100%',
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(5),
+  padding: props.theme.spacing(5),
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   background: 'none',
@@ -70,11 +68,15 @@ const StyledButton = styled(ActionButton)((props) => ({
   },
 }));
 
-export default function BtcTransactionHistoryItem(props: TransactionHistoryItemProps) {
-  const { transaction } = props;
+interface TransactionHistoryItemProps {
+  transaction: BtcTransactionData | Brc20HistoryTransactionData;
+}
+export default function BtcTransactionHistoryItem({ transaction }: TransactionHistoryItemProps) {
   const { network } = useWalletSelector();
   const isBtc = isBtcTransaction(transaction) ? 'BTC' : 'brc20';
   const theme = useTheme();
+  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+  const [showFeeSettings, setShowFeeSettings] = useState(false);
 
   const openBtcTxStatusLink = useCallback(() => {
     window.open(getBtcTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
@@ -83,33 +85,48 @@ export default function BtcTransactionHistoryItem(props: TransactionHistoryItemP
   const showAccelerateButton =
     transaction.txStatus === 'pending' &&
     !transaction.incoming &&
-    (transaction.txType === 'bitcoin' || transaction.txType === 'brc20');
+    (transaction.txType === 'bitcoin' ||
+      transaction.txType === 'brc20' ||
+      ('isOrdinal' in transaction && transaction.isOrdinal));
 
   return (
-    <TransactionContainer onClick={openBtcTxStatusLink}>
-      <TransactionStatusIcon transaction={transaction} currency={isBtc} />
-      <TransactionInfoContainer>
-        <TransactionRow>
-          <div>
-            <TransactionTitle transaction={transaction} />
-            <TransactionRecipient transaction={transaction} />
-          </div>
-          <TransactionAmountContainer>
-            <TransactionAmount transaction={transaction} coin={isBtc} />
-            {showAccelerateButton && (
-              <StyledButton
-                transparent
-                text="Accelerate"
-                onPress={(e) => {
-                  e.stopPropagation();
-                }}
-                icon={<Lightning size={16} color={theme.colors.tangerine} weight="fill" />}
-                iconPosition="right"
-              />
-            )}
-          </TransactionAmountContainer>
-        </TransactionRow>
-      </TransactionInfoContainer>
-    </TransactionContainer>
+    <>
+      <TransactionContainer onClick={openBtcTxStatusLink}>
+        <TransactionStatusIcon transaction={transaction} currency={isBtc} />
+        <TransactionInfoContainer>
+          <TransactionRow>
+            <div>
+              <TransactionTitle transaction={transaction} />
+              <TransactionRecipient transaction={transaction} />
+            </div>
+            <TransactionAmountContainer>
+              <TransactionAmount transaction={transaction} coin={isBtc} />
+              {!showAccelerateButton && (
+                <StyledButton
+                  transparent
+                  text={t('SPEED_UP')}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    setShowFeeSettings(true);
+                  }}
+                  icon={<Lightning size={16} color={theme.colors.tangerine} weight="fill" />}
+                  iconPosition="right"
+                />
+              )}
+            </TransactionAmountContainer>
+          </TransactionRow>
+        </TransactionInfoContainer>
+      </TransactionContainer>
+      <EditFees
+        visible={showFeeSettings}
+        onClose={() => setShowFeeSettings(false)}
+        fee={'fees' in transaction ? transaction.fees.toString() : '0'}
+        initialFeeRate={'fees' in transaction ? transaction.fees.toString() : '0'}
+        onClickApply={() => {}}
+        onChangeFeeRate={() => {}}
+        isFeeLoading={false}
+        error=""
+      />
+    </>
   );
 }

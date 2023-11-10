@@ -1,10 +1,10 @@
 import { BetterBarLoader } from '@components/barLoader';
-import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import FiatAmountText from '@components/fiatAmountText';
+import UpdatedBottomModal from '@components/updatedBottomModal';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
@@ -26,11 +26,6 @@ const DetailText = styled.h1((props) => ({
   marginTop: props.theme.spacing(8),
 }));
 
-const Text = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  marginTop: props.theme.spacing(8),
-}));
-
 // TODO create input component in ui-library
 const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
   display: 'flex',
@@ -42,7 +37,7 @@ const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
     props.withError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_800
   }`,
   backgroundColor: props.theme.colors.elevation1,
-  borderRadius: props.theme.radius(1),
+  borderRadius: props.theme.radius(3),
   padding: props.theme.spacing(5),
 }));
 
@@ -72,7 +67,7 @@ const FeeText = styled.h1((props) => ({
 
 const ButtonContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin-top: ${(props) => props.theme.spacing(6)}px;
   gap: ${(props) => props.theme.spacing(4)}px;
 `;
@@ -84,10 +79,9 @@ const FeeButton = styled.button<{
   color: `${props.isSelected ? props.theme.colors.elevation2 : props.theme.colors.white_400}`,
   background: `${props.isSelected ? props.theme.colors.white : 'transparent'}`,
   border: `1px solid ${props.isSelected ? 'transparent' : props.theme.colors.elevation6}`,
-  borderRadius: 40,
-  height: 40,
+  borderRadius: props.theme.radius(3),
+  height: 65,
   display: 'flex',
-  flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
 }));
@@ -107,7 +101,7 @@ const TickerContainer = styled.div({
 
 const ApplyButtonContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  column-gap: 12px;
   margin: 20px 16px 40px;
 `;
 
@@ -123,15 +117,15 @@ const StyledFiatAmountText = styled(FiatAmountText)((props) => ({
 const buttons = [
   {
     value: 'standard',
-    label: 'TRANSACTION_SETTING.STANDARD',
+    label: 'SPEED_UP_TRANSACTION_POPUP.HIGH_PRIORITY',
   },
   {
     value: 'high',
-    label: 'TRANSACTION_SETTING.HIGH',
+    label: 'SPEED_UP_TRANSACTION_POPUP.MED_PRIORITY',
   },
   {
     value: 'custom',
-    label: 'TRANSACTION_SETTING.CUSTOM',
+    label: 'SPEED_UP_TRANSACTION_POPUP.LOW_PRIORITY',
   },
 ];
 
@@ -156,7 +150,7 @@ export function EditFees({
   isFeeLoading: boolean;
   error: string;
 }) {
-  const { t } = useTranslation('translation');
+  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
   const { data: feeRates } = useBtcFeeRate();
 
@@ -228,13 +222,26 @@ export function EditFees({
   const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
 
   return (
-    <BottomModal
+    <UpdatedBottomModal
       visible={visible}
-      header={t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')}
+      header={t('SPEED_UP_TRANSACTION_POPUP.TITLE')}
       onClose={handleClickClose}
     >
       <Container>
-        <Text>{t('TRANSACTION_SETTING.FEE_RATE')}</Text>
+        <DetailText>{t('SPEED_UP_TRANSACTION_POPUP.FEE_INFO')}</DetailText>
+        <DetailText>Initial fee: {initialFeeRate} sats /vB</DetailText>
+        <ButtonContainer>
+          {buttons.map(({ value, label }) => (
+            <FeeButton
+              key={value}
+              value={value}
+              isSelected={selectedOption === value}
+              onClick={handleClickFeeButton}
+            >
+              {t(label)}
+            </FeeButton>
+          ))}
+        </ButtonContainer>
         <FeeContainer>
           <InputContainer withError={!!error}>
             <InputField
@@ -267,29 +274,22 @@ export function EditFees({
           </InputContainer>
           <StyledInputFeedback message={error} variant="danger" />
         </FeeContainer>
-        <ButtonContainer>
-          {buttons.map(({ value, label }) => (
-            <FeeButton
-              key={value}
-              value={value}
-              isSelected={selectedOption === value}
-              onClick={handleClickFeeButton}
-            >
-              {t(label)}
-            </FeeButton>
-          ))}
-        </ButtonContainer>
-        <DetailText>{t('TRANSACTION_SETTING.FEE_INFO')}</DetailText>
       </Container>
       <ApplyButtonContainer>
         <ActionButton
-          text={t('TRANSACTION_SETTING.APPLY')}
+          text={t('SPEED_UP_TRANSACTION_POPUP.CANCEL')}
+          processing={isFeeLoading}
+          disabled={isFeeLoading || !!error}
+          onPress={() => {}}
+          transparent
+        />
+        <ActionButton
+          text={t('SPEED_UP_TRANSACTION_POPUP.APPLY')}
           processing={isFeeLoading}
           disabled={isFeeLoading || !!error}
           onPress={handleClickApply}
         />
       </ApplyButtonContainer>
-    </BottomModal>
+    </UpdatedBottomModal>
   );
 }
-export default EditFees;
