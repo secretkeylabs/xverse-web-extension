@@ -53,7 +53,7 @@ export default function useNftDetail() {
   const handleOnSendClick = async () => {
     if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL(`options.html#/send-nft/${id}`),
+        url: chrome.runtime.getURL(`options.html#/nft-dashboard/nft-detail/${id}/send-nft`),
       });
       return;
     }

@@ -112,7 +112,7 @@ function SendNft() {
   const { data: stxPendingTxData } = useStxPendingTxData();
   const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
-  const associatedBnsName = useBnsName(recipientAddress);
+  const associatedBnsName = useBnsName(debouncedSearchTerm);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);
 
   const { isLoading, data, mutate } = useMutation<
@@ -170,7 +170,7 @@ function SendNft() {
         return;
       }
     }
-    if (!recipientError && nft) {
+    if (!isDangerFeedback(recipientError) && nft) {
       const tokenId = cvToHex(uintCV(nft?.token_id.toString()!));
       mutate({ tokenId, address: associatedAddress || recipientAddress });
     }
