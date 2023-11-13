@@ -8,6 +8,7 @@ import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -216,6 +217,9 @@ export function EditFees({
     setPreviousSelectedOption(selectedOption);
     // apply state to parent
     onClickApply(feeRateInput);
+
+    toast.success('Transaction fee updated');
+
     onClose();
   };
 
@@ -280,7 +284,7 @@ export function EditFees({
           text={t('SPEED_UP_TRANSACTION_POPUP.CANCEL')}
           processing={isFeeLoading}
           disabled={isFeeLoading || !!error}
-          onPress={() => {}}
+          onPress={handleClickClose}
           transparent
         />
         <ActionButton
