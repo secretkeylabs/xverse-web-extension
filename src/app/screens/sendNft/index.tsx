@@ -1,14 +1,11 @@
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import AccountHeaderComponent from '@components/accountHeader';
-import SendForm from '@components/sendForm';
-import BottomBar from '@components/tabBar';
-import TopRow from '@components/topRow';
+import ActionButton from '@components/button';
+import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useDebounce from '@hooks/useDebounce';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
-import NftImage from '@screens/nftDashboard/nftImage';
 import {
   cvToHex,
   generateUnsignedTransaction,
@@ -18,93 +15,93 @@ import {
   validateStxAddress,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
-import { checkNftExists, isLedgerAccount } from '@utils/helper';
+import { StyledHeading, StyledP } from '@ui-library/common.styled';
+import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
+import { checkNftExists } from '@utils/helper';
 import { getNftDataFromNftsCollectionData } from '@utils/nfts';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import SendLayout from '../../layouts/sendLayout';
 
-const ScrollContainer = styled.div`
+const Container = styled.div`
   display: flex;
-  flex: 1;
   flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  width: 360px;
-  margin: auto;
+  justify-content: space-between;
+  flex-grow: 1;
 `;
 
-const Container = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  flex: 1,
-});
+const StyledSendTo = styled(StyledHeading)`
+  margin-bottom: ${(props) => props.theme.space.l};
+`;
 
-const NftContainer = styled.div((props) => ({
-  maxHeight: 148,
-  width: 148,
+const NextButtonContainer = styled.div((props) => ({
+  position: 'sticky',
+  bottom: 0,
+  paddingBottom: props.theme.spacing(12),
+  paddingTop: props.theme.spacing(12),
+  backgroundColor: props.theme.colors.elevation0,
+}));
+
+const InputGroup = styled.div`
+  margin-top: ${(props) => props.theme.spacing(8)}px;
+`;
+
+const Label = styled.label((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
   display: 'flex',
-  aspectRatio: 1,
-  justifyContent: 'center',
+  flex: 1,
+}));
+
+const AmountInputContainer = styled.div<{ error: boolean }>((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
   alignItems: 'center',
-  borderRadius: 8,
-  marginTop: props.theme.spacing(16),
+  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(4),
+  border: props.error
+    ? `1px solid ${props.theme.colors.danger_dark_200}`
+    : `1px solid ${props.theme.colors.white_800}`,
+  backgroundColor: props.theme.colors.elevation_n1,
+  borderRadius: props.theme.radius(1),
+  paddingLeft: props.theme.spacing(5),
+  paddingRight: props.theme.spacing(5),
+  height: 44,
+}));
+
+const InputFieldContainer = styled.div(() => ({
+  flex: 1,
+}));
+
+const InputField = styled.input((props) => ({
+  ...props.theme.typography.body_m,
+  backgroundColor: 'transparent',
+  color: props.theme.colors.white_0,
+  width: '100%',
+  border: 'transparent',
+}));
+
+const ErrorContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(3),
   marginBottom: props.theme.spacing(12),
 }));
 
-const NftTitleText = styled.h1((props) => ({
-  ...props.theme.typography.headline_s,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const BottomBarContainer = styled.div({
-  marginTop: 'auto',
-});
-
-const ButtonContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
-  marginLeft: '15%',
-  marginTop: props.theme.spacing(40),
-}));
-
-const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
   alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  opacity: 0.8,
-  marginTop: props.theme.spacing(5),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
+});
 
 function SendNft() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
   const location = useLocation();
-  let address: string | undefined;
-  if (location.state) {
-    address = location.state.recipientAddress;
-  }
+  const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
+  const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress ?? '');
+
+  useResetUserFlow('/send-nft');
 
   const { id } = useParams();
   const stacksNftsQuery = useStacksCollectibles();
@@ -113,24 +110,24 @@ function SendNft() {
 
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { stxAddress, stxPublicKey, network, feeMultipliers, selectedAccount } =
-    useWalletSelector();
-  const [error, setError] = useState('');
-  const [recipientAddress, setRecipientAddress] = useState('');
+  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
+  const debouncedSearchTerm = useDebounce(recipientAddress, 300);
+  const associatedBnsName = useBnsName(debouncedSearchTerm);
+  const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);
+
   const { isLoading, data, mutate } = useMutation<
     StacksTransaction,
     Error,
-    { tokenId: string; associatedAddress: string }
+    { tokenId: string; address: string }
   >({
-    mutationFn: async ({ tokenId, associatedAddress }) => {
+    mutationFn: async ({ tokenId, address }) => {
       const principal = nft?.fully_qualified_token_id?.split('::')!;
       const name = principal[1].split(':')[0];
       const contractInfo: string[] = principal[0].split('.');
       const unsginedTx: UnsignedStacksTransation = {
         amount: tokenId,
         senderAddress: stxAddress,
-        recipientAddress: associatedAddress,
+        recipientAddress: address,
         contractAddress: contractInfo[0],
         contractName: contractInfo[1],
         assetName: name,
@@ -146,7 +143,7 @@ function SendNft() {
           unsignedTx.auth.spendingCondition.fee * BigInt(feeMultipliers.stxSendTxMultiplier),
         );
       }
-      setRecipientAddress(associatedAddress);
+      setRecipientAddress(address);
       return unsignedTx;
     },
   });
@@ -162,81 +159,115 @@ function SendNft() {
     }
   }, [data]);
 
-  useResetUserFlow('/send-nft');
-
   const handleBackButtonClick = () => {
     navigate(-1);
   };
 
-  function validateFields(associatedAddress: string): boolean {
-    if (!associatedAddress) {
-      setError(t('ERRORS.ADDRESS_REQUIRED'));
-      return false;
-    }
-
-    if (!validateStxAddress({ stxAddress: associatedAddress, network: network.type })) {
-      setError(t('ERRORS.ADDRESS_INVALID'));
-      return false;
-    }
-
-    if (associatedAddress === stxAddress) {
-      setError(t('ERRORS.SEND_TO_SELF'));
-      return false;
-    }
-
-    return true;
-  }
-
-  const onPressSendNFT = async (associatedAddress: string) => {
+  const onPressNext = async () => {
     if (stxPendingTxData) {
       if (checkNftExists(stxPendingTxData?.pendingTransactions, nft!)) {
-        setError(t('ERRORS.NFT_SEND_DETAIL'));
+        setRecipientError({ variant: 'danger', message: t('ERRORS.NFT_SEND_DETAIL') });
         return;
       }
     }
-    if (validateFields(associatedAddress.trim()) && nft) {
-      setError('');
+    if (!isDangerFeedback(recipientError) && nft) {
       const tokenId = cvToHex(uintCV(nft?.token_id.toString()!));
-      mutate({ tokenId, associatedAddress });
+      mutate({ tokenId, address: associatedAddress || recipientAddress });
     }
   };
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRecipientAddress(e.target.value.trim());
+  };
+
+  useEffect(() => {
+    const validateRecipientAddress = (address: string): boolean => {
+      if (!address) {
+        setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_REQUIRED') });
+        return false;
+      }
+      if (!validateStxAddress({ stxAddress: address, network: network.type })) {
+        setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
+        return false;
+      }
+      if (address === stxAddress) {
+        setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
+        return true;
+      }
+      setRecipientError(null);
+      return true;
+    };
+    if (associatedAddress) {
+      validateRecipientAddress(associatedAddress);
+    } else if (recipientAddress) {
+      validateRecipientAddress(recipientAddress);
+    }
+  }, [associatedAddress, recipientAddress, network.type, stxAddress, t]);
+
+  const isNextEnabled = !isDangerFeedback(recipientError) && !!recipientAddress;
+
+  // hide back button if there is no history
+  const hideBackButton = location.key === 'default';
+
   return (
-    <>
-      {isGalleryOpen && (
-        <>
-          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          {!isLedgerAccount(selectedAccount) && (
-            <ButtonContainer>
-              <Button onClick={handleBackButtonClick}>
-                <>
-                  <ButtonImage src={ArrowLeft} />
-                  <ButtonText>{t('MOVE_TO_ASSET_DETAIL')}</ButtonText>
-                </>
-              </Button>
-            </ButtonContainer>
-          )}
-        </>
-      )}
-      <ScrollContainer>
-        {!isGalleryOpen && <TopRow title={t('SEND_NFT')} onClick={handleBackButtonClick} />}
-        <SendForm
-          processing={isLoading}
-          currencyType="NFT"
-          disableAmountInput
-          recepientError={error}
-          recipient={address}
-          onPressSend={onPressSendNFT}
-        >
-          <Container>
-            <NftContainer>
-              <NftImage metadata={nft?.token_metadata!} />
-            </NftContainer>
-            <NftTitleText>{nft?.token_metadata?.name}</NftTitleText>
-          </Container>
-        </SendForm>
-        <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>
-      </ScrollContainer>
-    </>
+    <SendLayout
+      selectedBottomTab="nft"
+      onClickBack={handleBackButtonClick}
+      hideBackButton={hideBackButton}
+    >
+      <Container>
+        <div>
+          <StyledSendTo typography="headline_xs" color="white_0">
+            {t('SEND_TO')}
+          </StyledSendTo>
+          <InputGroup>
+            <RowContainer>
+              <Label>{t('RECIPIENT')}</Label>
+            </RowContainer>
+            <AmountInputContainer error={isDangerFeedback(recipientError)}>
+              <InputFieldContainer>
+                <InputField
+                  value={recipientAddress}
+                  placeholder={t('RECIPIENT_PLACEHOLDER')}
+                  onChange={handleAddressChange}
+                />
+              </InputFieldContainer>
+            </AmountInputContainer>
+            {associatedAddress && (
+              <>
+                <StyledP typography="body_s" color="white_400">
+                  {t('ASSOCIATED_ADDRESS')}
+                </StyledP>
+                <StyledP typography="body_s" color="white">
+                  {associatedAddress}
+                </StyledP>
+              </>
+            )}
+            {associatedBnsName && (
+              <>
+                <StyledP typography="body_s" color="white_400">
+                  {t('ASSOCIATED_BNS_DOMAIN')}
+                </StyledP>
+                <StyledP typography="body_s" color="white">
+                  {associatedBnsName}
+                </StyledP>
+              </>
+            )}
+            <ErrorContainer>
+              {recipientError && <InputFeedback {...recipientError} />}
+            </ErrorContainer>
+          </InputGroup>
+        </div>
+        <NextButtonContainer>
+          <ActionButton
+            text={t('NEXT')}
+            disabled={!isNextEnabled}
+            processing={isLoading}
+            onPress={onPressNext}
+          />
+        </NextButtonContainer>
+      </Container>
+    </SendLayout>
   );
 }
 

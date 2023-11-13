@@ -8,7 +8,7 @@ import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
-import { getBtcTxStatusUrl, isLedgerAccount } from '@utils/helper';
+import { getBtcTxStatusUrl, isInOptions, isLedgerAccount } from '@utils/helper';
 import {
   getInscriptionsCollectionGridItemSubText,
   getInscriptionsCollectionGridItemSubTextColor,
@@ -83,7 +83,7 @@ export default function useOrdinalDetail() {
       return;
     }
     if (ordinalData) setSelectedOrdinalDetails(ordinalData);
-    if (isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#/nft-dashboard/ordinal-detail/${id}/send-ordinal`),
       });

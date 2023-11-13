@@ -14,7 +14,12 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight, ArrowUp, Circle } from '@phosphor-icons/react';
 import Callout from '@ui-library/callout';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
-import { getBtcTxStatusUrl, getTruncatedAddress, isLedgerAccount } from '@utils/helper';
+import {
+  getBtcTxStatusUrl,
+  getTruncatedAddress,
+  isInOptions,
+  isLedgerAccount,
+} from '@utils/helper';
 import {
   BundleItem,
   getBundleItemId,
@@ -292,7 +297,7 @@ function RareSatsDetailScreen() {
       return showAlert();
     }
 
-    if (isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL('options.html#/nft-dashboard/send-rare-sat'),
       });
