@@ -1,5 +1,4 @@
 import ActionButton from '@components/button';
-import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import { StyledP, StyledTab, StyledTabList } from '@ui-library/common.styled';
 import { ApiBundle, Bundle, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
@@ -8,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TabPanel, Tabs } from 'react-tabs';
 import styled from 'styled-components';
+import { StyledBarLoader, TilesSkeletonLoader } from '../../components/tilesSkeletonLoader';
 import Notice from './notice';
 import RareSatsTabGridItem from './rareSatsTabGridItem';
 import type { NftDashboardState } from './useNftDashboard';

@@ -170,6 +170,7 @@ const useWalletReducer = () => {
       ordinalsPublicKey: wallet.ordinalsPublicKey,
       stxAddress: wallet.stxAddress,
       stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
     };
     const hasSeed = await seedVault.hasSeed();
     if (hasSeed && !masterPubKey) {
@@ -229,6 +230,7 @@ const useWalletReducer = () => {
       ordinalsPublicKey: wallet.ordinalsPublicKey,
       stxAddress: wallet.stxAddress,
       stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
     };
     trackMixPanel(AnalyticsEvents.CreateNewWallet);
 
@@ -252,7 +254,7 @@ const useWalletReducer = () => {
   const switchAccount = async (account: Account) => {
     // we clear the query cache to prevent data from the other account potentially being displayed
     await queryClient.cancelQueries();
-    await queryClient.clear();
+    queryClient.clear();
 
     dispatch(
       selectAccount(
@@ -295,6 +297,7 @@ const useWalletReducer = () => {
       ordinalsPublicKey: wallet.ordinalsPublicKey,
       stxAddress: wallet.stxAddress,
       stxPublicKey: wallet.stxPublicKey,
+      bnsName: wallet.bnsName,
     };
     dispatch(setWalletAction(wallet));
     try {

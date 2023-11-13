@@ -31,8 +31,7 @@ const useAddressInscriptionCollections = () => {
       }
       return false;
     },
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    staleTime: 1 * 60 * 1000, // 1 min
   });
 };
 

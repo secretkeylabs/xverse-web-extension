@@ -12,7 +12,6 @@ import ActionButton from '@components/button';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
-import SquareButton from '@components/squareButton';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
 import UpdatedBottomModal from '@components/updatedBottomModal';
@@ -37,6 +36,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import Theme from 'theme';
+import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
 
 export const Container = styled.div((props) => ({
