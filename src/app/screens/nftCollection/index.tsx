@@ -9,8 +9,11 @@ import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import Nft from '@screens/nftDashboard/nft';
-import { getNftCollectionsGridItemId } from '@utils/nfts';
+import SnackBar from '@ui-library/snackBar';
+import { getNftCollectionsGridItemId, isBnsCollection } from '@utils/nfts';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import useNftCollection from './useNftCollection';
 
@@ -109,6 +112,7 @@ const StyledGridContainer = styled(GridContainer)`
 
 function NftCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
+  const navigate = useNavigate();
   const {
     collectionData,
     portfolioValue,
@@ -118,8 +122,9 @@ function NftCollection() {
     isGalleryOpen,
     handleBackButtonClick,
     openInGalleryView,
-    handleOnClick,
   } = useNftCollection();
+
+  const ToastContent = <SnackBar text={t('ERRORS.FAILED_TO_FETCH')} type="error" />;
 
   return (
     <>
@@ -183,7 +188,19 @@ function NftCollection() {
                   key={nft.asset_identifier}
                   item={nft}
                   itemId={getNftCollectionsGridItemId(nft, collectionData)}
-                  onClick={handleOnClick}
+                  onClick={
+                    isBnsCollection(nft.asset_identifier)
+                      ? undefined
+                      : () => {
+                          if (nft.data?.token_metadata) {
+                            navigate(
+                              `/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`,
+                            );
+                          } else {
+                            toast.custom(ToastContent);
+                          }
+                        }
+                  }
                 >
                   <Nft asset={nft} isGalleryOpen={isGalleryOpen} />
                 </CollectibleCollectionGridItem>
