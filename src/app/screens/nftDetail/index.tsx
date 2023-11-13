@@ -42,7 +42,7 @@ const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  columnGap: props.theme.spacing(11),
+  columnGap: props.theme.spacing(8),
   paddingBottom: props.theme.spacing(16),
   marginBottom: props.theme.spacing(4),
   marginTop: props.theme.spacing(4),
@@ -324,9 +324,9 @@ const NftDetailsContainer = styled.div<DetailSectionProps>((props) => ({
 const DetailSection = styled.div<DetailSectionProps>((props) => ({
   display: 'flex',
   flexDirection: !props.isGallery ? 'row' : 'column',
-  justifyContent: 'space-between',
+  justifyContent: 'center',
   width: '100%',
-  flex: 1,
+  columnGap: props.theme.spacing(8),
 }));
 
 const InfoContainer = styled.div((props) => ({

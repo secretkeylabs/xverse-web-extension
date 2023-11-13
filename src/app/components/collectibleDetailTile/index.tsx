@@ -35,7 +35,6 @@ const Container = styled.div<ContainerProps>((props) => ({
 }));
 
 const ValueContainer = styled.h1<DetailSectionProps>((props) => ({
-  marginRight: props.isGallery ? 0 : props.theme.spacing(12),
   marginLeft: props.isGallery ? props.theme.spacing(6) : 0,
   marginBottom: props.isGallery ? props.theme.spacing(6) : props.theme.spacing(8),
 }));
