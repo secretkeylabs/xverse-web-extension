@@ -185,7 +185,7 @@ function NftCollection() {
             ) : (
               collectionData?.all_nfts.map((nft) => (
                 <CollectibleCollectionGridItem
-                  key={nft.asset_identifier}
+                  key={nft.data?.fully_qualified_token_id}
                   item={nft}
                   itemId={getNftCollectionsGridItemId(nft, collectionData)}
                   onClick={
