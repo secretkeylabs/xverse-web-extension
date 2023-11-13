@@ -20,6 +20,7 @@ const useInscriptionCollectionMarketData = (collectionId?: string | null) => {
     retry: handleRetries,
     queryKey: ['collection-market-data', collectionId],
     queryFn: collectionMarketData,
+    staleTime: 1 * 60 * 1000, // 1 min
   });
 };
 

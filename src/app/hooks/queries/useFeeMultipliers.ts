@@ -1,5 +1,6 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { AppInfo, fetchAppInfo } from '@secretkeylabs/xverse-core/';
+import type { AppInfo } from '@secretkeylabs/xverse-core';
+import { fetchAppInfo } from '@secretkeylabs/xverse-core';
 import { setFeeMultiplierAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';

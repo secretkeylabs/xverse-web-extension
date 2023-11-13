@@ -17,10 +17,10 @@ export const useBtcWalletData = () => {
   };
 
   return useQuery({
-    queryKey: [`wallet-data-${btcAddress}`],
-    refetchOnWindowFocus: true,
+    queryKey: ['btc-wallet-data', btcAddress],
     queryFn: fetchBtcWalletData,
     enabled: !!btcAddress,
+    staleTime: 10 * 1000, // 10 secs
   });
 };
 
