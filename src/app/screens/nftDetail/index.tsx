@@ -42,7 +42,7 @@ const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  columnGap: props.theme.spacing(8),
+  columnGap: props.theme.spacing(11),
   paddingBottom: props.theme.spacing(16),
   marginBottom: props.theme.spacing(4),
   marginTop: props.theme.spacing(4),
