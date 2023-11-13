@@ -28,8 +28,6 @@ export const useAddressRareSats = () => {
   };
 
   return useInfiniteQuery(['rare-sats', ordinalsAddress], getRareSatsByAddress, {
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
     retry: handleRetries,
     getNextPageParam: (lastPage, allPages) => {
       const currentLength = allPages.map((page) => page.results).flat().length;
@@ -37,6 +35,7 @@ export const useAddressRareSats = () => {
         return currentLength;
       }
     },
+    staleTime: 1 * 60 * 1000, // 1 min
   });
 };
 
@@ -54,11 +53,10 @@ export const useGetUtxoOrdinalBundle = (output?: string, shouldMakeTheCall?: boo
 
   const { data, isLoading } = useQuery({
     enabled: !!(output && shouldMakeTheCall),
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
     queryKey: ['rare-sats', output],
     queryFn: getUtxoOrdinalBundleByOutput,
     retry: handleRetries,
+    staleTime: 1 * 60 * 1000, // 1 min
   });
   const bundle = data?.txid ? mapRareSatsAPIResponseToRareSats(data) : undefined;
 
