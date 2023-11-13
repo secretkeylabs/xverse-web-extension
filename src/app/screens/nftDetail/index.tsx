@@ -121,8 +121,8 @@ const GridContainer = styled.div((props) => ({
   display: 'grid',
   width: '100%',
   marginTop: props.theme.spacing(6),
-  columnGap: props.theme.spacing(8),
-  rowGap: props.theme.spacing(6),
+  columnGap: props.theme.spacing(4),
+  rowGap: props.theme.spacing(4),
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
   marginBottom: props.theme.spacing(8),
 }));
@@ -294,6 +294,11 @@ const GalleryLoaderContainer = styled.div({
   flexDirection: 'column',
 });
 
+const ItemContainer = styled.div((props) => ({
+  marginRight: props.theme.spacing(8),
+  flexDirection: 'column',
+}));
+
 const StyledSeparator = styled(Separator)`
   width: 100%;
 `;
@@ -321,6 +326,7 @@ const DetailSection = styled.div<DetailSectionProps>((props) => ({
   flexDirection: !props.isGallery ? 'row' : 'column',
   justifyContent: 'space-between',
   width: '100%',
+  flex: 1,
 }));
 
 const InfoContainer = styled.div((props) => ({
