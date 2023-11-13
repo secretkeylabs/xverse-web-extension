@@ -319,7 +319,7 @@
     "CLOSE": "Close",
     "SIGNING_TRANSACTIONS": "Signing transactions",
     "BROADCASTING_TRANSACTIONS": "Broadcasting transactions",
-    "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep your wallet open.",
+    "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep this window open.",
     "TRANSACTIONS_BROADCASTED": "Transactions broadcasted",
     "TRANSACTIONS_SIGNED": "Transactions signed",
     "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
