@@ -97,19 +97,19 @@ export const useNftDashboard = (): NftDashboardState => {
   const inscriptionsQuery = useAddressInscriptionCollections();
   const rareSatsQuery = useAddressRareSats();
 
-  const ordinalsLength = inscriptionsQuery.data?.pages?.[0]?.total ?? 0;
-  const totalNfts = stacksNftsQuery.data?.pages?.[0]?.total ?? 0;
+  const totalInscriptions = inscriptionsQuery.data?.pages?.[0]?.total_inscriptions ?? 0;
+  const totalNfts = stacksNftsQuery.data?.pages?.[0]?.total_nfts ?? 0;
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
   useEffect(() => {
     if (
-      (hasActivatedOrdinalsKey === undefined && ordinalsLength) ||
+      (hasActivatedOrdinalsKey === undefined && totalInscriptions) ||
       hasActivatedRareSatsKey === undefined
     ) {
       setShowNewFeatureAlert(true);
     }
-  }, [hasActivatedOrdinalsKey, hasActivatedRareSatsKey, ordinalsLength]);
+  }, [hasActivatedOrdinalsKey, hasActivatedRareSatsKey, totalInscriptions]);
 
   useEffect(() => {
     setShowNoticeAlert(rareSatsNoticeDismissed === undefined);
@@ -150,7 +150,7 @@ export const useNftDashboard = (): NftDashboardState => {
       );
     }
 
-    if (ordinalsLength === 0) {
+    if (totalInscriptions === 0) {
       return <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>;
     }
 
@@ -177,7 +177,7 @@ export const useNftDashboard = (): NftDashboardState => {
         )}
       </>
     );
-  }, [inscriptionsQuery, isGalleryOpen, ordinalsLength, t]);
+  }, [inscriptionsQuery, isGalleryOpen, totalInscriptions, t]);
 
   const NftListView = useCallback(() => {
     if (stacksNftsQuery.error && !(stacksNftsQuery.error instanceof InvalidParamsError)) {
@@ -265,7 +265,7 @@ export const useNftDashboard = (): NftDashboardState => {
     showNoticeAlert,
     rareSatsQuery,
     totalNfts,
-    totalInscriptions: ordinalsLength,
+    totalInscriptions,
   };
 };
 
