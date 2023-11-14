@@ -190,12 +190,14 @@ function OrdinalImage({
     <ImageContainer>
       <StyledImage
         width="100%"
+        height="100%"
         placeholder={
           <LoaderContainer>
             <StyledBarLoader width={loaderSize} height={loaderSize} />
           </LoaderContainer>
         }
         src={src}
+        preview={false}
       />
       {isNftDashboard && (
         <OrdinalsTag>
