@@ -250,16 +250,20 @@ function SignBatchPsbtRequest() {
       }
       setIsSigning(true);
 
-      const signedPsbts: any[] = [];
+      const signedPsbts: {
+        txId: string;
+        psbtBase64: string;
+      }[] = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const psbt of payload.psbts) {
         // eslint-disable-next-line no-await-in-loop
         await delay(5000);
 
         // eslint-disable-next-line no-await-in-loop
-        const psbtBase64 = await confirmSignPsbt(psbt);
+        const signedPsbt = await confirmSignPsbt(psbt);
         signedPsbts.push({
-          psbtBase64,
+          txId: signedPsbt.txId,
+          psbtBase64: signedPsbt.signingResponse,
         });
         setSigningPsbtIndex((prevIndex) => prevIndex + 1);
       }
@@ -271,16 +275,15 @@ function SignBatchPsbtRequest() {
         setIsSigning(false);
         setIsBroadcasting(true);
 
-        let index = 0;
         // eslint-disable-next-line no-restricted-syntax
-        for (const psbt of payload.psbts) {
+        for (const psbt of signedPsbts) {
           // eslint-disable-next-line no-await-in-loop
           await delay(5000);
 
           // eslint-disable-next-line no-await-in-loop
-          const txId = await broadcastPsbt(signedPsbts[index].psbtBase64);
-          signedPsbts[index].txId = txId;
-          index += 1;
+          const txId = await broadcastPsbt(psbt.psbtBase64);
+          psbt.txId = txId;
+
           setBroadcastingPsbtIndex((prevIndex) => prevIndex + 1);
         }
 
