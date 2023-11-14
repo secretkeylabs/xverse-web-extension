@@ -63,7 +63,7 @@ const OrdinalsTag = styled.div((props) => ({
 }));
 
 const Text = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   textTransform: 'uppercase',
   color: props.theme.colors.white_0,
   fontSize: 10,
@@ -98,8 +98,8 @@ const OrdinalContentText = styled.p<TextProps>((props) => {
     fontSize = '15px';
   }
   return {
-    ...props.theme.body_medium_m,
-    color: props.theme.colors.white[0],
+    ...props.theme.typography.body_medium_m,
+    color: props.theme.colors.white_0,
     fontSize,
     overflow: 'hidden',
     textAlign: 'center',
@@ -149,35 +149,35 @@ function OrdinalImage({
   const [brc721eImage, setBrc721eImage] = useState<string | undefined>(undefined);
   const { network } = useWalletSelector();
 
-  const fetchBrc721eMetadata = async () => {
-    if (!textContent) {
-      return;
-    }
-
-    try {
-      const parsedContent = JSON.parse(textContent);
-      const erc721Metadata = await getErc721Metadata(
-        network.type,
-        parsedContent.contract,
-        parsedContent.token_id,
-      );
-
-      const url = getFetchableUrl(erc721Metadata, 'ipfs');
-
-      if (url) {
-        const ipfsMetadata = await (await fetch(url)).json();
-        setBrc721eImage(getFetchableUrl(ipfsMetadata.image, 'ipfs'));
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   useEffect(() => {
+    const fetchBrc721eMetadata = async () => {
+      if (!textContent) {
+        return;
+      }
+
+      try {
+        const parsedContent = JSON.parse(textContent);
+        const erc721Metadata = await getErc721Metadata(
+          network.type,
+          parsedContent.contract,
+          parsedContent.token_id,
+        );
+
+        const url = getFetchableUrl(erc721Metadata, 'ipfs');
+
+        if (url) {
+          const ipfsMetadata = await (await fetch(url)).json();
+          setBrc721eImage(getFetchableUrl(ipfsMetadata.image, 'ipfs'));
+        }
+      } catch (e) {
+        console.error(e); // eslint-disable-line no-console
+      }
+    };
+
     if (textContent?.includes('brc-721e')) {
       fetchBrc721eMetadata();
     }
-  }, [textContent]);
+  }, [textContent, network.type]);
 
   let loaderSize = 151;
   if (inNftDetail && isGalleryOpen) {
