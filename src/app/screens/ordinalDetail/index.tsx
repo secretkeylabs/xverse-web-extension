@@ -325,6 +325,7 @@ const DetailSection = styled.div<DetailSectionProps>((props) => ({
   display: 'flex',
   flexDirection: !props.isGallery ? 'row' : 'column',
   justifyContent: 'space-between',
+  columnGap: props.theme.space.m,
   width: '100%',
 }));
 
