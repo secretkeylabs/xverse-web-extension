@@ -10,13 +10,12 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const TxStatusContainer = styled.div({
-  background: 'rgba(25, 25, 48, 0.74)',
+const TxStatusContainer = styled.div((props) => ({
+  background: props.theme.colors.elevation0,
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-  backdropFilter: 'blur(16px)',
-});
+}));
 
 const Container = styled.div({
   display: 'flex',
@@ -84,14 +83,14 @@ const Image = styled.img({
 });
 
 const HeadingText = styled.h1((props) => ({
-  ...props.theme.headline_s,
+  ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   textAlign: 'center',
   marginTop: props.theme.spacing(8),
 }));
 
 const BodyText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
@@ -110,19 +109,19 @@ const TxIDText = styled.h1((props) => ({
 }));
 
 const BeforeButtonText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_400,
 }));
 
 const IDText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(2),
   wordBreak: 'break-all',
 }));
 
 const ButtonText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   marginRight: props.theme.spacing(2),
   color: props.theme.colors.white_0,
 }));
