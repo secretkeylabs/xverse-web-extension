@@ -186,10 +186,10 @@ function TransactionStatus() {
 
   const onCloseClick = () => {
     if (browserTx) window.close();
-    else if (isRareSat) navigate('/nftDashboard?tab=rareSats');
-    else if (isOrdinal) navigate('nftDashboard?tab=inscriptions');
-    else if (isNft) navigate('/nftDashboard?tab=nfts');
-    else navigate(-3);
+    else if (isRareSat) navigate('/nft-dashboard?tab=rareSats');
+    else if (isOrdinal) navigate('/nft-dashboard?tab=inscriptions');
+    else if (isNft) navigate('/nft-dashboard?tab=nfts');
+    else navigate('/');
   };
 
   const handleClickTrySwapAgain = () => {
