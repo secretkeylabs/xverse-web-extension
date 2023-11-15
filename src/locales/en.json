@@ -913,7 +913,7 @@
     },
     "COMPLETE": {
       "INSCRIBED": "Ordinal inscribed",
-      "MESSAGE": "Your ordinal have been successfully inscribed and should appear in a few minutes.",
+      "MESSAGE": "Your ordinal has been successfully inscribed and should appear in a few minutes.",
       "SEE_ON": "See on",
       "BITCOIN_EXPLORER": "mempool",
       "TRANSACTION_ID": "Transaction ID",
