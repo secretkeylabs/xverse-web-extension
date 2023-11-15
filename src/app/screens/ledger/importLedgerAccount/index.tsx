@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useTransition } from '@react-spring/web';
+import { delay, getDeviceNewAccountIndex, getNewAccountId } from '@common/utils/ledger';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { useTransition } from '@react-spring/web';
 import {
   Account,
   getMasterFingerPrint,
@@ -9,17 +11,15 @@ import {
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
 } from '@secretkeylabs/xverse-core';
-import useWalletReducer from '@hooks/useWalletReducer';
-import { getDeviceNewAccountIndex, getNewAccountId, ledgerDelay } from '@common/utils/ledger';
-import useWalletSelector from '@hooks/useWalletSelector';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
-import { ImportLedgerSteps, LedgerLiveOptions } from './types';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import StepControls from './stepControls';
 import Steps from './steps';
+import { ImportLedgerSteps, LedgerLiveOptions } from './types';
 
-import { Container, OnBoardingContentContainer, OnBoardingActionsContainer } from './index.styled';
+import { Container, OnBoardingActionsContainer, OnBoardingContentContainer } from './index.styled';
 
 export interface Credential {
   publicKey: string;
@@ -210,7 +210,7 @@ function ImportLedger(): JSX.Element {
           ),
         };
         await addLedgerAccount(ledgerAccount);
-        await ledgerDelay(1000);
+        await delay(1000);
         setCurrentStep(ImportLedgerSteps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
         return;
@@ -225,7 +225,7 @@ function ImportLedger(): JSX.Element {
           ordinalsPublicKey: ordinalsCreds?.publicKey || '',
         };
         await updateLedgerAccounts(ledgerAccount);
-        await ledgerDelay(1000);
+        await delay(1000);
         setCurrentStep(ImportLedgerSteps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
         return;
@@ -238,12 +238,12 @@ function ImportLedger(): JSX.Element {
           stxPublicKey: stacksCreds?.publicKey || '',
         };
         await updateLedgerAccounts(ledgerAccount);
-        await ledgerDelay(1000);
+        await delay(1000);
         setCurrentStep(ImportLedgerSteps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
       }
 
-      await ledgerDelay(500);
+      await delay(500);
       setIsButtonDisabled(false);
     } catch (err) {
       console.error(err);
@@ -287,7 +287,7 @@ function ImportLedger(): JSX.Element {
         await importStxAccounts(false);
       }
       setIsConnectSuccess(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       if (
         isBitcoinSelected &&
         ledgerAccountsList?.find((account) => account.masterPubKey === masterFingerPrint)
@@ -338,7 +338,7 @@ function ImportLedger(): JSX.Element {
       }
       const updatedAccount: Account = { ...accountToUpdate, accountName };
       await updateLedgerAccounts(updatedAccount);
-      await ledgerDelay(1000);
+      await delay(1000);
       setIsButtonDisabled(false);
       handleClickNext();
     } catch (err) {

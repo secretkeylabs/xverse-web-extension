@@ -1,4 +1,5 @@
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -240,9 +241,6 @@ function SignBatchPsbtRequest() {
   }, [parsedPsbts]);
 
   const onSignPsbtConfirmed = async () => {
-    // TODO: Remove the delay for production
-    const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
     try {
       if (isLedgerAccount(selectedAccount)) {
         // setIsModalVisible(true);

@@ -2,7 +2,7 @@ import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
-import { ledgerDelay } from '@common/utils/ledger';
+import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -156,7 +156,7 @@ function AuthenticationRequest() {
     }
 
     setIsConnectSuccess(true);
-    await ledgerDelay(1500);
+    await delay(1500);
     setCurrentStepIndex(1);
 
     const profile = {
@@ -176,7 +176,7 @@ function AuthenticationRequest() {
         profile,
       });
       setIsTxApproved(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
         source: MESSAGE_SOURCE,
         payload: {
