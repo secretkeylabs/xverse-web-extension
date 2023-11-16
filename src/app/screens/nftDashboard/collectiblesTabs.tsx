@@ -28,7 +28,7 @@ const StickyStyledTabList = styled(StyledTabList)`
   position: sticky;
   background: ${(props) => props.theme.colors.elevation0};
   top: -1px;
-  z-index: 5;
+  z-index: 1;
   padding: ${(props) => props.theme.space.m} 0;
 `;
 

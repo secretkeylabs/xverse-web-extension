@@ -23,7 +23,7 @@ const OuterContainer = styled.div({
   left: 0,
   right: 0,
   backgroundColor: 'transparent',
-  zIndex: 1,
+  zIndex: 2,
 });
 
 interface Props {
