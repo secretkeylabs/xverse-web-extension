@@ -15,16 +15,6 @@ const useAddressInscriptionCollections = () => {
     if (!ordinalsAddress) {
       throw new InvalidParamsError('ordinalsAddress is required');
     }
-
-    // TODO cui: remove mock data after QA
-    const testAddress = localStorage.getItem('testAddress');
-    if (testAddress) {
-      return getCollections(
-        testAddress,
-        pageParam || 0, // offset,
-        PAGE_SIZE, // limit
-      );
-    }
     return getCollections(ordinalsAddress, pageParam || 0, PAGE_SIZE);
   };
 

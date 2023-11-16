@@ -29,8 +29,8 @@ interface ContainerProps {
 const Container = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   flexDirection: props.isColumnAlignment ? 'column' : 'row',
-  justifyContent: 'space-between',
   width: '100%',
+  justifyContent: 'space-between',
 }));
 
 const ValueContainer = styled.h1<DetailSectionProps>((props) => ({
@@ -38,9 +38,14 @@ const ValueContainer = styled.h1<DetailSectionProps>((props) => ({
   marginBottom: props.isGallery ? props.theme.spacing(6) : props.theme.spacing(8),
 }));
 
+const LoaderContainer = styled.div<DetailSectionProps>((props) => ({
+  display: 'flex',
+  justifyContent: props.isGallery ? 'flex-end' : 'flex-start',
+}));
+
 const StyledBarLoader = styled(BetterBarLoader)`
   padding: 0;
-  border-radius: 6px;
+  border-radius: 8px;
 `;
 
 interface Props {
@@ -66,7 +71,11 @@ function CollectibleDetailTile({
     <Container isColumnAlignment={!isGalleryOpen || isColumnAlignment}>
       <DescriptionHeadingText isGallery={isGalleryOpen}>{title}</DescriptionHeadingText>
       <ValueContainer isGallery={isGalleryOpen}>
-        {isLoading && <StyledBarLoader width={100} height={18.5} />}
+        {isLoading && (
+          <LoaderContainer isGallery={isGalleryOpen}>
+            <StyledBarLoader width={100} height={18.5} />
+          </LoaderContainer>
+        )}
         {!isLoading && allowThousandSeperator && (
           <NumericFormat
             value={value}

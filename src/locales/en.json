@@ -627,6 +627,7 @@
     "DETAILS": "See detail on",
     "GAMMA": "Gamma.io",
     "MOVE_TO_ASSET_DETAIL": "Back to gallery",
+    "BACK_TO_COLLECTION": "Back to collection",
     "ORDINALS": "Ordinal",
     "ORDINAL_PENDING_SEND_TITLE": "Transfer Pending",
     "ORDINAL_PENDING_SEND_DESCRIPTION": "This Ordinal is already in a pending transfer.",
@@ -711,7 +712,7 @@
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
     "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
-    "ENABLE_RARE_SATS_DETAIL": "Display Rare Sats in the collectibles and allow to scan the wallet for Rare Sats. This feature can impact performance.",
+    "ENABLE_RARE_SATS_DETAIL": "Automatically scan and display rare sats in your Ordinals wallet.",
     "ADVANCED": "Advanced"
   },
   "OPTIONS_DIALOG": {
@@ -734,8 +735,11 @@
     "BUY_COIN_BUTTON": "Buy",
     "TRANSACTION_HISTORY_TITLE": "Transaction history",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
+    "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
+    "MINT": "Mint",
+    "INSCRIBE_TRANSFER": "Inscribe Transfer",
     "TRANSACTION_PENDING_RECEIVING": "Receiving",
     "TRANSACTION_PENDING_SENDING": "Sending",
     "ORDINAL_TRANSACTION_PENDING_RECEIVING": "Receiving Ordinal",

@@ -289,7 +289,7 @@ function NftDetailScreen() {
   }, [nftDetailsData]);
 
   const handleBackButtonClick = () => {
-    navigate('/nft-dashboard');
+    navigate('/nft-dashboard?tab=nfts');
   };
 
   const onSharePress = () => {

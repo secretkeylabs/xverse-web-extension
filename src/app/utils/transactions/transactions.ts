@@ -1,4 +1,9 @@
-import { BtcTransactionData, StacksNetwork } from '@secretkeylabs/xverse-core';
+import {
+  Brc20HistoryTransactionData,
+  BtcTransactionData,
+  StacksNetwork,
+  StxTransactionData,
+} from '@secretkeylabs/xverse-core';
 import { getNetworkURL } from '@secretkeylabs/xverse-core/api/helper';
 import { API_TIMEOUT_MILLI } from '@secretkeylabs/xverse-core/constant';
 import {
@@ -88,13 +93,31 @@ export function isAddressTransactionWithTransfers(
 }
 
 export function isBtcTransaction(
-  tx: AddressTransactionWithTransfers | Tx | BtcTransactionData,
+  tx: AddressTransactionWithTransfers | Tx | BtcTransactionData | Brc20HistoryTransactionData,
 ): tx is BtcTransactionData {
   return (tx as BtcTransactionData).txType === 'bitcoin';
 }
 
 export function isBtcTransactionArr(
-  txs: (AddressTransactionWithTransfers | MempoolTransaction)[] | BtcTransactionData[],
+  txs:
+    | (AddressTransactionWithTransfers | MempoolTransaction)[]
+    | BtcTransactionData[]
+    | Brc20HistoryTransactionData[],
 ): txs is BtcTransactionData[] {
   return (txs as BtcTransactionData[])[0].txType === 'bitcoin';
+}
+
+export function isBrc20TransactionArr(
+  txs:
+    | (AddressTransactionWithTransfers | MempoolTransaction)[]
+    | BtcTransactionData[]
+    | Brc20HistoryTransactionData[],
+): txs is BtcTransactionData[] {
+  return (txs as Brc20HistoryTransactionData[])[0].txType === 'brc20';
+}
+
+export function isBrc20Transaction(
+  tx: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData,
+): tx is Brc20HistoryTransactionData {
+  return (tx as Brc20HistoryTransactionData).txType === 'brc20';
 }

@@ -22,7 +22,7 @@ export const getInscriptionsCollectionGridItemId = (inscription?: Inscription): 
 
 export const getInscriptionsCollectionGridItemSubText = (inscription?: Inscription): string => {
   if (inscription?.category === 'brc-20') {
-    return isBrcTransferValid(inscription) ? 'valid' : 'used';
+    return isBrcTransferValid(inscription) ? 'Valid' : 'Used';
   }
   return '';
 };
@@ -37,7 +37,7 @@ export const getInscriptionsCollectionGridItemSubTextColor = (inscription?: Insc
 export const getInscriptionsTabGridItemId = (collection: InscriptionCollectionsData) =>
   (isCollection(collection)
     ? collection.collection_name
-    : collection.thumbnail_inscriptions?.[0]?.number?.toString()) ?? ''; // TODO needs to be added to API
+    : collection.thumbnail_inscriptions?.[0]?.number?.toString()) ?? '';
 
 export const getInscriptionsTabGridItemSubText = (collection: InscriptionCollectionsData) => {
   if (!isCollection(collection)) {

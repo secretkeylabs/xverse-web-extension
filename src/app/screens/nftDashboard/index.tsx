@@ -27,7 +27,6 @@ import CollectiblesTabs, { GridContainer } from './collectiblesTabs';
 import { InscriptionsTabGridItem } from './inscriptionsTabGridItem';
 import Nft from './nft';
 import ReceiveNftModal from './receiveNft';
-import { StyledBarLoader, TilesSkeletonLoader } from './tilesSkeletonLoader';
 
 const Container = styled.div`
   display: flex;
@@ -74,11 +73,6 @@ const CollectibleContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const LoaderContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
 const ButtonContainer = styled.div({
   display: 'flex',
   position: 'relative',
@@ -90,24 +84,6 @@ const ButtonContainer = styled.div({
 
 const ReceiveButtonContainer = styled.div(() => ({
   width: '100%',
-}));
-
-const LoadMoreButton = styled.button((props) => ({
-  ...props.theme.body_medium_l,
-  fontSize: 13,
-  width: 98,
-  height: 34,
-  color: props.theme.colors.white['0'],
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-  background: props.theme.colors.background.elevation0,
-  borderRadius: 24,
-  padding: '8px, 16px, 8px, 16px',
-  ':hover': {
-    background: props.theme.colors.background.elevation9,
-  },
-  ':focus': {
-    background: props.theme.colors.background.elevation10,
-  },
 }));
 
 const NoCollectiblesText = styled.h1((props) => ({
@@ -135,11 +111,6 @@ const ErrorTextContainer = styled.div((props) => ({
 const ErrorText = styled.div((props) => ({
   ...props.theme.body_bold_m,
   color: props.theme.colors.white['200'],
-}));
-
-const CountLoaderContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(6),
-  marginBottom: props.theme.spacing(12),
 }));
 
 const LoadMoreButtonContainer = styled.div((props) => ({
@@ -353,11 +324,13 @@ const useNftDashboard = (): NftDashboardState => {
         </GridContainer>
         {hasNextPage && (
           <LoadMoreButtonContainer>
-            {isFetchingNextPage ? (
-              <TilesSkeletonLoader />
-            ) : (
-              <LoadMoreButton onClick={onLoadMoreButtonClick}>{t('LOAD_MORE')}</LoadMoreButton>
-            )}
+            <ActionButton
+              transparent
+              text={t('LOAD_MORE')}
+              processing={isFetchingNextPage}
+              disabled={isFetchingNextPage}
+              onPress={onLoadMoreButtonClick}
+            />
           </LoadMoreButtonContainer>
         )}
       </>
@@ -497,14 +470,6 @@ function NftDashboard() {
           nftListView={<NftListView />}
           inscriptionListView={<InscriptionListView />}
           nftDashboard={nftDashboard}
-          loader={
-            <LoaderContainer>
-              <CountLoaderContainer>
-                <StyledBarLoader width={85} height={20} />
-              </CountLoaderContainer>
-              <TilesSkeletonLoader />
-            </LoaderContainer>
-          }
         />
       </Container>
 

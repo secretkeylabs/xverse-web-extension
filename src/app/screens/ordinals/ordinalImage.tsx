@@ -29,7 +29,7 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   fontSize: '3em',
   wordWrap: 'break-word',
   backgroundColor: props.theme.colors.elevation1,
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   '> img': {
     width: '100%',
   },
@@ -69,6 +69,18 @@ const Text = styled.h1((props) => ({
   marginLeft: props.theme.spacing(4),
 }));
 
+const LoaderContainer = styled.div<ContainerProps>({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  position: 'absolute',
+  width: '100%',
+  left: 0,
+  bottom: 0,
+  right: 0,
+  top: 0,
+});
+
 interface TextProps {
   inNftSend?: boolean;
   isSmall?: boolean;
@@ -105,12 +117,10 @@ const StyledImage = styled(Image)`
   image-rendering: pixelated;
 `;
 
-export const StyledBarLoader = styled(BetterBarLoader)<{
-  withMarginBottom?: boolean;
-}>((props) => ({
+export const StyledBarLoader = styled(BetterBarLoader)((props) => ({
   padding: 0,
-  borderRadius: 6,
-  marginBottom: props.withMarginBottom ? props.theme.spacing(6) : 0,
+  borderRadius: props.theme.radius(1),
+  marginBottom: 0,
 }));
 
 interface Props {
@@ -166,12 +176,21 @@ function OrdinalImage({
     }
   }, [textContent]);
 
+  let loaderSize = 151;
+  if (inNftDetail && isGalleryOpen) {
+    loaderSize = 376.5;
+  } else if (isGalleryOpen) {
+    loaderSize = 276;
+  }
+
   const renderImage = (tag: string, src?: string) => (
     <ImageContainer>
       <StyledImage
         width="100%"
         placeholder={
-          <StyledBarLoader width={isGalleryOpen ? 300 : 150} height={isGalleryOpen ? 300 : 150} />
+          <LoaderContainer>
+            <StyledBarLoader width={loaderSize} height={loaderSize} />
+          </LoaderContainer>
         }
         src={src}
       />
@@ -221,9 +240,7 @@ function OrdinalImage({
 
   if (contentType.includes('text')) {
     if (!textContent) {
-      return (
-        <StyledBarLoader width={isGalleryOpen ? 300 : 150} height={isGalleryOpen ? 300 : 150} />
-      );
+      return <StyledBarLoader width={loaderSize} height={loaderSize} />;
     }
 
     if (contentType.includes('html')) {

@@ -15,17 +15,6 @@ const useAddressInscriptions = (collectionId?: string) => {
     if (!ordinalsAddress || !collectionId) {
       throw new InvalidParamsError('ordinalsAddress and collectionId are required');
     }
-
-    // TODO cui: remove mock data after QA
-    const testAddress = localStorage.getItem('testAddress');
-    if (testAddress) {
-      return getCollectionSpecificInscriptions(
-        testAddress,
-        collectionId,
-        pageParam || 0, // offset,
-        PAGE_SIZE, // limit
-      );
-    }
     return getCollectionSpecificInscriptions(
       ordinalsAddress,
       collectionId,
