@@ -167,6 +167,19 @@ function SignBatchPsbtRequest() {
     [handlePsbtParsing, payload.psbts],
   );
 
+  const checkAddressMismatch = (input) => {
+    if (input.address !== btcAddress && input.address !== ordinalsAddress) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error: t('ADDRESS_MISMATCH'),
+          browserTx: true,
+        },
+      });
+    }
+  };
+
   const checkIfMismatch = () => {
     if (payload.network.type !== network.type) {
       navigate('/tx-status', {
@@ -178,19 +191,6 @@ function SignBatchPsbtRequest() {
         },
       });
     }
-
-    const checkAddressMismatch = (input) => {
-      if (input.address !== btcAddress && input.address !== ordinalsAddress) {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'BTC',
-            error: t('ADDRESS_MISMATCH'),
-            browserTx: true,
-          },
-        });
-      }
-    };
 
     payload.psbts.forEach((psbt) => psbt.inputsToSign.forEach(checkAddressMismatch));
   };
@@ -255,7 +255,7 @@ function SignBatchPsbtRequest() {
       // eslint-disable-next-line no-restricted-syntax
       for (const psbt of payload.psbts) {
         // eslint-disable-next-line no-await-in-loop
-        await delay(5000);
+        await delay(1000);
 
         // eslint-disable-next-line no-await-in-loop
         const signedPsbt = await confirmSignPsbt(psbt);
@@ -278,11 +278,15 @@ function SignBatchPsbtRequest() {
           // eslint-disable-next-line no-await-in-loop
           await delay(5000);
 
-          // eslint-disable-next-line no-await-in-loop
-          const txId = await broadcastPsbt(psbt.psbtBase64);
-          psbt.txId = txId;
+          try {
+            // eslint-disable-next-line no-await-in-loop
+            const txId = await broadcastPsbt(psbt.psbtBase64);
+            psbt.txId = txId;
 
-          setBroadcastingPsbtIndex((prevIndex) => prevIndex + 1);
+            setBroadcastingPsbtIndex((prevIndex) => prevIndex + 1);
+          } catch (e) {
+            console.error(e);
+          }
         }
 
         setIsBroadcastingComplete(true);
