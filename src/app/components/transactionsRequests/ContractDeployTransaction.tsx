@@ -6,9 +6,9 @@ import StxPostConditionCard from '@components/postCondition/stxPostConditionCard
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
+import { broadcastSignedTransaction, isMultiSig } from '@secretkeylabs/xverse-core';
 import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
-import { PostCondition, StacksTransaction } from '@stacks/transactions';
+import { MultiSigSpendingCondition, PostCondition, StacksTransaction } from '@stacks/transactions';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -112,6 +112,12 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   const [loaderForBroadcastingTx, setLoaderForBroadcastingTx] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  // SignTransaction Params
+  const isMultiSigTx = isMultiSig(unsignedTx);
+  const hasSignatures =
+    isMultiSigTx &&
+    (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0;
+
   useOnOriginTabClose(tabId, () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -161,6 +167,13 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
           browserTx: true,
         },
       });
+    } else if (isMultiSigTx) {
+      finalizeTxSignature({
+        requestPayload: requestToken,
+        tabId,
+        data: { txId: '', txRaw: buf2hex(unsignedTx.serialize()) },
+      });
+      window.close();
     } else {
       broadcastTx(txs);
     }
@@ -207,6 +220,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         loading={loaderForBroadcastingTx}
         isSponsored={sponsored}
         title={t('DEPLOY_CONTRACT_REQUEST.DEPLOY_CONTRACT')}
+        hasSignatures={hasSignatures}
       >
         {hasTabClosed && (
           <InfoContainer

@@ -8,12 +8,13 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import {
-addressToString,
-Args,
-broadcastSignedTransaction,
-Coin,
-ContractFunction,
-extractFromPayload
+  addressToString,
+  Args,
+  broadcastSignedTransaction,
+  Coin,
+  ContractFunction,
+  extractFromPayload,
+  isMultiSig,
 } from '@secretkeylabs/xverse-core';
 import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { ContractCallPayload } from '@stacks/connect';
@@ -21,6 +22,7 @@ import {
   ClarityType,
   cvToJSON,
   cvToString,
+  MultiSigSpendingCondition,
   PostConditionType,
   SomeCV,
   StacksTransaction,
@@ -86,6 +88,12 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
+
+  // SignTransaction Params
+  const isMultiSigTx = isMultiSig(unsignedTx);
+  const hasSignatures =
+    isMultiSigTx &&
+    (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0;
 
   useOnOriginTabClose(tabId, () => {
     setHasTabClosed(true);
@@ -210,6 +218,13 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
           browserTx: true,
         },
       });
+    } else if (isMultiSigTx) {
+      finalizeTxSignature({
+        requestPayload: requestToken,
+        tabId,
+        data: { txId: '', txRaw: buf2hex(unsignedTx.serialize()) },
+      });
+      window.close();
     } else {
       broadcastTx(transactions, attachment);
     }
@@ -259,6 +274,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         loading={false}
         title={request.functionName}
         subTitle={`Requested by ${request.appDetails?.name}`}
+        hasSignatures={hasSignatures}
       >
         <>
           {hasTabClosed && (

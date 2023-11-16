@@ -58,7 +58,6 @@ function ConfirmStxTransaction() {
 
   // SignTransaction Params
   const isMultiSigTx = isMultiSig(unsignedTx);
-  console.log('🚀 ~ file: index.tsx:60 ~ ConfirmStxTransaction ~ isMultiSigTx:', isMultiSigTx);
   const hasSignatures =
     isMultiSigTx &&
     (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0;
