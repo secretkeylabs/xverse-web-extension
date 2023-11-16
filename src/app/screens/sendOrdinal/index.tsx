@@ -5,6 +5,7 @@ import TopRow from '@components/topRow';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { isOrdinalOwnedByAccount } from '@secretkeylabs/xverse-core';
@@ -143,8 +144,9 @@ function SendOrdinal() {
   const { selectedOrdinal } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
-  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+  const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
+  const { getSeed } = useSeedVault();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress ?? '');
   const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
@@ -160,6 +162,7 @@ function SendOrdinal() {
     mutate,
   } = useMutation<SignedBtcTx | undefined, ResponseError, string>({
     mutationFn: async (recipient) => {
+      const seedPhrase = await getSeed();
       const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
       const ordUtxo = addressUtxos.find(
         (utxo) => `${utxo.txid}:${utxo.vout}` === selectedOrdinal?.output,

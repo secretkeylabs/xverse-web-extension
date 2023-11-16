@@ -1,5 +1,6 @@
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import AccountHeaderComponent from '@components/accountHeader';
+import BundleAsset from '@components/bundleAsset/bundleAsset';
 import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
@@ -7,6 +8,7 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
+import useSeedVault from '@hooks/useSeedVault';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
   SignedBtcTx,
@@ -15,14 +17,13 @@ import {
 import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { useMutation } from '@tanstack/react-query';
+import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { isLedgerAccount } from '@utils/helper';
-import { getBundleSubText, getBundleId } from '@utils/rareSats';
+import { getBundleId, getBundleSubText } from '@utils/rareSats';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import styled from 'styled-components';
-import BundleAsset from '@components/bundleAsset/bundleAsset';
 
 const ScrollContainer = styled.div`
   display: flex;
@@ -98,8 +99,9 @@ function SendOrdinal() {
   const { selectedSatBundle } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
-  const { network, ordinalsAddress, btcAddress, selectedAccount, seedPhrase, btcFiatRate } =
+  const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
+  const { getSeed } = useSeedVault();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -120,6 +122,7 @@ function SendOrdinal() {
     );
     setOrdinalUtxo(ordUtxo);
     if (ordUtxo) {
+      const seedPhrase = await getSeed();
       const signedTx = await signOrdinalSendTransaction(
         recipient,
         ordUtxo,
@@ -234,8 +237,10 @@ function SendOrdinal() {
           onPressSend={onPressNext}
           onAddressInputChange={handleInputChange}
           warning={warning}
+          info={t('SEND.INFO.ADDRESS_SUPPORTS_RARE_SATS')}
           hideMemo
           hideTokenImage
+          hideDefaultWarning
         >
           <Container>
             <BundleAssetContainer>

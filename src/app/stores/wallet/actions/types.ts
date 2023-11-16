@@ -1,23 +1,20 @@
-import {
+import type {
   Account,
   AccountType,
   AppInfo,
   BaseWallet,
   Coin,
-  FeesMultipliers,
   FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
-} from '@secretkeylabs/xverse-core/types';
+} from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 
 export const SetWalletKey = 'SetWallet';
 export const ResetWalletKey = 'ResetWallet';
 export const FetchAccountKey = 'FetchAccount';
 export const SelectAccountKey = 'SelectAccount';
-export const UnlockWalletKey = 'UnlockWallet';
-export const LockWalletKey = 'LockWallet';
 export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
 export const UpdateVisibleCoinListKey = 'UpdateVisibleCoinList';
 export const AddAccountKey = 'AddAccount';
@@ -25,7 +22,6 @@ export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
 export const GetActiveAccountsKey = 'GetActiveAccounts';
-export const SetWalletSeedPhraseKey = 'SetWalletSeed';
 
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const SetStxWalletDataKey = 'SetStxWalletDataKey';
@@ -49,6 +45,8 @@ export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 
+export const SetWalletUnlockedKey = 'SetWalletUnlocked';
+
 export enum WalletSessionPeriods {
   LOW = 1,
   STANDARD = 10,
@@ -67,7 +65,6 @@ export interface WalletState {
   ledgerAccountsList: Account[];
   selectedAccount: Account | null;
   network: SettingsNetwork;
-  seedPhrase: string;
   encryptedSeed: string;
   fiatCurrency: SupportedCurrency;
   btcFiatRate: BigNumber;
@@ -92,6 +89,7 @@ export interface WalletState {
   accountName: string | undefined;
   btcApiUrl: string;
   walletLockPeriod: WalletSessionPeriods;
+  isUnlocked: boolean;
 }
 
 export interface SetWallet {
@@ -103,24 +101,11 @@ export interface StoreEncryptedSeed {
   type: typeof StoreEncryptedSeedKey;
   encryptedSeed: string;
 }
-
-export interface SetWalletSeedPhrase {
-  type: typeof SetWalletSeedPhraseKey;
-  seedPhrase: string;
-}
-export interface UnlockWallet {
-  type: typeof UnlockWalletKey;
-  seed: string;
-}
-
 export interface SetFeeMultiplier {
   type: typeof SetFeeMultiplierKey;
-  feeMultipliers: FeesMultipliers;
+  feeMultipliers: AppInfo;
 }
 
-export interface LockWallet {
-  type: typeof LockWalletKey;
-}
 export interface ResetWallet {
   type: typeof ResetWalletKey;
 }
@@ -240,7 +225,10 @@ export interface SetWalletLockPeriod {
   type: typeof SetWalletLockPeriodKey;
   walletLockPeriod: WalletSessionPeriods;
 }
-
+export interface SetWalletUnlocked {
+  type: typeof SetWalletUnlockedKey;
+  isUnlocked: boolean;
+}
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -249,9 +237,6 @@ export type WalletActions =
   | AddLedgerAccount
   | SelectAccount
   | StoreEncryptedSeed
-  | SetWalletSeedPhrase
-  | UnlockWallet
-  | LockWallet
   | SetFeeMultiplier
   | SetCoinRates
   | SetStxWalletData
@@ -262,8 +247,11 @@ export type WalletActions =
   | ChangeNetwork
   | GetActiveAccounts
   | ChangeActivateOrdinals
+  | ChangeActivateRareSats
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
   | ChangeShowDataCollectionAlert
   | SetBrcCoinsData
-  | SetWalletLockPeriod;
+  | SetWalletLockPeriod
+  | SetRareSatsNoticeDismissed
+  | SetWalletUnlocked;

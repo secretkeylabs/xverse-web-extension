@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import useSeedVault from '@hooks/useSeedVault';
 import Brc20TransferForm from './brc20TransferForm';
 import Brc20TransferInfo from './brc20TransferInfo';
 
@@ -53,15 +54,9 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
 function SendBrc20Screen() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
-  const {
-    btcAddress,
-    ordinalsAddress,
-    selectedAccount,
-    seedPhrase,
-    network,
-    btcFiatRate,
-    brcCoinsList,
-  } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate, brcCoinsList } =
+    useWalletSelector();
+  const { getSeed } = useSeedVault();
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
@@ -146,6 +141,7 @@ function SendBrc20Screen() {
           amountSats: orderAmount,
         },
       ];
+      const seedPhrase = await getSeed();
       const data = await signBtcTransaction(
         recipients,
         btcAddress,

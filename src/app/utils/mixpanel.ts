@@ -1,6 +1,6 @@
-import mixpanel from 'mixpanel-browser';
+import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import { sha256 } from 'js-sha256';
-import { AnalyticsEvents } from '@secretkeylabs/xverse-core/types';
+import mixpanel from 'mixpanel-browser';
 import { MIX_PANEL_TOKEN } from './constants';
 
 export const isMixPanelInited = () => !!MIX_PANEL_TOKEN && !!mixpanel.config;

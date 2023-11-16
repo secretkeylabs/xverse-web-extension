@@ -14,24 +14,26 @@ jobs:
         uses: actions/setup-node@v3
         with:
           always-auth: true
-          node-version: '16.x'
+          node-version: '18.x'
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
+      - name: Test
+        run: npx eslint .
+      # run: npx tsc --noEmit
+      # run: npm test --passWithNoTests
       - name: Build
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
           MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
         run: npm run build --if-present
-      # - name: Test
-      # run: npm test --passWithNoTests
       - name: Save Filename
         run: |
-          BRANCH_NAME=$(echo ${{ github.head_ref }} | sed 's/\//-/')
+          BRANCH_NAME=$(echo ${{ github.head_ref }} | sed 's/\//-/g')
           GIT_SHA_SHORT=$(git rev-parse --short ${{ github.sha }})
           echo "FILENAME=xverse-extension.$BRANCH_NAME.$GIT_SHA_SHORT" >> $GITHUB_ENV
       - name: Upload Archive

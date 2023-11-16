@@ -1,68 +1,24 @@
-import { useEffect, useState } from 'react';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import {
   FungibleToken,
   getNewNonce,
+  getNonce,
   microstacksToStx,
   setNonce,
-  getNonce,
 } from '@secretkeylabs/xverse-core';
-import { useTranslation } from 'react-i18next';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { TokenImageProps } from '@components/tokenImage';
+import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
 import { AlexSDK, Currency } from 'alex-sdk';
 import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
-import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
-import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import { SelectedCurrencyState, Side, STXOrFungibleToken, UseSwap } from './types';
 import { useAlexSponsoredTransaction } from './useAlexSponsoredTransaction';
 import { useCurrencyConversion } from './useCurrencyConversion';
 
 const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
-
-export type STXOrFungibleToken = 'STX' | FungibleToken;
-export type Side = 'from' | 'to';
-
-export type SwapToken = {
-  name: string;
-  image: TokenImageProps;
-  balance?: number;
-  amount?: number;
-  fiatAmount?: number;
-};
-
-export type UseSwap = {
-  coinsList: FungibleToken[];
-  isLoadingWalletData: boolean;
-  selectedFromToken?: SwapToken;
-  selectedToToken?: SwapToken;
-  onSelectToken: (token: STXOrFungibleToken, side: Side) => void;
-  inputAmount: string;
-  inputAmountInvalid?: boolean;
-  onInputAmountChanged: (amount: string) => void;
-  handleClickDownArrow: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  submitError?: string;
-  swapInfo?: {
-    exchangeRate?: string;
-    lpFee?: string;
-    route?: string;
-  };
-  slippage: number;
-  onSlippageChanged: (slippage: number) => void;
-  minReceived?: string;
-  onSwap?: () => Promise<void>;
-  isSponsored: boolean;
-  isServiceRunning: boolean;
-  handleChangeUserOverrideSponsorValue: (checked: boolean) => void;
-  isSponsorDisabled: boolean;
-};
-
-export type SelectedCurrencyState = {
-  to?: Currency;
-  from?: Currency;
-  prevTo?: Currency;
-  prevFrom?: Currency;
-};
 
 function updateOppositeCurrencyIfSameAsSelected(
   state: SelectedCurrencyState,

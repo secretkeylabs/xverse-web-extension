@@ -31,17 +31,17 @@ const Button = styled.button<ButtonProps>((props) => ({
 }));
 
 const TransparentButton = styled(Button)((props) => ({
-  border: `1px solid ${props.theme.colors.background.elevation6}`,
+  border: `1px solid ${props.theme.colors.elevation6}`,
   backgroundColor: 'transparent',
   ':disabled': {
     cursor: 'not-allowed',
     opacity: 0.4,
   },
   ':hover:enabled': {
-    backgroundColor: props.theme.colors.background.elevation6_800,
+    backgroundColor: props.theme.colors.elevation6_800,
   },
   ':active:enabled': {
-    backgroundColor: props.theme.colors.background.elevation6_600,
+    backgroundColor: props.theme.colors.elevation6_600,
   },
 }));
 
@@ -52,16 +52,14 @@ interface TextProps {
 const ButtonText = styled.h1<TextProps>((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: `${
-    props.warning ? props.theme.colors.white[0] : props.theme.colors.background.elevation0
-  }`,
+  color: `${props.warning ? props.theme.colors.white_0 : props.theme.colors.elevation0}`,
   textAlign: 'center',
 }));
 
 const AnimatedButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 

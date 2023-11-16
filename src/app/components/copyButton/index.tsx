@@ -1,9 +1,9 @@
-import styled from 'styled-components';
 import Copy from '@assets/img/nftDashboard/Copy.svg';
 import Tick from '@assets/img/tick.svg';
 import { useEffect, useState } from 'react';
-import { Tooltip } from 'react-tooltip';
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from 'react-tooltip';
+import styled from 'styled-components';
 
 const Button = styled.button((props) => ({
   display: 'flex',
@@ -13,7 +13,7 @@ const Button = styled.button((props) => ({
   marginLeft: props.theme.spacing(3),
   padding: 3,
   ':hover': {
-    background: props.theme.colors.white[900],
+    background: props.theme.colors.white_900,
     borderRadius: 24,
   },
 }));

@@ -1,16 +1,16 @@
-import ActionButton from '@components/button';
-import BigNumber from 'bignumber.js';
+import { BetterBarLoader } from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
-import styled from 'styled-components';
+import ActionButton from '@components/button';
+import FiatAmountText from '@components/fiatAmountText';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BetterBarLoader } from '@components/barLoader';
-import { NumericFormat } from 'react-number-format';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import InputFeedback from '@ui-library/inputFeedback';
+import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import FiatAmountText from '@components/fiatAmountText';
-import InputFeedback from '@ui-library/inputFeedback';
+import { NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -22,7 +22,7 @@ const Container = styled.div((props) => ({
 
 const DetailText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(8),
 }));
 
@@ -52,7 +52,7 @@ const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
   backgroundColor: 'transparent',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   border: 'transparent',
   width: '50%',
   '&::-webkit-outer-spin-button': {
@@ -70,7 +70,7 @@ const InputField = styled.input((props) => ({
 
 const FeeText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const ButtonContainer = styled.div`
@@ -84,13 +84,9 @@ const FeeButton = styled.button<{
   isSelected: boolean;
 }>((props) => ({
   ...props.theme.body_medium_m,
-  color: `${
-    props.isSelected ? props.theme.colors.background.elevation2 : props.theme.colors.white['400']
-  }`,
+  color: `${props.isSelected ? props.theme.colors.elevation2 : props.theme.colors.white_400}`,
   background: `${props.isSelected ? props.theme.colors.white : 'transparent'}`,
-  border: `1px solid ${
-    props.isSelected ? 'transparent' : props.theme.colors.background.elevation6
-  }`,
+  border: `1px solid ${props.isSelected ? 'transparent' : props.theme.colors.elevation6}`,
   borderRadius: 40,
   height: 40,
   display: 'flex',
@@ -124,7 +120,7 @@ const StyledInputFeedback = styled(InputFeedback)`
 
 const StyledFiatAmountText = styled(FiatAmountText)((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const buttons = [

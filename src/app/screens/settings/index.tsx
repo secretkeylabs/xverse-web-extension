@@ -1,22 +1,23 @@
-import styled from 'styled-components';
-import { useTranslation } from 'react-i18next';
-import useWalletSelector from '@hooks/useWalletSelector';
-import XverseLogo from '@assets/img/settings/logo.svg';
-import ArrowIcon from '@assets/img/settings/arrow.svg';
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
-import BottomBar from '@components/tabBar';
-import { PRIVACY_POLICY_LINK, TERMS_LINK, SUPPORT_LINK } from '@utils/constants';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import ArrowIcon from '@assets/img/settings/arrow.svg';
+import XverseLogo from '@assets/img/settings/logo.svg';
 import PasswordInput from '@components/passwordInput';
+import BottomBar from '@components/tabBar';
+import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { useDispatch } from 'react-redux';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   ChangeActivateOrdinalsAction,
   ChangeActivateRareSatsAction,
 } from '@stores/wallet/actions/actionCreators';
-import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
+import { PRIVACY_POLICY_LINK, SUPPORT_LINK, TERMS_LINK } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import ResetWalletPrompt from '../../components/resetWallet';
 import SettingComponent from './settingComponent';
 
@@ -50,7 +51,7 @@ const ResetWalletContainer = styled.div((props) => ({
 
 const LogoContainer = styled.div((props) => ({
   padding: props.theme.spacing(11),
-  borderBottom: `1px solid ${props.theme.colors.background.elevation3}`,
+  borderBottom: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 function Setting() {
@@ -69,8 +70,8 @@ function Setting() {
   } = useWalletSelector();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { unlockWallet, resetWallet } = useWalletReducer();
-  const { unspentUtxos } = useNonOrdinalUtxos();
+  const { resetWallet } = useWalletReducer();
+  const { unlockVault } = useSeedVault();
 
   const openTermsOfService = () => {
     window.open(TERMS_LINK);
@@ -131,11 +132,6 @@ function Setting() {
     setShowResetWalletDisplay(false);
   };
 
-  const handleResetWallet = () => {
-    resetWallet();
-    navigate('/');
-  };
-
   const openLockCountdownScreen = () => {
     navigate('/lockCountdown');
   };
@@ -153,10 +149,10 @@ function Setting() {
   const handlePasswordNextClick = async () => {
     try {
       setLoading(true);
-      await unlockWallet(password);
+      await unlockVault(password);
       setPassword('');
       setError('');
-      handleResetWallet();
+      await resetWallet();
     } catch (e) {
       setError(t('INCORRECT_PASSWORD_ERROR'));
     } finally {

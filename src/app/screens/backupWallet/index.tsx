@@ -1,7 +1,7 @@
 import backup from '@assets/img/backupWallet/backup.svg';
 import ActionButton from '@components/button';
-import useWalletReducer from '@hooks/useWalletReducer';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSeedVault from '@hooks/useSeedVault';
+import { a } from '@react-spring/web';
 import { generateMnemonic } from '@secretkeylabs/xverse-core/wallet';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,7 +39,7 @@ const SubTitle = styled.h2((props) => ({
   ...props.theme.body_l,
   textAlign: 'center',
   marginTop: props.theme.spacing(4),
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
 }));
 
 const BackupActionsContainer = styled.div((props) => ({
@@ -58,14 +58,33 @@ const TransparentButtonContainer = styled.div((props) => ({
 function BackupWallet(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const navigate = useNavigate();
-  const { seedPhrase } = useWalletSelector();
-  const { storeSeedPhrase } = useWalletReducer();
+  const {
+    init: initSeedVault,
+    storeSeed,
+    unlockVault,
+    hasSeed,
+    clearVaultStorage,
+  } = useSeedVault();
+
+  const generateAndStoreSeedPhrase = async () => {
+    const newSeedPhrase = generateMnemonic();
+    await initSeedVault('');
+    await storeSeed(newSeedPhrase);
+  };
 
   useEffect(() => {
-    if (!seedPhrase) {
-      const newSeedPhrase = generateMnemonic();
-      storeSeedPhrase(newSeedPhrase);
-    }
+    (async () => {
+      const hasSeedPhrase = await hasSeed();
+      if (!hasSeedPhrase) {
+        await generateAndStoreSeedPhrase();
+      } else {
+        // attempt to unlock the wallet with an empty password (verifies the user didn't finish onboarding)
+        await unlockVault('');
+        // clear the vault storage and generate a new seed phrase
+        await clearVaultStorage();
+        await generateAndStoreSeedPhrase();
+      }
+    })();
   }, []);
 
   const handleBackup = () => {

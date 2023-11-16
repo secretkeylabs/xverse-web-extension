@@ -61,7 +61,7 @@ function BottomModal({
       maxWidth: 360,
       maxHeight: '90%',
       border: 'transparent',
-      background: theme.colors.background.elevation2,
+      background: theme.colors.elevation2,
       margin: 0,
       padding: 0,
       borderTopLeftRadius: isGalleryOpen ? 12 : 20,

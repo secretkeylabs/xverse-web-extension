@@ -20,10 +20,23 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles", "@tanstack/query"],
+  "plugins": [
+    "react",
+    "prettier",
+    "eslint-plugin-no-inline-styles",
+    "@tanstack/query"
+  ],
   "rules": {
     "consistent-return": "off",
     "import/prefer-default-export": 1,
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          "@secretkeylabs/xverse-core/**/*"
+        ]
+      }
+    ],
     "no-promise-executor-return": "warn",
     "max-len": "off",
     "no-inline-styles/no-inline-styles": 2,
@@ -42,13 +55,22 @@
         "argsIgnorePattern": "^_"
       }
     ],
-    "no-plusplus": "off"
+    "no-plusplus": "off",
+    "@tanstack/query/exhaustive-deps": 1
   },
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"],
-        "moduleDirectory": ["node_modules", "src/"]
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ],
+        "moduleDirectory": [
+          "node_modules",
+          "src/"
+        ]
       }
     }
   }

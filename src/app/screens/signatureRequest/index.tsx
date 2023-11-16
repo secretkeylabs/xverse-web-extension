@@ -16,22 +16,22 @@ import useSignatureRequest, {
   useSignMessage,
 } from '@hooks/useSignatureRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { getNetworkType, isHardwareAccount, getTruncatedAddress } from '@utils/helper';
-import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
-import { useNavigate } from 'react-router-dom';
-import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
-import Transport from '@ledgerhq/hw-transport-webusb';
-import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';
 import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
+import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { bytesToHex } from '@stacks/transactions';
+import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
+import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import CollapsableContainer from './collapsableContainer';
+import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
-import SignatureRequestMessage from './signatureRequestMessage';
-import CollapsableContainer from './collapsableContainer';
 
 const OuterContainer = styled.div({
   display: 'flex',
@@ -39,32 +39,29 @@ const OuterContainer = styled.div({
   height: '100%',
 });
 
-const InnerContainer = styled.div({
+const InnerContainer = styled.div((props) => ({
   flex: 1,
-  overflowY: 'auto',
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-});
+  ...props.theme.scrollbar,
+}));
 
-const MainContainer = styled.div((props) => ({
+export const MainContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.spacing(4),
+  paddingRight: props.theme.spacing(4),
 }));
 
 const RequestType = styled.h1((props) => ({
   ...props.theme.headline_s,
   marginTop: props.theme.spacing(11),
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'left',
   marginBottom: props.theme.spacing(4),
 }));
 
 const RequestSource = styled.h2((props) => ({
   ...props.theme.body_medium_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   textAlign: 'left',
   marginBottom: props.theme.spacing(12),
 }));
@@ -74,14 +71,14 @@ const MessageHash = styled.p((props) => ({
   textAlign: 'left',
   lineHeight: 1.6,
   wordWrap: 'break-word',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(4),
 }));
 
 const SigningAddressContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  background: props.theme.colors.background.elevation1,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '12px 16px',
   marginBottom: props.theme.spacing(6),
@@ -91,7 +88,7 @@ const SigningAddressContainer = styled.div((props) => ({
 const SigningAddressTitle = styled.p((props) => ({
   ...props.theme.body_medium_m,
   wordWrap: 'break-word',
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(4),
 }));
 
@@ -105,7 +102,7 @@ const SigningAddressType = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
   wordWrap: 'break-word',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(4),
 }));
 
@@ -113,13 +110,13 @@ const SigningAddressValue = styled.p((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
   wordWrap: 'break-word',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(4),
 }));
 
 const ActionDisclaimer = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[400],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(8),
 }));
@@ -146,7 +143,7 @@ function SignatureRequest(): JSX.Element {
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isTxInvalid, setIsTxInvalid] = useState(false);
-  const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
+  const { selectedAccount, accountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
   const { messageType, request, payload, tabId, domain, isSignMessageBip322 } =

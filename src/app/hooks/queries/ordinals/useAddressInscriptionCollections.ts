@@ -9,13 +9,13 @@ const PAGE_SIZE = 30;
  * Get collections belonging to an address
  */
 const useAddressInscriptionCollections = () => {
-  const { ordinalsAddress } = useWalletSelector();
+  const { ordinalsAddress, network } = useWalletSelector();
 
   const getCollectionsByAddress = async ({ pageParam = 0 }) => {
     if (!ordinalsAddress) {
       throw new InvalidParamsError('ordinalsAddress is required');
     }
-    return getCollections(ordinalsAddress, pageParam || 0, PAGE_SIZE);
+    return getCollections(network.type, ordinalsAddress, pageParam || 0, PAGE_SIZE);
   };
 
   return useInfiniteQuery(['inscription-collections', ordinalsAddress], getCollectionsByAddress, {
@@ -31,8 +31,7 @@ const useAddressInscriptionCollections = () => {
       }
       return false;
     },
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    staleTime: 1 * 60 * 1000, // 1 min
   });
 };
 

@@ -1,20 +1,23 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
 import TopRow from '@components/topRow';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   BtcUtxoDataResponse,
   ErrorCodes,
-  ResponseError,
-  UTXO,
   getBtcFiatEquivalent,
+  ResponseError,
   satsToBtc,
+  signBtcTransaction,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
-import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
 import {
   Recipient,
   SignedBtcTx,
@@ -22,16 +25,14 @@ import {
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation } from '@tanstack/react-query';
+import Callout from '@ui-library/callout';
 import { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import InfoContainer from '@components/infoContainer';
-import useWalletSelector from '@hooks/useWalletSelector';
 import TransactionDetailComponent from '../transactionDetailComponent';
-import Callout from '@ui-library/callout';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -81,8 +82,8 @@ const Button = styled.button((props) => ({
 }));
 
 const ButtonText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -99,16 +100,16 @@ const ErrorContainer = styled.div((props) => ({
 }));
 
 const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
+  ...props.theme.typography.body_s,
+  color: props.theme.colors.danger_medium,
 }));
 
 interface ReviewTransactionTitleProps {
   isOridnalTx: boolean;
 }
 const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
+  ...props.theme.typography.headline_s,
+  color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
   textAlign: props.isOridnalTx ? 'center' : 'left',
 }));
@@ -166,8 +167,8 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
-  const { btcAddress, selectedAccount, seedPhrase, network, btcFiatRate, feeMultipliers } =
-    useWalletSelector();
+  const { btcAddress, selectedAccount, network, btcFiatRate, feeMultipliers } = useWalletSelector();
+  const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
@@ -182,11 +183,12 @@ function ConfirmBtcTransactionComponent({
     SignedBtcTx,
     ResponseError,
     {
-      recipients: Recipient[];
+      txRecipients: Recipient[];
       txFee: string;
+      seedPhrase: string;
     }
   >({
-    mutationFn: async ({ recipients: newRecipients, txFee }) =>
+    mutationFn: async ({ txRecipients: newRecipients, txFee, seedPhrase }) =>
       signBtcTransaction(
         newRecipients,
         btcAddress,
@@ -197,13 +199,23 @@ function ConfirmBtcTransactionComponent({
       ),
   });
 
+  if (typeof feePerVByte !== 'string' && !BigNumber.isBigNumber(feePerVByte)) {
+    Object.setPrototypeOf(feePerVByte, BigNumber.prototype);
+  }
+
+  recipients.forEach((recipient) => {
+    if (typeof recipient.amountSats !== 'string' && !BigNumber.isBigNumber(recipient.amountSats)) {
+      Object.setPrototypeOf(recipient.amountSats, BigNumber.prototype);
+    }
+  });
+
   const {
     isLoading: isLoadingNonOrdinalBtcSend,
     error: errorSigningNonOrdial,
     data: signedNonOrdinalBtcSend,
     mutate: mutateSignNonOrdinalBtcTransaction,
-  } = useMutation<SignedBtcTx, ResponseError, string>({
-    mutationFn: async (txFee) => {
+  } = useMutation<SignedBtcTx, ResponseError, { txFee: string; seedPhrase: string }>({
+    mutationFn: async ({ txFee, seedPhrase }) => {
       const signedNonOrdinalBtcTx = await signNonOrdinalBtcSendTransaction(
         btcAddress,
         nonOrdinalUtxos!,
@@ -223,8 +235,8 @@ function ConfirmBtcTransactionComponent({
     data: ordinalData,
     error: ordinalError,
     mutate: ordinalMutate,
-  } = useMutation<SignedBtcTx, ResponseError, string>({
-    mutationFn: async (txFee) => {
+  } = useMutation<SignedBtcTx, ResponseError, { txFee: string; seedPhrase: string }>({
+    mutationFn: async ({ txFee, seedPhrase }) => {
       const ordinalsUtxos = ordinals!.map((ord) => ord.utxo);
 
       const newSignedTx = await signOrdinalSendTransaction(
@@ -259,10 +271,9 @@ function ConfirmBtcTransactionComponent({
 
   useEffect(() => {
     let sum: BigNumber = new BigNumber(0);
-    if (recipients) {
-      recipients.map((recipient) => {
+    if (recipients?.length) {
+      recipients.forEach((recipient) => {
         sum = sum.plus(recipient.amountSats);
-        return sum;
       });
       sum = sum?.plus(currentFee);
     }
@@ -296,7 +307,7 @@ function ConfirmBtcTransactionComponent({
     setShowFeeSettings(false);
   };
 
-  const onApplyClick = ({
+  const onApplyClick = async ({
     fee: modifiedFee,
     feeRate,
   }: {
@@ -305,14 +316,14 @@ function ConfirmBtcTransactionComponent({
     nonce?: string;
   }) => {
     const newFee = new BigNumber(modifiedFee);
-
     setCurrentFee(newFee);
-    setCurrentFeeRate(new BigNumber(feeRate));
-    if (ordinalTxUtxo) ordinalMutate(modifiedFee);
+    const seed = await getSeed();
+    setCurrentFeeRate(new BigNumber(feeRate ?? ''));
+    if (ordinalTxUtxo) ordinalMutate({ txFee: modifiedFee, seedPhrase: seed });
     else if (isRestoreFundFlow) {
-      mutateSignNonOrdinalBtcTransaction(modifiedFee);
+      mutateSignNonOrdinalBtcTransaction({ txFee: modifiedFee, seedPhrase: seed });
     } else {
-      mutate({ recipients, txFee: modifiedFee });
+      mutate({ txRecipients: recipients, txFee: modifiedFee, seedPhrase: seed });
     }
     setLoading(true);
   };
@@ -397,12 +408,13 @@ function ConfirmBtcTransactionComponent({
               value={assetDetail!}
               valueDetail={assetDetailValue}
               icon={AssetIcon}
-              currencyType={currencyType ? currencyType : 'Ordinal'}
+              currencyType={currencyType || 'Ordinal'}
               title={t('CONFIRM_TRANSACTION.ASSET')}
             />
           ) : (
             recipients?.map((recipient, index) => (
               <RecipientComponent
+                key={recipient.address}
                 recipientIndex={index + 1}
                 address={recipient.address}
                 value={satsToBtc(recipient.amountSats).toString()}

@@ -1,6 +1,6 @@
-import styled, { useTheme } from 'styled-components';
 import TickIcon from '@assets/img/settings/tick.svg';
-import { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
+import type { SettingsNetwork } from '@secretkeylabs/xverse-core';
+import styled, { useTheme } from 'styled-components';
 
 interface TitleProps {
   color: string;
@@ -41,9 +41,7 @@ function NetworkRow({ network, isSelected, onNetworkSelected, showDivider }: Pro
 
   return (
     <Button onClick={onClick} border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}>
-      <Text color={isSelected ? theme.colors.white['0'] : theme.colors.white['200']}>
-        {network.type}
-      </Text>
+      <Text color={isSelected ? theme.colors.white_0 : theme.colors.white_200}>{network.type}</Text>
       {isSelected && <img src={TickIcon} alt="tick" />}
     </Button>
   );

@@ -5,7 +5,7 @@ import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
-import Swap from '@assets/img/dashboard/swap.svg';
+import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -25,7 +25,7 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import { CurrencyTypes } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
@@ -88,7 +88,7 @@ const Button = styled.button((props) => ({
 const ButtonText = styled.div((props) => ({
   ...props.theme.body_xs,
   fontWeight: 700,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -193,6 +193,7 @@ function Home() {
     showBtcReceiveAlert,
     showOrdinalReceiveAlert,
     showDataCollectionAlert,
+    network,
   } = useWalletSelector();
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
@@ -434,7 +435,7 @@ function Home() {
     dispatch(changeShowDataCollectionAlertAction(false));
   };
 
-  const showSwaps = !isLedgerAccount(selectedAccount);
+  const showSwaps = !isLedgerAccount(selectedAccount) && network.type !== 'Testnet';
 
   return (
     <>
@@ -466,7 +467,7 @@ function Home() {
             text={t('RECEIVE')}
             onPress={onReceiveModalOpen}
           />
-          {showSwaps && <SquareButton src={Swap} text={t('SWAP')} onPress={onSwapPressed} />}
+          {showSwaps && <SquareButton src={ArrowSwap} text={t('SWAP')} onPress={onSwapPressed} />}
           <SquareButton
             icon={<Plus weight="regular" size="20" />}
             text={t('BUY')}

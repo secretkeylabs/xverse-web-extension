@@ -1,24 +1,24 @@
-import BigNumber from 'bignumber.js';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import useDebounce from '@hooks/useDebounce';
+import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
 import {
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core/currency';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { NumericFormat } from 'react-number-format';
 import {
   getBtcFees,
   getBtcFeesForNonOrdinalBtcSend,
   getBtcFeesForOrdinalSend,
   Recipient,
 } from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
-import useDebounce from '@hooks/useDebounce';
-import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import BigNumber from 'bignumber.js';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -30,12 +30,12 @@ const Container = styled.div((props) => ({
 
 const FiatAmountText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 const DetailText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(8),
 }));
 
@@ -54,9 +54,9 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(6),
   border: `1px solid ${
-    props.withError ? props.theme.colors.feedback.error : props.theme.colors.background.elevation6
+    props.withError ? props.theme.colors.feedback.error : props.theme.colors.elevation6
   }`,
-  backgroundColor: props.theme.colors.background.elevation1,
+  backgroundColor: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(1),
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
@@ -67,7 +67,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
 const InputField = styled.input((props) => ({
   ...props.theme.body_m,
   backgroundColor: 'transparent',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   border: 'transparent',
   width: '50%',
   '&::-webkit-outer-spin-button': {
@@ -85,12 +85,12 @@ const InputField = styled.input((props) => ({
 
 const FeeText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const SubText = styled.h1((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
 }));
 
 interface ButtonProps {
@@ -100,13 +100,9 @@ interface ButtonProps {
 }
 const FeeButton = styled.button<ButtonProps>((props) => ({
   ...props.theme.body_medium_m,
-  color: `${
-    props.isSelected ? props.theme.colors.background.elevation2 : props.theme.colors.white['400']
-  }`,
+  color: `${props.isSelected ? props.theme.colors.elevation2 : props.theme.colors.white_400}`,
   background: `${props.isSelected ? props.theme.colors.white : 'transparent'}`,
-  border: `1px solid ${
-    props.isSelected ? 'transparent' : props.theme.colors.background.elevation6
-  }`,
+  border: `1px solid ${props.isSelected ? 'transparent' : props.theme.colors.elevation6}`,
   borderRadius: 40,
   width: props.isBtc ? 104 : 82,
   height: 40,
@@ -233,7 +229,7 @@ function EditFee({
             btcAddress,
             nonOrdinalUtxos!,
             ordinalsAddress,
-            'Mainnet',
+            network.type,
             mode,
           );
           setFeeRateInput(selectedFeeRate?.toString() || '');
@@ -292,7 +288,7 @@ function EditFee({
             btcAddress,
             nonOrdinalUtxos!,
             ordinalsAddress,
-            'Mainnet',
+            network.type,
             feeMode,
             feeRateInput,
           );

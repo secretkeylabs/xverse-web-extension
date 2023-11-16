@@ -1,11 +1,11 @@
-import styled, { useTheme } from 'styled-components';
-import { FacebookShareButton, TwitterShareButton, EmailShareButton } from 'react-share';
-import { useTranslation } from 'react-i18next';
-import FBIcon from '@assets/img/nftDashboard/shareNft/facebook-f.svg';
+import Cross from '@assets/img/dashboard/X.svg';
 import EmailIcon from '@assets/img/nftDashboard/shareNft/Envelope.svg';
+import FBIcon from '@assets/img/nftDashboard/shareNft/facebook-f.svg';
 import LinkIcon from '@assets/img/nftDashboard/shareNft/Link.svg';
 import TwitterIcon from '@assets/img/nftDashboard/shareNft/Vector.svg';
-import Cross from '@assets/img/dashboard/X.svg';
+import { useTranslation } from 'react-i18next';
+import { EmailShareButton, FacebookShareButton, TwitterShareButton } from 'react-share';
+import styled, { useTheme } from 'styled-components';
 import ShareLinkRow from './shareLinkRow';
 
 const Container = styled.button((props) => ({
@@ -18,7 +18,7 @@ const Container = styled.button((props) => ({
   paddingBottom: props.theme.spacing(4),
   borderRadius: 12,
   width: 220,
-  background: props.theme.colors.background.elevation2,
+  background: props.theme.colors.elevation2,
 }));
 
 const CrossContainer = styled.button(() => ({
@@ -59,7 +59,7 @@ function ShareDialog({ url, onCrossClick }: Props) {
       <ShareLinkRow
         onClick={onCopyPress}
         img={LinkIcon}
-        background={theme.colors.white['400']}
+        background={theme.colors.white_400}
         text={t('COPY')}
       />
     </Container>

@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import { animated } from '@react-spring/web';
+import styled from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
@@ -37,7 +37,7 @@ export const SelectAssetTitle = styled.h1((props) => ({
 
 export const SelectAssetText = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 
@@ -80,7 +80,7 @@ export const CopyContainer = styled.div((props) => ({
 export const QRCodeContainer = styled.div((props) => ({
   display: 'flex',
   aspectRatio: 1,
-  backgroundColor: props.theme.colors.white['0'],
+  backgroundColor: props.theme.colors.white_0,
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),

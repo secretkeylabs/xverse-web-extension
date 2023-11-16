@@ -1,17 +1,20 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.21.0",
+  "version": "0.22.1",
   "private": true,
+  "engines": {
+    "node": "^18.18.2"
+  },
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "1.9.1",
+    "@secretkeylabs/xverse-core": "2.3.0",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
-    "@stacks/stacks-blockchain-api-types": "^6.1.1",
-    "@stacks/transactions": "^4.3.8",
+    "@stacks/stacks-blockchain-api-types": "6.1.1",
+    "@stacks/transactions": "4.3.8",
     "@tanstack/query-sync-storage-persister": "^4.29.1",
     "@tanstack/react-query": "^4.29.3",
     "@tanstack/react-query-devtools": "^4.29.3",
@@ -86,14 +89,17 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "prettier --write",
-      "eslint"
+      "eslint",
+      "tsc-files --noEmit src/styled.d.ts src/react-app-env.d.ts"
     ],
     "*.json": [
       "prettier --write"
     ]
   },
   "devDependencies": {
-    "@babel/preset-react": "^7.18.6",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@tanstack/eslint-plugin-query": "^4.29.4",
     "@types/argon2-browser": "^1.18.1",
@@ -108,11 +114,10 @@
     "@types/zxcvbn": "^4.4.1",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
-    "babel-core": "^6.26.3",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^27.5.1",
     "babel-loader": "^8.2.5",
     "babel-plugin-styled-components": "^2.0.7",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
     "base64-loader": "^1.0.0",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^11.0.0",
@@ -145,6 +150,7 @@
     "terser-webpack-plugin": "^5.3.6",
     "ts-jest": "^27.0.5",
     "ts-loader": "^8.4.0",
+    "tsc-files": "^1.1.4",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "type-fest": "^2.19.0",
     "typescript": "^4.8.2",

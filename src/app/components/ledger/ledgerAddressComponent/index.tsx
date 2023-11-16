@@ -1,6 +1,6 @@
-import styled from 'styled-components';
-import { Tooltip } from 'react-tooltip';
 import { useState } from 'react';
+import { Tooltip } from 'react-tooltip';
+import styled from 'styled-components';
 
 import copyIcon from '@assets/img/Copy.svg';
 
@@ -17,7 +17,7 @@ const AddressComponent = styled.p({
 
 const AddressComponentTitle = styled.p((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white[200],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(2),
 }));
 

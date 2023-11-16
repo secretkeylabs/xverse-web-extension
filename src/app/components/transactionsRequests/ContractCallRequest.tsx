@@ -1,13 +1,21 @@
-import SwapImage from '@assets/img/webInteractions/swapCall.svg';
-import BNSImage from '@assets/img/webInteractions/bnsCall.svg';
-import NFTImage from '@assets/img/webInteractions/nftCall.svg';
-import ContractCall from '@assets/img/webInteractions/contractCall.svg';
-import { ContractCallPayload } from '@stacks/connect';
-import styled from 'styled-components';
+import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import InfoContainer from '@components/infoContainer';
+import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
+import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
-import { createContext, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useNetworkSelector from '@hooks/useNetwork';
+import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import {
+  addressToString,
+  Args,
+  broadcastSignedTransaction,
+  Coin,
+  ContractFunction,
+  extractFromPayload,
+} from '@secretkeylabs/xverse-core';
+import { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,
   cvToJSON,
@@ -16,21 +24,10 @@ import {
   SomeCV,
   StacksTransaction,
 } from '@stacks/transactions';
-import {
-  addressToString,
-  broadcastSignedTransaction,
-  Coin,
-  extractFromPayload,
-} from '@secretkeylabs/xverse-core';
+import { createContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
-import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
-import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
-import AccountHeaderComponent from '@components/accountHeader';
-import useOnOriginTabClose from '@hooks/useOnTabClosed';
-import InfoContainer from '@components/infoContainer';
-import useNetworkSelector from '@hooks/useNetwork';
-import TransactionDetailComponent from '@components/transactionDetailComponent';
+import styled from 'styled-components';
 import finalizeTxSignature from './utils';
 
 const PostConditionContainer = styled.div((props) => ({
@@ -38,17 +35,19 @@ const PostConditionContainer = styled.div((props) => ({
   paddingTop: props.theme.spacing(12),
   paddingBottom: props.theme.spacing(12),
   marginBottom: props.theme.spacing(12),
-  borderTop: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  borderBottom: `0.5px solid ${props.theme.colors.background.elevation3}`,
+  borderTop: `0.5px solid ${props.theme.colors.elevation3}`,
+  borderBottom: `0.5px solid ${props.theme.colors.elevation3}`,
   flexDirection: 'column',
 }));
+
 const SponsoredContainer = styled.div({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
 });
+
 const SponsoredTag = styled.div((props) => ({
-  background: props.theme.colors.background.elevation3,
+  background: props.theme.colors.elevation3,
   marginTop: props.theme.spacing(7.5),
   paddingTop: props.theme.spacing(4),
   paddingBottom: props.theme.spacing(4),
@@ -56,66 +55,15 @@ const SponsoredTag = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
   borderRadius: 30,
 }));
+
 const SponosredText = styled.h1((props) => ({
   ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
+
 const PostConditionAlertText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
-  color: props.theme.colors.white['0'],
-}));
-
-const Line = styled.div((props) => ({
-  position: 'absolute',
-  width: '100%',
-  border: `0.5px solid ${props.theme.colors.background.elevation3}`,
-  marginTop: props.theme.spacing(8),
-}));
-
-const ButtonContainer = styled.div({
-  position: 'absolute',
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
-const ShowMoreButton = styled.button((props) => ({
-  position: 'relative',
-  paddingLeft: props.theme.spacing(4),
-  paddingRight: props.theme.spacing(4),
-  paddingTop: props.theme.spacing(2),
-  paddingBottom: props.theme.spacing(2),
-  backgroundColor: '#12151E',
-  borderRadius: 24,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  flexDirection: 'row',
-  border: `1px solid ${props.theme.colors.background.elevation3}`,
-}));
-
-const ShowMoreButtonContainer = styled.div((props) => ({
-  position: 'relative',
-  width: '100%',
-  marginTop: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(12),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 700,
-  marginLeft: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
-const ButtonSymbolText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  marginLeft: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-  fontSize: 20,
+  color: props.theme.colors.white_0,
 }));
 
 interface ContractCallRequestProps {
@@ -136,7 +84,6 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
-  const [isShowMore, setIsShowMore] = useState(false);
 
   useOnOriginTabClose(tabId, () => {
     setHasTabClosed(true);
@@ -145,38 +92,40 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
 
   type ArgToView = { name: string; value: string; type: any };
   const getFunctionArgs = (): Array<ArgToView> => {
-    const args: Array<ArgToView> = [];
     const { funcArgs } = extractFromPayload(request);
-    funcMetaData?.args?.map((arg: Args, index: number) => {
-      const funcArg = cvToJSON(funcArgs[index]);
+    const args: Array<ArgToView> = funcMetaData?.args
+      ? funcMetaData?.args?.map((arg: Args, index: number) => {
+          const funcArg = cvToJSON(funcArgs[index]);
 
-      const argTypeIsOptionalSome = funcArgs[index].type === ClarityType.OptionalSome;
+          const argTypeIsOptionalSome = funcArgs[index].type === ClarityType.OptionalSome;
 
-      const funcArgType = argTypeIsOptionalSome
-        ? (funcArgs[index] as SomeCV).value?.type
-        : funcArgs[index]?.type;
+          const funcArgType = argTypeIsOptionalSome
+            ? (funcArgs[index] as SomeCV).value?.type
+            : funcArgs[index]?.type;
 
-      const funcArgValString = argTypeIsOptionalSome
-        ? cvToString((funcArgs[index] as SomeCV).value, 'tryAscii')
-        : cvToString(funcArgs[index]);
+          const funcArgValString = argTypeIsOptionalSome
+            ? cvToString((funcArgs[index] as SomeCV).value, 'tryAscii')
+            : cvToString(funcArgs[index]);
 
-      const normalizedValue = (() => {
-        switch (funcArgType) {
-          case ClarityType.UInt:
-            return funcArgValString.split('u').join('');
-          case ClarityType.Buffer:
-            return funcArgValString.substring(1, funcArgValString.length - 1);
-          default:
-            return funcArgValString;
-        }
-      })();
-      const argToView: ArgToView = {
-        name: arg.name,
-        value: normalizedValue,
-        type: funcArg.type,
-      };
-      args.push(argToView);
-    });
+          const normalizedValue = (() => {
+            switch (funcArgType) {
+              case ClarityType.UInt:
+                return funcArgValString.split('u').join('');
+              case ClarityType.Buffer:
+                return funcArgValString.substring(1, funcArgValString.length - 1);
+              default:
+                return funcArgValString;
+            }
+          })();
+          const argToView: ArgToView = {
+            name: arg.name,
+            value: normalizedValue,
+            type: funcArg.type,
+          };
+
+          return argToView;
+        })
+      : [];
     return args;
   };
 
@@ -270,26 +219,27 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const renderPostConditionsCard = () => {
     const { postConds } = extractFromPayload(request);
     return postConds?.map((postCondition, i) => {
+      const key = `${postCondition.conditionType}-${i}`;
+
       switch (postCondition.conditionType) {
         case PostConditionType.STX:
-          return <StxPostConditionCard key={i} postCondition={postCondition} />;
+          return <StxPostConditionCard key={key} postCondition={postCondition} />;
         case PostConditionType.Fungible:
-          const coinInfo = coinsMetaData?.find(
-            (coin: Coin) =>
-              coin.contract ===
-              `${addressToString(postCondition.assetInfo.address)}.${
-                postCondition.assetInfo.contractName.content
-              }`,
-          );
           return (
             <FtPostConditionCard
-              key={i}
+              key={key}
               postCondition={postCondition}
-              ftMetaData={coinInfo}
+              ftMetaData={coinsMetaData?.find(
+                (coin: Coin) =>
+                  coin.contract ===
+                  `${addressToString(postCondition.assetInfo.address)}.${
+                    postCondition.assetInfo.contractName.content
+                  }`,
+              )}
             />
           );
         case PostConditionType.NonFungible:
-          return <NftPostConditionCard key={i} postCondition={postCondition} />;
+          return <NftPostConditionCard key={key} postCondition={postCondition} />;
         default:
           return '';
       }

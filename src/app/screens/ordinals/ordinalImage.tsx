@@ -2,6 +2,7 @@ import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { BetterBarLoader } from '@components/barLoader';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { CondensedInscription, getErc721Metadata, Inscription } from '@secretkeylabs/xverse-core';
 import { getBrc20Details } from '@utils/brc20';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
@@ -62,9 +63,9 @@ const OrdinalsTag = styled.div((props) => ({
 }));
 
 const Text = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   textTransform: 'uppercase',
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   fontSize: 10,
   marginLeft: props.theme.spacing(4),
 }));
@@ -97,8 +98,8 @@ const OrdinalContentText = styled.p<TextProps>((props) => {
     fontSize = '15px';
   }
   return {
-    ...props.theme.body_medium_m,
-    color: props.theme.colors.white[0],
+    ...props.theme.typography.body_medium_m,
+    color: props.theme.colors.white_0,
     fontSize,
     overflow: 'hidden',
     textAlign: 'center',
@@ -146,35 +147,37 @@ function OrdinalImage({
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const [brc721eImage, setBrc721eImage] = useState<string | undefined>(undefined);
-
-  const fetchBrc721eMetadata = async () => {
-    if (!textContent) {
-      return;
-    }
-
-    try {
-      const parsedContent = JSON.parse(textContent);
-      const erc721Metadata = await getErc721Metadata(
-        parsedContent.contract,
-        parsedContent.token_id,
-      );
-
-      const url = getFetchableUrl(erc721Metadata, 'ipfs');
-
-      if (url) {
-        const ipfsMetadata = await (await fetch(url)).json();
-        setBrc721eImage(getFetchableUrl(ipfsMetadata.image, 'ipfs'));
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const { network } = useWalletSelector();
 
   useEffect(() => {
+    const fetchBrc721eMetadata = async () => {
+      if (!textContent) {
+        return;
+      }
+
+      try {
+        const parsedContent = JSON.parse(textContent);
+        const erc721Metadata = await getErc721Metadata(
+          network.type,
+          parsedContent.contract,
+          parsedContent.token_id,
+        );
+
+        const url = getFetchableUrl(erc721Metadata, 'ipfs');
+
+        if (url) {
+          const ipfsMetadata = await (await fetch(url)).json();
+          setBrc721eImage(getFetchableUrl(ipfsMetadata.image, 'ipfs'));
+        }
+      } catch (e) {
+        console.error(e); // eslint-disable-line no-console
+      }
+    };
+
     if (textContent?.includes('brc-721e')) {
       fetchBrc721eMetadata();
     }
-  }, [textContent]);
+  }, [textContent, network.type]);
 
   let loaderSize = 151;
   if (inNftDetail && isGalleryOpen) {
@@ -187,12 +190,14 @@ function OrdinalImage({
     <ImageContainer>
       <StyledImage
         width="100%"
+        height="100%"
         placeholder={
           <LoaderContainer>
             <StyledBarLoader width={loaderSize} height={loaderSize} />
           </LoaderContainer>
         }
         src={src}
+        preview={false}
       />
       {isNftDashboard && (
         <OrdinalsTag>
@@ -211,11 +216,14 @@ function OrdinalImage({
   );
 
   if (contentType.includes('image/svg')) {
-    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL}/thumbnail/${ordinal.id}`);
+    return renderImage(
+      t('ORDINAL'),
+      `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`,
+    );
   }
 
   if (contentType.includes('image')) {
-    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL}/content/${ordinal.id}`);
+    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/content/${ordinal.id}`);
   }
 
   if (textContent?.includes('brc-721e')) {
@@ -246,7 +254,10 @@ function OrdinalImage({
     if (contentType.includes('html')) {
       return (
         <ImageContainer inNftDetail={inNftDetail}>
-          <FillImg src={`${XVERSE_ORDIVIEW_URL}/thumbnail/${ordinal.id}`} alt="/html/" />
+          <FillImg
+            src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`}
+            alt="/html/"
+          />
           {isNftDashboard && (
             <OrdinalsTag>
               <ButtonIcon src={OrdinalsIcon} />
