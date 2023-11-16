@@ -8,6 +8,7 @@ import {
   microstacksToStx,
   setNonce,
 } from '@secretkeylabs/xverse-core';
+import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
 import { AlexSDK, Currency } from 'alex-sdk';
 import BigNumber from 'bignumber.js';
@@ -278,7 +279,7 @@ export function useSwap(): UseSwap {
               txFeeAmount: fee,
               txFeeFiatAmount: currencyToToken(Currency.STX, fee)?.fiatAmount,
               routers: info.route.map(currencyToToken).filter(isNotNull),
-              unsignedTx: unsignedTx.serialize().toString('hex'),
+              unsignedTx: buf2hex(unsignedTx.serialize()),
               functionName: `${tx.contractName}\n${tx.functionName}`,
               userOverrideSponsorValue,
             };

@@ -14,14 +14,15 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  addressToString,
-  broadcastSignedTransaction,
-  getStxFiatEquivalent,
-  isMultiSig,
-  microstacksToStx,
-  StacksTransaction,
-  TokenTransferPayload,
+addressToString,
+broadcastSignedTransaction,
+getStxFiatEquivalent,
+isMultiSig,
+microstacksToStx,
+StacksTransaction,
+TokenTransferPayload
 } from '@secretkeylabs/xverse-core';
+import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { deserializeTransaction, MultiSigSpendingCondition } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
@@ -57,6 +58,7 @@ function ConfirmStxTransaction() {
 
   // SignTransaction Params
   const isMultiSigTx = isMultiSig(unsignedTx);
+  console.log('🚀 ~ file: index.tsx:60 ~ ConfirmStxTransaction ~ isMultiSigTx:', isMultiSigTx);
   const hasSignatures =
     isMultiSigTx &&
     (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0;
@@ -161,9 +163,8 @@ function ConfirmStxTransaction() {
       navigate('/confirm-ledger-tx', { state });
       return;
     }
-    const rawTx = txs[0].serialize().toString();
+    const rawTx = buf2hex(txs[0].serialize());
     setTxRaw(rawTx);
-
     if (isMultiSigTx && isBrowserTx) {
       finalizeTxSignature({
         requestPayload: requestToken,

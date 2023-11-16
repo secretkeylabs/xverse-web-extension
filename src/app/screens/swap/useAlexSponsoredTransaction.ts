@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { StacksTransaction } from '@secretkeylabs/xverse-core';
-import { AlexSDK } from 'alex-sdk';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { StacksTransaction } from '@secretkeylabs/xverse-core';
+import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
+import { useQuery } from '@tanstack/react-query';
+import { AlexSDK } from 'alex-sdk';
+import { useEffect, useRef, useState } from 'react';
 
 const useAlexSponsorSwapEnabledQuery = (alexSDK: AlexSDK) =>
   useQuery({
@@ -24,7 +25,7 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
   }, [isEnabled, error, isLoading]);
 
   const sponsorTransaction = async (signed: StacksTransaction) =>
-    alexSDK.broadcastSponsoredTx(signed.serialize().toString('hex'));
+    alexSDK.broadcastSponsoredTx(buf2hex(signed.serialize()));
 
   const { data: stxPendingTxData } = useStxPendingTxData();
   const upcomingPendingTransactionNonce =

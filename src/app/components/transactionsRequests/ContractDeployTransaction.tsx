@@ -7,6 +7,7 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
+import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { PostCondition, StacksTransaction } from '@stacks/transactions';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -124,7 +125,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') },
+          data: { txId: broadcastResult, txRaw: buf2hex(tx[0].serialize()) },
         });
         navigate('/tx-status', {
           state: {

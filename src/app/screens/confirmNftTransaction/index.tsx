@@ -1,5 +1,5 @@
 import AssetIcon from '@assets/img/transactions/Assets.svg';
-import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import { ConfirmStxTransactionState,LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import RecipientComponent from '@components/recipientComponent';
@@ -20,7 +20,7 @@ import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation,useNavigate,useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 const ScrollContainer = styled.div`
@@ -121,7 +121,7 @@ function ConfirmNftTransaction() {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
       const state: ConfirmStxTransactionState = {
-        unsignedTx: unsignedTx.serialize(),
+        unsignedTx: Buffer.from(unsignedTx.serialize()),
         type,
         recipients: [
           {

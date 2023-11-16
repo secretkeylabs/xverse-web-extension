@@ -13,6 +13,7 @@ import {
   getContractCallPromises,
   getTokenTransferRequest,
 } from '@secretkeylabs/xverse-core';
+import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
 import { StacksTransaction } from '@stacks/transactions';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';
@@ -58,7 +59,7 @@ function TransactionRequest() {
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
       state: {
-        unsignedTx: unsignedSendStxTx.serialize().toString(),
+        unsignedTx: buf2hex(unsignedSendStxTx.serialize()),
         sponsored: tokenTransferPayload.sponsored,
         isBrowserTx: true,
         tabId,
@@ -147,15 +148,11 @@ function TransactionRequest() {
   };
 
   const handleTxSigningRequest = async () => {
-    console.log(payload);
     if (payload.txType === 'contract_call') {
       await handleContractCallRequest(payload);
-      console.log('first');
     } else if (payload.txType === 'smart_contract') {
       await handleContractDeployRequest(payload);
-      console.log('second');
     } else {
-      console.log('default');
       navigate('/confirm-stx-tx', {
         state: {
           unsignedTx: payload.txHex,

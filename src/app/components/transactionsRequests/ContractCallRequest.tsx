@@ -8,13 +8,14 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import {
-  addressToString,
-  Args,
-  broadcastSignedTransaction,
-  Coin,
-  ContractFunction,
-  extractFromPayload,
+addressToString,
+Args,
+broadcastSignedTransaction,
+Coin,
+ContractFunction,
+extractFromPayload
 } from '@secretkeylabs/xverse-core';
+import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,
@@ -176,7 +177,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') },
+          data: { txId: broadcastResult, txRaw: buf2hex(tx[0].serialize()) },
         });
         navigate('/tx-status', {
           state: {

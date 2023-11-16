@@ -1,4 +1,4 @@
-import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import { ConfirmStxTransactionState,LedgerTransactionType } from '@common/types/ledger';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import RecipientComponent from '@components/recipientComponent';
@@ -16,7 +16,7 @@ import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 
 function ConfirmFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -68,7 +68,7 @@ function ConfirmFtTransaction() {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
       const state: ConfirmStxTransactionState = {
-        unsignedTx: unsignedTx.serialize(),
+        unsignedTx: Buffer.from(unsignedTx.serialize()),
         type,
         recipients: [{ address: recepientAddress, amountMicrostacks: new BigNumber(amount) }],
         fee: new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),

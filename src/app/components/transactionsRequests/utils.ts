@@ -1,8 +1,8 @@
 import {
-  ExternalMethods,
-  MESSAGE_SOURCE,
-  TransactionResponseMessage,
-  TxResult,
+ExternalMethods,
+MESSAGE_SOURCE,
+TransactionResponseMessage,
+TxResult
 } from '@common/types/message-types';
 
 interface FormatTxSignatureResponseArgs {
@@ -36,6 +36,7 @@ export default function finalizeTxSignature({
 }: FinalizeTxSignatureArgs) {
   try {
     const responseMessage = formatTxSignatureResponse({ payload: requestPayload, response: data });
+    console.log('🚀 ~ file: utils.ts:39 ~ responseMessage:', responseMessage);
     chrome.tabs.sendMessage(tabId, responseMessage);
   } catch (e) {
     console.log(e);

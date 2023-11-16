@@ -12,12 +12,13 @@ import NftImage from '@screens/nftDashboard/nftImage';
 import { validateStxAddress } from '@secretkeylabs/xverse-core';
 import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
 import {
-  cvToHex,
-  StacksTransaction,
-  uintCV,
-  UnsignedStacksTransation,
+cvToHex,
+StacksTransaction,
+uintCV,
+UnsignedStacksTransation
 } from '@secretkeylabs/xverse-core/types';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { useMutation } from '@tanstack/react-query';
 import { checkNftExists, isLedgerAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
@@ -165,7 +166,7 @@ function SendNft() {
     if (data) {
       navigate(`/confirm-nft-tx/${id}`, {
         state: {
-          unsignedTx: data.serialize().toString('hex'),
+          unsignedTx: buf2hex(data.serialize()),
           recipientAddress,
         },
       });
