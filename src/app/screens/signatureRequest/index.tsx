@@ -20,8 +20,8 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
+import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
-import { bytesToHex } from '@stacks/transactions';
 import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
 import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';
 import { useCallback, useEffect, useState } from 'react';
@@ -342,7 +342,7 @@ function SignatureRequest(): JSX.Element {
 
   const getMessageHash = useCallback(() => {
     if (!isSignMessageBip322) {
-      return bytesToHex(hashMessage(payload.message));
+      return buf2hex(hashMessage(payload.message));
     }
     return bip0322Hash(payload.message);
   }, [isSignMessageBip322, payload.message]);

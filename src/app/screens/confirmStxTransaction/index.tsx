@@ -1,5 +1,5 @@
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import { ConfirmStxTransactionState,LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
@@ -13,12 +13,15 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
 import {
   addressToString,
   broadcastSignedTransaction,
-} from '@secretkeylabs/xverse-core/transactions';
-import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
+  getStxFiatEquivalent,
+  isMultiSig,
+  microstacksToStx,
+  StacksTransaction,
+  TokenTransferPayload,
+} from '@secretkeylabs/xverse-core';
 import { deserializeTransaction, MultiSigSpendingCondition } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
@@ -44,26 +47,25 @@ function ConfirmStxTransaction() {
   const [txRaw, setTxRaw] = useState('');
   const [memo, setMemo] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
   const selectedNetwork = useNetworkSelector();
-  const {
-    unsignedTx: stringHex,
-    sponsored,
-    isBrowserTx,
-    tabId,
-    requestToken,
-    isMultiSig,
-  } = location.state;
+  const { stxBtcRate, btcFiatRate, network, selectedAccount } = useWalletSelector();
+  const { refetch } = useStxWalletData();
+
+  const location = useLocation();
+  const { unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken } = location.state;
   const unsignedTx = deserializeTransaction(stringHex);
+
+  // SignTransaction Params
+  const isMultiSigTx = isMultiSig(unsignedTx);
   const hasSignatures =
-    isMultiSig &&
+    isMultiSigTx &&
     (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0;
+
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
-  const { stxBtcRate, btcFiatRate, network, selectedAccount } = useWalletSelector();
-  const { refetch } = useStxWalletData();
+
   const {
     isLoading,
     error: txError,
@@ -150,7 +152,7 @@ function ConfirmStxTransaction() {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
       const state: ConfirmStxTransactionState = {
-        unsignedTx: unsignedTx.serialize(),
+        unsignedTx: Buffer.from(unsignedTx.serialize()),
         type,
         recipients: [{ address: recipient, amountMicrostacks: amount }],
         fee,
@@ -159,13 +161,14 @@ function ConfirmStxTransaction() {
       navigate('/confirm-ledger-tx', { state });
       return;
     }
-    const rawTx = txs[0].serialize().toString('hex');
+    const rawTx = txs[0].serialize().toString();
     setTxRaw(rawTx);
 
-    if (isMultiSig && isBrowserTx) {
+    if (isMultiSigTx && isBrowserTx) {
       finalizeTxSignature({
         requestPayload: requestToken,
         tabId: Number(tabId),
+        // No TxId since the tx was not broadcasted
         data: { txId: '', txRaw: rawTx },
       });
       window.close();

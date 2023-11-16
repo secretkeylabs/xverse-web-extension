@@ -24,6 +24,7 @@ import {
   SomeCV,
   StacksTransaction,
 } from '@stacks/transactions';
+import { nanoid } from 'nanoid';
 import { createContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -136,6 +137,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
     const args = getFunctionArgs();
     return args.map((arg, index) => (
       <TransactionDetailComponent
+        key={nanoid()}
         title={arg.name}
         value={arg.value.length > 20 ? truncateFunctionArgsView(arg.value) : arg.value}
         description={arg.type}

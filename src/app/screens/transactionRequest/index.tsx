@@ -2,7 +2,7 @@ import ContractCallRequest from '@components/transactionsRequests/ContractCallRe
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
-import useDappRequest from '@hooks/useTransationRequest';
+import useStxTransactionRequest from '@hooks/useStxTransactionRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -10,14 +10,16 @@ import {
   ContractFunction,
   createDeployContractRequest,
   extractFromPayload,
+  getContractCallPromises,
+  getTokenTransferRequest,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction, StacksTransaction } from '@stacks/transactions';
+import { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
+import { StacksTransaction } from '@stacks/transactions';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
-import { getContractCallPromises, getTokenTransferRequest, isMultiSig } from './helper';
 
 const LoaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -28,13 +30,13 @@ const LoaderContainer = styled.div((props) => ({
 }));
 
 function TransactionRequest() {
-  const { payload, tabId, requestToken } = useDappRequest();
-  const navigate = useNavigate();
   const { stxAddress, network, stxPublicKey, feeMultipliers, accountsList, selectedAccount } =
     useWalletSelector();
+  const { payload, tabId, requestToken } = useStxTransactionRequest();
+  const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const { switchAccount } = useWalletReducer();
-  const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>();
+  const [unsignedTx, setUnsignedTx] = useState<StacksTransaction | null>(null);
   const [funcMetaData, setFuncMetaData] = useState<ContractFunction | undefined>(undefined);
   const [coinsMetaData, setCoinsMetaData] = useState<Coin[] | null>(null);
   const [codeBody, setCodeBody] = useState(undefined);
@@ -43,11 +45,11 @@ function TransactionRequest() {
   const [hasSwitchedAccount, setHasSwitchedAccount] = useState(false);
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
 
-  const handleTokenTransferRequest = async () => {
+  const handleTokenTransferRequest = async (tokenTransferPayload: any) => {
     const unsignedSendStxTx = await getTokenTransferRequest(
-      payload.recipient,
-      payload.amount,
-      payload.memo!,
+      tokenTransferPayload.recipient,
+      tokenTransferPayload.amount,
+      tokenTransferPayload.memo!,
       stxPublicKey,
       feeMultipliers!,
       selectedNetwork,
@@ -56,8 +58,8 @@ function TransactionRequest() {
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
       state: {
-        unsignedTx: unsignedSendStxTx.serialize().toString('hex'),
-        sponosred: payload.sponsored,
+        unsignedTx: unsignedSendStxTx.serialize().toString(),
+        sponsored: tokenTransferPayload.sponsored,
         isBrowserTx: true,
         tabId,
         requestToken,
@@ -65,22 +67,27 @@ function TransactionRequest() {
     });
   };
 
-  const handleContractCallRequest = async () => {
+  const handleContractCallRequest = async (contractCallPayload: ContractCallPayload) => {
     const {
       unSignedContractCall,
       contractInterface,
       coinsMetaData: coinMeta,
-    } = await getContractCallPromises(payload, stxAddress, selectedNetwork, stxPublicKey);
+    } = await getContractCallPromises(
+      contractCallPayload,
+      stxAddress,
+      selectedNetwork,
+      stxPublicKey,
+    );
     setUnsignedTx(unSignedContractCall);
     setCoinsMetaData(coinMeta);
     const invokedFuncMetaData: ContractFunction | undefined = contractInterface?.functions?.find(
-      (func) => func.name === payload.functionName,
+      (func) => func.name === contractCallPayload.functionName,
     );
-    const txAttachment = payload.attachment ?? undefined;
+    const txAttachment = contractCallPayload.attachment ?? undefined;
     if (txAttachment) setAttachment(txAttachment);
     if (invokedFuncMetaData) {
       setFuncMetaData(invokedFuncMetaData);
-      const { funcArgs } = extractFromPayload(payload);
+      const { funcArgs } = extractFromPayload(contractCallPayload);
       if (invokedFuncMetaData?.args.length !== funcArgs.length) {
         navigate('/tx-status', {
           state: {
@@ -94,9 +101,9 @@ function TransactionRequest() {
     }
   };
 
-  const handleContractDeployRequest = async () => {
+  const handleContractDeployRequest = async (contractDeployPayload: ContractDeployPayload) => {
     const response = await createDeployContractRequest(
-      payload,
+      contractDeployPayload,
       selectedNetwork,
       stxPublicKey,
       feeMultipliers!,
@@ -139,33 +146,41 @@ function TransactionRequest() {
     setHasSwitchedAccount(true);
   };
 
-  const handleTxSigningRequest = () => {
-    const stacksTransaction = deserializeTransaction(payload.txHex!);
-    const { hashMode } = stacksTransaction.auth.spendingCondition;
-    const isMultiSigTx = isMultiSig(hashMode);
-    navigate('/confirm-stx-tx', {
-      state: {
-        unsignedTx: payload.txHex,
-        sponosred: payload.sponsored,
-        isBrowserTx: true,
-        tabId,
-        requestToken,
-        isMultiSig: isMultiSigTx,
-      },
-    });
+  const handleTxSigningRequest = async () => {
+    console.log(payload);
+    if (payload.txType === 'contract_call') {
+      await handleContractCallRequest(payload);
+      console.log('first');
+    } else if (payload.txType === 'smart_contract') {
+      await handleContractDeployRequest(payload);
+      console.log('second');
+    } else {
+      console.log('default');
+      navigate('/confirm-stx-tx', {
+        state: {
+          unsignedTx: payload.txHex,
+          sponsored: payload.sponsored,
+          isBrowserTx: true,
+          tabId,
+          requestToken,
+        },
+      });
+    }
   };
 
   const createRequestTx = async () => {
     try {
       if (hasSwitchedAccount) {
-        if (payload.txType === 'token_transfer') {
-          await handleTokenTransferRequest();
-        } else if (payload.txType === 'contract_call') {
-          await handleContractCallRequest();
-        } else if (payload.txType === 'smart_contract') {
-          await handleContractDeployRequest();
-        } else if (payload.txHex) {
-          handleTxSigningRequest();
+        if (!payload.txHex) {
+          if (payload.txType === 'token_transfer') {
+            await handleTokenTransferRequest(payload);
+          } else if (payload.txType === 'contract_call') {
+            await handleContractCallRequest(payload);
+          } else if (payload.txType === 'smart_contract') {
+            await handleContractDeployRequest(payload);
+          }
+        } else {
+          await handleTxSigningRequest();
         }
       }
     } catch (e: unknown) {
