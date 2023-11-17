@@ -20,9 +20,8 @@ import { getBtcTxStatusUrl, isLedgerAccount } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import { EditFees } from './editFees';
 import TransactionAmount from './transactionAmount';
 import TransactionRecipient from './transactionRecipient';
 import TransactionStatusIcon from './transactionStatusIcon';
@@ -108,7 +107,6 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
   });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
@@ -223,33 +221,22 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
             <TransactionAmountContainer>
               <TransactionAmount transaction={transaction} coin={isBtc} />
               {!showAccelerateButton && (
-                <StyledButton
-                  transparent
-                  text={t('SPEED_UP')}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    setShowFeeSettings(true);
-                  }}
-                  icon={<FastForward size={16} color={theme.colors.tangerine} weight="fill" />}
-                  iconPosition="right"
-                />
+                <Link to="/speed-up-tx">
+                  <StyledButton
+                    transparent
+                    text={t('SPEED_UP')}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                    }}
+                    icon={<FastForward size={16} color={theme.colors.tangerine} weight="fill" />}
+                    iconPosition="right"
+                  />
+                </Link>
               )}
             </TransactionAmountContainer>
           </TransactionRow>
         </TransactionInfoContainer>
       </TransactionContainer>
-      {showFeeSettings && (
-        <EditFees
-          visible={showFeeSettings}
-          onClose={() => setShowFeeSettings(false)}
-          fee={'fees' in transaction ? transaction.fees.toString() : '0'}
-          initialFeeRate={'fees' in transaction ? transaction.fees.toString() : '0'}
-          onClickApply={submitTransaction}
-          onChangeFeeRate={() => {}}
-          isFeeLoading={false}
-          error=""
-        />
-      )}
 
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (

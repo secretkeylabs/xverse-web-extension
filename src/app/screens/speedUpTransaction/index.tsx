@@ -1,7 +1,7 @@
 import { BetterBarLoader } from '@components/barLoader';
 import ActionButton from '@components/button';
 import FiatAmountText from '@components/fiatAmountText';
-import UpdatedBottomModal from '@components/updatedBottomModal';
+import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
@@ -11,7 +11,15 @@ import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+
+const Title = styled.h1((props) => ({
+  ...props.theme.typography.headline_s,
+  color: props.theme.colors.white_0,
+  marginTop: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(8),
+}));
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -24,7 +32,7 @@ const Container = styled.div((props) => ({
 const DetailText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(8),
+  marginBottom: props.theme.spacing(4),
 }));
 
 // TODO create input component in ui-library
@@ -97,10 +105,9 @@ const TickerContainer = styled.div({
   flexDirection: 'column',
   alignItems: 'flex-end',
   flex: 1,
-  minHeight: 34,
 });
 
-const ApplyButtonContainer = styled.div`
+const ControlsContainer = styled.div`
   display: flex;
   column-gap: 12px;
   margin: 20px 16px 40px;
@@ -118,42 +125,47 @@ const StyledFiatAmountText = styled(FiatAmountText)((props) => ({
 const buttons = [
   {
     value: 'standard',
-    label: 'SPEED_UP_TRANSACTION_POPUP.HIGH_PRIORITY',
+    label: 'HIGH_PRIORITY',
   },
   {
     value: 'high',
-    label: 'SPEED_UP_TRANSACTION_POPUP.MED_PRIORITY',
+    label: 'MED_PRIORITY',
   },
   {
     value: 'custom',
-    label: 'SPEED_UP_TRANSACTION_POPUP.LOW_PRIORITY',
+    label: 'LOW_PRIORITY',
   },
 ];
 
 export type OnChangeFeeRate = (feeRate: string) => void;
 
-export function EditFees({
-  visible,
-  onClose,
-  onClickApply,
-  onChangeFeeRate,
-  fee,
-  initialFeeRate,
-  isFeeLoading,
-  error,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  onClickApply: OnChangeFeeRate;
-  onChangeFeeRate: OnChangeFeeRate;
-  fee: string;
-  initialFeeRate: string;
-  isFeeLoading: boolean;
-  error: string;
-}) {
-  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+function SpeedUpTransactionScreen() {
+  const {
+    onClickApply,
+    onChangeFeeRate,
+    fee,
+    initialFeeRate,
+    isFeeLoading,
+    error,
+  }: {
+    onClickApply: OnChangeFeeRate;
+    onChangeFeeRate: OnChangeFeeRate;
+    fee: string;
+    initialFeeRate: string;
+    isFeeLoading: boolean;
+    error: string;
+  } = {
+    onClickApply: () => {},
+    onChangeFeeRate: () => {},
+    fee: '',
+    initialFeeRate: '',
+    isFeeLoading: false,
+    error: '',
+  };
+  const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
   const { data: feeRates } = useBtcFeeRate();
+  const navigate = useNavigate();
 
   // save the previous state in case user clicks X without applying
   const [previousFeeRate, setPreviousFeeRate] = useState(initialFeeRate);
@@ -204,14 +216,15 @@ export function EditFees({
     }
   };
 
-  const handleClickClose = () => {
+  const handleClickCancel = () => {
     // reset state
     setFeeRateInput(previousFeeRate);
     setSelectedOption(previousSelectedOption);
-    onClose();
+
+    navigate('/coinDashboard/BTC');
   };
 
-  const handleClickApply = () => {
+  const handleClickSubmit = () => {
     // save state
     setPreviousFeeRate(feeRateInput);
     setPreviousSelectedOption(selectedOption);
@@ -220,20 +233,23 @@ export function EditFees({
 
     toast.success('Transaction fee updated');
 
-    onClose();
+    navigate('/coinDashboard/BTC');
   };
 
   const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
 
+  const handleBackButtonClick = () => {
+    navigate('/coinDashboard/BTC');
+  };
+
   return (
-    <UpdatedBottomModal
-      visible={visible}
-      header={t('SPEED_UP_TRANSACTION_POPUP.TITLE')}
-      onClose={handleClickClose}
-    >
+    <>
+      <TopRow title="" onClick={handleBackButtonClick} />
       <Container>
-        <DetailText>{t('SPEED_UP_TRANSACTION_POPUP.FEE_INFO')}</DetailText>
-        <DetailText>Initial fee: {initialFeeRate} sats /vB</DetailText>
+        <Title>{t('TITLE')}</Title>
+        <DetailText>{t('FEE_INFO')}</DetailText>
+        <DetailText>Current fee: {initialFeeRate} sats /vB</DetailText>
+        <DetailText>Estimated completion time: min</DetailText>
         <ButtonContainer>
           {buttons.map(({ value, label }) => (
             <FeeButton
@@ -279,21 +295,23 @@ export function EditFees({
           <StyledInputFeedback message={error} variant="danger" />
         </FeeContainer>
       </Container>
-      <ApplyButtonContainer>
+      <ControlsContainer>
         <ActionButton
-          text={t('SPEED_UP_TRANSACTION_POPUP.CANCEL')}
+          text={t('CANCEL')}
           processing={isFeeLoading}
           disabled={isFeeLoading || !!error}
-          onPress={handleClickClose}
+          onPress={handleClickCancel}
           transparent
         />
         <ActionButton
-          text={t('SPEED_UP_TRANSACTION_POPUP.APPLY')}
+          text={t('SUBMIT')}
           processing={isFeeLoading}
           disabled={isFeeLoading || !!error}
-          onPress={handleClickApply}
+          onPress={handleClickSubmit}
         />
-      </ApplyButtonContainer>
-    </UpdatedBottomModal>
+      </ControlsContainer>
+    </>
   );
 }
+
+export default SpeedUpTransactionScreen;
