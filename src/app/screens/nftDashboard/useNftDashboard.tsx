@@ -98,7 +98,7 @@ export const useNftDashboard = (): NftDashboardState => {
   const rareSatsQuery = useAddressRareSats();
 
   const totalInscriptions = inscriptionsQuery.data?.pages?.[0]?.total_inscriptions ?? 0;
-  const totalNfts = stacksNftsQuery.data?.pages?.[0]?.total_nfts ?? 0;
+  const totalNfts = stacksNftsQuery.data?.total_nfts ?? 0;
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
@@ -199,14 +199,11 @@ export const useNftDashboard = (): NftDashboardState => {
     return (
       <>
         <GridContainer isGalleryOpen={isGalleryOpen}>
-          {stacksNftsQuery.data?.pages
-            ?.map((page) => page?.results)
-            .flat()
-            .map((collection: StacksCollectionData) => (
-              <NftTabGridItem key={collection.collection_id} item={collection} />
-            ))}
+          {stacksNftsQuery.data?.results.map((collection: StacksCollectionData) => (
+            <NftTabGridItem key={collection.collection_id} item={collection} />
+          ))}
         </GridContainer>
-        {stacksNftsQuery.hasNextPage && (
+        {/* stacksNftsQuery.hasNextPage && (
           <LoadMoreButtonContainer>
             <ActionButton
               transparent
@@ -216,7 +213,7 @@ export const useNftDashboard = (): NftDashboardState => {
               onPress={stacksNftsQuery.fetchNextPage}
             />
           </LoadMoreButtonContainer>
-        )}
+        ) */}
       </>
     );
   }, [stacksNftsQuery, isGalleryOpen, totalNfts, t]);

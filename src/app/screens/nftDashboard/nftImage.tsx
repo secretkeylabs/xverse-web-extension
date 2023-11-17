@@ -52,7 +52,7 @@ const StyledImg = styled(Image)`
   object-fit: contain;
 `;
 interface Props {
-  metadata: TokenMetaData;
+  metadata?: TokenMetaData;
   isInCollage?: boolean;
 }
 

@@ -11,6 +11,23 @@ export const getNftsTabGridItemSubText = (collection: StacksCollectionData) =>
 export const isBnsCollection = (collectionId?: string | null): boolean =>
   collectionId === 'SP000000000000000000002Q6VF78.bns';
 
+export const getFullyQualifiedKey = ({
+  tokenId,
+  contractName,
+  contractAddress,
+}: NonFungibleToken['identifier']) =>
+  `${contractAddress}.${contractName}::${contractName}:${tokenId}`;
+
+export const getIdentifier = (fullyQualifiedKey: string): NonFungibleToken['identifier'] => {
+  const [principal, , contractName, tokenId] = fullyQualifiedKey.split(':');
+  const [contractAddress] = principal.split('.');
+  return {
+    tokenId,
+    contractName,
+    contractAddress,
+  };
+};
+
 // fully_qualified_token_id like:
 // SP1E1RNN4JZ7T6Y0JVCSY2TH4918Z590P8JAB9HZM.radboy-first-feat::radboy-first-feat:64
 export const getNftDataFromNftsCollectionData = (
@@ -27,14 +44,13 @@ export const getNftDataFromNftsCollectionData = (
   const nft = isBnsCollection(collectionId)
     ? collection?.all_nfts[0] // assume bns collections have 1 item
     : collection?.all_nfts.find(
-        (n: NonFungibleToken) => n.data?.fully_qualified_token_id === fully_qualified_token_id,
+        (n: NonFungibleToken) => getFullyQualifiedKey(n.identifier) === fully_qualified_token_id,
       );
 
   return {
     collectionId,
     collection,
     nft,
-    nftData: nft?.data,
   };
 };
 
@@ -44,6 +60,6 @@ export const getNftCollectionsGridItemId = (
 ) =>
   isBnsCollection(collectionData?.collection_id)
     ? getBnsNftName(nft)
-    : nft?.data?.token_id
-    ? `${collectionData?.collection_name} #${nft?.data?.token_id}`
+    : nft?.identifier.tokenId
+    ? `${collectionData?.collection_name} #${nft?.identifier.tokenId}`
     : `${collectionData?.collection_name}`;

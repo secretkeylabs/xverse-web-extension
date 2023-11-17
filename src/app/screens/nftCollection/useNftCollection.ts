@@ -10,10 +10,9 @@ export default function useNftCollection() {
   const { id: collectionId } = useParams();
   const { data, isLoading, error } = useStacksCollectibles();
 
-  const collectionData = data?.pages
-    ?.map((page) => page?.results)
-    .flat()
-    .find((collection) => collection.collection_id === collectionId);
+  const collectionData = data?.results.find(
+    (collection) => collection.collection_id === collectionId,
+  );
 
   const portfolioValue = collectionData?.floor_price
     ? collectionData.floor_price * collectionData.total_nft

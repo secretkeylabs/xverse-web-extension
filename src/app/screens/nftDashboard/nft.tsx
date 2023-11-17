@@ -1,4 +1,5 @@
 import NftUser from '@assets/img/nftDashboard/bns.svg';
+import useNftDetail from '@hooks/queries/useNftDetail';
 import { NonFungibleToken } from '@secretkeylabs/xverse-core';
 import { BNS_CONTRACT } from '@utils/constants';
 import styled from 'styled-components';
@@ -43,13 +44,14 @@ const BnsImage = styled.img({
 });
 
 function Nft({ asset, isGalleryOpen }: Props) {
+  const { data, isLoading, error } = useNftDetail(asset.identifier);
   return (
     <GridItemContainer>
       <NftImageContainer isGalleryView={isGalleryOpen}>
         {asset.asset_identifier === BNS_CONTRACT ? (
           <BnsImage src={NftUser} alt="user" />
         ) : (
-          <NftImage metadata={asset?.data?.token_metadata!} isInCollage />
+          <NftImage metadata={data?.data?.token_metadata} isInCollage />
         )}
       </NftImageContainer>
     </GridItemContainer>

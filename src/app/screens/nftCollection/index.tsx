@@ -10,7 +10,7 @@ import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import Nft from '@screens/nftDashboard/nft';
 import SnackBar from '@ui-library/snackBar';
-import { getNftCollectionsGridItemId, isBnsCollection } from '@utils/nfts';
+import { getFullyQualifiedKey, getNftCollectionsGridItemId, isBnsCollection } from '@utils/nfts';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -185,16 +185,17 @@ function NftCollection() {
             ) : (
               collectionData?.all_nfts.map((nft) => (
                 <CollectibleCollectionGridItem
-                  key={nft.data?.fully_qualified_token_id}
+                  key={getFullyQualifiedKey(nft.identifier)}
                   item={nft}
                   itemId={getNftCollectionsGridItemId(nft, collectionData)}
                   onClick={
                     isBnsCollection(nft.asset_identifier)
                       ? undefined
                       : () => {
-                          if (nft.data?.token_metadata) {
+                          // TODO
+                          if (true) {
                             navigate(
-                              `/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`,
+                              `/nft-dashboard/nft-detail/${getFullyQualifiedKey(nft.identifier)}`,
                             );
                           } else {
                             toast.custom(ToastContent);
