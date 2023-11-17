@@ -1,4 +1,4 @@
-import { txPayloadToRequest } from '@secretkeylabs/xverse-core/connect';
+import { txPayloadToRequest } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
@@ -9,11 +9,12 @@ const useStxTransactionRequest = () => {
   const requestToken = params.get('request') ?? '';
   const request = decodeToken(requestToken) as any;
   const tabId = params.get('tabId') ?? '0';
+  const stacksTransaction = request.payload.txHex
+    ? deserializeTransaction(request.payload.txHex!)
+    : undefined;
 
   const getPayload = () => {
-    const isSignHex = Boolean(request.payload.txHex);
-    if (isSignHex) {
-      const stacksTransaction = deserializeTransaction(request.payload.txHex!);
+    if (stacksTransaction) {
       const txPayload = txPayloadToRequest(
         stacksTransaction,
         request.payload.stxAddress,
@@ -31,6 +32,7 @@ const useStxTransactionRequest = () => {
 
   return {
     payload: txPayload,
+    stacksTransaction,
     tabId,
     requestToken,
   };

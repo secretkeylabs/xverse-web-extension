@@ -33,7 +33,7 @@ const LoaderContainer = styled.div((props) => ({
 function TransactionRequest() {
   const { stxAddress, network, stxPublicKey, feeMultipliers, accountsList, selectedAccount } =
     useWalletSelector();
-  const { payload, tabId, requestToken } = useStxTransactionRequest();
+  const { payload, tabId, requestToken, stacksTransaction } = useStxTransactionRequest();
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const { switchAccount } = useWalletReducer();
@@ -55,6 +55,7 @@ function TransactionRequest() {
       feeMultipliers!,
       selectedNetwork,
       stxPendingTxData,
+      stacksTransaction?.auth,
     );
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
@@ -78,6 +79,7 @@ function TransactionRequest() {
       stxAddress,
       selectedNetwork,
       stxPublicKey,
+      stacksTransaction?.auth,
     );
     setUnsignedTx(unSignedContractCall);
     setCoinsMetaData(coinMeta);
@@ -109,6 +111,7 @@ function TransactionRequest() {
       stxPublicKey,
       feeMultipliers!,
       stxAddress,
+      stacksTransaction?.auth,
     );
     setUnsignedTx(response.contractDeployTx);
     setCodeBody(response.codeBody);
