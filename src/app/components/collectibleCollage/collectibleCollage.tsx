@@ -34,7 +34,7 @@ const RemainingAmountOfAssets = styled.div((props) => ({
   background: props.theme.colors.elevation1,
   p: {
     ...props.theme.typography.body_medium_m,
-    fontSize: 'calc(2vw + 2vh)',
+    fontSize: 'calc((2vw + 2vh)* 0.8)',
     color: props.theme.colors.white_0,
   },
 }));

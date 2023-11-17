@@ -6,9 +6,11 @@ import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonL
 import TopRow from '@components/topRow';
 import WebGalleryButton from '@components/webGalleryButton';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
+import useNftDetail from '@hooks/queries/useNftDetail';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import Nft from '@screens/nftDashboard/nft';
+import { NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
 import SnackBar from '@ui-library/snackBar';
 import { getFullyQualifiedKey, getNftCollectionsGridItemId, isBnsCollection } from '@utils/nfts';
 import toast from 'react-hot-toast';
@@ -110,9 +112,42 @@ const StyledGridContainer = styled(GridContainer)`
   width: 100%;
 `;
 
+function CollectionGridItemWithData({
+  nft,
+  collectionData,
+  isGalleryOpen,
+}: {
+  nft: NonFungibleToken;
+  collectionData: StacksCollectionData;
+  isGalleryOpen: boolean;
+}) {
+  const { data: nftData } = useNftDetail(nft.identifier);
+  const navigate = useNavigate();
+  const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
+
+  const handleClickItem = isBnsCollection(nft.asset_identifier)
+    ? undefined
+    : () => {
+        if (nftData?.data?.token_metadata) {
+          navigate(`/nft-dashboard/nft-detail/${getFullyQualifiedKey(nft.identifier)}`);
+        } else {
+          toast.custom(<SnackBar text={t('ERRORS.FAILED_TO_FETCH')} type="error" />);
+        }
+      };
+
+  return (
+    <CollectibleCollectionGridItem
+      item={nft}
+      itemId={getNftCollectionsGridItemId(nft, collectionData)}
+      onClick={handleClickItem}
+    >
+      <Nft asset={nft} isGalleryOpen={isGalleryOpen} />
+    </CollectibleCollectionGridItem>
+  );
+}
+
 function NftCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
-  const navigate = useNavigate();
   const {
     collectionData,
     portfolioValue,
@@ -123,8 +158,6 @@ function NftCollection() {
     handleBackButtonClick,
     openInGalleryView,
   } = useNftCollection();
-
-  const ToastContent = <SnackBar text={t('ERRORS.FAILED_TO_FETCH')} type="error" />;
 
   return (
     <>
@@ -184,27 +217,12 @@ function NftCollection() {
               />
             ) : (
               collectionData?.all_nfts.map((nft) => (
-                <CollectibleCollectionGridItem
+                <CollectionGridItemWithData
                   key={getFullyQualifiedKey(nft.identifier)}
-                  item={nft}
-                  itemId={getNftCollectionsGridItemId(nft, collectionData)}
-                  onClick={
-                    isBnsCollection(nft.asset_identifier)
-                      ? undefined
-                      : () => {
-                          // TODO
-                          if (true) {
-                            navigate(
-                              `/nft-dashboard/nft-detail/${getFullyQualifiedKey(nft.identifier)}`,
-                            );
-                          } else {
-                            toast.custom(ToastContent);
-                          }
-                        }
-                  }
-                >
-                  <Nft asset={nft} isGalleryOpen={isGalleryOpen} />
-                </CollectibleCollectionGridItem>
+                  nft={nft}
+                  collectionData={collectionData}
+                  isGalleryOpen={isGalleryOpen}
+                />
               ))
             )}
           </StyledGridContainer>
