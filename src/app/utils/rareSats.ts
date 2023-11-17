@@ -1,14 +1,50 @@
 import { t } from 'i18next';
 import { getTruncatedAddress } from './helper';
 
-const RoadArmorRareSats = ['uncommon', 'rare', 'epic', 'legendary', 'mythic', 'common'] as const;
+export const RoadArmorRareSats = [
+  'mythic',
+  'legendary',
+  'epic',
+  'rare',
+  'uncommon',
+  'common',
+] as const;
 export type RoadArmorRareSatsType = (typeof RoadArmorRareSats)[number];
 
-export const RareSats = ['unknown', ...RoadArmorRareSats] as const;
+export const Sattributes = [
+  'BLACK_LEGENDARY',
+  'BLACK_EPIC',
+  'BLACK_RARE',
+  'BLACK_UNCOMMON',
+  'FIBONACCI',
+  '1D_PALINDROME',
+  '2D_PALINDROME',
+  '3D_PALINDROME',
+  'SEQUENCE_PALINDROME',
+  'PERFECT_PALINCEPTION',
+  'PALIBLOCK_PALINDROME',
+  'PALINDROME',
+  'NAME_PALINDROME',
+  'ALPHA',
+  'OMEGA',
+  'FIRST_TRANSACTION',
+  'BLOCK9',
+  'BLOCK78',
+  'NAKAMOTO',
+  'VINTAGE',
+  'PIZZA',
+  'JPEG',
+  'HITMAN',
+  'SILK_ROAD',
+] as const;
+export type SattributesType = (typeof Sattributes)[number];
+
+// TODO: remove unknown and unify with common
+export const RareSats = [...RoadArmorRareSats, 'unknown', ...Sattributes] as const;
 export type RareSatsType = (typeof RareSats)[number];
 
 export const getRareSatsLabelByType = (type: RareSatsType) =>
-  t(`RARE_SATS.RARE_TYPES.${type.toUpperCase()}`);
+  t(`RARE_SATS.RARITY_LABEL.${type.toUpperCase()}`);
 
 export type SatType = 'inscription' | 'rare-sat' | 'inscribed-sat' | 'unknown';
 
@@ -45,31 +81,31 @@ export const getRareSatsColorsByRareSatsType = (rareSatsType: RareSatsType) =>
   ({
     unknown: {
       color: 'rgb(175,186,189)',
-      backgroundColor: 'rgba(175,186,189,0.15)',
+      backgroundColor: 'rgba(175,186,189,0.20)',
     },
     uncommon: {
-      color: 'rgb(0,218,182)',
-      backgroundColor: 'rgba(0,218,182,0.15)',
+      color: 'rgb(215, 105, 254)',
+      backgroundColor: 'rgba(215, 105, 254, 0.20)',
     },
     rare: {
-      color: 'rgb(100,196,246)',
-      backgroundColor: 'rgba(100,196,246,0.15)',
+      color: 'rgb(131, 113, 242)',
+      backgroundColor: 'rgba(131, 113, 242, 0.20)',
     },
     epic: {
-      color: 'rgb(182,105,254)',
-      backgroundColor: 'rgba(182,105,254,0.15)',
+      color: 'rgb(145, 226, 96)',
+      backgroundColor: 'rgba(145, 226, 96, 0.20)',
     },
     legendary: {
       color: 'rgb(255,205,120)',
-      backgroundColor: 'rgba(255,205,120,0.15)',
+      backgroundColor: 'rgba(255,205,120,0.20)',
     },
     mythic: {
       color: 'rgb(255,244,203)',
-      backgroundColor: 'rgba(255,244,203, 0.15)',
+      backgroundColor: 'rgba(255,244,203, 0.20)',
     },
     common: {
       color: 'rgb(216,216,216)',
-      backgroundColor: 'rgba(216,216,216,0.15)',
+      backgroundColor: 'rgba(216,216,216,0.20)',
     },
   }[rareSatsType ?? 'common']);
 

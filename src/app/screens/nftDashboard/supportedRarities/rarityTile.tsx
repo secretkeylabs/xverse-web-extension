@@ -1,11 +1,7 @@
-import { useTranslation } from 'react-i18next';
-import { ArrowUpRight } from '@phosphor-icons/react';
-import styled from 'styled-components';
-import { RareSatsType } from '@utils/rareSats';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { MAGISAT_IO_RARITY_SCAN_URL } from '@utils/constants';
-import Theme from 'theme';
+import { getRareSatsLabelByType, RareSatsType } from '@utils/rareSats';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -25,27 +21,13 @@ const TextsColumn = styled.div((props) => ({
 
 const RarityText = styled.p((props) => ({
   ...props.theme.typography.body_bold_m,
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textTransform: 'capitalize',
 }));
 
 const RarityDetailText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white[200],
-}));
-
-const ButtonText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.orange_main,
-  marginRight: props.theme.spacing(2),
-}));
-
-const ButtonImage = styled.button((props) => ({
-  backgroundColor: 'transparent',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(2),
+  color: props.theme.colors.white_200,
 }));
 
 interface Props {
@@ -53,24 +35,14 @@ interface Props {
 }
 
 function RarityTile({ type }: Props) {
-  const { ordinalsAddress } = useWalletSelector();
-  const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
-
-  const openScanLink = () =>
-    window.open(`${MAGISAT_IO_RARITY_SCAN_URL}${ordinalsAddress}`, '_blank', 'noopener,noreferrer');
+  const { t } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
 
   return (
     <Container>
       <RareSatIcon glow={false} size={32} type={type} />
       <TextsColumn>
-        <RarityText>{type}</RarityText>
+        <RarityText>{getRareSatsLabelByType(type)}</RarityText>
         <RarityDetailText>{t(`RARITY_DETAIL.${type.toUpperCase()}`)}</RarityDetailText>
-        {type === 'unknown' && (
-          <ButtonImage onClick={openScanLink}>
-            <ButtonText>{t('RARITY_DETAIL.SCAN')}</ButtonText>
-            <ArrowUpRight size="16" color={Theme.colors.orange_main} />
-          </ButtonImage>
-        )}
       </TextsColumn>
     </Container>
   );

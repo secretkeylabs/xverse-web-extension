@@ -22,8 +22,6 @@ export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
 export const XVERSE_ORDIVIEW_URL = (network: NetworkType) =>
   `https://ord${network === 'Mainnet' ? '' : '-testnet'}.xverse.app`;
 
-export const MAGISAT_IO_RARITY_SCAN_URL = 'https://magisat.io/wallet?walletAddress=';
-
 export const TRANSAC_URL = 'https://global.transak.com';
 export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;
 export const MOON_PAY_URL = 'https://buy.moonpay.com';
