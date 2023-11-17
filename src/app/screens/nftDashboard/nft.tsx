@@ -44,7 +44,7 @@ const BnsImage = styled.img({
 });
 
 function Nft({ asset, isGalleryOpen }: Props) {
-  const { data, isLoading, error } = useNftDetail(asset.identifier);
+  const { data } = useNftDetail(asset.identifier);
   return (
     <GridItemContainer>
       <NftImageContainer isGalleryView={isGalleryOpen}>
