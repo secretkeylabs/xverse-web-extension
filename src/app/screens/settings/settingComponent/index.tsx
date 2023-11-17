@@ -75,7 +75,6 @@ const DisabledOverlay = styled.div((props) => ({
   left: 0,
   bottom: 0,
   right: 0,
-  zIndex: 10,
   backgroundColor: props.theme.colors.elevation0,
   opacity: 0.5,
 }));
