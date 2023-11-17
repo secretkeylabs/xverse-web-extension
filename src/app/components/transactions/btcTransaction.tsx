@@ -1,13 +1,21 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { ledgerDelay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import useBtcClient from '@hooks/useBtcClient';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { Lightning } from '@phosphor-icons/react';
-import { Brc20HistoryTransactionData, BtcTransactionData } from '@secretkeylabs/xverse-core';
+import { FastForward } from '@phosphor-icons/react';
+import {
+  Brc20HistoryTransactionData,
+  BtcTransactionData,
+  signIncomingSingleSigPSBT,
+} from '@secretkeylabs/xverse-core';
 import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
+import { psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { getBtcTxStatusUrl, isLedgerAccount } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';
 import { useCallback, useState } from 'react';
@@ -106,6 +114,7 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
+  const btcClient = useBtcClient();
 
   const openBtcTxStatusLink = useCallback(() => {
     window.open(getBtcTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
@@ -118,42 +127,36 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
   };
 
   const handleLedgerPsbtSigning = async (transport: TransportType) => {
-    //   const addressIndex = selectedAccount?.deviceAccountIndex;
-    //   const { inputsToSign, psbtBase64, broadcast } = payload;
-    //   if (addressIndex === undefined) {
-    //     throw new Error('Account not found');
-    //   }
-    //   const signingResponse = await signIncomingSingleSigPSBT({
-    //     transport,
-    //     network: network.type,
-    //     addressIndex,
-    //     inputsToSign,
-    //     psbtBase64,
-    //     finalize: broadcast,
-    //   });
-    //   let txId: string = '';
-    //   if (request.payload.broadcast) {
-    //     const txHex = psbtBase64ToHex(signingResponse);
-    //     const response = await btcClient.sendRawTransaction(txHex);
-    //     txId = response.tx.hash;
-    //   }
-    //   const signingMessage = {
-    //     source: MESSAGE_SOURCE,
-    //     method: ExternalSatsMethods.signPsbtResponse,
-    //     payload: {
-    //       signPsbtRequest: requestToken,
-    //       signPsbtResponse: {
-    //         psbtBase64: signingResponse,
-    //         txId,
-    //       },
-    //     },
-    //   };
-    //   chrome.tabs.sendMessage(+tabId, signingMessage);
-    //   return {
-    //     txId,
-    //     signingResponse,
-    //   };
+    const addressIndex = selectedAccount?.deviceAccountIndex;
+
+    if (addressIndex === undefined) {
+      throw new Error('Account not found');
+    }
+
+    // TODO: Update this to sign BTC / BRC-20 transactions
+    // const signingResponse = await signIncomingSingleSigPSBT({
+    //   transport,
+    //   network: network.type,
+    //   addressIndex,
+    //   inputsToSign,
+    //   psbtBase64,
+    //   finalize: true,
+    // });
+    // let txId = '';
+    // const txHex = psbtBase64ToHex(signingResponse);
+    // const response = await btcClient.sendRawTransaction(txHex);
+    // txId = response.tx.hash;
+
+    // return {
+    //   txId,
+    //   signingResponse,
     // };
+
+    return {
+      // TODO: Remove this when the above is implemented
+      txId: '',
+      signingResponse: '',
+    };
   };
 
   const handleConnectAndConfirm = async () => {
@@ -168,31 +171,26 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
       setIsConnectFailed(true);
       setIsButtonDisabled(false);
     }
-    console.log('transport', transport);
-    //   setIsConnectSuccess(true);
-    //   await ledgerDelay(1500);
-    //   setCurrentStepIndex(1);
-    //   try {
-    //     const response = await handleLedgerPsbtSigning(transport);
-    //     if (payload.broadcast) {
-    //       navigate('/tx-status', {
-    //         state: {
-    //           txid: response.txId,
-    //           currency: 'BTC',
-    //           error: '',
-    //           browserTx: true,
-    //         },
-    //       });
-    //     } else {
-    //       window.close();
-    //     }
-    //   } catch (err) {
-    //     console.error(err);
-    //     setIsTxRejected(true);
-    //   } finally {
-    //     await transport.close();
-    //     setIsButtonDisabled(false);
-    //   }
+    setIsConnectSuccess(true);
+    await ledgerDelay(1500);
+    setCurrentStepIndex(1);
+    try {
+      const response = await handleLedgerPsbtSigning(transport);
+      navigate('/tx-status', {
+        state: {
+          txid: response.txId,
+          currency: 'BTC',
+          error: '',
+          browserTx: true,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      setIsTxRejected(true);
+    } finally {
+      await transport.close();
+      setIsButtonDisabled(false);
+    }
   };
 
   const handleRetry = async () => {
@@ -232,7 +230,7 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
                     e.stopPropagation();
                     setShowFeeSettings(true);
                   }}
-                  icon={<Lightning size={16} color={theme.colors.tangerine} weight="fill" />}
+                  icon={<FastForward size={16} color={theme.colors.tangerine} weight="fill" />}
                   iconPosition="right"
                 />
               )}
