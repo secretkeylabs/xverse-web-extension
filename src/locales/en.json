@@ -321,6 +321,8 @@
     "BROADCASTING_TRANSACTIONS": "Broadcasting transactions",
     "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep this window open.",
     "TRANSACTIONS_BROADCASTED": "Transactions broadcasted",
+    "TRANSACTIONS_FAILED_TO_BROADCAST": "{{failed}}/{{total}} transactions failed to broadcast",
+    "CHECK_THE_APP_YOU_USE": "Please check the app you are using.",
     "TRANSACTIONS_SIGNED": "Transactions signed",
     "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
     "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",

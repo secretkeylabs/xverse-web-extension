@@ -6,6 +6,7 @@ import ActionButton from '@components/button';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import InfoContainer from '@components/infoContainer';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
+import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
@@ -110,6 +111,11 @@ const TxReviewModalControls = styled.div((props) => ({
   paddingBottom: props.theme.spacing(20),
 }));
 
+interface TxResponse {
+  txId: string;
+  psbtBase64: string;
+}
+
 function SignBatchPsbtRequest() {
   const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
     useWalletSelector();
@@ -129,6 +135,7 @@ function SignBatchPsbtRequest() {
   const [isBroadcastingComplete, setIsBroadcastingComplete] = useState(false);
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(0);
+  const [txResponseArr, setTxResponseArr] = useState<TxResponse[]>([]);
   const [broadcastingPsbtIndex, setBroadcastingPsbtIndex] = useState(0);
   const [hasOutputScript, setHasOutputScript] = useState(false);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
@@ -141,6 +148,7 @@ function SignBatchPsbtRequest() {
     { bundleItemsData: BundleItem[]; userReceivesOrdinal: boolean }[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
+  const notBroadcastedPsbtsLength = txResponseArr.filter((tx) => !tx.txId).length;
 
   const handlePsbtParsing = useCallback(
     (psbt: SignMultiplePsbtPayload, index: number) => {
@@ -248,10 +256,7 @@ function SignBatchPsbtRequest() {
       }
       setIsSigning(true);
 
-      const signedPsbts: {
-        txId: string;
-        psbtBase64: string;
-      }[] = [];
+      const signedPsbts: TxResponse[] = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const psbt of payload.psbts) {
         // eslint-disable-next-line no-await-in-loop
@@ -282,16 +287,18 @@ function SignBatchPsbtRequest() {
             // eslint-disable-next-line no-await-in-loop
             const txId = await broadcastPsbt(psbt.psbtBase64);
             psbt.txId = txId;
-
-            setBroadcastingPsbtIndex((prevIndex) => prevIndex + 1);
           } catch (e) {
             console.error(e);
+          } finally {
+            setBroadcastingPsbtIndex((prevIndex) => prevIndex + 1);
           }
         }
 
         setIsBroadcastingComplete(true);
         setIsBroadcasting(false);
       }
+
+      setTxResponseArr(signedPsbts);
 
       const signingMessage = {
         source: MESSAGE_SOURCE,
@@ -303,16 +310,11 @@ function SignBatchPsbtRequest() {
       };
 
       chrome.tabs.sendMessage(+tabId, signingMessage);
-
-      setSigningPsbtIndex(0);
-      setBroadcastingPsbtIndex(0);
     } catch (err) {
       setIsSigning(false);
       setIsBroadcasting(false);
       setIsSigningComplete(false);
       setIsBroadcastingComplete(false);
-      setSigningPsbtIndex(0);
-      setBroadcastingPsbtIndex(0);
 
       if (err instanceof Error) {
         navigate('/tx-status', {
@@ -373,29 +375,31 @@ function SignBatchPsbtRequest() {
     .map((item) => item.bundleItemsData)
     .flat();
 
-  const getSigningStatus = () => {
-    if (isSigningComplete) {
-      return 'SUCCESS';
+  const signingStatus: ConfirmationStatus = isSigningComplete ? 'SUCCESS' : 'LOADING';
+
+  let broadcastingStatus: ConfirmationStatus = 'LOADING';
+
+  if (isBroadcastingComplete) {
+    if (notBroadcastedPsbtsLength > 0) {
+      broadcastingStatus = 'FAILURE';
+    } else {
+      broadcastingStatus = 'SUCCESS';
     }
-
-    return 'LOADING';
-  };
-
-  const getBroadcastingStatus = () => {
-    if (isBroadcastingComplete) {
-      return 'SUCCESS';
-    }
-
-    return 'LOADING';
-  };
+  }
 
   if (isBroadcasting || isBroadcastingComplete) {
     return (
       <LoadingTransactionStatus
-        status={getBroadcastingStatus()}
+        status={broadcastingStatus}
         resultTexts={{
-          title: t('TRANSACTIONS_BROADCASTED'),
-          description: '',
+          title:
+            broadcastingStatus === 'SUCCESS'
+              ? t('TRANSACTIONS_BROADCASTED')
+              : t('TRANSACTIONS_FAILED_TO_BROADCAST', {
+                  failed: notBroadcastedPsbtsLength,
+                  total: payload.psbts.length,
+                }),
+          description: broadcastingStatus === 'SUCCESS' ? '' : t('CHECK_THE_APP_YOU_USE'),
         }}
         loadingTexts={{
           title: `${t('BROADCASTING_TRANSACTIONS')} ${broadcastingPsbtIndex + 1}/${
@@ -415,7 +419,7 @@ function SignBatchPsbtRequest() {
   if (isSigning || isSigningComplete) {
     return (
       <LoadingTransactionStatus
-        status={getSigningStatus()}
+        status={signingStatus}
         resultTexts={{
           title: t('TRANSACTIONS_SIGNED'),
           description: '',
