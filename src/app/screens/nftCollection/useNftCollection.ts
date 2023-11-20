@@ -14,9 +14,10 @@ export default function useNftCollection() {
     (collection) => collection.collection_id === collectionId,
   );
 
-  const portfolioValue = collectionData?.floor_price
-    ? collectionData.floor_price * collectionData.total_nft
-    : null;
+  const portfolioValue =
+    collectionData?.floor_price && !Number.isNaN(collectionData?.all_nfts?.length)
+      ? collectionData.floor_price * collectionData.all_nfts.length
+      : null;
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
@@ -35,7 +36,7 @@ export default function useNftCollection() {
     portfolioValue,
     isLoading,
     isError: error,
-    isEmpty: !isLoading && !error && collectionData?.total_nft === 0,
+    isEmpty: !isLoading && !error && collectionData?.all_nfts.length === 0,
     isGalleryOpen,
     handleBackButtonClick,
     openInGalleryView,

@@ -1,7 +1,7 @@
 import { getBnsNftName, NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
 
 export const getNftsTabGridItemSubText = (collection: StacksCollectionData) =>
-  collection.total_nft > 1 ? `${collection.total_nft} Items` : '1 Item';
+  collection?.all_nfts?.length > 1 ? `${collection.all_nfts.length} Items` : '1 Item';
 
 export const isBnsCollection = (collectionId?: string | null): boolean =>
   collectionId === 'SP000000000000000000002Q6VF78.bns';

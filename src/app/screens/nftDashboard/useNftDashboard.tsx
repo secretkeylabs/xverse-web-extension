@@ -19,7 +19,6 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { GridContainer } from './collectiblesTabs';
 import { InscriptionsTabGridItem } from './inscriptionsTabGridItem';
-import NftImage from './nftImage';
 import { NftTabGridItem } from './nftTabGridItem';
 
 const NoCollectiblesText = styled.h1((props) => ({

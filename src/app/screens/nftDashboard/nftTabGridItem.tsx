@@ -61,7 +61,7 @@ export function NftTabGridItem({
       <ThumbnailContainer onClick={handleClickCollection}>
         {isLoading ? (
           <NftImage />
-        ) : collection?.total_nft > 1 ? (
+        ) : collection?.all_nfts?.length > 1 ? (
           <CollectibleCollage items={collection?.all_nfts} />
         ) : (
           <Nft asset={collection.all_nfts[0]} isGalleryOpen />
