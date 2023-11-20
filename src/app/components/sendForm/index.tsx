@@ -5,9 +5,12 @@ import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
 import useDebounce from '@hooks/useDebounce';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
-import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import {
+  getBtcEquivalent,
+  getFiatEquivalent,
+  getStxTokenEquivalent,
+} from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
 import { CurrencyTypes } from '@utils/constants';
 import { getCurrencyFlag } from '@utils/currency';
@@ -257,8 +260,8 @@ function SendForm({
     const amountInCurrency = getFiatEquivalent(
       Number(amountToSend),
       currencyType,
-      stxBtcRate,
-      btcFiatRate,
+      BigNumber(stxBtcRate),
+      BigNumber(btcFiatRate),
       fungibleToken,
     );
     setFiatAmount(amountInCurrency);
@@ -293,8 +296,8 @@ function SendForm({
     const amountInCurrency = getFiatEquivalent(
       Number(newValue),
       currencyType,
-      stxBtcRate,
-      btcFiatRate,
+      BigNumber(stxBtcRate),
+      BigNumber(btcFiatRate),
       fungibleToken,
     );
     setFiatAmount(amountInCurrency);
@@ -307,11 +310,17 @@ function SendForm({
     if (!tokenAmount) return '0';
     switch (currencyType) {
       case 'STX':
-        return getStxTokenEquivalent(new BigNumber(tokenAmount), stxBtcRate, btcFiatRate)
+        return getStxTokenEquivalent(
+          new BigNumber(tokenAmount),
+          BigNumber(stxBtcRate),
+          BigNumber(btcFiatRate),
+        )
           .toFixed(6)
           .toString();
       case 'BTC':
-        return getBtcEquivalent(new BigNumber(tokenAmount), btcFiatRate).toFixed(8).toString();
+        return getBtcEquivalent(new BigNumber(tokenAmount), BigNumber(btcFiatRate))
+          .toFixed(8)
+          .toString();
       case 'FT':
         if (fungibleToken?.tokenFiatRate) {
           return new BigNumber(tokenAmount)

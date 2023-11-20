@@ -231,7 +231,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   }
 
   const renderStackingBalances = () => {
-    if (stxLockedBalance && !new BigNumber(stxLockedBalance).eq(0, 10) && coin === 'STX') {
+    if (!new BigNumber(stxLockedBalance).eq(0) && coin === 'STX') {
       return (
         <>
           <HeaderSeparator />

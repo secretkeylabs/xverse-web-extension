@@ -4,7 +4,7 @@ import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import useWalletSelector from './useWalletSelector';
 
-const useDetectOrdinalInSignPsbt = (parsedPsbt: '' | ParsedPSBT) => {
+const useDetectOrdinalInSignPsbt = (parsedPsbt?: ParsedPSBT) => {
   const [loading, setLoading] = useState(false);
   const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
   const [bundleItemsData, setBundleItemsData] = useState<BundleItem[]>([]);
