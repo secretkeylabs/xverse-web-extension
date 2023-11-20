@@ -6,13 +6,18 @@ import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonL
 import TopRow from '@components/topRow';
 import WebGalleryButton from '@components/webGalleryButton';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
+import useNftDetail from '@hooks/queries/useNftDetail';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import Nft from '@screens/nftDashboard/nft';
+import NftImage from '@screens/nftDashboard/nftImage';
+import { NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
 import SnackBar from '@ui-library/snackBar';
-import { getNftCollectionsGridItemId, isBnsCollection } from '@utils/nfts';
+import { getFullyQualifiedKey, getNftCollectionsGridItemId, isBnsCollection } from '@utils/nfts';
+import { PropsWithChildren, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useIsVisible } from 'react-is-visible';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import useNftCollection from './useNftCollection';
@@ -110,9 +115,59 @@ const StyledGridContainer = styled(GridContainer)`
   width: 100%;
 `;
 
+function IsVisibleOrPlaceholder({ children }: PropsWithChildren) {
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const isVisible = useIsVisible(nodeRef, { once: false });
+
+  return (
+    <div ref={nodeRef}>
+      {isVisible ? (
+        children
+      ) : (
+        <CollectibleCollectionGridItem item={{}} itemId="">
+          <NftImage />
+        </CollectibleCollectionGridItem>
+      )}
+    </div>
+  );
+}
+
+function CollectionGridItemWithData({
+  nft,
+  collectionData,
+  isGalleryOpen,
+}: {
+  nft: NonFungibleToken;
+  collectionData: StacksCollectionData;
+  isGalleryOpen: boolean;
+}) {
+  const { data: nftData } = useNftDetail(nft.identifier);
+  const navigate = useNavigate();
+  const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
+
+  const handleClickItem = isBnsCollection(nft.asset_identifier)
+    ? undefined
+    : () => {
+        if (nftData?.data?.token_metadata) {
+          navigate(`/nft-dashboard/nft-detail/${getFullyQualifiedKey(nft.identifier)}`);
+        } else {
+          toast.custom(<SnackBar text={t('ERRORS.FAILED_TO_FETCH')} type="error" />);
+        }
+      };
+
+  return (
+    <CollectibleCollectionGridItem
+      item={nft}
+      itemId={getNftCollectionsGridItemId(nft, collectionData)}
+      onClick={handleClickItem}
+    >
+        <Nft asset={nft} isGalleryOpen={isGalleryOpen} />
+    </CollectibleCollectionGridItem>
+  );
+}
+
 function NftCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
-  const navigate = useNavigate();
   const {
     collectionData,
     portfolioValue,
@@ -123,8 +178,6 @@ function NftCollection() {
     handleBackButtonClick,
     openInGalleryView,
   } = useNftCollection();
-
-  const ToastContent = <SnackBar text={t('ERRORS.FAILED_TO_FETCH')} type="error" />;
 
   return (
     <>
@@ -183,28 +236,17 @@ function NftCollection() {
                 tileSize={isGalleryOpen ? 276 : 151}
               />
             ) : (
-              collectionData?.all_nfts.map((nft) => (
-                <CollectibleCollectionGridItem
-                  key={nft.data?.fully_qualified_token_id}
-                  item={nft}
-                  itemId={getNftCollectionsGridItemId(nft, collectionData)}
-                  onClick={
-                    isBnsCollection(nft.asset_identifier)
-                      ? undefined
-                      : () => {
-                          if (nft.data?.token_metadata) {
-                            navigate(
-                              `/nft-dashboard/nft-detail/${nft.data?.fully_qualified_token_id}`,
-                            );
-                          } else {
-                            toast.custom(ToastContent);
-                          }
-                        }
-                  }
-                >
-                  <Nft asset={nft} isGalleryOpen={isGalleryOpen} />
-                </CollectibleCollectionGridItem>
-              ))
+              collectionData?.all_nfts
+                .sort((a, b) => (a.value.repr > b.value.repr ? 1 : -1))
+                .map((nft) => (
+                  <IsVisibleOrPlaceholder key={getFullyQualifiedKey(nft.identifier)}>
+                    <CollectionGridItemWithData
+                      nft={nft}
+                      collectionData={collectionData}
+                      isGalleryOpen={isGalleryOpen}
+                    />
+                  </IsVisibleOrPlaceholder>
+                ))
             )}
           </StyledGridContainer>
         </>

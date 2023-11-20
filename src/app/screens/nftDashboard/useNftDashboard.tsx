@@ -12,12 +12,14 @@ import {
 } from '@stores/wallet/actions/actionCreators';
 import { getCollectionKey } from '@utils/inscriptions';
 import { InvalidParamsError } from '@utils/query';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useIsVisible } from 'react-is-visible';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { GridContainer } from './collectiblesTabs';
 import { InscriptionsTabGridItem } from './inscriptionsTabGridItem';
+import NftImage from './nftImage';
 import { NftTabGridItem } from './nftTabGridItem';
 
 const NoCollectiblesText = styled.h1((props) => ({
@@ -57,6 +59,17 @@ const LoadMoreButtonContainer = styled.div((props) => ({
     width: 156,
   },
 }));
+
+function IsVisibleOrPlaceholder({ children }: PropsWithChildren) {
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const isVisible = useIsVisible(nodeRef, { once: false });
+
+  return (
+    <div ref={nodeRef}>
+      {isVisible ? children : <NftTabGridItem isLoading item={{} as StacksCollectionData} />}
+    </div>
+  );
+}
 
 export type NftDashboardState = {
   openReceiveModal: boolean;
@@ -98,7 +111,7 @@ export const useNftDashboard = (): NftDashboardState => {
   const rareSatsQuery = useAddressRareSats();
 
   const totalInscriptions = inscriptionsQuery.data?.pages?.[0]?.total_inscriptions ?? 0;
-  const totalNfts = stacksNftsQuery.data?.pages?.[0]?.total_nfts ?? 0;
+  const totalNfts = stacksNftsQuery.data?.total_nfts ?? 0;
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
@@ -197,27 +210,13 @@ export const useNftDashboard = (): NftDashboardState => {
     }
 
     return (
-      <>
-        <GridContainer isGalleryOpen={isGalleryOpen}>
-          {stacksNftsQuery.data?.pages
-            ?.map((page) => page?.results)
-            .flat()
-            .map((collection: StacksCollectionData) => (
-              <NftTabGridItem key={collection.collection_id} item={collection} />
-            ))}
-        </GridContainer>
-        {stacksNftsQuery.hasNextPage && (
-          <LoadMoreButtonContainer>
-            <ActionButton
-              transparent
-              text={t('LOAD_MORE')}
-              processing={stacksNftsQuery.isFetchingNextPage}
-              disabled={stacksNftsQuery.isFetchingNextPage}
-              onPress={stacksNftsQuery.fetchNextPage}
-            />
-          </LoadMoreButtonContainer>
-        )}
-      </>
+      <GridContainer isGalleryOpen={isGalleryOpen}>
+        {stacksNftsQuery.data?.results.map((collection: StacksCollectionData) => (
+          <IsVisibleOrPlaceholder key={collection.collection_id}>
+            <NftTabGridItem item={collection} />
+          </IsVisibleOrPlaceholder>
+        ))}
+      </GridContainer>
     );
   }, [stacksNftsQuery, isGalleryOpen, totalNfts, t]);
 

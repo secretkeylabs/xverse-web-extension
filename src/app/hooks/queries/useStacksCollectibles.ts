@@ -1,8 +1,8 @@
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getNftCollections, StacksCollectionList } from '@secretkeylabs/xverse-core';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { handleRetries, InvalidParamsError } from '@utils/query';
+import { useQuery } from '@tanstack/react-query';
+import { handleRetries } from '@utils/query';
 
 const useStacksCollectibles = () => {
   let { stxAddress } = useWalletSelector();
@@ -14,28 +14,15 @@ const useStacksCollectibles = () => {
     stxAddress = testAddress;
   }
 
-  function fetchNfts({ pageParam = 0 }): Promise<StacksCollectionList> {
-    if (!stxAddress) {
-      return Promise.reject(new InvalidParamsError('stxAddress is required'));
-    }
-    return getNftCollections(stxAddress, selectedNetwork, pageParam || 0, 150);
-  }
+  const fetchNftCollections = (): Promise<StacksCollectionList> =>
+    getNftCollections(stxAddress, selectedNetwork);
 
-  return useInfiniteQuery(['nft-collection-data', stxAddress], fetchNfts, {
+  return useQuery({
+    enabled: !!stxAddress,
     retry: handleRetries,
-    keepPreviousData: false,
-    getNextPageParam: (lastpage, pages) => {
-      const currentLength = pages
-        .map((page) => page.results)
-        .filter(Boolean)
-        .flat().length;
-      if (currentLength < lastpage.total) {
-        return currentLength;
-      }
-      return false;
-    },
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    queryKey: ['nft-collection-data', stxAddress],
+    queryFn: fetchNftCollections,
+    staleTime: 5 * 60 * 1000, // 5mins
   });
 };
 

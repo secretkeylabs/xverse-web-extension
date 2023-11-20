@@ -1,31 +1,31 @@
+import useNftDetail from '@hooks/queries/useNftDetail';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useResetUserFlow from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBnsNftName } from '@secretkeylabs/xverse-core';
 import { GAMMA_URL } from '@utils/constants';
 import { getExplorerUrl, isInOptions, isLedgerAccount } from '@utils/helper';
-import { getNftDataFromNftsCollectionData } from '@utils/nfts';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-export default function useNftDetail() {
+export default function useNftDetailScreen() {
   const navigate = useNavigate();
   const { stxAddress, selectedAccount } = useWalletSelector();
   const { id } = useParams();
-  const { data, isLoading } = useStacksCollectibles();
-  const nftCollections = data?.pages?.map((page) => page?.results).flat();
-  const { collectionId, collection, nft, nftData } = getNftDataFromNftsCollectionData(
-    id,
-    nftCollections,
+
+  const nftDetailQuery = useNftDetail(id!);
+  const nftCollectionsQuery = useStacksCollectibles();
+  const collectionId = nftDetailQuery.data?.data.collection_contract_id;
+  const collection = nftCollectionsQuery.data?.results.find(
+    (c) => c.collection_id === collectionId,
   );
-  const metaData = nft?.data?.token_metadata;
-  const gammaUrl = `${GAMMA_URL}collections/${metaData?.contract_id}/${nft?.data?.token_id}`;
+
+  const metadata = nftDetailQuery.data?.data?.token_metadata;
+  const gammaUrl = `${GAMMA_URL}collections/${metadata?.contract_id}/${nftDetailQuery.data?.data?.token_id}`;
 
   useResetUserFlow('/nft-detail');
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
-  const galleryTitle =
-    collectionId === 'bns' && nft ? getBnsNftName(nft) : nft?.data?.token_metadata.name;
+  const galleryTitle = metadata?.name;
 
   const onSharePress = () => {
     navigator.clipboard.writeText(gammaUrl);
@@ -40,7 +40,7 @@ export default function useNftDetail() {
   };
 
   const onExplorerPress = () => {
-    const address = nft?.data?.token_metadata?.contract_id?.split('.')!;
+    const address = metadata?.contract_id?.split('.')!;
     window.open(getExplorerUrl(address[0]));
   };
 
@@ -61,11 +61,11 @@ export default function useNftDetail() {
   };
 
   return {
-    nft,
-    nftData,
+    nft: nftDetailQuery.data,
+    nftData: nftDetailQuery.data?.data,
     collection,
     stxAddress,
-    isLoading,
+    isLoading: nftDetailQuery.isLoading,
     isGalleryOpen,
     onSharePress,
     handleBackButtonClick,

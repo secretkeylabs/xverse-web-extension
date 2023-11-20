@@ -8,12 +8,13 @@ import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { ArrowLeft, ArrowUp, Share } from '@phosphor-icons/react';
-import Nft from '@screens/nftDashboard/nft';
+import NftImage from '@screens/nftDashboard/nftImage';
+import { Attribute } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
 import NftAttribute from './nftAttribute';
-import useNftDetail from './useNftDetail';
+import useNftDetailScreen from './useNftDetail';
 
 const ExtensionContainer = styled.div((props) => ({
   ...props.theme.scrollbar,
@@ -294,11 +295,6 @@ const GalleryLoaderContainer = styled.div({
   flexDirection: 'column',
 });
 
-const ItemContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(8),
-  flexDirection: 'column',
-}));
-
 const StyledSeparator = styled(Separator)`
   width: 100%;
 `;
@@ -352,13 +348,13 @@ function NftDetailScreen() {
     openInGalleryView,
     handleOnSendClick,
     galleryTitle,
-  } = useNftDetail();
+  } = useNftDetailScreen();
 
   const nftAttributes = nftData?.nft_token_attributes?.length !== 0 && (
     <>
       <AttributeText>{t('ATTRIBUTES')}</AttributeText>
       <GridContainer>
-        {nftData?.nft_token_attributes.map((attribute) => (
+        {nftData?.nft_token_attributes?.map((attribute: Attribute) => (
           <NftAttribute
             key={attribute.trait_type}
             type={attribute.trait_type}
@@ -426,7 +422,7 @@ function NftDetailScreen() {
   ) : (
     <ExtensionContainer>
       <CollectibleText>{t('COLLECTIBLE')}</CollectibleText>
-      <NftTitleText>{nftData?.token_metadata.name}</NftTitleText>
+      <NftTitleText>{nftData?.token_metadata?.name}</NftTitleText>
       <WebGalleryButton onClick={openInGalleryView}>
         <>
           <ButtonImage src={SquaresFour} />
@@ -434,7 +430,7 @@ function NftDetailScreen() {
         </>
       </WebGalleryButton>
       <ExtensionNftContainer>
-        {nft && <Nft asset={nft} isGalleryOpen={isGalleryOpen} />}
+        {nft && <NftImage metadata={nftData?.token_metadata} />}
       </ExtensionNftContainer>
       <ButtonContainer>
         <SquareButton
@@ -516,7 +512,7 @@ function NftDetailScreen() {
         </BackButtonContainer>
         <GalleryRowContainer>
           <ColumnContainer>
-            <NftContainer>{nft && <Nft asset={nft} isGalleryOpen={isGalleryOpen} />}</NftContainer>
+            <NftContainer>{nft && <NftImage metadata={nftData?.token_metadata} />}</NftContainer>
             {nftAttributes}
           </ColumnContainer>
           <DescriptionContainer>

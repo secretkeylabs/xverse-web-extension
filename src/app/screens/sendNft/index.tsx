@@ -1,6 +1,6 @@
 import ActionButton from '@components/button';
 import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
-import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
+import useNftDetail from '@hooks/queries/useNftDetail';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useDebounce from '@hooks/useDebounce';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -18,7 +18,6 @@ import { useMutation } from '@tanstack/react-query';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import { checkNftExists } from '@utils/helper';
-import { getNftDataFromNftsCollectionData } from '@utils/nfts';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -104,9 +103,8 @@ function SendNft() {
   useResetUserFlow('/send-nft');
 
   const { id } = useParams();
-  const stacksNftsQuery = useStacksCollectibles();
-  const nftCollections = stacksNftsQuery.data?.pages?.map((page) => page?.results).flat();
-  const { nftData: nft } = getNftDataFromNftsCollectionData(id, nftCollections);
+  const { data: nftDetail } = useNftDetail(id!);
+  const nft = nftDetail?.data;
 
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();

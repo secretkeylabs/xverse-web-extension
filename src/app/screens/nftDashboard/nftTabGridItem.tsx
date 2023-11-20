@@ -5,6 +5,7 @@ import { getNftsTabGridItemSubText } from '@utils/nfts';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Nft from './nft';
+import NftImage from './nftImage';
 
 const CollectionContainer = styled.div((props) => ({
   display: 'flex',
@@ -39,7 +40,13 @@ const StyledItemSub = styled(StyledP)`
   width: 100%;
 `;
 
-export function NftTabGridItem({ item: collection }: { item: StacksCollectionData }) {
+export function NftTabGridItem({
+  item: collection,
+  isLoading = false,
+}: {
+  item: StacksCollectionData;
+  isLoading?: boolean;
+}) {
   const navigate = useNavigate();
 
   const handleClickCollection = () => {
@@ -52,8 +59,10 @@ export function NftTabGridItem({ item: collection }: { item: StacksCollectionDat
   return (
     <CollectionContainer>
       <ThumbnailContainer onClick={handleClickCollection}>
-        {collection.total_nft > 1 ? (
-          <CollectibleCollage items={collection.thumbnail_nfts} />
+        {isLoading ? (
+          <NftImage />
+        ) : collection?.total_nft > 1 ? (
+          <CollectibleCollage items={collection?.all_nfts} />
         ) : (
           <Nft asset={collection.thumbnail_nfts[0]} isGalleryOpen />
         )}
