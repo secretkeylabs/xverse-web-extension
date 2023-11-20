@@ -6,7 +6,7 @@ import useWalletSelector from './useWalletSelector';
 const useDetectOrdinalInSignPsbt = () => {
   const { ordinalsAddress, network } = useWalletSelector();
 
-  const handleOrdinalAndOrdinalInfo = async (parsedPsbt: '' | ParsedPSBT) => {
+  const handleOrdinalAndOrdinalInfo = async (parsedPsbt?: ParsedPSBT) => {
     const bundleItems: BundleItem[] = [];
     let userReceivesOrdinal = false;
 

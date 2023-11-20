@@ -156,7 +156,7 @@ function SignBatchPsbtRequest() {
             browserTx: true,
           },
         });
-        return '';
+        return undefined;
       }
     },
     [selectedAccount, network.type],
