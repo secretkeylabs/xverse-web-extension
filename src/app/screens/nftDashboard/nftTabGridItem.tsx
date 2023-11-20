@@ -64,7 +64,7 @@ export function NftTabGridItem({
         ) : collection?.total_nft > 1 ? (
           <CollectibleCollage items={collection?.all_nfts} />
         ) : (
-          <Nft asset={collection.thumbnail_nfts[0]} isGalleryOpen />
+          <Nft asset={collection.all_nfts[0]} isGalleryOpen />
         )}
       </ThumbnailContainer>
       <InfoContainer>
