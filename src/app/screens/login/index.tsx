@@ -4,10 +4,10 @@ import logo from '@assets/img/xverse_logo.svg';
 import ActionButton from '@components/button';
 import useCacheMigration from '@hooks/useCacheMigration';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { animated, useSpring } from '@react-spring/web';
+import { animated,useSpring } from '@react-spring/web';
 import MigrationConfirmation from '@screens/migrationConfirmation';
 import { addMinutes } from 'date-fns';
-import { useEffect, useState } from 'react';
+import { useEffect,useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -167,7 +167,7 @@ function Login(): JSX.Element {
       } else {
         await unlockWallet(password);
         setIsVerifying(false);
-        navigate('/');
+        navigate(-1);
       }
     } catch (err) {
       setIsVerifying(false);

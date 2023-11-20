@@ -21,7 +21,7 @@ import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transacti
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -123,15 +123,14 @@ function SignPsbtRequest() {
   const request = decodeToken(requestToken) as any as SignTransactionOptions;
   const btcClient = useBtcClient();
 
-  const handlePsbtParsing = useCallback(() => {
+  const parsedPsbt = useMemo(() => {
     try {
       return parsePsbt(selectedAccount!, payload.inputsToSign, payload.psbtBase64, network.type);
     } catch (err) {
       return undefined;
     }
-  }, [selectedAccount, payload.psbtBase64]);
+  }, [selectedAccount, payload.inputsToSign, payload.psbtBase64, network.type]);
 
-  const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
   const { loading, bundleItemsData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
@@ -363,7 +362,7 @@ function SignPsbtRequest() {
                   />
                 ))}
               <RecipientComponent
-                value={`${satsToBtc(new BigNumber(parsedPsbt!.netAmount.toString()))
+                value={`${satsToBtc(new BigNumber((parsedPsbt?.netAmount ?? 0).toString()))
                   .toString()
                   .replace('-', '')}`}
                 currencyType="BTC"
@@ -381,10 +380,10 @@ function SignPsbtRequest() {
               {payload.broadcast ? (
                 <TransactionDetailComponent
                   title={t('FEES')}
-                  value={getSatsAmountString(new BigNumber(parsedPsbt!.fees.toString()))}
+                  value={getSatsAmountString(new BigNumber((parsedPsbt?.fees ?? 0).toString()))}
                   subValue={getBtcFiatEquivalent(
-                    new BigNumber(parsedPsbt!.fees.toString()),
-                    btcFiatRate,
+                    new BigNumber((parsedPsbt?.fees ?? 0).toString()),
+                    BigNumber(btcFiatRate),
                   )}
                 />
               ) : null}

@@ -71,12 +71,6 @@ const CopyButtonContainer = styled.div({
   padding: 2,
 });
 
-const InfoMessageContainer = styled.div({
-  marginLeft: 8,
-  marginRight: 8,
-  marginTop: 20,
-});
-
 const Image = styled.img({
   alignSelf: 'center',
   transform: 'all',

@@ -67,7 +67,7 @@ function RecipientCard({ address, amountBrc20, amountSats, fungibleToken }: Reci
         }
         amountSubText={
           <FiatAmountText
-            fiatAmount={getBtcFiatEquivalent(amountSats, btcFiatRate)}
+            fiatAmount={getBtcFiatEquivalent(amountSats, BigNumber(btcFiatRate))}
             fiatCurrency={fiatCurrency}
           />
         }
