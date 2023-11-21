@@ -44,6 +44,7 @@ const GridItemContainer = styled.button`
   background: transparent;
   gap: ${(props) => props.theme.space.s};
   cursor: ${(props) => (props.onClick ? 'pointer' : 'initial')};
+  width: 100%;
 `;
 
 interface Props {
