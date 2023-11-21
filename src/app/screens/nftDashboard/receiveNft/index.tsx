@@ -6,7 +6,7 @@ import ActionButton from '@components/button';
 import UpdatedBottomModal from '@components/updatedBottomModal';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
-import { isLedgerAccount } from '@utils/helper';
+import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -171,9 +171,13 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           src={plusIcon}
           text={t('ADD_STACKS_ADDRESS')}
           onPress={async () => {
-            await chrome.tabs.create({
-              url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
-            });
+            if (!isInOptions()) {
+              await chrome.tabs.create({
+                url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+              });
+            } else {
+              navigate('/add-stx-address-ledger');
+            }
           }}
         />
       )}

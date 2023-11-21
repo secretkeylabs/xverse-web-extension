@@ -7,7 +7,7 @@ const TilesLoaderContainer = styled.div<{
   width: '100%',
   display: 'flex',
   justifyContent: 'flex-start',
-  columnGap: props.isGalleryOpen ? props.theme.spacing(16) : props.theme.spacing(12),
+  columnGap: props.isGalleryOpen ? props.theme.spacing(16) : props.theme.spacing(8),
 }));
 
 const TileLoaderContainer = styled.div({
