@@ -1,6 +1,6 @@
 import { getNftDetail, NftDetailResponse, NonFungibleToken } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import { getIdentifier } from '@utils/nfts';
+import { getIdentifier, isBnsCollection } from '@utils/nfts';
 import { handleRetries } from '@utils/query';
 
 const useNftDetail = (id: string | NonFungibleToken['identifier']) => {
@@ -11,7 +11,13 @@ const useNftDetail = (id: string | NonFungibleToken['identifier']) => {
     getNftDetail(tokenId, contractAddress, contractName);
 
   return useQuery({
-    enabled: !!(id && tokenId && contractAddress && contractName),
+    enabled: !!(
+      id &&
+      tokenId &&
+      contractAddress &&
+      contractName &&
+      !isBnsCollection(`${contractAddress}.${contractName}`)
+    ),
     retry: handleRetries,
     queryKey: ['nft-detail', contractAddress, contractName, tokenId],
     queryFn: fetchNft,

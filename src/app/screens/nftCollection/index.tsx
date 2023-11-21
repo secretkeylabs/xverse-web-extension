@@ -115,6 +115,10 @@ const StyledGridContainer = styled(GridContainer)`
   width: 100%;
 `;
 
+/*
+ * component to virtualise the grid item if not in window
+ * placeholder is required to match grid item size, in order to negate scroll jank
+ */
 function IsVisibleOrPlaceholder({ children }: PropsWithChildren) {
   const nodeRef = useRef<HTMLDivElement>(null);
   const isVisible = useIsVisible(nodeRef, { once: false });
@@ -132,6 +136,9 @@ function IsVisibleOrPlaceholder({ children }: PropsWithChildren) {
   );
 }
 
+/*
+ * component to load nft detail which contains image url
+ */
 function CollectionGridItemWithData({
   nft,
   collectionData,
@@ -145,7 +152,7 @@ function CollectionGridItemWithData({
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
 
-  const handleClickItem = isBnsCollection(nft.asset_identifier)
+  const handleClickItem = isBnsCollection(collectionData.collection_id)
     ? undefined
     : () => {
         if (nftData?.data?.token_metadata) {
@@ -161,7 +168,7 @@ function CollectionGridItemWithData({
       itemId={getNftCollectionsGridItemId(nft, collectionData)}
       onClick={handleClickItem}
     >
-        <Nft asset={nft} isGalleryOpen={isGalleryOpen} />
+      <Nft asset={nft} isGalleryOpen={isGalleryOpen} />
     </CollectibleCollectionGridItem>
   );
 }
