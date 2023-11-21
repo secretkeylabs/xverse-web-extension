@@ -18,7 +18,7 @@ const useInscriptionCollectionMarketData = (collectionId?: string | null) => {
   return useQuery({
     enabled: !!collectionId,
     retry: handleRetries,
-    queryKey: ['collection-market-data', collectionId],
+    queryKey: ['collection-market-data', collectionId, network.type],
     queryFn: collectionMarketData,
     staleTime: 1 * 60 * 1000, // 1 min
   });
