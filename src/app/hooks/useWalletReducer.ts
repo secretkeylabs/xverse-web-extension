@@ -2,16 +2,18 @@ import { getDeviceAccountIndex } from '@common/utils/ledger';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
-import { createWalletAccount, restoreWalletWithAccounts } from '@secretkeylabs/xverse-core/account';
-import { getBnsName } from '@secretkeylabs/xverse-core/api/stacks';
-import { decryptSeedPhraseCBC } from '@secretkeylabs/xverse-core/encryption';
 import {
   Account,
   AnalyticsEvents,
+  createWalletAccount,
+  decryptSeedPhraseCBC,
+  getBnsName,
+  newWallet,
+  restoreWalletWithAccounts,
   SettingsNetwork,
   StacksNetwork,
-} from '@secretkeylabs/xverse-core/types';
-import { newWallet, walletFromSeedPhrase } from '@secretkeylabs/xverse-core/wallet';
+  walletFromSeedPhrase,
+} from '@secretkeylabs/xverse-core';
 import {
   addAccountAction,
   ChangeNetworkAction,
@@ -170,7 +172,6 @@ const useWalletReducer = () => {
       ordinalsPublicKey: wallet.ordinalsPublicKey,
       stxAddress: wallet.stxAddress,
       stxPublicKey: wallet.stxPublicKey,
-      bnsName: wallet.bnsName,
     };
     const hasSeed = await seedVault.hasSeed();
     if (hasSeed && !masterPubKey) {
@@ -230,7 +231,6 @@ const useWalletReducer = () => {
       ordinalsPublicKey: wallet.ordinalsPublicKey,
       stxAddress: wallet.stxAddress,
       stxPublicKey: wallet.stxPublicKey,
-      bnsName: wallet.bnsName,
     };
     trackMixPanel(AnalyticsEvents.CreateNewWallet);
 
@@ -297,7 +297,6 @@ const useWalletReducer = () => {
       ordinalsPublicKey: wallet.ordinalsPublicKey,
       stxAddress: wallet.stxAddress,
       stxPublicKey: wallet.stxPublicKey,
-      bnsName: wallet.bnsName,
     };
     dispatch(setWalletAction(wallet));
     try {

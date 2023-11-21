@@ -44,7 +44,6 @@ import RareSatsBundle from '@screens/rareSatsBundle';
 import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
 import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
-import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20Screen from '@screens/sendBrc20';
@@ -301,10 +300,6 @@ const router = createHashRouter([
       {
         path: 'restore-funds',
         element: <RestoreFunds />,
-      },
-      {
-        path: 'recover-btc',
-        element: <RestoreBtc />,
       },
       {
         path: 'recover-ordinals',

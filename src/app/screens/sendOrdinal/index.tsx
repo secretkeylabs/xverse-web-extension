@@ -20,6 +20,7 @@ import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { StyledHeading } from '@ui-library/common.styled';
 import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
+import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -162,9 +163,9 @@ function SendOrdinal() {
           recipientAddress,
           fee: data.fee,
           feePerVByte: data.feePerVByte,
-          fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
+          fiatFee: getBtcFiatEquivalent(data.fee, BigNumber(btcFiatRate)),
           total: data.total,
-          fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),
+          fiatTotal: getBtcFiatEquivalent(data.total, BigNumber(btcFiatRate)),
           ordinalUtxo,
         },
       });

@@ -3,7 +3,6 @@ import ArrowIcon from '@assets/img/settings/arrow.svg';
 import XverseLogo from '@assets/img/settings/logo.svg';
 import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
-import useNonOrdinalUtxos from '@hooks/useNonOrdinalUtxo';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';

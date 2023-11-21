@@ -13,6 +13,16 @@ import type {
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
 
+type NumberLike = string | number | bigint | BigNumber;
+
+function numberLikeToStringOrThrow(value: NumberLike, name: string): string {
+  if (typeof value !== 'bigint' && BigNumber(value).isNaN()) {
+    throw new Error(`Invalid value for ${name}: ${value}`);
+  }
+
+  return `${value}`;
+}
+
 export function setWalletAction(wallet: BaseWallet): actions.SetWallet {
   return {
     type: actions.SetWalletKey,
@@ -103,37 +113,37 @@ export function setFeeMultiplierAction(feeMultipliers: AppInfo): actions.SetFeeM
 }
 
 export function setCoinRatesAction(
-  stxBtcRate: BigNumber,
-  btcFiatRate: BigNumber,
+  stxBtcRate: NumberLike,
+  btcFiatRate: NumberLike,
 ): actions.SetCoinRates {
   return {
     type: actions.SetCoinRatesKey,
-    stxBtcRate,
-    btcFiatRate,
+    stxBtcRate: numberLikeToStringOrThrow(stxBtcRate, 'stx fiat rate'),
+    btcFiatRate: numberLikeToStringOrThrow(btcFiatRate, 'btc fiat rate'),
   };
 }
 
 export function setStxWalletDataAction(
-  stxBalance: BigNumber,
-  stxAvailableBalance: BigNumber,
-  stxLockedBalance: BigNumber,
+  stxBalance: NumberLike,
+  stxAvailableBalance: NumberLike,
+  stxLockedBalance: NumberLike,
   stxTransactions: TransactionData[],
   stxNonce: number,
 ): actions.SetStxWalletData {
   return {
     type: actions.SetStxWalletDataKey,
-    stxBalance,
-    stxAvailableBalance,
-    stxLockedBalance,
+    stxBalance: numberLikeToStringOrThrow(stxBalance, 'stx balance'),
+    stxAvailableBalance: numberLikeToStringOrThrow(stxAvailableBalance, 'stx available'),
+    stxLockedBalance: numberLikeToStringOrThrow(stxLockedBalance, 'stx locked'),
     stxTransactions,
     stxNonce,
   };
 }
 
-export function SetBtcWalletDataAction(balance: BigNumber): actions.SetBtcWalletData {
+export function SetBtcWalletDataAction(balance: NumberLike): actions.SetBtcWalletData {
   return {
     type: actions.SetBtcWalletDataKey,
-    balance,
+    balance: numberLikeToStringOrThrow(balance, 'bitcoin balance'),
   };
 }
 
