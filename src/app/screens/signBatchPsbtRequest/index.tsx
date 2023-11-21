@@ -13,13 +13,12 @@ import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
-import { getBtcFiatEquivalent, parsePsbt, satsToBtc } from '@secretkeylabs/xverse-core';
+import { parsePsbt, satsToBtc } from '@secretkeylabs/xverse-core';
 import { isLedgerAccount } from '@utils/helper';
 import { BundleItem } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import { SignMultiplePsbtPayload } from 'sats-connect';
@@ -117,26 +116,15 @@ interface TxResponse {
 }
 
 function SignBatchPsbtRequest() {
-  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
-    useWalletSelector();
+  const { btcAddress, ordinalsAddress, selectedAccount, network } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const {
-    payload,
-    confirmSignPsbt,
-    broadcastPsbt,
-    cancelSignPsbt,
-    getSigningAddresses,
-    requestToken,
-  } = useSignBatchPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses, requestToken } =
+    useSignBatchPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
-  const [isBroadcasting, setIsBroadcasting] = useState(false);
-  const [isBroadcastingComplete, setIsBroadcastingComplete] = useState(false);
   const [isSigningComplete, setIsSigningComplete] = useState(false);
-  const [signingPsbtIndex, setSigningPsbtIndex] = useState(0);
-  const [txResponseArr, setTxResponseArr] = useState<TxResponse[]>([]);
-  const [broadcastingPsbtIndex, setBroadcastingPsbtIndex] = useState(0);
+  const [signingPsbtIndex, setSigningPsbtIndex] = useState(1);
   const [hasOutputScript, setHasOutputScript] = useState(false);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
   const [reviewTransaction, setReviewTransaction] = useState(false);
@@ -148,7 +136,6 @@ function SignBatchPsbtRequest() {
     { bundleItemsData: BundleItem[]; userReceivesOrdinal: boolean }[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
-  const notBroadcastedPsbtsLength = txResponseArr.filter((tx) => !tx.txId).length;
 
   const handlePsbtParsing = useCallback(
     (psbt: SignMultiplePsbtPayload, index: number) => {
@@ -260,7 +247,7 @@ function SignBatchPsbtRequest() {
       // eslint-disable-next-line no-restricted-syntax
       for (const psbt of payload.psbts) {
         // eslint-disable-next-line no-await-in-loop
-        await delay(1000);
+        await delay(100);
 
         // eslint-disable-next-line no-await-in-loop
         const signedPsbt = await confirmSignPsbt(psbt);
@@ -268,37 +255,14 @@ function SignBatchPsbtRequest() {
           txId: signedPsbt.txId,
           psbtBase64: signedPsbt.signingResponse,
         });
-        setSigningPsbtIndex((prevIndex) => prevIndex + 1);
+
+        if (payload.psbts.findIndex((item) => item === psbt) !== payload.psbts.length - 1) {
+          setSigningPsbtIndex((prevIndex) => prevIndex + 1);
+        }
       }
 
       setIsSigningComplete(true);
       setIsSigning(false);
-
-      if (payload.broadcast) {
-        setIsSigning(false);
-        setIsBroadcasting(true);
-
-        // eslint-disable-next-line no-restricted-syntax
-        for (const psbt of signedPsbts) {
-          // eslint-disable-next-line no-await-in-loop
-          await delay(5000);
-
-          try {
-            // eslint-disable-next-line no-await-in-loop
-            const txId = await broadcastPsbt(psbt.psbtBase64);
-            psbt.txId = txId;
-          } catch (e) {
-            console.error(e);
-          } finally {
-            setBroadcastingPsbtIndex((prevIndex) => prevIndex + 1);
-          }
-        }
-
-        setIsBroadcastingComplete(true);
-        setIsBroadcasting(false);
-      }
-
-      setTxResponseArr(signedPsbts);
 
       const signingMessage = {
         source: MESSAGE_SOURCE,
@@ -312,16 +276,14 @@ function SignBatchPsbtRequest() {
       chrome.tabs.sendMessage(+tabId, signingMessage);
     } catch (err) {
       setIsSigning(false);
-      setIsBroadcasting(false);
       setIsSigningComplete(false);
-      setIsBroadcastingComplete(false);
 
       if (err instanceof Error) {
         navigate('/tx-status', {
           state: {
             txid: '',
             currency: 'BTC',
-            errorTitle: !payload.broadcast ? t('PSBT_CANT_SIGN_ERROR_TITLE') : '',
+            errorTitle: t('PSBT_CANT_SIGN_ERROR_TITLE'),
             error: err.message,
             browserTx: true,
           },
@@ -343,27 +305,10 @@ function SignBatchPsbtRequest() {
     window.close();
   };
 
-  const getSatsAmountString = (sats: BigNumber) => (
-    <NumericFormat
-      value={sats.toString()}
-      displayType="text"
-      thousandSeparator
-      suffix={` ${t('SATS')}`}
-    />
-  );
-
   const totalNetAmount = parsedPsbts.reduce(
     (sum, psbt) => (psbt ? sum.plus(new BigNumber(psbt.netAmount)) : sum),
     new BigNumber(0),
   );
-
-  const totalFees = parsedPsbts.reduce((sum, psbt) => {
-    if (psbt && psbt.fees) {
-      return sum.plus(new BigNumber(psbt.fees));
-    }
-    return sum;
-  }, new BigNumber(0));
-  const totalFeesInFiat = getBtcFiatEquivalent(totalFees, btcFiatRate);
 
   const userReceivesOrdinals = userReceivesOrdinalArr
     .filter((item) => item.userReceivesOrdinal)
@@ -377,45 +322,6 @@ function SignBatchPsbtRequest() {
 
   const signingStatus: ConfirmationStatus = isSigningComplete ? 'SUCCESS' : 'LOADING';
 
-  let broadcastingStatus: ConfirmationStatus = 'LOADING';
-
-  if (isBroadcastingComplete) {
-    if (notBroadcastedPsbtsLength > 0) {
-      broadcastingStatus = 'FAILURE';
-    } else {
-      broadcastingStatus = 'SUCCESS';
-    }
-  }
-
-  if (isBroadcasting || isBroadcastingComplete) {
-    return (
-      <LoadingTransactionStatus
-        status={broadcastingStatus}
-        resultTexts={{
-          title:
-            broadcastingStatus === 'SUCCESS'
-              ? t('TRANSACTIONS_BROADCASTED')
-              : t('TRANSACTIONS_FAILED_TO_BROADCAST', {
-                  failed: notBroadcastedPsbtsLength,
-                  total: payload.psbts.length,
-                }),
-          description: broadcastingStatus === 'SUCCESS' ? '' : t('CHECK_THE_APP_YOU_USE'),
-        }}
-        loadingTexts={{
-          title: `${t('BROADCASTING_TRANSACTIONS')} ${broadcastingPsbtIndex + 1}/${
-            payload.psbts.length
-          }...`,
-          description: t('THIS_MAY_TAKE_A_FEW_MINUTES'),
-        }}
-        loadingPercentage={
-          isBroadcastingComplete ? 1 : broadcastingPsbtIndex / payload.psbts.length
-        }
-        primaryAction={{ onPress: closeCallback, text: t('CLOSE') }}
-        withLoadingBgCircle
-      />
-    );
-  }
-
   if (isSigning || isSigningComplete) {
     return (
       <LoadingTransactionStatus
@@ -425,7 +331,7 @@ function SignBatchPsbtRequest() {
           description: '',
         }}
         loadingTexts={{
-          title: `${t('SIGNING_TRANSACTIONS')} ${signingPsbtIndex + 1}/${payload.psbts.length}...`,
+          title: `${t('SIGNING_TRANSACTIONS')} ${signingPsbtIndex}/${payload.psbts.length}...`,
           description: t('THIS_MAY_TAKE_A_FEW_MINUTES'),
         }}
         loadingPercentage={isSigningComplete ? 1 : signingPsbtIndex / payload.psbts.length}
@@ -460,10 +366,6 @@ function SignBatchPsbtRequest() {
                   <ArrowRight size={12} weight="bold" />
                 </BundleLinkContainer>
 
-                {!payload.broadcast && (
-                  <InfoContainer bodyText={t('PSBTS_NO_BROADCAST_DISCLAIMER')} />
-                )}
-
                 {userTransfersOrdinals.length > 0 && (
                   <BundleItemsComponent items={userReceivesOrdinals} />
                 )}
@@ -485,13 +387,6 @@ function SignBatchPsbtRequest() {
 
                 <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
 
-                {payload.broadcast && (
-                  <TransactionDetailComponent
-                    title={t('FEES')}
-                    value={getSatsAmountString(totalFees)}
-                    subValue={totalFeesInFiat}
-                  />
-                )}
                 {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
               </Container>
             )}
@@ -552,16 +447,6 @@ function SignBatchPsbtRequest() {
               onArrowClick={expandInputOutputSection}
             />
 
-            {payload.broadcast ? (
-              <TransactionDetailComponent
-                title={t('FEES')}
-                value={getSatsAmountString(new BigNumber(parsedPsbts[currentPsbtIndex]?.fees))}
-                subValue={getBtcFiatEquivalent(
-                  new BigNumber(parsedPsbts[currentPsbtIndex]?.fees),
-                  btcFiatRate,
-                )}
-              />
-            ) : null}
             {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
           </CustomizedModalContainer>
         </OuterContainer>

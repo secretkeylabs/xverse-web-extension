@@ -1,14 +1,9 @@
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  InputToSign,
-  psbtBase64ToHex,
-  signPsbt,
-} from '@secretkeylabs/xverse-core/transactions/psbt';
+import { InputToSign, signPsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
 import { SignMultiplePsbtPayload, SignMultipleTransactionOptions } from 'sats-connect';
-import useBtcClient from './useBtcClient';
 import useSeedVault from './useSeedVault';
 
 const useSignBatchPsbtTx = () => {
@@ -19,7 +14,6 @@ const useSignBatchPsbtTx = () => {
   const requestToken = params.get('signBatchPsbtRequest') ?? '';
   const request = decodeToken(requestToken) as any as SignMultipleTransactionOptions;
   const tabId = params.get('tabId') ?? '0';
-  const btcClient = useBtcClient();
 
   const confirmSignPsbt = async (psbt: SignMultiplePsbtPayload) => {
     const txId = '';
@@ -29,7 +23,7 @@ const useSignBatchPsbtTx = () => {
       accountsList,
       psbt.inputsToSign,
       psbt.psbtBase64,
-      request.payload.broadcast,
+      false,
       network.type,
     );
 
@@ -37,15 +31,6 @@ const useSignBatchPsbtTx = () => {
       txId,
       signingResponse,
     };
-  };
-
-  const broadcastPsbt = async (psbtBase64: string) => {
-    let txId = '';
-    const txHex = psbtBase64ToHex(psbtBase64);
-    const response = await btcClient.sendRawTransaction(txHex);
-    txId = response.tx.hash;
-
-    return txId;
   };
 
   const cancelSignPsbt = () => {
@@ -73,7 +58,6 @@ const useSignBatchPsbtTx = () => {
     requestToken,
     getSigningAddresses,
     confirmSignPsbt,
-    broadcastPsbt,
     cancelSignPsbt,
   };
 };
