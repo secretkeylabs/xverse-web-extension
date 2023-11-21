@@ -55,7 +55,7 @@ function RareSatAsset({ item, isCollage = false }: Props) {
     <Container>
       {isInscription ? (
         <InscriptionContainer>
-          {!isCollage && !!item.rarity_ranking && item.rarity_ranking !== 'common' && (
+          {!isCollage && !!item.rarity_ranking && item.rarity_ranking !== 'COMMON' && (
             <RareSatIconContainer isGallery={isGallery}>
               <RareSatIcon
                 type={item.rarity_ranking}

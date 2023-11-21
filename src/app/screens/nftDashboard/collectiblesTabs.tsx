@@ -1,7 +1,7 @@
 import ActionButton from '@components/button';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import { StyledP, StyledTab, StyledTabList } from '@ui-library/common.styled';
-import { ApiBundle, Bundle, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
+import { ApiBundleV2, BundleV2, mapRareSatsAPIResponseToRareSatsV2 } from '@utils/rareSats';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -11,6 +11,9 @@ import type { NftDashboardState } from '.';
 import { StyledBarLoader, TilesSkeletonLoader } from '../../components/tilesSkeletonLoader';
 import Notice from './notice';
 import RareSatsTabGridItem from './rareSatsTabGridItem';
+
+const MAX_SATS_ITEMS_EXTENSION = 6;
+const MAX_SATS_ITEMS_GALLERY = 20;
 
 export const GridContainer = styled.div<{
   isGalleryOpen: boolean;
@@ -22,6 +25,12 @@ export const GridContainer = styled.div<{
   gridTemplateColumns: props.isGalleryOpen
     ? 'repeat(auto-fill,minmax(220px,1fr))'
     : 'repeat(auto-fill,minmax(150px,1fr))',
+}));
+
+export const RareSatsTabContainer = styled.div<{
+  isGalleryOpen: boolean;
+}>((props) => ({
+  marginTop: props.theme.space.l,
 }));
 
 const StyledTotalItems = styled(StyledP)`
@@ -219,17 +228,21 @@ export default function CollectiblesTabs({
           {rareSatsQuery.isLoading ? (
             <SkeletonLoader isGalleryOpen={isGalleryOpen} />
           ) : (
-            <GridContainer isGalleryOpen={isGalleryOpen}>
+            <RareSatsTabContainer isGalleryOpen={isGalleryOpen}>
               {!rareSatsQuery.error &&
                 !rareSatsQuery.isLoading &&
                 rareSatsQuery.data?.pages
                   ?.map((page) => page?.results)
                   .flat()
-                  .map((utxo: ApiBundle) => mapRareSatsAPIResponseToRareSats(utxo))
-                  .map((bundle: Bundle) => (
-                    <RareSatsTabGridItem key={bundle.txid} bundle={bundle} />
+                  .map((utxo: ApiBundleV2) => mapRareSatsAPIResponseToRareSatsV2(utxo))
+                  .map((bundle: BundleV2) => (
+                    <RareSatsTabGridItem
+                      key={bundle.txid}
+                      bundle={bundle}
+                      maxItems={isGalleryOpen ? MAX_SATS_ITEMS_GALLERY : MAX_SATS_ITEMS_EXTENSION}
+                    />
                   ))}
-            </GridContainer>
+            </RareSatsTabContainer>
           )}
           {rareSatsQuery.hasNextPage && (
             <LoadMoreButtonContainer>

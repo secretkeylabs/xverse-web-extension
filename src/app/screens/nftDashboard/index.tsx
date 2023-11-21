@@ -5,7 +5,7 @@ import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
 import WebGalleryButton from '@components/webGalleryButton';
 import useAddressInscriptionCollections from '@hooks/queries/ordinals/useAddressInscriptionCollections';
-import { useAddressRareSats } from '@hooks/queries/ordinals/useAddressRareSats';
+import { useAddressRareSatsV2 } from '@hooks/queries/ordinals/useAddressRareSats';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, Wrench } from '@phosphor-icons/react';
@@ -131,7 +131,7 @@ export type NftDashboardState = {
   isOrdinalReceiveAlertVisible: boolean;
   stacksNftsQuery: ReturnType<typeof useStacksCollectibles>;
   inscriptionsQuery: ReturnType<typeof useAddressInscriptionCollections>;
-  rareSatsQuery: ReturnType<typeof useAddressRareSats>;
+  rareSatsQuery: ReturnType<typeof useAddressRareSatsV2>;
   openInGalleryView: () => void;
   onReceiveModalOpen: () => void;
   onReceiveModalClose: () => void;
@@ -162,7 +162,7 @@ const useNftDashboard = (): NftDashboardState => {
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const stacksNftsQuery = useStacksCollectibles();
   const inscriptionsQuery = useAddressInscriptionCollections();
-  const rareSatsQuery = useAddressRareSats();
+  const rareSatsQuery = useAddressRareSatsV2();
 
   const ordinalsLength = inscriptionsQuery.data?.pages?.[0]?.total ?? 0;
   const totalNfts = stacksNftsQuery.data?.pages?.[0]?.total ?? 0;

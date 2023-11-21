@@ -51,5 +51,5 @@ export const mapCondensedInscriptionToBundleItem = (
 ): BundleItem => ({
   inscription,
   type: 'inscription',
-  rarity_ranking: 'common', // TODO eventually want to fetch this rarity and display it
+  rarity_ranking: 'COMMON', // TODO eventually want to fetch this rarity and display it
 });

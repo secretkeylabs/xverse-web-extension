@@ -93,12 +93,12 @@ function RareSatIcon({
 }: Props) {
   const isGallery: boolean = document.documentElement.clientWidth > 360;
   const src = {
-    epic: Epic,
-    legendary: Legendary,
-    mythic: Mythic,
-    rare: Rare,
-    uncommon: Uncommon,
-    unknown: Unknown,
+    EPIC: Epic,
+    LEGENDARY: Legendary,
+    MYTHIC: Mythic,
+    RARE: Rare,
+    UNCOMMON: Uncommon,
+    UNKNOWN: Unknown,
     BLACK_LEGENDARY: BlackLegendary,
     BLACK_EPIC: BlackEpic,
     BLACK_RARE: BlackRare,
@@ -136,7 +136,7 @@ function RareSatIcon({
   return (
     <Container bgColor={backgroundColor} padding={padding}>
       <ImageContainer size={size} dynamicSize={isDynamicSize}>
-        {glow && type !== 'unknown' && (
+        {glow && type !== 'UNKNOWN' && (
           <Glow color={color} outerColor={outerColor} isCollage={isCollage} isGallery={isGallery} />
         )}
         <Image src={src} alt={type} />

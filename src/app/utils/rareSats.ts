@@ -2,12 +2,12 @@ import { t } from 'i18next';
 import { getTruncatedAddress } from './helper';
 
 export const RoadArmorRareSats = [
-  'mythic',
-  'legendary',
-  'epic',
-  'rare',
-  'uncommon',
-  'common',
+  'MYTHIC',
+  'LEGENDARY',
+  'EPIC',
+  'RARE',
+  'UNCOMMON',
+  'COMMON',
 ] as const;
 export type RoadArmorRareSatsType = (typeof RoadArmorRareSats)[number];
 
@@ -40,11 +40,10 @@ export const Sattributes = [
 export type SattributesType = (typeof Sattributes)[number];
 
 // TODO: remove unknown and unify with common
-export const RareSats = [...RoadArmorRareSats, 'unknown', ...Sattributes] as const;
+export const RareSats = [...RoadArmorRareSats, 'UNKNOWN', ...Sattributes] as const;
 export type RareSatsType = (typeof RareSats)[number];
 
-export const getRareSatsLabelByType = (type: RareSatsType) =>
-  t(`RARE_SATS.RARITY_LABEL.${type.toUpperCase()}`);
+export const getRareSatsLabelByType = (type: RareSatsType) => t(`RARE_SATS.RARITY_LABEL.${type}`);
 
 export type SatType = 'inscription' | 'rare-sat' | 'inscribed-sat' | 'unknown';
 
@@ -58,10 +57,10 @@ export const getBundleItemSubText = ({
   ({
     inscription: t('COMMON.INSCRIPTION'),
     'rare-sat': t('RARE_SATS.SAT_TYPES.RARE_SAT', {
-      type: getRareSatsLabelByType(rareSatsType ?? 'unknown'),
+      type: getRareSatsLabelByType(rareSatsType ?? 'UNKNOWN'),
     }),
     'inscribed-sat': t('RARE_SATS.SAT_TYPES.INSCRIBED_RARE_SAT', {
-      type: getRareSatsLabelByType(rareSatsType ?? 'unknown'),
+      type: getRareSatsLabelByType(rareSatsType ?? 'UNKNOWN'),
     }),
     unknown: t('RARE_SATS.SAT_TYPES.UNKNOWN_RARE_SAT'),
   }[satType]);
@@ -115,7 +114,7 @@ type SatInscription = {
   content_type: string;
 };
 
-type Sat = { number: string; offset: number; rarity_ranking: RoadArmorRareSatsType };
+type Sat = { number: string; offset: number; rarity_ranking: Lowercase<RoadArmorRareSatsType> };
 
 export type ApiBundle = {
   txid: string;
@@ -151,7 +150,7 @@ export type BundleItem =
     }
   | {
       type: 'unknown';
-      rarity_ranking: 'unknown';
+      rarity_ranking: 'UNKNOWN';
     };
 
 export type Bundle = Omit<ApiBundle, 'sats' | 'inscriptions'> & {
@@ -168,7 +167,7 @@ export const mapRareSatsAPIResponseToRareSats = (apiBundles: ApiBundle): Bundle 
 
   // unknown
   if (!apiBundles.sats.length && !apiBundles.inscriptions.length) {
-    return { ...generalBundleInfo, items: [{ type: 'unknown', rarity_ranking: 'unknown' }] };
+    return { ...generalBundleInfo, items: [{ type: 'unknown', rarity_ranking: 'UNKNOWN' }] };
   }
 
   // only rare sats
@@ -177,7 +176,7 @@ export const mapRareSatsAPIResponseToRareSats = (apiBundles: ApiBundle): Bundle 
       ...generalBundleInfo,
       items: apiBundles.sats.map((sat) => ({
         type: 'rare-sat',
-        rarity_ranking: sat.rarity_ranking,
+        rarity_ranking: sat.rarity_ranking.toUpperCase() as RoadArmorRareSatsType,
         number: sat.number,
       })),
     };
@@ -200,7 +199,7 @@ export const mapRareSatsAPIResponseToRareSats = (apiBundles: ApiBundle): Bundle 
     }
     items.push({
       type: 'inscription',
-      rarity_ranking: 'common',
+      rarity_ranking: 'COMMON',
       inscription: {
         id: inscription.id,
         content_type: inscription.content_type,
@@ -213,13 +212,13 @@ export const mapRareSatsAPIResponseToRareSats = (apiBundles: ApiBundle): Bundle 
     if (!inscription) {
       return items.push({
         type: 'rare-sat',
-        rarity_ranking: sat.rarity_ranking,
+        rarity_ranking: sat.rarity_ranking.toUpperCase() as RoadArmorRareSatsType,
         number: sat.number,
       });
     }
     items.push({
       type: 'inscribed-sat',
-      rarity_ranking: sat.rarity_ranking,
+      rarity_ranking: sat.rarity_ranking.toUpperCase() as RoadArmorRareSatsType,
       number: sat.number,
       inscription: {
         id: inscription.id,
@@ -234,7 +233,7 @@ export const mapRareSatsAPIResponseToRareSats = (apiBundles: ApiBundle): Bundle 
   };
 };
 
-const getFormattedTxIdVoutFromBundle = (bundle: Bundle) =>
+export const getFormattedTxIdVoutFromBundle = (bundle: Bundle | BundleV2) =>
   `${getTruncatedAddress(bundle.txid, 6)}:${bundle.vout}`;
 
 export const getBundleId = (bundle: Bundle): string => {
@@ -267,4 +266,109 @@ export const getBundleItemId = (bundle: Bundle, index: number): string => {
     return getTruncatedAddress(item.inscription.id, 6);
   }
   return item.number;
+};
+
+// TODO: once we define the layout changes for inscriptions and buy/sell confirmation screen we can remove old implementation and remove the v2 from here
+type Inscription = {
+  id: string;
+  content_type: string;
+};
+
+type BundleSatRange = Omit<ApiBundleSatRange, 'year_mined'> & {
+  totalSats: number;
+  yearMined: number;
+};
+
+export type BundleV2 = Omit<ApiBundleV2, 'sat_ranges'> & {
+  satRanges: BundleSatRange[];
+  inscriptions: Inscription[];
+  satributes: RareSatsType[][];
+};
+
+export type ApiBundleSatRange = {
+  range: {
+    start: string;
+    end: string;
+  };
+  year_mined: number;
+  block: number;
+  offset: number;
+  satributes: RareSatsType[];
+  inscriptions: Inscription[];
+};
+
+export type ApiBundleV2 = {
+  txid: string;
+  vout: number;
+  block_height?: number;
+  value: number;
+  sat_ranges: ApiBundleSatRange[];
+};
+
+export const mapRareSatsAPIResponseToRareSatsV2 = (apiBundle: ApiBundleV2): BundleV2 => {
+  const generalBundleInfo = {
+    txid: apiBundle.txid,
+    vout: apiBundle.vout,
+    block_height: apiBundle.block_height,
+    value: apiBundle.value,
+  };
+
+  const commonUnknownRange: BundleSatRange = {
+    range: {
+      start: '0',
+      end: '0',
+    },
+    yearMined: 0,
+    block: 0,
+    offset: 0,
+    satributes: ['UNKNOWN'],
+    inscriptions: [],
+    totalSats: apiBundle.value,
+  };
+
+  // if bundle has and empty sat ranges, it means that it's a common/unknown bundle
+  if (!apiBundle.sat_ranges.length) {
+    return {
+      ...generalBundleInfo,
+      satRanges: [commonUnknownRange],
+      inscriptions: [],
+      satributes: [['UNKNOWN']],
+    };
+  }
+
+  const satRanges = apiBundle.sat_ranges.map((satRange) => {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { year_mined, ...satRangeProps } = satRange;
+    return {
+      ...satRangeProps,
+      totalSats: Number(BigInt(satRange.range.end) - BigInt(satRange.range.start)),
+      yearMined: year_mined,
+    };
+  });
+
+  // we map this previous to a possible push of a common unknown range cause we don't need to show the icon rare sats tab. We only show it if the bundle is fully common/unknown
+  const inscriptions = satRanges.reduce(
+    (acc, curr) => [...acc, ...curr.inscriptions],
+    [] as BundleV2['satRanges'][0]['inscriptions'],
+  );
+  const satributes = satRanges.reduce(
+    (acc, curr) => [...acc, curr.satributes],
+    [] as RareSatsType[][],
+  );
+
+  // if totalExotics doesn't match the value of the bundle, it means that the bundle is not fully exotic and we need to add a common unknown sat range more
+  const totalExotics = satRanges.reduce((acc, curr) => acc + curr.totalSats, 0);
+  if (totalExotics !== apiBundle.value) {
+    satRanges.push({
+      ...commonUnknownRange,
+      totalSats: apiBundle.value - totalExotics,
+    });
+  }
+
+  return {
+    ...generalBundleInfo,
+    satRanges,
+    inscriptions,
+    satributes,
+  };
 };

@@ -73,7 +73,7 @@ export function InscriptionsTabGridItem({
         onClick={isCollection(collection) ? handleClickCollectionId : handleClickInscriptionId}
       >
         {!collection.thumbnail_inscriptions ? ( // eslint-disable-line no-nested-ternary
-          <OrdinalImage ordinal={{ id: '', content_type: 'unknown' }} />
+          <OrdinalImage ordinal={{ id: '', content_type: 'unknown', number: 0 }} />
         ) : !isCollection(collection) || collection.thumbnail_inscriptions.length === 1 ? ( // eslint-disable-line no-nested-ternary
           <RareSatAsset
             item={mapCondensedInscriptionToBundleItem(collection.thumbnail_inscriptions[0])}
