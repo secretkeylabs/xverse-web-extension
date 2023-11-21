@@ -6,16 +6,16 @@ import Success from '@assets/img/send/check_circle.svg';
 
 import ActionButton from '@components/button';
 import CopyButton from '@components/copyButton';
-import type { SettingsNetwork } from '@secretkeylabs/xverse-core/types';
+import type { SettingsNetwork } from '@secretkeylabs/xverse-core';
 import { getBtcTxStatusUrl } from '@utils/helper';
 
-const TxStatusContainer = styled.div({
-  background: 'rgba(25, 25, 48, 0.74)',
+const TxStatusContainer = styled.div((props) => ({
+  background: props.theme.colors.elevation0,
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
   backdropFilter: 'blur(16px)',
-});
+}));
 
 const Container = styled.div({
   display: 'flex',
@@ -77,15 +77,15 @@ const Image = styled.img({
 });
 
 const HeadingText = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white['0'],
+  ...props.theme.typography.headline_s,
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   marginTop: props.theme.spacing(8),
 }));
 
-const BodyText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+const BodyText = styled.p((props) => ({
+  ...props.theme.typography.body_m,
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
   overflowWrap: 'break-word',
@@ -95,29 +95,29 @@ const BodyText = styled.h1((props) => ({
   marginRight: props.theme.spacing(5),
 }));
 
-const TxIDText = styled.h1((props) => ({
+const TxIDText = styled.p((props) => ({
   ...props.theme.headline_category_s,
-  color: props.theme.colors.white['400'],
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textTransform: 'uppercase',
 }));
 
-const BeforeButtonText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['400'],
+const BeforeButtonText = styled.p((props) => ({
+  ...props.theme.typography.body_m,
+  color: props.theme.colors.white_400,
 }));
 
-const IDText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white['0'],
+const IDText = styled.p((props) => ({
+  ...props.theme.typography.body_m,
+  color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(2),
   wordBreak: 'break-all',
 }));
 
-const ButtonText = styled.h1((props) => ({
-  ...props.theme.body_m,
+const ButtonText = styled.p((props) => ({
+  ...props.theme.typography.body_m,
   marginRight: props.theme.spacing(2),
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
 }));
 
 const ButtonImage = styled.img((props) => ({

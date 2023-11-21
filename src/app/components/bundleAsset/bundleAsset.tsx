@@ -2,7 +2,7 @@ import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
 import { Bundle } from '@utils/rareSats';
 import styled from 'styled-components';
 
-import RareSatsCollage from './rareSatsCollage';
+import CollectibleCollage from '../collectibleCollage/collectibleCollage';
 
 const ImageContainer = styled.div`
   display: flex;
@@ -29,7 +29,7 @@ function BundleAsset({ bundle }: Props) {
   return (
     <ImageContainer>
       {isMoreThanOneItem ? (
-        <RareSatsCollage items={bundle.items} />
+        <CollectibleCollage items={bundle.items} />
       ) : (
         <IndividualAssetContainer>
           <RareSatAsset item={bundle.items[0]} />

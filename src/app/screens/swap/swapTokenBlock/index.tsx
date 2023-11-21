@@ -1,7 +1,10 @@
 import ChevronIcon from '@assets/img/swap/chevron.svg';
 import TokenImage from '@components/tokenImage';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { SwapToken } from '@screens/swap/types';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
@@ -115,6 +118,7 @@ function SwapTokenBlock({
   error,
 }: SwapTokenBlockProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
+  const { fiatCurrency } = useWalletSelector();
 
   return (
     <Container>
@@ -141,9 +145,14 @@ function SwapTokenBlock({
           />
         </RowContainer>
         <RowContainer>
-          <EstimateUSDText>
-            {selectedCoin?.fiatAmount ? `≈ $ ${selectedCoin.fiatAmount} USD` : '--'}
-          </EstimateUSDText>
+          <NumericFormat
+            value={selectedCoin?.fiatAmount ?? '--'}
+            displayType="text"
+            thousandSeparator
+            prefix={`${currencySymbolMap[fiatCurrency]} `}
+            suffix={` ${fiatCurrency}`}
+            renderText={(value) => <EstimateUSDText>{value}</EstimateUSDText>}
+          />
         </RowContainer>
       </CardContainer>
     </Container>

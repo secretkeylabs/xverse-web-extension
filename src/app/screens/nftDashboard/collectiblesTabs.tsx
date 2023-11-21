@@ -7,10 +7,10 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TabPanel, Tabs } from 'react-tabs';
 import styled from 'styled-components';
-import type { NftDashboardState } from '.';
 import { StyledBarLoader, TilesSkeletonLoader } from '../../components/tilesSkeletonLoader';
 import Notice from './notice';
 import RareSatsTabGridItem from './rareSatsTabGridItem';
+import type { NftDashboardState } from './useNftDashboard';
 
 export const GridContainer = styled.div<{
   isGalleryOpen: boolean;
@@ -23,6 +23,14 @@ export const GridContainer = styled.div<{
     ? 'repeat(auto-fill,minmax(220px,1fr))'
     : 'repeat(auto-fill,minmax(150px,1fr))',
 }));
+
+const StickyStyledTabList = styled(StyledTabList)`
+  position: sticky;
+  background: ${(props) => props.theme.colors.elevation0};
+  top: -1px;
+  z-index: 1;
+  padding: ${(props) => props.theme.space.m} 0;
+`;
 
 const StyledTotalItems = styled(StyledP)`
   margin-top: ${(props) => props.theme.space.s};
@@ -155,11 +163,11 @@ export default function CollectiblesTabs({
   return (
     <Tabs className={className} selectedIndex={tabIndex} onSelect={handleSelectTab}>
       {visibleTabButtons.length > 1 && (
-        <StyledTabList>
+        <StickyStyledTabList>
           {visibleTabButtons.map(({ key, label }) => (
             <StyledTab key={key}>{t(label)}</StyledTab>
           ))}
-        </StyledTabList>
+        </StickyStyledTabList>
       )}
       {hasActivatedOrdinalsKey && (
         <TabPanel>
@@ -169,7 +177,7 @@ export default function CollectiblesTabs({
             <>
               {totalInscriptions > 0 && (
                 <StyledTotalItems typography="body_medium_m" color="white_200">
-                  {t('TOTAL_ITEMS', { total: totalInscriptions || 0 })}
+                  {t('TOTAL_ITEMS', { count: totalInscriptions })}
                 </StyledTotalItems>
               )}
               {inscriptionListView}
@@ -184,7 +192,7 @@ export default function CollectiblesTabs({
           <>
             {totalNfts > 0 && (
               <StyledTotalItems typography="body_medium_m" color="white_200">
-                {t('TOTAL_ITEMS', { total: totalNfts || 0 })}
+                {t('TOTAL_ITEMS', { count: totalNfts })}
               </StyledTotalItems>
             )}
             {nftListView}
@@ -195,7 +203,7 @@ export default function CollectiblesTabs({
         <TabPanel>
           {!rareSatsQuery.isLoading && ordinalBundleCount > 0 && (
             <StyledTotalItems typography="body_medium_m" color="white_200">
-              {t('TOTAL_ITEMS', { total: ordinalBundleCount })}
+              {t('TOTAL_ITEMS', { count: ordinalBundleCount })}
             </StyledTotalItems>
           )}
 

@@ -558,7 +558,8 @@
     "ERROR_RETRIEVING": "We are having trouble retrieving data.",
     "TRY_AGAIN": "Please try again later.",
     "LOAD_MORE": "Load more",
-    "TOTAL_ITEMS": "{{total}} items",
+    "TOTAL_ITEMS_one": "{{count}} item",
+    "TOTAL_ITEMS_other": "{{count}} items",
     "WEB_GALLERY": "Open gallery",
     "RECEIVE": "Receive",
     "SEND": "Send",
@@ -649,7 +650,7 @@
     "RARITY": "Overall rarity",
     "CONTRACT_ID": "Contract ID",
     "ATTRIBUTES": "Attributes",
-    "VIEW_CONTRACT": "View the contract on",
+    "VIEW_CONTRACT": "View on",
     "STACKS_EXPLORER": "Stacks Explorer",
     "DETAILS": "See detail on",
     "GAMMA": "Gamma.io",
@@ -931,7 +932,7 @@
     },
     "COMPLETE": {
       "INSCRIBED": "Ordinal inscribed",
-      "MESSAGE": "Your ordinal have been successfully inscribed and should appear in a few minutes.",
+      "MESSAGE": "Your ordinal has been successfully inscribed and should appear in a few minutes.",
       "SEE_ON": "See on",
       "BITCOIN_EXPLORER": "mempool",
       "TRANSACTION_ID": "Transaction ID",
@@ -1126,11 +1127,14 @@
     "RARE_SAT": "Rare Sat",
     "INSCRIBED_SAT": "Inscribed Sat"
   },
-  "ORDINALS_COLLECTION_SCREEN": {
+  "COLLECTIBLE_COLLECTION_SCREEN": {
     "BACK_TO_GALLERY": "Back to gallery",
     "COLLECTION_FLOOR_PRICE": "Collection floor price",
     "EST_PORTFOLIO_VALUE": "Est. portfolio value",
     "COLLECTION": "Collection",
-    "LOAD_MORE": "Load more"
+    "LOAD_MORE": "Load more",
+    "ERRORS": {
+      "FAILED_TO_FETCH": "Failed to fetch data"
+    }
   }
 }

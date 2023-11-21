@@ -10,7 +10,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { CurrencyTypes } from '@utils/constants';
-import { isLedgerAccount } from '@utils/helper';
+import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
@@ -262,7 +262,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   };
 
   const goToSendScreen = async () => {
-    if (isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       switch (coin) {
         case 'BTC':
           await chrome.tabs.create({
