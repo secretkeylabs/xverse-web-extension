@@ -43,6 +43,7 @@ function App(): JSX.Element {
                 <RouterProvider router={router} />
                 <Toaster
                   position="bottom-center"
+                  containerStyle={{ bottom: 80 }}
                   toastOptions={{
                     success: {
                       icon: <CheckCircle size={20} weight="bold" />,
