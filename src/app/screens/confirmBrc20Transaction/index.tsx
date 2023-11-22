@@ -240,7 +240,7 @@ const useConfirmBrc20Transfer = (): {
       label: 'Total Fee',
       value: totalFee,
       suffix: 'sats',
-      fiatValue: getBtcFiatEquivalent(totalFee, btcFiatRate),
+      fiatValue: getBtcFiatEquivalent(totalFee, BigNumber(btcFiatRate)),
       fiatCurrency,
     },
   ];

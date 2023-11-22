@@ -12,16 +12,17 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import type { StacksTransaction } from '@secretkeylabs/xverse-core';
 import {
   getNonce,
+  microstacksToStx,
   setFee,
   setNonce,
   signLedgerStxTransaction,
   signMultiStxTransactions,
   signTransaction,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
-import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
 import { isHardwareAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
