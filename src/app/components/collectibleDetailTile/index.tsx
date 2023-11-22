@@ -7,17 +7,17 @@ interface DetailSectionProps {
   isGallery: boolean;
 }
 const DescriptionHeadingText = styled.p<DetailSectionProps>((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_400,
   marginBottom: props.theme.spacing(2),
   whiteSpace: 'nowrap',
   textAlign: props.isGallery ? 'right' : 'left',
 }));
 
 const DescriptionValueText = styled.p<DetailSectionProps>((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   wordWrap: 'break-word',
-  color: props.theme.colors.white['0'],
+  color: props.theme.colors.white_0,
   textAlign: !props.isGallery ? 'left' : 'right',
   maxWidth: 375,
 }));
@@ -30,6 +30,7 @@ const Container = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   flexDirection: props.isColumnAlignment ? 'column' : 'row',
   width: '100%',
+  flex: 1,
   justifyContent: 'space-between',
 }));
 

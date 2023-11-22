@@ -1,4 +1,3 @@
-import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
@@ -31,10 +30,6 @@ function RestoreFunds() {
     navigate(-1);
   };
 
-  const handleOnRestoreBtcClick = () => {
-    navigate('/recover-btc');
-  };
-
   const handleOnRestoreOridnalClick = () => {
     navigate('/recover-ordinals');
   };
@@ -44,7 +39,6 @@ function RestoreFunds() {
       <TopRow title={t('TITLE')} onClick={handleOnCancelClick} />
       <RestoreFundTitle>{t('DESCRIPTION')}</RestoreFundTitle>
       <Container>
-        {/* <FundsRow image={BitcoinIcon} title={t('RECOVER_BTC')} description={t('RECOVER_BTC_DESC')} onClick={handleOnRestoreBtcClick} /> */}
         <FundsRow
           image={OrdinalsIcon}
           title={t('RECOVER_ORDINALS')}

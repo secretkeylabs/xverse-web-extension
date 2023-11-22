@@ -1,6 +1,5 @@
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import { useBnsName } from '@hooks/queries/useBnsName';
-import useNetworkSelector from '@hooks/useNetwork';
 import { getExplorerUrl } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -56,9 +55,8 @@ interface Props {
   recipient: string;
 }
 function RecipientAddressView({ recipient }: Props) {
-  const selectedNetwork = useNetworkSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const bnsName = useBnsName(recipient, selectedNetwork);
+  const bnsName = useBnsName(recipient);
   const handleOnPress = () => {
     window.open(getExplorerUrl(recipient));
   };

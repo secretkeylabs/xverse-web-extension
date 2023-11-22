@@ -97,7 +97,7 @@ const Button = styled.button((props) => ({
 
 interface Props {
   address: string[];
-  parsedPsbt: ParsedPSBT;
+  parsedPsbt: ParsedPSBT | undefined;
   isExpanded: boolean;
   onArrowClick: () => void;
 }

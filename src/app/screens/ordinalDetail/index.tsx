@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
@@ -11,6 +9,7 @@ import Separator from '@components/separator';
 import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import WebGalleryButton from '@components/webGalleryButton';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ArrowRight, ArrowUp, CubeTransparent, Share } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
@@ -95,31 +94,31 @@ const ExtensionOrdinalsContainer = styled.div((props) => ({
 }));
 
 const OrdinalTitleText = styled.h1((props) => ({
-  ...props.theme.headline_m,
+  ...props.theme.typography.headline_m,
   color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(1),
   textAlign: 'center',
 }));
 
 const OrdinalGalleryTitleText = styled.h1((props) => ({
-  ...props.theme.headline_l,
-  color: props.theme.colors.white['0'],
+  ...props.theme.typography.headline_l,
+  color: props.theme.colors.white_0,
 }));
 
 const DescriptionText = styled.h1((props) => ({
-  ...props.theme.headline_l,
+  ...props.theme.typography.headline_l,
   color: props.theme.colors.white_0,
   fontSize: 24,
   marginBottom: props.theme.spacing(8),
 }));
 
 const NftOwnedByText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_400,
 }));
 
 const OwnerAddressText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   marginLeft: props.theme.spacing(3),
 }));
 
@@ -171,16 +170,9 @@ const DescriptionContainer = styled.h1((props) => ({
   marginBottom: props.theme.spacing(30),
 }));
 
-const WebGalleryButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  width: '100%',
-  marginTop: props.theme.spacing(6),
-}));
+const StyledWebGalleryButton = styled(WebGalleryButton)`
+  margintop: ${(props) => props.theme.space.s};
+`;
 
 const ViewInExplorerButton = styled.button<DetailSectionProps>((props) => ({
   display: 'flex',
@@ -198,13 +190,13 @@ const ViewInExplorerButton = styled.button<DetailSectionProps>((props) => ({
 }));
 
 const ButtonText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['400'],
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_400,
 }));
 
 const ButtonHiglightedText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
   marginLeft: props.theme.spacing(2),
   marginRight: props.theme.spacing(2),
 }));
@@ -218,13 +210,6 @@ const StyledTooltip = styled(Tooltip)`
     padding: 7px;
   }
 `;
-
-const WebGalleryButtonText = styled.div((props) => ({
-  ...props.theme.body_m,
-  fontWeight: 700,
-  color: props.theme.colors.white_200,
-  textAlign: 'center',
-}));
 
 const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
@@ -242,7 +227,7 @@ const Button = styled.button((props) => ({
 }));
 
 const AssetDeatilButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.typography.body_s,
   fontWeight: 400,
   fontSize: 14,
   color: props.theme.colors.white_0,
@@ -267,18 +252,18 @@ const OrdinalsTag = styled.div({
 });
 
 const CollectibleText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
 const GalleryCollectibleText = styled.h1((props) => ({
-  ...props.theme.body_bold_l,
-  color: props.theme.colors.white['400'],
+  ...props.theme.typography.body_bold_l,
+  color: props.theme.colors.white_400,
 }));
 
 const Text = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   textTransform: 'uppercase',
   color: props.theme.colors.white_0,
   fontSize: 10,
@@ -299,7 +284,7 @@ const CubeTransparentIcon = styled(CubeTransparent)((props) => ({
   marginRight: props.theme.spacing(8),
 }));
 const RareSatsBundleTextDescription = styled.div((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
 }));
 const BundleLinkContainer = styled.button((props) => ({
@@ -311,12 +296,11 @@ const BundleLinkContainer = styled.button((props) => ({
   color: props.theme.colors.white_0,
   transition: 'background-color 0.2s ease, opacity 0.2s ease',
   ':hover': {
-    color: props.theme.colors.action.classicLight,
-    opacity: 0.6,
+    color: props.theme.colors.white_200,
   },
 }));
 const BundleLinkText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   marginRight: props.theme.spacing(1),
 }));
 
@@ -341,6 +325,7 @@ const DetailSection = styled.div<DetailSectionProps>((props) => ({
   display: 'flex',
   flexDirection: !props.isGallery ? 'row' : 'column',
   justifyContent: 'space-between',
+  columnGap: props.theme.space.m,
   width: '100%',
 }));
 
@@ -638,12 +623,7 @@ function OrdinalDetailScreen() {
         {isBrc20Ordinal ? t('BRC20_INSCRIPTION') : ordinal?.collection_name || t('INSCRIPTION')}
       </CollectibleText>
       <OrdinalTitleText>{ordinal?.number}</OrdinalTitleText>
-      <WebGalleryButton onClick={openInGalleryView}>
-        <>
-          <ButtonImage src={SquaresFour} />
-          <WebGalleryButtonText>{t('WEB_GALLERY')}</WebGalleryButtonText>
-        </>
-      </WebGalleryButton>
+      <StyledWebGalleryButton onClick={openInGalleryView} />
       <ExtensionOrdinalsContainer>
         <OrdinalImage ordinal={ordinal!} />
       </ExtensionOrdinalsContainer>

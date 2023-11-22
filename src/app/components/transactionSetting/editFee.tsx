@@ -1,12 +1,13 @@
 import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BtcUtxoDataResponse, ErrorCodes, UTXO } from '@secretkeylabs/xverse-core';
 import {
+  ErrorCodes,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
-} from '@secretkeylabs/xverse-core/currency';
+  UTXO,
+} from '@secretkeylabs/xverse-core';
 import {
   getBtcFees,
   getBtcFeesForNonOrdinalBtcSend,
@@ -143,7 +144,7 @@ interface Props {
   btcRecipients?: Recipient[];
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
-  nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  nonOrdinalUtxos?: UTXO[];
   feeMode: string;
   error: string;
   setIsLoading: () => void;
@@ -182,7 +183,7 @@ function EditFee({
   } = useWalletSelector();
   const [totalFee, setTotalFee] = useState(fee);
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const debouncedFeeRateInput = useDebounce(feeRateInput, 500);
   const isBtcOrOrdinals = type === 'BTC' || type === 'Ordinals';
   const isStx = type === 'STX';
@@ -289,7 +290,7 @@ function EditFee({
             feeMode,
             feeRateInput,
           );
-          setFeeRateInput(selectedFeeRate?.toString());
+          setFeeRateInput(selectedFeeRate!.toString());
           setTotalFee(modifiedFee.toString());
         } else if (btcRecipients && selectedAccount) {
           const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
@@ -299,7 +300,7 @@ function EditFee({
             feeMode,
             feeRateInput,
           );
-          setFeeRateInput(selectedFeeRate?.toString());
+          setFeeRateInput(selectedFeeRate!.toString());
           setTotalFee(modifiedFee.toString());
         }
       } catch (err: any) {
@@ -325,7 +326,7 @@ function EditFee({
           feeMode,
           feeRateInput,
         );
-        setFeeRateInput(selectedFeeRate?.toString());
+        setFeeRateInput(selectedFeeRate!.toString());
         setTotalFee(modifiedFee.toString());
       } catch (err: any) {
         if (Number(err) === ErrorCodes.InSufficientBalance) {
@@ -353,8 +354,12 @@ function EditFee({
 
   function getFiatEquivalent() {
     return isStx
-      ? getStxFiatEquivalent(stxToMicrostacks(new BigNumber(totalFee)), stxBtcRate, btcFiatRate)
-      : getBtcFiatEquivalent(new BigNumber(totalFee), btcFiatRate);
+      ? getStxFiatEquivalent(
+          stxToMicrostacks(new BigNumber(totalFee)),
+          BigNumber(stxBtcRate),
+          BigNumber(btcFiatRate),
+        )
+      : getBtcFiatEquivalent(new BigNumber(totalFee), BigNumber(btcFiatRate));
   }
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
