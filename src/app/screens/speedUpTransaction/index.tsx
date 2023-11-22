@@ -1,19 +1,13 @@
-import { BetterBarLoader } from '@components/barLoader';
 import ActionButton from '@components/button';
-import FiatAmountText from '@components/fiatAmountText';
 import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { CarProfile, Faders, RocketLaunch } from '@phosphor-icons/react';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
-import InputFeedback from '@ui-library/inputFeedback';
-import BigNumber from 'bignumber.js';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+import { CustomFee } from './customFee';
 
 const Title = styled.h1((props) => ({
   ...props.theme.typography.headline_s,
@@ -34,45 +28,6 @@ const DetailText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(4),
-}));
-
-// TODO create input component in ui-library
-const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(6),
-  border: `1px solid ${
-    props.withError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_800
-  }`,
-  backgroundColor: props.theme.colors.elevation1,
-  borderRadius: props.theme.radius(3),
-  padding: props.theme.spacing(5),
-}));
-
-const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
-  backgroundColor: 'transparent',
-  color: props.theme.colors.white_0,
-  border: 'transparent',
-  width: '50%',
-  '&::-webkit-outer-spin-button': {
-    '-webkit-appearance': 'none',
-    margin: 0,
-  },
-  '&::-webkit-inner-spin-button': {
-    '-webkit-appearance': 'none',
-    margin: 0,
-  },
-  '&[type=number]': {
-    '-moz-appearance': 'textfield',
-  },
-}));
-
-const FeeText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white_0,
 }));
 
 const ButtonContainer = styled.div`
@@ -103,93 +58,33 @@ const FeeButton = styled.button<{
   paddingBottom: props.theme.spacing(6),
 }));
 
-const FeeContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const TickerContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-end',
-  flex: 1,
-});
-
 const ControlsContainer = styled.div`
   display: flex;
   column-gap: 12px;
   margin: 20px 16px 40px;
 `;
 
-const StyledInputFeedback = styled(InputFeedback)`
-  margin-bottom: ${(props) => props.theme.spacing(2)}px;
-`;
+const CustomFeeIcon = styled(Faders)({
+  transform: 'rotate(90deg)',
+});
 
-const StyledFiatAmountText = styled(FiatAmountText)((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white_400,
+const PriorityFee = styled.div((props) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: props.theme.spacing(6),
 }));
 
 export type OnChangeFeeRate = (feeRate: string) => void;
 
 function SpeedUpTransactionScreen() {
-  const {
-    onClickApply,
-    onChangeFeeRate,
-    fee,
-    initialFeeRate,
-    isFeeLoading,
-    error,
-  }: {
-    onClickApply: OnChangeFeeRate;
-    onChangeFeeRate: OnChangeFeeRate;
-    fee: string;
-    initialFeeRate: string;
-    isFeeLoading: boolean;
-    error: string;
-  } = {
-    onClickApply: () => {},
-    onChangeFeeRate: () => {},
-    fee: '',
-    initialFeeRate: '',
-    isFeeLoading: false,
-    error: '',
-  };
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
-  const { btcFiatRate, fiatCurrency } = useWalletSelector();
   const { data: feeRates } = useBtcFeeRate();
   const theme = useTheme();
   const navigate = useNavigate();
+  const [showCustomFee, setShowCustomFee] = useState(false);
 
-  // save the previous state in case user clicks X without applying
-  const [previousFeeRate, setPreviousFeeRate] = useState(initialFeeRate);
-  const [previousSelectedOption, setPreviousSelectedOption] = useState('standard');
-
-  const [feeRateInput, setFeeRateInput] = useState(previousFeeRate);
-  const [selectedOption, setSelectedOption] = useState(previousSelectedOption);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    onChangeFeeRate(feeRateInput);
-  }, [feeRateInput, onChangeFeeRate]);
-
-  /* callbacks */
-  const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // only allow positive integers
-    // disable common special characters, including - and .
-    // eslint-disable-next-line no-useless-escape
-    if (e.key.match(/^[!-\/:-@[-`{-~]$/)) {
-      e.preventDefault();
-    }
-  };
-
-  const handleChangeFeeRateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFeeRateInput(e.target.value);
-    if (selectedOption !== 'custom') {
-      setSelectedOption('custom');
-    }
-  };
+  const [feeRateInput, setFeeRateInput] = useState('1');
+  const [selectedOption, setSelectedOption] = useState('standard');
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     setSelectedOption(e.currentTarget.value);
@@ -198,11 +93,11 @@ function SpeedUpTransactionScreen() {
         case 'high':
           setFeeRateInput(feeRates.priority.toString());
           break;
-        case 'standard':
+        case 'medium':
           setFeeRateInput(feeRates.regular.toString());
           break;
         case 'custom':
-          inputRef.current?.focus();
+          setShowCustomFee(true);
           break;
         default:
           break;
@@ -211,29 +106,17 @@ function SpeedUpTransactionScreen() {
   };
 
   const handleClickCancel = () => {
-    // reset state
-    setFeeRateInput(previousFeeRate);
-    setSelectedOption(previousSelectedOption);
-
-    navigate('/coinDashboard/BTC');
+    navigate(-1);
   };
 
   const handleClickSubmit = () => {
-    // save state
-    setPreviousFeeRate(feeRateInput);
-    setPreviousSelectedOption(selectedOption);
-    // apply state to parent
-    onClickApply(feeRateInput);
-
     toast.success('Transaction fee updated');
 
-    navigate('/coinDashboard/BTC');
+    navigate(-1);
   };
 
-  const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), new BigNumber(btcFiatRate));
-
   const handleBackButtonClick = () => {
-    navigate('/coinDashboard/BTC');
+    navigate(-1);
   };
 
   return (
@@ -243,7 +126,7 @@ function SpeedUpTransactionScreen() {
         <Title>{t('TITLE')}</Title>
         <DetailText>{t('FEE_INFO')}</DetailText>
         <DetailText>
-          {t('CURRENT_FEE')} {initialFeeRate} sats /vB
+          {t('CURRENT_FEE')} {feeRateInput} sats /vB
         </DetailText>
         <DetailText>{t('ESTIMATED_COMPLETION_TIME')} min</DetailText>
         <ButtonContainer>
@@ -253,13 +136,13 @@ function SpeedUpTransactionScreen() {
             isSelected={selectedOption === 'high'}
             onClick={handleClickFeeButton}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(6) }}>
+            <PriorityFee>
               <RocketLaunch size={20} color={theme.colors.tangerine} />
               <div>
                 {t('HIGH_PRIORITY')}
                 <div>759 Sats /vByte</div>
               </div>
-            </div>
+            </PriorityFee>
             <div>
               <div>90,000 Sats</div>
               <div>~ $6.10 USD</div>
@@ -271,13 +154,13 @@ function SpeedUpTransactionScreen() {
             isSelected={selectedOption === 'medium'}
             onClick={handleClickFeeButton}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(6) }}>
+            <PriorityFee>
               <CarProfile size={20} color={theme.colors.tangerine} />
               <div>
                 {t('MED_PRIORITY')}
                 <div>759 Sats /vByte</div>
               </div>
-            </div>
+            </PriorityFee>
             <div>
               <div>90,000 Sats</div>
               <div>~ $6.10 USD</div>
@@ -289,17 +172,13 @@ function SpeedUpTransactionScreen() {
             isSelected={selectedOption === 'custom'}
             onClick={handleClickFeeButton}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(6) }}>
-              <Faders
-                size={20}
-                color={theme.colors.tangerine}
-                style={{ transform: 'rotate(90deg)' }}
-              />
+            <PriorityFee>
+              <CustomFeeIcon size={20} color={theme.colors.tangerine} />
               <div>
                 {t('CUSTOM')}
                 <div>759 Sats /vByte</div>
               </div>
-            </div>
+            </PriorityFee>
             <div>
               <div>90,000 Sats</div>
               <div>~ $6.10 USD</div>
@@ -308,20 +187,20 @@ function SpeedUpTransactionScreen() {
         </ButtonContainer>
       </Container>
       <ControlsContainer>
-        <ActionButton
-          text={t('CANCEL')}
-          processing={isFeeLoading}
-          disabled={isFeeLoading || !!error}
-          onPress={handleClickCancel}
-          transparent
-        />
-        <ActionButton
-          text={t('SUBMIT')}
-          processing={isFeeLoading}
-          disabled={isFeeLoading || !!error}
-          onPress={handleClickSubmit}
-        />
+        <ActionButton text={t('CANCEL')} onPress={handleClickCancel} transparent />
+        <ActionButton text={t('SUBMIT')} onPress={handleClickSubmit} />
       </ControlsContainer>
+
+      <CustomFee
+        visible={showCustomFee}
+        onClose={() => setShowCustomFee(false)}
+        initialFeeRate={feeRateInput}
+        fee={feeRateInput}
+        isFeeLoading={false}
+        error=""
+        onChangeFeeRate={setFeeRateInput}
+        onClickApply={(feeRate: string) => {}}
+      />
     </>
   );
 }
