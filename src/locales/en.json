@@ -1,7 +1,9 @@
 {
   "COMMON": {
     "INSCRIPTION": "Inscription",
-    "SEND": "Send"
+    "SEND": "Send",
+    "COMBO": "Combo",
+    "SATS": "Sats"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",

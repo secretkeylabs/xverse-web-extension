@@ -1,67 +1,12 @@
+import ExoticSatsRow from '@components/exoticSatsRow/exoticSatsRow';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
-// import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
+import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
+import { DotsThree } from '@phosphor-icons/react';
 import { StyledP } from '@ui-library/common.styled';
 import { BundleV2, getFormattedTxIdVoutFromBundle } from '@utils/rareSats';
-// import { useNavigate } from 'react-router-dom';
-import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small.svg';
-import { DotsThree } from '@phosphor-icons/react';
-import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
-
-const InfoContainer = styled.div`
-  flex: 1,
-  flex-direction: column;
-  align-items: flex-start;
-  margin-right: ${(props) => props.theme.space.m};
-`;
-
-const IconsContainer = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-`;
-
-const StyledBundleId = styled(StyledP)`
-  text-wrap: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-`;
-
-const InscriptionText = styled(StyledP)`
-  text-wrap: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  margin-left: 4px;
-  width: 80px;
-`;
-
-const StyledBundleSub = styled(StyledP)`
-  text-align: left;
-  width: 100%;
-`;
-
-const TileText = styled(StyledP)`
-  text-align: center;
-  color: ${(props) => props.theme.colors.white_200};
-  padding: 2px 3px;
-`;
-
-const ItemContainer = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  flex: 1;
-  padding: ${(props) => props.theme.space.m};
-  margin-bottom: ${(props) => props.theme.space.s};
-  border-radius: ${(props) => props.theme.space.xs};
-  background-color: ${(props) => props.theme.colors.elevation1};
-  justify-content: space-between;
-`;
 
 const Range = styled.div`
   display: flex;
@@ -73,28 +18,26 @@ const Range = styled.div`
   padding: 1px;
 `;
 
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  flex-direction: row;
+const TileText = styled(StyledP)`
+  text-align: center;
+  color: ${(props) => props.theme.colors.white_200};
+  padding: 2px 3px;
 `;
 
-function RareSatsTabGridItem({ bundle, maxItems }: { bundle: BundleV2; maxItems: number }) {
-  // const navigate = useNavigate();
-  // const { setSelectedSatBundleDetails, setSelectedSatBundleItemIndex } = useSatBundleDataReducer();
+const Pressable = styled.button((props) => ({
+  background: 'transparent',
+  width: '100%',
+  marginBottom: props.theme.space.s,
+}));
 
-  const { t } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
+function RareSatsTabGridItem({ bundle, maxItems }: { bundle: BundleV2; maxItems: number }) {
+  const navigate = useNavigate();
+  const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
 
   const handleOnClick = () => {
-    // TODO: handle UI changes before navigate to this screens
-    // const isMoreThanOneItem = bundle.satRanges.length > 1;
-    // setSelectedSatBundleDetails(bundle);
-    // if (isMoreThanOneItem) {
-    //   return navigate('/nft-dashboard/rare-sats-bundle');
-    // }
-    // setSelectedSatBundleItemIndex(0);
-    // navigate('/nft-dashboard/rare-sats-detail');
+    // exotics v1 wont show rage details only bundle details
+    setSelectedSatBundleDetails(bundle);
+    navigate('/nft-dashboard/rare-sats-bundle');
   };
 
   const renderedIcons = () => {
@@ -109,7 +52,7 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: BundleV2; maxItems:
       if (totalIconsDisplayed >= maxItems - 1) {
         totalIconsDisplayed += 1;
         return (
-          <Range>
+          <Range key={`${totalTilesDisplayed}-ellipsis`}>
             <TileText typography="body_m">
               +{bundle.satributes.length - totalTilesDisplayed}
             </TileText>
@@ -118,7 +61,7 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: BundleV2; maxItems:
       }
       totalTilesDisplayed += 1;
       return (
-        <Range key={bundle.satRanges[index].offset}>
+        <Range key={`${bundle.satRanges[index].block}-${bundle.satRanges[index].offset}`}>
           {sats.map((sattribute, indexSattributes) => {
             totalIconsDisplayed += 1;
             if (totalIconsDisplayed >= maxItems - 1) {
@@ -138,34 +81,14 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: BundleV2; maxItems:
   const bundleId = getFormattedTxIdVoutFromBundle(bundle);
 
   return (
-    <ItemContainer onClick={handleOnClick}>
-      <InfoContainer>
-        <StyledBundleId typography="body_bold_m" color="white_0">
-          {bundleId}
-        </StyledBundleId>
-        <NumericFormat
-          value={bundle.value}
-          displayType="text"
-          suffix=" Sats"
-          thousandSeparator
-          renderText={(value: string) => (
-            <StyledBundleSub typography="body_medium_m" color="white_400">
-              {value}
-            </StyledBundleSub>
-          )}
-        />
-
-        {bundle.inscriptions.map((inscription) => (
-          <Row>
-            <img src={OrdinalIcon} alt="ordinal" />
-            <InscriptionText typography="body_medium_m" color="white_400">
-              {inscription.id}
-            </InscriptionText>
-          </Row>
-        ))}
-      </InfoContainer>
-      <IconsContainer>{renderedIcons()}</IconsContainer>
-    </ItemContainer>
+    <Pressable type="button" onClick={handleOnClick}>
+      <ExoticSatsRow
+        title={bundleId}
+        satAmount={bundle.value}
+        inscriptions={bundle.inscriptions}
+        icons={renderedIcons()}
+      />
+    </Pressable>
   );
 }
 export default RareSatsTabGridItem;

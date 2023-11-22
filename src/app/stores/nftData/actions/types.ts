@@ -1,11 +1,11 @@
 import { Inscription } from '@secretkeylabs/xverse-core/types/api/ordinals';
 import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
-import { Bundle } from '@utils/rareSats';
+import { BundleV2 } from '@utils/rareSats';
 
 export interface NftDataState {
   nftData: NftData[];
   selectedOrdinal: Inscription | null;
-  selectedSatBundle: Bundle | null;
+  selectedSatBundle: BundleV2 | null;
   selectedSatBundleItemIndex: number | null;
 }
 

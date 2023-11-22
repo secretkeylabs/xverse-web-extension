@@ -269,12 +269,13 @@ export const getBundleItemId = (bundle: Bundle, index: number): string => {
 };
 
 // TODO: once we define the layout changes for inscriptions and buy/sell confirmation screen we can remove old implementation and remove the v2 from here
-type Inscription = {
+export type Inscription = {
   id: string;
   content_type: string;
+  inscription_number: number;
 };
 
-type BundleSatRange = Omit<ApiBundleSatRange, 'year_mined'> & {
+export type BundleSatRange = Omit<ApiBundleSatRange, 'year_mined'> & {
   totalSats: number;
   yearMined: number;
 };
@@ -283,6 +284,7 @@ export type BundleV2 = Omit<ApiBundleV2, 'sat_ranges'> & {
   satRanges: BundleSatRange[];
   inscriptions: Inscription[];
   satributes: RareSatsType[][];
+  totalExoticSats: number;
 };
 
 export type ApiBundleSatRange = {
@@ -333,6 +335,7 @@ export const mapRareSatsAPIResponseToRareSatsV2 = (apiBundle: ApiBundleV2): Bund
       satRanges: [commonUnknownRange],
       inscriptions: [],
       satributes: [['UNKNOWN']],
+      totalExoticSats: 0,
     };
   }
 
@@ -357,11 +360,11 @@ export const mapRareSatsAPIResponseToRareSatsV2 = (apiBundle: ApiBundleV2): Bund
   );
 
   // if totalExotics doesn't match the value of the bundle, it means that the bundle is not fully exotic and we need to add a common unknown sat range more
-  const totalExotics = satRanges.reduce((acc, curr) => acc + curr.totalSats, 0);
-  if (totalExotics !== apiBundle.value) {
+  const totalExoticSats = satRanges.reduce((acc, curr) => acc + curr.totalSats, 0);
+  if (totalExoticSats !== apiBundle.value) {
     satRanges.push({
       ...commonUnknownRange,
-      totalSats: apiBundle.value - totalExotics,
+      totalSats: apiBundle.value - totalExoticSats,
     });
   }
 
@@ -370,5 +373,6 @@ export const mapRareSatsAPIResponseToRareSatsV2 = (apiBundle: ApiBundleV2): Bund
     satRanges,
     inscriptions,
     satributes,
+    totalExoticSats,
   };
 };

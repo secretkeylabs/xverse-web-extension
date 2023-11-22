@@ -44,6 +44,7 @@ export const mockData: Response = {
             {
               content_type: 'text/plain;charset=utf-8',
               id: '09c094c3f1ab71c9be7a356a0f1af21b0e552c18d50372fd3799430c890ef135i0',
+              inscription_number: 123141212,
             },
           ],
         },
@@ -88,7 +89,7 @@ export const mockTestCase3: Response = {
   xVersion: 1,
   limit: 30,
   offset: 0,
-  total: 1,
+  total: 5,
   results: [
     {
       block_height: 803128,
@@ -120,6 +121,7 @@ export const mockTestCase3: Response = {
             {
               content_type: 'text/plain;charset=utf-8',
               id: '09c094c3f1ab71c9be7a356a0f1af21b0e552c18d50372fd3799430c890ef135i0',
+              inscription_number: 123141212,
             },
           ],
         },
@@ -161,7 +163,7 @@ export const mockTestCase3: Response = {
             start: '34234320000000',
             end: '34234320010000',
           },
-          satributes: ['BLOCK78'],
+          satributes: ['MYTHIC', 'BLOCK78'],
           inscriptions: [],
         },
         {
@@ -177,6 +179,7 @@ export const mockTestCase3: Response = {
             {
               content_type: 'text/plain;charset=utf-8',
               id: '09c094c3f1ab71c9be7a356a0f1af21b0e552c18d50372fd3799430c890ef135i0',
+              inscription_number: 123141212,
             },
           ],
         },
@@ -234,6 +237,7 @@ export const mockTestCase3: Response = {
             {
               content_type: 'text/plain;charset=utf-8',
               id: '09c094c3f1ab71c9be7a356a0f1af21b0e552c18d50372fd3799430c890ef135i0',
+              inscription_number: 123141212,
             },
           ],
         },
@@ -245,7 +249,16 @@ export const mockTestCase3: Response = {
             start: '34234320010002',
             end: '34234320010003',
           },
-          satributes: ['HITMAN', 'NAME_PALINDROME', 'NAKAMOTO', 'VINTAGE', 'FIRST_TRANSACTION'],
+          satributes: [
+            'HITMAN',
+            'NAME_PALINDROME',
+            'NAKAMOTO',
+            'VINTAGE',
+            'FIRST_TRANSACTION',
+            '2D_PALINDROME',
+            'BLOCK78',
+            'BLOCK9',
+          ],
           inscriptions: [],
         },
       ],
