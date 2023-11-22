@@ -11,7 +11,7 @@ import {
   ChangeActivateRareSatsAction,
 } from '@stores/wallet/actions/actionCreators';
 import { PRIVACY_POLICY_LINK, SUPPORT_LINK, TERMS_LINK } from '@utils/constants';
-import { isLedgerAccount } from '@utils/helper';
+import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -136,7 +136,7 @@ function Setting() {
   };
 
   const onRestoreFundClick = async () => {
-    if (isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL('options.html#/restore-funds'),
       });

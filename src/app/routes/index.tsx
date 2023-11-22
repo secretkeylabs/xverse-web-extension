@@ -33,6 +33,7 @@ import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import LegalLinks from '@screens/legalLinks';
 import Login from '@screens/login';
 import ManageTokens from '@screens/manageTokens';
+import NftCollection from '@screens/nftCollection';
 import NftDashboard from '@screens/nftDashboard';
 import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
@@ -370,10 +371,6 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'send-nft/:id',
-        element: <SendNft />,
-      },
-      {
         path: 'confirm-inscription-request',
         element: (
           <AuthGuard>
@@ -451,6 +448,14 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/nft-detail/:id/send-nft',
         element: <SendNft />,
+      },
+      {
+        path: 'nft-dashboard/nft-collection/:id',
+        element: (
+          <AuthGuard>
+            <NftCollection />
+          </AuthGuard>
+        ),
       },
       {
         path: 'nft-dashboard/ordinal-detail/:id/send-ordinal',

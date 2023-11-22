@@ -1,42 +1,29 @@
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getNfts, NftsListData } from '@secretkeylabs/xverse-core';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { handleRetries, InvalidParamsError } from '@utils/query';
+import { getNftCollections, StacksCollectionList } from '@secretkeylabs/xverse-core';
+import { useQuery } from '@tanstack/react-query';
+import { handleRetries } from '@utils/query';
 
 const useStacksCollectibles = () => {
-  const { stxAddress } = useWalletSelector();
+  let { stxAddress } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
 
-  function fetchNfts({ pageParam = 0 }): Promise<NftsListData> {
-    if (!stxAddress) {
-      return Promise.reject(new InvalidParamsError('stxAddress is required'));
-    }
-    return getNfts(stxAddress, selectedNetwork, pageParam);
+  // TODO remove this after testing
+  const testAddress = localStorage.getItem('stxAddress');
+  if (testAddress) {
+    stxAddress = testAddress;
   }
 
-  const { isLoading, data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch, error } =
-    useInfiniteQuery([`nft-meta-data-${stxAddress}`], fetchNfts, {
-      retry: handleRetries,
-      keepPreviousData: false,
-      getNextPageParam: (lastpage, pages) => {
-        const currentLength = pages.map((page) => page.nftsList).flat().length;
-        if (currentLength < lastpage.total) {
-          return currentLength;
-        }
-        return false;
-      },
-    });
+  const fetchNftCollections = (): Promise<StacksCollectionList> =>
+    getNftCollections(stxAddress, selectedNetwork);
 
-  return {
-    isLoading,
-    error,
-    data,
-    fetchNextPage,
-    isFetchingNextPage,
-    hasNextPage,
-    refetch,
-  };
+  return useQuery({
+    enabled: !!stxAddress,
+    retry: handleRetries,
+    queryKey: ['nft-collection-data', stxAddress],
+    queryFn: fetchNftCollections,
+    staleTime: 5 * 60 * 1000, // 5mins
+  });
 };
 
 export default useStacksCollectibles;

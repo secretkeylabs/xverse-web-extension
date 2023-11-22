@@ -7,13 +7,12 @@ import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useNftDetail from '@hooks/queries/useNftDetail';
 import useWalletSelector from '@hooks/useWalletSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
+import { broadcastSignedTransaction, StacksTransaction } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
@@ -43,7 +42,7 @@ const Container = styled.div({
   alignItems: 'center',
 });
 
-const NFtContainer = styled.div((props) => ({
+const NftContainer = styled.div((props) => ({
   maxWidth: 120,
   maxHeight: 120,
   width: '60%',
@@ -57,7 +56,7 @@ const NFtContainer = styled.div((props) => ({
 }));
 
 const ReviewTransactionText = styled.h1((props) => ({
-  ...props.theme.headline_s,
+  ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
   textAlign: 'center',
@@ -70,9 +69,10 @@ function ConfirmNftTransaction() {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
-  const { nftData } = useNftDataSelector();
-  const nftIdDetails = id!.split('::');
-  const nft = nftData.find((nftItem) => nftItem?.asset_id === nftIdDetails[1]);
+
+  const nftDetailQuery = useNftDetail(id!);
+  const nft = nftDetailQuery.data?.data
+
   const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
   const unsignedTx = deserializeTransaction(unsignedTxHex);
   const { network } = useWalletSelector();
@@ -168,9 +168,9 @@ function ConfirmNftTransaction() {
           skipModal={isLedgerAccount(selectedAccount)}
         >
           <Container>
-            <NFtContainer>
+            <NftContainer>
               <NftImage metadata={nft?.token_metadata!} />
-            </NFtContainer>
+            </NftContainer>
             <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
           </Container>
           <RecipientComponent

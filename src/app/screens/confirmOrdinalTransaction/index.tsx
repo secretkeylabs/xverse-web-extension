@@ -101,7 +101,8 @@ function ConfirmOrdinalTransaction() {
           txid: btcTxBroadcastData.tx.hash,
           currency: 'BTC',
           error: '',
-          isOrdinal: true,
+          isRareSat,
+          isOrdinal: !isRareSat,
         },
       });
       setTimeout(() => {

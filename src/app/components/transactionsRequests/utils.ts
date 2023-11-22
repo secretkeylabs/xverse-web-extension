@@ -1,8 +1,8 @@
 import {
-ExternalMethods,
-MESSAGE_SOURCE,
-TransactionResponseMessage,
-TxResult
+  ExternalMethods,
+  MESSAGE_SOURCE,
+  TransactionResponseMessage,
+  TxResult,
 } from '@common/types/message-types';
 
 interface FormatTxSignatureResponseArgs {
