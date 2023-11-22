@@ -4,6 +4,7 @@ import FiatAmountText from '@components/fiatAmountText';
 import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { CarProfile, Faders, RocketLaunch } from '@phosphor-icons/react';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
 import BigNumber from 'bignumber.js';
@@ -12,7 +13,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 const Title = styled.h1((props) => ({
   ...props.theme.typography.headline_s,
@@ -85,14 +86,21 @@ const FeeButton = styled.button<{
   isSelected: boolean;
 }>((props) => ({
   ...props.theme.body_medium_m,
-  color: `${props.isSelected ? props.theme.colors.elevation2 : props.theme.colors.white_400}`,
-  background: `${props.isSelected ? props.theme.colors.white : 'transparent'}`,
-  border: `1px solid ${props.isSelected ? 'transparent' : props.theme.colors.elevation6}`,
-  borderRadius: props.theme.radius(3),
+  textAlign: 'left',
+  color: props.theme.colors.white_0,
+  backgroundColor: `${props.isSelected ? props.theme.colors.elevation6_600 : 'transparent'}`,
+  border: `1px solid ${
+    props.isSelected ? props.theme.colors.white_800 : props.theme.colors.white_850
+  }`,
+  borderRadius: props.theme.radius(2),
   height: 65,
   display: 'flex',
-  justifyContent: 'center',
+  justifyContent: 'space-between',
   alignItems: 'center',
+  transition: 'background-color 0.1s ease-in-out, border 0.1s ease-in-out',
+  padding: props.theme.spacing(8),
+  paddingTop: props.theme.spacing(6),
+  paddingBottom: props.theme.spacing(6),
 }));
 
 const FeeContainer = styled.div({
@@ -122,21 +130,6 @@ const StyledFiatAmountText = styled(FiatAmountText)((props) => ({
   color: props.theme.colors.white_400,
 }));
 
-const buttons = [
-  {
-    value: 'standard',
-    label: 'HIGH_PRIORITY',
-  },
-  {
-    value: 'high',
-    label: 'MED_PRIORITY',
-  },
-  {
-    value: 'custom',
-    label: 'LOW_PRIORITY',
-  },
-];
-
 export type OnChangeFeeRate = (feeRate: string) => void;
 
 function SpeedUpTransactionScreen() {
@@ -165,6 +158,7 @@ function SpeedUpTransactionScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
   const { data: feeRates } = useBtcFeeRate();
+  const theme = useTheme();
   const navigate = useNavigate();
 
   // save the previous state in case user clicks X without applying
@@ -236,7 +230,7 @@ function SpeedUpTransactionScreen() {
     navigate('/coinDashboard/BTC');
   };
 
-  const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
+  const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), new BigNumber(btcFiatRate));
 
   const handleBackButtonClick = () => {
     navigate('/coinDashboard/BTC');
@@ -248,52 +242,70 @@ function SpeedUpTransactionScreen() {
       <Container>
         <Title>{t('TITLE')}</Title>
         <DetailText>{t('FEE_INFO')}</DetailText>
-        <DetailText>Current fee: {initialFeeRate} sats /vB</DetailText>
-        <DetailText>Estimated completion time: min</DetailText>
+        <DetailText>
+          {t('CURRENT_FEE')} {initialFeeRate} sats /vB
+        </DetailText>
+        <DetailText>{t('ESTIMATED_COMPLETION_TIME')} min</DetailText>
         <ButtonContainer>
-          {buttons.map(({ value, label }) => (
-            <FeeButton
-              key={value}
-              value={value}
-              isSelected={selectedOption === value}
-              onClick={handleClickFeeButton}
-            >
-              {t(label)}
-            </FeeButton>
-          ))}
+          <FeeButton
+            key="high"
+            value="high"
+            isSelected={selectedOption === 'high'}
+            onClick={handleClickFeeButton}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(6) }}>
+              <RocketLaunch size={20} color={theme.colors.tangerine} />
+              <div>
+                {t('HIGH_PRIORITY')}
+                <div>759 Sats /vByte</div>
+              </div>
+            </div>
+            <div>
+              <div>90,000 Sats</div>
+              <div>~ $6.10 USD</div>
+            </div>
+          </FeeButton>
+          <FeeButton
+            key="medium"
+            value="medium"
+            isSelected={selectedOption === 'medium'}
+            onClick={handleClickFeeButton}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(6) }}>
+              <CarProfile size={20} color={theme.colors.tangerine} />
+              <div>
+                {t('MED_PRIORITY')}
+                <div>759 Sats /vByte</div>
+              </div>
+            </div>
+            <div>
+              <div>90,000 Sats</div>
+              <div>~ $6.10 USD</div>
+            </div>
+          </FeeButton>
+          <FeeButton
+            key="custom"
+            value="custom"
+            isSelected={selectedOption === 'custom'}
+            onClick={handleClickFeeButton}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(6) }}>
+              <Faders
+                size={20}
+                color={theme.colors.tangerine}
+                style={{ transform: 'rotate(90deg)' }}
+              />
+              <div>
+                {t('CUSTOM')}
+                <div>759 Sats /vByte</div>
+              </div>
+            </div>
+            <div>
+              <div>90,000 Sats</div>
+              <div>~ $6.10 USD</div>
+            </div>
+          </FeeButton>
         </ButtonContainer>
-        <FeeContainer>
-          <InputContainer withError={!!error}>
-            <InputField
-              type="number"
-              ref={inputRef}
-              value={feeRateInput?.toString()}
-              onKeyDown={handleKeyDownFeeRateInput}
-              onChange={handleChangeFeeRateInput}
-            />
-            <FeeText>sats /vB</FeeText>
-            <TickerContainer>
-              {isFeeLoading ? (
-                <>
-                  <BetterBarLoader width={75} height={16} />
-                  <BetterBarLoader width={75} height={16} />
-                </>
-              ) : (
-                <>
-                  <NumericFormat
-                    value={fee}
-                    displayType="text"
-                    thousandSeparator
-                    suffix=" sats"
-                    renderText={(value: string) => <FeeText>{value}</FeeText>}
-                  />
-                  <StyledFiatAmountText fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
-                </>
-              )}
-            </TickerContainer>
-          </InputContainer>
-          <StyledInputFeedback message={error} variant="danger" />
-        </FeeContainer>
       </Container>
       <ControlsContainer>
         <ActionButton

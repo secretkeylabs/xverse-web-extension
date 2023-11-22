@@ -784,11 +784,13 @@
   "SPEED_UP_TRANSACTION": {
     "TITLE": "Speed up transaction",
     "FEE_INFO": "Use a higher fee to help the transaction confirm earlier.",
+    "CURRENT_FEE": "Current fee:",
+    "ESTIMATED_COMPLETION_TIME": "Estimated completion time:",
     "CANCEL": "Cancel",
     "SUBMIT": "Submit",
     "HIGH_PRIORITY": "High priority",
     "MED_PRIORITY": "Medium priority",
-    "LOW_PRIORITY": "Low priority"
+    "CUSTOM": "Custom"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",
