@@ -77,8 +77,8 @@ export function BetterBarLoader({
   height,
   className,
 }: {
-  width: number;
-  height: number;
+  width: number | string;
+  height: number | string;
   className?: string;
 }) {
   return (
@@ -88,7 +88,6 @@ export function BetterBarLoader({
       interval={0.1}
       width={width}
       height={height}
-      viewBox={`0 0 ${width} ${height}`}
       backgroundColor={Theme.colors.elevation3}
       foregroundColor={Theme.colors.grey}
       className={className}

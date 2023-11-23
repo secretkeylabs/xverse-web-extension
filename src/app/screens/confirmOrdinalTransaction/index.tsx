@@ -6,6 +6,8 @@ import BottomBar from '@components/tabBar';
 import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
+import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -74,6 +76,8 @@ function ConfirmOrdinalTransaction() {
   }
 
   const { selectedOrdinal, selectedSatBundle } = useNftDataSelector();
+  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
+  const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
   const { refetch } = useBtcWalletData();
   const [currentFee, setCurrentFee] = useState(fee);
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
@@ -96,12 +100,15 @@ function ConfirmOrdinalTransaction() {
 
   useEffect(() => {
     if (btcTxBroadcastData) {
+      setSelectedOrdinalDetails(null);
+      setSelectedSatBundleDetails(null);
       navigate('/tx-status', {
         state: {
           txid: btcTxBroadcastData.tx.hash,
           currency: 'BTC',
           error: '',
-          isOrdinal: true,
+          isRareSat,
+          isOrdinal: !isRareSat,
         },
       });
       setTimeout(() => {
@@ -112,6 +119,8 @@ function ConfirmOrdinalTransaction() {
 
   useEffect(() => {
     if (txError) {
+      setSelectedOrdinalDetails(null);
+      setSelectedSatBundleDetails(null);
       navigate('/tx-status', {
         state: {
           txid: '',
