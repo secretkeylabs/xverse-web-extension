@@ -24,9 +24,16 @@
   "rules": {
     "consistent-return": "off",
     "import/prefer-default-export": 1,
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": ["@secretkeylabs/xverse-core/**/*"]
+      }
+    ],
     "no-promise-executor-return": "warn",
     "max-len": "off",
     "no-inline-styles/no-inline-styles": 2,
+    "no-nested-ternary": "off",
     "no-param-reassign": "off",
     "react-hooks/exhaustive-deps": "warn",
     "react/jsx-key": "warn",

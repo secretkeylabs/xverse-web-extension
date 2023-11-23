@@ -1,4 +1,4 @@
-import {
+import type {
   Account,
   AccountType,
   AppInfo,
@@ -8,8 +8,7 @@ import {
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
-} from '@secretkeylabs/xverse-core/types';
-import BigNumber from 'bignumber.js';
+} from '@secretkeylabs/xverse-core';
 
 export const SetWalletKey = 'SetWallet';
 export const ResetWalletKey = 'ResetWallet';
@@ -67,13 +66,13 @@ export interface WalletState {
   network: SettingsNetwork;
   encryptedSeed: string;
   fiatCurrency: SupportedCurrency;
-  btcFiatRate: BigNumber;
-  stxBtcRate: BigNumber;
-  stxBalance: BigNumber;
-  stxAvailableBalance: BigNumber;
-  stxLockedBalance: BigNumber;
+  btcFiatRate: string;
+  stxBtcRate: string;
+  stxBalance: string;
+  stxAvailableBalance: string;
+  stxLockedBalance: string;
   stxNonce: number;
-  btcBalance: BigNumber;
+  btcBalance: string;
   coinsList: FungibleToken[] | null;
   coins: Coin[];
   brcCoinsList: FungibleToken[] | null;
@@ -142,22 +141,22 @@ export interface SelectAccount {
 }
 export interface SetCoinRates {
   type: typeof SetCoinRatesKey;
-  stxBtcRate: BigNumber;
-  btcFiatRate: BigNumber;
+  stxBtcRate: string;
+  btcFiatRate: string;
 }
 
 export interface SetStxWalletData {
   type: typeof SetStxWalletDataKey;
-  stxBalance: BigNumber;
-  stxAvailableBalance: BigNumber;
-  stxLockedBalance: BigNumber;
+  stxBalance: string;
+  stxAvailableBalance: string;
+  stxLockedBalance: string;
   stxTransactions: TransactionData[];
   stxNonce: number;
 }
 
 export interface SetBtcWalletData {
   type: typeof SetBtcWalletDataKey;
-  balance: BigNumber;
+  balance: string;
 }
 
 export interface SetCoinData {
@@ -248,6 +247,7 @@ export type WalletActions =
   | GetActiveAccounts
   | ChangeActivateOrdinals
   | ChangeActivateRareSats
+  | SetRareSatsNoticeDismissed
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
   | ChangeShowDataCollectionAlert

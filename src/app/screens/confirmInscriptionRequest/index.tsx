@@ -317,7 +317,7 @@ function ConfirmInscriptionRequest() {
     nonce?: string;
   }) => {
     const seedPhrase = await getSeed();
-    setCurrentFeeRate(new BigNumber(feeRate));
+    setCurrentFeeRate(new BigNumber(feeRate!));
     mutateTxFee({ recipients: recipient, txFee: modifiedFee, seedPhrase });
   };
 
@@ -391,7 +391,7 @@ function ConfirmInscriptionRequest() {
         <TransactionDetailComponent
           title="Inscription Service Fee"
           value={getAmountString(satsToBtc(new BigNumber(amount)), t('BTC'))}
-          subValue={getBtcFiatEquivalent(new BigNumber(amount), btcFiatRate)}
+          subValue={getBtcFiatEquivalent(new BigNumber(amount), BigNumber(btcFiatRate))}
         />
         <TransferFeeView
           feePerVByte={currentFeeRate}
@@ -401,7 +401,7 @@ function ConfirmInscriptionRequest() {
         <TransactionDetailComponent
           title={t('CONFIRM_TRANSACTION.TOTAL')}
           value={getAmountString(satsToBtc(total), t('BTC'))}
-          subValue={getBtcFiatEquivalent(total, btcFiatRate)}
+          subValue={getBtcFiatEquivalent(total, BigNumber(btcFiatRate))}
           subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
         />
         <Button onClick={onAdvancedSettingClick}>

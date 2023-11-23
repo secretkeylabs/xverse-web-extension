@@ -1,6 +1,6 @@
 import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { BtcOrdinal, Inscription } from '@secretkeylabs/xverse-core/types';
+import type { BtcOrdinal, Inscription } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';

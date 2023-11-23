@@ -9,11 +9,12 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import {
   addressToString,
+  Args,
   broadcastSignedTransaction,
   Coin,
+  ContractFunction,
   extractFromPayload,
 } from '@secretkeylabs/xverse-core';
-import { Args, ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
 import { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,
@@ -133,8 +134,9 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
 
   const functionArgsView = () => {
     const args = getFunctionArgs();
-    return args.map((arg, index) => (
+    return args.map((arg) => (
       <TransactionDetailComponent
+        key={arg.name}
         title={arg.name}
         value={arg.value.length > 20 ? truncateFunctionArgsView(arg.value) : arg.value}
         description={arg.type}
@@ -223,20 +225,18 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
       switch (postCondition.conditionType) {
         case PostConditionType.STX:
           return <StxPostConditionCard key={key} postCondition={postCondition} />;
-        case PostConditionType.Fungible:
-          return (
-            <FtPostConditionCard
-              key={key}
-              postCondition={postCondition}
-              ftMetaData={coinsMetaData?.find(
-                (coin: Coin) =>
-                  coin.contract ===
-                  `${addressToString(postCondition.assetInfo.address)}.${
-                    postCondition.assetInfo.contractName.content
-                  }`,
-              )}
-            />
+        case PostConditionType.Fungible: {
+          const coinInfo = coinsMetaData?.find(
+            (coin: Coin) =>
+              coin.contract ===
+              `${addressToString(postCondition.assetInfo.address)}.${
+                postCondition.assetInfo.contractName.content
+              }`,
           );
+          return (
+            <FtPostConditionCard key={key} postCondition={postCondition} ftMetaData={coinInfo} />
+          );
+        }
         case PostConditionType.NonFungible:
           return <NftPostConditionCard key={key} postCondition={postCondition} />;
         default:

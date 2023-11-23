@@ -5,8 +5,12 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useDappRequest from '@hooks/useTransationRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Coin, createDeployContractRequest, extractFromPayload } from '@secretkeylabs/xverse-core';
-import { ContractFunction } from '@secretkeylabs/xverse-core/types/api/stacks/transaction';
+import {
+  Coin,
+  ContractFunction,
+  createDeployContractRequest,
+  extractFromPayload,
+} from '@secretkeylabs/xverse-core';
 import { StacksTransaction } from '@stacks/transactions';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';

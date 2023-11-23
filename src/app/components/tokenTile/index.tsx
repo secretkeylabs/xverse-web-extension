@@ -1,6 +1,6 @@
 import { BetterBarLoader } from '@components/barLoader';
-import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { StoreState } from '@stores/index';
 import { CurrencyTypes } from '@utils/constants';
@@ -347,7 +347,7 @@ function TokenTile({
     onPress({
       coin: currency as CurrencyTypes,
       ft: fungibleToken && fungibleToken.principal,
-      brc20Ft: !fungibleToken?.principal && fungibleToken?.name,
+      brc20Ft: !fungibleToken?.principal ? fungibleToken?.name : undefined,
     });
   };
 

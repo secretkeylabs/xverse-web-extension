@@ -1,13 +1,15 @@
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import TokenImage from '@components/tokenImage';
-import { useBnsName, useBNSResolver } from '@hooks/queries/useBnsName';
+import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
 import useDebounce from '@hooks/useDebounce';
-import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcEquivalent, getStxTokenEquivalent } from '@secretkeylabs/xverse-core';
-import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import {
+  FungibleToken,
+  getBtcEquivalent,
+  getFiatEquivalent,
+  getStxTokenEquivalent,
+} from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
 import { CurrencyTypes } from '@utils/constants';
 import { getCurrencyFlag } from '@utils/currency';
@@ -64,45 +66,45 @@ const MemoContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
-const ErrorText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
+const ErrorText = styled.p((props) => ({
+  ...props.theme.typography.body_s,
+  color: props.theme.colors.danger_medium,
 }));
 
 const InputFieldContainer = styled.div(() => ({
   flex: 1,
 }));
 
-const TitleText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+const TitleText = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
   flex: 1,
   display: 'flex',
 }));
 
-const Text = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+const Text = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
 }));
 
-const SubText = styled.h1((props) => ({
-  ...props.theme.body_xs,
+const SubText = styled.p((props) => ({
+  ...props.theme.typography.body_s,
   display: 'flex',
   flex: 1,
   color: props.theme.colors.white_400,
 }));
 
-const AssociatedText = styled.h1((props) => ({
-  ...props.theme.body_xs,
+const AssociatedText = styled.p((props) => ({
+  ...props.theme.typography.body_s,
   wordWrap: 'break-word',
 }));
 
-const BalanceText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+const BalanceText = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
   marginRight: props.theme.spacing(2),
 }));
 
 const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   backgroundColor: props.theme.colors.elevation_n1,
   color: props.theme.colors.white_0,
   width: '100%',
@@ -224,10 +226,9 @@ function SendForm({
 
   const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount } =
     useWalletSelector();
-  const network = useNetworkSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
-  const associatedBnsName = useBnsName(recipientAddress, network);
-  const associatedAddress = useBNSResolver(debouncedSearchTerm, stxAddress, currencyType);
+  const associatedBnsName = useBnsName(recipientAddress);
+  const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress, currencyType);
   const { isAccountSwitched } = useClearFormOnAccountSwitch();
 
   useEffect(() => {
@@ -257,8 +258,8 @@ function SendForm({
     const amountInCurrency = getFiatEquivalent(
       Number(amountToSend),
       currencyType,
-      stxBtcRate,
-      btcFiatRate,
+      BigNumber(stxBtcRate),
+      BigNumber(btcFiatRate),
       fungibleToken,
     );
     setFiatAmount(amountInCurrency);
@@ -293,8 +294,8 @@ function SendForm({
     const amountInCurrency = getFiatEquivalent(
       Number(newValue),
       currencyType,
-      stxBtcRate,
-      btcFiatRate,
+      BigNumber(stxBtcRate),
+      BigNumber(btcFiatRate),
       fungibleToken,
     );
     setFiatAmount(amountInCurrency);
@@ -307,11 +308,17 @@ function SendForm({
     if (!tokenAmount) return '0';
     switch (currencyType) {
       case 'STX':
-        return getStxTokenEquivalent(new BigNumber(tokenAmount), stxBtcRate, btcFiatRate)
+        return getStxTokenEquivalent(
+          new BigNumber(tokenAmount),
+          BigNumber(stxBtcRate),
+          BigNumber(btcFiatRate),
+        )
           .toFixed(6)
           .toString();
       case 'BTC':
-        return getBtcEquivalent(new BigNumber(tokenAmount), btcFiatRate).toFixed(8).toString();
+        return getBtcEquivalent(new BigNumber(tokenAmount), BigNumber(btcFiatRate))
+          .toFixed(8)
+          .toString();
       case 'FT':
         if (fungibleToken?.tokenFiatRate) {
           return new BigNumber(tokenAmount)

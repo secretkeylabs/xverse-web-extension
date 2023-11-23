@@ -1,6 +1,7 @@
 import AccountHeaderComponent from '@components/accountHeader';
 import { BetterBarLoader } from '@components/barLoader';
 import ActionButton from '@components/button';
+import CollectibleCollectionGridItem from '@components/collectibleCollectionGridItem';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
 import Separator from '@components/separator';
 import BottomTabBar from '@components/tabBar';
@@ -10,15 +11,22 @@ import WebGalleryButton from '@components/webGalleryButton';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import useAddressInscriptions from '@hooks/queries/ordinals/useAddressInscriptions';
 import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useCollectionMarketData';
+import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
+import OrdinalImage from '@screens/ordinals/ordinalImage';
+import { Inscription } from '@secretkeylabs/xverse-core';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
+import {
+  getInscriptionsCollectionGridItemId,
+  getInscriptionsCollectionGridItemSubText,
+  getInscriptionsCollectionGridItemSubTextColor,
+} from '@utils/inscriptions';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { OrdinalsCollectionGridItem } from './ordinalsCollectionGridItem';
 
 interface DetailSectionProps {
   isGalleryOpen?: boolean;
@@ -27,11 +35,9 @@ interface DetailSectionProps {
 /* layout */
 // TODO tim: create a reusable layout
 const Container = styled.div`
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow-y: auto;
   ${(props) => props.theme.scrollbar}
 `;
 
@@ -129,8 +135,9 @@ const StyledBarLoader = styled(BetterBarLoader)((props) => ({
 }));
 
 function OrdinalsCollection() {
-  const { t } = useTranslation('translation', { keyPrefix: 'ORDINALS_COLLECTION_SCREEN' });
+  const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
   const navigate = useNavigate();
+  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { id: collectionId } = useParams();
   const { data, error, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useAddressInscriptions(collectionId);
@@ -151,7 +158,7 @@ function OrdinalsCollection() {
     });
   };
 
-  const isEmpty = !isLoading && !error && data?.pages?.[0]?.data?.total === 0;
+  const isEmpty = !isLoading && !error && data?.pages?.[0]?.total === 0;
 
   const collectionHeading = data?.pages?.[0].collection_name;
   const estPortfolioValue =
@@ -161,6 +168,11 @@ function OrdinalsCollection() {
   const collectionFloorPrice = collectionMarketData?.floor_price
     ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
     : '--';
+
+  const handleOnClick = (item: Inscription) => {
+    setSelectedOrdinalDetails(item);
+    navigate(`/nft-dashboard/ordinal-detail/${item.id}`);
+  };
 
   return (
     <>
@@ -222,7 +234,16 @@ function OrdinalsCollection() {
                 ?.map((page) => page?.data)
                 .flat()
                 .map((inscription) => (
-                  <OrdinalsCollectionGridItem key={inscription?.id} item={inscription} />
+                  <CollectibleCollectionGridItem
+                    key={inscription?.id}
+                    item={inscription}
+                    itemId={getInscriptionsCollectionGridItemId(inscription)}
+                    itemSubText={getInscriptionsCollectionGridItemSubText(inscription)}
+                    itemSubTextColor={getInscriptionsCollectionGridItemSubTextColor(inscription)}
+                    onClick={handleOnClick}
+                  >
+                    <OrdinalImage ordinal={inscription} />
+                  </CollectibleCollectionGridItem>
                 ))
             )}
           </StyledGridContainer>

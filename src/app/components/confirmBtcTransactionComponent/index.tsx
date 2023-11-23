@@ -10,7 +10,6 @@ import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  BtcUtxoDataResponse,
   ErrorCodes,
   getBtcFiatEquivalent,
   ResponseError,
@@ -130,7 +129,7 @@ interface Props {
   assetDetail?: string;
   assetDetailValue?: string;
   isRestoreFundFlow?: boolean;
-  nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  nonOrdinalUtxos?: UTXO[];
   isBtcSendBrowserTx?: boolean;
   currencyType?: CurrencyTypes;
   isPartOfBundle?: boolean;
@@ -318,7 +317,7 @@ function ConfirmBtcTransactionComponent({
     const newFee = new BigNumber(modifiedFee);
     setCurrentFee(newFee);
     const seed = await getSeed();
-    setCurrentFeeRate(new BigNumber(feeRate ?? ''));
+    setCurrentFeeRate(new BigNumber(feeRate!));
     if (ordinalTxUtxo) ordinalMutate({ txFee: modifiedFee, seedPhrase: seed });
     else if (isRestoreFundFlow) {
       mutateSignNonOrdinalBtcTransaction({ txFee: modifiedFee, seedPhrase: seed });
@@ -439,7 +438,7 @@ function ConfirmBtcTransactionComponent({
             <TransactionDetailComponent
               title={t('CONFIRM_TRANSACTION.TOTAL')}
               value={getAmountString(satsToBtc(total), t('BTC'))}
-              subValue={getBtcFiatEquivalent(total, btcFiatRate)}
+              subValue={getBtcFiatEquivalent(total, BigNumber(btcFiatRate))}
               subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
             />
           )}
