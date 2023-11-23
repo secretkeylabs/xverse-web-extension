@@ -52,7 +52,7 @@ const InputField = styled.input((props) => ({
   backgroundColor: 'transparent',
   color: props.theme.colors.white_200,
   border: 'transparent',
-  width: '50%',
+  width: '80%',
   '&::-webkit-outer-spin-button': {
     '-webkit-appearance': 'none',
     margin: 0,
@@ -109,6 +109,7 @@ export function CustomFee({
   onClose,
   onClickApply,
   onChangeFeeRate,
+  setSelectedOption,
   fee,
   initialFeeRate,
   isFeeLoading,
@@ -118,6 +119,7 @@ export function CustomFee({
   onClose: () => void;
   onClickApply: OnChangeFeeRate;
   onChangeFeeRate: OnChangeFeeRate;
+  setSelectedOption: (option?: string) => void;
   fee: string;
   initialFeeRate: string;
   isFeeLoading: boolean;
@@ -129,12 +131,7 @@ export function CustomFee({
 
   // save the previous state in case user clicks X without applying
   const [previousFeeRate, setPreviousFeeRate] = useState(initialFeeRate);
-  const [previousSelectedOption, setPreviousSelectedOption] = useState('standard');
-
   const [feeRateInput, setFeeRateInput] = useState(previousFeeRate);
-  const [selectedOption, setSelectedOption] = useState(previousSelectedOption);
-
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     onChangeFeeRate(feeRateInput);
@@ -152,22 +149,18 @@ export function CustomFee({
 
   const handleChangeFeeRateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFeeRateInput(e.target.value);
-    if (selectedOption !== 'custom') {
-      setSelectedOption('custom');
-    }
   };
 
   const handleClickClose = () => {
     // reset state
     setFeeRateInput(previousFeeRate);
-    setSelectedOption(previousSelectedOption);
     onClose();
   };
 
   const handleClickApply = () => {
     // save state
     setPreviousFeeRate(feeRateInput);
-    setPreviousSelectedOption(selectedOption);
+    setSelectedOption('custom');
     // apply state to parent
     onClickApply(feeRateInput);
     onClose();
@@ -182,7 +175,6 @@ export function CustomFee({
           <InputContainer withError={!!error}>
             <InputField
               type="number"
-              ref={inputRef}
               value={feeRateInput?.toString()}
               onKeyDown={handleKeyDownFeeRateInput}
               onChange={handleChangeFeeRateInput}
@@ -210,7 +202,7 @@ export function CustomFee({
           text="Back"
           processing={isFeeLoading}
           disabled={isFeeLoading || !!error}
-          onPress={onClose}
+          onPress={handleClickClose}
           transparent
         />
         <StyledActionButton

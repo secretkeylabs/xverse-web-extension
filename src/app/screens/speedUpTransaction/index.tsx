@@ -24,10 +24,15 @@ const Container = styled.div((props) => ({
   marginBottom: props.theme.spacing(2),
 }));
 
-const DetailText = styled.h1((props) => ({
-  ...props.theme.body_m,
+const DetailText = styled.span((props) => ({
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(4),
+}));
+
+const HighlightedText = styled.span((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
 }));
 
 const ButtonContainer = styled.div`
@@ -48,7 +53,8 @@ const FeeButton = styled.button<{
     props.isSelected ? props.theme.colors.white_800 : props.theme.colors.white_850
   }`,
   borderRadius: props.theme.radius(2),
-  height: 65,
+  height: 'auto',
+  maxHeight: 65,
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -56,6 +62,9 @@ const FeeButton = styled.button<{
   padding: props.theme.spacing(8),
   paddingTop: props.theme.spacing(6),
   paddingBottom: props.theme.spacing(6),
+  ':hover': {
+    borderColor: props.theme.colors.white_800,
+  },
 }));
 
 const ControlsContainer = styled.div`
@@ -74,7 +83,11 @@ const PriorityFee = styled.div((props) => ({
   gap: props.theme.spacing(6),
 }));
 
-export type OnChangeFeeRate = (feeRate: string) => void;
+const SecondaryText = styled.div((props) => ({
+  ...props.theme.typography.body_medium_s,
+  color: props.theme.colors.white_200,
+  marginTop: props.theme.spacing(2),
+}));
 
 function SpeedUpTransactionScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
@@ -84,10 +97,13 @@ function SpeedUpTransactionScreen() {
   const [showCustomFee, setShowCustomFee] = useState(false);
 
   const [feeRateInput, setFeeRateInput] = useState('1');
-  const [selectedOption, setSelectedOption] = useState('standard');
+  const [selectedOption, setSelectedOption] = useState<string | undefined>();
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setSelectedOption(e.currentTarget.value);
+    if (e.currentTarget.value === 'high' || e.currentTarget.value === 'medium') {
+      setSelectedOption(e.currentTarget.value);
+    }
+
     if (feeRates) {
       switch (e.currentTarget.value) {
         case 'high':
@@ -126,9 +142,11 @@ function SpeedUpTransactionScreen() {
         <Title>{t('TITLE')}</Title>
         <DetailText>{t('FEE_INFO')}</DetailText>
         <DetailText>
-          {t('CURRENT_FEE')} {feeRateInput} sats /vB
+          {t('CURRENT_FEE')} <HighlightedText>{feeRateInput} sats /vB</HighlightedText>
         </DetailText>
-        <DetailText>{t('ESTIMATED_COMPLETION_TIME')} min</DetailText>
+        <DetailText>
+          {t('ESTIMATED_COMPLETION_TIME')} <HighlightedText>~30 min</HighlightedText>
+        </DetailText>
         <ButtonContainer>
           <FeeButton
             key="high"
@@ -140,12 +158,12 @@ function SpeedUpTransactionScreen() {
               <RocketLaunch size={20} color={theme.colors.tangerine} />
               <div>
                 {t('HIGH_PRIORITY')}
-                <div>759 Sats /vByte</div>
+                <SecondaryText>759 Sats /vByte</SecondaryText>
               </div>
             </PriorityFee>
             <div>
               <div>90,000 Sats</div>
-              <div>~ $6.10 USD</div>
+              <SecondaryText>~ $6.10 USD</SecondaryText>
             </div>
           </FeeButton>
           <FeeButton
@@ -158,37 +176,52 @@ function SpeedUpTransactionScreen() {
               <CarProfile size={20} color={theme.colors.tangerine} />
               <div>
                 {t('MED_PRIORITY')}
-                <div>759 Sats /vByte</div>
+                <SecondaryText>759 Sats /vByte</SecondaryText>
               </div>
             </PriorityFee>
             <div>
               <div>90,000 Sats</div>
-              <div>~ $6.10 USD</div>
+              <SecondaryText>~ $6.10 USD</SecondaryText>
             </div>
           </FeeButton>
-          <FeeButton
-            key="custom"
-            value="custom"
-            isSelected={selectedOption === 'custom'}
-            onClick={handleClickFeeButton}
-          >
-            <PriorityFee>
-              <CustomFeeIcon size={20} color={theme.colors.tangerine} />
+          {true ? ( // TODO: Show the custom values if user applied it
+            <FeeButton
+              key="custom"
+              value="custom"
+              isSelected={selectedOption === 'custom'}
+              onClick={handleClickFeeButton}
+            >
+              <PriorityFee>
+                <CustomFeeIcon size={20} color={theme.colors.tangerine} />
+                <div>{t('CUSTOM')}</div>
+              </PriorityFee>
+              <div>Manual setting</div>
+            </FeeButton>
+          ) : (
+            <FeeButton
+              key="custom"
+              value="custom"
+              isSelected={selectedOption === 'custom'}
+              onClick={handleClickFeeButton}
+            >
+              <PriorityFee>
+                <CustomFeeIcon size={20} color={theme.colors.tangerine} />
+                <div>
+                  {t('CUSTOM')}
+                  <div>759 Sats /vByte</div>
+                </div>
+              </PriorityFee>
               <div>
-                {t('CUSTOM')}
-                <div>759 Sats /vByte</div>
+                <div>90,000 Sats</div>
+                <div>~ $6.10 USD</div>
               </div>
-            </PriorityFee>
-            <div>
-              <div>90,000 Sats</div>
-              <div>~ $6.10 USD</div>
-            </div>
-          </FeeButton>
+            </FeeButton>
+          )}
         </ButtonContainer>
       </Container>
       <ControlsContainer>
         <ActionButton text={t('CANCEL')} onPress={handleClickCancel} transparent />
-        <ActionButton text={t('SUBMIT')} onPress={handleClickSubmit} />
+        <ActionButton text={t('SUBMIT')} disabled={!selectedOption} onPress={handleClickSubmit} />
       </ControlsContainer>
 
       <CustomFee
@@ -200,6 +233,7 @@ function SpeedUpTransactionScreen() {
         error=""
         onChangeFeeRate={setFeeRateInput}
         onClickApply={(feeRate: string) => {}}
+        setSelectedOption={setSelectedOption}
       />
     </>
   );
