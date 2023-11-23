@@ -220,7 +220,7 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
             </div>
             <TransactionAmountContainer>
               <TransactionAmount transaction={transaction} coin={isBtc} />
-              {!showAccelerateButton && (
+              {showAccelerateButton && (
                 <Link to="/speed-up-tx">
                   <StyledButton
                     transparent

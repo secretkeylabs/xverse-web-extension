@@ -2,7 +2,8 @@ import ActionButton from '@components/button';
 import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { CarProfile, Faders, RocketLaunch } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { rbf } from '@secretkeylabs/xverse-core';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +55,6 @@ const FeeButton = styled.button<{
   }`,
   borderRadius: props.theme.radius(2),
   height: 'auto',
-  maxHeight: 65,
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -62,8 +62,18 @@ const FeeButton = styled.button<{
   padding: props.theme.spacing(8),
   paddingTop: props.theme.spacing(6),
   paddingBottom: props.theme.spacing(6),
-  ':hover': {
+  ':not(:disabled):hover': {
     borderColor: props.theme.colors.white_800,
+  },
+  ':disabled': {
+    cursor: 'not-allowed',
+    color: props.theme.colors.white_400,
+    div: {
+      color: 'inherit',
+    },
+    svg: {
+      fill: props.theme.colors.white_600,
+    },
   },
 }));
 
@@ -77,15 +87,35 @@ const CustomFeeIcon = styled(Faders)({
   transform: 'rotate(90deg)',
 });
 
-const PriorityFee = styled.div((props) => ({
+const FeeButtonLeft = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   gap: props.theme.spacing(6),
 }));
 
-const SecondaryText = styled.div((props) => ({
+const FeeButtonRight = styled.div({
+  textAlign: 'right',
+});
+
+const SecondaryText = styled.div<{
+  alignRight?: boolean;
+}>((props) => ({
   ...props.theme.typography.body_medium_s,
   color: props.theme.colors.white_200,
+  marginTop: props.theme.spacing(2),
+  textAlign: props.alignRight ? 'right' : 'left',
+}));
+
+const StyledActionButton = styled(ActionButton)((props) => ({
+  'div, h1': {
+    ...props.theme.typography.body_medium_m,
+  },
+}));
+
+const WarningText = styled.span((props) => ({
+  ...props.theme.typography.body_medium_s,
+  display: 'block',
+  color: props.theme.colors.danger_light,
   marginTop: props.theme.spacing(2),
 }));
 
@@ -95,6 +125,18 @@ function SpeedUpTransactionScreen() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
+
+  // const fetchRbfRecommendedFees = async () => {
+  //   const rbfTransaction = new rbf.RbfTransaction(transaction, rbfProps);
+  //   const mempoolFees = {
+  //   };
+
+  //   const response = await rbfTransaction.getRbfRecommendedFees(mempoolFees);
+  //   console.log(response);
+
+  // useEffect(() => {
+  //   fetchRbfRecommendedFees();
+  // }, []);
 
   const [feeRateInput, setFeeRateInput] = useState('1');
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
@@ -153,18 +195,20 @@ function SpeedUpTransactionScreen() {
             value="high"
             isSelected={selectedOption === 'high'}
             onClick={handleClickFeeButton}
+            disabled
           >
-            <PriorityFee>
+            <FeeButtonLeft>
               <RocketLaunch size={20} color={theme.colors.tangerine} />
               <div>
                 {t('HIGH_PRIORITY')}
                 <SecondaryText>759 Sats /vByte</SecondaryText>
               </div>
-            </PriorityFee>
-            <div>
+            </FeeButtonLeft>
+            <FeeButtonRight>
               <div>90,000 Sats</div>
-              <SecondaryText>~ $6.10 USD</SecondaryText>
-            </div>
+              <SecondaryText alignRight>~ $6.10 USD</SecondaryText>
+              <WarningText>Insufficient funds</WarningText>
+            </FeeButtonRight>
           </FeeButton>
           <FeeButton
             key="medium"
@@ -172,16 +216,16 @@ function SpeedUpTransactionScreen() {
             isSelected={selectedOption === 'medium'}
             onClick={handleClickFeeButton}
           >
-            <PriorityFee>
+            <FeeButtonLeft>
               <CarProfile size={20} color={theme.colors.tangerine} />
               <div>
                 {t('MED_PRIORITY')}
                 <SecondaryText>759 Sats /vByte</SecondaryText>
               </div>
-            </PriorityFee>
+            </FeeButtonLeft>
             <div>
               <div>90,000 Sats</div>
-              <SecondaryText>~ $6.10 USD</SecondaryText>
+              <SecondaryText alignRight>~ $6.10 USD</SecondaryText>
             </div>
           </FeeButton>
           {true ? ( // TODO: Show the custom values if user applied it
@@ -191,10 +235,10 @@ function SpeedUpTransactionScreen() {
               isSelected={selectedOption === 'custom'}
               onClick={handleClickFeeButton}
             >
-              <PriorityFee>
+              <FeeButtonLeft>
                 <CustomFeeIcon size={20} color={theme.colors.tangerine} />
                 <div>{t('CUSTOM')}</div>
-              </PriorityFee>
+              </FeeButtonLeft>
               <div>Manual setting</div>
             </FeeButton>
           ) : (
@@ -204,24 +248,28 @@ function SpeedUpTransactionScreen() {
               isSelected={selectedOption === 'custom'}
               onClick={handleClickFeeButton}
             >
-              <PriorityFee>
+              <FeeButtonLeft>
                 <CustomFeeIcon size={20} color={theme.colors.tangerine} />
                 <div>
                   {t('CUSTOM')}
-                  <div>759 Sats /vByte</div>
+                  <SecondaryText>759 Sats /vByte</SecondaryText>
                 </div>
-              </PriorityFee>
+              </FeeButtonLeft>
               <div>
                 <div>90,000 Sats</div>
-                <div>~ $6.10 USD</div>
+                <SecondaryText alignRight>~ $6.10 USD</SecondaryText>
               </div>
             </FeeButton>
           )}
         </ButtonContainer>
       </Container>
       <ControlsContainer>
-        <ActionButton text={t('CANCEL')} onPress={handleClickCancel} transparent />
-        <ActionButton text={t('SUBMIT')} disabled={!selectedOption} onPress={handleClickSubmit} />
+        <StyledActionButton text={t('CANCEL')} onPress={handleClickCancel} transparent />
+        <StyledActionButton
+          text={t('SUBMIT')}
+          disabled={!selectedOption}
+          onPress={handleClickSubmit}
+        />
       </ControlsContainer>
 
       <CustomFee
