@@ -3,7 +3,6 @@ import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { PersistConfig, persistReducer, persistStore } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
-import * as actions from './wallet/actions/types';
 import { WalletState } from './wallet/actions/types';
 import walletReducer from './wallet/reducer';
 
@@ -33,14 +32,8 @@ export type StoreState = ReturnType<typeof rootReducer>;
 
 const storeMiddleware = [
   createStateSyncMiddleware({
-    // We only want to sync seedphrase data for onboarding
-    whitelist: [
-      actions.StoreEncryptedSeedKey,
-      actions.SelectAccountKey,
-      actions.SetWalletUnlockedKey,
-      actions.AddAccountKey,
-      actions.UpdateLedgerAccountsKey,
-    ],
+    // We don't want to sync the redux-persist actions
+    blacklist: ['persist/PERSIST', 'persist/REHYDRATE'],
   }),
 ];
 const store = createStore(persistedReducer, applyMiddleware(...storeMiddleware));

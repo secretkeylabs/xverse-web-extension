@@ -3,7 +3,7 @@ import ArrowIcon from '@assets/img/settings/arrow.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BtcUtxoDataResponse, UTXO } from '@secretkeylabs/xverse-core';
+import { UTXO } from '@secretkeylabs/xverse-core';
 import { stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
 import { isCustomFeesAllowed, Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
@@ -64,7 +64,7 @@ interface Props {
   btcRecipients?: Recipient[];
   ordinalTxUtxo?: UTXO;
   isRestoreFlow?: boolean;
-  nonOrdinalUtxos?: BtcUtxoDataResponse[];
+  nonOrdinalUtxos?: UTXO[];
   showFeeSettings: boolean;
   setShowFeeSettings: (value: boolean) => void;
 }
@@ -123,7 +123,7 @@ function TransactionSettingAlert({
 
   const applyClickForBtc = async () => {
     const currentFee = new BigNumber(feeInput);
-    if (btcBalance && currentFee.gt(btcBalance)) {
+    if (currentFee.gt(btcBalance)) {
       // show fee exceeds total balance error
       setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
       return;

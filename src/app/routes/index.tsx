@@ -33,6 +33,7 @@ import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import LegalLinks from '@screens/legalLinks';
 import Login from '@screens/login';
 import ManageTokens from '@screens/manageTokens';
+import NftCollection from '@screens/nftCollection';
 import NftDashboard from '@screens/nftDashboard';
 import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
@@ -43,7 +44,6 @@ import RareSatsBundle from '@screens/rareSatsBundle';
 import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
 import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
-import RestoreBtc from '@screens/restoreFunds/restoreBtc';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20Screen from '@screens/sendBrc20';
@@ -302,10 +302,6 @@ const router = createHashRouter([
         element: <RestoreFunds />,
       },
       {
-        path: 'recover-btc',
-        element: <RestoreBtc />,
-      },
-      {
         path: 'recover-ordinals',
         element: <RestoreOrdinals />,
       },
@@ -373,10 +369,6 @@ const router = createHashRouter([
             <SendBrc20OneStepScreen />
           </AuthGuard>
         ),
-      },
-      {
-        path: 'send-nft/:id',
-        element: <SendNft />,
       },
       {
         path: 'confirm-inscription-request',
@@ -456,6 +448,14 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/nft-detail/:id/send-nft',
         element: <SendNft />,
+      },
+      {
+        path: 'nft-dashboard/nft-collection/:id',
+        element: (
+          <AuthGuard>
+            <NftCollection />
+          </AuthGuard>
+        ),
       },
       {
         path: 'nft-dashboard/ordinal-detail/:id/send-ordinal',

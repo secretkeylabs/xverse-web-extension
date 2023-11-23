@@ -9,7 +9,7 @@ const queue = new PQueue({ concurrency: 1 });
 const useTextOrdinalContent = (ordinal: Inscription | CondensedInscription) => {
   const { network } = useWalletSelector();
   const { data: textContent } = useQuery({
-    queryKey: [`ordinal-text-${ordinal?.id}`],
+    queryKey: ['ordinal-text', ordinal?.id, network.type],
     queryFn: async () => queue.add(() => getTextOrdinalContent(network.type, ordinal?.id)),
     staleTime: 5 * 60 * 1000, // 5 min
   });

@@ -1,25 +1,15 @@
-import { Inscription } from '@secretkeylabs/xverse-core/types/api/ordinals';
-import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+import { Inscription } from '@secretkeylabs/xverse-core';
 import { BundleV2 } from '@utils/rareSats';
 
 export interface NftDataState {
-  nftData: NftData[];
   selectedOrdinal: Inscription | null;
   selectedSatBundle: BundleV2 | null;
   selectedSatBundleItemIndex: number | null;
 }
 
-export const SetNftDataKey = 'SetNftData';
-
 export const SetSelectedOrdinalKey = 'SetSelectedOrdinal';
-
 export const SetSelectedSatBundleKey = 'SetSelectedSatBundle';
 export const SetSelectedSatBundleItemIndexKey = 'SetSelectedSatBundleItemIndex';
-
-export interface SetNftData {
-  type: typeof SetNftDataKey;
-  nftData: NftData[];
-}
 
 export interface SetSelectedOrdinal {
   type: typeof SetSelectedOrdinalKey;
@@ -36,7 +26,6 @@ export interface SetSelectedSatBundleItemIndex {
 }
 
 export type NftDataAction =
-  | SetNftData
   | SetSelectedOrdinal
   | SetSelectedSatBundle
   | SetSelectedSatBundleItemIndex;

@@ -1,7 +1,7 @@
-import RareSatsCollage from '@components/bundleAsset/rareSatsCollage';
+import CollectibleCollage from '@components/collectibleCollage/collectibleCollage';
 import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { InscriptionCollectionsData } from '@secretkeylabs/xverse-core/types';
+import { InscriptionCollectionsData } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import {
   getCollectionKey,
@@ -35,6 +35,7 @@ const StyledItemId = styled(StyledP)`
   text-wrap: nowrap;
   overflow: hidden;
   width: 100%;
+  text-overflow: ellipsis;
 `;
 
 const StyledItemSub = styled(StyledP)`
@@ -81,7 +82,7 @@ export function InscriptionsTabGridItem({
         ) : collection.category === 'brc-20' ? (
           <OrdinalImage ordinal={collection.thumbnail_inscriptions[0]} withoutTitles />
         ) : (
-          <RareSatsCollage
+          <CollectibleCollage
             items={collection.thumbnail_inscriptions.map(mapCondensedInscriptionToBundleItem)}
           />
         )}

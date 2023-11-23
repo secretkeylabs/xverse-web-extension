@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.22.1",
+  "version": "0.23.0",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -10,7 +10,7 @@
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "2.3.0",
+    "@secretkeylabs/xverse-core": "3.0.0",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
@@ -46,6 +46,7 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.0",
     "react-i18next": "^11.18.6",
+    "react-is-visible": "^1.2.0",
     "react-modal": "^3.15.1",
     "react-number-format": "^5.0.0",
     "react-qr-code": "^2.0.8",
@@ -60,7 +61,7 @@
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
     "redux-state-sync": "^3.1.4",
-    "sats-connect": "1.1.1",
+    "sats-connect": "1.1.2",
     "stream-browserify": "^3.0.0",
     "string-to-color": "^2.2.2",
     "styled-components": "^5.3.5",

@@ -22,7 +22,7 @@ export const useCoinRates = () => {
   };
 
   return useQuery({
-    queryKey: ['coin_rates'],
+    queryKey: ['coin_rates', fiatCurrency, network.type],
     queryFn: fetchCoinRates,
     staleTime: 5 * 60 * 1000, // 5 min
   });

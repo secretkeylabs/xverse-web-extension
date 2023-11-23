@@ -15,17 +15,13 @@ import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import {
-  getBtcFiatEquivalent,
-  satsToBtc,
-  signIncomingSingleSigPSBT,
-} from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, satsToBtc, signLedgerPSBT } from '@secretkeylabs/xverse-core';
 import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
 import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -95,8 +91,15 @@ const SuccessActionsContainer = styled.div((props) => ({
 }));
 
 function SignPsbtRequest() {
-  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
-    useWalletSelector();
+  const {
+    btcAddress,
+    btcPublicKey,
+    ordinalsAddress,
+    ordinalsPublicKey,
+    selectedAccount,
+    network,
+    btcFiatRate,
+  } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: signatureRequestTranslate } = useTranslation('translation', {
@@ -120,15 +123,14 @@ function SignPsbtRequest() {
   const request = decodeToken(requestToken) as any as SignTransactionOptions;
   const btcClient = useBtcClient();
 
-  const handlePsbtParsing = useCallback(() => {
+  const parsedPsbt = useMemo(() => {
     try {
       return parsePsbt(selectedAccount!, payload.inputsToSign, payload.psbtBase64, network.type);
     } catch (err) {
-      return '';
+      return undefined;
     }
-  }, [selectedAccount, payload.psbtBase64]);
+  }, [selectedAccount, payload.inputsToSign, payload.psbtBase64, network.type]);
 
-  const parsedPsbt = useMemo(() => handlePsbtParsing(), [handlePsbtParsing]);
   const { loading, bundleItemsData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
@@ -187,7 +189,7 @@ function SignPsbtRequest() {
   const onSignPsbtConfirmed = async () => {
     try {
       if (isLedgerAccount(selectedAccount)) {
-        // setIsModalVisible(true);
+        setIsModalVisible(true);
         return;
       }
 
@@ -232,19 +234,20 @@ function SignPsbtRequest() {
 
   const handleLedgerPsbtSigning = async (transport: TransportType) => {
     const addressIndex = selectedAccount?.deviceAccountIndex;
-    const { inputsToSign, psbtBase64, broadcast } = payload;
+    const { psbtBase64, broadcast } = payload;
 
     if (addressIndex === undefined) {
       throw new Error('Account not found');
     }
 
-    const signingResponse = await signIncomingSingleSigPSBT({
+    const signingResponse = await signLedgerPSBT({
       transport,
       network: network.type,
       addressIndex,
-      inputsToSign,
-      psbtBase64,
-      finalize: broadcast,
+      psbtInputBase64: psbtBase64,
+      finalize: broadcast ?? false,
+      nativeSegwitPubKey: btcPublicKey,
+      taprootPubKey: ordinalsPublicKey,
     });
 
     let txId: string = '';
@@ -346,53 +349,46 @@ function SignPsbtRequest() {
       ) : (
         <>
           <OuterContainer>
-            {isLedgerAccount(selectedAccount) ? (
-              <Container>
-                <InfoContainer bodyText="External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application." />
-              </Container>
-            ) : (
-              <Container>
-                <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
-                {!payload.broadcast && (
-                  <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />
-                )}
-                {bundleItemsData &&
-                  bundleItemsData.map((bundleItem, index) => (
-                    <BundleItemsComponent
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={index}
-                      item={bundleItem}
-                      userReceivesOrdinal={userReceivesOrdinal}
-                    />
-                  ))}
-                <RecipientComponent
-                  value={`${satsToBtc(new BigNumber(parsedPsbt?.netAmount))
-                    .toString()
-                    .replace('-', '')}`}
-                  currencyType="BTC"
-                  title={t('AMOUNT')}
-                  heading={
-                    parsedPsbt?.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')
-                  }
-                />
-                <InputOutputComponent
-                  parsedPsbt={parsedPsbt}
-                  isExpanded={expandInputOutputView}
-                  address={signingAddresses}
-                  onArrowClick={expandInputOutputSection}
-                />
-
-                <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-                {payload.broadcast ? (
-                  <TransactionDetailComponent
-                    title={t('FEES')}
-                    value={getSatsAmountString(new BigNumber(parsedPsbt?.fees))}
-                    subValue={getBtcFiatEquivalent(new BigNumber(parsedPsbt?.fees), btcFiatRate)}
+            <Container>
+              <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
+              {!payload.broadcast && <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
+              {bundleItemsData &&
+                bundleItemsData.map((bundleItem, index) => (
+                  <BundleItemsComponent
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    item={bundleItem}
+                    userReceivesOrdinal={userReceivesOrdinal}
                   />
-                ) : null}
-                {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
-              </Container>
-            )}
+                ))}
+              <RecipientComponent
+                value={`${satsToBtc(new BigNumber((parsedPsbt?.netAmount ?? 0).toString()))
+                  .toString()
+                  .replace('-', '')}`}
+                currencyType="BTC"
+                title={t('AMOUNT')}
+                heading={parsedPsbt!.netAmount < 0 ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_RECEIVE')}
+              />
+              <InputOutputComponent
+                parsedPsbt={parsedPsbt!}
+                isExpanded={expandInputOutputView}
+                address={signingAddresses}
+                onArrowClick={expandInputOutputSection}
+              />
+
+              <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
+              {payload.broadcast ? (
+                <TransactionDetailComponent
+                  title={t('FEES')}
+                  value={getSatsAmountString(new BigNumber((parsedPsbt?.fees ?? 0).toString()))}
+                  subValue={getBtcFiatEquivalent(
+                    new BigNumber((parsedPsbt?.fees ?? 0).toString()),
+                    BigNumber(btcFiatRate),
+                  )}
+                />
+              ) : null}
+              {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
+            </Container>
           </OuterContainer>
           <ButtonContainer>
             <TransparentButtonContainer>
@@ -402,7 +398,6 @@ function SignPsbtRequest() {
               text={t('CONFIRM')}
               onPress={onSignPsbtConfirmed}
               processing={isSigning}
-              disabled={isLedgerAccount(selectedAccount)}
             />
           </ButtonContainer>
         </>

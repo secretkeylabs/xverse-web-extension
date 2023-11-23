@@ -6,6 +6,7 @@ import { AlexSDK, Currency } from 'alex-sdk';
 import BigNumber from 'bignumber.js';
 import { SwapToken } from './types';
 
+// eslint-disable-next-line import/prefer-default-export
 export function useCurrencyConversion() {
   const alexSDK = new AlexSDK();
   const {
@@ -46,7 +47,14 @@ export function useCurrencyConversion() {
         amount,
         fiatAmount:
           amount != null
-            ? Number(getFiatEquivalent(amount, 'STX', stxBtcRate as any, btcFiatRate as any))
+            ? Number(
+                getFiatEquivalent(
+                  amount,
+                  'STX',
+                  BigNumber(stxBtcRate) as any,
+                  BigNumber(btcFiatRate) as any,
+                ),
+              )
             : undefined,
       };
     }
@@ -63,7 +71,9 @@ export function useCurrencyConversion() {
       balance: Number(ftDecimals(token.balance, token.decimals ?? 0)),
       fiatAmount:
         amount != null
-          ? Number(getFiatEquivalent(amount, 'FT', stxBtcRate as any, btcFiatRate as any, token))
+          ? Number(
+              getFiatEquivalent(amount, 'FT', BigNumber(stxBtcRate), BigNumber(btcFiatRate), token),
+            )
           : undefined,
     };
   }

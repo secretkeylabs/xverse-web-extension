@@ -228,7 +228,7 @@ export function EditFees({
     onClose();
   };
 
-  const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), btcFiatRate);
+  const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), BigNumber(btcFiatRate));
 
   return (
     <BottomModal
