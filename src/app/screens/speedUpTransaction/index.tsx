@@ -149,7 +149,7 @@ function SpeedUpTransactionScreen() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const { selectedAccount, network, btcFiatRate, fiatCurrency } = useWalletSelector();
+  const { selectedAccount, accountType, network, btcFiatRate, fiatCurrency } = useWalletSelector();
   const seedVault = useSeedVault();
   const { id } = useParams();
   const btcClient = useBtcClient();
@@ -180,6 +180,7 @@ function SpeedUpTransactionScreen() {
 
     const rbfTx = new rbf.RbfTransaction(transaction, {
       ...selectedAccount,
+      accountType: accountType!,
       accountId: selectedAccount.deviceAccountIndex!,
       network: network.type,
       // @ts-ignore
@@ -297,39 +298,44 @@ function SpeedUpTransactionScreen() {
         </DetailText>
         <ButtonContainer>
           {rbfRecommendedFees &&
-            Object.entries(rbfRecommendedFees).map(([key, obj]) => (
-              <FeeButton
-                key={key}
-                value={key}
-                isSelected={selectedOption === key}
-                onClick={handleClickFeeButton}
-                disabled={!obj.enoughFunds}
-              >
-                <FeeButtonLeft>
-                  {feeButtonMapping[key].icon}
-                  <div>
-                    {feeButtonMapping[key].title}
-                    <SecondaryText>{obj.feeRate} Sats /vByte</SecondaryText>
-                  </div>
-                </FeeButtonLeft>
-                <FeeButtonRight>
-                  <div>{obj.fee || '--'} Sats</div>
-                  {obj.fee ? (
-                    <SecondaryText alignRight>
-                      ~ {currencySymbolMap[fiatCurrency]}
-                      {getBtcFiatEquivalent(
-                        satsToBtc(BigNumber(obj.fee)),
-                        BigNumber(btcFiatRate),
-                      ).toString()}{' '}
-                      {fiatCurrency}
-                    </SecondaryText>
-                  ) : (
-                    <SecondaryText alignRight>-- {fiatCurrency}</SecondaryText>
-                  )}
-                  {!obj.enoughFunds && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
-                </FeeButtonRight>
-              </FeeButton>
-            ))}
+            Object.entries(rbfRecommendedFees)
+              .sort((a, b) => {
+                const priorityOrder = ['highest', 'higher', 'high', 'medium'];
+                return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
+              })
+              .map(([key, obj]) => (
+                <FeeButton
+                  key={key}
+                  value={key}
+                  isSelected={selectedOption === key}
+                  onClick={handleClickFeeButton}
+                  disabled={!obj.enoughFunds}
+                >
+                  <FeeButtonLeft>
+                    {feeButtonMapping[key].icon}
+                    <div>
+                      {feeButtonMapping[key].title}
+                      <SecondaryText>{obj.feeRate} Sats /vByte</SecondaryText>
+                    </div>
+                  </FeeButtonLeft>
+                  <FeeButtonRight>
+                    <div>{obj.fee || '--'} Sats</div>
+                    {obj.fee ? (
+                      <SecondaryText alignRight>
+                        ~ {currencySymbolMap[fiatCurrency]}
+                        {getBtcFiatEquivalent(
+                          satsToBtc(BigNumber(obj.fee)),
+                          BigNumber(btcFiatRate),
+                        ).toString()}{' '}
+                        {fiatCurrency}
+                      </SecondaryText>
+                    ) : (
+                      <SecondaryText alignRight>-- {fiatCurrency}</SecondaryText>
+                    )}
+                    {!obj.enoughFunds && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
+                  </FeeButtonRight>
+                </FeeButton>
+              ))}
           {true ? ( // TODO: Show the custom values if user applied it
             <FeeButton
               key="custom"
