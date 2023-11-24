@@ -789,10 +789,13 @@
     "CANCEL": "Cancel",
     "SUBMIT": "Submit",
     "HIGH_PRIORITY": "High priority",
+    "HIGHER_PRIORITY": "Higher priority",
+    "HIGHEST_PRIORITY": "Highest priority",
     "MED_PRIORITY": "Medium priority",
     "CUSTOM": "Custom",
     "INSUFFICIENT_FUNDS": "Insufficient funds",
-    "MANUAL_SETTING": "Manual setting"
+    "MANUAL_SETTING": "Manual setting",
+    "TX_FEE_UPDATED": "Transaction fee updated"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",

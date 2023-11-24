@@ -1,18 +1,37 @@
 import ActionButton from '@components/button';
 import TopRow from '@components/topRow';
 import useBtcClient from '@hooks/useBtcClient';
-import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { CarProfile, Faders, RocketLaunch } from '@phosphor-icons/react';
-import { fetchBtcTransaction, rbf } from '@secretkeylabs/xverse-core';
+import { CarProfile, Faders, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
+import {
+  fetchBtcTransaction,
+  getBtcFiatEquivalent,
+  rbf,
+  satsToBtc,
+} from '@secretkeylabs/xverse-core';
 import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/api/esplora';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { CustomFee } from './customFee';
+
+type TierFees = {
+  enoughFunds: boolean;
+  fee?: number;
+  feeRate: number;
+};
+
+type RbfRecommendedFees = {
+  medium?: TierFees;
+  high?: TierFees;
+  higher?: TierFees;
+  highest?: TierFees;
+};
 
 const Title = styled.h1((props) => ({
   ...props.theme.typography.headline_s,
@@ -125,11 +144,10 @@ const WarningText = styled.span((props) => ({
 
 function SpeedUpTransactionScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
-  const { data: feeRates } = useBtcFeeRate();
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const { selectedAccount, network } = useWalletSelector();
+  const { selectedAccount, network, btcFiatRate, fiatCurrency } = useWalletSelector();
   const seedVault = useSeedVault();
   const { id } = useParams();
   const btcClient = useBtcClient();
@@ -143,8 +161,9 @@ function SpeedUpTransactionScreen() {
   const [totalFee, setTotalFee] = useState<string | undefined>();
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
   const [recommendedFees, setRecommendedFees] = useState<RecommendedFeeResponse>();
+  const [rbfRecommendedFees, setRbfRecommendedFees] = useState<RbfRecommendedFees>();
 
-  const fetchRbfRecommendedFees = async () => {
+  const fetchRbfData = async () => {
     if (!selectedAccount || !id) {
       return;
     }
@@ -174,33 +193,28 @@ function SpeedUpTransactionScreen() {
     console.log('rbfTransactionSummary', rbfTransactionSummary);
     setRbfTxSummary(rbfTransactionSummary);
 
-    // @ts-ignore
-    const rbfRecommendedFees = await rbfTransaction.getRbfRecommendedFees(mempoolFees);
+    const rbfRecommendedFeesResponse = await rbfTransaction.getRbfRecommendedFees(mempoolFees);
+    setRbfRecommendedFees(rbfRecommendedFeesResponse);
     console.log('rbfRecommendedFees', rbfRecommendedFees);
   };
 
   useEffect(() => {
-    fetchRbfRecommendedFees();
+    fetchRbfData();
   }, [selectedAccount, id]);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (e.currentTarget.value === 'high' || e.currentTarget.value === 'medium') {
-      setSelectedOption(e.currentTarget.value);
+    if (e.currentTarget.value === 'custom') {
+      setShowCustomFee(true);
+      return;
     }
 
-    if (feeRates) {
-      switch (e.currentTarget.value) {
-        case 'high':
-          setFeeRateInput(feeRates.priority.toString());
-          break;
-        case 'medium':
-          setFeeRateInput(feeRates.regular.toString());
-          break;
-        case 'custom':
-          setShowCustomFee(true);
-          break;
-        default:
-          break;
+    if (rbfRecommendedFees) {
+      const feeObj = rbfRecommendedFees[e.currentTarget.value];
+
+      if (feeObj?.enoughFunds) {
+        setTotalFee(feeObj.fee);
+        setFeeRateInput(feeObj.feeRate);
+        setSelectedOption(e.currentTarget.value);
       }
     }
   };
@@ -210,7 +224,7 @@ function SpeedUpTransactionScreen() {
   };
 
   const handleClickSubmit = () => {
-    toast.success('Transaction fee updated');
+    toast.success(t('TX_FEE_UPDATED'));
 
     navigate(-1);
   };
@@ -232,6 +246,25 @@ function SpeedUpTransactionScreen() {
     }
   }
 
+  const feeButtonMapping = {
+    medium: {
+      icon: <CarProfile size={20} color={theme.colors.tangerine} />,
+      title: t('MED_PRIORITY'),
+    },
+    high: {
+      icon: <RocketLaunch size={20} color={theme.colors.tangerine} />,
+      title: t('HIGH_PRIORITY'),
+    },
+    higher: {
+      icon: <Lightning size={20} color={theme.colors.tangerine} />,
+      title: t('HIGHER_PRIORITY'),
+    },
+    highest: {
+      icon: <ShootingStar size={20} color={theme.colors.tangerine} />,
+      title: t('HIGHEST_PRIORITY'),
+    },
+  };
+
   return (
     <>
       <TopRow title="" onClick={handleBackButtonClick} />
@@ -250,44 +283,40 @@ function SpeedUpTransactionScreen() {
           <HighlightedText>{estimatedCompletionTime}</HighlightedText>
         </DetailText>
         <ButtonContainer>
-          <FeeButton
-            key="high"
-            value="high"
-            isSelected={selectedOption === 'high'}
-            onClick={handleClickFeeButton}
-            disabled
-          >
-            <FeeButtonLeft>
-              <RocketLaunch size={20} color={theme.colors.tangerine} />
-              <div>
-                {t('HIGH_PRIORITY')}
-                <SecondaryText>759 Sats /vByte</SecondaryText>
-              </div>
-            </FeeButtonLeft>
-            <FeeButtonRight>
-              <div>90,000 Sats</div>
-              <SecondaryText alignRight>~ $6.10 USD</SecondaryText>
-              <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>
-            </FeeButtonRight>
-          </FeeButton>
-          <FeeButton
-            key="medium"
-            value="medium"
-            isSelected={selectedOption === 'medium'}
-            onClick={handleClickFeeButton}
-          >
-            <FeeButtonLeft>
-              <CarProfile size={20} color={theme.colors.tangerine} />
-              <div>
-                {t('MED_PRIORITY')}
-                <SecondaryText>759 Sats /vByte</SecondaryText>
-              </div>
-            </FeeButtonLeft>
-            <div>
-              <div>90,000 Sats</div>
-              <SecondaryText alignRight>~ $6.10 USD</SecondaryText>
-            </div>
-          </FeeButton>
+          {rbfRecommendedFees &&
+            Object.entries(rbfRecommendedFees).map(([key, obj]) => (
+              <FeeButton
+                key={key}
+                value={key}
+                isSelected={selectedOption === key}
+                onClick={handleClickFeeButton}
+                disabled={!obj.enoughFunds}
+              >
+                <FeeButtonLeft>
+                  {feeButtonMapping[key].icon}
+                  <div>
+                    {feeButtonMapping[key].title}
+                    <SecondaryText>{obj.feeRate} Sats /vByte</SecondaryText>
+                  </div>
+                </FeeButtonLeft>
+                <FeeButtonRight>
+                  <div>{obj.fee} Sats</div>
+                  {obj.fee ? (
+                    <SecondaryText alignRight>
+                      ~ {currencySymbolMap[fiatCurrency]}
+                      {getBtcFiatEquivalent(
+                        satsToBtc(BigNumber(obj.fee)),
+                        BigNumber(btcFiatRate),
+                      ).toString()}{' '}
+                      {fiatCurrency}
+                    </SecondaryText>
+                  ) : (
+                    <SecondaryText alignRight>-- {fiatCurrency}</SecondaryText>
+                  )}
+                  {!obj.enoughFunds && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
+                </FeeButtonRight>
+              </FeeButton>
+            ))}
           {true ? ( // TODO: Show the custom values if user applied it
             <FeeButton
               key="custom"
@@ -335,8 +364,8 @@ function SpeedUpTransactionScreen() {
       <CustomFee
         visible={showCustomFee}
         onClose={() => setShowCustomFee(false)}
-        initialFeeRate={feeRateInput}
-        fee={totalFee}
+        initialFeeRate={feeRateInput!}
+        fee={totalFee!}
         isFeeLoading={false}
         error=""
         onChangeFeeRate={setFeeRateInput}
