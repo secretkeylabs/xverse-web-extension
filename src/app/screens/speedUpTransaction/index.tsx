@@ -6,6 +6,7 @@ import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CarProfile, Faders, RocketLaunch } from '@phosphor-icons/react';
 import { fetchBtcTransaction, rbf } from '@secretkeylabs/xverse-core';
+import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/api/esplora';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -132,6 +133,16 @@ function SpeedUpTransactionScreen() {
   const seedVault = useSeedVault();
   const { id } = useParams();
   const btcClient = useBtcClient();
+  const [rbfTxSummary, setRbfTxSummary] = useState<{
+    currentFee: number;
+    currentFeeRate: number;
+    minimumRbfFee: number;
+    minimumRbfFeeRate: number;
+  }>();
+  const [feeRateInput, setFeeRateInput] = useState<string | undefined>();
+  const [totalFee, setTotalFee] = useState<string | undefined>();
+  const [selectedOption, setSelectedOption] = useState<string | undefined>();
+  const [recommendedFees, setRecommendedFees] = useState<RecommendedFeeResponse>();
 
   const fetchRbfRecommendedFees = async () => {
     if (!selectedAccount || !id) {
@@ -146,6 +157,10 @@ function SpeedUpTransactionScreen() {
     );
     console.log('transaction', transaction);
 
+    const mempoolFees = await btcClient.getRecommendedFees();
+    setRecommendedFees(mempoolFees);
+    console.log('mempoolFees', mempoolFees);
+
     const rbfTransaction = new rbf.RbfTransaction(transaction, {
       ...selectedAccount,
       accountId: selectedAccount.deviceAccountIndex!,
@@ -155,20 +170,18 @@ function SpeedUpTransactionScreen() {
     });
     console.log('rbfTransaction', rbfTransaction);
 
-    const mempoolFees = await btcClient.getRecommendedFees();
-    console.log('mempoolFees', mempoolFees);
+    const rbfTransactionSummary = await rbf.getRbfTransactionSummary(transaction);
+    console.log('rbfTransactionSummary', rbfTransactionSummary);
+    setRbfTxSummary(rbfTransactionSummary);
 
     // @ts-ignore
-    const response = await rbfTransaction.getRbfRecommendedFees(mempoolFees);
-    console.log('getRbfRecommendedFees', response);
+    const rbfRecommendedFees = await rbfTransaction.getRbfRecommendedFees(mempoolFees);
+    console.log('rbfRecommendedFees', rbfRecommendedFees);
   };
 
   useEffect(() => {
     fetchRbfRecommendedFees();
   }, [selectedAccount, id]);
-
-  const [feeRateInput, setFeeRateInput] = useState('1');
-  const [selectedOption, setSelectedOption] = useState<string | undefined>();
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'high' || e.currentTarget.value === 'medium') {
@@ -206,6 +219,19 @@ function SpeedUpTransactionScreen() {
     navigate(-1);
   };
 
+  let estimatedCompletionTime = '~10 mins';
+
+  if (rbfTxSummary && recommendedFees) {
+    if (rbfTxSummary?.currentFeeRate < recommendedFees?.hourFee) {
+      estimatedCompletionTime = 'several hours or more';
+    } else if (
+      rbfTxSummary?.currentFeeRate > recommendedFees?.hourFee &&
+      rbfTxSummary?.currentFeeRate <= recommendedFees?.halfHourFee
+    ) {
+      estimatedCompletionTime = '~30 mins';
+    }
+  }
+
   return (
     <>
       <TopRow title="" onClick={handleBackButtonClick} />
@@ -213,10 +239,15 @@ function SpeedUpTransactionScreen() {
         <Title>{t('TITLE')}</Title>
         <DetailText>{t('FEE_INFO')}</DetailText>
         <DetailText>
-          {t('CURRENT_FEE')} <HighlightedText>{feeRateInput} sats /vB</HighlightedText>
+          {t('CURRENT_FEE')}{' '}
+          <HighlightedText>
+            {rbfTxSummary?.currentFee || totalFee} sats /{' '}
+            {rbfTxSummary?.currentFeeRate || feeRateInput} sats /vB
+          </HighlightedText>
         </DetailText>
         <DetailText>
-          {t('ESTIMATED_COMPLETION_TIME')} <HighlightedText>~30 min</HighlightedText>
+          {t('ESTIMATED_COMPLETION_TIME')}{' '}
+          <HighlightedText>{estimatedCompletionTime}</HighlightedText>
         </DetailText>
         <ButtonContainer>
           <FeeButton
@@ -305,7 +336,7 @@ function SpeedUpTransactionScreen() {
         visible={showCustomFee}
         onClose={() => setShowCustomFee(false)}
         initialFeeRate={feeRateInput}
-        fee={feeRateInput}
+        fee={totalFee}
         isFeeLoading={false}
         error=""
         onChangeFeeRate={setFeeRateInput}
