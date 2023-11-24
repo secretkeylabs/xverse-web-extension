@@ -5,14 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { handleRetries } from '@utils/query';
 
 const useStacksCollectibles = () => {
-  let { stxAddress } = useWalletSelector();
+  const { stxAddress } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-
-  // TODO remove this after testing
-  const testAddress = localStorage.getItem('stxAddress');
-  if (testAddress) {
-    stxAddress = testAddress;
-  }
 
   const fetchNftCollections = (): Promise<StacksCollectionList> =>
     getNftCollections(stxAddress, selectedNetwork);
