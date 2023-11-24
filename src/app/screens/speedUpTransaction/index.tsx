@@ -180,7 +180,7 @@ function SpeedUpTransactionScreen() {
 
     const rbfTx = new rbf.RbfTransaction(transaction, {
       ...selectedAccount,
-      accountType: accountType!,
+      accountType: accountType || 'software',
       accountId: selectedAccount.deviceAccountIndex!,
       network: network.type,
       // @ts-ignore
