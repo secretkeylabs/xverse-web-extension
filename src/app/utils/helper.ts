@@ -1,18 +1,18 @@
-import {
-  Account,
-  StxMempoolTransactionData,
-  SettingsNetwork,
-  NetworkType,
-} from '@secretkeylabs/xverse-core/types';
-import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core';
 import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
-import BigNumber from 'bignumber.js';
+import {
+  Account,
+  NetworkType,
+  SettingsNetwork,
+  StxMempoolTransactionData,
+} from '@secretkeylabs/xverse-core/types';
+import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { ChainID } from '@stacks/transactions';
+import BigNumber from 'bignumber.js';
 import {
   BTC_TRANSACTION_STATUS_URL,
-  TRANSACTION_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
+  TRANSACTION_STATUS_URL,
 } from './constants';
 
 const validUrl = require('valid-url');
@@ -101,15 +101,6 @@ export function getBtcTxStatusUrl(txId: string, network: SettingsNetwork) {
   return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
 }
 
-export function getFetchableUrl(uri: string, protocol: string): string | undefined {
-  const publicIpfs = 'https://gamma.mypinata.cloud/ipfs';
-  if (protocol === 'http') return uri;
-  if (protocol === 'ipfs') {
-    const url = uri.split('//');
-    return `${publicIpfs}/${url[1]}`;
-  }
-  return undefined;
-}
 /**
  * check if nft transaction exists in pending transactions
  * @param pendingTransactions
