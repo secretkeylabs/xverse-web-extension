@@ -250,12 +250,11 @@ function SpeedUpTransactionScreen() {
   let estimatedCompletionTime = '~10 mins';
 
   if (rbfTxSummary && recommendedFees) {
-    if (rbfTxSummary?.currentFeeRate < recommendedFees?.hourFee) {
+    const feeRate = Number(feeRateInput) || rbfTxSummary?.currentFeeRate;
+
+    if (feeRate < recommendedFees?.hourFee) {
       estimatedCompletionTime = 'several hours or more';
-    } else if (
-      rbfTxSummary?.currentFeeRate > recommendedFees?.hourFee &&
-      rbfTxSummary?.currentFeeRate <= recommendedFees?.halfHourFee
-    ) {
+    } else if (feeRate > recommendedFees?.hourFee && feeRate <= recommendedFees?.halfHourFee) {
       estimatedCompletionTime = '~30 mins';
     }
   }
@@ -288,8 +287,8 @@ function SpeedUpTransactionScreen() {
         <DetailText>
           {t('CURRENT_FEE')}{' '}
           <HighlightedText>
-            {rbfTxSummary?.currentFee || totalFee} sats /{' '}
-            {rbfTxSummary?.currentFeeRate || feeRateInput} sats /vB
+            {totalFee || rbfTxSummary?.currentFee} sats /{' '}
+            {feeRateInput || rbfTxSummary?.currentFeeRate} sats /vB
           </HighlightedText>
         </DetailText>
         <DetailText>
