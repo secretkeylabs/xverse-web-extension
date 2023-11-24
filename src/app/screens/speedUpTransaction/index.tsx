@@ -6,12 +6,7 @@ import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Faders, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
-import {
-  fetchBtcTransaction,
-  getBtcFiatEquivalent,
-  rbf,
-  satsToBtc,
-} from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, rbf, satsToBtc } from '@secretkeylabs/xverse-core';
 import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/api/esplora';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import BigNumber from 'bignumber.js';
