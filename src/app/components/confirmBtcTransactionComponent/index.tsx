@@ -1,14 +1,18 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
+import BundleIcon from '@assets/img/rareSats/satBundle.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
+import AssetModal from '@components/assetModal';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
 import TopRow from '@components/topRow';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { CaretDown } from '@phosphor-icons/react';
 import {
   ErrorCodes,
   getBtcFiatEquivalent,
@@ -25,13 +29,17 @@ import {
 } from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
+import { StyledP } from '@ui-library/common.styled';
 import { CurrencyTypes } from '@utils/constants';
+import { BundleSatRange, Inscription } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
+import Theme from 'theme';
 import TransactionDetailComponent from '../transactionDetailComponent';
+import { BundleItem } from './bundleItem';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -53,6 +61,10 @@ const Container = styled.div((props) => ({
 
 interface ButtonProps {
   isBtcSendBrowserTx?: boolean;
+}
+
+interface BundleItemContainerProps {
+  addMargin: boolean;
 }
 
 const ButtonContainer = styled.div<ButtonProps>((props) => ({
@@ -103,20 +115,55 @@ const ErrorText = styled.h1((props) => ({
   color: props.theme.colors.danger_medium,
 }));
 
+const BundleItemsContainer = styled.div<BundleItemContainerProps>`
+  margin-top: ${(props) => (props.addMargin ? Theme.space.m : 0)};
+`;
+
 interface ReviewTransactionTitleProps {
-  isOridnalTx: boolean;
+  centerAligned: boolean;
 }
 const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
   ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
-  textAlign: props.isOridnalTx ? 'center' : 'left',
+  textAlign: props.centerAligned ? 'center' : 'left',
 }));
 
 const CalloutContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(8),
   marginhorizontal: props.theme.spacing(8),
 }));
+
+const SatsBundle = styled.button`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: ${(props) => props.theme.colors.elevation1};
+`;
+
+const SatsBundleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: ${(props) => props.theme.space.s};
+  border-radius: ${(props) => props.theme.space.s};
+  padding: ${(props) => props.theme.space.m};
+  background-color: ${(props) => props.theme.colors.elevation1};
+`;
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const BundleTitle = styled(StyledP)`
+  margin-left: ${(props) => props.theme.space.s};
+`;
+
+const BundleValue = styled(StyledP)`
+  margin-right: ${(props) => props.theme.space.xs};
+`;
 
 interface Props {
   currentFee: BigNumber;
@@ -167,12 +214,15 @@ function ConfirmBtcTransactionComponent({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
   const { btcAddress, selectedAccount, network, btcFiatRate, feeMultipliers } = useWalletSelector();
+  const { selectedSatBundle } = useNftDataSelector();
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const [showFeeWarning, setShowFeeWarning] = useState(false);
+  const [showBundleDetail, setShowBundleDetail] = useState(false);
+  const [inscriptionToShow, setInscriptionToShow] = useState<Inscription | undefined>(undefined);
   const {
     isLoading,
     data,
@@ -376,8 +426,13 @@ function ConfirmBtcTransactionComponent({
   return (
     <>
       <OuterContainer>
-        {!isBtcSendBrowserTx && !isGalleryOpen && (
-          <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
+        {!isBtcSendBrowserTx && !isGalleryOpen && <TopRow title="" onClick={onBackButtonClick} />}
+        {inscriptionToShow && (
+          <AssetModal
+            show={!!inscriptionToShow}
+            onClose={() => setInscriptionToShow(undefined)}
+            inscription={inscriptionToShow}
+          />
         )}
         <Container>
           {showFeeWarning && (
@@ -388,7 +443,7 @@ function ConfirmBtcTransactionComponent({
           )}
 
           {children}
-          <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
+          <ReviewTransactionText centerAligned={currencyType === 'Ordinal'}>
             {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
           </ReviewTransactionText>
 
@@ -401,10 +456,48 @@ function ConfirmBtcTransactionComponent({
             </CalloutContainer>
           )}
 
+          {selectedSatBundle && (
+            <SatsBundleContainer>
+              <SatsBundle
+                type="button"
+                onClick={() => setShowBundleDetail((prevState) => !prevState)}
+              >
+                <Row>
+                  <img src={BundleIcon} alt="bundle" />
+                  <BundleTitle typography="body_medium_m" color="white_200">
+                    {t('RARE_SATS.SATS_BUNDLE')}
+                  </BundleTitle>
+                </Row>
+                <Row>
+                  <BundleValue
+                    typography="body_medium_m"
+                    color="white_0"
+                  >{`${selectedSatBundle.satributes.length} Rare Sats`}</BundleValue>
+                  <CaretDown color={Theme.colors.white_0} size={16} />
+                </Row>
+              </SatsBundle>
+
+              {showBundleDetail &&
+                selectedSatBundle.satRanges.map((item: BundleSatRange, index: number) => (
+                  <BundleItemsContainer addMargin={index === 0}>
+                    <BundleItem
+                      key={`${item.block}-${item.offset}`}
+                      item={item}
+                      ordinalEyePressed={(inscription: Inscription) => {
+                        // show ordinal modal to show asset
+                        setInscriptionToShow(inscription);
+                      }}
+                      showDivider={index !== selectedSatBundle.satRanges.length - 1}
+                    />
+                  </BundleItemsContainer>
+                ))}
+            </SatsBundleContainer>
+          )}
+
           {ordinalTxUtxo ? (
             <RecipientComponent
               address={recipients[0]?.address}
-              value={assetDetail!}
+              value={assetDetail ?? ''}
               valueDetail={assetDetailValue}
               icon={AssetIcon}
               currencyType={currencyType || 'Ordinal'}

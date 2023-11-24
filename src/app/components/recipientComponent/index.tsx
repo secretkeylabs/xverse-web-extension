@@ -36,10 +36,7 @@ const RowContainer = styled.div({
   flexDirection: 'row',
   width: '100%',
   alignItems: 'flex-start',
-});
-
-const AddressContainer = styled.div({
-  marginTop: 12,
+  marginBottom: 12,
 });
 
 const Icon = styled.img((props) => ({
@@ -210,29 +207,31 @@ function RecipientComponent({
         </RecipientTitleText>
       )}
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
-      <RowContainer>
-        {renderIcon()}
-        <TitleText>{title}</TitleText>
-        {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
-          <ColumnContainer>
-            <ValueText>{value}</ValueText>
-            {valueDetail && <SubValueText>{valueDetail}</SubValueText>}
-          </ColumnContainer>
-        ) : (
-          <ColumnContainer>
-            <NumericFormat
-              value={Number(value)}
-              displayType="text"
-              thousandSeparator
-              suffix={currencyType === 'FT' ? ` ${getFtTicker()} ` : ` ${currencyType}`}
-              renderText={(amount) => <ValueText>{amount}</ValueText>}
-            />
-            <SubValueText>{getFiatAmountString(new BigNumber(fiatAmount!))}</SubValueText>
-          </ColumnContainer>
-        )}
-      </RowContainer>
+      {value && (
+        <RowContainer>
+          {renderIcon()}
+          <TitleText>{title}</TitleText>
+          {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
+            <ColumnContainer>
+              <ValueText>{value}</ValueText>
+              {valueDetail && <SubValueText>{valueDetail}</SubValueText>}
+            </ColumnContainer>
+          ) : (
+            <ColumnContainer>
+              <NumericFormat
+                value={Number(value)}
+                displayType="text"
+                thousandSeparator
+                suffix={currencyType === 'FT' ? ` ${getFtTicker()} ` : ` ${currencyType}`}
+                renderText={(amount) => <ValueText>{amount}</ValueText>}
+              />
+              <SubValueText>{getFiatAmountString(new BigNumber(fiatAmount!))}</SubValueText>
+            </ColumnContainer>
+          )}
+        </RowContainer>
+      )}
       {address && (
-        <AddressContainer>
+        <div>
           {showSenderAddress ? (
             <MultipleAddressContainer>
               <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
@@ -242,7 +241,7 @@ function RecipientComponent({
           ) : (
             <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
           )}
-        </AddressContainer>
+        </div>
       )}
     </Container>
   );

@@ -1,14 +1,13 @@
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import BundleAsset from '@components/bundleAsset/bundleAsset';
 import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useWalletSelector from '@hooks/useWalletSelector';
 import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
   SignedBtcTx,
@@ -17,9 +16,8 @@ import {
 import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { useMutation } from '@tanstack/react-query';
-import { StyledHeading, StyledP } from '@ui-library/common.styled';
+import { StyledHeading } from '@ui-library/common.styled';
 import { isLedgerAccount } from '@utils/helper';
-import { getBundleId, getBundleSubText } from '@utils/rareSats';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -36,14 +34,6 @@ const ScrollContainer = styled.div`
   width: 360px;
   margin: auto;
 `;
-
-const Container = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  flex: 1,
-});
 
 const BottomBarContainer = styled.div({
   marginTop: 'auto',
@@ -81,17 +71,10 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
-const BundleAssetContainer = styled.div((props) => ({
-  maxHeight: 148,
-  width: 148,
-  display: 'flex',
-  aspectRatio: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: 8,
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(6),
-}));
+const Heading = styled(StyledHeading)`
+  margin-top: ${(props) => props.theme.space.m};
+  margin-left: ${(props) => props.theme.space.m};
+`;
 
 function SendOrdinal() {
   const { t } = useTranslation('translation');
@@ -206,9 +189,6 @@ function SendOrdinal() {
     setWarning('');
   };
 
-  const heading = selectedSatBundle ? getBundleSubText(selectedSatBundle) : '';
-  const subText = selectedSatBundle ? getBundleId(selectedSatBundle) : '';
-
   return (
     <>
       {isGalleryOpen && (
@@ -227,7 +207,8 @@ function SendOrdinal() {
         </>
       )}
       <ScrollContainer>
-        {!isGalleryOpen && <TopRow title={t('SEND.SEND')} onClick={handleBackButtonClick} />}
+        {!isGalleryOpen && <TopRow title="" onClick={handleBackButtonClick} />}
+        <Heading typography="headline_xs">{t('SEND.SEND_TO')}</Heading>
         <SendForm
           processing={isLoading}
           currencyType="Ordinal"
@@ -241,19 +222,7 @@ function SendOrdinal() {
           hideMemo
           hideTokenImage
           hideDefaultWarning
-        >
-          <Container>
-            <BundleAssetContainer>
-              <BundleAsset bundle={selectedSatBundle!} />
-            </BundleAssetContainer>
-            <StyledHeading typography="headline_s" color="white_0">
-              {heading}
-            </StyledHeading>
-            <StyledP typography="body_medium_m" color="white_400">
-              {subText}
-            </StyledP>
-          </Container>
-        </SendForm>
+        />
         <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>
       </ScrollContainer>
     </>

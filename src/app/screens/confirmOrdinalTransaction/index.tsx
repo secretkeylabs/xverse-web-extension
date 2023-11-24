@@ -1,6 +1,5 @@
 import { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
-import BundleAsset from '@components/bundleAsset/bundleAsset';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import BottomBar from '@components/tabBar';
 import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
@@ -15,7 +14,6 @@ import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
-import { getBundleId, getBundleSubText } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -81,9 +79,6 @@ function ConfirmOrdinalTransaction() {
   const { refetch } = useBtcWalletData();
   const [currentFee, setCurrentFee] = useState(fee);
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
-
-  const bundleId = isRareSat && selectedSatBundle ? getBundleId(selectedSatBundle) : '';
-  const bundleSubText = isRareSat && selectedSatBundle ? getBundleSubText(selectedSatBundle) : '';
 
   const {
     isLoading,
@@ -186,8 +181,7 @@ function ConfirmOrdinalTransaction() {
           onCancelClick={handleOnCancelClick}
           onBackButtonClick={handleOnCancelClick}
           ordinalTxUtxo={ordinalUtxo}
-          assetDetail={bundleSubText ?? selectedOrdinal?.number.toString()}
-          assetDetailValue={bundleId ?? ''}
+          assetDetail={selectedOrdinal ? selectedOrdinal.number.toString() : ''}
           currentFee={currentFee}
           setCurrentFee={setCurrentFee}
           currentFeeRate={currentFeeRate}
@@ -195,15 +189,13 @@ function ConfirmOrdinalTransaction() {
           currencyType={isRareSat ? 'RareSat' : 'Ordinal'}
           isPartOfBundle={isPartOfABundle}
         >
-          <Container>
-            <NftContainer>
-              {selectedSatBundle && isRareSat ? (
-                <BundleAsset bundle={selectedSatBundle} />
-              ) : (
+          {selectedOrdinal && (
+            <Container>
+              <NftContainer>
                 <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
-              )}
-            </NftContainer>
-          </Container>
+              </NftContainer>
+            </Container>
+          )}
         </ConfirmBtcTransactionComponent>
 
         {!isGalleryOpen && (

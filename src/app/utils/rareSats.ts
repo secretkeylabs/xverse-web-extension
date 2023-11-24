@@ -376,3 +376,21 @@ export const mapRareSatsAPIResponseToRareSatsV2 = (apiBundle: ApiBundleV2): Bund
     totalExoticSats,
   };
 };
+
+export const getSatLabel = (satributes: RareSatsType[]): string => {
+  const isLengthGrateThanTwo = satributes.length > 2;
+  if (satributes.length === 1) {
+    return `${getRareSatsLabelByType(satributes[0])}`;
+  }
+
+  // we expect to roadarmor sats be in the first position
+  if (RoadArmorRareSats.includes(satributes[0] as RoadArmorRareSatsType)) {
+    return `${getRareSatsLabelByType(satributes[0])} ${t(
+      isLengthGrateThanTwo ? 'COMMON.COMBO' : `RARE_SATS.RARITY_LABEL.${satributes[1]}`,
+    )}`;
+  }
+
+  return isLengthGrateThanTwo
+    ? `${t('COMMON.COMBO')}`
+    : `${getRareSatsLabelByType(satributes[0])} ${getRareSatsLabelByType(satributes[1])}`;
+};
