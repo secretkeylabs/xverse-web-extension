@@ -1,8 +1,10 @@
 import ActionButton from '@components/button';
 import TopRow from '@components/topRow';
+import useTransaction from '@hooks/queries/useTransaction';
 import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Faders, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
 import {
   fetchBtcTransaction,
@@ -162,45 +164,42 @@ function SpeedUpTransactionScreen() {
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
   const [recommendedFees, setRecommendedFees] = useState<RecommendedFeeResponse>();
   const [rbfRecommendedFees, setRbfRecommendedFees] = useState<RbfRecommendedFees>();
+  const { data: transaction } = useTransaction(id!);
+  const [rbfTransaction, setRbfTransaction] = useState<any>();
+
+  console.log('transaction', transaction);
+  console.log('rbfTransaction', rbfTransaction);
+  console.log('recommendedFees', recommendedFees);
+  console.log('rbfRecommendedFees', rbfRecommendedFees);
+  console.log('setRbfTxSummary', setRbfTxSummary);
 
   const fetchRbfData = async () => {
-    if (!selectedAccount || !id) {
+    if (!selectedAccount || !id || !transaction) {
       return;
     }
 
-    const transaction = await fetchBtcTransaction(
-      id,
-      selectedAccount.btcAddress,
-      selectedAccount.ordinalsAddress,
-      network.type,
-    );
-    console.log('transaction', transaction);
-
-    const mempoolFees = await btcClient.getRecommendedFees();
-    setRecommendedFees(mempoolFees);
-    console.log('mempoolFees', mempoolFees);
-
-    const rbfTransaction = new rbf.RbfTransaction(transaction, {
+    const rbfTx = new rbf.RbfTransaction(transaction, {
       ...selectedAccount,
       accountId: selectedAccount.deviceAccountIndex!,
       network: network.type,
       // @ts-ignore
       seedVault,
     });
-    console.log('rbfTransaction', rbfTransaction);
+    setRbfTransaction(rbfTx);
 
     const rbfTransactionSummary = await rbf.getRbfTransactionSummary(transaction);
-    console.log('rbfTransactionSummary', rbfTransactionSummary);
     setRbfTxSummary(rbfTransactionSummary);
 
-    const rbfRecommendedFeesResponse = await rbfTransaction.getRbfRecommendedFees(mempoolFees);
+    const mempoolFees = await btcClient.getRecommendedFees();
+    setRecommendedFees(mempoolFees);
+
+    const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
     setRbfRecommendedFees(rbfRecommendedFeesResponse);
-    console.log('rbfRecommendedFees', rbfRecommendedFees);
   };
 
   useEffect(() => {
     fetchRbfData();
-  }, [selectedAccount, id]);
+  }, [selectedAccount, id, transaction]);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
@@ -223,7 +222,21 @@ function SpeedUpTransactionScreen() {
     navigate(-1);
   };
 
-  const handleClickSubmit = () => {
+  const handleClickSubmit = async () => {
+    if (!selectedAccount || !id) {
+      return;
+    }
+
+    const transport = await Transport.create();
+    if (!transport) {
+      return;
+    }
+
+    const signedTx = await rbfTransaction.getReplacementTransaction({
+      feeRate: Number(feeRateInput),
+      ledgerTransport: transport,
+    });
+
     toast.success(t('TX_FEE_UPDATED'));
 
     navigate(-1);
@@ -300,7 +313,7 @@ function SpeedUpTransactionScreen() {
                   </div>
                 </FeeButtonLeft>
                 <FeeButtonRight>
-                  <div>{obj.fee} Sats</div>
+                  <div>{obj.fee || '--'} Sats</div>
                   {obj.fee ? (
                     <SecondaryText alignRight>
                       ~ {currencySymbolMap[fiatCurrency]}
