@@ -5,14 +5,18 @@ import AlertMessage from '@components/alertMessage';
 import { BetterBarLoader } from '@components/barLoader';
 import ActionButton from '@components/button';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
+import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import Separator from '@components/separator';
 import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import WebGalleryButton from '@components/webGalleryButton';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import { ArrowRight, ArrowUp, CubeTransparent, Share } from '@phosphor-icons/react';
+import { ArrowUp, Share } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
+import Callout from '@ui-library/callout';
+import { StyledP } from '@ui-library/common.styled';
+import { getRareSatsColorsByRareSatsType, getRareSatsLabelByType } from '@utils/rareSats';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
@@ -89,8 +93,8 @@ const ExtensionOrdinalsContainer = styled.div((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
-  marginBottom: props.theme.spacing(12),
   marginTop: props.theme.spacing(12),
+  marginBottom: props.theme.space.m,
 }));
 
 const OrdinalTitleText = styled.h1((props) => ({
@@ -109,7 +113,6 @@ const DescriptionText = styled.h1((props) => ({
   ...props.theme.typography.headline_l,
   color: props.theme.colors.white_0,
   fontSize: 24,
-  marginBottom: props.theme.spacing(8),
 }));
 
 const NftOwnedByText = styled.h1((props) => ({
@@ -164,7 +167,7 @@ const MintLimitContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(30),
 }));
 
-const DescriptionContainer = styled.h1((props) => ({
+const DescriptionContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   marginBottom: props.theme.spacing(30),
@@ -270,40 +273,6 @@ const Text = styled.h1((props) => ({
   marginLeft: props.theme.spacing(2),
 }));
 
-const RareSatsBundleContainer = styled.div((props) => ({
-  display: 'flex',
-  flex: 1,
-  flexDirection: 'row',
-  padding: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
-  border: `1px solid ${props.theme.colors.white_800}`,
-  borderRadius: '12px',
-}));
-const CubeTransparentIcon = styled(CubeTransparent)((props) => ({
-  color: props.theme.colors.white_200,
-  marginRight: props.theme.spacing(8),
-}));
-const RareSatsBundleTextDescription = styled.div((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_200,
-}));
-const BundleLinkContainer = styled.button((props) => ({
-  display: 'inline-flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  backgroundColor: 'transparent',
-  color: props.theme.colors.white_0,
-  transition: 'background-color 0.2s ease, opacity 0.2s ease',
-  ':hover': {
-    color: props.theme.colors.white_200,
-  },
-}));
-const BundleLinkText = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  marginRight: props.theme.spacing(1),
-}));
-
 const GalleryButtonContainer = styled.div`
   width: 190px;
   border-radius: 12px;
@@ -314,9 +283,12 @@ const RowButtonContainer = styled.div((props) => ({
   flexDirection: 'row',
   justifyContent: 'center',
   columnGap: props.theme.spacing(11),
-  paddingBottom: props.theme.spacing(16),
-  marginBottom: props.theme.spacing(4),
-  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.space.l,
+  marginTop: props.theme.space.m,
+  width: '100%',
+}));
+
+const Divider = styled.div((props) => ({
   width: '100%',
   borderBottom: `1px solid ${props.theme.colors.elevation3}`,
 }));
@@ -379,8 +351,49 @@ const InfoContainer = styled.div((props) => ({
   padding: `0 ${props.theme.spacing(8)}px`,
 }));
 
+const RareSatsBundleCallout = styled(Callout)<DetailSectionProps>((props) => ({
+  width: props.isGallery ? 400 : '100%',
+  marginBottom: props.isGallery ? 0 : props.theme.space.l,
+  marginTop: props.isGallery ? props.theme.space.xs : 0,
+}));
+
+const SatributesIconsContainer = styled.div<DetailSectionProps>((props) => ({
+  display: 'inline-flex',
+  flexDirection: 'row',
+  marginTop: props.isGallery ? props.theme.space.m : 0,
+}));
+
+const SatributesBadgeContainer = styled.div<DetailSectionProps>((props) => ({
+  marginTop: props.isGallery ? 0 : props.theme.space.m,
+}));
+const SatributesBadges = styled.div<DetailSectionProps>((props) => ({
+  display: 'inline-flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  maxWidth: props.isGallery ? 400 : '100%',
+  marginTop: props.theme.space.s,
+}));
+const Badge = styled.div<{ backgroundColor?: string; isLastItem: boolean }>((props) => ({
+  display: 'inline-flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: props.backgroundColor,
+  padding: `${props.theme.space.s} ${props.theme.space.s}`,
+  borderRadius: props.theme.radius(2),
+  border: `1px solid ${props.theme.colors.elevation3}`,
+  marginRight: props.isLastItem ? 0 : props.theme.space.xs,
+  marginBottom: props.theme.space.xs,
+}));
+const SatributeBadgeLabel = styled(StyledP)`
+  margin-left: ${(props) => props.theme.space.xs};
+`;
+const DataItemsContainer = styled.div`
+  margin-top: ${(props) => props.theme.space.l};
+`;
+
 function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
+  const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const ordinalDetails = useOrdinalDetail();
   const {
     ordinal,
@@ -390,6 +403,7 @@ function OrdinalDetailScreen() {
     showSendOridnalsAlert,
     isBrc20Ordinal,
     isPartOfABundle,
+    ordinalSatributes,
     isGalleryOpen,
     brc20InscriptionStatus,
     brc20InscriptionStatusColor,
@@ -573,18 +587,48 @@ function OrdinalDetailScreen() {
   };
 
   const rareSats = isPartOfABundle && (
-    <RareSatsBundleContainer>
-      <CubeTransparentIcon size={24} />
-      <div>
-        <RareSatsBundleTextDescription>
-          {t('RARE_SATS_BUNDLE_DESCRIPTION')}
-        </RareSatsBundleTextDescription>
-        <BundleLinkContainer onClick={handleNavigationToRareSatsBundle}>
-          <BundleLinkText>{t('RARE_SATS_BUNDLE_LINK')}</BundleLinkText>
-          <ArrowRight size={12} weight="bold" />
-        </BundleLinkContainer>
-      </div>
-    </RareSatsBundleContainer>
+    <RareSatsBundleCallout
+      isGallery={isGalleryOpen}
+      bodyText={t('RARE_SATS_BUNDLE_DESCRIPTION')}
+      redirectText={t('RARE_SATS_BUNDLE_LINK')}
+      onClickRedirect={handleNavigationToRareSatsBundle}
+    />
+  );
+
+  const showSatributes = ordinalSatributes.length > 0;
+  const satributesIcons = showSatributes && (
+    <SatributesIconsContainer isGallery={isGalleryOpen}>
+      {ordinalSatributes.map((satribute) => (
+        <RareSatIcon key={satribute} type={satribute} />
+      ))}
+    </SatributesIconsContainer>
+  );
+  const stributesBadges = showSatributes && (
+    <SatributesBadgeContainer isGallery={isGalleryOpen}>
+      <StyledP typography="body_medium_m" color="white_400">
+        {commonT('SATTRIBUTES')}
+      </StyledP>
+      <SatributesBadges isGallery={isGalleryOpen}>
+        {ordinalSatributes.map((satribute, index) => {
+          const { backgroundColor } = getRareSatsColorsByRareSatsType(satribute) ?? {
+            color: 'transparent',
+            backgroundColor: 'transparent',
+          };
+          return (
+            <Badge
+              key={satribute}
+              backgroundColor={backgroundColor}
+              isLastItem={index + 1 >= ordinalSatributes.length}
+            >
+              <RareSatIcon key={satribute} type={satribute} />
+              <SatributeBadgeLabel typography="body_medium_m">
+                {getRareSatsLabelByType(satribute)}
+              </SatributeBadgeLabel>
+            </Badge>
+          );
+        })}
+      </SatributesBadges>
+    </SatributesBadgeContainer>
   );
 
   const extensionView = isLoading ? (
@@ -627,6 +671,7 @@ function OrdinalDetailScreen() {
       <ExtensionOrdinalsContainer>
         <OrdinalImage ordinal={ordinal!} />
       </ExtensionOrdinalsContainer>
+      {satributesIcons}
       <RowButtonContainer>
         <SquareButton
           icon={<ArrowUp weight="regular" size="20" />}
@@ -649,6 +694,8 @@ function OrdinalDetailScreen() {
         />
       </RowButtonContainer>
       {rareSats}
+      <Divider />
+      {stributesBadges}
       {isBrc20Ordinal ? showBrc20OrdinalDetail(false) : ordinalDetailAttributes}
       <ViewInExplorerButton isGallery={isGalleryOpen} onClick={openInOrdinalsExplorer}>
         <ButtonText>{t('VIEW_IN')}</ButtonText>
@@ -714,6 +761,7 @@ function OrdinalDetailScreen() {
                 : ordinal?.collection_name || t('INSCRIPTION')}
             </GalleryCollectibleText>
             <OrdinalGalleryTitleText>{ordinal?.number}</OrdinalGalleryTitleText>
+            {satributesIcons}
             <RowContainer>
               <ButtonText>{t('OWNED_BY')}</ButtonText>
               <ButtonHiglightedText>{`${ordinalsAddress.substring(
@@ -752,7 +800,10 @@ function OrdinalDetailScreen() {
             </ButtonContainer>
             <DescriptionText>{t('DATA')}</DescriptionText>
             {rareSats}
-            {isBrc20Ordinal ? showBrc20OrdinalDetail(true) : ordinalDetailAttributes}
+            <DataItemsContainer>
+              {stributesBadges}
+              {isBrc20Ordinal ? showBrc20OrdinalDetail(true) : ordinalDetailAttributes}
+            </DataItemsContainer>
             <ViewInExplorerButton isGallery={isGalleryOpen} onClick={openInOrdinalsExplorer}>
               <ButtonText>{t('VIEW_IN')}</ButtonText>
               <ButtonHiglightedText>{t('ORDINAL_VIEWER')}</ButtonHiglightedText>

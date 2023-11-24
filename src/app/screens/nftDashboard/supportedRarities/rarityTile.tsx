@@ -39,7 +39,7 @@ function RarityTile({ type }: Props) {
 
   return (
     <Container>
-      <RareSatIcon glow={false} size={32} type={type} />
+      <RareSatIcon size={32} type={type} />
       <TextsColumn>
         <RarityText>{getRareSatsLabelByType(type)}</RarityText>
         <RarityDetailText>{t(`RARITY_DETAIL.${type.toUpperCase()}`)}</RarityDetailText>

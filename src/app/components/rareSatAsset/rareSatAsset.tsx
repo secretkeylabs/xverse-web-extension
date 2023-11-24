@@ -62,7 +62,6 @@ function RareSatAsset({ item, isCollage = false }: Props) {
                 size={isGallery ? 40 : 24}
                 padding={isGallery ? 8 : 4}
                 bgColor="elevation0"
-                glow={false}
               />
             </RareSatIconContainer>
           )}
@@ -75,7 +74,7 @@ function RareSatAsset({ item, isCollage = false }: Props) {
       ) : (
         <RareSatsContainer>
           <DynamicSizeContainer isCollage={isCollage}>
-            <RareSatIcon type={item.rarity_ranking} isDynamicSize isCollage={isCollage} />
+            <RareSatIcon type={item.rarity_ranking} isDynamicSize />
           </DynamicSizeContainer>
         </RareSatsContainer>
       )}

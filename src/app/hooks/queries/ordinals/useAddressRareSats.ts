@@ -7,9 +7,20 @@ import {
 import { XVERSE_API_BASE_URL } from '@secretkeylabs/xverse-core/constant';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { handleRetries, InvalidParamsError } from '@utils/query';
-import { mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
+import {
+  ApiBundleV2,
+  mapRareSatsAPIResponseToRareSats,
+  mapRareSatsAPIResponseToRareSatsV2,
+} from '@utils/rareSats';
 import axios from 'axios';
-import { mockData, mockTestCase1, mockTestCase3, Response } from './tempAddressRareSatsMock';
+import {
+  exoticInscriptionNotPartOfBundle,
+  inscriptionPartOfBundle,
+  mockData,
+  mockTestCase1,
+  mockTestCase3,
+  Response,
+} from './tempAddressRareSatsMock';
 
 const PAGE_SIZE = 30;
 
@@ -138,6 +149,74 @@ export const useAddressRareSats = () => {
     },
     staleTime: 1 * 60 * 1000, // 1 min
   });
+};
+
+export const getUtxoOrdinalBundleV2 = async (
+  network: NetworkType,
+  txid: string,
+  vout: number,
+): Promise<ApiBundleV2 & { xVersion: number }> => {
+  const response = await axios.get<ApiBundleV2 & { xVersion: number }>(
+    `${XVERSE_API_BASE_URL(network)}/v2/ordinal-utxo/${txid}:${vout}`,
+  );
+  return response.data;
+};
+
+export const useGetUtxoOrdinalBundleV2 = (
+  output?: string,
+  shouldMakeTheCall?: boolean,
+  ordinalNumber?: number,
+) => {
+  const { network } = useWalletSelector();
+  const getUtxoOrdinalBundleByOutput = async () => {
+    if (!output) {
+      throw new InvalidParamsError('output is required');
+    }
+
+    const customOrdinalAddress = localStorage.getItem('ordinalAddress');
+    const useProdApi = localStorage.getItem('useProdApi');
+    if (!(useProdApi || customOrdinalAddress)) {
+      if (output === `${inscriptionPartOfBundle.txid}:${inscriptionPartOfBundle.vout}`) {
+        return inscriptionPartOfBundle;
+      }
+
+      if (
+        output ===
+        `${exoticInscriptionNotPartOfBundle.txid}:${exoticInscriptionNotPartOfBundle.vout}`
+      ) {
+        return exoticInscriptionNotPartOfBundle;
+      }
+    }
+
+    const [txid, vout] = output.split(':');
+    const bundleResponse = await getUtxoOrdinalBundleV2(network.type, txid, parseInt(vout, 10));
+    return bundleResponse;
+  };
+
+  const { data, isLoading } = useQuery({
+    enabled: !!(output && shouldMakeTheCall),
+    queryKey: ['rare-sats', output],
+    queryFn: getUtxoOrdinalBundleByOutput,
+    retry: handleRetries,
+    staleTime: 1 * 60 * 1000, // 1 min
+  });
+
+  const bundle = data?.txid ? mapRareSatsAPIResponseToRareSatsV2(data) : undefined;
+  const inscriptionRange = bundle?.satRanges.find((range) =>
+    range.inscriptions.some((inscription) => inscription.inscription_number === ordinalNumber),
+  );
+  const ordinalSatributes =
+    inscriptionRange?.satributes.filter((satribute) => satribute !== 'UNKNOWN') ?? [];
+  const exoticRangesCount = (bundle?.satributes.filter((range) => !range.includes('UNKNOWN')) ?? [])
+    .length;
+  const isPartOfABundle = exoticRangesCount > ordinalSatributes.length;
+
+  return {
+    bundle,
+    isPartOfABundle,
+    ordinalSatributes,
+    isLoading,
+  };
 };
 
 export const useGetUtxoOrdinalBundle = (output?: string, shouldMakeTheCall?: boolean) => {

@@ -8,6 +8,71 @@ export type Response = {
   results: ApiBundleV2[];
 };
 
+export const inscriptionPartOfBundle: ApiBundleV2 & { xVersion: number } = {
+  block_height: 803128,
+  txid: 'b8f8aee03af313ef1fbba7316aadf7390c91dc5dd34928a15f708ea4ed642852',
+  value: 100,
+  vout: 0,
+  sat_ranges: [
+    {
+      year_mined: 2009,
+      block: 10,
+      offset: 0,
+      range: {
+        start: '34234320000000',
+        end: '34234320000001',
+      },
+      satributes: ['UNCOMMON', 'PIZZA', 'PALINDROME'],
+      inscriptions: [],
+    },
+    {
+      year_mined: 2009,
+      block: 11,
+      offset: 1,
+      range: {
+        start: '34234320000003',
+        end: '34234320000004',
+      },
+      satributes: [],
+      inscriptions: [
+        {
+          content_type: 'image/png',
+          id: '6b186d467d817e4d086a9d1bf93785d736df6431c1cc9c305571161d616d05d0i0',
+          inscription_number: 11067474,
+        },
+      ],
+    },
+  ],
+  xVersion: 1,
+};
+
+export const exoticInscriptionNotPartOfBundle: ApiBundleV2 & { xVersion: number } = {
+  block_height: 803128,
+  txid: 'b143d94bb084eb429c3d3d4e8ebc9ee7b6a070a3b9b1a92849fe4059f8c2da09',
+  value: 1,
+  vout: 0,
+  sat_ranges: [
+    {
+      year_mined: 2009,
+      block: 10,
+      offset: 0,
+      range: {
+        start: '34234320000000',
+        end: '34234320000001',
+      },
+      satributes: ['UNCOMMON', 'PIZZA', 'PALINDROME'],
+      inscriptions: [
+        {
+          content_type: 'text/html',
+          id: 'b143d94bb084eb429c3d3d4e8ebc9ee7b6a070a3b9b1a92849fe4059f8c2da09i0',
+          inscription_number: 32218693,
+        },
+      ],
+    },
+  ],
+  xVersion: 1,
+};
+
 export const mockData: Response = {
   xVersion: 1,
   limit: 30,
@@ -85,6 +150,7 @@ export const mockTestCase1: Response = {
 };
 
 // TestCase 2 - 3 bundles
+const { xVersion, ...bundle } = inscriptionPartOfBundle;
 export const mockTestCase3: Response = {
   xVersion: 1,
   limit: 30,
@@ -282,6 +348,7 @@ export const mockTestCase3: Response = {
         },
       ],
     },
+    bundle,
     {
       block_height: 803128,
       txid: 'f5aa0649f2e5d0c6402c2d6b64ba6ea89e8be836a2ad01cbb0cdcc8721e314d2',

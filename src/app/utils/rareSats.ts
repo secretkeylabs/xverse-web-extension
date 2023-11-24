@@ -76,37 +76,39 @@ export const getRarityLabelByRareSatsType = (rareSatsType: RareSatsType) =>
     common: '--',
   }[rareSatsType]);
 
-export const getRareSatsColorsByRareSatsType = (rareSatsType: RareSatsType) =>
-  ({
-    unknown: {
+export const getRareSatsColorsByRareSatsType = (rareSatsType: RareSatsType) => {
+  const colors: Partial<Record<RareSatsType, { color: string; backgroundColor: string }>> = {
+    UNKNOWN: {
       color: 'rgb(175,186,189)',
       backgroundColor: 'rgba(175,186,189,0.20)',
     },
-    uncommon: {
+    UNCOMMON: {
       color: 'rgb(215, 105, 254)',
       backgroundColor: 'rgba(215, 105, 254, 0.20)',
     },
-    rare: {
+    RARE: {
       color: 'rgb(131, 113, 242)',
       backgroundColor: 'rgba(131, 113, 242, 0.20)',
     },
-    epic: {
+    EPIC: {
       color: 'rgb(145, 226, 96)',
       backgroundColor: 'rgba(145, 226, 96, 0.20)',
     },
-    legendary: {
+    LEGENDARY: {
       color: 'rgb(255,205,120)',
       backgroundColor: 'rgba(255,205,120,0.20)',
     },
-    mythic: {
+    MYTHIC: {
       color: 'rgb(255,244,203)',
       backgroundColor: 'rgba(255,244,203, 0.20)',
     },
-    common: {
+    COMMON: {
       color: 'rgb(216,216,216)',
       backgroundColor: 'rgba(216,216,216,0.20)',
     },
-  }[rareSatsType ?? 'common']);
+  };
+  return colors[rareSatsType];
+};
 
 type SatInscription = {
   id: string;
@@ -346,27 +348,39 @@ export const mapRareSatsAPIResponseToRareSatsV2 = (apiBundle: ApiBundleV2): Bund
       ...satRangeProps,
       totalSats: Number(BigInt(satRange.range.end) - BigInt(satRange.range.start)),
       yearMined: year_mined,
+      // we want to common/unknown inscriptions to be shown as a additional row from common/unknown row
+      satributes:
+        !satRange.satributes.length && satRange.inscriptions.length
+          ? (['UNKNOWN'] as RareSatsType[])
+          : satRange.satributes,
     };
   });
 
-  // we map this previous to a possible push of a common unknown range cause we don't need to show the icon rare sats tab. We only show it if the bundle is fully common/unknown
+  // if totalExotics doesn't match the value of the bundle, it means that the bundle is not fully exotic and we need to add a common unknown sat range more
+  let totalExoticSats = 0;
+  let totalCommonUnknownInscribedSats = 0;
+  satRanges.forEach((satRange) => {
+    if (satRange.satributes.includes('UNKNOWN')) {
+      totalCommonUnknownInscribedSats += satRange.totalSats;
+    } else {
+      totalExoticSats += satRange.totalSats;
+    }
+  });
+  if (totalExoticSats !== apiBundle.value) {
+    satRanges.push({
+      ...commonUnknownRange,
+      totalSats: apiBundle.value - (totalExoticSats + totalCommonUnknownInscribedSats),
+    });
+  }
+
   const inscriptions = satRanges.reduce(
     (acc, curr) => [...acc, ...curr.inscriptions],
-    [] as BundleV2['satRanges'][0]['inscriptions'],
+    [] as Inscription[],
   );
   const satributes = satRanges.reduce(
     (acc, curr) => [...acc, curr.satributes],
     [] as RareSatsType[][],
   );
-
-  // if totalExotics doesn't match the value of the bundle, it means that the bundle is not fully exotic and we need to add a common unknown sat range more
-  const totalExoticSats = satRanges.reduce((acc, curr) => acc + curr.totalSats, 0);
-  if (totalExoticSats !== apiBundle.value) {
-    satRanges.push({
-      ...commonUnknownRange,
-      totalSats: apiBundle.value - totalExoticSats,
-    });
-  }
 
   return {
     ...generalBundleInfo,

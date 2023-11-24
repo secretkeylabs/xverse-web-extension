@@ -1,4 +1,4 @@
-import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
+import { useGetUtxoOrdinalBundleV2 } from '@hooks/queries/ordinals/useAddressRareSats';
 import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useCollectionMarketData';
 import useAddressInscription from '@hooks/queries/ordinals/useInscription';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
@@ -33,9 +33,10 @@ export default function useOrdinalDetail() {
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(ordinalData?.tx_id);
   const textContent = useTextOrdinalContent(ordinalData!);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
-  const { bundle, isPartOfABundle } = useGetUtxoOrdinalBundle(
+  const { bundle, isPartOfABundle, ordinalSatributes } = useGetUtxoOrdinalBundleV2(
     ordinalData?.output,
     hasActivatedRareSatsKey,
+    ordinalData?.number,
   );
   const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
@@ -128,7 +129,8 @@ export default function useOrdinalDetail() {
     ordinalsAddress,
     showSendOridnalsAlert,
     isBrc20Ordinal,
-    isPartOfABundle,
+    isPartOfABundle: isPartOfABundle && hasActivatedRareSatsKey,
+    ordinalSatributes: hasActivatedRareSatsKey ? ordinalSatributes : [],
     isGalleryOpen,
     brc20InscriptionStatus,
     brc20InscriptionStatusColor,

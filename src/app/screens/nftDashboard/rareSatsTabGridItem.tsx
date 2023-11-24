@@ -43,39 +43,40 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: BundleV2; maxItems:
   const renderedIcons = () => {
     let totalIconsDisplayed = 0;
     let totalTilesDisplayed = 0;
+    return bundle.satributes
+      .filter((satributes) => !(satributes.includes('UNKNOWN') && bundle.satributes.length > 1))
+      .map((sats, index) => {
+        if (totalIconsDisplayed > maxItems) {
+          return null;
+        }
 
-    return bundle.satributes.map((sats, index) => {
-      if (totalIconsDisplayed > maxItems) {
-        return null;
-      }
-
-      if (totalIconsDisplayed >= maxItems - 1) {
-        totalIconsDisplayed += 1;
+        if (totalIconsDisplayed >= maxItems - 1) {
+          totalIconsDisplayed += 1;
+          return (
+            <Range key={`${totalTilesDisplayed}-ellipsis`}>
+              <TileText typography="body_m">
+                +{bundle.satributes.length - totalTilesDisplayed}
+              </TileText>
+            </Range>
+          );
+        }
+        totalTilesDisplayed += 1;
         return (
-          <Range key={`${totalTilesDisplayed}-ellipsis`}>
-            <TileText typography="body_m">
-              +{bundle.satributes.length - totalTilesDisplayed}
-            </TileText>
+          <Range key={`${bundle.satRanges[index].block}-${bundle.satRanges[index].offset}`}>
+            {sats.map((sattribute, indexSattributes) => {
+              totalIconsDisplayed += 1;
+              if (totalIconsDisplayed >= maxItems - 1) {
+                return null;
+              }
+              // eslint-disable-next-line react/no-array-index-key
+              return <RareSatIcon key={`${sattribute}-${indexSattributes}`} type={sattribute} />;
+            })}
+            {totalIconsDisplayed > maxItems - 2 ? (
+              <DotsThree color={Theme.colors.white_200} size="20" />
+            ) : null}
           </Range>
         );
-      }
-      totalTilesDisplayed += 1;
-      return (
-        <Range key={`${bundle.satRanges[index].block}-${bundle.satRanges[index].offset}`}>
-          {sats.map((sattribute, indexSattributes) => {
-            totalIconsDisplayed += 1;
-            if (totalIconsDisplayed >= maxItems - 1) {
-              return null;
-            }
-            // eslint-disable-next-line react/no-array-index-key
-            return <RareSatIcon key={`${sattribute}-${indexSattributes}`} type={sattribute} />;
-          })}
-          {totalIconsDisplayed > maxItems - 2 ? (
-            <DotsThree color={Theme.colors.white_200} size="20" />
-          ) : null}
-        </Range>
-      );
-    });
+      });
   };
 
   const bundleId = getFormattedTxIdVoutFromBundle(bundle);

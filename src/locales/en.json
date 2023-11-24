@@ -3,7 +3,8 @@
     "INSCRIPTION": "Inscription",
     "SEND": "Send",
     "COMBO": "Combo",
-    "SATS": "Sats"
+    "SATS": "Sats",
+    "SATTRIBUTES": "Sattributes"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
