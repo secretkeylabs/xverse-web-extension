@@ -1,12 +1,15 @@
 import ActionButton from '@components/button';
 import TopRow from '@components/topRow';
+import useBtcClient from '@hooks/useBtcClient';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { CarProfile, Faders, RocketLaunch } from '@phosphor-icons/react';
-import { rbf } from '@secretkeylabs/xverse-core';
+import { fetchBtcTransaction, rbf } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { CustomFee } from './customFee';
 
@@ -125,18 +128,44 @@ function SpeedUpTransactionScreen() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
+  const { selectedAccount, network } = useWalletSelector();
+  const seedVault = useSeedVault();
+  const { id } = useParams();
+  const btcClient = useBtcClient();
 
-  // const fetchRbfRecommendedFees = async () => {
-  //   const rbfTransaction = new rbf.RbfTransaction(transaction, rbfProps);
-  //   const mempoolFees = {
-  //   };
+  const fetchRbfRecommendedFees = async () => {
+    if (!selectedAccount || !id) {
+      return;
+    }
 
-  //   const response = await rbfTransaction.getRbfRecommendedFees(mempoolFees);
-  //   console.log(response);
+    const transaction = await fetchBtcTransaction(
+      id,
+      selectedAccount.btcAddress,
+      selectedAccount.ordinalsAddress,
+      network.type,
+    );
+    console.log('transaction', transaction);
 
-  // useEffect(() => {
-  //   fetchRbfRecommendedFees();
-  // }, []);
+    const rbfTransaction = new rbf.RbfTransaction(transaction, {
+      ...selectedAccount,
+      accountId: selectedAccount.deviceAccountIndex!,
+      network: network.type,
+      // @ts-ignore
+      seedVault,
+    });
+    console.log('rbfTransaction', rbfTransaction);
+
+    const mempoolFees = await btcClient.getRecommendedFees();
+    console.log('mempoolFees', mempoolFees);
+
+    // @ts-ignore
+    const response = await rbfTransaction.getRbfRecommendedFees(mempoolFees);
+    console.log('getRbfRecommendedFees', response);
+  };
+
+  useEffect(() => {
+    fetchRbfRecommendedFees();
+  }, [selectedAccount, id]);
 
   const [feeRateInput, setFeeRateInput] = useState('1');
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
@@ -207,7 +236,7 @@ function SpeedUpTransactionScreen() {
             <FeeButtonRight>
               <div>90,000 Sats</div>
               <SecondaryText alignRight>~ $6.10 USD</SecondaryText>
-              <WarningText>Insufficient funds</WarningText>
+              <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>
             </FeeButtonRight>
           </FeeButton>
           <FeeButton
@@ -239,7 +268,7 @@ function SpeedUpTransactionScreen() {
                 <CustomFeeIcon size={20} color={theme.colors.tangerine} />
                 <div>{t('CUSTOM')}</div>
               </FeeButtonLeft>
-              <div>Manual setting</div>
+              <div>{t('MANUAL_SETTING')}</div>
             </FeeButton>
           ) : (
             <FeeButton

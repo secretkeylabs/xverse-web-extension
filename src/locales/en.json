@@ -790,7 +790,9 @@
     "SUBMIT": "Submit",
     "HIGH_PRIORITY": "High priority",
     "MED_PRIORITY": "Medium priority",
-    "CUSTOM": "Custom"
+    "CUSTOM": "Custom",
+    "INSUFFICIENT_FUNDS": "Insufficient funds",
+    "MANUAL_SETTING": "Manual setting"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",

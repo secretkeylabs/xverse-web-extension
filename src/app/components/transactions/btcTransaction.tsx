@@ -221,7 +221,7 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
             <TransactionAmountContainer>
               <TransactionAmount transaction={transaction} coin={isBtc} />
               {showAccelerateButton && (
-                <Link to="/speed-up-tx">
+                <Link to={`/speed-up-tx/${transaction.txid}`}>
                   <StyledButton
                     transparent
                     text={t('SPEED_UP')}

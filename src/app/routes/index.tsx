@@ -259,7 +259,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'speed-up-tx',
+        path: 'speed-up-tx/:id',
         element: <SpeedUpTransactionScreen />,
       },
       {
