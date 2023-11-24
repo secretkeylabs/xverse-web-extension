@@ -2,7 +2,7 @@ import { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import BottomBar from '@components/tabBar';
-import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
+import { useGetUtxoOrdinalBundleV2 } from '@hooks/queries/ordinals/useAddressRareSats';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
@@ -73,7 +73,7 @@ function ConfirmOrdinalTransaction() {
     fee = BigNumber(fee);
   }
 
-  const { selectedOrdinal, selectedSatBundle } = useNftDataSelector();
+  const { selectedOrdinal } = useNftDataSelector();
   const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
   const { refetch } = useBtcWalletData();
@@ -127,9 +127,10 @@ function ConfirmOrdinalTransaction() {
     }
   }, [txError]);
 
-  const { isPartOfABundle } = useGetUtxoOrdinalBundle(
+  const { bundle: ordinalBundle, isPartOfABundle } = useGetUtxoOrdinalBundleV2(
     selectedOrdinal?.output,
     hasActivatedRareSatsKey,
+    selectedOrdinal?.number,
   );
 
   const handleOnConfirmClick = (txHex: string) => {
@@ -188,6 +189,7 @@ function ConfirmOrdinalTransaction() {
           setCurrentFeeRate={setCurrentFeeRate}
           currencyType={isRareSat ? 'RareSat' : 'Ordinal'}
           isPartOfBundle={isPartOfABundle}
+          ordinalBundle={ordinalBundle}
         >
           {selectedOrdinal && (
             <Container>

@@ -31,7 +31,7 @@ import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
 import { CurrencyTypes } from '@utils/constants';
-import { BundleSatRange, Inscription } from '@utils/rareSats';
+import { BundleSatRange, BundleV2, Inscription } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -180,6 +180,7 @@ interface Props {
   isBtcSendBrowserTx?: boolean;
   currencyType?: CurrencyTypes;
   isPartOfBundle?: boolean;
+  ordinalBundle?: BundleV2;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;
   setCurrentFeeRate: (feeRate: BigNumber) => void;
@@ -203,6 +204,7 @@ function ConfirmBtcTransactionComponent({
   isBtcSendBrowserTx,
   isPartOfBundle,
   currencyType,
+  ordinalBundle,
   currentFeeRate,
   setCurrentFee,
   setCurrentFeeRate,
@@ -223,6 +225,8 @@ function ConfirmBtcTransactionComponent({
   const [showFeeWarning, setShowFeeWarning] = useState(false);
   const [showBundleDetail, setShowBundleDetail] = useState(false);
   const [inscriptionToShow, setInscriptionToShow] = useState<Inscription | undefined>(undefined);
+
+  const bundle = selectedSatBundle ?? ordinalBundle ?? undefined;
   const {
     isLoading,
     data,
@@ -456,7 +460,7 @@ function ConfirmBtcTransactionComponent({
             </CalloutContainer>
           )}
 
-          {selectedSatBundle && (
+          {bundle && (
             <SatsBundleContainer>
               <SatsBundle
                 type="button"
@@ -469,16 +473,15 @@ function ConfirmBtcTransactionComponent({
                   </BundleTitle>
                 </Row>
                 <Row>
-                  <BundleValue
-                    typography="body_medium_m"
-                    color="white_0"
-                  >{`${selectedSatBundle.satributes.length} Rare Sats`}</BundleValue>
+                  <BundleValue typography="body_medium_m" color="white_0">{`${
+                    bundle.satributes.length
+                  } ${t('NFT_DASHBOARD_SCREEN.RARE_SATS')}`}</BundleValue>
                   <CaretDown color={Theme.colors.white_0} size={16} />
                 </Row>
               </SatsBundle>
 
               {showBundleDetail &&
-                selectedSatBundle.satRanges.map((item: BundleSatRange, index: number) => (
+                bundle.satRanges.map((item: BundleSatRange, index: number) => (
                   <BundleItemsContainer addMargin={index === 0}>
                     <BundleItem
                       key={`${item.block}-${item.offset}`}
@@ -487,7 +490,7 @@ function ConfirmBtcTransactionComponent({
                         // show ordinal modal to show asset
                         setInscriptionToShow(inscription);
                       }}
-                      showDivider={index !== selectedSatBundle.satRanges.length - 1}
+                      showDivider={index !== bundle.satRanges.length - 1}
                     />
                   </BundleItemsContainer>
                 ))}
