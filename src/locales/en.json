@@ -1025,11 +1025,11 @@
   },
   "CACHE_MIGRATION_SCREEN": {
     "TITLE": "Your wallet data store needs to be updated in order to remain secure.",
-    "WARNING": "Please make sure you have your seed phrase backed up securely before moving forward.",
+    "WARNING": "Please make sure you have your seed phrase backed up securely and restore your wallet after resetting it from settings",
     "SUCCESS_TITLE": "Update Complete",
     "SKIP_BUTTON": "Do it later",
     "CONFIRM_BUTTON": "Confirm",
-    "CLOSE_TAB": "Continue"
+    "CLOSE_TAB": "I understand"
   },
   "SWAP_SCREEN": {
     "SWAP": "Swap",
