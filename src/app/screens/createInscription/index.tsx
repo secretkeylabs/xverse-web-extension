@@ -8,13 +8,14 @@ import { useLocation } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
-import type { BtcFeeResponse } from '@secretkeylabs/xverse-core';
 import {
+  BtcFeeResponse,
   currencySymbolMap,
   fetchBtcFeeRate,
   getNonOrdinalUtxo,
   useInscriptionExecute,
   useInscriptionFees,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
 import { CreateInscriptionPayload } from 'sats-connect';
 
@@ -24,7 +25,6 @@ import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
-import type { UTXO } from '@secretkeylabs/xverse-core';
 import { getShortTruncatedAddress } from '@utils/helper';
 
 import useSeedVault from '@hooks/useSeedVault';
