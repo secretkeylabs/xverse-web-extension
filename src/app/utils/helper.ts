@@ -1,18 +1,17 @@
-import {
+import BitcoinEsploraApiProvider, {
   Account,
-  StxMempoolTransactionData,
-  SettingsNetwork,
+  getStacksInfo,
   NetworkType,
-} from '@secretkeylabs/xverse-core/types';
-import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
-import { getStacksInfo } from '@secretkeylabs/xverse-core';
-import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
-import BigNumber from 'bignumber.js';
+  NftData,
+  SettingsNetwork,
+  StxMempoolTransactionData,
+} from '@secretkeylabs/xverse-core';
 import { ChainID } from '@stacks/transactions';
+import BigNumber from 'bignumber.js';
 import {
   BTC_TRANSACTION_STATUS_URL,
-  TRANSACTION_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
+  TRANSACTION_STATUS_URL,
 } from './constants';
 
 const validUrl = require('valid-url');

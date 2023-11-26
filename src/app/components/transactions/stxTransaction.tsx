@@ -1,5 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { parseStxTransactionData } from '@secretkeylabs/xverse-core/api/helper';
+import { parseStxTransactionData } from '@secretkeylabs/xverse-core';
 import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
 import { CurrencyTypes } from '@utils/constants';
 import { isAddressTransactionWithTransfers, Tx } from '@utils/transactions/transactions';

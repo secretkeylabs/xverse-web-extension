@@ -86,7 +86,7 @@ function UpdatedReceive(): JSX.Element {
   const { stxAddress, btcAddress, ordinalsAddress, showOrdinalReceiveAlert } = useWalletSelector();
 
   // TODO : Get currency from param
-  const currency = 'ORD';
+  const currency: string = 'ORD';
 
   const getAddress = () => {
     switch (currency) {

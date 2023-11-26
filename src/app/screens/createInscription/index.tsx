@@ -10,12 +10,12 @@ import styled from 'styled-components';
 
 import type { BtcFeeResponse } from '@secretkeylabs/xverse-core';
 import {
+  currencySymbolMap,
   fetchBtcFeeRate,
   getNonOrdinalUtxo,
   useInscriptionExecute,
   useInscriptionFees,
 } from '@secretkeylabs/xverse-core';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { CreateInscriptionPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
@@ -24,7 +24,7 @@ import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
-import type { UTXO } from '@secretkeylabs/xverse-core/types';
+import type { UTXO } from '@secretkeylabs/xverse-core';
 import { getShortTruncatedAddress } from '@utils/helper';
 
 import useSeedVault from '@hooks/useSeedVault';

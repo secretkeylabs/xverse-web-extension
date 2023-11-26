@@ -17,15 +17,18 @@ import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Brc20Tile from '@screens/ordinals/brc20Tile';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
-import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
-import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import {
+  BtcTransactionBroadcastResponse,
+  getBtcFiatEquivalent,
+  parseOrdinalTextContentData,
   Recipient,
+  ResponseError,
+  satsToBtc,
   signBtcTransaction,
   SignedBtcTx,
-} from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcTransactionBroadcastResponse, ResponseError } from '@secretkeylabs/xverse-core/types';
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
+import { Brc20Definition } from '@utils/brc20';
 import { isLedgerAccount } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';

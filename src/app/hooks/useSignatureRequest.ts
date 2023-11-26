@@ -1,20 +1,18 @@
-import { getStxAddressKeyChain } from '@secretkeylabs/xverse-core/wallet';
-import { signMessage } from '@secretkeylabs/xverse-core/connect/signature';
+import { getStxAddressKeyChain, signBip322Message, signMessage } from '@secretkeylabs/xverse-core';
 import { SignaturePayload } from '@stacks/connect';
 import {
   ChainID,
-  TupleCV,
+  createStacksPrivateKey,
   deserializeCV,
   signStructuredData,
-  createStacksPrivateKey,
+  TupleCV,
 } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SignMessagePayload } from 'sats-connect';
-import { signBip322Message } from '@secretkeylabs/xverse-core/connect/bip322Signature';
-import useWalletSelector from './useWalletSelector';
 import useSeedVault from './useSeedVault';
+import useWalletSelector from './useWalletSelector';
 
 export type SignatureMessageType = 'utf8' | 'structured';
 

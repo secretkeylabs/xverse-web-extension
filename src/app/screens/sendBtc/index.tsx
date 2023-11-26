@@ -4,11 +4,17 @@ import TopRow from '@components/topRow';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ErrorCodes, ResponseError } from '@secretkeylabs/xverse-core';
-import { btcToSats, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
-import { signBtcTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { Recipient, SignedBtcTx } from '@secretkeylabs/xverse-core/transactions/btc';
-import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
+import {
+  btcToSats,
+  ErrorCodes,
+  getBtcFiatEquivalent,
+  Recipient,
+  ResponseError,
+  satsToBtc,
+  signBtcTransaction,
+  SignedBtcTx,
+  validateBtcAddress,
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { isInOptions } from '@utils/helper';
