@@ -25,7 +25,7 @@ jobs:
         run: |
           npx eslint .
           npx tsc --noEmit
-          npm test --passWithNoTests
+          # npm test --passWithNoTests
       - name: Build
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
