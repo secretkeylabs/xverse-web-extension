@@ -1,4 +1,4 @@
-import OrdinalsApi from '@secretkeylabs/xverse-core';
+import { OrdinalsApi } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import useWalletSelector from './useWalletSelector';
 

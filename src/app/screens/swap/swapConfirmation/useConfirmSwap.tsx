@@ -117,7 +117,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
             state: {
               txid: '',
               currency: 'STX',
-              error: e instanceof ApiResponseError ? e.data.message : e.message,
+              error: e instanceof ApiResponseError ? (e.data as any).message : e.message,
               sponsored: isSponsored,
               browserTx: true,
               isSwapTransaction: true,

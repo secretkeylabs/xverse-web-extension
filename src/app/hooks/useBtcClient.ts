@@ -1,4 +1,4 @@
-import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core';
+import { BitcoinEsploraApiProvider } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo } from 'react';
 import useWalletSelector from './useWalletSelector';
 

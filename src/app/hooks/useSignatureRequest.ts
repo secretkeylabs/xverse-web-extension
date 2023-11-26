@@ -42,8 +42,8 @@ function useSignatureRequest() {
     payload: request.payload as any,
     isSignMessageBip322: isSignBip322Request(request.payload as any),
     request: requestToken as string,
-    domain: request.payload.domain
-      ? deserializeCV(Buffer.from(request.payload.domain, 'hex'))
+    domain: (request.payload as any).domain // TODO: fix type error
+      ? deserializeCV(Buffer.from((request.payload as any).domain, 'hex')) // TODO: fix type error
       : null,
     messageType: messageType as SignatureMessageType,
     tabId,

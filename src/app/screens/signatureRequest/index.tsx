@@ -222,7 +222,7 @@ function SignatureRequest(): JSX.Element {
       if (!isSignMessageBip322) {
         const signature = await handleMessageSigning({
           message: payload.message,
-          domain: domain || undefined,
+          domain: (domain as any) || undefined, // TODO fix type error
         });
         if (signature) {
           finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: signature });

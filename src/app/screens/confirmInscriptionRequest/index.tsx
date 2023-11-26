@@ -28,7 +28,6 @@ import {
   SignedBtcTx,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
-import { Brc20Definition } from '@utils/brc20';
 import { isLedgerAccount } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
@@ -366,8 +365,9 @@ function ConfirmInscriptionRequest() {
       <OuterContainer>
         {textContent && (
           <Brc20TileContainer>
+            {/* TODO fix type error */}
             <Brc20Tile
-              brcContent={textContent}
+              brcContent={textContent as any}
               isGalleryOpen={false}
               isNftDashboard={false}
               inNftDetail={false}
