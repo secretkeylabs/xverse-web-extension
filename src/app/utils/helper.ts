@@ -1,5 +1,6 @@
-import BitcoinEsploraApiProvider, {
+import {
   Account,
+  BitcoinEsploraApiProvider,
   getStacksInfo,
   NetworkType,
   NftData,
