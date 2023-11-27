@@ -4,15 +4,15 @@ import useTransaction from '@hooks/queries/useTransaction';
 import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
-import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Faders, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
-import { getBtcFiatEquivalent, rbf, satsToBtc } from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, rbf } from '@secretkeylabs/xverse-core';
 import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/api/esplora';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { CustomFee } from './customFee';
@@ -42,7 +42,6 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(2),
 }));
 
 const DetailText = styled.span((props) => ({
@@ -100,7 +99,7 @@ const FeeButton = styled.button<{
 const ControlsContainer = styled.div`
   display: flex;
   column-gap: 12px;
-  margin: 20px 16px 40px;
+  margin: 38px 16px 40px;
 `;
 
 const CustomFeeIcon = styled(Faders)({
@@ -223,15 +222,10 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
-    const transport = await Transport.create();
-    if (!transport) {
-      return;
-    }
-
     const signedTx = await rbfTransaction.getReplacementTransaction({
       feeRate: Number(feeRateInput),
-      ledgerTransport: transport,
     });
+    console.log('signedTx', signedTx);
 
     toast.success(t('TX_FEE_UPDATED'));
 
@@ -273,6 +267,27 @@ function SpeedUpTransactionScreen() {
     },
   };
 
+  const getFiatAmountString = (fiatAmount: BigNumber) => {
+    if (!fiatAmount) {
+      return '';
+    }
+
+    if (fiatAmount.isLessThan(0.01)) {
+      return `< ${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
+    }
+
+    return (
+      <NumericFormat
+        value={fiatAmount.toFixed(2).toString()}
+        displayType="text"
+        thousandSeparator
+        prefix={`${currencySymbolMap[fiatCurrency]}`}
+        suffix={` ${fiatCurrency}`}
+        renderText={(value: string) => `~ ${value}`}
+      />
+    );
+  };
+
   return (
     <>
       <TopRow title="" onClick={handleBackButtonClick} />
@@ -282,8 +297,18 @@ function SpeedUpTransactionScreen() {
         <DetailText>
           {t('CURRENT_FEE')}{' '}
           <HighlightedText>
-            {totalFee || rbfTxSummary?.currentFee} sats /{' '}
-            {feeRateInput || rbfTxSummary?.currentFeeRate} sats /vB
+            <NumericFormat
+              value={totalFee || rbfTxSummary?.currentFee}
+              displayType="text"
+              thousandSeparator
+              suffix=" Sats / "
+            />
+            <NumericFormat
+              value={feeRateInput || rbfTxSummary?.currentFeeRate}
+              displayType="text"
+              thousandSeparator
+              suffix=" Sats /vB"
+            />
           </HighlightedText>
         </DetailText>
         <DetailText>
@@ -309,19 +334,34 @@ function SpeedUpTransactionScreen() {
                     {feeButtonMapping[key].icon}
                     <div>
                       {feeButtonMapping[key].title}
-                      <SecondaryText>{obj.feeRate} Sats /vByte</SecondaryText>
+                      <SecondaryText>
+                        <NumericFormat
+                          value={obj.feeRate}
+                          displayType="text"
+                          thousandSeparator
+                          suffix=" Sats /vByte"
+                        />
+                      </SecondaryText>
                     </div>
                   </FeeButtonLeft>
                   <FeeButtonRight>
-                    <div>{obj.fee || '--'} Sats</div>
+                    <div>
+                      {obj.fee ? (
+                        <NumericFormat
+                          value={obj.fee}
+                          displayType="text"
+                          thousandSeparator
+                          suffix=" Sats"
+                        />
+                      ) : (
+                        '--'
+                      )}
+                    </div>
                     {obj.fee ? (
                       <SecondaryText alignRight>
-                        ~ {currencySymbolMap[fiatCurrency]}
-                        {getBtcFiatEquivalent(
-                          satsToBtc(BigNumber(obj.fee)),
-                          BigNumber(btcFiatRate),
-                        ).toString()}{' '}
-                        {fiatCurrency}
+                        {getFiatAmountString(
+                          getBtcFiatEquivalent(BigNumber(obj.fee), BigNumber(btcFiatRate)),
+                        )}
                       </SecondaryText>
                     ) : (
                       <SecondaryText alignRight>-- {fiatCurrency}</SecondaryText>
