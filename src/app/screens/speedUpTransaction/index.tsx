@@ -8,6 +8,7 @@ import { CarProfile, Faders, Lightning, RocketLaunch, ShootingStar } from '@phos
 import { getBtcFiatEquivalent, rbf } from '@secretkeylabs/xverse-core';
 import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/api/esplora';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -162,11 +163,9 @@ function SpeedUpTransactionScreen() {
   const { data: transaction } = useTransaction(id!);
   const [rbfTransaction, setRbfTransaction] = useState<any>();
 
-  console.log('transaction', transaction);
   console.log('rbfTransaction', rbfTransaction);
-  console.log('recommendedFees', recommendedFees);
   console.log('rbfRecommendedFees', rbfRecommendedFees);
-  console.log('setRbfTxSummary', setRbfTxSummary);
+  console.log('rbfTxSummary', rbfTxSummary);
 
   const fetchRbfData = async () => {
     if (!selectedAccount || !id || !transaction) {
@@ -176,7 +175,9 @@ function SpeedUpTransactionScreen() {
     const rbfTx = new rbf.RbfTransaction(transaction, {
       ...selectedAccount,
       accountType: accountType || 'software',
-      accountId: selectedAccount.deviceAccountIndex!,
+      accountId: isLedgerAccount(selectedAccount)
+        ? selectedAccount.deviceAccountIndex!
+        : selectedAccount.id,
       network: network.type,
       // @ts-ignore
       seedVault,
@@ -223,6 +224,8 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
+    console.log('feeRateInput', feeRateInput);
+    console.log('Signing tx...');
     const signedTx = await rbfTransaction.getReplacementTransaction({
       feeRate: Number(feeRateInput),
     });
