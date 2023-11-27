@@ -236,17 +236,21 @@ function SpeedUpTransactionScreen() {
     navigate(-1);
   };
 
-  let estimatedCompletionTime = '~10 mins';
-
-  if (rbfTxSummary && recommendedFees) {
-    const feeRate = Number(feeRateInput) || rbfTxSummary?.currentFeeRate;
+  const getEstimatedCompletionTime = (feeRate?: number) => {
+    if (!feeRate || !recommendedFees) {
+      return '--';
+    }
 
     if (feeRate < recommendedFees?.hourFee) {
-      estimatedCompletionTime = 'several hours or more';
-    } else if (feeRate > recommendedFees?.hourFee && feeRate <= recommendedFees?.halfHourFee) {
-      estimatedCompletionTime = '~30 mins';
+      return 'several hours or more';
     }
-  }
+
+    if (feeRate > recommendedFees?.hourFee && feeRate <= recommendedFees?.halfHourFee) {
+      return '~30 mins';
+    }
+
+    return '~10 mins';
+  };
 
   const feeButtonMapping = {
     medium: {
@@ -313,7 +317,9 @@ function SpeedUpTransactionScreen() {
         </DetailText>
         <DetailText>
           {t('ESTIMATED_COMPLETION_TIME')}{' '}
-          <HighlightedText>{estimatedCompletionTime}</HighlightedText>
+          <HighlightedText>
+            {getEstimatedCompletionTime(Number(feeRateInput) || rbfTxSummary?.currentFeeRate)}
+          </HighlightedText>
         </DetailText>
         <ButtonContainer>
           {rbfRecommendedFees &&
@@ -334,6 +340,7 @@ function SpeedUpTransactionScreen() {
                     {feeButtonMapping[key].icon}
                     <div>
                       {feeButtonMapping[key].title}
+                      <SecondaryText>{getEstimatedCompletionTime(obj.feeRate)}</SecondaryText>
                       <SecondaryText>
                         <NumericFormat
                           value={obj.feeRate}
