@@ -4,9 +4,9 @@ import { BetterBarLoader } from '@components/barLoader';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CondensedInscription, getErc721Metadata, Inscription } from '@secretkeylabs/xverse-core';
+import { getFetchableUrl } from '@secretkeylabs/xverse-core/api/helper';
 import { getBrc20Details } from '@utils/brc20';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
-import { getFetchableUrl } from '@utils/helper';
 import Image from 'rc-image';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -146,7 +146,7 @@ function OrdinalImage({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360 && !withoutSizeIncrease;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
-  const [brc721eImage, setBrc721eImage] = useState<string | undefined>(undefined);
+  const [brc721eImage, setBrc721eImage] = useState<string | null>(null);
   const { network } = useWalletSelector();
 
   useEffect(() => {
@@ -186,27 +186,28 @@ function OrdinalImage({
     loaderSize = 276;
   }
 
-  const renderImage = (tag: string, src?: string) => (
-    <ImageContainer>
-      <StyledImage
-        width="100%"
-        height="100%"
-        placeholder={
-          <LoaderContainer>
-            <StyledBarLoader width={loaderSize} height={loaderSize} />
-          </LoaderContainer>
-        }
-        src={src}
-        preview={false}
-      />
-      {isNftDashboard && (
-        <OrdinalsTag>
-          <ButtonIcon src={OrdinalsIcon} />
-          <Text>{tag}</Text>
-        </OrdinalsTag>
-      )}
-    </ImageContainer>
-  );
+  const renderImage = (tag: string, src?: string | null) =>
+    !!src && (
+      <ImageContainer>
+        <StyledImage
+          width="100%"
+          height="100%"
+          placeholder={
+            <LoaderContainer>
+              <StyledBarLoader width={loaderSize} height={loaderSize} />
+            </LoaderContainer>
+          }
+          src={src}
+          preview={false}
+        />
+        {isNftDashboard && (
+          <OrdinalsTag>
+            <ButtonIcon src={OrdinalsIcon} />
+            <Text>{tag}</Text>
+          </OrdinalsTag>
+        )}
+      </ImageContainer>
+    );
 
   const contentType = ordinal?.content_type ?? '';
 

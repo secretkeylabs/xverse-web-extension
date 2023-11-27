@@ -1,7 +1,7 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { SquareLogo } from '@phosphor-icons/react';
 import { TokenMetaData } from '@secretkeylabs/xverse-core';
-import { getFetchableUrl } from '@utils/helper';
+import { getFetchableUrl } from '@secretkeylabs/xverse-core/api/helper';
 import Image from 'rc-image';
 import { Suspense, useState } from 'react';
 import styled from 'styled-components';
@@ -73,7 +73,7 @@ function NftImage({ metadata, isInCollage = false }: Props) {
             <StyledImg
               width="100%"
               preview={false}
-              src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '')}
+              src={getFetchableUrl(metadata.image_url ?? '', metadata.image_protocol ?? '') ?? ''}
               placeholder={
                 <LoaderContainer>
                   <StyledBarLoader width="100%" height="100%" />
@@ -89,7 +89,7 @@ function NftImage({ metadata, isInCollage = false }: Props) {
   if (metadata?.asset_protocol) {
     return (
       <Video
-        src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '')}
+        src={getFetchableUrl(metadata.asset_url ?? '', metadata.asset_protocol ?? '') ?? ''}
         loop
         playsInline
         controls
