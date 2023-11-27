@@ -231,6 +231,10 @@ function SpeedUpTransactionScreen() {
     });
     console.log('signedTx', signedTx);
 
+    const response = await btcClient.sendRawTransaction(signedTx.hex);
+    const txId = response.tx.hash;
+    console.log('txId', txId);
+
     toast.success(t('TX_FEE_UPDATED'));
 
     navigate(-1);
