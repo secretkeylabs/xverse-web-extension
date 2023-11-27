@@ -59,6 +59,5 @@
         "moduleDirectory": ["node_modules", "src/"]
       }
     }
-  },
-  "ignorePatterns": ["vite.config.ts"]
+  }
 }
