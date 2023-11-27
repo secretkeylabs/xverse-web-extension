@@ -378,7 +378,7 @@ function SpeedUpTransactionScreen() {
 
   return (
     <>
-      <TopRow title="" onClick={handleBackButtonClick} />
+      <TopRow title="" onClick={handleGoBack} />
       <Container>
         <Title>{t('TITLE')}</Title>
         <DetailText>{t('FEE_INFO')}</DetailText>
