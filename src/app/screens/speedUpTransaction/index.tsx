@@ -64,6 +64,7 @@ const ButtonContainer = styled.div`
 
 const FeeButton = styled.button<{
   isSelected: boolean;
+  centered?: boolean;
 }>((props) => ({
   ...props.theme.body_medium_m,
   textAlign: 'left',
@@ -76,7 +77,7 @@ const FeeButton = styled.button<{
   height: 'auto',
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'center',
+  alignItems: props.centered ? 'center' : 'flex-start',
   transition: 'background-color 0.1s ease-in-out, border 0.1s ease-in-out',
   padding: props.theme.spacing(8),
   paddingTop: props.theme.spacing(6),
@@ -383,6 +384,7 @@ function SpeedUpTransactionScreen() {
               value="custom"
               isSelected={selectedOption === 'custom'}
               onClick={handleClickFeeButton}
+              centered
             >
               <FeeButtonLeft>
                 <CustomFeeIcon size={20} color={theme.colors.tangerine} />
