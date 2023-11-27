@@ -28,7 +28,7 @@ const Container = styled.div((props) => ({
 const RecipientTitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white_200,
-  marginBottom: 16,
+  marginBottom: props.theme.space.xs,
 }));
 
 const RowContainer = styled.div({
