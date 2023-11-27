@@ -244,8 +244,29 @@ function SpeedUpTransactionScreen() {
     }
   };
 
-  const handleClickCancel = () => {
+  const handleGoBack = () => {
     navigate(-1);
+  };
+
+  const signAndBroadcastTx = async (transport?: TransportType) => {
+    if (isLedgerAccount(selectedAccount) && !transport) {
+      return;
+    }
+
+    console.log('feeRateInput', feeRateInput);
+    console.log('Signing tx...');
+    const signedTx = await rbfTransaction.getReplacementTransaction({
+      feeRate: Number(feeRateInput),
+      ledgerTransport: transport,
+    });
+    console.log('signedTx', signedTx);
+
+    const response = await btcClient.sendRawTransaction(signedTx.hex);
+    const txId = response.tx.hash;
+    console.log('txId', txId);
+
+    toast.success(t('TX_FEE_UPDATED'));
+    handleGoBack();
   };
 
   const handleClickSubmit = async () => {
@@ -258,57 +279,7 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
-    console.log('feeRateInput', feeRateInput);
-    console.log('Signing tx...');
-    const signedTx = await rbfTransaction.getReplacementTransaction({
-      feeRate: Number(feeRateInput),
-    });
-    console.log('signedTx', signedTx);
-
-    const response = await btcClient.sendRawTransaction(signedTx.hex);
-    const txId = response.tx.hash;
-    console.log('txId', txId);
-
-    toast.success(t('TX_FEE_UPDATED'));
-
-    navigate(-1);
-  };
-
-  const handleBackButtonClick = () => {
-    navigate(-1);
-  };
-
-  const handleLedgerPsbtSigning = async (transport: TransportType) => {
-    const addressIndex = selectedAccount?.deviceAccountIndex;
-
-    if (addressIndex === undefined) {
-      throw new Error('Account not found');
-    }
-
-    // TODO: Update this to sign BTC / BRC-20 transactions
-    // const signingResponse = await signIncomingSingleSigPSBT({
-    //   transport,
-    //   network: network.type,
-    //   addressIndex,
-    //   inputsToSign,
-    //   psbtBase64,
-    //   finalize: true,
-    // });
-    // let txId = '';
-    // const txHex = psbtBase64ToHex(signingResponse);
-    // const response = await btcClient.sendRawTransaction(txHex);
-    // txId = response.tx.hash;
-
-    // return {
-    //   txId,
-    //   signingResponse,
-    // };
-
-    return {
-      // TODO: Remove this when the above is implemented
-      txId: '',
-      signingResponse: '',
-    };
+    signAndBroadcastTx();
   };
 
   const handleConnectAndConfirm = async () => {
@@ -316,6 +287,7 @@ function SpeedUpTransactionScreen() {
       console.error('No account selected');
       return;
     }
+
     setIsButtonDisabled(true);
     const transport = await Transport.create();
     if (!transport) {
@@ -323,19 +295,12 @@ function SpeedUpTransactionScreen() {
       setIsConnectFailed(true);
       setIsButtonDisabled(false);
     }
+
     setIsConnectSuccess(true);
     await ledgerDelay(1500);
     setCurrentStepIndex(1);
     try {
-      const response = await handleLedgerPsbtSigning(transport);
-      navigate('/tx-status', {
-        state: {
-          txid: response.txId,
-          currency: 'BTC',
-          error: '',
-          browserTx: true,
-        },
-      });
+      const response = await signAndBroadcastTx(transport);
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
@@ -533,7 +498,7 @@ function SpeedUpTransactionScreen() {
         </ButtonContainer>
       </Container>
       <ControlsContainer>
-        <StyledActionButton text={t('CANCEL')} onPress={handleClickCancel} transparent />
+        <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
         <StyledActionButton
           text={t('SUBMIT')}
           disabled={!selectedOption}
