@@ -22,8 +22,9 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useNavigate, useParams } from 'react-router-dom';
+import { MoonLoader } from 'react-spinners';
 import styled, { useTheme } from 'styled-components';
-import { CustomFee } from './customFee';
+import CustomFee from './customFee';
 
 type TierFees = {
   enoughFunds: boolean;
@@ -44,6 +45,13 @@ const Title = styled.h1((props) => ({
   marginTop: props.theme.spacing(8),
   marginBottom: props.theme.spacing(8),
 }));
+
+const LoaderContainer = styled.div({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: 'inherit',
+});
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -190,6 +198,9 @@ function SpeedUpTransactionScreen() {
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
+  const [customFeeError, setCustomFeeError] = useState<string | undefined>();
 
   console.log('rbfTransaction', rbfTransaction);
   console.log('rbfRecommendedFees', rbfRecommendedFees);
@@ -200,26 +211,36 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
-    const rbfTx = new rbf.RbfTransaction(transaction, {
-      ...selectedAccount,
-      accountType: accountType || 'software',
-      accountId: isLedgerAccount(selectedAccount)
-        ? selectedAccount.deviceAccountIndex!
-        : selectedAccount.id,
-      network: network.type,
-      // @ts-ignore
-      seedVault,
-    });
-    setRbfTransaction(rbfTx);
+    try {
+      if (!isLoading) {
+        setIsLoading(true);
+      }
+      const rbfTx = new rbf.RbfTransaction(transaction, {
+        ...selectedAccount,
+        accountType: accountType || 'software',
+        accountId:
+          isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
+            ? selectedAccount.deviceAccountIndex
+            : selectedAccount.id,
+        network: network.type,
+        // @ts-ignore
+        seedVault,
+      });
+      setRbfTransaction(rbfTx);
 
-    const rbfTransactionSummary = await rbf.getRbfTransactionSummary(transaction);
-    setRbfTxSummary(rbfTransactionSummary);
+      const rbfTransactionSummary = await rbf.getRbfTransactionSummary(transaction);
+      setRbfTxSummary(rbfTransactionSummary);
 
-    const mempoolFees = await btcClient.getRecommendedFees();
-    setRecommendedFees(mempoolFees);
+      const mempoolFees = await btcClient.getRecommendedFees();
+      setRecommendedFees(mempoolFees);
 
-    const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
-    setRbfRecommendedFees(rbfRecommendedFeesResponse);
+      const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
+      setRbfRecommendedFees(rbfRecommendedFeesResponse);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -319,6 +340,23 @@ function SpeedUpTransactionScreen() {
     setIsModalVisible(false);
   };
 
+  const handleApplyCustomFee = (feeRate: string) => {
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
+      return;
+    }
+
+    if (customFeeError) {
+      setCustomFeeError(undefined);
+    }
+
+    setFeeRateInput(feeRate);
+    setCustomFeeRate(feeRate);
+    setSelectedOption('custom');
+
+    setShowCustomFee(false);
+  };
+
   const getEstimatedCompletionTime = (feeRate?: number) => {
     if (!feeRate || !recommendedFees) {
       return '--';
@@ -326,6 +364,10 @@ function SpeedUpTransactionScreen() {
 
     if (feeRate < recommendedFees?.hourFee) {
       return 'several hours or more';
+    }
+
+    if (feeRate === recommendedFees?.hourFee) {
+      return '~1 hour';
     }
 
     if (feeRate > recommendedFees?.hourFee && feeRate <= recommendedFees?.halfHourFee) {
@@ -378,184 +420,202 @@ function SpeedUpTransactionScreen() {
   return (
     <>
       <TopRow title="" onClick={handleGoBack} />
-      <Container>
-        <Title>{t('TITLE')}</Title>
-        <DetailText>{t('FEE_INFO')}</DetailText>
-        <DetailText>
-          {t('CURRENT_FEE')}{' '}
-          <HighlightedText>
-            <NumericFormat
-              value={totalFee || rbfTxSummary?.currentFee}
-              displayType="text"
-              thousandSeparator
-              suffix=" Sats / "
-            />
-            <NumericFormat
-              value={feeRateInput || rbfTxSummary?.currentFeeRate}
-              displayType="text"
-              thousandSeparator
-              suffix=" Sats /vB"
-            />
-          </HighlightedText>
-        </DetailText>
-        <DetailText>
-          {t('ESTIMATED_COMPLETION_TIME')}{' '}
-          <HighlightedText>
-            {getEstimatedCompletionTime(Number(feeRateInput) || rbfTxSummary?.currentFeeRate)}
-          </HighlightedText>
-        </DetailText>
-        <ButtonContainer>
-          {rbfRecommendedFees &&
-            Object.entries(rbfRecommendedFees)
-              .sort((a, b) => {
-                const priorityOrder = ['highest', 'higher', 'high', 'medium'];
-                return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
-              })
-              .map(([key, obj]) => (
-                <FeeButton
-                  key={key}
-                  value={key}
-                  isSelected={selectedOption === key}
-                  onClick={handleClickFeeButton}
-                  disabled={!obj.enoughFunds}
-                >
-                  <FeeButtonLeft>
-                    {feeButtonMapping[key].icon}
-                    <div>
-                      {feeButtonMapping[key].title}
-                      <SecondaryText>{getEstimatedCompletionTime(obj.feeRate)}</SecondaryText>
+      {isLoading ? (
+        <LoaderContainer>
+          <MoonLoader color="white" size={30} />
+        </LoaderContainer>
+      ) : (
+        <>
+          <Container>
+            <Title>{t('TITLE')}</Title>
+            <DetailText>{t('FEE_INFO')}</DetailText>
+            <DetailText>
+              {t('CURRENT_FEE')}{' '}
+              <HighlightedText>
+                <NumericFormat
+                  value={totalFee || rbfTxSummary?.currentFee}
+                  displayType="text"
+                  thousandSeparator
+                  suffix=" Sats / "
+                />
+                <NumericFormat
+                  value={feeRateInput || rbfTxSummary?.currentFeeRate}
+                  displayType="text"
+                  thousandSeparator
+                  suffix=" Sats /vB"
+                />
+              </HighlightedText>
+            </DetailText>
+            <DetailText>
+              {t('ESTIMATED_COMPLETION_TIME')}{' '}
+              <HighlightedText>
+                {getEstimatedCompletionTime(Number(feeRateInput) || rbfTxSummary?.currentFeeRate)}
+              </HighlightedText>
+            </DetailText>
+            <ButtonContainer>
+              {rbfRecommendedFees &&
+                Object.entries(rbfRecommendedFees)
+                  .sort((a, b) => {
+                    const priorityOrder = ['highest', 'higher', 'high', 'medium'];
+                    return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
+                  })
+                  .map(([key, obj]) => (
+                    <FeeButton
+                      key={key}
+                      value={key}
+                      isSelected={selectedOption === key}
+                      onClick={handleClickFeeButton}
+                      disabled={!obj.enoughFunds}
+                    >
+                      <FeeButtonLeft>
+                        {feeButtonMapping[key].icon}
+                        <div>
+                          {feeButtonMapping[key].title}
+                          <SecondaryText>{getEstimatedCompletionTime(obj.feeRate)}</SecondaryText>
+                          <SecondaryText>
+                            <NumericFormat
+                              value={obj.feeRate}
+                              displayType="text"
+                              thousandSeparator
+                              suffix=" Sats /vByte"
+                            />
+                          </SecondaryText>
+                        </div>
+                      </FeeButtonLeft>
+                      <FeeButtonRight>
+                        <div>
+                          {obj.fee ? (
+                            <NumericFormat
+                              value={obj.fee}
+                              displayType="text"
+                              thousandSeparator
+                              suffix=" Sats"
+                            />
+                          ) : (
+                            '--'
+                          )}
+                        </div>
+                        {obj.fee ? (
+                          <SecondaryText alignRight>
+                            {getFiatAmountString(
+                              getBtcFiatEquivalent(BigNumber(obj.fee), BigNumber(btcFiatRate)),
+                            )}
+                          </SecondaryText>
+                        ) : (
+                          <SecondaryText alignRight>-- {fiatCurrency}</SecondaryText>
+                        )}
+                        {!obj.enoughFunds && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
+                      </FeeButtonRight>
+                    </FeeButton>
+                  ))}
+              <FeeButton
+                key="custom"
+                value="custom"
+                isSelected={selectedOption === 'custom'}
+                onClick={handleClickFeeButton}
+                centered={!customFeeRate}
+              >
+                <FeeButtonLeft>
+                  <CustomFeeIcon size={20} color={theme.colors.tangerine} />
+                  <div>
+                    {t('CUSTOM')}
+                    {customFeeRate && (
                       <SecondaryText>
                         <NumericFormat
-                          value={obj.feeRate}
+                          value={customFeeRate}
                           displayType="text"
                           thousandSeparator
                           suffix=" Sats /vByte"
                         />
                       </SecondaryText>
-                    </div>
-                  </FeeButtonLeft>
-                  <FeeButtonRight>
-                    <div>
-                      {obj.fee ? (
-                        <NumericFormat
-                          value={obj.fee}
-                          displayType="text"
-                          thousandSeparator
-                          suffix=" Sats"
-                        />
-                      ) : (
-                        '--'
-                      )}
-                    </div>
-                    {obj.fee ? (
-                      <SecondaryText alignRight>
-                        {getFiatAmountString(
-                          getBtcFiatEquivalent(BigNumber(obj.fee), BigNumber(btcFiatRate)),
-                        )}
-                      </SecondaryText>
-                    ) : (
-                      <SecondaryText alignRight>-- {fiatCurrency}</SecondaryText>
                     )}
-                    {!obj.enoughFunds && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
-                  </FeeButtonRight>
-                </FeeButton>
-              ))}
-          {true ? ( // TODO: Show the custom values if user applied it
-            <FeeButton
-              key="custom"
-              value="custom"
-              isSelected={selectedOption === 'custom'}
-              onClick={handleClickFeeButton}
-              centered
-            >
-              <FeeButtonLeft>
-                <CustomFeeIcon size={20} color={theme.colors.tangerine} />
-                <div>{t('CUSTOM')}</div>
-              </FeeButtonLeft>
-              <div>{t('MANUAL_SETTING')}</div>
-            </FeeButton>
-          ) : (
-            <FeeButton
-              key="custom"
-              value="custom"
-              isSelected={selectedOption === 'custom'}
-              onClick={handleClickFeeButton}
-            >
-              <FeeButtonLeft>
-                <CustomFeeIcon size={20} color={theme.colors.tangerine} />
-                <div>
-                  {t('CUSTOM')}
-                  <SecondaryText>759 Sats /vByte</SecondaryText>
-                </div>
-              </FeeButtonLeft>
-              <div>
-                <div>90,000 Sats</div>
-                <SecondaryText alignRight>~ $6.10 USD</SecondaryText>
-              </div>
-            </FeeButton>
-          )}
-        </ButtonContainer>
-      </Container>
-      <ControlsContainer>
-        <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
-        <StyledActionButton
-          text={t('SUBMIT')}
-          disabled={!selectedOption}
-          onPress={handleClickSubmit}
-        />
-      </ControlsContainer>
+                  </div>
+                </FeeButtonLeft>
+                {customFeeRate ? (
+                  <div>
+                    <div>
+                      <NumericFormat
+                        value={totalFee || rbfTxSummary?.currentFee.toString()}
+                        displayType="text"
+                        thousandSeparator
+                        suffix=" Sats"
+                      />
+                    </div>
+                    <SecondaryText alignRight>
+                      {getFiatAmountString(
+                        getBtcFiatEquivalent(
+                          BigNumber(totalFee || rbfTxSummary?.currentFee!),
+                          BigNumber(btcFiatRate),
+                        ),
+                      )}
+                    </SecondaryText>
+                  </div>
+                ) : (
+                  <div>{t('MANUAL_SETTING')}</div>
+                )}
+              </FeeButton>
+            </ButtonContainer>
+          </Container>
+          <ControlsContainer>
+            <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
+            <StyledActionButton
+              text={t('SUBMIT')}
+              disabled={!selectedOption}
+              onPress={handleClickSubmit}
+            />
+          </ControlsContainer>
 
-      <CustomFee
-        visible={showCustomFee}
-        onClose={() => setShowCustomFee(false)}
-        initialFeeRate={feeRateInput!}
-        fee={totalFee!}
-        isFeeLoading={false}
-        error=""
-        onChangeFeeRate={setFeeRateInput}
-        onClickApply={(feeRate: string) => {}}
-        setSelectedOption={setSelectedOption}
-      />
+          <CustomFee
+            visible={showCustomFee}
+            onClose={() => setShowCustomFee(false)}
+            initialFeeRate={feeRateInput || rbfTxSummary?.currentFeeRate.toString()!}
+            fee={totalFee || rbfTxSummary?.currentFee.toString()!}
+            isFeeLoading={false}
+            error={customFeeError || ''}
+            onClickApply={handleApplyCustomFee}
+          />
 
-      <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
-        {currentStepIndex === 0 && (
-          <LedgerConnectionView
-            title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
-            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', { name: 'Bitcoin' })}
-            titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
-            textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={ledgerConnectBtcIcon}
-            isConnectSuccess={isConnectSuccess}
-            isConnectFailed={isConnectFailed}
-          />
-        )}
-        {currentStepIndex === 1 && (
-          <LedgerConnectionView
-            title={signatureRequestTranslate('LEDGER.CONFIRM.TITLE')}
-            text={signatureRequestTranslate('LEDGER.CONFIRM.SUBTITLE')}
-            titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
-            textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
-            imageDefault={ledgerConnectDefaultIcon}
-            isConnectSuccess={isTxApproved}
-            isConnectFailed={isTxRejected}
-          />
-        )}
-        <SuccessActionsContainer>
-          <ActionButton
-            onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
-            text={signatureRequestTranslate(
-              isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
+          <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+            {currentStepIndex === 0 && (
+              <LedgerConnectionView
+                title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
+                text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', { name: 'Bitcoin' })}
+                titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
+                textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
+                imageDefault={ledgerConnectBtcIcon}
+                isConnectSuccess={isConnectSuccess}
+                isConnectFailed={isConnectFailed}
+              />
             )}
-            disabled={isButtonDisabled}
-            processing={isButtonDisabled}
-          />
-          <ActionButton
-            onPress={cancelCallback}
-            text={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
-            transparent
-          />
-        </SuccessActionsContainer>
-      </BottomModal>
+            {currentStepIndex === 1 && (
+              <LedgerConnectionView
+                title={signatureRequestTranslate('LEDGER.CONFIRM.TITLE')}
+                text={signatureRequestTranslate('LEDGER.CONFIRM.SUBTITLE')}
+                titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
+                textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
+                imageDefault={ledgerConnectDefaultIcon}
+                isConnectSuccess={isTxApproved}
+                isConnectFailed={isTxRejected}
+              />
+            )}
+            <SuccessActionsContainer>
+              <ActionButton
+                onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+                text={signatureRequestTranslate(
+                  isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
+                )}
+                disabled={isButtonDisabled}
+                processing={isButtonDisabled}
+              />
+              <ActionButton
+                onPress={cancelCallback}
+                text={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
+                transparent
+              />
+            </SuccessActionsContainer>
+          </BottomModal>
+        </>
+      )}
     </>
   );
 }

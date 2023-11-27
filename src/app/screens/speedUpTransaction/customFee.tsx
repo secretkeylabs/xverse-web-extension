@@ -1,12 +1,11 @@
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import FiatAmountText from '@components/fiatAmountText';
-import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
 import BigNumber from 'bignumber.js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -88,7 +87,7 @@ const ControlsContainer = styled.div`
 `;
 
 const StyledInputFeedback = styled(InputFeedback)`
-  margin-bottom: ${(props) => props.theme.spacing(2)}px;
+  margin-top: ${(props) => props.theme.spacing(2)}px;
 `;
 
 const StyledFiatAmountText = styled(FiatAmountText)((props) => ({
@@ -102,14 +101,10 @@ const StyledActionButton = styled(ActionButton)((props) => ({
   },
 }));
 
-export type OnChangeFeeRate = (feeRate: string) => void;
-
-export function CustomFee({
+export default function CustomFee({
   visible,
   onClose,
   onClickApply,
-  onChangeFeeRate,
-  setSelectedOption,
   fee,
   initialFeeRate,
   isFeeLoading,
@@ -117,9 +112,7 @@ export function CustomFee({
 }: {
   visible: boolean;
   onClose: () => void;
-  onClickApply: OnChangeFeeRate;
-  onChangeFeeRate: OnChangeFeeRate;
-  setSelectedOption: (option?: string) => void;
+  onClickApply: (feeRate: string) => void;
   fee: string;
   initialFeeRate: string;
   isFeeLoading: boolean;
@@ -127,15 +120,7 @@ export function CustomFee({
 }) {
   const { t } = useTranslation('translation');
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
-  const { data: feeRates } = useBtcFeeRate();
-
-  // save the previous state in case user clicks X without applying
-  const [previousFeeRate, setPreviousFeeRate] = useState(initialFeeRate);
-  const [feeRateInput, setFeeRateInput] = useState(previousFeeRate);
-
-  useEffect(() => {
-    onChangeFeeRate(feeRateInput);
-  }, [feeRateInput, onChangeFeeRate]);
+  const [feeRateInput, setFeeRateInput] = useState(initialFeeRate);
 
   /* callbacks */
   const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -151,25 +136,15 @@ export function CustomFee({
     setFeeRateInput(e.target.value);
   };
 
-  const handleClickClose = () => {
-    // reset state
-    setFeeRateInput(previousFeeRate);
-    onClose();
-  };
-
   const handleClickApply = () => {
-    // save state
-    setPreviousFeeRate(feeRateInput);
-    setSelectedOption('custom');
     // apply state to parent
     onClickApply(feeRateInput);
-    onClose();
   };
 
   const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), BigNumber(btcFiatRate));
 
   return (
-    <BottomModal visible={visible} header="Custom fee" onClose={handleClickClose}>
+    <BottomModal visible={visible} header={t('TRANSACTION_SETTING.CUSTOM_FEE')} onClose={onClose}>
       <Container>
         <FeeContainer>
           <InputContainer withError={!!error}>
@@ -179,18 +154,18 @@ export function CustomFee({
               onKeyDown={handleKeyDownFeeRateInput}
               onChange={handleChangeFeeRateInput}
             />
-            <InputLabel>sats /vB</InputLabel>
+            <InputLabel>Sats /vB</InputLabel>
           </InputContainer>
           <StyledInputFeedback message={error} variant="danger" />
         </FeeContainer>
         <InfoContainer>
           <TotalFeeText>
-            Total fee:
+            {t('TRANSACTION_SETTING.TOTAL_FEE')}
             <NumericFormat
               value={fee}
               displayType="text"
               thousandSeparator
-              suffix=" sats"
+              suffix=" Sats"
               renderText={(value: string) => <FeeText>{value}</FeeText>}
             />
           </TotalFeeText>
@@ -199,16 +174,16 @@ export function CustomFee({
       </Container>
       <ControlsContainer>
         <StyledActionButton
-          text="Back"
+          text={t('TRANSACTION_SETTING.BACK')}
           processing={isFeeLoading}
-          disabled={isFeeLoading || !!error}
-          onPress={handleClickClose}
+          disabled={isFeeLoading}
+          onPress={onClose}
           transparent
         />
         <StyledActionButton
           text={t('TRANSACTION_SETTING.APPLY')}
           processing={isFeeLoading}
-          disabled={isFeeLoading || !!error}
+          disabled={isFeeLoading}
           onPress={handleClickApply}
         />
       </ControlsContainer>

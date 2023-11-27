@@ -369,10 +369,13 @@
     "STANDARD": "Regular",
     "HIGH": "Fast",
     "CUSTOM": "Custom",
+    "CUSTOM_FEE": "Custom fee",
+    "TOTAL_FEE": "Total fee:",
     "LOW": "Slow",
     "FEE_INFO": "Apply a higher fee to help your transaction confirm quickly, especially when the network is congested.",
     "NONCE": "Nonce",
     "APPLY": "Apply",
+    "BACK": "Back",
     "NONCE_INFO": "You can use a custom nonce to replace a pending transaction with the same nonce.",
     "SAME_FEE_ERROR": "New fee must be greater than current fee",
     "GREATER_FEE_ERROR": "Fee is more than available balance",
@@ -795,7 +798,8 @@
     "CUSTOM": "Custom",
     "INSUFFICIENT_FUNDS": "Insufficient funds",
     "MANUAL_SETTING": "Manual setting",
-    "TX_FEE_UPDATED": "Transaction fee updated"
+    "TX_FEE_UPDATED": "Transaction fee updated",
+    "FEE_TOO_LOW": "The minimum fee is {{minimumFee}}"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",
