@@ -579,7 +579,8 @@
     "RARE_SATS_NOTICE_TITLE": "Don't see your rare sat?",
     "RARE_SATS_NOTICE_DETAIL": "Currently, Xverse only supports the Rodarmor rarity index. Your sats may have other attributes.",
     "SEE_SUPPORTED": "See supported rarity scale",
-    "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle."
+    "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle.",
+    "HOLDS_RARE_SAT": "This inscription holds a rare sat."
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Restore assets",

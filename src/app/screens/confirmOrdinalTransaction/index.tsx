@@ -127,11 +127,17 @@ function ConfirmOrdinalTransaction() {
     }
   }, [txError]);
 
-  const { bundle: ordinalBundle, isPartOfABundle } = useGetUtxoOrdinalBundleV2(
+  const {
+    bundle: ordinalBundle,
+    isPartOfABundle,
+    ordinalSatributes,
+  } = useGetUtxoOrdinalBundleV2(
     selectedOrdinal?.output,
     hasActivatedRareSatsKey,
     selectedOrdinal?.number,
   );
+
+  const holdsRareSats = ordinalSatributes?.length > 0;
 
   const handleOnConfirmClick = (txHex: string) => {
     if (isLedgerAccount(selectedAccount)) {
@@ -190,6 +196,7 @@ function ConfirmOrdinalTransaction() {
           currencyType={isRareSat ? 'RareSat' : 'Ordinal'}
           isPartOfBundle={isPartOfABundle}
           ordinalBundle={ordinalBundle}
+          holdsRareSats={!!holdsRareSats}
         >
           {selectedOrdinal && (
             <Container>

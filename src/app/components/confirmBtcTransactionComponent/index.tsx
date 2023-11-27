@@ -137,6 +137,7 @@ interface Props {
   currencyType?: CurrencyTypes;
   isPartOfBundle?: boolean;
   ordinalBundle?: BundleV2;
+  holdsRareSats?: boolean;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;
   setCurrentFeeRate: (feeRate: BigNumber) => void;
@@ -161,6 +162,7 @@ function ConfirmBtcTransactionComponent({
   isPartOfBundle,
   currencyType,
   ordinalBundle,
+  holdsRareSats,
   currentFeeRate,
   setCurrentFee,
   setCurrentFeeRate,
@@ -404,6 +406,11 @@ function ConfirmBtcTransactionComponent({
                 bodyText={t('NFT_DASHBOARD_SCREEN.FROM_RARE_SAT_BUNDLE')}
                 variant="warning"
               />
+            </CalloutContainer>
+          )}
+          {holdsRareSats && (
+            <CalloutContainer>
+              <Callout bodyText={t('NFT_DASHBOARD_SCREEN.HOLDS_RARE_SAT')} variant="warning" />
             </CalloutContainer>
           )}
 
