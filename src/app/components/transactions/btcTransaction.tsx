@@ -81,7 +81,8 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
     window.open(getBtcTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
   }, []);
 
-  const showAccelerateButton = rbf.isTransactionRbfEnabled(transaction); // TODO: Fix the type error
+  const showAccelerateButton =
+    isBtcTransaction(transaction) && rbf.isTransactionRbfEnabled(transaction);
 
   return (
     <TransactionContainer onClick={openBtcTxStatusLink}>

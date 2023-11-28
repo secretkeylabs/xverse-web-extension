@@ -350,13 +350,13 @@ function SpeedUpTransactionScreen() {
               {t('CURRENT_FEE')}{' '}
               <HighlightedText>
                 <NumericFormat
-                  value={totalFee || rbfTxSummary?.currentFee}
+                  value={rbfTxSummary?.currentFee}
                   displayType="text"
                   thousandSeparator
                   suffix=" Sats / "
                 />
                 <NumericFormat
-                  value={feeRateInput || rbfTxSummary?.currentFeeRate}
+                  value={rbfTxSummary?.currentFeeRate}
                   displayType="text"
                   thousandSeparator
                   suffix=" Sats /vB"
@@ -366,7 +366,7 @@ function SpeedUpTransactionScreen() {
             <DetailText>
               {t('ESTIMATED_COMPLETION_TIME')}{' '}
               <HighlightedText>
-                {getEstimatedCompletionTime(Number(feeRateInput) || rbfTxSummary?.currentFeeRate)}
+                {getEstimatedCompletionTime(rbfTxSummary?.currentFeeRate)}
               </HighlightedText>
             </DetailText>
             <ButtonContainer>
@@ -437,14 +437,19 @@ function SpeedUpTransactionScreen() {
                   <div>
                     {t('CUSTOM')}
                     {customFeeRate && (
-                      <SecondaryText>
-                        <NumericFormat
-                          value={customFeeRate}
-                          displayType="text"
-                          thousandSeparator
-                          suffix=" Sats /vByte"
-                        />
-                      </SecondaryText>
+                      <>
+                        <SecondaryText>
+                          {getEstimatedCompletionTime(Number(customFeeRate))}
+                        </SecondaryText>
+                        <SecondaryText>
+                          <NumericFormat
+                            value={customFeeRate}
+                            displayType="text"
+                            thousandSeparator
+                            suffix=" Sats /vByte"
+                          />
+                        </SecondaryText>
+                      </>
                     )}
                   </div>
                 </FeeButtonLeft>
