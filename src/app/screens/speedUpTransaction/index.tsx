@@ -10,7 +10,7 @@ import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { CarProfile, Faders, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
+import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
 import { getBtcFiatEquivalent, rbf } from '@secretkeylabs/xverse-core';
 import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
 import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/api/esplora';
@@ -23,8 +23,25 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
-import styled, { useTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 import CustomFee from './customFee';
+import {
+  ButtonContainer,
+  Container,
+  ControlsContainer,
+  CustomFeeIcon,
+  DetailText,
+  FeeButton,
+  FeeButtonLeft,
+  FeeButtonRight,
+  HighlightedText,
+  LoaderContainer,
+  SecondaryText,
+  StyledActionButton,
+  SuccessActionsContainer,
+  Title,
+  WarningText,
+} from './index.styled';
 
 type TierFees = {
   enoughFunds: boolean;
@@ -38,133 +55,6 @@ type RbfRecommendedFees = {
   higher?: TierFees;
   highest?: TierFees;
 };
-
-const Title = styled.h1((props) => ({
-  ...props.theme.typography.headline_s,
-  color: props.theme.colors.white_0,
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
-}));
-
-const LoaderContainer = styled.div({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: 'inherit',
-});
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
-
-const DetailText = styled.span((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_200,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const HighlightedText = styled.span((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-}));
-
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: ${(props) => props.theme.spacing(6)}px;
-  gap: ${(props) => props.theme.spacing(4)}px;
-`;
-
-const FeeButton = styled.button<{
-  isSelected: boolean;
-  centered?: boolean;
-}>((props) => ({
-  ...props.theme.body_medium_m,
-  textAlign: 'left',
-  color: props.theme.colors.white_0,
-  backgroundColor: `${props.isSelected ? props.theme.colors.elevation6_600 : 'transparent'}`,
-  border: `1px solid ${
-    props.isSelected ? props.theme.colors.white_800 : props.theme.colors.white_850
-  }`,
-  borderRadius: props.theme.radius(2),
-  height: 'auto',
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: props.centered ? 'center' : 'flex-start',
-  transition: 'background-color 0.1s ease-in-out, border 0.1s ease-in-out',
-  padding: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(6),
-  paddingBottom: props.theme.spacing(6),
-  ':not(:disabled):hover': {
-    borderColor: props.theme.colors.white_800,
-  },
-  ':disabled': {
-    cursor: 'not-allowed',
-    color: props.theme.colors.white_400,
-    div: {
-      color: 'inherit',
-    },
-    svg: {
-      fill: props.theme.colors.white_600,
-    },
-  },
-}));
-
-const ControlsContainer = styled.div`
-  display: flex;
-  column-gap: 12px;
-  margin: 38px 16px 40px;
-`;
-
-const CustomFeeIcon = styled(Faders)({
-  transform: 'rotate(90deg)',
-});
-
-const FeeButtonLeft = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: props.theme.spacing(6),
-}));
-
-const FeeButtonRight = styled.div({
-  textAlign: 'right',
-});
-
-const SecondaryText = styled.div<{
-  alignRight?: boolean;
-}>((props) => ({
-  ...props.theme.typography.body_medium_s,
-  color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(2),
-  textAlign: props.alignRight ? 'right' : 'left',
-}));
-
-const StyledActionButton = styled(ActionButton)((props) => ({
-  'div, h1': {
-    ...props.theme.typography.body_medium_m,
-  },
-}));
-
-const WarningText = styled.span((props) => ({
-  ...props.theme.typography.body_medium_s,
-  display: 'block',
-  color: props.theme.colors.danger_light,
-  marginTop: props.theme.spacing(2),
-}));
-
-const SuccessActionsContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.spacing(6),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(20),
-  marginTop: props.theme.spacing(20),
-}));
 
 function SpeedUpTransactionScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
