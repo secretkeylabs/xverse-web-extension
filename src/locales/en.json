@@ -946,7 +946,8 @@
         "INSCRIPTION_VALUE_TOO_LOW": "The calling application sent an invalid payload. Please contact the application developer.",
         "FAILED_TO_FINALIZE": "The inscription transaction failed to finalize. Please try again or contact support.",
         "SERVER_ERROR": "An unknown server error occurred. Please try again or contact support."
-      }
+      },
+      "TOO_MANY_REPEATS": "You can only repeat up to 24 times in one request"
     }
   },
   "ERROR_SCREEN": {

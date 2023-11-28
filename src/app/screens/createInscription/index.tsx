@@ -28,6 +28,7 @@ import type { UTXO } from '@secretkeylabs/xverse-core/types';
 import { getShortTruncatedAddress } from '@utils/helper';
 
 import useSeedVault from '@hooks/useSeedVault';
+import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
 import CompleteScreen from './CompleteScreen';
 import ContentLabel from './ContentLabel';
@@ -154,6 +155,10 @@ const SubTitle = styled.h1((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
+const StyledCallout = styled(Callout)`
+  margin-bottom: ${(props) => props.theme.space.m};
+`;
+
 const CardContainer = styled.div<{ bottomPadding?: boolean }>((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
@@ -250,6 +255,7 @@ function CreateInscription() {
   } = payload as CreateInscriptionPayload | CreateRepeatInscriptionsPayload;
 
   const { repeat } = payload as CreateRepeatInscriptionsPayload;
+  const showOver24RepeatsError = !Number.isNaN(repeat) && repeat > 24;
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
@@ -411,14 +417,20 @@ function CreateInscription() {
       cancelText={t('CANCEL_BUTTON')}
       confirmText={!errorCode ? t('CONFIRM_BUTTON') : t(`ERRORS.SHORT.${errorCode}`)}
       loading={isExecuting || isLoading}
-      disabled={!!errorCode || isExecuting}
-      isError={!!errorCode}
+      disabled={!!errorCode || isExecuting || showOver24RepeatsError}
+      isError={!!errorCode || showOver24RepeatsError}
     >
       <OuterContainer>
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
         <MainContainer>
           <Title>{t('TITLE')}</Title>
           <SubTitle>{t('SUBTITLE', { name: appName ?? '' })}</SubTitle>
+          {showOver24RepeatsError && (
+            <StyledCallout
+              variant="danger"
+              bodyText={t("ERRORS.TOO_MANY_REPEATS")}
+            />
+          )}
           <CardContainer bottomPadding>
             <CardRow>
               <StyledPillLabel>
