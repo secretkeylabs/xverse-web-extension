@@ -164,9 +164,7 @@ function SpeedUpTransactionScreen() {
       enoughFunds: boolean;
       fee?: number;
       feeRate: number;
-    } = await rbfTransaction.getRbfFeeSummary({
-      feeRate: Number(feeRate),
-    });
+    } = await rbfTransaction.getRbfFeeSummary(Number(feeRate));
 
     console.log('feeSummary', feeSummary);
 
@@ -263,6 +261,7 @@ function SpeedUpTransactionScreen() {
     }
 
     setFeeRateInput(feeRate);
+    setTotalFee(customTotalFee);
     setCustomFeeRate(feeRate);
     setSelectedOption('custom');
 
