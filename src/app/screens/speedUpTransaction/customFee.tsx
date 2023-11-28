@@ -105,6 +105,7 @@ export default function CustomFee({
   visible,
   onClose,
   onClickApply,
+  calculateTotalFee,
   fee,
   initialFeeRate,
   isFeeLoading,
@@ -113,6 +114,7 @@ export default function CustomFee({
   visible: boolean;
   onClose: () => void;
   onClickApply: (feeRate: string) => void;
+  calculateTotalFee: (feeRate: string) => Promise<number | undefined>;
   fee: string;
   initialFeeRate: string;
   isFeeLoading: boolean;
@@ -121,6 +123,19 @@ export default function CustomFee({
   const { t } = useTranslation('translation');
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
   const [feeRateInput, setFeeRateInput] = useState(initialFeeRate);
+  const [totalFee, setTotalFee] = useState(fee);
+
+  const fetchTotalFee = async () => {
+    const response = await calculateTotalFee(feeRateInput);
+
+    if (response) {
+      setTotalFee(response.toString());
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalFee();
+  }, [feeRateInput]);
 
   /* callbacks */
   const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -141,7 +156,7 @@ export default function CustomFee({
     onClickApply(feeRateInput);
   };
 
-  const fiatFee = getBtcFiatEquivalent(new BigNumber(fee), BigNumber(btcFiatRate));
+  const fiatFee = getBtcFiatEquivalent(new BigNumber(totalFee), BigNumber(btcFiatRate));
 
   return (
     <BottomModal visible={visible} header={t('TRANSACTION_SETTING.CUSTOM_FEE')} onClose={onClose}>
@@ -162,7 +177,7 @@ export default function CustomFee({
           <TotalFeeText>
             {t('TRANSACTION_SETTING.TOTAL_FEE')}
             <NumericFormat
-              value={fee}
+              value={totalFee}
               displayType="text"
               thousandSeparator
               suffix=" Sats"

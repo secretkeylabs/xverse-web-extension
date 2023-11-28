@@ -200,6 +200,7 @@ function SpeedUpTransactionScreen() {
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
+  const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
 
   console.log('rbfTransaction', rbfTransaction);
@@ -268,22 +269,43 @@ function SpeedUpTransactionScreen() {
     navigate(-1);
   };
 
+  const calculateTotalFee = async (feeRate: string) => {
+    const feeSummary: {
+      enoughFunds: boolean;
+      fee?: number;
+      feeRate: number;
+    } = await rbfTransaction.getRbfFeeSummary({
+      feeRate: Number(feeRate),
+    });
+
+    console.log('feeSummary', feeSummary);
+
+    if (!feeSummary.enoughFunds) {
+      setCustomFeeError(t('INSUFFICIENT_FUNDS'));
+    }
+
+    if (feeSummary.fee) {
+      setCustomTotalFee(feeSummary.fee.toString());
+    }
+
+    return feeSummary.fee;
+  };
+
   const signAndBroadcastTx = async (transport?: TransportType) => {
     if (isLedgerAccount(selectedAccount) && !transport) {
       return;
     }
 
-    console.log('feeRateInput', feeRateInput);
     console.log('Signing tx...');
     const signedTx = await rbfTransaction.getReplacementTransaction({
       feeRate: Number(feeRateInput),
       ledgerTransport: transport,
     });
-    console.log('signedTx', signedTx);
+    console.log('Signed tx:', signedTx);
 
     const response = await btcClient.sendRawTransaction(signedTx.hex);
     const txId = response.tx.hash;
-    console.log('txId', txId);
+    console.log('txId:', txId);
 
     toast.success(t('TX_FEE_UPDATED'));
     handleGoBack();
@@ -531,11 +553,11 @@ function SpeedUpTransactionScreen() {
                     )}
                   </div>
                 </FeeButtonLeft>
-                {customFeeRate ? (
+                {customFeeRate && customTotalFee ? (
                   <div>
                     <div>
                       <NumericFormat
-                        value={totalFee || rbfTxSummary?.currentFee.toString()}
+                        value={customTotalFee}
                         displayType="text"
                         thousandSeparator
                         suffix=" Sats"
@@ -543,10 +565,7 @@ function SpeedUpTransactionScreen() {
                     </div>
                     <SecondaryText alignRight>
                       {getFiatAmountString(
-                        getBtcFiatEquivalent(
-                          BigNumber(totalFee || rbfTxSummary?.currentFee!),
-                          BigNumber(btcFiatRate),
-                        ),
+                        getBtcFiatEquivalent(BigNumber(customTotalFee), BigNumber(btcFiatRate)),
                       )}
                     </SecondaryText>
                   </div>
@@ -572,6 +591,7 @@ function SpeedUpTransactionScreen() {
             fee={totalFee || rbfTxSummary?.currentFee.toString()!}
             isFeeLoading={false}
             error={customFeeError || ''}
+            calculateTotalFee={calculateTotalFee}
             onClickApply={handleApplyCustomFee}
           />
 
