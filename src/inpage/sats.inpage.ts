@@ -21,6 +21,7 @@ import {
 import {
   BitcoinProvider,
   CreateInscriptionResponse,
+  CreateRepeatInscriptionsResponse,
   GetAddressResponse,
   SignTransactionResponse,
 } from 'sats-connect';
@@ -146,7 +147,7 @@ const SatsMethodsProvider: BitcoinProvider = {
   },
   createRepeatInscriptions: async (
     createRepeatInscriptionsRequest: string,
-  ): Promise<CreateInscriptionResponse> => {
+  ): Promise<CreateRepeatInscriptionsResponse> => {
     const event = new CustomEvent<CreateRepeatInscriptionsEventDetails>(
       DomEventName.createRepeatInscriptionsRequest,
       {
