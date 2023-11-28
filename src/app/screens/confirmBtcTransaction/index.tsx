@@ -236,6 +236,7 @@ function ConfirmBtcTransaction() {
         setCurrentFee={setCurrentFee}
         currentFeeRate={currentFeeRate}
         setCurrentFeeRate={setCurrentFeeRate}
+        horizontalSpacing
       >
         {ordinalsInBtc && ordinalsInBtc.length > 0 && (
           <InfoContainer

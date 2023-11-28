@@ -474,6 +474,14 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'nft-dashboard/confirm-ordinal-tx/:id',
+        element: (
+          <AuthGuard>
+            <ConfirmOrdinalTransaction />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'nft-dashboard/supported-rarity-scale',
         element: <SupportedRarities />,
       },

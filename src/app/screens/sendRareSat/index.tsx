@@ -1,8 +1,4 @@
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import AccountHeaderComponent from '@components/accountHeader';
-import SendForm from '@components/sendForm';
-import BottomBar from '@components/tabBar';
-import TopRow from '@components/topRow';
+import ActionButton from '@components/button';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -16,68 +12,91 @@ import {
 import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
 import { useMutation } from '@tanstack/react-query';
+import Callout from '@ui-library/callout';
 import { StyledHeading } from '@ui-library/common.styled';
-import { isLedgerAccount } from '@utils/helper';
-import { useEffect, useMemo, useState } from 'react';
+import InputFeedback, { InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import SendLayout from '../../layouts/sendLayout';
 
-const ScrollContainer = styled.div`
+const Container = styled.div`
   display: flex;
-  flex: 1;
   flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  width: 360px;
-  margin: auto;
+  justify-content: space-between;
+  flex-grow: 1;
 `;
 
-const BottomBarContainer = styled.div({
-  marginTop: 'auto',
+const StyledSendTo = styled(StyledHeading)`
+  margin-bottom: ${(props) => props.theme.space.l};
+`;
+
+const NextButtonContainer = styled.div((props) => ({
+  position: 'sticky',
+  bottom: 0,
+  paddingBottom: props.theme.space.s,
+  paddingTop: props.theme.space.s,
+  backgroundColor: props.theme.colors.elevation0,
+}));
+
+const InputGroup = styled.div`
+  margin-top: ${(props) => props.theme.spacing(8)}px;
+`;
+
+const Label = styled.label((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
+  display: 'flex',
+  flex: 1,
+}));
+
+const AmountInputContainer = styled.div<{ error: boolean }>((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: props.theme.space.xs,
+  marginBottom: props.theme.space.xs,
+  border: props.error
+    ? `1px solid ${props.theme.colors.danger_dark_200}`
+    : `1px solid ${props.theme.colors.white_800}`,
+  backgroundColor: props.theme.colors.elevation_n1,
+  borderRadius: props.theme.radius(1),
+  paddingLeft: props.theme.space.s,
+  paddingRight: props.theme.space.s,
+  height: 44,
+}));
+
+const InputFieldContainer = styled.div(() => ({
+  flex: 1,
+}));
+
+const InputField = styled.input((props) => ({
+  ...props.theme.typography.body_m,
+  backgroundColor: 'transparent',
+  color: props.theme.colors.white_0,
+  width: '100%',
+  border: 'transparent',
+}));
+
+const ErrorContainer = styled.div((props) => ({
+  marginTop: props.theme.space.xs,
+  marginBottom: props.theme.space.l,
+}));
+
+const RowContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
 });
 
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginLeft: '15%',
-  marginTop: props.theme.spacing(40),
-}));
-
-const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  opacity: 0.8,
-  marginTop: props.theme.spacing(5),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 400,
-  fontSize: 14,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
-
-const Heading = styled(StyledHeading)`
-  margin-top: ${(props) => props.theme.space.m};
-  margin-left: ${(props) => props.theme.space.m};
+const StyledCallout = styled(Callout)`
+  margin-bottom: ${(props) => props.theme.spacing(14)}px;
 `;
 
 function SendOrdinal() {
-  const { t } = useTranslation('translation');
+  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
   const { selectedSatBundle } = useNftDataSelector();
   const btcClient = useBtcClient();
@@ -86,39 +105,9 @@ function SendOrdinal() {
     useWalletSelector();
   const { getSeed } = useSeedVault();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
-  const [error, setError] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [warning, setWarning] = useState('');
+  const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
   useResetUserFlow('/send-rare-sat');
-
-  const address: string | undefined = useMemo(
-    () => (location.state ? location.state.recipientAddress : undefined),
-    [location.state],
-  );
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
-
-  const signTransaction = async (recipient: string) => {
-    const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
-    const ordUtxo = addressUtxos.find(
-      (utxo) =>
-        `${utxo.txid}:${utxo.vout}` === `${selectedSatBundle?.txid}:${selectedSatBundle?.vout}`,
-    );
-    setOrdinalUtxo(ordUtxo);
-    if (ordUtxo) {
-      const seedPhrase = await getSeed();
-      const signedTx = await signOrdinalSendTransaction(
-        recipient,
-        ordUtxo,
-        btcAddress,
-        Number(selectedAccount?.id),
-        seedPhrase,
-        network.type,
-        [ordUtxo],
-      );
-
-      return signedTx;
-    }
-  };
 
   const {
     isLoading,
@@ -126,20 +115,40 @@ function SendOrdinal() {
     error: txError,
     mutate,
   } = useMutation<SignedBtcTx | undefined, ResponseError, string>({
-    mutationFn: signTransaction,
+    mutationFn: async (recipient) => {
+      const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
+      const ordUtxo = addressUtxos.find(
+        (utxo) =>
+          `${utxo.txid}:${utxo.vout}` === `${selectedSatBundle?.txid}:${selectedSatBundle?.vout}`,
+      );
+      setOrdinalUtxo(ordUtxo);
+      if (ordUtxo) {
+        const seedPhrase = await getSeed();
+        const signedTx = await signOrdinalSendTransaction(
+          recipient,
+          ordUtxo,
+          btcAddress,
+          Number(selectedAccount?.id),
+          seedPhrase,
+          network.type,
+          [ordUtxo],
+        );
+        return signedTx;
+      }
+    },
   });
 
   useEffect(() => {
     if (data) {
-      navigate(`/confirm-ordinal-tx/${selectedSatBundle?.txid}`, {
+      navigate(`/nft-dashboard/confirm-ordinal-tx/${selectedSatBundle?.txid}`, {
         state: {
           signedTxHex: data.signedTx,
           recipientAddress,
           fee: data.fee,
           feePerVByte: data.feePerVByte,
-          fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
+          fiatFee: getBtcFiatEquivalent(data.fee, new BigNumber(btcFiatRate)),
           total: data.total,
-          fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),
+          fiatTotal: getBtcFiatEquivalent(data.total, new BigNumber(btcFiatRate)),
           ordinalUtxo,
           isRareSat: true,
         },
@@ -149,11 +158,12 @@ function SendOrdinal() {
 
   useEffect(() => {
     if (txError) {
+      console.log('txError', txError);
       if (Number(txError) === ErrorCodes.InSufficientBalance) {
-        setError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
+        setRecipientError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
       } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
-        setError(t('SEND.ERRORS.INSUFFICIENT_BALANCE_FEES'));
-      } else setError(txError.toString());
+        setRecipientError(t('SEND.ERRORS.INSUFFICIENT_BALANCE_FEES'));
+      } else setRecipientError(txError);
     }
   }, [txError]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -161,71 +171,84 @@ function SendOrdinal() {
     navigate(-1);
   };
 
-  function validateFields(associatedAddress: string): boolean {
-    if (!associatedAddress) {
-      setError(t('SEND.ERRORS.ADDRESS_REQUIRED'));
+  const validateRecipientAddress = (address: string): boolean => {
+    if (!address) {
+      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_REQUIRED') });
       return false;
     }
-
-    if (!validateBtcAddress({ btcAddress: associatedAddress, network: network.type })) {
-      setError(t('SEND.ERRORS.ADDRESS_INVALID'));
+    if (
+      !validateBtcAddress({
+        btcAddress: address,
+        network: network.type,
+      })
+    ) {
+      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
       return false;
     }
-
+    if (address === ordinalsAddress || address === btcAddress) {
+      setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
+      return true;
+    }
+    setRecipientError(null);
     return true;
-  }
+  };
 
-  const onPressNext = async (associatedAddress: string) => {
-    setRecipientAddress(associatedAddress);
-    if (validateFields(associatedAddress)) {
-      mutate(associatedAddress);
+  const onPressNext = async () => {
+    if (validateRecipientAddress(recipientAddress)) {
+      mutate(recipientAddress);
     }
   };
 
-  const handleInputChange = (inputAddress: string) => {
-    if (inputAddress === ordinalsAddress) {
-      return setWarning(t('SEND.YOU_ARE_TRANSFERRING_TO_YOURSELF'));
-    }
-    setWarning('');
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    validateRecipientAddress(e.target.value);
+    setRecipientAddress(e.target.value);
   };
+
+  const isNextEnabled = !isDangerFeedback(recipientError) && !!recipientAddress;
+
+  // hide back button if there is no history
+  const hideBackButton = location.key === 'default';
 
   return (
-    <>
-      {isGalleryOpen && (
-        <>
-          <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-          {!isLedgerAccount(selectedAccount) && (
-            <ButtonContainer>
-              <Button onClick={handleBackButtonClick}>
-                <>
-                  <ButtonImage src={ArrowLeft} />
-                  <ButtonText>{t('SEND.MOVE_TO_ASSET_DETAIL')}</ButtonText>
-                </>
-              </Button>
-            </ButtonContainer>
-          )}
-        </>
-      )}
-      <ScrollContainer>
-        {!isGalleryOpen && <TopRow title="" onClick={handleBackButtonClick} />}
-        <Heading typography="headline_xs">{t('SEND.SEND_TO')}</Heading>
-        <SendForm
-          processing={isLoading}
-          currencyType="Ordinal"
-          disableAmountInput
-          recepientError={error}
-          recipient={address}
-          onPressSend={onPressNext}
-          onAddressInputChange={handleInputChange}
-          warning={warning}
-          info={t('SEND.INFO.ADDRESS_SUPPORTS_RARE_SATS')}
-          hideMemo
-          hideTokenImage
-          hideDefaultWarning
-        />
-        <BottomBarContainer>{!isGalleryOpen && <BottomBar tab="nft" />}</BottomBarContainer>
-      </ScrollContainer>
-    </>
+    <SendLayout
+      selectedBottomTab="nft"
+      onClickBack={handleBackButtonClick}
+      hideBackButton={hideBackButton}
+    >
+      <Container>
+        <div>
+          <StyledSendTo typography="headline_xs" color="white_0">
+            {t('SEND_TO')}
+          </StyledSendTo>
+          <InputGroup>
+            <RowContainer>
+              <Label>{t('RECIPIENT')}</Label>
+            </RowContainer>
+            <AmountInputContainer error={isDangerFeedback(recipientError)}>
+              <InputFieldContainer>
+                <InputField
+                  value={recipientAddress}
+                  placeholder={t('ORDINAL_RECIPIENT_PLACEHOLDER')}
+                  onChange={handleAddressChange}
+                />
+              </InputFieldContainer>
+            </AmountInputContainer>
+            <ErrorContainer>
+              {recipientError && <InputFeedback {...recipientError} />}
+            </ErrorContainer>
+          </InputGroup>
+          <StyledCallout bodyText={t('MAKE_SURE_THE_RECIPIENT')} />
+        </div>
+        <NextButtonContainer>
+          <ActionButton
+            text={t('NEXT')}
+            disabled={!isNextEnabled}
+            processing={isLoading}
+            onPress={onPressNext}
+          />
+        </NextButtonContainer>
+      </Container>
+    </SendLayout>
   );
 }
 

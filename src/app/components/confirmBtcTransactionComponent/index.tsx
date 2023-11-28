@@ -3,7 +3,6 @@ import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
-import TopRow from '@components/topRow';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
@@ -36,6 +35,10 @@ import styled from 'styled-components';
 import TransactionDetailComponent from '../transactionDetailComponent';
 import SatsBundle from './bundle';
 
+interface ContainerProps {
+  horizontalSpacing: boolean;
+}
+
 const OuterContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -43,15 +46,16 @@ const OuterContainer = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+  flex-grow: 1;
 `;
 
-const Container = styled.div((props) => ({
+const Container = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
   marginTop: props.theme.spacing(11),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  marginLeft: props.horizontalSpacing ? props.theme.spacing(8) : 0,
+  marginRight: props.horizontalSpacing ? props.theme.spacing(8) : 0,
 }));
 
 interface ButtonProps {
@@ -136,6 +140,7 @@ interface Props {
   isBtcSendBrowserTx?: boolean;
   currencyType?: CurrencyTypes;
   isPartOfBundle?: boolean;
+  horizontalSpacing?: boolean;
   ordinalBundle?: Bundle;
   holdsRareSats?: boolean;
   currentFeeRate: BigNumber;
@@ -162,6 +167,7 @@ function ConfirmBtcTransactionComponent({
   isPartOfBundle,
   currencyType,
   ordinalBundle,
+  horizontalSpacing,
   holdsRareSats,
   currentFeeRate,
   setCurrentFee,
@@ -386,8 +392,7 @@ function ConfirmBtcTransactionComponent({
   return (
     <>
       <OuterContainer>
-        {!isBtcSendBrowserTx && !isGalleryOpen && <TopRow title="" onClick={onBackButtonClick} />}
-        <Container>
+        <Container horizontalSpacing={!!horizontalSpacing}>
           {showFeeWarning && (
             <InfoContainer
               type="Warning"
