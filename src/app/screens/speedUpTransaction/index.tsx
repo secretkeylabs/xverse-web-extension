@@ -93,10 +93,6 @@ function SpeedUpTransactionScreen() {
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
 
-  console.log('rbfTransaction', rbfTransaction);
-  console.log('rbfRecommendedFees', rbfRecommendedFees);
-  console.log('rbfTxSummary', rbfTxSummary);
-
   const fetchRbfData = async () => {
     if (!selectedAccount || !id || !transaction) {
       return;
@@ -127,7 +123,7 @@ function SpeedUpTransactionScreen() {
 
       const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
       setRbfRecommendedFees(rbfRecommendedFeesResponse);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -166,8 +162,6 @@ function SpeedUpTransactionScreen() {
       feeRate: number;
     } = await rbfTransaction.getRbfFeeSummary(Number(feeRate));
 
-    console.log('feeSummary', feeSummary);
-
     if (!feeSummary.enoughFunds) {
       setCustomFeeError(t('INSUFFICIENT_FUNDS'));
     } else {
@@ -186,19 +180,23 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
-    console.log('Signing tx...');
-    const signedTx = await rbfTransaction.getReplacementTransaction({
-      feeRate: Number(feeRateInput),
-      ledgerTransport: transport,
-    });
-    console.log('Signed tx:', signedTx);
+    try {
+      const signedTx = await rbfTransaction.getReplacementTransaction({
+        feeRate: Number(feeRateInput),
+        ledgerTransport: transport,
+      });
 
-    const response = await btcClient.sendRawTransaction(signedTx.hex);
-    const txId = response.tx.hash;
-    console.log('txId:', txId);
+      await btcClient.sendRawTransaction(signedTx.hex);
 
-    toast.success(t('TX_FEE_UPDATED'));
-    handleGoBack();
+      toast.success(t('TX_FEE_UPDATED'));
+      handleGoBack();
+    } catch (err: any) {
+      console.error(err);
+
+      if (err?.response?.data && err?.response?.data.includes('insufficient fee')) {
+        toast.error('Insufficient fee');
+      }
+    }
   };
 
   const handleClickSubmit = async () => {
