@@ -16,7 +16,7 @@ import {
   useInscriptionFees,
 } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
-import { CreateInscriptionPayload } from 'sats-connect';
+import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
@@ -161,7 +161,8 @@ function CreateInscription() {
 
   const [payload, requestToken, tabId] = useMemo(() => {
     const params = new URLSearchParams(search);
-    const requestEncoded = params.get('createInscription');
+    const requestEncoded =
+      params.get('createInscription') ?? params.get('createRepeatInscriptions');
     const requestBody = decodeToken(requestEncoded as string);
     return [requestBody.payload as unknown, requestEncoded, Number(params.get('tabId'))];
   }, [search]);
@@ -174,7 +175,9 @@ function CreateInscription() {
     appFeeAddress,
     appFee,
     suggestedMinerFeeRate,
-  } = payload as CreateInscriptionPayload;
+  } = payload as CreateInscriptionPayload | CreateRepeatInscriptionsPayload;
+
+  const { repeat } = payload as CreateRepeatInscriptionsPayload;
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
@@ -260,8 +263,14 @@ function CreateInscription() {
   const cancelCallback = () => {
     const response = {
       source: MESSAGE_SOURCE,
-      method: ExternalSatsMethods.createInscriptionResponse,
-      payload: { createInscriptionRequest: requestToken, createInscriptionResponse: 'cancel' },
+      method: repeat
+        ? ExternalSatsMethods.createRepeatInscriptionsResponse
+        : ExternalSatsMethods.createInscriptionResponse,
+      payload: {
+        createInscriptionRequest: requestToken,
+        createInscriptionResponse: 'cancel',
+        ...(repeat ? { repeat } : null),
+      },
     };
 
     chrome.tabs.sendMessage(tabId, response);
@@ -294,13 +303,22 @@ function CreateInscription() {
     const onClose = () => {
       const response = {
         source: MESSAGE_SOURCE,
-        method: ExternalSatsMethods.createInscriptionResponse,
-        payload: {
-          createInscriptionRequest: requestToken,
-          createInscriptionResponse: {
-            txId: revealTransactionId,
-          },
-        },
+        method: repeat
+          ? ExternalSatsMethods.createRepeatInscriptionsResponse
+          : ExternalSatsMethods.createInscriptionResponse,
+        payload: repeat
+          ? {
+              createRepeatInscriptionsRequest: requestToken,
+              createRepeatInscriptionsResponse: {
+                txId: revealTransactionId,
+              },
+            }
+          : {
+              createInscriptionRequest: requestToken,
+              createInscriptionResponse: {
+                txId: revealTransactionId,
+              },
+            },
       };
       chrome.tabs.sendMessage(tabId, response);
       window.close();

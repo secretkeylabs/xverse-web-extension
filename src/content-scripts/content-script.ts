@@ -179,7 +179,7 @@ document.addEventListener(DomEventName.createInscriptionRequest, ((
 }) as EventListener);
 
 // Listen for a CustomEvent (Create Repeat Inscriptions Request) coming from the web app
-document.addEventListener(DomEventName.createInscriptionRequest, ((
+document.addEventListener(DomEventName.createRepeatInscriptionsRequest, ((
   event: CreateRepeatInscriptionsEvent,
 ) => {
   forwardDomEventToBackground({
