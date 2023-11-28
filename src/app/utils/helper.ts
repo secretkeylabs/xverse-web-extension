@@ -1,18 +1,18 @@
-import {
-  Account,
-  StxMempoolTransactionData,
-  SettingsNetwork,
-  NetworkType,
-} from '@secretkeylabs/xverse-core/types';
-import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { getStacksInfo } from '@secretkeylabs/xverse-core';
 import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
-import BigNumber from 'bignumber.js';
+import {
+  Account,
+  NetworkType,
+  SettingsNetwork,
+  StxMempoolTransactionData,
+} from '@secretkeylabs/xverse-core/types';
+import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
 import { ChainID } from '@stacks/transactions';
+import BigNumber from 'bignumber.js';
 import {
   BTC_TRANSACTION_STATUS_URL,
-  TRANSACTION_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
+  TRANSACTION_STATUS_URL,
 } from './constants';
 
 const validUrl = require('valid-url');
@@ -168,3 +168,7 @@ export const isLedgerAccount = (account: Account | null): boolean =>
   account?.accountType === 'ledger';
 
 export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
+
+export function formatNumber(value?: string | number) {
+  return value ? new Intl.NumberFormat().format(Number(value)) : '-';
+}

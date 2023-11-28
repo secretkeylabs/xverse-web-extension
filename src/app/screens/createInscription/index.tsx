@@ -59,18 +59,34 @@ const NumberSuffix = styled.div((props) => ({
   color: props.theme.colors.white_400,
 }));
 
+const StyledPillLabel = styled.p`
+  display: flex;
+  align-items: center;
+  gap: ${(props) => props.theme.space.s};
+`;
+
+const Pill = styled.span`
+  ${(props) => props.theme.typography.body_bold_s}
+  color: ${(props) => props.theme.colors.elevation0};
+  background-color: ${(props) => props.theme.colors.white_0};
+  padding: 3px 6px;
+  border-radius: 40px;
+`;
+
 function FeeRow({
   label,
   subLabel,
   value = 0,
   fiatCurrency,
   fiatRate,
+  repeat,
 }: {
   label: string;
   subLabel?: string;
   value?: number | string | null;
   fiatCurrency: string;
   fiatRate: string;
+  repeat?: number;
 }) {
   if (!value) {
     return null;
@@ -80,7 +96,10 @@ function FeeRow({
   return (
     <CardRow>
       <div>
-        <p>{label}</p>
+        <StyledPillLabel>
+          {label}
+          {repeat && <Pill>{`x${repeat}`}</Pill>}
+        </StyledPillLabel>
         {!!subLabel && <NumberSuffix>{subLabel}</NumberSuffix>}
       </div>
       <NumberWithSuffixContainer>
@@ -98,22 +117,8 @@ function FeeRow({
   );
 }
 
-const StyledYouWillInscribe = styled(StyledP)`
-  display: flex;
-  align-items: center;
-  gap: ${(props) => props.theme.space.s};
-`;
-
 const YourAddress = styled.div`
   text-align: right;
-`;
-
-const Pill = styled.span`
-  ${(props) => props.theme.typography.body_bold_s}
-  color: ${(props) => props.theme.colors.elevation0};
-  background-color: ${(props) => props.theme.colors.white_0};
-  padding: 3px 6px;
-  border-radius: 40px;
 `;
 
 const OuterContainer = styled.div({
@@ -219,13 +224,20 @@ function CreateInscription() {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
   const { search } = useLocation();
 
-  const [payload, requestToken, tabId] = useMemo(() => {
+  const [payload, requestToken, tabId, origin] = useMemo(() => {
     const params = new URLSearchParams(search);
     const requestEncoded =
       params.get('createInscription') ?? params.get('createRepeatInscriptions');
     const requestBody = decodeToken(requestEncoded as string);
-    return [requestBody.payload as unknown, requestEncoded, Number(params.get('tabId'))];
+    return [
+      requestBody.payload as unknown,
+      requestEncoded,
+      Number(params.get('tabId')),
+      params.get('origin'),
+    ];
   }, [search]);
+
+  const appName = new URL(origin || '').host;
 
   const {
     contentType,
@@ -355,6 +367,10 @@ function CreateInscription() {
 
   const toFiat = (value: number | string = 0) =>
     new BigNumber(value).dividedBy(100e6).multipliedBy(btcFiatRate).toFixed(2);
+  
+  const bundlePlusFees = new BigNumber(totalFee ?? 0)
+                .plus(new BigNumber(commitValue ?? 0).multipliedBy(repeat ?? 1))
+                .toString()
 
   if (complete && revealTransactionId) {
     const onClose = () => {
@@ -402,13 +418,13 @@ function CreateInscription() {
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
         <MainContainer>
           <Title>{t('TITLE')}</Title>
-          <SubTitle>{t('SUBTITLE', { name: 'xverse.app' })}</SubTitle>
+          <SubTitle>{t('SUBTITLE', { name: appName })}</SubTitle>
           <CardContainer bottomPadding>
             <CardRow>
-              <StyledYouWillInscribe typography="body_medium_m" color="white_200">
+              <StyledPillLabel>
                 {t('SUMMARY.TITLE')}
                 {repeat && <Pill>{`x${repeat}`}</Pill>}
-              </StyledYouWillInscribe>
+              </StyledPillLabel>
             </CardRow>
             <CardRow center>
               <IconLabel>
@@ -417,7 +433,12 @@ function CreateInscription() {
                 </div>
                 <div>{t('SUMMARY.ORDINAL')}</div>
               </IconLabel>
-              <ContentLabel contentType={contentType} content={content} type={payloadType} />
+              <ContentLabel
+                contentType={contentType}
+                content={content}
+                type={payloadType}
+                repeat={repeat}
+              />
             </CardRow>
             <CardRow center>
               <IconLabel>
@@ -450,6 +471,7 @@ function CreateInscription() {
               value={commitValue}
               fiatCurrency={fiatCurrency}
               fiatRate={btcFiatRate}
+              repeat={repeat}
             />
           </CardContainer>
           <CardContainer bottomPadding>
@@ -495,20 +517,20 @@ function CreateInscription() {
                 />
               </NumberWithSuffixContainer>
             </CardRow>
-            {showTotalFee && <FeeRow
-              label={t('FEES.TOTAL')}
-              value={totalFee}
-              fiatCurrency={fiatCurrency}
-              fiatRate={btcFiatRate}
-            />}
+            {showTotalFee && (
+              <FeeRow
+                label={t('FEES.TOTAL')}
+                value={totalFee}
+                fiatCurrency={fiatCurrency}
+                fiatRate={btcFiatRate}
+              />
+            )}
           </CardContainer>
           <CardContainer>
             <FeeRow
               label={t('TOTAL')}
               subLabel={t('AMOUNT_PLUS_FEES')}
-              value={BigNumber(totalFee ?? 0)
-                .plus(commitValue ?? 0)
-                .toString()}
+              value={bundlePlusFees}
               fiatCurrency={fiatCurrency}
               fiatRate={btcFiatRate}
             />
