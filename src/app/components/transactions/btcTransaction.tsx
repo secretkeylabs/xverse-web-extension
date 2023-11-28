@@ -1,7 +1,7 @@
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FastForward } from '@phosphor-icons/react';
-import { Brc20HistoryTransactionData, BtcTransactionData } from '@secretkeylabs/xverse-core';
+import { Brc20HistoryTransactionData, BtcTransactionData, rbf } from '@secretkeylabs/xverse-core';
 import { getBtcTxStatusUrl } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';
 import { useCallback } from 'react';
@@ -81,12 +81,7 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
     window.open(getBtcTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
   }, []);
 
-  const showAccelerateButton =
-    transaction.txStatus === 'pending' &&
-    !transaction.incoming &&
-    (transaction.txType === 'bitcoin' ||
-      transaction.txType === 'brc20' ||
-      ('isOrdinal' in transaction && transaction.isOrdinal));
+  const showAccelerateButton = rbf.isTransactionRbfEnabled(transaction); // TODO: Fix the type error
 
   return (
     <TransactionContainer onClick={openBtcTxStatusLink}>
