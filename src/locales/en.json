@@ -874,7 +874,7 @@
   },
   "INSCRIPTION_REQUEST": {
     "TITLE": "Review Transaction",
-    "SUBTITLE": "Inscribe Ordinal",
+    "SUBTITLE": "Requested by {{name}}",
     "CANCEL_BUTTON": "Cancel",
     "CONFIRM_BUTTON": "Confirm",
     "FEES_TOO_LOW": "Minimum fee is {{fee}}",
@@ -902,13 +902,15 @@
       "PREVIEW": "Open in ordinals viewer"
     },
     "NETWORK": "Network",
-    "VALUE": "Bitcoin value",
+    "VALUE": "Bundle size",
     "EDIT_FEES": "Edit Fees",
+    "TOTAL": "Total",
+    "AMOUNT_PLUS_FEES": "Bundle size + fees",
     "FEES": {
       "TITLE": "Fees",
-      "INSCRIPTION": "Inscription fees",
-      "DEVELOPER": "Developer fees",
-      "TRANSACTION": "Transaction fees",
+      "INSCRIPTION": "Inscription fee",
+      "DEVELOPER": "Developer fee",
+      "TRANSACTION": "Network fee",
       "TOTAL": "Total fees"
     },
     "COMPLETE": {
@@ -1002,7 +1004,7 @@
     "YOU_ARE_TRANSFERRING_TO_YOURSELF": "You are transferring to yourself"
   },
   "CONFIRM_BRC20": {
-    "BITCOIN_VALUE": "Bitcoin value",
+    "BITCOIN_VALUE": "Bundle size",
     "ERROR_CODES": {
       "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
       "INSUFFICIENT_FUNDS": "Insufficient BTC balance for transaction fees",

@@ -41,11 +41,13 @@ const getContentType = (inputContentType: string) => {
 const isPreviewable = (contentType: ContentType) => previewableContentTypes.has(contentType);
 const isOrdiPreviewable = (contentType: ContentType) => ordiViewTypes.has(contentType);
 
-const SuffixContainer = styled.div({
+const SuffixContainer = styled.div(props => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-end',
-});
+}));
 
 const Container = styled.div({
   display: 'flex',
@@ -62,8 +64,8 @@ const ButtonIcon = styled.div((props) => ({
 }));
 
 const Suffix = styled.div((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
+  ...props.theme.typography.body_medium_s,
+  color: props.theme.colors.white_400,
 }));
 
 const MenuContainer = styled.div({
