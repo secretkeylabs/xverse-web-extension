@@ -26,9 +26,8 @@ import SequencePali from '@assets/img/nftDashboard/rareSats/sequence_pali.svg';
 import Uncommon from '@assets/img/nftDashboard/rareSats/uncommon.svg';
 import Unknown from '@assets/img/nftDashboard/rareSats/unknown.svg';
 import Vintage from '@assets/img/nftDashboard/rareSats/vintage.svg';
-import { RareSatsType } from '@utils/rareSats';
+import { RareSatsType } from '@secretkeylabs/xverse-core';
 import styled from 'styled-components';
-
 import Theme from '../../../theme';
 
 const Container = styled.div<{ bgColor: string; padding: number }>((props) => ({
@@ -65,7 +64,7 @@ function RareSatIcon({ type, size = 24, bgColor, padding = 0, isDynamicSize = fa
     MYTHIC: Mythic,
     RARE: Rare,
     UNCOMMON: Uncommon,
-    UNKNOWN: Unknown,
+    COMMON: Unknown,
     BLACK_LEGENDARY: BlackLegendary,
     BLACK_EPIC: BlackEpic,
     BLACK_RARE: BlackRare,

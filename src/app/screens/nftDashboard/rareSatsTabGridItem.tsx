@@ -2,8 +2,9 @@ import ExoticSatsRow from '@components/exoticSatsRow/exoticSatsRow';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { DotsThree } from '@phosphor-icons/react';
+import { Bundle } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { BundleV2, getFormattedTxIdVoutFromBundle } from '@utils/rareSats';
+import { getFormattedTxIdVoutFromBundle } from '@utils/rareSats';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -30,12 +31,12 @@ const Pressable = styled.button((props) => ({
   marginBottom: props.theme.space.s,
 }));
 
-function RareSatsTabGridItem({ bundle, maxItems }: { bundle: BundleV2; maxItems: number }) {
+function RareSatsTabGridItem({ bundle, maxItems }: { bundle: Bundle; maxItems: number }) {
   const navigate = useNavigate();
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
 
   const handleOnClick = () => {
-    // exotics v1 wont show rage details only bundle details
+    // exotics v1 wont show range details only bundle details
     setSelectedSatBundleDetails(bundle);
     navigate('/nft-dashboard/rare-sats-bundle');
   };
@@ -44,7 +45,7 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: BundleV2; maxItems:
     let totalIconsDisplayed = 0;
     let totalTilesDisplayed = 0;
     return bundle.satributes
-      .filter((satributes) => !(satributes.includes('UNKNOWN') && bundle.satributes.length > 1))
+      .filter((satributes) => !(satributes.includes('COMMON') && bundle.satributes.length > 1))
       .map((sats, index) => {
         if (totalIconsDisplayed > maxItems) {
           return null;

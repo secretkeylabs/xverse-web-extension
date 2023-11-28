@@ -1,8 +1,7 @@
 import Cross from '@assets/img/dashboard/X.svg';
 import { animated, useSpring } from '@react-spring/web';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { CondensedInscription } from '@secretkeylabs/xverse-core/types';
-import { Inscription } from '@utils/rareSats';
+import { CondensedInscription, SatRangeInscription } from '@secretkeylabs/xverse-core';
 import styled from 'styled-components';
 
 const TransparentButton = styled.button({
@@ -49,12 +48,11 @@ const OrdinalBackgroundContainer = styled(animated.div)({
 });
 
 interface Props {
-  show: boolean;
-  inscription: Inscription;
+  inscription: SatRangeInscription;
   onClose: () => void;
 }
 
-function AssetModal({ show, inscription, onClose }: Props) {
+function AssetModal({ inscription, onClose }: Props) {
   const consdensedInscription: CondensedInscription = {
     ...inscription,
     number: inscription.inscription_number,

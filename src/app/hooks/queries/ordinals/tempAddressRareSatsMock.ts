@@ -1,14 +1,6 @@
-import { ApiBundleV2 } from '@utils/rareSats';
+import { AddressBundleResponse, UtxoBundleResponse } from '@secretkeylabs/xverse-core';
 
-export type Response = {
-  xVersion: number;
-  limit: number;
-  offset: number;
-  total: number;
-  results: ApiBundleV2[];
-};
-
-export const inscriptionPartOfBundle: ApiBundleV2 & { xVersion: number } = {
+export const inscriptionPartOfBundle: UtxoBundleResponse = {
   block_height: 803128,
   txid: 'b8f8aee03af313ef1fbba7316aadf7390c91dc5dd34928a15f708ea4ed642852',
   value: 100,
@@ -46,7 +38,7 @@ export const inscriptionPartOfBundle: ApiBundleV2 & { xVersion: number } = {
   xVersion: 1,
 };
 
-export const exoticInscriptionNotPartOfBundle: ApiBundleV2 & { xVersion: number } = {
+export const exoticInscriptionNotPartOfBundle: UtxoBundleResponse = {
   block_height: 803128,
   txid: 'b143d94bb084eb429c3d3d4e8ebc9ee7b6a070a3b9b1a92849fe4059f8c2da09',
   value: 1,
@@ -73,7 +65,7 @@ export const exoticInscriptionNotPartOfBundle: ApiBundleV2 & { xVersion: number 
   xVersion: 1,
 };
 
-export const mockData: Response = {
+export const mockData: AddressBundleResponse = {
   xVersion: 1,
   limit: 30,
   offset: 0,
@@ -141,7 +133,7 @@ export const mockData: Response = {
 };
 
 // TestCase 1 - Empty response
-export const mockTestCase1: Response = {
+export const mockTestCase1: AddressBundleResponse = {
   xVersion: 1,
   limit: 30,
   offset: 0,
@@ -151,7 +143,7 @@ export const mockTestCase1: Response = {
 
 // TestCase 2 - 3 bundles
 const { xVersion, ...bundle } = inscriptionPartOfBundle;
-export const mockTestCase3: Response = {
+export const mockTestCase3: AddressBundleResponse = {
   xVersion: 1,
   limit: 30,
   offset: 0,
@@ -238,7 +230,7 @@ export const mockTestCase3: Response = {
           offset: 10000,
           range: {
             start: '34234320010001',
-            end: '34234320010001',
+            end: '34234320010002',
           },
           satributes: ['PIZZA'],
           inscriptions: [
@@ -296,7 +288,7 @@ export const mockTestCase3: Response = {
           offset: 3,
           range: {
             start: '34234320010001',
-            end: '34234320010001',
+            end: '34234320010002',
           },
           satributes: ['UNCOMMON', 'PIZZA', 'PALINDROME'],
           inscriptions: [

@@ -1,7 +1,11 @@
 import ActionButton from '@components/button';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
+import {
+  Bundle,
+  mapRareSatsAPIResponseToBundle,
+  UtxoOrdinalBundle,
+} from '@secretkeylabs/xverse-core';
 import { StyledP, StyledTab, StyledTabList } from '@ui-library/common.styled';
-import { ApiBundleV2, BundleV2, mapRareSatsAPIResponseToRareSatsV2 } from '@utils/rareSats';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -242,8 +246,8 @@ export default function CollectiblesTabs({
                 rareSatsQuery.data?.pages
                   ?.map((page) => page?.results)
                   .flat()
-                  .map((utxo: ApiBundleV2) => mapRareSatsAPIResponseToRareSatsV2(utxo))
-                  .map((bundle: BundleV2) => (
+                  .map((utxo: UtxoOrdinalBundle) => mapRareSatsAPIResponseToBundle(utxo))
+                  .map((bundle: Bundle) => (
                     <RareSatsTabGridItem
                       key={bundle.txid}
                       bundle={bundle}

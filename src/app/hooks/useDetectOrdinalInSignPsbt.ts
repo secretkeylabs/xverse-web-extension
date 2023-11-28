@@ -1,11 +1,15 @@
-import { ParsedPSBT } from '@secretkeylabs/xverse-core';
-import { BundleSatRange, BundleV2, mapRareSatsAPIResponseToRareSatsV2 } from '@utils/rareSats';
+import {
+  Bundle,
+  BundleSatRange,
+  getUtxoOrdinalBundle,
+  mapRareSatsAPIResponseToBundle,
+  ParsedPSBT,
+} from '@secretkeylabs/xverse-core';
 import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
-import { getUtxoOrdinalBundleV2 } from './queries/ordinals/useAddressRareSats';
 import useWalletSelector from './useWalletSelector';
 
-type InputsBundle = Pick<BundleV2, 'value' | 'satRanges' | 'totalExoticSats'>;
+type InputsBundle = Pick<Bundle, 'value' | 'satRanges' | 'totalExoticSats'>;
 
 const useDetectOrdinalInSignPsbt = (parsedPsbt: undefined | ParsedPSBT) => {
   const [loading, setLoading] = useState(false);
@@ -26,9 +30,9 @@ const useDetectOrdinalInSignPsbt = (parsedPsbt: undefined | ParsedPSBT) => {
       await Promise.all(
         parsedPsbt.inputs.map(async (input) => {
           try {
-            const data = await getUtxoOrdinalBundleV2(network.type, input.txid, input.index);
+            const data = await getUtxoOrdinalBundle(network.type, input.txid, input.index);
 
-            const bundle = mapRareSatsAPIResponseToRareSatsV2(data);
+            const bundle = mapRareSatsAPIResponseToBundle(data);
             satRanges.push(...bundle.satRanges);
             value += bundle.value;
             totalExoticSats += bundle.totalExoticSats;

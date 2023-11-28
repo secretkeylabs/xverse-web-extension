@@ -1,13 +1,13 @@
 import BundleIcon from '@assets/img/rareSats/satBundle.svg';
 import AssetModal from '@components/assetModal';
 import { CaretDown } from '@phosphor-icons/react';
+import { Bundle, BundleSatRange, SatRangeInscription } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { BundleSatRange, BundleV2, Inscription } from '@utils/rareSats';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
-import { BundleItem } from './bundleItem';
+import BundleItem from './bundleItem';
 
 interface BundleItemContainerProps {
   addMargin: boolean;
@@ -52,9 +52,11 @@ const Title = styled(StyledP)((props) => ({
   marginBottom: props.theme.space.xs,
 }));
 
-function SatsBundle({ bundle, title }: { bundle: BundleV2; title?: string }) {
+function SatsBundle({ bundle, title }: { bundle: Bundle; title?: string }) {
   const [showBundleDetail, setShowBundleDetail] = useState(false);
-  const [inscriptionToShow, setInscriptionToShow] = useState<Inscription | undefined>(undefined);
+  const [inscriptionToShow, setInscriptionToShow] = useState<SatRangeInscription | undefined>(
+    undefined,
+  );
 
   const { t } = useTranslation('translation');
 
@@ -62,7 +64,6 @@ function SatsBundle({ bundle, title }: { bundle: BundleV2; title?: string }) {
     <>
       {inscriptionToShow && (
         <AssetModal
-          show={!!inscriptionToShow}
           onClose={() => setInscriptionToShow(undefined)}
           inscription={inscriptionToShow}
         />
@@ -92,7 +93,7 @@ function SatsBundle({ bundle, title }: { bundle: BundleV2; title?: string }) {
             <BundleItemsContainer key={`${item.block}-${item.offset}`} addMargin={index === 0}>
               <BundleItem
                 item={item}
-                ordinalEyePressed={(inscription: Inscription) => {
+                ordinalEyePressed={(inscription: SatRangeInscription) => {
                   // show ordinal modal to show asset
                   setInscriptionToShow(inscription);
                 }}

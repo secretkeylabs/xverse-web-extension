@@ -1,6 +1,6 @@
 import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small.svg';
+import { SatRangeInscription } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { Inscription } from '@utils/rareSats';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -69,7 +69,7 @@ function ExoticSatsRow({
 }: {
   title: string;
   satAmount: number;
-  inscriptions: Inscription[];
+  inscriptions: SatRangeInscription[];
   icons: ReactNode;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'COMMON' });

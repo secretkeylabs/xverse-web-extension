@@ -610,10 +610,7 @@ function OrdinalDetailScreen() {
       </StyledP>
       <SatributesBadges isGallery={isGalleryOpen}>
         {ordinalSatributes.map((satribute, index) => {
-          const { backgroundColor } = getRareSatsColorsByRareSatsType(satribute) ?? {
-            color: 'transparent',
-            backgroundColor: 'transparent',
-          };
+          const backgroundColor = getRareSatsColorsByRareSatsType(satribute) ?? 'transparent';
           return (
             <Badge
               key={satribute}

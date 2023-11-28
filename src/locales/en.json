@@ -1074,9 +1074,8 @@
   },
   "RARE_SATS": {
     "RARITY_LABEL": {
-      "UNKNOWN": "Common/Unknown",
       "UNCOMMON": "Uncommon",
-      "COMMON": "Common",
+      "COMMON": "Common/Unknown",
       "RARE": "Rare",
       "EPIC": "Epic",
       "LEGENDARY": "Legendary",
@@ -1116,7 +1115,7 @@
       "EPIC": "The first sat of each halving epoch.",
       "RARE": "The first sat of each difficulty adjustment period.",
       "UNCOMMON": "The first sat of each block.",
-      "UNKNOWN": "A sat of unknown rarity.",
+      "COMMON": "A sat of unknown rarity.",
       "BLACK_LEGENDARY": "The last sat of each cycle.",
       "BLACK_EPIC": "The last sat of each halving epoch.",
       "BLACK_RARE": "The last sat of each difficulty adjustment period.",

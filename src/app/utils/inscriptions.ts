@@ -1,11 +1,9 @@
 import {
-  CondensedInscription,
   Inscription,
   InscriptionCollectionsData,
   isBrcTransferValid,
 } from '@secretkeylabs/xverse-core';
 import type { Color } from 'theme';
-import { BundleItem } from './rareSats';
 
 export type Brc20Status = 'valid' | 'used';
 
@@ -45,11 +43,3 @@ export const getInscriptionsTabGridItemSubText = (collection: InscriptionCollect
   }
   return collection.total_inscriptions > 1 ? `${collection.total_inscriptions} Items` : '1 Item';
 };
-
-export const mapCondensedInscriptionToBundleItem = (
-  inscription: CondensedInscription,
-): BundleItem => ({
-  inscription,
-  type: 'inscription',
-  rarity_ranking: 'COMMON', // TODO eventually want to fetch this rarity and display it
-});

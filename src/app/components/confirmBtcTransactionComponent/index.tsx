@@ -11,6 +11,7 @@ import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  Bundle,
   ErrorCodes,
   getBtcFiatEquivalent,
   ResponseError,
@@ -27,7 +28,6 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { CurrencyTypes } from '@utils/constants';
-import { BundleV2 } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -136,7 +136,7 @@ interface Props {
   isBtcSendBrowserTx?: boolean;
   currencyType?: CurrencyTypes;
   isPartOfBundle?: boolean;
-  ordinalBundle?: BundleV2;
+  ordinalBundle?: Bundle;
   holdsRareSats?: boolean;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;

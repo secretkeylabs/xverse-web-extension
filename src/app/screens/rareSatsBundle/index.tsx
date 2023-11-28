@@ -12,6 +12,7 @@ import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
+import { BundleSatRange } from '@secretkeylabs/xverse-core';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import {
   getBtcTxStatusUrl,
@@ -19,7 +20,6 @@ import {
   isInOptions,
   isLedgerAccount,
 } from '@utils/helper';
-import { BundleSatRange } from '@utils/rareSats';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -162,7 +162,7 @@ function RareSatsBundle() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
   const { network, selectedAccount, ordinalsAddress } = useWalletSelector();
-  const { selectedSatBundle: bundle } = useNftDataSelector();
+  const { selectedSatBundle: bundle, selectedOrdinal } = useNftDataSelector();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(bundle?.txid);
   const [showSendOrdinalsAlert, setShowSendOrdinalsAlert] = useState<boolean>(false);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
@@ -172,7 +172,7 @@ function RareSatsBundle() {
   useResetUserFlow('/rare-sats-bundle');
 
   const handleBackButtonClick = () => {
-    navigate('/nft-dashboard?tab=rareSats');
+    navigate(-1);
     setSelectedSatBundleDetails(null);
   };
 
@@ -213,6 +213,10 @@ function RareSatsBundle() {
 
   const isEmpty = !bundle?.satRanges?.length;
 
+  const goBackText = selectedOrdinal?.id
+    ? t('SEND.MOVE_TO_ASSET_DETAIL')
+    : t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL');
+
   return (
     <>
       {isGalleryOpen ? (
@@ -227,9 +231,7 @@ function RareSatsBundle() {
               <Button onClick={handleBackButtonClick}>
                 <>
                   <ButtonImage src={ArrowLeft} />
-                  <AssetDetailButtonText>
-                    {t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL')}
-                  </AssetDetailButtonText>
+                  <AssetDetailButtonText>{goBackText}</AssetDetailButtonText>
                 </>
               </Button>
             </BackButtonContainer>

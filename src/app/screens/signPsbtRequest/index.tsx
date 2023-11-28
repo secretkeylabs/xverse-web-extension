@@ -16,11 +16,15 @@ import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { getBtcFiatEquivalent, satsToBtc, signLedgerPSBT } from '@secretkeylabs/xverse-core';
+import {
+  Bundle,
+  getBtcFiatEquivalent,
+  satsToBtc,
+  signLedgerPSBT,
+} from '@secretkeylabs/xverse-core';
 import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
 import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { isLedgerAccount } from '@utils/helper';
-import { BundleV2 } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
@@ -359,7 +363,7 @@ function SignPsbtRequest() {
               {bundleItemsData && (
                 <SatsBundle
                   title={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
-                  bundle={bundleItemsData as BundleV2}
+                  bundle={bundleItemsData as Bundle}
                 />
               )}
               <RecipientComponent

@@ -1,9 +1,8 @@
-import { Inscription } from '@secretkeylabs/xverse-core';
-import { BundleV2 } from '@utils/rareSats';
+import { Bundle, Inscription } from '@secretkeylabs/xverse-core';
 
 export interface NftDataState {
   selectedOrdinal: Inscription | null;
-  selectedSatBundle: BundleV2 | null;
+  selectedSatBundle: Bundle | null;
   selectedSatBundleItemIndex: number | null;
 }
 

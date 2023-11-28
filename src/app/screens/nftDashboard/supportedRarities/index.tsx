@@ -1,8 +1,8 @@
 import TopRow from '@components/topRow';
 import { ArrowUpRight } from '@phosphor-icons/react';
+import { RoadArmorRareSats, Sattributes } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { BLOG_LINK } from '@utils/constants';
-import { RareSats } from '@utils/rareSats';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -53,7 +53,7 @@ const MainContainer = styled.div({
   backgroundColor: Theme.colors.elevation0,
 });
 
-const rarityTypes = RareSats.filter((rareSat) => rareSat !== 'common');
+const rarityTypes = [...RoadArmorRareSats, ...Sattributes];
 
 function SupportedRarities() {
   const navigate = useNavigate();

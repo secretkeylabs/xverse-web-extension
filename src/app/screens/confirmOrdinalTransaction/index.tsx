@@ -2,7 +2,7 @@ import { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import BottomBar from '@components/tabBar';
-import { useGetUtxoOrdinalBundleV2 } from '@hooks/queries/ordinals/useAddressRareSats';
+import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
@@ -131,7 +131,7 @@ function ConfirmOrdinalTransaction() {
     bundle: ordinalBundle,
     isPartOfABundle,
     ordinalSatributes,
-  } = useGetUtxoOrdinalBundleV2(
+  } = useGetUtxoOrdinalBundle(
     selectedOrdinal?.output,
     hasActivatedRareSatsKey,
     selectedOrdinal?.number,

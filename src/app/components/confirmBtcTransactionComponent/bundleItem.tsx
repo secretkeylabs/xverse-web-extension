@@ -1,9 +1,9 @@
 import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small.svg';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import { DotsThree, Eye } from '@phosphor-icons/react';
+import { BundleSatRange, SatRangeInscription } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { BundleSatRange, getSatLabel, Inscription } from '@utils/rareSats';
-import { useTranslation } from 'react-i18next';
+import { getSatLabel } from '@utils/rareSats';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -66,17 +66,15 @@ const BundleText = styled(StyledP)`
   width: 100%;
 `;
 
-export function BundleItem({
+function BundleItem({
   item,
   ordinalEyePressed,
   showDivider,
 }: {
   item: BundleSatRange;
-  ordinalEyePressed: (inscription: Inscription) => void;
+  ordinalEyePressed: (inscription: SatRangeInscription) => void;
   showDivider?: boolean;
 }) {
-  const { t } = useTranslation('translation');
-
   const renderedIcons = () => (
     <RangeContainer>
       <Range>
@@ -126,3 +124,5 @@ export function BundleItem({
     </Container>
   );
 }
+
+export default BundleItem;

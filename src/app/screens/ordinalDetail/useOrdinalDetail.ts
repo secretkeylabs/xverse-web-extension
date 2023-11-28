@@ -1,4 +1,4 @@
-import { useGetUtxoOrdinalBundleV2 } from '@hooks/queries/ordinals/useAddressRareSats';
+import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useCollectionMarketData';
 import useAddressInscription from '@hooks/queries/ordinals/useInscription';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
@@ -33,7 +33,7 @@ export default function useOrdinalDetail() {
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(ordinalData?.tx_id);
   const textContent = useTextOrdinalContent(ordinalData!);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
-  const { bundle, isPartOfABundle, ordinalSatributes } = useGetUtxoOrdinalBundleV2(
+  const { bundle, isPartOfABundle, ordinalSatributes } = useGetUtxoOrdinalBundle(
     ordinalData?.output,
     hasActivatedRareSatsKey,
     ordinalData?.number,
@@ -105,9 +105,10 @@ export default function useOrdinalDetail() {
   };
 
   const handleNavigationToRareSatsBundle = () => {
-    if (!bundle) {
+    if (!bundle || !ordinalData) {
       return;
     }
+    setSelectedOrdinalDetails(ordinalData);
     setSelectedSatBundleDetails(bundle);
     navigate('/nft-dashboard/rare-sats-bundle');
   };

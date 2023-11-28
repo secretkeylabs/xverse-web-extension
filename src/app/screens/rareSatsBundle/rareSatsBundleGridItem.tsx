@@ -1,6 +1,7 @@
 import ExoticSatsRow from '@components/exoticSatsRow/exoticSatsRow';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
-import { BundleSatRange, getSatLabel } from '@utils/rareSats';
+import { BundleSatRange } from '@secretkeylabs/xverse-core';
+import { getSatLabel } from '@utils/rareSats';
 import styled from 'styled-components';
 
 const RangeContainer = styled.div`

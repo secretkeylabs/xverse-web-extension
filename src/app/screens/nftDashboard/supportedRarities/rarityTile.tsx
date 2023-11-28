@@ -1,5 +1,6 @@
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
-import { getRareSatsLabelByType, RareSatsType } from '@utils/rareSats';
+import { RareSatsType } from '@secretkeylabs/xverse-core';
+import { getRareSatsLabelByType } from '@utils/rareSats';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
