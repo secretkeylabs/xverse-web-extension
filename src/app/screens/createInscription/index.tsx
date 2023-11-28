@@ -315,6 +315,7 @@ function CreateInscription() {
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
     network: network.type,
+    repetitions: repeat,
   });
 
   const {
@@ -336,6 +337,7 @@ function CreateInscription() {
     contentString: payloadType === 'PLAIN_TEXT' ? content : undefined,
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
+    repetitions: repeat,
   });
 
   const cancelCallback = () => {
