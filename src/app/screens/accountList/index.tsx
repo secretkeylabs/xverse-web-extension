@@ -6,7 +6,7 @@ import TopRow from '@components/topRow';
 import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Account } from '@secretkeylabs/xverse-core/types';
+import type { Account } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -85,10 +85,12 @@ function AccountList(): JSX.Element {
   const { createAccount, switchAccount } = useWalletReducer();
 
   const displayedAccountsList = useMemo(() => {
-    if (network.type === 'Mainnet') {
-      return [...ledgerAccountsList, ...accountsList];
-    }
-    return accountsList;
+    const networkLedgerAccounts = ledgerAccountsList.filter(
+      (account) =>
+        (account.ordinalsAddress?.startsWith('bc1') && network.type === 'Mainnet') ||
+        (account.ordinalsAddress?.startsWith('tb1') && network.type === 'Testnet'),
+    );
+    return [...networkLedgerAccounts, ...accountsList];
   }, [accountsList, ledgerAccountsList, network]);
 
   const handleAccountSelect = async (account: Account, goBack = true) => {
@@ -140,14 +142,12 @@ function AccountList(): JSX.Element {
           </AddAccountContainer>
           <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
         </ButtonContainer>
-        {network.type === 'Mainnet' && (
-          <ButtonContainer onClick={onImportLedgerAccount}>
-            <AddAccountContainer>
-              <ButtonImage src={ConnectLedger} />
-            </AddAccountContainer>
-            <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
-          </ButtonContainer>
-        )}
+        <ButtonContainer onClick={onImportLedgerAccount}>
+          <AddAccountContainer>
+            <ButtonImage src={ConnectLedger} />
+          </AddAccountContainer>
+          <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
+        </ButtonContainer>
       </ButtonsWrapper>
     </Container>
   );
