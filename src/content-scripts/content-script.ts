@@ -1,6 +1,7 @@
 import {
   AuthenticationRequestEvent,
   CreateInscriptionEvent,
+  CreateRepeatInscriptionsEvent,
   DomEventName,
   GetAddressRequestEvent,
   SendBtcRequestEvent,
@@ -174,6 +175,18 @@ document.addEventListener(DomEventName.createInscriptionRequest, ((
     payload: event.detail.createInscriptionRequest,
     urlParam: 'createInscriptionRequest',
     method: ExternalSatsMethods.createInscriptionRequest,
+  });
+}) as EventListener);
+
+// Listen for a CustomEvent (Create Repeat Inscriptions Request) coming from the web app
+document.addEventListener(DomEventName.createInscriptionRequest, ((
+  event: CreateRepeatInscriptionsEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.CreateRepeatInscriptions,
+    payload: event.detail.createRepeatInscriptionsRequest,
+    urlParam: 'createRepeatInscriptionsRequest',
+    method: ExternalSatsMethods.createRepeatInscriptionsRequest,
   });
 }) as EventListener);
 

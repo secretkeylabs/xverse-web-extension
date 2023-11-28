@@ -107,6 +107,8 @@ export enum ExternalSatsMethods {
   sendBtcResponse = 'sendBtcResponse',
   createInscriptionRequest = 'createInscriptionRequest',
   createInscriptionResponse = 'createInscriptionResponse',
+  createRepeatInscriptionsRequest = 'createRepeatInscriptionsRequest',
+  createRepeatInscriptionsResponse = 'createRepeatInscriptionsResponse',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -162,16 +164,31 @@ export type CreateInscriptionResponseMessage = Message<
   }
 >;
 
+type CreateRepeatInscriptionsRequestMessage = Message<
+  ExternalSatsMethods.createRepeatInscriptionsRequest,
+  string
+>;
+
+export type CreateRepeatInscriptionsResponseMessage = Message<
+  ExternalSatsMethods.createRepeatInscriptionsResponse,
+  {
+    createRepeatInscriptionsRequest: string;
+    createRepeatInscriptionsResponse: CreateInscriptionResponse | string;
+  }
+>;
+
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage
   | SignPsbtRequestMessage
   | SignMessageRequestMessage
   | SendBtcRequestMessage
-  | CreateInscriptionRequestMessage;
+  | CreateInscriptionRequestMessage
+  | CreateRepeatInscriptionsRequestMessage;
 
 export type SatsConnectMessageToContentScript =
   | GetAddressResponseMessage
   | SignPsbtResponseMessage
   | SignMessageResponseMessage
   | SendBtcResponseMessage
-  | CreateInscriptionResponseMessage;
+  | CreateInscriptionResponseMessage
+  | CreateRepeatInscriptionsResponseMessage;

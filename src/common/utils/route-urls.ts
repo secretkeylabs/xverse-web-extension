@@ -7,6 +7,7 @@ enum RequestsRoutes {
   SignBtcTx = '/psbt-signing-request',
   SendBtcTx = '/btc-send-request',
   CreateInscription = '/create-inscription',
+  CreateRepeatInscriptions = '/create-repeat-inscriptions',
 }
 
 export default RequestsRoutes;

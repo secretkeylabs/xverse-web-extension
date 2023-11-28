@@ -11,6 +11,7 @@ export enum DomEventName {
   signMessageRequest = 'SatsSignMessage',
   sendBtcRequest = 'SatsSendBtcRequest',
   createInscriptionRequest = 'SatsCreateInscriptionRequest',
+  createRepeatInscriptionsRequest = 'SatsCreateRepeatInscriptionsRequest',
 }
 
 export interface AuthenticationRequestEventDetails {
@@ -60,3 +61,9 @@ export interface CreateInscriptionEventDetails {
 }
 
 export type CreateInscriptionEvent = CustomEvent<CreateInscriptionEventDetails>;
+
+export interface CreateRepeatInscriptionsEventDetails {
+  createRepeatInscriptionsRequest: string;
+}
+
+export type CreateRepeatInscriptionsEvent = CustomEvent<CreateRepeatInscriptionsEventDetails>;
