@@ -947,7 +947,7 @@
         "FAILED_TO_FINALIZE": "The inscription transaction failed to finalize. Please try again or contact support.",
         "SERVER_ERROR": "An unknown server error occurred. Please try again or contact support."
       },
-      "TOO_MANY_REPEATS": "You can only repeat up to 24 times in one request"
+      "TOO_MANY_REPEATS": "You can only create up to 24 inscriptions in a single request"
     }
   },
   "ERROR_SCREEN": {
