@@ -61,7 +61,7 @@
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
     "redux-state-sync": "^3.1.4",
-    "sats-connect": "1.1.2-f8b9558",
+    "sats-connect": "1.2.0",
     "stream-browserify": "^3.0.0",
     "string-to-color": "^2.2.2",
     "styled-components": "^5.3.5",
