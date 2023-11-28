@@ -259,6 +259,10 @@ function SpeedUpTransactionScreen() {
     }
 
     if (customFeeError) {
+      if (customFeeError === t('INSUFFICIENT_FUNDS')) {
+        return;
+      }
+
       setCustomFeeError(undefined);
     }
 
