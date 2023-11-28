@@ -237,7 +237,7 @@ function CreateInscription() {
     ];
   }, [search]);
 
-  const appName = new URL(origin || '').host;
+  const appName = new URL(origin || '')?.host;
 
   const {
     contentType,
@@ -367,10 +367,10 @@ function CreateInscription() {
 
   const toFiat = (value: number | string = 0) =>
     new BigNumber(value).dividedBy(100e6).multipliedBy(btcFiatRate).toFixed(2);
-  
+
   const bundlePlusFees = new BigNumber(totalFee ?? 0)
-                .plus(new BigNumber(commitValue ?? 0).multipliedBy(repeat ?? 1))
-                .toString()
+    .plus(new BigNumber(commitValue ?? 0).multipliedBy(repeat ?? 1))
+    .toString();
 
   if (complete && revealTransactionId) {
     const onClose = () => {
@@ -418,7 +418,7 @@ function CreateInscription() {
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
         <MainContainer>
           <Title>{t('TITLE')}</Title>
-          <SubTitle>{t('SUBTITLE', { name: appName })}</SubTitle>
+          <SubTitle>{t('SUBTITLE', { name: appName ?? '' })}</SubTitle>
           <CardContainer bottomPadding>
             <CardRow>
               <StyledPillLabel>
