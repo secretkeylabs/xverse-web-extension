@@ -4,7 +4,7 @@ import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
 
 const BottomModalHeaderText = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_m,
+  ...props.theme.typography.body_bold_l,
   flex: 1,
 }));
 

@@ -22,6 +22,7 @@ const InfoContainer = styled.div((props) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   marginTop: props.theme.spacing(6),
+  minHeight: 20,
 }));
 
 const TotalFeeText = styled.span((props) => ({
@@ -83,7 +84,7 @@ const FeeContainer = styled.div({
 const ControlsContainer = styled.div`
   display: flex;
   gap: 12px;
-  margin: 32px 16px 40px;
+  margin: 24px 16px 40px;
 `;
 
 const StyledInputFeedback = styled(InputFeedback)`
@@ -108,6 +109,7 @@ export default function CustomFee({
   calculateTotalFee,
   fee,
   initialFeeRate,
+  minimumFeeRate,
   isFeeLoading,
   error,
 }: {
@@ -117,6 +119,7 @@ export default function CustomFee({
   calculateTotalFee: (feeRate: string) => Promise<number | undefined>;
   fee: string;
   initialFeeRate: string;
+  minimumFeeRate?: string;
   isFeeLoading: boolean;
   error: string;
 }) {
@@ -128,7 +131,7 @@ export default function CustomFee({
   const fetchTotalFee = async () => {
     const response = await calculateTotalFee(feeRateInput);
 
-    if (response) {
+    if (response && initialFeeRate !== feeRateInput) {
       setTotalFee(response.toString());
     }
   };
@@ -171,20 +174,24 @@ export default function CustomFee({
             />
             <InputLabel>Sats /vB</InputLabel>
           </InputContainer>
-          <StyledInputFeedback message={error} variant="danger" />
         </FeeContainer>
         <InfoContainer>
-          <TotalFeeText>
-            {t('TRANSACTION_SETTING.TOTAL_FEE')}
-            <NumericFormat
-              value={totalFee}
-              displayType="text"
-              thousandSeparator
-              suffix=" Sats"
-              renderText={(value: string) => <FeeText>{value}</FeeText>}
-            />
-          </TotalFeeText>
-          <StyledFiatAmountText fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
+          {error && <StyledInputFeedback message={error} variant="danger" />}
+          {!error && minimumFeeRate && Number(feeRateInput) >= Number(minimumFeeRate) && (
+            <>
+              <TotalFeeText>
+                {t('TRANSACTION_SETTING.TOTAL_FEE')}
+                <NumericFormat
+                  value={totalFee}
+                  displayType="text"
+                  thousandSeparator
+                  suffix=" Sats"
+                  renderText={(value: string) => <FeeText>{value}</FeeText>}
+                />
+              </TotalFeeText>
+              <StyledFiatAmountText fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
+            </>
+          )}
         </InfoContainer>
       </Container>
       <ControlsContainer>

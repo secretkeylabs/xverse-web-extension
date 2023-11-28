@@ -170,6 +170,8 @@ function SpeedUpTransactionScreen() {
 
     if (!feeSummary.enoughFunds) {
       setCustomFeeError(t('INSUFFICIENT_FUNDS'));
+    } else {
+      setCustomFeeError(undefined);
     }
 
     if (feeSummary.fee) {
@@ -482,6 +484,7 @@ function SpeedUpTransactionScreen() {
             error={customFeeError || ''}
             calculateTotalFee={calculateTotalFee}
             onClickApply={handleApplyCustomFee}
+            minimumFeeRate={rbfTxSummary?.minimumRbfFeeRate?.toString()}
           />
 
           <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
