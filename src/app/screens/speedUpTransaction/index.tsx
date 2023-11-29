@@ -15,9 +15,9 @@ import {
   currencySymbolMap,
   getBtcFiatEquivalent,
   rbf,
+  RecommendedFeeResponse,
   Transport as TransportType,
 } from '@secretkeylabs/xverse-core';
-import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/api/esplora';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
