@@ -15,9 +15,14 @@ import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { getBtcFiatEquivalent, satsToBtc, signLedgerPSBT } from '@secretkeylabs/xverse-core';
-import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
-import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
+import {
+  getBtcFiatEquivalent,
+  parsePsbt,
+  psbtBase64ToHex,
+  satsToBtc,
+  signLedgerPSBT,
+  Transport as TransportType,
+} from '@secretkeylabs/xverse-core';
 import { isLedgerAccount } from '@utils/helper';
 import { BundleItem } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';

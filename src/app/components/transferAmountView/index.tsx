@@ -1,6 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
-import { getFiatEquivalent } from '@secretkeylabs/xverse-core/transactions';
+import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { getTicker } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';

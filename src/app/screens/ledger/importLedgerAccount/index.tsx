@@ -10,8 +10,8 @@ import {
   importNativeSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
+  LedgerErrors,
 } from '@secretkeylabs/xverse-core';
-import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -256,7 +256,11 @@ function ImportLedger(): JSX.Element {
       setCurrentStep(ImportLedgerSteps.ADD_ADDRESS);
       setIsButtonDisabled(true);
       if (isBitcoinSelected) {
-        const { btcCreds, ordinalsCreds, newAccountId } = await importBtcAccounts(true);
+        const importedBtcAccounts = await importBtcAccounts(true);
+        if (!importedBtcAccounts) {
+          throw new Error('No accounts');
+        }
+        const { btcCreds, ordinalsCreds, newAccountId } = importedBtcAccounts;
         await saveAddressToWallet({ btcCreds, ordinalsCreds, newAccountId });
       }
     } catch (err) {
@@ -298,10 +302,11 @@ function ImportLedger(): JSX.Element {
       }
       handleClickNext();
       if (isBitcoinSelected) {
-        const { btcCreds, ordinalsCreds, newAccountId } = await importBtcAccounts(
-          true,
-          masterFingerPrint,
-        );
+        const importedBtcAccounts = await importBtcAccounts(true, masterFingerPrint);
+        if (!importedBtcAccounts) {
+          throw new Error('No accounts');
+        }
+        const { btcCreds, ordinalsCreds, newAccountId } = importedBtcAccounts;
         await saveAddressToWallet({ btcCreds, ordinalsCreds, masterFingerPrint, newAccountId });
       } else {
         const stacksCreds = await importStxAccounts(true);

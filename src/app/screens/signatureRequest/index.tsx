@@ -18,8 +18,7 @@ import useSignatureRequest, {
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
-import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
+import { bip0322Hash, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { bytesToHex } from '@stacks/transactions';
 import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
@@ -223,7 +222,7 @@ function SignatureRequest(): JSX.Element {
       if (!isSignMessageBip322) {
         const signature = await handleMessageSigning({
           message: payload.message,
-          domain: domain || undefined,
+          domain: (domain as any) || undefined, // TODO fix type error
         });
         if (signature) {
           finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: signature });

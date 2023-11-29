@@ -1,8 +1,11 @@
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getCoinMetaData } from '@secretkeylabs/xverse-core';
-import { getCoinsInfo, getFtData } from '@secretkeylabs/xverse-core/api';
-import { FungibleToken } from '@secretkeylabs/xverse-core/types';
+import {
+  FungibleToken,
+  getCoinMetaData,
+  getCoinsInfo,
+  getFtData,
+} from '@secretkeylabs/xverse-core';
 import { setCoinDataAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { handleRetries, InvalidParamsError } from '@utils/query';

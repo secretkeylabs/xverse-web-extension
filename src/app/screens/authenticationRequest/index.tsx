@@ -12,7 +12,11 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { createAuthResponse, handleLedgerStxJWTAuth } from '@secretkeylabs/xverse-core';
+import {
+  AuthRequest,
+  createAuthResponse,
+  handleLedgerStxJWTAuth,
+} from '@secretkeylabs/xverse-core';
 import { AddressVersion, publicKeyToAddress, StacksMessageType } from '@stacks/transactions';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
@@ -82,7 +86,7 @@ function AuthenticationRequest() {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
-  const authRequest = decodeToken(authRequestToken);
+  const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
   const { selectedAccount } = useWalletSelector();
   const { getSeed } = useSeedVault();
   const isDisabled = !selectedAccount?.stxAddress;

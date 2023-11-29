@@ -23,14 +23,14 @@ import { useTransition } from '@react-spring/web';
 import {
   broadcastSignedTransaction,
   microstacksToStx,
+  Recipient,
   satsToBtc,
   signLedgerMixedBtcTransaction,
   signLedgerNativeSegwitBtcTransaction,
   signLedgerStxTransaction,
+  StacksRecipient,
+  UTXO,
 } from '@secretkeylabs/xverse-core';
-import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import { StacksRecipient } from '@secretkeylabs/xverse-core/transactions/stx';
-import { UTXO } from '@secretkeylabs/xverse-core/types';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { getBtcTxStatusUrl, getStxTxStatusUrl, getTruncatedAddress } from '@utils/helper';
 import BigNumber from 'bignumber.js';
