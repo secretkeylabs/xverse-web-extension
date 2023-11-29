@@ -797,6 +797,7 @@
     "MED_PRIORITY": "Medium priority",
     "CUSTOM": "Custom",
     "INSUFFICIENT_FUNDS": "Insufficient funds",
+    "INSUFFICIENT_FEE": "Insufficient fee",
     "MANUAL_SETTING": "Manual setting",
     "TX_FEE_UPDATED": "Transaction fee updated",
     "FEE_TOO_LOW": "The minimum fee is {{minimumFee}}"

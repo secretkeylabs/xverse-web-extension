@@ -11,10 +11,13 @@ import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
-import { getBtcFiatEquivalent, rbf } from '@secretkeylabs/xverse-core';
-import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
+import {
+  currencySymbolMap,
+  getBtcFiatEquivalent,
+  rbf,
+  Transport as TransportType,
+} from '@secretkeylabs/xverse-core';
 import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/api/esplora';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
@@ -83,10 +86,9 @@ function SpeedUpTransactionScreen() {
   });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isLedgerConnectButtonDisabled, setIsLedgerConnectButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
-  const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
@@ -99,9 +101,7 @@ function SpeedUpTransactionScreen() {
     }
 
     try {
-      if (!isLoading) {
-        setIsLoading(true);
-      }
+      setIsLoading(true);
       const rbfTx = new rbf.RbfTransaction(transaction, {
         ...selectedAccount,
         accountType: accountType || 'software',
@@ -202,7 +202,7 @@ function SpeedUpTransactionScreen() {
       console.error(err);
 
       if (err?.response?.data && err?.response?.data.includes('insufficient fee')) {
-        toast.error('Insufficient fee');
+        toast.error(t('INSUFFICIENT_FEE'));
       }
     }
   };
@@ -226,25 +226,26 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
-    setIsButtonDisabled(true);
+    setIsLedgerConnectButtonDisabled(true);
     const transport = await Transport.create();
     if (!transport) {
       setIsConnectSuccess(false);
       setIsConnectFailed(true);
-      setIsButtonDisabled(false);
+      setIsLedgerConnectButtonDisabled(false);
+      return;
     }
 
     setIsConnectSuccess(true);
     await ledgerDelay(1500);
     setCurrentStepIndex(1);
     try {
-      const response = await signAndBroadcastTx(transport);
+      await signAndBroadcastTx(transport);
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
     } finally {
       await transport.close();
-      setIsButtonDisabled(false);
+      setIsLedgerConnectButtonDisabled(false);
     }
   };
 
@@ -521,7 +522,7 @@ function SpeedUpTransactionScreen() {
                 titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
                 textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
                 imageDefault={ledgerConnectDefaultIcon}
-                isConnectSuccess={isTxApproved}
+                isConnectSuccess={false}
                 isConnectFailed={isTxRejected}
               />
             )}
@@ -531,8 +532,8 @@ function SpeedUpTransactionScreen() {
                 text={signatureRequestTranslate(
                   isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
                 )}
-                disabled={isButtonDisabled}
-                processing={isButtonDisabled}
+                disabled={isLedgerConnectButtonDisabled}
+                processing={isLedgerConnectButtonDisabled}
               />
               <ActionButton
                 onPress={cancelCallback}
