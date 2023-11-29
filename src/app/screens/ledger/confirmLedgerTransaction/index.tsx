@@ -5,7 +5,7 @@ import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ordinals_icon_big.svg';
 import { LedgerTransactionType } from '@common/types/ledger';
-import { ledgerDelay } from '@common/utils/ledger';
+import { delay } from '@common/utils/ledger';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView, {
@@ -121,7 +121,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
 
       const { value: txHex } = await result.next();
       setIsFinalTxApproved(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       const transactionId = await btcClient.sendRawTransaction(txHex || taprootSignedValue);
       setTxId(transactionId.tx.hash);
       setCurrentStep(Steps.TransactionConfirmed);
@@ -144,7 +144,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         feeRate: feeRateInput?.toString(),
       });
       setIsFinalTxApproved(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       const transactionId = await btcClient.sendRawTransaction(result);
       setTxId(transactionId.tx.hash);
       setCurrentStep(Steps.TransactionConfirmed);
@@ -165,7 +165,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
         addressIndex,
       });
       setIsFinalTxApproved(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       const transactionHash = await broadcastSignedTransaction(result, selectedNetwork);
       setTxId(transactionHash);
       setCurrentStep(Steps.TransactionConfirmed);
@@ -207,7 +207,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
       }
 
       setIsConnectSuccess(true);
-      await ledgerDelay(1500);
+      await delay(1500);
 
       if (
         type === 'ORDINALS' &&

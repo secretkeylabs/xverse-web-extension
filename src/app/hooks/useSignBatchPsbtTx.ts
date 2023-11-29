@@ -1,50 +1,32 @@
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { InputToSign, psbtBase64ToHex, signPsbt } from '@secretkeylabs/xverse-core';
+import { InputToSign, signPsbt } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
-import { SignTransactionOptions } from 'sats-connect';
-import useBtcClient from './useBtcClient';
+import { SignMultiplePsbtPayload, SignMultipleTransactionOptions } from 'sats-connect';
 import useSeedVault from './useSeedVault';
 
-const useSignPsbtTx = () => {
+const useSignBatchPsbtTx = () => {
   const { accountsList, network } = useWalletSelector();
   const { search } = useLocation();
   const { getSeed } = useSeedVault();
   const params = new URLSearchParams(search);
-  const requestToken = params.get('signPsbtRequest') ?? '';
-  const request = decodeToken(requestToken) as any as SignTransactionOptions;
+  const requestToken = params.get('signBatchPsbtRequest') ?? '';
+  const request = decodeToken(requestToken) as any as SignMultipleTransactionOptions;
   const tabId = params.get('tabId') ?? '0';
-  const btcClient = useBtcClient();
 
-  const confirmSignPsbt = async () => {
+  const confirmSignPsbt = async (psbt: SignMultiplePsbtPayload) => {
+    const txId = '';
     const seedPhrase = await getSeed();
     const signingResponse = await signPsbt(
       seedPhrase,
       accountsList,
-      request.payload.inputsToSign,
-      request.payload.psbtBase64,
-      request.payload.broadcast,
+      psbt.inputsToSign,
+      psbt.psbtBase64,
+      false,
       network.type,
     );
-    let txId: string = '';
-    if (request.payload.broadcast) {
-      const txHex = psbtBase64ToHex(signingResponse);
-      const response = await btcClient.sendRawTransaction(txHex);
-      txId = response.tx.hash;
-    }
-    const signingMessage = {
-      source: MESSAGE_SOURCE,
-      method: ExternalSatsMethods.signPsbtResponse,
-      payload: {
-        signPsbtRequest: requestToken,
-        signPsbtResponse: {
-          psbtBase64: signingResponse,
-          txId,
-        },
-      },
-    };
-    chrome.tabs.sendMessage(+tabId, signingMessage);
+
     return {
       txId,
       signingResponse,
@@ -54,8 +36,8 @@ const useSignPsbtTx = () => {
   const cancelSignPsbt = () => {
     const signingMessage = {
       source: MESSAGE_SOURCE,
-      method: ExternalSatsMethods.signPsbtResponse,
-      payload: { signPsbtRequest: requestToken, signPsbtResponse: 'cancel' },
+      method: ExternalSatsMethods.signBatchPsbtResponse,
+      payload: { signBatchPsbtRequest: requestToken, signBatchPsbtResponse: 'cancel' },
     };
     chrome.tabs.sendMessage(+tabId, signingMessage);
   };
@@ -80,4 +62,4 @@ const useSignPsbtTx = () => {
   };
 };
 
-export default useSignPsbtTx;
+export default useSignBatchPsbtTx;

@@ -1,7 +1,7 @@
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import stxIcon from '@assets/img/ledger/stx_icon.svg';
-import { ledgerDelay } from '@common/utils/ledger';
+import { delay } from '@common/utils/ledger';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import LedgerFailView from '@components/ledger/failLedgerView';
@@ -74,7 +74,7 @@ function AddStxAddress(): JSX.Element {
       stxPublicKey: stacksCreds?.publicKey || '',
     };
     await updateLedgerAccounts(ledgerAccount);
-    await ledgerDelay(1000);
+    await delay(1000);
     setCurrentStep(Steps.AddressAdded);
     setIsButtonDisabled(false);
   };
@@ -123,7 +123,7 @@ function AddStxAddress(): JSX.Element {
       }
 
       setIsConnectSuccess(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       handleClickNext();
 
       const stacksCreds = await importStxAccounts(true);
