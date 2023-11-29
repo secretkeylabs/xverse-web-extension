@@ -246,7 +246,7 @@ export default function CollectiblesTabs({
                 text={t('LOAD_MORE')}
                 processing={rareSatsQuery.isFetchingNextPage}
                 disabled={rareSatsQuery.isFetchingNextPage}
-                onPress={rareSatsQuery.fetchNextPage}
+                onPress={() => rareSatsQuery.fetchNextPage()}
               />
             </LoadMoreButtonContainer>
           )}
