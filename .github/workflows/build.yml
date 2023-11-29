@@ -7,24 +7,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           always-auth: true
           node-version: '18.x'
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
+        run: npm ci
       - name: Test
-        run: npx eslint .
-      # run: npx tsc --noEmit
-      # run: npm test --passWithNoTests
+        run: |
+          npx eslint .
+          npx tsc --noEmit
+          npm test
       - name: Build
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}

@@ -32,7 +32,11 @@ export default function TransactionRecipient(props: TransactionRecipientProps): 
     return <RecipientAddress>{formatAddress(transaction.recipientAddress ?? '')}</RecipientAddress>;
   }
   if (isBrc20Transaction(transaction)) {
-    return <RecipientAddress>{formatAddress(transaction.to ?? '')}</RecipientAddress>;
+    return (
+      <RecipientAddress>
+        {formatAddress(transaction.transfer_send?.to_address ?? '')}
+      </RecipientAddress>
+    );
   }
   if (transaction.txType === 'token_transfer' || transaction.txType === 'coinbase') {
     return (

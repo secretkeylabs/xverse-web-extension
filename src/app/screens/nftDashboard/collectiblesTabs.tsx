@@ -171,7 +171,7 @@ export default function CollectiblesTabs({
       )}
       {hasActivatedOrdinalsKey && (
         <TabPanel>
-          {inscriptionsQuery.isLoading ? (
+          {inscriptionsQuery.isInitialLoading ? (
             <SkeletonLoader isGalleryOpen={isGalleryOpen} />
           ) : (
             <>
@@ -186,7 +186,7 @@ export default function CollectiblesTabs({
         </TabPanel>
       )}
       <TabPanel>
-        {stacksNftsQuery.isLoading ? (
+        {stacksNftsQuery.isInitialLoading ? (
           <SkeletonLoader isGalleryOpen={isGalleryOpen} />
         ) : (
           <>
@@ -224,7 +224,7 @@ export default function CollectiblesTabs({
           {showNoBundlesNotice && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
 
           {!!rareSatsQuery.error && <StyledWrenchErrorMessage />}
-          {rareSatsQuery.isLoading ? (
+          {rareSatsQuery.isInitialLoading ? (
             <SkeletonLoader isGalleryOpen={isGalleryOpen} />
           ) : (
             <GridContainer isGalleryOpen={isGalleryOpen}>

@@ -1,7 +1,7 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
 import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
-import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core/currency';
+import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';

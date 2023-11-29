@@ -2,20 +2,20 @@ import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  ErrorCodes,
   createBrc20TransferOrder,
+  ErrorCodes,
   getBtcFiatEquivalent,
+  Recipient,
   signBtcTransaction,
 } from '@secretkeylabs/xverse-core';
-import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import useSeedVault from '@hooks/useSeedVault';
 import Brc20TransferForm from './brc20TransferForm';
 import Brc20TransferInfo from './brc20TransferInfo';
 

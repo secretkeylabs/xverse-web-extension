@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { StacksTransaction } from '@secretkeylabs/xverse-core';
-import { AlexSDK } from 'alex-sdk';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { StacksTransaction } from '@secretkeylabs/xverse-core';
+import { useQuery } from '@tanstack/react-query';
+import { AlexSDK } from 'alex-sdk';
+import { useEffect, useRef, useState } from 'react';
 
 const useAlexSponsorSwapEnabledQuery = (alexSDK: AlexSDK) =>
   useQuery({
@@ -38,7 +38,7 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
   if (stxNonce > upcomingPendingTransactionNonce) {
     hasPendingTransactions = false;
   } else {
-    hasPendingTransactions = stxPendingTxData?.pendingTransactions?.length > 0;
+    hasPendingTransactions = (stxPendingTxData?.pendingTransactions?.length ?? 0) > 0;
   }
   return {
     isSponsored: userOverrideSponsorValue && isServiceRunning && !hasPendingTransactions,

@@ -1,5 +1,5 @@
+import { BitcoinEsploraApiProvider } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo } from 'react';
-import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
 import useWalletSelector from './useWalletSelector';
 
 const useBtcClient = () => {

@@ -1,25 +1,25 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useTransition } from '@react-spring/web';
+import { getDeviceNewAccountIndex, getNewAccountId, ledgerDelay } from '@common/utils/ledger';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { useTransition } from '@react-spring/web';
 import {
   Account,
   getMasterFingerPrint,
   importNativeSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
+  LedgerErrors,
 } from '@secretkeylabs/xverse-core';
-import useWalletReducer from '@hooks/useWalletReducer';
-import { getDeviceNewAccountIndex, getNewAccountId, ledgerDelay } from '@common/utils/ledger';
-import useWalletSelector from '@hooks/useWalletSelector';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
-import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
-import { ImportLedgerSteps, LedgerLiveOptions } from './types';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import StepControls from './stepControls';
 import Steps from './steps';
+import { ImportLedgerSteps, LedgerLiveOptions } from './types';
 
-import { Container, OnBoardingContentContainer, OnBoardingActionsContainer } from './index.styled';
+import { Container, OnBoardingActionsContainer, OnBoardingContentContainer } from './index.styled';
 
 export interface Credential {
   publicKey: string;
@@ -256,7 +256,11 @@ function ImportLedger(): JSX.Element {
       setCurrentStep(ImportLedgerSteps.ADD_ADDRESS);
       setIsButtonDisabled(true);
       if (isBitcoinSelected) {
-        const { btcCreds, ordinalsCreds, newAccountId } = await importBtcAccounts(true);
+        const importedBtcAccounts = await importBtcAccounts(true);
+        if (!importedBtcAccounts) {
+          throw new Error('No accounts');
+        }
+        const { btcCreds, ordinalsCreds, newAccountId } = importedBtcAccounts;
         await saveAddressToWallet({ btcCreds, ordinalsCreds, newAccountId });
       }
     } catch (err) {
@@ -298,10 +302,11 @@ function ImportLedger(): JSX.Element {
       }
       handleClickNext();
       if (isBitcoinSelected) {
-        const { btcCreds, ordinalsCreds, newAccountId } = await importBtcAccounts(
-          true,
-          masterFingerPrint,
-        );
+        const importedBtcAccounts = await importBtcAccounts(true, masterFingerPrint);
+        if (!importedBtcAccounts) {
+          throw new Error('No accounts');
+        }
+        const { btcCreds, ordinalsCreds, newAccountId } = importedBtcAccounts;
         await saveAddressToWallet({ btcCreds, ordinalsCreds, masterFingerPrint, newAccountId });
       } else {
         const stacksCreds = await importStxAccounts(true);

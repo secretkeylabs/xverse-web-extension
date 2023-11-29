@@ -12,17 +12,15 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   ErrorCodes,
   getBtcFiatEquivalent,
+  Recipient,
   ResponseError,
   satsToBtc,
   signBtcTransaction,
-  UTXO,
-} from '@secretkeylabs/xverse-core';
-import {
-  Recipient,
   SignedBtcTx,
   signNonOrdinalBtcSendTransaction,
   signOrdinalSendTransaction,
-} from '@secretkeylabs/xverse-core/transactions/btc';
+  UTXO,
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { CurrencyTypes } from '@utils/constants';
