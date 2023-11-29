@@ -17,7 +17,7 @@ import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/ap
 import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -93,7 +93,7 @@ function SpeedUpTransactionScreen() {
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
 
-  const fetchRbfData = async () => {
+  const fetchRbfData = useCallback(async () => {
     if (!selectedAccount || !id || !transaction) {
       return;
     }
@@ -127,11 +127,20 @@ function SpeedUpTransactionScreen() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [
+    selectedAccount,
+    id,
+    transaction,
+    accountType,
+    network.type,
+    seedVault,
+    btcClient,
+    isLoading,
+  ]);
 
   useEffect(() => {
     fetchRbfData();
-  }, [selectedAccount, id, transaction]);
+  }, [selectedAccount, id, transaction, fetchRbfData]);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
