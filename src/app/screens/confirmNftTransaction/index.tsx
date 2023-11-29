@@ -6,10 +6,10 @@ import RecipientComponent from '@components/recipientComponent';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useNftDetail from '@hooks/queries/useNftDetail';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useNftDetail from '@hooks/queries/useNftDetail';
 import useWalletSelector from '@hooks/useWalletSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
 import { broadcastSignedTransaction, StacksTransaction } from '@secretkeylabs/xverse-core';
@@ -71,7 +71,7 @@ function ConfirmNftTransaction() {
   const { id } = useParams();
 
   const nftDetailQuery = useNftDetail(id!);
-  const nft = nftDetailQuery.data?.data
+  const nft = nftDetailQuery.data?.data;
 
   const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
   const unsignedTx = deserializeTransaction(unsignedTxHex);
