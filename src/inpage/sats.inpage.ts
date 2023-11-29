@@ -33,6 +33,7 @@ const isValidEvent = (event: MessageEvent, method: SatsConnectMessageToContentSc
   return correctSource && correctMethod && !!data.payload;
 };
 
+// @ts-ignore
 const SatsMethodsProvider: BitcoinProvider = {
   connect: async (btcAddressRequest): Promise<GetAddressResponse> => {
     const event = new CustomEvent<GetAddressRequestEventDetails>(DomEventName.getAddressRequest, {
