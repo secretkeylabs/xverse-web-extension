@@ -5,7 +5,7 @@ import Separator from '@components/separator';
 import TopRow from '@components/topRow';
 import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
-import useWalletSelector from '@hooks/useWalletSelect
+import useWalletSelector from '@hooks/useWalletSelector';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
