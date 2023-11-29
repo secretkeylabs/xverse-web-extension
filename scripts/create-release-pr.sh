@@ -25,7 +25,7 @@ git push --set-upstream origin $BRANCH
 
 echo -e "\n\n--- Create draft release for $TAG ---\n\n"
 
-gh api \                                                                                                                                                                                                                                                 ─╯
+gh api \
   --method POST \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
