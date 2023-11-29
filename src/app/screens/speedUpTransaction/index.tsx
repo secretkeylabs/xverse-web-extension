@@ -127,20 +127,11 @@ function SpeedUpTransactionScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [
-    selectedAccount,
-    id,
-    transaction,
-    accountType,
-    network.type,
-    seedVault,
-    btcClient,
-    isLoading,
-  ]);
+  }, [selectedAccount, id, transaction, accountType, network.type, seedVault, btcClient]);
 
   useEffect(() => {
     fetchRbfData();
-  }, [selectedAccount, id, transaction, fetchRbfData]);
+  }, [fetchRbfData]);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
