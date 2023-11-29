@@ -107,7 +107,7 @@ export default function useOrdinalDetail() {
     if (!bundle) {
       return;
     }
-    setSelectedSatBundleDetails(bundle);
+    // setSelectedSatBundleDetails(bundle);
     navigate('/nft-dashboard/rare-sats-bundle');
   };
 

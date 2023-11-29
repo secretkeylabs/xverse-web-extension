@@ -1,5 +1,9 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getAddressUtxoOrdinalBundles, getUtxoOrdinalBundle } from '@secretkeylabs/xverse-core';
+import {
+  getAddressUtxoOrdinalBundles,
+  getUtxoOrdinalBundle,
+  mapRareSatsAPIResponseToBundle,
+} from '@secretkeylabs/xverse-core';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { handleRetries, InvalidParamsError } from '@utils/query';
 import { mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
@@ -58,11 +62,11 @@ export const useGetUtxoOrdinalBundle = (output?: string, shouldMakeTheCall?: boo
     retry: handleRetries,
     staleTime: 1 * 60 * 1000, // 1 min
   });
-  const bundle = data?.txid ? mapRareSatsAPIResponseToRareSats(data) : undefined;
+  const bundle = data?.txid ? mapRareSatsAPIResponseToBundle(data) : undefined;
 
   return {
     bundle,
-    isPartOfABundle: (bundle?.items ?? []).length > 1,
+    isPartOfABundle: false,
     isLoading,
   };
 };

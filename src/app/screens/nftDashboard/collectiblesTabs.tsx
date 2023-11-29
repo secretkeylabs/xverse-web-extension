@@ -1,5 +1,6 @@
 import ActionButton from '@components/button';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
+import { mapRareSatsAPIResponseToBundle, UtxoBundleResponse } from '@secretkeylabs/xverse-core';
 import { StyledP, StyledTab, StyledTabList } from '@ui-library/common.styled';
 import { ApiBundle, Bundle, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
 import { useEffect, useState } from 'react';
@@ -228,15 +229,15 @@ export default function CollectiblesTabs({
             <SkeletonLoader isGalleryOpen={isGalleryOpen} />
           ) : (
             <GridContainer isGalleryOpen={isGalleryOpen}>
-              {!rareSatsQuery.error &&
+              {/* {!rareSatsQuery.error &&
                 !rareSatsQuery.isLoading &&
                 rareSatsQuery.data?.pages
                   ?.map((page) => page?.results)
                   .flat()
-                  .map((utxo: ApiBundle) => mapRareSatsAPIResponseToRareSats(utxo))
+                  .map((utxo: UtxoBundleResponse) => mapRareSatsAPIResponseToBundle(utxo))
                   .map((bundle: Bundle) => (
                     <RareSatsTabGridItem key={bundle.txid} bundle={bundle} />
-                  ))}
+                  ))} */}
             </GridContainer>
           )}
           {rareSatsQuery.hasNextPage && (
