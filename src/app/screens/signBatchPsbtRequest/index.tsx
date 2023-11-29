@@ -306,7 +306,7 @@ function SignBatchPsbtRequest() {
   };
 
   const totalNetAmount = parsedPsbts.reduce(
-    (sum, psbt) => (psbt ? sum.plus(new BigNumber(psbt.netAmount)) : sum),
+    (sum, psbt) => (psbt ? sum.plus(new BigNumber(psbt.netAmount.toString())) : sum),
     new BigNumber(0),
   );
 
@@ -428,9 +428,13 @@ function SignBatchPsbtRequest() {
             ))}
 
             <RecipientComponent
-              value={`${satsToBtc(new BigNumber(parsedPsbts[currentPsbtIndex]?.netAmount))
-                .toString()
-                .replace('-', '')}`}
+              value={`${
+                parsedPsbts[currentPsbtIndex]?.netAmount !== undefined
+                  ? satsToBtc(new BigNumber(parsedPsbts[currentPsbtIndex]!.netAmount.toString()))
+                      .toString()
+                      .replace('-', '')
+                  : ''
+              }`}
               currencyType="BTC"
               title={t('AMOUNT')}
               heading={
