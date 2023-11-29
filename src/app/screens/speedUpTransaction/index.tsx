@@ -14,6 +14,7 @@ import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-ico
 import {
   currencySymbolMap,
   getBtcFiatEquivalent,
+  mempoolApi,
   rbf,
   RecommendedFeeResponse,
   Transport as TransportType,
@@ -119,7 +120,7 @@ function SpeedUpTransactionScreen() {
       );
       setRbfTxSummary(rbfTransactionSummary);
 
-      const mempoolFees = await btcClient.getRecommendedFees();
+      const mempoolFees = await mempoolApi.getRecommendedFees(network.type);
       setRecommendedFees(mempoolFees);
 
       const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
@@ -129,7 +130,7 @@ function SpeedUpTransactionScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedAccount, id, transaction, accountType, network.type, seedVault, btcClient]);
+  }, [selectedAccount, id, transaction, accountType, network.type, seedVault]);
 
   useEffect(() => {
     fetchRbfData();
