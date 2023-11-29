@@ -157,6 +157,11 @@ function SpeedUpTransactionScreen() {
   };
 
   const calculateTotalFee = async (feeRate: string) => {
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
+      return;
+    }
+
     const feeSummary: {
       enoughFunds: boolean;
       fee?: number;

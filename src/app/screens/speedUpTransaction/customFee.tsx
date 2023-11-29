@@ -129,14 +129,10 @@ export default function CustomFee({
 }) {
   const { t } = useTranslation('translation');
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
-  const [feeRateInput, setFeeRateInput] = useState(feeRate || initialFeeRate);
+  const [feeRateInput, setFeeRateInput] = useState(feeRate || minimumFeeRate || initialFeeRate);
   const [totalFee, setTotalFee] = useState(fee || initialTotalFee);
 
   const fetchTotalFee = async () => {
-    if (initialFeeRate === feeRateInput) {
-      return;
-    }
-
     const response = await calculateTotalFee(feeRateInput);
 
     if (response) {
