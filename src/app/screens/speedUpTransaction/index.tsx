@@ -1,6 +1,6 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import { ledgerDelay } from '@common/utils/ledger';
+import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -225,7 +225,7 @@ function SpeedUpTransactionScreen() {
     }
 
     setIsConnectSuccess(true);
-    await ledgerDelay(1500);
+    await delay(1500);
     setCurrentStepIndex(1);
     try {
       await signAndBroadcastTx(transport);
@@ -488,8 +488,8 @@ function SpeedUpTransactionScreen() {
             <CustomFee
               visible={showCustomFee}
               onClose={handleCloseCustomFee}
-              initialFeeRate={rbfTxSummary?.currentFeeRate.toString()!}
-              initialTotalFee={rbfTxSummary?.currentFee.toString()!}
+              initialFeeRate={rbfTxSummary?.minimumRbfFeeRate.toString()!}
+              initialTotalFee={rbfTxSummary?.minimumRbfFee.toString()!}
               feeRate={customFeeRate}
               fee={customTotalFee}
               isFeeLoading={false}
