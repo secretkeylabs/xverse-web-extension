@@ -7,7 +7,6 @@ import {
   HIRO_TESTNET_DEFAULT,
 } from '@secretkeylabs/xverse-core';
 
-export const BNS_CONTRACT = 'SP000000000000000000002Q6VF78.bns::names';
 export const GAMMA_URL = 'https://gamma.io/';
 export const TERMS_LINK = 'https://xverse.app/terms';
 export const PRIVACY_POLICY_LINK = 'https://xverse.app/privacy';
