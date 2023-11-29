@@ -1,6 +1,5 @@
 import Error from '@assets/img/ErrorBoundary/error.svg';
 import { SUPPORT_EMAIL } from '@utils/constants';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouteError } from 'react-router-dom';
 import styled from 'styled-components';
@@ -58,7 +57,7 @@ function ErrorBoundary() {
       <SupportText>
         {t('SUPPORT')} <span>{SUPPORT_EMAIL}</span>
       </SupportText>
-      <ErrorContent>{`${t('ERROR_PREFIX')}${' '}${error.message}`}</ErrorContent>
+      <ErrorContent>{`${t('ERROR_PREFIX')}${' '}${(error as any).message}`}</ErrorContent>
     </ScreenContainer>
   );
 }

@@ -2,7 +2,7 @@ import ChevronIcon from '@assets/img/swap/chevron.svg';
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import BottomModal from '@components/bottomModal';
 import { SlippageModalContent } from '@screens/swap/slippageModal';
-import { UseSwap } from '@screens/swap/useSwap';
+import { UseSwap } from '@screens/swap/types';
 import { SUPPORT_URL_TAB_TARGET, SWAP_SPONSOR_DISABLED_SUPPORT_URL } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

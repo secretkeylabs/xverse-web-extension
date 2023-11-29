@@ -4,7 +4,7 @@ import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getMoonPaySignedUrl } from '@secretkeylabs/xverse-core/api';
+import { getMoonPaySignedUrl } from '@secretkeylabs/xverse-core';
 import { MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL } from '@utils/constants';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

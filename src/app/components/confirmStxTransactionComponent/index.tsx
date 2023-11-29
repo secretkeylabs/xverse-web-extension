@@ -319,10 +319,11 @@ function ConfirmStxTransationComponent({
 
         {children}
         <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
-        {initialStxTransactions[0]?.payload?.amount && (
+        {/* TODO fix type error as any */}
+        {(initialStxTransactions[0]?.payload as any)?.amount && (
           <TransferFeeView
             fee={microstacksToStx(
-              getFee().plus(new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10))),
+              getFee().plus(new BigNumber((initialStxTransactions[0]?.payload as any).amount?.toString(10))),
             )}
             currency="STX"
             title={t('TOTAL')}

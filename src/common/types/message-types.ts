@@ -1,5 +1,9 @@
 import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
-import { CreateInscriptionResponse, GetAddressResponse, SignPsbtResponse } from 'sats-connect';
+import {
+  CreateInscriptionResponse,
+  GetAddressResponse,
+  SignTransactionResponse,
+} from 'sats-connect';
 
 export const MESSAGE_SOURCE = 'xverse-wallet' as const;
 
@@ -125,7 +129,7 @@ export type SignPsbtResponseMessage = Message<
   ExternalSatsMethods.signPsbtResponse,
   {
     signPsbtRequest: string;
-    signPsbtResponse: SignPsbtResponse | string;
+    signPsbtResponse: SignTransactionResponse | string;
   }
 >;
 

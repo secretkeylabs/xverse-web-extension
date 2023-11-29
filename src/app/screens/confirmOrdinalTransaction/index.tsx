@@ -12,7 +12,7 @@ import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core/types';
+import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { getBundleId, getBundleSubText } from '@utils/rareSats';

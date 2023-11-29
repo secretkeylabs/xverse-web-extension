@@ -1,5 +1,8 @@
-import { getBtcFiatEquivalent, getFiatEquivalent } from '@secretkeylabs/xverse-core';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import {
+  currencySymbolMap,
+  getBtcFiatEquivalent,
+  getFiatEquivalent,
+} from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';

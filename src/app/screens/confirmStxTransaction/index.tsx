@@ -12,12 +12,14 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getStxFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core/currency';
 import {
   addressToString,
   broadcastSignedTransaction,
-} from '@secretkeylabs/xverse-core/transactions';
-import { StacksTransaction, TokenTransferPayload } from '@secretkeylabs/xverse-core/types';
+  getStxFiatEquivalent,
+  microstacksToStx,
+  StacksTransaction,
+  TokenTransferPayload,
+} from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';

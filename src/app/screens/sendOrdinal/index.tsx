@@ -9,13 +9,11 @@ import {
   getBtcFiatEquivalent,
   isOrdinalOwnedByAccount,
   ResponseError,
+  SignedBtcTx,
+  signOrdinalSendTransaction,
   UTXO,
   validateBtcAddress,
 } from '@secretkeylabs/xverse-core';
-import {
-  SignedBtcTx,
-  signOrdinalSendTransaction,
-} from '@secretkeylabs/xverse-core/transactions/btc';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { StyledHeading } from '@ui-library/common.styled';

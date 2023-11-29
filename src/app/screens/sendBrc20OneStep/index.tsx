@@ -4,13 +4,13 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  BRC20ErrorCode,
   brc20TransferEstimateFees,
   CoreError,
   getNonOrdinalUtxo,
   UTXO,
   validateBtcAddress,
 } from '@secretkeylabs/xverse-core';
-import { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
 import { InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import {
   Brc20TransferEstimateFeesParams,
