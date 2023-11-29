@@ -1,5 +1,4 @@
-import { getBtcFeeRate } from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcFeeResponse } from '@secretkeylabs/xverse-core/types';
+import { BtcFeeResponse, getBtcFeeRate } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import useWalletSelector from './useWalletSelector';
 

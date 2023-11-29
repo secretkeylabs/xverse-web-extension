@@ -2,7 +2,7 @@ import backup from '@assets/img/backupWallet/backup.svg';
 import ActionButton from '@components/button';
 import useSeedVault from '@hooks/useSeedVault';
 import { a } from '@react-spring/web';
-import { generateMnemonic } from '@secretkeylabs/xverse-core/wallet';
+import { generateMnemonic } from '@secretkeylabs/xverse-core';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

@@ -2,6 +2,7 @@ import useSendBtcRequest from '@hooks/useSendBtcRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ErrorCodes, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
+import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { ApiBundle, Bundle, mapRareSatsAPIResponseToRareSats } from './rareSats';
 
 describe('rareSats', () => {

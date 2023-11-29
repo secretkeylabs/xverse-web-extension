@@ -1,23 +1,22 @@
-import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import Transport from '@ledgerhq/hw-transport-webusb';
-import ActionButton from '@components/button';
-import { LedgerErrors } from '@secretkeylabs/xverse-core/ledger/types';
-import stxIcon from '@assets/img/ledger/stx_icon.svg';
-import { useTransition } from '@react-spring/web';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { ledgerDelay } from '@common/utils/ledger';
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
-import { importStacksAccountFromLedger, Account } from '@secretkeylabs/xverse-core';
-import useWalletReducer from '@hooks/useWalletReducer';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import stxIcon from '@assets/img/ledger/stx_icon.svg';
+import { ledgerDelay } from '@common/utils/ledger';
+import ActionButton from '@components/button';
+import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import LedgerFailView from '@components/ledger/failLedgerView';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useResetUserFlow from '@hooks/useResetUserFlow';
-import { useLocation } from 'react-router-dom';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { useTransition } from '@react-spring/web';
+import { Account, importStacksAccountFromLedger, LedgerErrors } from '@secretkeylabs/xverse-core';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { Credential } from '../importLedgerAccount';
 
 import {

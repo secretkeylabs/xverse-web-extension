@@ -161,6 +161,7 @@ function StepControls({
     default:
       return null;
   }
+  return null;
 }
 
 export default StepControls;
