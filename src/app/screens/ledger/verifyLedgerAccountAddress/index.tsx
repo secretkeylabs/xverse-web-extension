@@ -1,48 +1,48 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useTransition } from '@react-spring/web';
-import Transport from '@ledgerhq/hw-transport-webusb';
+import { delay } from '@common/utils/ledger';
 import ActionButton from '@components/button';
+import InfoContainer from '@components/infoContainer';
+import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { useTransition } from '@react-spring/web';
 import {
   importNativeSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
 } from '@secretkeylabs/xverse-core';
-import { ledgerDelay } from '@common/utils/ledger';
-import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
-import useWalletSelector from '@hooks/useWalletSelector';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
-import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
-import InfoContainer from '@components/infoContainer';
+import { useLocation } from 'react-router-dom';
 
 import btcIcon from '@assets/img/ledger/btc_icon.svg';
-import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
-import stxIcon from '@assets/img/ledger/stx_icon.svg';
+import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
+import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
+import stxIcon from '@assets/img/ledger/stx_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
-import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import useResetUserFlow from '@hooks/useResetUserFlow';
+import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
 import {
-  Container,
-  OnBoardingContentContainer,
-  ActionButtonsContainer,
   ActionButtonContainer,
-  AddAddressHeaderContainer,
-  SelectAssetTitle,
+  ActionButtonsContainer,
   AddAddressDetailsContainer,
-  SelectAssetText,
-  QRCodeContainer,
+  AddAddressHeaderContainer,
+  AddressAddedContainer,
+  Container,
   CopyContainer,
   InfoAlertContainer,
-  AddressAddedContainer,
-  OnBoardingActionsContainer,
-  LedgerFailViewContainer,
   LedgerFailButtonsContainer,
+  LedgerFailViewContainer,
+  OnBoardingActionsContainer,
+  OnBoardingContentContainer,
+  QRCodeContainer,
+  SelectAssetText,
+  SelectAssetTitle,
 } from './index.styled';
 
 enum Steps {
@@ -186,7 +186,7 @@ function VerifyLedger(): JSX.Element {
       }
 
       setIsConnectSuccess(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       handleClickNext();
       if (isBitcoinSelected || isOrdinalSelected) {
         await importBtcAccounts(true);

@@ -1,6 +1,6 @@
-import styled from 'styled-components';
 import ActionButton from '@components/button';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { ImportLedgerSteps } from './types';
 
 const ButtonContainer = styled.div((props) => ({

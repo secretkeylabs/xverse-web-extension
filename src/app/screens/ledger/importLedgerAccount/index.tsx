@@ -1,4 +1,4 @@
-import { getDeviceNewAccountIndex, getNewAccountId, ledgerDelay } from '@common/utils/ledger';
+import { delay, getDeviceNewAccountIndex, getNewAccountId } from '@common/utils/ledger';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -210,7 +210,7 @@ function ImportLedger(): JSX.Element {
           ),
         };
         await addLedgerAccount(ledgerAccount);
-        await ledgerDelay(1000);
+        await delay(1000);
         setCurrentStep(ImportLedgerSteps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
         return;
@@ -225,7 +225,7 @@ function ImportLedger(): JSX.Element {
           ordinalsPublicKey: ordinalsCreds?.publicKey || '',
         };
         await updateLedgerAccounts(ledgerAccount);
-        await ledgerDelay(1000);
+        await delay(1000);
         setCurrentStep(ImportLedgerSteps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
         return;
@@ -238,12 +238,12 @@ function ImportLedger(): JSX.Element {
           stxPublicKey: stacksCreds?.publicKey || '',
         };
         await updateLedgerAccounts(ledgerAccount);
-        await ledgerDelay(1000);
+        await delay(1000);
         setCurrentStep(ImportLedgerSteps.ADDRESS_ADDED);
         setIsButtonDisabled(false);
       }
 
-      await ledgerDelay(500);
+      await delay(500);
       setIsButtonDisabled(false);
     } catch (err) {
       console.error(err);
@@ -291,7 +291,7 @@ function ImportLedger(): JSX.Element {
         await importStxAccounts(false);
       }
       setIsConnectSuccess(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       if (
         isBitcoinSelected &&
         ledgerAccountsList?.find((account) => account.masterPubKey === masterFingerPrint)
@@ -343,7 +343,7 @@ function ImportLedger(): JSX.Element {
       }
       const updatedAccount: Account = { ...accountToUpdate, accountName };
       await updateLedgerAccounts(updatedAccount);
-      await ledgerDelay(1000);
+      await delay(1000);
       setIsButtonDisabled(false);
       handleClickNext();
     } catch (err) {
