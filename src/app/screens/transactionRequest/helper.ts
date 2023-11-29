@@ -1,9 +1,9 @@
 import {
   createContractCallPromises,
   FeesMultipliers,
-  StacksTransaction,
   generateUnsignedStxTokenTransferTransaction,
   StacksNetwork,
+  StacksTransaction,
 } from '@secretkeylabs/xverse-core';
 import { TransactionPayload } from '@stacks/connect';
 

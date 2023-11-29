@@ -1,7 +1,6 @@
 import { BetterBarLoader } from '@components/barLoader';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
-import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { currencySymbolMap, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import { CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';

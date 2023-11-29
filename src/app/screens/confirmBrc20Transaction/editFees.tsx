@@ -4,7 +4,7 @@ import ActionButton from '@components/button';
 import FiatAmountText from '@components/fiatAmountText';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';

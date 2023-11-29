@@ -4,13 +4,15 @@ import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
+  ErrorCodes,
+  getBtcFiatEquivalent,
+  ResponseError,
   SignedBtcTx,
   signOrdinalSendTransaction,
-} from '@secretkeylabs/xverse-core/transactions/btc';
-import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
-import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
+  UTXO,
+  validateBtcAddress,
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { StyledHeading } from '@ui-library/common.styled';

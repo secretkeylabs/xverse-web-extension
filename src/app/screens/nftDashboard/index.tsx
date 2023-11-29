@@ -10,7 +10,6 @@ import Dialog from '@ui-library/dialog';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CollectiblesTabs from './collectiblesTabs';
-
 import ReceiveNftModal from './receiveNft';
 import { useNftDashboard } from './useNftDashboard';
 
@@ -97,7 +96,6 @@ function NftDashboard() {
       {isOrdinalReceiveAlertVisible && (
         <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
       )}
-
       {showNewFeatureAlert && (
         <Dialog
           title={t('NEW_FEATURE')}
@@ -115,7 +113,6 @@ function NftDashboard() {
           icon={<img src={FeatureIcon} width="60" height="60" alt="new feature" />}
         />
       )}
-
       <AccountHeaderComponent disableMenuOption={isGalleryOpen} showBorderBottom={false} />
       <Container>
         <PageHeader>
@@ -151,10 +148,8 @@ function NftDashboard() {
           nftDashboard={nftDashboard}
         />
       </Container>
-
       {!isGalleryOpen && <BottomTabBar tab="nft" />}
     </>
   );
 }
-
 export default NftDashboard;

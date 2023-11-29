@@ -19,11 +19,12 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import {
   Bundle,
   getBtcFiatEquivalent,
+  parsePsbt,
+  psbtBase64ToHex,
   satsToBtc,
   signLedgerPSBT,
+  Transport as TransportType,
 } from '@secretkeylabs/xverse-core';
-import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
-import { parsePsbt, psbtBase64ToHex } from '@secretkeylabs/xverse-core/transactions/psbt';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';

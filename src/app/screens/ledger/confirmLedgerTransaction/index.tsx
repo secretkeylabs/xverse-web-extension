@@ -1,59 +1,59 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-import { useTransition } from '@react-spring/web';
-import Transport from '@ledgerhq/hw-transport-webusb';
+import InfoIcon from '@assets/img/info.svg';
+import ledgerConfirmBtcIcon from '@assets/img/ledger/btc_icon.svg';
+import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
+import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ordinals_icon_big.svg';
+import { LedgerTransactionType } from '@common/types/ledger';
+import { ledgerDelay } from '@common/utils/ledger';
 import ActionButton from '@components/button';
-import {
-  broadcastSignedTransaction,
-  signLedgerNativeSegwitBtcTransaction,
-  signLedgerStxTransaction,
-  signLedgerMixedBtcTransaction,
-  satsToBtc,
-  microstacksToStx,
-} from '@secretkeylabs/xverse-core';
-import BigNumber from 'bignumber.js';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { Recipient } from '@secretkeylabs/xverse-core/transactions/btc';
-import { StacksRecipient } from '@secretkeylabs/xverse-core/transactions/stx';
+import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView, {
   ConnectLedgerContainer,
   ConnectLedgerText,
 } from '@components/ledger/connectLedgerView';
-import { ledgerDelay } from '@common/utils/ledger';
-import { getBtcTxStatusUrl, getStxTxStatusUrl, getTruncatedAddress } from '@utils/helper';
+import LedgerFailView from '@components/ledger/failLedgerView';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
+import Stepper from '@components/stepper';
 import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import ledgerConfirmBtcIcon from '@assets/img/ledger/btc_icon.svg';
-import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ordinals_icon_big.svg';
-import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
-import InfoIcon from '@assets/img/info.svg';
-import InfoContainer from '@components/infoContainer';
-import LedgerFailView from '@components/ledger/failLedgerView';
-import { UTXO } from '@secretkeylabs/xverse-core/types';
-import Stepper from '@components/stepper';
-import { LedgerTransactionType } from '@common/types/ledger';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Transport from '@ledgerhq/hw-transport-webusb';
+import { useTransition } from '@react-spring/web';
+import {
+  broadcastSignedTransaction,
+  microstacksToStx,
+  Recipient,
+  satsToBtc,
+  signLedgerMixedBtcTransaction,
+  signLedgerNativeSegwitBtcTransaction,
+  signLedgerStxTransaction,
+  StacksRecipient,
+  UTXO,
+} from '@secretkeylabs/xverse-core';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
+import { getBtcTxStatusUrl, getStxTxStatusUrl, getTruncatedAddress } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 import {
+  ConfirmTxIconBig,
+  ConnectLedgerTextAdvanced,
+  ConnectLedgerTitle,
   Container,
+  InfoContainerWrapper,
+  InfoImage,
   OnBoardingContentContainer,
   RecipientsWrapper,
-  ConfirmTxIconBig,
+  SuccessActionsContainer,
+  TxConfirmedContainer,
+  TxConfirmedDescription,
+  TxConfirmedTitle,
   TxDetails,
   TxDetailsRow,
   TxDetailsTitle,
-  ConnectLedgerTitle,
-  ConnectLedgerTextAdvanced,
-  InfoImage,
-  SuccessActionsContainer,
-  TxConfirmedContainer,
-  TxConfirmedTitle,
-  TxConfirmedDescription,
-  InfoContainerWrapper,
 } from './index.styled';
 
 enum Steps {
