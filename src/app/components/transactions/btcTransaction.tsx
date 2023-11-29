@@ -1,7 +1,9 @@
 import ActionButton from '@components/button';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FastForward } from '@phosphor-icons/react';
 import { Brc20HistoryTransactionData, BtcTransactionData, rbf } from '@secretkeylabs/xverse-core';
+import { RBFProps } from '@secretkeylabs/xverse-core/dist/transactions/rbf';
 import { getBtcTxStatusUrl } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';
 import { useCallback } from 'react';
@@ -70,8 +72,12 @@ const StyledButton = styled(ActionButton)((props) => ({
 
 interface TransactionHistoryItemProps {
   transaction: BtcTransactionData | Brc20HistoryTransactionData;
+  wallet: RBFProps;
 }
-export default function BtcTransactionHistoryItem({ transaction }: TransactionHistoryItemProps) {
+export default function BtcTransactionHistoryItem({
+  transaction,
+  wallet,
+}: TransactionHistoryItemProps) {
   const { network } = useWalletSelector();
   const isBtc = isBtcTransaction(transaction) ? 'BTC' : 'brc20';
   const theme = useTheme();
@@ -82,7 +88,7 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
   }, []);
 
   const showAccelerateButton =
-    isBtcTransaction(transaction) && rbf.isTransactionRbfEnabled(transaction);
+    isBtcTransaction(transaction) && rbf.isTransactionRbfEnabled(transaction, wallet);
 
   return (
     <TransactionContainer onClick={openBtcTxStatusLink}>

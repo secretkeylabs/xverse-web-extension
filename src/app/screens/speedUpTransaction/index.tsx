@@ -110,7 +110,6 @@ function SpeedUpTransactionScreen() {
             ? selectedAccount.deviceAccountIndex
             : selectedAccount.id,
         network: network.type,
-        // @ts-ignore
         seedVault,
       });
       setRbfTransaction(rbfTx);
