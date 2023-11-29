@@ -126,8 +126,8 @@ function ConfirmNftTransaction() {
         recipients: [
           {
             address: recipientAddress,
-            amountMicrostacks: unsignedTx?.payload?.amount
-              ? new BigNumber(unsignedTx?.payload.amount?.toString(10))
+            amountMicrostacks: (unsignedTx?.payload as any)?.amount // TODO fix type error
+              ? new BigNumber((unsignedTx?.payload as any).amount?.toString(10)) // TODO fix type error
               : new BigNumber(0),
           },
         ],

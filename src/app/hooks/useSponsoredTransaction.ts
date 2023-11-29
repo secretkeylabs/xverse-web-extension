@@ -1,5 +1,4 @@
-import { StacksTransaction } from '@secretkeylabs/xverse-core';
-import { getSponsorInfo, sponsorTransaction } from '@secretkeylabs/xverse-core/api';
+import { getSponsorInfo, sponsorTransaction, StacksTransaction } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 

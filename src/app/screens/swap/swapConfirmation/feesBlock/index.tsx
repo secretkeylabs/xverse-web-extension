@@ -1,7 +1,7 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Container, TitleText } from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

@@ -17,14 +17,16 @@ import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Brc20Tile from '@screens/ordinals/brc20Tile';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
-import { parseOrdinalTextContentData } from '@secretkeylabs/xverse-core/api';
-import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core/currency';
 import {
+  BtcTransactionBroadcastResponse,
+  getBtcFiatEquivalent,
+  parseOrdinalTextContentData,
   Recipient,
+  ResponseError,
+  satsToBtc,
   signBtcTransaction,
   SignedBtcTx,
-} from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcTransactionBroadcastResponse, ResponseError } from '@secretkeylabs/xverse-core/types';
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import axios from 'axios';
@@ -363,8 +365,9 @@ function ConfirmInscriptionRequest() {
       <OuterContainer>
         {textContent && (
           <Brc20TileContainer>
+            {/* TODO fix type error */}
             <Brc20Tile
-              brcContent={textContent}
+              brcContent={textContent as any}
               isGalleryOpen={false}
               isNftDashboard={false}
               inNftDetail={false}

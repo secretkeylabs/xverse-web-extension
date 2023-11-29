@@ -4,12 +4,12 @@ import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SwapToken } from '@screens/swap/types';
 import {
+  ApiResponseError,
   broadcastSignedTransaction,
   microstacksToStx,
   signTransaction,
   StacksTransaction,
 } from '@secretkeylabs/xverse-core';
-import { ApiResponseError } from '@secretkeylabs/xverse-core/types';
 import { deserializeTransaction } from '@stacks/transactions';
 import { Currency, SponsoredTxError, SponsoredTxErrorCode } from 'alex-sdk';
 import BigNumber from 'bignumber.js';
@@ -117,7 +117,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
             state: {
               txid: '',
               currency: 'STX',
-              error: e instanceof ApiResponseError ? e.data.message : e.message,
+              error: e instanceof ApiResponseError ? (e.data as any).message : e.message,
               sponsored: isSponsored,
               browserTx: true,
               isSwapTransaction: true,

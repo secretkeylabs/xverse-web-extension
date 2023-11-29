@@ -7,19 +7,22 @@ import TopRow from '@components/topRow';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useWalletSelector from '@hooks/useWalletSelector';
 import useSeedVault from '@hooks/useSeedVault';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  ErrorCodes,
+  getBtcFiatEquivalent,
+  ResponseError,
   SignedBtcTx,
   signOrdinalSendTransaction,
-} from '@secretkeylabs/xverse-core/transactions/btc';
-import { ErrorCodes, ResponseError, UTXO } from '@secretkeylabs/xverse-core/types';
-import { validateBtcAddress } from '@secretkeylabs/xverse-core/wallet';
+  UTXO,
+  validateBtcAddress,
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { isLedgerAccount } from '@utils/helper';
 import { getBundleId, getBundleSubText } from '@utils/rareSats';
+import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -154,9 +157,9 @@ function SendOrdinal() {
           recipientAddress,
           fee: data.fee,
           feePerVByte: data.feePerVByte,
-          fiatFee: getBtcFiatEquivalent(data.fee, btcFiatRate),
+          fiatFee: getBtcFiatEquivalent(data.fee, new BigNumber(btcFiatRate)),
           total: data.total,
-          fiatTotal: getBtcFiatEquivalent(data.total, btcFiatRate),
+          fiatTotal: getBtcFiatEquivalent(data.total, new BigNumber(btcFiatRate)),
           ordinalUtxo,
           isRareSat: true,
         },

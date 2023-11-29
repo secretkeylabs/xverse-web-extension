@@ -7,13 +7,12 @@ import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FadersHorizontal } from '@phosphor-icons/react';
-import type { SettingsNetwork } from '@secretkeylabs/xverse-core';
+import type { BRC20ErrorCode, SettingsNetwork } from '@secretkeylabs/xverse-core';
 import {
   getBtcFiatEquivalent,
   useBrc20TransferFees,
   validateBtcAddressIsTaproot,
 } from '@secretkeylabs/xverse-core';
-import type { BRC20ErrorCode } from '@secretkeylabs/xverse-core/transactions/brc20';
 import Callout, { CalloutProps } from '@ui-library/callout';
 import {
   Brc20TransferEstimateFeesParams,

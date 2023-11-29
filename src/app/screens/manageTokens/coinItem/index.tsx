@@ -1,5 +1,5 @@
 import Separator from '@components/separator';
-import { Coin } from '@secretkeylabs/xverse-core/types';
+import { Coin } from '@secretkeylabs/xverse-core';
 import { getTicker } from '@utils/helper';
 import { useState } from 'react';
 import Switch from 'react-switch';
