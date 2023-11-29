@@ -75,7 +75,6 @@ function SpeedUpTransactionScreen() {
     minimumRbfFeeRate: number;
   }>();
   const [feeRateInput, setFeeRateInput] = useState<string | undefined>();
-  const [totalFee, setTotalFee] = useState<string | undefined>();
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
   const [recommendedFees, setRecommendedFees] = useState<RecommendedFeeResponse>();
   const [rbfRecommendedFees, setRbfRecommendedFees] = useState<RbfRecommendedFees>();
@@ -114,7 +113,10 @@ function SpeedUpTransactionScreen() {
       });
       setRbfTransaction(rbfTx);
 
-      const rbfTransactionSummary = await rbf.getRbfTransactionSummary(transaction);
+      const rbfTransactionSummary = await rbf.getRbfTransactionSummary(
+        network.type,
+        transaction.txid,
+      );
       setRbfTxSummary(rbfTransactionSummary);
 
       const mempoolFees = await btcClient.getRecommendedFees();
@@ -143,7 +145,6 @@ function SpeedUpTransactionScreen() {
       const feeObj = rbfRecommendedFees[e.currentTarget.value];
 
       if (feeObj?.enoughFunds) {
-        setTotalFee(feeObj.fee);
         setFeeRateInput(feeObj.feeRate);
         setSelectedOption(e.currentTarget.value);
       }
@@ -261,7 +262,6 @@ function SpeedUpTransactionScreen() {
     }
 
     setFeeRateInput(feeRate);
-    setTotalFee(fee);
     setCustomFeeRate(feeRate);
     setCustomTotalFee(fee);
     setSelectedOption('custom');

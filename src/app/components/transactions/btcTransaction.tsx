@@ -1,9 +1,12 @@
 import ActionButton from '@components/button';
-import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FastForward } from '@phosphor-icons/react';
-import { Brc20HistoryTransactionData, BtcTransactionData, rbf } from '@secretkeylabs/xverse-core';
-import { RBFProps } from '@secretkeylabs/xverse-core/dist/transactions/rbf';
+import {
+  Brc20HistoryTransactionData,
+  BtcTransactionData,
+  rbf,
+  RBFProps,
+} from '@secretkeylabs/xverse-core';
 import { getBtcTxStatusUrl } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';
 import { useCallback } from 'react';
