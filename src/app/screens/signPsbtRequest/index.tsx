@@ -1,7 +1,7 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
-import { ledgerDelay } from '@common/utils/ledger';
+import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -12,7 +12,7 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useBtcClient from '@hooks/useBtcClient';
-import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
+import useDetectOrdinalInSignPsbt, { InputsBundle } from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -73,8 +73,7 @@ const ButtonContainer = styled.div((props) => ({
 }));
 
 const TransparentButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(2),
-  marginRight: props.theme.spacing(2),
+  marginRight: props.theme.spacing(6),
   width: '100%',
 }));
 
@@ -140,7 +139,10 @@ function SignPsbtRequest() {
     }
   }, [selectedAccount, payload.inputsToSign, payload.psbtBase64, network.type]);
 
-  const { loading, bundleItemsData, userReceivesOrdinal } = useDetectOrdinalInSignPsbt(parsedPsbt);
+  const handleOrdinalAndOrdinalInfo = useDetectOrdinalInSignPsbt();
+  const [isLoading, setIsLoading] = useState(true);
+  const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
+  const [bundleItemsData, setBundleItemsData] = useState<InputsBundle>();
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
     [payload.inputsToSign],
@@ -174,7 +176,7 @@ function SignPsbtRequest() {
           navigate('/tx-status', {
             state: {
               txid: '',
-              currency: 'STX',
+              currency: 'BTC',
               error: t('ADDRESS_MISMATCH'),
               browserTx: true,
             },
@@ -183,6 +185,30 @@ function SignPsbtRequest() {
       });
     }
   };
+
+  const checkIfUserReceivesOrdinal = async () => {
+    try {
+      const result = await handleOrdinalAndOrdinalInfo(parsedPsbt);
+      setBundleItemsData(result.bundleItemsData);
+      setUserReceivesOrdinal(result.userReceivesOrdinal);
+    } catch {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
+          error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
+          browserTx: true,
+        },
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkIfUserReceivesOrdinal();
+  }, []);
 
   useEffect(() => {
     checkIfMismatch();
@@ -302,7 +328,7 @@ function SignPsbtRequest() {
     }
 
     setIsConnectSuccess(true);
-    await ledgerDelay(1500);
+    await delay(1500);
     setCurrentStepIndex(1);
 
     try {
@@ -351,7 +377,7 @@ function SignPsbtRequest() {
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      {loading ? (
+      {isLoading ? (
         <LoaderContainer>
           <MoonLoader color="white" size={50} />
         </LoaderContainer>
@@ -385,9 +411,9 @@ function SignPsbtRequest() {
               <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
               <TransactionDetailComponent
                 title={rareSatsTranslate('BUNDLE_SIZE')}
-                value={getSatsAmountString(new BigNumber(bundleItemsData.value.toString()))}
+                value={getSatsAmountString(new BigNumber(bundleItemsData?.value.toString() ?? 0))}
                 subValue={getBtcFiatEquivalent(
-                  new BigNumber(bundleItemsData.value.toString()),
+                  new BigNumber(bundleItemsData?.value.toString() ?? 0),
                   BigNumber(btcFiatRate),
                 )}
               />
