@@ -16,7 +16,7 @@ import Notice from './notice';
 import RareSatsTabGridItem from './rareSatsTabGridItem';
 import type { NftDashboardState } from './useNftDashboard';
 
-const MAX_SATS_ITEMS_EXTENSION = 6;
+const MAX_SATS_ITEMS_EXTENSION = 5;
 const MAX_SATS_ITEMS_GALLERY = 20;
 
 export const GridContainer = styled.div<{

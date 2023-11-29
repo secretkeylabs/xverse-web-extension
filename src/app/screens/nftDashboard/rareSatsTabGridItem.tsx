@@ -2,7 +2,7 @@ import ExoticSatsRow from '@components/exoticSatsRow/exoticSatsRow';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { DotsThree } from '@phosphor-icons/react';
-import { Bundle } from '@secretkeylabs/xverse-core';
+import { Bundle, RareSatsType } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getFormattedTxIdVoutFromBundle } from '@utils/rareSats';
 import { useNavigate } from 'react-router-dom';
@@ -44,40 +44,70 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: Bundle; maxItems: n
   const renderedIcons = () => {
     let totalIconsDisplayed = 0;
     let totalTilesDisplayed = 0;
-    return bundle.satributes
-      .filter((satributes) => !(satributes.includes('COMMON') && bundle.satributes.length > 1))
-      .map((sats, index) => {
-        if (totalIconsDisplayed > maxItems) {
-          return null;
-        }
 
-        if (totalIconsDisplayed >= maxItems - 1) {
-          totalIconsDisplayed += 1;
-          return (
-            <Range key={`${totalTilesDisplayed}-ellipsis`}>
-              <TileText typography="body_m">
-                +{bundle.satributes.length - totalTilesDisplayed}
-              </TileText>
-            </Range>
-          );
+    const icons: (RareSatsType | 'ellipsis' | '+X')[][] = [];
+    let overLimitSatsIndex: number | null = null;
+    let totalSats = 0;
+    let totalTiles = 0;
+    bundle.satributes
+      .filter((satributes) => !(satributes.includes('COMMON') && bundle.satributes.length > 1))
+      .forEach((sats, index) => {
+        totalSats += sats.length;
+        totalTiles += 1;
+
+        const isOverLimit =
+          totalIconsDisplayed + sats.length > maxItems - (sats.length > 1 ? 2 : 1);
+        // we add ranges till we reach the limit and we store the index of the range that is over the limit
+        if (isOverLimit || overLimitSatsIndex !== null) {
+          overLimitSatsIndex = overLimitSatsIndex !== null ? overLimitSatsIndex : index;
+          return;
         }
         totalTilesDisplayed += 1;
-        return (
-          <Range key={`${bundle.satRanges[index].block}-${bundle.satRanges[index].offset}`}>
-            {sats.map((sattribute, indexSattributes) => {
-              totalIconsDisplayed += 1;
-              if (totalIconsDisplayed >= maxItems - 1) {
-                return null;
-              }
-              // eslint-disable-next-line react/no-array-index-key
-              return <RareSatIcon key={`${sattribute}-${indexSattributes}`} type={sattribute} />;
-            })}
-            {totalIconsDisplayed > maxItems - 2 ? (
-              <DotsThree color={Theme.colors.white_200} size="20" />
-            ) : null}
-          </Range>
-        );
+        totalIconsDisplayed += sats.length;
+        icons.push(sats);
       });
+
+    // if we have more than 1 range and we have reached the limit we add ellipsis and +X
+    if (overLimitSatsIndex !== null) {
+      const sats = bundle.satributes[overLimitSatsIndex];
+      const satsToDisplay = maxItems - totalIconsDisplayed - 2;
+      const firstSats = sats.slice(0, satsToDisplay);
+      // we add ellipsis only if we have more than 1 slot left counting the +X
+      if (firstSats.length > 0) {
+        totalTilesDisplayed += 1;
+        icons.push([...firstSats, 'ellipsis']);
+      }
+
+      if (totalSats > maxItems) {
+        icons.push(['+X']);
+      }
+    }
+
+    return icons.map((sats, index) => (
+      <Range key={`${bundle.satRanges[index].block}-${bundle.satRanges[index].offset}`}>
+        {sats.map((sattribute, indexSatributes) => {
+          if (sattribute === 'ellipsis') {
+            return (
+              <DotsThree
+                key={`${totalTilesDisplayed}-ellipsis`}
+                color={Theme.colors.white_200}
+                size="20"
+              />
+            );
+          }
+
+          if (sattribute === '+X') {
+            return (
+              <TileText key={`${totalTilesDisplayed}-+X`} typography="body_m">
+                +{totalTiles - totalTilesDisplayed}
+              </TileText>
+            );
+          }
+          // eslint-disable-next-line react/no-array-index-key
+          return <RareSatIcon key={`${sattribute}-${indexSatributes}`} type={sattribute} />;
+        })}
+      </Range>
+    ));
   };
 
   const bundleId = getFormattedTxIdVoutFromBundle(bundle);
@@ -88,6 +118,7 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: Bundle; maxItems: n
         title={bundleId}
         satAmount={bundle.value}
         inscriptions={bundle.inscriptions}
+        showNumberOfInscriptions
         icons={renderedIcons()}
       />
     </Pressable>

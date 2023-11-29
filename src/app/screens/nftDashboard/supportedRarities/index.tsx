@@ -1,6 +1,6 @@
 import TopRow from '@components/topRow';
 import { ArrowUpRight } from '@phosphor-icons/react';
-import { RoadArmorRareSats, Sattributes } from '@secretkeylabs/xverse-core';
+import { RodarmorRareSats, Satributes } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { BLOG_LINK } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
@@ -54,7 +54,7 @@ const MainContainer = styled.div((props) => ({
   backgroundColor: Theme.colors.elevation0,
 }));
 
-const rarityTypes = [...RoadArmorRareSats, ...Sattributes];
+const rarityTypes = [...RodarmorRareSats, ...Satributes];
 
 function SupportedRarities() {
   const navigate = useNavigate();

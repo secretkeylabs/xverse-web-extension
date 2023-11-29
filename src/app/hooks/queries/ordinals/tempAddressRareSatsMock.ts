@@ -141,13 +141,13 @@ export const mockTestCase1: AddressBundleResponse = {
   results: [],
 };
 
-// TestCase 2 - 3 bundles
+// TestCase 3 - 6 bundles
 const { xVersion, ...bundle } = inscriptionPartOfBundle;
 export const mockTestCase3: AddressBundleResponse = {
   xVersion: 1,
   limit: 30,
   offset: 0,
-  total: 5,
+  total: 6,
   results: [
     {
       block_height: 803128,
@@ -180,6 +180,16 @@ export const mockTestCase3: AddressBundleResponse = {
               content_type: 'text/plain;charset=utf-8',
               id: '09c094c3f1ab71c9be7a356a0f1af21b0e552c18d50372fd3799430c890ef135i0',
               inscription_number: 123141212,
+            },
+            {
+              content_type: 'text/plain;charset=utf-8',
+              id: '09c094c3f1ab71c9be7a356a0f1af21b0e552c18d50372fd3799430c890ef135i0',
+              inscription_number: 123141213,
+            },
+            {
+              content_type: 'text/plain;charset=utf-8',
+              id: '09c094c3f1ab71c9be7a356a0f1af21b0e552c18d50372fd3799430c890ef135i0',
+              inscription_number: 123141214,
             },
           ],
         },
@@ -221,7 +231,7 @@ export const mockTestCase3: AddressBundleResponse = {
             start: '34234320000000',
             end: '34234320010000',
           },
-          satributes: ['MYTHIC', 'BLOCK78'],
+          satributes: ['MYTHIC'],
           inscriptions: [],
         },
         {
@@ -232,7 +242,7 @@ export const mockTestCase3: AddressBundleResponse = {
             start: '34234320010001',
             end: '34234320010002',
           },
-          satributes: ['PIZZA'],
+          satributes: ['PIZZA', 'BLOCK78', 'BLOCK9', 'NAKAMOTO', 'VINTAGE', 'FIRST_TRANSACTION'],
           inscriptions: [
             {
               content_type: 'text/plain;charset=utf-8',
@@ -335,7 +345,103 @@ export const mockTestCase3: AddressBundleResponse = {
             start: '34234320000000',
             end: '34234320000003',
           },
+          satributes: ['UNCOMMON', 'PIZZA', 'PALINDROME', 'BLOCK9_450', 'VINTAGE', 'SILK_ROAD'],
+          inscriptions: [],
+        },
+        {
+          year_mined: 2009,
+          block: 9,
+          offset: 0,
+          range: {
+            start: '34234320000000',
+            end: '34234320000003',
+          },
           satributes: ['UNCOMMON', 'PIZZA', 'PALINDROME'],
+          inscriptions: [],
+        },
+      ],
+    },
+    {
+      block_height: 803128,
+      txid: 'f5aa0649f2e5d0c6402c2d6b64ba6ea89e8be836a2ad01cbb0cdcc8721e314d1',
+      value: 100,
+      vout: 0,
+      sat_ranges: [
+        {
+          year_mined: 2009,
+          block: 9,
+          offset: 0,
+          range: {
+            start: '34234320000000',
+            end: '34234320000003',
+          },
+          satributes: ['UNCOMMON'],
+          inscriptions: [],
+        },
+        {
+          year_mined: 2009,
+          block: 9,
+          offset: 0,
+          range: {
+            start: '34234320000000',
+            end: '34234320000003',
+          },
+          satributes: ['NAKAMOTO'],
+          inscriptions: [],
+        },
+        {
+          year_mined: 2009,
+          block: 9,
+          offset: 0,
+          range: {
+            start: '34234320000000',
+            end: '34234320000003',
+          },
+          satributes: ['SILK_ROAD'],
+          inscriptions: [],
+        },
+        {
+          year_mined: 2009,
+          block: 9,
+          offset: 0,
+          range: {
+            start: '34234320000000',
+            end: '34234320000003',
+          },
+          satributes: ['SEQUENCE_PALINDROME'],
+          inscriptions: [],
+        },
+        {
+          year_mined: 2009,
+          block: 9,
+          offset: 0,
+          range: {
+            start: '34234320000000',
+            end: '34234320000003',
+          },
+          satributes: ['PERFECT_PALINCEPTION'],
+          inscriptions: [],
+        },
+        {
+          year_mined: 2009,
+          block: 9,
+          offset: 0,
+          range: {
+            start: '34234320000000',
+            end: '34234320000003',
+          },
+          satributes: ['VINTAGE'],
+          inscriptions: [],
+        },
+        {
+          year_mined: 2009,
+          block: 9,
+          offset: 0,
+          range: {
+            start: '34234320000000',
+            end: '34234320000003',
+          },
+          satributes: ['MYTHIC'],
           inscriptions: [],
         },
       ],
@@ -347,6 +453,161 @@ export const mockTestCase3: AddressBundleResponse = {
       value: 100,
       vout: 0,
       sat_ranges: [],
+    },
+  ],
+};
+
+// TestCase 4 - 4 bundles with unsupported types
+export const mockTestCase4: AddressBundleResponse = {
+  xVersion: 1,
+  limit: 30,
+  offset: 0,
+  total: 5,
+  results: [
+    {
+      block_height: 803128,
+      txid: 'b8f8aee03af313ef1fbba7316aadf7390c91dc5dd34928a15f708ea4ed642852',
+      value: 10,
+      vout: 0,
+      sat_ranges: [
+        {
+          year_mined: 2009,
+          block: 11,
+          offset: 1,
+          range: {
+            start: '34234320000003',
+            end: '34234320000004',
+          },
+          satributes: ['1D_PALINDROME', '2D_PALINDROME', 'BLOCK9_450'],
+          inscriptions: [],
+        },
+        {
+          year_mined: 2009,
+          block: 11,
+          offset: 2,
+          range: {
+            start: '34234320000003',
+            end: '34234320000004',
+          },
+          satributes: ['PIZZA', 'BLOCK9_450'],
+          inscriptions: [
+            {
+              content_type: 'image/png',
+              id: '6b186d467d817e4d086a9d1bf93785d736df6431c1cc9c305571161d616d05d0i0',
+              inscription_number: 11067475,
+            },
+          ],
+        },
+        {
+          year_mined: 2009,
+          block: 10,
+          offset: 0,
+          range: {
+            start: '34234320000000',
+            end: '34234320000001',
+          },
+          satributes: ['BLOCK9_450'],
+          inscriptions: [
+            {
+              content_type: 'image/png',
+              id: '6b186d467d817e4d086a9d1bf93785d736df6431c1cc9c305571161d616d05d0i0',
+              inscription_number: 11067474,
+            },
+          ],
+        },
+        {
+          year_mined: 2009,
+          block: 11,
+          offset: 3,
+          range: {
+            start: '34234320000004',
+            end: '34234320000005',
+          },
+          satributes: ['BLOCK9_450'],
+          inscriptions: [],
+        },
+      ],
+    },
+    {
+      block_height: 803128,
+      txid: 'b8f8aee03af313ef1fbba7316aadf7390c91dc5dd34928a15f708ea4ed642852',
+      value: 10,
+      vout: 0,
+      sat_ranges: [
+        {
+          year_mined: 2009,
+          block: 11,
+          offset: 0,
+          range: {
+            start: '34234320000003',
+            end: '34234320000004',
+          },
+          satributes: ['EPIC', '1D_PALINDROME', '2D_PALINDROME', 'BLOCK9_450', 'VINTAGE'],
+          inscriptions: [],
+        },
+        {
+          year_mined: 2009,
+          block: 11,
+          offset: 1,
+          range: {
+            start: '34234320000003',
+            end: '34234320000004',
+          },
+          satributes: ['PIZZA', 'BLOCK9_450'],
+          inscriptions: [
+            {
+              content_type: 'image/png',
+              id: '6b186d467d817e4d086a9d1bf93785d736df6431c1cc9c305571161d616d05d0i0',
+              inscription_number: 11067475,
+            },
+          ],
+        },
+        {
+          year_mined: 2009,
+          block: 10,
+          offset: 2,
+          range: {
+            start: '34234320000000',
+            end: '34234320000001',
+          },
+          satributes: ['BLOCK9_450', 'BLOCK78', 'FIBONACCI'],
+          inscriptions: [
+            {
+              content_type: 'image/png',
+              id: '6b186d467d817e4d086a9d1bf93785d736df6431c1cc9c305571161d616d05d0i0',
+              inscription_number: 11067474,
+            },
+          ],
+        },
+        {
+          year_mined: 2009,
+          block: 10,
+          offset: 3,
+          range: {
+            start: '34234320000000',
+            end: '34234320000001',
+          },
+          satributes: ['BLOCK9_450', 'BLOCK78', 'FIBONACCI', 'BLACK_EPIC'],
+          inscriptions: [
+            {
+              content_type: 'image/png',
+              id: '6b186d467d817e4d086a9d1bf93785d736df6431c1cc9c305571161d616d05d0i0',
+              inscription_number: 11067473,
+            },
+          ],
+        },
+        {
+          year_mined: 2009,
+          block: 11,
+          offset: 4,
+          range: {
+            start: '34234320000004',
+            end: '34234320000005',
+          },
+          satributes: ['BLOCK9_450'],
+          inscriptions: [],
+        },
+      ],
     },
   ],
 };

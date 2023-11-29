@@ -12,6 +12,7 @@ import {
   mockData,
   mockTestCase1,
   mockTestCase3,
+  mockTestCase4,
 } from './tempAddressRareSatsMock';
 
 const PAGE_SIZE = 30;
@@ -41,10 +42,16 @@ export const useAddressRareSats = () => {
         throw new Error('Error response from API');
       }
 
-      // 1 BUNDLE with 4 sat ranges
+      // 6 bundles with different combinations of sats and inscriptions
       const testcase3 = localStorage.getItem('testcase3');
       if (testcase3) {
         return mockTestCase3;
+      }
+
+      // 2 bundles with different combinations of sats and inscriptions but with unsupported types
+      const testcase4 = localStorage.getItem('testcase4');
+      if (testcase4) {
+        return mockTestCase4;
       }
 
       return mockData;
