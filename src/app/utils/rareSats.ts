@@ -1,8 +1,8 @@
 import {
   Bundle,
   RareSatsType,
-  RoadArmorRareSats,
-  RoadArmorRareSatsType,
+  RodarmorRareSats,
+  RodarmorRareSatsType,
 } from '@secretkeylabs/xverse-core';
 import { t } from 'i18next';
 import { getTruncatedAddress } from './helper';
@@ -31,7 +31,7 @@ export const getSatLabel = (satributes: RareSatsType[]): string => {
   }
 
   // we expect to roadarmor sats be in the first position
-  if (RoadArmorRareSats.includes(satributes[0] as RoadArmorRareSatsType)) {
+  if (RodarmorRareSats.includes(satributes[0] as RodarmorRareSatsType)) {
     return `${getRareSatsLabelByType(satributes[0])} ${t(
       isLengthGrateThanTwo ? 'COMMON.COMBO' : `RARE_SATS.RARITY_LABEL.${satributes[1]}`,
     )}`;

@@ -66,10 +66,12 @@ function ExoticSatsRow({
   satAmount,
   inscriptions,
   icons,
+  showNumberOfInscriptions = false,
 }: {
   title: string;
   satAmount: number;
   inscriptions: SatRangeInscription[];
+  showNumberOfInscriptions?: boolean;
   icons: ReactNode;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'COMMON' });
@@ -90,14 +92,25 @@ function ExoticSatsRow({
             </StyledBundleSub>
           )}
         />
-        {inscriptions.map((inscription) => (
-          <Row key={inscription.id}>
+        {showNumberOfInscriptions && inscriptions.length ? (
+          <Row>
             <img src={OrdinalIcon} alt="ordinal" />
             <InscriptionText typography="body_medium_m" color="white_0">
-              {inscription.inscription_number}
+              {inscriptions.length > 1
+                ? `+${inscriptions.length}`
+                : inscriptions[0].inscription_number}
             </InscriptionText>
           </Row>
-        ))}
+        ) : (
+          inscriptions.map((inscription) => (
+            <Row key={inscription.id}>
+              <img src={OrdinalIcon} alt="ordinal" />
+              <InscriptionText typography="body_medium_m" color="white_0">
+                {inscription.inscription_number}
+              </InscriptionText>
+            </Row>
+          ))
+        )}
       </InfoContainer>
       <IconsContainer>{icons}</IconsContainer>
     </ItemContainer>
