@@ -434,7 +434,7 @@ function SignBatchPsbtRequest() {
               currencyType="BTC"
               title={t('AMOUNT')}
               heading={
-                parsedPsbts[currentPsbtIndex]?.netAmount < 0
+                Number(parsedPsbts[currentPsbtIndex]?.netAmount) < 0
                   ? t('YOU_WILL_TRANSFER')
                   : t('YOU_WILL_RECEIVE')
               }

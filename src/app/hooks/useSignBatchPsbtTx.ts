@@ -1,6 +1,6 @@
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { InputToSign, signPsbt } from '@secretkeylabs/xverse-core/transactions/psbt';
+import { InputToSign, signPsbt } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
 import { SignMultiplePsbtPayload, SignMultipleTransactionOptions } from 'sats-connect';
