@@ -7,6 +7,7 @@ import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Account } from '@secretkeylabs/xverse-core';
+import { filterLedgerAccounts } from '@utils/ledger';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -85,11 +86,7 @@ function AccountList(): JSX.Element {
   const { createAccount, switchAccount } = useWalletReducer();
 
   const displayedAccountsList = useMemo(() => {
-    const networkLedgerAccounts = ledgerAccountsList.filter(
-      (account) =>
-        (account.ordinalsAddress?.startsWith('bc1') && network.type === 'Mainnet') ||
-        (account.ordinalsAddress?.startsWith('tb1') && network.type === 'Testnet'),
-    );
+    const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
     return [...networkLedgerAccounts, ...accountsList];
   }, [accountsList, ledgerAccountsList, network]);
 

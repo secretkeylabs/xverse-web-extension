@@ -29,6 +29,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { generatePasswordHash } from '@utils/encryptionUtils';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
+import { filterLedgerAccounts } from '@utils/ledger';
 import { resetMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { useDispatch } from 'react-redux';
 import useSeedVault from './useSeedVault';
@@ -81,7 +82,16 @@ const useWalletReducer = () => {
     if (!selectedAccount) {
       [selectedAccountData] = walletAccounts;
     } else if (isLedgerAccount(selectedAccount)) {
-      selectedAccountData = ledgerAccountsList[selectedAccount.id];
+      const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, currentNetwork.type);
+      const selectedAccountDataInNetwork = networkLedgerAccounts.find(
+        (account) => account.deviceAccountIndex === selectedAccount.deviceAccountIndex,
+      );
+
+      // we try find the specific matching ledger account
+      // If we can't find it, we default to the first ledger account in the selected network
+      // If we can't find that, we default to the first software account in the wallet
+      selectedAccountData =
+        selectedAccountDataInNetwork ?? networkLedgerAccounts[0] ?? walletAccounts[0];
     } else {
       selectedAccountData = walletAccounts[selectedAccount.id];
     }
