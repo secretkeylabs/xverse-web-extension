@@ -167,10 +167,6 @@ function SpeedUpTransactionScreen() {
       setCustomFeeError(undefined);
     }
 
-    if (feeSummary.fee) {
-      setCustomTotalFee(feeSummary.fee.toString());
-    }
-
     return feeSummary.fee;
   };
 
@@ -250,7 +246,7 @@ function SpeedUpTransactionScreen() {
     setIsModalVisible(false);
   };
 
-  const handleApplyCustomFee = (feeRate: string) => {
+  const handleApplyCustomFee = (feeRate: string, fee: string) => {
     if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
       setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
       return;
@@ -265,10 +261,15 @@ function SpeedUpTransactionScreen() {
     }
 
     setFeeRateInput(feeRate);
-    setTotalFee(customTotalFee);
+    setTotalFee(fee);
     setCustomFeeRate(feeRate);
+    setCustomTotalFee(fee);
     setSelectedOption('custom');
 
+    setShowCustomFee(false);
+  };
+
+  const handleCloseCustomFee = () => {
     setShowCustomFee(false);
   };
 
@@ -482,17 +483,21 @@ function SpeedUpTransactionScreen() {
             />
           </ControlsContainer>
 
-          <CustomFee
-            visible={showCustomFee}
-            onClose={() => setShowCustomFee(false)}
-            initialFeeRate={feeRateInput || rbfTxSummary?.currentFeeRate.toString()!}
-            fee={totalFee || rbfTxSummary?.currentFee.toString()!}
-            isFeeLoading={false}
-            error={customFeeError || ''}
-            calculateTotalFee={calculateTotalFee}
-            onClickApply={handleApplyCustomFee}
-            minimumFeeRate={rbfTxSummary?.minimumRbfFeeRate?.toString()}
-          />
+          {showCustomFee && (
+            <CustomFee
+              visible={showCustomFee}
+              onClose={handleCloseCustomFee}
+              initialFeeRate={rbfTxSummary?.currentFeeRate.toString()!}
+              initialTotalFee={rbfTxSummary?.currentFee.toString()!}
+              feeRate={customFeeRate}
+              fee={customTotalFee}
+              isFeeLoading={false}
+              error={customFeeError || ''}
+              calculateTotalFee={calculateTotalFee}
+              onClickApply={handleApplyCustomFee}
+              minimumFeeRate={rbfTxSummary?.minimumRbfFeeRate?.toString()}
+            />
+          )}
 
           <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
             {currentStepIndex === 0 && (
