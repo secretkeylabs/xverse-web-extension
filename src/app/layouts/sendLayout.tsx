@@ -31,7 +31,7 @@ const Container = styled.div`
     max-width: 588px;
     border: 1px solid ${(props) => props.theme.colors.elevation3};
     border-radius: ${(props) => props.theme.space.s};
-    padding: ${(props) => props.theme.space.l} ${(props) => props.theme.space.m};
+    padding: ${(props) => props.theme.space.l} 0;
     padding-bottom: ${(props) => props.theme.space.xxl};
     margin-top: ${(props) => props.theme.space.xxxxl};
   }
@@ -51,6 +51,7 @@ const Button = styled.button`
   display: flex;
   background-color: transparent;
   margin-bottom: ${(props) => props.theme.space.l};
+  margin-left: ${(props) => props.theme.space.s};
 `;
 
 function SendLayout({

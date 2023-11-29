@@ -38,7 +38,7 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: Bundle; maxItems: n
   const handleOnClick = () => {
     // exotics v1 wont show range details only bundle details
     setSelectedSatBundleDetails(bundle);
-    navigate('/nft-dashboard/rare-sats-bundle');
+    navigate('/nft-dashboard/rare-sats-bundle', { state: { source: 'RareSatsTab' } });
   };
 
   const renderedIcons = () => {

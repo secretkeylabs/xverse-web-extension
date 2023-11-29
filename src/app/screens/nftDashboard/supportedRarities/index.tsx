@@ -45,13 +45,14 @@ const Container = styled.div<ContainerProps>((props) => ({
   width: props.isGallery ? 580 : '100%',
 }));
 
-const MainContainer = styled.div({
+const MainContainer = styled.div((props) => ({
+  ...props.theme.scrollbar,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   width: '100%',
   backgroundColor: Theme.colors.elevation0,
-});
+}));
 
 const rarityTypes = [...RoadArmorRareSats, ...Sattributes];
 

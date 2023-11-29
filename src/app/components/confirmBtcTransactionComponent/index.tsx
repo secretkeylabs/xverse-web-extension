@@ -35,27 +35,25 @@ import styled from 'styled-components';
 import TransactionDetailComponent from '../transactionDetailComponent';
 import SatsBundle from './bundle';
 
-interface ContainerProps {
-  horizontalSpacing: boolean;
+interface MainContainerProps {
+  isGalleryOpen: boolean;
 }
 
-const OuterContainer = styled.div`
+const OuterContainer = styled.div<MainContainerProps>`
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  flex: 1;
   flex-grow: 1;
+  ...${(props) => (props.isGalleryOpen ? props.theme.scrollbar : {})};
 `;
 
-const Container = styled.div<ContainerProps>((props) => ({
+const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
   marginTop: props.theme.spacing(11),
-  marginLeft: props.horizontalSpacing ? props.theme.spacing(8) : 0,
-  marginRight: props.horizontalSpacing ? props.theme.spacing(8) : 0,
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
 }));
 
 interface ButtonProps {
@@ -66,8 +64,8 @@ const ButtonContainer = styled.div<ButtonProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
   marginBottom: props.isBtcSendBrowserTx ? props.theme.spacing(20) : props.theme.spacing(5),
 }));
 
@@ -140,7 +138,6 @@ interface Props {
   isBtcSendBrowserTx?: boolean;
   currencyType?: CurrencyTypes;
   isPartOfBundle?: boolean;
-  horizontalSpacing?: boolean;
   ordinalBundle?: Bundle;
   holdsRareSats?: boolean;
   currentFeeRate: BigNumber;
@@ -167,7 +164,6 @@ function ConfirmBtcTransactionComponent({
   isPartOfBundle,
   currencyType,
   ordinalBundle,
-  horizontalSpacing,
   holdsRareSats,
   currentFeeRate,
   setCurrentFee,
@@ -391,8 +387,8 @@ function ConfirmBtcTransactionComponent({
 
   return (
     <>
-      <OuterContainer>
-        <Container horizontalSpacing={!!horizontalSpacing}>
+      <OuterContainer isGalleryOpen={isGalleryOpen}>
+        <Container>
           {showFeeWarning && (
             <InfoContainer
               type="Warning"

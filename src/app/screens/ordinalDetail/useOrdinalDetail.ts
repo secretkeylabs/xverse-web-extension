@@ -110,7 +110,7 @@ export default function useOrdinalDetail() {
     }
     setSelectedOrdinalDetails(ordinalData);
     setSelectedSatBundleDetails(bundle);
-    navigate('/nft-dashboard/rare-sats-bundle');
+    navigate('/nft-dashboard/rare-sats-bundle', { state: { source: 'OrdinalDetail' } });
   };
 
   const onCopyClick = () => {

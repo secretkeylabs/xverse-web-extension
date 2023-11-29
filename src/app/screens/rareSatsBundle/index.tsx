@@ -22,7 +22,7 @@ import {
 } from '@utils/helper';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import OrdinalAttributeComponent from '../ordinalDetail/ordinalAttributeComponent';
 import { RareSatsBundleGridItem } from './rareSatsBundleGridItem';
@@ -33,7 +33,9 @@ interface DetailSectionProps {
 
 /* layout */
 const Container = styled.div`
+  ...${(props) => props.theme.scrollbar};
   overflow-y: auto;
+  padding-bottom: ${(props) => props.theme.space.l};
 `;
 
 const PageHeader = styled.div<DetailSectionProps>`
@@ -161,6 +163,8 @@ const SeeRarityContainer = styled.div`
 function RareSatsBundle() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { source } = location.state || {};
   const { network, selectedAccount, ordinalsAddress } = useWalletSelector();
   const { selectedSatBundle: bundle, selectedOrdinal } = useNftDataSelector();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(bundle?.txid);
@@ -172,7 +176,11 @@ function RareSatsBundle() {
   useResetUserFlow('/rare-sats-bundle');
 
   const handleBackButtonClick = () => {
-    navigate(-1);
+    if (source === 'OrdinalDetail') {
+      navigate(-1);
+    } else {
+      navigate('/nft-dashboard?tab=rareSats');
+    }
     setSelectedSatBundleDetails(null);
   };
 
