@@ -60,7 +60,7 @@ export const useGetUtxoOrdinalBundle = (
 
   const { data, isLoading } = useQuery({
     enabled: !!(output && shouldMakeTheCall),
-    queryKey: ['rare-sats', output],
+    queryKey: ['rare-sats', output, network.type],
     queryFn: getUtxoOrdinalBundleByOutput,
     retry: handleRetries,
     staleTime: 1 * 60 * 1000, // 1 min
