@@ -54,7 +54,7 @@ function TransactionRequest() {
       stxPublicKey,
       feeMultipliers!,
       selectedNetwork,
-      stxPendingTxData,
+      stxPendingTxData.data,
       stacksTransaction?.auth,
     );
     setUnsignedTx(unsignedSendStxTx);
@@ -87,7 +87,7 @@ function TransactionRequest() {
       (func) => func.name === contractCallPayload.functionName,
     );
     const txAttachment = contractCallPayload.attachment ?? undefined;
-    if (txAttachment) setAttachment(txAttachment);
+    if (txAttachment) setAttachment(Buffer.from(txAttachment));
     if (invokedFuncMetaData) {
       setFuncMetaData(invokedFuncMetaData);
       const { funcArgs } = extractFromPayload(contractCallPayload);
@@ -169,22 +169,18 @@ function TransactionRequest() {
   };
 
   const createRequestTx = async () => {
-    try {
-      if (hasSwitchedAccount) {
-        if (!payload.txHex) {
-          if (payload.txType === 'token_transfer') {
-            await handleTokenTransferRequest(payload);
-          } else if (payload.txType === 'contract_call') {
-            await handleContractCallRequest(payload);
-          } else if (payload.txType === 'smart_contract') {
-            await handleContractDeployRequest(payload);
-          }
-        } else {
-          await handleTxSigningRequest();
+    if (hasSwitchedAccount) {
+      if (!payload.txHex) {
+        if (payload.txType === 'token_transfer') {
+          await handleTokenTransferRequest(payload);
+        } else if (payload.txType === 'contract_call') {
+          await handleContractCallRequest(payload);
+        } else if (payload.txType === 'smart_contract') {
+          await handleContractDeployRequest(payload);
         }
+      } else {
+        await handleTxSigningRequest();
       }
-    } catch (e: unknown) {
-      console.log(e);
     }
   };
 
