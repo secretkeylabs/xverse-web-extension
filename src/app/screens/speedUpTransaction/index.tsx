@@ -156,7 +156,9 @@ function SpeedUpTransactionScreen() {
   };
 
   const handleGoBack = () => {
-    navigate(-1);
+    // HACKY: navigate back to homepage to give mempool api time to consolidate transactions
+    // otherwise, the original replaced transaction may still appear
+    navigate(-2);
   };
 
   const calculateTotalFee = async (feeRate: string) => {
