@@ -4,7 +4,6 @@ import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import InfoContainer from '@components/infoContainer';
-import BottomBar from '@components/tabBar';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
@@ -14,6 +13,7 @@ import { BtcTransactionBroadcastResponse, Recipient } from '@secretkeylabs/xvers
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
+import SendLayout from 'app/layouts/sendLayout';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -206,7 +206,7 @@ function ConfirmBtcTransaction() {
   };
 
   return (
-    <>
+    <SendLayout selectedBottomTab="dashboard" onClickBack={goBackToScreen}>
       {showOrdinalsDetectedAlert && (
         <AlertMessage
           title={t('BTC_TRANSFER_DANGER_ALERT_TITLE')}
@@ -246,12 +246,7 @@ function ConfirmBtcTransaction() {
           />
         )}
       </ConfirmBtcTransactionComponent>
-      {!btcSendBrowserTx && (
-        <BottomBarContainer>
-          <BottomBar tab="dashboard" />
-        </BottomBarContainer>
-      )}
-    </>
+    </SendLayout>
   );
 }
 

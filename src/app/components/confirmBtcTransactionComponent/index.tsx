@@ -50,8 +50,6 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   flex: 1,
   marginTop: props.theme.spacing(11),
-  marginLeft: props.theme.space.m,
-  marginRight: props.theme.space.m,
 }));
 
 interface ButtonProps {
@@ -62,8 +60,6 @@ const ButtonContainer = styled.div<ButtonProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
-  marginLeft: props.theme.space.m,
-  marginRight: props.theme.space.m,
   marginBottom: props.isBtcSendBrowserTx ? props.theme.spacing(20) : props.theme.spacing(5),
 }));
 

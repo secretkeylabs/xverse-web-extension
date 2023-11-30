@@ -8,6 +8,10 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { breakpoints, devices } from 'theme';
 
+interface ContainerProps {
+  isGallery?: boolean;
+}
+
 const ScrollContainer = styled.div((props) => ({
   display: 'flex',
   flex: 1,
@@ -15,7 +19,7 @@ const ScrollContainer = styled.div((props) => ({
   ...props.theme.scrollbar,
 }));
 
-const Container = styled.div`
+const Container = styled.div<ContainerProps>`
   display: flex;
   flex-direction: column;
   margin: auto;
@@ -31,7 +35,9 @@ const Container = styled.div`
     max-width: 588px;
     border: 1px solid ${(props) => props.theme.colors.elevation3};
     border-radius: ${(props) => props.theme.space.s};
-    padding: ${(props) => props.theme.space.l} 0;
+    padding-top: ${(props) => props.theme.space.l};
+    padding-left: ${(props) => (props.isGallery ? props.theme.space.m : 0)};
+    padding-right: ${(props) => (props.isGallery ? props.theme.space.m : 0)};
     padding-bottom: ${(props) => props.theme.space.xxl};
     margin-top: ${(props) => props.theme.space.xxxxl};
   }
@@ -67,6 +73,7 @@ function SendLayout({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const isScreenLargerThanXs = document.documentElement.clientWidth > Number(breakpoints.xs);
   const year = new Date().getFullYear();
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   return (
     <>
@@ -76,7 +83,7 @@ function SendLayout({
         <TopRow title="" onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
       )}
       <ScrollContainer>
-        <Container>
+        <Container isGallery={isGalleryOpen}>
           {isScreenLargerThanXs && !hideBackButton && onClickBack && (
             <Button onClick={onClickBack}>
               <ArrowLeft size={20} color="white" />
