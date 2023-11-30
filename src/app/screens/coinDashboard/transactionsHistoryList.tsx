@@ -203,7 +203,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       {groupedTxs &&
         !isLoading &&
         Object.keys(groupedTxs).map((group) => (
-          <GroupContainer style={styles}>
+          <GroupContainer key={group} style={styles}>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
               <SectionSeparator />
