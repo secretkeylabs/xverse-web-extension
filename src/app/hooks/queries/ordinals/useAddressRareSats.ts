@@ -6,14 +6,6 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { handleRetries, InvalidParamsError } from '@utils/query';
-import {
-  exoticInscriptionNotPartOfBundle,
-  inscriptionPartOfBundle,
-  mockData,
-  mockTestCase1,
-  mockTestCase3,
-  mockTestCase4,
-} from './tempAddressRareSatsMock';
 
 const PAGE_SIZE = 30;
 
@@ -25,41 +17,9 @@ export const useAddressRareSats = () => {
       throw new InvalidParamsError('ordinalsAddress is required');
     }
 
-    // custom ordinal address takes precedence over mocks
-    const customOrdinalAddress = localStorage.getItem('ordinalAddress');
-    const useProdApi = localStorage.getItem('useProdApi');
-
-    if (!(useProdApi || customOrdinalAddress)) {
-      // EMPTY RESPONSE
-      const testcase1 = localStorage.getItem('testcase1');
-      if (testcase1) {
-        return mockTestCase1;
-      }
-
-      // ERROR RESPONSE
-      const testcase2 = localStorage.getItem('testcase2');
-      if (testcase2) {
-        throw new Error('Error response from API');
-      }
-
-      // 6 bundles with different combinations of sats and inscriptions
-      const testcase3 = localStorage.getItem('testcase3');
-      if (testcase3) {
-        return mockTestCase3;
-      }
-
-      // 2 bundles with different combinations of sats and inscriptions but with unsupported types
-      const testcase4 = localStorage.getItem('testcase4');
-      if (testcase4) {
-        return mockTestCase4;
-      }
-
-      return mockData;
-    }
-
     const bundleResponse = await getAddressUtxoOrdinalBundles(
       network.type,
-      customOrdinalAddress ?? ordinalsAddress,
+      ordinalsAddress,
       pageParam,
       PAGE_SIZE,
       {
@@ -91,21 +51,6 @@ export const useGetUtxoOrdinalBundle = (
   const getUtxoOrdinalBundleByOutput = async () => {
     if (!output) {
       throw new InvalidParamsError('output is required');
-    }
-
-    const customOrdinalAddress = localStorage.getItem('ordinalAddress');
-    const useProdApi = localStorage.getItem('useProdApi');
-    if (!(useProdApi || customOrdinalAddress)) {
-      if (output === `${inscriptionPartOfBundle.txid}:${inscriptionPartOfBundle.vout}`) {
-        return inscriptionPartOfBundle;
-      }
-
-      if (
-        output ===
-        `${exoticInscriptionNotPartOfBundle.txid}:${exoticInscriptionNotPartOfBundle.vout}`
-      ) {
-        return exoticInscriptionNotPartOfBundle;
-      }
     }
 
     const [txid, vout] = output.split(':');
