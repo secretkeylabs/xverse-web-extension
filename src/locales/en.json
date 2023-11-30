@@ -1,7 +1,10 @@
 {
   "COMMON": {
     "INSCRIPTION": "Inscription",
-    "SEND": "Send"
+    "SEND": "Send",
+    "COMBO": "Combo",
+    "SATS": "Sats",
+    "SATTRIBUTES": "Sattributes"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
@@ -585,19 +588,6 @@
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",
     "ADD_STACKS_ADDRESS": "Add a Stacks address",
-    "RARITY_DETAIL": {
-      "TOP_TEXT": "Currently, only the default rarity scale is supported. Your sats could have other attributes.",
-      "LEARN_MORE": "Learn more",
-      "UNKNOWN": "A sat of unknown rarity.",
-      "UNCOMMON": "The first sat of each block.",
-      "RARE": "The first sat of each difficulty adjustment period.",
-      "EPIC": "The first sat of each halving epoch.",
-      "LEGENDARY": "The first sat of each cycle.",
-      "MYTHIC": "The first sat of the genesis block.",
-      "SCAN": "Scan for custom attributes",
-      "SUPPORTED_RARITIES": "Supported rarities",
-      "RARITY_INFO": "Currently, only the default rarity scale is supported. Your sats could have other attributes."
-    },
     "NFTS": "NFTs",
     "RARE_SATS": "Rare Sats",
     "NEW_FEATURE": "New Feature, Rare Sats",
@@ -608,7 +598,8 @@
     "RARE_SATS_NOTICE_TITLE": "Don't see your rare sat?",
     "RARE_SATS_NOTICE_DETAIL": "Currently, Xverse only supports the Rodarmor rarity index. Your sats may have other attributes.",
     "SEE_SUPPORTED": "See supported rarity scale",
-    "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle."
+    "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle.",
+    "HOLDS_RARE_SAT": "This inscription holds a rare sat."
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Restore assets",
@@ -1101,14 +1092,73 @@
     "LEARN_MORE": "Learn more"
   },
   "RARE_SATS": {
-    "RARE_TYPES": {
-      "UNKNOWN": "Unknown",
+    "RARITY_LABEL": {
       "UNCOMMON": "Uncommon",
-      "COMMON": "Common",
+      "COMMON": "Common/Unknown",
       "RARE": "Rare",
       "EPIC": "Epic",
       "LEGENDARY": "Legendary",
-      "MYTHIC": "Mythic"
+      "MYTHIC": "Mythic",
+      "BLACK_LEGENDARY": "Black Legendary",
+      "BLACK_EPIC": "Black Epic",
+      "BLACK_RARE": "Black Rare",
+      "BLACK_UNCOMMON": "Black Uncommon",
+      "FIBONACCI": "Fibonacci Sequence",
+      "1D_PALINDROME": "1D Pali",
+      "2D_PALINDROME": "2D Pali",
+      "3D_PALINDROME": "3D Pali",
+      "SEQUENCE_PALINDROME": "Sequence Pali",
+      "PERFECT_PALINCEPTION": "Perfect Paliception",
+      "PALIBLOCK_PALINDROME": "Block Pali",
+      "PALINDROME": "Palindrome",
+      "NAME_PALINDROME": "Name Palindrome",
+      "ALPHA": "Alpha",
+      "OMEGA": "Omega",
+      "FIRST_TRANSACTION": "First transaction",
+      "BLOCK9": "Block 9",
+      "BLOCK78": "Block 78",
+      "NAKAMOTO": "Nakamoto",
+      "VINTAGE": "Vintage",
+      "PIZZA": "Pizza",
+      "JPEG": "Jpeg",
+      "HITMAN": "Hitman",
+      "SILK_ROAD": "Silkroad"
+    },
+    "RARITY_DETAIL": {
+      "TOP_TEXT": "Currently, only the default rarity scale is supported. Your sats could have other attributes.",
+      "LEARN_MORE": "Learn more",
+      "RARITY_INFO": "Currently, only the default rarity scale is supported. Your sats could have other attributes.",
+      "SUPPORTED_RARITIES": "Supported rarities",
+      "MYTHIC": "The first sat of the genesis block.",
+      "LEGENDARY": "The first sat of each cycle.",
+      "EPIC": "The first sat of each halving epoch.",
+      "RARE": "The first sat of each difficulty adjustment period.",
+      "UNCOMMON": "The first sat of each block.",
+      "COMMON": "A sat of unknown rarity.",
+      "BLACK_LEGENDARY": "The last sat of each cycle.",
+      "BLACK_EPIC": "The last sat of each halving epoch.",
+      "BLACK_RARE": "The last sat of each difficulty adjustment period.",
+      "BLACK_UNCOMMON": "The last sat of each block.",
+      "FIBONACCI": "Sats with IDs that follow the Fibonacci Sequence.",
+      "1D_PALINDROME": "Sats with number composed of only 1 digit (ex: 888888888888).",
+      "2D_PALINDROME": "Sats with palindromic number, composed of only 2 digit (ex: 8888822288888).",
+      "3D_PALINDROME": "Sats with palindromic number, composed of only 3 digit (ex: 8885522255888).",
+      "SEQUENCE_PALINDROME": "Sats with palindromic number, and a sequence of at least 3 consecutive identical digits (ex: 3275433345723).",
+      "PERFECT_PALINCEPTION": "Sats with palindromic number made of a subsequence which is also a palindrome of at least 2 distinct digits.",
+      "PALIBLOCK_PALINDROME": "Sats with palindromic number, in a block with a palindromic number.",
+      "PALINDROME": "Sats with palindromic number (ex: 3275431345723).",
+      "NAME_PALINDROME": "Sats with palindromic names (ex: abcba).",
+      "ALPHA": "The first sats in each bitcoin. They always end in at least 8 zeros.",
+      "OMEGA": "The last sats in each bitcoin. They always end in at least 8 nines.",
+      "FIRST_TRANSACTION": "Sats from the 10 bitcoins Satoshi Nakamoto sent Hal Finney in the first bitcoin transaction.",
+      "BLOCK9": "Sats mined in Block 9 (the first block with sats circulating today).",
+      "BLOCK78": "Sats mined by Hal Finney in Block 78 (the first block mined by someone other than Satoshi).",
+      "NAKAMOTO": "Sats mined by Satoshi Nakamoto himself.",
+      "VINTAGE": "Sats mined in the first 1000 bitcoin blocks.",
+      "PIZZA": "Sats involved in the famous pizza transaction from 2010.",
+      "JPEG": "Sats involved in the possible first bitcoin trade for an image on February 24, 2010.",
+      "HITMAN": "Sats involved in the transaction made by Ross Ulbricht to hire a hitman.",
+      "SILK_ROAD": "Sats seized from Silk Road and auctioned off on June 27, 2014 by US Marshals."
     },
     "SAT_TYPES": {
       "RARE_SAT": "{{type}} Sat",
@@ -1125,7 +1175,8 @@
     "RARE_SATS_BUNDLE": "Rare Sats Bundle",
     "BUNDLE_PENDING_SEND_DESCRIPTION": "This bundle is already in a pending transfer.",
     "RARE_SAT": "Rare Sat",
-    "INSCRIBED_SAT": "Inscribed Sat"
+    "INSCRIBED_SAT": "Inscribed Sat",
+    "BUNDLE_SIZE": "Bundle size"
   },
   "COLLECTIBLE_COLLECTION_SCREEN": {
     "BACK_TO_GALLERY": "Back to gallery",
