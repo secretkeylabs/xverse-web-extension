@@ -13,12 +13,12 @@ import { BtcTransactionBroadcastResponse, Recipient } from '@secretkeylabs/xvers
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
-import SendLayout from 'app/layouts/sendLayout';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import SendLayout from 'app/layouts/sendLayout';
 
 const BottomBarContainer = styled.h1((props) => ({
   marginTop: props.theme.spacing(5),
