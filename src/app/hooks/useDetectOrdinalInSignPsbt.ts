@@ -1,39 +1,33 @@
 import {
+  Bundle,
+  BundleSatRange,
   getUtxoOrdinalBundle,
   mapRareSatsAPIResponseToBundle,
   ParsedPSBT,
 } from '@secretkeylabs/xverse-core';
-import { BundleItem } from '@utils/rareSats';
-import { isAxiosError } from 'axios';
 import useWalletSelector from './useWalletSelector';
+
+export type InputsBundle = Pick<Bundle, 'value' | 'satRanges' | 'totalExoticSats'>;
 
 const useDetectOrdinalInSignPsbt = () => {
   const { ordinalsAddress, network } = useWalletSelector();
 
   const handleOrdinalAndOrdinalInfo = async (parsedPsbt?: ParsedPSBT) => {
-    const bundleItems: BundleItem[] = [];
+    const satRanges: BundleSatRange[] = [];
+    let value = 0;
+    let totalExoticSats = 0;
     let userReceivesOrdinal = false;
 
     if (parsedPsbt) {
-      parsedPsbt.inputs.map(async (input) => {
-        try {
-          const data = await getUtxoOrdinalBundle(network.type, input.txid, input.index);
-
-          const bundle = mapRareSatsAPIResponseToBundle(data);
-          // bundle.items.forEach((item) => {
-          //   // we don't show unknown items for now
-          //   if (item.type === 'unknown') {
-          //     return;
-          //   }
-          //   bundleItems.push(item);
-          // });
-        } catch (e) {
-          // we get back a 404 if the UTXO is not found, so it is likely this is a UTXO from an unpublished txn
-          if (!isAxiosError(e) || e.response?.status !== 404) {
-            // rethrow error if response was not 404
-            throw e;
-          }
-        }
+      const inputsRequest = parsedPsbt.inputs.map((input) =>
+        getUtxoOrdinalBundle(network.type, input.txid, input.index),
+      );
+      const inputsResponse = await Promise.all(inputsRequest);
+      inputsResponse.forEach((inputResponse) => {
+        const bundle = mapRareSatsAPIResponseToBundle(inputResponse);
+        value += bundle.value;
+        totalExoticSats += bundle.totalExoticSats;
+        satRanges.push(...bundle.satRanges);
       });
 
       parsedPsbt.outputs.forEach((output) => {
@@ -43,8 +37,14 @@ const useDetectOrdinalInSignPsbt = () => {
       });
     }
 
+    const bundleItemsData = {
+      value,
+      satRanges,
+      totalExoticSats,
+    };
+
     return {
-      bundleItemsData: bundleItems,
+      bundleItemsData,
       userReceivesOrdinal,
     };
   };
