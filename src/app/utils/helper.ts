@@ -1,12 +1,12 @@
-import { getStacksInfo } from '@secretkeylabs/xverse-core';
-import BitcoinEsploraApiProvider from '@secretkeylabs/xverse-core/api/esplora/esploraAPiProvider';
 import {
   Account,
+  BitcoinEsploraApiProvider,
+  getStacksInfo,
   NetworkType,
+  NftData,
   SettingsNetwork,
   StxMempoolTransactionData,
-} from '@secretkeylabs/xverse-core/types';
-import { NftData } from '@secretkeylabs/xverse-core/types/api/stacks/assets';
+} from '@secretkeylabs/xverse-core';
 import { ChainID } from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
 import {

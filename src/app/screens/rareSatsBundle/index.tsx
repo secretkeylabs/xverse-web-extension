@@ -12,13 +12,17 @@ import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
-import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
+import { BundleSatRange } from '@secretkeylabs/xverse-core';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
-import { getBtcTxStatusUrl, isInOptions, isLedgerAccount } from '@utils/helper';
-import { BundleItem } from '@utils/rareSats';
+import {
+  getBtcTxStatusUrl,
+  getTruncatedAddress,
+  isInOptions,
+  isLedgerAccount,
+} from '@utils/helper';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import OrdinalAttributeComponent from '../ordinalDetail/ordinalAttributeComponent';
 import { RareSatsBundleGridItem } from './rareSatsBundleGridItem';
@@ -29,11 +33,13 @@ interface DetailSectionProps {
 
 /* layout */
 const Container = styled.div`
+  ...${(props) => props.theme.scrollbar};
   overflow-y: auto;
+  padding-bottom: ${(props) => props.theme.space.l};
 `;
 
 const PageHeader = styled.div<DetailSectionProps>`
-  padding: ${(props) => props.theme.space.m};
+  padding: ${(props) => (props.isGalleryOpen ? props.theme.space.m : 0)};
   padding-top: 0;
   max-width: 1224px;
   margin-top: ${(props) => (props.isGalleryOpen ? props.theme.space.xxl : props.theme.space.l)};
@@ -47,25 +53,15 @@ const PageHeaderContent = styled.div<DetailSectionProps>`
   display: flex;
   flex-direction: ${(props) => (props.isGalleryOpen ? 'row' : 'column')};
   justify-content: ${(props) => (props.isGalleryOpen ? 'space-between' : 'initial')};
-  row-gap: ${(props) => props.theme.space.xl};
 `;
 
-const AttributesContainer = styled.div`
-  max-width: 285px;
-`;
+const AttributesContainer = styled.div<DetailSectionProps>((props) => ({
+  maxWidth: props.isGalleryOpen ? '285px' : '100%',
+  padding: props.isGalleryOpen ? 0 : `0 ${props.theme.space.m}`,
+}));
 
 const StyledSeparator = styled(Separator)`
   margin-bottom: ${(props) => props.theme.space.xxl};
-`;
-
-const StyledGridContainer = styled(GridContainer)`
-  margin-top: ${(props) => props.theme.spacing(8)}px;
-  padding: 0 ${(props) => props.theme.space.m};
-  padding-bottom: ${(props) => props.theme.space.xl};
-  max-width: 1224px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
 `;
 
 /* components */
@@ -138,11 +134,39 @@ const NoCollectiblesText = styled.p((props) => ({
   textAlign: 'center',
 }));
 
+const Header = styled.div<{ isGalleryOpen: boolean }>((props) => ({
+  display: props.isGalleryOpen ? 'block' : 'flex',
+  flexDirection: props.isGalleryOpen ? 'row' : 'column',
+  alignItems: props.isGalleryOpen ? 'flex-start' : 'center',
+}));
+
+const SatRangeContainer = styled.div<DetailSectionProps>((props) => ({
+  marginTop: props.isGalleryOpen ? 0 : props.theme.space.xl,
+  maxWidth: '1224px',
+  marginLeft: 'auto',
+  marginRight: 'auto',
+  width: '100%',
+}));
+
+const DetailSection = styled.div<DetailSectionProps>((props) => ({
+  display: 'flex',
+  flexDirection: props.isGalleryOpen ? 'column' : 'row',
+  justifyContent: 'space-between',
+  columnGap: props.theme.space.m,
+  width: '100%',
+}));
+
+const SeeRarityContainer = styled.div`
+  padding: ${(props) => props.theme.space.l} ${(props) => props.theme.space.m};
+`;
+
 function RareSatsBundle() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
-  const { network, selectedAccount } = useWalletSelector();
-  const { selectedSatBundle: bundle } = useNftDataSelector();
+  const location = useLocation();
+  const { source } = location.state || {};
+  const { network, selectedAccount, ordinalsAddress } = useWalletSelector();
+  const { selectedSatBundle: bundle, selectedOrdinal } = useNftDataSelector();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(bundle?.txid);
   const [showSendOrdinalsAlert, setShowSendOrdinalsAlert] = useState<boolean>(false);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
@@ -152,7 +176,11 @@ function RareSatsBundle() {
   useResetUserFlow('/rare-sats-bundle');
 
   const handleBackButtonClick = () => {
-    navigate('/nft-dashboard?tab=rareSats');
+    if (source === 'OrdinalDetail') {
+      navigate(-1);
+    } else {
+      navigate('/nft-dashboard?tab=rareSats');
+    }
     setSelectedSatBundleDetails(null);
   };
 
@@ -191,7 +219,11 @@ function RareSatsBundle() {
     navigate('/nft-dashboard/supported-rarity-scale');
   };
 
-  const isEmpty = !bundle?.items?.length;
+  const isEmpty = !bundle?.satRanges?.length;
+
+  const goBackText = selectedOrdinal?.id
+    ? t('SEND.MOVE_TO_ASSET_DETAIL')
+    : t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL');
 
   return (
     <>
@@ -207,20 +239,18 @@ function RareSatsBundle() {
               <Button onClick={handleBackButtonClick}>
                 <>
                   <ButtonImage src={ArrowLeft} />
-                  <AssetDetailButtonText>
-                    {t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL')}
-                  </AssetDetailButtonText>
+                  <AssetDetailButtonText>{goBackText}</AssetDetailButtonText>
                 </>
               </Button>
             </BackButtonContainer>
           )}
           <PageHeaderContent isGalleryOpen={isGalleryOpen}>
-            <div>
+            <Header isGalleryOpen={isGalleryOpen}>
               <StyledP typography="body_bold_m" color="white_400">
-                {t('RARE_SATS.RARE_SATS_BUNDLE')}
+                {t('NFT_DASHBOARD_SCREEN.RARE_SATS')}
               </StyledP>
               <StyledHeading typography="headline_m" color="white_0">
-                {t('NFT_DASHBOARD_SCREEN.TOTAL_ITEMS', { total: bundle?.items?.length })}
+                {bundle?.totalExoticSats}
               </StyledHeading>
               {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
               <SendButtonContainer isGalleryOpen={isGalleryOpen}>
@@ -230,19 +260,47 @@ function RareSatsBundle() {
                   onPress={handleSendOrdinal}
                 />
               </SendButtonContainer>
-              <BundleRarityLinkContainer onClick={handleRarityScale}>
-                <StyledP typography="body_medium_m" color="currentColor">
-                  {t('RARE_SATS.RARITY_LINK_TEXT')}
-                </StyledP>
-                <ArrowRight size={16} weight="bold" color="currentColor" />
-              </BundleRarityLinkContainer>
-            </div>
-            <AttributesContainer>
-              <OrdinalAttributeComponent
-                title={t('RARE_SATS.SATS_VALUE')}
-                value={`${bundle?.value}`}
-                suffix=" sats"
-              />
+              {isGalleryOpen && (
+                <BundleRarityLinkContainer onClick={handleRarityScale}>
+                  <StyledP typography="body_medium_m" color="currentColor">
+                    {t('RARE_SATS.RARITY_LINK_TEXT')}
+                  </StyledP>
+                  <ArrowRight size={16} weight="bold" color="currentColor" />
+                </BundleRarityLinkContainer>
+              )}
+            </Header>
+            {isEmpty && (
+              <NoCollectiblesText>{t('NFT_DASHBOARD_SCREEN.NO_COLLECTIBLES')}</NoCollectiblesText>
+            )}
+            {!isGalleryOpen && (
+              <SatRangeContainer isGalleryOpen={isGalleryOpen}>
+                {bundle?.satRanges.map((item: BundleSatRange) => (
+                  <RareSatsBundleGridItem key={`${item.block}-${item.offset}`} item={item} />
+                ))}
+              </SatRangeContainer>
+            )}
+            {!isGalleryOpen && (
+              <SeeRarityContainer>
+                <ActionButton
+                  text={t('RARE_SATS.RARITY_LINK_TEXT')}
+                  transparent
+                  onPress={handleRarityScale}
+                />
+              </SeeRarityContainer>
+            )}
+            <AttributesContainer isGalleryOpen={isGalleryOpen}>
+              <DetailSection>
+                <OrdinalAttributeComponent
+                  title={t('RARE_SATS.SATS_VALUE')}
+                  value={`${bundle?.value}`}
+                  suffix=" sats"
+                />
+                <OrdinalAttributeComponent
+                  title={t('NFT_DETAIL_SCREEN.OWNED_BY')}
+                  value={getTruncatedAddress(ordinalsAddress, 6)}
+                  isAddress
+                />
+              </DetailSection>
               <OrdinalAttributeComponent
                 title={t('NFT_DETAIL_SCREEN.ID')}
                 value={bundle?.txid}
@@ -255,15 +313,13 @@ function RareSatsBundle() {
         {isEmpty && (
           <NoCollectiblesText>{t('NFT_DASHBOARD_SCREEN.NO_COLLECTIBLES')}</NoCollectiblesText>
         )}
-        <StyledGridContainer isGalleryOpen={isGalleryOpen}>
-          {bundle?.items?.map((item: BundleItem, index) => (
-            <RareSatsBundleGridItem
-              key={index} // eslint-disable-line react/no-array-index-key
-              itemIndex={index}
-              item={item}
-            />
-          ))}
-        </StyledGridContainer>
+        {isGalleryOpen && (
+          <SatRangeContainer isGalleryOpen={isGalleryOpen}>
+            {bundle?.satRanges.map((item: BundleSatRange) => (
+              <RareSatsBundleGridItem key={`${item.block}-${item.offset}`} item={item} />
+            ))}
+          </SatRangeContainer>
+        )}
         {showSendOrdinalsAlert && (
           <AlertMessage
             title={t('ORDINAL_PENDING_SEND_TITLE')}

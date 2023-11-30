@@ -1,6 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import {} from '@secretkeylabs/xverse-core/';
-import { getOrdinalsFtBalance } from '@secretkeylabs/xverse-core/api';
+import { getOrdinalsFtBalance } from '@secretkeylabs/xverse-core';
 import { setBrcCoinsDataAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';

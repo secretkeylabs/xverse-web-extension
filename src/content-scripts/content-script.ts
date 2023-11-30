@@ -5,9 +5,10 @@ import {
   DomEventName,
   GetAddressRequestEvent,
   SendBtcRequestEvent,
+  SignatureRequestEvent,
+  SignBatchPsbtRequestEvent,
   SignMessageRequestEvent,
   SignPsbtRequestEvent,
-  SignatureRequestEvent,
   TransactionRequestEvent,
 } from '@common/types/inpage-types';
 import {
@@ -143,6 +144,18 @@ document.addEventListener(DomEventName.signPsbtRequest, ((event: SignPsbtRequest
     payload: event.detail.signPsbtRequest,
     urlParam: 'signPsbtRequest',
     method: ExternalSatsMethods.signPsbtRequest,
+  });
+}) as EventListener);
+
+// Listen for a CustomEvent (Batch PSBT Signing request) coming from the web app
+document.addEventListener(DomEventName.signBatchPsbtRequest, ((
+  event: SignBatchPsbtRequestEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.SignBatchBtcTx,
+    payload: event.detail.signBatchPsbtRequest,
+    urlParam: 'signBatchPsbtRequest',
+    method: ExternalSatsMethods.signBatchPsbtRequest,
   });
 }) as EventListener);
 

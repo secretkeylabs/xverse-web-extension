@@ -12,11 +12,11 @@ export default function popupCenter(options: PopupOptions): Promise<Windows.Wind
   return new Promise((resolve) => {
     chrome.windows.getCurrent(async (win) => {
       // the farthest left/top sides of all displays
-      const dualScreenLeft = win.left;
-      const dualScreenTop = win.top;
+      const dualScreenLeft = win.left ?? 0;
+      const dualScreenTop = win.top ?? 0;
 
       // dimensions of the window that originated the action
-      const { width, height } = win;
+      const { width = 0, height = 0 } = win;
 
       const left = Math.floor(width / 2 - w / 2 + dualScreenLeft);
       const top = Math.floor(height / 2 - h / 2 + dualScreenTop);
@@ -31,7 +31,7 @@ export default function popupCenter(options: PopupOptions): Promise<Windows.Wind
         type: 'popup',
       });
 
-      resolve(popup);
+      resolve(popup as Windows.Window);
     });
   });
 }

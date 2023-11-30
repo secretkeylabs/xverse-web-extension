@@ -1,7 +1,7 @@
+import { currencySymbolMap, SupportedCurrency } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
-import styled from 'styled-components';
 import { NumericFormat } from 'react-number-format';
-import { SupportedCurrency, currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import styled from 'styled-components';
 
 export function FiatAmountText({
   className,

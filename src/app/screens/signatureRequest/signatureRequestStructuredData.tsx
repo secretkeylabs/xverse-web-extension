@@ -14,7 +14,7 @@ export default function SignatureRequestStructuredData(props: SignatureRequestSt
   return (
     <CollapsableContainer text="" title={t('MESSAGE_HEADER')}>
       <ClarityMessageView
-        val={deserializeCV(Buffer.from(payload.message, 'hex'))}
+        val={deserializeCV(Buffer.from(payload.message as any, 'hex'))} // TODO: fix type error
         encoding="tryAscii"
       />
     </CollapsableContainer>

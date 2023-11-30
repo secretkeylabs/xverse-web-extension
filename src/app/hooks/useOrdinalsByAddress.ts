@@ -1,5 +1,4 @@
-import { getOrdinalsByAddress } from '@secretkeylabs/xverse-core/api/xverse';
-import { BtcOrdinal } from '@secretkeylabs/xverse-core/types';
+import { BtcOrdinal, getOrdinalsByAddress } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import useWalletSelector from './useWalletSelector';
 

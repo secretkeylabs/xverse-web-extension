@@ -1,5 +1,11 @@
 import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
-import { CreateInscriptionResponse, CreateRepeatInscriptionsResponse, GetAddressResponse, SignPsbtResponse } from 'sats-connect';
+import {
+  CreateInscriptionResponse,
+  CreateRepeatInscriptionsResponse,
+  GetAddressResponse,
+  SignMultipleTransactionsResponse,
+  SignTransactionResponse,
+} from 'sats-connect';
 
 export const MESSAGE_SOURCE = 'xverse-wallet' as const;
 
@@ -100,7 +106,9 @@ export enum ExternalSatsMethods {
   getAddressRequest = 'getAddressRequest',
   getAddressResponse = 'getAddressResponse',
   signPsbtRequest = 'signPsbtRequest',
+  signBatchPsbtRequest = 'signBatchPsbtRequest',
   signPsbtResponse = 'signPsbtResponse',
+  signBatchPsbtResponse = 'signBatchPsbtResponse',
   signMessageRequest = 'signMessageRequest',
   signMessageResponse = 'signMessageResponse',
   sendBtcRequest = 'sendBtcRequest',
@@ -123,11 +131,21 @@ export type GetAddressResponseMessage = Message<
 
 type SignPsbtRequestMessage = Message<ExternalSatsMethods.signPsbtRequest, string>;
 
+type SignBatchPsbtRequestMessage = Message<ExternalSatsMethods.signBatchPsbtRequest, string>;
+
 export type SignPsbtResponseMessage = Message<
   ExternalSatsMethods.signPsbtResponse,
   {
     signPsbtRequest: string;
-    signPsbtResponse: SignPsbtResponse | string;
+    signPsbtResponse: SignTransactionResponse | string;
+  }
+>;
+
+export type SignBatchPsbtResponseMessage = Message<
+  ExternalSatsMethods.signBatchPsbtResponse,
+  {
+    signBatchPsbtRequest: string;
+    signBatchPsbtResponse: SignMultipleTransactionsResponse | string;
   }
 >;
 
@@ -180,6 +198,7 @@ export type CreateRepeatInscriptionsResponseMessage = Message<
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage
   | SignPsbtRequestMessage
+  | SignBatchPsbtRequestMessage
   | SignMessageRequestMessage
   | SendBtcRequestMessage
   | CreateInscriptionRequestMessage
@@ -188,6 +207,7 @@ export type SatsConnectMessageFromContentScript =
 export type SatsConnectMessageToContentScript =
   | GetAddressResponseMessage
   | SignPsbtResponseMessage
+  | SignBatchPsbtResponseMessage
   | SignMessageResponseMessage
   | SendBtcResponseMessage
   | CreateInscriptionResponseMessage

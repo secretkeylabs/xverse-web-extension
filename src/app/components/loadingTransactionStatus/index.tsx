@@ -1,9 +1,9 @@
 import ActionButton from '@components/button';
-import className from 'classnames';
-import styled from 'styled-components';
-import { StyledP, StyledHeading, VerticalStackButtonContainer } from '@ui-library/common.styled';
 import { animated, easings, useSpring } from '@react-spring/web';
+import { StyledHeading, StyledP, VerticalStackButtonContainer } from '@ui-library/common.styled';
+import className from 'classnames';
 import { useState } from 'react';
+import styled from 'styled-components';
 import { CircularSvgAnimation, ConfirmationStatus } from './circularSvgAnimation';
 
 type Texts = {
@@ -84,7 +84,7 @@ const StatusLarge = styled.div`
 `;
 
 const Heading = styled(StyledHeading)`
-  margin-bottom: 6px;
+  margin-bottom: 12px;
 `;
 
 /**
@@ -103,13 +103,15 @@ export function LoadingTransactionStatus({
   primaryAction,
   secondaryAction,
   loadingPercentage,
+  withLoadingBgCircle = false,
 }: {
   status: ConfirmationStatus;
   resultTexts: Texts;
   loadingTexts: Texts;
   primaryAction: Action;
-  secondaryAction: Action;
+  secondaryAction?: Action;
   loadingPercentage: number;
+  withLoadingBgCircle?: boolean;
 }) {
   const [hasCircleAnimationRested, setHasCircleAnimationRested] = useState(false);
 
@@ -147,6 +149,7 @@ export function LoadingTransactionStatus({
             status={status}
             loadingPercentage={loadingPercentage}
             onRest={handleAnimationRest}
+            withLoadingBgCircle={withLoadingBgCircle}
           />
         </StatusLarge>
         <AnimatedBodyContainer>
@@ -167,7 +170,7 @@ export function LoadingTransactionStatus({
       <BottomFixedContainer className={visibleClass}>
         <VerticalStackButtonContainer>
           <ActionButton text={primaryAction.text} onPress={primaryAction.onPress} />
-          {status === 'SUCCESS' && (
+          {secondaryAction && status === 'SUCCESS' && (
             <ActionButton
               text={secondaryAction.text}
               onPress={secondaryAction.onPress}
