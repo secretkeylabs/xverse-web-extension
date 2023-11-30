@@ -13,7 +13,7 @@ const RangeContainer = styled.div``;
 const Range = styled.div`
   display: flex;
   border-radius: 6px;
-  border: 1px solid var(--white-800, rgba(255, 255, 255, 0.2));
+  border: 1px solid ${(props) => props.theme.colors.white_800};
   padding: 1px;
   flex-wrap: wrap;
   flex-direction: row;
@@ -32,7 +32,7 @@ const Container = styled.div<ComponentWithDividerProps>`
   justify-content: space-between;
   align-items: center;
   border-bottom: ${(props) =>
-    props.showDivider ? '1px solid rgba(255, 255, 255, 0.10)' : 'transparent'};
+    props.showDivider ? `1px solid ${props.theme.colors.white_900}` : 'transparent'};
   width: 100%;
 }`;
 
