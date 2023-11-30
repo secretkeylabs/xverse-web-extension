@@ -3,19 +3,19 @@ import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
+import SatsBundle from '@components/confirmBtcTransactionComponent/bundle';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import InfoContainer from '@components/infoContainer';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
 import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
-import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
+import useDetectOrdinalInSignPsbt, { InputsBundle } from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
-import { parsePsbt, satsToBtc } from '@secretkeylabs/xverse-core';
+import { Bundle, parsePsbt, satsToBtc } from '@secretkeylabs/xverse-core';
 import { isLedgerAccount } from '@utils/helper';
-import { BundleItem } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,8 +23,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import { SignMultiplePsbtPayload } from 'sats-connect';
 import styled from 'styled-components';
-import BundleItemComponent from '../signPsbtRequest/bundleItemsComponent';
-import BundleItemsComponent from './bundleItemsComponent';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -133,7 +131,7 @@ function SignBatchPsbtRequest() {
   const tabId = params.get('tabId') ?? '0';
   const handleOrdinalAndOrdinalInfo = useDetectOrdinalInSignPsbt();
   const [userReceivesOrdinalArr, setUserReceivesOrdinalArr] = useState<
-    { bundleItemsData: BundleItem[]; userReceivesOrdinal: boolean }[]
+    { bundleItemsData: InputsBundle; userReceivesOrdinal: boolean }[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -366,13 +364,17 @@ function SignBatchPsbtRequest() {
                   <ArrowRight size={12} weight="bold" />
                 </BundleLinkContainer>
 
-                {userTransfersOrdinals.length > 0 && (
-                  <BundleItemsComponent items={userReceivesOrdinals} />
-                )}
+                {userTransfersOrdinals.length > 0 &&
+                  userTransfersOrdinals.map((item, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <SatsBundle key={`${index}-transfer`} bundle={item as Bundle} />
+                  ))}
 
-                {userReceivesOrdinals.length > 0 && (
-                  <BundleItemsComponent items={userReceivesOrdinals} userReceivesOrdinal />
-                )}
+                {userReceivesOrdinals.length > 0 &&
+                  userTransfersOrdinals.map((item, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <SatsBundle key={`${index}-receive`} bundle={item as Bundle} />
+                  ))}
 
                 <RecipientComponent
                   value={`${satsToBtc(totalNetAmount).toString().replace('-', '')}`}
@@ -418,14 +420,16 @@ function SignBatchPsbtRequest() {
               {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
             </ReviewTransactionText>
 
-            {userReceivesOrdinalArr[currentPsbtIndex]?.bundleItemsData?.map((bundleItem, index) => (
-              <BundleItemComponent
-                // eslint-disable-next-line react/no-array-index-key
-                key={index}
-                item={bundleItem}
-                userReceivesOrdinal={userReceivesOrdinalArr[currentPsbtIndex].userReceivesOrdinal}
+            {userReceivesOrdinalArr[currentPsbtIndex]?.bundleItemsData && (
+              <SatsBundle
+                title={
+                  userReceivesOrdinalArr[currentPsbtIndex]?.userReceivesOrdinal
+                    ? t('YOU_WILL_RECEIVE')
+                    : t('YOU_WILL_TRANSFER')
+                }
+                bundle={userReceivesOrdinalArr[currentPsbtIndex]?.bundleItemsData as Bundle}
               />
-            ))}
+            )}
 
             <RecipientComponent
               value={`${
