@@ -81,7 +81,7 @@ export default function BtcTransactionHistoryItem({
   transaction,
   wallet,
 }: TransactionHistoryItemProps) {
-  const { network } = useWalletSelector();
+  const { network, hasActivatedRBFKey } = useWalletSelector();
   const isBtc = isBtcTransaction(transaction) ? 'BTC' : 'brc20';
   const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
@@ -91,7 +91,9 @@ export default function BtcTransactionHistoryItem({
   }, []);
 
   const showAccelerateButton =
-    isBtcTransaction(transaction) && rbf.isTransactionRbfEnabled(transaction, wallet);
+    hasActivatedRBFKey &&
+    isBtcTransaction(transaction) &&
+    rbf.isTransactionRbfEnabled(transaction, wallet);
 
   return (
     <TransactionContainer onClick={openBtcTxStatusLink}>
