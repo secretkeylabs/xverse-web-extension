@@ -596,8 +596,8 @@
     "MAYBE_LATER": "Maybe Later",
     "ENABLE": "Enable",
     "RARE_SATS_NOTICE_TITLE": "Don't see your rare sat?",
-    "RARE_SATS_NOTICE_DETAIL": "Currently, Xverse only supports the Rodarmor rarity index. Your sats may have other attributes.",
-    "SEE_SUPPORTED": "See supported rarity scale",
+    "RARE_SATS_NOTICE_DETAIL": "Xverse supports most rare sats, but your sats may have other attributes.",
+    "SEE_SUPPORTED": "See supported rarities",
     "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle.",
     "HOLDS_RARE_SAT": "This inscription holds a rare sat."
   },
@@ -1125,9 +1125,8 @@
       "SILK_ROAD": "Silkroad"
     },
     "RARITY_DETAIL": {
-      "TOP_TEXT": "Currently, only the default rarity scale is supported. Your sats could have other attributes.",
       "LEARN_MORE": "Learn more",
-      "RARITY_INFO": "Currently, only the default rarity scale is supported. Your sats could have other attributes.",
+      "RARITY_INFO": "Looking for more rare sats? Your sats may have other attributes which are not supported yet.",
       "SUPPORTED_RARITIES": "Supported rarities",
       "MYTHIC": "The first sat of the genesis block.",
       "LEGENDARY": "The first sat of each cycle.",
