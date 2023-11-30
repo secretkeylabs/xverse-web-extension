@@ -2,19 +2,17 @@ import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  currencySymbolMap,
   ErrorCodes,
-  getBtcFiatEquivalent,
-  getStxFiatEquivalent,
-  stxToMicrostacks,
-  UTXO,
-} from '@secretkeylabs/xverse-core';
-import {
   getBtcFees,
   getBtcFeesForNonOrdinalBtcSend,
   getBtcFeesForOrdinalSend,
+  getBtcFiatEquivalent,
+  getStxFiatEquivalent,
   Recipient,
-} from '@secretkeylabs/xverse-core/transactions/btc';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+  stxToMicrostacks,
+  UTXO,
+} from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

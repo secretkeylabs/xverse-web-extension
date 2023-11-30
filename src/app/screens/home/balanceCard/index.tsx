@@ -1,7 +1,6 @@
 import BarLoader from '@components/barLoader';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core/currency';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { currencySymbolMap, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';

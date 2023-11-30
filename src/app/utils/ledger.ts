@@ -1,5 +1,4 @@
-import { NetworkType, signSimpleBip322Message } from '@secretkeylabs/xverse-core';
-import { Transport } from '@secretkeylabs/xverse-core/ledger/types';
+import { NetworkType, signSimpleBip322Message, Transport } from '@secretkeylabs/xverse-core';
 
 export const handleBip322LedgerMessageSigning = async ({
   transport,

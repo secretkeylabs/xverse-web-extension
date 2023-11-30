@@ -1,12 +1,11 @@
-import { useTranslation } from 'react-i18next';
-import { ArrowUpRight } from '@phosphor-icons/react';
-import styled from 'styled-components';
 import TopRow from '@components/topRow';
-import { useNavigate } from 'react-router-dom';
+import { ArrowUpRight } from '@phosphor-icons/react';
+import { RodarmorRareSats, Satributes } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { RareSats } from '@utils/rareSats';
-import { useMemo } from 'react';
 import { BLOG_LINK } from '@utils/constants';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import Theme from 'theme';
 import RarityTile from './rarityTile';
 
@@ -46,21 +45,22 @@ const Container = styled.div<ContainerProps>((props) => ({
   width: props.isGallery ? 580 : '100%',
 }));
 
-const MainContainer = styled.div({
+const MainContainer = styled.div((props) => ({
+  ...props.theme.scrollbar,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   width: '100%',
-  height: '100%',
-});
+  backgroundColor: Theme.colors.elevation0,
+}));
 
-const rarityTypes = RareSats.filter((rareSat) => rareSat !== 'common');
+const rarityTypes = [...RodarmorRareSats, ...Satributes];
 
 function SupportedRarities() {
   const navigate = useNavigate();
-  const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
+  const { t } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   const openLearnMoreLink = () =>
     window.open(`${BLOG_LINK}/rare-satoshis`, '_blank', 'noopener,noreferrer');
@@ -80,7 +80,7 @@ function SupportedRarities() {
             <StyledP typography="body_medium_m" color="orange_main">
               {t('RARITY_DETAIL.LEARN_MORE')}
             </StyledP>
-            <ArrowUpRight size="16" color={Theme.colors.orange_main} />
+            <ArrowUpRight size="16" color={Theme.colors.tangerine} />
           </ButtonImage>
 
           <TypesContainer>

@@ -2,7 +2,7 @@ import ChevronIcon from '@assets/img/swap/chevron.svg';
 import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SwapToken } from '@screens/swap/types';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';

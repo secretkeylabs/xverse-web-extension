@@ -1,15 +1,16 @@
-import { useMemo } from 'react';
-import SeedVault, {
+import {
   CryptoUtilsAdapter,
+  generateRandomKey,
+  SeedVault,
   StorageAdapter,
-} from '@secretkeylabs/xverse-core/seedVault';
-import { generateRandomKey } from '@secretkeylabs/xverse-core/encryption';
-import { chromeSessionStorage, chromeLocalStorage } from '@utils/chromeStorage';
+} from '@secretkeylabs/xverse-core';
+import { chromeLocalStorage, chromeSessionStorage } from '@utils/chromeStorage';
 import {
   decryptSeedPhraseHandler,
   encryptSeedPhraseHandler,
   generateKeyArgon2id,
 } from '@utils/encryptionUtils';
+import { useMemo } from 'react';
 
 const cryptoUtilsAdapter: CryptoUtilsAdapter = {
   encrypt: encryptSeedPhraseHandler,

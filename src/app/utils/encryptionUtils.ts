@@ -1,9 +1,10 @@
-import argon2 from 'argon2-browser';
-import { encryptSeedPhrase, decryptSeedPhrase } from '@secretkeylabs/xverse-core/encryption';
 import {
-  encryptMnemonicWithHandler,
   decryptMnemonicWithHandler,
-} from '@secretkeylabs/xverse-core/wallet';
+  decryptSeedPhrase,
+  encryptMnemonicWithHandler,
+  encryptSeedPhrase,
+} from '@secretkeylabs/xverse-core';
+import argon2 from 'argon2-browser';
 
 export async function generateKeyArgon2id(password: string, salt: string): Promise<string> {
   const result = await argon2.hash({

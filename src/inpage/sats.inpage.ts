@@ -3,6 +3,7 @@ import {
   DomEventName,
   GetAddressRequestEventDetails,
   SendBtcRequestEventDetails,
+  SignBatchPsbtRequestEventDetails,
   SignMessageRequestEventDetails,
   SignPsbtRequestEventDetails,
 } from '@common/types/inpage-types';
@@ -13,6 +14,7 @@ import {
   MESSAGE_SOURCE,
   SatsConnectMessageToContentScript,
   SendBtcResponseMessage,
+  SignBatchPsbtResponseMessage,
   SignMessageResponseMessage,
   SignPsbtResponseMessage,
 } from '@common/types/message-types';
@@ -20,6 +22,7 @@ import {
   BitcoinProvider,
   CreateInscriptionResponse,
   GetAddressResponse,
+  SignMultipleTransactionsResponse,
   SignTransactionResponse,
 } from 'sats-connect';
 
@@ -30,6 +33,7 @@ const isValidEvent = (event: MessageEvent, method: SatsConnectMessageToContentSc
   return correctSource && correctMethod && !!data.payload;
 };
 
+// @ts-ignore
 const SatsMethodsProvider: BitcoinProvider = {
   connect: async (btcAddressRequest): Promise<GetAddressResponse> => {
     const event = new CustomEvent<GetAddressRequestEventDetails>(DomEventName.getAddressRequest, {
@@ -68,6 +72,32 @@ const SatsMethodsProvider: BitcoinProvider = {
         }
         if (typeof eventMessage.data.payload.signPsbtResponse !== 'string') {
           resolve(eventMessage.data.payload.signPsbtResponse);
+        }
+      };
+      window.addEventListener('message', handleMessage);
+    });
+  },
+  signMultipleTransactions: async (
+    signBatchPsbtRequest: string,
+  ): Promise<SignMultipleTransactionsResponse> => {
+    const event = new CustomEvent<SignBatchPsbtRequestEventDetails>(
+      DomEventName.signBatchPsbtRequest,
+      {
+        detail: { signBatchPsbtRequest },
+      },
+    );
+    document.dispatchEvent(event);
+    return new Promise((resolve, reject) => {
+      const handleMessage = (eventMessage: MessageEvent<SignBatchPsbtResponseMessage>) => {
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.signBatchPsbtResponse)) return;
+        if (eventMessage.data.payload?.signBatchPsbtRequest !== signBatchPsbtRequest) return;
+        window.removeEventListener('message', handleMessage);
+        if (eventMessage.data.payload.signBatchPsbtResponse === 'cancel') {
+          reject(eventMessage.data.payload.signBatchPsbtResponse);
+          return;
+        }
+        if (typeof eventMessage.data.payload.signBatchPsbtResponse !== 'string') {
+          resolve(eventMessage.data.payload.signBatchPsbtResponse);
         }
       };
       window.addEventListener('message', handleMessage);

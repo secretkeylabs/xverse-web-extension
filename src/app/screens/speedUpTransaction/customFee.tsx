@@ -107,31 +107,35 @@ export default function CustomFee({
   onClose,
   onClickApply,
   calculateTotalFee,
+  feeRate,
   fee,
   initialFeeRate,
+  initialTotalFee,
   minimumFeeRate,
   isFeeLoading,
   error,
 }: {
   visible: boolean;
   onClose: () => void;
-  onClickApply: (feeRate: string) => void;
+  onClickApply: (feeRate: string, fee: string) => void;
   calculateTotalFee: (feeRate: string) => Promise<number | undefined>;
-  fee: string;
+  feeRate?: string;
+  fee?: string;
   initialFeeRate: string;
+  initialTotalFee: string;
   minimumFeeRate?: string;
   isFeeLoading: boolean;
   error: string;
 }) {
   const { t } = useTranslation('translation');
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
-  const [feeRateInput, setFeeRateInput] = useState(initialFeeRate);
-  const [totalFee, setTotalFee] = useState(fee);
+  const [feeRateInput, setFeeRateInput] = useState(feeRate || minimumFeeRate || initialFeeRate);
+  const [totalFee, setTotalFee] = useState(fee || initialTotalFee);
 
   const fetchTotalFee = async () => {
     const response = await calculateTotalFee(feeRateInput);
 
-    if (response && initialFeeRate !== feeRateInput) {
+    if (response) {
       setTotalFee(response.toString());
     }
   };
@@ -156,10 +160,12 @@ export default function CustomFee({
 
   const handleClickApply = () => {
     // apply state to parent
-    onClickApply(feeRateInput);
+    onClickApply(feeRateInput, totalFee);
   };
 
-  const fiatFee = getBtcFiatEquivalent(new BigNumber(totalFee), BigNumber(btcFiatRate));
+  const fiatFee = totalFee
+    ? getBtcFiatEquivalent(BigNumber(totalFee), BigNumber(btcFiatRate))
+    : BigNumber(0);
 
   return (
     <BottomModal visible={visible} header={t('TRANSACTION_SETTING.CUSTOM_FEE')} onClose={onClose}>

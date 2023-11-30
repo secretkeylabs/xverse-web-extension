@@ -1,7 +1,7 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { ledgerDelay } from '@common/utils/ledger';
+import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
@@ -275,7 +275,7 @@ function ConfirmStxTransationComponent({
     }
 
     setIsConnectSuccess(true);
-    await ledgerDelay(1500);
+    await delay(1500);
     setCurrentStepIndex(1);
     try {
       const signedTxs = await signLedgerStxTransaction({
@@ -284,7 +284,7 @@ function ConfirmStxTransationComponent({
         addressIndex: selectedAccount.deviceAccountIndex,
       });
       setIsTxApproved(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       onConfirmClick([signedTxs]);
     } catch (e) {
       console.error(e);
@@ -319,10 +319,13 @@ function ConfirmStxTransationComponent({
 
         {children}
         <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
-        {initialStxTransactions[0]?.payload?.amount && (
+        {/* TODO fix type error as any */}
+        {(initialStxTransactions[0]?.payload as any)?.amount && (
           <TransferFeeView
             fee={microstacksToStx(
-              getFee().plus(new BigNumber(initialStxTransactions[0]?.payload.amount?.toString(10))),
+              getFee().plus(
+                new BigNumber((initialStxTransactions[0]?.payload as any).amount?.toString(10)),
+              ),
             )}
             currency="STX"
             title={t('TOTAL')}

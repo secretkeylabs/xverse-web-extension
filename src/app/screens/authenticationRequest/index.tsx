@@ -2,7 +2,7 @@ import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
-import { ledgerDelay } from '@common/utils/ledger';
+import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -12,7 +12,11 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { createAuthResponse, handleLedgerStxJWTAuth } from '@secretkeylabs/xverse-core';
+import {
+  AuthRequest,
+  createAuthResponse,
+  handleLedgerStxJWTAuth,
+} from '@secretkeylabs/xverse-core';
 import { AddressVersion, publicKeyToAddress, StacksMessageType } from '@stacks/transactions';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
@@ -82,7 +86,7 @@ function AuthenticationRequest() {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
-  const authRequest = decodeToken(authRequestToken);
+  const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
   const { selectedAccount } = useWalletSelector();
   const { getSeed } = useSeedVault();
   const isDisabled = !selectedAccount?.stxAddress;
@@ -156,7 +160,7 @@ function AuthenticationRequest() {
     }
 
     setIsConnectSuccess(true);
-    await ledgerDelay(1500);
+    await delay(1500);
     setCurrentStepIndex(1);
 
     const profile = {
@@ -176,7 +180,7 @@ function AuthenticationRequest() {
         profile,
       });
       setIsTxApproved(true);
-      await ledgerDelay(1500);
+      await delay(1500);
       chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
         source: MESSAGE_SOURCE,
         payload: {

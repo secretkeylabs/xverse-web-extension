@@ -183,7 +183,7 @@ export const useNftDashboard = (): NftDashboardState => {
               text={t('LOAD_MORE')}
               processing={inscriptionsQuery.isFetchingNextPage}
               disabled={inscriptionsQuery.isFetchingNextPage}
-              onPress={inscriptionsQuery.fetchNextPage}
+              onPress={() => inscriptionsQuery.fetchNextPage()}
             />
           </LoadMoreButtonContainer>
         )}

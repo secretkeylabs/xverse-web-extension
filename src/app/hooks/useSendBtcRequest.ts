@@ -1,12 +1,12 @@
-import { Recipient, signBtcTransaction } from '@secretkeylabs/xverse-core/transactions/btc';
+import { Recipient, signBtcTransaction } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SendBtcTransactionOptions } from 'sats-connect';
-import useWalletSelector from './useWalletSelector';
 import useSeedVault from './useSeedVault';
+import useWalletSelector from './useWalletSelector';
 
 function useSendBtcRequest() {
   const { search } = useLocation();

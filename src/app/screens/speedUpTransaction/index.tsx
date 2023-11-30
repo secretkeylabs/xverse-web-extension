@@ -1,6 +1,6 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import { ledgerDelay } from '@common/utils/ledger';
+import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -11,13 +11,17 @@ import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
-import { getBtcFiatEquivalent, rbf } from '@secretkeylabs/xverse-core';
-import { Transport as TransportType } from '@secretkeylabs/xverse-core/ledger/types';
-import type { RecommendedFeeResponse } from '@secretkeylabs/xverse-core/types/api/esplora';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import {
+  currencySymbolMap,
+  getBtcFiatEquivalent,
+  mempoolApi,
+  rbf,
+  RecommendedFeeResponse,
+  Transport as TransportType,
+} from '@secretkeylabs/xverse-core';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -72,7 +76,6 @@ function SpeedUpTransactionScreen() {
     minimumRbfFeeRate: number;
   }>();
   const [feeRateInput, setFeeRateInput] = useState<string | undefined>();
-  const [totalFee, setTotalFee] = useState<string | undefined>();
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
   const [recommendedFees, setRecommendedFees] = useState<RecommendedFeeResponse>();
   const [rbfRecommendedFees, setRbfRecommendedFees] = useState<RbfRecommendedFees>();
@@ -83,29 +86,22 @@ function SpeedUpTransactionScreen() {
   });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isLedgerConnectButtonDisabled, setIsLedgerConnectButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
-  const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
 
-  console.log('rbfTransaction', rbfTransaction);
-  console.log('rbfRecommendedFees', rbfRecommendedFees);
-  console.log('rbfTxSummary', rbfTxSummary);
-
-  const fetchRbfData = async () => {
+  const fetchRbfData = useCallback(async () => {
     if (!selectedAccount || !id || !transaction) {
       return;
     }
 
     try {
-      if (!isLoading) {
-        setIsLoading(true);
-      }
+      setIsLoading(true);
       const rbfTx = new rbf.RbfTransaction(transaction, {
         ...selectedAccount,
         accountType: accountType || 'software',
@@ -114,29 +110,31 @@ function SpeedUpTransactionScreen() {
             ? selectedAccount.deviceAccountIndex
             : selectedAccount.id,
         network: network.type,
-        // @ts-ignore
         seedVault,
       });
       setRbfTransaction(rbfTx);
 
-      const rbfTransactionSummary = await rbf.getRbfTransactionSummary(transaction);
+      const rbfTransactionSummary = await rbf.getRbfTransactionSummary(
+        network.type,
+        transaction.txid,
+      );
       setRbfTxSummary(rbfTransactionSummary);
 
-      const mempoolFees = await btcClient.getRecommendedFees();
+      const mempoolFees = await mempoolApi.getRecommendedFees(network.type);
       setRecommendedFees(mempoolFees);
 
       const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
       setRbfRecommendedFees(rbfRecommendedFeesResponse);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedAccount, id, transaction, accountType, network.type, seedVault]);
 
   useEffect(() => {
     fetchRbfData();
-  }, [selectedAccount, id, transaction]);
+  }, [fetchRbfData]);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
@@ -148,7 +146,6 @@ function SpeedUpTransactionScreen() {
       const feeObj = rbfRecommendedFees[e.currentTarget.value];
 
       if (feeObj?.enoughFunds) {
-        setTotalFee(feeObj.fee);
         setFeeRateInput(feeObj.feeRate);
         setSelectedOption(e.currentTarget.value);
       }
@@ -162,22 +159,21 @@ function SpeedUpTransactionScreen() {
   };
 
   const calculateTotalFee = async (feeRate: string) => {
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
+      return;
+    }
+
     const feeSummary: {
       enoughFunds: boolean;
       fee?: number;
       feeRate: number;
     } = await rbfTransaction.getRbfFeeSummary(Number(feeRate));
 
-    console.log('feeSummary', feeSummary);
-
     if (!feeSummary.enoughFunds) {
       setCustomFeeError(t('INSUFFICIENT_FUNDS'));
     } else {
       setCustomFeeError(undefined);
-    }
-
-    if (feeSummary.fee) {
-      setCustomTotalFee(feeSummary.fee.toString());
     }
 
     return feeSummary.fee;
@@ -188,19 +184,23 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
-    console.log('Signing tx...');
-    const signedTx = await rbfTransaction.getReplacementTransaction({
-      feeRate: Number(feeRateInput),
-      ledgerTransport: transport,
-    });
-    console.log('Signed tx:', signedTx);
+    try {
+      const signedTx = await rbfTransaction.getReplacementTransaction({
+        feeRate: Number(feeRateInput),
+        ledgerTransport: transport,
+      });
 
-    const response = await btcClient.sendRawTransaction(signedTx.hex);
-    const txId = response.tx.hash;
-    console.log('txId:', txId);
+      await btcClient.sendRawTransaction(signedTx.hex);
 
-    toast.success(t('TX_FEE_UPDATED'));
-    handleGoBack();
+      toast.success(t('TX_FEE_UPDATED'));
+      handleGoBack();
+    } catch (err: any) {
+      console.error(err);
+
+      if (err?.response?.data && err?.response?.data.includes('insufficient fee')) {
+        toast.error(t('INSUFFICIENT_FEE'));
+      }
+    }
   };
 
   const handleClickSubmit = async () => {
@@ -222,25 +222,26 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
-    setIsButtonDisabled(true);
+    setIsLedgerConnectButtonDisabled(true);
     const transport = await Transport.create();
     if (!transport) {
       setIsConnectSuccess(false);
       setIsConnectFailed(true);
-      setIsButtonDisabled(false);
+      setIsLedgerConnectButtonDisabled(false);
+      return;
     }
 
     setIsConnectSuccess(true);
-    await ledgerDelay(1500);
+    await delay(1500);
     setCurrentStepIndex(1);
     try {
-      const response = await signAndBroadcastTx(transport);
+      await signAndBroadcastTx(transport);
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
     } finally {
       await transport.close();
-      setIsButtonDisabled(false);
+      setIsLedgerConnectButtonDisabled(false);
     }
   };
 
@@ -254,7 +255,7 @@ function SpeedUpTransactionScreen() {
     setIsModalVisible(false);
   };
 
-  const handleApplyCustomFee = (feeRate: string) => {
+  const handleApplyCustomFee = (feeRate: string, fee: string) => {
     if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
       setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
       return;
@@ -269,10 +270,14 @@ function SpeedUpTransactionScreen() {
     }
 
     setFeeRateInput(feeRate);
-    setTotalFee(customTotalFee);
     setCustomFeeRate(feeRate);
+    setCustomTotalFee(fee);
     setSelectedOption('custom');
 
+    setShowCustomFee(false);
+  };
+
+  const handleCloseCustomFee = () => {
     setShowCustomFee(false);
   };
 
@@ -486,17 +491,21 @@ function SpeedUpTransactionScreen() {
             />
           </ControlsContainer>
 
-          <CustomFee
-            visible={showCustomFee}
-            onClose={() => setShowCustomFee(false)}
-            initialFeeRate={feeRateInput || rbfTxSummary?.currentFeeRate.toString()!}
-            fee={totalFee || rbfTxSummary?.currentFee.toString()!}
-            isFeeLoading={false}
-            error={customFeeError || ''}
-            calculateTotalFee={calculateTotalFee}
-            onClickApply={handleApplyCustomFee}
-            minimumFeeRate={rbfTxSummary?.minimumRbfFeeRate?.toString()}
-          />
+          {showCustomFee && (
+            <CustomFee
+              visible={showCustomFee}
+              onClose={handleCloseCustomFee}
+              initialFeeRate={rbfTxSummary?.minimumRbfFeeRate.toString()!}
+              initialTotalFee={rbfTxSummary?.minimumRbfFee.toString()!}
+              feeRate={customFeeRate}
+              fee={customTotalFee}
+              isFeeLoading={false}
+              error={customFeeError || ''}
+              calculateTotalFee={calculateTotalFee}
+              onClickApply={handleApplyCustomFee}
+              minimumFeeRate={rbfTxSummary?.minimumRbfFeeRate?.toString()}
+            />
+          )}
 
           <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
             {currentStepIndex === 0 && (
@@ -517,7 +526,7 @@ function SpeedUpTransactionScreen() {
                 titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
                 textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
                 imageDefault={ledgerConnectDefaultIcon}
-                isConnectSuccess={isTxApproved}
+                isConnectSuccess={false}
                 isConnectFailed={isTxRejected}
               />
             )}
@@ -527,8 +536,8 @@ function SpeedUpTransactionScreen() {
                 text={signatureRequestTranslate(
                   isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
                 )}
-                disabled={isButtonDisabled}
-                processing={isButtonDisabled}
+                disabled={isLedgerConnectButtonDisabled}
+                processing={isLedgerConnectButtonDisabled}
               />
               <ActionButton
                 onPress={cancelCallback}

@@ -1,7 +1,12 @@
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FastForward } from '@phosphor-icons/react';
-import { Brc20HistoryTransactionData, BtcTransactionData, rbf } from '@secretkeylabs/xverse-core';
+import {
+  Brc20HistoryTransactionData,
+  BtcTransactionData,
+  rbf,
+  RBFProps,
+} from '@secretkeylabs/xverse-core';
 import { getBtcTxStatusUrl } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';
 import { useCallback } from 'react';
@@ -70,9 +75,13 @@ const StyledButton = styled(ActionButton)((props) => ({
 
 interface TransactionHistoryItemProps {
   transaction: BtcTransactionData | Brc20HistoryTransactionData;
+  wallet: RBFProps;
 }
-export default function BtcTransactionHistoryItem({ transaction }: TransactionHistoryItemProps) {
-  const { network } = useWalletSelector();
+export default function BtcTransactionHistoryItem({
+  transaction,
+  wallet,
+}: TransactionHistoryItemProps) {
+  const { network, hasActivatedRBFKey } = useWalletSelector();
   const isBtc = isBtcTransaction(transaction) ? 'BTC' : 'brc20';
   const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
@@ -82,7 +91,9 @@ export default function BtcTransactionHistoryItem({ transaction }: TransactionHi
   }, []);
 
   const showAccelerateButton =
-    isBtcTransaction(transaction) && rbf.isTransactionRbfEnabled(transaction);
+    hasActivatedRBFKey &&
+    isBtcTransaction(transaction) &&
+    rbf.isTransactionRbfEnabled(transaction, wallet);
 
   return (
     <TransactionContainer onClick={openBtcTxStatusLink}>
