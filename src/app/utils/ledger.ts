@@ -33,8 +33,6 @@ export const handleBip322LedgerMessageSigning = async ({
 export const signatureVrsToRsv = (sig: string): string => sig.slice(2) + sig.slice(0, 2);
 
 export const filterLedgerAccounts = (accounts: Account[], network: NetworkType) =>
-  accounts.filter(
-    (account) =>
-      (account.ordinalsAddress?.startsWith('bc1') && network === 'Mainnet') ||
-      (account.ordinalsAddress?.startsWith('tb1') && network === 'Testnet'),
+  accounts.filter((account) =>
+    account.ordinalsAddress?.startsWith(network === 'Mainnet' ? 'bc1' : 'tb1'),
   );
