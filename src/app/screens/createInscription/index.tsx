@@ -35,6 +35,8 @@ import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';
 
+const SATS_PER_BTC = 100e6;
+
 type CardRowProps = {
   topMargin?: boolean;
   center?: boolean;
@@ -92,7 +94,10 @@ function FeeRow({
   if (!value) {
     return null;
   }
-  const fiatValue = new BigNumber(value || 0).dividedBy(100e6).multipliedBy(fiatRate).toFixed(2);
+  const fiatValue = new BigNumber(value || 0)
+    .dividedBy(SATS_PER_BTC)
+    .multipliedBy(fiatRate)
+    .toFixed(2);
 
   return (
     <CardRow>
@@ -302,7 +307,6 @@ function CreateInscription() {
   }, [contentType, content, payloadType]);
 
   const {
-    commitValue,
     commitValueBreakdown,
     errorCode: feeErrorCode,
     isLoading: inscriptionFeesLoading,
@@ -366,18 +370,24 @@ function CreateInscription() {
     setShowFeeSettings(false);
   };
 
-  const revealServiceFee = commitValueBreakdown?.revealServiceFee;
-  const externalServiceFee = commitValueBreakdown?.externalServiceFee;
-  const chainFee =
-    (commitValueBreakdown?.revealChainFee ?? 0) + (commitValueBreakdown?.commitChainFee ?? 0);
+  const {
+    revealServiceFee,
+    externalServiceFee,
+    revealChainFee,
+    commitChainFee,
+    totalInscriptionValue,
+    inscriptionValue,
+  } = commitValueBreakdown ?? {};
+
+  const chainFee = (revealChainFee ?? 0) + (commitChainFee ?? 0);
   const totalFee = (revealServiceFee ?? 0) + (externalServiceFee ?? 0) + chainFee;
-  const showTotalFee = [revealServiceFee, externalServiceFee].some(Boolean);
+  const showTotalFee = totalFee !== chainFee;
 
   const toFiat = (value: number | string = 0) =>
-    new BigNumber(value).dividedBy(100e6).multipliedBy(btcFiatRate).toFixed(2);
+    new BigNumber(value).dividedBy(SATS_PER_BTC).multipliedBy(btcFiatRate).toFixed(2);
 
   const bundlePlusFees = new BigNumber(totalFee ?? 0)
-    .plus(new BigNumber(commitValue ?? 0).multipliedBy(repeat ?? 1))
+    .plus(new BigNumber(totalInscriptionValue ?? 0))
     .toString();
 
   if (complete && revealTransactionId) {
@@ -428,10 +438,7 @@ function CreateInscription() {
           <Title>{t('TITLE')}</Title>
           <SubTitle>{t('SUBTITLE', { name: appName ?? '' })}</SubTitle>
           {showOver24RepeatsError && (
-            <StyledCallout
-              variant="danger"
-              bodyText={t("ERRORS.TOO_MANY_REPEATS")}
-            />
+            <StyledCallout variant="danger" bodyText={t('ERRORS.TOO_MANY_REPEATS')} />
           )}
           <CardContainer bottomPadding>
             <CardRow>
@@ -482,7 +489,7 @@ function CreateInscription() {
           <CardContainer>
             <FeeRow
               label={t('VALUE')}
-              value={commitValue}
+              value={inscriptionValue}
               fiatCurrency={fiatCurrency}
               fiatRate={btcFiatRate}
               repeat={repeat}
