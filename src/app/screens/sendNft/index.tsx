@@ -29,7 +29,6 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: space-between;
   flex-grow: 1;
-  padding: 0 ${(props) => props.theme.space.m};
 `;
 
 const StyledSendTo = styled(StyledHeading)`
