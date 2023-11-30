@@ -33,9 +33,10 @@ export default function useOrdinalDetail() {
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(ordinalData?.tx_id);
   const textContent = useTextOrdinalContent(ordinalData!);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
-  const { bundle, isPartOfABundle } = useGetUtxoOrdinalBundle(
+  const { bundle, isPartOfABundle, ordinalSatributes } = useGetUtxoOrdinalBundle(
     ordinalData?.output,
     hasActivatedRareSatsKey,
+    ordinalData?.number,
   );
   const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
@@ -104,11 +105,12 @@ export default function useOrdinalDetail() {
   };
 
   const handleNavigationToRareSatsBundle = () => {
-    if (!bundle) {
+    if (!bundle || !ordinalData) {
       return;
     }
+    setSelectedOrdinalDetails(ordinalData);
     setSelectedSatBundleDetails(bundle);
-    navigate('/nft-dashboard/rare-sats-bundle');
+    navigate('/nft-dashboard/rare-sats-bundle', { state: { source: 'OrdinalDetail' } });
   };
 
   const onCopyClick = () => {
@@ -128,7 +130,8 @@ export default function useOrdinalDetail() {
     ordinalsAddress,
     showSendOridnalsAlert,
     isBrc20Ordinal,
-    isPartOfABundle,
+    isPartOfABundle: isPartOfABundle && hasActivatedRareSatsKey,
+    ordinalSatributes: hasActivatedRareSatsKey ? ordinalSatributes : [],
     isGalleryOpen,
     brc20InscriptionStatus,
     brc20InscriptionStatusColor,

@@ -11,12 +11,12 @@ import {
   addressToString,
   Args,
   broadcastSignedTransaction,
+  buf2hex,
   Coin,
   ContractFunction,
   extractFromPayload,
   isMultiSig,
 } from '@secretkeylabs/xverse-core';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,

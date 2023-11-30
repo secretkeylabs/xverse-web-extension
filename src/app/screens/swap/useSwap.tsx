@@ -7,8 +7,8 @@ import {
   getNonce,
   microstacksToStx,
   setNonce,
+  buf2hex
 } from '@secretkeylabs/xverse-core';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
 import { AlexSDK, Currency } from 'alex-sdk';
 import BigNumber from 'bignumber.js';

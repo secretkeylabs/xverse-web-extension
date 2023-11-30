@@ -6,8 +6,7 @@ import StxPostConditionCard from '@components/postCondition/stxPostConditionCard
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
-import { broadcastSignedTransaction, isMultiSig } from '@secretkeylabs/xverse-core';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
+import { broadcastSignedTransaction, buf2hex, isMultiSig } from '@secretkeylabs/xverse-core';
 import { MultiSigSpendingCondition, PostCondition, StacksTransaction } from '@stacks/transactions';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

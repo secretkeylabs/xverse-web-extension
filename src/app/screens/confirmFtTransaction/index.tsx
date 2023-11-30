@@ -1,4 +1,4 @@
-import { ConfirmStxTransactionState,LedgerTransactionType } from '@common/types/ledger';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import RecipientComponent from '@components/recipientComponent';
@@ -8,15 +8,14 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { broadcastSignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { StacksTransaction } from '@secretkeylabs/xverse-core/types';
+import { broadcastSignedTransaction, StacksTransaction } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function ConfirmFtTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });

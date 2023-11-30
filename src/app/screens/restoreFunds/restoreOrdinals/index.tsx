@@ -5,12 +5,14 @@ import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core/currency';
 import {
+  BtcOrdinal,
+  ErrorCodes,
+  getBtcFiatEquivalent,
+  Inscription,
   SignedBtcTx,
   signOrdinalSendTransaction,
-} from '@secretkeylabs/xverse-core/transactions/btc';
-import { BtcOrdinal, ErrorCodes, Inscription } from '@secretkeylabs/xverse-core/types';
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';

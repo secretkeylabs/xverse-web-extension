@@ -4,10 +4,13 @@ import TopRow from '@components/topRow';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { generateUnsignedTransaction } from '@secretkeylabs/xverse-core/transactions';
-import { StacksTransaction, UnsignedStacksTransation } from '@secretkeylabs/xverse-core/types';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
-import { validateStxAddress } from '@secretkeylabs/xverse-core/wallet';
+import {
+  buf2hex,
+  generateUnsignedTransaction,
+  StacksTransaction,
+  UnsignedStacksTransation,
+  validateStxAddress,
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot } from '@utils/helper';
 import { useEffect, useState } from 'react';

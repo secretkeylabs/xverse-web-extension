@@ -2,7 +2,7 @@ import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
-import { ledgerDelay } from '@common/utils/ledger';
+import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -18,9 +18,7 @@ import useSignatureRequest, {
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
-import { bip0322Hash } from '@secretkeylabs/xverse-core/connect/bip322Signature';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
+import { bip0322Hash, hashMessage, signStxMessage, buf2hex } from '@secretkeylabs/xverse-core';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
 import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';
@@ -223,7 +221,7 @@ function SignatureRequest(): JSX.Element {
       if (!isSignMessageBip322) {
         const signature = await handleMessageSigning({
           message: payload.message,
-          domain: domain || undefined,
+          domain: (domain as any) || undefined, // TODO fix type error
         });
         if (signature) {
           finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: signature });
@@ -265,7 +263,7 @@ function SignatureRequest(): JSX.Element {
     }
 
     setIsConnectSuccess(true);
-    await ledgerDelay(1500);
+    await delay(1500);
     setCurrentStepIndex(1);
 
     try {

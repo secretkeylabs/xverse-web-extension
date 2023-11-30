@@ -1,5 +1,4 @@
-import type { Inscription } from '@secretkeylabs/xverse-core';
-import { Bundle } from '@utils/rareSats';
+import { Bundle, Inscription } from '@secretkeylabs/xverse-core';
 
 export interface NftDataState {
   selectedOrdinal: Inscription | null;

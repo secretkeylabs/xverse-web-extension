@@ -1,11 +1,11 @@
 import {
+  API_TIMEOUT_MILLI,
   Brc20HistoryTransactionData,
   BtcTransactionData,
+  getNetworkURL,
   StacksNetwork,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { getNetworkURL } from '@secretkeylabs/xverse-core/api/helper';
-import { API_TIMEOUT_MILLI } from '@secretkeylabs/xverse-core/constant';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,

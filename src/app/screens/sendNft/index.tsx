@@ -7,6 +7,7 @@ import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  buf2hex,
   cvToHex,
   generateUnsignedTransaction,
   StacksTransaction,
@@ -14,7 +15,6 @@ import {
   UnsignedStacksTransation,
   validateStxAddress,
 } from '@secretkeylabs/xverse-core';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { useMutation } from '@tanstack/react-query';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';

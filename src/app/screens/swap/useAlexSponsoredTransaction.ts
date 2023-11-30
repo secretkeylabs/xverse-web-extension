@@ -1,7 +1,7 @@
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { StacksTransaction } from '@secretkeylabs/xverse-core';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
+import { buf2hex } from '@secretkeylabs/xverse-core';
+import { StacksTransaction } from '@stacks/transactions';
 import { useQuery } from '@tanstack/react-query';
 import { AlexSDK } from 'alex-sdk';
 import { useEffect, useRef, useState } from 'react';
@@ -39,7 +39,7 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
   if (stxNonce > upcomingPendingTransactionNonce) {
     hasPendingTransactions = false;
   } else {
-    hasPendingTransactions = stxPendingTxData?.pendingTransactions?.length > 0;
+    hasPendingTransactions = (stxPendingTxData?.pendingTransactions?.length ?? 0) > 0;
   }
   return {
     isSponsored: userOverrideSponsorValue && isServiceRunning && !hasPendingTransactions,

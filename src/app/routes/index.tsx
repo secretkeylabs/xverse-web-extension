@@ -62,6 +62,7 @@ import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import LockCountdown from '@screens/settings/lockCountdown';
 import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 import SignatureRequest from '@screens/signatureRequest';
+import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import Stacking from '@screens/stacking';
 import SwapScreen from '@screens/swap';
@@ -246,6 +247,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SignPsbtRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'batch-psbt-signing-request',
+        element: (
+          <AuthGuard>
+            <SignBatchPsbtRequest />
           </AuthGuard>
         ),
       },
@@ -470,6 +479,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SendRareSat />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'nft-dashboard/confirm-ordinal-tx/:id',
+        element: (
+          <AuthGuard>
+            <ConfirmOrdinalTransaction />
           </AuthGuard>
         ),
       },

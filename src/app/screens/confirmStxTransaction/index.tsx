@@ -14,22 +14,21 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-addressToString,
-broadcastSignedTransaction,
-getStxFiatEquivalent,
-isMultiSig,
-microstacksToStx,
-StacksTransaction,
-TokenTransferPayload
+  addressToString,
+  broadcastSignedTransaction,
+  getStxFiatEquivalent,
+  microstacksToStx,
+  StacksTransaction,
+  TokenTransferPayload,
+  buf2hex,
 } from '@secretkeylabs/xverse-core';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
-import { deserializeTransaction, MultiSigSpendingCondition } from '@stacks/transactions';
+import { deserializeTransaction,MultiSigSpendingCondition } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect,useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const AlertContainer = styled.div((props) => ({

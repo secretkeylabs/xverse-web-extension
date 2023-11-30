@@ -4,19 +4,19 @@ import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-generateUnsignedStxTokenTransferTransaction,
-microstacksToStx,
-StacksTransaction,
-stxToMicrostacks,
-validateStxAddress
+  buf2hex,
+  generateUnsignedStxTokenTransferTransaction,
+  microstacksToStx,
+  StacksTransaction,
+  stxToMicrostacks,
+  validateStxAddress,
 } from '@secretkeylabs/xverse-core';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { useMutation } from '@tanstack/react-query';
 import { replaceCommaByDot } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect,useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import TopRow from '../../components/topRow';
 
 function SendStxScreen() {

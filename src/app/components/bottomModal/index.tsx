@@ -8,25 +8,17 @@ const BottomModalHeaderText = styled.h1((props) => ({
   flex: 1,
 }));
 
-const RowContainer = styled.div({
+const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'space-between',
-  margin: '24px 24px 20px 24px',
-});
+  margin: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(10),
+}));
 
 const ButtonImage = styled.button({
   backgroundColor: 'transparent',
 });
-
-interface Props {
-  header: string;
-  visible: boolean;
-  children: React.ReactNode;
-  onClose: () => void;
-  overlayStylesOverriding?: {};
-  contentStylesOverriding?: {};
-}
 
 const CustomisedModal = styled(Modal)`
   overflow-y: auto;
@@ -36,6 +28,16 @@ const CustomisedModal = styled(Modal)`
   position: absolute;
 `;
 
+interface Props {
+  header: string;
+  visible: boolean;
+  children: React.ReactNode;
+  onClose: () => void;
+  overlayStylesOverriding?: {};
+  contentStylesOverriding?: {};
+  className?: string;
+}
+
 function BottomModal({
   header,
   children,
@@ -43,6 +45,7 @@ function BottomModal({
   onClose,
   overlayStylesOverriding,
   contentStylesOverriding,
+  className,
 }: Props) {
   const theme = useTheme();
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
@@ -79,6 +82,7 @@ function BottomModal({
       ariaHideApp={false}
       style={customStyles}
       contentLabel="Example Modal"
+      className={className}
     >
       <RowContainer>
         <BottomModalHeaderText>{header}</BottomModalHeaderText>

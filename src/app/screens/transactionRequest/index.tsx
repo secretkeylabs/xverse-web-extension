@@ -6,6 +6,7 @@ import useStxTransactionRequest from '@hooks/useStxTransactionRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  buf2hex,
   Coin,
   ContractFunction,
   createDeployContractRequest,
@@ -13,11 +14,10 @@ import {
   getContractCallPromises,
   getTokenTransferRequest,
 } from '@secretkeylabs/xverse-core';
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
 import { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
 import { StacksTransaction } from '@stacks/transactions';
-import { getNetworkType, isHardwareAccount } from '@utils/helper';
-import { useEffect, useState } from 'react';
+import { getNetworkType,isHardwareAccount } from '@utils/helper';
+import { useEffect,useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';

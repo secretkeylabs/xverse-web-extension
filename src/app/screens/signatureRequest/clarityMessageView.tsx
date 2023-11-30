@@ -1,4 +1,4 @@
-import { buf2hex } from '@secretkeylabs/xverse-core/utils/arrayBuffers';
+import { buf2hex } from '@secretkeylabs/xverse-core';
 import { ClarityType, ClarityValue, cvToString,principalToString } from '@stacks/transactions';
 import styled from 'styled-components';
 
