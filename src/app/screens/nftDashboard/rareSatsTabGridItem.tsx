@@ -13,7 +13,7 @@ const Range = styled.div`
   display: flex;
   flex-direction: row;
   border-radius: 6px;
-  border: 1px solid var(--white-800, rgba(255, 255, 255, 0.2));
+  border: 1px solid ${(props) => props.theme.colors.white_800};
   margin-left: 2px;
   align-items: center;
   padding: 1px;
