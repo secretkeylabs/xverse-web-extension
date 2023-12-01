@@ -275,6 +275,14 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'create-repeat-inscriptions',
+        element: (
+          <AuthGuard>
+            <CreateInscription />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'login',
         element: <Login />,
       },
@@ -479,6 +487,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SendRareSat />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'nft-dashboard/confirm-ordinal-tx/:id',
+        element: (
+          <AuthGuard>
+            <ConfirmOrdinalTransaction />
           </AuthGuard>
         ),
       },

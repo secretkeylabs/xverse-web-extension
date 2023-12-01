@@ -1,5 +1,4 @@
 import CollectibleCollage from '@components/collectibleCollage/collectibleCollage';
-import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { InscriptionCollectionsData } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
@@ -8,7 +7,6 @@ import {
   getInscriptionsTabGridItemId,
   getInscriptionsTabGridItemSubText,
   isCollection,
-  mapCondensedInscriptionToBundleItem,
 } from '@utils/inscriptions';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -76,15 +74,11 @@ export function InscriptionsTabGridItem({
         {!collection.thumbnail_inscriptions ? ( // eslint-disable-line no-nested-ternary
           <OrdinalImage ordinal={{ id: '', content_type: 'unknown', number: 0 }} />
         ) : !isCollection(collection) || collection.thumbnail_inscriptions.length === 1 ? ( // eslint-disable-line no-nested-ternary
-          <RareSatAsset
-            item={mapCondensedInscriptionToBundleItem(collection.thumbnail_inscriptions[0])}
-          />
+          <OrdinalImage ordinal={collection.thumbnail_inscriptions[0]} />
         ) : collection.category === 'brc-20' ? (
           <OrdinalImage ordinal={collection.thumbnail_inscriptions[0]} withoutTitles />
         ) : (
-          <CollectibleCollage
-            items={collection.thumbnail_inscriptions.map(mapCondensedInscriptionToBundleItem)}
-          />
+          <CollectibleCollage items={collection.thumbnail_inscriptions} />
         )}
       </ThumbnailContainer>
       <InfoContainer>

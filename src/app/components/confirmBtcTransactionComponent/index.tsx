@@ -3,13 +3,14 @@ import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
-import TopRow from '@components/topRow';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
+import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  Bundle,
   ErrorCodes,
   getBtcFiatEquivalent,
   Recipient,
@@ -30,14 +31,18 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import TransactionDetailComponent from '../transactionDetailComponent';
+import SatsBundle from './bundle';
 
-const OuterContainer = styled.div`
+interface MainContainerProps {
+  isGalleryOpen: boolean;
+}
+
+const OuterContainer = styled.div<MainContainerProps>`
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  flex: 1;
+  flex-grow: 1;
+  ...${(props) => (props.isGalleryOpen ? props.theme.scrollbar : {})};
 `;
 
 const Container = styled.div((props) => ({
@@ -45,8 +50,6 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   flex: 1,
   marginTop: props.theme.spacing(11),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
 }));
 
 interface ButtonProps {
@@ -57,8 +60,6 @@ const ButtonContainer = styled.div<ButtonProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
   marginBottom: props.isBtcSendBrowserTx ? props.theme.spacing(20) : props.theme.spacing(5),
 }));
 
@@ -102,13 +103,13 @@ const ErrorText = styled.h1((props) => ({
 }));
 
 interface ReviewTransactionTitleProps {
-  isOridnalTx: boolean;
+  centerAligned: boolean;
 }
 const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
   ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
-  textAlign: props.isOridnalTx ? 'center' : 'left',
+  textAlign: props.centerAligned ? 'center' : 'left',
 }));
 
 const CalloutContainer = styled.div((props) => ({
@@ -131,6 +132,8 @@ interface Props {
   isBtcSendBrowserTx?: boolean;
   currencyType?: CurrencyTypes;
   isPartOfBundle?: boolean;
+  ordinalBundle?: Bundle;
+  holdsRareSats?: boolean;
   currentFeeRate: BigNumber;
   setCurrentFee: (feeRate: BigNumber) => void;
   setCurrentFeeRate: (feeRate: BigNumber) => void;
@@ -154,6 +157,8 @@ function ConfirmBtcTransactionComponent({
   isBtcSendBrowserTx,
   isPartOfBundle,
   currencyType,
+  ordinalBundle,
+  holdsRareSats,
   currentFeeRate,
   setCurrentFee,
   setCurrentFeeRate,
@@ -165,12 +170,15 @@ function ConfirmBtcTransactionComponent({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
   const { btcAddress, selectedAccount, network, btcFiatRate, feeMultipliers } = useWalletSelector();
+  const { selectedSatBundle } = useNftDataSelector();
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const [showFeeWarning, setShowFeeWarning] = useState(false);
+
+  const bundle = selectedSatBundle ?? ordinalBundle ?? undefined;
   const {
     isLoading,
     data,
@@ -373,10 +381,7 @@ function ConfirmBtcTransactionComponent({
 
   return (
     <>
-      <OuterContainer>
-        {!isBtcSendBrowserTx && !isGalleryOpen && (
-          <TopRow title={t('CONFIRM_TRANSACTION.SEND')} onClick={onBackButtonClick} />
-        )}
+      <OuterContainer isGalleryOpen={isGalleryOpen}>
         <Container>
           {showFeeWarning && (
             <InfoContainer
@@ -386,7 +391,7 @@ function ConfirmBtcTransactionComponent({
           )}
 
           {children}
-          <ReviewTransactionText isOridnalTx={!!ordinalTxUtxo}>
+          <ReviewTransactionText centerAligned={currencyType === 'Ordinal'}>
             {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
           </ReviewTransactionText>
 
@@ -398,11 +403,18 @@ function ConfirmBtcTransactionComponent({
               />
             </CalloutContainer>
           )}
+          {holdsRareSats && (
+            <CalloutContainer>
+              <Callout bodyText={t('NFT_DASHBOARD_SCREEN.HOLDS_RARE_SAT')} variant="warning" />
+            </CalloutContainer>
+          )}
+
+          {bundle && <SatsBundle bundle={bundle} />}
 
           {ordinalTxUtxo ? (
             <RecipientComponent
               address={recipients[0]?.address}
-              value={assetDetail!}
+              value={assetDetail ?? ''}
               valueDetail={assetDetailValue}
               icon={AssetIcon}
               currencyType={currencyType || 'Ordinal'}

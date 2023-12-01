@@ -1,7 +1,6 @@
-import RareSatAsset from '@components/rareSatAsset/rareSatAsset';
 import Nft from '@screens/nftDashboard/nft';
-import { NonFungibleToken } from '@secretkeylabs/xverse-core';
-import { BundleItem } from '@utils/rareSats';
+import OrdinalImage from '@screens/ordinals/ordinalImage';
+import { CondensedInscription, NonFungibleToken } from '@secretkeylabs/xverse-core';
 import styled from 'styled-components';
 
 const CollageContainer = styled.div`
@@ -39,10 +38,11 @@ const RemainingAmountOfAssets = styled.div((props) => ({
   },
 }));
 
-function CollectibleCollage({ items }: { items: Array<BundleItem | NonFungibleToken> }) {
+function CollectibleCollage({ items }: { items: Array<CondensedInscription | NonFungibleToken> }) {
   const moreThanFourItems = items.length > 4;
 
-  const isBundleItem = (item: any): boolean => (item as BundleItem).rarity_ranking !== undefined;
+  const isStacksNft = (item: CondensedInscription | NonFungibleToken): boolean =>
+    'asset_identifier' in item;
   return (
     <CollageContainer>
       {items.slice(0, 4).map((item, index) => (
@@ -53,10 +53,10 @@ function CollectibleCollage({ items }: { items: Array<BundleItem | NonFungibleTo
               <p>+{items.length - 4}</p>
             </RemainingAmountOfAssets>
           ) : // Conditionally render RareSatAsset if item is a BundleItem otherwise render Nft
-          isBundleItem(item) ? (
-            <RareSatAsset item={item as BundleItem} isCollage />
-          ) : (
+          isStacksNft(item) ? (
             <Nft asset={item as NonFungibleToken} isGalleryOpen={false} />
+          ) : (
+            <OrdinalImage ordinal={item as CondensedInscription} />
           )}
         </CollageItem>
       ))}

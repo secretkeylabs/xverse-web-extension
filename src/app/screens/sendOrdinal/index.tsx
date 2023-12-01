@@ -155,7 +155,7 @@ function SendOrdinal() {
 
   useEffect(() => {
     if (data) {
-      navigate(`/confirm-ordinal-tx/${selectedOrdinal?.id}`, {
+      navigate(`/nft-dashboard/confirm-ordinal-tx/${selectedOrdinal?.id}`, {
         state: {
           signedTxHex: data.signedTx,
           recipientAddress,
