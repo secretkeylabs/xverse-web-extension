@@ -8,6 +8,7 @@ var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const aliases = {
   // alias stacks.js packages to their esm (default prefers /dist/polyfill)
@@ -71,14 +72,14 @@ var options = {
         exclude: /node_modules/,
         use: [
           {
-            loader: require.resolve('ts-loader'),
+            loader: 'ts-loader',
             options: {
               getCustomTransformers: () => ({
                 before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(
                   Boolean
                 ),
               }),
-              transpileOnly: true,
+              transpileOnly: false,
             },
           },
         ],
@@ -111,6 +112,7 @@ var options = {
     },
   },
   plugins: [
+    new ForkTsCheckerWebpackPlugin(),
     new Dotenv({ safe: true, systemvars: true }),
     new CleanWebpackPlugin({ verbose: false }),
     new webpack.ProgressPlugin(),

@@ -7,8 +7,12 @@ import ActionButton from '@components/button';
 import SmallActionButton from '@components/smallActionButton';
 import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FungibleToken, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core/types/currency';
+import {
+  currencySymbolMap,
+  FungibleToken,
+  microstacksToStx,
+  satsToBtc,
+} from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { getFtBalance, getFtTicker } from '@utils/tokens';

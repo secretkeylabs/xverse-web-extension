@@ -1,5 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { parseStxTransactionData } from '@secretkeylabs/xverse-core/api/helper';
+import { parseStxTransactionData } from '@secretkeylabs/xverse-core';
 import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
 import { CurrencyTypes } from '@utils/constants';
 import { isAddressTransactionWithTransfers, Tx } from '@utils/transactions/transactions';
@@ -42,7 +42,7 @@ export default function StxTransactionHistoryItem(props: TransactionHistoryItemP
       <>
         <StxTransferTransaction
           transaction={parseStxTransactionData({
-            responseTx: transaction,
+            responseTx: transaction as any, // TODO fix type error
             stxAddress: selectedAccount?.stxAddress as string,
           })}
           transactionCoin={transactionCoin}
@@ -60,7 +60,7 @@ export default function StxTransactionHistoryItem(props: TransactionHistoryItemP
     return (
       <StxTransferTransaction
         transaction={parseStxTransactionData({
-          responseTx: transaction.tx,
+          responseTx: transaction.tx as any, // TODO fix type error
           stxAddress: selectedAccount?.stxAddress as string,
         })}
         transactionCoin={transactionCoin}
@@ -72,7 +72,7 @@ export default function StxTransactionHistoryItem(props: TransactionHistoryItemP
       <TxTransfers transaction={transaction} coin={transactionCoin} txFilter={txFilter} />
       <StxTransferTransaction
         transaction={parseStxTransactionData({
-          responseTx: transaction.tx,
+          responseTx: transaction.tx as any, // TODO fix type error
           stxAddress: selectedAccount?.stxAddress as string,
         })}
         transactionCoin={transactionCoin}

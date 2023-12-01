@@ -1,7 +1,11 @@
 import ActionButton from '@components/button';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
+import {
+  Bundle,
+  mapRareSatsAPIResponseToBundle,
+  UtxoOrdinalBundle,
+} from '@secretkeylabs/xverse-core';
 import { StyledP, StyledTab, StyledTabList } from '@ui-library/common.styled';
-import { ApiBundle, Bundle, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -11,6 +15,9 @@ import { StyledBarLoader, TilesSkeletonLoader } from '../../components/tilesSkel
 import Notice from './notice';
 import RareSatsTabGridItem from './rareSatsTabGridItem';
 import type { NftDashboardState } from './useNftDashboard';
+
+const MAX_SATS_ITEMS_EXTENSION = 5;
+const MAX_SATS_ITEMS_GALLERY = 20;
 
 export const GridContainer = styled.div<{
   isGalleryOpen: boolean;
@@ -22,6 +29,12 @@ export const GridContainer = styled.div<{
   gridTemplateColumns: props.isGalleryOpen
     ? 'repeat(auto-fill,minmax(220px,1fr))'
     : 'repeat(auto-fill,minmax(150px,1fr))',
+}));
+
+export const RareSatsTabContainer = styled.div<{
+  isGalleryOpen: boolean;
+}>((props) => ({
+  marginTop: props.theme.space.l,
 }));
 
 const StickyStyledTabList = styled(StyledTabList)`
@@ -171,7 +184,7 @@ export default function CollectiblesTabs({
       )}
       {hasActivatedOrdinalsKey && (
         <TabPanel>
-          {inscriptionsQuery.isLoading ? (
+          {inscriptionsQuery.isInitialLoading ? (
             <SkeletonLoader isGalleryOpen={isGalleryOpen} />
           ) : (
             <>
@@ -186,7 +199,7 @@ export default function CollectiblesTabs({
         </TabPanel>
       )}
       <TabPanel>
-        {stacksNftsQuery.isLoading ? (
+        {stacksNftsQuery.isInitialLoading ? (
           <SkeletonLoader isGalleryOpen={isGalleryOpen} />
         ) : (
           <>
@@ -224,20 +237,24 @@ export default function CollectiblesTabs({
           {showNoBundlesNotice && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
 
           {!!rareSatsQuery.error && <StyledWrenchErrorMessage />}
-          {rareSatsQuery.isLoading ? (
+          {rareSatsQuery.isInitialLoading ? (
             <SkeletonLoader isGalleryOpen={isGalleryOpen} />
           ) : (
-            <GridContainer isGalleryOpen={isGalleryOpen}>
+            <RareSatsTabContainer isGalleryOpen={isGalleryOpen}>
               {!rareSatsQuery.error &&
                 !rareSatsQuery.isLoading &&
                 rareSatsQuery.data?.pages
                   ?.map((page) => page?.results)
                   .flat()
-                  .map((utxo: ApiBundle) => mapRareSatsAPIResponseToRareSats(utxo))
+                  .map((utxo: UtxoOrdinalBundle) => mapRareSatsAPIResponseToBundle(utxo))
                   .map((bundle: Bundle) => (
-                    <RareSatsTabGridItem key={bundle.txid} bundle={bundle} />
+                    <RareSatsTabGridItem
+                      key={bundle.txid}
+                      bundle={bundle}
+                      maxItems={isGalleryOpen ? MAX_SATS_ITEMS_GALLERY : MAX_SATS_ITEMS_EXTENSION}
+                    />
                   ))}
-            </GridContainer>
+            </RareSatsTabContainer>
           )}
           {rareSatsQuery.hasNextPage && (
             <LoadMoreButtonContainer>

@@ -1,5 +1,4 @@
-import { getNonOrdinalUtxo } from '@secretkeylabs/xverse-core/api';
-import { UTXO } from '@secretkeylabs/xverse-core/types';
+import { getNonOrdinalUtxo, UTXO } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { REFETCH_UNSPENT_UTXO_TIME } from '@utils/constants';
 import { getTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
