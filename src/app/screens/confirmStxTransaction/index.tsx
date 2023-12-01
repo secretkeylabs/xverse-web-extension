@@ -1,5 +1,5 @@
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
-import { ConfirmStxTransactionState,LedgerTransactionType } from '@common/types/ledger';
+import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
@@ -16,19 +16,20 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   addressToString,
   broadcastSignedTransaction,
+  buf2hex,
   getStxFiatEquivalent,
+  isMultiSig,
   microstacksToStx,
   StacksTransaction,
   TokenTransferPayload,
-  buf2hex,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction,MultiSigSpendingCondition } from '@stacks/transactions';
+import { deserializeTransaction, MultiSigSpendingCondition } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const AlertContainer = styled.div((props) => ({

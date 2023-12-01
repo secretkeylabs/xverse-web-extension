@@ -30,7 +30,7 @@ const isValidEvent = (event: MessageEvent, method: SatsConnectMessageToContentSc
   return correctSource && correctMethod && !!data.payload;
 };
 
-const SatsMethodsProvider: BitcoinProvider = {
+const SatsMethodsProvider: Partial<BitcoinProvider> = {
   connect: async (btcAddressRequest): Promise<GetAddressResponse> => {
     const event = new CustomEvent<GetAddressRequestEventDetails>(DomEventName.getAddressRequest, {
       detail: { btcAddressRequest },
