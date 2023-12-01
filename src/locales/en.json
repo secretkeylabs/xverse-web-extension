@@ -599,8 +599,8 @@
     "MAYBE_LATER": "Maybe Later",
     "ENABLE": "Enable",
     "RARE_SATS_NOTICE_TITLE": "Don't see your rare sat?",
-    "RARE_SATS_NOTICE_DETAIL": "Currently, Xverse only supports the Rodarmor rarity index. Your sats may have other attributes.",
-    "SEE_SUPPORTED": "See supported rarity scale",
+    "RARE_SATS_NOTICE_DETAIL": "Xverse supports most rare sats, but your sats may have other attributes.",
+    "SEE_SUPPORTED": "See supported rarities",
     "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle.",
     "HOLDS_RARE_SAT": "This inscription holds a rare sat."
   },
@@ -908,7 +908,7 @@
   },
   "INSCRIPTION_REQUEST": {
     "TITLE": "Review Transaction",
-    "SUBTITLE": "Inscribe Ordinal",
+    "SUBTITLE": "Requested by {{name}}",
     "CANCEL_BUTTON": "Cancel",
     "CONFIRM_BUTTON": "Confirm",
     "FEES_TOO_LOW": "Minimum fee is {{fee}}",
@@ -936,13 +936,15 @@
       "PREVIEW": "Open in ordinals viewer"
     },
     "NETWORK": "Network",
-    "VALUE": "Bitcoin value",
+    "VALUE": "Bundle size",
     "EDIT_FEES": "Edit Fees",
+    "TOTAL": "Total",
+    "AMOUNT_PLUS_FEES": "Bundle size + fees",
     "FEES": {
       "TITLE": "Fees",
-      "INSCRIPTION": "Inscription fees",
-      "DEVELOPER": "Developer fees",
-      "TRANSACTION": "Transaction fees",
+      "INSCRIPTION": "Inscription fee",
+      "DEVELOPER": "Developer fee",
+      "TRANSACTION": "Network fee",
       "TOTAL": "Total fees"
     },
     "COMPLETE": {
@@ -978,7 +980,8 @@
         "INSCRIPTION_VALUE_TOO_LOW": "The calling application sent an invalid payload. Please contact the application developer.",
         "FAILED_TO_FINALIZE": "The inscription transaction failed to finalize. Please try again or contact support.",
         "SERVER_ERROR": "An unknown server error occurred. Please try again or contact support."
-      }
+      },
+      "TOO_MANY_REPEATS": "You can only create up to 24 inscriptions in a single request"
     }
   },
   "ERROR_SCREEN": {
@@ -1036,7 +1039,7 @@
     "YOU_ARE_TRANSFERRING_TO_YOURSELF": "You are transferring to yourself"
   },
   "CONFIRM_BRC20": {
-    "BITCOIN_VALUE": "Bitcoin value",
+    "BITCOIN_VALUE": "Bundle size",
     "ERROR_CODES": {
       "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
       "INSUFFICIENT_FUNDS": "Insufficient BTC balance for transaction fees",
@@ -1149,9 +1152,8 @@
       "SILK_ROAD": "Silkroad"
     },
     "RARITY_DETAIL": {
-      "TOP_TEXT": "Currently, only the default rarity scale is supported. Your sats could have other attributes.",
       "LEARN_MORE": "Learn more",
-      "RARITY_INFO": "Currently, only the default rarity scale is supported. Your sats could have other attributes.",
+      "RARITY_INFO": "Looking for more rare sats? Your sats may have other attributes which are not supported yet.",
       "SUPPORTED_RARITIES": "Supported rarities",
       "MYTHIC": "The first sat of the genesis block.",
       "LEGENDARY": "The first sat of each cycle.",
