@@ -356,7 +356,7 @@ function ConfirmBtcTransactionComponent({
         {showFeeWarning && (
           <InfoContainer type="Warning" bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')} />
         )}
-        {/* TODO tim: refactor this not to use children. it should be another prop */}
+        {/* TODO tim: refactor this not to use children. it should be just another prop */}
         {children}
         <ReviewTransactionText centerAligned={currencyType === 'Ordinal'}>
           {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
