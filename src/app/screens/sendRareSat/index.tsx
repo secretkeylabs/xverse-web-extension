@@ -15,7 +15,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
-import { StyledHeading } from '@ui-library/common.styled';
+import { StickyButtonContainer, StyledHeading } from '@ui-library/common.styled';
 import InputFeedback, { InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -34,14 +34,6 @@ const Container = styled.div`
 const StyledSendTo = styled(StyledHeading)`
   margin-bottom: ${(props) => props.theme.space.l};
 `;
-
-const NextButtonContainer = styled.div((props) => ({
-  position: 'sticky',
-  bottom: 0,
-  paddingBottom: props.theme.space.s,
-  paddingTop: props.theme.space.s,
-  backgroundColor: props.theme.colors.elevation0,
-}));
 
 const InputGroup = styled.div`
   margin-top: ${(props) => props.theme.spacing(8)}px;
@@ -243,14 +235,14 @@ function SendOrdinal() {
           </InputGroup>
           <StyledCallout bodyText={t('MAKE_SURE_THE_RECIPIENT')} />
         </div>
-        <NextButtonContainer>
+        <StickyButtonContainer>
           <ActionButton
             text={t('NEXT')}
             disabled={!isNextEnabled}
             processing={isLoading}
             onPress={onPressNext}
           />
-        </NextButtonContainer>
+        </StickyButtonContainer>
       </Container>
     </SendLayout>
   );
