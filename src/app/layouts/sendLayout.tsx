@@ -22,18 +22,15 @@ const Container = styled.div`
   margin: auto;
   margin-top: ${(props) => props.theme.space.m};
   margin-bottom: ${(props) => props.theme.space.xxs};
-  padding-top: 0;
-  padding-left: ${(props) => props.theme.space.xs};
-  padding-right: ${(props) => props.theme.space.xs};
-  padding-bottom: 0;
+  padding: 0 ${(props) => props.theme.space.xs};
   width: 100%;
   height: 100%;
   max-width: ${breakpoints.xs}px;
+  max-height: 600px;
 
   @media only screen and ${devices.min.s} {
     flex: initial;
     max-width: 588px;
-    min-height: 600px;
     max-height: unset;
     height: auto;
     border: 1px solid ${(props) => props.theme.colors.elevation3};
@@ -43,7 +40,7 @@ const Container = styled.div`
     padding-right: ${(props) => props.theme.space.m};
     padding-bottom: ${(props) => props.theme.space.xxl};
     margin-top: ${(props) => props.theme.space.xxxxl};
-    overflow: hidden;
+    margin-bottom: ${(props) => props.theme.space.m};
   }
 `;
 
