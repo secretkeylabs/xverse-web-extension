@@ -2,6 +2,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
+import { devices } from 'theme';
 
 const RouteContainer = styled.div`
   display: flex;
@@ -12,6 +13,13 @@ const RouteContainer = styled.div`
   background-color: ${(props) => props.theme.colors.elevation0};
   border: 1px solid rgba(126, 137, 171, 0.2);
   box-shadow: 0px 8px 28px rgba(0, 0, 0, 0.35);
+
+  @media only screen and ${devices.min.s} {
+    max-width: 588px;
+    min-height: 600px;
+    max-height: unset;
+    height: auto;
+  }
 `;
 
 const TestnetContainer = styled.div((props) => ({
@@ -34,7 +42,7 @@ function ScreenContainer(): JSX.Element {
   const { t } = useTranslation('translation');
 
   return (
-    <RouteContainer className="optionsContainer">
+    <RouteContainer>
       {network.type === 'Testnet' && (
         <TestnetContainer>
           <TestnetText>{t('SETTING_SCREEN.TESTNET')}</TestnetText>

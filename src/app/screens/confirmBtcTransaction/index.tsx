@@ -205,7 +205,8 @@ function ConfirmBtcTransaction() {
       selectedBottomTab="dashboard"
       onClickBack={goBackToScreen}
       hideBackButton={hideBackButton}
-      alwaysShowAccountHeader={btcSendBrowserTx}
+      showAccountHeader={btcSendBrowserTx}
+      hideBottomBar={btcSendBrowserTx}
     >
       {showOrdinalsDetectedAlert && (
         <AlertMessage

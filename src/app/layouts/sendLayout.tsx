@@ -71,12 +71,14 @@ function SendLayout({
   selectedBottomTab,
   onClickBack,
   hideBackButton = false,
-  alwaysShowAccountHeader = false,
+  showAccountHeader = false,
+  hideBottomBar = false,
 }: PropsWithChildren<{
   selectedBottomTab: Tab;
   onClickBack?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   hideBackButton?: boolean;
-  alwaysShowAccountHeader?: boolean;
+  showAccountHeader?: boolean;
+  hideBottomBar?: boolean;
 }>) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const isScreenLargerThanXs = document.documentElement.clientWidth > Number(breakpoints.xs);
@@ -84,7 +86,7 @@ function SendLayout({
 
   return (
     <>
-      {isScreenLargerThanXs || alwaysShowAccountHeader ? (
+      {isScreenLargerThanXs || showAccountHeader ? (
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
         <TopRow title="" onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
@@ -105,7 +107,7 @@ function SendLayout({
         </FooterContainer>
       </ScrollContainer>
       <BottomBarContainer>
-        {!isScreenLargerThanXs && <BottomBar tab={selectedBottomTab} />}
+        {!isScreenLargerThanXs && !hideBottomBar && <BottomBar tab={selectedBottomTab} />}
       </BottomBarContainer>
     </>
   );
