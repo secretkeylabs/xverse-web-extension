@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { devices } from 'theme';
 
 const RouteContainer = styled.div`
+  // any route should default to the chrome extension window size
   display: flex;
   flex-direction: column;
   height: 600px;
@@ -14,6 +15,8 @@ const RouteContainer = styled.div`
   border: 1px solid rgba(126, 137, 171, 0.2);
   box-shadow: 0px 8px 28px rgba(0, 0, 0, 0.35);
 
+  // set some basic responsive properties here for when we load routes
+  // in either full screen tabs or popup windows
   @media only screen and ${devices.min.s} {
     max-width: 588px;
     min-height: 600px;
@@ -32,7 +35,7 @@ const TestnetContainer = styled.div((props) => ({
 }));
 
 const TestnetText = styled.h1((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.typography.body_s,
   textAlign: 'center',
   color: props.theme.colors.white_200,
 }));
