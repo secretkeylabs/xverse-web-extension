@@ -29,11 +29,11 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   max-width: ${breakpoints.xs}px;
-  min-height: 600px;
 
   @media only screen and ${devices.min.s} {
     flex: initial;
     max-width: 588px;
+    min-height: 600px;
     max-height: unset;
     height: auto;
     border: 1px solid ${(props) => props.theme.colors.elevation3};
