@@ -172,7 +172,7 @@ function ConfirmOrdinalTransaction() {
         ordinalBundle={ordinalBundle}
         holdsRareSats={holdsRareSats}
       >
-        {selectedOrdinal && (
+        {!isRareSat && selectedOrdinal && (
           <Container>
             <NftContainer>
               <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />
