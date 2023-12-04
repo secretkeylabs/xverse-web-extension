@@ -43,6 +43,7 @@ const Container = styled.div`
     padding-right: ${(props) => props.theme.space.m};
     padding-bottom: ${(props) => props.theme.space.xxl};
     margin-top: ${(props) => props.theme.space.xxxxl};
+    overflow: hidden;
   }
 `;
 
