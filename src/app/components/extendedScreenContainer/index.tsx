@@ -6,11 +6,13 @@ import styled from 'styled-components';
 const ExtendedScreenRouteContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: '100vh',
+  height: '100%',
+  minHeight: '100vh',
   width: '100vw',
   backgroundColor: props.theme.colors.elevation0,
   border: `1px solid ${props.theme.colors.elevation2}`,
   boxShadow: '0px 8px 28px rgba(0, 0, 0, 0.35)',
+  overflow: 'hidden',
 }));
 
 const TestnetContainer = styled.div((props) => ({

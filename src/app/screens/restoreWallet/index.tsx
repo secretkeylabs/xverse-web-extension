@@ -13,7 +13,8 @@ const Body = styled.div(() => ({
   display: 'flex',
   height: '100%',
   justifyContent: 'center',
-  alignItems: 'center',
+  alignItems: 'flex-start',
+  margin: '60px 0',
 }));
 
 const Container = styled.div((props) => ({
