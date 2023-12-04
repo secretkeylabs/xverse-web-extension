@@ -20,7 +20,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin: auto;
-  margin-top: 0;
+  margin-top: ${(props) => props.theme.space.xxs};
   margin-bottom: ${(props) => props.theme.space.xxs};
   padding-top: 0;
   padding-left: ${(props) => props.theme.space.xs};
@@ -29,7 +29,7 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   max-width: ${breakpoints.xs}px;
-  max-height: 600px;
+  min-height: 600px;
 
   @media only screen and ${devices.min.s} {
     flex: initial;
