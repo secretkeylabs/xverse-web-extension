@@ -195,13 +195,18 @@ function ConfirmBtcTransaction() {
       });
     }
   };
+  const hideBackButton = location.key === 'default';
 
   const onClosePress = () => {
     setShowOrdinalsDetectedAlert(false);
   };
 
   return (
-    <SendLayout selectedBottomTab="dashboard" onClickBack={goBackToScreen}>
+    <SendLayout
+      selectedBottomTab="dashboard"
+      onClickBack={goBackToScreen}
+      hideBackButton={hideBackButton}
+    >
       {showOrdinalsDetectedAlert && (
         <AlertMessage
           title={t('BTC_TRANSFER_DANGER_ALERT_TITLE')}
