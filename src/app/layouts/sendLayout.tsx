@@ -20,7 +20,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin: auto;
-  margin-top: ${(props) => props.theme.space.xxs};
+  margin-top: ${(props) => props.theme.space.m};
   margin-bottom: ${(props) => props.theme.space.xxs};
   padding-top: 0;
   padding-left: ${(props) => props.theme.space.xs};
@@ -47,9 +47,13 @@ const Container = styled.div`
 `;
 
 const FooterContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: ${(props) => props.theme.space.xxl};
+  display: none;
+
+  @media only screen and ${devices.min.s} {
+    display: flex;
+    justify-content: center;
+    margin-bottom: ${(props) => props.theme.space.xxl};
+  }
 `;
 
 const BottomBarContainer = styled.div({
@@ -67,10 +71,12 @@ function SendLayout({
   selectedBottomTab,
   onClickBack,
   hideBackButton = false,
+  alwaysShowAccountHeader = false,
 }: PropsWithChildren<{
   selectedBottomTab: Tab;
   onClickBack?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   hideBackButton?: boolean;
+  alwaysShowAccountHeader?: boolean;
 }>) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const isScreenLargerThanXs = document.documentElement.clientWidth > Number(breakpoints.xs);
@@ -78,8 +84,8 @@ function SendLayout({
 
   return (
     <>
-      {isScreenLargerThanXs ? (
-        <AccountHeaderComponent disableMenuOption={isScreenLargerThanXs} disableAccountSwitch />
+      {isScreenLargerThanXs || alwaysShowAccountHeader ? (
+        <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
         <TopRow title="" onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
       )}
@@ -92,13 +98,11 @@ function SendLayout({
           )}
           {children}
         </Container>
-        {isScreenLargerThanXs && (
-          <FooterContainer>
-            <StyledP typography="body_medium_m" color="white_400">
-              {t('COPYRIGHT', { year })}
-            </StyledP>
-          </FooterContainer>
-        )}
+        <FooterContainer>
+          <StyledP typography="body_medium_m" color="white_400">
+            {t('COPYRIGHT', { year })}
+          </StyledP>
+        </FooterContainer>
       </ScrollContainer>
       <BottomBarContainer>
         {!isScreenLargerThanXs && <BottomBar tab={selectedBottomTab} />}

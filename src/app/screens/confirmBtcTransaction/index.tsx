@@ -206,6 +206,7 @@ function ConfirmBtcTransaction() {
       selectedBottomTab="dashboard"
       onClickBack={goBackToScreen}
       hideBackButton={hideBackButton}
+      alwaysShowAccountHeader={btcSendBrowserTx}
     >
       {showOrdinalsDetectedAlert && (
         <AlertMessage
@@ -219,7 +220,6 @@ function ConfirmBtcTransaction() {
           isWarningAlert
         />
       )}
-      {btcSendBrowserTx && <AccountHeaderComponent disableMenuOption disableAccountSwitch />}
       <ConfirmBtcTransactionComponent
         feePerVByte={feePerVByte}
         recipients={recipient as Recipient[]}
