@@ -168,3 +168,7 @@ export const isLedgerAccount = (account: Account | null): boolean =>
   account?.accountType === 'ledger';
 
 export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
+
+export function formatNumber(value?: string | number) {
+  return value ? new Intl.NumberFormat().format(Number(value)) : '-';
+}

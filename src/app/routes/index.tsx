@@ -275,6 +275,14 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'create-repeat-inscriptions',
+        element: (
+          <AuthGuard>
+            <CreateInscription />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'login',
         element: <Login />,
       },

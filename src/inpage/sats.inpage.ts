@@ -1,5 +1,6 @@
 import {
   CreateInscriptionEventDetails,
+  CreateRepeatInscriptionsEventDetails,
   DomEventName,
   GetAddressRequestEventDetails,
   SendBtcRequestEventDetails,
@@ -8,6 +9,7 @@ import {
 } from '@common/types/inpage-types';
 import {
   CreateInscriptionResponseMessage,
+  CreateRepeatInscriptionsResponseMessage,
   ExternalSatsMethods,
   GetAddressResponseMessage,
   MESSAGE_SOURCE,
@@ -19,6 +21,7 @@ import {
 import {
   BitcoinProvider,
   CreateInscriptionResponse,
+  CreateRepeatInscriptionsResponse,
   GetAddressResponse,
   SignTransactionResponse,
 } from 'sats-connect';
@@ -137,6 +140,39 @@ const SatsMethodsProvider: Partial<BitcoinProvider> = {
         }
         if (typeof eventMessage.data.payload.createInscriptionResponse !== 'string') {
           resolve(eventMessage.data.payload.createInscriptionResponse);
+        }
+      };
+      window.addEventListener('message', handleMessage);
+    });
+  },
+  createRepeatInscriptions: async (
+    createRepeatInscriptionsRequest: string,
+  ): Promise<CreateRepeatInscriptionsResponse> => {
+    const event = new CustomEvent<CreateRepeatInscriptionsEventDetails>(
+      DomEventName.createRepeatInscriptionsRequest,
+      {
+        detail: { createRepeatInscriptionsRequest },
+      },
+    );
+    document.dispatchEvent(event);
+    return new Promise((resolve, reject) => {
+      const handleMessage = (
+        eventMessage: MessageEvent<CreateRepeatInscriptionsResponseMessage>,
+      ) => {
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.createRepeatInscriptionsResponse))
+          return;
+        if (
+          eventMessage.data.payload?.createRepeatInscriptionsRequest !==
+          createRepeatInscriptionsRequest
+        )
+          return;
+        window.removeEventListener('message', handleMessage);
+        if (eventMessage.data.payload.createRepeatInscriptionsResponse === 'cancel') {
+          reject(eventMessage.data.payload.createRepeatInscriptionsResponse);
+          return;
+        }
+        if (typeof eventMessage.data.payload.createRepeatInscriptionsResponse !== 'string') {
+          resolve(eventMessage.data.payload.createRepeatInscriptionsResponse);
         }
       };
       window.addEventListener('message', handleMessage);

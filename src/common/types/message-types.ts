@@ -1,6 +1,7 @@
 import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
 import {
   CreateInscriptionResponse,
+  CreateRepeatInscriptionsResponse,
   GetAddressResponse,
   SignMultipleTransactionsResponse,
   SignTransactionResponse,
@@ -114,6 +115,8 @@ export enum ExternalSatsMethods {
   sendBtcResponse = 'sendBtcResponse',
   createInscriptionRequest = 'createInscriptionRequest',
   createInscriptionResponse = 'createInscriptionResponse',
+  createRepeatInscriptionsRequest = 'createRepeatInscriptionsRequest',
+  createRepeatInscriptionsResponse = 'createRepeatInscriptionsResponse',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -179,13 +182,27 @@ export type CreateInscriptionResponseMessage = Message<
   }
 >;
 
+type CreateRepeatInscriptionsRequestMessage = Message<
+  ExternalSatsMethods.createRepeatInscriptionsRequest,
+  string
+>;
+
+export type CreateRepeatInscriptionsResponseMessage = Message<
+  ExternalSatsMethods.createRepeatInscriptionsResponse,
+  {
+    createRepeatInscriptionsRequest: string;
+    createRepeatInscriptionsResponse: CreateRepeatInscriptionsResponse | string;
+  }
+>;
+
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage
   | SignPsbtRequestMessage
   | SignBatchPsbtRequestMessage
   | SignMessageRequestMessage
   | SendBtcRequestMessage
-  | CreateInscriptionRequestMessage;
+  | CreateInscriptionRequestMessage
+  | CreateRepeatInscriptionsRequestMessage;
 
 export type SatsConnectMessageToContentScript =
   | GetAddressResponseMessage
@@ -193,4 +210,5 @@ export type SatsConnectMessageToContentScript =
   | SignBatchPsbtResponseMessage
   | SignMessageResponseMessage
   | SendBtcResponseMessage
-  | CreateInscriptionResponseMessage;
+  | CreateInscriptionResponseMessage
+  | CreateRepeatInscriptionsResponseMessage;
