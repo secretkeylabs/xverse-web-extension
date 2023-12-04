@@ -161,7 +161,6 @@ function ConfirmOrdinalTransaction() {
         signedTxHex={signedTxHex}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
-        onBackButtonClick={handleOnCancelClick}
         ordinalTxUtxo={ordinalUtxo}
         assetDetail={selectedOrdinal ? selectedOrdinal.number.toString() : ''}
         currentFee={currentFee}

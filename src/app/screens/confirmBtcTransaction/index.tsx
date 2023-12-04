@@ -17,12 +17,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
-
-const BottomBarContainer = styled.h1((props) => ({
-  marginTop: props.theme.spacing(5),
-}));
 
 function ConfirmBtcTransaction() {
   const navigate = useNavigate();
@@ -228,9 +223,7 @@ function ConfirmBtcTransaction() {
         isRestoreFundFlow={isRestoreFundFlow}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={goBackToScreen}
-        onBackButtonClick={goBackToScreen}
         nonOrdinalUtxos={unspentUtxos}
-        isBtcSendBrowserTx={btcSendBrowserTx}
         currentFee={currentFee}
         setCurrentFee={setCurrentFee}
         currentFeeRate={currentFeeRate}

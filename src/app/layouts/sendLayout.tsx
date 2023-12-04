@@ -8,23 +8,24 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { breakpoints, devices } from 'theme';
 
-interface ContainerProps {
-  isGallery?: boolean;
-}
+const ScrollContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  ${(props) => props.theme.scrollbar}
+`;
 
-const ScrollContainer = styled.div((props) => ({
-  display: 'flex',
-  flex: 1,
-  flexDirection: 'column',
-  ...props.theme.scrollbar,
-}));
-
-const Container = styled.div<ContainerProps>`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin: auto;
-  margin-top: ${(props) => props.theme.space.xxs};
-  padding: 0 ${(props) => props.theme.space.s};
+  margin-top: 0;
+  margin-bottom: ${(props) => props.theme.space.xxs};
+  padding-top: 0;
+  padding-left: ${(props) => props.theme.space.xs};
+  padding-right: ${(props) => props.theme.space.xs};
+  padding-bottom: 0;
   width: 100%;
   height: 100%;
   max-width: ${breakpoints.xs}px;
@@ -33,11 +34,13 @@ const Container = styled.div<ContainerProps>`
   @media only screen and ${devices.min.s} {
     flex: initial;
     max-width: 588px;
+    max-height: unset;
+    height: auto;
     border: 1px solid ${(props) => props.theme.colors.elevation3};
     border-radius: ${(props) => props.theme.space.s};
     padding-top: ${(props) => props.theme.space.l};
-    padding-left: ${(props) => (props.isGallery ? props.theme.space.m : 0)};
-    padding-right: ${(props) => (props.isGallery ? props.theme.space.m : 0)};
+    padding-left: ${(props) => props.theme.space.m};
+    padding-right: ${(props) => props.theme.space.m};
     padding-bottom: ${(props) => props.theme.space.xxl};
     margin-top: ${(props) => props.theme.space.xxxxl};
   }
@@ -57,7 +60,6 @@ const Button = styled.button`
   display: flex;
   background-color: transparent;
   margin-bottom: ${(props) => props.theme.space.l};
-  margin-left: ${(props) => props.theme.space.s};
 `;
 
 function SendLayout({
@@ -73,7 +75,6 @@ function SendLayout({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const isScreenLargerThanXs = document.documentElement.clientWidth > Number(breakpoints.xs);
   const year = new Date().getFullYear();
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   return (
     <>
@@ -83,7 +84,7 @@ function SendLayout({
         <TopRow title="" onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
       )}
       <ScrollContainer>
-        <Container isGallery={isGalleryOpen}>
+        <Container>
           {isScreenLargerThanXs && !hideBackButton && onClickBack && (
             <Button onClick={onClickBack}>
               <ArrowLeft size={20} color="white" />

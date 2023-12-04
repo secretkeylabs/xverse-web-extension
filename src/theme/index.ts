@@ -364,7 +364,7 @@ const Theme = {
       fontSize: 12,
     },
   },
-
+  // css utils
   scrollbar: {
     scrollbarGutter: 'stable both-edges',
     'overflow-y': 'hidden',
@@ -383,7 +383,6 @@ const Theme = {
       background: 'rgba(255, 255, 255, 0.2)',
     },
   },
-
   /**
    * @deprecated use theme.typography
    */

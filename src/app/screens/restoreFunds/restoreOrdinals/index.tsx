@@ -120,7 +120,7 @@ function RestoreOrdinals() {
     const seedPhrase = await getSeed();
     const signedTx = await mutateAsync({ ordinal: selectedOrdinal, seedPhrase });
     setSelectedOrdinalDetails(ordinalData);
-    navigate(`/confirm-ordinal-tx/${selectedOrdinal.id}`, {
+    navigate(`/nft-dashboard/confirm-ordinal-tx/${selectedOrdinal.id}`, {
       state: {
         signedTxHex: signedTx.signedTx,
         recipientAddress: ordinalsAddress,
