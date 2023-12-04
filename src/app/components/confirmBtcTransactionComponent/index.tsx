@@ -6,6 +6,7 @@ import RecipientComponent from '@components/recipientComponent';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -177,6 +178,7 @@ function ConfirmBtcTransactionComponent({
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const [showFeeWarning, setShowFeeWarning] = useState(false);
+  const btcClient = useBtcClient();
 
   const bundle = selectedSatBundle ?? ordinalBundle ?? undefined;
   const {
@@ -199,6 +201,7 @@ function ConfirmBtcTransactionComponent({
         btcAddress,
         selectedAccount?.id ?? 0,
         seedPhrase,
+        btcClient,
         network.type,
         new BigNumber(txFee),
       ),
@@ -250,6 +253,7 @@ function ConfirmBtcTransactionComponent({
         btcAddress,
         Number(selectedAccount?.id),
         seedPhrase,
+        btcClient,
         network.type,
         ordinalsUtxos,
         new BigNumber(txFee),

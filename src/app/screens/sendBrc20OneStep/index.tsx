@@ -1,5 +1,6 @@
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useBtcClient from '@hooks/useBtcClient';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -35,6 +36,7 @@ function SendBrc20Screen() {
   const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
   const [recipientAddress, setRecipientAddress] = useState('');
   const [processing, setProcessing] = useState(false);
+  const btcClient = useBtcClient();
 
   useResetUserFlow('/send-brc20');
 
@@ -115,7 +117,7 @@ function SendBrc20Screen() {
       setProcessing(true);
 
       // TODO get this from store or cache?
-      const addressUtxos: UTXO[] = await getNonOrdinalUtxo(btcAddress, network.type);
+      const addressUtxos: UTXO[] = await getNonOrdinalUtxo(btcAddress, btcClient, network.type);
       const ticker = getFtTicker(fungibleToken);
       const numberAmount = Number(replaceCommaByDot(amountToSend));
       const estimateFeesParams: Brc20TransferEstimateFeesParams = {

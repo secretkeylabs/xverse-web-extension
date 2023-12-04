@@ -122,7 +122,6 @@ function SignPsbtRequest() {
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
-  const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -277,6 +276,7 @@ function SignPsbtRequest() {
 
     const signingResponse = await signLedgerPSBT({
       transport,
+      esploraProvider: btcClient,
       network: network.type,
       addressIndex,
       psbtInputBase64: psbtBase64,
@@ -461,7 +461,7 @@ function SignPsbtRequest() {
             titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
             textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
             imageDefault={ledgerConnectDefaultIcon}
-            isConnectSuccess={isTxApproved}
+            isConnectSuccess={false}
             isConnectFailed={isTxRejected}
           />
         )}

@@ -2,6 +2,7 @@ import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
+import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -74,6 +75,8 @@ function RestoreOrdinals() {
   const [error, setError] = useState('');
   const [transferringOrdinalId, setTransferringOrdinalId] = useState<string | null>(null);
   const location = useLocation();
+  const btcClient = useBtcClient();
+
   const isRestoreFundFlow = location.state?.isRestoreFundFlow;
 
   const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
@@ -90,6 +93,7 @@ function RestoreOrdinals() {
         btcAddress,
         Number(selectedAccount?.id),
         seedPhrase,
+        btcClient,
         network.type,
         ordinalsUtxos!,
       );
