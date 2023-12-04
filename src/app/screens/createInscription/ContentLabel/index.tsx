@@ -1,13 +1,13 @@
+import useWalletSelector from '@hooks/useWalletSelector';
+import { DotsThreeVertical, Eye, Share } from '@phosphor-icons/react';
+import { getBrc20Details } from '@utils/brc20';
+import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
+import { formatNumber } from '@utils/helper';
 import axios from 'axios';
+import BigNumber from 'bignumber.js';
 import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-import { DotsThreeVertical, Eye, Share } from '@phosphor-icons/react';
-import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
-
-import useWalletSelector from '@hooks/useWalletSelector';
-import { getBrc20Details } from '@utils/brc20';
 import { ContentType } from './common';
 import Preview from './preview';
 import getSatsDetails from './utils';
@@ -41,11 +41,13 @@ const getContentType = (inputContentType: string) => {
 const isPreviewable = (contentType: ContentType) => previewableContentTypes.has(contentType);
 const isOrdiPreviewable = (contentType: ContentType) => ordiViewTypes.has(contentType);
 
-const SuffixContainer = styled.div({
+const SuffixContainer = styled.div((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-end',
-});
+}));
 
 const Container = styled.div({
   display: 'flex',
@@ -62,8 +64,8 @@ const ButtonIcon = styled.div((props) => ({
 }));
 
 const Suffix = styled.div((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
+  ...props.theme.typography.body_medium_s,
+  color: props.theme.colors.white_400,
 }));
 
 const MenuContainer = styled.div({
@@ -98,9 +100,10 @@ type Props = {
   type: 'BASE_64' | 'PLAIN_TEXT';
   contentType: string;
   content: string;
+  repeat?: number;
 };
 
-function ContentIcon({ type, content, contentType: inputContentType }: Props) {
+function ContentIcon({ type, content, contentType: inputContentType, repeat = 1 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST.PREVIEW' });
   const [showPreview, setShowPreview] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -151,7 +154,8 @@ function ContentIcon({ type, content, contentType: inputContentType }: Props) {
           {t('BRC20.TITLE')} {t(`BRC20.${brc20Details.op.toUpperCase()}`)}
         </div>
         <Suffix>
-          {brc20Details.tick} - {brc20Details.value}
+          {formatNumber(new BigNumber(brc20Details.value).multipliedBy(repeat).toString())}{' '}
+          {brc20Details.tick}
         </Suffix>
       </SuffixContainer>
     );

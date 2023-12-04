@@ -1,4 +1,4 @@
-import { Wallet } from '@phosphor-icons/react';
+import { ArrowDown } from '@phosphor-icons/react';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
@@ -17,7 +17,7 @@ import {
   useInscriptionFees,
   UTXO,
 } from '@secretkeylabs/xverse-core';
-import { CreateInscriptionPayload } from 'sats-connect';
+import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
@@ -28,10 +28,104 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { getShortTruncatedAddress } from '@utils/helper';
 
 import useSeedVault from '@hooks/useSeedVault';
+import Callout from '@ui-library/callout';
+import { StyledP } from '@ui-library/common.styled';
 import CompleteScreen from './CompleteScreen';
 import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';
+
+const SATS_PER_BTC = 100e6;
+
+type CardRowProps = {
+  topMargin?: boolean;
+  center?: boolean;
+};
+const CardRow = styled.div<CardRowProps>((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: props.center ? 'center' : 'flex-start',
+  justifyContent: 'space-between',
+  marginTop: props.topMargin ? props.theme.spacing(8) : 0,
+}));
+
+const NumberWithSuffixContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  alignItems: 'flex-end',
+  color: props.theme.colors.white_0,
+}));
+
+const NumberSuffix = styled.div((props) => ({
+  ...props.theme.typography.body_s,
+  color: props.theme.colors.white_400,
+}));
+
+const StyledPillLabel = styled.p`
+  display: flex;
+  align-items: center;
+  gap: ${(props) => props.theme.space.s};
+`;
+
+const Pill = styled.span`
+  ${(props) => props.theme.typography.body_bold_s}
+  color: ${(props) => props.theme.colors.elevation0};
+  background-color: ${(props) => props.theme.colors.white_0};
+  padding: 3px 6px;
+  border-radius: 40px;
+`;
+
+function FeeRow({
+  label,
+  subLabel,
+  value = 0,
+  fiatCurrency,
+  fiatRate,
+  repeat,
+}: {
+  label: string;
+  subLabel?: string;
+  value?: number | string | null;
+  fiatCurrency: string;
+  fiatRate: string;
+  repeat?: number;
+}) {
+  if (!value) {
+    return null;
+  }
+  const fiatValue = new BigNumber(value || 0)
+    .dividedBy(SATS_PER_BTC)
+    .multipliedBy(fiatRate)
+    .toFixed(2);
+
+  return (
+    <CardRow>
+      <div>
+        <StyledPillLabel>
+          {label}
+          {repeat && <Pill>{`x${repeat}`}</Pill>}
+        </StyledPillLabel>
+        {!!subLabel && <NumberSuffix>{subLabel}</NumberSuffix>}
+      </div>
+      <NumberWithSuffixContainer>
+        <NumericFormat value={value} displayType="text" thousandSeparator suffix=" sats" />
+        <NumericFormat
+          value={fiatValue}
+          displayType="text"
+          thousandSeparator
+          prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
+          suffix={` ${fiatCurrency}`}
+          renderText={(val: string) => <NumberSuffix>{val}</NumberSuffix>}
+        />
+      </NumberWithSuffixContainer>
+    </CardRow>
+  );
+}
+
+const YourAddress = styled.div`
+  text-align: right;
+`;
 
 const OuterContainer = styled.div({
   display: 'flex',
@@ -52,24 +146,31 @@ const MainContainer = styled.div((props) => ({
 }));
 
 const Title = styled.h1((props) => ({
-  ...props.theme.headline_s,
+  ...props.theme.typography.headline_s,
   marginTop: props.theme.spacing(11),
-  color: props.theme.colors.white[0],
+  color: props.theme.colors.white_0,
   textAlign: 'left',
 }));
 
 const SubTitle = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(4),
-  color: props.theme.colors.white[400],
   textAlign: 'left',
   marginBottom: props.theme.spacing(12),
 }));
 
+const StyledCallout = styled(Callout)`
+  margin-bottom: ${(props) => props.theme.space.m};
+`;
+
 const CardContainer = styled.div<{ bottomPadding?: boolean }>((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
   display: 'flex',
   flexDirection: 'column',
-  background: props.theme.colors.background.elevation1,
+  gap: props.theme.space.m,
+  background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: props.theme.spacing(8),
   paddingBottom: props.bottomPadding ? props.theme.spacing(12) : props.theme.spacing(8),
@@ -78,24 +179,14 @@ const CardContainer = styled.div<{ bottomPadding?: boolean }>((props) => ({
   fontSize: 14,
 }));
 
-type CardRowProps = {
-  topMargin?: boolean;
-  center?: boolean;
-};
-const CardRow = styled.div<CardRowProps>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: props.center ? 'center' : 'flex-start',
-  justifyContent: 'space-between',
-  marginTop: props.topMargin ? props.theme.spacing(8) : 0,
-}));
-
-const IconLabel = styled.div({
+const IconLabel = styled.div((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-});
+}));
 
 const ButtonIcon = styled.img((props) => ({
   width: 32,
@@ -104,18 +195,15 @@ const ButtonIcon = styled.img((props) => ({
 }));
 
 const InfoIconContainer = styled.div((props) => ({
-  background: props.theme.colors.background.elevation3,
+  background: props.theme.colors.white_0,
+  color: props.theme.colors.elevation0,
   width: 32,
   height: 32,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: 16,
+  borderRadius: '50%',
   marginRight: props.theme.spacing(5),
-}));
-
-const MutedLabel = styled.div((props) => ({
-  color: props.theme.colors.white[400],
 }));
 
 const Button = styled.button((props) => ({
@@ -129,8 +217,8 @@ const Button = styled.button((props) => ({
 }));
 
 const ButtonText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
   textAlign: 'center',
 }));
 
@@ -140,31 +228,26 @@ const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
-const NumberWithSuffixContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  alignItems: 'flex-end',
-  color: props.theme.colors.white[0],
-}));
-
-const NumberSuffix = styled.div((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white[400],
-}));
-
 const DEFAULT_FEE_RATE = 8;
 
 function CreateInscription() {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
   const { search } = useLocation();
 
-  const [payload, requestToken, tabId] = useMemo(() => {
+  const [payload, requestToken, tabId, origin] = useMemo(() => {
     const params = new URLSearchParams(search);
-    const requestEncoded = params.get('createInscription');
+    const requestEncoded =
+      params.get('createInscription') ?? params.get('createRepeatInscriptions');
     const requestBody = decodeToken(requestEncoded as string);
-    return [requestBody.payload as unknown, requestEncoded, Number(params.get('tabId'))];
+    return [
+      requestBody.payload as unknown,
+      requestEncoded,
+      Number(params.get('tabId')),
+      params.get('origin'),
+    ];
   }, [search]);
+
+  const appName = new URL(origin || '')?.host;
 
   const {
     contentType,
@@ -174,7 +257,10 @@ function CreateInscription() {
     appFeeAddress,
     appFee,
     suggestedMinerFeeRate,
-  } = payload as CreateInscriptionPayload;
+  } = payload as CreateInscriptionPayload | CreateRepeatInscriptionsPayload;
+
+  const { repeat } = payload as CreateRepeatInscriptionsPayload;
+  const showOver24RepeatsError = !Number.isNaN(repeat) && repeat > 24;
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
@@ -221,7 +307,6 @@ function CreateInscription() {
   }, [contentType, content, payloadType]);
 
   const {
-    commitValue,
     commitValueBreakdown,
     errorCode: feeErrorCode,
     isLoading: inscriptionFeesLoading,
@@ -234,6 +319,7 @@ function CreateInscription() {
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
     network: network.type,
+    repetitions: repeat,
   });
 
   const {
@@ -255,13 +341,20 @@ function CreateInscription() {
     contentString: payloadType === 'PLAIN_TEXT' ? content : undefined,
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
+    repetitions: repeat,
   });
 
   const cancelCallback = () => {
     const response = {
       source: MESSAGE_SOURCE,
-      method: ExternalSatsMethods.createInscriptionResponse,
-      payload: { createInscriptionRequest: requestToken, createInscriptionResponse: 'cancel' },
+      method: repeat
+        ? ExternalSatsMethods.createRepeatInscriptionsResponse
+        : ExternalSatsMethods.createInscriptionResponse,
+      payload: {
+        createInscriptionRequest: requestToken,
+        createInscriptionResponse: 'cancel',
+        ...(repeat ? { repeat } : null),
+      },
     };
 
     chrome.tabs.sendMessage(tabId, response);
@@ -277,30 +370,46 @@ function CreateInscription() {
     setShowFeeSettings(false);
   };
 
-  const revealServiceFee = commitValueBreakdown?.revealServiceFee;
-  const externalServiceFee = commitValueBreakdown?.externalServiceFee;
-  const chainFee =
-    (commitValueBreakdown?.revealChainFee ?? 0) + (commitValueBreakdown?.commitChainFee ?? 0);
+  const {
+    revealServiceFee,
+    externalServiceFee,
+    revealChainFee,
+    commitChainFee,
+    totalInscriptionValue,
+    inscriptionValue,
+  } = commitValueBreakdown ?? {};
+
+  const chainFee = (revealChainFee ?? 0) + (commitChainFee ?? 0);
   const totalFee = (revealServiceFee ?? 0) + (externalServiceFee ?? 0) + chainFee;
+  const showTotalFee = totalFee !== chainFee;
 
-  const fiatFees = new BigNumber(totalFee).dividedBy(100e6).multipliedBy(btcFiatRate).toFixed(2);
+  const toFiat = (value: number | string = 0) =>
+    new BigNumber(value).dividedBy(SATS_PER_BTC).multipliedBy(btcFiatRate).toFixed(2);
 
-  const fiatValue = new BigNumber(commitValue ?? 0)
-    .dividedBy(100e6)
-    .multipliedBy(btcFiatRate)
-    .toFixed(2);
+  const bundlePlusFees = new BigNumber(totalFee ?? 0)
+    .plus(new BigNumber(totalInscriptionValue ?? 0))
+    .toString();
 
   if (complete && revealTransactionId) {
     const onClose = () => {
       const response = {
         source: MESSAGE_SOURCE,
-        method: ExternalSatsMethods.createInscriptionResponse,
-        payload: {
-          createInscriptionRequest: requestToken,
-          createInscriptionResponse: {
-            txId: revealTransactionId,
-          },
-        },
+        method: repeat
+          ? ExternalSatsMethods.createRepeatInscriptionsResponse
+          : ExternalSatsMethods.createInscriptionResponse,
+        payload: repeat
+          ? {
+              createRepeatInscriptionsRequest: requestToken,
+              createRepeatInscriptionsResponse: {
+                txId: revealTransactionId,
+              },
+            }
+          : {
+              createInscriptionRequest: requestToken,
+              createInscriptionResponse: {
+                txId: revealTransactionId,
+              },
+            },
       };
       chrome.tabs.sendMessage(tabId, response);
       window.close();
@@ -320,140 +429,132 @@ function CreateInscription() {
       cancelText={t('CANCEL_BUTTON')}
       confirmText={!errorCode ? t('CONFIRM_BUTTON') : t(`ERRORS.SHORT.${errorCode}`)}
       loading={isExecuting || isLoading}
-      disabled={!!errorCode || isExecuting}
-      isError={!!errorCode}
+      disabled={!!errorCode || isExecuting || showOver24RepeatsError}
+      isError={!!errorCode || showOver24RepeatsError}
     >
       <OuterContainer>
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
         <MainContainer>
           <Title>{t('TITLE')}</Title>
-          <SubTitle>{t('SUBTITLE')}</SubTitle>
+          <SubTitle>{t('SUBTITLE', { name: appName ?? '' })}</SubTitle>
+          {showOver24RepeatsError && (
+            <StyledCallout variant="danger" bodyText={t('ERRORS.TOO_MANY_REPEATS')} />
+          )}
           <CardContainer bottomPadding>
             <CardRow>
-              <div>{t('SUMMARY.TITLE')}</div>
+              <StyledPillLabel>
+                {t('SUMMARY.TITLE')}
+                {repeat && <Pill>{`x${repeat}`}</Pill>}
+              </StyledPillLabel>
             </CardRow>
-            <CardRow topMargin center>
+            <CardRow center>
               <IconLabel>
                 <div>
                   <ButtonIcon src={OrdinalsIcon} />
                 </div>
                 <div>{t('SUMMARY.ORDINAL')}</div>
               </IconLabel>
-              <ContentLabel contentType={contentType} content={content} type={payloadType} />
+              <ContentLabel
+                contentType={contentType}
+                content={content}
+                type={payloadType}
+                repeat={repeat}
+              />
             </CardRow>
-            <CardRow topMargin>
-              <MutedLabel>{t('SUMMARY.TO')}</MutedLabel>
-            </CardRow>
-            <CardRow topMargin center>
+            <CardRow center>
               <IconLabel>
                 <InfoIconContainer>
-                  <Wallet size={18} />
+                  <ArrowDown size={16} weight="bold" />
                 </InfoIconContainer>
-                {t('SUMMARY.YOUR_ADDRESS')}
+                {t('SUMMARY.TO')}
               </IconLabel>
-              <div>{getShortTruncatedAddress(ordinalsAddress)}</div>
+              <YourAddress>
+                <StyledP typography="body_medium_m" color="white_0">
+                  {getShortTruncatedAddress(ordinalsAddress)}
+                </StyledP>
+                <StyledP typography="body_medium_s" color="white_400">
+                  {t('SUMMARY.YOUR_ADDRESS')}
+                </StyledP>
+              </YourAddress>
             </CardRow>
           </CardContainer>
           <CardContainer>
             <CardRow>
               <div>{t('NETWORK')}</div>
-              <div>{network.type}</div>
+              <StyledP typography="body_medium_m" color="white_0">
+                {network.type}
+              </StyledP>
             </CardRow>
           </CardContainer>
           <CardContainer>
-            <CardRow>
-              <div>{t('VALUE')}</div>
-              <div>
-                {isLoading && <MoonLoader color="white" size={20} />}
-                {!isLoading && (
-                  <NumberWithSuffixContainer>
-                    <NumericFormat
-                      value={commitValue}
-                      displayType="text"
-                      thousandSeparator
-                      suffix=" sats"
-                    />
-                    <NumericFormat
-                      value={fiatValue}
-                      displayType="text"
-                      thousandSeparator
-                      prefix={`${currencySymbolMap[fiatCurrency]} `}
-                      suffix={` ${fiatCurrency}`}
-                      renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
-                    />
-                  </NumberWithSuffixContainer>
-                )}
-              </div>
-            </CardRow>
+            <FeeRow
+              label={t('VALUE')}
+              value={inscriptionValue}
+              fiatCurrency={fiatCurrency}
+              fiatRate={btcFiatRate}
+              repeat={repeat}
+            />
           </CardContainer>
           <CardContainer bottomPadding>
             <CardRow>
               <div>{t('FEES.TITLE')}</div>
               <div>{isLoading && <MoonLoader color="white" size={20} />}</div>
             </CardRow>
-            {!isLoading && (
-              <>
-                <CardRow topMargin>
-                  <div>{t('FEES.INSCRIPTION')}</div>
-                  <NumericFormat
-                    value={revealServiceFee ?? 0}
-                    displayType="text"
-                    thousandSeparator
-                    suffix=" sats"
-                  />
-                </CardRow>
-                {externalServiceFee && (
-                  <CardRow topMargin>
-                    <div>{t('FEES.DEVELOPER')}</div>
-                    <NumericFormat
-                      value={externalServiceFee}
-                      displayType="text"
-                      thousandSeparator
-                      suffix=" sats"
-                    />
-                  </CardRow>
-                )}
-                <CardRow topMargin>
-                  <div>{t('FEES.TRANSACTION')}</div>
-                  <NumberWithSuffixContainer>
-                    <NumericFormat
-                      value={chainFee}
-                      displayType="text"
-                      thousandSeparator
-                      suffix=" sats"
-                    />
-                    <NumericFormat
-                      value={feeRate}
-                      displayType="text"
-                      thousandSeparator
-                      suffix=" sats/vB"
-                      renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
-                    />
-                  </NumberWithSuffixContainer>
-                </CardRow>
-                <CardRow topMargin>
-                  <div>{t('FEES.TOTAL')}</div>
-                  <div>
-                    <NumberWithSuffixContainer>
-                      <NumericFormat
-                        value={totalFee}
-                        displayType="text"
-                        thousandSeparator
-                        suffix=" sats"
-                      />
-                      <NumericFormat
-                        value={fiatFees}
-                        displayType="text"
-                        thousandSeparator
-                        prefix={`${currencySymbolMap[fiatCurrency]} `}
-                        suffix={` ${fiatCurrency}`}
-                        renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
-                      />
-                    </NumberWithSuffixContainer>
-                  </div>
-                </CardRow>
-              </>
+            <FeeRow
+              label={t('FEES.INSCRIPTION')}
+              value={revealServiceFee}
+              fiatCurrency={fiatCurrency}
+              fiatRate={btcFiatRate}
+            />
+            <FeeRow
+              label={t('FEES.DEVELOPER')}
+              value={externalServiceFee}
+              fiatCurrency={fiatCurrency}
+              fiatRate={btcFiatRate}
+            />
+            <CardRow>
+              <div>{t('FEES.TRANSACTION')}</div>
+              <NumberWithSuffixContainer>
+                <NumericFormat
+                  value={chainFee}
+                  displayType="text"
+                  thousandSeparator
+                  suffix=" sats"
+                />
+                <NumericFormat
+                  value={feeRate}
+                  displayType="text"
+                  thousandSeparator
+                  suffix=" sats/vB"
+                  renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
+                />
+                <NumericFormat
+                  value={toFiat(chainFee)}
+                  displayType="text"
+                  thousandSeparator
+                  prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
+                  suffix={` ${fiatCurrency}`}
+                  renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
+                />
+              </NumberWithSuffixContainer>
+            </CardRow>
+            {showTotalFee && (
+              <FeeRow
+                label={t('FEES.TOTAL')}
+                value={totalFee}
+                fiatCurrency={fiatCurrency}
+                fiatRate={btcFiatRate}
+              />
             )}
+          </CardContainer>
+          <CardContainer>
+            <FeeRow
+              label={t('TOTAL')}
+              subLabel={t('AMOUNT_PLUS_FEES')}
+              value={bundlePlusFees}
+              fiatCurrency={fiatCurrency}
+              fiatRate={btcFiatRate}
+            />
           </CardContainer>
           <Button onClick={onAdvancedSettingClick}>
             <ButtonImage src={SettingIcon} />
