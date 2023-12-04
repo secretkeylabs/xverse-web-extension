@@ -1,6 +1,5 @@
 import { ConfirmBtcTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
-import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import InfoContainer from '@components/infoContainer';
@@ -233,6 +232,7 @@ function ConfirmBtcTransaction() {
         setCurrentFee={setCurrentFee}
         currentFeeRate={currentFeeRate}
         setCurrentFeeRate={setCurrentFeeRate}
+        currencyType="BTC"
       >
         {ordinalsInBtc && ordinalsInBtc.length > 0 && (
           <InfoContainer
