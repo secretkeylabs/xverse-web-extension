@@ -110,8 +110,8 @@ function SignPsbtRequest() {
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
-  const { t: rareSatsTranslate } = useTranslation('translation', {
-    keyPrefix: 'RARE_SATS',
+  const { t: tCommon } = useTranslation('translation', {
+    keyPrefix: 'COMMON',
   });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
@@ -387,12 +387,21 @@ function SignPsbtRequest() {
             <Container>
               <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
               {!payload.broadcast && <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
-              {bundleItemsData && (
-                <SatsBundle
-                  title={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
-                  bundle={bundleItemsData as Bundle}
-                />
-              )}
+              {Array.isArray(bundleItemsData) &&
+                bundleItemsData.map((bundle, index) => (
+                  <SatsBundle
+                    title={`${tCommon('INPUT')} #${bundle.inputIndex}`}
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    bundle={
+                      {
+                        totalExoticSats: bundle.totalExoticSats,
+                        satRanges: bundle.satRanges,
+                      } as Bundle
+                    }
+                  />
+                ))}
+
               <RecipientComponent
                 value={`${satsToBtc(new BigNumber((parsedPsbt?.netAmount ?? 0).toString()))
                   .toString()
@@ -409,14 +418,6 @@ function SignPsbtRequest() {
               />
 
               <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-              <TransactionDetailComponent
-                title={rareSatsTranslate('BUNDLE_SIZE')}
-                value={getSatsAmountString(new BigNumber(bundleItemsData?.value.toString() ?? 0))}
-                subValue={getBtcFiatEquivalent(
-                  new BigNumber(bundleItemsData?.value.toString() ?? 0),
-                  BigNumber(btcFiatRate),
-                )}
-              />
               {payload.broadcast ? (
                 <TransactionDetailComponent
                   title={t('FEES')}
