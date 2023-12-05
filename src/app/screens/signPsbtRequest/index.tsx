@@ -390,7 +390,7 @@ function SignPsbtRequest() {
               {Array.isArray(bundleItemsData) &&
                 bundleItemsData.map((bundle, index) => (
                   <SatsBundle
-                    title={`${tCommon('INPUT')} #${bundle.inputIndex + 1}`}
+                    title={`${tCommon('INPUT')} #${bundle.inputIndex}`}
                     // eslint-disable-next-line react/no-array-index-key
                     key={index}
                     bundle={

@@ -370,7 +370,7 @@ function SignBatchPsbtRequest() {
                     <SatsBundle
                       // eslint-disable-next-line react/no-array-index-key
                       key={`${index}-transfer`}
-                      title={`${tCommon('INPUT')} #${item.inputIndex + 1}`}
+                      title={`${tCommon('INPUT')} #${item.inputIndex}`}
                       bundle={
                         {
                           totalExoticSats: item.totalExoticSats,
@@ -385,7 +385,7 @@ function SignBatchPsbtRequest() {
                     <SatsBundle
                       // eslint-disable-next-line react/no-array-index-key
                       key={`${index}-receive`}
-                      title={`${tCommon('INPUT')} #${item.inputIndex + 1}`}
+                      title={`${tCommon('INPUT')} #${item.inputIndex}`}
                       bundle={
                         {
                           totalExoticSats: item.totalExoticSats,
@@ -444,7 +444,7 @@ function SignBatchPsbtRequest() {
                 <SatsBundle
                   // eslint-disable-next-line react/no-array-index-key
                   key={index}
-                  title={`${tCommon('INPUT')} #${bundle.inputIndex + 1}`}
+                  title={`${tCommon('INPUT')} #${bundle.inputIndex}`}
                   bundle={
                     {
                       totalExoticSats: bundle.totalExoticSats,
