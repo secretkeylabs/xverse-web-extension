@@ -17,7 +17,7 @@ const RouteContainer = styled.div`
 
   // set some basic responsive properties here for when we load routes
   // in either full screen tabs or popup windows
-  @media only screen and ${devices.min.s} {
+  @media only screen and ${devices.min.xs} {
     max-width: 588px;
     min-height: 600px;
     max-height: unset;

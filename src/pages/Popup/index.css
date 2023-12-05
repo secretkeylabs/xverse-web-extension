@@ -6,6 +6,24 @@ body {
   background-color: #181818;
 }
 
+#app-container {
+  height: 600px;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  align-items: safe center;
+  @media only screen and (min-width: 360px) {
+    height: 100vh;
+    width: 100vw;
+  }
+}
+
+#app {
+  min-height: 600px;
+  min-width: 360px;
+}
+
 ::-webkit-scrollbar {
   display: none;
 }
