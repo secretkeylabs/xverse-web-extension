@@ -73,7 +73,6 @@ export type BundleItem =
 
 // remove later when we fix sign psbt screen
 export const convertV2ToV1Bundle = (v2: any): BundleItem[] => {
-  console.log('v2:', v2);
   const bundleItems: BundleItem[] = [];
   v2.forEach((item) => {
     item.satRanges.forEach((satRange) => {
