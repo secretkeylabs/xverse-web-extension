@@ -10,7 +10,7 @@
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "4.1.0-af4b3a9",
+    "@secretkeylabs/xverse-core": "5.1.0",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
