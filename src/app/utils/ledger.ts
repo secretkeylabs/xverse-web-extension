@@ -1,9 +1,4 @@
-import {
-  Account,
-  NetworkType,
-  signSimpleBip322Message,
-  Transport,
-} from '@secretkeylabs/xverse-core';
+import { NetworkType, signSimpleBip322Message, Transport } from '@secretkeylabs/xverse-core';
 
 export const handleBip322LedgerMessageSigning = async ({
   transport,
@@ -31,8 +26,3 @@ export const handleBip322LedgerMessageSigning = async ({
 };
 
 export const signatureVrsToRsv = (sig: string): string => sig.slice(2) + sig.slice(0, 2);
-
-export const filterLedgerAccounts = (accounts: Account[], network: NetworkType) =>
-  accounts.filter((account) =>
-    account.ordinalsAddress?.startsWith(network === 'Mainnet' ? 'bc1' : 'tb1'),
-  );

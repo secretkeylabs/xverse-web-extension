@@ -1,4 +1,4 @@
-import { getDeviceAccountIndex } from '@common/utils/ledger';
+import { filterLedgerAccounts, getDeviceAccountIndex } from '@common/utils/ledger';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -29,7 +29,6 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { generatePasswordHash } from '@utils/encryptionUtils';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
-import { filterLedgerAccounts } from '@utils/ledger';
 import { resetMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { useDispatch } from 'react-redux';
 import useSeedVault from './useSeedVault';
@@ -107,6 +106,9 @@ const useWalletReducer = () => {
 
     dispatch(fetchAccountAction(selectedAccountData, walletAccounts));
 
+    // ledger accounts initially didn't have a deviceAccountIndex
+    // this is a migration to add the deviceAccountIndex to the ledger accounts without them
+    // it should only fire once if ever
     if (ledgerAccountsList.some((account) => account.deviceAccountIndex === undefined)) {
       const newLedgerAccountsList = ledgerAccountsList.map((account) => ({
         ...account,

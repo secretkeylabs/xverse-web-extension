@@ -1,5 +1,6 @@
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import Plus from '@assets/img/dashboard/plus.svg';
+import { filterLedgerAccounts } from '@common/utils/ledger';
 import AccountRow from '@components/accountRow';
 import Separator from '@components/separator';
 import TopRow from '@components/topRow';
@@ -7,7 +8,6 @@ import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Account } from '@secretkeylabs/xverse-core';
-import { filterLedgerAccounts } from '@utils/ledger';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
