@@ -5,7 +5,7 @@ if [[ -z "$BUMP" ]]; then
   exit 1
 fi
 
-echo -e "\n\n--- Prepare for $BUMP release branch ---\n\n"
+echo -e "\n--- Prepare for $BUMP release branch ---"
 
 git fetch --all
 git checkout develop
@@ -23,7 +23,7 @@ git merge origin/main -s ours
 
 git push --set-upstream origin $BRANCH
 
-echo -e "\n\n--- Create draft release for $TAG ---\n\n"
+echo -e "\n--- Create draft release for $TAG ---"
 
 gh api \
   --method POST \
@@ -41,7 +41,7 @@ cat release.json | jq -r .body > body.md
 echo -e "\n\nDraft release: $(cat release.json | jq -r .html_url)" >> body.md
 
 for b in main develop; do
-  echo -e "\n\n--- Create PR to $b ---\n\n"
+  echo -e "\n--- Create PR to $b ---"
 
   gh api \
     --method POST \
@@ -53,7 +53,7 @@ for b in main develop; do
     -f head="$BRANCH" \
     -f base="$b" > pr-$b.json
 
-  echo -e "\n\n--- Update PR to $b with description ---\n\n"
+  echo -e "\n--- Update PR to $b with description ---"
 
   PR_ID=$(cat pr-$b.json | jq -r .number)
 
@@ -68,7 +68,7 @@ for b in main develop; do
   # rm pr-$b.json
 done
 
-echo -e "\n\n--- Done ---\n\n"
+echo -e "\n--- Done ---"
 # clean up temp files
 # rm release.json
 # rm body.md

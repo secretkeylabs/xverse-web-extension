@@ -29,4 +29,5 @@ jobs:
           # git config
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
-          ./scripts/create-release-pr.sh
+          cd scripts
+          ./create-release-pr.sh
