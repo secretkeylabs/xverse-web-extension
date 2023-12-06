@@ -8,23 +8,21 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { breakpoints, devices } from 'theme';
 
-interface ContainerProps {
-  isGallery?: boolean;
-}
+const ScrollContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  ${(props) => props.theme.scrollbar}
+`;
 
-const ScrollContainer = styled.div((props) => ({
-  display: 'flex',
-  flex: 1,
-  flexDirection: 'column',
-  ...props.theme.scrollbar,
-}));
-
-const Container = styled.div<ContainerProps>`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin: auto;
-  margin-top: ${(props) => props.theme.space.xxs};
-  padding: 0 ${(props) => props.theme.space.s};
+  margin-top: ${(props) => props.theme.space.m};
+  margin-bottom: ${(props) => props.theme.space.xxs};
+  padding: 0 ${(props) => props.theme.space.xs};
   width: 100%;
   height: 100%;
   max-width: ${breakpoints.xs}px;
@@ -33,20 +31,27 @@ const Container = styled.div<ContainerProps>`
   @media only screen and ${devices.min.s} {
     flex: initial;
     max-width: 588px;
+    max-height: unset;
+    height: auto;
     border: 1px solid ${(props) => props.theme.colors.elevation3};
     border-radius: ${(props) => props.theme.space.s};
     padding-top: ${(props) => props.theme.space.l};
-    padding-left: ${(props) => (props.isGallery ? props.theme.space.m : 0)};
-    padding-right: ${(props) => (props.isGallery ? props.theme.space.m : 0)};
+    padding-left: ${(props) => props.theme.space.m};
+    padding-right: ${(props) => props.theme.space.m};
     padding-bottom: ${(props) => props.theme.space.xxl};
     margin-top: ${(props) => props.theme.space.xxxxl};
+    margin-bottom: ${(props) => props.theme.space.m};
   }
 `;
 
 const FooterContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: ${(props) => props.theme.space.xxl};
+  display: none;
+
+  @media only screen and ${devices.min.s} {
+    display: flex;
+    justify-content: center;
+    margin-bottom: ${(props) => props.theme.space.xxl};
+  }
 `;
 
 const BottomBarContainer = styled.div({
@@ -57,7 +62,6 @@ const Button = styled.button`
   display: flex;
   background-color: transparent;
   margin-bottom: ${(props) => props.theme.space.l};
-  margin-left: ${(props) => props.theme.space.s};
 `;
 
 function SendLayout({
@@ -65,25 +69,28 @@ function SendLayout({
   selectedBottomTab,
   onClickBack,
   hideBackButton = false,
+  showAccountHeader = false,
+  hideBottomBar = false,
 }: PropsWithChildren<{
   selectedBottomTab: Tab;
   onClickBack?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   hideBackButton?: boolean;
+  showAccountHeader?: boolean;
+  hideBottomBar?: boolean;
 }>) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const isScreenLargerThanXs = document.documentElement.clientWidth > Number(breakpoints.xs);
   const year = new Date().getFullYear();
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
 
   return (
     <>
-      {isScreenLargerThanXs ? (
-        <AccountHeaderComponent disableMenuOption={isScreenLargerThanXs} disableAccountSwitch />
+      {isScreenLargerThanXs || showAccountHeader ? (
+        <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
         <TopRow title="" onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
       )}
       <ScrollContainer>
-        <Container isGallery={isGalleryOpen}>
+        <Container>
           {isScreenLargerThanXs && !hideBackButton && onClickBack && (
             <Button onClick={onClickBack}>
               <ArrowLeft size={20} color="white" />
@@ -91,16 +98,14 @@ function SendLayout({
           )}
           {children}
         </Container>
-        {isScreenLargerThanXs && (
-          <FooterContainer>
-            <StyledP typography="body_medium_m" color="white_400">
-              {t('COPYRIGHT', { year })}
-            </StyledP>
-          </FooterContainer>
-        )}
+        <FooterContainer>
+          <StyledP typography="body_medium_m" color="white_400">
+            {t('COPYRIGHT', { year })}
+          </StyledP>
+        </FooterContainer>
       </ScrollContainer>
       <BottomBarContainer>
-        {!isScreenLargerThanXs && <BottomBar tab={selectedBottomTab} />}
+        {!isScreenLargerThanXs && !hideBottomBar && <BottomBar tab={selectedBottomTab} />}
       </BottomBarContainer>
     </>
   );

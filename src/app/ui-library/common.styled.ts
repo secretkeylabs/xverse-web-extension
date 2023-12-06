@@ -34,6 +34,30 @@ export const VerticalStackButtonContainer = styled.div`
   gap: ${(props) => props.theme.spacing(6)}px;
 `;
 
+export const HorizontalSplitButtonContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: ${(props) => props.theme.space.s};
+`;
+
+// two buttons side by side - sticky bottom
+export const StickyHorizontalSplitButtonContainer = styled(HorizontalSplitButtonContainer)`
+  position: sticky;
+  bottom: 0;
+  padding-bottom: ${(props) => props.theme.space.l};
+  padding-top: ${(props) => props.theme.space.l};
+  background-color: ${(props) => props.theme.colors.elevation0};
+`;
+
+// single button - sticky bottom
+export const StickyButtonContainer = styled.div`
+  position: sticky;
+  bottom: 0;
+  padding-bottom: ${(props) => props.theme.space.l};
+  padding-top: ${(props) => props.theme.space.l};
+  background-color: ${(props) => props.theme.colors.elevation0};
+`;
+
 /*
  * Tabulations (styled react-tabs)
  *
