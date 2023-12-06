@@ -1,7 +1,9 @@
 import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
 import {
   CreateInscriptionResponse,
+  CreateRepeatInscriptionsResponse,
   GetAddressResponse,
+  SignMultipleTransactionsResponse,
   SignTransactionResponse,
 } from 'sats-connect';
 
@@ -104,13 +106,17 @@ export enum ExternalSatsMethods {
   getAddressRequest = 'getAddressRequest',
   getAddressResponse = 'getAddressResponse',
   signPsbtRequest = 'signPsbtRequest',
+  signBatchPsbtRequest = 'signBatchPsbtRequest',
   signPsbtResponse = 'signPsbtResponse',
+  signBatchPsbtResponse = 'signBatchPsbtResponse',
   signMessageRequest = 'signMessageRequest',
   signMessageResponse = 'signMessageResponse',
   sendBtcRequest = 'sendBtcRequest',
   sendBtcResponse = 'sendBtcResponse',
   createInscriptionRequest = 'createInscriptionRequest',
   createInscriptionResponse = 'createInscriptionResponse',
+  createRepeatInscriptionsRequest = 'createRepeatInscriptionsRequest',
+  createRepeatInscriptionsResponse = 'createRepeatInscriptionsResponse',
 }
 
 type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
@@ -125,11 +131,21 @@ export type GetAddressResponseMessage = Message<
 
 type SignPsbtRequestMessage = Message<ExternalSatsMethods.signPsbtRequest, string>;
 
+type SignBatchPsbtRequestMessage = Message<ExternalSatsMethods.signBatchPsbtRequest, string>;
+
 export type SignPsbtResponseMessage = Message<
   ExternalSatsMethods.signPsbtResponse,
   {
     signPsbtRequest: string;
     signPsbtResponse: SignTransactionResponse | string;
+  }
+>;
+
+export type SignBatchPsbtResponseMessage = Message<
+  ExternalSatsMethods.signBatchPsbtResponse,
+  {
+    signBatchPsbtRequest: string;
+    signBatchPsbtResponse: SignMultipleTransactionsResponse | string;
   }
 >;
 
@@ -166,16 +182,33 @@ export type CreateInscriptionResponseMessage = Message<
   }
 >;
 
+type CreateRepeatInscriptionsRequestMessage = Message<
+  ExternalSatsMethods.createRepeatInscriptionsRequest,
+  string
+>;
+
+export type CreateRepeatInscriptionsResponseMessage = Message<
+  ExternalSatsMethods.createRepeatInscriptionsResponse,
+  {
+    createRepeatInscriptionsRequest: string;
+    createRepeatInscriptionsResponse: CreateRepeatInscriptionsResponse | string;
+  }
+>;
+
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage
   | SignPsbtRequestMessage
+  | SignBatchPsbtRequestMessage
   | SignMessageRequestMessage
   | SendBtcRequestMessage
-  | CreateInscriptionRequestMessage;
+  | CreateInscriptionRequestMessage
+  | CreateRepeatInscriptionsRequestMessage;
 
 export type SatsConnectMessageToContentScript =
   | GetAddressResponseMessage
   | SignPsbtResponseMessage
+  | SignBatchPsbtResponseMessage
   | SignMessageResponseMessage
   | SendBtcResponseMessage
-  | CreateInscriptionResponseMessage;
+  | CreateInscriptionResponseMessage
+  | CreateRepeatInscriptionsResponseMessage;

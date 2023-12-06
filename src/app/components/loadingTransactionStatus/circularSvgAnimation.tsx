@@ -54,10 +54,12 @@ const StyledSvg = styled.svg<{ status: ConfirmationStatus; loadingPercentage: nu
 export function CircularSvgAnimation({
   status,
   loadingPercentage,
+  withLoadingBgCircle = false,
   onRest,
 }: {
   status: ConfirmationStatus;
   loadingPercentage: number;
+  withLoadingBgCircle?: boolean;
   onRest?: () => void;
 }) {
   const [isCircleRested, setIsCircleRested] = useState(false);
@@ -94,6 +96,13 @@ export function CircularSvgAnimation({
         fill="none"
       >
         <path className={checkClass} d="M59.125 35.75L38.9582 55L28.875 45.375" />
+        {withLoadingBgCircle && status === 'LOADING' && (
+          <path
+            stroke="rgba(255, 255, 255, 0.1)"
+            strokeWidth={2}
+            d="M44 77C62.2254 77 77 62.2254 77 44C77 25.7746 62.2254 11 44 11C25.7746 11 11 25.7746 11 44C11 62.2254 25.7746 77 44 77Z"
+          />
+        )}
         <animated.path
           className="circle"
           d="M44 77C62.2254 77 77 62.2254 77 44C77 25.7746 62.2254 11 44 11C25.7746 11 11 25.7746 11 44C11 62.2254 25.7746 77 44 77Z"

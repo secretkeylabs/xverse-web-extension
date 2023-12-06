@@ -8,9 +8,11 @@ export enum DomEventName {
   transactionRequest = 'stacksTransactionRequest',
   getAddressRequest = 'SatsAddressRequest',
   signPsbtRequest = 'SatsPsbtRequest',
+  signBatchPsbtRequest = 'SatsBatchPsbtRequest',
   signMessageRequest = 'SatsSignMessage',
   sendBtcRequest = 'SatsSendBtcRequest',
   createInscriptionRequest = 'SatsCreateInscriptionRequest',
+  createRepeatInscriptionsRequest = 'SatsCreateRepeatInscriptionsRequest',
 }
 
 export interface AuthenticationRequestEventDetails {
@@ -43,6 +45,12 @@ export interface SignPsbtRequestEventDetails {
 
 export type SignPsbtRequestEvent = CustomEvent<SignPsbtRequestEventDetails>;
 
+export interface SignBatchPsbtRequestEventDetails {
+  signBatchPsbtRequest: string;
+}
+
+export type SignBatchPsbtRequestEvent = CustomEvent<SignBatchPsbtRequestEventDetails>;
+
 export interface SignMessageRequestEventDetails {
   signMessageRequest: string;
 }
@@ -60,3 +68,9 @@ export interface CreateInscriptionEventDetails {
 }
 
 export type CreateInscriptionEvent = CustomEvent<CreateInscriptionEventDetails>;
+
+export interface CreateRepeatInscriptionsEventDetails {
+  createRepeatInscriptionsRequest: string;
+}
+
+export type CreateRepeatInscriptionsEvent = CustomEvent<CreateRepeatInscriptionsEventDetails>;

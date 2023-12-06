@@ -1,62 +1,57 @@
-import { getUtxoOrdinalBundle, ParsedPSBT } from '@secretkeylabs/xverse-core';
-import { BundleItem, mapRareSatsAPIResponseToRareSats } from '@utils/rareSats';
-import { isAxiosError } from 'axios';
-import { useEffect, useState } from 'react';
+import {
+  Bundle,
+  getUtxoOrdinalBundle,
+  mapRareSatsAPIResponseToBundle,
+  ParsedPSBT,
+} from '@secretkeylabs/xverse-core';
 import useWalletSelector from './useWalletSelector';
 
-const useDetectOrdinalInSignPsbt = (parsedPsbt: undefined | ParsedPSBT) => {
-  const [loading, setLoading] = useState(false);
-  const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
-  const [bundleItemsData, setBundleItemsData] = useState<BundleItem[]>([]);
+export type InputsBundle = (Pick<Bundle, 'satRanges' | 'totalExoticSats'> & {
+  inputIndex: number;
+})[];
+
+const useDetectOrdinalInSignPsbt = () => {
   const { ordinalsAddress, network } = useWalletSelector();
 
-  async function handleOrdinalAndOrdinalInfo() {
-    const bundleItems: BundleItem[] = [];
+  const handleOrdinalAndOrdinalInfo = async (
+    parsedPsbt?: ParsedPSBT,
+  ): Promise<{ bundleItemsData: InputsBundle; userReceivesOrdinal: boolean }> => {
+    const bundleItemsData: InputsBundle = [];
+    let userReceivesOrdinal = false;
+
     if (parsedPsbt) {
-      setLoading(true);
-      await Promise.all(
-        parsedPsbt.inputs.map(async (input) => {
-          try {
-            const data = await getUtxoOrdinalBundle(network.type, input.txid, input.index);
-
-            const bundle = mapRareSatsAPIResponseToRareSats(data);
-            bundle.items.forEach((item) => {
-              // we don't show unknown items for now
-              if (item.type === 'unknown') {
-                return;
-              }
-              bundleItems.push(item);
-            });
-          } catch (e) {
-            // we get back a 404 if the UTXO is not found, so it is likely this is a UTXO from an unpublished txn
-            if (!isAxiosError(e) || e.response?.status !== 404) {
-              // rethrow error if response was not 404
-              throw e;
-            }
-          }
-        }),
+      const inputsRequest = parsedPsbt.inputs.map((input) =>
+        getUtxoOrdinalBundle(network.type, input.txid, input.index),
       );
+      const inputsResponse = await Promise.all(inputsRequest);
+      inputsResponse.forEach((inputResponse, index) => {
+        const bundle = mapRareSatsAPIResponseToBundle(inputResponse);
+        if (
+          bundle.inscriptions.length > 0 ||
+          bundle.satributes.some((satributes) => !satributes.includes('COMMON'))
+        ) {
+          bundleItemsData.push({
+            satRanges: bundle.satRanges,
+            totalExoticSats: bundle.totalExoticSats,
+            inputIndex: index,
+          });
+        }
+      });
 
-      setBundleItemsData(bundleItems);
-      setLoading(false);
-
-      parsedPsbt.outputs.forEach(async (output) => {
+      parsedPsbt.outputs.forEach((output) => {
         if (output.address === ordinalsAddress) {
-          setUserReceivesOrdinal(true);
+          userReceivesOrdinal = true;
         }
       });
     }
-  }
 
-  useEffect(() => {
-    handleOrdinalAndOrdinalInfo();
-  }, []);
-
-  return {
-    loading,
-    bundleItemsData,
-    userReceivesOrdinal,
+    return {
+      bundleItemsData,
+      userReceivesOrdinal,
+    };
   };
+
+  return handleOrdinalAndOrdinalInfo;
 };
 
 export default useDetectOrdinalInSignPsbt;

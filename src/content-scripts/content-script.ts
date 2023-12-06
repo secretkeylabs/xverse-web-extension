@@ -1,12 +1,14 @@
 import {
   AuthenticationRequestEvent,
   CreateInscriptionEvent,
+  CreateRepeatInscriptionsEvent,
   DomEventName,
   GetAddressRequestEvent,
   SendBtcRequestEvent,
+  SignatureRequestEvent,
+  SignBatchPsbtRequestEvent,
   SignMessageRequestEvent,
   SignPsbtRequestEvent,
-  SignatureRequestEvent,
   TransactionRequestEvent,
 } from '@common/types/inpage-types';
 import {
@@ -145,6 +147,18 @@ document.addEventListener(DomEventName.signPsbtRequest, ((event: SignPsbtRequest
   });
 }) as EventListener);
 
+// Listen for a CustomEvent (Batch PSBT Signing request) coming from the web app
+document.addEventListener(DomEventName.signBatchPsbtRequest, ((
+  event: SignBatchPsbtRequestEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.SignBatchBtcTx,
+    payload: event.detail.signBatchPsbtRequest,
+    urlParam: 'signBatchPsbtRequest',
+    method: ExternalSatsMethods.signBatchPsbtRequest,
+  });
+}) as EventListener);
+
 // Listen for a CustomEvent (Message Signing request) coming from the web app
 document.addEventListener(DomEventName.signMessageRequest, ((event: SignMessageRequestEvent) => {
   forwardDomEventToBackground({
@@ -174,6 +188,18 @@ document.addEventListener(DomEventName.createInscriptionRequest, ((
     payload: event.detail.createInscriptionRequest,
     urlParam: 'createInscriptionRequest',
     method: ExternalSatsMethods.createInscriptionRequest,
+  });
+}) as EventListener);
+
+// Listen for a CustomEvent (Create Repeat Inscriptions Request) coming from the web app
+document.addEventListener(DomEventName.createRepeatInscriptionsRequest, ((
+  event: CreateRepeatInscriptionsEvent,
+) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.CreateRepeatInscriptions,
+    payload: event.detail.createRepeatInscriptionsRequest,
+    urlParam: 'createRepeatInscriptionsRequest',
+    method: ExternalSatsMethods.createRepeatInscriptionsRequest,
   });
 }) as EventListener);
 

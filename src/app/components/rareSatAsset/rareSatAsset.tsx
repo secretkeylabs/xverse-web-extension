@@ -55,14 +55,13 @@ function RareSatAsset({ item, isCollage = false }: Props) {
     <Container>
       {isInscription ? (
         <InscriptionContainer>
-          {!isCollage && !!item.rarity_ranking && item.rarity_ranking !== 'common' && (
+          {!isCollage && !!item.rarity_ranking && item.rarity_ranking !== 'COMMON' && (
             <RareSatIconContainer isGallery={isGallery}>
               <RareSatIcon
                 type={item.rarity_ranking}
                 size={isGallery ? 40 : 24}
                 padding={isGallery ? 8 : 4}
                 bgColor="elevation0"
-                glow={false}
               />
             </RareSatIconContainer>
           )}
@@ -75,7 +74,7 @@ function RareSatAsset({ item, isCollage = false }: Props) {
       ) : (
         <RareSatsContainer>
           <DynamicSizeContainer isCollage={isCollage}>
-            <RareSatIcon type={item.rarity_ranking} isDynamicSize isCollage={isCollage} />
+            <RareSatIcon type={item.rarity_ranking as any} isDynamicSize />
           </DynamicSizeContainer>
         </RareSatsContainer>
       )}

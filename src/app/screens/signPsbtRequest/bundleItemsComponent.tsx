@@ -158,7 +158,7 @@ function BundleItemsComponent({ item, userReceivesOrdinal }: Props) {
   };
   const itemSubText = getBundleItemSubText({
     satType: item.type,
-    rareSatsType: item.rarity_ranking,
+    rareSatsType: item.rarity_ranking as any,
   });
   const getDetail = () => {
     if (item.type === 'inscription' || item.type === 'inscribed-sat') {

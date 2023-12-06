@@ -209,6 +209,27 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
+    case ExternalSatsMethods.signBatchPsbtRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['signBatchPsbtRequest', payload],
+      ]);
+
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.SignBatchBtcTx, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            signBatchPsbtRequest: payload,
+            signBatchPsbtResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.signBatchPsbtResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
     case ExternalSatsMethods.signMessageRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['signMessageRequest', payload],
@@ -267,6 +288,27 @@ export async function handleLegacyExternalMethodFormat(
             createInscriptionResponse: 'cancel',
           },
           method: ExternalSatsMethods.createInscriptionResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
+    case ExternalSatsMethods.createRepeatInscriptionsRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['createRepeatInscriptions', payload],
+      ]);
+
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.CreateRepeatInscriptions, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            createRepeatInscriptionsRequest: payload,
+            createRepeatInscriptionsResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.createRepeatInscriptionsResponse,
         },
       });
       listenForOriginTabClose({ tabId });
