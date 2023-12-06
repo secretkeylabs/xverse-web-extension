@@ -2,6 +2,7 @@ import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
+import { StickyButtonContainer } from '@ui-library/common.styled';
 import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
 import { getFtTicker } from '@utils/tokens';
 import { useTranslation } from 'react-i18next';
@@ -70,14 +71,6 @@ const AmountInputContainer = styled.div<{ error: boolean }>((props) => ({
   paddingLeft: props.theme.spacing(5),
   paddingRight: props.theme.spacing(5),
   height: 44,
-}));
-
-const NextButtonContainer = styled.div((props) => ({
-  position: 'sticky',
-  bottom: 0,
-  paddingBottom: props.theme.spacing(12),
-  paddingTop: props.theme.spacing(12),
-  backgroundColor: props.theme.colors.elevation0,
 }));
 
 const Label = styled.label((props) => ({
@@ -199,14 +192,14 @@ function Brc20TransferForm(props: Props) {
         </InputGroup>
         <StyledCallout bodyText={t('MAKE_SURE_THE_RECIPIENT')} />
       </div>
-      <NextButtonContainer>
+      <StickyButtonContainer>
         <ActionButton
           text={t('NEXT')}
           disabled={!isNextEnabled}
           processing={processing}
           onPress={onPressNext}
         />
-      </NextButtonContainer>
+      </StickyButtonContainer>
     </Container>
   );
 }

@@ -26,10 +26,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  padding: 0 ${(props) => props.theme.space.xs};
+  ${(props) => props.theme.scrollbar}
 `;
 
 const ResetWalletContainer = styled.div((props) => ({

@@ -161,7 +161,6 @@ function ConfirmOrdinalTransaction() {
         signedTxHex={signedTxHex}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleOnCancelClick}
-        onBackButtonClick={handleOnCancelClick}
         ordinalTxUtxo={ordinalUtxo}
         assetDetail={selectedOrdinal ? selectedOrdinal.number.toString() : ''}
         currentFee={currentFee}
@@ -173,7 +172,7 @@ function ConfirmOrdinalTransaction() {
         ordinalBundle={ordinalBundle}
         holdsRareSats={holdsRareSats}
       >
-        {selectedOrdinal && (
+        {!isRareSat && selectedOrdinal && (
           <Container>
             <NftContainer>
               <OrdinalImage inNftSend withoutSizeIncrease ordinal={selectedOrdinal!} />

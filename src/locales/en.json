@@ -4,7 +4,8 @@
     "SEND": "Send",
     "COMBO": "Combo",
     "SATS": "Sats",
-    "SATTRIBUTES": "Sattributes"
+    "SATTRIBUTES": "Sattributes",
+    "INPUT": "Input"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
@@ -948,7 +949,7 @@
       },
       "LONG": {
         "INVALID_JSON_CONTENT": "The content is not valid JSON. Please verify the content of your inscription.",
-        "INSUFFICIENT_FUNDS": "You have insufficient balance to process this transaction. Please add more funds to your wallet or try with a lower fee rate.",
+        "INSUFFICIENT_FUNDS": "You have insufficient confirmed funds to process this transaction. This may be due to unconfirmed outputs in your balance. Please add more funds or try with a lower fee rate",
         "INVALID_FEE_RATE": "The fee applied to this transaction is too low. To apply a higher fee, select edit fees at the bottom of this screen.",
         "INVALID_SERVICE_FEE_CONFIG": "The calling application sent an invalid payload. Please contact the application developer.",
         "INVALID_CONTENT": "The ordinal content you are trying to inscribe is not valid. Please verify the content of your inscription.",
@@ -1177,8 +1178,7 @@
     "RARE_SATS_BUNDLE": "Rare Sats Bundle",
     "BUNDLE_PENDING_SEND_DESCRIPTION": "This bundle is already in a pending transfer.",
     "RARE_SAT": "Rare Sat",
-    "INSCRIBED_SAT": "Inscribed Sat",
-    "BUNDLE_SIZE": "Bundle size"
+    "INSCRIBED_SAT": "Inscribed Sat"
   },
   "COLLECTIBLE_COLLECTION_SCREEN": {
     "BACK_TO_GALLERY": "Back to gallery",
