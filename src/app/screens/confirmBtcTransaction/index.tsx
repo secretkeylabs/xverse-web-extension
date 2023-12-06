@@ -1,6 +1,5 @@
 import { ConfirmBtcTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
-import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import InfoContainer from '@components/infoContainer';
@@ -17,12 +16,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
-
-const BottomBarContainer = styled.h1((props) => ({
-  marginTop: props.theme.spacing(5),
-}));
 
 function ConfirmBtcTransaction() {
   const navigate = useNavigate();
@@ -200,13 +194,20 @@ function ConfirmBtcTransaction() {
       });
     }
   };
+  const hideBackButton = location.key === 'default';
 
   const onClosePress = () => {
     setShowOrdinalsDetectedAlert(false);
   };
 
   return (
-    <SendLayout selectedBottomTab="dashboard" onClickBack={goBackToScreen}>
+    <SendLayout
+      selectedBottomTab="dashboard"
+      onClickBack={goBackToScreen}
+      hideBackButton={hideBackButton}
+      showAccountHeader={btcSendBrowserTx}
+      hideBottomBar={btcSendBrowserTx}
+    >
       {showOrdinalsDetectedAlert && (
         <AlertMessage
           title={t('BTC_TRANSFER_DANGER_ALERT_TITLE')}
@@ -219,7 +220,6 @@ function ConfirmBtcTransaction() {
           isWarningAlert
         />
       )}
-      {btcSendBrowserTx && <AccountHeaderComponent disableMenuOption disableAccountSwitch />}
       <ConfirmBtcTransactionComponent
         feePerVByte={feePerVByte}
         recipients={recipient as Recipient[]}
@@ -228,13 +228,12 @@ function ConfirmBtcTransaction() {
         isRestoreFundFlow={isRestoreFundFlow}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={goBackToScreen}
-        onBackButtonClick={goBackToScreen}
         nonOrdinalUtxos={unspentUtxos}
-        isBtcSendBrowserTx={btcSendBrowserTx}
         currentFee={currentFee}
         setCurrentFee={setCurrentFee}
         currentFeeRate={currentFeeRate}
         setCurrentFeeRate={setCurrentFeeRate}
+        currencyType="BTC"
       >
         {ordinalsInBtc && ordinalsInBtc.length > 0 && (
           <InfoContainer

@@ -39,14 +39,13 @@ import Theme from 'theme';
 import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
 
-export const Container = styled.div((props) => ({
-  ...props.theme.scrollbar,
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  paddingLeft: props.theme.spacing(4),
-  paddingRight: props.theme.spacing(4),
-}));
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 ${(props) => props.theme.space.xs};
+  ${(props) => props.theme.scrollbar}
+`;
 
 const ColumnContainer = styled.div((props) => ({
   display: 'flex',
