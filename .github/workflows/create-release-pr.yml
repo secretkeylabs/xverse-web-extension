@@ -1,0 +1,33 @@
+name: Create release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump level'
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - id: run-create-release-pr-sh
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          # git config
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          cd scripts
+          ./create-release-pr.sh
