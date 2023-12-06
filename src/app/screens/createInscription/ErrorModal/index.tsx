@@ -20,6 +20,7 @@ const Container = styled.div`
 `;
 
 const CardContainer = styled.div((props) => ({
+  ...props.theme.typography.body_m,
   display: 'flex',
   flexDirection: 'column',
   background: props.theme.colors.background.elevation3,
@@ -27,13 +28,12 @@ const CardContainer = styled.div((props) => ({
   padding: props.theme.spacing(8),
   justifyContent: 'center',
   marginBottom: props.theme.spacing(6),
-  fontSize: 14,
   width: '100vw',
   margin: props.theme.spacing(12),
 }));
 
 const Title = styled.div((props) => ({
-  fontWeight: 700,
+  ...props.theme.typography.body_bold_m,
   lineHeight: '140%',
   color: props.theme.colors.white[0],
   position: 'relative',

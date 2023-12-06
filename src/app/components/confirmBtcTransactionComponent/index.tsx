@@ -24,6 +24,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
+import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
@@ -40,34 +41,7 @@ interface MainContainerProps {
 const OuterContainer = styled.div<MainContainerProps>`
   display: flex;
   flex-direction: column;
-  flex: 1;
-  flex-grow: 1;
-  ...${(props) => (props.isGalleryOpen ? props.theme.scrollbar : {})};
 `;
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  marginTop: props.theme.spacing(11),
-}));
-
-interface ButtonProps {
-  isBtcSendBrowserTx?: boolean;
-}
-
-const ButtonContainer = styled.div<ButtonProps>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  position: 'relative',
-  marginBottom: props.isBtcSendBrowserTx ? props.theme.spacing(20) : props.theme.spacing(5),
-}));
-
-const TransparentButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(2),
-  marginRight: props.theme.spacing(2),
-  width: '100%',
-}));
 
 const Button = styled.button((props) => ({
   display: 'flex',
@@ -77,6 +51,7 @@ const Button = styled.button((props) => ({
   backgroundColor: 'transparent',
   width: '100%',
   marginTop: props.theme.spacing(10),
+  marginBottom: props.theme.space.m,
 }));
 
 const ButtonText = styled.div((props) => ({
@@ -129,7 +104,6 @@ interface Props {
   assetDetailValue?: string;
   isRestoreFundFlow?: boolean;
   nonOrdinalUtxos?: UTXO[];
-  isBtcSendBrowserTx?: boolean;
   currencyType?: CurrencyTypes;
   isPartOfBundle?: boolean;
   ordinalBundle?: Bundle;
@@ -139,7 +113,6 @@ interface Props {
   setCurrentFeeRate: (feeRate: BigNumber) => void;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
-  onBackButtonClick: () => void;
 }
 
 function ConfirmBtcTransactionComponent({
@@ -154,7 +127,6 @@ function ConfirmBtcTransactionComponent({
   assetDetailValue,
   isRestoreFundFlow,
   nonOrdinalUtxos,
-  isBtcSendBrowserTx,
   isPartOfBundle,
   currencyType,
   ordinalBundle,
@@ -164,7 +136,6 @@ function ConfirmBtcTransactionComponent({
   setCurrentFeeRate,
   onConfirmClick,
   onCancelClick,
-  onBackButtonClick,
 }: Props) {
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
@@ -382,117 +353,100 @@ function ConfirmBtcTransactionComponent({
   return (
     <>
       <OuterContainer isGalleryOpen={isGalleryOpen}>
-        <Container>
-          {showFeeWarning && (
-            <InfoContainer
-              type="Warning"
-              bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')}
-            />
-          )}
-
-          {children}
-          <ReviewTransactionText centerAligned={currencyType === 'Ordinal'}>
-            {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
-          </ReviewTransactionText>
-
-          {isPartOfBundle && (
-            <CalloutContainer>
-              <Callout
-                bodyText={t('NFT_DASHBOARD_SCREEN.FROM_RARE_SAT_BUNDLE')}
-                variant="warning"
-              />
-            </CalloutContainer>
-          )}
-          {holdsRareSats && (
-            <CalloutContainer>
-              <Callout bodyText={t('NFT_DASHBOARD_SCREEN.HOLDS_RARE_SAT')} variant="warning" />
-            </CalloutContainer>
-          )}
-
-          {bundle && <SatsBundle bundle={bundle} />}
-
-          {ordinalTxUtxo ? (
+        {showFeeWarning && (
+          <InfoContainer type="Warning" bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')} />
+        )}
+        {/* TODO tim: refactor this not to use children. it should be just another prop */}
+        {children}
+        <ReviewTransactionText centerAligned={currencyType === 'Ordinal'}>
+          {t('CONFIRM_TRANSACTION.REVIEW_TRANSACTION')}
+        </ReviewTransactionText>
+        {isPartOfBundle && (
+          <CalloutContainer>
+            <Callout bodyText={t('NFT_DASHBOARD_SCREEN.FROM_RARE_SAT_BUNDLE')} variant="warning" />
+          </CalloutContainer>
+        )}
+        {holdsRareSats && (
+          <CalloutContainer>
+            <Callout bodyText={t('NFT_DASHBOARD_SCREEN.HOLDS_RARE_SAT')} variant="warning" />
+          </CalloutContainer>
+        )}
+        {currencyType !== 'BTC' && bundle && <SatsBundle bundle={bundle} />}
+        {ordinalTxUtxo ? (
+          <RecipientComponent
+            address={recipients[0]?.address}
+            value={assetDetail ?? ''}
+            valueDetail={assetDetailValue}
+            icon={AssetIcon}
+            currencyType={currencyType || 'Ordinal'}
+            title={t('CONFIRM_TRANSACTION.ASSET')}
+          />
+        ) : (
+          recipients?.map((recipient, index) => (
             <RecipientComponent
-              address={recipients[0]?.address}
-              value={assetDetail ?? ''}
-              valueDetail={assetDetailValue}
-              icon={AssetIcon}
-              currencyType={currencyType || 'Ordinal'}
-              title={t('CONFIRM_TRANSACTION.ASSET')}
+              key={recipient.address}
+              recipientIndex={index + 1}
+              address={recipient.address}
+              value={satsToBtc(recipient.amountSats).toString()}
+              totalRecipient={recipients.length}
+              currencyType="BTC"
+              title={t('CONFIRM_TRANSACTION.AMOUNT')}
+              showSenderAddress={isRestoreFundFlow}
             />
-          ) : (
-            recipients?.map((recipient, index) => (
-              <RecipientComponent
-                key={recipient.address}
-                recipientIndex={index + 1}
-                address={recipient.address}
-                value={satsToBtc(recipient.amountSats).toString()}
-                totalRecipient={recipients.length}
-                currencyType="BTC"
-                title={t('CONFIRM_TRANSACTION.AMOUNT')}
-                showSenderAddress={isRestoreFundFlow}
-              />
-            ))
-          )}
-
+          ))
+        )}
+        <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
+        <TransferFeeView
+          feePerVByte={currentFeeRate}
+          fee={currentFee}
+          currency={t('CONFIRM_TRANSACTION.SATS')}
+        />
+        {!ordinalTxUtxo && (
           <TransactionDetailComponent
-            title={t('CONFIRM_TRANSACTION.NETWORK')}
-            value={network.type}
+            title={t('CONFIRM_TRANSACTION.TOTAL')}
+            value={getAmountString(satsToBtc(total), t('BTC'))}
+            subValue={getBtcFiatEquivalent(total, BigNumber(btcFiatRate))}
+            subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
           />
-          <TransferFeeView
-            feePerVByte={currentFeeRate}
-            fee={currentFee}
-            currency={t('CONFIRM_TRANSACTION.SATS')}
-          />
-          {!ordinalTxUtxo && (
-            <TransactionDetailComponent
-              title={t('CONFIRM_TRANSACTION.TOTAL')}
-              value={getAmountString(satsToBtc(total), t('BTC'))}
-              subValue={getBtcFiatEquivalent(total, BigNumber(btcFiatRate))}
-              subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
-            />
-          )}
-          <Button onClick={onAdvancedSettingClick}>
-            <>
-              <ButtonImage src={SettingIcon} />
-              <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
-            </>
-          </Button>
-          <TransactionSettingAlert
-            visible={showFeeSettings}
-            fee={new BigNumber(currentFee).toString()}
-            feePerVByte={feePerVByte}
-            type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
-            btcRecipients={recipients}
-            ordinalTxUtxo={ordinalTxUtxo}
-            onApplyClick={onApplyClick}
-            onCrossClick={closeTransactionSettingAlert}
-            nonOrdinalUtxos={nonOrdinalUtxos}
-            loading={loading || ordinalsLoading}
-            isRestoreFlow={isRestoreFundFlow}
-            showFeeSettings={showFeeSettings}
-            setShowFeeSettings={setShowFeeSettings}
-          />
-        </Container>
-        <ErrorContainer>
-          <ErrorText>{error}</ErrorText>
-        </ErrorContainer>
+        )}
+        <Button onClick={onAdvancedSettingClick}>
+          <ButtonImage src={SettingIcon} />
+          <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
+        </Button>
+        <TransactionSettingAlert
+          visible={showFeeSettings}
+          fee={new BigNumber(currentFee).toString()}
+          feePerVByte={feePerVByte}
+          type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
+          btcRecipients={recipients}
+          ordinalTxUtxo={ordinalTxUtxo}
+          onApplyClick={onApplyClick}
+          onCrossClick={closeTransactionSettingAlert}
+          nonOrdinalUtxos={nonOrdinalUtxos}
+          loading={loading || ordinalsLoading}
+          isRestoreFlow={isRestoreFundFlow}
+          showFeeSettings={showFeeSettings}
+          setShowFeeSettings={setShowFeeSettings}
+        />
+        {!!error && (
+          <ErrorContainer>
+            <ErrorText>{error}</ErrorText>
+          </ErrorContainer>
+        )}
       </OuterContainer>
-      <ButtonContainer isBtcSendBrowserTx={isBtcSendBrowserTx}>
-        <TransparentButtonContainer>
-          <ActionButton
-            text={t('CONFIRM_TRANSACTION.CANCEL')}
-            transparent
-            onPress={onCancelClick}
-            disabled={
-              loadingBroadcastedTx ||
-              isLoading ||
-              isLoadingOrdData ||
-              isLoadingNonOrdinalBtcSend ||
-              ordinalsLoading
-            }
-          />
-        </TransparentButtonContainer>
+      <StickyHorizontalSplitButtonContainer>
+        <ActionButton
+          text={t('CONFIRM_TRANSACTION.CANCEL')}
+          transparent
+          onPress={onCancelClick}
+          disabled={
+            loadingBroadcastedTx ||
+            isLoading ||
+            isLoadingOrdData ||
+            isLoadingNonOrdinalBtcSend ||
+            ordinalsLoading
+          }
+        />
         <ActionButton
           text={t('CONFIRM_TRANSACTION.CONFIRM')}
           disabled={
@@ -511,7 +465,7 @@ function ConfirmBtcTransactionComponent({
           }
           onPress={handleOnConfirmClick}
         />
-      </ButtonContainer>
+      </StickyHorizontalSplitButtonContainer>
     </>
   );
 }

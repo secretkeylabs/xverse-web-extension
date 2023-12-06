@@ -293,6 +293,27 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
+    case ExternalSatsMethods.createRepeatInscriptionsRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['createRepeatInscriptions', payload],
+      ]);
+
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.CreateRepeatInscriptions, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            createRepeatInscriptionsRequest: payload,
+            createRepeatInscriptionsResponse: 'cancel',
+          },
+          method: ExternalSatsMethods.createRepeatInscriptionsResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
     default: {
       break;
     }
