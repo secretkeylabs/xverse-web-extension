@@ -214,6 +214,13 @@ export function ChangeActivateRareSatsAction(
   };
 }
 
+export function ChangeActivateRBFAction(hasActivatedRBFKey: boolean): actions.ChangeActivateRBF {
+  return {
+    type: actions.ChangeHasActivatedRBFKey,
+    hasActivatedRBFKey,
+  };
+}
+
 export function SetRareSatsNoticeDismissedAction(
   rareSatsNoticeDismissed: boolean,
 ): actions.SetRareSatsNoticeDismissed {
