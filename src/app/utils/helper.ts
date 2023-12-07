@@ -132,30 +132,52 @@ export function checkNftExists(
 
 export async function isValidStacksApi(url: string, type: NetworkType): Promise<boolean> {
   const networkChainId = type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet;
-  if (validUrl.isUri(url)) {
+
+  if (!validUrl.isUri(url)) {
+    return false;
+  }
+
+  try {
     const response = await getStacksInfo(url);
     if (response) {
       if (response.network_id !== networkChainId) {
-        throw new Error('URL not compatible with current Network');
+        // incorrect network
+        return false;
       }
       return true;
     }
+  } catch (e) {
+    return false;
   }
-  throw new Error('Invalid URL');
+
+  return false;
 }
 
 export async function isValidBtcApi(url: string, network: NetworkType) {
-  if (validUrl.isUri(url)) {
-    const btcClient = new BitcoinEsploraApiProvider({
-      network,
-      url,
-    });
-    const response = await btcClient.getLatestBlockHeight();
-    if (response) {
-      return true;
-    }
+  if (!validUrl.isUri(url)) {
+    return false;
   }
-  throw new Error('Invalid URL');
+
+  const btcClient = new BitcoinEsploraApiProvider({
+    network,
+    url,
+  });
+  const defaultBtcClient = new BitcoinEsploraApiProvider({
+    network,
+  });
+
+  try {
+    const [customHash, defaultHash] = await Promise.all([
+      btcClient.getBlockHash(1),
+      defaultBtcClient.getBlockHash(1),
+    ]);
+    // this ensures the URL is for correct network
+    return customHash === defaultHash;
+  } catch (e) {
+    return false;
+  }
+
+  return false;
 }
 
 export const getNetworkType = (stxNetwork) =>

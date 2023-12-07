@@ -1,3 +1,4 @@
+import useBtcClient from '@hooks/useBtcClient';
 import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -190,6 +191,7 @@ function EditFee({
   const isStx = type === 'STX';
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
+  const btcClient = useBtcClient();
 
   const modifyStxFees = (mode: string) => {
     const currentFee = new BigNumber(fee);
@@ -237,6 +239,7 @@ function EditFee({
           const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
             btcRecipients,
             btcAddress,
+            btcClient,
             network.type,
             mode,
           );
@@ -248,6 +251,7 @@ function EditFee({
           btcRecipients[0].address,
           ordinalTxUtxo,
           btcAddress,
+          btcClient,
           network.type,
           ordinalsUtxos || [],
           mode,
@@ -297,6 +301,7 @@ function EditFee({
           const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
             btcRecipients,
             btcAddress,
+            btcClient,
             network.type,
             feeMode,
             feeRateInput,
@@ -322,6 +327,7 @@ function EditFee({
           btcRecipients[0].address,
           ordinalTxUtxo,
           btcAddress,
+          btcClient,
           network.type,
           ordinalsUtxos || [],
           feeMode,
