@@ -1,9 +1,11 @@
+import useBtcClient from '@hooks/useBtcClient';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { fetchBtcTransaction } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
 export default function useTransaction(id: string) {
-  const { selectedAccount, network } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
+  const btcClient = useBtcClient();
 
   const fetchTransaction = async () => {
     if (!selectedAccount || !id) {
@@ -14,14 +16,14 @@ export default function useTransaction(id: string) {
       id,
       selectedAccount.btcAddress,
       selectedAccount.ordinalsAddress,
-      network.type,
+      btcClient,
     );
 
     return transaction;
   };
 
   return useQuery({
-    queryKey: [`transaction-${id}`],
+    queryKey: ['transaction', id],
     queryFn: fetchTransaction,
   });
 }

@@ -110,14 +110,12 @@ function SpeedUpTransactionScreen() {
             ? selectedAccount.deviceAccountIndex
             : selectedAccount.id,
         network: network.type,
+        esploraProvider: btcClient,
         seedVault,
       });
       setRbfTransaction(rbfTx);
 
-      const rbfTransactionSummary = await rbf.getRbfTransactionSummary(
-        network.type,
-        transaction.txid,
-      );
+      const rbfTransactionSummary = await rbf.getRbfTransactionSummary(btcClient, transaction.txid);
       setRbfTxSummary(rbfTransactionSummary);
 
       const mempoolFees = await mempoolApi.getRecommendedFees(network.type);

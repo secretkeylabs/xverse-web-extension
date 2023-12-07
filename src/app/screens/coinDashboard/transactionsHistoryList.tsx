@@ -1,6 +1,7 @@
 import BtcTransactionHistoryItem from '@components/transactions/btcTransaction';
 import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
 import useTransactions from '@hooks/queries/useTransactions';
+import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, config, useSpring } from '@react-spring/web';
@@ -167,6 +168,7 @@ const filterTxs = (
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, txFilter, brc20Token } = props;
   const { network, selectedAccount, accountType } = useWalletSelector();
+  const btcClient = useBtcClient();
   const seedVault = useSeedVault();
   const { data, isLoading, isFetching, error } = useTransactions(
     (coin as CurrencyTypes) || 'STX',
@@ -190,6 +192,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
             ? selectedAccount.deviceAccountIndex
             : selectedAccount.id,
         network: network.type,
+        esploraProvider: btcClient,
         seedVault,
       }
     : undefined;
