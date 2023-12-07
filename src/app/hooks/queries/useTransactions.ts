@@ -1,3 +1,4 @@
+import useBtcClient from '@hooks/useBtcClient';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { Brc20HistoryTransactionData, BtcTransactionData } from '@secretkeylabs/xverse-core';
 import { fetchBtcTransactionsData, getBrc20History } from '@secretkeylabs/xverse-core';
@@ -14,6 +15,8 @@ export default function useTransactions(coinType: CurrencyTypes, brc20Token: str
   const { network, stxAddress, btcAddress, ordinalsAddress, hasActivatedOrdinalsKey } =
     useWalletSelector();
   const selectedNetwork = useNetworkSelector();
+  const btcClient = useBtcClient();
+
   const fetchTransactions = async (): Promise<
     | BtcTransactionData[]
     | (AddressTransactionWithTransfers | MempoolTransaction)[]
@@ -26,7 +29,7 @@ export default function useTransactions(coinType: CurrencyTypes, brc20Token: str
       const btcData = await fetchBtcTransactionsData(
         btcAddress,
         ordinalsAddress,
-        network.type,
+        btcClient,
         hasActivatedOrdinalsKey as boolean,
       );
       return btcData;

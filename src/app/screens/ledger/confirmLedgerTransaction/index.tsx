@@ -107,6 +107,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     try {
       const result = await signLedgerMixedBtcTransaction({
         transport,
+        esploraProvider: btcClient,
         network: network.type,
         addressIndex,
         recipients: recipients as Recipient[],
@@ -138,6 +139,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     try {
       const result = await signLedgerNativeSegwitBtcTransaction({
         transport,
+        esploraProvider: btcClient,
         network: network.type,
         addressIndex,
         recipients: recipients as Recipient[],

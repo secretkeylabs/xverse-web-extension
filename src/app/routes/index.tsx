@@ -172,10 +172,6 @@ const router = createHashRouter([
         element: <ConfirmFtTransaction />,
       },
       {
-        path: 'confirm-btc-tx',
-        element: <ConfirmBtcTransaction />,
-      },
-      {
         path: 'confirm-brc20-tx',
         element: (
           <AuthGuard>
@@ -416,14 +412,6 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
-      {
-        path: 'confirm-ordinal-tx/:id',
-        element: (
-          <AuthGuard>
-            <ConfirmOrdinalTransaction />
-          </AuthGuard>
-        ),
-      },
     ],
   },
   {
@@ -431,6 +419,10 @@ const router = createHashRouter([
     element: <ExtendedScreenContainer />,
     errorElement: <ErrorBoundary />,
     children: [
+      {
+        path: 'confirm-btc-tx',
+        element: <ConfirmBtcTransaction />,
+      },
       {
         path: 'nft-dashboard',
         element: (

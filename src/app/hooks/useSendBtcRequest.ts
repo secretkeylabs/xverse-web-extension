@@ -5,6 +5,7 @@ import { decodeToken } from 'jsontokens';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SendBtcTransactionOptions } from 'sats-connect';
+import useBtcClient from './useBtcClient';
 import useSeedVault from './useSeedVault';
 import useWalletSelector from './useWalletSelector';
 
@@ -17,6 +18,7 @@ function useSendBtcRequest() {
   const tabId = params.get('tabId') ?? '0';
   const { getSeed } = useSeedVault();
   const { network, selectedAccount } = useWalletSelector();
+  const btcClient = useBtcClient();
 
   const generateSignedTransaction = async () => {
     const seedPhrase = await getSeed();
@@ -34,6 +36,7 @@ function useSendBtcRequest() {
       request.payload?.senderAddress,
       selectedAccount?.id ?? 0,
       seedPhrase,
+      btcClient,
       network.type,
     );
     return signedTx;
