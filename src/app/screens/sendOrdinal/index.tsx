@@ -125,6 +125,7 @@ function SendOrdinal() {
           btcAddress,
           Number(selectedAccount?.id),
           seedPhrase,
+          btcClient,
           network.type,
           [ordUtxo],
         );

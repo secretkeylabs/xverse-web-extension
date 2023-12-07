@@ -16,6 +16,10 @@ on:
 jobs:
   create-release-pr:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -30,5 +34,6 @@ jobs:
           # git config
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
+          # run shell script
           cd scripts
           ./create-release-pr.sh
