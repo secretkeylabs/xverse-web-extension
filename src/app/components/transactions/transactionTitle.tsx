@@ -23,16 +23,17 @@ export default function TransactionTitle(props: TransactionTitleProps) {
   const { transaction } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const { coins } = useWalletSelector();
+  const isPending = transaction.txStatus === 'pending';
 
   const getTokenTransferTitle = (tx: TransactionData): string => {
-    if (tx.txStatus === 'pending') {
+    if (isPending) {
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
     return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
   };
 
   const getBrc20TokenTitle = (tx: Brc20HistoryTransactionData): string => {
-    if (tx.txStatus === 'pending') {
+    if (isPending) {
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
     if (tx.operation === 'transfer_send') {
@@ -48,7 +49,7 @@ export default function TransactionTitle(props: TransactionTitleProps) {
   };
 
   const getBtcTokenTransferTitle = (tx: BtcTransactionData): string => {
-    if (tx.txStatus === 'pending') {
+    if (isPending) {
       if (tx.isOrdinal) {
         return tx.incoming
           ? t('ORDINAL_TRANSACTION_PENDING_RECEIVING')

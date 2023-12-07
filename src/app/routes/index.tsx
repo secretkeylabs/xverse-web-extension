@@ -64,6 +64,7 @@ import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 import SignatureRequest from '@screens/signatureRequest';
 import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
 import SignPsbtRequest from '@screens/signPsbtRequest';
+import SpeedUpTransactionScreen from '@screens/speedUpTransaction';
 import Stacking from '@screens/stacking';
 import SwapScreen from '@screens/swap';
 import SwapConfirmScreen from '@screens/swap/swapConfirmation';
@@ -261,6 +262,10 @@ const router = createHashRouter([
             <BtcSendScreen />
           </AuthGuard>
         ),
+      },
+      {
+        path: 'speed-up-tx/:id',
+        element: <SpeedUpTransactionScreen />,
       },
       {
         path: 'create-inscription',

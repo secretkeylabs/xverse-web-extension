@@ -58,10 +58,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
   }`,
   backgroundColor: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(1),
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(5),
+  padding: props.theme.spacing(5),
 }));
 
 const InputField = styled.input((props) => ({
@@ -103,7 +100,7 @@ const FeeButton = styled.button<ButtonProps>((props) => ({
   color: `${props.isSelected ? props.theme.colors.elevation2 : props.theme.colors.white_400}`,
   background: `${props.isSelected ? props.theme.colors.white : 'transparent'}`,
   border: `1px solid ${props.isSelected ? 'transparent' : props.theme.colors.elevation6}`,
-  borderRadius: 40,
+  borderRadius: props.theme.radius(9),
   width: props.isBtc ? 104 : 82,
   height: 40,
   display: 'flex',
@@ -112,13 +109,13 @@ const FeeButton = styled.button<ButtonProps>((props) => ({
   marginRight: props.isLastInRow ? 0 : 8,
 }));
 
-const ButtonContainer = styled.div({
+const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  marginTop: 12,
-});
+  marginTop: props.theme.spacing(6),
+}));
 
 const FeeContainer = styled.div({
   display: 'flex',
