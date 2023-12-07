@@ -29,6 +29,7 @@ jobs:
       - id: run-create-release-pr-sh
         env:
           BUMP: ${{ inputs.bump }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           # git config
           git config user.name "GitHub Actions Bot"
