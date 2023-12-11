@@ -1,10 +1,9 @@
 import {
   Bundle,
-  getUtxoOrdinalBundle,
+  getUtxoOrdinalBundleIfFound,
   mapRareSatsAPIResponseToBundle,
   ParsedPSBT,
 } from '@secretkeylabs/xverse-core';
-import { isAxiosError } from 'axios';
 import useWalletSelector from './useWalletSelector';
 
 export type InputsBundle = (Pick<Bundle, 'satRanges' | 'totalExoticSats'> & {
@@ -22,15 +21,7 @@ const useDetectOrdinalInSignPsbt = () => {
 
     if (parsedPsbt) {
       const inputsRequest = parsedPsbt.inputs.map((input) =>
-        getUtxoOrdinalBundle(network.type, input.txid, input.index).catch((e) => {
-          // we don't reject on 404s because if the UTXO is not found,
-          // it is likely this is a UTXO from an unpublished txn.
-          // this is required for gamma.io purchase flow
-          if (!isAxiosError(e) || e.response?.status !== 404) {
-            // rethrow error if response was not 404
-            throw e;
-          }
-        }),
+        getUtxoOrdinalBundleIfFound(network.type, input.txid, input.index),
       );
       const inputsResponse = await Promise.all(inputsRequest);
       inputsResponse.forEach((inputResponse, index) => {
