@@ -213,6 +213,7 @@ function ConfirmInscriptionRequest() {
         btcAddress,
         selectedAccount?.id ?? 0,
         seedPhrase,
+        btcClient,
         network.type,
         new BigNumber(txFee),
       ),

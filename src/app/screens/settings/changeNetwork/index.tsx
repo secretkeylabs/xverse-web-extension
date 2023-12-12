@@ -88,12 +88,11 @@ function ChangeNetworkScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const { network, btcApiUrl, networkAddress } = useWalletSelector();
   const [changedNetwork, setChangedNetwork] = useState<SettingsNetwork>(network);
-  const [error, setError] = useState<string>('');
+  const [stacksUrlError, setStacksUrlError] = useState<string>('');
   const [btcURLError, setBtcURLError] = useState('');
   const [btcUrl, setBtcUrl] = useState(btcApiUrl || network.btcApiUrl);
-  const [url, setUrl] = useState<string>(networkAddress || network.address);
+  const [stacksUrl, setStacksUrl] = useState<string>(networkAddress || network.address);
   const [isChangingNetwork, setIsChangingNetwork] = useState<boolean>(false);
-  const [isUrlEdited, setIsUrlEdited] = useState(false);
   const navigate = useNavigate();
   const { changeNetwork } = useWalletReducer();
 
@@ -102,27 +101,25 @@ function ChangeNetworkScreen() {
   };
 
   const onNetworkSelected = (networkSelected: SettingsNetwork) => {
-    setIsUrlEdited(false);
-    setUrl(networkSelected.address);
+    setStacksUrl(networkSelected.address);
     setChangedNetwork(networkSelected);
     setBtcUrl(networkSelected.btcApiUrl);
-    setError('');
+    setStacksUrlError('');
     setBtcURLError('');
   };
 
   const onChangeStacksUrl = (event: React.FormEvent<HTMLInputElement>) => {
-    setError('');
-    setUrl(event.currentTarget.value);
+    setStacksUrlError('');
+    setStacksUrl(event.currentTarget.value);
   };
 
   const onChangeBtcApiUrl = (event: React.FormEvent<HTMLInputElement>) => {
     setBtcURLError('');
-    setIsUrlEdited(true);
     setBtcUrl(event.currentTarget.value);
   };
 
   const onClearStacksUrl = () => {
-    setUrl('');
+    setStacksUrl('');
   };
 
   const onClearBtcUrl = () => {
@@ -130,39 +127,39 @@ function ChangeNetworkScreen() {
   };
 
   const onResetBtcUrl = async () => {
-    if (changedNetwork.type !== network.type) {
-      setBtcUrl(changedNetwork.btcApiUrl);
-    } else {
-      setBtcUrl(network.btcApiUrl);
-    }
+    setBtcUrl(changedNetwork.btcApiUrl);
     setBtcURLError('');
   };
 
   const onResetStacks = async () => {
-    if (changedNetwork.type !== network.type) {
-      setUrl(changedNetwork.address);
-    } else {
-      setUrl(networkAddress || network.address);
-    }
-    setError('');
+    setStacksUrl(changedNetwork.address);
+    setStacksUrlError('');
   };
 
   const onSubmit = async () => {
     setIsChangingNetwork(true);
-    const isValidStacksUrl = await isValidStacksApi(url, changedNetwork.type).catch((err) =>
-      setError(err.message),
-    );
-    const isValidBtcApiUrl = await isValidBtcApi(btcUrl, changedNetwork.type).catch((err) =>
-      setBtcURLError(err.message),
-    );
+
+    const [isValidStacksUrl, isValidBtcApiUrl] = await Promise.all([
+      isValidStacksApi(stacksUrl, changedNetwork.type),
+      isValidBtcApi(btcUrl, changedNetwork.type),
+    ]);
+
     if (isValidStacksUrl && isValidBtcApiUrl) {
       const networkObject =
-        changedNetwork.type === 'Mainnet' ? new StacksMainnet({ url }) : new StacksTestnet({ url });
-      const btcChangedUrl = isUrlEdited ? btcUrl : '';
-      await changeNetwork(changedNetwork, networkObject, url, btcChangedUrl);
+        changedNetwork.type === 'Mainnet'
+          ? new StacksMainnet({ url: stacksUrl })
+          : new StacksTestnet({ url: stacksUrl });
+      await changeNetwork(changedNetwork, networkObject, stacksUrl, btcUrl);
       navigate('/settings');
+    } else {
+      if (!isValidStacksUrl) {
+        setStacksUrlError(t('INVALID_URL'));
+      }
+      if (!isValidBtcApiUrl) {
+        setBtcURLError(t('INVALID_URL'));
+      }
+      setIsChangingNetwork(false);
     }
-    setIsChangingNetwork(false);
   };
 
   return (
@@ -186,12 +183,12 @@ function ChangeNetworkScreen() {
           <NodeResetButton onClick={onResetStacks}>Reset URL</NodeResetButton>
         </NodeInputHeader>
         <InputContainer>
-          <Input onChange={onChangeStacksUrl} value={url} />
+          <Input onChange={onChangeStacksUrl} value={stacksUrl} />
           <Button onClick={onClearStacksUrl}>
             <img width={22} height={22} src={Cross} alt="cross" />
           </Button>
         </InputContainer>
-        <ErrorMessage>{error}</ErrorMessage>
+        <ErrorMessage>{stacksUrlError}</ErrorMessage>
         <NodeInputHeader>
           <NodeText>BTC API URL</NodeText>
           <NodeResetButton onClick={onResetBtcUrl}>Reset URL</NodeResetButton>
