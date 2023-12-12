@@ -1,6 +1,7 @@
 import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -62,6 +63,7 @@ function SendBrc20Screen() {
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const location = useLocation();
+  const btcClient = useBtcClient();
 
   const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
   const fungibleToken =
@@ -103,6 +105,7 @@ function SendBrc20Screen() {
         fungibleToken.ticker,
         amountToSend,
         ordinalsAddress,
+        btcClient,
       );
       if ((order.inscriptionRequest as any).error) {
         throw new Error((order.inscriptionRequest as any).error);
@@ -147,6 +150,7 @@ function SendBrc20Screen() {
         btcAddress,
         selectedAccount?.id ?? 0,
         seedPhrase,
+        btcClient,
         network.type,
       );
       navigate('/confirm-inscription-request', {

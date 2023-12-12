@@ -298,7 +298,10 @@ export async function handleLegacyExternalMethodFormat(
         ['createRepeatInscriptions', payload],
       ]);
 
-      const { id } = await triggerRequestWindowOpen(RequestsRoutes.CreateRepeatInscriptions, urlParams);
+      const { id } = await triggerRequestWindowOpen(
+        RequestsRoutes.CreateRepeatInscriptions,
+        urlParams,
+      );
       listenForPopupClose({
         id,
         tabId,

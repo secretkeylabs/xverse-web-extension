@@ -254,7 +254,7 @@ function OrdinalsCollection() {
                 text={t('LOAD_MORE')}
                 processing={isFetchingNextPage}
                 disabled={isFetchingNextPage}
-                onPress={fetchNextPage}
+                onPress={() => fetchNextPage()}
               />
             </LoadMoreButtonContainer>
           )}

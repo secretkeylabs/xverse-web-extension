@@ -117,6 +117,7 @@ function SignBatchPsbtRequest() {
   const { btcAddress, ordinalsAddress, selectedAccount, network } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses, requestToken } =
     useSignBatchPsbtTx();
@@ -366,14 +367,32 @@ function SignBatchPsbtRequest() {
 
                 {userTransfersOrdinals.length > 0 &&
                   userTransfersOrdinals.map((item, index) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <SatsBundle key={`${index}-transfer`} bundle={item as Bundle} />
+                    <SatsBundle
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`${index}-transfer`}
+                      title={`${tCommon('INPUT')} #${item.inputIndex}`}
+                      bundle={
+                        {
+                          totalExoticSats: item.totalExoticSats,
+                          satRanges: item.satRanges,
+                        } as Bundle
+                      }
+                    />
                   ))}
 
                 {userReceivesOrdinals.length > 0 &&
                   userTransfersOrdinals.map((item, index) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <SatsBundle key={`${index}-receive`} bundle={item as Bundle} />
+                    <SatsBundle
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`${index}-receive`}
+                      title={`${tCommon('INPUT')} #${item.inputIndex}`}
+                      bundle={
+                        {
+                          totalExoticSats: item.totalExoticSats,
+                          satRanges: item.satRanges,
+                        } as Bundle
+                      }
+                    />
                   ))}
 
                 <RecipientComponent
@@ -420,16 +439,20 @@ function SignBatchPsbtRequest() {
               {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
             </ReviewTransactionText>
 
-            {userReceivesOrdinalArr[currentPsbtIndex]?.bundleItemsData && (
-              <SatsBundle
-                title={
-                  userReceivesOrdinalArr[currentPsbtIndex]?.userReceivesOrdinal
-                    ? t('YOU_WILL_RECEIVE')
-                    : t('YOU_WILL_TRANSFER')
-                }
-                bundle={userReceivesOrdinalArr[currentPsbtIndex]?.bundleItemsData as Bundle}
-              />
-            )}
+            {Array.isArray(userReceivesOrdinalArr[currentPsbtIndex]?.bundleItemsData) &&
+              userReceivesOrdinalArr[currentPsbtIndex].bundleItemsData.map((bundle, index) => (
+                <SatsBundle
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  title={`${tCommon('INPUT')} #${bundle.inputIndex}`}
+                  bundle={
+                    {
+                      totalExoticSats: bundle.totalExoticSats,
+                      satRanges: bundle.satRanges,
+                    } as Bundle
+                  }
+                />
+              ))}
 
             <RecipientComponent
               value={`${

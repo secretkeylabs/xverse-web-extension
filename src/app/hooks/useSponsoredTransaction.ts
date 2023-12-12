@@ -16,7 +16,6 @@ export const useSponsorInfoQuery = (sponsorUrl?: string) =>
 
 export const useSponsoredTransaction = (isSponsorOptionSelected: boolean, sponsorUrl?: string) => {
   const [isServiceRunning, setIsServiceRunning] = useState(false);
-
   const { error, data: isActive, isLoading } = useSponsorInfoQuery(sponsorUrl);
 
   useEffect(() => {

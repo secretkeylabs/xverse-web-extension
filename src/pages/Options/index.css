@@ -35,10 +35,6 @@ header h2 {
   min-height: 600px;
 }
 
-.optionsContainer {
-  height: 600px !important;
-}
-
 :focus-within,
 :focus-visible,
 :focus {
