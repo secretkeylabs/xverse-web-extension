@@ -1,7 +1,7 @@
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -56,7 +56,7 @@ function SignPsbtRequest() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parsedPsbt]);
 
-  const onConfirm = async () => {
+  const onConfirm = async (ledgerTransport?: Transport) => {
     setIsSigning(true);
     try {
       const allowedSighash = payload.inputsToSign
@@ -66,9 +66,7 @@ function SignPsbtRequest() {
       const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
         finalize: payload.broadcast,
         allowedSighash: allowedSighash.length ? allowedSighash : undefined,
-        // TODO: add ledger functionality. We need to construct the transport with the ledger modals we use elsewhere
-        // TODO: and just pass the transport here. Everything else should be automatic.
-        // ledgerTransport
+        ledgerTransport,
       });
 
       await confirmSignPsbt(signedPsbt);

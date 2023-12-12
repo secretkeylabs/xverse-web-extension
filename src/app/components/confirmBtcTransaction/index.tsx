@@ -1,5 +1,7 @@
 import ActionButton from '@components/button';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import useWalletSelector from '@hooks/useWalletSelector';
+import TransportFactory from '@ledgerhq/hw-transport-webusb';
+import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
@@ -32,7 +34,7 @@ type Props = {
   hideBottomBar?: boolean;
   cancelText: string;
   confirmText: string;
-  onConfirm: () => void;
+  onConfirm: (ledgerTransport?: Transport) => void;
   onCancel: () => void;
   onBackClick?: () => void;
   confirmDisabled?: boolean;
@@ -58,6 +60,8 @@ function ConfirmBtcTransaction({
   getFeeForFeeRate,
   onFeeRateSet,
 }: Props) {
+  const { selectedAccount } = useWalletSelector();
+
   const hideBackButton = !onBackClick;
 
   let body = <MoonLoader color="white" size={50} />;
@@ -79,6 +83,17 @@ function ConfirmBtcTransaction({
     );
   }
 
+  const onConfirmPress = async () => {
+    if (selectedAccount?.accountType !== 'ledger') {
+      onConfirm();
+      return;
+    }
+
+    // TODO: we need to show the ledger connection screens here
+    const ledgerTransport = await TransportFactory.create();
+    onConfirm(ledgerTransport);
+  };
+
   return (
     <SendLayout
       selectedBottomTab="dashboard"
@@ -93,7 +108,7 @@ function ConfirmBtcTransaction({
           <ActionButton onPress={onCancel} text={cancelText} transparent />
           <ConfirmButtonContainer>
             <ActionButton
-              onPress={onConfirm}
+              onPress={onConfirmPress}
               disabled={confirmDisabled}
               processing={isSubmitting}
               text={confirmText}
