@@ -164,8 +164,8 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
-    if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
-      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary.minimumRbfFeeRate }));
       return;
     }
 
@@ -206,7 +206,7 @@ function SpeedUpTransactionScreen() {
     } catch (err: any) {
       console.error(err);
 
-      if (err?.response?.data && err?.response?.data.includes('insufficient fee')) {
+      if (err?.response?.data && err.response.data.includes('insufficient fee')) {
         toast.error(t('INSUFFICIENT_FEE'));
       }
     }
@@ -265,8 +265,8 @@ function SpeedUpTransactionScreen() {
   };
 
   const handleApplyCustomFee = (feeRate: string, fee: string) => {
-    if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
-      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary.minimumRbfFeeRate }));
       return;
     }
 
@@ -295,15 +295,15 @@ function SpeedUpTransactionScreen() {
       return EMPTY_LABEL;
     }
 
-    if (feeRate < recommendedFees?.hourFee) {
+    if (feeRate < recommendedFees.hourFee) {
       return t('TIME.SEVERAL_HOURS_OR_MORE');
     }
 
-    if (feeRate === recommendedFees?.hourFee) {
+    if (feeRate === recommendedFees.hourFee) {
       return `~1 ${t('TIME.HOUR')}`;
     }
 
-    if (feeRate > recommendedFees?.hourFee && feeRate <= recommendedFees?.halfHourFee) {
+    if (feeRate > recommendedFees.hourFee && feeRate <= recommendedFees.halfHourFee) {
       return `~30 ${t('TIME.MINUTES')}`;
     }
 
