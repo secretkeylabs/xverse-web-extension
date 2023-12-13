@@ -65,6 +65,7 @@ const useWalletReducer = () => {
       currentAccounts,
     );
 
+    // we sanitise the account to remove any unknown properties which we had in pervious versions of the app
     walletAccounts[0] = {
       id: walletAccounts[0].id,
       btcAddress: walletAccounts[0].btcAddress,
@@ -77,13 +78,18 @@ const useWalletReducer = () => {
       bnsName: walletAccounts[0].bnsName,
     };
 
-    let selectedAccountData: Account;
+    let selectedAccountData: Account | undefined;
     if (!selectedAccount) {
       [selectedAccountData] = walletAccounts;
     } else if (isLedgerAccount(selectedAccount)) {
-      selectedAccountData = ledgerAccountsList[selectedAccount.id];
+      selectedAccountData = ledgerAccountsList.find((a) => a.id === selectedAccount.id);
     } else {
-      selectedAccountData = walletAccounts[selectedAccount.id];
+      selectedAccountData = walletAccounts.find((a) => a.id === selectedAccount.id);
+    }
+
+    if (!selectedAccountData) {
+      // this should not happen but is a good fallback to have, just in case
+      [selectedAccountData] = walletAccounts;
     }
 
     if (!isHardwareAccount(selectedAccountData)) {
