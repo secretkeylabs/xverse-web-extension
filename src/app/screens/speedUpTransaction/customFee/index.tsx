@@ -51,17 +51,17 @@ export default function CustomFee({
   const [feeRateInput, setFeeRateInput] = useState(feeRate || minimumFeeRate);
   const [totalFee, setTotalFee] = useState(fee || initialTotalFee);
 
-  const fetchTotalFee = useCallback(async () => {
+  const fetchTotalFee = async () => {
     const response = await calculateTotalFee(feeRateInput);
 
     if (response) {
       setTotalFee(response.toString());
     }
-  }, [feeRateInput, calculateTotalFee]);
+  };
 
   useEffect(() => {
     fetchTotalFee();
-  }, [fetchTotalFee]);
+  }, [feeRateInput]);
 
   const handleChangeFeeRateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFeeRateInput(e.target.value);

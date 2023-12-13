@@ -296,18 +296,18 @@ function SpeedUpTransactionScreen() {
     }
 
     if (feeRate < recommendedFees?.hourFee) {
-      return t('SEVERAL_HOURS_OR_MORE');
+      return t('TIME.SEVERAL_HOURS_OR_MORE');
     }
 
     if (feeRate === recommendedFees?.hourFee) {
-      return `~1 ${t('HOUR')}`;
+      return `~1 ${t('TIME.HOUR')}`;
     }
 
     if (feeRate > recommendedFees?.hourFee && feeRate <= recommendedFees?.halfHourFee) {
-      return `~30 ${t('MINUTES')}`;
+      return `~30 ${t('TIME.MINUTES')}`;
     }
 
-    return `~10 ${t('MINUTES')}`;
+    return `~10 ${t('TIME.MINUTES')}`;
   };
 
   const iconProps = {
