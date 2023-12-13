@@ -50,16 +50,24 @@ type SeedWordInputProps = {
   index: number;
   handleChangeInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyDownInput: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  handlePaste: (pastedText: string) => void;
   disabled?: boolean;
 };
 const SeedWordInput = React.forwardRef<HTMLInputElement, SeedWordInputProps>(
-  ({ value, index, handleChangeInput, handleKeyDownInput, disabled }, ref) => {
-    const [showValue, setShowValue] = useState(false);
+  ({ value, index, handleChangeInput, handleKeyDownInput, disabled, handlePaste }, ref) => {
+    const DEV_MODE = process.env.NODE_ENV === 'development';
+    const [showValue, setShowValue] = useState(DEV_MODE);
 
     const handleFocusInput = () => setShowValue(true);
     const handleBlurInput = () => setShowValue(false);
     const handlePasteInput = (e: React.ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
+
+      if (DEV_MODE) {
+        const { clipboardData } = e;
+        const pastedText = clipboardData.getData('text');
+        handlePaste(pastedText);
+      }
     };
 
     return (
@@ -167,6 +175,16 @@ export default function SeedPhraseInput({
     });
   };
 
+  const handlePaste = (pastedText: string) => {
+    const splitPastedText = pastedText.split(' ');
+    splitPastedText.forEach((text, index) => {
+      setSeedInputValues((prevSeed) => {
+        prevSeed[index] = text;
+        return [...prevSeed];
+      });
+    });
+  };
+
   useEffect(() => {
     const seedPhrase = seedInputValues
       .slice(0, !show24Words ? 12 : 24)
@@ -190,6 +208,7 @@ export default function SeedPhraseInput({
             index={index}
             handleChangeInput={handleChangeInput(index)}
             handleKeyDownInput={handleKeyDownInput(index)}
+            handlePaste={handlePaste}
             ref={(el) => {
               inputsRef.current[index] = el;
             }}
@@ -206,6 +225,7 @@ export default function SeedPhraseInput({
               index={index}
               handleChangeInput={handleChangeInput(index)}
               handleKeyDownInput={handleKeyDownInput(index)}
+              handlePaste={handlePaste}
               ref={(el) => {
                 inputsRef.current[index] = el;
               }}
