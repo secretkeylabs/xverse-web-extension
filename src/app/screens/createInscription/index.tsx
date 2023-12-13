@@ -25,8 +25,9 @@ import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getShortTruncatedAddress } from '@utils/helper';
+import { getShortTruncatedAddress, isLedgerAccount } from '@utils/helper';
 
+import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
 import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
 import Callout from '@ui-library/callout';
@@ -270,8 +271,15 @@ function CreateInscription() {
   const { getSeed } = useSeedVault();
   const btcClient = useBtcClient();
 
-  const { ordinalsAddress, network, btcAddress, selectedAccount, btcFiatRate, fiatCurrency } =
-    useWalletSelector();
+  const {
+    ordinalsAddress,
+    network,
+    btcAddress,
+    selectedAccount,
+    btcFiatRate,
+    fiatCurrency,
+    btcBalance,
+  } = useWalletSelector();
 
   useEffect(() => {
     getNonOrdinalUtxo(btcAddress, btcClient, requestedNetwork.type).then(setUtxos);
@@ -381,8 +389,11 @@ function CreateInscription() {
     inscriptionValue,
   } = commitValueBreakdown ?? {};
 
+  const { confirmedBalance } = useConfirmedBtcBalance();
+
   const chainFee = (revealChainFee ?? 0) + (commitChainFee ?? 0);
   const totalFee = (revealServiceFee ?? 0) + (externalServiceFee ?? 0) + chainFee;
+
   const showTotalFee = totalFee !== chainFee;
 
   const toFiat = (value: number | string = 0) =>
@@ -391,6 +402,9 @@ function CreateInscription() {
   const bundlePlusFees = new BigNumber(totalFee ?? 0)
     .plus(new BigNumber(totalInscriptionValue ?? 0))
     .toString();
+
+  const showInsufficientBalanceError =
+    confirmedBalance !== undefined && confirmedBalance < Number(bundlePlusFees);
 
   if (complete && revealTransactionId) {
     const onClose = () => {
@@ -424,6 +438,13 @@ function CreateInscription() {
 
   const isLoading = utxos === undefined || inscriptionFeesLoading;
 
+  const disableConfirmButton =
+    !!errorCode ||
+    isExecuting ||
+    showOver24RepeatsError ||
+    showInsufficientBalanceError ||
+    isLedgerAccount(selectedAccount);
+
   return (
     <ConfirmScreen
       onConfirm={executeMint}
@@ -431,7 +452,7 @@ function CreateInscription() {
       cancelText={t('CANCEL_BUTTON')}
       confirmText={!errorCode ? t('CONFIRM_BUTTON') : t(`ERRORS.SHORT.${errorCode}`)}
       loading={isExecuting || isLoading}
-      disabled={!!errorCode || isExecuting || showOver24RepeatsError}
+      disabled={disableConfirmButton}
       isError={!!errorCode || showOver24RepeatsError}
     >
       <OuterContainer>
@@ -441,6 +462,12 @@ function CreateInscription() {
           <SubTitle>{t('SUBTITLE', { name: appName ?? '' })}</SubTitle>
           {showOver24RepeatsError && (
             <StyledCallout variant="danger" bodyText={t('ERRORS.TOO_MANY_REPEATS')} />
+          )}
+          {showInsufficientBalanceError && (
+            <StyledCallout variant="danger" bodyText={t('ERRORS.UNCONFIRMED_UTXO')} />
+          )}
+          {isLedgerAccount(selectedAccount) && (
+            <StyledCallout variant="danger" bodyText={t('ERRORS.LEDGER_INSCRIPTION')} />
           )}
           <CardContainer bottomPadding>
             <CardRow>
