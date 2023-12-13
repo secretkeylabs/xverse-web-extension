@@ -194,3 +194,12 @@ export const isInOptions = (): boolean => !!window.location?.pathname?.match(/op
 export function formatNumber(value?: string | number) {
   return value ? new Intl.NumberFormat().format(Number(value)) : '-';
 }
+
+export const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  // only allow positive integers
+  // disable common special characters, including - and .
+  // eslint-disable-next-line no-useless-escape
+  if (e.key.match(/^[!-\/:-@[-`{-~]$/)) {
+    e.preventDefault();
+  }
+};
