@@ -486,15 +486,15 @@ function SpeedUpTransactionScreen() {
                 )}
               </FeeButton>
             </ButtonContainer>
+            <ControlsContainer>
+              <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
+              <StyledActionButton
+                text={t('SUBMIT')}
+                disabled={!selectedOption}
+                onPress={handleClickSubmit}
+              />
+            </ControlsContainer>
           </Container>
-          <ControlsContainer>
-            <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
-            <StyledActionButton
-              text={t('SUBMIT')}
-              disabled={!selectedOption}
-              onPress={handleClickSubmit}
-            />
-          </ControlsContainer>
 
           {/* TODO: Move this modal and the custom option info above to a separate component */}
           {rbfTxSummary && showCustomFee && (
