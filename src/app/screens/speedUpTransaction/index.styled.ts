@@ -80,7 +80,7 @@ export const FeeButton = styled.button<{
 export const ControlsContainer = styled.div`
   display: flex;
   column-gap: 12px;
-  margin: 38px 16px 40px;
+  margin: 38px 0px 40px;
 `;
 
 export const CustomFeeIcon = styled(Faders)({

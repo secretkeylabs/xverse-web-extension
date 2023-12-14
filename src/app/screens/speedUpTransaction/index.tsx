@@ -22,7 +22,7 @@ import {
 import { EMPTY_LABEL } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -98,6 +98,18 @@ function SpeedUpTransactionScreen() {
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
 
+  /* TODO: Move `fetchRbfData` function logic to a separate hook like
+    const useRbfTransactionData: (transaction: ReturnType<useTransaction>) => {
+      rbfTransaction?: rbf.RbfTransaction,
+      rbfTxSummary?: {
+        currentFee: number;
+        currentFeeRate: number;
+        minimumRbfFee: number;
+        minimumRbfFeeRate: number;
+      },
+      rbfRecommendedFees?: RbfRecommendedFees
+    } => { // logic here }
+  */
   const fetchRbfData = useCallback(async () => {
     if (!selectedAccount || !id || !transaction) {
       return;
@@ -125,7 +137,14 @@ function SpeedUpTransactionScreen() {
       setRecommendedFees(mempoolFees);
 
       const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
-      setRbfRecommendedFees(rbfRecommendedFeesResponse);
+      setRbfRecommendedFees(
+        Object.fromEntries(
+          Object.entries(rbfRecommendedFeesResponse).sort((a, b) => {
+            const priorityOrder = ['highest', 'higher', 'high', 'medium'];
+            return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
+          }),
+        ),
+      );
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -206,8 +225,10 @@ function SpeedUpTransactionScreen() {
     } catch (err: any) {
       console.error(err);
 
-      if (err?.response?.data && err.response.data.includes('insufficient fee')) {
-        toast.error(t('INSUFFICIENT_FEE'));
+      if (err?.response?.data) {
+        if (err.response.data.includes('insufficient fee')) {
+          toast.error(t('INSUFFICIENT_FEE'));
+        }
       }
     }
   };
@@ -371,68 +392,63 @@ function SpeedUpTransactionScreen() {
             </DetailText>
             <ButtonContainer>
               {rbfRecommendedFees &&
-                Object.entries(rbfRecommendedFees)
-                  .sort((a, b) => {
-                    const priorityOrder = ['highest', 'higher', 'high', 'medium'];
-                    return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
-                  })
-                  .map(([key, obj]) => {
-                    const isDisabled = !obj.enoughFunds;
+                Object.entries(rbfRecommendedFees).map(([key, obj]) => {
+                  const isDisabled = !obj.enoughFunds;
 
-                    return (
-                      <FeeButton
-                        key={key}
-                        value={key}
-                        isSelected={selectedOption === key}
-                        onClick={handleClickFeeButton}
-                        disabled={isDisabled}
-                      >
-                        <FeeButtonLeft>
-                          {feeButtonMapping[key].icon}
-                          <div>
-                            {feeButtonMapping[key].title}
-                            <SecondaryText>{getEstimatedCompletionTime(obj.feeRate)}</SecondaryText>
-                            <SecondaryText>
-                              <NumericFormat
-                                value={obj.feeRate}
-                                displayType="text"
-                                thousandSeparator
-                                suffix=" Sats /vByte"
-                              />
-                            </SecondaryText>
-                          </div>
-                        </FeeButtonLeft>
-                        <FeeButtonRight>
-                          <div>
-                            {obj.fee ? (
-                              <NumericFormat
-                                value={obj.fee}
-                                displayType="text"
-                                thousandSeparator
-                                suffix=" Sats"
-                              />
-                            ) : (
-                              EMPTY_LABEL
-                            )}
-                          </div>
-                          <SecondaryText alignRight>
-                            {obj.fee ? (
-                              <FiatAmountText
-                                fiatAmount={getBtcFiatEquivalent(
-                                  BigNumber(obj.fee),
-                                  BigNumber(btcFiatRate),
-                                )}
-                                fiatCurrency={fiatCurrency}
-                              />
-                            ) : (
-                              `${EMPTY_LABEL} ${fiatCurrency}`
-                            )}
+                  return (
+                    <FeeButton
+                      key={key}
+                      value={key}
+                      isSelected={selectedOption === key}
+                      onClick={handleClickFeeButton}
+                      disabled={isDisabled}
+                    >
+                      <FeeButtonLeft>
+                        {feeButtonMapping[key].icon}
+                        <div>
+                          {feeButtonMapping[key].title}
+                          <SecondaryText>{getEstimatedCompletionTime(obj.feeRate)}</SecondaryText>
+                          <SecondaryText>
+                            <NumericFormat
+                              value={obj.feeRate}
+                              displayType="text"
+                              thousandSeparator
+                              suffix=" Sats /vByte"
+                            />
                           </SecondaryText>
-                          {isDisabled && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
-                        </FeeButtonRight>
-                      </FeeButton>
-                    );
-                  })}
+                        </div>
+                      </FeeButtonLeft>
+                      <FeeButtonRight>
+                        <div>
+                          {obj.fee ? (
+                            <NumericFormat
+                              value={obj.fee}
+                              displayType="text"
+                              thousandSeparator
+                              suffix=" Sats"
+                            />
+                          ) : (
+                            EMPTY_LABEL
+                          )}
+                        </div>
+                        <SecondaryText alignRight>
+                          {obj.fee ? (
+                            <FiatAmountText
+                              fiatAmount={getBtcFiatEquivalent(
+                                BigNumber(obj.fee),
+                                BigNumber(btcFiatRate),
+                              )}
+                              fiatCurrency={fiatCurrency}
+                            />
+                          ) : (
+                            `${EMPTY_LABEL} ${fiatCurrency}`
+                          )}
+                        </SecondaryText>
+                        {isDisabled && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
+                      </FeeButtonRight>
+                    </FeeButton>
+                  );
+                })}
               <FeeButton
                 key="custom"
                 value="custom"

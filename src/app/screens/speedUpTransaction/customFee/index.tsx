@@ -3,7 +3,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { handleKeyDownFeeRateInput } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import {
