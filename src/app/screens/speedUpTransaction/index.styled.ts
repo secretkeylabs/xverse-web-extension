@@ -19,8 +19,9 @@ export const LoaderContainer = styled.div({
 export const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  ...props.theme.scrollbar,
 }));
 
 export const DetailText = styled.span((props) => ({

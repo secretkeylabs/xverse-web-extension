@@ -479,15 +479,15 @@ function SpeedUpTransactionScreen() {
                 )}
               </FeeButton>
             </ButtonContainer>
+            <ControlsContainer>
+              <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
+              <StyledActionButton
+                text={t('SUBMIT')}
+                disabled={!selectedOption}
+                onPress={handleClickSubmit}
+              />
+            </ControlsContainer>
           </Container>
-          <ControlsContainer>
-            <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
-            <StyledActionButton
-              text={t('SUBMIT')}
-              disabled={!selectedOption}
-              onPress={handleClickSubmit}
-            />
-          </ControlsContainer>
 
           {showCustomFee && (
             <CustomFee
