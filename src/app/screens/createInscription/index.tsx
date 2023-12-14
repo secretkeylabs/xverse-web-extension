@@ -13,6 +13,7 @@ import {
   currencySymbolMap,
   fetchBtcFeeRate,
   getNonOrdinalUtxo,
+  InscriptionErrorCode,
   useInscriptionExecute,
   useInscriptionFees,
   UTXO,
@@ -266,6 +267,7 @@ function CreateInscription() {
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
+  const [showConfirmedBalanceError, setShowConfirmedBalanceError] = useState(false);
   const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? DEFAULT_FEE_RATE);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
   const { getSeed } = useSeedVault();
@@ -403,8 +405,17 @@ function CreateInscription() {
     .plus(new BigNumber(totalInscriptionValue ?? 0))
     .toString();
 
-  const showInsufficientBalanceError =
-    confirmedBalance !== undefined && confirmedBalance < Number(bundlePlusFees);
+  const errorCode = feeErrorCode || executeErrorCode;
+
+  const isLoading = utxos === undefined || inscriptionFeesLoading;
+
+  useEffect(() => {
+    const showConfirmError =
+      !isLoading &&
+      errorCode !== InscriptionErrorCode.INSUFFICIENT_FUNDS &&
+      Number(bundlePlusFees) > confirmedBalance;
+    setShowConfirmedBalanceError(!!showConfirmError);
+  }, [confirmedBalance, errorCode, bundlePlusFees, isLoading]);
 
   if (complete && revealTransactionId) {
     const onClose = () => {
@@ -434,15 +445,11 @@ function CreateInscription() {
     return <CompleteScreen txId={revealTransactionId} onClose={onClose} network={network} />;
   }
 
-  const errorCode = feeErrorCode || executeErrorCode;
-
-  const isLoading = utxos === undefined || inscriptionFeesLoading;
-
   const disableConfirmButton =
     !!errorCode ||
     isExecuting ||
     showOver24RepeatsError ||
-    showInsufficientBalanceError ||
+    showConfirmedBalanceError ||
     isLedgerAccount(selectedAccount);
 
   return (
@@ -463,7 +470,7 @@ function CreateInscription() {
           {showOver24RepeatsError && (
             <StyledCallout variant="danger" bodyText={t('ERRORS.TOO_MANY_REPEATS')} />
           )}
-          {showInsufficientBalanceError && (
+          {showConfirmedBalanceError && (
             <StyledCallout variant="danger" bodyText={t('ERRORS.UNCONFIRMED_UTXO')} />
           )}
           {isLedgerAccount(selectedAccount) && (
