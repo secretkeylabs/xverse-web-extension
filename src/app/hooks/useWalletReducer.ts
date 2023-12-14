@@ -332,36 +332,24 @@ const useWalletReducer = () => {
   };
 
   const addLedgerAccount = async (ledgerAccount: Account) => {
-    try {
-      dispatch(updateLedgerAccountsAction([...ledgerAccountsList, ledgerAccount]));
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    dispatch(updateLedgerAccountsAction([...ledgerAccountsList, ledgerAccount]));
   };
 
   const removeLedgerAccount = async (ledgerAccount: Account) => {
-    try {
-      dispatch(
-        updateLedgerAccountsAction(
-          ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
-        ),
-      );
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    dispatch(
+      updateLedgerAccountsAction(
+        ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
+      ),
+    );
   };
 
   const updateLedgerAccounts = async (updatedLedgerAccount: Account) => {
     const newLedgerAccountsList = ledgerAccountsList.map((account) =>
       account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account,
     );
-    try {
-      dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
-      if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
-        switchAccount(updatedLedgerAccount);
-      }
-    } catch (err) {
-      return Promise.reject(err);
+    dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
+    if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
+      switchAccount(updatedLedgerAccount);
     }
   };
 
