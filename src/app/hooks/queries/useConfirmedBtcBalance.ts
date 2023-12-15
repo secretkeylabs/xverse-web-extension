@@ -8,7 +8,7 @@ const useConfirmBtcBalance = () => {
 
   const fetchBtcAddressData = async () => btcClient.getAddressData(btcAddress);
 
-  let confirmedBalance: number = 0;
+  let confirmedBalance = 0;
 
   const response = useQuery({
     queryKey: ['btc-address-data'],

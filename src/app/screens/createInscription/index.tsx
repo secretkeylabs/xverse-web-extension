@@ -232,6 +232,7 @@ const ButtonImage = styled.img((props) => ({
 }));
 
 const DEFAULT_FEE_RATE = 8;
+const MAX_REPEATS = 24;
 
 function CreateInscription() {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
@@ -263,7 +264,7 @@ function CreateInscription() {
   } = payload as CreateInscriptionPayload | CreateRepeatInscriptionsPayload;
 
   const { repeat } = payload as CreateRepeatInscriptionsPayload;
-  const showOver24RepeatsError = !Number.isNaN(repeat) && repeat > 24;
+  const showOver24RepeatsError = !Number.isNaN(repeat) && repeat > MAX_REPEATS;
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
@@ -468,7 +469,10 @@ function CreateInscription() {
           <Title>{t('TITLE')}</Title>
           <SubTitle>{t('SUBTITLE', { name: appName ?? '' })}</SubTitle>
           {showOver24RepeatsError && (
-            <StyledCallout variant="danger" bodyText={t('ERRORS.TOO_MANY_REPEATS')} />
+            <StyledCallout
+              variant="danger"
+              bodyText={t('ERRORS.TOO_MANY_REPEATS', { maxRepeats: MAX_REPEATS })}
+            />
           )}
           {showConfirmedBalanceError && (
             <StyledCallout variant="danger" bodyText={t('ERRORS.UNCONFIRMED_UTXO')} />
