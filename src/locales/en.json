@@ -352,6 +352,7 @@
     "CONITNUE": "Continue",
     "BACK": "Back",
     "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
+    "UNCONFIRMED_BALANCE_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
