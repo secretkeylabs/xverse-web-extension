@@ -46,6 +46,7 @@ jobs:
       upload_url: ${{ steps.publish-prerelease.outputs.UPLOAD_URL }}
       filename: ${{ steps.publish-prerelease.outputs.FILENAME }}
     steps:
+      - uses: actions/checkout@v4
       - id: publish-prerelease
         name: Publish prerelease
         env:

@@ -22,8 +22,9 @@ jobs:
       pull-requests: write
       issues: write
     steps:
-      - id: set-latest
-        name: Set latest
+      - uses: actions/checkout@v4
+      - id: create-latest-release
+        name: Create latest release
         env:
           GH_TOKEN: ${{ github.token }}
           PR_ID: ${{ github.event.pull_request.number }}
