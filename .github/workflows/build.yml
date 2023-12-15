@@ -76,6 +76,9 @@ jobs:
             /repos/{owner}/{repo}/issues/comments/%q
       - name: Post test package PR comment
         if: ${{ github.event_name == 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_ID: ${{ github.event.pull_request.number }}
         run: |
           gh api \
             --method POST \
