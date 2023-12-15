@@ -25,10 +25,6 @@ jobs:
           npx eslint .
           npx tsc --noEmit
           npm test
-      - name: Install dependencies
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
-        run: npm ci
       - name: Build
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
