@@ -1,50 +1,61 @@
-name: Release
+name: Publish Latest Release
 
 on:
-  release:
-    types: [created]
+  pull_request:
+    branches:
+      - main
+    types: [ closed ]
 
+##
+# This workflow creates a latest release with the same target_commitish
+# as the highest rc matching the release PR version
+#
+# It should also update the release PR description
+# It should also attach the highest rc asset to the latest release
+#
 jobs:
-  build:
+  publish-latest:
+    if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/')}}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          always-auth: true
-          node-version: '18.x'
-          registry-url: https://npm.pkg.github.com
-          scope: '@secretkeylabs'
-      - name: Install dependencies
+      - id: set-latest
+        name: Set latest
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
-        run: npm ci
-      - name: Test
+          GH_TOKEN: ${{ github.token }}
+          PR_ID: ${{ github.event.pull_request.number }}
+          SOURCE_BRANCH: ${{ github.head_ref }}
         run: |
-          npx eslint .
-          npx tsc --noEmit
-          npm test
-      - name: Build
-        env:
-          TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
-          MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
-          MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
-        run: npm run build --if-present
-      - name: Save Filename
-        id: save-filename
-        run: |
-          echo "FILENAME=xverse-extension.$(echo ${{github.ref_name}}| sed 's/\//-/').zip" >> $GITHUB_OUTPUT
-      - name: Create Archive
-        run: |
-          zip -rj build.zip ./build
-      - name: Upload Release Asset
-        if: ${{ github.event.release.upload_url }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: build.zip
-          asset_name: ${{ steps.save-filename.outputs.FILENAME }}
-          asset_content_type: application/zip
+          # find the target commitish of the latest release matching our tag
+          TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/releases > releases.json
+          TARGET_COMMITISH=$(cat releases.json | jq '.[] | select(.tag_name | match("$TAG")) | .target_commitish' | head -1)
+          # publish the latest release
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/releases \
+            -f tag_name="$TAG" \
+            -f target_commitish="$TARGET_COMMITISH" \
+            -f name="$TAG" \
+            -F generate_release_notes=true > release.json
+          # update PR description
+          cat release.json | jq -r .body > body.md
+          echo -e "\n\nPublished latest release: $(cat release.json | jq -r .html_url)" >> body.md
+          gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/pulls/$PR_ID \
+            -F 'body=@body.md'
+          # TODO attach the rc asset to latest release
+          # save output for upload
+          # echo "FILENAME=xverse-web-extension.$TAG.zip" >> $GITHUB_OUTPUT
+          # echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_OUTPUT

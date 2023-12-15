@@ -1,11 +1,11 @@
-name: Build & Publish Release Candidates
+name: Build for PR
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [develop]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,105 +25,6 @@ jobs:
           npx eslint .
           npx tsc --noEmit
           npm test
-  publish-github-release-candidate:
-    if: ${{ github.base_ref == 'main' && startsWith(github.head_ref, 'release/')}}
-    needs: test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-    outputs:
-      upload_url: ${{ steps.publish-prerelease-rc.outputs.UPLOAD_URL }}
-      filename: ${{ steps.publish-prerelease-rc.outputs.FILENAME }}
-    steps:
-      - id: publish-prerelease-rc
-        name: Publish prerelease rc
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_ID: ${{ github.event.pull_request.number }}
-          SOURCE_BRANCH: ${{ github.head_ref }}
-        run: |
-          # find the next rc tag
-          gh api \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/{owner}/{repo}/releases > releases.json
-          TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
-          ./find-tag.sh # look up releases.json and export $NEXT_TAG
-          # publish the github release
-          gh api \
-            --method POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/{owner}/{repo}/releases \
-            -f tag_name="$NEXT_TAG" \
-            -f target_commitish="$SOURCE_BRANCH" \
-            -f name="$NEXT_TAG" \
-            -F draft=false \
-            -F prerelease=true \
-            -F generate_release_notes=true > release.json
-          # update PR description
-          cat release.json | jq -r .body > body.md
-          echo -e "\n\nRelease candidate: $(cat release.json | jq -r .html_url)" >> body.md
-          echo -e "\nTo publish a latest release: Merge Commit this PR" >> body.md
-          gh api \
-            --method PATCH \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/{owner}/{repo}/pulls/$PR_ID \
-            -F 'body=@body.md'
-          echo "FILENAME=xverse-web-extension.$NEXT_TAG.zip" >> $GITHUB_OUTPUT
-          echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_OUTPUT
-  build-for-release-candidate:
-    needs: publish-github-release-candidate
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          always-auth: true
-          node-version: '18.x'
-          registry-url: https://npm.pkg.github.com
-          scope: '@secretkeylabs'
-      - name: Install dependencies
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
-        run: npm ci
-      - name: Build
-        env:
-          TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
-          MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
-          MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
-        run: npm run build --if-present
-      - name: Create Archive
-        run: |
-          zip -rj build.zip ./build
-      - name: Upload Release Asset
-        if: ${{ github.event.release.upload_url }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_URL: ${{needs.publish-github-release-candidate.outputs.upload_url}}
-          FILENAME: ${{needs.publish-github-release-candidate.outputs.filename}}
-        with:
-          upload_url: $UPLOAD_URL
-          asset_path: build.zip
-          asset_name: $FILENAME
-          asset_content_type: application/zip
-  build-for-pr:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          always-auth: true
-          node-version: '18.x'
-          registry-url: https://npm.pkg.github.com
-          scope: '@secretkeylabs'
       - name: Install dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
@@ -147,7 +48,7 @@ jobs:
           retention-days: 30
           if-no-files-found: error
   comment-on-pr:
-    needs: build-for-pr
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
