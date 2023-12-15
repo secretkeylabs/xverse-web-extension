@@ -1,4 +1,11 @@
 #! /bin/bash
+#
+##
+# create-release-pr.sh for xverse-web-extension
+#
+# NOTE: make sure you git commit your work before running this.
+# Alternatively trigger it from the github action
+#
 
 if [[ -z "$BUMP" ]]; then
   echo "BUMP is required. major|minor|patch"

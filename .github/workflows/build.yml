@@ -46,6 +46,9 @@ jobs:
   comment-on-pr:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Get Artifact URL
         env:
@@ -58,31 +61,70 @@ jobs:
       - name: Delete old bot comments
         if: ${{ github.event_name == 'pull_request' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           PR_ID: ${{ github.event.pull_request.number }}
-          REPO: ${{ github.repository }}
         run: |
-          curl \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            https://api.github.com/repos/$REPO/issues/$PR_ID/comments \
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/issues/$PR_ID/comments \
           | jq ".[] | select(.user.login==\"github-actions[bot]\") | .id" \
-          | xargs -I %q curl \
-            -L \
-            -X DELETE \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token $GITHUB_TOKEN"\
-            https://api.github.com/repos/$REPO/issues/comments/%q
+          | xargs -I %q gh api \
+            --method DELETE \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/issues/comments/%q
       - name: Post test package PR comment
         if: ${{ github.event_name == 'pull_request' }}
-        env:
-          VERSION: ${{ steps.published-version.outputs.version }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_URL: ${{ github.event.pull_request.comments_url }}
         run: |
-          curl \
-            -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            $GITHUB_URL \
-            -d "{\"body\":\"> Test with build here: ${{ env.ARTIFACT_URL }}\"}"
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/issues/$PR_ID/comments \
+            -f body="Test with build here: $ARTIFACT_URL"
+  publish-github-release-candidate:
+    if: ${{ github.base_ref == 'main' && startsWith(github.head_ref, 'release/')}}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - id: publish-prerelease-rc
+        name: Publish prerelease rc
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_ID: ${{ github.event.pull_request.number }}
+          SOURCE_BRANCH: ${{ github.head_ref }}
+        run: |
+          # find the next rc tag
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/releases > releases.json
+          TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
+          ./find-tag.sh # look up releases.json and export $NEXT_TAG
+          # publish the github release
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/releases \
+            -f tag_name="$NEXT_TAG" \
+            -f target_commitish="$SOURCE_BRANCH" \
+            -f name="$NEXT_TAG" \
+            -F draft=false \
+            -F prerelease=true \
+            -F generate_release_notes=true > release.json
+          # update PR description
+          cat release.json | jq -r .body > body.md
+          echo -e "\n\nRelease candidate: $(cat release.json | jq -r .html_url)" >> body.md
+          echo -e "\nTo publish a latest release: Merge Commit this PR" >> body.md
+          gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/pulls/$PR_ID \
+            -F 'body=@body.md'
