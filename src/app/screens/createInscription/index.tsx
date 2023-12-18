@@ -274,15 +274,8 @@ function CreateInscription() {
   const { getSeed } = useSeedVault();
   const btcClient = useBtcClient();
 
-  const {
-    ordinalsAddress,
-    network,
-    btcAddress,
-    selectedAccount,
-    btcFiatRate,
-    fiatCurrency,
-    btcBalance,
-  } = useWalletSelector();
+  const { ordinalsAddress, network, btcAddress, selectedAccount, btcFiatRate, fiatCurrency } =
+    useWalletSelector();
 
   useEffect(() => {
     getNonOrdinalUtxo(btcAddress, btcClient, requestedNetwork.type).then(setUtxos);
@@ -392,7 +385,7 @@ function CreateInscription() {
     inscriptionValue,
   } = commitValueBreakdown ?? {};
 
-  const { confirmedBalance } = useConfirmedBtcBalance();
+  const { confirmedBalance, isLoading: confirmedBalanceLoading } = useConfirmedBtcBalance();
 
   const chainFee = (revealChainFee ?? 0) + (commitChainFee ?? 0);
   const totalFee = (revealServiceFee ?? 0) + (externalServiceFee ?? 0) + chainFee;
@@ -413,10 +406,12 @@ function CreateInscription() {
   useEffect(() => {
     const showConfirmError =
       !isLoading &&
+      !confirmedBalanceLoading &&
       errorCode !== InscriptionErrorCode.INSUFFICIENT_FUNDS &&
+      confirmedBalance !== undefined &&
       Number(bundlePlusFees) > confirmedBalance;
     setShowConfirmedBalanceError(!!showConfirmError);
-  }, [confirmedBalance, errorCode, bundlePlusFees, isLoading]);
+  }, [confirmedBalance, errorCode, bundlePlusFees, isLoading, confirmedBalanceLoading]);
 
   if (complete && revealTransactionId) {
     const onClose = () => {

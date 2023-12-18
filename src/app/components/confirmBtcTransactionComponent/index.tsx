@@ -4,7 +4,6 @@ import ActionButton from '@components/button';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
-import useConfirmBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
@@ -149,9 +148,7 @@ function ConfirmBtcTransactionComponent({
   const [signedTx, setSignedTx] = useState(signedTxHex);
   const [total, setTotal] = useState<BigNumber>(new BigNumber(0));
   const [showFeeWarning, setShowFeeWarning] = useState(false);
-  const [showUnconfirmedWarning, setShowUnconfirmedWarning] = useState(false);
   const btcClient = useBtcClient();
-  const { confirmedBalance } = useConfirmBtcBalance();
 
   const bundle = selectedSatBundle ?? ordinalBundle ?? undefined;
   const {
@@ -275,10 +272,7 @@ function ConfirmBtcTransactionComponent({
       feeMultipliers &&
       currentFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighSatsFee));
     setShowFeeWarning(!!isFeeHigh);
-
-    const shouldShowUnconfirmedWarning = currentFee.isGreaterThan(confirmedBalance);
-    setShowUnconfirmedWarning(shouldShowUnconfirmedWarning);
-  }, [currentFee, feeMultipliers, confirmedBalance]);
+  }, [currentFee, feeMultipliers]);
 
   const onAdvancedSettingClick = () => {
     setShowFeeSettings(true);
@@ -361,14 +355,6 @@ function ConfirmBtcTransactionComponent({
         {showFeeWarning && (
           <CalloutContainer>
             <Callout bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')} variant="warning" />
-          </CalloutContainer>
-        )}
-        {showUnconfirmedWarning && (
-          <CalloutContainer>
-            <Callout
-              bodyText={t('CONFIRM_TRANSACTION.UNCONFIRMED_BALANCE_WARNING')}
-              variant="warning"
-            />
           </CalloutContainer>
         )}
         {/* TODO tim: refactor this not to use children. it should be just another prop */}
