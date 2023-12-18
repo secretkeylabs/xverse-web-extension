@@ -1,5 +1,6 @@
 import ActionButton from '@components/button';
 import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
+import { useApplyFeeMultiplier } from '@hooks/queries/useFeeMultipliers';
 import useNftDetail from '@hooks/queries/useNftDetail';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useDebounce from '@hooks/useDebounce';
@@ -100,7 +101,8 @@ function SendNft() {
 
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
-  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
+  const { stxAddress, stxPublicKey, network } = useWalletSelector();
+  const applyFeeMultiplier = useApplyFeeMultiplier();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(debouncedSearchTerm);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);
@@ -127,12 +129,8 @@ function SendNft() {
         memo: '',
         isNFT: true,
       };
-      const unsignedTx: StacksTransaction = await generateUnsignedTransaction(unsginedTx);
-      if (feeMultipliers?.stxSendTxMultiplier) {
-        unsignedTx.setFee(
-          unsignedTx.auth.spendingCondition.fee * BigInt(feeMultipliers.stxSendTxMultiplier),
-        );
-      }
+      const unsignedTx = await generateUnsignedTransaction(unsginedTx);
+      applyFeeMultiplier(unsignedTx);
       setRecipientAddress(address);
       return unsignedTx;
     },

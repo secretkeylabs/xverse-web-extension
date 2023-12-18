@@ -49,7 +49,7 @@ function TransactionRequest() {
       payload.amount,
       payload.memo!,
       stxPublicKey,
-      feeMultipliers!,
+      feeMultipliers,
       selectedNetwork,
       stxPendingTxData,
     );

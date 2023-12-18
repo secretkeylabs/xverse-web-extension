@@ -1,5 +1,6 @@
 import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
+import { useApplyFeeMultiplier } from '@hooks/queries/useFeeMultipliers';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -21,8 +22,8 @@ import TopRow from '../../components/topRow';
 function SendStxScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxAvailableBalance, stxPublicKey, feeMultipliers, network } =
-    useWalletSelector();
+  const { stxAddress, stxAvailableBalance, stxPublicKey, network } = useWalletSelector();
+  const applyFeeMultiplier = useApplyFeeMultiplier();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
@@ -54,12 +55,7 @@ function SendStxScreen() {
           stxPublicKey,
           selectedNetwork,
         );
-      // increasing the fees with multiplication factor
-      const fee: bigint =
-        BigInt(unsignedSendStxTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
-      if (feeMultipliers?.stxSendTxMultiplier) {
-        unsignedSendStxTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
-      }
+      applyFeeMultiplier(unsignedSendStxTx);
       return unsignedSendStxTx;
     },
   });

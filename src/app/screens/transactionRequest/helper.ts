@@ -1,6 +1,7 @@
+import { applyFeeMultiplier } from '@hooks/queries/useFeeMultipliers';
 import {
+  AppInfo,
   createContractCallPromises,
-  FeesMultipliers,
   generateUnsignedStxTokenTransferTransaction,
   StacksNetwork,
   StacksTransaction,
@@ -28,7 +29,7 @@ export async function getTokenTransferRequest(
   amount: string,
   memo: string,
   stxPublicKey: string,
-  feeMultipliers: FeesMultipliers,
+  feeMultipliers: AppInfo | null,
   network: StacksNetwork,
   stxPendingTransactions,
 ) {
@@ -40,10 +41,6 @@ export async function getTokenTransferRequest(
     stxPublicKey,
     network,
   );
-  // increasing the fees with multiplication factor
-  const fee: bigint = BigInt(unsignedSendStxTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
-  if (feeMultipliers?.stxSendTxMultiplier) {
-    unsignedSendStxTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
-  }
+  applyFeeMultiplier(unsignedSendStxTx, feeMultipliers);
   return unsignedSendStxTx;
 }
