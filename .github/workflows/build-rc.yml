@@ -17,8 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           always-auth: true
           node-version: 18
@@ -82,7 +81,7 @@ jobs:
           echo "FILENAME=xverse-web-extension.$NEXT_TAG.zip" >> $GITHUB_OUTPUT
           echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_OUTPUT
       - id: update-description
-        name: Update description with release notes
+        name: Update PR description with release notes
         env:
           PR_ID: ${{ github.event.pull_request.number }}
         run: |
