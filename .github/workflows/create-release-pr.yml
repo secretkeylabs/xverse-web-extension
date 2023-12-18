@@ -1,4 +1,4 @@
-name: Create release PR
+name: Create release PRs
 
 on:
   workflow_dispatch:
@@ -13,6 +13,12 @@ on:
           - minor
           - major
 
+##
+# This workflow initiates the release process (create release PRs):
+# - creates a release branch with version bump
+# - creates a release PR to main
+# - creates a release PR to develop
+#
 jobs:
   create-release-pr:
     runs-on: ubuntu-latest
@@ -21,8 +27,8 @@ jobs:
       pull-requests: write
       issues: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm

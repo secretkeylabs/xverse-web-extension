@@ -21,9 +21,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           always-auth: true
-          node-version: '18.x'
+          node-version: 18
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
+          cache: npm
       - name: Install dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
@@ -42,16 +43,16 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
     outputs:
       upload_url: ${{ steps.publish-prerelease.outputs.UPLOAD_URL }}
       filename: ${{ steps.publish-prerelease.outputs.FILENAME }}
     steps:
       - uses: actions/checkout@v4
       - id: publish-prerelease
-        name: Publish prerelease
+        name: Publish release candidate as prerelease
         env:
-          GH_TOKEN: ${{ github.token }}
-          PR_ID: ${{ github.event.pull_request.number }}
           SOURCE_BRANCH: ${{ github.head_ref }}
           TARGET_COMMITISH: ${{ github.event.pull_request.head.sha }}
         run: |
@@ -60,8 +61,11 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/{owner}/{repo}/releases > releases.json
+          # get $TAG from branch name, e.g. v0.25.0
           TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
-          ./find-tag.sh # look up releases.json and export $NEXT_TAG
+          # export $NEXT_TAG using releases.json and $TAG, e.g. v0.25.0-rc.0
+          cd scripts
+          ./find-tag.sh
           # publish the release as prerelease rc
           gh api \
             --method POST \
@@ -74,6 +78,14 @@ jobs:
             -F draft=false \
             -F prerelease=true \
             -F generate_release_notes=true > release.json
+          # save output for upload
+          echo "FILENAME=xverse-web-extension.$NEXT_TAG.zip" >> $GITHUB_OUTPUT
+          echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_OUTPUT
+      - id: update-description
+        name: Update description with release notes
+        env:
+          PR_ID: ${{ github.event.pull_request.number }}
+        run: |
           # update PR description
           cat release.json | jq -r .body > body.md
           echo -e "\n\nRelease candidate: $(cat release.json | jq -r .html_url)" >> body.md
@@ -84,35 +96,31 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/{owner}/{repo}/pulls/$PR_ID \
             -F 'body=@body.md'
-          # save output for upload
-          echo "FILENAME=xverse-web-extension.$NEXT_TAG.zip" >> $GITHUB_OUTPUT
-          echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_OUTPUT
   build-rc:
     needs: publish-rc
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           always-auth: true
-          node-version: '18.x'
+          node-version: 18
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
+          cache: npm
       - name: Install dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
         run: npm ci
-      - name: Build
+      - name: Build & zip
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
           MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
-        run: npm run build --if-present
-      - name: Create Archive
         run: |
+          npm run build
           zip -rj build.zip ./build
-      - name: Upload Release Asset
+      - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
