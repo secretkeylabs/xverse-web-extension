@@ -4,7 +4,8 @@
     "SEND": "Send",
     "COMBO": "Combo",
     "SATS": "Sats",
-    "SATTRIBUTES": "Sattributes"
+    "SATTRIBUTES": "Sattributes",
+    "INPUT": "Input"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
@@ -391,10 +392,13 @@
     "STANDARD": "Regular",
     "HIGH": "Fast",
     "CUSTOM": "Custom",
+    "CUSTOM_FEE": "Custom fee",
+    "TOTAL_FEE": "Total fee:",
     "LOW": "Slow",
     "FEE_INFO": "Apply a higher fee to help your transaction confirm quickly, especially when the network is congested.",
     "NONCE": "Nonce",
     "APPLY": "Apply",
+    "BACK": "Back",
     "NONCE_INFO": "You can use a custom nonce to replace a pending transaction with the same nonce.",
     "SAME_FEE_ERROR": "New fee must be greater than current fee",
     "GREATER_FEE_ERROR": "Fee is more than available balance",
@@ -732,6 +736,8 @@
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
     "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
     "ENABLE_RARE_SATS_DETAIL": "Automatically scan and display rare sats in your Ordinals wallet.",
+    "ENABLE_SPEED_UP_TRANSACTIONS": "Enable speed up transactions",
+    "ENABLE_SPEED_UP_TRANSACTIONS_DETAIL": "Allows you to speed up unconfirmed transactions by paying a higher fee.",
     "ADVANCED": "Advanced"
   },
   "OPTIONS_DIALOG": {
@@ -758,6 +764,7 @@
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
     "MINT": "Mint",
+    "SPEED_UP": "Speed up",
     "INSCRIBE_TRANSFER": "Inscribe Transfer",
     "TRANSACTION_PENDING_RECEIVING": "Receiving",
     "TRANSACTION_PENDING_SENDING": "Sending",
@@ -787,6 +794,24 @@
     "COMING_SOON": "Coming soon",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address"
+  },
+  "SPEED_UP_TRANSACTION": {
+    "TITLE": "Speed up transaction",
+    "FEE_INFO": "Use a higher fee to help the transaction confirm earlier.",
+    "CURRENT_FEE": "Current fee:",
+    "ESTIMATED_COMPLETION_TIME": "Estimated completion time:",
+    "CANCEL": "Cancel",
+    "SUBMIT": "Submit",
+    "HIGH_PRIORITY": "High priority",
+    "HIGHER_PRIORITY": "Higher priority",
+    "HIGHEST_PRIORITY": "Highest priority",
+    "MED_PRIORITY": "Medium priority",
+    "CUSTOM": "Custom",
+    "INSUFFICIENT_FUNDS": "Insufficient funds",
+    "INSUFFICIENT_FEE": "Insufficient fee",
+    "MANUAL_SETTING": "Manual setting",
+    "TX_FEE_UPDATED": "Transaction fee updated",
+    "FEE_TOO_LOW": "The minimum fee is {{minimumFee}}"
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",
@@ -948,7 +973,7 @@
       },
       "LONG": {
         "INVALID_JSON_CONTENT": "The content is not valid JSON. Please verify the content of your inscription.",
-        "INSUFFICIENT_FUNDS": "You have insufficient balance to process this transaction. Please add more funds to your wallet or try with a lower fee rate.",
+        "INSUFFICIENT_FUNDS": "You have insufficient confirmed funds to process this transaction. This may be due to unconfirmed outputs in your balance. Please add more funds or try with a lower fee rate",
         "INVALID_FEE_RATE": "The fee applied to this transaction is too low. To apply a higher fee, select edit fees at the bottom of this screen.",
         "INVALID_SERVICE_FEE_CONFIG": "The calling application sent an invalid payload. Please contact the application developer.",
         "INVALID_CONTENT": "The ordinal content you are trying to inscribe is not valid. Please verify the content of your inscription.",
@@ -1177,8 +1202,7 @@
     "RARE_SATS_BUNDLE": "Rare Sats Bundle",
     "BUNDLE_PENDING_SEND_DESCRIPTION": "This bundle is already in a pending transfer.",
     "RARE_SAT": "Rare Sat",
-    "INSCRIBED_SAT": "Inscribed Sat",
-    "BUNDLE_SIZE": "Bundle size"
+    "INSCRIBED_SAT": "Inscribed Sat"
   },
   "COLLECTIBLE_COLLECTION_SCREEN": {
     "BACK_TO_GALLERY": "Back to gallery",

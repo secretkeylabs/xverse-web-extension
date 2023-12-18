@@ -5,19 +5,17 @@ import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
-import SatsBundle from '@components/confirmBtcTransactionComponent/bundle';
 import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useBtcClient from '@hooks/useBtcClient';
-import useDetectOrdinalInSignPsbt, { InputsBundle } from '@hooks/useDetectOrdinalInSignPsbt';
+import useDetectOrdinalInSignPsbt from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import {
-  Bundle,
   getBtcFiatEquivalent,
   parsePsbt,
   psbtBase64ToHex,
@@ -26,6 +24,7 @@ import {
   Transport as TransportType,
 } from '@secretkeylabs/xverse-core';
 import { isLedgerAccount } from '@utils/helper';
+import { BundleItem, convertV2ToV1Bundle } from '@utils/rareSats';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
@@ -35,6 +34,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import { SignTransactionOptions } from 'sats-connect';
 import styled from 'styled-components';
+import BundleItemsComponent from './bundleItemsComponent';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -110,9 +110,6 @@ function SignPsbtRequest() {
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
-  const { t: rareSatsTranslate } = useTranslation('translation', {
-    keyPrefix: 'RARE_SATS',
-  });
   const [expandInputOutputView, setExpandInputOutputView] = useState(false);
   const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses } = useSignPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
@@ -122,7 +119,6 @@ function SignPsbtRequest() {
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
-  const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -142,7 +138,7 @@ function SignPsbtRequest() {
   const handleOrdinalAndOrdinalInfo = useDetectOrdinalInSignPsbt();
   const [isLoading, setIsLoading] = useState(true);
   const [userReceivesOrdinal, setUserReceivesOrdinal] = useState(false);
-  const [bundleItemsData, setBundleItemsData] = useState<InputsBundle>();
+  const [bundleItemsData, setBundleItemsData] = useState<BundleItem[]>([]);
   const signingAddresses = useMemo(
     () => getSigningAddresses(payload.inputsToSign),
     [payload.inputsToSign],
@@ -189,7 +185,7 @@ function SignPsbtRequest() {
   const checkIfUserReceivesOrdinal = async () => {
     try {
       const result = await handleOrdinalAndOrdinalInfo(parsedPsbt);
-      setBundleItemsData(result.bundleItemsData);
+      setBundleItemsData(convertV2ToV1Bundle(result.bundleItemsData));
       setUserReceivesOrdinal(result.userReceivesOrdinal);
     } catch {
       navigate('/tx-status', {
@@ -277,6 +273,7 @@ function SignPsbtRequest() {
 
     const signingResponse = await signLedgerPSBT({
       transport,
+      esploraProvider: btcClient,
       network: network.type,
       addressIndex,
       psbtInputBase64: psbtBase64,
@@ -387,12 +384,15 @@ function SignPsbtRequest() {
             <Container>
               <ReviewTransactionText>{t('REVIEW_TRANSACTION')}</ReviewTransactionText>
               {!payload.broadcast && <InfoContainer bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
-              {bundleItemsData && (
-                <SatsBundle
-                  title={userReceivesOrdinal ? t('YOU_WILL_RECEIVE') : t('YOU_WILL_TRANSFER')}
-                  bundle={bundleItemsData as Bundle}
-                />
-              )}
+              {bundleItemsData &&
+                bundleItemsData.map((bundleItem, index) => (
+                  <BundleItemsComponent
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    item={bundleItem}
+                    userReceivesOrdinal={userReceivesOrdinal}
+                  />
+                ))}
               <RecipientComponent
                 value={`${satsToBtc(new BigNumber((parsedPsbt?.netAmount ?? 0).toString()))
                   .toString()
@@ -409,14 +409,6 @@ function SignPsbtRequest() {
               />
 
               <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-              <TransactionDetailComponent
-                title={rareSatsTranslate('BUNDLE_SIZE')}
-                value={getSatsAmountString(new BigNumber(bundleItemsData?.value.toString() ?? 0))}
-                subValue={getBtcFiatEquivalent(
-                  new BigNumber(bundleItemsData?.value.toString() ?? 0),
-                  BigNumber(btcFiatRate),
-                )}
-              />
               {payload.broadcast ? (
                 <TransactionDetailComponent
                   title={t('FEES')}
@@ -461,7 +453,7 @@ function SignPsbtRequest() {
             titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
             textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
             imageDefault={ledgerConnectDefaultIcon}
-            isConnectSuccess={isTxApproved}
+            isConnectSuccess={false}
             isConnectFailed={isTxRejected}
           />
         )}

@@ -64,6 +64,7 @@ import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 import SignatureRequest from '@screens/signatureRequest';
 import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
 import SignPsbtRequest from '@screens/signPsbtRequest';
+import SpeedUpTransactionScreen from '@screens/speedUpTransaction';
 import Stacking from '@screens/stacking';
 import SwapScreen from '@screens/swap';
 import SwapConfirmScreen from '@screens/swap/swapConfirmation';
@@ -171,10 +172,6 @@ const router = createHashRouter([
         element: <ConfirmFtTransaction />,
       },
       {
-        path: 'confirm-btc-tx',
-        element: <ConfirmBtcTransaction />,
-      },
-      {
         path: 'confirm-brc20-tx',
         element: (
           <AuthGuard>
@@ -265,6 +262,10 @@ const router = createHashRouter([
             <BtcSendScreen />
           </AuthGuard>
         ),
+      },
+      {
+        path: 'speed-up-tx/:id',
+        element: <SpeedUpTransactionScreen />,
       },
       {
         path: 'create-inscription',
@@ -411,14 +412,6 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
-      {
-        path: 'confirm-ordinal-tx/:id',
-        element: (
-          <AuthGuard>
-            <ConfirmOrdinalTransaction />
-          </AuthGuard>
-        ),
-      },
     ],
   },
   {
@@ -426,6 +419,10 @@ const router = createHashRouter([
     element: <ExtendedScreenContainer />,
     errorElement: <ErrorBoundary />,
     children: [
+      {
+        path: 'confirm-btc-tx',
+        element: <ConfirmBtcTransaction />,
+      },
       {
         path: 'nft-dashboard',
         element: (

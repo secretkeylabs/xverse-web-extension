@@ -1,4 +1,5 @@
 import LoadingScreen from '@components/loadingScreen';
+import { CheckCircle } from '@phosphor-icons/react';
 import rootStore from '@stores/index';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -40,7 +41,23 @@ function App(): JSX.Element {
             <SessionGuard>
               <ThemeProvider theme={Theme}>
                 <RouterProvider router={router} />
-                <Toaster position="bottom-center" />
+                <Toaster
+                  position="bottom-center"
+                  containerStyle={{ bottom: 80 }}
+                  toastOptions={{
+                    success: {
+                      icon: <CheckCircle size={20} weight="bold" />,
+                      style: {
+                        ...Theme.typography.body_medium_m,
+                        backgroundColor: Theme.colors.success_medium,
+                        borderRadius: Theme.radius(2),
+                        padding: Theme.spacing(4),
+                        paddingLeft: Theme.spacing(6),
+                        color: Theme.colors.elevation0,
+                      },
+                    },
+                  }}
+                />
               </ThemeProvider>
             </SessionGuard>
           </PersistGate>

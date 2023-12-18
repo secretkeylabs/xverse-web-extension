@@ -81,7 +81,7 @@ interface Props {
   icon?: JSX.Element;
   iconPosition?: 'left' | 'right';
   text: string;
-  onPress: () => void;
+  onPress: (e: React.MouseEvent<HTMLButtonElement>) => void;
   processing?: boolean;
   disabled?: boolean;
   transparent?: boolean;
@@ -102,9 +102,9 @@ function ActionButton({
   warning,
   hoverDialogId,
 }: Props) {
-  const handleOnPress = () => {
+  const handleOnPress = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled) {
-      onPress();
+      onPress(e);
     }
   };
 

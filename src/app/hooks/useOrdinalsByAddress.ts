@@ -1,11 +1,14 @@
 import { BtcOrdinal, getOrdinalsByAddress } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import useBtcClient from './useBtcClient';
 import useWalletSelector from './useWalletSelector';
 
 const useOrdinalsByAddress = (address: string) => {
   const { network } = useWalletSelector();
+  const btcClient = useBtcClient();
+
   const fetchOrdinals = async (): Promise<BtcOrdinal[]> => {
-    const ordinals = await getOrdinalsByAddress(network.type, address);
+    const ordinals = await getOrdinalsByAddress(btcClient, network.type, address);
     return ordinals.filter((item) => item.id !== undefined);
   };
 
