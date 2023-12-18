@@ -1,5 +1,9 @@
 name: Create release PRs
-
+##
+# This workflow initiates the release process (create release PRs):
+# - creates a release branch with version bump
+# - creates a release PR to main & develop
+#
 on:
   workflow_dispatch:
     inputs:
@@ -12,13 +16,6 @@ on:
           - patch
           - minor
           - major
-
-##
-# This workflow initiates the release process (create release PRs):
-# - creates a release branch with version bump
-# - creates a release PR to main
-# - creates a release PR to develop
-#
 jobs:
   create-release-pr:
     runs-on: ubuntu-latest

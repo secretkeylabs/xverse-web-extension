@@ -1,9 +1,4 @@
 name: Build & Publish Release Candidate
-
-on:
-  pull_request:
-    branches: [main, develop]
-
 ##
 # This workflow builds new release candidates (create release + upload asset):
 # - for a new release PR and
@@ -11,6 +6,11 @@ on:
 #
 # It should also keep the release PR description in sync with the latest release candidate
 #
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
 jobs:
   test:
     if: ${{ startsWith(github.head_ref, 'release/') }}

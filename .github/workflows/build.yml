@@ -1,16 +1,16 @@
 name: Build for PR
-
-on:
-  pull_request:
-    branches: [develop]
-
 ##
 # This workflow tests, builds, and uploads the extension code for each PR
 #
 # It should also keep an updated comment on the PR showing where the upload is
 #
+on:
+  pull_request:
+    branches:
+      - develop
 jobs:
   build:
+    if: ${{ !startsWith(github.head_ref, 'release/') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,9 +18,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           always-auth: true
-          node-version: '18.x'
+          node-version: 18
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
+          cache: npm
       - name: Install dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
@@ -39,7 +40,7 @@ jobs:
       - name: Save Filename
         run: |
           BRANCH_NAME=$(echo ${{ github.head_ref }} | sed 's/\//-/g')
-          GIT_SHA_SHORT=$(git rev-parse --short ${{ github.sha }})
+          GIT_SHA_SHORT=$(git rev-parse --short ${{ github.event.pull_request.head.sha }})
           echo "FILENAME=xverse-extension.$BRANCH_NAME.$GIT_SHA_SHORT" >> $GITHUB_ENV
       - name: Upload Archive
         uses: actions/upload-artifact@v3
@@ -54,9 +55,11 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
-      - name: Get Artifact URL
+      - name: Get artifact URL
         env:
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
@@ -65,8 +68,6 @@ jobs:
           ARTIFACT_URL="https://github.com/$OWNER/$REPO/actions/runs/$WORKFLOW_ID"
           echo "ARTIFACT_URL=$ARTIFACT_URL" >> $GITHUB_ENV
       - name: Delete old bot comments
-        env:
-          GH_TOKEN: ${{ github.token }}
           PR_ID: ${{ github.event.pull_request.number }}
         run: |
           gh api \
@@ -81,7 +82,6 @@ jobs:
             /repos/{owner}/{repo}/issues/comments/%q
       - name: Post test package PR comment
         env:
-          GH_TOKEN: ${{ github.token }}
           PR_ID: ${{ github.event.pull_request.number }}
         run: |
           gh api \
