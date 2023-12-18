@@ -1,4 +1,4 @@
-name: Build for PR
+name: Build & Test for PR
 ##
 # This workflow tests, builds, and uploads the extension code for each PR
 #
