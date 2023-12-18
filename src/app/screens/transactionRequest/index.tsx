@@ -51,7 +51,7 @@ function TransactionRequest() {
       stxPublicKey,
       feeMultipliers!,
       selectedNetwork,
-      stxPendingTxData,
+      stxPendingTxData.data,
     );
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
