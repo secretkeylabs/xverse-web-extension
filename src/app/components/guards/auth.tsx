@@ -1,13 +1,13 @@
-import { PropsWithChildren, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { useDispatch } from 'react-redux';
 import { setWalletUnlockedAction } from '@stores/wallet/actions/actionCreators';
+import { PropsWithChildren, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function AuthGuard({ children }: PropsWithChildren) {
   const navigate = useNavigate();
-  const { masterPubKey, encryptedSeed, isUnlocked } = useWalletSelector();
+  const { masterPubKey, encryptedSeed, isUnlocked, accountsList } = useWalletSelector();
   const { getSeed, hasSeed } = useSeedVault();
   const dispatch = useDispatch();
 
@@ -26,7 +26,12 @@ function AuthGuard({ children }: PropsWithChildren) {
       return;
     }
     const hasSeedPhrase = await hasSeed();
-    if (!hasSeedPhrase || !masterPubKey) {
+    if (
+      !hasSeedPhrase ||
+      // We ensure there is at least 1 account with a masterPubKey as the unlock code will select an account if one
+      // is not selected in the store
+      (!masterPubKey && (accountsList.length === 0 || !accountsList[0].masterPubKey))
+    ) {
       navigate('/landing');
       return;
     }
