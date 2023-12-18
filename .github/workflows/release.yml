@@ -1,4 +1,4 @@
-name: Publish Latest Release
+name: Publish latest release
 ##
 # This workflow creates a latest release with the same target_commitish
 # as the highest rc matching the release PR version
