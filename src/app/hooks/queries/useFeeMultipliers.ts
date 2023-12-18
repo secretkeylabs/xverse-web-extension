@@ -39,7 +39,7 @@ export const applyFeeMultiplier = (
     // TODO remove this check once fee multipliers are lowered again
     // we switched to using estimated network fees,
     // so need this while fee multipliers are still very high
-    if (newFee < feeMultipliers.thresholdHighStacksFee) {
+    if (newFee < BigInt(feeMultipliers.thresholdHighStacksFee)) {
       unsignedTx.setFee(newFee);
     }
   }
