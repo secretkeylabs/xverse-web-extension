@@ -1,6 +1,5 @@
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
-import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useDappRequest from '@hooks/useTransationRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -10,6 +9,7 @@ import {
   ContractFunction,
   createDeployContractRequest,
   extractFromPayload,
+  fetchStxPendingTxData,
 } from '@secretkeylabs/xverse-core';
 import { StacksTransaction } from '@stacks/transactions';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';
@@ -39,11 +39,11 @@ function TransactionRequest() {
   const [coinsMetaData, setCoinsMetaData] = useState<Coin[] | null>(null);
   const [codeBody, setCodeBody] = useState(undefined);
   const [contractName, setContractName] = useState(undefined);
-  const stxPendingTxData = useStxPendingTxData();
   const [hasSwitchedAccount, setHasSwitchedAccount] = useState(false);
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
 
   const handleTokenTransferRequest = async () => {
+    const stxPendingTxData = await fetchStxPendingTxData(stxAddress, selectedNetwork);
     const unsignedSendStxTx = await getTokenTransferRequest(
       payload.recipient,
       payload.amount,
@@ -51,7 +51,7 @@ function TransactionRequest() {
       stxPublicKey,
       feeMultipliers!,
       selectedNetwork,
-      stxPendingTxData.data,
+      stxPendingTxData || [],
     );
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
