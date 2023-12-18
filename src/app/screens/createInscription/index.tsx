@@ -27,6 +27,7 @@ import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getShortTruncatedAddress } from '@utils/helper';
 
+import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
 import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
@@ -267,12 +268,13 @@ function CreateInscription() {
   const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? DEFAULT_FEE_RATE);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
   const { getSeed } = useSeedVault();
+  const btcClient = useBtcClient();
 
   const { ordinalsAddress, network, btcAddress, selectedAccount, btcFiatRate, fiatCurrency } =
     useWalletSelector();
 
   useEffect(() => {
-    getNonOrdinalUtxo(btcAddress, requestedNetwork.type).then(setUtxos);
+    getNonOrdinalUtxo(btcAddress, btcClient, requestedNetwork.type).then(setUtxos);
   }, [btcAddress, requestedNetwork]);
 
   useEffect(() => {

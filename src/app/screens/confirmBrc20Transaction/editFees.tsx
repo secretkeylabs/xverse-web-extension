@@ -38,15 +38,12 @@ const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
   alignItems: 'center',
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(6),
-  border: props.withError
-    ? `1px solid ${props.theme.colors.danger_dark_200}`
-    : `1px solid ${props.theme.colors.white_800}`,
+  border: `1px solid ${
+    props.withError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_800
+  }`,
   backgroundColor: props.theme.colors.elevation1,
-  borderRadius: 8,
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(5),
+  borderRadius: props.theme.radius(1),
+  padding: props.theme.spacing(5),
 }));
 
 const InputField = styled.input((props) => ({

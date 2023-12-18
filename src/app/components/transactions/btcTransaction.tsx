@@ -1,23 +1,28 @@
+import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Brc20HistoryTransactionData, BtcTransactionData } from '@secretkeylabs/xverse-core';
+import { FastForward } from '@phosphor-icons/react';
+import {
+  Brc20HistoryTransactionData,
+  BtcTransactionData,
+  rbf,
+  RBFProps,
+} from '@secretkeylabs/xverse-core';
 import { getBtcTxStatusUrl } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';
 import { useCallback } from 'react';
-import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import styled, { useTheme } from 'styled-components';
 import TransactionAmount from './transactionAmount';
 import TransactionRecipient from './transactionRecipient';
 import TransactionStatusIcon from './transactionStatusIcon';
 import TransactionTitle from './transactionTitle';
 
-interface TransactionHistoryItemProps {
-  transaction: BtcTransactionData | Brc20HistoryTransactionData;
-}
-
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
+  alignItems: 'center',
   width: '100%',
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(5),
+  padding: props.theme.spacing(5),
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   background: 'none',
@@ -30,10 +35,11 @@ const TransactionContainer = styled.button((props) => ({
 }));
 
 const TransactionAmountContainer = styled.div({
-  display: 'flex',
-  flex: 1,
   width: '100%',
-  justifyContent: 'flex-end',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  flex: 1,
 });
 
 const TransactionInfoContainer = styled.div((props) => ({
@@ -47,29 +53,73 @@ const TransactionRow = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
 }));
 
-export default function BtcTransactionHistoryItem(props: TransactionHistoryItemProps) {
-  const { transaction } = props;
-  const { network } = useWalletSelector();
+const StyledButton = styled(ActionButton)((props) => ({
+  padding: 0,
+  border: 'none',
+  width: 'auto',
+  height: 'auto',
+  div: {
+    ...props.theme.typography.body_medium_m,
+    color: props.theme.colors.tangerine,
+  },
+  ':hover:enabled': {
+    backgroundColor: 'transparent',
+  },
+  ':active:enabled': {
+    backgroundColor: 'transparent',
+  },
+}));
+
+interface TransactionHistoryItemProps {
+  transaction: BtcTransactionData | Brc20HistoryTransactionData;
+  wallet: RBFProps;
+}
+export default function BtcTransactionHistoryItem({
+  transaction,
+  wallet,
+}: TransactionHistoryItemProps) {
+  const { network, hasActivatedRBFKey } = useWalletSelector();
   const isBtc = isBtcTransaction(transaction) ? 'BTC' : 'brc20';
+  const theme = useTheme();
+  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+
   const openBtcTxStatusLink = useCallback(() => {
     window.open(getBtcTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
   }, []);
+
+  const showAccelerateButton =
+    hasActivatedRBFKey &&
+    isBtcTransaction(transaction) &&
+    rbf.isTransactionRbfEnabled(transaction, wallet);
 
   return (
     <TransactionContainer onClick={openBtcTxStatusLink}>
       <TransactionStatusIcon transaction={transaction} currency={isBtc} />
       <TransactionInfoContainer>
         <TransactionRow>
-          <TransactionTitle transaction={transaction} />
+          <div>
+            <TransactionTitle transaction={transaction} />
+            <TransactionRecipient transaction={transaction} />
+          </div>
           <TransactionAmountContainer>
             <TransactionAmount transaction={transaction} coin={isBtc} />
+            {showAccelerateButton && (
+              <Link to={`/speed-up-tx/${transaction.txid}`}>
+                <StyledButton
+                  transparent
+                  text={t('SPEED_UP')}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                  }}
+                  icon={<FastForward size={16} color={theme.colors.tangerine} weight="fill" />}
+                  iconPosition="right"
+                />
+              </Link>
+            )}
           </TransactionAmountContainer>
-        </TransactionRow>
-        <TransactionRow>
-          <TransactionRecipient transaction={transaction} />
         </TransactionRow>
       </TransactionInfoContainer>
     </TransactionContainer>

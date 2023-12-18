@@ -186,9 +186,15 @@ const SatsMethodsProvider: BitcoinProvider = {
     );
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
-      const handleMessage = (eventMessage: MessageEvent<CreateRepeatInscriptionsResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.createRepeatInscriptionsResponse)) return;
-        if (eventMessage.data.payload?.createRepeatInscriptionsRequest !== createRepeatInscriptionsRequest)
+      const handleMessage = (
+        eventMessage: MessageEvent<CreateRepeatInscriptionsResponseMessage>,
+      ) => {
+        if (!isValidEvent(eventMessage, ExternalSatsMethods.createRepeatInscriptionsResponse))
+          return;
+        if (
+          eventMessage.data.payload?.createRepeatInscriptionsRequest !==
+          createRepeatInscriptionsRequest
+        )
           return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.createRepeatInscriptionsResponse === 'cancel') {

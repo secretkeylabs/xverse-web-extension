@@ -1,3 +1,4 @@
+import useBtcClient from '@hooks/useBtcClient';
 import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -57,10 +58,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
   }`,
   backgroundColor: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(1),
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(5),
+  padding: props.theme.spacing(5),
 }));
 
 const InputField = styled.input((props) => ({
@@ -102,7 +100,7 @@ const FeeButton = styled.button<ButtonProps>((props) => ({
   color: `${props.isSelected ? props.theme.colors.elevation2 : props.theme.colors.white_400}`,
   background: `${props.isSelected ? props.theme.colors.white : 'transparent'}`,
   border: `1px solid ${props.isSelected ? 'transparent' : props.theme.colors.elevation6}`,
-  borderRadius: 40,
+  borderRadius: props.theme.radius(9),
   width: props.isBtc ? 104 : 82,
   height: 40,
   display: 'flex',
@@ -111,13 +109,13 @@ const FeeButton = styled.button<ButtonProps>((props) => ({
   marginRight: props.isLastInRow ? 0 : 8,
 }));
 
-const ButtonContainer = styled.div({
+const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  marginTop: 12,
-});
+  marginTop: props.theme.spacing(6),
+}));
 
 const FeeContainer = styled.div({
   display: 'flex',
@@ -190,6 +188,7 @@ function EditFee({
   const isStx = type === 'STX';
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
+  const btcClient = useBtcClient();
 
   const modifyStxFees = (mode: string) => {
     const currentFee = new BigNumber(fee);
@@ -237,6 +236,7 @@ function EditFee({
           const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
             btcRecipients,
             btcAddress,
+            btcClient,
             network.type,
             mode,
           );
@@ -248,6 +248,7 @@ function EditFee({
           btcRecipients[0].address,
           ordinalTxUtxo,
           btcAddress,
+          btcClient,
           network.type,
           ordinalsUtxos || [],
           mode,
@@ -297,6 +298,7 @@ function EditFee({
           const { fee: modifiedFee, selectedFeeRate } = await getBtcFees(
             btcRecipients,
             btcAddress,
+            btcClient,
             network.type,
             feeMode,
             feeRateInput,
@@ -322,6 +324,7 @@ function EditFee({
           btcRecipients[0].address,
           ordinalTxUtxo,
           btcAddress,
+          btcClient,
           network.type,
           ordinalsUtxos || [],
           feeMode,

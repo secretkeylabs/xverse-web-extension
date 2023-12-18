@@ -1,6 +1,6 @@
 import {
   Bundle,
-  getUtxoOrdinalBundle,
+  getUtxoOrdinalBundleIfFound,
   mapRareSatsAPIResponseToBundle,
   ParsedPSBT,
 } from '@secretkeylabs/xverse-core';
@@ -21,10 +21,13 @@ const useDetectOrdinalInSignPsbt = () => {
 
     if (parsedPsbt) {
       const inputsRequest = parsedPsbt.inputs.map((input) =>
-        getUtxoOrdinalBundle(network.type, input.txid, input.index),
+        getUtxoOrdinalBundleIfFound(network.type, input.txid, input.index),
       );
       const inputsResponse = await Promise.all(inputsRequest);
       inputsResponse.forEach((inputResponse, index) => {
+        if (!inputResponse) {
+          return;
+        }
         const bundle = mapRareSatsAPIResponseToBundle(inputResponse);
         if (
           bundle.inscriptions.length > 0 ||

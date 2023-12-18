@@ -1,8 +1,11 @@
 import BtcTransactionHistoryItem from '@components/transactions/btcTransaction';
 import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
 import useTransactions from '@hooks/queries/useTransactions';
+import useBtcClient from '@hooks/useBtcClient';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, config, useSpring } from '@react-spring/web';
-import { BtcTransactionData } from '@secretkeylabs/xverse-core';
+import type { BtcTransactionData } from '@secretkeylabs/xverse-core';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
@@ -10,6 +13,7 @@ import {
 } from '@stacks/stacks-blockchain-api-types';
 import { CurrencyTypes } from '@utils/constants';
 import { formatDate } from '@utils/date';
+import { isLedgerAccount } from '@utils/helper';
 import {
   isAddressTransactionWithTransfers,
   isBrc20Transaction,
@@ -163,6 +167,9 @@ const filterTxs = (
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, txFilter, brc20Token } = props;
+  const { network, selectedAccount, accountType } = useWalletSelector();
+  const btcClient = useBtcClient();
+  const seedVault = useSeedVault();
   const { data, isLoading, isFetching, error } = useTransactions(
     (coin as CurrencyTypes) || 'STX',
     brc20Token,
@@ -176,6 +183,19 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
   });
 
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+  const wallet = selectedAccount
+    ? {
+        ...selectedAccount,
+        accountType: accountType || 'software',
+        accountId:
+          isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
+            ? selectedAccount.deviceAccountIndex
+            : selectedAccount.id,
+        network: network.type,
+        esploraProvider: btcClient,
+        seedVault,
+      }
+    : undefined;
 
   const groupedTxs = useMemo(() => {
     if (!data?.length) {
@@ -203,15 +223,19 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       {groupedTxs &&
         !isLoading &&
         Object.keys(groupedTxs).map((group) => (
-          <GroupContainer style={styles}>
+          <GroupContainer key={group} style={styles}>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
               <SectionSeparator />
             </SectionHeader>
             {groupedTxs[group].map((transaction) => {
-              if (isBtcTransaction(transaction) || isBrc20Transaction(transaction)) {
+              if (wallet && (isBtcTransaction(transaction) || isBrc20Transaction(transaction))) {
                 return (
-                  <BtcTransactionHistoryItem transaction={transaction} key={transaction.txid} />
+                  <BtcTransactionHistoryItem
+                    transaction={transaction}
+                    wallet={wallet}
+                    key={transaction.txid}
+                  />
                 );
               }
               return (
