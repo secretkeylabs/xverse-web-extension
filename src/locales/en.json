@@ -980,12 +980,13 @@
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
   },
   "SELECT_BTC_ADDRESS_SCREEN": {
-    "TITLE": "Bitcoin Address Request",
+    "TITLE": "Connection Request",
     "ACCOUNT": "Account",
-    "CONNECT_BUTTON": "Approve",
-    "CANCEL_BUTTON": "Dismiss",
+    "CONNECT_BUTTON": "Connect",
+    "CANCEL_BUTTON": "Cancel",
     "BITCOIN_ADDRESS": "Bitcoin address",
     "ORDINAL_ADDRESS": "Ordinal address",
+    "STX_ADDRESS": "Stacks address",
     "NETWORK_MISMATCH_ERROR_TITLE": "Mismatched Network",
     "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings."
   },

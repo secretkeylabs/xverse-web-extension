@@ -1,21 +1,19 @@
+import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
+import stxIcon from '@assets/img/ledger/stx_icon.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import XverseLogo from '@assets/img/settings/logo.svg';
-import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
-import AccountRow from '@components/accountRow';
+import AccountHeaderComponent from '@components/accountHeader';
 import ActionButton from '@components/button';
-import Separator from '@components/separator';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
-import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useSpring } from '@react-spring/web';
-import { Account } from '@secretkeylabs/xverse-core';
-import { useEffect, useState } from 'react';
+import { getTruncatedAddress } from '@utils/helper';
+import axios from 'axios';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
-import AccountView from './accountView';
 
 const TitleContainer = styled.div({
   display: 'flex',
@@ -27,84 +25,33 @@ const TitleContainer = styled.div({
   marginRight: 30,
 });
 
-const DropDownContainer = styled.div({
+const Container = styled.div((props) => ({
   display: 'flex',
-  flexDirection: 'row',
-  flex: 1,
-  height: '100%',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-});
-
-const Container = styled.div({
-  display: 'flex',
-  alignItems: 'center',
-});
-
-const LogoContainer = styled.div((props) => ({
-  padding: props.theme.spacing(11),
-  marginBottom: props.theme.spacing(16),
-  borderBottom: `1px solid ${props.theme.colors.elevation3}`,
+  flexDirection: 'column',
+  width: '100%',
+  marginTop: props.theme.spacing(12),
 }));
 
 const AddressContainer = styled.div((props) => ({
-  background: props.theme.colors.elevation2,
-  borderRadius: 40,
-  height: 24,
+  borderRadius: props.theme.radius(2),
+  width: 328,
+  height: 66,
+  padding: props.theme.spacing(8),
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  justifyContent: 'center',
-  padding: '3px 10px 3px 6px',
-  marginTop: props.theme.spacing(4),
-  marginRight: props.theme.spacing(2),
-}));
-
-const AccountListContainer = styled(animated.div)((props) => ({
-  paddingBottom: 20,
-  width: '100%',
-  borderRadius: 12,
-  height: 214,
-  marginTop: props.theme.spacing(9.5),
-  boxShadow: '0px 8px 104px rgba(0, 0, 0, 0.5)',
-  background: props.theme.colors.elevation2,
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-  overflowY: 'auto',
+  border: `1px solid var(--white-850, rgba(255, 255, 255, 0.15))`,
+  marginBottom: props.theme.spacing(4),
 }));
 
 const TopImage = styled.img({
-  aspectRatio: 1,
   height: 88,
-  borderWidth: 10,
-  borderColor: 'white',
 });
 
-const FunctionTitle = styled.h1((props) => ({
+const Title = styled.h1((props) => ({
   ...props.theme.body_bold_l,
   color: props.theme.colors.white_0,
   marginTop: 16,
-}));
-
-const AccountContainer = styled.button((props) => ({
-  background: props.theme.colors.elevation1,
-  border: `1px solid ${props.theme.colors.elevation3}`,
-  borderRadius: 8,
-  width: '100%',
-  padding: '12px 16px',
-  display: 'flex',
-  flexDirection: 'row',
-  marginTop: props.theme.spacing(4),
-  ':hover': {
-    background: props.theme.colors.elevation2,
-  },
-}));
-
-const AccountText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_400,
-  marginTop: 24,
 }));
 
 const DappTitle = styled.h2((props) => ({
@@ -115,9 +62,8 @@ const DappTitle = styled.h2((props) => ({
 }));
 
 const AddressTextTitle = styled.h1((props) => ({
-  ...props.theme.body_medium_l,
+  ...props.theme.body_medium_m,
   color: props.theme.colors.white_0,
-  fontSize: 10,
   textAlign: 'center',
 }));
 
@@ -137,23 +83,6 @@ const ButtonsContainer = styled.div((props) => ({
   marginTop: 82,
 }));
 
-const BitcoinDot = styled.div((props) => ({
-  borderRadius: 20,
-  background: props.theme.colors.feedback.caution,
-  width: 6,
-  marginRight: props.theme.spacing(3),
-  height: 6,
-}));
-
-const AccountListRow = styled.div((props) => ({
-  paddingTop: props.theme.spacing(8),
-  paddingLeft: 16,
-  paddingRight: 16,
-  ':hover': {
-    background: props.theme.colors.elevation3,
-  },
-}));
-
 const TransparentButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(2),
   marginRight: props.theme.spacing(2),
@@ -161,27 +90,20 @@ const TransparentButtonContainer = styled.div((props) => ({
 }));
 
 const OrdinalImage = styled.img({
-  width: 12,
-  height: 12,
+  width: 24,
+  height: 24,
   marginRight: 8,
 });
 
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
-  const [showAccountList, setShowAccountList] = useState(false);
+  const [appIcon, setAppIcon] = useState('');
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
-  const { selectedAccount, accountsList, ledgerAccountsList, network } = useWalletSelector();
-  const { switchAccount } = useWalletReducer();
-  const { payload, approveBtcAddressRequest, cancelAddressRequest } = useBtcAddressRequest();
-  const springProps = useSpring({
-    transform: showAccountList ? 'translateY(0%)' : 'translateY(100%)',
-    opacity: showAccountList ? 1 : 0,
-    config: {
-      tension: 160,
-      friction: 25,
-    },
-  });
+  const { network, btcAddress, ordinalsAddress, stxAddress } = useWalletSelector();
+  const { payload, origin, approveBtcAddressRequest, cancelAddressRequest } =
+    useBtcAddressRequest();
+
   const styles = useSpring({
     from: {
       opacity: 0,
@@ -204,18 +126,6 @@ function BtcSelectAddressScreen() {
     window.close();
   };
 
-  const onChangeAccount = () => {
-    setShowAccountList(true);
-  };
-
-  const isAccountSelected = (account: Account) =>
-    account.id === selectedAccount?.id && account.accountType === selectedAccount?.accountType;
-
-  const handleAccountSelect = async (account: Account) => {
-    await switchAccount(account);
-    setShowAccountList(false);
-  };
-
   const switchAccountBasedOnRequest = () => {
     if (payload.network.type !== network.type) {
       navigate('/tx-status', {
@@ -229,72 +139,70 @@ function BtcSelectAddressScreen() {
       });
     }
   };
+  const AddressPurposeRow = useCallback((purpose) => {
+    if (purpose === AddressPurpose.Payment) {
+      return (
+        <AddressContainer key={purpose}>
+          <OrdinalImage src={BitcoinIcon} />
+          <div>
+            <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
+            <AddressTextTitle>{getTruncatedAddress(btcAddress)}</AddressTextTitle>
+          </div>
+        </AddressContainer>
+      );
+    }
+    if (purpose === AddressPurpose.Ordinals) {
+      return (
+        <AddressContainer key={purpose}>
+          <OrdinalImage src={OrdinalsIcon} />
+          <div>
+            <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
+            <AddressTextTitle>{getTruncatedAddress(ordinalsAddress)}</AddressTextTitle>
+          </div>
+        </AddressContainer>
+      );
+    }
+    return (
+      <AddressContainer key={purpose}>
+        <OrdinalImage src={stxIcon} />
+        <div>
+          <AddressTextTitle>{t('STX_ADDRESS')}</AddressTextTitle>
+          <AddressTextTitle>{getTruncatedAddress(stxAddress)}</AddressTextTitle>
+        </div>
+      </AddressContainer>
+    );
+  }, []);
 
   useEffect(() => {
     switchAccountBasedOnRequest();
   }, []);
-
+  useEffect(() => {
+    axios
+      .get<string>(`http://www.google.com/s2/favicons?domain=${origin}`, {
+        timeout: 30000,
+      })
+      .then((response) => setAppIcon(response.data))
+      .catch((error) => '');
+    return () => {
+      setAppIcon('');
+    };
+  }, [origin]);
   return (
     <>
-      <LogoContainer>
-        <img src={XverseLogo} alt="xverse logo" />
-      </LogoContainer>
+      <AccountHeaderComponent disableMenuOption showBorderBottom={false} />
       <OuterContainer style={styles}>
         <TitleContainer>
-          <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
-          <FunctionTitle>{t('TITLE')}</FunctionTitle>
-          <Container>
-            {payload.purposes.map((purpose) =>
-              purpose === AddressPurpose.Payment ? (
-                <AddressContainer key={purpose}>
-                  <BitcoinDot />
-                  <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
-                </AddressContainer>
-              ) : (
-                <AddressContainer key={purpose}>
-                  <OrdinalImage src={OrdinalsIcon} />
-                  <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
-                </AddressContainer>
-              ),
-            )}
-          </Container>
-          <DappTitle>{payload.message}</DappTitle>
+          <TopImage src={`${`${origin}/logo.png`}`} alt="Dapp Logo" />
+          <Title>{t('TITLE')}</Title>
+          <DappTitle>{origin}</DappTitle>
         </TitleContainer>
-        {showAccountList ? (
-          <AccountListContainer style={springProps}>
-            {[...ledgerAccountsList, ...accountsList].map((account) => (
-              <AccountListRow key={account.id}>
-                <AccountRow
-                  key={account.stxAddress}
-                  account={account}
-                  isSelected={isAccountSelected(account)}
-                  onAccountSelected={handleAccountSelect}
-                />
-                <Separator />
-              </AccountListRow>
-            ))}
-          </AccountListContainer>
-        ) : (
-          <>
-            <AccountText>{t('ACCOUNT')}</AccountText>
-            <AccountContainer onClick={onChangeAccount}>
-              <AccountView account={selectedAccount!} isBitcoinTx />
-              <DropDownContainer>
-                <img src={DropDownIcon} alt="Drop Down" />
-              </DropDownContainer>
-            </AccountContainer>
-            <ButtonsContainer>
-              <TransparentButtonContainer>
-                <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
-              </TransparentButtonContainer>
-              <ActionButton
-                text={t('CONNECT_BUTTON')}
-                processing={loading}
-                onPress={confirmCallback}
-              />
-            </ButtonsContainer>
-          </>
-        )}
+        <Container>{payload.purposes.map(AddressPurposeRow)}</Container>
+        <ButtonsContainer>
+          <TransparentButtonContainer>
+            <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
+          </TransparentButtonContainer>
+          <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />
+        </ButtonsContainer>
       </OuterContainer>
     </>
   );

@@ -16,7 +16,7 @@
     "isolatedModules": true,
     "noEmit": false,
     "jsx": "react-jsx",
-    "rootDir": "src",
+    // "rootDir": "src",
     "outDir": "build/js",
     "baseUrl": "./src",
     "paths": {

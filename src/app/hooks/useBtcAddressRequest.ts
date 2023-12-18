@@ -5,12 +5,14 @@ import { useLocation } from 'react-router-dom';
 import { Address, AddressPurpose, GetAddressOptions, GetAddressResponse } from 'sats-connect';
 
 const useBtcAddressRequest = () => {
-  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
+    useWalletSelector();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('addressRequest') ?? '';
   const request = decodeToken(requestToken) as any as GetAddressOptions;
   const tabId = params.get('tabId') ?? '0';
+  const origin = params.get('origin') ?? '';
 
   const approveBtcAddressRequest = () => {
     const addressesResponse: Address[] = request.payload.purposes.map((purpose: AddressPurpose) => {
@@ -19,6 +21,13 @@ const useBtcAddressRequest = () => {
           address: ordinalsAddress,
           publicKey: ordinalsPublicKey,
           purpose: AddressPurpose.Ordinals,
+        };
+      }
+      if (purpose === AddressPurpose.STX) {
+        return {
+          address: stxAddress,
+          publicKey: stxPublicKey,
+          purpose: AddressPurpose.STX,
         };
       }
       return {
@@ -50,6 +59,7 @@ const useBtcAddressRequest = () => {
   return {
     payload: request.payload,
     tabId,
+    origin,
     requestToken,
     approveBtcAddressRequest,
     cancelAddressRequest,
