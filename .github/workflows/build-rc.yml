@@ -1,4 +1,4 @@
-name: Build & Publish Release Candidate
+name: Build & Publish release candidate
 ##
 # This workflow builds new release candidates (create release + upload asset):
 # - for a new release PR and
