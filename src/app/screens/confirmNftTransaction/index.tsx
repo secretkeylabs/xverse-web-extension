@@ -17,7 +17,7 @@ import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -74,7 +74,7 @@ function ConfirmNftTransaction() {
   const nft = nftDetailQuery.data?.data;
 
   const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
-  const unsignedTx = deserializeTransaction(unsignedTxHex);
+  const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
   const { network } = useWalletSelector();
   const { refetch } = useStxWalletData();
   const selectedNetwork = useNetworkSelector();
