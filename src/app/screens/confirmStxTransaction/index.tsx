@@ -24,7 +24,7 @@ import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -49,7 +49,7 @@ function ConfirmStxTransaction() {
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
   const { unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken } = location.state;
-  const unsignedTx = deserializeTransaction(stringHex);
+  const unsignedTx = useMemo(() => deserializeTransaction(stringHex), [stringHex]);
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
