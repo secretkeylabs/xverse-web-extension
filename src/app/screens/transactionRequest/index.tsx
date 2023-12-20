@@ -18,6 +18,7 @@ import { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
 import { StacksTransaction } from '@stacks/transactions';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
@@ -134,8 +135,8 @@ function TransactionRequest() {
       });
     }
   };
-
   const createRequestTx = async () => {
+    try {
       if (!payload.txHex) {
         if (payload.txType === 'token_transfer') {
           await handleTokenTransferRequest(payload);
@@ -143,12 +144,15 @@ function TransactionRequest() {
           await handleContractCallRequest(payload);
         } else if (payload.txType === 'smart_contract') {
           await handleContractDeployRequest(payload);
+        } else {
+          await handleTxSigningRequest();
         }
-      } else {
-        await handleTxSigningRequest();
       }
-  }
-
+    } catch (e: unknown) {
+      console.error(e); // eslint-disable-line
+      toast.error('Unexpected error creating transaction');
+    }
+  };
 
   createRequestTx();
 
