@@ -7,6 +7,7 @@ import ActionButton from '@components/button';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useSpring } from '@react-spring/web';
+import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { getTruncatedAddress } from '@utils/helper';
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -32,7 +33,7 @@ const Container = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-const AddressContainer = styled.div((props) => ({
+const AddressBox = styled.div((props) => ({
   borderRadius: props.theme.radius(2),
   width: 328,
   height: 66,
@@ -44,6 +45,12 @@ const AddressContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(4),
 }));
 
+const AddressContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+});
+
 const TopImage = styled.img({
   height: 88,
 });
@@ -51,20 +58,34 @@ const TopImage = styled.img({
 const Title = styled.h1((props) => ({
   ...props.theme.body_bold_l,
   color: props.theme.colors.white_0,
-  marginTop: 16,
+  marginTop: 12,
 }));
 
-const DappTitle = styled.h2((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white_200,
-  marginTop: 12,
+const DapURL = styled.h2((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white_400,
+  marginTop: 4,
   textAlign: 'center',
 }));
 
-const AddressTextTitle = styled.h1((props) => ({
+const AddressTextTitle = styled.h2((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white_400,
+  textAlign: 'center',
+}));
+
+const TruncatedAddress = styled.h3((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white_0,
   textAlign: 'center',
+}));
+
+const RequestMessage = styled.p((props) => ({
+  ...props.theme.body_medium_m,
+  color: props.theme.colors.white_200,
+  textAlign: 'left',
+  wordWrap: 'break-word',
+  marginTop: 12,
 }));
 
 const OuterContainer = styled(animated.div)({
@@ -73,21 +94,6 @@ const OuterContainer = styled(animated.div)({
   marginLeft: 16,
   marginRight: 16,
 });
-
-const ButtonsContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'flex-end',
-  marginBottom: props.theme.spacing(20),
-  marginTop: 82,
-}));
-
-const TransparentButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(2),
-  marginRight: props.theme.spacing(2),
-  width: '100%',
-}));
 
 const OrdinalImage = styled.img({
   width: 24,
@@ -142,34 +148,34 @@ function BtcSelectAddressScreen() {
   const AddressPurposeRow = useCallback((purpose) => {
     if (purpose === AddressPurpose.Payment) {
       return (
-        <AddressContainer key={purpose}>
+        <AddressBox key={purpose}>
           <OrdinalImage src={BitcoinIcon} />
-          <div>
+          <AddressContainer>
             <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
-            <AddressTextTitle>{getTruncatedAddress(btcAddress)}</AddressTextTitle>
-          </div>
-        </AddressContainer>
+            <TruncatedAddress>{getTruncatedAddress(btcAddress)}</TruncatedAddress>
+          </AddressContainer>
+        </AddressBox>
       );
     }
     if (purpose === AddressPurpose.Ordinals) {
       return (
-        <AddressContainer key={purpose}>
+        <AddressBox key={purpose}>
           <OrdinalImage src={OrdinalsIcon} />
-          <div>
+          <AddressContainer>
             <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
-            <AddressTextTitle>{getTruncatedAddress(ordinalsAddress)}</AddressTextTitle>
-          </div>
-        </AddressContainer>
+            <TruncatedAddress>{getTruncatedAddress(ordinalsAddress)}</TruncatedAddress>
+          </AddressContainer>
+        </AddressBox>
       );
     }
     return (
-      <AddressContainer key={purpose}>
+      <AddressBox key={purpose}>
         <OrdinalImage src={stxIcon} />
-        <div>
+        <AddressContainer>
           <AddressTextTitle>{t('STX_ADDRESS')}</AddressTextTitle>
-          <AddressTextTitle>{getTruncatedAddress(stxAddress)}</AddressTextTitle>
-        </div>
-      </AddressContainer>
+          <TruncatedAddress>{getTruncatedAddress(stxAddress)}</TruncatedAddress>
+        </AddressContainer>
+      </AddressBox>
     );
   }, []);
 
@@ -192,17 +198,16 @@ function BtcSelectAddressScreen() {
       <AccountHeaderComponent disableMenuOption showBorderBottom={false} />
       <OuterContainer style={styles}>
         <TitleContainer>
-          <TopImage src={`${`${origin}/logo.png`}`} alt="Dapp Logo" />
+          <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
           <Title>{t('TITLE')}</Title>
-          <DappTitle>{origin}</DappTitle>
+          <DapURL>{origin.replace(/(^\w+:|^)\/\//, '')}</DapURL>
         </TitleContainer>
+        <RequestMessage>{payload.message.substring(0, 80)}</RequestMessage>
         <Container>{payload.purposes.map(AddressPurposeRow)}</Container>
-        <ButtonsContainer>
-          <TransparentButtonContainer>
-            <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
-          </TransparentButtonContainer>
+        <StickyHorizontalSplitButtonContainer>
+          <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
           <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />
-        </ButtonsContainer>
+        </StickyHorizontalSplitButtonContainer>
       </OuterContainer>
     </>
   );
