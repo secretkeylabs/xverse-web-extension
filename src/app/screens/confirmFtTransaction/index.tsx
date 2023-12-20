@@ -13,7 +13,7 @@ import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -22,8 +22,14 @@ function ConfirmFtTransaction() {
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const location = useLocation();
-  const { unsignedTx: seedHex, amount, fungibleToken, memo, recepientAddress } = location.state;
-  const unsignedTx = deserializeTransaction(seedHex);
+  const {
+    unsignedTx: unsignedTxHex,
+    amount,
+    fungibleToken,
+    memo,
+    recepientAddress,
+  } = location.state;
+  const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
   const { refetch } = useStxWalletData();
   const { network, selectedAccount } = useWalletSelector();
 
