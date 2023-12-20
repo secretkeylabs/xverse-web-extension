@@ -42,7 +42,6 @@ function TransactionRequest() {
   const [coinsMetaData, setCoinsMetaData] = useState<Coin[] | null>(null);
   const [codeBody, setCodeBody] = useState(undefined);
   const [contractName, setContractName] = useState(undefined);
-  const [hasSwitchedAccount, setHasSwitchedAccount] = useState(false);
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
 
   const handleTokenTransferRequest = async (tokenTransferPayload: any) => {
@@ -118,38 +117,6 @@ function TransactionRequest() {
     setContractName(response.contractName);
   };
 
-  const switchAccountBasedOnRequest = () => {
-    if (getNetworkType(payload.network) !== network.type) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'STX',
-          error:
-            'There’s a mismatch between your active network and the network you’re logged with.',
-          browserTx: true,
-        },
-      });
-      return;
-    }
-    if (payload.stxAddress !== selectedAccount?.stxAddress && !isHardwareAccount(selectedAccount)) {
-      const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
-      if (account) {
-        switchAccount(account);
-      } else {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'STX',
-            error:
-              'There’s a mismatch between your active  address and the address you’re logged with.',
-            browserTx: true,
-          },
-        });
-      }
-    }
-    setHasSwitchedAccount(true);
-  };
-
   const handleTxSigningRequest = async () => {
     if (payload.txType === 'contract_call') {
       await handleContractCallRequest(payload);
@@ -169,7 +136,6 @@ function TransactionRequest() {
   };
 
   const createRequestTx = async () => {
-    if (hasSwitchedAccount) {
       if (!payload.txHex) {
         if (payload.txType === 'token_transfer') {
           await handleTokenTransferRequest(payload);
@@ -181,13 +147,47 @@ function TransactionRequest() {
       } else {
         await handleTxSigningRequest();
       }
-    }
-  };
+  }
+
+
+  createRequestTx();
 
   useEffect(() => {
+    const switchAccountBasedOnRequest = () => {
+      if (getNetworkType(payload.network) !== network.type) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'STX',
+            error:
+              'There’s a mismatch between your active network and the network you’re logged with.',
+            browserTx: true,
+          },
+        });
+        return;
+      }
+      if (
+        payload.stxAddress !== selectedAccount?.stxAddress &&
+        !isHardwareAccount(selectedAccount)
+      ) {
+        const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
+        if (account) {
+          switchAccount(account);
+        } else {
+          navigate('/tx-status', {
+            state: {
+              txid: '',
+              currency: 'STX',
+              error:
+                'There’s a mismatch between your active  address and the address you’re logged with.',
+              browserTx: true,
+            },
+          });
+        }
+      }
+    };
     switchAccountBasedOnRequest();
-    createRequestTx();
-  }, [hasSwitchedAccount]);
+  }, [accountsList, network.type, navigate, payload, selectedAccount, switchAccount]);
 
   return (
     <>

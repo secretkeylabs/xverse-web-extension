@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import useNetworkSelector from '../useNetwork';
 import useWalletSelector from '../useWalletSelector';
 
+// TODO refactor: no need to put this in store. use this hook instead
 export const useStxWalletData = () => {
   const dispatch = useDispatch();
   const { stxAddress } = useWalletSelector();
