@@ -27,7 +27,7 @@ import { deserializeTransaction, MultiSigSpendingCondition } from '@stacks/trans
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -54,13 +54,16 @@ function ConfirmStxTransaction() {
 
   const location = useLocation();
   const { unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken } = location.state;
-  const unsignedTx = deserializeTransaction(stringHex);
+  const unsignedTx = useMemo(() => deserializeTransaction(stringHex), [stringHex]);
 
   // SignTransaction Params
-  const isMultiSigTx = isMultiSig(unsignedTx);
-  const hasSignatures =
-    isMultiSigTx &&
-    (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0;
+  const isMultiSigTx = useMemo(() => isMultiSig(unsignedTx), [unsignedTx]);
+  const hasSignatures = useMemo(
+    () =>
+      isMultiSigTx &&
+      (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0,
+    [unsignedTx, isMultiSigTx],
+  );
 
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);

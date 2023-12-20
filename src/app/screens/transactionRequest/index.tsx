@@ -1,6 +1,5 @@
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
-import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useStxTransactionRequest from '@hooks/useStxTransactionRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -11,13 +10,14 @@ import {
   ContractFunction,
   createDeployContractRequest,
   extractFromPayload,
+  fetchStxPendingTxData,
   getContractCallPromises,
   getTokenTransferRequest,
 } from '@secretkeylabs/xverse-core';
 import { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
 import { StacksTransaction } from '@stacks/transactions';
-import { getNetworkType,isHardwareAccount } from '@utils/helper';
-import { useEffect,useState } from 'react';
+import { getNetworkType, isHardwareAccount } from '@utils/helper';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
@@ -42,11 +42,11 @@ function TransactionRequest() {
   const [coinsMetaData, setCoinsMetaData] = useState<Coin[] | null>(null);
   const [codeBody, setCodeBody] = useState(undefined);
   const [contractName, setContractName] = useState(undefined);
-  const stxPendingTxData = useStxPendingTxData();
   const [hasSwitchedAccount, setHasSwitchedAccount] = useState(false);
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
 
   const handleTokenTransferRequest = async (tokenTransferPayload: any) => {
+    const stxPendingTxData = await fetchStxPendingTxData(stxAddress, selectedNetwork);
     const unsignedSendStxTx = await getTokenTransferRequest(
       tokenTransferPayload.recipient,
       tokenTransferPayload.amount,
@@ -54,7 +54,7 @@ function TransactionRequest() {
       stxPublicKey,
       feeMultipliers!,
       selectedNetwork,
-      stxPendingTxData.data,
+      stxPendingTxData || [],
       stacksTransaction?.auth,
     );
     setUnsignedTx(unsignedSendStxTx);
