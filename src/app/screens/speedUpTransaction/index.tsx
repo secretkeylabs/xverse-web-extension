@@ -8,7 +8,7 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TopRow from '@components/topRow';
 import useTransaction from '@hooks/queries/useTransaction';
 import useBtcClient from '@hooks/useBtcClient';
-import useRbfTransactionData from '@hooks/useRbfTransactionData';
+import useRbfTransactionData, { isBtcTransaction } from '@hooks/useRbfTransactionData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
@@ -69,6 +69,7 @@ function SpeedUpTransactionScreen() {
   const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
+  const isBtc = isBtcTransaction(stxTransaction || btcTransaction);
 
   console.log('stxTransaction', stxTransaction);
 
@@ -286,18 +287,29 @@ function SpeedUpTransactionScreen() {
             <DetailText>
               {t('CURRENT_FEE')}{' '}
               <HighlightedText>
-                <NumericFormat
-                  value={rbfTxSummary?.currentFee}
-                  displayType="text"
-                  thousandSeparator
-                  suffix=" Sats / "
-                />
-                <NumericFormat
-                  value={rbfTxSummary?.currentFeeRate}
-                  displayType="text"
-                  thousandSeparator
-                  suffix=" Sats /vB"
-                />
+                {isBtc ? (
+                  <>
+                    <NumericFormat
+                      value={rbfTxSummary?.currentFee}
+                      displayType="text"
+                      thousandSeparator
+                      suffix=" Sats / "
+                    />
+                    <NumericFormat
+                      value={rbfTxSummary?.currentFeeRate}
+                      displayType="text"
+                      thousandSeparator
+                      suffix=" Sats /vB"
+                    />
+                  </>
+                ) : (
+                  <NumericFormat
+                    value={rbfTxSummary?.currentFee}
+                    displayType="text"
+                    thousandSeparator
+                    suffix=" STX"
+                  />
+                )}
               </HighlightedText>
             </DetailText>
             <DetailText>
@@ -441,6 +453,7 @@ function SpeedUpTransactionScreen() {
               error={customFeeError || ''}
               calculateTotalFee={calculateTotalFee}
               onClickApply={handleApplyCustomFee}
+              isBtc={isBtc}
             />
           )}
 

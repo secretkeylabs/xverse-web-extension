@@ -32,6 +32,7 @@ export default function CustomFee({
   minimumFeeRate,
   isFeeLoading,
   error,
+  isBtc,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -43,6 +44,7 @@ export default function CustomFee({
   initialTotalFee: string;
   isFeeLoading: boolean;
   error: string;
+  isBtc: boolean;
 }) {
   const { t } = useTranslation('translation', {
     keyPrefix: 'TRANSACTION_SETTING',
@@ -87,12 +89,18 @@ export default function CustomFee({
               onKeyDown={handleKeyDownFeeRateInput}
               onChange={handleChangeFeeRateInput}
             />
-            <InputLabel>Sats /vB</InputLabel>
+            <InputLabel>
+              {isBtc ? (
+                'Sats /vB'
+              ) : (
+                <StyledFiatAmountText fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
+              )}
+            </InputLabel>
           </InputContainer>
         </FeeContainer>
         <InfoContainer>
           {error && <StyledInputFeedback message={error} variant="danger" />}
-          {!error && minimumFeeRate && Number(feeRateInput) >= Number(minimumFeeRate) && (
+          {!error && isBtc && minimumFeeRate && Number(feeRateInput) >= Number(minimumFeeRate) && (
             <>
               <TotalFeeText>
                 {t('TOTAL_FEE')}

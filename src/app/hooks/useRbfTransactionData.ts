@@ -5,7 +5,7 @@ import {
   RecommendedFeeResponse,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { isLedgerAccount } from '@utils/helper';
+import { isLedgerAccount, microStxToStx } from '@utils/helper';
 import { useCallback, useEffect, useState } from 'react';
 import useBtcClient from './useBtcClient';
 import useSeedVault from './useSeedVault';
@@ -35,7 +35,7 @@ type RbfData = {
   isLoading?: boolean;
 };
 
-const isBtcTransaction = (
+export const isBtcTransaction = (
   transaction: BtcTransactionData | StxTransactionData,
 ): transaction is BtcTransactionData => (transaction as BtcTransactionData).txType === 'bitcoin';
 
@@ -47,31 +47,41 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
   const btcClient = useBtcClient();
 
   const fetchStxData = () => {
-    console.log('fetching stx data');
+    if (!transaction || isBtcTransaction(transaction)) {
+      return;
+    }
+
+    const fee = microStxToStx(transaction.fee);
 
     setRbfData({
       rbfTransaction: undefined,
       rbfTxSummary: {
-        currentFee: 0,
-        currentFeeRate: 0,
-        minimumRbfFee: 0,
-        minimumRbfFeeRate: 0,
+        currentFee: fee.toNumber(),
+        currentFeeRate: fee.toNumber(),
+        minimumRbfFee: fee.toNumber(),
+        minimumRbfFeeRate: fee.toNumber(),
       },
       rbfRecommendedFees: Object.fromEntries(
         Object.entries({
-          medium: { enoughFunds: true, feeRate: 0 },
-          high: { enoughFunds: true, feeRate: 0 },
+          medium: {
+            enoughFunds: true,
+            feeRate: fee.multipliedBy(1200).toNumber(),
+          },
+          high: {
+            enoughFunds: true,
+            feeRate: fee.multipliedBy(2000).toNumber(),
+          },
         }).sort((a, b) => {
           const priorityOrder = ['highest', 'higher', 'high', 'medium'];
           return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
         }),
       ),
       mempoolFees: {
-        fastestFee: 0,
-        halfHourFee: 0,
-        hourFee: 0,
-        economyFee: 0,
-        minimumFee: 0,
+        fastestFee: 1,
+        halfHourFee: 0.5,
+        hourFee: 0.25,
+        economyFee: 0.01,
+        minimumFee: 0.0001,
       },
     });
 
@@ -88,8 +98,6 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       fetchStxData();
       return;
     }
-
-    console.log('fetching btc data');
 
     try {
       const rbfTx = new rbf.RbfTransaction(transaction, {
