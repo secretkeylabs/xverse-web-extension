@@ -8,21 +8,15 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TopRow from '@components/topRow';
 import useTransaction from '@hooks/queries/useTransaction';
 import useBtcClient from '@hooks/useBtcClient';
-import useSeedVault from '@hooks/useSeedVault';
+import useRbfTransactionData from '@hooks/useRbfTransactionData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
-import {
-  getBtcFiatEquivalent,
-  mempoolApi,
-  rbf,
-  RecommendedFeeResponse,
-  Transport as TransportType,
-} from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, Transport as TransportType } from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -48,42 +42,19 @@ import {
   WarningText,
 } from './index.styled';
 
-type TierFees = {
-  enoughFunds: boolean;
-  fee?: number;
-  feeRate: number;
-};
-
-type RbfRecommendedFees = {
-  medium?: TierFees;
-  high?: TierFees;
-  higher?: TierFees;
-  highest?: TierFees;
-};
-
 function SpeedUpTransactionScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const { selectedAccount, accountType, network, btcFiatRate, fiatCurrency } = useWalletSelector();
-  const seedVault = useSeedVault();
+  const { selectedAccount, btcFiatRate, fiatCurrency } = useWalletSelector();
   const { id } = useParams();
   const btcClient = useBtcClient();
-  const [rbfTxSummary, setRbfTxSummary] = useState<{
-    currentFee: number;
-    currentFeeRate: number;
-    minimumRbfFee: number;
-    minimumRbfFeeRate: number;
-  }>();
   const [feeRateInput, setFeeRateInput] = useState<string | undefined>();
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
-  const [recommendedFees, setRecommendedFees] = useState<RecommendedFeeResponse>();
-  const [rbfRecommendedFees, setRbfRecommendedFees] = useState<RbfRecommendedFees>();
   const { data: transaction } = useTransaction(id!);
-  const [rbfTransaction, setRbfTransaction] = useState<
-    InstanceType<typeof rbf.RbfTransaction> | undefined
-  >();
+  const { isLoading, rbfTransaction, rbfRecommendedFees, rbfTxSummary, mempoolFees } =
+    useRbfTransactionData(transaction);
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
@@ -93,68 +64,9 @@ function SpeedUpTransactionScreen() {
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
-
-  /* TODO: Move `fetchRbfData` function logic to a separate hook like
-    const useRbfTransactionData: (transaction: ReturnType<useTransaction>) => {
-      rbfTransaction?: rbf.RbfTransaction,
-      rbfTxSummary?: {
-        currentFee: number;
-        currentFeeRate: number;
-        minimumRbfFee: number;
-        minimumRbfFeeRate: number;
-      },
-      rbfRecommendedFees?: RbfRecommendedFees
-    } => { // logic here }
-  */
-  const fetchRbfData = useCallback(async () => {
-    if (!selectedAccount || !id || !transaction) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const rbfTx = new rbf.RbfTransaction(transaction, {
-        ...selectedAccount,
-        accountType: accountType || 'software',
-        accountId:
-          isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
-            ? selectedAccount.deviceAccountIndex
-            : selectedAccount.id,
-        network: network.type,
-        esploraProvider: btcClient,
-        seedVault,
-      });
-      setRbfTransaction(rbfTx);
-
-      const rbfTransactionSummary = await rbf.getRbfTransactionSummary(btcClient, transaction.txid);
-      setRbfTxSummary(rbfTransactionSummary);
-
-      const mempoolFees = await mempoolApi.getRecommendedFees(network.type);
-      setRecommendedFees(mempoolFees);
-
-      const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
-      setRbfRecommendedFees(
-        Object.fromEntries(
-          Object.entries(rbfRecommendedFeesResponse).sort((a, b) => {
-            const priorityOrder = ['highest', 'higher', 'high', 'medium'];
-            return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
-          }),
-        ),
-      );
-    } catch (err: any) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedAccount, id, transaction, accountType, network.type, seedVault, btcClient]);
-
-  useEffect(() => {
-    fetchRbfData();
-  }, [fetchRbfData]);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
@@ -312,19 +224,19 @@ function SpeedUpTransactionScreen() {
   };
 
   const getEstimatedCompletionTime = (feeRate?: number) => {
-    if (!feeRate || !recommendedFees) {
+    if (!feeRate || !mempoolFees) {
       return EMPTY_LABEL;
     }
 
-    if (feeRate < recommendedFees.hourFee) {
+    if (feeRate < mempoolFees.hourFee) {
       return t('TIME.SEVERAL_HOURS_OR_MORE');
     }
 
-    if (feeRate === recommendedFees.hourFee) {
+    if (feeRate === mempoolFees.hourFee) {
       return `~1 ${t('TIME.HOUR')}`;
     }
 
-    if (feeRate > recommendedFees.hourFee && feeRate <= recommendedFees.halfHourFee) {
+    if (feeRate > mempoolFees.hourFee && feeRate <= mempoolFees.halfHourFee) {
       return `~30 ${t('TIME.MINUTES')}`;
     }
 
