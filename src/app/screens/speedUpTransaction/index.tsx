@@ -20,7 +20,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 import CustomFee from './customFee';
@@ -49,12 +49,14 @@ function SpeedUpTransactionScreen() {
   const [showCustomFee, setShowCustomFee] = useState(false);
   const { selectedAccount, btcFiatRate, fiatCurrency } = useWalletSelector();
   const { id } = useParams();
+  const location = useLocation();
   const btcClient = useBtcClient();
   const [feeRateInput, setFeeRateInput] = useState<string | undefined>();
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
-  const { data: transaction } = useTransaction(id!);
+  const { transaction: stxTransaction } = location.state || {};
+  const { data: btcTransaction } = useTransaction(stxTransaction ? undefined : id);
   const { isLoading, rbfTransaction, rbfRecommendedFees, rbfTxSummary, mempoolFees } =
-    useRbfTransactionData(transaction);
+    useRbfTransactionData(stxTransaction || btcTransaction);
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
@@ -67,6 +69,8 @@ function SpeedUpTransactionScreen() {
   const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
+
+  console.log('stxTransaction', stxTransaction);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {

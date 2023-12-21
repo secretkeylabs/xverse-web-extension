@@ -9,7 +9,7 @@ import { StxTransactionData } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { getStxTxStatusUrl } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 const TransactionContainer = styled.button((props) => ({
@@ -80,7 +80,9 @@ export default function StxTransferTransaction({
   const { network, hasActivatedRBFKey } = useWalletSelector();
   const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const showAccelerateButton = hasActivatedRBFKey; // TODO: check if transaction is RBF enabled
+  const navigate = useNavigate();
+  const showAccelerateButton =
+    hasActivatedRBFKey && transaction.txStatus === 'pending' && !transaction.incoming; // TODO: check if transaction is RBF enabled
 
   const openTxStatusUrl = () => {
     window.open(getStxTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
@@ -97,17 +99,21 @@ export default function StxTransferTransaction({
           <TransactionAmountContainer>
             <TransactionAmount transaction={transaction} coin={transactionCoin} />
             {showAccelerateButton && (
-              <Link to={`/speed-up-tx/${transaction.txid}`}>
-                <StyledButton
-                  transparent
-                  text={t('SPEED_UP')}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                  }}
-                  icon={<FastForward size={16} color={theme.colors.tangerine} weight="fill" />}
-                  iconPosition="right"
-                />
-              </Link>
+              <StyledButton
+                transparent
+                text={t('SPEED_UP')}
+                onPress={(e) => {
+                  e.stopPropagation();
+
+                  navigate(`/speed-up-tx/${transaction.txid}`, {
+                    state: {
+                      transaction,
+                    },
+                  });
+                }}
+                icon={<FastForward size={16} color={theme.colors.tangerine} weight="fill" />}
+                iconPosition="right"
+              />
             )}
           </TransactionAmountContainer>
         </TransactionRow>
