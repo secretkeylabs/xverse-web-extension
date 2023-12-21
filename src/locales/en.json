@@ -5,7 +5,9 @@
     "COMBO": "Combo",
     "SATS": "Sats",
     "SATTRIBUTES": "Sattributes",
-    "INPUT": "Input"
+    "INPUT": "Input",
+    "SIZE": "Size",
+    "BUNDLE": "Bundle"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
@@ -375,7 +377,12 @@
       "CANCEL_BUTTON": "Cancel",
       "SEE_TRANSACTION_BUTTON": "See transaction",
       "RETRY_BUTTON": "Try again"
-    }
+    },
+    "YOUR_ORDINAL_ADDRESS": "Your ordinals address",
+    "YOUR_PAYMENT_ADDRESS": "Your payment address",
+    "INSCRIBED_SATS": "Some of these sats are inscribed",
+    "INSCRIBED_RARE_SATS": "Some of these sats are rare or inscribed",
+    "INSCRIBED_RARE_SATS_WARNING": "Your payment wallet holds assets. To avoid spending them in your transactions and fees, transfer them to your ordinals wallet."
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",

@@ -116,6 +116,7 @@ const StyledImage = styled(Image)`
   border-radius: 8px;
   object-fit: contain;
   image-rendering: pixelated;
+  display: flex;
 `;
 
 export const StyledBarLoader = styled(BetterBarLoader)((props) => ({

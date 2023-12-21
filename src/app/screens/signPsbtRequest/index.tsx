@@ -1,10 +1,12 @@
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useTransactionContext from '@hooks/useTransactionContext';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import getPsbtDataWithMocks from './tempMockDataUtil';
 import useSignPsbtValidationGate from './useSignPsbtValidationGate';
 
 function SignPsbtRequest() {
@@ -29,6 +31,7 @@ function SignPsbtRequest() {
 
   useSignPsbtValidationGate({ payload, parsedPsbt });
 
+  const { btcAddress, ordinalsAddress } = useWalletSelector();
   useEffect(() => {
     if (!parsedPsbt) return;
 
@@ -36,9 +39,22 @@ function SignPsbtRequest() {
       .getSummary()
       .then((summary) => {
         const { feeOutput: psbtFeeOutput, inputs: psbtInputs, outputs: psbtOutputs } = summary;
-        setFeeOutput(psbtFeeOutput);
-        setInputs(psbtInputs);
-        setOutputs(psbtOutputs);
+        // TODO: remove this section, this is only for testing
+        const { inputsWithMocks, outputsWithMocks, feeOutputWithMocks } = getPsbtDataWithMocks(
+          btcAddress,
+          ordinalsAddress,
+          psbtInputs,
+          psbtOutputs,
+          !feeOutput,
+          psbtFeeOutput,
+        );
+        setFeeOutput(feeOutputWithMocks);
+        setInputs(inputsWithMocks);
+        setOutputs(outputsWithMocks);
+
+        // setFeeOutput(psbtFeeOutput);
+        // setInputs(psbtInputs);
+        // setOutputs(psbtOutputs);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -69,12 +85,36 @@ function SignPsbtRequest() {
         ledgerTransport,
       });
 
-      await confirmSignPsbt(signedPsbt);
-
-      window.close();
+      const response = await confirmSignPsbt(signedPsbt);
+      if (ledgerTransport) {
+        await ledgerTransport?.close();
+      }
+      setIsSigning(false);
+      if (payload.broadcast) {
+        navigate('/tx-status', {
+          state: {
+            txid: response.txId,
+            currency: 'BTC',
+            error: '',
+            browserTx: true,
+          },
+        });
+      } else {
+        window.close();
+      }
     } catch (err) {
       setIsSigning(false);
-      // TODO: show error to user
+      if (err instanceof Error) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'BTC',
+            errorTitle: !payload.broadcast ? t('PSBT_CANT_SIGN_ERROR_TITLE') : '',
+            error: err.message,
+            browserTx: true,
+          },
+        });
+      }
     }
   };
 
@@ -90,10 +130,13 @@ function SignPsbtRequest() {
       feeOutput={feeOutput}
       isLoading={isLoading}
       isSubmitting={isSigning}
+      isBroadcast={payload.broadcast}
       confirmText={t('CONFIRM')}
       cancelText={t('CANCEL')}
       onCancel={onCancel}
       onConfirm={onConfirm}
+      hideBottomBar
+      showAccountHeader
     />
   );
 }

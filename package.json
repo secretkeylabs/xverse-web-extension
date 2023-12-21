@@ -11,7 +11,7 @@
     "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
     "@scure/btc-signer": "^1.1.1",
-    "@secretkeylabs/xverse-core": "5.3.0-24d3c39",
+    "@secretkeylabs/xverse-core": "5.3.0-639b8fb",
     "@stacks/connect": "^6.10.2",
     "@stacks/encryption": "4.3.5",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
