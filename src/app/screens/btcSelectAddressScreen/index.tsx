@@ -1,20 +1,20 @@
 import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import stxIcon from '@assets/img/ledger/stx_icon.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
-import AccountHeaderComponent from '@components/accountHeader';
 import ActionButton from '@components/button';
+import SelectAccount from '@components/selectAccount';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { Check } from '@phosphor-icons/react';
 import { animated, useSpring } from '@react-spring/web';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { getTruncatedAddress } from '@utils/helper';
-import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AddressPurpose } from 'sats-connect';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
+import { getAppIconFromWebManifest } from './helper';
 
 const TitleContainer = styled.div({
   display: 'flex',
@@ -24,69 +24,8 @@ const TitleContainer = styled.div({
   overflow: 'hidden',
   marginLeft: 30,
   marginRight: 30,
+  marginTop: 48,
 });
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  marginTop: props.theme.spacing(12),
-}));
-
-const AddressBox = styled.div((props) => ({
-  borderRadius: props.theme.radius(2),
-  width: 328,
-  height: 66,
-  padding: props.theme.spacing(8),
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  border: `1px solid var(--white-850, rgba(255, 255, 255, 0.15))`,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const AddressContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
-});
-
-const TopImage = styled.img({
-  height: 88,
-});
-
-const Title = styled.h1((props) => ({
-  ...props.theme.body_bold_l,
-  color: props.theme.colors.white_0,
-  marginTop: 12,
-}));
-
-const DapURL = styled.h2((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_400,
-  marginTop: 4,
-  textAlign: 'center',
-}));
-
-const AddressTextTitle = styled.h2((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_400,
-  textAlign: 'center',
-}));
-
-const TruncatedAddress = styled.h3((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const RequestMessage = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_200,
-  textAlign: 'left',
-  wordWrap: 'break-word',
-  marginTop: 12,
-}));
 
 const OuterContainer = styled(animated.div)({
   display: 'flex',
@@ -95,20 +34,122 @@ const OuterContainer = styled(animated.div)({
   marginRight: 16,
 });
 
-const OrdinalImage = styled.img({
+const AddressBoxContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  marginTop: props.theme.spacing(12),
+}));
+
+const AddressBox = styled.div((props) => ({
+  width: 328,
+  height: 66,
+  padding: props.theme.spacing(10),
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: props.theme.colors.elevation6_800,
+  marginBottom: 1,
+  ':first-of-type': {
+    borderTopLeftRadius: props.theme.radius(2),
+    borderTopRightRadius: props.theme.radius(2),
+  },
+  ':last-of-type': {
+    borderBottomLeftRadius: props.theme.radius(2),
+    borderBottomRightRadius: props.theme.radius(2),
+  },
+}));
+
+const AddressContainer = styled.div({
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const TopImage = styled.img({
+  maxHeight: 48,
+  maxWidth: 48,
+});
+
+const Title = styled.h1((props) => ({
+  ...props.theme.typography.body_bold_l,
+  color: props.theme.colors.white_0,
+  marginTop: 12,
+}));
+
+const DapURL = styled.h2((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_400,
+  marginTop: 4,
+  textAlign: 'center',
+}));
+
+const AddressImage = styled.img({
   width: 24,
   height: 24,
   marginRight: 8,
 });
 
+const AddressTextTitle = styled.h2((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
+  textAlign: 'center',
+}));
+
+const TruncatedAddress = styled.h3((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
+  textAlign: 'right',
+}));
+
+const BnsName = styled.h3((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
+  textAlign: 'right',
+}));
+
+const RequestMessage = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
+  textAlign: 'left',
+  wordWrap: 'break-word',
+  marginTop: props.theme.spacing(12),
+  marginBottom: props.theme.spacing(12),
+}));
+
+const PermissionsTitle = styled.h3((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
+  textAlign: 'left',
+  marginTop: 24,
+}));
+
+const Permission = styled.div((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
+  marginTop: 12,
+  display: 'flex',
+  alignContent: 'center',
+}));
+
+const PermissionIcon = styled.div({
+  marginRight: 4,
+});
+
+const ActionsContainer = styled(StickyHorizontalSplitButtonContainer)({
+  marginTop: 'auto',
+});
+
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
-  const [appIcon, setAppIcon] = useState('');
   const navigate = useNavigate();
+  const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
-  const { network, btcAddress, ordinalsAddress, stxAddress } = useWalletSelector();
+  const { network, btcAddress, ordinalsAddress, stxAddress, selectedAccount } = useWalletSelector();
+  const [appIcon, setAppIcon] = useState<string>('');
   const { payload, origin, approveBtcAddressRequest, cancelAddressRequest } =
     useBtcAddressRequest();
+  const appUrl = useMemo(() => origin.replace(/(^\w+:|^)\/\//, ''), [origin]);
 
   const styles = useSpring({
     from: {
@@ -145,71 +186,94 @@ function BtcSelectAddressScreen() {
       });
     }
   };
-  const AddressPurposeRow = useCallback((purpose) => {
+
+  useEffect(() => {
+    switchAccountBasedOnRequest();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (origin !== '') {
+        getAppIconFromWebManifest(origin).then((appIcons) => {
+          setAppIcon(appIcons);
+        });
+      }
+    })();
+
+    return () => {
+      setAppIcon('');
+    };
+  }, [origin]);
+
+  const AddressPurposeRow = useCallback((purpose: AddressPurpose) => {
     if (purpose === AddressPurpose.Payment) {
       return (
         <AddressBox key={purpose}>
-          <OrdinalImage src={BitcoinIcon} />
           <AddressContainer>
+            <AddressImage src={BitcoinIcon} />
             <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
-            <TruncatedAddress>{getTruncatedAddress(btcAddress)}</TruncatedAddress>
           </AddressContainer>
+          <TruncatedAddress>{getTruncatedAddress(btcAddress)}</TruncatedAddress>
         </AddressBox>
       );
     }
     if (purpose === AddressPurpose.Ordinals) {
       return (
         <AddressBox key={purpose}>
-          <OrdinalImage src={OrdinalsIcon} />
           <AddressContainer>
+            <AddressImage src={OrdinalsIcon} />
             <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
-            <TruncatedAddress>{getTruncatedAddress(ordinalsAddress)}</TruncatedAddress>
           </AddressContainer>
+          <TruncatedAddress>{getTruncatedAddress(ordinalsAddress)}</TruncatedAddress>
         </AddressBox>
       );
     }
     return (
       <AddressBox key={purpose}>
-        <OrdinalImage src={stxIcon} />
         <AddressContainer>
+          <AddressImage src={stxIcon} />
           <AddressTextTitle>{t('STX_ADDRESS')}</AddressTextTitle>
-          <TruncatedAddress>{getTruncatedAddress(stxAddress)}</TruncatedAddress>
         </AddressContainer>
+        <div>
+          {selectedAccount?.bnsName ? <BnsName>{selectedAccount?.bnsName}</BnsName> : null}
+          <TruncatedAddress>{getTruncatedAddress(stxAddress)}</TruncatedAddress>
+        </div>
       </AddressBox>
     );
   }, []);
 
-  useEffect(() => {
-    switchAccountBasedOnRequest();
-  }, []);
-  useEffect(() => {
-    axios
-      .get<string>(`http://www.google.com/s2/favicons?domain=${origin}`, {
-        timeout: 30000,
-      })
-      .then((response) => setAppIcon(response.data))
-      .catch((error) => '');
-    return () => {
-      setAppIcon('');
-    };
-  }, [origin]);
+  const handleSwitchAccount = () => {
+    navigate('/account-list');
+  };
+
   return (
-    <>
-      <AccountHeaderComponent disableMenuOption showBorderBottom={false} />
-      <OuterContainer style={styles}>
-        <TitleContainer>
-          <TopImage src={DappPlaceholderIcon} alt="Dapp Logo" />
-          <Title>{t('TITLE')}</Title>
-          <DapURL>{origin.replace(/(^\w+:|^)\/\//, '')}</DapURL>
-        </TitleContainer>
-        <RequestMessage>{payload.message.substring(0, 80)}</RequestMessage>
-        <Container>{payload.purposes.map(AddressPurposeRow)}</Container>
-        <StickyHorizontalSplitButtonContainer>
-          <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
-          <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />
-        </StickyHorizontalSplitButtonContainer>
-      </OuterContainer>
-    </>
+    <OuterContainer style={styles}>
+      <TitleContainer>
+        {appIcon !== '' ? <TopImage src={appIcon} alt="Dapp Logo" /> : null}
+        <Title>{t('TITLE')}</Title>
+        <DapURL>{appUrl}</DapURL>
+      </TitleContainer>
+      {payload.message ? <RequestMessage>{payload.message.substring(0, 80)}</RequestMessage> : null}
+      <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
+      <AddressBoxContainer>{payload.purposes.map(AddressPurposeRow)}</AddressBoxContainer>
+      <PermissionsTitle>{t('PERMISSIONS_TITLE')}</PermissionsTitle>
+      <Permission>
+        <PermissionIcon>
+          <Check color={theme.colors.success_light} />
+        </PermissionIcon>
+        {t('PERMISSION_WALLET_BALANCE')}
+      </Permission>
+      <Permission>
+        <PermissionIcon>
+          <Check color={theme.colors.success_light} />
+        </PermissionIcon>
+        {t('PERMISSION_REQUEST_TX')}
+      </Permission>
+      <ActionsContainer>
+        <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
+        <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />
+      </ActionsContainer>
+    </OuterContainer>
   );
 }
 

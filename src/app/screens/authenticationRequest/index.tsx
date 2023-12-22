@@ -1,6 +1,5 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
@@ -20,7 +19,7 @@ import {
 import { AddressVersion, publicKeyToAddress, StacksMessageType } from '@stacks/transactions';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -133,10 +132,13 @@ function AuthenticationRequest() {
     window.close();
   };
 
-  const getDappLogo = () =>
-    validUrl.isWebUri(authRequest?.payload?.appDetails?.icon)
-      ? authRequest?.payload?.appDetails?.icon
-      : DappPlaceholderIcon;
+  const getDappLogo = useCallback(
+    () =>
+      validUrl.isWebUri(authRequest?.payload?.appDetails?.icon) ? (
+        <TopImage src={authRequest?.payload?.appDetails?.icon} alt="Dapp Logo" />
+      ) : null,
+    [authRequest],
+  );
 
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {
@@ -216,7 +218,7 @@ function AuthenticationRequest() {
     >
       <AccountHeaderComponent />
       <MainContainer>
-        <TopImage src={getDappLogo()} alt="Dapp Logo" />
+        {getDappLogo()}
         <FunctionTitle>{t('TITLE')}</FunctionTitle>
         <DappTitle>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappTitle>
         {isDisabled && (
