@@ -1,6 +1,10 @@
 import BottomModal from '@components/bottomModal';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import {
+  getBtcFiatEquivalent,
+  getStxFiatEquivalent,
+  stxToMicrostacks,
+} from '@secretkeylabs/xverse-core';
 import { handleKeyDownFeeRateInput } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -49,7 +53,7 @@ export default function CustomFee({
   const { t } = useTranslation('translation', {
     keyPrefix: 'TRANSACTION_SETTING',
   });
-  const { btcFiatRate, fiatCurrency } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate, fiatCurrency } = useWalletSelector();
   const [feeRateInput, setFeeRateInput] = useState(feeRate || minimumFeeRate);
   const [totalFee, setTotalFee] = useState(fee || initialTotalFee);
 
@@ -74,9 +78,17 @@ export default function CustomFee({
     onClickApply(feeRateInput, totalFee);
   };
 
-  const fiatFee = totalFee
-    ? getBtcFiatEquivalent(BigNumber(totalFee), BigNumber(btcFiatRate))
-    : BigNumber(0);
+  let fiatFee = BigNumber(0);
+
+  if (totalFee) {
+    fiatFee = isBtc
+      ? getBtcFiatEquivalent(BigNumber(totalFee), BigNumber(btcFiatRate))
+      : getStxFiatEquivalent(
+          stxToMicrostacks(BigNumber(totalFee)),
+          BigNumber(stxBtcRate),
+          BigNumber(btcFiatRate),
+        );
+  }
 
   return (
     <BottomModal visible={visible} header={t('CUSTOM_FEE')} onClose={onClose}>

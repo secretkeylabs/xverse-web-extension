@@ -3,11 +3,16 @@ import {
   mempoolApi,
   rbf,
   RecommendedFeeResponse,
+  SettingsNetwork,
+  StacksTransaction,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';
+import { BufferReader, deserializeTransaction, estimateTransaction } from '@stacks/transactions';
 import { isLedgerAccount, microStxToStx } from '@utils/helper';
+import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import useBtcClient from './useBtcClient';
+import useNetworkSelector from './useNetwork';
 import useSeedVault from './useSeedVault';
 import useWalletSelector from './useWalletSelector';
 
@@ -39,37 +44,69 @@ export const isBtcTransaction = (
   transaction: BtcTransactionData | StxTransactionData,
 ): transaction is BtcTransactionData => (transaction as BtcTransactionData).txType === 'bitcoin';
 
+interface RawTransactionResponse {
+  raw_tx: string;
+}
+
+export async function getRawTransaction(txId: string, network: SettingsNetwork): Promise<string> {
+  const baseUrl = network?.address;
+  const apiUrl = `${baseUrl}/extended/v1/tx/${txId}/raw`;
+
+  return axios.get<RawTransactionResponse>(apiUrl).then((response) => response.data.raw_tx);
+}
+
+export function convertStringHexToBufferReader(strHex: string): BufferReader {
+  return strHex.slice(0, 2).toLowerCase() === '0x'
+    ? new BufferReader(Buffer.from(strHex.slice(2), 'hex'))
+    : new BufferReader(Buffer.from(strHex, 'hex'));
+}
+
 const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransactionData): RbfData => {
   const [isLoading, setIsLoading] = useState(true);
   const [rbfData, setRbfData] = useState<RbfData>({});
   const { accountType, network, selectedAccount } = useWalletSelector();
   const seedVault = useSeedVault();
   const btcClient = useBtcClient();
+  const selectedNetwork = useNetworkSelector();
 
-  const fetchStxData = () => {
-    if (!transaction || isBtcTransaction(transaction)) {
+  const fetchStxData = useCallback(async () => {
+    if (!transaction || isBtcTransaction(transaction) || !transaction.tokenTransfer) {
       return;
     }
 
     const fee = microStxToStx(transaction.fee);
+
+    const txRaw: string = await getRawTransaction(transaction.txid, network);
+
+    const unsignedTx: StacksTransaction = deserializeTransaction(
+      convertStringHexToBufferReader(txRaw),
+    );
+
+    const [slow, medium, high] = await estimateTransaction(
+      unsignedTx.payload,
+      undefined,
+      selectedNetwork,
+    );
 
     setRbfData({
       rbfTransaction: undefined,
       rbfTxSummary: {
         currentFee: fee.toNumber(),
         currentFeeRate: fee.toNumber(),
-        minimumRbfFee: fee.toNumber(),
-        minimumRbfFeeRate: fee.toNumber(),
+        minimumRbfFee: microStxToStx(slow.fee).toNumber(),
+        minimumRbfFeeRate: microStxToStx(slow.fee).toNumber(),
       },
       rbfRecommendedFees: Object.fromEntries(
         Object.entries({
           medium: {
-            enoughFunds: true,
-            feeRate: fee.multipliedBy(1200).toNumber(),
+            enoughFunds: true, // TODO: check if enough funds
+            feeRate: microStxToStx(medium.fee).toNumber(),
+            fee: microStxToStx(medium.fee).toNumber(),
           },
           high: {
             enoughFunds: true,
-            feeRate: fee.multipliedBy(2000).toNumber(),
+            feeRate: microStxToStx(high.fee).toNumber(),
+            fee: microStxToStx(high.fee).toNumber(),
           },
         }).sort((a, b) => {
           const priorityOrder = ['highest', 'higher', 'high', 'medium'];
@@ -77,16 +114,16 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         }),
       ),
       mempoolFees: {
-        fastestFee: 1,
-        halfHourFee: 0.5,
-        hourFee: 0.25,
-        economyFee: 0.01,
-        minimumFee: 0.0001,
+        fastestFee: microStxToStx(high.fee).toNumber(),
+        halfHourFee: microStxToStx(medium.fee).toNumber(),
+        hourFee: microStxToStx(slow.fee).toNumber(),
+        economyFee: microStxToStx(slow.fee).toNumber(),
+        minimumFee: microStxToStx(slow.fee).toNumber(),
       },
     });
 
     setIsLoading(false);
-  };
+  }, [transaction, network, selectedNetwork]);
 
   const fetchRbfData = useCallback(async () => {
     if (!selectedAccount || !transaction) {
@@ -95,8 +132,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
     }
 
     if (!isBtcTransaction(transaction)) {
-      fetchStxData();
-      return;
+      return fetchStxData();
     }
 
     try {
@@ -133,7 +169,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
     } finally {
       setIsLoading(false);
     }
-  }, [selectedAccount, transaction, accountType, network.type, seedVault, btcClient]);
+  }, [selectedAccount, transaction, accountType, network.type, seedVault, btcClient, fetchStxData]);
 
   useEffect(() => {
     fetchRbfData();

@@ -12,7 +12,12 @@ import useRbfTransactionData, { isBtcTransaction } from '@hooks/useRbfTransactio
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
-import { getBtcFiatEquivalent, Transport as TransportType } from '@secretkeylabs/xverse-core';
+import {
+  getBtcFiatEquivalent,
+  getStxFiatEquivalent,
+  stxToMicrostacks,
+  Transport as TransportType,
+} from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -47,7 +52,7 @@ function SpeedUpTransactionScreen() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const { selectedAccount, btcFiatRate, fiatCurrency } = useWalletSelector();
+  const { selectedAccount, btcFiatRate, stxBtcRate, fiatCurrency } = useWalletSelector();
   const { id } = useParams();
   const location = useLocation();
   const btcClient = useBtcClient();
@@ -336,14 +341,16 @@ function SpeedUpTransactionScreen() {
                         <div>
                           {feeButtonMapping[key].title}
                           <SecondaryText>{getEstimatedCompletionTime(obj.feeRate)}</SecondaryText>
-                          <SecondaryText>
-                            <NumericFormat
-                              value={obj.feeRate}
-                              displayType="text"
-                              thousandSeparator
-                              suffix=" Sats /vByte"
-                            />
-                          </SecondaryText>
+                          {isBtc && (
+                            <SecondaryText>
+                              <NumericFormat
+                                value={obj.feeRate}
+                                displayType="text"
+                                thousandSeparator
+                                suffix=" Sats /vByte"
+                              />
+                            </SecondaryText>
+                          )}
                         </div>
                       </FeeButtonLeft>
                       <FeeButtonRight>
@@ -353,7 +360,7 @@ function SpeedUpTransactionScreen() {
                               value={obj.fee}
                               displayType="text"
                               thousandSeparator
-                              suffix=" Sats"
+                              suffix={isBtc ? ' Sats' : ' STX'}
                             />
                           ) : (
                             EMPTY_LABEL
@@ -362,10 +369,15 @@ function SpeedUpTransactionScreen() {
                         <SecondaryText alignRight>
                           {obj.fee ? (
                             <FiatAmountText
-                              fiatAmount={getBtcFiatEquivalent(
-                                BigNumber(obj.fee),
-                                BigNumber(btcFiatRate),
-                              )}
+                              fiatAmount={
+                                isBtc
+                                  ? getBtcFiatEquivalent(BigNumber(obj.fee), BigNumber(btcFiatRate))
+                                  : getStxFiatEquivalent(
+                                      stxToMicrostacks(BigNumber(obj.fee)),
+                                      BigNumber(stxBtcRate),
+                                      BigNumber(btcFiatRate),
+                                    )
+                              }
                               fiatCurrency={fiatCurrency}
                             />
                           ) : (
