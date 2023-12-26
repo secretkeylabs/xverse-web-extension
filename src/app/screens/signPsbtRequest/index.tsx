@@ -45,7 +45,7 @@ function SignPsbtRequest() {
           ordinalsAddress,
           psbtInputs,
           psbtOutputs,
-          !feeOutput,
+          !psbtFeeOutput,
           psbtFeeOutput,
         );
         setFeeOutput(feeOutputWithMocks);

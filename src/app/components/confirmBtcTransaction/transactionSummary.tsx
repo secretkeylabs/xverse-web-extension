@@ -57,9 +57,6 @@ function TransactionSummary({
   const { btcAddress, ordinalsAddress } = useWalletSelector();
   const navigate = useNavigate();
 
-  // 1 !isPartialTransaction - magic eden purchase transaction
-  // 2 isPartialTransaction - magic eden listing transaction
-
   const goToRecoverAssets = async () => {
     if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
