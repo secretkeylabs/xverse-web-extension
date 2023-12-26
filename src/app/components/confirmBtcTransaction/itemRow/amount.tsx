@@ -67,7 +67,7 @@ export default function Amount({ amount }: TokenImageProps) {
         </div>
         <NumberTypeContainer>
           <NumericFormat
-            value={satsToBtc(new BigNumber(amount)).toString()}
+            value={satsToBtc(new BigNumber(amount)).toFixed()}
             displayType="text"
             thousandSeparator
             suffix=" BTC"

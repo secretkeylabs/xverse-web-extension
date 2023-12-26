@@ -74,7 +74,7 @@ const getPsbtDataWithMocks = (
     // TODO: mock data for bundle item in ordinal address
     outputsWithMocks.push({
       address: ordinalsAddress,
-      amount: 20000,
+      amount: 20,
       inscriptions: [
         {
           contentType: 'image/png',
@@ -88,15 +88,21 @@ const getPsbtDataWithMocks = (
           fromAddress: 'bc1pmz88ylp258alrgeqsy7jn99u20ylkc4fuqcgwva3eef8s92ye9squunk5r',
           id: '2237248523bc923a7844b47cb7e2552c1666032ed54ab153a00fba1f5c3e1e22i0',
           number: 10878824,
-          offset: 1,
+          offset: 2,
         },
       ],
       satributes: [
         {
           amount: 1,
           fromAddress: 'bc1pugy3kp2zeuntlw649vse3eyy9zr6rwd2lfchdasx9pa7nvm2555qfeepyt',
-          offset: 2,
+          offset: 3,
           types: ['FIRST_TRANSACTION', 'VINTAGE', 'BLOCK9', 'NAKAMOTO'],
+        },
+        {
+          amount: 1,
+          fromAddress: 'bc1pugy3kp2zeuntlw649vse3eyy9zr6rwd2lfchdasx9pa7nvm2555qfeepyt',
+          offset: 0,
+          types: ['PIZZA'],
         },
       ],
     });

@@ -73,7 +73,30 @@ const getSatRangesWithInscriptions = ({
     };
   }
 
-  const satRangesArray = Object.values(satRanges);
+  // sort should be: inscribed rare, rare, inscribed common, common
+  const satRangesArray = Object.values(satRanges).sort((a, b) => {
+    // Check conditions for each category
+    const aHasInscriptions = a.inscriptions.length > 0;
+    const bHasInscriptions = b.inscriptions.length > 0;
+    const aHasRareSatributes = a.satributes.some((s) => s !== 'COMMON');
+    const bHasRareSatributes = b.satributes.some((s) => s !== 'COMMON');
+
+    // sats not rare and not inscribed at bottom
+    if (!aHasInscriptions && !aHasRareSatributes) return 1;
+
+    // sats inscribed and rare at top
+    if (aHasInscriptions && aHasRareSatributes) return -1;
+
+    // sats not inscribed and rare below inscribed and rare
+    if (bHasInscriptions && bHasRareSatributes) return 1;
+
+    // sats inscribed and not rare above sats not inscribed and not rare
+    if (aHasRareSatributes) return -1;
+    if (bHasRareSatributes) return 1;
+
+    // equal ranges
+    return 0;
+  });
   const totalExoticSats = satRangesArray.reduce(
     (acc, curr) => acc + (!curr.satributes.includes('COMMON') ? curr.totalSats : 0),
     0,
