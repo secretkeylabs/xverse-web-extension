@@ -33,8 +33,7 @@ const LoaderContainer = styled.div((props) => ({
 }));
 
 function TransactionRequest() {
-  const { stxAddress, network, stxPublicKey, feeMultipliers, accountsList, selectedAccount } =
-    useWalletSelector();
+  const { network, feeMultipliers, accountsList, selectedAccount } = useWalletSelector();
   const { payload, tabId, requestToken, stacksTransaction } = useStxTransactionRequest();
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
@@ -47,7 +46,10 @@ function TransactionRequest() {
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
 
   const handleTokenTransferRequest = async (tokenTransferPayload: any, requestAccount: Account) => {
-    const stxPendingTxData = await fetchStxPendingTxData(stxAddress, selectedNetwork);
+    const stxPendingTxData = await fetchStxPendingTxData(
+      requestAccount.stxAddress,
+      selectedNetwork,
+    );
     const unsignedSendStxTx = await getTokenTransferRequest(
       tokenTransferPayload.recipient,
       tokenTransferPayload.amount,
