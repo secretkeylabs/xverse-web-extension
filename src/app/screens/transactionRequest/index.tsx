@@ -5,6 +5,7 @@ import useStxTransactionRequest from '@hooks/useStxTransactionRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  Account,
   buf2hex,
   Coin,
   ContractFunction,
@@ -45,13 +46,13 @@ function TransactionRequest() {
   const [contractName, setContractName] = useState(undefined);
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
 
-  const handleTokenTransferRequest = async (tokenTransferPayload: any) => {
+  const handleTokenTransferRequest = async (tokenTransferPayload: any, requestAccount: Account) => {
     const stxPendingTxData = await fetchStxPendingTxData(stxAddress, selectedNetwork);
     const unsignedSendStxTx = await getTokenTransferRequest(
       tokenTransferPayload.recipient,
       tokenTransferPayload.amount,
       tokenTransferPayload.memo!,
-      stxPublicKey,
+      requestAccount.stxPublicKey,
       feeMultipliers!,
       selectedNetwork,
       stxPendingTxData || [],
@@ -69,16 +70,19 @@ function TransactionRequest() {
     });
   };
 
-  const handleContractCallRequest = async (contractCallPayload: ContractCallPayload) => {
+  const handleContractCallRequest = async (
+    contractCallPayload: ContractCallPayload,
+    requestAccount: Account,
+  ) => {
     const {
       unSignedContractCall,
       contractInterface,
       coinsMetaData: coinMeta,
     } = await getContractCallPromises(
       contractCallPayload,
-      stxAddress,
+      requestAccount.stxAddress,
       selectedNetwork,
-      stxPublicKey,
+      requestAccount.stxPublicKey,
       stacksTransaction?.auth,
     );
     setUnsignedTx(unSignedContractCall);
@@ -104,13 +108,16 @@ function TransactionRequest() {
     }
   };
 
-  const handleContractDeployRequest = async (contractDeployPayload: ContractDeployPayload) => {
+  const handleContractDeployRequest = async (
+    contractDeployPayload: ContractDeployPayload,
+    requestAccount: Account,
+  ) => {
     const response = await createDeployContractRequest(
       contractDeployPayload,
       selectedNetwork,
-      stxPublicKey,
+      requestAccount.stxPublicKey,
       feeMultipliers!,
-      stxAddress,
+      requestAccount.stxAddress,
       stacksTransaction?.auth,
     );
     setUnsignedTx(response.contractDeployTx);
@@ -118,11 +125,11 @@ function TransactionRequest() {
     setContractName(response.contractName);
   };
 
-  const handleTxSigningRequest = async () => {
+  const handleTxSigningRequest = async (requestAccount: Account) => {
     if (payload.txType === 'contract_call') {
-      await handleContractCallRequest(payload);
+      await handleContractCallRequest(payload, requestAccount);
     } else if (payload.txType === 'smart_contract') {
-      await handleContractDeployRequest(payload);
+      await handleContractDeployRequest(payload, requestAccount);
     } else {
       navigate('/confirm-stx-tx', {
         state: {
@@ -135,18 +142,19 @@ function TransactionRequest() {
       });
     }
   };
-  const createRequestTx = async () => {
+
+  const createRequestTx = async (account: Account) => {
     try {
       if (!payload.txHex) {
         if (payload.txType === 'token_transfer') {
-          await handleTokenTransferRequest(payload);
+          await handleTokenTransferRequest(payload, account);
         } else if (payload.txType === 'contract_call') {
-          await handleContractCallRequest(payload);
+          await handleContractCallRequest(payload, account);
         } else if (payload.txType === 'smart_contract') {
-          await handleContractDeployRequest(payload);
-        } else {
-          await handleTxSigningRequest();
+          await handleContractDeployRequest(payload, account);
         }
+      } else {
+        await handleTxSigningRequest(account);
       }
     } catch (e: unknown) {
       console.error(e); // eslint-disable-line
@@ -154,44 +162,43 @@ function TransactionRequest() {
     }
   };
 
-  createRequestTx();
-
-  useEffect(() => {
-    const switchAccountBasedOnRequest = () => {
-      if (getNetworkType(payload.network) !== network.type) {
+  const handleRequest = async () => {
+    if (getNetworkType(payload.network) !== network.type) {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'STX',
+          error:
+            'There’s a mismatch between your active network and the network you’re logged with.',
+          browserTx: true,
+        },
+      });
+      return;
+    }
+    if (payload.stxAddress !== selectedAccount?.stxAddress && !isHardwareAccount(selectedAccount)) {
+      const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
+      if (account) {
+        await switchAccount(account);
+        await createRequestTx(account);
+      } else {
         navigate('/tx-status', {
           state: {
             txid: '',
             currency: 'STX',
             error:
-              'There’s a mismatch between your active network and the network you’re logged with.',
+              'There’s a mismatch between your active  address and the address you’re logged with.',
             browserTx: true,
           },
         });
-        return;
       }
-      if (
-        payload.stxAddress !== selectedAccount?.stxAddress &&
-        !isHardwareAccount(selectedAccount)
-      ) {
-        const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
-        if (account) {
-          switchAccount(account);
-        } else {
-          navigate('/tx-status', {
-            state: {
-              txid: '',
-              currency: 'STX',
-              error:
-                'There’s a mismatch between your active  address and the address you’re logged with.',
-              browserTx: true,
-            },
-          });
-        }
-      }
-    };
-    switchAccountBasedOnRequest();
-  }, [accountsList, network.type, navigate, payload, selectedAccount, switchAccount]);
+    } else {
+      await createRequestTx(selectedAccount!);
+    }
+  };
+
+  useEffect(() => {
+    handleRequest();
+  }, []);
 
   return (
     <>
