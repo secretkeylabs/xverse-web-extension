@@ -1,13 +1,13 @@
 /* eslint-disable no-nested-ternary */
-import { StoreState } from '@stores/index';
-import { useSelector } from 'react-redux';
 import {
   addressToString,
   FungibleConditionCode,
   NonFungibleConditionCode,
   PostCondition,
 } from '@stacks/transactions';
+import { StoreState } from '@stores/index';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 
 import TransferAmountComponent from '@components/transferAmountComponent';
 import { getNameFromPostCondition, getSymbolFromPostCondition } from './helper';
@@ -36,9 +36,9 @@ function PostConditionsView({ postCondition, amount, icon }: Props) {
         return t('TRANSFER_LESS');
       case FungibleConditionCode.LessEqual:
         return t('TRANSFER_LESS_EQUAL');
-      case NonFungibleConditionCode.DoesNotOwn:
+      case NonFungibleConditionCode.Sends:
         return t('TRANSFER_DOES_NOT_OWN');
-      case NonFungibleConditionCode.Owns:
+      case NonFungibleConditionCode.DoesNotSend:
         return t('TRANSFER_OWN');
       default:
         return '';

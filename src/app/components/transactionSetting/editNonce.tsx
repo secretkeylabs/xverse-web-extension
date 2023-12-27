@@ -58,7 +58,7 @@ function EditNonce({ nonce, setNonce }: Props) {
 
   useEffect(() => {
     setNonce(nonceInput);
-  }, [nonceInput]);
+  }, [nonceInput, setNonce]);
 
   return (
     <NonceContainer>

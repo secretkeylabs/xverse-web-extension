@@ -1,5 +1,5 @@
 import AccountHeaderComponent from '@components/accountHeader';
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import InfoContainer from '@components/infoContainer';
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
 import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
@@ -11,15 +11,18 @@ import {
   addressToString,
   Args,
   broadcastSignedTransaction,
+  buf2hex,
   Coin,
   ContractFunction,
   extractFromPayload,
+  isMultiSig,
 } from '@secretkeylabs/xverse-core';
 import { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,
   cvToJSON,
   cvToString,
+  MultiSigSpendingCondition,
   PostConditionType,
   SomeCV,
   StacksTransaction,
@@ -84,6 +87,12 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
+
+  // SignTransaction Params
+  const isMultiSigTx = isMultiSig(unsignedTx);
+  const hasSignatures =
+    isMultiSigTx &&
+    (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0;
 
   useOnOriginTabClose(tabId, () => {
     setHasTabClosed(true);
@@ -175,7 +184,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId: broadcastResult, txRaw: tx[0].serialize().toString('hex') },
+          data: { txId: broadcastResult, txRaw: buf2hex(tx[0].serialize()) },
         });
         navigate('/tx-status', {
           state: {
@@ -208,6 +217,13 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
           browserTx: true,
         },
       });
+    } else if (isMultiSigTx) {
+      finalizeTxSignature({
+        requestPayload: requestToken,
+        tabId,
+        data: { txId: '', txRaw: buf2hex(unsignedTx.serialize()) },
+      });
+      window.close();
     } else {
       broadcastTx(transactions, attachment);
     }
@@ -248,13 +264,14 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      <ConfirmStxTransationComponent
+      <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx]}
         onConfirmClick={confirmCallback}
         onCancelClick={cancelCallback}
         loading={false}
         title={request.functionName}
         subTitle={`Requested by ${request.appDetails?.name}`}
+        hasSignatures={hasSignatures}
       >
         <>
           {hasTabClosed && (
@@ -272,7 +289,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
           />
           {functionArgsView()}
         </>
-      </ConfirmStxTransationComponent>
+      </ConfirmStxTransactionComponent>
     </>
   );
 }

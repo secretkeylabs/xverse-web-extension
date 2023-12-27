@@ -4,6 +4,7 @@ import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  buf2hex,
   generateUnsignedStxTokenTransferTransaction,
   microstacksToStx,
   StacksTransaction,
@@ -13,9 +14,9 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { replaceCommaByDot } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect,useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import TopRow from '../../components/topRow';
 
 function SendStxScreen() {
@@ -68,7 +69,7 @@ function SendStxScreen() {
     if (data) {
       navigate('/confirm-stx-tx', {
         state: {
-          unsignedTx: data.serialize().toString('hex'),
+          unsignedTx: buf2hex(data.serialize()),
         },
       });
     }
