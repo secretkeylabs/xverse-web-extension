@@ -8,16 +8,27 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TopRow from '@components/topRow';
 import useTransaction from '@hooks/queries/useTransaction';
 import useBtcClient from '@hooks/useBtcClient';
-import useRbfTransactionData, { isBtcTransaction } from '@hooks/useRbfTransactionData';
+import useNetworkSelector from '@hooks/useNetwork';
+import useRbfTransactionData, {
+  convertStringHexToBufferReader,
+  getLatestNonce,
+  getRawTransaction,
+  isBtcTransaction,
+} from '@hooks/useRbfTransactionData';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
 import {
+  broadcastSignedTransaction,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
+  signTransaction,
+  StacksTransaction,
   stxToMicrostacks,
   Transport as TransportType,
 } from '@secretkeylabs/xverse-core';
+import { deserializeTransaction } from '@stacks/transactions';
 import { EMPTY_LABEL } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -52,7 +63,8 @@ function SpeedUpTransactionScreen() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const { selectedAccount, btcFiatRate, stxBtcRate, fiatCurrency } = useWalletSelector();
+  const { selectedAccount, btcFiatRate, stxBtcRate, stxAddress, fiatCurrency, network } =
+    useWalletSelector();
   const { id } = useParams();
   const location = useLocation();
   const btcClient = useBtcClient();
@@ -74,9 +86,9 @@ function SpeedUpTransactionScreen() {
   const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
+  const { getSeed } = useSeedVault();
+  const selectedStacksNetwork = useNetworkSelector();
   const isBtc = isBtcTransaction(stxTransaction || btcTransaction);
-
-  console.log('stxTransaction', stxTransaction);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
@@ -100,7 +112,23 @@ function SpeedUpTransactionScreen() {
     navigate('/');
   };
 
+  const calculateStxTotalFee = async (feeRate: string) => {
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary.minimumRbfFeeRate }));
+      return;
+    }
+    setCustomFeeError(undefined);
+
+    // TODO: Add insufficient funds check
+
+    return Number(feeRate);
+  };
+
   const calculateTotalFee = async (feeRate: string) => {
+    if (!isBtc) {
+      return calculateStxTotalFee(feeRate);
+    }
+
     if (!rbfTransaction) {
       return;
     }
@@ -125,7 +153,52 @@ function SpeedUpTransactionScreen() {
     return feeSummary.fee;
   };
 
+  const signAndBroadcastStxTx = async () => {
+    if (!feeRateInput || !selectedAccount) {
+      return;
+    }
+
+    try {
+      const fee = stxToMicrostacks(new BigNumber(feeRateInput)).toString();
+
+      const txRaw: string = await getRawTransaction(stxTransaction.txid, network);
+
+      const unsignedTx: StacksTransaction = deserializeTransaction(
+        convertStringHexToBufferReader(txRaw),
+      );
+
+      // check if the transaction exists in microblock
+      const latestNonceData = await getLatestNonce(stxAddress, network);
+      if (stxTransaction.nonce > latestNonceData.last_executed_tx_nonce) {
+        unsignedTx.setFee(BigInt(fee));
+        unsignedTx.setNonce(BigInt(stxTransaction.nonce));
+
+        const seedPhrase = await getSeed();
+        const signedTx: StacksTransaction = await signTransaction(
+          unsignedTx,
+          seedPhrase,
+          selectedAccount.id,
+          selectedStacksNetwork,
+        );
+        const result = await broadcastSignedTransaction(signedTx, selectedStacksNetwork);
+
+        toast.success(t('TX_FEE_UPDATED'));
+        handleGoBack();
+        return result;
+      }
+
+      toast.error('This transaction has already been confirmed in a microblock.');
+      return;
+    } catch (err: any) {
+      console.error(err);
+    }
+  };
+
   const signAndBroadcastTx = async (transport?: TransportType) => {
+    if (!isBtc) {
+      return signAndBroadcastStxTx();
+    }
+
     if (!rbfTransaction) {
       return;
     }
@@ -156,7 +229,7 @@ function SpeedUpTransactionScreen() {
   };
 
   const handleClickSubmit = async () => {
-    if (!selectedAccount || !id) {
+    if (!selectedAccount || (!btcTransaction && !stxTransaction)) {
       return;
     }
 
@@ -405,41 +478,52 @@ function SpeedUpTransactionScreen() {
                         <SecondaryText>
                           {getEstimatedCompletionTime(Number(customFeeRate))}
                         </SecondaryText>
-                        <SecondaryText>
-                          <NumericFormat
-                            value={customFeeRate}
-                            displayType="text"
-                            thousandSeparator
-                            suffix=" Sats /vByte"
-                          />
-                        </SecondaryText>
+                        {isBtc && (
+                          <SecondaryText>
+                            <NumericFormat
+                              value={customFeeRate}
+                              displayType="text"
+                              thousandSeparator
+                              suffix=" Sats /vByte"
+                            />
+                          </SecondaryText>
+                        )}
                       </>
                     )}
                   </div>
                 </FeeButtonLeft>
-                {customFeeRate && customTotalFee ? (
-                  <div>
-                    <div>
+                <FeeButtonRight>
+                  {customFeeRate && customTotalFee ? (
+                    <>
                       <NumericFormat
                         value={customTotalFee}
                         displayType="text"
                         thousandSeparator
-                        suffix=" Sats"
+                        suffix={isBtc ? ' Sats' : ' STX'}
+                        renderText={(value: string) => <HighlightedText>{value}</HighlightedText>}
                       />
-                    </div>
-                    <SecondaryText alignRight>
-                      <FiatAmountText
-                        fiatAmount={getBtcFiatEquivalent(
-                          BigNumber(customTotalFee),
-                          BigNumber(btcFiatRate),
-                        )}
-                        fiatCurrency={fiatCurrency}
-                      />
-                    </SecondaryText>
-                  </div>
-                ) : (
-                  <div>{t('MANUAL_SETTING')}</div>
-                )}
+                      <SecondaryText alignRight>
+                        <FiatAmountText
+                          fiatAmount={
+                            isBtc
+                              ? getBtcFiatEquivalent(
+                                  BigNumber(customTotalFee),
+                                  BigNumber(btcFiatRate),
+                                )
+                              : getStxFiatEquivalent(
+                                  stxToMicrostacks(BigNumber(customTotalFee)),
+                                  BigNumber(stxBtcRate),
+                                  BigNumber(btcFiatRate),
+                                )
+                          }
+                          fiatCurrency={fiatCurrency}
+                        />
+                      </SecondaryText>
+                    </>
+                  ) : (
+                    t('MANUAL_SETTING')
+                  )}
+                </FeeButtonRight>
               </FeeButton>
             </ButtonContainer>
             <ControlsContainer>

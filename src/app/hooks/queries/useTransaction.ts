@@ -25,5 +25,6 @@ export default function useTransaction(id?: string) {
   return useQuery({
     queryKey: ['transaction', id],
     queryFn: fetchTransaction,
+    enabled: id !== undefined,
   });
 }

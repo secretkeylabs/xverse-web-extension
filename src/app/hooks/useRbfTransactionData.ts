@@ -44,6 +44,22 @@ export const isBtcTransaction = (
   transaction: BtcTransactionData | StxTransactionData,
 ): transaction is BtcTransactionData => (transaction as BtcTransactionData).txType === 'bitcoin';
 
+interface LatestNonceResponse {
+  last_mempool_tx_nonce: number;
+  last_executed_tx_nonce: number;
+  possible_next_nonce: number;
+  detected_missing_nonces: Array<number>;
+}
+
+export async function getLatestNonce(
+  stxAddress: string,
+  network: SettingsNetwork,
+): Promise<LatestNonceResponse> {
+  const baseUrl = network?.address;
+  const apiUrl = `${baseUrl}/extended/v1/address/${stxAddress}/nonces`;
+  return axios.get<LatestNonceResponse>(apiUrl).then((response) => response.data);
+}
+
 interface RawTransactionResponse {
   raw_tx: string;
 }
