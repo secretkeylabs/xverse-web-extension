@@ -55,7 +55,11 @@ function TransactionRequest() {
       tokenTransferPayload.amount,
       tokenTransferPayload.memo!,
       requestAccount.stxPublicKey,
-      feeMultipliers!,
+      {
+        stxSendTxMultiplier: feeMultipliers?.stxSendTxMultiplier || 1,
+        poolStackingTxMultiplier: feeMultipliers?.poolStackingTxMultiplier || 1,
+        otherTxMultiplier: feeMultipliers?.otherTxMultiplier || 1,
+      },
       selectedNetwork,
       stxPendingTxData || [],
       stacksTransaction?.auth,
@@ -193,7 +197,7 @@ function TransactionRequest() {
           },
         });
       }
-    } else {
+    } else if (selectedAccount) {
       await createRequestTx(selectedAccount!);
     }
   };
