@@ -5,11 +5,10 @@ import AssetModal from '@components/assetModal';
 import TransferFeeView from '@components/transferFeeView';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { BLOG_LINK } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ReceiveSection from './receiveSection';
 import TransferSection from './transferSection';
@@ -55,22 +54,10 @@ function TransactionSummary({
     btcTransaction.IOInscription | undefined
   >(undefined);
 
-  const { network, selectedAccount } = useWalletSelector();
+  const { network } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { t: settingsT } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
+  const { t: rareSatsT } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
   const { btcAddress, ordinalsAddress } = useWalletSelector();
-  const navigate = useNavigate();
-
-  const goToRecoverAssets = async () => {
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
-      await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/restore-funds'),
-      });
-      return;
-    }
-
-    navigate('/restore-funds');
-  };
 
   const hasOutputScript = outputs.some((output) => isScriptOutput(output));
 
@@ -115,8 +102,8 @@ function TransactionSummary({
         <InscribedRareSatWarning
           variant="warning"
           bodyText={t('INSCRIBED_RARE_SATS_WARNING')}
-          redirectText={settingsT('RECOVER_ASSETS')}
-          onClickRedirect={goToRecoverAssets}
+          redirectText={rareSatsT('RARITY_DETAIL.LEARN_MORE')}
+          anchorRedirect={`${BLOG_LINK}/rare-satoshis`}
         />
       )}
 

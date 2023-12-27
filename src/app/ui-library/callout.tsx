@@ -56,6 +56,14 @@ const RedirectButton = styled.button`
   text-transform: capitalize;
 `;
 
+export const AnchorLink = styled.a((props) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: props.theme.space.xxxs,
+  textTransform: 'capitalize',
+  color: props.theme.colors.white_0,
+}));
+
 /**
  * ref: https://zeroheight.com/0683c9fa7/p/051ca8-callout/t/7814dc
  */
@@ -66,6 +74,7 @@ export type CalloutProps = {
   variant?: CalloutVariant;
   redirectText?: string;
   onClickRedirect?: () => void;
+  anchorRedirect?: string;
 };
 export function Callout({
   className,
@@ -73,7 +82,8 @@ export function Callout({
   bodyText,
   variant = 'info',
   redirectText,
-  onClickRedirect = () => {},
+  onClickRedirect,
+  anchorRedirect,
 }: CalloutProps) {
   const StyledIcon = icons[variant];
   return (
@@ -89,12 +99,22 @@ export function Callout({
           <BodySpan>{bodyText}</BodySpan>
         </StyledP>
         {redirectText && (
-          <RedirectButton onClick={onClickRedirect}>
-            <StyledP typography="body_medium_m" color="white_0">
-              {redirectText}
-            </StyledP>
-            <ArrowRight size={12} color="currentColor" />
-          </RedirectButton>
+          <>
+            {onClickRedirect && (
+              <RedirectButton onClick={onClickRedirect}>
+                <StyledP typography="body_medium_m" color="white_0">
+                  {redirectText}
+                </StyledP>
+                <ArrowRight size={12} color="currentColor" weight="bold" />
+              </RedirectButton>
+            )}
+            {anchorRedirect && (
+              <AnchorLink href={anchorRedirect} target="_blank" rel="noopener noreferrer">
+                <StyledP typography="body_medium_m">{redirectText}</StyledP>
+                <ArrowRight size={12} color="currentColor" weight="bold" />
+              </AnchorLink>
+            )}
+          </>
         )}
       </TextContainer>
     </Container>
