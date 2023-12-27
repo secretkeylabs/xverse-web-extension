@@ -382,7 +382,8 @@
     "YOUR_PAYMENT_ADDRESS": "Your payment address",
     "INSCRIBED_SATS": "Some of these sats are inscribed",
     "INSCRIBED_RARE_SATS": "Some of these sats are rare or inscribed",
-    "INSCRIBED_RARE_SATS_WARNING": "Your payment wallet holds assets. To avoid spending them in your transactions and fees, transfer them to your ordinals wallet."
+    "INSCRIBED_RARE_SATS_WARNING": "Your payment wallet holds assets. To avoid spending them in your transactions and fees, transfer them to your ordinals wallet.",
+    "UNCONFIRMED_UTXO_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",

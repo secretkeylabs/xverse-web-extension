@@ -23,6 +23,10 @@ const InscribedRareSatWarning = styled(Callout)`
   margin-bottom: ${(props) => props.theme.space.m};
 `;
 
+const UnconfirmedInputCallout = styled(Callout)`
+  margin-bottom: ${(props) => props.theme.space.m};
+`;
+
 type Props = {
   isPartialTransaction: boolean;
 
@@ -77,6 +81,8 @@ function TransactionSummary({
     ordinalsAddress,
   });
 
+  const isUnConfirmedInput = inputs.some((input) => !input.extendedUtxo.utxo.status.confirmed);
+
   const paymentHasInscribedRareSats = isPartialTransaction
     ? inputs.some(
         (input) =>
@@ -112,6 +118,10 @@ function TransactionSummary({
           redirectText={settingsT('RECOVER_ASSETS')}
           onClickRedirect={goToRecoverAssets}
         />
+      )}
+
+      {isUnConfirmedInput && (
+        <UnconfirmedInputCallout bodyText={t('UNCONFIRMED_UTXO_WARNING')} variant="warning" />
       )}
 
       <TransferSection
