@@ -64,7 +64,7 @@ function TransactionInput({ input }: Props) {
         hideCopyButton={isPaymentsAddress || isOrdinalsAddress}
         amount={`${satsToBtc(
           new BigNumber(input.extendedUtxo.utxo.value.toString()),
-        ).toString()} BTC`}
+        ).toFixed()} BTC`}
         address={isExternalInput ? input.extendedUtxo.utxo.txid : input.extendedUtxo.address}
       >
         {isExternalInput ? (

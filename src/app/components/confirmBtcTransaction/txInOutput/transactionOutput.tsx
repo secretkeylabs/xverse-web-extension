@@ -64,7 +64,7 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
         hideCopyButton={detailViewHideCopyButton}
         amount={`${satsToBtc(
           new BigNumber(isSpendOutput(output) ? output.amount.toString() : '0'),
-        ).toString()} BTC`}
+        ).toFixed()} BTC`}
         address={outputWithScript ? '' : output.address}
         outputScript={outputWithScript ? output.script : undefined}
         outputScriptIndex={outputWithScript ? scriptOutputCount : undefined}
