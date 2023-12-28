@@ -1,5 +1,6 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -23,6 +24,7 @@ import {
   broadcastSignedTransaction,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
+  signLedgerStxTransaction,
   signTransaction,
   StacksTransaction,
   stxToMicrostacks,
@@ -124,7 +126,6 @@ function SpeedUpTransactionScreen() {
       setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary.minimumRbfFeeRate }));
       return;
     }
-    setCustomFeeError(undefined);
 
     if (stxToMicrostacks(BigNumber(feeRate)).gt(BigNumber(stxAvailableBalance))) {
       setCustomFeeError(t('INSUFFICIENT_FUNDS'));
@@ -164,7 +165,7 @@ function SpeedUpTransactionScreen() {
     return feeSummary.fee;
   };
 
-  const signAndBroadcastStxTx = async () => {
+  const signAndBroadcastStxTx = async (transport?: TransportType) => {
     if (!feeRateInput || !selectedAccount) {
       return;
     }
@@ -183,17 +184,32 @@ function SpeedUpTransactionScreen() {
         unsignedTx.setNonce(BigInt(stxTransaction.nonce));
 
         const seedPhrase = await getSeed();
-        const signedTx: StacksTransaction = await signTransaction(
-          unsignedTx,
-          seedPhrase,
-          selectedAccount.id,
-          selectedStacksNetwork,
-        );
-        const result = await broadcastSignedTransaction(signedTx, selectedStacksNetwork);
+
+        if (isLedgerAccount(selectedAccount)) {
+          if (!transport || selectedAccount.deviceAccountIndex === undefined) {
+            return;
+          }
+
+          const result = await signLedgerStxTransaction({
+            transport,
+            transactionBuffer: unsignedTx.serialize(),
+            addressIndex: selectedAccount.deviceAccountIndex,
+          });
+          await delay(1500);
+          await broadcastSignedTransaction(result, selectedStacksNetwork);
+        } else {
+          const signedTx: StacksTransaction = await signTransaction(
+            unsignedTx,
+            seedPhrase,
+            selectedAccount.id,
+            selectedStacksNetwork,
+          );
+          await broadcastSignedTransaction(signedTx, selectedStacksNetwork);
+        }
 
         toast.success(t('TX_FEE_UPDATED'));
         handleGoBack();
-        return result;
+        return;
       }
 
       toast.error('This transaction has already been confirmed in a microblock.');
@@ -205,7 +221,7 @@ function SpeedUpTransactionScreen() {
 
   const signAndBroadcastTx = async (transport?: TransportType) => {
     if (!isBtc) {
-      return signAndBroadcastStxTx();
+      return signAndBroadcastStxTx(transport);
     }
 
     if (!rbfTransaction) {
@@ -566,10 +582,12 @@ function SpeedUpTransactionScreen() {
             {currentStepIndex === 0 && (
               <LedgerConnectionView
                 title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
-                text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', { name: 'Bitcoin' })}
+                text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', {
+                  name: isBtc ? 'Bitcoin' : 'Stacks',
+                })}
                 titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
                 textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
-                imageDefault={ledgerConnectBtcIcon}
+                imageDefault={isBtc ? ledgerConnectBtcIcon : ledgerConnectStxIcon}
                 isConnectSuccess={isConnectSuccess}
                 isConnectFailed={isConnectFailed}
               />

@@ -17,6 +17,8 @@ import useNetworkSelector from './useNetwork';
 import useSeedVault from './useSeedVault';
 import useWalletSelector from './useWalletSelector';
 
+// TODO: move the types and helper functions below to xverse-core
+
 type TierFees = {
   enoughFunds: boolean;
   fee?: number;
