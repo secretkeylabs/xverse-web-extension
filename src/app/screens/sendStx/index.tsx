@@ -4,6 +4,7 @@ import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  buf2hex,
   generateUnsignedStxTokenTransferTransaction,
   microstacksToStx,
   StacksTransaction,
@@ -68,7 +69,7 @@ function SendStxScreen() {
     if (data) {
       navigate('/confirm-stx-tx', {
         state: {
-          unsignedTx: data.serialize().toString('hex'),
+          unsignedTx: buf2hex(data.serialize()),
         },
       });
     }
