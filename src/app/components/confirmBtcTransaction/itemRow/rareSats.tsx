@@ -1,16 +1,16 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import BundleItem from '@components/confirmBtcTransactionComponent/bundleItem';
-import Divider from '@components/divider/divider';
 import { Butterfly } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
-import { btcTransaction, BundleSatRange } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import Divider from '@ui-library/divider';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
-import Avatar from './avatar';
+import Avatar from '../../../ui-library/avatar';
+import { mapTxSatributeInfoToBundleInfo, SatRangeTx } from '../utils';
 
 const SatsBundleContainer = styled.div`
   display: flex;
@@ -50,22 +50,11 @@ const BundleInfo = styled.div`
   margin-left: ${(props) => props.theme.space.s};
 `;
 
-export type SatRange = {
-  totalSats: number;
-  offset: number;
-  fromAddress: string;
-  inscriptions: (Omit<btcTransaction.IOInscription, 'contentType' | 'number'> & {
-    content_type: string;
-    inscription_number: number;
-  })[];
-  satributes: btcTransaction.IOSatribute['types'];
-};
-
 function RareSats({
   satributesInfo,
   bundleSize,
 }: {
-  satributesInfo: { satRanges: SatRange[]; totalExoticSats: number };
+  satributesInfo: { satRanges: SatRangeTx[]; totalExoticSats: number };
   bundleSize?: number;
 }) {
   const [showBundleDetail, setShowBundleDetail] = useState(false);
@@ -119,26 +108,10 @@ function RareSats({
 
       {showBundleDetail && (
         <RangesContainer style={slideInStyles}>
-          {satributesInfo.satRanges.map((item: SatRange, index: number) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <div key={index}>
+          {satributesInfo.satRanges.map((item: SatRangeTx, index: number) => (
+            <div key={item.offset}>
               <Range>
-                <BundleItem
-                  item={
-                    {
-                      totalSats: item.totalSats,
-                      inscriptions: item.inscriptions,
-                      satributes: item.satributes,
-                      offset: item.offset,
-                      block: 0,
-                      range: {
-                        start: '0',
-                        end: '0',
-                      },
-                      yearMined: 0,
-                    } as BundleSatRange
-                  }
-                />
+                <BundleItem item={mapTxSatributeInfoToBundleInfo(item)} />
               </Range>
               {satributesInfo.satRanges.length > index + 1 && <Divider verticalMargin="s" />}
             </div>

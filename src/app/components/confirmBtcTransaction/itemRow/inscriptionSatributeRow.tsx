@@ -1,11 +1,12 @@
-import Divider from '@components/divider/divider';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
+import Divider from '@ui-library/divider';
 import styled from 'styled-components';
+import { getSatRangesWithInscriptions } from '../utils';
 import Amount from './amount';
-import Bundle from './bundle';
+import BundleTxView from './bundleTxView';
 import Inscription from './inscription';
-import RareSats, { SatRange } from './rareSats';
+import RareSats from './rareSats';
 
 const RowContainer = styled.div((props) => ({
   padding: `0 ${props.theme.space.m}`,
@@ -18,91 +19,6 @@ type Props = {
   showBottomDivider?: boolean;
   showTopDivider?: boolean;
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
-};
-
-const getSatRangesWithInscriptions = ({
-  satributes,
-  inscriptions,
-  amount,
-}: Omit<Props, 'onShowInscription' | 'showBottomDivider' | 'showTopDivider'>) => {
-  const satRanges: {
-    [offset: number]: SatRange;
-  } = {};
-
-  satributes.forEach((satribute) => {
-    const { types, amount: totalSats, ...rest } = satribute;
-    satRanges[rest.offset] = { ...rest, satributes: types, totalSats, inscriptions: [] };
-  });
-
-  inscriptions.forEach((inscription) => {
-    const { contentType, number, ...inscriptionRest } = inscription;
-    const mappedInscription = {
-      ...inscriptionRest,
-      content_type: contentType,
-      inscription_number: number,
-    };
-    if (satRanges[inscription.offset]) {
-      satRanges[inscription.offset] = {
-        ...satRanges[inscription.offset],
-        inscriptions: [...satRanges[inscription.offset].inscriptions, mappedInscription],
-      };
-      return;
-    }
-
-    satRanges[inscription.offset] = {
-      totalSats: 1,
-      offset: inscription.offset,
-      fromAddress: inscription.fromAddress,
-      inscriptions: [mappedInscription],
-      satributes: ['COMMON'],
-    };
-  });
-
-  const amountOfExoticsOrInscribedSats = Object.values(satRanges).reduce(
-    (acc, range) => acc + range.totalSats,
-    0,
-  );
-
-  if (amountOfExoticsOrInscribedSats < amount) {
-    satRanges[-1] = {
-      totalSats: amount - amountOfExoticsOrInscribedSats,
-      offset: -1,
-      fromAddress: '',
-      inscriptions: [],
-      satributes: ['COMMON'],
-    };
-  }
-
-  // sort should be: inscribed rare, rare, inscribed common, common
-  const satRangesArray = Object.values(satRanges).sort((a, b) => {
-    // Check conditions for each category
-    const aHasInscriptions = a.inscriptions.length > 0;
-    const bHasInscriptions = b.inscriptions.length > 0;
-    const aHasRareSatributes = a.satributes.some((s) => s !== 'COMMON');
-    const bHasRareSatributes = b.satributes.some((s) => s !== 'COMMON');
-
-    // sats not rare and not inscribed at bottom
-    if (!aHasInscriptions && !aHasRareSatributes) return 1;
-
-    // sats inscribed and rare at top
-    if (aHasInscriptions && aHasRareSatributes) return -1;
-
-    // sats not inscribed and rare below inscribed and rare
-    if (bHasInscriptions && bHasRareSatributes) return 1;
-
-    // sats inscribed and not rare above sats not inscribed and not rare
-    if (aHasRareSatributes) return -1;
-    if (bHasRareSatributes) return 1;
-
-    // equal ranges
-    return 0;
-  });
-  const totalExoticSats = satRangesArray.reduce(
-    (acc, curr) => acc + (!curr.satributes.includes('COMMON') ? curr.totalSats : 0),
-    0,
-  );
-
-  return { satRanges: satRangesArray, totalExoticSats };
 };
 
 function InscriptionSatributeRow({
@@ -124,7 +40,7 @@ function InscriptionSatributeRow({
   const getRow = () => {
     if (inscriptions.length > 0 && inscriptions.length + satributes.length > 1) {
       return (
-        <Bundle
+        <BundleTxView
           inscriptions={inscriptions}
           satributesInfo={satributesInfo}
           bundleSize={amount}

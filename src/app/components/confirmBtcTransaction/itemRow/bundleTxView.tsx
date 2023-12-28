@@ -2,22 +2,22 @@ import Link from '@assets/img/rareSats/link.svg';
 import { CubeTransparent } from '@phosphor-icons/react';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
-import Avatar from './avatar';
+import Avatar from '../../../ui-library/avatar';
+import { SatRangeTx } from '../utils';
 import Inscription from './inscription';
-import RareSats, { SatRange } from './rareSats';
+import RareSats from './rareSats';
 
-export interface TokenImageProps {
+type Props = {
   inscriptions: btcTransaction.IOInscription[];
-  satributesInfo: { satRanges: SatRange[]; totalExoticSats: number };
+  satributesInfo: { satRanges: SatRangeTx[]; totalExoticSats: number };
   bundleSize: number;
   isRareSatsEnabled?: boolean;
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
-}
+};
 
 const Header = styled.div((props) => ({
   display: 'flex',
@@ -41,13 +41,13 @@ const Divider = styled.div`
   margin: ${(props) => props.theme.space.xxxs} 0;
 `;
 
-export default function Bundle({
+export default function BundleTxView({
   inscriptions,
   satributesInfo,
   bundleSize,
   isRareSatsEnabled,
   onShowInscription,
-}: TokenImageProps) {
+}: Props) {
   const { t } = useTranslation('translation');
 
   // we only show rare sats if there are any and the user has enabled the feature

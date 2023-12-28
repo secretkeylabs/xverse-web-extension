@@ -1,15 +1,16 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import BundleItem from '@components/confirmBtcTransactionComponent/bundleItem';
-import Divider from '@components/divider/divider';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { WarningOctagon } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { btcTransaction, BundleSatRange } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import Divider from '@ui-library/divider';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
+import { mapTxSatributeInfoToBundleInfo } from '../utils';
 import Inscription from './inscription';
 
 const WarningContainer = styled.div`
@@ -99,8 +100,7 @@ export default function AmountWithInscriptionSatribute({
       {showBundleDetail && (
         <ItemsContainer style={slideInStyles}>
           {inscriptions.map((item: btcTransaction.IOInscription, index: number) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <div key={index}>
+            <div key={item.id}>
               <Range>
                 <Inscription
                   inscription={item}
@@ -114,25 +114,9 @@ export default function AmountWithInscriptionSatribute({
             </div>
           ))}
           {satributesArray.map((item: btcTransaction.IOSatribute, index: number) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <div key={index}>
+            <div key={item.offset}>
               <Range>
-                <BundleItem
-                  item={
-                    {
-                      totalSats: item.amount,
-                      inscriptions: [],
-                      satributes: item.types,
-                      offset: item.offset,
-                      block: 0,
-                      range: {
-                        start: '0',
-                        end: '0',
-                      },
-                      yearMined: 0,
-                    } as BundleSatRange
-                  }
-                />
+                <BundleItem item={mapTxSatributeInfoToBundleInfo(item)} />
               </Range>
               {satributesArray.length > index + 1 && <Divider verticalMargin="s" />}
             </div>

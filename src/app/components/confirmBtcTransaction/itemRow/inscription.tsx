@@ -1,19 +1,19 @@
 import { Eye } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
+import Avatar from '@ui-library/avatar';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
-import Avatar from './avatar';
 
-export interface TokenImageProps {
+type Props = {
   inscription: btcTransaction.IOInscription;
   bundleSize?: number;
   hideTypeSizeInfo?: boolean;
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
-}
+};
 
 const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
   display: 'flex',
@@ -44,7 +44,7 @@ export default function Inscription({
   bundleSize,
   hideTypeSizeInfo = false,
   onShowInscription,
-}: TokenImageProps) {
+}: Props) {
   const { t } = useTranslation('translation');
 
   return (

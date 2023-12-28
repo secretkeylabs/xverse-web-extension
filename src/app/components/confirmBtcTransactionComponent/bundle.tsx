@@ -1,9 +1,9 @@
 import BundleIcon from '@assets/img/rareSats/satBundle.svg';
 import AssetModal from '@components/assetModal';
-import Divider from '@components/divider/divider';
 import { CaretDown } from '@phosphor-icons/react';
 import { Bundle, BundleSatRange, SatRangeInscription } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import Divider from '@ui-library/divider';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

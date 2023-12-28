@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
-export interface TokenImageProps {
+type Props = {
   icon?: React.ReactNode;
   src?: React.ReactNode;
   size?: number;
-}
+};
 
 const ImageContainer = styled.div<{ size: number }>((props) => ({
   height: props.size,
@@ -23,7 +23,7 @@ const IconContainer = styled.div((props) => ({
   backgroundColor: props.theme.colors.white_0,
 }));
 
-export default function Avatar({ icon, src, size = 32 }: TokenImageProps) {
+export default function Avatar({ icon, src, size = 32 }: Props) {
   return (
     <ImageContainer size={size}>
       {icon && <IconContainer>{icon}</IconContainer>}

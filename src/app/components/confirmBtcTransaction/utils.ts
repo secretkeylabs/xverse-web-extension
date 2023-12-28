@@ -1,4 +1,15 @@
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { btcTransaction, BundleSatRange } from '@secretkeylabs/xverse-core';
+
+export type SatRangeTx = {
+  totalSats: number;
+  offset: number;
+  fromAddress: string;
+  inscriptions: (Omit<btcTransaction.IOInscription, 'contentType' | 'number'> & {
+    content_type: string;
+    inscription_number: number;
+  })[];
+  satributes: btcTransaction.IOSatribute['types'];
+};
 
 export const isScriptOutput = (
   output: btcTransaction.EnhancedOutput,
@@ -131,4 +142,126 @@ export const getOutputsWithAssetsToUserAddress = ({
   });
 
   return { outputsToPayment, outputsToOrdinal };
+};
+
+export const mapTxSatributeInfoToBundleInfo = (item: btcTransaction.IOSatribute | SatRangeTx) => {
+  const commonProps = {
+    offset: item.offset,
+    block: 0,
+    range: {
+      start: '0',
+      end: '0',
+    },
+    yearMined: 0,
+  };
+
+  // SatRangeTx
+  if ('totalSats' in item) {
+    return {
+      ...commonProps,
+      totalSats: item.totalSats,
+      inscriptions: item.inscriptions,
+      satributes: item.satributes,
+    } as BundleSatRange;
+  }
+
+  // btcTransaction.IOSatribute
+  return {
+    ...commonProps,
+    totalSats: item.amount,
+    inscriptions: [],
+    satributes: item.types,
+  } as BundleSatRange;
+};
+
+export const getSatRangesWithInscriptions = ({
+  satributes,
+  inscriptions,
+  amount,
+}: {
+  inscriptions: btcTransaction.IOInscription[];
+  satributes: btcTransaction.IOSatribute[];
+  amount: number;
+}) => {
+  const satRanges: {
+    [offset: number]: SatRangeTx;
+  } = {};
+
+  satributes.forEach((satribute) => {
+    const { types, amount: totalSats, ...rest } = satribute;
+    satRanges[rest.offset] = { ...rest, satributes: types, totalSats, inscriptions: [] };
+  });
+
+  inscriptions.forEach((inscription) => {
+    const { contentType, number, ...inscriptionRest } = inscription;
+    const mappedInscription = {
+      ...inscriptionRest,
+      content_type: contentType,
+      inscription_number: number,
+    };
+    if (satRanges[inscription.offset]) {
+      satRanges[inscription.offset] = {
+        ...satRanges[inscription.offset],
+        inscriptions: [...satRanges[inscription.offset].inscriptions, mappedInscription],
+      };
+      return;
+    }
+
+    satRanges[inscription.offset] = {
+      totalSats: 1,
+      offset: inscription.offset,
+      fromAddress: inscription.fromAddress,
+      inscriptions: [mappedInscription],
+      satributes: ['COMMON'],
+    };
+  });
+
+  const { amountOfExoticsOrInscribedSats, totalExoticSats } = Object.values(satRanges).reduce(
+    (acc, range) => ({
+      amountOfExoticsOrInscribedSats: acc.amountOfExoticsOrInscribedSats + range.totalSats,
+      totalExoticSats:
+        acc.totalExoticSats + (!range.satributes.includes('COMMON') ? range.totalSats : 0),
+    }),
+    {
+      amountOfExoticsOrInscribedSats: 0,
+      totalExoticSats: 0,
+    },
+  );
+
+  if (amountOfExoticsOrInscribedSats < amount) {
+    satRanges[-1] = {
+      totalSats: amount - amountOfExoticsOrInscribedSats,
+      offset: -1,
+      fromAddress: '',
+      inscriptions: [],
+      satributes: ['COMMON'],
+    };
+  }
+
+  // sort should be: inscribed rare, rare, inscribed common, common
+  const satRangesArray = Object.values(satRanges).sort((a, b) => {
+    // Check conditions for each category
+    const aHasInscriptions = a.inscriptions.length > 0;
+    const bHasInscriptions = b.inscriptions.length > 0;
+    const aHasRareSatributes = a.satributes.some((s) => s !== 'COMMON');
+    const bHasRareSatributes = b.satributes.some((s) => s !== 'COMMON');
+
+    // sats not rare and not inscribed at bottom
+    if (!aHasInscriptions && !aHasRareSatributes) return 1;
+
+    // sats inscribed and rare at top
+    if (aHasInscriptions && aHasRareSatributes) return -1;
+
+    // sats not inscribed and rare below inscribed and rare
+    if (bHasInscriptions && bHasRareSatributes) return 1;
+
+    // sats inscribed and not rare above sats not inscribed and not rare
+    if (aHasRareSatributes) return -1;
+    if (bHasRareSatributes) return 1;
+
+    // equal ranges
+    return 0;
+  });
+
+  return { satRanges: satRangesArray, totalExoticSats };
 };
