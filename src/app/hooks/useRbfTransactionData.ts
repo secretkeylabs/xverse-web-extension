@@ -83,7 +83,8 @@ export function convertStringHexToBufferReader(strHex: string): BufferReader {
 const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransactionData): RbfData => {
   const [isLoading, setIsLoading] = useState(true);
   const [rbfData, setRbfData] = useState<RbfData>({});
-  const { accountType, network, selectedAccount, stxAvailableBalance } = useWalletSelector();
+  const { accountType, network, selectedAccount, stxAvailableBalance, feeMultipliers } =
+    useWalletSelector();
   const seedVault = useSeedVault();
   const btcClient = useBtcClient();
   const selectedNetwork = useNetworkSelector();
@@ -106,25 +107,37 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         selectedNetwork,
       );
 
+      const minimumFee = fee.multipliedBy(1.25);
+      let highFee = high.fee;
+      let mediumFee = medium.fee;
+
+      if (feeMultipliers && highFee > BigInt(feeMultipliers?.thresholdHighStacksFee)) {
+        highFee = feeMultipliers.thresholdHighStacksFee;
+      }
+
+      if (feeMultipliers && mediumFee > BigInt(feeMultipliers?.thresholdHighStacksFee)) {
+        mediumFee = feeMultipliers.thresholdHighStacksFee * 0.75;
+      }
+
       setRbfData({
         rbfTransaction: undefined,
         rbfTxSummary: {
           currentFee: fee.toNumber(),
           currentFeeRate: fee.toNumber(),
-          minimumRbfFee: microStxToStx(slow.fee).toNumber(),
-          minimumRbfFeeRate: microStxToStx(slow.fee).toNumber(),
+          minimumRbfFee: minimumFee.toNumber(),
+          minimumRbfFeeRate: minimumFee.toNumber(),
         },
         rbfRecommendedFees: Object.fromEntries(
           Object.entries({
             medium: {
-              enoughFunds: !BigNumber(medium.fee).gt(BigNumber(stxAvailableBalance)),
-              feeRate: microStxToStx(medium.fee).toNumber(),
-              fee: microStxToStx(medium.fee).toNumber(),
+              enoughFunds: !BigNumber(mediumFee).gt(BigNumber(stxAvailableBalance)),
+              feeRate: microStxToStx(mediumFee).toNumber(),
+              fee: microStxToStx(mediumFee).toNumber(),
             },
             high: {
-              enoughFunds: !BigNumber(high.fee).gt(BigNumber(stxAvailableBalance)),
-              feeRate: microStxToStx(high.fee).toNumber(),
-              fee: microStxToStx(high.fee).toNumber(),
+              enoughFunds: !BigNumber(highFee).gt(BigNumber(stxAvailableBalance)),
+              feeRate: microStxToStx(highFee).toNumber(),
+              fee: microStxToStx(highFee).toNumber(),
             },
           }).sort((a, b) => {
             const priorityOrder = ['highest', 'higher', 'high', 'medium'];
@@ -144,7 +157,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
     } finally {
       setIsLoading(false);
     }
-  }, [transaction, network, selectedNetwork]);
+  }, [transaction, network, selectedNetwork, feeMultipliers, stxAvailableBalance]);
 
   const fetchRbfData = useCallback(async () => {
     if (!selectedAccount || !transaction) {
