@@ -34,7 +34,7 @@ const AvatarContainer = styled.div`
 const RowsContainer = styled.div`
   padding-left: ${(props) => props.theme.space.m};
 `;
-const Divider = styled.div`
+const LinkContainer = styled.div`
   display: flex;
   width: 32px;
   justify-content: center;
@@ -84,9 +84,9 @@ export default function BundleTxView({
           <div key={inscription.number}>
             <Inscription inscription={inscription} onShowInscription={onShowInscription} />
             {!!(inscriptions.length > index + 1 || showRareSats) && (
-              <Divider>
+              <LinkContainer>
                 <img src={Link} alt="link" />
-              </Divider>
+              </LinkContainer>
             )}
           </div>
         ))}

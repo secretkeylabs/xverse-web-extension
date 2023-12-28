@@ -11,6 +11,8 @@ export type SatRangeTx = {
   satributes: btcTransaction.IOSatribute['types'];
 };
 
+const DUMMY_OFFSET = -1;
+
 export const isScriptOutput = (
   output: btcTransaction.EnhancedOutput,
 ): output is btcTransaction.TransactionScriptOutput =>
@@ -81,7 +83,7 @@ export const getOutputsWithAssetsFromUserAddress = ({
     });
 
     if (itemsFromOrdinal.length > 0) {
-      return outputsFromOrdinal.push(output);
+      outputsFromOrdinal.push(output);
     }
     if (itemsFromPayment.length > 0) {
       outputsFromPayment.push(output);
@@ -229,9 +231,9 @@ export const getSatRangesWithInscriptions = ({
   );
 
   if (amountOfExoticsOrInscribedSats < amount) {
-    satRanges[-1] = {
+    satRanges[DUMMY_OFFSET] = {
       totalSats: amount - amountOfExoticsOrInscribedSats,
-      offset: -1,
+      offset: DUMMY_OFFSET,
       fromAddress: '',
       inscriptions: [],
       satributes: ['COMMON'],

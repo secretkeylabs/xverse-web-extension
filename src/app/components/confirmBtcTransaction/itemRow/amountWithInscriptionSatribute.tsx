@@ -3,7 +3,7 @@ import BundleItem from '@components/confirmBtcTransactionComponent/bundleItem';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { WarningOctagon } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
-import { btcTransaction, BundleSatRange } from '@secretkeylabs/xverse-core';
+import { btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Divider from '@ui-library/divider';
 import { useState } from 'react';
