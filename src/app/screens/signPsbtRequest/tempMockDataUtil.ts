@@ -24,6 +24,9 @@ const getPsbtDataWithMocks = (
           // @ts-ignore
           utxo: {
             value: 100000,
+            status: {
+              confirmed: false, // to test the unconfirmed utxo warning callout
+            },
           },
         },
         inscriptions: [

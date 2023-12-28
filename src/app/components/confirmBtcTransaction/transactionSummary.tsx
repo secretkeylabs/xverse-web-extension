@@ -22,6 +22,10 @@ const InscribedRareSatWarning = styled(Callout)`
   margin-bottom: ${(props) => props.theme.space.m};
 `;
 
+const UnconfirmedInputCallout = styled(Callout)`
+  margin-bottom: ${(props) => props.theme.space.m};
+`;
+
 type Props = {
   isPartialTransaction: boolean;
 
@@ -64,6 +68,8 @@ function TransactionSummary({
     ordinalsAddress,
   });
 
+  const isUnConfirmedInput = inputs.some((input) => !input.extendedUtxo.utxo.status.confirmed);
+
   const paymentHasInscribedRareSats = isPartialTransaction
     ? inputs.some(
         (input) =>
@@ -99,6 +105,10 @@ function TransactionSummary({
           redirectText={rareSatsT('RARITY_DETAIL.LEARN_MORE')}
           anchorRedirect={`${BLOG_LINK}/rare-satoshis`}
         />
+      )}
+
+      {isUnConfirmedInput && (
+        <UnconfirmedInputCallout bodyText={t('UNCONFIRMED_UTXO_WARNING')} variant="warning" />
       )}
 
       <TransferSection
