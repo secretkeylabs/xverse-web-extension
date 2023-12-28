@@ -82,7 +82,7 @@ export default function StxTransferTransaction({
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const showAccelerateButton =
-    hasActivatedRBFKey && transaction.txStatus === 'pending' && !transaction.incoming; // TODO: check if transaction is RBF enabled
+    hasActivatedRBFKey && transaction.txStatus === 'pending' && !transaction.incoming;
 
   const openTxStatusUrl = () => {
     window.open(getStxTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
