@@ -63,8 +63,15 @@ function SpeedUpTransactionScreen() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const { selectedAccount, btcFiatRate, stxBtcRate, stxAddress, fiatCurrency, network } =
-    useWalletSelector();
+  const {
+    selectedAccount,
+    btcFiatRate,
+    stxBtcRate,
+    stxAddress,
+    fiatCurrency,
+    network,
+    stxAvailableBalance,
+  } = useWalletSelector();
   const { id } = useParams();
   const location = useLocation();
   const btcClient = useBtcClient();
@@ -119,7 +126,11 @@ function SpeedUpTransactionScreen() {
     }
     setCustomFeeError(undefined);
 
-    // TODO: Add insufficient funds check
+    if (stxToMicrostacks(BigNumber(feeRate)).gt(BigNumber(stxAvailableBalance))) {
+      setCustomFeeError(t('INSUFFICIENT_FUNDS'));
+    } else {
+      setCustomFeeError(undefined);
+    }
 
     return Number(feeRate);
   };
@@ -159,10 +170,8 @@ function SpeedUpTransactionScreen() {
     }
 
     try {
-      const fee = stxToMicrostacks(new BigNumber(feeRateInput)).toString();
-
+      const fee = stxToMicrostacks(BigNumber(feeRateInput)).toString();
       const txRaw: string = await getRawTransaction(stxTransaction.txid, network);
-
       const unsignedTx: StacksTransaction = deserializeTransaction(
         convertStringHexToBufferReader(txRaw),
       );

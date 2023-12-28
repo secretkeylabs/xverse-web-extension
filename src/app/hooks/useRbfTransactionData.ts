@@ -10,6 +10,7 @@ import {
 import { BufferReader, deserializeTransaction, estimateTransaction } from '@stacks/transactions';
 import { isLedgerAccount, microStxToStx } from '@utils/helper';
 import axios from 'axios';
+import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
 import useBtcClient from './useBtcClient';
 import useNetworkSelector from './useNetwork';
@@ -42,7 +43,7 @@ type RbfData = {
 
 export const isBtcTransaction = (
   transaction: BtcTransactionData | StxTransactionData,
-): transaction is BtcTransactionData => (transaction as BtcTransactionData).txType === 'bitcoin';
+): transaction is BtcTransactionData => transaction?.txType === 'bitcoin';
 
 interface LatestNonceResponse {
   last_mempool_tx_nonce: number;
@@ -80,7 +81,7 @@ export function convertStringHexToBufferReader(strHex: string): BufferReader {
 const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransactionData): RbfData => {
   const [isLoading, setIsLoading] = useState(true);
   const [rbfData, setRbfData] = useState<RbfData>({});
-  const { accountType, network, selectedAccount } = useWalletSelector();
+  const { accountType, network, selectedAccount, stxAvailableBalance } = useWalletSelector();
   const seedVault = useSeedVault();
   const btcClient = useBtcClient();
   const selectedNetwork = useNetworkSelector();
@@ -90,55 +91,57 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       return;
     }
 
-    const fee = microStxToStx(transaction.fee);
+    try {
+      const fee = microStxToStx(transaction.fee);
+      const txRaw: string = await getRawTransaction(transaction.txid, network);
+      const unsignedTx: StacksTransaction = deserializeTransaction(
+        convertStringHexToBufferReader(txRaw),
+      );
 
-    const txRaw: string = await getRawTransaction(transaction.txid, network);
+      const [slow, medium, high] = await estimateTransaction(
+        unsignedTx.payload,
+        undefined,
+        selectedNetwork,
+      );
 
-    const unsignedTx: StacksTransaction = deserializeTransaction(
-      convertStringHexToBufferReader(txRaw),
-    );
-
-    const [slow, medium, high] = await estimateTransaction(
-      unsignedTx.payload,
-      undefined,
-      selectedNetwork,
-    );
-
-    setRbfData({
-      rbfTransaction: undefined,
-      rbfTxSummary: {
-        currentFee: fee.toNumber(),
-        currentFeeRate: fee.toNumber(),
-        minimumRbfFee: microStxToStx(slow.fee).toNumber(),
-        minimumRbfFeeRate: microStxToStx(slow.fee).toNumber(),
-      },
-      rbfRecommendedFees: Object.fromEntries(
-        Object.entries({
-          medium: {
-            enoughFunds: true, // TODO: check if enough funds
-            feeRate: microStxToStx(medium.fee).toNumber(),
-            fee: microStxToStx(medium.fee).toNumber(),
-          },
-          high: {
-            enoughFunds: true,
-            feeRate: microStxToStx(high.fee).toNumber(),
-            fee: microStxToStx(high.fee).toNumber(),
-          },
-        }).sort((a, b) => {
-          const priorityOrder = ['highest', 'higher', 'high', 'medium'];
-          return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
-        }),
-      ),
-      mempoolFees: {
-        fastestFee: microStxToStx(high.fee).toNumber(),
-        halfHourFee: microStxToStx(medium.fee).toNumber(),
-        hourFee: microStxToStx(slow.fee).toNumber(),
-        economyFee: microStxToStx(slow.fee).toNumber(),
-        minimumFee: microStxToStx(slow.fee).toNumber(),
-      },
-    });
-
-    setIsLoading(false);
+      setRbfData({
+        rbfTransaction: undefined,
+        rbfTxSummary: {
+          currentFee: fee.toNumber(),
+          currentFeeRate: fee.toNumber(),
+          minimumRbfFee: microStxToStx(slow.fee).toNumber(),
+          minimumRbfFeeRate: microStxToStx(slow.fee).toNumber(),
+        },
+        rbfRecommendedFees: Object.fromEntries(
+          Object.entries({
+            medium: {
+              enoughFunds: !BigNumber(medium.fee).gt(BigNumber(stxAvailableBalance)),
+              feeRate: microStxToStx(medium.fee).toNumber(),
+              fee: microStxToStx(medium.fee).toNumber(),
+            },
+            high: {
+              enoughFunds: !BigNumber(high.fee).gt(BigNumber(stxAvailableBalance)),
+              feeRate: microStxToStx(high.fee).toNumber(),
+              fee: microStxToStx(high.fee).toNumber(),
+            },
+          }).sort((a, b) => {
+            const priorityOrder = ['highest', 'higher', 'high', 'medium'];
+            return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
+          }),
+        ),
+        mempoolFees: {
+          fastestFee: microStxToStx(high.fee).toNumber(),
+          halfHourFee: microStxToStx(medium.fee).toNumber(),
+          hourFee: microStxToStx(slow.fee).toNumber(),
+          economyFee: microStxToStx(slow.fee).toNumber(),
+          minimumFee: microStxToStx(slow.fee).toNumber(),
+        },
+      });
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   }, [transaction, network, selectedNetwork]);
 
   const fetchRbfData = useCallback(async () => {
