@@ -95,6 +95,8 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
     }
 
     try {
+      setIsLoading(true);
+
       const fee = microStxToStx(transaction.fee);
       const txRaw: string = await getRawTransaction(transaction.txid, network);
       const unsignedTx: StacksTransaction = deserializeTransaction(
@@ -170,6 +172,8 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
     }
 
     try {
+      setIsLoading(true);
+
       const rbfTx = new rbf.RbfTransaction(transaction, {
         ...selectedAccount,
         accountType: accountType || 'software',
