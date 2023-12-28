@@ -2,12 +2,12 @@ import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import {
+  buf2hex,
   FungibleToken,
   getNewNonce,
   getNonce,
   microstacksToStx,
   setNonce,
-  buf2hex
 } from '@secretkeylabs/xverse-core';
 import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
 import { AlexSDK, Currency } from 'alex-sdk';
