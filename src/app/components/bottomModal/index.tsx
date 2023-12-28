@@ -1,5 +1,5 @@
-import Cross from '@assets/img/dashboard/X.svg';
 import Separator from '@components/separator';
+import { XCircle } from '@phosphor-icons/react';
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
 
@@ -11,9 +11,9 @@ const BottomModalHeaderText = styled.h1((props) => ({
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'space-between',
-  margin: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(10),
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  margin: props.theme.spacing(8),
 }));
 
 const ButtonImage = styled.button({
@@ -87,7 +87,7 @@ function BottomModal({
       <RowContainer>
         <BottomModalHeaderText>{header}</BottomModalHeaderText>
         <ButtonImage onClick={onClose}>
-          <img src={Cross} alt="cross" />
+          <XCircle color={theme.colors.white_200} weight="fill" size="28" />
         </ButtonImage>
       </RowContainer>
       {header && <Separator />}

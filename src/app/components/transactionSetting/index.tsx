@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import Theme from 'theme';
 import EditFee from './editFee';
 import EditNonce from './editNonce';
 
@@ -220,6 +221,10 @@ function TransactionSettingAlert({
       onClose={onClosePress}
       overlayStylesOverriding={{
         height: 600,
+      }}
+      contentStylesOverriding={{
+        background: Theme.colors.elevation6_600,
+        backdropFilter: 'blur(10px)',
       }}
     >
       {renderContent()}

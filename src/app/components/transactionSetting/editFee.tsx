@@ -36,7 +36,6 @@ const FiatAmountText = styled.h1((props) => ({
 const DetailText = styled.h1((props) => ({
   ...props.theme.body_m,
   color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(8),
 }));
 
 const Text = styled.h1((props) => ({
@@ -404,6 +403,7 @@ function EditFee({
 
   return (
     <Container>
+      <DetailText>{t('TRANSACTION_SETTING.FEE_INFO')}</DetailText>
       <Text>{t('TRANSACTION_SETTING.FEE')}</Text>
       <FeeContainer>
         <InputContainer withError={!!error}>
@@ -458,7 +458,6 @@ function EditFee({
           {t('TRANSACTION_SETTING.CUSTOM')}
         </FeeButton>
       </ButtonContainer>
-      <DetailText>{t('TRANSACTION_SETTING.FEE_INFO')}</DetailText>
     </Container>
   );
 }
