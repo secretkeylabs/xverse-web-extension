@@ -98,7 +98,7 @@ export default function CustomFee({
             <InputField
               type="number"
               value={feeRateInput?.toString()}
-              onKeyDown={handleKeyDownFeeRateInput}
+              onKeyDown={isBtc ? handleKeyDownFeeRateInput : undefined}
               onChange={handleChangeFeeRateInput}
             />
             <InputLabel>
