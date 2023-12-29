@@ -1,4 +1,4 @@
-import { fetchStxPendingTxData } from '@secretkeylabs/xverse-core';
+import { fetchStxPendingTxData, StxPendingTxData } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
@@ -9,7 +9,7 @@ const useStxPendingTxData = () => {
   const selectedNetwork = useNetworkSelector();
   const result = useQuery({
     queryKey: ['stx-pending-transaction', { stxAddress, selectedNetwork }],
-    queryFn: () => fetchStxPendingTxData(stxAddress, selectedNetwork),
+    queryFn: (): Promise<StxPendingTxData> => fetchStxPendingTxData(stxAddress, selectedNetwork),
   });
   return result;
 };

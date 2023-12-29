@@ -1,7 +1,7 @@
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import RecipientComponent from '@components/recipientComponent';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
@@ -121,7 +121,7 @@ function ConfirmNftTransaction() {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
       const state: ConfirmStxTransactionState = {
-        unsignedTx: unsignedTx.serialize(),
+        unsignedTx: Buffer.from(unsignedTx.serialize()),
         type,
         recipients: [
           {
@@ -159,7 +159,7 @@ function ConfirmNftTransaction() {
       )}
       <ScrollContainer>
         {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
-        <ConfirmStxTransationComponent
+        <ConfirmStxTransactionComponent
           initialStxTransactions={initialStxTransactions}
           loading={isLoading}
           onConfirmClick={handleOnConfirmClick}
@@ -181,7 +181,7 @@ function ConfirmNftTransaction() {
             title={t('ASSET')}
           />
           <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-        </ConfirmStxTransationComponent>
+        </ConfirmStxTransactionComponent>
         {!isGalleryOpen && <BottomBar tab="nft" />}
       </ScrollContainer>
     </>

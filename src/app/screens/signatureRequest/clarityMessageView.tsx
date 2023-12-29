@@ -1,5 +1,5 @@
-import { bytesToHex, ClarityType, ClarityValue, cvToString } from '@stacks/transactions';
-import { principalToString } from '@stacks/transactions/dist/esm/clarity/types/principalCV';
+import { buf2hex } from '@secretkeylabs/xverse-core';
+import { ClarityType, ClarityValue, cvToString, principalToString } from '@stacks/transactions';
 import styled from 'styled-components';
 
 const Container = styled.div<{ isRoot: boolean }>((props) => ({
@@ -56,7 +56,7 @@ export default function ClarityMessageView(props: ClarityMessageViewProps) {
         const str = bytesToAscii(val.buffer);
         if (/[ -~]/.test(str)) return wrapText(JSON.stringify(str));
       }
-      return wrapText(`0x${bytesToHex(val.buffer)}`);
+      return wrapText(`0x${buf2hex(val.buffer)}`);
     case ClarityType.OptionalNone:
       return wrapText('none');
     case ClarityType.OptionalSome:
