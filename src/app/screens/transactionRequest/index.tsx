@@ -57,7 +57,7 @@ function TransactionRequest() {
     navigate('/confirm-stx-tx', {
       state: {
         unsignedTx: unsignedSendStxTx.serialize().toString('hex'),
-        sponosred: payload.sponsored,
+        sponsored: payload.sponsored,
         isBrowserTx: true,
         tabId,
         requestToken,
@@ -107,7 +107,7 @@ function TransactionRequest() {
     setContractName(response.contractName);
   };
 
-  const switchAccountBasedOnRequest = () => {
+  const switchAccountBasedOnRequest = async () => {
     if (getNetworkType(payload.network) !== network.type) {
       navigate('/tx-status', {
         state: {
@@ -123,7 +123,7 @@ function TransactionRequest() {
     if (payload.stxAddress !== selectedAccount?.stxAddress && !isHardwareAccount(selectedAccount)) {
       const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
       if (account) {
-        switchAccount(account);
+        await switchAccount(account);
       } else {
         navigate('/tx-status', {
           state: {
