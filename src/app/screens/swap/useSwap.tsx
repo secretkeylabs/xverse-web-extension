@@ -2,6 +2,7 @@ import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import {
+  buf2hex,
   FungibleToken,
   getNewNonce,
   getNonce,
@@ -278,7 +279,7 @@ export function useSwap(): UseSwap {
               txFeeAmount: fee,
               txFeeFiatAmount: currencyToToken(Currency.STX, fee)?.fiatAmount,
               routers: info.route.map(currencyToToken).filter(isNotNull),
-              unsignedTx: unsignedTx.serialize().toString('hex'),
+              unsignedTx: buf2hex(unsignedTx.serialize()),
               functionName: `${tx.contractName}\n${tx.functionName}`,
               userOverrideSponsorValue,
             };

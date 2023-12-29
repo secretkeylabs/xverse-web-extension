@@ -12,14 +12,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const aliases = {
   // alias stacks.js packages to their esm (default prefers /dist/polyfill)
-  '@stacks/auth': '@stacks/auth/dist/esm',
-  '@stacks/common': '@stacks/common/dist/esm',
-  '@stacks/encryption': '@stacks/encryption/dist/esm',
-  '@stacks/network': '@stacks/network/dist/esm',
-  '@stacks/profile': '@stacks/profile/dist/esm',
-  '@stacks/storage': '@stacks/storage/dist/esm',
   '@stacks/transactions': '@stacks/transactions/dist/esm',
-  '@stacks/keychain': '@stacks/keychain/dist/esm',
   '@secretkeylabs/xverse-core': '@secretkeylabs/xverse-core/dist',
 };
 const ASSET_PATH = process.env.ASSET_PATH || '/';
