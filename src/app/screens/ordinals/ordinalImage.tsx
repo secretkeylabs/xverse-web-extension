@@ -133,6 +133,7 @@ interface Props {
   isSmallImage?: boolean;
   withoutSizeIncrease?: boolean;
   withoutTitles?: boolean;
+  placeholderIcon?: string;
 }
 
 function OrdinalImage({
@@ -143,6 +144,7 @@ function OrdinalImage({
   isSmallImage = false,
   withoutSizeIncrease = false,
   withoutTitles = false,
+  placeholderIcon,
 }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360 && !withoutSizeIncrease;
   const textContent = useTextOrdinalContent(ordinal);
@@ -291,7 +293,7 @@ function OrdinalImage({
 
   return (
     <ImageContainer>
-      <img src={PlaceholderImage} alt="ordinal" />
+      <img src={placeholderIcon ?? PlaceholderImage} alt="ordinal" />
     </ImageContainer>
   );
 }

@@ -1,3 +1,4 @@
+import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small_over_card.svg';
 import { Eye } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
@@ -15,12 +16,13 @@ type Props = {
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
 };
 
-const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
+const RowCenter = styled.div<{ spaceBetween?: boolean; gap?: boolean }>((props) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: props.spaceBetween ? 'space-between' : 'initial',
+  gap: props.gap ? props.theme.space.xs : 0,
 }));
 
 const InscriptionNumberContainer = styled.button`
@@ -37,6 +39,9 @@ const AvatarContainer = styled.div`
 
 const InscriptionNumber = styled(StyledP)`
   margin-right: ${(props) => props.theme.space.xs};
+`;
+const ContentType = styled(StyledP)`
+  word-break: break-word;
 `;
 
 export default function Inscription({
@@ -58,11 +63,12 @@ export default function Inscription({
                 id: inscription.id,
                 content_type: inscription.contentType,
               }}
+              placeholderIcon={OrdinalIcon}
             />
           }
         />
       </AvatarContainer>
-      <RowCenter spaceBetween>
+      <RowCenter spaceBetween gap>
         <div>
           {!hideTypeSizeInfo && (
             <>
@@ -100,9 +106,9 @@ export default function Inscription({
               <Eye color={Theme.colors.white_0} size={20} weight="fill" />
             </RowCenter>
           </InscriptionNumberContainer>
-          <StyledP typography="body_medium_s" color="white_400">
+          <ContentType typography="body_medium_s" color="white_400">
             {inscription.contentType}
-          </StyledP>
+          </ContentType>
         </NumberTypeContainer>
       </RowCenter>
     </RowCenter>
