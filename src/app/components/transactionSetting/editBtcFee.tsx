@@ -358,7 +358,7 @@ function EditBtcFee({
                 {t('TRANSACTION_SETTING.CUSTOM')}
               </StyledP>
               <StyledP typography="body_medium_m" color="white_0">
-                Manual Setting
+                {t('TRANSACTION_SETTING.MANUAL_SETTING')}
               </StyledP>
             </TextsRow>
           </FeeItemContainer>

@@ -403,7 +403,8 @@
     "SAME_FEE_ERROR": "New fee must be greater than current fee",
     "GREATER_FEE_ERROR": "Fee is more than available balance",
     "LOWER_THAN_MINIMUM": "Set fee is below minimum",
-    "NONCE_WARNING": "Entering an erroneous nonce can result in a failed transaction. Only apply changes if you know what you are doing."
+    "NONCE_WARNING": "Entering an erroneous nonce can result in a failed transaction. Only apply changes if you know what you are doing.",
+    "MANUAL_SETTING": "Manual setting"
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",
