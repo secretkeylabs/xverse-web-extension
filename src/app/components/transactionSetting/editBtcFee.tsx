@@ -31,11 +31,6 @@ const Container = styled.div((props) => ({
   paddingBottom: props.theme.space.m,
 }));
 
-const FiatAmountText = styled.h1((props) => ({
-  ...props.theme.typography.body_s,
-  color: props.theme.colors.white_400,
-}));
-
 const DetailText = styled.h1((props) => ({
   ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
@@ -48,6 +43,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
+  justifyContent: 'space-between',
   marginTop: props.theme.space.xs,
   marginBottom: props.theme.space.s,
   border: `1px solid ${
@@ -82,21 +78,9 @@ const FeeText = styled.h1((props) => ({
   color: props.theme.colors.white_0,
 }));
 
-const SubText = styled.h1((props) => ({
-  ...props.theme.typography.body_s,
-  color: props.theme.colors.white_400,
-}));
-
 const FeeContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-});
-
-const TickerContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-end',
-  flex: 1,
 });
 
 const ErrorText = styled.h1((props) => ({
@@ -134,6 +118,23 @@ const TextsRow = styled.div`
   flex-direction: row;
   justify-content: space-between;
   flex: 1;
+`;
+
+const CustomTexts = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 1;
+`;
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const TotalFeeText = styled(StyledP)`
+  margin-right: ${(props) => props.theme.space.xxs};
 `;
 
 interface Props {
@@ -293,7 +294,11 @@ function EditBtcFee({
           thousandSeparator
           prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
           suffix={` ${fiatCurrency}`}
-          renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
+          renderText={(value: string) => (
+            <StyledP typography="body_medium_m" color="white_200">
+              {value}
+            </StyledP>
+          )}
         />
       );
     }
@@ -383,18 +388,29 @@ function EditBtcFee({
               value={feeRateInput?.toString()}
               onChange={onInputEditFeesChange}
             />
-            <FeeText>Sats /vB</FeeText>
-            <TickerContainer>
+            <FeeText>Sats /vByte</FeeText>
+          </InputContainer>
+          <CustomTexts>
+            <Row>
+              <TotalFeeText typography="body_medium_m" color="white_200">
+                Total fee:
+              </TotalFeeText>
               <NumericFormat
                 value={totalFee}
                 displayType="text"
                 thousandSeparator
                 suffix=" Sats"
-                renderText={(value: string) => <FeeText>{value}</FeeText>}
+                renderText={(value: string) => (
+                  <StyledP typography="body_medium_m" color="white_0">
+                    {value}
+                  </StyledP>
+                )}
               />
-              <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
-            </TickerContainer>
-          </InputContainer>
+            </Row>
+            <StyledP typography="body_medium_m" color="white_200">
+              {getFiatAmountString(getFiatEquivalent())}
+            </StyledP>
+          </CustomTexts>
           {error && <ErrorText>{error}</ErrorText>}
         </FeeContainer>
       )}
