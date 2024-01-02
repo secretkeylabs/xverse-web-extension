@@ -1,6 +1,7 @@
 import { Bicycle, CarProfile, RocketLaunch } from '@phosphor-icons/react';
 import { StyledP } from '@ui-library/common.styled';
 import styled from 'styled-components';
+import Theme from 'theme';
 
 const FeeItemContainer = styled.button`
   display: flex;
@@ -11,6 +12,9 @@ const FeeItemContainer = styled.button`
   border-radius: 12px;
   border: 1px solid var(--White-850, rgba(255, 255, 255, 0.15));
   flex-direction: row;
+  background: transparent;
+  margin-top: ${(props) => props.theme.space.xs};
+  flex: 1;
 `;
 
 const IconContainer = styled.div`
@@ -23,11 +27,20 @@ const TextsContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+
+  flex: 1;
 `;
 
 const ColumnsTexts = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+`;
+const EndColumnTexts = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 `;
 
 const StyledHeading = styled(StyledP)`
@@ -46,20 +59,21 @@ interface FeeItemProps {
   time: string;
   feeRate: string;
   totalFee: string;
-  fiat: string;
+  fiat: string | JSX.Element;
+  onClick?: () => void;
 }
 
-function FeeItem({ priority, time, feeRate, totalFee, fiat }: FeeItemProps) {
+function FeeItem({ priority, time, feeRate, totalFee, fiat, onClick }: FeeItemProps) {
   const getIcon = () => {
     switch (priority) {
       case 'high':
-        return <RocketLaunch size={20} />;
+        return <RocketLaunch size={20} color={Theme.colors.tangerine} />;
       case 'medium':
-        return <CarProfile size={20} />;
+        return <CarProfile size={20} color={Theme.colors.tangerine} />;
       case 'low':
-        return <Bicycle size={20} />;
+        return <Bicycle size={20} color={Theme.colors.tangerine} />;
       default:
-        return <RocketLaunch size={20} />;
+        return <RocketLaunch size={20} color={Theme.colors.tangerine} />;
     }
   };
 
@@ -78,18 +92,22 @@ function FeeItem({ priority, time, feeRate, totalFee, fiat }: FeeItemProps) {
   };
 
   return (
-    <FeeItemContainer>
+    <FeeItemContainer onClick={onClick}>
       <IconContainer>{getIcon()}</IconContainer>
       <TextsContainer>
         <ColumnsTexts>
-          <StyledHeading typography="body_medium_m">{getLabel()}</StyledHeading>
+          <StyledHeading typography="body_medium_m" color="white_0">
+            {getLabel()}
+          </StyledHeading>
           <StyledSubText typography="body_medium_s">{time}</StyledSubText>
-          <StyledSubText typography="body_medium_s">{feeRate}</StyledSubText>
+          <StyledSubText typography="body_medium_s">{`${feeRate} Sats/ vByte`}</StyledSubText>
         </ColumnsTexts>
-        <ColumnsTexts>
-          <StyledHeading typography="body_medium_m">{totalFee}</StyledHeading>
+        <EndColumnTexts>
+          <StyledHeading typography="body_medium_m" color="white_0">
+            {totalFee}
+          </StyledHeading>
           <StyledSubText typography="body_medium_s">{fiat}</StyledSubText>
-        </ColumnsTexts>
+        </EndColumnTexts>
       </TextsContainer>
     </FeeItemContainer>
   );
