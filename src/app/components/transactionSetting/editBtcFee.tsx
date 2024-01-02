@@ -179,7 +179,6 @@ function EditBtcFee({
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
   const debouncedFeeRateInput = useDebounce(feeRateInput, 500);
-  const isBtcOrOrdinals = type === 'BTC' || type === 'Ordinals';
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
   const btcClient = useBtcClient();
@@ -374,17 +373,15 @@ function EditBtcFee({
               value={feeRateInput?.toString()}
               onChange={onInputEditFeesChange}
             />
-            {isBtcOrOrdinals && <FeeText>Sats /vB</FeeText>}
+            <FeeText>Sats /vB</FeeText>
             <TickerContainer>
-              {isBtcOrOrdinals && (
-                <NumericFormat
-                  value={totalFee}
-                  displayType="text"
-                  thousandSeparator
-                  suffix=" Sats"
-                  renderText={(value: string) => <FeeText>{value}</FeeText>}
-                />
-              )}
+              <NumericFormat
+                value={totalFee}
+                displayType="text"
+                thousandSeparator
+                suffix=" Sats"
+                renderText={(value: string) => <FeeText>{value}</FeeText>}
+              />
               <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
             </TickerContainer>
           </InputContainer>
