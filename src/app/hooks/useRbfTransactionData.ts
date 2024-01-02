@@ -5,6 +5,7 @@ import {
   RecommendedFeeResponse,
   SettingsNetwork,
   StacksTransaction,
+  stxToMicrostacks,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
@@ -84,7 +85,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
   const selectedNetwork = useNetworkSelector();
 
   const fetchStxData = useCallback(async () => {
-    if (!transaction || isBtcTransaction(transaction) || !transaction.tokenTransfer) {
+    if (!transaction || isBtcTransaction(transaction)) {
       return;
     }
 
@@ -101,9 +102,13 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         selectedNetwork,
       );
 
-      const minimumFee = fee.multipliedBy(1.25);
+      let minimumFee = fee.multipliedBy(1.25);
       let highFee = high.fee;
       let mediumFee = medium.fee;
+
+      if (!Number.isSafeInteger(minimumFee)) {
+        minimumFee = microStxToStx(Math.ceil(stxToMicrostacks(minimumFee).toNumber()));
+      }
 
       if (feeMultipliers && highFee > BigInt(feeMultipliers?.thresholdHighStacksFee)) {
         highFee = feeMultipliers.thresholdHighStacksFee;
