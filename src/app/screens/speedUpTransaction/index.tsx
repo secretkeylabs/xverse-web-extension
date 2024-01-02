@@ -11,7 +11,6 @@ import useTransaction from '@hooks/queries/useTransaction';
 import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import useRbfTransactionData, {
-  convertStringHexToBufferReader,
   getLatestNonce,
   getRawTransaction,
   isBtcTransaction,
@@ -173,9 +172,7 @@ function SpeedUpTransactionScreen() {
     try {
       const fee = stxToMicrostacks(BigNumber(feeRateInput)).toString();
       const txRaw: string = await getRawTransaction(stxTransaction.txid, network);
-      const unsignedTx: StacksTransaction = deserializeTransaction(
-        convertStringHexToBufferReader(txRaw),
-      );
+      const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
 
       // check if the transaction exists in microblock
       const latestNonceData = await getLatestNonce(stxAddress, network);
@@ -192,7 +189,7 @@ function SpeedUpTransactionScreen() {
 
           const result = await signLedgerStxTransaction({
             transport,
-            transactionBuffer: unsignedTx.serialize(),
+            transactionBuffer: Buffer.from(unsignedTx.serialize()),
             addressIndex: selectedAccount.deviceAccountIndex,
           });
           await delay(1500);

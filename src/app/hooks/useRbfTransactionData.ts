@@ -7,7 +7,7 @@ import {
   StacksTransaction,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { BufferReader, deserializeTransaction, estimateTransaction } from '@stacks/transactions';
+import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
 import { isLedgerAccount, microStxToStx } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
@@ -74,12 +74,6 @@ export async function getRawTransaction(txId: string, network: SettingsNetwork):
   return axios.get<RawTransactionResponse>(apiUrl).then((response) => response.data.raw_tx);
 }
 
-export function convertStringHexToBufferReader(strHex: string): BufferReader {
-  return strHex.slice(0, 2).toLowerCase() === '0x'
-    ? new BufferReader(Buffer.from(strHex.slice(2), 'hex'))
-    : new BufferReader(Buffer.from(strHex, 'hex'));
-}
-
 const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransactionData): RbfData => {
   const [isLoading, setIsLoading] = useState(true);
   const [rbfData, setRbfData] = useState<RbfData>({});
@@ -99,9 +93,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
 
       const fee = microStxToStx(transaction.fee);
       const txRaw: string = await getRawTransaction(transaction.txid, network);
-      const unsignedTx: StacksTransaction = deserializeTransaction(
-        convertStringHexToBufferReader(txRaw),
-      );
+      const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
 
       const [slow, medium, high] = await estimateTransaction(
         unsignedTx.payload,
