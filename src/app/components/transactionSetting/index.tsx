@@ -9,8 +9,8 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
 import EditBtcFee from './editBtcFee';
-import EditFee from './editFee';
 import EditNonce from './editNonce';
+import EditStxFee from './editStxFee';
 
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -204,22 +204,16 @@ function TransactionSettingAlert({
     if (showFeeSettings) {
       if (type === 'STX') {
         return (
-          <EditFee
+          <EditStxFee
             fee={fee}
             feeRate={feeRate}
             type={type}
             error={error}
-            setIsLoading={onLoading}
-            setIsNotLoading={onComplete}
             setFee={setFeeInput}
             setFeeRate={setFeeRate}
             setError={setError}
             feeMode={selectedOption}
             setFeeMode={setSelectedOption}
-            btcRecipients={btcRecipients}
-            ordinalTxUtxo={ordinalTxUtxo}
-            isRestoreFlow={isRestoreFlow}
-            nonOrdinalUtxos={nonOrdinalUtxos}
           />
         );
       }
