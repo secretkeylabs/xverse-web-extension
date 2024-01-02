@@ -26,9 +26,9 @@ import FeeItem from './feeItem';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(2),
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
+  paddingBottom: props.theme.space.m,
 }));
 
 const FiatAmountText = styled.h1((props) => ({
@@ -48,14 +48,14 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(6),
+  marginTop: props.theme.space.xs,
+  marginBottom: props.theme.space.s,
   border: `1px solid ${
     props.withError ? props.theme.colors.feedback.error : props.theme.colors.elevation6
   }`,
   backgroundColor: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(1),
-  padding: props.theme.spacing(5),
+  padding: props.theme.space.s,
 }));
 
 const InputField = styled.input((props) => ({
@@ -101,8 +101,8 @@ const TickerContainer = styled.div({
 
 const ErrorText = styled.h1((props) => ({
   ...props.theme.typography.body_s,
-  color: props.theme.colors.feedback.error,
-  marginBottom: props.theme.spacing(2),
+  color: props.theme.colors.danger_light,
+  marginBottom: props.theme.space.xxs,
 }));
 
 const FeePrioritiesContainer = styled.div`
@@ -111,7 +111,11 @@ const FeePrioritiesContainer = styled.div`
   flex-direction: column;
 `;
 
-const FeeItemContainer = styled.button`
+interface FeeContainerProps {
+  isSelected: boolean;
+}
+
+const FeeItemContainer = styled.button<FeeContainerProps>`
   display: flex;
   padding: 12px 16px;
   align-items: center;
@@ -120,7 +124,7 @@ const FeeItemContainer = styled.button`
   border-radius: 12px;
   border: 1px solid var(--White-850, rgba(255, 255, 255, 0.15));
   flex-direction: row;
-  background: transparent;
+  background: ${(props) => (props.isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
   margin-top: ${(props) => props.theme.space.xs};
   flex: 1;
 `;
@@ -329,7 +333,9 @@ function EditBtcFee({
             )}
             onClick={() => {
               feeOptionSelected(feeData?.highFeeRate?.toString() || '', feeData?.highTotalFee);
+              setFeeMode('high');
             }}
+            selected={feeMode === 'high'}
           />
           <FeeItem
             priority="medium"
@@ -344,11 +350,15 @@ function EditBtcFee({
                 feeData?.standardFeeRate?.toString() || '',
                 feeData?.standardTotalFee,
               );
+              setFeeMode('medium');
             }}
+            selected={feeMode === 'medium'}
           />
           <FeeItemContainer
+            isSelected={feeMode === 'custom'}
             onClick={() => {
               setCustomFeeSelected(true);
+              setFeeMode('custom');
             }}
           >
             <Faders size={20} color={Theme.colors.tangerine} />

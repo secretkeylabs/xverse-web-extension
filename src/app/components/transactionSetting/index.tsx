@@ -109,7 +109,7 @@ function TransactionSettingAlert({
   const [feeRate, setFeeRate] = useState<BigNumber | string | undefined>(feePerVByte);
   const [nonceInput, setNonceInput] = useState<string | undefined>(nonce);
   const [error, setError] = useState('');
-  const [selectedOption, setSelectedOption] = useState<string>('standard');
+  const [selectedOption, setSelectedOption] = useState<string>('medium');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
   const [customFeeSelected, setCustomFeeSelected] = useState(false);

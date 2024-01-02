@@ -3,7 +3,11 @@ import { StyledP } from '@ui-library/common.styled';
 import styled from 'styled-components';
 import Theme from 'theme';
 
-const FeeItemContainer = styled.button`
+interface FeeContainer {
+  isSelected: boolean;
+}
+
+const FeeItemContainer = styled.button<FeeContainer>`
   display: flex;
   padding: 12px 16px;
   align-items: center;
@@ -12,7 +16,7 @@ const FeeItemContainer = styled.button`
   border-radius: 12px;
   border: 1px solid var(--White-850, rgba(255, 255, 255, 0.15));
   flex-direction: row;
-  background: transparent;
+  background: ${(props) => (props.isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
   margin-top: ${(props) => props.theme.space.xs};
   flex: 1;
 `;
@@ -60,10 +64,11 @@ interface FeeItemProps {
   feeRate: string;
   totalFee: string;
   fiat: string | JSX.Element;
+  selected: boolean;
   onClick?: () => void;
 }
 
-function FeeItem({ priority, time, feeRate, totalFee, fiat, onClick }: FeeItemProps) {
+function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }: FeeItemProps) {
   const getIcon = () => {
     switch (priority) {
       case 'high':
@@ -92,7 +97,7 @@ function FeeItem({ priority, time, feeRate, totalFee, fiat, onClick }: FeeItemPr
   };
 
   return (
-    <FeeItemContainer onClick={onClick}>
+    <FeeItemContainer onClick={onClick} isSelected={selected}>
       <IconContainer>{getIcon()}</IconContainer>
       <TextsContainer>
         <ColumnsTexts>
