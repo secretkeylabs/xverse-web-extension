@@ -1,5 +1,7 @@
 import { Bicycle, CarProfile, RocketLaunch } from '@phosphor-icons/react';
 import { StyledP } from '@ui-library/common.styled';
+import { useTranslation } from 'react-i18next';
+import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import Theme from 'theme';
 
@@ -9,12 +11,12 @@ interface FeeContainer {
 
 const FeeItemContainer = styled.button<FeeContainer>`
   display: flex;
-  padding: 12px 16px;
+  padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
   align-items: center;
-  gap: 12px;
+  gap: ${(props) => props.theme.space.s};
   align-self: stretch;
-  border-radius: 12px;
-  border: 1px solid var(--White-850, rgba(255, 255, 255, 0.15));
+  border-radius: ${(props) => props.theme.space.s};
+  border: 1px solid ${(props) => props.theme.colors.elevation6};
   flex-direction: row;
   background: ${(props) => (props.isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
   margin-top: ${(props) => props.theme.space.xs};
@@ -56,6 +58,13 @@ const StyledSubText = styled(StyledP)`
   margin-bottom: ${(props) => props.theme.space.xxs};
 `;
 
+const LoaderContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+`;
+
 type FeePriority = 'high' | 'medium' | 'low';
 
 interface FeeItemProps {
@@ -69,6 +78,7 @@ interface FeeItemProps {
 }
 
 function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }: FeeItemProps) {
+  const { t } = useTranslation('translation');
   const getIcon = () => {
     switch (priority) {
       case 'high':
@@ -82,17 +92,16 @@ function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }:
     }
   };
 
-  // todo: localisation
   const getLabel = () => {
     switch (priority) {
       case 'high':
-        return 'High Priority';
+        return t('SPEED_UP_TRANSACTION.HIGH_PRIORITY');
       case 'medium':
-        return 'Medium Priority';
+        return t('SPEED_UP_TRANSACTION.MED_PRIORITY');
       case 'low':
-        return 'Low Priority';
+        return t('SPEED_UP_TRANSACTION.LOW_PRIORITY');
       default:
-        return 'High Priority';
+        return t('SPEED_UP_TRANSACTION.HIGH_PRIORITY');
     }
   };
 
@@ -107,12 +116,18 @@ function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }:
           <StyledSubText typography="body_medium_s">{time}</StyledSubText>
           <StyledSubText typography="body_medium_s">{`${feeRate} Sats/ vByte`}</StyledSubText>
         </ColumnsTexts>
-        <EndColumnTexts>
-          <StyledHeading typography="body_medium_m" color="white_0">
-            {totalFee}
-          </StyledHeading>
-          <StyledSubText typography="body_medium_s">{fiat}</StyledSubText>
-        </EndColumnTexts>
+        {totalFee ? (
+          <EndColumnTexts>
+            <StyledHeading typography="body_medium_m" color="white_0">
+              {`${totalFee} Sats`}
+            </StyledHeading>
+            <StyledSubText typography="body_medium_s">{fiat}</StyledSubText>
+          </EndColumnTexts>
+        ) : (
+          <LoaderContainer>
+            <MoonLoader color="white" size={20} />
+          </LoaderContainer>
+        )}
       </TextsContainer>
     </FeeItemContainer>
   );

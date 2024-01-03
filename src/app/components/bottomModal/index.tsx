@@ -13,7 +13,7 @@ const RowContainer = styled.div((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  margin: props.theme.spacing(8),
+  margin: props.theme.space.m,
 }));
 
 const ButtonImage = styled.button({

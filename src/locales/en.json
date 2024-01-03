@@ -807,6 +807,7 @@
     "HIGHER_PRIORITY": "Higher priority",
     "HIGHEST_PRIORITY": "Highest priority",
     "MED_PRIORITY": "Medium priority",
+    "LOW_PRIORITY": "Low priority",
     "CUSTOM": "Custom",
     "INSUFFICIENT_FUNDS": "Insufficient funds",
     "INSUFFICIENT_FEE": "Insufficient fee",

@@ -47,7 +47,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
   marginTop: props.theme.space.xs,
   marginBottom: props.theme.space.s,
   border: `1px solid ${
-    props.withError ? props.theme.colors.feedback.error : props.theme.colors.elevation6
+    props.withError ? props.theme.colors.danger_medium : props.theme.colors.elevation6
   }`,
   backgroundColor: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(1),
@@ -101,26 +101,26 @@ interface FeeContainerProps {
 
 const FeeItemContainer = styled.button<FeeContainerProps>`
   display: flex;
-  padding: 12px 16px;
+  padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
   align-items: center;
-  gap: 12px;
+  gap: ${(props) => props.theme.space.s};
   align-self: stretch;
-  border-radius: 12px;
-  border: 1px solid var(--White-850, rgba(255, 255, 255, 0.15));
+  border-radius: ${(props) => props.theme.space.s};
+  border: 1px solid ${(props) => props.theme.colors.elevation6};
   flex-direction: row;
   background: ${(props) => (props.isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
   margin-top: ${(props) => props.theme.space.xs};
   flex: 1;
 `;
 
-const TextsRow = styled.div`
+const TextRow = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   flex: 1;
 `;
 
-const CustomTexts = styled.div`
+const CustomTextsContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -252,7 +252,7 @@ function EditBtcFee({
           feeMode,
           feeRateInput,
         );
-        setFeeRateInput(selectedFeeRate!.toString());
+        if (selectedFeeRate) setFeeRateInput(selectedFeeRate.toString());
         setTotalFee(modifiedFee.toString());
       } catch (err: any) {
         if (Number(err) === ErrorCodes.InSufficientBalance) {
@@ -292,7 +292,7 @@ function EditBtcFee({
           value={fiatAmount.toFixed(2).toString()}
           displayType="text"
           thousandSeparator
-          prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
+          prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
           suffix={` ${fiatCurrency}`}
           renderText={(value: string) => (
             <StyledP typography="body_medium_m" color="white_200">
@@ -367,14 +367,14 @@ function EditBtcFee({
             }}
           >
             <Faders size={20} color={Theme.colors.tangerine} />
-            <TextsRow>
+            <TextRow>
               <StyledP typography="body_medium_m" color="white_0">
                 {t('TRANSACTION_SETTING.CUSTOM')}
               </StyledP>
               <StyledP typography="body_medium_m" color="white_0">
                 {t('TRANSACTION_SETTING.MANUAL_SETTING')}
               </StyledP>
-            </TextsRow>
+            </TextRow>
           </FeeItemContainer>
         </FeePrioritiesContainer>
       )}
@@ -390,7 +390,7 @@ function EditBtcFee({
             />
             <FeeText>Sats /vByte</FeeText>
           </InputContainer>
-          <CustomTexts>
+          <CustomTextsContainer>
             <Row>
               <TotalFeeText typography="body_medium_m" color="white_200">
                 {t('TRANSACTION_SETTING.TOTAL_FEE')}
@@ -410,7 +410,7 @@ function EditBtcFee({
             <StyledP typography="body_medium_m" color="white_200">
               {getFiatAmountString(getFiatEquivalent())}
             </StyledP>
-          </CustomTexts>
+          </CustomTextsContainer>
           {error && <ErrorText>{error}</ErrorText>}
         </FeeContainer>
       )}
