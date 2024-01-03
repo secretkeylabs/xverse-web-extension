@@ -68,6 +68,7 @@ jobs:
           ARTIFACT_URL="https://github.com/$OWNER/$REPO/actions/runs/$WORKFLOW_ID"
           echo "ARTIFACT_URL=$ARTIFACT_URL" >> $GITHUB_ENV
       - name: Delete old bot comments
+        env:
           PR_ID: ${{ github.event.pull_request.number }}
         run: |
           gh api \
