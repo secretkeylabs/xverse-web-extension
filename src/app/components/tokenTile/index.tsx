@@ -124,22 +124,6 @@ const TokenTitleContainer = styled.div({
   justifyContent: 'flex-start',
 });
 
-const TagContainer = styled.div({
-  display: 'flex',
-  alignItems: 'center',
-});
-
-const ProtocolText = styled.p((props) => ({
-  ...props.theme.headline_category_s,
-  fontWeight: '700',
-  textTransform: 'uppercase',
-  marginLeft: props.theme.spacing(5),
-  backgroundColor: props.theme.colors.white_400,
-  padding: '2px 6px 1px',
-  borderRadius: props.theme.radius(2),
-  whiteSpace: 'nowrap',
-}));
-
 const StyledBarLoader = styled(BetterBarLoader)<{
   withMarginBottom?: boolean;
 }>((props) => ({
