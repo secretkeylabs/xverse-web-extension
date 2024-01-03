@@ -31,6 +31,37 @@ import {
   WalletState,
 } from './actions/types';
 
+/*
+ * This store should ONLY be used for global app settings such as:
+ *  - hasActivatedOrdinalsKey: undefined,
+ *  - hasActivatedRareSatsKey: undefined,
+ *  - hasActivatedRBFKey: true,
+ *  - rareSatsNoticeDismissed: undefined,
+ *  - showBtcReceiveAlert: true,
+ *  - showOrdinalReceiveAlert: true,
+ *  - showDataCollectionAlert: true,
+ *  - btcApiUrl: '',
+ *  - selectedAccount: null,
+ *  - accountType: 'software',
+ *  - accountName: undefined,
+ *  - walletLockPeriod: WalletSessionPeriods.STANDARD,
+ *  - isUnlocked: false,
+ *  - fiatCurrency: 'USD',
+ *
+ * because we get many bugs around caching the wrong values when switching accounts,
+ * we prefer react-query cache (with the correct cache keys) for all
+ * account-specific values, and API fetch results such as:
+ *  - btcFiatRate: '0',
+ *  - stxBtcRate: '0',
+ *  - stxBalance: '0',
+ *  - stxAvailableBalance: '0',
+ *  - stxLockedBalance: '0',
+ *  - stxNonce: 0,
+ *  - btcBalance: '0',
+ *  - feeMultipliers: null,
+ *
+ * TODO refactor most of these values out of the store and use query cache instead
+ */
 const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',

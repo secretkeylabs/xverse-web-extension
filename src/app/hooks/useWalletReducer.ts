@@ -65,6 +65,7 @@ const useWalletReducer = () => {
       currentAccounts,
     );
 
+    // we sanitise the account to remove any unknown properties which we had in pervious versions of the app
     walletAccounts[0] = {
       id: walletAccounts[0].id,
       btcAddress: walletAccounts[0].btcAddress,
@@ -77,13 +78,13 @@ const useWalletReducer = () => {
       bnsName: walletAccounts[0].bnsName,
     };
 
-    let selectedAccountData: Account;
+    let selectedAccountData: Account | undefined;
     if (!selectedAccount) {
       [selectedAccountData] = walletAccounts;
     } else if (isLedgerAccount(selectedAccount)) {
       const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, currentNetwork.type);
       const selectedAccountDataInNetwork = networkLedgerAccounts.find(
-        (account) => account.deviceAccountIndex === selectedAccount.deviceAccountIndex,
+        (a) => a.id === selectedAccount.id,
       );
 
       // we try find the specific matching ledger account
@@ -92,7 +93,12 @@ const useWalletReducer = () => {
       selectedAccountData =
         selectedAccountDataInNetwork ?? networkLedgerAccounts[0] ?? walletAccounts[0];
     } else {
-      selectedAccountData = walletAccounts[selectedAccount.id];
+      selectedAccountData = walletAccounts.find((a) => a.id === selectedAccount.id);
+    }
+
+    if (!selectedAccountData) {
+      // this should not happen but is a good fallback to have, just in case
+      [selectedAccountData] = walletAccounts;
     }
 
     if (!isHardwareAccount(selectedAccountData)) {
@@ -338,36 +344,24 @@ const useWalletReducer = () => {
   };
 
   const addLedgerAccount = async (ledgerAccount: Account) => {
-    try {
-      dispatch(updateLedgerAccountsAction([...ledgerAccountsList, ledgerAccount]));
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    dispatch(updateLedgerAccountsAction([...ledgerAccountsList, ledgerAccount]));
   };
 
   const removeLedgerAccount = async (ledgerAccount: Account) => {
-    try {
-      dispatch(
-        updateLedgerAccountsAction(
-          ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
-        ),
-      );
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    dispatch(
+      updateLedgerAccountsAction(
+        ledgerAccountsList.filter((account) => account.id !== ledgerAccount.id),
+      ),
+    );
   };
 
   const updateLedgerAccounts = async (updatedLedgerAccount: Account) => {
     const newLedgerAccountsList = ledgerAccountsList.map((account) =>
       account.id === updatedLedgerAccount.id ? updatedLedgerAccount : account,
     );
-    try {
-      dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
-      if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
-        switchAccount(updatedLedgerAccount);
-      }
-    } catch (err) {
-      return Promise.reject(err);
+    dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
+    if (isLedgerAccount(selectedAccount) && updatedLedgerAccount.id === selectedAccount?.id) {
+      switchAccount(updatedLedgerAccount);
     }
   };
 
