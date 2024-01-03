@@ -18,7 +18,7 @@ import useSignatureRequest, {
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { bip0322Hash, hashMessage, signStxMessage, buf2hex } from '@secretkeylabs/xverse-core';
+import { bip0322Hash, buf2hex, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
 import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';

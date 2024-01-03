@@ -14,9 +14,9 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { replaceCommaByDot } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import TopRow from '../../components/topRow';
 
 function SendStxScreen() {

@@ -1,5 +1,5 @@
 import { buf2hex } from '@secretkeylabs/xverse-core';
-import { ClarityType, ClarityValue, cvToString,principalToString } from '@stacks/transactions';
+import { ClarityType, ClarityValue, cvToString, principalToString } from '@stacks/transactions';
 import styled from 'styled-components';
 
 const Container = styled.div<{ isRoot: boolean }>((props) => ({
