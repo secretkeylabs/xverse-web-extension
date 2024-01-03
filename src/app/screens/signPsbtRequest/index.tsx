@@ -23,7 +23,7 @@ function SignPsbtRequest() {
   const txnContext = useTransactionContext();
   const parsedPsbt = useMemo(() => {
     try {
-      return new btcTransaction.EnhancedPsbt(txnContext, payload.psbtBase64);
+      return new btcTransaction.EnhancedPsbt(txnContext, payload.psbtBase64, payload.inputsToSign);
     } catch (err) {
       return undefined;
     }
@@ -75,13 +75,8 @@ function SignPsbtRequest() {
   const onConfirm = async (ledgerTransport?: Transport) => {
     setIsSigning(true);
     try {
-      const allowedSighash = payload.inputsToSign
-        .filter((input) => input.sigHash)
-        .map((input) => input.sigHash!);
-
       const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
         finalize: payload.broadcast,
-        allowedSighash: allowedSighash.length ? allowedSighash : undefined,
         ledgerTransport,
       });
 
