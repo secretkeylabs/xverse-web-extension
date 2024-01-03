@@ -363,13 +363,6 @@ function TokenTile({
           <CoinTickerText>{getTickerTitle()}</CoinTickerText>
           <TokenTitleContainer>
             <SubText>{title}</SubText>
-            {fungibleToken?.protocol ? (
-              <TagContainer>
-                <ProtocolText>
-                  {fungibleToken?.protocol === 'stacks' ? 'Sip-10' : fungibleToken?.protocol}
-                </ProtocolText>
-              </TagContainer>
-            ) : null}
           </TokenTitleContainer>
         </TextContainer>
       </RowContainer>
