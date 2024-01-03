@@ -1,7 +1,6 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import ActionButton from '@components/button';
-import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
@@ -269,14 +268,10 @@ function ConfirmBtcTransactionComponent({
   }, [signedNonOrdinalBtcSend]);
 
   useEffect(() => {
-    if (
+    const isFeeHigh =
       feeMultipliers &&
-      currentFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighSatsFee))
-    ) {
-      setShowFeeWarning(true);
-    } else if (showFeeWarning) {
-      setShowFeeWarning(false);
-    }
+      currentFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighSatsFee));
+    setShowFeeWarning(!!isFeeHigh);
   }, [currentFee, feeMultipliers]);
 
   const onAdvancedSettingClick = () => {
@@ -358,7 +353,9 @@ function ConfirmBtcTransactionComponent({
     <>
       <OuterContainer isGalleryOpen={isGalleryOpen}>
         {showFeeWarning && (
-          <InfoContainer type="Warning" bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')} />
+          <CalloutContainer>
+            <Callout bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')} variant="warning" />
+          </CalloutContainer>
         )}
         {/* TODO tim: refactor this not to use children. it should be just another prop */}
         {children}

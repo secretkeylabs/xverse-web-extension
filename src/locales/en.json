@@ -352,6 +352,7 @@
     "CONITNUE": "Continue",
     "BACK": "Back",
     "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
+    "UNCONFIRMED_BALANCE_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
@@ -975,7 +976,7 @@
       },
       "LONG": {
         "INVALID_JSON_CONTENT": "The content is not valid JSON. Please verify the content of your inscription.",
-        "INSUFFICIENT_FUNDS": "You have insufficient confirmed funds to process this transaction. This may be due to unconfirmed outputs in your balance. Please add more funds or try with a lower fee rate",
+        "INSUFFICIENT_FUNDS": "Your balance is insufficient to process this transaction. Please add more funds to your wallet or try with a lower fee rate",
         "INVALID_FEE_RATE": "The fee applied to this transaction is too low. To apply a higher fee, select edit fees at the bottom of this screen.",
         "INVALID_SERVICE_FEE_CONFIG": "The calling application sent an invalid payload. Please contact the application developer.",
         "INVALID_CONTENT": "The ordinal content you are trying to inscribe is not valid. Please verify the content of your inscription.",
@@ -984,7 +985,9 @@
         "FAILED_TO_FINALIZE": "The inscription transaction failed to finalize. Please try again or contact support.",
         "SERVER_ERROR": "An unknown server error occurred. Please try again or contact support."
       },
-      "TOO_MANY_REPEATS": "You can only create up to 24 inscriptions in a single request"
+      "TOO_MANY_REPEATS": "You can only create up to {{maxRepeats}} inscriptions in a single request",
+      "UNCONFIRMED_UTXO": "Some of your balance consists of unconfirmed outputs. You don't have enough confirmed funds to proceed with this transaction",
+      "LEDGER_INSCRIPTION": "This inscription service is not compatible with Ledger accounts. Please switch to a standard account to inscribe."
     }
   },
   "ERROR_SCREEN": {

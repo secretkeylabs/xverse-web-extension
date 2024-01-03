@@ -13,6 +13,7 @@ import {
   currencySymbolMap,
   fetchBtcFeeRate,
   getNonOrdinalUtxo,
+  InscriptionErrorCode,
   useInscriptionExecute,
   useInscriptionFees,
   UTXO,
@@ -25,8 +26,9 @@ import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getShortTruncatedAddress } from '@utils/helper';
+import { getShortTruncatedAddress, isLedgerAccount } from '@utils/helper';
 
+import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
 import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
 import Callout from '@ui-library/callout';
@@ -230,6 +232,7 @@ const ButtonImage = styled.img((props) => ({
 }));
 
 const DEFAULT_FEE_RATE = 8;
+const MAX_REPEATS = 24;
 
 function CreateInscription() {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
@@ -261,10 +264,11 @@ function CreateInscription() {
   } = payload as CreateInscriptionPayload | CreateRepeatInscriptionsPayload;
 
   const { repeat } = payload as CreateRepeatInscriptionsPayload;
-  const showOver24RepeatsError = !Number.isNaN(repeat) && repeat > 24;
+  const showOver24RepeatsError = !Number.isNaN(repeat) && repeat > MAX_REPEATS;
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
+  const [showConfirmedBalanceError, setShowConfirmedBalanceError] = useState(false);
   const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? DEFAULT_FEE_RATE);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
   const { getSeed } = useSeedVault();
@@ -381,8 +385,11 @@ function CreateInscription() {
     inscriptionValue,
   } = commitValueBreakdown ?? {};
 
+  const { confirmedBalance, isLoading: confirmedBalanceLoading } = useConfirmedBtcBalance();
+
   const chainFee = (revealChainFee ?? 0) + (commitChainFee ?? 0);
   const totalFee = (revealServiceFee ?? 0) + (externalServiceFee ?? 0) + chainFee;
+
   const showTotalFee = totalFee !== chainFee;
 
   const toFiat = (value: number | string = 0) =>
@@ -391,6 +398,20 @@ function CreateInscription() {
   const bundlePlusFees = new BigNumber(totalFee ?? 0)
     .plus(new BigNumber(totalInscriptionValue ?? 0))
     .toString();
+
+  const errorCode = feeErrorCode || executeErrorCode;
+
+  const isLoading = utxos === undefined || inscriptionFeesLoading;
+
+  useEffect(() => {
+    const showConfirmError =
+      !isLoading &&
+      !confirmedBalanceLoading &&
+      errorCode !== InscriptionErrorCode.INSUFFICIENT_FUNDS &&
+      confirmedBalance !== undefined &&
+      Number(bundlePlusFees) > confirmedBalance;
+    setShowConfirmedBalanceError(!!showConfirmError);
+  }, [confirmedBalance, errorCode, bundlePlusFees, isLoading, confirmedBalanceLoading]);
 
   if (complete && revealTransactionId) {
     const onClose = () => {
@@ -420,9 +441,12 @@ function CreateInscription() {
     return <CompleteScreen txId={revealTransactionId} onClose={onClose} network={network} />;
   }
 
-  const errorCode = feeErrorCode || executeErrorCode;
-
-  const isLoading = utxos === undefined || inscriptionFeesLoading;
+  const disableConfirmButton =
+    !!errorCode ||
+    isExecuting ||
+    showOver24RepeatsError ||
+    showConfirmedBalanceError ||
+    isLedgerAccount(selectedAccount);
 
   return (
     <ConfirmScreen
@@ -431,7 +455,7 @@ function CreateInscription() {
       cancelText={t('CANCEL_BUTTON')}
       confirmText={!errorCode ? t('CONFIRM_BUTTON') : t(`ERRORS.SHORT.${errorCode}`)}
       loading={isExecuting || isLoading}
-      disabled={!!errorCode || isExecuting || showOver24RepeatsError}
+      disabled={disableConfirmButton}
       isError={!!errorCode || showOver24RepeatsError}
     >
       <OuterContainer>
@@ -440,7 +464,16 @@ function CreateInscription() {
           <Title>{t('TITLE')}</Title>
           <SubTitle>{t('SUBTITLE', { name: appName ?? '' })}</SubTitle>
           {showOver24RepeatsError && (
-            <StyledCallout variant="danger" bodyText={t('ERRORS.TOO_MANY_REPEATS')} />
+            <StyledCallout
+              variant="danger"
+              bodyText={t('ERRORS.TOO_MANY_REPEATS', { maxRepeats: MAX_REPEATS })}
+            />
+          )}
+          {showConfirmedBalanceError && (
+            <StyledCallout variant="danger" bodyText={t('ERRORS.UNCONFIRMED_UTXO')} />
+          )}
+          {isLedgerAccount(selectedAccount) && (
+            <StyledCallout variant="danger" bodyText={t('ERRORS.LEDGER_INSCRIPTION')} />
           )}
           <CardContainer bottomPadding>
             <CardRow>
