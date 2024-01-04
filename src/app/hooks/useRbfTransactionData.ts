@@ -84,6 +84,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
   const btcClient = useBtcClient();
   const selectedNetwork = useNetworkSelector();
 
+  // TODO: move the STX RBF calculations to xverse-core and add unit tests
   const fetchStxData = useCallback(async () => {
     if (!transaction || isBtcTransaction(transaction)) {
       return;
@@ -129,12 +130,12 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         rbfRecommendedFees: Object.fromEntries(
           Object.entries({
             medium: {
-              enoughFunds: !BigNumber(mediumFee).gt(BigNumber(stxAvailableBalance)),
+              enoughFunds: BigNumber(mediumFee).lte(BigNumber(stxAvailableBalance)),
               feeRate: microStxToStx(mediumFee).toNumber(),
               fee: microStxToStx(mediumFee).toNumber(),
             },
             high: {
-              enoughFunds: !BigNumber(highFee).gt(BigNumber(stxAvailableBalance)),
+              enoughFunds: BigNumber(highFee).lte(BigNumber(stxAvailableBalance)),
               feeRate: microStxToStx(highFee).toNumber(),
               fee: microStxToStx(highFee).toNumber(),
             },

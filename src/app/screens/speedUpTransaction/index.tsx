@@ -4,8 +4,9 @@ import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.s
 import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
-import FiatAmountText from '@components/fiatAmountText';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import SpeedUpBtcTransaction from '@components/speedUpTransaction/btc';
+import SpeedUpStxTransaction from '@components/speedUpTransaction/stx';
 import TopRow from '@components/topRow';
 import useTransaction from '@hooks/queries/useTransaction';
 import useBtcClient from '@hooks/useBtcClient';
@@ -20,14 +21,12 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
 import {
+  StacksTransaction,
+  Transport as TransportType,
   broadcastSignedTransaction,
-  getBtcFiatEquivalent,
-  getStxFiatEquivalent,
   signLedgerStxTransaction,
   signTransaction,
-  StacksTransaction,
   stxToMicrostacks,
-  Transport as TransportType,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { EMPTY_LABEL } from '@utils/constants';
@@ -36,43 +35,18 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 import CustomFee from './customFee';
-import {
-  ButtonContainer,
-  Container,
-  ControlsContainer,
-  CustomFeeIcon,
-  DetailText,
-  FeeButton,
-  FeeButtonLeft,
-  FeeButtonRight,
-  HighlightedText,
-  LoaderContainer,
-  SecondaryText,
-  StyledActionButton,
-  SuccessActionsContainer,
-  Title,
-  WarningText,
-} from './index.styled';
+import { LoaderContainer, SuccessActionsContainer } from './index.styled';
 
 function SpeedUpTransactionScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const {
-    selectedAccount,
-    btcFiatRate,
-    stxBtcRate,
-    stxAddress,
-    fiatCurrency,
-    network,
-    stxAvailableBalance,
-  } = useWalletSelector();
+  const { selectedAccount, stxAddress, network, stxAvailableBalance } = useWalletSelector();
   const { id } = useParams();
   const location = useLocation();
   const btcClient = useBtcClient();
@@ -381,182 +355,33 @@ function SpeedUpTransactionScreen() {
         </LoaderContainer>
       ) : (
         <>
-          <Container>
-            <Title>{t('TITLE')}</Title>
-            <DetailText>{t('FEE_INFO')}</DetailText>
-            <DetailText>
-              {t('CURRENT_FEE')}{' '}
-              <HighlightedText>
-                {isBtc ? (
-                  <>
-                    <NumericFormat
-                      value={rbfTxSummary?.currentFee}
-                      displayType="text"
-                      thousandSeparator
-                      suffix=" Sats / "
-                    />
-                    <NumericFormat
-                      value={rbfTxSummary?.currentFeeRate}
-                      displayType="text"
-                      thousandSeparator
-                      suffix=" Sats /vB"
-                    />
-                  </>
-                ) : (
-                  <NumericFormat
-                    value={rbfTxSummary?.currentFee}
-                    displayType="text"
-                    thousandSeparator
-                    suffix=" STX"
-                  />
-                )}
-              </HighlightedText>
-            </DetailText>
-            <DetailText>
-              {t('ESTIMATED_COMPLETION_TIME')}{' '}
-              <HighlightedText>
-                {getEstimatedCompletionTime(rbfTxSummary?.currentFeeRate)}
-              </HighlightedText>
-            </DetailText>
-            <ButtonContainer>
-              {rbfRecommendedFees &&
-                Object.entries(rbfRecommendedFees).map(([key, obj]) => {
-                  const isDisabled = !obj.enoughFunds;
-
-                  return (
-                    <FeeButton
-                      key={key}
-                      value={key}
-                      isSelected={selectedOption === key}
-                      onClick={handleClickFeeButton}
-                      disabled={isDisabled}
-                    >
-                      <FeeButtonLeft>
-                        {feeButtonMapping[key].icon}
-                        <div>
-                          {feeButtonMapping[key].title}
-                          <SecondaryText>{getEstimatedCompletionTime(obj.feeRate)}</SecondaryText>
-                          {isBtc && (
-                            <SecondaryText>
-                              <NumericFormat
-                                value={obj.feeRate}
-                                displayType="text"
-                                thousandSeparator
-                                suffix=" Sats /vByte"
-                              />
-                            </SecondaryText>
-                          )}
-                        </div>
-                      </FeeButtonLeft>
-                      <FeeButtonRight>
-                        <div>
-                          {obj.fee ? (
-                            <NumericFormat
-                              value={obj.fee}
-                              displayType="text"
-                              thousandSeparator
-                              suffix={isBtc ? ' Sats' : ' STX'}
-                            />
-                          ) : (
-                            EMPTY_LABEL
-                          )}
-                        </div>
-                        <SecondaryText alignRight>
-                          {obj.fee ? (
-                            <FiatAmountText
-                              fiatAmount={
-                                isBtc
-                                  ? getBtcFiatEquivalent(BigNumber(obj.fee), BigNumber(btcFiatRate))
-                                  : getStxFiatEquivalent(
-                                      stxToMicrostacks(BigNumber(obj.fee)),
-                                      BigNumber(stxBtcRate),
-                                      BigNumber(btcFiatRate),
-                                    )
-                              }
-                              fiatCurrency={fiatCurrency}
-                            />
-                          ) : (
-                            `${EMPTY_LABEL} ${fiatCurrency}`
-                          )}
-                        </SecondaryText>
-                        {isDisabled && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
-                      </FeeButtonRight>
-                    </FeeButton>
-                  );
-                })}
-              <FeeButton
-                key="custom"
-                value="custom"
-                isSelected={selectedOption === 'custom'}
-                onClick={handleClickFeeButton}
-                centered={!customFeeRate}
-              >
-                <FeeButtonLeft>
-                  <CustomFeeIcon {...iconProps} />
-                  <div>
-                    {t('CUSTOM')}
-                    {customFeeRate && (
-                      <>
-                        <SecondaryText>
-                          {getEstimatedCompletionTime(Number(customFeeRate))}
-                        </SecondaryText>
-                        {isBtc && (
-                          <SecondaryText>
-                            <NumericFormat
-                              value={customFeeRate}
-                              displayType="text"
-                              thousandSeparator
-                              suffix=" Sats /vByte"
-                            />
-                          </SecondaryText>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </FeeButtonLeft>
-                <FeeButtonRight>
-                  {customFeeRate && customTotalFee ? (
-                    <>
-                      <NumericFormat
-                        value={customTotalFee}
-                        displayType="text"
-                        thousandSeparator
-                        suffix={isBtc ? ' Sats' : ' STX'}
-                        renderText={(value: string) => <HighlightedText>{value}</HighlightedText>}
-                      />
-                      <SecondaryText alignRight>
-                        <FiatAmountText
-                          fiatAmount={
-                            isBtc
-                              ? getBtcFiatEquivalent(
-                                  BigNumber(customTotalFee),
-                                  BigNumber(btcFiatRate),
-                                )
-                              : getStxFiatEquivalent(
-                                  stxToMicrostacks(BigNumber(customTotalFee)),
-                                  BigNumber(stxBtcRate),
-                                  BigNumber(btcFiatRate),
-                                )
-                          }
-                          fiatCurrency={fiatCurrency}
-                        />
-                      </SecondaryText>
-                    </>
-                  ) : (
-                    t('MANUAL_SETTING')
-                  )}
-                </FeeButtonRight>
-              </FeeButton>
-            </ButtonContainer>
-            <ControlsContainer>
-              <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
-              <StyledActionButton
-                text={t('SUBMIT')}
-                disabled={!selectedOption}
-                onPress={handleClickSubmit}
-              />
-            </ControlsContainer>
-          </Container>
+          {isBtc ? (
+            <SpeedUpBtcTransaction
+              rbfTxSummary={rbfTxSummary}
+              rbfRecommendedFees={rbfRecommendedFees}
+              selectedOption={selectedOption}
+              customFeeRate={customFeeRate}
+              customTotalFee={customTotalFee}
+              feeButtonMapping={feeButtonMapping}
+              handleGoBack={handleGoBack}
+              handleClickFeeButton={handleClickFeeButton}
+              handleClickSubmit={handleClickSubmit}
+              getEstimatedCompletionTime={getEstimatedCompletionTime}
+            />
+          ) : (
+            <SpeedUpStxTransaction
+              rbfTxSummary={rbfTxSummary}
+              rbfRecommendedFees={rbfRecommendedFees}
+              selectedOption={selectedOption}
+              customFeeRate={customFeeRate}
+              customTotalFee={customTotalFee}
+              feeButtonMapping={feeButtonMapping}
+              handleGoBack={handleGoBack}
+              handleClickFeeButton={handleClickFeeButton}
+              handleClickSubmit={handleClickSubmit}
+              getEstimatedCompletionTime={getEstimatedCompletionTime}
+            />
+          )}
 
           {/* TODO: Move this modal and the custom option info above to a separate component */}
           {rbfTxSummary && showCustomFee && (
