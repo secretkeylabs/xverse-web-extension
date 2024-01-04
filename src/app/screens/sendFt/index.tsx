@@ -6,6 +6,7 @@ import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  buf2hex,
   generateUnsignedTransaction,
   StacksTransaction,
   UnsignedStacksTransation,
@@ -82,7 +83,7 @@ function SendFtScreen() {
     if (data) {
       navigate('/confirm-ft-tx', {
         state: {
-          unsignedTx: data.serialize().toString('hex'),
+          unsignedTx: buf2hex(data.serialize()),
           amount: amountToSend.toString(),
           fungibleToken,
           memo: txMemo,
