@@ -70,10 +70,6 @@ var options = {
             loader: 'ts-loader',
             options: {
               getCustomTransformers: () => ({
-                // before: [
-                //   env.NODE_ENV === 'development' && ReactRefreshTypeScript(),
-                //   env.NODE_ENV === 'development' && styledComponentsTransformer,
-                // ].filter(Boolean),
                 before:
                   env.NODE_ENV === 'development'
                     ? [ReactRefreshTypeScript(), styledComponentsTransformer]
