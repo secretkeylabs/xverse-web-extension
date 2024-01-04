@@ -1,10 +1,10 @@
 import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
-import { useApplyFeeMultiplier } from '@hooks/queries/useFeeMultipliers';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  applyFeeMultiplier,
   buf2hex,
   generateUnsignedStxTokenTransferTransaction,
   microstacksToStx,
@@ -23,8 +23,8 @@ import TopRow from '../../components/topRow';
 function SendStxScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxAvailableBalance, stxPublicKey, network } = useWalletSelector();
-  const applyFeeMultiplier = useApplyFeeMultiplier();
+  const { stxAddress, stxAvailableBalance, stxPublicKey, network, feeMultipliers } =
+    useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
@@ -56,7 +56,7 @@ function SendStxScreen() {
           stxPublicKey,
           selectedNetwork,
         );
-      applyFeeMultiplier(unsignedSendStxTx);
+      applyFeeMultiplier(unsignedSendStxTx, feeMultipliers);
       return unsignedSendStxTx;
     },
   });

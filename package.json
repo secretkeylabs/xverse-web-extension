@@ -10,7 +10,7 @@
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "7.0.0",
+    "@secretkeylabs/xverse-core": "7.2.0-9e51ce3",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
     "@stacks/transactions": "6.9.0",
@@ -139,10 +139,10 @@
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "type-fest": "^2.19.0",
     "typescript": "^5.0.0",
+    "typescript-plugin-styled-components": "^3.0.0",
     "vitest": "^0.34.6",
     "webpack": "^5.89.0",
     "webpack-cli": "^4.0.0",
-    "webpack-dev-server": "^4.11.0",
-    "typescript-plugin-styled-components": "^3.0.0"
+    "webpack-dev-server": "^4.11.0"
   }
 }

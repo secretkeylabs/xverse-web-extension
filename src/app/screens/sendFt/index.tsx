@@ -1,15 +1,15 @@
 import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { useApplyFeeMultiplier } from '@hooks/queries/useFeeMultipliers';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  buf2hex,
-  generateUnsignedTransaction,
   StacksTransaction,
   UnsignedStacksTransation,
+  applyFeeMultiplier,
+  buf2hex,
+  generateUnsignedTransaction,
   validateStxAddress,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
@@ -21,8 +21,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function SendFtScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxPublicKey, network, coinsList } = useWalletSelector();
-  const applyFeeMultiplier = useApplyFeeMultiplier();
+  const { stxAddress, stxPublicKey, network, coinsList, feeMultipliers } = useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
@@ -74,7 +73,7 @@ function SendFtScreen() {
         memo,
       };
       const unsignedTx = await generateUnsignedTransaction(unsginedTx);
-      applyFeeMultiplier(unsignedTx);
+      applyFeeMultiplier(unsignedTx, feeMultipliers);
       return unsignedTx;
     },
   });

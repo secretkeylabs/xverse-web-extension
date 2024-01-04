@@ -1,6 +1,5 @@
 import ActionButton from '@components/button';
 import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
-import { useApplyFeeMultiplier } from '@hooks/queries/useFeeMultipliers';
 import useNftDetail from '@hooks/queries/useNftDetail';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useDebounce from '@hooks/useDebounce';
@@ -10,6 +9,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   StacksTransaction,
   UnsignedStacksTransation,
+  applyFeeMultiplier,
   buf2hex,
   cvToHex,
   generateUnsignedTransaction,
@@ -102,8 +102,7 @@ function SendNft() {
 
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
-  const { stxAddress, stxPublicKey, network } = useWalletSelector();
-  const applyFeeMultiplier = useApplyFeeMultiplier();
+  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(debouncedSearchTerm);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);
@@ -131,7 +130,7 @@ function SendNft() {
         isNFT: true,
       };
       const unsignedTx = await generateUnsignedTransaction(unsginedTx);
-      applyFeeMultiplier(unsignedTx);
+      applyFeeMultiplier(unsignedTx, feeMultipliers);
       setRecipientAddress(address);
       return unsignedTx;
     },
