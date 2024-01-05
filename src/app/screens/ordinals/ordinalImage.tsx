@@ -3,6 +3,7 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { BetterBarLoader } from '@components/barLoader';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { TextT } from '@phosphor-icons/react';
 import { CondensedInscription, getErc721Metadata, Inscription } from '@secretkeylabs/xverse-core';
 import { getBrc20Details } from '@utils/brc20';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
@@ -11,6 +12,7 @@ import Image from 'rc-image';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import Theme from 'theme';
 import Brc20Tile from './brc20Tile';
 
 interface ContainerProps {
@@ -118,6 +120,14 @@ const StyledImage = styled(Image)`
   image-rendering: pixelated;
   display: flex;
 `;
+const ContentTypeThumbnailContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: ${(props) => props.theme.colors.white_0};
+`;
 
 export const StyledBarLoader = styled(BetterBarLoader)((props) => ({
   padding: 0,
@@ -134,6 +144,7 @@ interface Props {
   withoutSizeIncrease?: boolean;
   withoutTitles?: boolean;
   placeholderIcon?: string;
+  showContentTypeThumbnail?: boolean;
 }
 
 function OrdinalImage({
@@ -145,6 +156,7 @@ function OrdinalImage({
   withoutSizeIncrease = false,
   withoutTitles = false,
   placeholderIcon,
+  showContentTypeThumbnail = false,
 }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360 && !withoutSizeIncrease;
   const textContent = useTextOrdinalContent(ordinal);
@@ -267,6 +279,16 @@ function OrdinalImage({
               <Text>{t('ORDINAL')}</Text>
             </OrdinalsTag>
           )}
+        </ImageContainer>
+      );
+    }
+
+    if (showContentTypeThumbnail) {
+      return (
+        <ImageContainer>
+          <ContentTypeThumbnailContainer>
+            <TextT width="50%" height="50%" color={Theme.colors.elevation0} weight="bold" />
+          </ContentTypeThumbnailContainer>
         </ImageContainer>
       );
     }
