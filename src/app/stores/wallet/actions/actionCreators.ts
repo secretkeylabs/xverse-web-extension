@@ -279,3 +279,10 @@ export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletU
     isUnlocked,
   };
 }
+
+export function setWalletHideStxAction(hideStx: boolean): actions.SetWalletHideStx {
+  return {
+    type: actions.SetWalletHideStxKey,
+    hideStx,
+  };
+}

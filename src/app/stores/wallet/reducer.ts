@@ -100,6 +100,7 @@ const initialWalletState: WalletState = {
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
+  hideStx: false,
 };
 
 const walletReducer = (
