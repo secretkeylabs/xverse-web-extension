@@ -71,7 +71,7 @@ function ManageTokens() {
       <TokenContainer>
         {coins?.map((coin, index) => (
           <CoinItem
-            key={coin.contract} // contract is not optional and is be unique
+            key={coin.contract} // contract is not optional and is unique
             coin={coin}
             disabled={false}
             toggled={toggled}
