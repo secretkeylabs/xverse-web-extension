@@ -38,6 +38,7 @@ const TickerImage = styled.img<TickerProps>((props) => ({
   transform: 'all',
   height: props.enlargeTicker ? 40 : 32,
   width: props.enlargeTicker ? 40 : 32,
+  borderRadius: '50%',
 }));
 
 const TickerIconContainer = styled.div<TickerProps>((props) => ({
