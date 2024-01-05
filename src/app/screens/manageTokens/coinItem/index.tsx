@@ -30,6 +30,7 @@ const CoinIcon = styled.img((props) => ({
   width: 32,
   height: 32,
   resizeMode: 'stretch',
+  borderRadius: '50%',
 }));
 
 const CustomSwitch = styled(Switch)`
