@@ -1,4 +1,3 @@
-import { StacksProvider } from '@stacks/connect';
 import {
   AuthenticationRequestEventDetails,
   DomEventName,
@@ -13,6 +12,7 @@ import {
   SignatureResponseMessage,
   TransactionResponseMessage,
 } from '@common/types/message-types';
+import { StacksProvider } from '@stacks/connect';
 
 declare const VERSION: string;
 type CallableMethods = keyof typeof ExternalMethods;
@@ -60,7 +60,7 @@ const isValidEvent = (event: MessageEvent, method: LegacyMessageToContentScript[
   return correctSource && correctMethod && !!data.payload;
 };
 
-const StacksMethodsProvider: StacksProvider = {
+const StacksMethodsProvider: Partial<StacksProvider> = {
   getURL: async () => {
     const { url } = await callAndReceive('getURL');
     return url;

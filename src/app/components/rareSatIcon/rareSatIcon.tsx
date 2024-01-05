@@ -1,31 +1,32 @@
-import OneDPali from '@assets/img/nftDashboard/rareSats/1d_pali.svg';
-import TwoDPali from '@assets/img/nftDashboard/rareSats/2d_pali.svg';
-import ThreeDPali from '@assets/img/nftDashboard/rareSats/3d_pali.svg';
-import Alpha from '@assets/img/nftDashboard/rareSats/alpha.svg';
+import OneDPali from '@assets/img/nftDashboard/rareSats/1Dpali.png';
+import FirstTx from '@assets/img/nftDashboard/rareSats/1stx.png';
+import TwoDPali from '@assets/img/nftDashboard/rareSats/2Dpali.png';
+import ThreeDPali from '@assets/img/nftDashboard/rareSats/3Dpali.png';
+import Alpha from '@assets/img/nftDashboard/rareSats/alpha.png';
+import Block78 from '@assets/img/nftDashboard/rareSats/b78.png';
+import Block9 from '@assets/img/nftDashboard/rareSats/b9.png';
 import BlackEpic from '@assets/img/nftDashboard/rareSats/black_epic.svg';
 import BlackLegendary from '@assets/img/nftDashboard/rareSats/black_legendary.svg';
 import BlackRare from '@assets/img/nftDashboard/rareSats/black_rare.svg';
 import BlackUncommon from '@assets/img/nftDashboard/rareSats/black_uncommon.svg';
-import Block78 from '@assets/img/nftDashboard/rareSats/block_78.svg';
-import Block9 from '@assets/img/nftDashboard/rareSats/block_9.svg';
-import BlockPali from '@assets/img/nftDashboard/rareSats/block_pali.svg';
 import Epic from '@assets/img/nftDashboard/rareSats/epic.svg';
-import FibonacciSequence from '@assets/img/nftDashboard/rareSats/fibonacci_sequence.svg';
-import FirstTransactionSilkroad from '@assets/img/nftDashboard/rareSats/first_transaction_silkroad.svg';
-import Hitman from '@assets/img/nftDashboard/rareSats/hitman.svg';
-import Jpeg from '@assets/img/nftDashboard/rareSats/jpeg.svg';
+import FibonacciSequence from '@assets/img/nftDashboard/rareSats/fibonacci.png';
+import Hitman from '@assets/img/nftDashboard/rareSats/hitman.png';
+import Jpeg from '@assets/img/nftDashboard/rareSats/jpeg.png';
 import Legendary from '@assets/img/nftDashboard/rareSats/legendary.svg';
 import Mythic from '@assets/img/nftDashboard/rareSats/mythic.svg';
-import Nakamoto from '@assets/img/nftDashboard/rareSats/nakamoto.svg';
-import Omega from '@assets/img/nftDashboard/rareSats/omega.svg';
-import Palinception from '@assets/img/nftDashboard/rareSats/palinception.svg';
-import Palindrome from '@assets/img/nftDashboard/rareSats/palindrome.svg';
-import Pizza from '@assets/img/nftDashboard/rareSats/pizza.svg';
+import Nakamoto from '@assets/img/nftDashboard/rareSats/nakamoto.png';
+import Omega from '@assets/img/nftDashboard/rareSats/omega.png';
+import Palindrome from '@assets/img/nftDashboard/rareSats/pali.png';
+import BlockPali from '@assets/img/nftDashboard/rareSats/paliblock.png';
+import Palinception from '@assets/img/nftDashboard/rareSats/perfectpaliception.png';
+import Pizza from '@assets/img/nftDashboard/rareSats/pizza.png';
 import Rare from '@assets/img/nftDashboard/rareSats/rare.svg';
-import SequencePali from '@assets/img/nftDashboard/rareSats/sequence_pali.svg';
+import SequencePali from '@assets/img/nftDashboard/rareSats/seqpali.png';
+import SilkRoad from '@assets/img/nftDashboard/rareSats/silkroad.png';
 import Uncommon from '@assets/img/nftDashboard/rareSats/uncommon.svg';
 import Unknown from '@assets/img/nftDashboard/rareSats/unknown.svg';
-import Vintage from '@assets/img/nftDashboard/rareSats/vintage.svg';
+import Vintage from '@assets/img/nftDashboard/rareSats/vintage.png';
 import { RareSatsType } from '@secretkeylabs/xverse-core';
 import styled from 'styled-components';
 import Theme from '../../../theme';
@@ -47,6 +48,7 @@ const Image = styled.img`
   width: 100%;
   height: 100%;
   zindex: 2;
+  object-fit: cover;
 `;
 
 interface Props {
@@ -80,7 +82,7 @@ function RareSatIcon({ type, size = 24, bgColor, padding = 0, isDynamicSize = fa
     NAME_PALINDROME: Palindrome,
     ALPHA: Alpha,
     OMEGA: Omega,
-    FIRST_TRANSACTION: FirstTransactionSilkroad,
+    FIRST_TRANSACTION: FirstTx,
     BLOCK9: Block9,
     BLOCK78: Block78,
     NAKAMOTO: Nakamoto,
@@ -88,7 +90,7 @@ function RareSatIcon({ type, size = 24, bgColor, padding = 0, isDynamicSize = fa
     PIZZA: Pizza,
     JPEG: Jpeg,
     HITMAN: Hitman,
-    SILK_ROAD: FirstTransactionSilkroad,
+    SILK_ROAD: SilkRoad,
   }[type];
   if (!src) {
     return null;
