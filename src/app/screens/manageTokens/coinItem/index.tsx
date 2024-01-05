@@ -44,12 +44,13 @@ const CustomSwitch = styled(Switch)`
 const TickerIconContainer = styled.div((props) => ({
   display: 'flex',
   marginRight: props.theme.spacing(7),
-  height: 30,
-  width: 30,
+  height: '32px',
+  width: '32px',
   borderRadius: props.theme.radius(3),
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: props.color,
+  flexShrink: 0,
 }));
 
 const TickerText = styled.h1((props) => ({
@@ -58,6 +59,7 @@ const TickerText = styled.h1((props) => ({
   textAlign: 'center',
   wordBreak: 'break-all',
   fontSize: 10,
+  width: '100%',
 }));
 
 const SelectedCoinTitleText = styled.h1((props) => ({
