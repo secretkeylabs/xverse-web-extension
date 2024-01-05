@@ -1,5 +1,5 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import IconStacks from '@assets/img/ledger/stx_icon.svg';
 import BarLoader from '@components/barLoader';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';

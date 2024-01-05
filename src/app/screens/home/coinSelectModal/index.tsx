@@ -1,5 +1,5 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import IconStacks from '@assets/img/ledger/stx_icon.svg';
 import BottomModal from '@components/bottomModal';
 import TokenTile from '@components/tokenTile';
 import useWalletSelector from '@hooks/useWalletSelector';

@@ -1,4 +1,4 @@
-import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
+import stacksIcon from '@assets/img/ledger/stx_icon.svg';
 import TopRow from '@components/topRow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
