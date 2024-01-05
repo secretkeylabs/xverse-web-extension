@@ -11,6 +11,7 @@ const useBtcClient = () => {
     () =>
       new BitcoinEsploraApiProvider({
         url,
+        fallbackUrl: 'https://btc-1.xverse.app', // TODO take this from settings input
         network: type,
       }),
     [url, type],
