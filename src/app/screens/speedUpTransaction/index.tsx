@@ -383,7 +383,6 @@ function SpeedUpTransactionScreen() {
             />
           )}
 
-          {/* TODO: Move this modal and the custom option info above to a separate component */}
           {rbfTxSummary && showCustomFee && (
             <CustomFee
               visible={showCustomFee}
