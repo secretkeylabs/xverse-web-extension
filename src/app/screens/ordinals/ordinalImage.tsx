@@ -287,7 +287,7 @@ function OrdinalImage({
       return (
         <ImageContainer>
           <ContentTypeThumbnailContainer>
-            <TextT width="50%" height="50%" color={Theme.colors.elevation0} weight="bold" />
+            <TextT width="50%" height="50%" color={Theme.colors.elevation0} />
           </ContentTypeThumbnailContainer>
         </ImageContainer>
       );
