@@ -31,7 +31,7 @@ function ManageTokens() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const toggled = (isEnabled: boolean, coin: Coin) => {
+  const toggled = (isEnabled: boolean, coin: Pick<Coin, 'name' | 'contract'>) => {
     /* if coins exists in list of fungible token, update the visible property otherwise
      add coin in list if coin is set to visible */
     const coinToBeUpdated: FungibleToken | undefined = coinsList?.find(

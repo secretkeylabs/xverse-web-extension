@@ -75,9 +75,9 @@ const UnSelectedCoinTitleText = styled.h1((props) => ({
 }));
 
 interface Props {
-  coin: Coin;
+  coin: Pick<Coin, 'name' | 'ticker' | 'contract' | 'image'>;
   disabled: boolean;
-  toggled(enabled: boolean, coin: Coin): void;
+  toggled(enabled: boolean, coin: Pick<Coin, 'name' | 'contract'>): void;
   enabled?: boolean;
   showDivider: boolean;
 }
