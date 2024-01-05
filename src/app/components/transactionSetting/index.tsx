@@ -157,6 +157,7 @@ function TransactionSettingAlert({
     }
     setShowNonceSettings(false);
     setShowFeeSettings(false);
+    setCustomFeeSelected(false);
     setError('');
     onApplyClick({ fee: feeInput.toString(), feeRate: feeRate?.toString() });
   };

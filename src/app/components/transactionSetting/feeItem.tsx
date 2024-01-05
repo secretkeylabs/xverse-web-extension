@@ -106,7 +106,7 @@ function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }:
   };
 
   return (
-    <FeeItemContainer onClick={onClick} isSelected={selected}>
+    <FeeItemContainer onClick={onClick} isSelected={selected} disabled={!totalFee}>
       <IconContainer>{getIcon()}</IconContainer>
       <TextsContainer>
         <ColumnsTexts>

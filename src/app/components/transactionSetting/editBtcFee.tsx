@@ -363,7 +363,6 @@ function EditBtcFee({
             isSelected={feeMode === 'custom'}
             onClick={() => {
               setCustomFeeSelected(true);
-              setFeeMode('custom');
             }}
           >
             <Faders size={20} color={Theme.colors.tangerine} />
