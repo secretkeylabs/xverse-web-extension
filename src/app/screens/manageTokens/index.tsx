@@ -1,4 +1,7 @@
+import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
 import TopRow from '@components/topRow';
+import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
 import CoinItem from '@screens/manageTokens/coinItem';
 import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
@@ -24,6 +27,27 @@ const Container = styled.div({
   flexDirection: 'column',
   overflow: 'hidden',
 });
+
+function Stacks() {
+  const { hideStx } = useWalletSelector();
+  const { toggleStxVisibility } = useWalletReducer();
+  const tickerConstant = 'stx';
+  return (
+    <CoinItem
+      key="stx"
+      coin={{
+        name: 'Stacks',
+        ticker: tickerConstant,
+        image: stacksIcon,
+        contract: tickerConstant,
+      }}
+      disabled={hideStx}
+      toggled={toggleStxVisibility}
+      enabled={!hideStx}
+      showDivider
+    />
+  );
+}
 
 function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
@@ -69,6 +93,7 @@ function ManageTokens() {
     <Container>
       <TopRow title={t('ADD_COINS')} onClick={handleBackButtonClick} />
       <TokenContainer>
+        <Stacks />
         {coins?.map((coin, index) => (
           <CoinItem
             key={coin.contract} // contract is not optional and is unique
@@ -76,7 +101,7 @@ function ManageTokens() {
             disabled={false}
             toggled={toggled}
             enabled={coin.visible}
-            showDivider={showDivider(index)}
+            showDivider={showDivider(index + 1)}
           />
         ))}
       </TokenContainer>
