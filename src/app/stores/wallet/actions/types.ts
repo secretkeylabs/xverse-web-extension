@@ -48,9 +48,10 @@ export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
 
 export enum WalletSessionPeriods {
-  LOW = 1,
-  STANDARD = 10,
-  LONG = 30,
+  LOW = 15,
+  STANDARD = 30,
+  LONG = 60,
+  VERY_LONG = 180,
 }
 
 export interface WalletState {

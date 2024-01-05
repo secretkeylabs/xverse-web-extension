@@ -49,7 +49,8 @@ const useWalletReducer = () => {
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
-  const { setSessionStartTime, clearSessionTime } = useWalletSession();
+  const { setSessionStartTime, clearSessionTime, setSessionStartTimeAndMigrate } =
+    useWalletSession();
   const queryClient = useQueryClient();
 
   const loadActiveAccounts = async (
@@ -142,7 +143,7 @@ const useWalletReducer = () => {
       dispatch(fetchAccountAction(accountsList[0], accountsList));
       dispatch(getActiveAccountsAction(accountsList));
     } finally {
-      setSessionStartTime();
+      setSessionStartTimeAndMigrate();
     }
   };
 
