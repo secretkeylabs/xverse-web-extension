@@ -303,6 +303,7 @@ function TransactionSettingAlert({
               onPress={() => {
                 setCustomFeeSelected(false);
               }}
+              transparent
             />
           </LeftButton>
           <RightButton>
