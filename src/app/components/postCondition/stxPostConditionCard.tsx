@@ -1,4 +1,4 @@
-import IconStacks from '@assets/img/ledger/stx_icon.svg';
+import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import { PostCondition } from '@stacks/transactions';
 import PostConditionsView from './postConditionView';
 import { getAmountFromPostCondition } from './postConditionView/helper';

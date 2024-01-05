@@ -1,4 +1,4 @@
-import IconStacks from '@assets/img/ledger/stx_icon.svg';
+import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
