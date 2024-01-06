@@ -1,4 +1,5 @@
 import { initialNetworksList } from '@utils/constants';
+import { getHideStx } from '@utils/localStorage';
 import {
   AddAccountKey,
   ChangeFiatCurrencyKey,
@@ -20,6 +21,7 @@ import {
   SetCoinRatesKey,
   SetFeeMultiplierKey,
   SetStxWalletDataKey,
+  SetWalletHideStxKey,
   SetWalletKey,
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
@@ -100,7 +102,7 @@ const initialWalletState: WalletState = {
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
-  hideStx: false,
+  hideStx: getHideStx() ?? false,
 };
 
 const walletReducer = (
@@ -262,6 +264,11 @@ const walletReducer = (
       return {
         ...state,
         isUnlocked: action.isUnlocked,
+      };
+    case SetWalletHideStxKey:
+      return {
+        ...state,
+        hideStx: action.hideStx,
       };
     default:
       return state;

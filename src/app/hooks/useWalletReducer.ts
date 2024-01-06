@@ -30,6 +30,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { generatePasswordHash } from '@utils/encryptionUtils';
 import { isHardwareAccount, isLedgerAccount } from '@utils/helper';
+import { saveHideStx } from '@utils/localStorage';
 import { resetMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { useDispatch } from 'react-redux';
 import useSeedVault from './useSeedVault';
@@ -154,6 +155,7 @@ const useWalletReducer = () => {
   };
 
   const toggleStxVisibility = async () => {
+    saveHideStx(!hideStx);
     dispatch(setWalletHideStxAction(!hideStx));
   };
 

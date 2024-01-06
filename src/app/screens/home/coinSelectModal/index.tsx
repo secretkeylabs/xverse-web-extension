@@ -35,7 +35,7 @@ function CoinSelectModal({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const theme = useTheme();
-  const { btcAddress, stxAddress } = useWalletSelector();
+  const { btcAddress, stxAddress, hideStx } = useWalletSelector();
   const handleOnBitcoinPress = () => {
     onSelectBitcoin?.();
     onClose();
@@ -61,7 +61,7 @@ function CoinSelectModal({
             onPress={handleOnBitcoinPress}
           />
         )}
-        {stxAddress && (
+        {stxAddress && !hideStx && (
           <TokenTile
             title={t('STACKS')}
             currency="STX"

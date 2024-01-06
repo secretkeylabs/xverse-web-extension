@@ -193,6 +193,7 @@ function Home() {
     showOrdinalReceiveAlert,
     showDataCollectionAlert,
     network,
+    hideStx,
   } = useWalletSelector();
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
@@ -377,7 +378,7 @@ function Home() {
         <MergedIcon src={ordinalsIcon} />
       </ReceiveCardComponent>
 
-      {stxAddress && (
+      {stxAddress && !hideStx && (
         <ReceiveCardComponent
           title={t('STACKS_AND_TOKEN')}
           address={stxAddress}
@@ -493,7 +494,7 @@ function Home() {
               onPress={handleTokenPressed}
             />
           )}
-          {stxAddress && (
+          {stxAddress && !hideStx && (
             <TokenTile
               title={t('STACKS')}
               currency="STX"

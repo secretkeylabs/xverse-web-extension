@@ -41,7 +41,7 @@ function Stacks() {
         image: stacksIcon,
         contract: tickerConstant,
       }}
-      disabled={hideStx}
+      disabled={false}
       toggled={toggleStxVisibility}
       enabled={!hideStx}
       showDivider
