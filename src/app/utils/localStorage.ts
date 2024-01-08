@@ -2,7 +2,6 @@ const userPrefBackupRemindKey = 'UserPref:BackupRemind';
 const isTermsAccepted = 'isTermsAccepted';
 const hasFinishedOnboardingKey = 'hasFinishedOnboarding';
 const nonOrdinalTransferTime = 'nonOrdinalTransferTime';
-const hideStx = 'hideStx';
 
 export function saveMultiple(items: { [x: string]: string }) {
   const itemKeys = Object.keys(items);
@@ -50,12 +49,4 @@ export async function saveTimeForNonOrdinalTransferTransaction(ordinalAddress: s
 
 export async function getTimeForNonOrdinalTransferTransaction(ordinalAddress: string) {
   return localStorage.getItem(nonOrdinalTransferTime + ordinalAddress);
-}
-
-export function getHideStx(): boolean {
-  return Boolean(localStorage.getItem(hideStx));
-}
-
-export function saveHideStx(newHideStx: boolean) {
-  return localStorage.setItem(hideStx, newHideStx.toString());
 }

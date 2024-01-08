@@ -1,5 +1,4 @@
 import { initialNetworksList } from '@utils/constants';
-import { getHideStx } from '@utils/localStorage';
 import {
   AddAccountKey,
   ChangeFiatCurrencyKey,
@@ -102,7 +101,7 @@ const initialWalletState: WalletState = {
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
-  hideStx: getHideStx() ?? false,
+  hideStx: false,
 };
 
 const walletReducer = (
