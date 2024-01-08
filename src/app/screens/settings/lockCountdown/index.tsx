@@ -41,25 +41,24 @@ interface TimeSelectionBoxProps {
 }
 
 const TimeSelectionBox = styled.button<TimeSelectionBoxProps>((props) => ({
-  ...props.theme.body_medium_m,
-  backgroundColor: 'transparent',
-  border: `1px solid ${props.selected ? props.theme.colors.white_0 : props.theme.colors.grey}`,
-  color: props.theme.colors.white_0,
+  ...props.theme.typography.body_medium_m,
+  backgroundColor: props.selected ? props.theme.colors.white_900 : 'transparent',
+  border: `1px solid ${props.theme.colors.white_800}`,
+  color: props.selected ? props.theme.colors.white_0 : props.theme.colors.white_200,
   borderRadius: props.theme.radius(1),
-  height: 44,
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'flex-start',
-  marginBottom: props.theme.spacing(12),
-  paddingLeft: props.theme.spacing(6),
-  paddingRight: props.theme.spacing(6),
+  padding: props.theme.space.m,
+  marginBottom: props.theme.space.s,
 }));
 
-const TimerIcon = styled.img((props) => ({
+const TimerIcon = styled.img<TimeSelectionBoxProps>((props) => ({
   width: 18,
   height: 21,
-  marginRight: props.theme.spacing(12),
+  marginRight: props.theme.space.l,
+  opacity: props.selected ? 1 : 0.8,
 }));
 
 const getLabel = (period: number) => {
@@ -108,7 +107,11 @@ function LockCountdown() {
             selected={selectedTime === period}
             onClick={() => setSelectedTime(period)}
           >
-            <TimerIcon src={iconsByPeriod[period]} alt={period.toString()} />
+            <TimerIcon
+              selected={selectedTime === period}
+              src={iconsByPeriod[period]}
+              alt={period.toString()}
+            />
             {getLabel(period)}
           </TimeSelectionBox>
         ))}
