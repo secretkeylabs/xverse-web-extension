@@ -53,7 +53,7 @@ function TransactionRequest() {
     const unsignedSendStxTx = await getTokenTransferRequest(
       tokenTransferPayload.recipient,
       tokenTransferPayload.amount,
-      tokenTransferPayload.memo!,
+      tokenTransferPayload.memo ?? '',
       requestAccount.stxPublicKey,
       feeMultipliers,
       selectedNetwork,
