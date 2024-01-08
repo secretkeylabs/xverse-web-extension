@@ -26,6 +26,13 @@ type TierFees = {
   feeRate: number;
 };
 
+type RbfRecommendedFees = {
+  medium?: TierFees;
+  high?: TierFees;
+  higher?: TierFees;
+  highest?: TierFees;
+};
+
 type RbfData = {
   rbfTransaction?: InstanceType<typeof rbf.RbfTransaction>;
   rbfTxSummary?: {
@@ -34,12 +41,7 @@ type RbfData = {
     minimumRbfFee: number;
     minimumRbfFeeRate: number;
   };
-  rbfRecommendedFees?: {
-    medium?: TierFees;
-    high?: TierFees;
-    higher?: TierFees;
-    highest?: TierFees;
-  };
+  rbfRecommendedFees?: RbfRecommendedFees;
   mempoolFees?: RecommendedFeeResponse;
   isLoading?: boolean;
 };
@@ -75,6 +77,51 @@ export async function getRawTransaction(txId: string, network: SettingsNetwork):
   return axios.get<RawTransactionResponse>(apiUrl).then((response) => response.data.raw_tx);
 }
 
+const constructRecommendedFees = async (
+  lowerName: keyof RbfRecommendedFees,
+  lowerFeeRate: number,
+  higherName: keyof RbfRecommendedFees,
+  higherFeeRate: number,
+  stxAvailableBalance: string,
+  thresholdHighStacksFee?: number,
+): Promise<RbfRecommendedFees> => {
+  let lowerFee = lowerFeeRate;
+  let higherFee = higherFeeRate;
+
+  if (thresholdHighStacksFee) {
+    // adding a fee cap
+
+    if (higherFee > thresholdHighStacksFee) {
+      higherFee = thresholdHighStacksFee;
+    }
+
+    if (lowerFee > thresholdHighStacksFee) {
+      lowerFee = thresholdHighStacksFee * 0.75;
+    }
+  }
+
+  return {
+    [lowerName]: {
+      enoughFunds: BigNumber(lowerFee).lte(BigNumber(stxAvailableBalance)),
+      feeRate: microStxToStx(lowerFee).toNumber(),
+      fee: microStxToStx(lowerFee).toNumber(),
+    },
+    [higherName]: {
+      enoughFunds: BigNumber(higherFee).lte(BigNumber(stxAvailableBalance)),
+      feeRate: microStxToStx(higherFee).toNumber(),
+      fee: microStxToStx(higherFee).toNumber(),
+    },
+  };
+};
+
+const sortFees = (fees: RbfRecommendedFees) =>
+  Object.fromEntries(
+    Object.entries(fees).sort((a, b) => {
+      const priorityOrder = ['highest', 'higher', 'high', 'medium'];
+      return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
+    }),
+  );
+
 const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransactionData): RbfData => {
   const [isLoading, setIsLoading] = useState(true);
   const [rbfData, setRbfData] = useState<RbfData>({});
@@ -104,19 +151,50 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       );
 
       let minimumFee = fee.multipliedBy(1.25);
-      let highFee = high.fee;
-      let mediumFee = medium.fee;
-
       if (!Number.isSafeInteger(minimumFee)) {
+        // round up the fee to the nearest integer
         minimumFee = microStxToStx(Math.ceil(stxToMicrostacks(minimumFee).toNumber()));
       }
 
-      if (feeMultipliers && highFee > BigInt(feeMultipliers?.thresholdHighStacksFee)) {
-        highFee = feeMultipliers.thresholdHighStacksFee;
-      }
+      const currentMicrostacksFee = stxToMicrostacks(fee);
+      let feePresets: RbfRecommendedFees = {};
+      const mediumFee = medium.fee;
+      const highFee = high.fee;
+      let higherFee = highFee * 1.25;
+      const highestFee = currentMicrostacksFee.multipliedBy(1.5).toNumber();
 
-      if (feeMultipliers && mediumFee > BigInt(feeMultipliers?.thresholdHighStacksFee)) {
-        mediumFee = feeMultipliers.thresholdHighStacksFee * 0.75;
+      if (currentMicrostacksFee.lt(BigNumber(mediumFee))) {
+        feePresets = await constructRecommendedFees(
+          'medium',
+          mediumFee,
+          'high',
+          highFee,
+          stxAvailableBalance,
+          feeMultipliers?.thresholdHighStacksFee,
+        );
+      } else if (
+        currentMicrostacksFee.gt(BigNumber(mediumFee)) &&
+        currentMicrostacksFee.lt(BigNumber(highFee))
+      ) {
+        feePresets = await constructRecommendedFees(
+          'high',
+          highFee,
+          'higher',
+          higherFee,
+          stxAvailableBalance,
+          feeMultipliers?.thresholdHighStacksFee,
+        );
+      } else {
+        higherFee = currentMicrostacksFee.multipliedBy(1.25).toNumber();
+
+        feePresets = await constructRecommendedFees(
+          'higher',
+          higherFee,
+          'highest',
+          highestFee,
+          stxAvailableBalance,
+          feeMultipliers?.thresholdHighStacksFee,
+        );
       }
 
       setRbfData({
@@ -127,23 +205,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
           minimumRbfFee: minimumFee.toNumber(),
           minimumRbfFeeRate: minimumFee.toNumber(),
         },
-        rbfRecommendedFees: Object.fromEntries(
-          Object.entries({
-            medium: {
-              enoughFunds: BigNumber(mediumFee).lte(BigNumber(stxAvailableBalance)),
-              feeRate: microStxToStx(mediumFee).toNumber(),
-              fee: microStxToStx(mediumFee).toNumber(),
-            },
-            high: {
-              enoughFunds: BigNumber(highFee).lte(BigNumber(stxAvailableBalance)),
-              feeRate: microStxToStx(highFee).toNumber(),
-              fee: microStxToStx(highFee).toNumber(),
-            },
-          }).sort((a, b) => {
-            const priorityOrder = ['highest', 'higher', 'high', 'medium'];
-            return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
-          }),
-        ),
+        rbfRecommendedFees: sortFees(feePresets),
         mempoolFees: {
           fastestFee: microStxToStx(high.fee).toNumber(),
           halfHourFee: microStxToStx(medium.fee).toNumber(),
@@ -192,12 +254,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       setRbfData({
         rbfTransaction: rbfTx,
         rbfTxSummary: rbfTransactionSummary,
-        rbfRecommendedFees: Object.fromEntries(
-          Object.entries(rbfRecommendedFeesResponse).sort((a, b) => {
-            const priorityOrder = ['highest', 'higher', 'high', 'medium'];
-            return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
-          }),
-        ),
+        rbfRecommendedFees: sortFees(rbfRecommendedFeesResponse),
         mempoolFees,
       });
     } catch (err: any) {
