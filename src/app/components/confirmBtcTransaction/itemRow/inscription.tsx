@@ -64,6 +64,7 @@ export default function Inscription({
                 content_type: inscription.contentType,
               }}
               placeholderIcon={OrdinalIcon}
+              showContentTypeThumbnail
             />
           }
         />
