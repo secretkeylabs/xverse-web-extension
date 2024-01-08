@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.26.1",
+  "version": "0.27.0",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -10,11 +10,10 @@
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
-    "@secretkeylabs/xverse-core": "5.3.0",
-    "@stacks/connect": "^6.10.2",
-    "@stacks/encryption": "4.3.5",
+    "@secretkeylabs/xverse-core": "7.0.0",
+    "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
-    "@stacks/transactions": "4.3.8",
+    "@stacks/transactions": "6.9.0",
     "@tanstack/query-sync-storage-persister": "^4.29.1",
     "@tanstack/react-query": "^4.29.3",
     "@tanstack/react-query-devtools": "^4.29.3",
@@ -139,10 +138,11 @@
     "tsc-files": "^1.1.4",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "type-fest": "^2.19.0",
-    "typescript": "^4.8.2",
+    "typescript": "^5.0.0",
     "vitest": "^0.34.6",
     "webpack": "^5.89.0",
     "webpack-cli": "^4.0.0",
-    "webpack-dev-server": "^4.11.0"
+    "webpack-dev-server": "^4.11.0",
+    "typescript-plugin-styled-components": "^3.0.0"
   }
 }

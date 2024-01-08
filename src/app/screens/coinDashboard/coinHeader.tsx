@@ -355,6 +355,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
         <RowContainer>
           <BalanceTitleText>{getDashboardTitle()}</BalanceTitleText>
           {coin === 'brc20' && <ProtocolText>BRC-20</ProtocolText>}
+          {fungibleToken?.protocol === 'stacks' && <ProtocolText>SIP-10</ProtocolText>}
         </RowContainer>
         <BalanceValuesContainer>
           <NumericFormat
