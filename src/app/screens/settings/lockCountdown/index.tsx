@@ -8,7 +8,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletSession from '@hooks/useWalletSession';
 import { WalletSessionPeriods } from '@stores/wallet/actions/types';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { TFunction, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -61,12 +61,12 @@ const TimerIcon = styled.img<TimeSelectionBoxProps>((props) => ({
   opacity: props.selected ? 1 : 0.8,
 }));
 
-const getLabel = (period: number) => {
+const getLabel = (period: number, t: TFunction<'translation', 'SETTING_SCREEN'>) => {
   if (period < 60) {
-    return `${period} minutes`;
+    return t('LOCK_COUNTDOWN_MIN', { count: period });
   }
   const hours = period / 60;
-  return `${hours} hour${hours === 1 ? '' : 's'}`;
+  return t('LOCK_COUNTDOWN_HS', { count: hours });
 };
 
 function LockCountdown() {
@@ -112,7 +112,7 @@ function LockCountdown() {
               src={iconsByPeriod[period]}
               alt={period.toString()}
             />
-            {getLabel(period)}
+            {getLabel(period, t)}
           </TimeSelectionBox>
         ))}
         <SaveButtonContainer>
