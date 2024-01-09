@@ -12,7 +12,7 @@ import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
-import { broadcastSignedTransaction, StacksTransaction } from '@secretkeylabs/xverse-core';
+import { StacksTransaction, broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
