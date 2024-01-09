@@ -55,11 +55,7 @@ function TransactionRequest() {
       tokenTransferPayload.amount,
       tokenTransferPayload.memo!,
       requestAccount.stxPublicKey,
-      {
-        stxSendTxMultiplier: feeMultipliers?.stxSendTxMultiplier || 1,
-        poolStackingTxMultiplier: feeMultipliers?.poolStackingTxMultiplier || 1,
-        otherTxMultiplier: feeMultipliers?.otherTxMultiplier || 1,
-      },
+      feeMultipliers,
       selectedNetwork,
       stxPendingTxData || [],
       stacksTransaction?.auth,
