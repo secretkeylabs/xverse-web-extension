@@ -3,6 +3,7 @@ import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.s
 import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
+import FiatAmountText from '@components/fiatAmountText';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TopRow from '@components/topRow';
 import useTransaction from '@hooks/queries/useTransaction';
@@ -14,11 +15,11 @@ import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-ico
 import {
   RecommendedFeeResponse,
   Transport as TransportType,
-  currencySymbolMap,
   getBtcFiatEquivalent,
   mempoolApi,
   rbf,
 } from '@secretkeylabs/xverse-core';
+import { EMPTY_LABEL } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
@@ -80,7 +81,9 @@ function SpeedUpTransactionScreen() {
   const [recommendedFees, setRecommendedFees] = useState<RecommendedFeeResponse>();
   const [rbfRecommendedFees, setRbfRecommendedFees] = useState<RbfRecommendedFees>();
   const { data: transaction } = useTransaction(id!);
-  const [rbfTransaction, setRbfTransaction] = useState<any>();
+  const [rbfTransaction, setRbfTransaction] = useState<
+    InstanceType<typeof rbf.RbfTransaction> | undefined
+  >();
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
@@ -95,6 +98,18 @@ function SpeedUpTransactionScreen() {
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
 
+  /* TODO: Move `fetchRbfData` function logic to a separate hook like
+    const useRbfTransactionData: (transaction: ReturnType<useTransaction>) => {
+      rbfTransaction?: rbf.RbfTransaction,
+      rbfTxSummary?: {
+        currentFee: number;
+        currentFeeRate: number;
+        minimumRbfFee: number;
+        minimumRbfFeeRate: number;
+      },
+      rbfRecommendedFees?: RbfRecommendedFees
+    } => { // logic here }
+  */
   const fetchRbfData = useCallback(async () => {
     if (!selectedAccount || !id || !transaction) {
       return;
@@ -122,13 +137,20 @@ function SpeedUpTransactionScreen() {
       setRecommendedFees(mempoolFees);
 
       const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
-      setRbfRecommendedFees(rbfRecommendedFeesResponse);
+      setRbfRecommendedFees(
+        Object.fromEntries(
+          Object.entries(rbfRecommendedFeesResponse).sort((a, b) => {
+            const priorityOrder = ['highest', 'higher', 'high', 'medium'];
+            return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
+          }),
+        ),
+      );
     } catch (err: any) {
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  }, [selectedAccount, id, transaction, accountType, network.type, seedVault]);
+  }, [selectedAccount, id, transaction, accountType, network.type, seedVault, btcClient]);
 
   useEffect(() => {
     fetchRbfData();
@@ -157,8 +179,12 @@ function SpeedUpTransactionScreen() {
   };
 
   const calculateTotalFee = async (feeRate: string) => {
-    if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
-      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
+    if (!rbfTransaction) {
+      return;
+    }
+
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary.minimumRbfFeeRate }));
       return;
     }
 
@@ -178,6 +204,10 @@ function SpeedUpTransactionScreen() {
   };
 
   const signAndBroadcastTx = async (transport?: TransportType) => {
+    if (!rbfTransaction) {
+      return;
+    }
+
     if (isLedgerAccount(selectedAccount) && !transport) {
       return;
     }
@@ -195,8 +225,10 @@ function SpeedUpTransactionScreen() {
     } catch (err: any) {
       console.error(err);
 
-      if (err?.response?.data && err?.response?.data.includes('insufficient fee')) {
-        toast.error(t('INSUFFICIENT_FEE'));
+      if (err?.response?.data) {
+        if (err.response.data.includes('insufficient fee')) {
+          toast.error(t('INSUFFICIENT_FEE'));
+        }
       }
     }
   };
@@ -254,8 +286,8 @@ function SpeedUpTransactionScreen() {
   };
 
   const handleApplyCustomFee = (feeRate: string, fee: string) => {
-    if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
-      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary.minimumRbfFeeRate }));
       return;
     }
 
@@ -281,62 +313,46 @@ function SpeedUpTransactionScreen() {
 
   const getEstimatedCompletionTime = (feeRate?: number) => {
     if (!feeRate || !recommendedFees) {
-      return '--';
+      return EMPTY_LABEL;
     }
 
-    if (feeRate < recommendedFees?.hourFee) {
-      return 'several hours or more';
+    if (feeRate < recommendedFees.hourFee) {
+      return t('TIME.SEVERAL_HOURS_OR_MORE');
     }
 
-    if (feeRate === recommendedFees?.hourFee) {
-      return '~1 hour';
+    if (feeRate === recommendedFees.hourFee) {
+      return `~1 ${t('TIME.HOUR')}`;
     }
 
-    if (feeRate > recommendedFees?.hourFee && feeRate <= recommendedFees?.halfHourFee) {
-      return '~30 mins';
+    if (feeRate > recommendedFees.hourFee && feeRate <= recommendedFees.halfHourFee) {
+      return `~30 ${t('TIME.MINUTES')}`;
     }
 
-    return '~10 mins';
+    return `~10 ${t('TIME.MINUTES')}`;
+  };
+
+  const iconProps = {
+    size: 20,
+    color: theme.colors.tangerine,
   };
 
   const feeButtonMapping = {
     medium: {
-      icon: <CarProfile size={20} color={theme.colors.tangerine} />,
+      icon: <CarProfile {...iconProps} />,
       title: t('MED_PRIORITY'),
     },
     high: {
-      icon: <RocketLaunch size={20} color={theme.colors.tangerine} />,
+      icon: <RocketLaunch {...iconProps} />,
       title: t('HIGH_PRIORITY'),
     },
     higher: {
-      icon: <Lightning size={20} color={theme.colors.tangerine} />,
+      icon: <Lightning {...iconProps} />,
       title: t('HIGHER_PRIORITY'),
     },
     highest: {
-      icon: <ShootingStar size={20} color={theme.colors.tangerine} />,
+      icon: <ShootingStar {...iconProps} />,
       title: t('HIGHEST_PRIORITY'),
     },
-  };
-
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (!fiatAmount) {
-      return '';
-    }
-
-    if (fiatAmount.isLessThan(0.01)) {
-      return `< ${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-    }
-
-    return (
-      <NumericFormat
-        value={fiatAmount.toFixed(2).toString()}
-        displayType="text"
-        thousandSeparator
-        prefix={`${currencySymbolMap[fiatCurrency]}`}
-        suffix={` ${fiatCurrency}`}
-        renderText={(value: string) => `~ ${value}`}
-      />
-    );
   };
 
   return (
@@ -376,18 +392,16 @@ function SpeedUpTransactionScreen() {
             </DetailText>
             <ButtonContainer>
               {rbfRecommendedFees &&
-                Object.entries(rbfRecommendedFees)
-                  .sort((a, b) => {
-                    const priorityOrder = ['highest', 'higher', 'high', 'medium'];
-                    return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
-                  })
-                  .map(([key, obj]) => (
+                Object.entries(rbfRecommendedFees).map(([key, obj]) => {
+                  const isDisabled = !obj.enoughFunds;
+
+                  return (
                     <FeeButton
                       key={key}
                       value={key}
                       isSelected={selectedOption === key}
                       onClick={handleClickFeeButton}
-                      disabled={!obj.enoughFunds}
+                      disabled={isDisabled}
                     >
                       <FeeButtonLeft>
                         {feeButtonMapping[key].icon}
@@ -414,22 +428,27 @@ function SpeedUpTransactionScreen() {
                               suffix=" Sats"
                             />
                           ) : (
-                            '--'
+                            EMPTY_LABEL
                           )}
                         </div>
-                        {obj.fee ? (
-                          <SecondaryText alignRight>
-                            {getFiatAmountString(
-                              getBtcFiatEquivalent(BigNumber(obj.fee), BigNumber(btcFiatRate)),
-                            )}
-                          </SecondaryText>
-                        ) : (
-                          <SecondaryText alignRight>-- {fiatCurrency}</SecondaryText>
-                        )}
-                        {!obj.enoughFunds && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
+                        <SecondaryText alignRight>
+                          {obj.fee ? (
+                            <FiatAmountText
+                              fiatAmount={getBtcFiatEquivalent(
+                                BigNumber(obj.fee),
+                                BigNumber(btcFiatRate),
+                              )}
+                              fiatCurrency={fiatCurrency}
+                            />
+                          ) : (
+                            `${EMPTY_LABEL} ${fiatCurrency}`
+                          )}
+                        </SecondaryText>
+                        {isDisabled && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
                       </FeeButtonRight>
                     </FeeButton>
-                  ))}
+                  );
+                })}
               <FeeButton
                 key="custom"
                 value="custom"
@@ -438,7 +457,7 @@ function SpeedUpTransactionScreen() {
                 centered={!customFeeRate}
               >
                 <FeeButtonLeft>
-                  <CustomFeeIcon size={20} color={theme.colors.tangerine} />
+                  <CustomFeeIcon {...iconProps} />
                   <div>
                     {t('CUSTOM')}
                     {customFeeRate && (
@@ -469,9 +488,13 @@ function SpeedUpTransactionScreen() {
                       />
                     </div>
                     <SecondaryText alignRight>
-                      {getFiatAmountString(
-                        getBtcFiatEquivalent(BigNumber(customTotalFee), BigNumber(btcFiatRate)),
-                      )}
+                      <FiatAmountText
+                        fiatAmount={getBtcFiatEquivalent(
+                          BigNumber(customTotalFee),
+                          BigNumber(btcFiatRate),
+                        )}
+                        fiatCurrency={fiatCurrency}
+                      />
                     </SecondaryText>
                   </div>
                 ) : (
@@ -479,29 +502,29 @@ function SpeedUpTransactionScreen() {
                 )}
               </FeeButton>
             </ButtonContainer>
+            <ControlsContainer>
+              <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
+              <StyledActionButton
+                text={t('SUBMIT')}
+                disabled={!selectedOption}
+                onPress={handleClickSubmit}
+              />
+            </ControlsContainer>
           </Container>
-          <ControlsContainer>
-            <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
-            <StyledActionButton
-              text={t('SUBMIT')}
-              disabled={!selectedOption}
-              onPress={handleClickSubmit}
-            />
-          </ControlsContainer>
 
-          {showCustomFee && (
+          {/* TODO: Move this modal and the custom option info above to a separate component */}
+          {rbfTxSummary && showCustomFee && (
             <CustomFee
               visible={showCustomFee}
               onClose={handleCloseCustomFee}
-              initialFeeRate={rbfTxSummary?.minimumRbfFeeRate.toString()!}
-              initialTotalFee={rbfTxSummary?.minimumRbfFee.toString()!}
+              minimumFeeRate={rbfTxSummary.minimumRbfFeeRate.toString()}
+              initialTotalFee={rbfTxSummary.minimumRbfFee.toString()}
               feeRate={customFeeRate}
               fee={customTotalFee}
               isFeeLoading={false}
               error={customFeeError || ''}
               calculateTotalFee={calculateTotalFee}
               onClickApply={handleApplyCustomFee}
-              minimumFeeRate={rbfTxSummary?.minimumRbfFeeRate?.toString()}
             />
           )}
 

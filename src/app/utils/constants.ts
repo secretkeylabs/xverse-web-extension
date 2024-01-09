@@ -80,3 +80,6 @@ export const DEFAULT_TRANSITION_OPTIONS = {
     opacity: 1,
   },
 };
+
+// UI
+export const EMPTY_LABEL = '--';
