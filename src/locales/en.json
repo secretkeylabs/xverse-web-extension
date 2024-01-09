@@ -705,6 +705,7 @@
     "BTC_URL": "BTC URL",
     "STACKS_URL": "Stacks URL",
     "FALLBACK_BTC_URL": "Fallback BTC URL",
+    "RESET_TO_DEFAULT": "Reset to default",
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",

@@ -1,5 +1,6 @@
-import Cross from '@assets/img/settings/x.svg';
-import styled from 'styled-components';
+import { XCircle } from '@phosphor-icons/react';
+import { useTranslation } from 'react-i18next';
+import styled, { useTheme } from 'styled-components';
 
 const NodeInputHeader = styled.div((props) => ({
   display: 'flex',
@@ -12,6 +13,7 @@ const NodeInputHeader = styled.div((props) => ({
 
 const NodeText = styled.label((props) => ({
   ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
 }));
 
 const NodeResetButton = styled.button((props) => ({
@@ -26,10 +28,10 @@ const InputContainer = styled.div((props) => ({
   border: `1px solid ${props.theme.colors.elevation3}`,
   backgroundColor: props.theme.colors.elevation_n1,
   borderRadius: props.theme.radius(1),
-  paddingLeft: props.theme.spacing(4),
-  paddingRight: props.theme.spacing(4),
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(3),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  marginTop: props.theme.space.s,
+  marginBottom: props.theme.space.s,
 }));
 
 const ErrorMessage = styled.h2((props) => ({
@@ -44,7 +46,7 @@ const Input = styled.input((props) => ({
   display: 'flex',
   flex: 1,
   backgroundColor: props.theme.colors.elevation_n1,
-  color: props.theme.colors.white_0,
+  color: props.theme.colors.white_200,
   border: 'none',
 }));
 
@@ -67,16 +69,19 @@ function NodeInput({
   onReset: () => void;
   error: string;
 }) {
+  const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
+  const theme = useTheme();
+
   return (
     <div>
       <NodeInputHeader>
         <NodeText>{label}</NodeText>
-        <NodeResetButton onClick={onReset}>Reset to default</NodeResetButton>
+        <NodeResetButton onClick={onReset}>{t('RESET_TO_DEFAULT')}</NodeResetButton>
       </NodeInputHeader>
       <InputContainer>
         <Input onChange={onChange} value={value} />
         <Button onClick={onClear}>
-          <img width={22} height={22} src={Cross} alt="cross" />
+          <XCircle size={18} weight="fill" color={theme.colors.white_200} />
         </Button>
       </InputContainer>
       <ErrorMessage>{error}</ErrorMessage>
