@@ -12,12 +12,12 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
 import {
+  RecommendedFeeResponse,
+  Transport as TransportType,
   currencySymbolMap,
   getBtcFiatEquivalent,
   mempoolApi,
   rbf,
-  RecommendedFeeResponse,
-  Transport as TransportType,
 } from '@secretkeylabs/xverse-core';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -106,7 +106,7 @@ function SpeedUpTransactionScreen() {
         ...selectedAccount,
         accountType: accountType || 'software',
         accountId:
-          isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
+          isLedgerAccount(selectedAccount) && typeof selectedAccount.deviceAccountIndex === 'number'
             ? selectedAccount.deviceAccountIndex
             : selectedAccount.id,
         network: network.type,
