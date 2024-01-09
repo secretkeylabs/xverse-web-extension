@@ -61,14 +61,14 @@ function NodeInput({
   error,
 }: {
   label: string;
-  onChange: (event: React.FormEvent<HTMLInputElement>) => void;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value: string;
   onClear: () => void;
   onReset: () => void;
   error: string;
 }) {
   return (
-    <>
+    <div>
       <NodeInputHeader>
         <NodeText>{label}</NodeText>
         <NodeResetButton onClick={onReset}>Reset to default</NodeResetButton>
@@ -80,7 +80,7 @@ function NodeInput({
         </Button>
       </InputContainer>
       <ErrorMessage>{error}</ErrorMessage>
-    </>
+    </div>
   );
 }
 

@@ -3,7 +3,12 @@ import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { defaultMainnet, defaultTestnet, SettingsNetwork } from '@secretkeylabs/xverse-core';
+import {
+  SettingsNetwork,
+  defaultMainnet,
+  defaultTestnet,
+  initialNetworksList,
+} from '@secretkeylabs/xverse-core';
 import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,56 +36,52 @@ const ButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(16),
 }));
 
-type NodeInputKey = 'stacksUrl' | 'btcUrl' | 'fallbackBtcUrl';
-const nodeInputKeys: NodeInputKey[] = ['stacksUrl', 'btcUrl', 'fallbackBtcUrl'];
+const NodeInputsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${(props) => props.theme.space.s};
+`;
+
+type NodeInputKey = keyof Pick<SettingsNetwork, 'address' | 'btcApiUrl' | 'fallbackBtcApiUrl'>;
+const nodeInputs: { key: NodeInputKey; labelKey: string }[] = [
+  { key: 'address', labelKey: 'STACKS_URL' },
+  { key: 'btcApiUrl', labelKey: 'BTC_URL' },
+  { key: 'fallbackBtcApiUrl', labelKey: 'FALLBACK_BTC_URL' },
+];
+
+type NodeInputErrors = Record<NodeInputKey, string>;
+const initialNodeErrors: NodeInputErrors = {
+  address: '',
+  btcApiUrl: '',
+  fallbackBtcApiUrl: '',
+};
 
 function ChangeNetworkScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
-  const { network, savedNetworks } = useWalletSelector();
-  const [changedNetwork, setChangedNetwork] = useState<SettingsNetwork>(network);
-  const [isChangingNetwork, setIsChangingNetwork] = useState(false);
-
-  const [formErrors, setFormErrors] = useState<Record<NodeInputKey, string>>({
-    stacksUrl: '',
-    btcUrl: '',
-    fallbackBtcUrl: '',
-  });
-
-  const [formInputs, setFormInputs] = useState<Record<NodeInputKey, string>>({
-    stacksUrl: network.address,
-    btcUrl: network.btcApiUrl,
-    fallbackBtcUrl: network.fallbackBtcApiUrl,
-  });
-
   const navigate = useNavigate();
   const { changeNetwork } = useWalletReducer();
+  const { network, savedNetworks } = useWalletSelector();
+  const [isChangingNetwork, setIsChangingNetwork] = useState(false);
+  const [formErrors, setFormErrors] = useState<NodeInputErrors>(initialNodeErrors);
+  const [formInputs, setFormInputs] = useState<SettingsNetwork>(network);
 
   const handleBackButtonClick = () => {
     navigate('/settings');
   };
 
   const onNetworkSelected = (networkSelected: SettingsNetwork) => {
-    setChangedNetwork(networkSelected);
-    setFormInputs({
-      stacksUrl: networkSelected.address,
-      btcUrl: networkSelected.btcApiUrl,
-      fallbackBtcUrl: networkSelected.fallbackBtcApiUrl,
-    });
-    setFormErrors({
-      stacksUrl: '',
-      btcUrl: '',
-      fallbackBtcUrl: '',
-    });
+    setFormInputs(networkSelected);
+    setFormErrors(initialNodeErrors);
   };
 
-  const onChangeFactory = (key: NodeInputKey) => (event: React.FormEvent<HTMLInputElement>) => {
+  const onChangeFactory = (key: NodeInputKey) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormErrors((prevErrors) => ({
       ...prevErrors,
       [key]: '',
     }));
     setFormInputs((prevInputs) => ({
       ...prevInputs,
-      [key]: event.currentTarget.value,
+      [key]: event.target.value,
     }));
   };
 
@@ -102,7 +103,7 @@ function ChangeNetworkScreen() {
     }));
     setFormInputs((prevInputs) => ({
       ...prevInputs,
-      [key]: changedNetwork[key],
+      [key]: initialNetworksList.find((n) => n.type === formInputs.type)?.[key],
     }));
   };
 
@@ -110,21 +111,20 @@ function ChangeNetworkScreen() {
     setIsChangingNetwork(true);
 
     const [isValidStacksUrl, isValidBtcApiUrl, isValidFallbackBtcApiUrl] = await Promise.all([
-      isValidStacksApi(changedNetwork.address, changedNetwork.type),
-      isValidBtcApi(changedNetwork.btcApiUrl, changedNetwork.type),
-      isValidBtcApi(changedNetwork.fallbackBtcApiUrl, changedNetwork.type),
+      isValidStacksApi(formInputs.address, formInputs.type),
+      isValidBtcApi(formInputs.btcApiUrl, formInputs.type),
+      isValidBtcApi(formInputs.fallbackBtcApiUrl, formInputs.type),
     ]);
 
     if (isValidStacksUrl && isValidBtcApiUrl && isValidFallbackBtcApiUrl) {
-      await changeNetwork(changedNetwork);
+      await changeNetwork(formInputs);
       navigate('/settings');
     } else {
-      setFormErrors((prevErrors) => ({
-        ...prevErrors,
-        stacksUrl: !isValidStacksUrl ? t('INVALID_URL') : '',
-        btcUrl: !isValidBtcApiUrl ? t('INVALID_URL') : '',
-        fallbackBtcUrl: !isValidFallbackBtcApiUrl ? t('INVALID_URL') : '',
-      }));
+      setFormErrors({
+        address: !isValidStacksUrl ? t('INVALID_URL') : '',
+        btcApiUrl: !isValidBtcApiUrl ? t('INVALID_URL') : '',
+        fallbackBtcApiUrl: !isValidFallbackBtcApiUrl ? t('INVALID_URL') : '',
+      });
       setIsChangingNetwork(false);
     }
   };
@@ -138,27 +138,29 @@ function ChangeNetworkScreen() {
       <Container>
         <NetworkRow
           network={savedMainnet || defaultMainnet}
-          isSelected={changedNetwork.type === 'Mainnet'}
+          isSelected={formInputs.type === 'Mainnet'}
           onNetworkSelected={onNetworkSelected}
           showDivider
         />
         <NetworkRow
           network={savedTestnet || defaultTestnet}
-          isSelected={changedNetwork.type === 'Testnet'}
+          isSelected={formInputs.type === 'Testnet'}
           onNetworkSelected={onNetworkSelected}
           showDivider={false}
         />
-        {nodeInputKeys.map((key) => (
-          <NodeInput
-            key={key}
-            label={t(key)}
-            onChange={onChangeFactory(key)}
-            value={formInputs[key]}
-            onClear={onClearFactory(key)}
-            onReset={onResetFactory(key)}
-            error={formErrors[key]}
-          />
-        ))}
+        <NodeInputsContainer>
+          {nodeInputs.map(({ key, labelKey }) => (
+            <NodeInput
+              key={key}
+              label={t(labelKey)}
+              onChange={onChangeFactory(key)}
+              value={formInputs[key]}
+              onClear={onClearFactory(key)}
+              onReset={onResetFactory(key)}
+              error={formErrors[key]}
+            />
+          ))}
+        </NodeInputsContainer>
       </Container>
       <ButtonContainer>
         <ActionButton
