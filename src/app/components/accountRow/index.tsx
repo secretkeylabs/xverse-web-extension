@@ -105,16 +105,14 @@ const ModalDescription = styled.div((props) => ({
   marginBottom: props.theme.spacing(16),
 }));
 
-const ModalControlsContainer = styled.div({
+const ModalControlsContainer = styled.div((props) => ({
   display: 'flex',
-});
-
-const ModalButtonContainer = styled.div((props) => ({
-  width: '100%',
-  '&:first-child': {
-    marginRight: props.theme.spacing(6),
-  },
+  columnGap: props.theme.space.s,
 }));
+
+const ModalButtonContainer = styled.div({
+  width: '100%',
+});
 
 const ButtonRow = styled.button`
   display: flex;
@@ -135,6 +133,45 @@ const ButtonRow = styled.button`
     background-color: ${(props) => props.theme.colors.elevation3};
   }
 `;
+
+const InputLabel = styled.div((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
+  marginBottom: props.theme.space.xs,
+}));
+
+const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: props.theme.spacing(4),
+  marginBottom: props.theme.spacing(6),
+  border: `1px solid ${
+    props.withError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_800
+  }`,
+  backgroundColor: props.theme.colors.elevation1,
+  borderRadius: props.theme.radius(1),
+  padding: props.theme.spacing(5),
+}));
+
+const InputField = styled.input((props) => ({
+  ...props.theme.body_m,
+  backgroundColor: 'transparent',
+  color: props.theme.colors.white_0,
+  border: 'transparent',
+  width: '50%',
+  '&::-webkit-outer-spin-button': {
+    '-webkit-appearance': 'none',
+    margin: 0,
+  },
+  '&::-webkit-inner-spin-button': {
+    '-webkit-appearance': 'none',
+    margin: 0,
+  },
+  '&[type=number]': {
+    '-moz-appearance': 'textfield',
+  },
+}));
 
 function AccountRow({
   account,
@@ -159,6 +196,7 @@ function AccountRow({
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
+  const [showRenameAccountModal, setShowRenameAccountModal] = useState(false);
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
     { top: string; left: string } | undefined
   >();
@@ -208,6 +246,14 @@ function AccountRow({
     setShowRemoveAccountModal(false);
   };
 
+  const handleRenameAccountModalOpen = () => {
+    setShowRenameAccountModal(true);
+  };
+
+  const handleRenameAccountModalClose = () => {
+    setShowRenameAccountModal(false);
+  };
+
   const handleRemoveLedgerAccount = async () => {
     if (!account) {
       return;
@@ -254,7 +300,7 @@ function AccountRow({
         </CurrentAcountContainer>
       </AccountInfoContainer>
 
-      {isAccountListView && isHardwareAccount(account) && (
+      {isAccountListView && (
         <OptionsButton onClick={openOptionsDialog}>
           <img src={threeDotsIcon} alt="Options" />
         </OptionsButton>
@@ -262,33 +308,65 @@ function AccountRow({
 
       {showOptionsDialog && (
         <OptionsDialog closeDialog={closeOptionsDialog} optionsDialogIndents={optionsDialogIndents}>
-          <ButtonRow onClick={handleRemoveAccountModalOpen}>
-            {optionsDialogTranslation('REMOVE_FROM_LIST')}
-          </ButtonRow>
+          {isHardwareAccount(account) ? (
+            <ButtonRow onClick={handleRemoveAccountModalOpen}>
+              {optionsDialogTranslation('REMOVE_FROM_LIST')}
+            </ButtonRow>
+          ) : (
+            <ButtonRow onClick={handleRenameAccountModalOpen}>
+              {optionsDialogTranslation('RENAME_ACCOUNT')}
+            </ButtonRow>
+          )}
         </OptionsDialog>
       )}
 
-      <BottomModal
-        visible={showRemoveAccountModal}
-        header={t('REMOVE_FROM_LIST_TITLE')}
-        onClose={handleRemoveAccountModalClose}
-      >
-        <ModalContent>
-          <ModalDescription>{t('REMOVE_FROM_LIST_DESCRIPTION')}</ModalDescription>
-          <ModalControlsContainer>
-            <ModalButtonContainer>
-              <ActionButton
-                transparent
-                text={t('CANCEL')}
-                onPress={handleRemoveAccountModalClose}
-              />
-            </ModalButtonContainer>
-            <ModalButtonContainer>
-              <ActionButton warning text={t('REMOVE_WALLET')} onPress={handleRemoveLedgerAccount} />
-            </ModalButtonContainer>
-          </ModalControlsContainer>
-        </ModalContent>
-      </BottomModal>
+      {showRemoveAccountModal && (
+        <BottomModal
+          visible={showRemoveAccountModal}
+          header={t('REMOVE_FROM_LIST_TITLE')}
+          onClose={handleRemoveAccountModalClose}
+        >
+          <ModalContent>
+            <ModalDescription>{t('REMOVE_FROM_LIST_DESCRIPTION')}</ModalDescription>
+            <ModalControlsContainer>
+              <ModalButtonContainer>
+                <ActionButton
+                  transparent
+                  text={t('CANCEL')}
+                  onPress={handleRemoveAccountModalClose}
+                />
+              </ModalButtonContainer>
+              <ModalButtonContainer>
+                <ActionButton
+                  warning
+                  text={t('REMOVE_WALLET')}
+                  onPress={handleRemoveLedgerAccount}
+                />
+              </ModalButtonContainer>
+            </ModalControlsContainer>
+          </ModalContent>
+        </BottomModal>
+      )}
+
+      {showRenameAccountModal && (
+        <BottomModal
+          visible={showRenameAccountModal}
+          header={optionsDialogTranslation('RENAME_ACCOUNT')}
+          onClose={handleRenameAccountModalClose}
+        >
+          <ModalContent>
+            <InputLabel>Account name</InputLabel>
+            <InputContainer>
+              <InputField />
+            </InputContainer>
+            <ModalControlsContainer>
+              <ModalButtonContainer>
+                <ActionButton text={t('SAVE')} onPress={() => {}} />
+              </ModalButtonContainer>
+            </ModalControlsContainer>
+          </ModalContent>
+        </BottomModal>
+      )}
     </TopSectionContainer>
   );
 }

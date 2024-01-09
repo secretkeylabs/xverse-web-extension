@@ -1,6 +1,7 @@
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import Plus from '@assets/img/dashboard/plus.svg';
 import AccountRow from '@components/accountRow';
+import ActionButton from '@components/button';
 import Separator from '@components/separator';
 import TopRow from '@components/topRow';
 import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
@@ -21,22 +22,6 @@ export const Container = styled.div({
   },
 });
 
-const ButtonContainer = styled.button((props) => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  background: 'transparent',
-  paddingTop: props.theme.spacing(4),
-  paddingBottom: props.theme.spacing(4),
-  paddingLeft: props.theme.spacing(11),
-  paddingRight: props.theme.spacing(11),
-  transition: 'background-color 0.2s ease',
-  ':hover': {
-    backgroundColor: props.theme.colors.elevation1,
-  },
-}));
-
 const AccountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -46,37 +31,24 @@ const AccountContainer = styled.div((props) => ({
   gap: props.theme.spacing(8),
 }));
 
-const AddAccountContainer = styled.div((props) => ({
-  display: 'flex',
-  height: 40,
-  width: 40,
-  borderRadius: 25,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: props.theme.colors.elevation1,
-  marginRight: props.theme.spacing(8),
-}));
-
-const ButtonImage = styled.img({
-  alignSelf: 'center',
-  transform: 'all',
-});
-
-const AddAccountText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  opacity: 0.8,
-  color: props.theme.colors.white_0,
-}));
-
 const ButtonsWrapper = styled.div(
   (props) => `
+  display: flex;
+  flex-direction: column;
   position: sticky;
   bottom: 0;
+  row-gap: ${props.theme.space.s};
   background-color: ${props.theme.colors.elevation0};
-  margin-top: ${props.theme.spacing(8)}px;
-  margin-bottom: ${props.theme.spacing(11)}px;
+  padding: ${props.theme.space.m};
+  padding-top: ${props.theme.space.l};
+  padding-bottom: ${props.theme.space.xxl};
 `,
 );
+
+const Title = styled.div((props) => ({
+  ...props.theme.typography.headline_xs,
+  marginBottom: props.theme.space.m,
+}));
 
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
@@ -119,8 +91,9 @@ function AccountList(): JSX.Element {
 
   return (
     <Container>
-      <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
+      <TopRow title="" onClick={handleBackButtonClick} />
       <AccountContainer>
+        <Title>{t('TITLE')}</Title>
         {displayedAccountsList.map((account) => (
           <div key={account.btcAddress}>
             <AccountRow
@@ -134,19 +107,19 @@ function AccountList(): JSX.Element {
         ))}
       </AccountContainer>
       <ButtonsWrapper>
-        <ButtonContainer onClick={onCreateAccount}>
-          <AddAccountContainer>
-            <ButtonImage src={Plus} />
-          </AddAccountContainer>
-          <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
-        </ButtonContainer>
+        <ActionButton
+          icon={<img src={Plus} alt="" />}
+          onPress={onCreateAccount}
+          text={t('NEW_ACCOUNT')}
+          transparent
+        />
         {network.type === 'Mainnet' && (
-          <ButtonContainer onClick={onImportLedgerAccount}>
-            <AddAccountContainer>
-              <ButtonImage src={ConnectLedger} />
-            </AddAccountContainer>
-            <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
-          </ButtonContainer>
+          <ActionButton
+            icon={<img src={ConnectLedger} alt="" />}
+            onPress={onImportLedgerAccount}
+            text={t('LEDGER_ACCOUNT')}
+            transparent
+          />
         )}
       </ButtonsWrapper>
     </Container>

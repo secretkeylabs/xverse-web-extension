@@ -206,6 +206,7 @@
     "SEND": "Send",
     "SWAP": "Swap",
     "BUY": "Buy",
+    "SAVE": "Save",
     "MANAGE_TOKEN": "Manage token list",
     "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
     "ORDINALS": "Ordinals & BRC-20 Tokens",
@@ -225,8 +226,8 @@
     "ADD_COINS": "Manage tokens"
   },
   "ACCOUNT_SCREEN": {
-    "CHANGE_ACCOUNT": "Change account",
-    "NEW_ACCOUNT": "Create a new account",
+    "TITLE": "Accounts",
+    "NEW_ACCOUNT": "Generate account",
     "LEDGER_ACCOUNT": "Connect hardware wallet"
   },
   "RECEIVE": {
@@ -746,7 +747,8 @@
     "SWITCH_ACCOUNT": "Switch Account",
     "LOCK": "Lock",
     "RESET_WALLET": "Reset Wallet",
-    "REMOVE_FROM_LIST": "Remove from list"
+    "REMOVE_FROM_LIST": "Remove from list",
+    "RENAME_ACCOUNT": "Rename account"
   },
   "BUY_SCREEN": {
     "BUY": "Buy",
