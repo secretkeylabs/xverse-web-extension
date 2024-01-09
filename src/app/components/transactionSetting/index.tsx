@@ -7,8 +7,10 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import EditFee from './editFee';
+import Theme from 'theme';
+import EditBtcFee from './editBtcFee';
 import EditNonce from './editNonce';
+import EditStxFee from './editStxFee';
 
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -18,6 +20,26 @@ const ButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
 }));
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-left: ${(props) => props.theme.space.m};
+  margin-right: ${(props) => props.theme.space.m};
+  margin-bottom: ${(props) => props.theme.space.m};
+`;
+
+const LeftButton = styled.div`
+  display: flex;
+  margin-right: ${(props) => props.theme.space.xs};
+  flex: 1;
+`;
+
+const RightButton = styled.div`
+  display: flex;
+  margin-left: ${(props) => props.theme.space.xs};
+  flex: 1;
+`;
 
 const TransactionSettingOptionText = styled.h1((props) => ({
   ...props.theme.body_medium_l,
@@ -87,9 +109,10 @@ function TransactionSettingAlert({
   const [feeRate, setFeeRate] = useState<BigNumber | string | undefined>(feePerVByte);
   const [nonceInput, setNonceInput] = useState<string | undefined>(nonce);
   const [error, setError] = useState('');
-  const [selectedOption, setSelectedOption] = useState<string>('standard');
+  const [selectedOption, setSelectedOption] = useState<string>('medium');
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
+  const [customFeeSelected, setCustomFeeSelected] = useState(false);
   const { btcBalance, stxAvailableBalance, network } = useWalletSelector();
 
   const applyClickForStx = () => {
@@ -134,8 +157,22 @@ function TransactionSettingAlert({
     }
     setShowNonceSettings(false);
     setShowFeeSettings(false);
+    setCustomFeeSelected(false);
     setError('');
     onApplyClick({ fee: feeInput.toString(), feeRate: feeRate?.toString() });
+  };
+
+  const btcFeeOptionSelected = async (selectedFeeRate: string, totalFee: string) => {
+    const currentFee = new BigNumber(feeInput);
+    if (currentFee.gt(btcBalance)) {
+      // show fee exceeds total balance error
+      setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
+      return;
+    }
+    setShowNonceSettings(false);
+    setShowFeeSettings(false);
+    setError('');
+    onApplyClick({ fee: totalFee, feeRate: selectedFeeRate });
   };
 
   const onEditFeesPress = () => {
@@ -166,8 +203,23 @@ function TransactionSettingAlert({
     }
 
     if (showFeeSettings) {
+      if (type === 'STX') {
+        return (
+          <EditStxFee
+            fee={fee}
+            feeRate={feeRate}
+            type={type}
+            error={error}
+            setFee={setFeeInput}
+            setFeeRate={setFeeRate}
+            setError={setError}
+            feeMode={selectedOption}
+            setFeeMode={setSelectedOption}
+          />
+        );
+      }
       return (
-        <EditFee
+        <EditBtcFee
           fee={fee}
           feeRate={feeRate}
           type={type}
@@ -183,6 +235,11 @@ function TransactionSettingAlert({
           ordinalTxUtxo={ordinalTxUtxo}
           isRestoreFlow={isRestoreFlow}
           nonOrdinalUtxos={nonOrdinalUtxos}
+          setCustomFeeSelected={(selected: boolean) => {
+            setCustomFeeSelected(selected);
+          }}
+          customFeeSelected={customFeeSelected}
+          feeOptionSelected={btcFeeOptionSelected}
         />
       );
     }
@@ -221,9 +278,14 @@ function TransactionSettingAlert({
       overlayStylesOverriding={{
         height: 600,
       }}
+      contentStylesOverriding={{
+        background: Theme.colors.elevation6_600,
+        backdropFilter: 'blur(10px)',
+        paddingBottom: Theme.spacing(8),
+      }}
     >
       {renderContent()}
-      {(showFeeSettings || showNonceSettings) && (
+      {type === 'STX' && (showFeeSettings || showNonceSettings) && (
         <ButtonContainer>
           <ActionButton
             text={t('TRANSACTION_SETTING.APPLY')}
@@ -232,6 +294,27 @@ function TransactionSettingAlert({
             onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
           />
         </ButtonContainer>
+      )}
+      {customFeeSelected && (
+        <ButtonsContainer>
+          <LeftButton>
+            <ActionButton
+              text="Back"
+              onPress={() => {
+                setCustomFeeSelected(false);
+              }}
+              transparent
+            />
+          </LeftButton>
+          <RightButton>
+            <ActionButton
+              text={t('TRANSACTION_SETTING.APPLY')}
+              processing={isLoading}
+              disabled={isLoading || !!error}
+              onPress={applyClickForBtc}
+            />
+          </RightButton>
+        </ButtonsContainer>
       )}
     </BottomModal>
   );
