@@ -3,6 +3,7 @@ import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SwapToken } from '@screens/swap/types';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
+import { EMPTY_LABEL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -125,7 +126,7 @@ function SwapTokenBlock({
       <RowContainer>
         <TitleText>{title}</TitleText>
         <BalanceText>{t('BALANCE')}:</BalanceText>
-        <Text>{selectedCoin?.balance ?? '--'}</Text>
+        <Text>{selectedCoin?.balance ?? EMPTY_LABEL}</Text>
       </RowContainer>
       <CardContainer error={error}>
         <RowContainer>
@@ -146,7 +147,7 @@ function SwapTokenBlock({
         </RowContainer>
         <RowContainer>
           <NumericFormat
-            value={selectedCoin?.fiatAmount ?? '--'}
+            value={selectedCoin?.fiatAmount ?? EMPTY_LABEL}
             displayType="text"
             thousandSeparator
             prefix={`${currencySymbolMap[fiatCurrency]} `}
