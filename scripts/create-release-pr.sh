@@ -1,5 +1,12 @@
 #! /bin/bash
 
+##
+# create-release-pr.sh for xverse-web-extension
+#
+# NOTE: make sure you git commit your work before running this locally.
+# Alternatively trigger it from the github action
+#
+
 if [[ -z "$BUMP" ]]; then
   echo "BUMP is required. major|minor|patch"
   exit 1
@@ -23,23 +30,6 @@ git merge origin/main -s ours
 
 git push --set-upstream origin $BRANCH
 
-echo -e "\n--- Create draft release for $TAG ---"
-
-gh api \
-  --method POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/{owner}/{repo}/releases \
-  -f tag_name=$TAG \
-  -f target_commitish="$BRANCH" \
-  -f name=$TAG \
-  -F draft=true \
-  -F prerelease=true \
-  -F generate_release_notes=true > release.json
-
-cat release.json | jq -r .body > body.md
-echo -e "\n\nDraft release: $(cat release.json | jq -r .html_url)" >> body.md
-
 for b in main develop; do
   echo -e "\n--- Create PR to $b ---"
 
@@ -52,17 +42,6 @@ for b in main develop; do
     -f body="Created by GitHub Actions Bot" \
     -f head="$BRANCH" \
     -f base="$b" > pr-$b.json
-
-  echo -e "\n--- Update PR to $b with description ---"
-
-  PR_ID=$(cat pr-$b.json | jq -r .number)
-
-  gh api \
-    --method PATCH \
-    -H "Accept: application/vnd.github+json" \
-    -H "X-GitHub-Api-Version: 2022-11-28" \
-    /repos/{owner}/{repo}/pulls/$PR_ID \
-    -F 'body=@body.md'
 
   # clean up temp files
   # rm pr-$b.json
