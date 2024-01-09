@@ -18,6 +18,7 @@ import NetworkRow from './networkRow';
 import NodeInput from './nodeInput';
 
 const Container = styled.div`
+  ${(props) => props.theme.typography.body_medium_m}
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -30,16 +31,15 @@ const Container = styled.div`
   }
 `;
 
-const ButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(16),
-}));
+const ButtonContainer = styled.div`
+  margin: ${(props) => props.theme.space.m};
+`;
 
 const NodeInputsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${(props) => props.theme.space.s};
+  margin-top: ${(props) => props.theme.space.s};
 `;
 
 type NodeInputKey = keyof Pick<SettingsNetwork, 'address' | 'btcApiUrl' | 'fallbackBtcApiUrl'>;
@@ -74,6 +74,7 @@ function ChangeNetworkScreen() {
     setFormErrors(initialNodeErrors);
   };
 
+  // TODO should validate required fields on change
   const onChangeFactory = (key: NodeInputKey) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormErrors((prevErrors) => ({
       ...prevErrors,
@@ -110,10 +111,28 @@ function ChangeNetworkScreen() {
   const onSubmit = async () => {
     setIsChangingNetwork(true);
 
+    if (!formInputs.address) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        address: t('REQUIRED'),
+      }));
+      setIsChangingNetwork(false);
+      return;
+    }
+
+    if (!formInputs.btcApiUrl) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        btcApiUrl: t('REQUIRED'),
+      }));
+      setIsChangingNetwork(false);
+      return;
+    }
+
     const [isValidStacksUrl, isValidBtcApiUrl, isValidFallbackBtcApiUrl] = await Promise.all([
       isValidStacksApi(formInputs.address, formInputs.type),
       isValidBtcApi(formInputs.btcApiUrl, formInputs.type),
-      isValidBtcApi(formInputs.fallbackBtcApiUrl, formInputs.type),
+      !formInputs.fallbackBtcApiUrl || isValidBtcApi(formInputs.fallbackBtcApiUrl, formInputs.type),
     ]);
 
     if (isValidStacksUrl && isValidBtcApiUrl && isValidFallbackBtcApiUrl) {
