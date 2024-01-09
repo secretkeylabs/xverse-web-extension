@@ -3,18 +3,18 @@ import { useMemo } from 'react';
 import useWalletSelector from './useWalletSelector';
 
 const useBtcClient = () => {
-  const { network, btcApiUrl } = useWalletSelector();
-  const { type, btcApiUrl: remoteBtcApiURL } = network;
-  const url = btcApiUrl || remoteBtcApiURL;
+  const { network } = useWalletSelector();
+  const { type, btcApiUrl, fallbackBtcApiUrl } = network;
+  const url = btcApiUrl;
 
   const esploraInstance = useMemo(
     () =>
       new BitcoinEsploraApiProvider({
         url,
-        fallbackUrl: 'https://btc-1.xverse.app', // TODO take this from settings input
+        fallbackUrl: fallbackBtcApiUrl,
         network: type,
       }),
-    [url, type],
+    [url, fallbackBtcApiUrl, type],
   );
 
   return esploraInstance;

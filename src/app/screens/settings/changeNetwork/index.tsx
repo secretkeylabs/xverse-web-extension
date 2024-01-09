@@ -1,17 +1,16 @@
-import Cross from '@assets/img/settings/x.svg';
 import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { SettingsNetwork, StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core';
-import { initialNetworksList } from '@utils/constants';
+import { defaultMainnet, defaultTestnet, SettingsNetwork } from '@secretkeylabs/xverse-core';
 import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import NetworkRow from './networkRow';
+import NodeInput from './nodeInput';
 
 const Container = styled.div`
   display: flex;
@@ -26,73 +25,33 @@ const Container = styled.div`
   }
 `;
 
-const NodeInputHeader = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  paddingLeft: props.theme.spacing(1),
-  paddingRight: props.theme.spacing(1),
-}));
-
-const NodeText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  marginTop: props.theme.spacing(6),
-}));
-
-const NodeResetButton = styled.button((props) => ({
-  background: 'none',
-  color: props.theme.colors.action.classicLight,
-}));
-
-const InputContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  width: '100%',
-  border: `1px solid ${props.theme.colors.elevation3}`,
-  backgroundColor: props.theme.colors.elevation_n1,
-  borderRadius: props.theme.radius(1),
-  paddingLeft: props.theme.spacing(4),
-  paddingRight: props.theme.spacing(4),
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(3),
-}));
-
 const ButtonContainer = styled.div((props) => ({
   marginLeft: props.theme.spacing(8),
   marginRight: props.theme.spacing(8),
   marginBottom: props.theme.spacing(16),
 }));
 
-const ErrorMessage = styled.h2((props) => ({
-  ...props.theme.body_medium_m,
-  textAlign: 'left',
-  color: props.theme.colors.feedback.error,
-}));
-
-const Input = styled.input((props) => ({
-  ...props.theme.body_medium_m,
-  height: 44,
-  display: 'flex',
-  flex: 1,
-  backgroundColor: props.theme.colors.elevation_n1,
-  color: props.theme.colors.white_0,
-  border: 'none',
-}));
-
-const Button = styled.button({
-  background: 'none',
-});
+type NodeInputKey = 'stacksUrl' | 'btcUrl' | 'fallbackBtcUrl';
+const nodeInputKeys: NodeInputKey[] = ['stacksUrl', 'btcUrl', 'fallbackBtcUrl'];
 
 function ChangeNetworkScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
-  const { network, btcApiUrl, networkAddress } = useWalletSelector();
+  const { network, savedNetworks } = useWalletSelector();
   const [changedNetwork, setChangedNetwork] = useState<SettingsNetwork>(network);
-  const [stacksUrlError, setStacksUrlError] = useState<string>('');
-  const [btcURLError, setBtcURLError] = useState('');
-  const [btcUrl, setBtcUrl] = useState(btcApiUrl || network.btcApiUrl);
-  const [stacksUrl, setStacksUrl] = useState<string>(networkAddress || network.address);
-  const [isChangingNetwork, setIsChangingNetwork] = useState<boolean>(false);
+  const [isChangingNetwork, setIsChangingNetwork] = useState(false);
+
+  const [formErrors, setFormErrors] = useState<Record<NodeInputKey, string>>({
+    stacksUrl: '',
+    btcUrl: '',
+    fallbackBtcUrl: '',
+  });
+
+  const [formInputs, setFormInputs] = useState<Record<NodeInputKey, string>>({
+    stacksUrl: network.address,
+    btcUrl: network.btcApiUrl,
+    fallbackBtcUrl: network.fallbackBtcApiUrl,
+  });
+
   const navigate = useNavigate();
   const { changeNetwork } = useWalletReducer();
 
@@ -101,105 +60,105 @@ function ChangeNetworkScreen() {
   };
 
   const onNetworkSelected = (networkSelected: SettingsNetwork) => {
-    setStacksUrl(networkSelected.address);
     setChangedNetwork(networkSelected);
-    setBtcUrl(networkSelected.btcApiUrl);
-    setStacksUrlError('');
-    setBtcURLError('');
+    setFormInputs({
+      stacksUrl: networkSelected.address,
+      btcUrl: networkSelected.btcApiUrl,
+      fallbackBtcUrl: networkSelected.fallbackBtcApiUrl,
+    });
+    setFormErrors({
+      stacksUrl: '',
+      btcUrl: '',
+      fallbackBtcUrl: '',
+    });
   };
 
-  const onChangeStacksUrl = (event: React.FormEvent<HTMLInputElement>) => {
-    setStacksUrlError('');
-    setStacksUrl(event.currentTarget.value);
+  const onChangeFactory = (key: NodeInputKey) => (event: React.FormEvent<HTMLInputElement>) => {
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [key]: '',
+    }));
+    setFormInputs((prevInputs) => ({
+      ...prevInputs,
+      [key]: event.currentTarget.value,
+    }));
   };
 
-  const onChangeBtcApiUrl = (event: React.FormEvent<HTMLInputElement>) => {
-    setBtcURLError('');
-    setBtcUrl(event.currentTarget.value);
+  const onClearFactory = (key: NodeInputKey) => () => {
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [key]: '',
+    }));
+    setFormInputs((prevInputs) => ({
+      ...prevInputs,
+      [key]: '',
+    }));
   };
 
-  const onClearStacksUrl = () => {
-    setStacksUrl('');
-  };
-
-  const onClearBtcUrl = () => {
-    setBtcUrl('');
-  };
-
-  const onResetBtcUrl = async () => {
-    setBtcUrl(changedNetwork.btcApiUrl);
-    setBtcURLError('');
-  };
-
-  const onResetStacks = async () => {
-    setStacksUrl(changedNetwork.address);
-    setStacksUrlError('');
+  const onResetFactory = (key: NodeInputKey) => () => {
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [key]: '',
+    }));
+    setFormInputs((prevInputs) => ({
+      ...prevInputs,
+      [key]: changedNetwork[key],
+    }));
   };
 
   const onSubmit = async () => {
     setIsChangingNetwork(true);
 
-    const [isValidStacksUrl, isValidBtcApiUrl] = await Promise.all([
-      isValidStacksApi(stacksUrl, changedNetwork.type),
-      isValidBtcApi(btcUrl, changedNetwork.type),
+    const [isValidStacksUrl, isValidBtcApiUrl, isValidFallbackBtcApiUrl] = await Promise.all([
+      isValidStacksApi(changedNetwork.address, changedNetwork.type),
+      isValidBtcApi(changedNetwork.btcApiUrl, changedNetwork.type),
+      isValidBtcApi(changedNetwork.fallbackBtcApiUrl, changedNetwork.type),
     ]);
 
-    if (isValidStacksUrl && isValidBtcApiUrl) {
-      const networkObject =
-        changedNetwork.type === 'Mainnet'
-          ? new StacksMainnet({ url: stacksUrl })
-          : new StacksTestnet({ url: stacksUrl });
-      await changeNetwork(changedNetwork, networkObject, stacksUrl, btcUrl);
+    if (isValidStacksUrl && isValidBtcApiUrl && isValidFallbackBtcApiUrl) {
+      await changeNetwork(changedNetwork);
       navigate('/settings');
     } else {
-      if (!isValidStacksUrl) {
-        setStacksUrlError(t('INVALID_URL'));
-      }
-      if (!isValidBtcApiUrl) {
-        setBtcURLError(t('INVALID_URL'));
-      }
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        stacksUrl: !isValidStacksUrl ? t('INVALID_URL') : '',
+        btcUrl: !isValidBtcApiUrl ? t('INVALID_URL') : '',
+        fallbackBtcUrl: !isValidFallbackBtcApiUrl ? t('INVALID_URL') : '',
+      }));
       setIsChangingNetwork(false);
     }
   };
+
+  const savedMainnet = savedNetworks.find((n) => n.type === 'Mainnet');
+  const savedTestnet = savedNetworks.find((n) => n.type === 'Testnet');
 
   return (
     <>
       <TopRow title={t('NETWORK')} onClick={handleBackButtonClick} />
       <Container>
         <NetworkRow
-          network={initialNetworksList[0]}
+          network={savedMainnet || defaultMainnet}
           isSelected={changedNetwork.type === 'Mainnet'}
           onNetworkSelected={onNetworkSelected}
           showDivider
         />
         <NetworkRow
-          network={initialNetworksList[1]}
+          network={savedTestnet || defaultTestnet}
           isSelected={changedNetwork.type === 'Testnet'}
           onNetworkSelected={onNetworkSelected}
           showDivider={false}
         />
-        <NodeInputHeader>
-          <NodeText>{t('NODE')}</NodeText>
-          <NodeResetButton onClick={onResetStacks}>Reset URL</NodeResetButton>
-        </NodeInputHeader>
-        <InputContainer>
-          <Input onChange={onChangeStacksUrl} value={stacksUrl} />
-          <Button onClick={onClearStacksUrl}>
-            <img width={22} height={22} src={Cross} alt="cross" />
-          </Button>
-        </InputContainer>
-        <ErrorMessage>{stacksUrlError}</ErrorMessage>
-        <NodeInputHeader>
-          <NodeText>BTC API URL</NodeText>
-          <NodeResetButton onClick={onResetBtcUrl}>Reset URL</NodeResetButton>
-        </NodeInputHeader>
-        <InputContainer>
-          <Input onChange={onChangeBtcApiUrl} value={btcUrl} />
-          <Button onClick={onClearBtcUrl}>
-            <img width={22} height={22} src={Cross} alt="cross" />
-          </Button>
-        </InputContainer>
-        <ErrorMessage>{btcURLError}</ErrorMessage>
+        {nodeInputKeys.map((key) => (
+          <NodeInput
+            key={key}
+            label={t(key)}
+            onChange={onChangeFactory(key)}
+            value={formInputs[key]}
+            onClear={onClearFactory(key)}
+            onReset={onResetFactory(key)}
+            error={formErrors[key]}
+          />
+        ))}
       </Container>
       <ButtonContainer>
         <ActionButton
@@ -209,7 +168,6 @@ function ChangeNetworkScreen() {
           disabled={isChangingNetwork}
         />
       </ButtonContainer>
-
       <BottomBar tab="settings" />
     </>
   );

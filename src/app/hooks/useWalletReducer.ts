@@ -11,7 +11,9 @@ import {
   newWallet,
   restoreWalletWithAccounts,
   SettingsNetwork,
+  StacksMainnet,
   StacksNetwork,
+  StacksTestnet,
   walletFromSeedPhrase,
 } from '@secretkeylabs/xverse-core';
 import {
@@ -281,14 +283,9 @@ const useWalletReducer = () => {
     dispatch(fetchAccountAction(account, accountsList));
   };
 
-  const changeNetwork = async (
-    changedNetwork: SettingsNetwork,
-    networkObject: StacksNetwork,
-    networkAddress: string,
-    btcApiUrl: string,
-  ) => {
+  const changeNetwork = async (changedNetwork: SettingsNetwork) => {
     const seedPhrase = await seedVault.getSeed();
-    dispatch(ChangeNetworkAction(changedNetwork, networkAddress, btcApiUrl));
+    dispatch(ChangeNetworkAction(changedNetwork));
     const wallet = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
       index: 0n,
@@ -305,6 +302,10 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
     };
     dispatch(setWalletAction(wallet));
+    const networkObject =
+      changedNetwork.type === 'Mainnet'
+        ? new StacksMainnet({ url: changedNetwork.address })
+        : new StacksTestnet({ url: changedNetwork.address });
     try {
       await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [account]);
     } catch (err) {
