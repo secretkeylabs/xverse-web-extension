@@ -77,14 +77,14 @@ export async function getRawTransaction(txId: string, network: SettingsNetwork):
   return axios.get<RawTransactionResponse>(apiUrl).then((response) => response.data.raw_tx);
 }
 
-const constructRecommendedFees = async (
+const constructRecommendedFees = (
   lowerName: keyof RbfRecommendedFees,
   lowerFeeRate: number,
   higherName: keyof RbfRecommendedFees,
   higherFeeRate: number,
   stxAvailableBalance: string,
   thresholdHighStacksFee?: number,
-): Promise<RbfRecommendedFees> => {
+): RbfRecommendedFees => {
   let lowerFee = lowerFeeRate;
   let higherFee = higherFeeRate;
 
@@ -150,13 +150,13 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         selectedNetwork,
       );
 
-      let minimumFee = fee.multipliedBy(1.25);
+      const currentMicrostacksFee = stxToMicrostacks(fee);
+      let minimumFee = currentMicrostacksFee.multipliedBy(1.25).toNumber();
       if (!Number.isSafeInteger(minimumFee)) {
         // round up the fee to the nearest integer
-        minimumFee = microStxToStx(Math.ceil(stxToMicrostacks(minimumFee).toNumber()));
+        minimumFee = Math.ceil(minimumFee);
       }
 
-      const currentMicrostacksFee = stxToMicrostacks(fee);
       let feePresets: RbfRecommendedFees = {};
       const mediumFee = medium.fee;
       const highFee = high.fee;
@@ -164,7 +164,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       const highestFee = currentMicrostacksFee.multipliedBy(1.5).toNumber();
 
       if (currentMicrostacksFee.lt(BigNumber(mediumFee))) {
-        feePresets = await constructRecommendedFees(
+        feePresets = constructRecommendedFees(
           'medium',
           mediumFee,
           'high',
@@ -176,7 +176,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         currentMicrostacksFee.gt(BigNumber(mediumFee)) &&
         currentMicrostacksFee.lt(BigNumber(highFee))
       ) {
-        feePresets = await constructRecommendedFees(
+        feePresets = constructRecommendedFees(
           'high',
           highFee,
           'higher',
@@ -187,7 +187,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       } else {
         higherFee = currentMicrostacksFee.multipliedBy(1.25).toNumber();
 
-        feePresets = await constructRecommendedFees(
+        feePresets = constructRecommendedFees(
           'higher',
           higherFee,
           'highest',
@@ -202,8 +202,8 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         rbfTxSummary: {
           currentFee: fee.toNumber(),
           currentFeeRate: fee.toNumber(),
-          minimumRbfFee: minimumFee.toNumber(),
-          minimumRbfFeeRate: minimumFee.toNumber(),
+          minimumRbfFee: microStxToStx(minimumFee).toNumber(),
+          minimumRbfFeeRate: microStxToStx(minimumFee).toNumber(),
         },
         rbfRecommendedFees: sortFees(feePresets),
         mempoolFees: {
