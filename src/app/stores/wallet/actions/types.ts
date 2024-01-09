@@ -56,7 +56,7 @@ export interface WalletState {
   ledgerAccountsList: Account[];
   selectedAccount: Account | null;
   network: SettingsNetwork; // currently selected network urls and type
-  savedNetworks: SettingsNetwork[]; // save the previously set network urls for type
+  savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
   fiatCurrency: SupportedCurrency;
   btcFiatRate: string;

@@ -5,17 +5,20 @@ import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 
 const useAppConfig = () => {
-  const { network, networkAddress, btcApiUrl } = useWalletSelector();
+  const { network } = useWalletSelector();
   const dispatch = useDispatch();
 
   return useQuery({
-    queryKey: ['app-config', network.type, btcApiUrl],
+    queryKey: ['app-config', network.type, network.btcApiUrl],
     queryFn: async () => {
       const response = await getAppConfig(network.type);
-      if (response.data.btcApiURL && network.type === 'Mainnet' && !btcApiUrl) {
+
+      // was this ever used? we set defaults for btcApiUrl in useWalletSelector
+      if (response.data.btcApiURL && network.type === 'Mainnet' && !network.btcApiUrl) {
         const updatedNetwork = { ...network, btcApiUrl: response.data.btcApiURL };
-        dispatch(ChangeNetworkAction(updatedNetwork, networkAddress, ''));
+        dispatch(ChangeNetworkAction(updatedNetwork));
       }
+
       return response;
     },
   });
