@@ -10,6 +10,7 @@ import TopRow from '@components/topRow';
 import { ArrowLeft, ArrowUp, Share } from '@phosphor-icons/react';
 import NftImage from '@screens/nftDashboard/nftImage';
 import { Attribute } from '@secretkeylabs/xverse-core';
+import { EMPTY_LABEL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
@@ -371,7 +372,9 @@ function NftDetailScreen() {
           <CollectibleDetailTile title={t('COLLECTION')} value={collection?.collection_name} />
           <CollectibleDetailTile
             title={t('COLLECTION_FLOOR_PRICE')}
-            value={collection?.floor_price ? `${collection?.floor_price.toString()} STX` : '--'}
+            value={
+              collection?.floor_price ? `${collection?.floor_price.toString()} STX` : EMPTY_LABEL
+            }
           />
         </DetailSection>
       )}

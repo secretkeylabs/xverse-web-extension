@@ -3,7 +3,11 @@ import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import BottomModal from '@components/bottomModal';
 import { SlippageModalContent } from '@screens/swap/slippageModal';
 import { UseSwap } from '@screens/swap/types';
-import { SUPPORT_URL_TAB_TARGET, SWAP_SPONSOR_DISABLED_SUPPORT_URL } from '@utils/constants';
+import {
+  EMPTY_LABEL,
+  SUPPORT_URL_TAB_TARGET,
+  SWAP_SPONSOR_DISABLED_SUPPORT_URL,
+} from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Switch from 'react-switch';
@@ -101,11 +105,11 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
             <ChevronImage alt={t('DETAILS')} src={ChevronIcon} rotated={expandDetail} />
           </DetailButton>
         </DT>
-        <DD>{swap.swapInfo?.exchangeRate ?? '--'}</DD>
+        <DD>{swap.swapInfo?.exchangeRate ?? EMPTY_LABEL}</DD>
         {expandDetail && (
           <>
             <DT>{t('MIN_RECEIVE')}</DT>
-            <DD>{swap.minReceived ?? '--'}</DD>
+            <DD>{swap.minReceived ?? EMPTY_LABEL}</DD>
             <DT>{t('SLIPPAGE')}</DT>
             <DD>
               <DetailButton onClick={() => setShowSlippageModal(true)}>
@@ -114,9 +118,9 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
               </DetailButton>
             </DD>
             <DT>{t('LP_FEE')}</DT>
-            <DD>{swap.swapInfo?.lpFee ?? '--'}</DD>
+            <DD>{swap.swapInfo?.lpFee ?? EMPTY_LABEL}</DD>
             <DT>{t('ROUTE')}</DT>
-            <DD>{swap.swapInfo?.route ?? '--'}</DD>
+            <DD>{swap.swapInfo?.route ?? EMPTY_LABEL}</DD>
             {swap.isServiceRunning && (
               <>
                 <>
