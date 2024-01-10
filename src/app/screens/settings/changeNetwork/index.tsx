@@ -75,7 +75,7 @@ function ChangeNetworkScreen() {
   };
 
   // TODO should validate required fields on change
-  const onChangeFactory = (key: NodeInputKey) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeCreator = (key: NodeInputKey) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormErrors((prevErrors) => ({
       ...prevErrors,
       [key]: '',
@@ -86,7 +86,7 @@ function ChangeNetworkScreen() {
     }));
   };
 
-  const onClearFactory = (key: NodeInputKey) => () => {
+  const onClearCreator = (key: NodeInputKey) => () => {
     setFormErrors((prevErrors) => ({
       ...prevErrors,
       [key]: '',
@@ -97,7 +97,7 @@ function ChangeNetworkScreen() {
     }));
   };
 
-  const onResetFactory = (key: NodeInputKey) => () => {
+  const onResetCreator = (key: NodeInputKey) => () => {
     setFormErrors((prevErrors) => ({
       ...prevErrors,
       [key]: '',
@@ -172,10 +172,10 @@ function ChangeNetworkScreen() {
             <NodeInput
               key={key}
               label={t(labelKey)}
-              onChange={onChangeFactory(key)}
+              onChange={onChangeCreator(key)}
               value={formInputs[key]}
-              onClear={onClearFactory(key)}
-              onReset={onResetFactory(key)}
+              onClear={onClearCreator(key)}
+              onReset={onResetCreator(key)}
               error={formErrors[key]}
             />
           ))}
