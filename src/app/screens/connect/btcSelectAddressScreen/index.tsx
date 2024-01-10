@@ -67,8 +67,8 @@ const AddressContainer = styled.div({
 });
 
 const TopImage = styled.img({
-  maxHeight: 48,
-  maxWidth: 48,
+  maxHeight: 32,
+  maxWidth: 32,
 });
 
 const Title = styled.h1((props) => ({
@@ -80,7 +80,7 @@ const Title = styled.h1((props) => ({
 const DapURL = styled.h2((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
-  marginTop: 4,
+  marginTop: props.theme.spacing(2),
   textAlign: 'center',
 }));
 
@@ -228,18 +228,30 @@ function BtcSelectAddressScreen() {
         </AddressBox>
       );
     }
-    return (
-      <AddressBox key={purpose}>
-        <AddressContainer>
-          <AddressImage src={stxIcon} />
-          <AddressTextTitle>{t('STX_ADDRESS')}</AddressTextTitle>
-        </AddressContainer>
-        <div>
-          {selectedAccount?.bnsName ? <BnsName>{selectedAccount?.bnsName}</BnsName> : null}
-          <TruncatedAddress>{getTruncatedAddress(stxAddress)}</TruncatedAddress>
-        </div>
-      </AddressBox>
-    );
+    if (purpose === AddressPurpose.Stacks) {
+      return (
+        <AddressBox key={purpose}>
+          <AddressContainer>
+            <AddressImage src={stxIcon} />
+            <AddressTextTitle>{t('STX_ADDRESS')}</AddressTextTitle>
+          </AddressContainer>
+          <div>
+            {selectedAccount?.bnsName ? <BnsName>{selectedAccount?.bnsName}</BnsName> : null}
+            <TruncatedAddress>{getTruncatedAddress(stxAddress)}</TruncatedAddress>
+          </div>
+        </AddressBox>
+      );
+    }
+
+    navigate('/tx-status', {
+      state: {
+        txid: '',
+        currency: 'BTC',
+        errorTitle: t('INVALID_PURPOSE_ERROR_TITLE'),
+        error: t('INVALID_PURPOSE_ERROR_DESCRIPTION'),
+        browserTx: true,
+      },
+    });
   }, []);
 
   const handleSwitchAccount = () => {

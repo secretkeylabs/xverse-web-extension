@@ -23,11 +23,11 @@ const useBtcAddressRequest = () => {
           purpose: AddressPurpose.Ordinals,
         };
       }
-      if (purpose === AddressPurpose.STX) {
+      if (purpose === AddressPurpose.Stacks) {
         return {
           address: stxAddress,
           publicKey: stxPublicKey,
-          purpose: AddressPurpose.STX,
+          purpose: AddressPurpose.Stacks,
         };
       }
       return {

@@ -93,7 +93,6 @@ function AccountView({ account, isBitcoinTx }: Props) {
         secondGradient={gradient[1]}
         thirdGradient={gradient[2]}
       />
-
       <ColumnContainer>
         <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
         <RowContainer>

@@ -1,39 +1,40 @@
+import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import stxIcon from '@assets/img/ledger/stx_icon.svg';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { delay } from '@common/utils/ledger';
-import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import SelectAccount from '@components/selectAccount';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { Check } from '@phosphor-icons/react';
 import {
   AuthRequest,
   createAuthResponse,
   handleLedgerStxJWTAuth,
 } from '@secretkeylabs/xverse-core';
-import { AddressVersion, publicKeyToAddress, StacksMessageType } from '@stacks/transactions';
-import { isHardwareAccount } from '@utils/helper';
+import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
+import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-import styled from 'styled-components';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styled, { useTheme } from 'styled-components';
 import validUrl from 'valid-url';
 
 const MainContainer = styled.div({
   display: 'flex',
-  flex: 1,
-  flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
-  width: '100%',
-  height: '100%',
+  flexDirection: 'column',
   overflow: 'hidden',
+  marginLeft: 16,
+  marginRight: 16,
 });
 
 const SuccessActionsContainer = styled.div((props) => ({
@@ -47,29 +48,106 @@ const SuccessActionsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(20),
 }));
 
-const TopImage = styled.img({
-  aspectRatio: 1,
-  height: 88,
-  borderWidth: 10,
-  borderColor: 'white',
-});
+const TopImage = styled.img((props) => ({
+  maxHeight: 48,
+  maxWidth: 48,
+  marginTop: props.theme.space.xxl,
+}));
 
 const FunctionTitle = styled.h1((props) => ({
-  ...props.theme.headline_s,
+  ...props.theme.typography.body_bold_l,
   color: props.theme.colors.white_0,
-  marginTop: props.theme.spacing(8),
+  marginTop: 12,
 }));
 
 const DappTitle = styled.h2((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(2),
+  marginBottom: props.theme.spacing(12),
+  textAlign: 'center',
 }));
 
 const InfoContainerWrapper = styled.div((props) => ({
   margin: props.theme.spacing(10),
   marginBottom: 0,
 }));
+
+const AddressesContainer = styled.div((props) => ({
+  marginTop: props.theme.space.s,
+}));
+
+const AddressBox = styled.div((props) => ({
+  width: 328,
+  height: 66,
+  padding: props.theme.spacing(10),
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: props.theme.colors.elevation6_800,
+  marginBottom: 1,
+  ':first-of-type': {
+    borderTopLeftRadius: props.theme.radius(2),
+    borderTopRightRadius: props.theme.radius(2),
+  },
+  ':last-of-type': {
+    borderBottomLeftRadius: props.theme.radius(2),
+    borderBottomRightRadius: props.theme.radius(2),
+  },
+}));
+
+const AddressContainer = styled.div({
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const AddressImage = styled.img({
+  width: 24,
+  height: 24,
+  marginRight: 8,
+});
+
+const AddressTextTitle = styled.h2((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
+  textAlign: 'center',
+}));
+
+const TruncatedAddress = styled.h3((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
+  textAlign: 'right',
+}));
+
+const BnsName = styled.h3((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
+  textAlign: 'right',
+}));
+
+const PermissionsContainer = styled.div({
+  width: '100%',
+});
+
+const PermissionsTitle = styled.h3((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
+  textAlign: 'left',
+  marginTop: 24,
+}));
+
+const Permission = styled.div((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
+  marginTop: 12,
+  display: 'flex',
+  alignContent: 'center',
+}));
+
+const PermissionIcon = styled.div({
+  marginRight: 4,
+});
 
 function AuthenticationRequest() {
   const [loading, setLoading] = useState(false);
@@ -81,13 +159,14 @@ function AuthenticationRequest() {
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'AUTH_REQUEST_SCREEN' });
-
+  const navigate = useNavigate();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
   const { selectedAccount } = useWalletSelector();
   const { getSeed } = useSeedVault();
+  const theme = useTheme();
   const isDisabled = !selectedAccount?.stxAddress;
 
   const confirmCallback = async () => {
@@ -103,6 +182,9 @@ function AuthenticationRequest() {
         seedPhrase,
         selectedAccount?.id ?? 0,
         authRequest,
+        {
+          btcAddress: selectedAccount?.btcAddress,
+        },
       );
       chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
         source: MESSAGE_SOURCE,
@@ -193,7 +275,6 @@ function AuthenticationRequest() {
       });
       window.close();
     } catch (e) {
-      console.error(e);
       setIsTxRejected(true);
       setIsButtonDisabled(false);
     } finally {
@@ -207,6 +288,10 @@ function AuthenticationRequest() {
     setCurrentStepIndex(0);
   };
 
+  const handleSwitchAccount = () => {
+    navigate('/account-list');
+  };
+
   return (
     <ConfirmScreen
       onConfirm={confirmCallback}
@@ -216,11 +301,47 @@ function AuthenticationRequest() {
       loading={loading}
       disabled={isDisabled}
     >
-      <AccountHeaderComponent />
       <MainContainer>
         {getDappLogo()}
         <FunctionTitle>{t('TITLE')}</FunctionTitle>
         <DappTitle>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappTitle>
+        <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
+        <AddressesContainer>
+          <AddressBox>
+            <AddressContainer>
+              <AddressImage src={stxIcon} />
+              <AddressTextTitle>{t('STX_ADDRESS')}</AddressTextTitle>
+            </AddressContainer>
+            <div>
+              {selectedAccount?.bnsName ? <BnsName>{selectedAccount?.bnsName}</BnsName> : null}
+              <TruncatedAddress>
+                {getTruncatedAddress(selectedAccount?.stxAddress!)}
+              </TruncatedAddress>
+            </div>
+          </AddressBox>
+          <AddressBox>
+            <AddressContainer>
+              <AddressImage src={BitcoinIcon} />
+              <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
+            </AddressContainer>
+            <TruncatedAddress>{getTruncatedAddress(selectedAccount?.btcAddress!)}</TruncatedAddress>
+          </AddressBox>
+        </AddressesContainer>
+        <PermissionsContainer>
+          <PermissionsTitle>{t('PERMISSIONS_TITLE')}</PermissionsTitle>
+          <Permission>
+            <PermissionIcon>
+              <Check color={theme.colors.success_light} />
+            </PermissionIcon>
+            {t('PERMISSION_WALLET_BALANCE')}
+          </Permission>
+          <Permission>
+            <PermissionIcon>
+              <Check color={theme.colors.success_light} />
+            </PermissionIcon>
+            {t('PERMISSION_REQUEST_TX')}
+          </Permission>
+        </PermissionsContainer>
         {isDisabled && (
           <InfoContainerWrapper>
             <InfoContainer
