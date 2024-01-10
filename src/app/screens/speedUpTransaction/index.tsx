@@ -126,7 +126,7 @@ function SpeedUpTransactionScreen() {
             : selectedAccount.id,
         network: network.type,
         esploraProvider: btcClient,
-        seedVault,
+        getSeedPhrase: seedVault.getSeed,
       });
       setRbfTransaction(rbfTx);
 
