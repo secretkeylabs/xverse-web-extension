@@ -13,11 +13,11 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
 import {
+  RecommendedFeeResponse,
+  Transport as TransportType,
   getBtcFiatEquivalent,
   mempoolApi,
   rbf,
-  RecommendedFeeResponse,
-  Transport as TransportType,
 } from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
