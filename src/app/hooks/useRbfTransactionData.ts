@@ -1,15 +1,15 @@
 import {
   BtcTransactionData,
-  mempoolApi,
-  rbf,
   RecommendedFeeResponse,
   SettingsNetwork,
   StacksTransaction,
-  stxToMicrostacks,
   StxTransactionData,
+  mempoolApi,
+  microstacksToStx,
+  rbf,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
-import { isLedgerAccount, microStxToStx } from '@utils/helper';
+import { isLedgerAccount } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
@@ -100,16 +100,19 @@ const constructRecommendedFees = (
     }
   }
 
+  const bigNumLowerFee = BigNumber(lowerFee);
+  const bigNumHigherFee = BigNumber(higherFee);
+
   return {
     [lowerName]: {
-      enoughFunds: BigNumber(lowerFee).lte(BigNumber(stxAvailableBalance)),
-      feeRate: microStxToStx(lowerFee).toNumber(),
-      fee: microStxToStx(lowerFee).toNumber(),
+      enoughFunds: bigNumLowerFee.lte(BigNumber(stxAvailableBalance)),
+      feeRate: microstacksToStx(bigNumLowerFee).toNumber(),
+      fee: microstacksToStx(bigNumLowerFee).toNumber(),
     },
     [higherName]: {
-      enoughFunds: BigNumber(higherFee).lte(BigNumber(stxAvailableBalance)),
-      feeRate: microStxToStx(higherFee).toNumber(),
-      fee: microStxToStx(higherFee).toNumber(),
+      enoughFunds: bigNumHigherFee.lte(BigNumber(stxAvailableBalance)),
+      feeRate: microstacksToStx(bigNumHigherFee).toNumber(),
+      fee: microstacksToStx(bigNumHigherFee).toNumber(),
     },
   };
 };
@@ -140,7 +143,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
     try {
       setIsLoading(true);
 
-      const fee = microStxToStx(transaction.fee);
+      const { fee } = transaction;
       const txRaw: string = await getRawTransaction(transaction.txid, network);
       const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
 
@@ -150,8 +153,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         selectedNetwork,
       );
 
-      const currentMicrostacksFee = stxToMicrostacks(fee);
-      let minimumFee = currentMicrostacksFee.multipliedBy(1.25).toNumber();
+      let minimumFee = fee.multipliedBy(1.25).toNumber();
       if (!Number.isSafeInteger(minimumFee)) {
         // round up the fee to the nearest integer
         minimumFee = Math.ceil(minimumFee);
@@ -161,9 +163,9 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       const mediumFee = medium.fee;
       const highFee = high.fee;
       let higherFee = highFee * 1.25;
-      const highestFee = currentMicrostacksFee.multipliedBy(1.5).toNumber();
+      const highestFee = fee.multipliedBy(1.5).toNumber();
 
-      if (currentMicrostacksFee.lt(BigNumber(mediumFee))) {
+      if (fee.lt(BigNumber(mediumFee))) {
         feePresets = constructRecommendedFees(
           'medium',
           mediumFee,
@@ -172,10 +174,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
           stxAvailableBalance,
           feeMultipliers?.thresholdHighStacksFee,
         );
-      } else if (
-        currentMicrostacksFee.gt(BigNumber(mediumFee)) &&
-        currentMicrostacksFee.lt(BigNumber(highFee))
-      ) {
+      } else if (fee.gt(BigNumber(mediumFee)) && fee.lt(BigNumber(highFee))) {
         feePresets = constructRecommendedFees(
           'high',
           highFee,
@@ -185,7 +184,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
           feeMultipliers?.thresholdHighStacksFee,
         );
       } else {
-        higherFee = currentMicrostacksFee.multipliedBy(1.25).toNumber();
+        higherFee = fee.multipliedBy(1.25).toNumber();
 
         feePresets = constructRecommendedFees(
           'higher',
@@ -200,18 +199,18 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       setRbfData({
         rbfTransaction: undefined,
         rbfTxSummary: {
-          currentFee: fee.toNumber(),
-          currentFeeRate: fee.toNumber(),
-          minimumRbfFee: microStxToStx(minimumFee).toNumber(),
-          minimumRbfFeeRate: microStxToStx(minimumFee).toNumber(),
+          currentFee: microstacksToStx(fee).toNumber(),
+          currentFeeRate: microstacksToStx(fee).toNumber(),
+          minimumRbfFee: microstacksToStx(BigNumber(minimumFee)).toNumber(),
+          minimumRbfFeeRate: microstacksToStx(BigNumber(minimumFee)).toNumber(),
         },
         rbfRecommendedFees: sortFees(feePresets),
         mempoolFees: {
-          fastestFee: microStxToStx(high.fee).toNumber(),
-          halfHourFee: microStxToStx(medium.fee).toNumber(),
-          hourFee: microStxToStx(slow.fee).toNumber(),
-          economyFee: microStxToStx(slow.fee).toNumber(),
-          minimumFee: microStxToStx(slow.fee).toNumber(),
+          fastestFee: microstacksToStx(BigNumber(high.fee)).toNumber(),
+          halfHourFee: microstacksToStx(BigNumber(medium.fee)).toNumber(),
+          hourFee: microstacksToStx(BigNumber(slow.fee)).toNumber(),
+          economyFee: microstacksToStx(BigNumber(slow.fee)).toNumber(),
+          minimumFee: microstacksToStx(BigNumber(slow.fee)).toNumber(),
         },
       });
     } catch (err: any) {
