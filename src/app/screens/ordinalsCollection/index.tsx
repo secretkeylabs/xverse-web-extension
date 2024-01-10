@@ -18,6 +18,7 @@ import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { Inscription } from '@secretkeylabs/xverse-core';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
+import { EMPTY_LABEL } from '@utils/constants';
 import {
   getInscriptionsCollectionGridItemId,
   getInscriptionsCollectionGridItemSubText,
@@ -164,10 +165,10 @@ function OrdinalsCollection() {
   const estPortfolioValue =
     data && data?.pages?.[0].portfolio_value !== 0
       ? `${data?.pages?.[0].portfolio_value.toFixed(8)} BTC`
-      : '--';
+      : EMPTY_LABEL;
   const collectionFloorPrice = collectionMarketData?.floor_price
     ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
-    : '--';
+    : EMPTY_LABEL;
 
   const handleOnClick = (item: Inscription) => {
     setSelectedOrdinalDetails(item);

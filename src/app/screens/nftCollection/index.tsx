@@ -13,6 +13,7 @@ import Nft from '@screens/nftDashboard/nft';
 import NftImage from '@screens/nftDashboard/nftImage';
 import { NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
 import SnackBar from '@ui-library/snackBar';
+import { EMPTY_LABEL } from '@utils/constants';
 import { getFullyQualifiedKey, getNftCollectionsGridItemId, isBnsCollection } from '@utils/nfts';
 import { PropsWithChildren, useRef } from 'react';
 import toast from 'react-hot-toast';
@@ -219,14 +220,14 @@ function NftCollection() {
                 value={
                   collectionData?.floor_price
                     ? `${collectionData?.floor_price?.toString()} STX`
-                    : '--'
+                    : EMPTY_LABEL
                 }
                 isColumnAlignment={isGalleryOpen}
                 isLoading={isLoading}
               />
               <CollectibleDetailTile
                 title={t('EST_PORTFOLIO_VALUE')}
-                value={portfolioValue ? `${portfolioValue?.toString()} STX` : '--'}
+                value={portfolioValue ? `${portfolioValue?.toString()} STX` : EMPTY_LABEL}
                 isColumnAlignment={isGalleryOpen}
                 isLoading={isLoading}
               />
