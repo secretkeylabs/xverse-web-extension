@@ -243,7 +243,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
             : selectedAccount.id,
         network: network.type,
         esploraProvider: btcClient,
-        seedVault,
+        getSeedPhrase: seedVault.getSeed,
       });
 
       const mempoolFees = await mempoolApi.getRecommendedFees(network.type);
