@@ -15,12 +15,12 @@ import { CurrencyTypes } from '@utils/constants';
 import { formatDate } from '@utils/date';
 import { isLedgerAccount } from '@utils/helper';
 import {
+  Tx,
   isAddressTransactionWithTransfers,
   isBrc20Transaction,
   isBrc20TransactionArr,
   isBtcTransaction,
   isBtcTransactionArr,
-  Tx,
 } from '@utils/transactions/transactions';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -193,7 +193,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
             : selectedAccount.id,
         network: network.type,
         esploraProvider: btcClient,
-        seedVault,
+        getSeedPhrase: seedVault.getSeed,
       }
     : undefined;
 

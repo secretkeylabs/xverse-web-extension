@@ -19,8 +19,9 @@ export const LoaderContainer = styled.div({
 export const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  paddingLeft: props.theme.spacing(8),
+  paddingRight: props.theme.spacing(8),
+  ...props.theme.scrollbar,
 }));
 
 export const DetailText = styled.span((props) => ({
@@ -79,7 +80,7 @@ export const FeeButton = styled.button<{
 export const ControlsContainer = styled.div`
   display: flex;
   column-gap: 12px;
-  margin: 38px 16px 40px;
+  margin: 38px 0px 40px;
 `;
 
 export const CustomFeeIcon = styled(Faders)({
