@@ -52,11 +52,13 @@ export const initialNetworksList: SettingsNetwork[] = [
     type: 'Mainnet',
     address: HIRO_MAINNET_DEFAULT,
     btcApiUrl: BTC_BASE_URI_MAINNET,
+    fallbackBtcApiUrl: '',
   },
   {
     type: 'Testnet',
     address: HIRO_TESTNET_DEFAULT,
     btcApiUrl: BTC_BASE_URI_TESTNET,
+    fallbackBtcApiUrl: '',
   },
 ];
 

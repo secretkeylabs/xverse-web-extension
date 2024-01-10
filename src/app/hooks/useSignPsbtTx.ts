@@ -17,16 +17,21 @@ const useSignPsbtTx = () => {
   const tabId = params.get('tabId') ?? '0';
   const btcClient = useBtcClient();
 
-  const confirmSignPsbt = async () => {
-    const seedPhrase = await getSeed();
-    const signingResponse = await signPsbt(
-      seedPhrase,
-      accountsList,
-      request.payload.inputsToSign,
-      request.payload.psbtBase64,
-      request.payload.broadcast,
-      network.type,
-    );
+  const confirmSignPsbt = async (signingResponseOverride?: string) => {
+    let signingResponse = signingResponseOverride;
+
+    if (!signingResponse) {
+      const seedPhrase = await getSeed();
+      signingResponse = await signPsbt(
+        seedPhrase,
+        accountsList,
+        request.payload.inputsToSign,
+        request.payload.psbtBase64,
+        request.payload.broadcast,
+        network.type,
+      );
+    }
+
     let txId: string = '';
     if (request.payload.broadcast) {
       const txHex = psbtBase64ToHex(signingResponse);
