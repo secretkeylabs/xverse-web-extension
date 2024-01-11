@@ -1,0 +1,132 @@
+name: Build & Publish release candidate
+##
+# This workflow builds new release candidates (create release + upload asset):
+# - for a new release PR and
+# - for every push to the release PR head branch
+#
+# It should also keep the release PR description in sync with the latest release candidate
+#
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+jobs:
+  test:
+    if: ${{ startsWith(github.head_ref, 'release/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          always-auth: true
+          node-version: 18
+          registry-url: https://npm.pkg.github.com
+          scope: '@secretkeylabs'
+          cache: npm
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
+        run: npm ci
+      - name: Test
+        run: |
+          npx eslint .
+          npx tsc --noEmit
+          npm test
+  publish-rc:
+    # TODO also keep the develop PR description up to date
+    if: ${{ github.base_ref == 'main' }}
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    outputs:
+      upload_url: ${{ steps.publish-prerelease.outputs.UPLOAD_URL }}
+      filename: ${{ steps.publish-prerelease.outputs.FILENAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: publish-prerelease
+        name: Publish release candidate as prerelease
+        env:
+          SOURCE_BRANCH: ${{ github.head_ref }}
+          TARGET_COMMITISH: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # find the next rc tag
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/releases > releases.json
+          # get $TAG from branch name, e.g. v0.25.0
+          TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
+          # export $NEXT_TAG using releases.json and $TAG, e.g. v0.25.0-rc.0
+          cd scripts
+          ./find-tag.sh
+          # publish the release as prerelease rc
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/releases \
+            -f tag_name="$NEXT_TAG" \
+            -f target_commitish="$TARGET_COMMITISH" \
+            -f name="$NEXT_TAG" \
+            -F draft=false \
+            -F prerelease=true \
+            -F generate_release_notes=true > release.json
+          # save output for upload
+          echo "FILENAME=xverse-web-extension.$NEXT_TAG.zip" >> $GITHUB_OUTPUT
+          echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_OUTPUT
+      - id: update-description
+        name: Update PR description with release notes
+        env:
+          PR_ID: ${{ github.event.pull_request.number }}
+        run: |
+          # update PR description
+          cat release.json | jq -r .body > body.md
+          echo -e "\n\nRelease candidate: $(cat release.json | jq -r .html_url)" >> body.md
+          echo -e "\nTo publish this rc as latest: Merge Commit this PR" >> body.md
+          gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/pulls/$PR_ID \
+            -F 'body=@body.md'
+  build-rc:
+    needs: publish-rc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          always-auth: true
+          node-version: 18
+          registry-url: https://npm.pkg.github.com
+          scope: '@secretkeylabs'
+          cache: npm
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
+        run: npm ci
+      - name: Build & zip
+        env:
+          TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
+          MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
+          MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
+        run: |
+          npm run build
+          zip -rj build.zip ./build
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{needs.publish-rc.outputs.upload_url}}
+          FILENAME: ${{needs.publish-rc.outputs.filename}}
+        with:
+          upload_url: $UPLOAD_URL
+          asset_path: build.zip
+          asset_name: $FILENAME
+          asset_content_type: application/zip
