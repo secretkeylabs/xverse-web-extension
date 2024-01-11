@@ -61,6 +61,7 @@ function ImportLedger(): JSX.Element {
     setAccountId(newAccountId);
     const deviceNewAccountIndex = getDeviceNewAccountIndex(
       ledgerAccountsList,
+      network.type,
       masterPubKey || masterFingerPrint,
     );
     if (isBitcoinSelected) {
@@ -206,6 +207,7 @@ function ImportLedger(): JSX.Element {
           accountName: `Ledger Account ${newAccountId + 1}`,
           deviceAccountIndex: getDeviceNewAccountIndex(
             ledgerAccountsList,
+            network.type,
             masterPubKey || masterFingerPrint,
           ),
         };

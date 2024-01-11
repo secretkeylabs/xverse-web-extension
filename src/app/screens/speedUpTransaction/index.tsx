@@ -121,7 +121,7 @@ function SpeedUpTransactionScreen() {
         ...selectedAccount,
         accountType: accountType || 'software',
         accountId:
-          isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
+          isLedgerAccount(selectedAccount) && typeof selectedAccount.deviceAccountIndex === 'number'
             ? selectedAccount.deviceAccountIndex
             : selectedAccount.id,
         network: network.type,

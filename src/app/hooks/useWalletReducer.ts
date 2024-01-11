@@ -1,4 +1,4 @@
-import { getDeviceAccountIndex } from '@common/utils/ledger';
+import { filterLedgerAccounts, getDeviceAccountIndex } from '@common/utils/ledger';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -85,7 +85,16 @@ const useWalletReducer = () => {
     if (!selectedAccount) {
       [selectedAccountData] = walletAccounts;
     } else if (isLedgerAccount(selectedAccount)) {
-      selectedAccountData = ledgerAccountsList.find((a) => a.id === selectedAccount.id);
+      const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, currentNetwork.type);
+      const selectedAccountDataInNetwork = networkLedgerAccounts.find(
+        (a) => a.id === selectedAccount.id,
+      );
+
+      // we try find the specific matching ledger account
+      // If we can't find it, we default to the first ledger account in the selected network
+      // If we can't find that, we default to the first software account in the wallet
+      selectedAccountData =
+        selectedAccountDataInNetwork ?? networkLedgerAccounts[0] ?? walletAccounts[0];
     } else {
       selectedAccountData = walletAccounts.find((a) => a.id === selectedAccount.id);
     }
@@ -106,6 +115,9 @@ const useWalletReducer = () => {
 
     dispatch(fetchAccountAction(selectedAccountData, walletAccounts));
 
+    // ledger accounts initially didn't have a deviceAccountIndex
+    // this is a migration to add the deviceAccountIndex to the ledger accounts without them
+    // it should only fire once if ever
     if (ledgerAccountsList.some((account) => account.deviceAccountIndex === undefined)) {
       const newLedgerAccountsList = ledgerAccountsList.map((account) => ({
         ...account,
