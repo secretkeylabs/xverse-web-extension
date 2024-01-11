@@ -830,6 +830,7 @@
     "MANUAL_SETTING": "Manual setting",
     "TX_FEE_UPDATED": "Transaction fee updated",
     "FEE_TOO_LOW": "The minimum fee is {{minimumFee}}",
+    "SOMETHING_WENT_WRONG": "Something went wrong",
     "TIME": {
       "SEVERAL_HOURS_OR_MORE": "several hours or more",
       "HOUR": "hour",

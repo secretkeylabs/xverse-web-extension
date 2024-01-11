@@ -71,6 +71,7 @@ function SpeedUpTransactionScreen() {
   const { getSeed } = useSeedVault();
   const selectedStacksNetwork = useNetworkSelector();
   const isBtc = isBtcTransaction(stxTransaction || btcTransaction);
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
@@ -144,6 +145,7 @@ function SpeedUpTransactionScreen() {
     }
 
     try {
+      setIsBroadcasting(true);
       const fee = stxToMicrostacks(BigNumber(feeRateInput)).toString();
       const txRaw: string = await getRawTransaction(stxTransaction.txid, network);
       const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
@@ -187,6 +189,8 @@ function SpeedUpTransactionScreen() {
       return;
     } catch (err: any) {
       console.error(err);
+    } finally {
+      setIsBroadcasting(false);
     }
   };
 
@@ -204,6 +208,7 @@ function SpeedUpTransactionScreen() {
     }
 
     try {
+      setIsBroadcasting(true);
       const signedTx = await rbfTransaction.getReplacementTransaction({
         feeRate: Number(feeRateInput),
         ledgerTransport: transport,
@@ -221,6 +226,8 @@ function SpeedUpTransactionScreen() {
           toast.error(t('INSUFFICIENT_FEE'));
         }
       }
+    } finally {
+      setIsBroadcasting(false);
     }
   };
 
@@ -367,6 +374,7 @@ function SpeedUpTransactionScreen() {
               handleClickFeeButton={handleClickFeeButton}
               handleClickSubmit={handleClickSubmit}
               getEstimatedCompletionTime={getEstimatedCompletionTime}
+              isBroadcasting={isBroadcasting}
             />
           ) : (
             <SpeedUpStxTransaction
@@ -380,6 +388,7 @@ function SpeedUpTransactionScreen() {
               handleClickFeeButton={handleClickFeeButton}
               handleClickSubmit={handleClickSubmit}
               getEstimatedCompletionTime={getEstimatedCompletionTime}
+              isBroadcasting={isBroadcasting}
             />
           )}
 

@@ -13,6 +13,9 @@ import { isLedgerAccount } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import useBtcClient from './useBtcClient';
 import useNetworkSelector from './useNetwork';
 import useSeedVault from './useSeedVault';
@@ -83,25 +86,9 @@ const constructRecommendedFees = (
   higherName: keyof RbfRecommendedFees,
   higherFeeRate: number,
   stxAvailableBalance: string,
-  thresholdHighStacksFee?: number,
 ): RbfRecommendedFees => {
-  let lowerFee = lowerFeeRate;
-  let higherFee = higherFeeRate;
-
-  if (thresholdHighStacksFee) {
-    // adding a fee cap
-
-    if (higherFee > thresholdHighStacksFee) {
-      higherFee = thresholdHighStacksFee;
-    }
-
-    if (lowerFee > thresholdHighStacksFee) {
-      lowerFee = thresholdHighStacksFee * 0.75;
-    }
-  }
-
-  const bigNumLowerFee = BigNumber(lowerFee);
-  const bigNumHigherFee = BigNumber(higherFee);
+  const bigNumLowerFee = BigNumber(lowerFeeRate);
+  const bigNumHigherFee = BigNumber(higherFeeRate);
 
   return {
     [lowerName]: {
@@ -133,6 +120,8 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
   const seedVault = useSeedVault();
   const btcClient = useBtcClient();
   const selectedNetwork = useNetworkSelector();
+  const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
+  const navigate = useNavigate();
 
   // TODO: move the STX RBF calculations to xverse-core and add unit tests
   const fetchStxData = useCallback(async () => {
@@ -153,17 +142,25 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         selectedNetwork,
       );
 
+      let feePresets: RbfRecommendedFees = {};
+      let mediumFee = medium.fee;
+      let highFee = high.fee;
+      const higherFee = fee.multipliedBy(1.25).toNumber();
+      const highestFee = fee.multipliedBy(1.5).toNumber();
+
+      if (feeMultipliers?.thresholdHighStacksFee) {
+        if (high.fee > feeMultipliers.thresholdHighStacksFee) {
+          // adding a fee cap
+          highFee = feeMultipliers.thresholdHighStacksFee * 1.5;
+          mediumFee = feeMultipliers.thresholdHighStacksFee;
+        }
+      }
+
       let minimumFee = fee.multipliedBy(1.25).toNumber();
       if (!Number.isSafeInteger(minimumFee)) {
         // round up the fee to the nearest integer
         minimumFee = Math.ceil(minimumFee);
       }
-
-      let feePresets: RbfRecommendedFees = {};
-      const mediumFee = medium.fee;
-      const highFee = high.fee;
-      let higherFee = highFee * 1.25;
-      const highestFee = fee.multipliedBy(1.5).toNumber();
 
       if (fee.lt(BigNumber(mediumFee))) {
         feePresets = constructRecommendedFees(
@@ -172,27 +169,14 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
           'high',
           highFee,
           stxAvailableBalance,
-          feeMultipliers?.thresholdHighStacksFee,
-        );
-      } else if (fee.gt(BigNumber(mediumFee)) && fee.lt(BigNumber(highFee))) {
-        feePresets = constructRecommendedFees(
-          'high',
-          highFee,
-          'higher',
-          higherFee,
-          stxAvailableBalance,
-          feeMultipliers?.thresholdHighStacksFee,
         );
       } else {
-        higherFee = fee.multipliedBy(1.25).toNumber();
-
         feePresets = constructRecommendedFees(
           'higher',
           higherFee,
           'highest',
           highestFee,
           stxAvailableBalance,
-          feeMultipliers?.thresholdHighStacksFee,
         );
       }
 
@@ -214,11 +198,13 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         },
       });
     } catch (err: any) {
+      toast.error(t('SOMETHING_WENT_WRONG'));
+      navigate(-1);
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  }, [transaction, network, selectedNetwork, feeMultipliers, stxAvailableBalance]);
+  }, [transaction, network, selectedNetwork, feeMultipliers, stxAvailableBalance, t, navigate]);
 
   const fetchRbfData = useCallback(async () => {
     if (!selectedAccount || !transaction) {
@@ -257,11 +243,23 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         mempoolFees,
       });
     } catch (err: any) {
+      toast.error(t('SOMETHING_WENT_WRONG'));
+      navigate(-1);
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  }, [selectedAccount, transaction, accountType, network.type, seedVault, btcClient, fetchStxData]);
+  }, [
+    selectedAccount,
+    transaction,
+    accountType,
+    network.type,
+    seedVault,
+    btcClient,
+    fetchStxData,
+    t,
+    navigate,
+  ]);
 
   useEffect(() => {
     fetchRbfData();

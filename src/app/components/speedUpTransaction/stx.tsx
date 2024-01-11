@@ -54,6 +54,7 @@ interface Props {
   handleClickFeeButton: (e: React.MouseEvent<HTMLButtonElement>) => void;
   handleClickSubmit: () => void;
   getEstimatedCompletionTime: (feeRate?: number) => string;
+  isBroadcasting: boolean;
 }
 
 function SpeedUpStxTransaction({
@@ -67,6 +68,7 @@ function SpeedUpStxTransaction({
   handleClickFeeButton,
   handleClickSubmit,
   getEstimatedCompletionTime,
+  isBroadcasting,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const { btcFiatRate, stxBtcRate, fiatCurrency } = useWalletSelector();
@@ -194,6 +196,7 @@ function SpeedUpStxTransaction({
           text={t('SUBMIT')}
           disabled={!selectedOption}
           onPress={handleClickSubmit}
+          processing={isBroadcasting}
         />
       </ControlsContainer>
     </Container>
