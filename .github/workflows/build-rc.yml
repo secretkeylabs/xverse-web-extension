@@ -126,7 +126,7 @@ jobs:
           UPLOAD_URL: ${{needs.publish-rc.outputs.upload_url}}
           FILENAME: ${{needs.publish-rc.outputs.filename}}
         with:
-          upload_url: $UPLOAD_URL
+          upload_url: ${{ env.UPLOAD_URL}}
           asset_path: build.zip
-          asset_name: $FILENAME
+          asset_name: ${{ env.FILENAME }}
           asset_content_type: application/zip
