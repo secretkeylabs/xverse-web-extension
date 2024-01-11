@@ -55,7 +55,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
 }));
 
 const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   backgroundColor: 'transparent',
   color: props.theme.colors.white_0,
   border: 'transparent',

@@ -38,7 +38,7 @@ const useBtcFees = ({
     highFeeRate: '',
     highTotalFee: '',
   });
-  const { network, btcAddress, selectedAccount, ordinalsAddress } = useWalletSelector();
+  const { network, btcAddress, ordinalsAddress } = useWalletSelector();
   const btcClient = useBtcClient();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
@@ -50,12 +50,12 @@ const useBtcFees = ({
         if (isRestoreFlow) {
           feeInfo = await getBtcFeesForNonOrdinalBtcSend(
             btcAddress,
-            nonOrdinalUtxos!,
+            nonOrdinalUtxos || [],
             ordinalsAddress,
             network.type,
             mode,
           );
-        } else if (btcRecipients && selectedAccount) {
+        } else if (type !== 'Ordinals' && btcRecipients) {
           feeInfo = await getBtcFees(btcRecipients, btcAddress, btcClient, network.type, mode);
         } else if (type === 'Ordinals' && btcRecipients && ordinalTxUtxo) {
           feeInfo = await getBtcFeesForOrdinalSend(
@@ -102,7 +102,6 @@ const useBtcFees = ({
     network,
     ordinalsUtxos,
     ordinalsAddress,
-    selectedAccount,
   ]);
 
   return feeData;
