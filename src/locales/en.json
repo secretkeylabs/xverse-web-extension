@@ -711,6 +711,11 @@
       "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
       "AUTHORIZE_DATA_COLLECTION": "Authorize data collection"
     },
+    "BTC_URL": "BTC URL",
+    "STACKS_URL": "Stacks URL",
+    "FALLBACK_BTC_URL": "Fallback BTC URL",
+    "RESET_TO_DEFAULT": "Reset to default",
+    "REQUIRED": "Required",
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",

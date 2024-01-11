@@ -1,11 +1,5 @@
 /* eslint-disable prefer-destructuring */
-import type { NetworkType, SettingsNetwork } from '@secretkeylabs/xverse-core';
-import {
-  BTC_BASE_URI_MAINNET,
-  BTC_BASE_URI_TESTNET,
-  HIRO_MAINNET_DEFAULT,
-  HIRO_TESTNET_DEFAULT,
-} from '@secretkeylabs/xverse-core';
+import type { NetworkType } from '@secretkeylabs/xverse-core';
 
 export const GAMMA_URL = 'https://gamma.io/';
 export const TERMS_LINK = 'https://xverse.app/terms';
@@ -46,21 +40,6 @@ export enum LoaderSize {
 export const BITCOIN_DUST_AMOUNT_SATS = 1500;
 export const PAGINATION_LIMIT = 50;
 export const REFETCH_UNSPENT_UTXO_TIME = 2 * 60 * 60 * 1000;
-
-export const initialNetworksList: SettingsNetwork[] = [
-  {
-    type: 'Mainnet',
-    address: HIRO_MAINNET_DEFAULT,
-    btcApiUrl: BTC_BASE_URI_MAINNET,
-    fallbackBtcApiUrl: '',
-  },
-  {
-    type: 'Testnet',
-    address: HIRO_TESTNET_DEFAULT,
-    btcApiUrl: BTC_BASE_URI_TESTNET,
-    fallbackBtcApiUrl: '',
-  },
-];
 
 /**
  * contract id of send_many transaction type
