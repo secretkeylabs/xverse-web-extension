@@ -8,7 +8,8 @@ const RouteContainer = styled.div`
   // any route should default to the chrome extension window size
   display: flex;
   flex-direction: column;
-  height: 600px;
+  height: 100%;
+  max-height: 600px;
   width: 360px;
   margin: auto;
   background-color: ${(props) => props.theme.colors.elevation0};

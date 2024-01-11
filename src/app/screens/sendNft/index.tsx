@@ -7,11 +7,13 @@ import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  StacksTransaction,
+  UnsignedStacksTransation,
+  applyFeeMultiplier,
+  buf2hex,
   cvToHex,
   generateUnsignedTransaction,
-  StacksTransaction,
   uintCV,
-  UnsignedStacksTransation,
   validateStxAddress,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
@@ -127,12 +129,8 @@ function SendNft() {
         memo: '',
         isNFT: true,
       };
-      const unsignedTx: StacksTransaction = await generateUnsignedTransaction(unsginedTx);
-      if (feeMultipliers?.stxSendTxMultiplier) {
-        unsignedTx.setFee(
-          unsignedTx.auth.spendingCondition.fee * BigInt(feeMultipliers.stxSendTxMultiplier),
-        );
-      }
+      const unsignedTx = await generateUnsignedTransaction(unsginedTx);
+      applyFeeMultiplier(unsignedTx, feeMultipliers);
       setRecipientAddress(address);
       return unsignedTx;
     },
@@ -142,7 +140,7 @@ function SendNft() {
     if (data) {
       navigate(`/confirm-nft-tx/${id}`, {
         state: {
-          unsignedTx: data.serialize().toString('hex'),
+          unsignedTx: buf2hex(data.serialize()),
           recipientAddress,
         },
       });

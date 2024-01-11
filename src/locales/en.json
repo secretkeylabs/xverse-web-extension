@@ -5,7 +5,9 @@
     "COMBO": "Combo",
     "SATS": "Sats",
     "SATTRIBUTES": "Sattributes",
-    "INPUT": "Input"
+    "INPUT": "Input",
+    "SIZE": "Size",
+    "BUNDLE": "Bundle"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
@@ -352,6 +354,7 @@
     "CONITNUE": "Continue",
     "BACK": "Back",
     "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
+    "UNCONFIRMED_BALANCE_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
@@ -375,7 +378,13 @@
       "CANCEL_BUTTON": "Cancel",
       "SEE_TRANSACTION_BUTTON": "See transaction",
       "RETRY_BUTTON": "Try again"
-    }
+    },
+    "YOUR_ORDINAL_ADDRESS": "Your ordinals address",
+    "YOUR_PAYMENT_ADDRESS": "Your payment address",
+    "INSCRIBED_SATS": "Some of these sats are inscribed",
+    "INSCRIBED_RARE_SATS": "Some of these sats are rare or inscribed",
+    "UNCONFIRMED_UTXO_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
+    "INSCRIBED_RARE_SATS_WARNING": "Your payment wallet holds rare or inscribed sats. To avoid spending them in your transactions and fees, transfer them to your ordinals wallet"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
@@ -403,7 +412,8 @@
     "SAME_FEE_ERROR": "New fee must be greater than current fee",
     "GREATER_FEE_ERROR": "Fee is more than available balance",
     "LOWER_THAN_MINIMUM": "Set fee is below minimum",
-    "NONCE_WARNING": "Entering an erroneous nonce can result in a failed transaction. Only apply changes if you know what you are doing."
+    "NONCE_WARNING": "Entering an erroneous nonce can result in a failed transaction. Only apply changes if you know what you are doing.",
+    "MANUAL_SETTING": "Manual setting"
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",
@@ -806,12 +816,18 @@
     "HIGHER_PRIORITY": "Higher priority",
     "HIGHEST_PRIORITY": "Highest priority",
     "MED_PRIORITY": "Medium priority",
+    "LOW_PRIORITY": "Low priority",
     "CUSTOM": "Custom",
     "INSUFFICIENT_FUNDS": "Insufficient funds",
     "INSUFFICIENT_FEE": "Insufficient fee",
     "MANUAL_SETTING": "Manual setting",
     "TX_FEE_UPDATED": "Transaction fee updated",
-    "FEE_TOO_LOW": "The minimum fee is {{minimumFee}}"
+    "FEE_TOO_LOW": "The minimum fee is {{minimumFee}}",
+    "TIME": {
+      "SEVERAL_HOURS_OR_MORE": "several hours or more",
+      "HOUR": "hour",
+      "MINUTES": "mins"
+    }
   },
   "POST_CONDITION_MESSAGE": {
     "YOU": "You",
@@ -973,7 +989,7 @@
       },
       "LONG": {
         "INVALID_JSON_CONTENT": "The content is not valid JSON. Please verify the content of your inscription.",
-        "INSUFFICIENT_FUNDS": "You have insufficient confirmed funds to process this transaction. This may be due to unconfirmed outputs in your balance. Please add more funds or try with a lower fee rate",
+        "INSUFFICIENT_FUNDS": "Your balance is insufficient to process this transaction. Please add more funds to your wallet or try with a lower fee rate",
         "INVALID_FEE_RATE": "The fee applied to this transaction is too low. To apply a higher fee, select edit fees at the bottom of this screen.",
         "INVALID_SERVICE_FEE_CONFIG": "The calling application sent an invalid payload. Please contact the application developer.",
         "INVALID_CONTENT": "The ordinal content you are trying to inscribe is not valid. Please verify the content of your inscription.",
@@ -982,7 +998,9 @@
         "FAILED_TO_FINALIZE": "The inscription transaction failed to finalize. Please try again or contact support.",
         "SERVER_ERROR": "An unknown server error occurred. Please try again or contact support."
       },
-      "TOO_MANY_REPEATS": "You can only create up to 24 inscriptions in a single request"
+      "TOO_MANY_REPEATS": "You can only create up to {{maxRepeats}} inscriptions in a single request",
+      "UNCONFIRMED_UTXO": "Some of your balance consists of unconfirmed outputs. You don't have enough confirmed funds to proceed with this transaction",
+      "LEDGER_INSCRIPTION": "This inscription service is not compatible with Ledger accounts. Please switch to a standard account to inscribe."
     }
   },
   "ERROR_SCREEN": {

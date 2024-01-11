@@ -6,7 +6,7 @@ body {
   background-color: #181818;
 }
 
-#app-container {
+#app {
   height: 600px;
   width: 360px;
   display: flex;
@@ -17,11 +17,6 @@ body {
     height: 100vh;
     width: 100vw;
   }
-}
-
-#app {
-  min-height: 600px;
-  min-width: 360px;
 }
 
 ::-webkit-scrollbar {

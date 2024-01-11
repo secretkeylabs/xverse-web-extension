@@ -1,5 +1,5 @@
 import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
-import ConfirmStxTransationComponent from '@components/confirmStxTransactionComponent';
+import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import RecipientComponent from '@components/recipientComponent';
 import BottomBar from '@components/tabBar';
@@ -8,7 +8,7 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { broadcastSignedTransaction, StacksTransaction } from '@secretkeylabs/xverse-core';
+import { StacksTransaction, broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
@@ -73,7 +73,7 @@ function ConfirmFtTransaction() {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
       const state: ConfirmStxTransactionState = {
-        unsignedTx: unsignedTx.serialize(),
+        unsignedTx: Buffer.from(unsignedTx.serialize()),
         type,
         recipients: [{ address: recepientAddress, amountMicrostacks: new BigNumber(amount) }],
         fee: new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
@@ -100,7 +100,7 @@ function ConfirmFtTransaction() {
   return (
     <>
       <TopRow title={t('CONFIRM_TX')} onClick={handleBackButtonClick} />
-      <ConfirmStxTransationComponent
+      <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
         onConfirmClick={handleOnConfirmClick}
@@ -116,7 +116,7 @@ function ConfirmFtTransaction() {
         />
         <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
         {memo && <TransferMemoView memo={memo} />}
-      </ConfirmStxTransationComponent>
+      </ConfirmStxTransactionComponent>
       <BottomBar tab="dashboard" />
     </>
   );

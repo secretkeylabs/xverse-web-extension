@@ -1,6 +1,7 @@
 import IconStacks from '@assets/img/dashboard/stack_icon.svg';
 import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
+import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import InfoContainer from '@components/infoContainer';
 import RecipientComponent from '@components/recipientComponent';
@@ -13,14 +14,16 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  addressToString,
-  broadcastSignedTransaction,
-  getStxFiatEquivalent,
-  microstacksToStx,
   StacksTransaction,
   TokenTransferPayload,
+  addressToString,
+  broadcastSignedTransaction,
+  buf2hex,
+  getStxFiatEquivalent,
+  isMultiSig,
+  microstacksToStx,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction } from '@stacks/transactions';
+import { MultiSigSpendingCondition, deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -28,7 +31,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import ConfirmStxTransationComponent from '../../components/confirmStxTransactionComponent';
 
 const AlertContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
@@ -46,16 +48,28 @@ function ConfirmStxTransaction() {
   const [txRaw, setTxRaw] = useState('');
   const [memo, setMemo] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
   const selectedNetwork = useNetworkSelector();
+  const { stxBtcRate, btcFiatRate, network, selectedAccount } = useWalletSelector();
+  const { refetch } = useStxWalletData();
+
+  const location = useLocation();
   const { unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken } = location.state;
   const unsignedTx = useMemo(() => deserializeTransaction(stringHex), [stringHex]);
+
+  // SignTransaction Params
+  const isMultiSigTx = useMemo(() => isMultiSig(unsignedTx), [unsignedTx]);
+  const hasSignatures = useMemo(
+    () =>
+      isMultiSigTx &&
+      (unsignedTx.auth.spendingCondition as MultiSigSpendingCondition).fields?.length > 0,
+    [unsignedTx, isMultiSigTx],
+  );
+
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
-  const { stxBtcRate, btcFiatRate, network, selectedAccount } = useWalletSelector();
-  const { refetch } = useStxWalletData();
+
   const {
     isLoading,
     error: txError,
@@ -146,7 +160,7 @@ function ConfirmStxTransaction() {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
       const state: ConfirmStxTransactionState = {
-        unsignedTx: unsignedTx.serialize(),
+        unsignedTx: Buffer.from(unsignedTx.serialize()),
         type,
         recipients: [{ address: recipient, amountMicrostacks: amount }],
         fee,
@@ -155,9 +169,19 @@ function ConfirmStxTransaction() {
       navigate('/confirm-ledger-tx', { state });
       return;
     }
-
-    setTxRaw(txs[0].serialize().toString('hex'));
-    mutate({ signedTx: txs[0] });
+    const rawTx = buf2hex(txs[0].serialize());
+    setTxRaw(rawTx);
+    if (isMultiSigTx && isBrowserTx) {
+      finalizeTxSignature({
+        requestPayload: requestToken,
+        tabId: Number(tabId),
+        // No TxId since the tx was not broadcasted
+        data: { txId: '', txRaw: rawTx },
+      });
+      window.close();
+    } else {
+      mutate({ signedTx: txs[0] });
+    }
   };
 
   const handleCancelClick = () => {
@@ -182,13 +206,14 @@ function ConfirmStxTransaction() {
       ) : (
         <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleCancelClick} />
       )}
-      <ConfirmStxTransationComponent
+      <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
         onConfirmClick={handleConfirmClick}
         onCancelClick={handleCancelClick}
         isSponsored={sponsored}
         skipModal={isLedgerAccount(selectedAccount)}
+        hasSignatures={hasSignatures}
       >
         <RecipientComponent
           address={recipient}
@@ -207,7 +232,7 @@ function ConfirmStxTransaction() {
             />
           </AlertContainer>
         )}
-      </ConfirmStxTransationComponent>
+      </ConfirmStxTransactionComponent>
       {!isBrowserTx && <BottomBar tab="dashboard" />}
     </>
   );

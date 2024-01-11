@@ -4,6 +4,8 @@ import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  applyFeeMultiplier,
+  buf2hex,
   generateUnsignedStxTokenTransferTransaction,
   microstacksToStx,
   StacksTransaction,
@@ -21,7 +23,7 @@ import TopRow from '../../components/topRow';
 function SendStxScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxAvailableBalance, stxPublicKey, feeMultipliers, network } =
+  const { stxAddress, stxAvailableBalance, stxPublicKey, network, feeMultipliers } =
     useWalletSelector();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
@@ -54,12 +56,7 @@ function SendStxScreen() {
           stxPublicKey,
           selectedNetwork,
         );
-      // increasing the fees with multiplication factor
-      const fee: bigint =
-        BigInt(unsignedSendStxTx.auth.spendingCondition.fee.toString()) ?? BigInt(0);
-      if (feeMultipliers?.stxSendTxMultiplier) {
-        unsignedSendStxTx.setFee(fee * BigInt(feeMultipliers.stxSendTxMultiplier));
-      }
+      applyFeeMultiplier(unsignedSendStxTx, feeMultipliers);
       return unsignedSendStxTx;
     },
   });
@@ -68,7 +65,7 @@ function SendStxScreen() {
     if (data) {
       navigate('/confirm-stx-tx', {
         state: {
-          unsignedTx: data.serialize().toString('hex'),
+          unsignedTx: buf2hex(data.serialize()),
         },
       });
     }

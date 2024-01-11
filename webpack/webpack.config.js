@@ -9,17 +9,12 @@ const ReactRefreshTypeScript = require('react-refresh-typescript');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
+const styledComponentsTransformer = createStyledComponentsTransformer();
 
 const aliases = {
   // alias stacks.js packages to their esm (default prefers /dist/polyfill)
-  '@stacks/auth': '@stacks/auth/dist/esm',
-  '@stacks/common': '@stacks/common/dist/esm',
-  '@stacks/encryption': '@stacks/encryption/dist/esm',
-  '@stacks/network': '@stacks/network/dist/esm',
-  '@stacks/profile': '@stacks/profile/dist/esm',
-  '@stacks/storage': '@stacks/storage/dist/esm',
   '@stacks/transactions': '@stacks/transactions/dist/esm',
-  '@stacks/keychain': '@stacks/keychain/dist/esm',
   '@secretkeylabs/xverse-core': '@secretkeylabs/xverse-core/dist',
 };
 const ASSET_PATH = process.env.ASSET_PATH || '/';
@@ -75,9 +70,10 @@ var options = {
             loader: 'ts-loader',
             options: {
               getCustomTransformers: () => ({
-                before: [env.NODE_ENV === 'development' && ReactRefreshTypeScript()].filter(
-                  Boolean
-                ),
+                before:
+                  env.NODE_ENV === 'development'
+                    ? [ReactRefreshTypeScript(), styledComponentsTransformer]
+                    : [],
               }),
               transpileOnly: false,
             },
@@ -98,9 +94,11 @@ var options = {
     ],
   },
   resolve: {
-    plugins: [new TsconfigPathsPlugin({
-      configFile: path.join(__dirname, '../', 'tsconfig.json')
-    })],
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: path.join(__dirname, '../', 'tsconfig.json'),
+      }),
+    ],
     extensions: fileExtensions
       .map((extension) => '.' + extension)
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
@@ -131,7 +129,7 @@ var options = {
                 description: process.env.npm_package_description,
                 version: process.env.npm_package_version,
                 ...JSON.parse(content.toString()),
-              })
+              }),
             );
           },
         },
@@ -146,9 +144,11 @@ var options = {
       ],
     }),
     new CopyWebpackPlugin({
-      patterns: [{
-        from: 'node_modules/webextension-polyfill/dist/browser-polyfill.js',
-      }],
+      patterns: [
+        {
+          from: 'node_modules/webextension-polyfill/dist/browser-polyfill.js',
+        },
+      ],
     }),
     new HtmlWebpackPlugin({
       template: path.join(SRC_ROOT_PATH, 'pages', 'Options', 'index.html'),
@@ -167,7 +167,7 @@ var options = {
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.DefinePlugin({
-      VERSION: JSON.stringify(require("../package.json").version),
+      VERSION: JSON.stringify(require('../package.json').version),
     }),
   ],
 

@@ -16,6 +16,7 @@ import { ArrowUp, Share } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
+import { EMPTY_LABEL } from '@utils/constants';
 import { getRareSatsColorsByRareSatsType, getRareSatsLabelByType } from '@utils/rareSats';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
@@ -444,7 +445,7 @@ function OrdinalDetailScreen() {
           <CollectibleDetailTile title={t('COLLECTION')} value={ordinal?.collection_name ?? ''} />
           <CollectibleDetailTile
             title={t('COLLECTION_FLOOR_PRICE')}
-            value={collectionMarketData?.floor_price?.toFixed(8) ?? '--'}
+            value={collectionMarketData?.floor_price?.toFixed(8) ?? EMPTY_LABEL}
             suffixValue="BTC"
           />
         </DetailSection>
@@ -455,7 +456,7 @@ function OrdinalDetailScreen() {
           value={
             ordinal?.inscription_floor_price || ordinal?.inscription_floor_price !== 0
               ? ordinal?.inscription_floor_price?.toString() ?? ''
-              : '--'
+              : EMPTY_LABEL
           }
           allowThousandSeperator={
             !!(ordinal?.inscription_floor_price || ordinal?.inscription_floor_price !== 0)

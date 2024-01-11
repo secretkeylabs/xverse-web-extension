@@ -1,20 +1,23 @@
 import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
+import AssetModal from '@components/assetModal';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
-import SatsBundle from '@components/confirmBtcTransactionComponent/bundle';
-import InputOutputComponent from '@components/confirmBtcTransactionComponent/inputOutputComponent';
+import ReceiveSection from '@components/confirmBtcTransaction/receiveSection';
+import TransactionSummary from '@components/confirmBtcTransaction/transactionSummary';
+import TransferSection from '@components/confirmBtcTransaction/transferSection';
+import { getNetAmount, isScriptOutput } from '@components/confirmBtcTransaction/utils';
 import InfoContainer from '@components/infoContainer';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
 import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
-import RecipientComponent from '@components/recipientComponent';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
-import useDetectOrdinalInSignPsbt, { InputsBundle } from '@hooks/useDetectOrdinalInSignPsbt';
 import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
+import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
-import { Bundle, parsePsbt, satsToBtc } from '@secretkeylabs/xverse-core';
+import { btcTransaction } from '@secretkeylabs/xverse-core';
+import Callout from '@ui-library/callout';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -113,33 +116,39 @@ interface TxResponse {
   psbtBase64: string;
 }
 
+type PsbtSummary = {
+  inputs: btcTransaction.EnhancedInput[];
+  outputs: btcTransaction.EnhancedOutput[];
+  feeOutput?: btcTransaction.TransactionFeeOutput | undefined;
+  hasSigHashNone: boolean;
+};
+
 function SignBatchPsbtRequest() {
   const { btcAddress, ordinalsAddress, selectedAccount, network } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
-  const [expandInputOutputView, setExpandInputOutputView] = useState(false);
-  const { payload, confirmSignPsbt, cancelSignPsbt, getSigningAddresses, requestToken } =
-    useSignBatchPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, requestToken } = useSignBatchPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(1);
-  const [hasOutputScript, setHasOutputScript] = useState(false);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
   const [reviewTransaction, setReviewTransaction] = useState(false);
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const tabId = params.get('tabId') ?? '0';
-  const handleOrdinalAndOrdinalInfo = useDetectOrdinalInSignPsbt();
-  const [userReceivesOrdinalArr, setUserReceivesOrdinalArr] = useState<
-    { bundleItemsData: InputsBundle; userReceivesOrdinal: boolean }[]
-  >([]);
   const [isLoading, setIsLoading] = useState(true);
+  const txnContext = useTransactionContext();
+  const [inscriptionToShow, setInscriptionToShow] = useState<
+    btcTransaction.IOInscription | undefined
+  >(undefined);
+
+  const [parsedPsbts, setParsedPsbts] = useState<PsbtSummary[]>([]);
 
   const handlePsbtParsing = useCallback(
     (psbt: SignMultiplePsbtPayload, index: number) => {
       try {
-        return parsePsbt(selectedAccount!, psbt.inputsToSign, psbt.psbtBase64, network.type);
+        const parsedPsbt = new btcTransaction.EnhancedPsbt(txnContext, psbt.psbtBase64);
+        return parsedPsbt.getSummary();
       } catch (err) {
         navigate('/tx-status', {
           state: {
@@ -153,13 +162,21 @@ function SignBatchPsbtRequest() {
         return undefined;
       }
     },
-    [selectedAccount, network.type],
+    [txnContext],
   );
 
-  const parsedPsbts = useMemo(
-    () => payload.psbts.map(handlePsbtParsing),
-    [handlePsbtParsing, payload.psbts],
-  );
+  useEffect(() => {
+    (async () => {
+      const parsedPsbtsResult = await Promise.all(payload.psbts.map(handlePsbtParsing));
+
+      if (parsedPsbtsResult.some((item) => item === undefined)) {
+        return setIsLoading(false);
+      }
+
+      setParsedPsbts(parsedPsbtsResult as PsbtSummary[]);
+      setIsLoading(false);
+    })();
+  }, [payload.psbts.length, handlePsbtParsing]);
 
   const checkAddressMismatch = (input) => {
     if (input.address !== btcAddress && input.address !== ordinalsAddress) {
@@ -189,50 +206,9 @@ function SignBatchPsbtRequest() {
     payload.psbts.forEach((psbt) => psbt.inputsToSign.forEach(checkAddressMismatch));
   };
 
-  const checkIfUserReceivesOrdinals = async () => {
-    try {
-      const results = await Promise.all(parsedPsbts.map(handleOrdinalAndOrdinalInfo));
-      setUserReceivesOrdinalArr(results);
-    } catch {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
-          error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
-          browserTx: true,
-        },
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkIfUserReceivesOrdinals();
-  }, []);
-
   useEffect(() => {
     checkIfMismatch();
   }, []);
-
-  useEffect(() => {
-    if (parsedPsbts) {
-      let outputScriptDetected = false;
-
-      parsedPsbts.forEach((psbt) => {
-        if (!psbt) {
-          return;
-        }
-
-        if (psbt.outputs.some((output) => !!output.outputScript)) {
-          outputScriptDetected = true;
-        }
-      });
-
-      setHasOutputScript(outputScriptDetected);
-    }
-  }, [parsedPsbts]);
 
   const onSignPsbtConfirmed = async () => {
     try {
@@ -296,28 +272,35 @@ function SignBatchPsbtRequest() {
     window.close();
   };
 
-  const expandInputOutputSection = () => {
-    setExpandInputOutputView(!expandInputOutputView);
-  };
-
   const closeCallback = () => {
     window.close();
   };
 
   const totalNetAmount = parsedPsbts.reduce(
-    (sum, psbt) => (psbt ? sum.plus(new BigNumber(psbt.netAmount.toString())) : sum),
+    (sum, psbt) =>
+      psbt
+        ? sum.plus(
+            new BigNumber(
+              getNetAmount({
+                inputs: psbt.inputs,
+                outputs: psbt.outputs,
+                btcAddress,
+                ordinalsAddress,
+              }),
+            ),
+          )
+        : sum,
     new BigNumber(0),
   );
+  const totalFeeAmount = parsedPsbts.reduce((sum, psbt) => {
+    const feeAmount = psbt.feeOutput?.amount ?? 0;
+    return sum.plus(new BigNumber(feeAmount));
+  }, new BigNumber(0));
 
-  const userReceivesOrdinals = userReceivesOrdinalArr
-    .filter((item) => item.userReceivesOrdinal)
-    .map((item) => item.bundleItemsData)
-    .flat();
-
-  const userTransfersOrdinals = userReceivesOrdinalArr
-    .filter((item) => !item.userReceivesOrdinal)
-    .map((item) => item.bundleItemsData)
-    .flat();
+  const hasOutputScript = useMemo(
+    () => parsedPsbts.some((psbt) => psbt.outputs.some((output) => isScriptOutput(output))),
+    [parsedPsbts.length],
+  );
 
   const signingStatus: ConfirmationStatus = isSigningComplete ? 'SUCCESS' : 'LOADING';
 
@@ -364,51 +347,30 @@ function SignBatchPsbtRequest() {
                   <BundleLinkText>{t('REVIEW_ALL')}</BundleLinkText>
                   <ArrowRight size={12} weight="bold" />
                 </BundleLinkContainer>
-
-                {userTransfersOrdinals.length > 0 &&
-                  userTransfersOrdinals.map((item, index) => (
-                    <SatsBundle
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={`${index}-transfer`}
-                      title={`${tCommon('INPUT')} #${item.inputIndex}`}
-                      bundle={
-                        {
-                          totalExoticSats: item.totalExoticSats,
-                          satRanges: item.satRanges,
-                        } as Bundle
-                      }
-                    />
-                  ))}
-
-                {userReceivesOrdinals.length > 0 &&
-                  userTransfersOrdinals.map((item, index) => (
-                    <SatsBundle
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={`${index}-receive`}
-                      title={`${tCommon('INPUT')} #${item.inputIndex}`}
-                      bundle={
-                        {
-                          totalExoticSats: item.totalExoticSats,
-                          satRanges: item.satRanges,
-                        } as Bundle
-                      }
-                    />
-                  ))}
-
-                <RecipientComponent
-                  value={`${satsToBtc(totalNetAmount).toString().replace('-', '')}`}
-                  currencyType="BTC"
-                  title={t('AMOUNT')}
-                  heading={
-                    totalNetAmount.isLessThan(0)
-                      ? t('YOU_WILL_TRANSFER_IN_TOTAL')
-                      : t('YOU_WILL_RECEIVE_IN_TOTAL')
-                  }
+                {inscriptionToShow && (
+                  <AssetModal
+                    onClose={() => setInscriptionToShow(undefined)}
+                    inscription={{
+                      content_type: inscriptionToShow.contentType,
+                      id: inscriptionToShow.id,
+                      inscription_number: inscriptionToShow.number,
+                    }}
+                  />
+                )}
+                <TransferSection
+                  inputs={parsedPsbts.map((psbt) => psbt.inputs).flat()}
+                  outputs={parsedPsbts.map((psbt) => psbt.outputs).flat()}
+                  netAmount={(totalNetAmount.toNumber() + totalFeeAmount.toNumber()) * -1}
+                  isPartialTransaction={parsedPsbts.some((psbt) => !psbt.feeOutput)}
+                  onShowInscription={setInscriptionToShow}
                 />
-
+                <ReceiveSection
+                  outputs={parsedPsbts.map((psbt) => psbt.outputs).flat()}
+                  onShowInscription={setInscriptionToShow}
+                  netAmount={totalNetAmount.toNumber()}
+                />
                 <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-
-                {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
+                {hasOutputScript && <Callout bodyText={t('SCRIPT_OUTPUT_TX')} />}
               </Container>
             )}
           </OuterContainer>
@@ -439,46 +401,14 @@ function SignBatchPsbtRequest() {
               {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
             </ReviewTransactionText>
 
-            {Array.isArray(userReceivesOrdinalArr[currentPsbtIndex]?.bundleItemsData) &&
-              userReceivesOrdinalArr[currentPsbtIndex].bundleItemsData.map((bundle, index) => (
-                <SatsBundle
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  title={`${tCommon('INPUT')} #${bundle.inputIndex}`}
-                  bundle={
-                    {
-                      totalExoticSats: bundle.totalExoticSats,
-                      satRanges: bundle.satRanges,
-                    } as Bundle
-                  }
-                />
-              ))}
-
-            <RecipientComponent
-              value={`${
-                parsedPsbts[currentPsbtIndex]?.netAmount !== undefined
-                  ? satsToBtc(new BigNumber(parsedPsbts[currentPsbtIndex]!.netAmount.toString()))
-                      .toString()
-                      .replace('-', '')
-                  : ''
-              }`}
-              currencyType="BTC"
-              title={t('AMOUNT')}
-              heading={
-                Number(parsedPsbts[currentPsbtIndex]?.netAmount) < 0
-                  ? t('YOU_WILL_TRANSFER')
-                  : t('YOU_WILL_RECEIVE')
-              }
-            />
-
-            <InputOutputComponent
-              parsedPsbt={parsedPsbts[currentPsbtIndex]}
-              isExpanded={expandInputOutputView}
-              address={getSigningAddresses(payload.psbts[currentPsbtIndex].inputsToSign)}
-              onArrowClick={expandInputOutputSection}
-            />
-
-            {hasOutputScript && <InfoContainer bodyText={t('SCRIPT_OUTPUT_TX')} />}
+            {!!parsedPsbts[currentPsbtIndex] && (
+              <TransactionSummary
+                inputs={parsedPsbts[currentPsbtIndex].inputs}
+                outputs={parsedPsbts[currentPsbtIndex].outputs}
+                feeOutput={parsedPsbts[currentPsbtIndex].feeOutput}
+                isPartialTransaction={!parsedPsbts[currentPsbtIndex].feeOutput}
+              />
+            )}
           </CustomizedModalContainer>
         </OuterContainer>
         <TxReviewModalControls>
