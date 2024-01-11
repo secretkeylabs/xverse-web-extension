@@ -12,13 +12,14 @@ fi
 
 if cat releases.json | jq '.[].tag_name' | grep $TAG; then
   echo found releases matching $TAG
-  LATEST_TAG=$(cat releases.json | jq '.[].tag_name' | grep $TAG | head -1)
-  LATEST_RC=$(echo $LATEST_TAG | grep rc | sed 's/.*-rc\(.*\)/\1/')
+  LATEST_TAG=$(cat releases.json | jq -r '.[].tag_name' | grep $TAG | head -1)
+  LATEST_RC=$(echo $LATEST_TAG | grep rc | sed 's/.*-rc.\(.*\)/\1/')
   if [[ -z "$LATEST_RC" ]]; then
     echo $TAG was already released
     exit 1;
   elif [[ -n "$LATEST_RC" ]]; then
-    NEXT_TAG="$TAG-rc.$($LATEST_RC +1)"
+    ((LATEST_RC++))
+    NEXT_TAG="$TAG-rc.$LATEST_RC"
   fi
 else
   echo no releases matching $TAG yet
