@@ -21,12 +21,12 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
 import {
+  StacksTransaction,
+  Transport as TransportType,
   broadcastSignedTransaction,
   signLedgerStxTransaction,
   signTransaction,
-  StacksTransaction,
   stxToMicrostacks,
-  Transport as TransportType,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { EMPTY_LABEL } from '@utils/constants';

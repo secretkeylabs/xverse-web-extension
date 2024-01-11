@@ -20,7 +20,7 @@ const Button = styled.button<ButtonProps>((props) => ({
 }));
 
 const Text = styled.h1<TitleProps>((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.color,
   flex: 1,
   textAlign: 'left',

@@ -1,10 +1,17 @@
-import { Account } from '@secretkeylabs/xverse-core';
+import { Account, NetworkType } from '@secretkeylabs/xverse-core';
 
 export const delay = (ms: number) =>
   new Promise((res) => {
     setTimeout(res, ms);
   });
 
+export const filterLedgerAccounts = (accounts: Account[], network: NetworkType) =>
+  accounts.filter((account) =>
+    account.ordinalsAddress?.startsWith(network === 'Mainnet' ? 'bc1' : 'tb1'),
+  );
+
+// this is used for migrating the old ledger accounts to the new format
+// it returns the index of the account in the list, which now maps to the deviceAccountIndex
 export const getDeviceAccountIndex = (
   ledgerAccountsList: Account[],
   id: number,
@@ -31,10 +38,17 @@ export const getNewAccountId = (ledgerAccountsList: Account[]) => {
   return ledgerAccountsList[ledgerAccountsList.length - 1].id + 1;
 };
 
-export const getDeviceNewAccountIndex = (ledgerAccountsList: Account[], masterKey?: string) => {
-  const ledgerAccountsIndexList = ledgerAccountsList
+export const getDeviceNewAccountIndex = (
+  ledgerAccountsList: Account[],
+  network: NetworkType,
+  masterKey?: string,
+) => {
+  const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network);
+
+  const ledgerAccountsIndexList = networkLedgerAccounts
     .filter((account) => masterKey === account.masterPubKey)
     .map((account, key) =>
+      // ledger accounts initially didn't have deviceAccountIndex, so we map to their list index as as the initial behaviour
       account.deviceAccountIndex !== undefined ? account.deviceAccountIndex : key,
     )
     .sort((a, b) => a - b);

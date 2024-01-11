@@ -5,7 +5,9 @@
     "COMBO": "Combo",
     "SATS": "Sats",
     "SATTRIBUTES": "Sattributes",
-    "INPUT": "Input"
+    "INPUT": "Input",
+    "SIZE": "Size",
+    "BUNDLE": "Bundle"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
@@ -376,7 +378,13 @@
       "CANCEL_BUTTON": "Cancel",
       "SEE_TRANSACTION_BUTTON": "See transaction",
       "RETRY_BUTTON": "Try again"
-    }
+    },
+    "YOUR_ORDINAL_ADDRESS": "Your ordinals address",
+    "YOUR_PAYMENT_ADDRESS": "Your payment address",
+    "INSCRIBED_SATS": "Some of these sats are inscribed",
+    "INSCRIBED_RARE_SATS": "Some of these sats are rare or inscribed",
+    "UNCONFIRMED_UTXO_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
+    "INSCRIBED_RARE_SATS_WARNING": "Your payment wallet holds rare or inscribed sats. To avoid spending them in your transactions and fees, transfer them to your ordinals wallet"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
@@ -703,6 +711,11 @@
       "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
       "AUTHORIZE_DATA_COLLECTION": "Authorize data collection"
     },
+    "BTC_URL": "BTC URL",
+    "STACKS_URL": "Stacks URL",
+    "FALLBACK_BTC_URL": "Fallback BTC URL",
+    "RESET_TO_DEFAULT": "Reset to default",
+    "REQUIRED": "Required",
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",
@@ -733,6 +746,9 @@
     "RECOVER_ASSETS": "Recover assets",
     "LOCK_COUNTDOWN": "Auto-lock Timer",
     "LOCK_COUNTDOWN_TITLE": "Select the time duration before the wallet locks automatically.",
+    "LOCK_COUNTDOWN_MIN": "{{count}} minutes",
+    "LOCK_COUNTDOWN_HS_one": "{{count}} hour",
+    "LOCK_COUNTDOWN_HS_other": "{{count}} hours",
     "ENTER_YOUR_NEW_PASSWORD": "Enter your new password",
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
