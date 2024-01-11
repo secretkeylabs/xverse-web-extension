@@ -1,6 +1,10 @@
 import BottomModal from '@components/bottomModal';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import {
+  getBtcFiatEquivalent,
+  getStxFiatEquivalent,
+  stxToMicrostacks,
+} from '@secretkeylabs/xverse-core';
 import { handleKeyDownFeeRateInput } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -32,6 +36,7 @@ export default function CustomFee({
   minimumFeeRate,
   isFeeLoading,
   error,
+  isBtc,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -43,11 +48,12 @@ export default function CustomFee({
   initialTotalFee: string;
   isFeeLoading: boolean;
   error: string;
+  isBtc: boolean;
 }) {
   const { t } = useTranslation('translation', {
     keyPrefix: 'TRANSACTION_SETTING',
   });
-  const { btcFiatRate, fiatCurrency } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate, fiatCurrency } = useWalletSelector();
   const [feeRateInput, setFeeRateInput] = useState(feeRate || minimumFeeRate);
   const [totalFee, setTotalFee] = useState(fee || initialTotalFee);
 
@@ -72,9 +78,17 @@ export default function CustomFee({
     onClickApply(feeRateInput, totalFee);
   };
 
-  const fiatFee = totalFee
-    ? getBtcFiatEquivalent(BigNumber(totalFee), BigNumber(btcFiatRate))
-    : BigNumber(0);
+  let fiatFee = BigNumber(0);
+
+  if (totalFee) {
+    fiatFee = isBtc
+      ? getBtcFiatEquivalent(BigNumber(totalFee), BigNumber(btcFiatRate))
+      : getStxFiatEquivalent(
+          stxToMicrostacks(BigNumber(totalFee)),
+          BigNumber(stxBtcRate),
+          BigNumber(btcFiatRate),
+        );
+  }
 
   return (
     <BottomModal visible={visible} header={t('CUSTOM_FEE')} onClose={onClose}>
@@ -84,15 +98,21 @@ export default function CustomFee({
             <InputField
               type="number"
               value={feeRateInput?.toString()}
-              onKeyDown={handleKeyDownFeeRateInput}
+              onKeyDown={isBtc ? handleKeyDownFeeRateInput : undefined}
               onChange={handleChangeFeeRateInput}
             />
-            <InputLabel>Sats /vB</InputLabel>
+            <InputLabel>
+              {isBtc ? (
+                'Sats /vB'
+              ) : (
+                <StyledFiatAmountText fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
+              )}
+            </InputLabel>
           </InputContainer>
         </FeeContainer>
         <InfoContainer>
           {error && <StyledInputFeedback message={error} variant="danger" />}
-          {!error && minimumFeeRate && Number(feeRateInput) >= Number(minimumFeeRate) && (
+          {!error && isBtc && minimumFeeRate && Number(feeRateInput) >= Number(minimumFeeRate) && (
             <>
               <TotalFeeText>
                 {t('TOTAL_FEE')}

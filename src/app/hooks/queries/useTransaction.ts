@@ -3,7 +3,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { fetchBtcTransaction } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
-export default function useTransaction(id: string) {
+export default function useTransaction(id?: string) {
   const { selectedAccount } = useWalletSelector();
   const btcClient = useBtcClient();
 
@@ -25,5 +25,6 @@ export default function useTransaction(id: string) {
   return useQuery({
     queryKey: ['transaction', id],
     queryFn: fetchTransaction,
+    enabled: id !== undefined,
   });
 }
