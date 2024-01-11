@@ -1,9 +1,9 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { setWalletLockPeriodAction } from '@stores/wallet/actions/actionCreators';
 import { WalletSessionPeriods } from '@stores/wallet/actions/types';
+import { chromeSessionStorage } from '@utils/chromeStorage';
 import { addMinutes } from 'date-fns';
 import { useDispatch } from 'react-redux';
-import { chromeSessionStorage } from '@utils/chromeStorage';
 import useSeedVault from './useSeedVault';
 
 const SESSION_START_TIME_KEY = 'sessionStartTime';
@@ -36,11 +36,20 @@ const useWalletSession = () => {
     setSessionStartTime();
   };
 
+  const setSessionStartTimeAndMigrate = () => {
+    if (walletLockPeriod < WalletSessionPeriods.LOW) {
+      return setWalletLockPeriod(WalletSessionPeriods.LOW);
+    }
+
+    setSessionStartTime();
+  };
+
   return {
     setSessionStartTime,
     setWalletLockPeriod,
     shouldLock,
     clearSessionTime,
+    setSessionStartTimeAndMigrate,
   };
 };
 
