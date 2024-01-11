@@ -39,7 +39,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       issues: write
     env:
@@ -55,6 +55,7 @@ jobs:
           SOURCE_BRANCH: ${{ github.head_ref }}
           TARGET_COMMITISH: ${{ github.event.pull_request.head.sha }}
         run: |
+          cd scripts
           # find the next rc tag
           gh api \
             -H "Accept: application/vnd.github+json" \
@@ -63,7 +64,6 @@ jobs:
           # get $TAG from branch name, e.g. v0.25.0
           export TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
           # export $NEXT_TAG using releases.json and $TAG, e.g. v0.25.0-rc.0
-          cd scripts
           source ./find-tag.sh
           # publish the release as prerelease rc
           gh api \
