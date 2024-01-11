@@ -61,10 +61,10 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/{owner}/{repo}/releases > releases.json
           # get $TAG from branch name, e.g. v0.25.0
-          TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
+          export TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
           # export $NEXT_TAG using releases.json and $TAG, e.g. v0.25.0-rc.0
           cd scripts
-          ./find-tag.sh
+          source ./find-tag.sh
           # publish the release as prerelease rc
           gh api \
             --method POST \
