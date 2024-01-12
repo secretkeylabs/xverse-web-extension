@@ -208,7 +208,6 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
 
   const fetchRbfData = useCallback(async () => {
     if (!selectedAccount || !transaction) {
-      setIsLoading(false);
       return;
     }
 
