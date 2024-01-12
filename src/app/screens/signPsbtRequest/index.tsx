@@ -6,7 +6,6 @@ import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import getPsbtDataWithMocks from './tempMockDataUtil';
 import useSignPsbtValidationGate from './useSignPsbtValidationGate';
 
 function SignPsbtRequest() {
@@ -39,22 +38,9 @@ function SignPsbtRequest() {
       .getSummary()
       .then((summary) => {
         const { feeOutput: psbtFeeOutput, inputs: psbtInputs, outputs: psbtOutputs } = summary;
-        // TODO: remove this section, this is only for testing
-        const { inputsWithMocks, outputsWithMocks, feeOutputWithMocks } = getPsbtDataWithMocks(
-          btcAddress,
-          ordinalsAddress,
-          psbtInputs,
-          psbtOutputs,
-          !psbtFeeOutput,
-          psbtFeeOutput,
-        );
-        setFeeOutput(feeOutputWithMocks);
-        setInputs(inputsWithMocks);
-        setOutputs(outputsWithMocks);
-
-        // setFeeOutput(psbtFeeOutput);
-        // setInputs(psbtInputs);
-        // setOutputs(psbtOutputs);
+        setFeeOutput(psbtFeeOutput);
+        setInputs(psbtInputs);
+        setOutputs(psbtOutputs);
         setIsLoading(false);
       })
       .catch((error) => {
