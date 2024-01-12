@@ -31,13 +31,15 @@ const useBtcFees = ({
   btcRecipients,
   type,
   ordinalTxUtxo,
-}: Params): FeeData => {
+}: Params): { feeData: FeeData; highFeeError?: string; mediumFeeError?: string } => {
   const [feeData, setFeeData] = useState<FeeData>({
     standardFeeRate: '',
     standardTotalFee: '',
     highFeeRate: '',
     highTotalFee: '',
   });
+  const [highFeeError, setHighFeeError] = useState<string>('');
+  const [standardFeeError, setStandardFeeError] = useState<string>('');
   const { network, btcAddress, ordinalsAddress } = useWalletSelector();
   const btcClient = useBtcClient();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
@@ -46,6 +48,8 @@ const useBtcFees = ({
   useEffect(() => {
     async function fetchFees(mode: 'standard' | 'high') {
       try {
+        setStandardFeeError('');
+        setHighFeeError('');
         let feeInfo;
         if (isRestoreFlow) {
           feeInfo = await getBtcFeesForNonOrdinalBtcSend(
@@ -55,7 +59,7 @@ const useBtcFees = ({
             network.type,
             mode,
           );
-        } else if (type !== 'Ordinals' && btcRecipients) {
+        } else if (type === 'BTC' && btcRecipients) {
           feeInfo = await getBtcFees(btcRecipients, btcAddress, btcClient, network.type, mode);
         } else if (type === 'Ordinals' && btcRecipients && ordinalTxUtxo) {
           feeInfo = await getBtcFeesForOrdinalSend(
@@ -68,12 +72,13 @@ const useBtcFees = ({
             mode,
           );
         }
-
         return {
           fee: feeInfo?.fee.toString() || '',
           feeRate: feeInfo?.selectedFeeRate.toString() || '',
         };
-      } catch (error) {
+      } catch (error: any) {
+        if (mode === 'standard') setStandardFeeError(error.toString());
+        else if (mode === 'high') setHighFeeError(error.toString());
         return { fee: '', feeRate: '' };
       }
     }
@@ -103,8 +108,7 @@ const useBtcFees = ({
     ordinalsUtxos,
     ordinalsAddress,
   ]);
-
-  return feeData;
+  return { feeData, highFeeError, mediumFeeError: standardFeeError };
 };
 
 export default useBtcFees;
