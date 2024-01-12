@@ -1,22 +1,24 @@
-import { getDeviceAccountIndex } from '@common/utils/ledger';
+import { filterLedgerAccounts, getDeviceAccountIndex } from '@common/utils/ledger';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import {
   Account,
   AnalyticsEvents,
+  SettingsNetwork,
+  StacksMainnet,
+  StacksNetwork,
+  StacksTestnet,
   createWalletAccount,
   decryptSeedPhraseCBC,
   getBnsName,
   newWallet,
   restoreWalletWithAccounts,
-  SettingsNetwork,
-  StacksNetwork,
   walletFromSeedPhrase,
 } from '@secretkeylabs/xverse-core';
 import {
-  addAccountAction,
   ChangeNetworkAction,
+  addAccountAction,
   fetchAccountAction,
   getActiveAccountsAction,
   resetWalletAction,
@@ -50,7 +52,8 @@ const useWalletReducer = () => {
   const dispatch = useDispatch();
   const { refetch: refetchStxData } = useStxWalletData();
   const { refetch: refetchBtcData } = useBtcWalletData();
-  const { setSessionStartTime, clearSessionTime } = useWalletSession();
+  const { setSessionStartTime, clearSessionTime, setSessionStartTimeAndMigrate } =
+    useWalletSession();
   const queryClient = useQueryClient();
   const { hideStx } = useWalletSelector();
 
@@ -84,7 +87,16 @@ const useWalletReducer = () => {
     if (!selectedAccount) {
       [selectedAccountData] = walletAccounts;
     } else if (isLedgerAccount(selectedAccount)) {
-      selectedAccountData = ledgerAccountsList.find((a) => a.id === selectedAccount.id);
+      const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, currentNetwork.type);
+      const selectedAccountDataInNetwork = networkLedgerAccounts.find(
+        (a) => a.id === selectedAccount.id,
+      );
+
+      // we try find the specific matching ledger account
+      // If we can't find it, we default to the first ledger account in the selected network
+      // If we can't find that, we default to the first software account in the wallet
+      selectedAccountData =
+        selectedAccountDataInNetwork ?? networkLedgerAccounts[0] ?? walletAccounts[0];
     } else {
       selectedAccountData = walletAccounts.find((a) => a.id === selectedAccount.id);
     }
@@ -105,6 +117,9 @@ const useWalletReducer = () => {
 
     dispatch(fetchAccountAction(selectedAccountData, walletAccounts));
 
+    // ledger accounts initially didn't have a deviceAccountIndex
+    // this is a migration to add the deviceAccountIndex to the ledger accounts without them
+    // it should only fire once if ever
     if (ledgerAccountsList.some((account) => account.deviceAccountIndex === undefined)) {
       const newLedgerAccountsList = ledgerAccountsList.map((account) => ({
         ...account,
@@ -144,7 +159,7 @@ const useWalletReducer = () => {
       dispatch(fetchAccountAction(accountsList[0], accountsList));
       dispatch(getActiveAccountsAction(accountsList));
     } finally {
-      setSessionStartTime();
+      setSessionStartTimeAndMigrate();
     }
   };
 
@@ -287,14 +302,9 @@ const useWalletReducer = () => {
     dispatch(fetchAccountAction(account, accountsList));
   };
 
-  const changeNetwork = async (
-    changedNetwork: SettingsNetwork,
-    networkObject: StacksNetwork,
-    networkAddress: string,
-    btcApiUrl: string,
-  ) => {
+  const changeNetwork = async (changedNetwork: SettingsNetwork) => {
     const seedPhrase = await seedVault.getSeed();
-    dispatch(ChangeNetworkAction(changedNetwork, networkAddress, btcApiUrl));
+    dispatch(ChangeNetworkAction(changedNetwork));
     const wallet = await walletFromSeedPhrase({
       mnemonic: seedPhrase,
       index: 0n,
@@ -311,6 +321,10 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
     };
     dispatch(setWalletAction(wallet));
+    const networkObject =
+      changedNetwork.type === 'Mainnet'
+        ? new StacksMainnet({ url: changedNetwork.address })
+        : new StacksTestnet({ url: changedNetwork.address });
     try {
       await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [account]);
     } catch (err) {

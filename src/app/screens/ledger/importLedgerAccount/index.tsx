@@ -6,11 +6,11 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import { useTransition } from '@react-spring/web';
 import {
   Account,
+  LedgerErrors,
   getMasterFingerPrint,
   importNativeSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
-  LedgerErrors,
 } from '@secretkeylabs/xverse-core';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { useEffect, useState } from 'react';
@@ -61,6 +61,7 @@ function ImportLedger(): JSX.Element {
     setAccountId(newAccountId);
     const deviceNewAccountIndex = getDeviceNewAccountIndex(
       ledgerAccountsList,
+      network.type,
       masterPubKey || masterFingerPrint,
     );
     if (isBitcoinSelected) {
@@ -206,6 +207,7 @@ function ImportLedger(): JSX.Element {
           accountName: `Ledger Account ${newAccountId + 1}`,
           deviceAccountIndex: getDeviceNewAccountIndex(
             ledgerAccountsList,
+            network.type,
             masterPubKey || masterFingerPrint,
           ),
         };

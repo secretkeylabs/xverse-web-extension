@@ -3,14 +3,14 @@ import { useMemo } from 'react';
 import useWalletSelector from './useWalletSelector';
 
 const useNetworkSelector = () => {
-  const { network, networkAddress } = useWalletSelector();
+  const { network } = useWalletSelector();
 
   const selectedNetwork = useMemo(
     () =>
       network.type === 'Mainnet'
-        ? new StacksMainnet({ url: networkAddress })
-        : new StacksTestnet({ url: networkAddress }),
-    [network.type, networkAddress],
+        ? new StacksMainnet({ url: network.address })
+        : new StacksTestnet({ url: network.address }),
+    [network.type, network.address],
   );
   return selectedNetwork;
 };

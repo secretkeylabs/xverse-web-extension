@@ -1,13 +1,14 @@
-import Timer from '@assets/img/settings/Timer.svg';
-import TimerFull from '@assets/img/settings/TimerFull.svg';
-import TimerHalf from '@assets/img/settings/TimerHalf.svg';
+import Timer15 from '@assets/img/settings/Timer15m.svg';
+import Timer1 from '@assets/img/settings/Timer1h.svg';
+import Timer30 from '@assets/img/settings/Timer30m.svg';
+import Timer3 from '@assets/img/settings/Timer3h.svg';
 import ActionButton from '@components/button';
 import TopRow from '@components/topRow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletSession from '@hooks/useWalletSession';
 import { WalletSessionPeriods } from '@stores/wallet/actions/types';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { TFunction, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -40,26 +41,33 @@ interface TimeSelectionBoxProps {
 }
 
 const TimeSelectionBox = styled.button<TimeSelectionBoxProps>((props) => ({
-  ...props.theme.body_medium_m,
-  backgroundColor: 'transparent',
-  border: `1px solid ${props.selected ? props.theme.colors.white_0 : props.theme.colors.grey}`,
-  color: props.theme.colors.white_0,
+  ...props.theme.typography.body_medium_m,
+  backgroundColor: props.selected ? props.theme.colors.white_900 : 'transparent',
+  border: `1px solid ${props.theme.colors.white_800}`,
+  color: props.selected ? props.theme.colors.white_0 : props.theme.colors.white_200,
   borderRadius: props.theme.radius(1),
-  height: 44,
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'flex-start',
-  marginBottom: props.theme.spacing(12),
-  paddingLeft: props.theme.spacing(6),
-  paddingRight: props.theme.spacing(6),
+  padding: props.theme.space.m,
+  marginBottom: props.theme.space.s,
 }));
 
-const TimerIcon = styled.img((props) => ({
+const TimerIcon = styled.img<TimeSelectionBoxProps>((props) => ({
   width: 18,
   height: 21,
-  marginRight: props.theme.spacing(12),
+  marginRight: props.theme.space.l,
+  opacity: props.selected ? 1 : 0.8,
 }));
+
+const getLabel = (period: number, t: TFunction<'translation', 'SETTING_SCREEN'>) => {
+  if (period < 60) {
+    return t('LOCK_COUNTDOWN_MIN', { count: period });
+  }
+  const hours = period / 60;
+  return t('LOCK_COUNTDOWN_HS', { count: hours });
+};
 
 function LockCountdown() {
   const navigate = useNavigate();
@@ -72,21 +80,20 @@ function LockCountdown() {
     navigate(-1);
   };
 
-  const onChooseLow = () => {
-    setSelectedTime(WalletSessionPeriods.LOW);
-  };
-
-  const onChooseStandard = () => {
-    setSelectedTime(WalletSessionPeriods.STANDARD);
-  };
-
-  const onChooseLong = () => {
-    setSelectedTime(WalletSessionPeriods.LONG);
-  };
-
   const onSave = () => {
     setWalletLockPeriod(selectedTime);
     navigate(-1);
+  };
+
+  const periodOptions: number[] = Object.keys(WalletSessionPeriods)
+    .filter((key) => !Number.isNaN(Number(WalletSessionPeriods[key])))
+    .map((key) => WalletSessionPeriods[key]);
+
+  const iconsByPeriod = {
+    [WalletSessionPeriods.LOW]: Timer15,
+    [WalletSessionPeriods.STANDARD]: Timer30,
+    [WalletSessionPeriods.LONG]: Timer1,
+    [WalletSessionPeriods.VERY_LONG]: Timer3,
   };
 
   return (
@@ -94,27 +101,20 @@ function LockCountdown() {
       <TopRow title={t('LOCK_COUNTDOWN')} onClick={handleBackButtonClick} />
       <Container>
         <Title>{t('LOCK_COUNTDOWN_TITLE')}</Title>
-        <TimeSelectionBox
-          selected={selectedTime === WalletSessionPeriods.LOW}
-          onClick={onChooseLow}
-        >
-          <TimerIcon src={Timer} alt="Low" />
-          {`${WalletSessionPeriods.LOW} minute`}
-        </TimeSelectionBox>
-        <TimeSelectionBox
-          selected={selectedTime === WalletSessionPeriods.STANDARD}
-          onClick={onChooseStandard}
-        >
-          <TimerIcon src={TimerHalf} alt="Standard" />
-          {`${WalletSessionPeriods.STANDARD} minutes`}
-        </TimeSelectionBox>
-        <TimeSelectionBox
-          selected={selectedTime === WalletSessionPeriods.LONG}
-          onClick={onChooseLong}
-        >
-          <TimerIcon src={TimerFull} alt="Long" />
-          {`${WalletSessionPeriods.LONG} minutes`}
-        </TimeSelectionBox>
+        {periodOptions.map((period) => (
+          <TimeSelectionBox
+            key={period}
+            selected={selectedTime === period}
+            onClick={() => setSelectedTime(period)}
+          >
+            <TimerIcon
+              selected={selectedTime === period}
+              src={iconsByPeriod[period]}
+              alt={period.toString()}
+            />
+            {getLabel(period, t)}
+          </TimeSelectionBox>
+        ))}
         <SaveButtonContainer>
           <ActionButton onPress={onSave} text={t('SAVE')} />
         </SaveButtonContainer>
