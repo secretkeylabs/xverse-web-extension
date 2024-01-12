@@ -197,14 +197,11 @@ function Setting() {
           icon={ArrowIcon}
           showDivider
         />
-        {!isLedgerAccount(selectedAccount) && (
-          <SettingComponent
-            text={t('NETWORK')}
-            onClick={openChangeNetworkScreen}
-            textDetail={network.type}
-          />
-        )}
-
+        <SettingComponent
+          text={t('NETWORK')}
+          onClick={openChangeNetworkScreen}
+          textDetail={network.type}
+        />
         <SettingComponent
           title={t('SECURITY')}
           text={t('UPDATE_PASSWORD')}

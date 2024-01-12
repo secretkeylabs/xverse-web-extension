@@ -1,10 +1,10 @@
-import { initialNetworksList } from '@utils/constants';
+import { defaultMainnet, initialNetworksList } from '@secretkeylabs/xverse-core';
 import {
   AddAccountKey,
   ChangeFiatCurrencyKey,
   ChangeHasActivatedOrdinalsKey,
-  ChangeHasActivatedRareSatsKey,
   ChangeHasActivatedRBFKey,
+  ChangeHasActivatedRareSatsKey,
   ChangeNetworkKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
@@ -70,7 +70,8 @@ const initialWalletState: WalletState = {
   stxPublicKey: '',
   btcPublicKey: '',
   ordinalsPublicKey: '',
-  network: initialNetworksList[0],
+  network: { ...defaultMainnet },
+  savedNetworks: initialNetworksList,
   accountsList: [],
   ledgerAccountsList: [],
   selectedAccount: null,
@@ -87,8 +88,6 @@ const initialWalletState: WalletState = {
   coins: [],
   brcCoinsList: [],
   feeMultipliers: null,
-  networkAddress: undefined,
-  btcApiUrl: '',
   hasActivatedOrdinalsKey: undefined,
   hasActivatedRareSatsKey: undefined,
   hasActivatedRBFKey: true,
@@ -204,8 +203,10 @@ const walletReducer = (
       return {
         ...state,
         network: action.network,
-        networkAddress: action.networkAddress,
-        btcApiUrl: action.btcApiUrl,
+        savedNetworks: [
+          ...state.savedNetworks.filter((n) => n.type !== action.network.type),
+          action.network,
+        ],
       };
     case GetActiveAccountsKey:
       return {

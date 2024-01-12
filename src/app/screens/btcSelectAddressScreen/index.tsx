@@ -2,6 +2,7 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import XverseLogo from '@assets/img/settings/logo.svg';
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
+import { filterLedgerAccounts } from '@common/utils/ledger';
 import AccountRow from '@components/accountRow';
 import ActionButton from '@components/button';
 import Separator from '@components/separator';
@@ -234,6 +235,8 @@ function BtcSelectAddressScreen() {
     switchAccountBasedOnRequest();
   }, []);
 
+  const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
+
   return (
     <>
       <LogoContainer>
@@ -262,7 +265,7 @@ function BtcSelectAddressScreen() {
         </TitleContainer>
         {showAccountList ? (
           <AccountListContainer style={springProps}>
-            {[...ledgerAccountsList, ...accountsList].map((account) => (
+            {[...networkLedgerAccounts, ...accountsList].map((account) => (
               <AccountListRow key={account.id}>
                 <AccountRow
                   key={account.stxAddress}

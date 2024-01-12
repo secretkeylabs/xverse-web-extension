@@ -1,5 +1,5 @@
-import OutputIcon from '@assets/img/transactions/output.svg';
 import ScriptIcon from '@assets/img/transactions/ScriptIcon.svg';
+import OutputIcon from '@assets/img/transactions/output.svg';
 import TransferDetailView from '@components/transferDetailView';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { btcTransaction, satsToBtc } from '@secretkeylabs/xverse-core';

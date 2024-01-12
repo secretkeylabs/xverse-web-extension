@@ -1,5 +1,6 @@
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import Plus from '@assets/img/dashboard/plus.svg';
+import { filterLedgerAccounts } from '@common/utils/ledger';
 import AccountRow from '@components/accountRow';
 import ActionButton from '@components/button';
 import Separator from '@components/separator';
@@ -57,10 +58,8 @@ function AccountList(): JSX.Element {
   const { createAccount, switchAccount } = useWalletReducer();
 
   const displayedAccountsList = useMemo(() => {
-    if (network.type === 'Mainnet') {
-      return [...ledgerAccountsList, ...accountsList];
-    }
-    return accountsList;
+    const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
+    return [...networkLedgerAccounts, ...accountsList];
   }, [accountsList, ledgerAccountsList, network]);
 
   const handleAccountSelect = async (account: Account, goBack = true) => {
@@ -113,14 +112,12 @@ function AccountList(): JSX.Element {
           text={t('NEW_ACCOUNT')}
           transparent
         />
-        {network.type === 'Mainnet' && (
-          <ActionButton
-            icon={<img src={ConnectLedger} alt="" />}
-            onPress={onImportLedgerAccount}
-            text={t('LEDGER_ACCOUNT')}
-            transparent
-          />
-        )}
+        <ActionButton
+          icon={<img src={ConnectLedger} alt="" />}
+          onPress={onImportLedgerAccount}
+          text={t('LEDGER_ACCOUNT')}
+          transparent
+        />
       </ButtonsWrapper>
     </Container>
   );
