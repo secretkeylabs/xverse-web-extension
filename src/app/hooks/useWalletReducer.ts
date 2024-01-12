@@ -21,6 +21,7 @@ import {
   addAccountAction,
   fetchAccountAction,
   getActiveAccountsAction,
+  renameAccountAction,
   resetWalletAction,
   selectAccount,
   setWalletAction,
@@ -367,6 +368,10 @@ const useWalletReducer = () => {
     }
   };
 
+  const renameAccount = async (updatedAccount: Account) => {
+    dispatch(renameAccountAction(updatedAccount));
+  };
+
   return {
     unlockWallet,
     lockWallet,
@@ -379,6 +384,7 @@ const useWalletReducer = () => {
     addLedgerAccount,
     removeLedgerAccount,
     updateLedgerAccounts,
+    renameAccount,
   };
 };
 

@@ -12,6 +12,7 @@ import {
   FetchAccountKey,
   GetActiveAccountsKey,
   RareSatsNoticeDismissedKey,
+  RenameAccountKey,
   ResetWalletKey,
   SelectAccountKey,
   SetBrcCoinsListKey,
@@ -262,6 +263,21 @@ const walletReducer = (
       return {
         ...state,
         isUnlocked: action.isUnlocked,
+      };
+    case RenameAccountKey:
+      return {
+        ...state,
+        accountsList: state.accountsList.map((account) =>
+          account.accountType === action.updatedAccount.accountType &&
+          account.id === action.updatedAccount.id
+            ? action.updatedAccount
+            : account,
+        ),
+        selectedAccount:
+          state.selectedAccount?.accountType === action.updatedAccount.accountType &&
+          state.selectedAccount?.id === action.updatedAccount.id
+            ? { ...state.selectedAccount, accountName: action.updatedAccount.accountName }
+            : state.selectedAccount,
       };
     default:
       return state;

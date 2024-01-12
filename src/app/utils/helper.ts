@@ -9,9 +9,11 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { ChainID } from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
+import { TFunction } from 'react-i18next';
 import {
   BTC_TRANSACTION_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
+  MAX_ACC_NAME_LENGTH,
   TRANSACTION_STATUS_URL,
 } from './constants';
 
@@ -202,4 +204,36 @@ export const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElemen
   if (e.key.match(/^[!-\/:-@[-`{-~]$/)) {
     e.preventDefault();
   }
+};
+
+export const validateAccountName = (
+  name: string,
+  t: TFunction<'translation', 'OPTIONS_DIALOG'>,
+  accountsList: Account[],
+  ledgerAccountsList: Account[],
+) => {
+  const regex = /^[a-zA-Z0-9 ]*$/;
+
+  if (!name.length) {
+    return t('RENAME_ACCOUNT_MODAL.REQUIRED_ERR');
+  }
+
+  if (name.length > MAX_ACC_NAME_LENGTH) {
+    return t('RENAME_ACCOUNT_MODAL.MAX_SYMBOLS_ERR', {
+      maxLength: MAX_ACC_NAME_LENGTH,
+    });
+  }
+
+  if (
+    ledgerAccountsList.find((account) => account.accountName === name) ||
+    accountsList.find((account) => account.accountName === name)
+  ) {
+    return t('RENAME_ACCOUNT_MODAL.ALREADY_EXISTS_ERR');
+  }
+
+  if (!regex.test(name)) {
+    return t('RENAME_ACCOUNT_MODAL.PROHIBITED_SYMBOLS_ERR');
+  }
+
+  return null;
 };

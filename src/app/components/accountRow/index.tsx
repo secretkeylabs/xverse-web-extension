@@ -8,23 +8,24 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown } from '@phosphor-icons/react';
 import { Account } from '@secretkeylabs/xverse-core';
-import { LoaderSize } from '@utils/constants';
+import InputFeedback from '@ui-library/inputFeedback';
+import { LoaderSize, MAX_ACC_NAME_LENGTH } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
-import { isHardwareAccount } from '@utils/helper';
+import { isLedgerAccount, validateAccountName } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import styled from 'styled-components';
 
-interface GradientCircleProps {
+const GradientCircle = styled.div<{
   firstGradient: string;
   secondGradient: string;
   thirdGradient: string;
-}
-const GradientCircle = styled.div<GradientCircleProps>((props) => ({
-  width: 20,
-  height: 20,
+  isBig: boolean;
+}>((props) => ({
+  width: props.isBig ? 32 : 20,
+  height: props.isBig ? 32 : 20,
   borderRadius: 25,
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
@@ -54,29 +55,23 @@ const CurrentAccountTextContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: props.theme.spacing(4),
+  gap: props.theme.space.xs,
 }));
 
-const CurrentSelectedAccountText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'start',
-}));
-
-const CurrentUnSelectedAccountText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white_400,
+const AccountName = styled.h1<{ isSelected: boolean }>((props) => ({
+  ...props.theme.typography.body_bold_m,
+  color: props.isSelected ? props.theme.colors.white_0 : props.theme.colors.white_400,
   textAlign: 'start',
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
   width: 200,
-  paddingTop: props.theme.spacing(2),
+  paddingTop: props.theme.space.xxs,
   backgroundColor: 'transparent',
 }));
 
 export const StyledToolTip = styled(Tooltip)`
-  background-color: #ffffff;
+  background-color: ${(props) => props.theme.colors.white_0};
   color: #12151e;
   border-radius: 8px;
   padding: 7px;
@@ -102,12 +97,12 @@ const ModalContent = styled.div((props) => ({
 const ModalDescription = styled.div((props) => ({
   fontSize: '0.875rem',
   color: props.theme.colors.white_200,
-  marginBottom: props.theme.spacing(16),
 }));
 
 const ModalControlsContainer = styled.div((props) => ({
   display: 'flex',
   columnGap: props.theme.space.s,
+  marginTop: props.theme.space.xl,
 }));
 
 const ModalButtonContainer = styled.div({
@@ -155,11 +150,11 @@ const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
 }));
 
 const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   backgroundColor: 'transparent',
   color: props.theme.colors.white_0,
   border: 'transparent',
-  width: '50%',
+  width: '100%',
   '&::-webkit-outer-spin-button': {
     '-webkit-appearance': 'none',
     margin: 0,
@@ -190,17 +185,20 @@ function AccountRow({
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
-  const { accountsList } = useWalletSelector();
+  const { accountsList, ledgerAccountsList } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
   const [showRenameAccountModal, setShowRenameAccountModal] = useState(false);
+  const [accountName, setAccountName] = useState('');
+  const [accountNameError, setAccountNameError] = useState<string | null>(null);
+  const [isAccountNameChangeLoading, setIsAccountNameChangeLoading] = useState(false);
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
     { top: string; left: string } | undefined
   >();
-  const { removeLedgerAccount } = useWalletReducer();
+  const { removeLedgerAccount, renameAccount, updateLedgerAccounts } = useWalletReducer();
 
   useEffect(
     () => () => {
@@ -216,7 +214,7 @@ function AccountRow({
       account?.bnsName ??
       `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
 
-    return name.length > 20 ? `${name.slice(0, 20)}...` : name;
+    return name.length > MAX_ACC_NAME_LENGTH ? `${name.slice(0, MAX_ACC_NAME_LENGTH)}...` : name;
   };
 
   const handleClick = () => {
@@ -268,6 +266,37 @@ function AccountRow({
     }
   };
 
+  const handleRenameAccount = async () => {
+    if (!account) {
+      return;
+    }
+
+    const validationError = validateAccountName(
+      accountName,
+      optionsDialogTranslation,
+      accountsList,
+      ledgerAccountsList,
+    );
+    if (validationError) {
+      setAccountNameError(validationError);
+      return;
+    }
+
+    try {
+      setIsAccountNameChangeLoading(true);
+      if (isLedgerAccount(account)) {
+        await updateLedgerAccounts({ ...account, accountName });
+      } else {
+        await renameAccount({ ...account, accountName });
+      }
+      handleRenameAccountModalClose();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsAccountNameChangeLoading(false);
+    }
+  };
+
   return (
     <TopSectionContainer disableClick={disabledAccountSelect}>
       <AccountInfoContainer onClick={handleClick}>
@@ -275,18 +304,17 @@ function AccountRow({
           firstGradient={gradient[0]}
           secondGradient={gradient[1]}
           thirdGradient={gradient[2]}
+          isBig={isAccountListView}
         />
         <CurrentAcountContainer>
           {account && (
             <TransparentSpan>
               <CurrentAccountTextContainer>
-                {isSelected ? (
-                  <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
-                ) : (
-                  <CurrentUnSelectedAccountText>{getName()}</CurrentUnSelectedAccountText>
+                <AccountName isSelected={isSelected}>{getName()}</AccountName>
+                {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+                {isSelected && !disabledAccountSelect && !isAccountListView && (
+                  <CaretDown weight="bold" size={16} />
                 )}
-                {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
-                {isSelected && !disabledAccountSelect && <CaretDown weight="bold" size={16} />}
               </CurrentAccountTextContainer>
             </TransparentSpan>
           )}
@@ -308,13 +336,12 @@ function AccountRow({
 
       {showOptionsDialog && (
         <OptionsDialog closeDialog={closeOptionsDialog} optionsDialogIndents={optionsDialogIndents}>
-          {isHardwareAccount(account) ? (
+          <ButtonRow onClick={handleRenameAccountModalOpen}>
+            {optionsDialogTranslation('RENAME_ACCOUNT')}
+          </ButtonRow>
+          {isLedgerAccount(account) && (
             <ButtonRow onClick={handleRemoveAccountModalOpen}>
               {optionsDialogTranslation('REMOVE_FROM_LIST')}
-            </ButtonRow>
-          ) : (
-            <ButtonRow onClick={handleRenameAccountModalOpen}>
-              {optionsDialogTranslation('RENAME_ACCOUNT')}
             </ButtonRow>
           )}
         </OptionsDialog>
@@ -355,13 +382,22 @@ function AccountRow({
           onClose={handleRenameAccountModalClose}
         >
           <ModalContent>
-            <InputLabel>Account name</InputLabel>
-            <InputContainer>
-              <InputField />
+            <InputLabel>{optionsDialogTranslation('RENAME_ACCOUNT_MODAL.LABEL')}</InputLabel>
+            <InputContainer withError={!!accountNameError}>
+              <InputField
+                value={accountName}
+                onChange={(e) => setAccountName(e.target.value)}
+                autoFocus
+              />
             </InputContainer>
+            {accountNameError && <InputFeedback variant="danger" message={accountNameError} />}
             <ModalControlsContainer>
               <ModalButtonContainer>
-                <ActionButton text={t('SAVE')} onPress={() => {}} />
+                <ActionButton
+                  text={t('SAVE')}
+                  onPress={handleRenameAccount}
+                  processing={isAccountNameChangeLoading}
+                />
               </ModalButtonContainer>
             </ModalControlsContainer>
           </ModalContent>
