@@ -1,4 +1,3 @@
-import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
@@ -6,7 +5,7 @@ import ActionButton from '@components/button';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { CaretDown } from '@phosphor-icons/react';
+import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
 import { Account } from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
 import { LoaderSize, MAX_ACC_NAME_LENGTH } from '@utils/constants';
@@ -330,7 +329,7 @@ function AccountRow({
 
       {isAccountListView && (
         <OptionsButton onClick={openOptionsDialog}>
-          <img src={threeDotsIcon} alt="Options" />
+          <DotsThreeVertical size={20} fill="white" />
         </OptionsButton>
       )}
 

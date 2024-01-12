@@ -1,5 +1,4 @@
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
-import Plus from '@assets/img/dashboard/plus.svg';
 import { filterLedgerAccounts } from '@common/utils/ledger';
 import AccountRow from '@components/accountRow';
 import ActionButton from '@components/button';
@@ -8,6 +7,7 @@ import TopRow from '@components/topRow';
 import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { Plus } from '@phosphor-icons/react';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -107,13 +107,13 @@ function AccountList(): JSX.Element {
       </AccountContainer>
       <ButtonsWrapper>
         <ActionButton
-          icon={<img src={Plus} alt="" />}
+          icon={<Plus size={16} fill="white" />}
           onPress={onCreateAccount}
           text={t('NEW_ACCOUNT')}
           transparent
         />
         <ActionButton
-          icon={<img src={ConnectLedger} alt="" />}
+          icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
           onPress={onImportLedgerAccount}
           text={t('LEDGER_ACCOUNT')}
           transparent
