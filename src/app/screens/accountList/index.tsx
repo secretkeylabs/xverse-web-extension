@@ -15,8 +15,10 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 export const Container = styled.div({
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
+  justifyContent: 'space-between',
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
     display: 'none',
@@ -90,21 +92,23 @@ function AccountList(): JSX.Element {
 
   return (
     <Container>
-      <TopRow title="" onClick={handleBackButtonClick} />
-      <AccountContainer>
-        <Title>{t('TITLE')}</Title>
-        {displayedAccountsList.map((account) => (
-          <div key={account.btcAddress}>
-            <AccountRow
-              account={account}
-              isSelected={isAccountSelected(account)}
-              onAccountSelected={handleAccountSelect}
-              isAccountListView
-            />
-            <Separator />
-          </div>
-        ))}
-      </AccountContainer>
+      <div>
+        <TopRow title="" onClick={handleBackButtonClick} />
+        <AccountContainer>
+          <Title>{t('TITLE')}</Title>
+          {displayedAccountsList.map((account) => (
+            <div key={account.btcAddress}>
+              <AccountRow
+                account={account}
+                isSelected={isAccountSelected(account)}
+                onAccountSelected={handleAccountSelect}
+                isAccountListView
+              />
+              <Separator />
+            </div>
+          ))}
+        </AccountContainer>
+      </div>
       <ButtonsWrapper>
         <ActionButton
           icon={<Plus size={16} fill="white" />}
