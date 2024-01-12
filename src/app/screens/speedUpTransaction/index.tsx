@@ -189,7 +189,7 @@ function SpeedUpTransactionScreen() {
       return;
     } catch (err: any) {
       console.error(err);
-      toast.error('An error occurred while broadcasting the transaction.');
+      toast.error('Failed to broadcast transaction.');
     } finally {
       setIsBroadcasting(false);
     }
