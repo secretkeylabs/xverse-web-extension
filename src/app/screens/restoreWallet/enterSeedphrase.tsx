@@ -1,6 +1,5 @@
 import ActionButton from '@components/button';
 import SeedPhraseInput from '@components/seedPhraseInput';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -8,6 +7,7 @@ const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
+  alignSelf: 'flex-start',
 });
 
 const Title = styled.h1((props) => ({
