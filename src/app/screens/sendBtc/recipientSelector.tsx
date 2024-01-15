@@ -14,14 +14,19 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
+const Buttons = styled.div`
+  margin: ${(props) => props.theme.spacing(12)}px 0;
+`;
+
 type Props = {
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
   onNext: () => void;
+  isLoading: boolean;
 };
 
 // TODO: this could be extracted into a component for reuse
-function RecipientSelector({ recipientAddress, setRecipientAddress, onNext }: Props) {
+function RecipientSelector({ recipientAddress, setRecipientAddress, onNext, isLoading }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { network } = useWalletSelector();
   const [addressIsValid, setAddressIsValid] = useState(true);
@@ -61,7 +66,14 @@ function RecipientSelector({ recipientAddress, setRecipientAddress, onNext }: Pr
         variant={addressIsValid ? 'default' : 'danger'}
         feedback={inputFeedback}
       />
-      <Button title={t('NEXT')} onClick={handleNext} disabled={!recipientAddress} />
+      <Buttons>
+        <Button
+          title={t('NEXT')}
+          onClick={handleNext}
+          disabled={!recipientAddress}
+          loading={isLoading}
+        />
+      </Buttons>
     </Container>
   );
 }

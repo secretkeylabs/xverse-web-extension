@@ -12,6 +12,10 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
+const Buttons = styled.div`
+  margin: ${(props) => props.theme.spacing(12)}px 0;
+`;
+
 type Props = {
   amountSats: string;
   setAmountSats: (amount: string) => void;
@@ -56,7 +60,9 @@ function AmountSelector({
         <input type="text" value={feeRate} onChange={(e) => setFeeRate(e.target.value)} />
         {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}
       </div>
-      <Button title={t('NEXT')} onClick={handleNext} loading={isLoading} />
+      <Buttons>
+        <Button title={t('NEXT')} onClick={handleNext} loading={isLoading} />
+      </Buttons>
     </Container>
   );
 }
