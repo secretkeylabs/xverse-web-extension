@@ -30,5 +30,5 @@
       "@ui-library/*": ["app/ui-library/*"]
     }
   },
-  "include": ["src", "styled.d.ts"]
+  "include": ["src", "styled.d.ts", "autotests"]
 }
