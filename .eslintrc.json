@@ -21,6 +21,7 @@
     "project": "./tsconfig.json"
   },
   "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles", "@tanstack/query"],
+  "ignorePatterns": ["autotests/**/*"],
   "rules": {
     "consistent-return": "off",
     "import/prefer-default-export": 1,
