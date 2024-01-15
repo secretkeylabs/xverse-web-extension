@@ -1,13 +1,6 @@
 import Switch from 'react-switch';
 import styled, { useTheme } from 'styled-components';
 
-interface ButtonProps {
-  border: string;
-}
-interface TitleProps {
-  textColor: string;
-}
-
 const CustomSwitch = styled(Switch)`
   .react-switch-handle {
     background-color: ${({ checked }) =>
@@ -16,56 +9,57 @@ const CustomSwitch = styled(Switch)`
   }
 `;
 
-const Button = styled.button<ButtonProps>((props) => ({
+const Button = styled.button<{
+  border: string;
+}>((props) => ({
   display: 'flex',
-  flexDirection: 'row',
   alignItems: 'center',
   background: 'transparent',
   justifyContent: 'flex-start',
-  marginTop: props.theme.spacing(6),
-  paddingBottom: props.theme.spacing(8),
+  paddingTop: props.theme.space.m,
+  paddingBottom: props.theme.space.m,
   borderBottom: props.border,
 }));
 
-const ColumnContainer = styled.div((props) => ({
+const ColumnContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
-}));
+});
 
 const TitleText = styled.h1((props) => ({
-  ...props.theme.body_bold_l,
+  ...props.theme.typography.body_bold_l,
   fontSize: 18,
-  paddingBottom: props.theme.spacing(6),
-  paddingTop: props.theme.spacing(16),
+  paddingBottom: props.theme.space.s,
+  paddingTop: props.theme.space.xl,
 }));
 
-const ComponentText = styled.h1<TitleProps>((props) => ({
-  ...props.theme.body_m,
-  paddingTop: props.theme.spacing(8),
+const ComponentText = styled.h1<{
+  textColor: string;
+}>((props) => ({
+  ...props.theme.typography.body_m,
   color: props.textColor,
   flex: 1,
   textAlign: 'left',
 }));
 
 const ComponentDescriptionText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
-  paddingTop: props.theme.spacing(8),
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_0,
 }));
 
 const DescriptionText = styled.p((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(2),
+  ...props.theme.typography.body_m,
+  marginTop: props.theme.space.xxs,
   color: props.theme.colors.white_400,
   textAlign: 'left',
-  paddingRight: props.theme.spacing(8),
+  paddingRight: props.theme.space.m,
 }));
 
-const Column = styled.div((props) => ({
+const Column = styled.div({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-}));
+});
 
 const DisabledOverlay = styled.div((props) => ({
   position: 'absolute',
