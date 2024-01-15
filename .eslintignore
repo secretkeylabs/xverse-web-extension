@@ -1,4 +1,3 @@
 build
 node_modules/
 **/*.js
-autotests/node_modules/
