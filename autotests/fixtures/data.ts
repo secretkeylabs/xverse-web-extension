@@ -7,5 +7,3 @@ export const data = {
   walletPassword: 'Admin@1234',
   seedPhrase: process.env.SEED_PHRASE as string,
 };
-
-export default data;

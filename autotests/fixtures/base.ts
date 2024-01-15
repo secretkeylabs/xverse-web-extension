@@ -31,5 +31,4 @@ export const test = baseTest.extend<{
   },
 });
 
-export default test;
-export const expect = baseTest.expect;
+export const { expect } = baseTest;

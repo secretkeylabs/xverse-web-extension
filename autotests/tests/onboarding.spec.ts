@@ -1,11 +1,14 @@
-import test, { expect } from '../fixtures/base';
-import data from '../fixtures/data';
+import { expect, test } from '../fixtures/base';
+import { data } from '../fixtures/data';
 import Onboarding from '../pages/onboarding';
 
 test.describe('Onboarding', () => {
   let onboarding: Onboarding;
   test.beforeEach(async ({ page, extensionId }) => {
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+  });
+  test.afterEach(async ({ context }) => {
+    await context.close();
   });
   test('Create and backup wallet', async ({ context, landing }) => {
     await test.step('open create wallet page in a new tab', async () => {
