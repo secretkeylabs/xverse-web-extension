@@ -3,16 +3,28 @@ import BarLoader from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import useBtcClient from '@hooks/useBtcClient';
+import useNetworkSelector from '@hooks/useNetwork';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
-import { Account } from '@secretkeylabs/xverse-core';
+import {
+  Account,
+  BtcAddressData,
+  StxAddressData,
+  currencySymbolMap,
+  fetchStxAddressData,
+  microstacksToStx,
+  satsToBtc,
+} from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
-import { LoaderSize, MAX_ACC_NAME_LENGTH } from '@utils/constants';
+import { LoaderSize, MAX_ACC_NAME_LENGTH, PAGINATION_LIMIT } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
 import { isLedgerAccount, validateAccountName } from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import styled from 'styled-components';
@@ -184,7 +196,8 @@ function AccountRow({
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
-  const { accountsList, ledgerAccountsList } = useWalletSelector();
+  const { accountsList, ledgerAccountsList, fiatCurrency, btcFiatRate, stxBtcRate } =
+    useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
@@ -194,10 +207,37 @@ function AccountRow({
   const [accountName, setAccountName] = useState('');
   const [accountNameError, setAccountNameError] = useState<string | null>(null);
   const [isAccountNameChangeLoading, setIsAccountNameChangeLoading] = useState(false);
+  const btcClient = useBtcClient();
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
     { top: string; left: string } | undefined
   >();
   const { removeLedgerAccount, renameAccount, updateLedgerAccounts } = useWalletReducer();
+  const stacksNetworkInstance = useNetworkSelector();
+  const [btcBalance, setBtcBalance] = useState(0);
+  const [stxBalance, setStxBalance] = useState(0);
+
+  const fetchBalance = async () => {
+    if (!account) {
+      return;
+    }
+
+    const { btcAddress, stxAddress } = account;
+
+    const btcData: BtcAddressData = await btcClient.getBalance(btcAddress);
+    const stxData: StxAddressData = await fetchStxAddressData(
+      stxAddress,
+      stacksNetworkInstance,
+      0,
+      PAGINATION_LIMIT,
+    );
+
+    setBtcBalance(btcData.finalBalance);
+    setStxBalance(stxData.balance.toNumber());
+  };
+
+  useEffect(() => {
+    fetchBalance();
+  }, []);
 
   useEffect(
     () => () => {
@@ -296,6 +336,24 @@ function AccountRow({
     }
   };
 
+  const calculateTotalBalance = () => {
+    let totalBalance = BigNumber(0);
+
+    if (stxBalance) {
+      const stxFiatEquiv = microstacksToStx(BigNumber(stxBalance))
+        .multipliedBy(BigNumber(stxBtcRate))
+        .multipliedBy(BigNumber(btcFiatRate));
+      totalBalance = totalBalance.plus(stxFiatEquiv);
+    }
+
+    if (btcBalance) {
+      const btcFiatEquiv = satsToBtc(BigNumber(btcBalance)).multipliedBy(BigNumber(btcFiatRate));
+      totalBalance = totalBalance.plus(btcFiatEquiv);
+    }
+
+    return totalBalance.toNumber().toFixed(2);
+  };
+
   return (
     <TopSectionContainer disableClick={disabledAccountSelect}>
       <AccountInfoContainer onClick={handleClick}>
@@ -315,6 +373,15 @@ function AccountRow({
                   <CaretDown weight="bold" size={16} />
                 )}
               </CurrentAccountTextContainer>
+              {isAccountListView && (
+                <NumericFormat
+                  value={calculateTotalBalance()}
+                  displayType="text"
+                  prefix={`${currencySymbolMap[fiatCurrency]}`}
+                  thousandSeparator
+                  renderText={(value: string) => <div>{value}</div>}
+                />
+              )}
             </TransparentSpan>
           )}
 

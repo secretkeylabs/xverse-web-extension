@@ -71,22 +71,25 @@ function BalanceCard(props: BalanceCardProps) {
     useWalletSelector();
   const { isLoading, isRefetching } = props;
 
-  function calculateTotalBalance() {
+  const calculateTotalBalance = () => {
     let totalBalance = new BigNumber(0);
+
     if (stxAddress) {
       const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
         .multipliedBy(new BigNumber(stxBtcRate))
         .multipliedBy(new BigNumber(btcFiatRate));
       totalBalance = totalBalance.plus(stxFiatEquiv);
     }
+
     if (btcAddress) {
       const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
         new BigNumber(btcFiatRate),
       );
       totalBalance = totalBalance.plus(btcFiatEquiv);
     }
+
     return totalBalance.toNumber().toFixed(2);
-  }
+  };
 
   return (
     <>
