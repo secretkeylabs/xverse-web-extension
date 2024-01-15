@@ -244,20 +244,23 @@
     "BTC_RECEIVE_MESSAGE": "Do not send Ordinals to this address, use your Ordinals NFT receive address."
   },
   "SEND": {
+    "BTC": {
+      "AMOUNT": "{{currency}} amount",
+      "RECIPIENT_PLACEHOLDER": "Enter address"
+    },
     "SEND_TO": "Send to",
     "SEND": "Send",
     "AMOUNT": "Amount",
     "BALANCE": "Balance",
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
-    "BTC_RECIPIENT_PLACEHOLDER": "Enter Bitcoin address",
     "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
-    "NO_FUNDS": "You don’t have any funds to send.",
+    "NO_FUNDS": "You don't have any funds to send.",
     "BUY_CRYPTO": "Buy crypto",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {

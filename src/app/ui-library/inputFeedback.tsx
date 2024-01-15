@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledP } from './common.styled';
 
-type FeedbackVariant = 'info' | 'danger';
+export type FeedbackVariant = 'info' | 'danger';
 
 const colors: Record<FeedbackVariant, string> = {
   info: Theme.colors.white_200,

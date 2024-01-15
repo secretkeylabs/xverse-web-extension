@@ -69,6 +69,7 @@ const Theme = {
     danger_dark: '#AB3030',
     danger_dark_100: 'rgba(171, 48, 48, 0.9)',
     danger_dark_200: 'rgba(171, 48, 48, 0.8)',
+    danger_dark_400: 'rgba(171, 48, 48, 0.6)',
     danger_dark_600: 'rgba(171, 48, 48, 0.4)',
     success_light: '#55E078',
     success_medium: '#55B86E',
