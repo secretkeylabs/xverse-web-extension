@@ -1,5 +1,6 @@
 import BtcAmountSelector from '@ui-components/btcAmountSelector';
 import Button from '@ui-library/button';
+import Callout from '@ui-library/callout';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -19,6 +20,7 @@ type Props = {
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   onNext: () => void;
+  dustFiltered: boolean;
   isLoading?: boolean;
 };
 
@@ -31,11 +33,12 @@ function AmountSelector({
   setSendMax,
   onNext,
   isLoading,
+  dustFiltered,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
 
   const handleNext = () => {
-    // TODO: validate amount - get fee summary form enhanced txn and ensure amount is payable
+    // TODO: validate amount - get fee summary from enhanced txn and ensure amount is payable
     onNext();
   };
 
@@ -51,6 +54,7 @@ function AmountSelector({
         />
         Fee Rate
         <input type="text" value={feeRate} onChange={(e) => setFeeRate(e.target.value)} />
+        {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}
       </div>
       <Button title={t('NEXT')} onClick={handleNext} loading={isLoading} />
     </Container>

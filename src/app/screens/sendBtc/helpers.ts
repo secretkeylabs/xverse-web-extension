@@ -1,9 +1,12 @@
 import { btcTransaction } from '@secretkeylabs/xverse-core';
 
+export type TransactionSummary = btcTransaction.TransactionSummary & {
+  dustFiltered?: boolean;
+};
+
 type TransactionBuildPayload = {
   transaction: btcTransaction.EnhancedTransaction;
-  summary: btcTransaction.TransactionSummary;
-  dustFiltered?: boolean;
+  summary: TransactionSummary;
 };
 
 export const generateTransaction = async (
@@ -41,5 +44,5 @@ export const generateSendMaxTransaction = async (
 
   const summary = await transaction.getSummary();
 
-  return { transaction, summary, dustFiltered };
+  return { transaction, summary: { ...summary, dustFiltered } };
 };

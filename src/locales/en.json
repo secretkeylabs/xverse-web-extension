@@ -246,7 +246,8 @@
   "SEND": {
     "BTC": {
       "AMOUNT": "{{currency}} amount",
-      "RECIPIENT_PLACEHOLDER": "Enter address"
+      "RECIPIENT_PLACEHOLDER": "Enter address",
+      "MAX_IGNORING_DUST_UTXO_MSG": "Small amounts may remain in your wallet, as sending them costs more in fees than their value."
     },
     "SEND_TO": "Send to",
     "SEND": "Send",

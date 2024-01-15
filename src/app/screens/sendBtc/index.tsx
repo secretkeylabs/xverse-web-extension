@@ -9,7 +9,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { generateSendMaxTransaction, generateTransaction } from './helpers';
+import {
+  generateSendMaxTransaction,
+  generateTransaction,
+  type TransactionSummary,
+} from './helpers';
 import StepDisplay from './stepDisplay';
 import { Step, getPreviousStep } from './steps';
 
@@ -58,7 +62,7 @@ function SendBtcScreen() {
 
   const transactionContext = useTransactionContext();
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
-  const [summary, setSummary] = useState<btcTransaction.TransactionSummary | undefined>();
+  const [summary, setSummary] = useState<TransactionSummary | undefined>();
 
   useEffect(() => {
     // TODO: validate properly

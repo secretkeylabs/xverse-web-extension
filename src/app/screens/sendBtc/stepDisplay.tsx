@@ -1,12 +1,12 @@
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import AmountSelector from './amountSelector';
+import { TransactionSummary } from './helpers';
 import RecipientSelector from './recipientSelector';
 import { Step, getNextStep } from './steps';
 
 type StepDisplayProps = {
-  summary: btcTransaction.TransactionSummary | undefined;
+  summary: TransactionSummary | undefined;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
@@ -62,6 +62,7 @@ function StepDisplay({
           setFeeRate={setFeeRate}
           sendMax={sendMax}
           setSendMax={setSendMax}
+          dustFiltered={summary?.dustFiltered ?? false}
           onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
           isLoading={isLoading}
         />
