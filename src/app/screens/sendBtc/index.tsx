@@ -3,9 +3,8 @@ import TokenImage from '@components/tokenImage';
 import TopRow from '@components/topRow';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { btcToSats, btcTransaction } from '@secretkeylabs/xverse-core';
+import { btcTransaction } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
-import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -69,7 +68,7 @@ function SendBtcScreen() {
       return;
     }
 
-    const amountBigInt = BigInt(btcToSats(new BigNumber(amountSats)).toNumber());
+    const amountBigInt = BigInt(amountSats);
 
     const generateTxnAndSummary = async () => {
       setIsLoading(true);
@@ -112,12 +111,16 @@ function SendBtcScreen() {
 
   return (
     <>
-      <TopRow title="" onClick={handleBackButtonClick} showBackButton={showNavButtons} />
       <Container>
-        <TitleContainer>
-          <TokenImage token="BTC" loading={false} />
-          <Title>{t('SEND')}</Title>
-        </TitleContainer>
+        {currentStep !== Step.Confirm && (
+          <>
+            <TopRow title="" onClick={handleBackButtonClick} showBackButton={showNavButtons} />
+            <TitleContainer>
+              <TokenImage token="BTC" loading={false} />
+              <Title>{t('SEND')}</Title>
+            </TitleContainer>
+          </>
+        )}
         <StepDisplay
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
@@ -130,8 +133,15 @@ function SendBtcScreen() {
           sendMax={sendMax}
           setSendMax={setSendMax}
           amountEditable={amountEditable}
+          onBack={handleBackButtonClick}
           onCancel={handleCancel}
+          onConfirm={async () => {
+            // TODO:
+            await transaction?.broadcast();
+            navigate('/');
+          }}
           isLoading={isLoading}
+          summary={summary}
         />
       </Container>
       <BottomBar tab="dashboard" />

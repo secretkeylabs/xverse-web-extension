@@ -1,8 +1,12 @@
+import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { useTranslation } from 'react-i18next';
 import AmountSelector from './amountSelector';
 import RecipientSelector from './recipientSelector';
 import { Step, getNextStep } from './steps';
 
 type StepDisplayProps = {
+  summary: btcTransaction.TransactionSummary | undefined;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
@@ -14,11 +18,14 @@ type StepDisplayProps = {
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   amountEditable: boolean;
+  onConfirm: () => void;
+  onBack: () => void;
   onCancel: () => void;
   isLoading: boolean;
 };
 
 function StepDisplay({
+  summary,
   currentStep,
   setCurrentStep,
   recipientAddress,
@@ -30,9 +37,13 @@ function StepDisplay({
   sendMax,
   setSendMax,
   amountEditable,
+  onConfirm,
+  onBack,
   onCancel,
   isLoading,
 }: StepDisplayProps) {
+  const { t } = useTranslation('translation');
+
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
@@ -56,7 +67,23 @@ function StepDisplay({
         />
       );
     case Step.Confirm:
-      return <div>Confirm</div>;
+      // TODO: ensure summary is not undefined
+      return (
+        <ConfirmBitcoinTransaction
+          inputs={summary!.inputs}
+          outputs={summary!.outputs}
+          feeOutput={summary!.feeOutput}
+          isLoading={false}
+          isSubmitting={false}
+          confirmText={t('CONFIRM')}
+          cancelText={t('CANCEL')}
+          onBackClick={onBack}
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+          isBroadcast
+          hideBottomBar
+        />
+      );
     default:
       throw new Error(`Unknown step: ${currentStep}`);
   }

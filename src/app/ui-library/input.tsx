@@ -139,6 +139,7 @@ type Props = {
   variant?: InputVariant;
   subText?: string;
   className?: string;
+  disabled?: boolean;
   feedback?: {
     message: string;
     variant?: FeedbackVariant;
@@ -159,6 +160,7 @@ function Input({
   subText,
   className,
   feedback,
+  disabled = false,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const complicationsRef = useRef<HTMLDivElement>(null);
@@ -206,6 +208,7 @@ function Input({
           onChange={handleChange}
           onBlur={onBlur}
           placeholder={placeholder}
+          disabled={disabled}
           $variant={variant}
         />
         <ComplicationsContainer ref={complicationsRef}>
