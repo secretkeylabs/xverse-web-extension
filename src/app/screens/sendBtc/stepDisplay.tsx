@@ -7,14 +7,15 @@ type StepDisplayProps = {
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
-  amount: string;
-  setAmount: (amount: string) => void;
+  amountSats: string;
+  setAmountSats: (amount: string) => void;
   feeRate: string;
   setFeeRate: (feeRate: string) => void;
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   amountEditable: boolean;
   onCancel: () => void;
+  isLoading: boolean;
 };
 
 function StepDisplay({
@@ -22,14 +23,15 @@ function StepDisplay({
   setCurrentStep,
   recipientAddress,
   setRecipientAddress,
-  amount,
-  setAmount,
+  amountSats,
+  setAmountSats,
   feeRate,
   setFeeRate,
   sendMax,
   setSendMax,
   amountEditable,
   onCancel,
+  isLoading,
 }: StepDisplayProps) {
   switch (currentStep) {
     case Step.SelectRecipient:
@@ -43,13 +45,14 @@ function StepDisplay({
     case Step.SelectAmount:
       return (
         <AmountSelector
-          amount={amount}
-          setAmount={setAmount}
+          amountSats={amountSats}
+          setAmountSats={setAmountSats}
           feeRate={feeRate}
           setFeeRate={setFeeRate}
           sendMax={sendMax}
           setSendMax={setSendMax}
           onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
+          isLoading={isLoading}
         />
       );
     case Step.Confirm:

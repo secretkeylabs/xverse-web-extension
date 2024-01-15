@@ -2,11 +2,15 @@ import BottomBar from '@components/tabBar';
 import TokenImage from '@components/tokenImage';
 import TopRow from '@components/topRow';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useTransactionContext from '@hooks/useTransactionContext';
+import { btcToSats, btcTransaction } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
-import { useState } from 'react';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { generateSendMaxTransaction, generateTransaction } from './helpers';
 import StepDisplay from './stepDisplay';
 import { Step, getPreviousStep } from './steps';
 
@@ -45,12 +49,52 @@ function SendBtcScreen() {
   const [recipientAddress, setRecipientAddress] = useState(
     location.state?.recipientAddress || '2N3J2uER8xjdNCpBfaA7K4kWpg9EbJfwfUu',
   );
-  const [amount, setAmount] = useState(location.state?.amount || '0.0001');
+  const [isLoading, setIsLoading] = useState(false);
+  const [amountSats, setAmountSats] = useState(location.state?.amount || '10000');
   const [feeRate, setFeeRate] = useState('1');
   const [sendMax, setSendMax] = useState(false);
   const amountEditable = location.state?.disableAmountEdit ?? true;
 
   const [currentStep, setCurrentStep] = useState<Step>(0);
+
+  const transactionContext = useTransactionContext();
+  const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
+  const [summary, setSummary] = useState<btcTransaction.TransactionSummary | undefined>();
+
+  useEffect(() => {
+    // TODO: validate properly
+    if (!recipientAddress || !amountSats || !feeRate) {
+      setTransaction(undefined);
+      setSummary(undefined);
+      return;
+    }
+
+    const amountBigInt = BigInt(btcToSats(new BigNumber(amountSats)).toNumber());
+
+    const generateTxnAndSummary = async () => {
+      setIsLoading(true);
+      try {
+        const transactionDetails = sendMax
+          ? await generateSendMaxTransaction(transactionContext, recipientAddress, +feeRate)
+          : await generateTransaction(transactionContext, recipientAddress, amountBigInt, +feeRate);
+
+        setTransaction(transactionDetails.transaction);
+
+        setSummary(transactionDetails.summary);
+
+        if (sendMax) {
+          setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
+        }
+      } catch (e) {
+        // TODO: handle error
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    generateTxnAndSummary();
+  }, [transactionContext, recipientAddress, amountSats, feeRate, sendMax]);
 
   const handleCancel = () => {
     navigate('/');
@@ -66,11 +110,6 @@ function SendBtcScreen() {
     }
   };
 
-  const handleAmountChange = (newAmount: string) => {
-    setSendMax(false);
-    setAmount(newAmount);
-  };
-
   return (
     <>
       <TopRow title="" onClick={handleBackButtonClick} showBackButton={showNavButtons} />
@@ -84,14 +123,15 @@ function SendBtcScreen() {
           setCurrentStep={setCurrentStep}
           recipientAddress={recipientAddress}
           setRecipientAddress={setRecipientAddress}
-          amount={amount}
-          setAmount={handleAmountChange}
+          amountSats={amountSats}
+          setAmountSats={setAmountSats}
           feeRate={feeRate}
           setFeeRate={setFeeRate}
           sendMax={sendMax}
           setSendMax={setSendMax}
           amountEditable={amountEditable}
           onCancel={handleCancel}
+          isLoading={isLoading}
         />
       </Container>
       <BottomBar tab="dashboard" />

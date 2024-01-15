@@ -9,7 +9,7 @@ import {
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -61,30 +61,48 @@ const fiatInputExtractor = /[0-9]+[.]?[0-9]{0,2}/;
 const fiatInputValidator = /^[0-9]+[.]?[0-9]{0,2}$/;
 
 type Props = {
-  amount: string;
-  setAmount: (amount: string) => void;
+  amountSats: string;
+  setAmountSats: (amount: string) => void;
   feeRate: string;
   setFeeRate: (feeRate: string) => void;
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   onNext: () => void;
+  isLoading?: boolean;
 };
 
 function AmountSelector({
-  amount,
-  setAmount,
+  amountSats,
+  setAmountSats,
   feeRate,
   setFeeRate,
   sendMax,
   setSendMax,
   onNext,
+  isLoading,
 }: Props) {
   BigNumber.config({ EXPONENTIAL_AT: 8 });
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { btcBalance: btcBalanceSats, btcFiatRate, fiatCurrency } = useWalletSelector();
 
-  const [amountDisplay, setAmountDisplay] = useState(amount);
+  const [amountDisplay, setAmountDisplay] = useState(
+    satsToBtc(new BigNumber(amountSats)).toString(),
+  );
   const [useBtcValue, setUseBtcValue] = useState(true);
+
+  useEffect(() => {
+    if (!sendMax) return;
+
+    const amountToDisplay = useBtcValue
+      ? satsToBtc(new BigNumber(amountSats)).toString()
+      : getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate))
+          .toNumber()
+          .toFixed(2);
+    if (amountToDisplay !== amountDisplay) {
+      setAmountDisplay(amountToDisplay);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- We specifically only want to run this on these 2 deps
+  }, [sendMax, amountSats]);
 
   const btcBalance = new BigNumber(btcBalanceSats);
   const balance = useBtcValue
@@ -92,10 +110,8 @@ function AmountSelector({
     : getBtcFiatEquivalent(btcBalance, new BigNumber(btcFiatRate)).toFixed(2);
 
   const sendAmountConverted = useBtcValue
-    ? getBtcFiatEquivalent(btcToSats(new BigNumber(amount)), BigNumber(btcFiatRate))
-        .toNumber()
-        .toFixed(2)
-    : amount;
+    ? getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate)).toNumber().toFixed(2)
+    : satsToBtc(new BigNumber(amountSats)).toString();
 
   const handleNext = () => {
     // TODO: validate amount
@@ -109,7 +125,8 @@ function AmountSelector({
     setAmountDisplay(newAmount);
 
     if (!newAmount) {
-      setAmount('0');
+      setAmountSats('0');
+      setSendMax(false);
       return;
     }
 
@@ -119,11 +136,15 @@ function AmountSelector({
 
     if (!isValidAmount) return;
 
+    setSendMax(false);
+
     if (useBtcValue) {
-      setAmount(newAmount);
+      setAmountSats(btcToSats(new BigNumber(newAmount)).toString());
     } else {
-      const btcAmount = getFiatBtcEquivalent(new BigNumber(newAmount), new BigNumber(btcFiatRate));
-      setAmount(btcAmount.toString());
+      const btcAmount = btcToSats(
+        getFiatBtcEquivalent(new BigNumber(newAmount), new BigNumber(btcFiatRate)),
+      );
+      setAmountSats(btcAmount.toString());
     }
   };
 
@@ -133,13 +154,10 @@ function AmountSelector({
 
     if (shouldUseBtcValue) {
       // convert outer sats amount to btc
-      setAmountDisplay(amount);
+      setAmountDisplay(satsToBtc(new BigNumber(amountSats)).toString());
     } else {
       // convert btc to fiat
-      const fiatAmount = getBtcFiatEquivalent(
-        btcToSats(new BigNumber(amount)),
-        BigNumber(btcFiatRate),
-      )
+      const fiatAmount = getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate))
         .toNumber()
         .toFixed(2);
       setAmountDisplay(fiatAmount);
@@ -159,6 +177,7 @@ function AmountSelector({
     }
   };
 
+  // TODO: extract to component
   return (
     <Container>
       <div>
@@ -191,7 +210,7 @@ function AmountSelector({
         Fee Rate
         <input type="text" value={feeRate} onChange={(e) => setFeeRate(e.target.value)} />
       </div>
-      <Button title={t('NEXT')} onClick={handleNext} />
+      <Button title={t('NEXT')} onClick={handleNext} loading={isLoading} />
     </Container>
   );
 }

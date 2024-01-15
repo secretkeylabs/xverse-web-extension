@@ -20,7 +20,7 @@ const ButtonContainer = styled.div<{
 
   ${(props) => props.theme.typography.body_m}
 
-  cursor: ${(props) => (props.$disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${(props) => (props.$disabled || props.$loading ? 'not-allowed' : 'pointer')};
 
   ${(props) => {
     if (props.$disabled || props.$loading) {
@@ -151,7 +151,7 @@ function Button({
   variant = 'primary',
 }: Props) {
   const handleClick = () => {
-    if (!disabled) {
+    if (!disabled && !loading) {
       onClick();
     }
   };
