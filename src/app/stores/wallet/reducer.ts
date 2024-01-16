@@ -63,7 +63,7 @@ import {
  *
  * TODO refactor most of these values out of the store and use query cache instead
  */
-const initialWalletState: WalletState = {
+export const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',
   ordinalsAddress: '',

@@ -1,10 +1,10 @@
 import { chromeLocalStorage } from '@utils/chromeStorage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
-import { PersistConfig, persistReducer, persistStore } from 'redux-persist';
+import { PersistConfig, createMigrate, persistReducer, persistStore } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
 import { WalletState } from './wallet/actions/types';
-import walletReducer from './wallet/reducer';
+import walletReducer, { initialWalletState } from './wallet/reducer';
 
 const rootPersistConfig = {
   version: 1,
@@ -13,10 +13,26 @@ const rootPersistConfig = {
   blacklist: ['walletState'],
 };
 
+const migrations = {
+  2: (state: WalletState) => {
+    if (state.network.type === 'Testnet') {
+      return state;
+    }
+    return {
+      ...state,
+      network: {
+        ...state.network,
+        fallbackBtcApiUrl: initialWalletState.network.fallbackBtcApiUrl,
+      },
+    };
+  },
+};
+
 export const WalletPersistConfig: PersistConfig<WalletState> = {
-  version: 1,
+  version: 2,
   key: 'walletState',
   storage: chromeLocalStorage,
+  migrate: createMigrate(migrations as any, { debug: false }),
 };
 
 const appReducer = combineReducers({
