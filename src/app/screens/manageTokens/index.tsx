@@ -30,6 +30,11 @@ const Container = styled.div({
   paddingRight: 16,
 });
 
+const ScrollableContainer = styled.div`
+  flex: 1;
+  overflow-y: auto;
+`;
+
 const FtInfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -138,36 +143,38 @@ function ManageTokens() {
     <>
       <TopRow onClick={handleBackButtonClick} />
       <Container>
-        <Header>{t('ADD_COINS')}</Header>
-        <Description>{t('DESCRIPTION')}</Description>
-        <FtInfoContainer>
-          <Button
-            isSelected={selectedProtocol === Protocols.SIP_10}
-            onClick={() => setSelectedProtocol(Protocols.SIP_10)}
-          >
-            {Protocols.SIP_10}
-          </Button>
-          {/* To be uncommented when brc-20 tokens are supported */}
-          {/* <Button
-            isSelected={selectedProtocol === Protocols.BRC_20}
-            onClick={() => setSelectedProtocol(Protocols.BRC_20)}
-          >
-            {Protocols.BRC_20}
-          </Button> */}
-        </FtInfoContainer>
-        <TokenContainer>
-          <Stacks />
-          {coins?.map((coin, index) => (
-            <CoinItem
-              key={coin.contract} // contract is not optional and is unique
-              coin={coin}
-              disabled={false}
-              toggled={toggled}
-              enabled={coin.visible}
-              showDivider={showDivider(index + 1)}
-            />
-          ))}
-        </TokenContainer>
+        <ScrollableContainer>
+          <Header>{t('ADD_COINS')}</Header>
+          <Description>{t('DESCRIPTION')}</Description>
+          <FtInfoContainer>
+            <Button
+              isSelected={selectedProtocol === Protocols.SIP_10}
+              onClick={() => setSelectedProtocol(Protocols.SIP_10)}
+            >
+              {Protocols.SIP_10}
+            </Button>
+            {/* To be uncommented when brc-20 tokens are supported */}
+            {/* <Button
+              isSelected={selectedProtocol === Protocols.BRC_20}
+              onClick={() => setSelectedProtocol(Protocols.BRC_20)}
+            >
+              {Protocols.BRC_20}
+            </Button> */}
+          </FtInfoContainer>
+          <TokenContainer>
+            <Stacks />
+            {coins?.map((coin, index) => (
+              <CoinItem
+                key={coin.contract} // contract is not optional and is unique
+                coin={coin}
+                disabled={false}
+                toggled={toggled}
+                enabled={coin.visible}
+                showDivider={showDivider(index + 1)}
+              />
+            ))}
+          </TokenContainer>
+        </ScrollableContainer>
       </Container>
       <BottomBar tab="dashboard" />
     </>
