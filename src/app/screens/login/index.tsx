@@ -3,11 +3,16 @@ import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import logo from '@assets/img/xverse_logo.svg';
 import ActionButton from '@components/button';
 import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useSpring } from '@react-spring/web';
 import MigrationConfirmation from '@screens/migrationConfirmation';
+import { SettingsNetwork } from '@secretkeylabs/xverse-core';
+import { ChangeNetworkAction } from '@stores/wallet/actions/actionCreators';
+import { initialWalletState } from '@stores/wallet/reducer';
 import { addMinutes } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -129,6 +134,18 @@ function Login(): JSX.Element {
     },
     delay: 100,
   });
+
+  // migration from undefined fallbackBtcApiUrl to default fallbackBtcApiUrl
+  const { network } = useWalletSelector();
+  const dispatch = useDispatch();
+  if (network.fallbackBtcApiUrl === undefined) {
+    dispatch(
+      ChangeNetworkAction({
+        ...network,
+        fallbackBtcApiUrl: initialWalletState.network.fallbackBtcApiUrl,
+      } as unknown as SettingsNetwork),
+    );
+  }
 
   const handleMigrateCache = async () => {
     try {
