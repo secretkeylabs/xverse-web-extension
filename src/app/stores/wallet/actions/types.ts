@@ -21,36 +21,28 @@ export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
 export const GetActiveAccountsKey = 'GetActiveAccounts';
-
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const SetStxWalletDataKey = 'SetStxWalletDataKey';
-
 export const SetBtcWalletDataKey = 'SetBtcWalletData';
-
 export const SetCoinRatesKey = 'SetCoinRatesKey';
-
 export const SetCoinDataKey = 'SetCoinDataKey';
-
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
 export const ChangeHasActivatedRBFKey = 'ChangeHasActivatedRBFKey';
-
 export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 export const ChangeShowDataCollectionAlertKey = 'ChangeShowDataCollectionAlertKey';
 export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
-
 export const SetBrcCoinsListKey = 'SetBrcCoinsList';
-
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
-
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
 
 export enum WalletSessionPeriods {
-  LOW = 1,
-  STANDARD = 10,
-  LONG = 30,
+  LOW = 15,
+  STANDARD = 30,
+  LONG = 60,
+  VERY_LONG = 180,
 }
 
 export interface WalletState {
@@ -64,7 +56,8 @@ export interface WalletState {
   accountsList: Account[];
   ledgerAccountsList: Account[];
   selectedAccount: Account | null;
-  network: SettingsNetwork;
+  network: SettingsNetwork; // currently selected network urls and type
+  savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
   fiatCurrency: SupportedCurrency;
   btcFiatRate: string;
@@ -78,7 +71,6 @@ export interface WalletState {
   coins: Coin[];
   brcCoinsList: FungibleToken[] | null;
   feeMultipliers: AppInfo | null;
-  networkAddress: string | undefined;
   hasActivatedOrdinalsKey: boolean | undefined;
   hasActivatedRareSatsKey: boolean | undefined;
   hasActivatedRBFKey: boolean | undefined;
@@ -88,7 +80,6 @@ export interface WalletState {
   showDataCollectionAlert: boolean | null;
   accountType: AccountType | undefined;
   accountName: string | undefined;
-  btcApiUrl: string;
   walletLockPeriod: WalletSessionPeriods;
   isUnlocked: boolean;
 }
@@ -178,8 +169,6 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
-  networkAddress: string | undefined;
-  btcApiUrl: string;
 }
 
 export interface GetActiveAccounts {

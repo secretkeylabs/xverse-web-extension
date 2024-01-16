@@ -1,86 +1,61 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import SpeedUpBtcTransaction from '@components/speedUpTransaction/btc';
+import SpeedUpStxTransaction from '@components/speedUpTransaction/stx';
 import TopRow from '@components/topRow';
 import useTransaction from '@hooks/queries/useTransaction';
 import useBtcClient from '@hooks/useBtcClient';
+import useNetworkSelector from '@hooks/useNetwork';
+import useRbfTransactionData, {
+  getLatestNonce,
+  getRawTransaction,
+  isBtcTransaction,
+} from '@hooks/useRbfTransactionData';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
 import {
-  currencySymbolMap,
-  getBtcFiatEquivalent,
-  mempoolApi,
-  rbf,
-  RecommendedFeeResponse,
+  StacksTransaction,
   Transport as TransportType,
+  broadcastSignedTransaction,
+  signLedgerStxTransaction,
+  signTransaction,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
+import { deserializeTransaction } from '@stacks/transactions';
+import { EMPTY_LABEL } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { MoonLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 import CustomFee from './customFee';
-import {
-  ButtonContainer,
-  Container,
-  ControlsContainer,
-  CustomFeeIcon,
-  DetailText,
-  FeeButton,
-  FeeButtonLeft,
-  FeeButtonRight,
-  HighlightedText,
-  LoaderContainer,
-  SecondaryText,
-  StyledActionButton,
-  SuccessActionsContainer,
-  Title,
-  WarningText,
-} from './index.styled';
-
-type TierFees = {
-  enoughFunds: boolean;
-  fee?: number;
-  feeRate: number;
-};
-
-type RbfRecommendedFees = {
-  medium?: TierFees;
-  high?: TierFees;
-  higher?: TierFees;
-  highest?: TierFees;
-};
+import { LoaderContainer, SuccessActionsContainer } from './index.styled';
 
 function SpeedUpTransactionScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const theme = useTheme();
   const navigate = useNavigate();
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const { selectedAccount, accountType, network, btcFiatRate, fiatCurrency } = useWalletSelector();
-  const seedVault = useSeedVault();
+  const { selectedAccount, stxAddress, network, stxAvailableBalance } = useWalletSelector();
   const { id } = useParams();
+  const location = useLocation();
   const btcClient = useBtcClient();
-  const [rbfTxSummary, setRbfTxSummary] = useState<{
-    currentFee: number;
-    currentFeeRate: number;
-    minimumRbfFee: number;
-    minimumRbfFeeRate: number;
-  }>();
   const [feeRateInput, setFeeRateInput] = useState<string | undefined>();
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
-  const [recommendedFees, setRecommendedFees] = useState<RecommendedFeeResponse>();
-  const [rbfRecommendedFees, setRbfRecommendedFees] = useState<RbfRecommendedFees>();
-  const { data: transaction } = useTransaction(id!);
-  const [rbfTransaction, setRbfTransaction] = useState<any>();
+  const { transaction: stxTransaction } = location.state || {};
+  const { data: btcTransaction } = useTransaction(stxTransaction ? undefined : id);
+  const { isLoading, rbfTransaction, rbfRecommendedFees, rbfTxSummary, mempoolFees } =
+    useRbfTransactionData(stxTransaction || btcTransaction);
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
@@ -90,49 +65,13 @@ function SpeedUpTransactionScreen() {
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
-
-  const fetchRbfData = useCallback(async () => {
-    if (!selectedAccount || !id || !transaction) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const rbfTx = new rbf.RbfTransaction(transaction, {
-        ...selectedAccount,
-        accountType: accountType || 'software',
-        accountId:
-          isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
-            ? selectedAccount.deviceAccountIndex
-            : selectedAccount.id,
-        network: network.type,
-        esploraProvider: btcClient,
-        seedVault,
-      });
-      setRbfTransaction(rbfTx);
-
-      const rbfTransactionSummary = await rbf.getRbfTransactionSummary(btcClient, transaction.txid);
-      setRbfTxSummary(rbfTransactionSummary);
-
-      const mempoolFees = await mempoolApi.getRecommendedFees(network.type);
-      setRecommendedFees(mempoolFees);
-
-      const rbfRecommendedFeesResponse = await rbfTx.getRbfRecommendedFees(mempoolFees);
-      setRbfRecommendedFees(rbfRecommendedFeesResponse);
-    } catch (err: any) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedAccount, id, transaction, accountType, network.type, seedVault]);
-
-  useEffect(() => {
-    fetchRbfData();
-  }, [fetchRbfData]);
+  const { getSeed } = useSeedVault();
+  const selectedStacksNetwork = useNetworkSelector();
+  const isBtc = isBtcTransaction(stxTransaction || btcTransaction);
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
@@ -156,9 +95,32 @@ function SpeedUpTransactionScreen() {
     navigate('/');
   };
 
+  const calculateStxTotalFee = async (feeRate: string) => {
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary.minimumRbfFeeRate }));
+      return;
+    }
+
+    if (stxToMicrostacks(BigNumber(feeRate)).gt(BigNumber(stxAvailableBalance))) {
+      setCustomFeeError(t('INSUFFICIENT_FUNDS'));
+    } else {
+      setCustomFeeError(undefined);
+    }
+
+    return Number(feeRate);
+  };
+
   const calculateTotalFee = async (feeRate: string) => {
-    if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
-      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
+    if (!isBtc) {
+      return calculateStxTotalFee(feeRate);
+    }
+
+    if (!rbfTransaction) {
+      return;
+    }
+
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary.minimumRbfFeeRate }));
       return;
     }
 
@@ -177,12 +139,77 @@ function SpeedUpTransactionScreen() {
     return feeSummary.fee;
   };
 
+  const signAndBroadcastStxTx = async (transport?: TransportType) => {
+    if (!feeRateInput || !selectedAccount) {
+      return;
+    }
+
+    try {
+      setIsBroadcasting(true);
+      const fee = stxToMicrostacks(BigNumber(feeRateInput)).toString();
+      const txRaw: string = await getRawTransaction(stxTransaction.txid, network);
+      const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
+
+      // check if the transaction exists in microblock
+      const latestNonceData = await getLatestNonce(stxAddress, network);
+      if (stxTransaction.nonce > latestNonceData.last_executed_tx_nonce) {
+        unsignedTx.setFee(BigInt(fee));
+        unsignedTx.setNonce(BigInt(stxTransaction.nonce));
+
+        const seedPhrase = await getSeed();
+
+        if (isLedgerAccount(selectedAccount)) {
+          if (!transport || selectedAccount.deviceAccountIndex === undefined) {
+            return;
+          }
+
+          const result = await signLedgerStxTransaction({
+            transport,
+            transactionBuffer: Buffer.from(unsignedTx.serialize()),
+            addressIndex: selectedAccount.deviceAccountIndex,
+          });
+          await delay(1500);
+          await broadcastSignedTransaction(result, selectedStacksNetwork);
+        } else {
+          const signedTx: StacksTransaction = await signTransaction(
+            unsignedTx,
+            seedPhrase,
+            selectedAccount.id,
+            selectedStacksNetwork,
+          );
+          await broadcastSignedTransaction(signedTx, selectedStacksNetwork);
+        }
+
+        toast.success(t('TX_FEE_UPDATED'));
+        handleGoBack();
+        return;
+      }
+
+      toast.error('This transaction has already been confirmed in a block.');
+      return;
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to broadcast transaction.');
+    } finally {
+      setIsBroadcasting(false);
+    }
+  };
+
   const signAndBroadcastTx = async (transport?: TransportType) => {
+    if (!isBtc) {
+      return signAndBroadcastStxTx(transport);
+    }
+
+    if (!rbfTransaction) {
+      return;
+    }
+
     if (isLedgerAccount(selectedAccount) && !transport) {
       return;
     }
 
     try {
+      setIsBroadcasting(true);
       const signedTx = await rbfTransaction.getReplacementTransaction({
         feeRate: Number(feeRateInput),
         ledgerTransport: transport,
@@ -195,14 +222,18 @@ function SpeedUpTransactionScreen() {
     } catch (err: any) {
       console.error(err);
 
-      if (err?.response?.data && err?.response?.data.includes('insufficient fee')) {
-        toast.error(t('INSUFFICIENT_FEE'));
+      if (err?.response?.data) {
+        if (err.response.data.includes('insufficient fee')) {
+          toast.error(t('INSUFFICIENT_FEE'));
+        }
       }
+    } finally {
+      setIsBroadcasting(false);
     }
   };
 
   const handleClickSubmit = async () => {
-    if (!selectedAccount || !id) {
+    if (!selectedAccount || (!btcTransaction && !stxTransaction)) {
       return;
     }
 
@@ -254,8 +285,8 @@ function SpeedUpTransactionScreen() {
   };
 
   const handleApplyCustomFee = (feeRate: string, fee: string) => {
-    if (rbfTxSummary && Number(feeRate) < rbfTxSummary?.minimumRbfFeeRate) {
-      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary?.minimumRbfFeeRate }));
+    if (rbfTxSummary && Number(feeRate) < rbfTxSummary.minimumRbfFeeRate) {
+      setCustomFeeError(t('FEE_TOO_LOW', { minimumFee: rbfTxSummary.minimumRbfFeeRate }));
       return;
     }
 
@@ -280,63 +311,47 @@ function SpeedUpTransactionScreen() {
   };
 
   const getEstimatedCompletionTime = (feeRate?: number) => {
-    if (!feeRate || !recommendedFees) {
-      return '--';
+    if (!feeRate || !mempoolFees) {
+      return EMPTY_LABEL;
     }
 
-    if (feeRate < recommendedFees?.hourFee) {
-      return 'several hours or more';
+    if (feeRate < mempoolFees.hourFee) {
+      return t('TIME.SEVERAL_HOURS_OR_MORE');
     }
 
-    if (feeRate === recommendedFees?.hourFee) {
-      return '~1 hour';
+    if (feeRate === mempoolFees.hourFee) {
+      return `~1 ${t('TIME.HOUR')}`;
     }
 
-    if (feeRate > recommendedFees?.hourFee && feeRate <= recommendedFees?.halfHourFee) {
-      return '~30 mins';
+    if (feeRate > mempoolFees.hourFee && feeRate <= mempoolFees.halfHourFee) {
+      return `~30 ${t('TIME.MINUTES')}`;
     }
 
-    return '~10 mins';
+    return `~10 ${t('TIME.MINUTES')}`;
+  };
+
+  const iconProps = {
+    size: 20,
+    color: theme.colors.tangerine,
   };
 
   const feeButtonMapping = {
     medium: {
-      icon: <CarProfile size={20} color={theme.colors.tangerine} />,
+      icon: <CarProfile {...iconProps} />,
       title: t('MED_PRIORITY'),
     },
     high: {
-      icon: <RocketLaunch size={20} color={theme.colors.tangerine} />,
+      icon: <RocketLaunch {...iconProps} />,
       title: t('HIGH_PRIORITY'),
     },
     higher: {
-      icon: <Lightning size={20} color={theme.colors.tangerine} />,
+      icon: <Lightning {...iconProps} />,
       title: t('HIGHER_PRIORITY'),
     },
     highest: {
-      icon: <ShootingStar size={20} color={theme.colors.tangerine} />,
+      icon: <ShootingStar {...iconProps} />,
       title: t('HIGHEST_PRIORITY'),
     },
-  };
-
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (!fiatAmount) {
-      return '';
-    }
-
-    if (fiatAmount.isLessThan(0.01)) {
-      return `< ${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-    }
-
-    return (
-      <NumericFormat
-        value={fiatAmount.toFixed(2).toString()}
-        displayType="text"
-        thousandSeparator
-        prefix={`${currencySymbolMap[fiatCurrency]}`}
-        suffix={` ${fiatCurrency}`}
-        renderText={(value: string) => `~ ${value}`}
-      />
-    );
   };
 
   return (
@@ -348,160 +363,49 @@ function SpeedUpTransactionScreen() {
         </LoaderContainer>
       ) : (
         <>
-          <Container>
-            <Title>{t('TITLE')}</Title>
-            <DetailText>{t('FEE_INFO')}</DetailText>
-            <DetailText>
-              {t('CURRENT_FEE')}{' '}
-              <HighlightedText>
-                <NumericFormat
-                  value={rbfTxSummary?.currentFee}
-                  displayType="text"
-                  thousandSeparator
-                  suffix=" Sats / "
-                />
-                <NumericFormat
-                  value={rbfTxSummary?.currentFeeRate}
-                  displayType="text"
-                  thousandSeparator
-                  suffix=" Sats /vB"
-                />
-              </HighlightedText>
-            </DetailText>
-            <DetailText>
-              {t('ESTIMATED_COMPLETION_TIME')}{' '}
-              <HighlightedText>
-                {getEstimatedCompletionTime(rbfTxSummary?.currentFeeRate)}
-              </HighlightedText>
-            </DetailText>
-            <ButtonContainer>
-              {rbfRecommendedFees &&
-                Object.entries(rbfRecommendedFees)
-                  .sort((a, b) => {
-                    const priorityOrder = ['highest', 'higher', 'high', 'medium'];
-                    return priorityOrder.indexOf(a[0]) - priorityOrder.indexOf(b[0]);
-                  })
-                  .map(([key, obj]) => (
-                    <FeeButton
-                      key={key}
-                      value={key}
-                      isSelected={selectedOption === key}
-                      onClick={handleClickFeeButton}
-                      disabled={!obj.enoughFunds}
-                    >
-                      <FeeButtonLeft>
-                        {feeButtonMapping[key].icon}
-                        <div>
-                          {feeButtonMapping[key].title}
-                          <SecondaryText>{getEstimatedCompletionTime(obj.feeRate)}</SecondaryText>
-                          <SecondaryText>
-                            <NumericFormat
-                              value={obj.feeRate}
-                              displayType="text"
-                              thousandSeparator
-                              suffix=" Sats /vByte"
-                            />
-                          </SecondaryText>
-                        </div>
-                      </FeeButtonLeft>
-                      <FeeButtonRight>
-                        <div>
-                          {obj.fee ? (
-                            <NumericFormat
-                              value={obj.fee}
-                              displayType="text"
-                              thousandSeparator
-                              suffix=" Sats"
-                            />
-                          ) : (
-                            '--'
-                          )}
-                        </div>
-                        {obj.fee ? (
-                          <SecondaryText alignRight>
-                            {getFiatAmountString(
-                              getBtcFiatEquivalent(BigNumber(obj.fee), BigNumber(btcFiatRate)),
-                            )}
-                          </SecondaryText>
-                        ) : (
-                          <SecondaryText alignRight>-- {fiatCurrency}</SecondaryText>
-                        )}
-                        {!obj.enoughFunds && <WarningText>{t('INSUFFICIENT_FUNDS')}</WarningText>}
-                      </FeeButtonRight>
-                    </FeeButton>
-                  ))}
-              <FeeButton
-                key="custom"
-                value="custom"
-                isSelected={selectedOption === 'custom'}
-                onClick={handleClickFeeButton}
-                centered={!customFeeRate}
-              >
-                <FeeButtonLeft>
-                  <CustomFeeIcon size={20} color={theme.colors.tangerine} />
-                  <div>
-                    {t('CUSTOM')}
-                    {customFeeRate && (
-                      <>
-                        <SecondaryText>
-                          {getEstimatedCompletionTime(Number(customFeeRate))}
-                        </SecondaryText>
-                        <SecondaryText>
-                          <NumericFormat
-                            value={customFeeRate}
-                            displayType="text"
-                            thousandSeparator
-                            suffix=" Sats /vByte"
-                          />
-                        </SecondaryText>
-                      </>
-                    )}
-                  </div>
-                </FeeButtonLeft>
-                {customFeeRate && customTotalFee ? (
-                  <div>
-                    <div>
-                      <NumericFormat
-                        value={customTotalFee}
-                        displayType="text"
-                        thousandSeparator
-                        suffix=" Sats"
-                      />
-                    </div>
-                    <SecondaryText alignRight>
-                      {getFiatAmountString(
-                        getBtcFiatEquivalent(BigNumber(customTotalFee), BigNumber(btcFiatRate)),
-                      )}
-                    </SecondaryText>
-                  </div>
-                ) : (
-                  <div>{t('MANUAL_SETTING')}</div>
-                )}
-              </FeeButton>
-            </ButtonContainer>
-          </Container>
-          <ControlsContainer>
-            <StyledActionButton text={t('CANCEL')} onPress={handleGoBack} transparent />
-            <StyledActionButton
-              text={t('SUBMIT')}
-              disabled={!selectedOption}
-              onPress={handleClickSubmit}
+          {isBtc ? (
+            <SpeedUpBtcTransaction
+              rbfTxSummary={rbfTxSummary}
+              rbfRecommendedFees={rbfRecommendedFees}
+              selectedOption={selectedOption}
+              customFeeRate={customFeeRate}
+              customTotalFee={customTotalFee}
+              feeButtonMapping={feeButtonMapping}
+              handleGoBack={handleGoBack}
+              handleClickFeeButton={handleClickFeeButton}
+              handleClickSubmit={handleClickSubmit}
+              getEstimatedCompletionTime={getEstimatedCompletionTime}
+              isBroadcasting={isBroadcasting}
             />
-          </ControlsContainer>
+          ) : (
+            <SpeedUpStxTransaction
+              rbfTxSummary={rbfTxSummary}
+              rbfRecommendedFees={rbfRecommendedFees}
+              selectedOption={selectedOption}
+              customFeeRate={customFeeRate}
+              customTotalFee={customTotalFee}
+              feeButtonMapping={feeButtonMapping}
+              handleGoBack={handleGoBack}
+              handleClickFeeButton={handleClickFeeButton}
+              handleClickSubmit={handleClickSubmit}
+              getEstimatedCompletionTime={getEstimatedCompletionTime}
+              isBroadcasting={isBroadcasting}
+            />
+          )}
 
-          {showCustomFee && (
+          {rbfTxSummary && showCustomFee && (
             <CustomFee
               visible={showCustomFee}
               onClose={handleCloseCustomFee}
-              initialFeeRate={rbfTxSummary?.minimumRbfFeeRate.toString()!}
-              initialTotalFee={rbfTxSummary?.minimumRbfFee.toString()!}
+              minimumFeeRate={rbfTxSummary.minimumRbfFeeRate.toString()}
+              initialTotalFee={rbfTxSummary.minimumRbfFee.toString()}
               feeRate={customFeeRate}
               fee={customTotalFee}
               isFeeLoading={false}
               error={customFeeError || ''}
               calculateTotalFee={calculateTotalFee}
               onClickApply={handleApplyCustomFee}
-              minimumFeeRate={rbfTxSummary?.minimumRbfFeeRate?.toString()}
+              isBtc={isBtc}
             />
           )}
 
@@ -509,10 +413,12 @@ function SpeedUpTransactionScreen() {
             {currentStepIndex === 0 && (
               <LedgerConnectionView
                 title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
-                text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', { name: 'Bitcoin' })}
+                text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', {
+                  name: isBtc ? 'Bitcoin' : 'Stacks',
+                })}
                 titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
                 textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
-                imageDefault={ledgerConnectBtcIcon}
+                imageDefault={isBtc ? ledgerConnectBtcIcon : ledgerConnectStxIcon}
                 isConnectSuccess={isConnectSuccess}
                 isConnectFailed={isConnectFailed}
               />

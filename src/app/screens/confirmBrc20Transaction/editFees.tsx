@@ -6,6 +6,7 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
+import { handleKeyDownFeeRateInput } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -174,15 +175,6 @@ export function EditFees({
   }, [feeRateInput, onChangeFeeRate]);
 
   /* callbacks */
-  const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // only allow positive integers
-    // disable common special characters, including - and .
-    // eslint-disable-next-line no-useless-escape
-    if (e.key.match(/^[!-\/:-@[-`{-~]$/)) {
-      e.preventDefault();
-    }
-  };
-
   const handleChangeFeeRateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFeeRateInput(e.target.value);
     if (selectedOption !== 'custom') {
