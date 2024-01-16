@@ -39,7 +39,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       issues: write
     env:
@@ -55,16 +55,16 @@ jobs:
           SOURCE_BRANCH: ${{ github.head_ref }}
           TARGET_COMMITISH: ${{ github.event.pull_request.head.sha }}
         run: |
+          cd scripts
           # find the next rc tag
           gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/{owner}/{repo}/releases > releases.json
           # get $TAG from branch name, e.g. v0.25.0
-          TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
+          export TAG=$(echo $SOURCE_BRANCH | sed 's/release\/\(.*\)/\1/')
           # export $NEXT_TAG using releases.json and $TAG, e.g. v0.25.0-rc.0
-          cd scripts
-          ./find-tag.sh
+          source ./find-tag.sh
           # publish the release as prerelease rc
           gh api \
             --method POST \
@@ -126,7 +126,7 @@ jobs:
           UPLOAD_URL: ${{needs.publish-rc.outputs.upload_url}}
           FILENAME: ${{needs.publish-rc.outputs.filename}}
         with:
-          upload_url: $UPLOAD_URL
+          upload_url: ${{ env.UPLOAD_URL}}
           asset_path: build.zip
-          asset_name: $FILENAME
+          asset_name: ${{ env.FILENAME }}
           asset_content_type: application/zip
