@@ -2,8 +2,9 @@ body {
   margin: 0;
   padding: 0;
   color: #ffffff;
-  background-color: #0C0C0C;
+  background-color: #0c0c0c;
   position: relative;
+  overflow-x: hidden;
 }
 header {
   display: flex;
@@ -22,7 +23,8 @@ header h2 {
 }
 
 #app-container {
-  height: 100vh;
+  height: 100%;
+  min-height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;

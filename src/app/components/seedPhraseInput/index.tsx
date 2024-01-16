@@ -177,12 +177,10 @@ export default function SeedPhraseInput({
 
   const handlePaste = (pastedText: string) => {
     const splitPastedText = pastedText.split(' ');
-    splitPastedText.forEach((text, index) => {
-      setSeedInputValues((prevSeed) => {
-        prevSeed[index] = text;
-        return [...prevSeed];
-      });
-    });
+    setSeedInputValues((prevSeed) =>
+      // To prevent unnecessary rerenders
+      prevSeed.map((value, index) => splitPastedText[index] || value),
+    );
   };
 
   useEffect(() => {
