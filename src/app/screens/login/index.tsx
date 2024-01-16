@@ -6,7 +6,6 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useSpring } from '@react-spring/web';
 import MigrationConfirmation from '@screens/migrationConfirmation';
-import { SettingsNetwork } from '@secretkeylabs/xverse-core';
 import { ChangeNetworkAction } from '@stores/wallet/actions/actionCreators';
 import { initialWalletState } from '@stores/wallet/reducer';
 import { addMinutes } from 'date-fns';
@@ -143,7 +142,7 @@ function Login(): JSX.Element {
       ChangeNetworkAction({
         ...network,
         fallbackBtcApiUrl: initialWalletState.network.fallbackBtcApiUrl,
-      } as unknown as SettingsNetwork),
+      }),
     );
   }
 
