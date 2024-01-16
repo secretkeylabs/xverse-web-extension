@@ -185,10 +185,11 @@ function SpeedUpTransactionScreen() {
         return;
       }
 
-      toast.error('This transaction has already been confirmed in a microblock.');
+      toast.error('This transaction has already been confirmed in a block.');
       return;
     } catch (err: any) {
       console.error(err);
+      toast.error('Failed to broadcast transaction.');
     } finally {
       setIsBroadcasting(false);
     }
