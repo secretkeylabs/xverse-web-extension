@@ -93,7 +93,7 @@ function AccountList(): JSX.Element {
   return (
     <Container>
       <div>
-        <TopRow title="" onClick={handleBackButtonClick} />
+        <TopRow onClick={handleBackButtonClick} />
         <AccountContainer>
           <Title>{t('TITLE')}</Title>
           {displayedAccountsList.map((account) => (

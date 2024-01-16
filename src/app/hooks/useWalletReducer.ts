@@ -369,7 +369,18 @@ const useWalletReducer = () => {
   };
 
   const renameAccount = async (updatedAccount: Account) => {
-    dispatch(renameAccountAction(updatedAccount));
+    const newAccountsList = accountsList.map((account) =>
+      account.accountType === updatedAccount.accountType && account.id === updatedAccount.id
+        ? updatedAccount
+        : account,
+    );
+    const newSelectedAccount =
+      selectedAccount?.accountType === updatedAccount.accountType &&
+      selectedAccount?.id === updatedAccount.id
+        ? { ...selectedAccount, accountName: updatedAccount.accountName }
+        : selectedAccount;
+
+    dispatch(renameAccountAction(newAccountsList, newSelectedAccount));
   };
 
   return {

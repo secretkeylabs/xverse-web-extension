@@ -228,7 +228,8 @@ export interface SetWalletUnlocked {
 
 export interface RenameAccount {
   type: typeof RenameAccountKey;
-  updatedAccount: Account;
+  accountsList: Account[];
+  selectedAccount: Account | null;
 }
 
 export type WalletActions =

@@ -147,7 +147,7 @@ export default function CoinDashboard() {
 
   return (
     <>
-      <TopRow title="" onClick={handleBack} />
+      <TopRow onClick={handleBack} />
       <Container>
         <CoinHeader coin={coin as CurrencyTypes} fungibleToken={ft || brc20Ft} />
         {ft && (
