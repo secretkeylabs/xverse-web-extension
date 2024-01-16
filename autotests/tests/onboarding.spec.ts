@@ -22,6 +22,16 @@ test.describe('Onboarding', () => {
       await onboarding.buttonNext.click();
       await onboarding.buttonNext.click();
       await onboarding.buttonContinue.click();
+      await onboarding.linkTOS.click();
+      await context.waitForEvent('page');
+      let newPage = context.pages()[2];
+      await newPage.waitForURL('https://www.xverse.app/terms');
+      await newPage.close();
+      await onboarding.linkPrivacy.click();
+      await context.waitForEvent('page');
+      newPage = context.pages()[2];
+      await newPage.waitForURL('https://www.xverse.app/privacy');
+      await newPage.close();
       await onboarding.buttonAccept.click();
     });
     await test.step('backup wallet and verify seed phrase', async () => {
@@ -40,8 +50,9 @@ test.describe('Onboarding', () => {
       await onboarding.buttonContinue.click();
     });
     await test.step('verify wallet is created successfully', async () => {
-      await onboarding.page.getByText(data.walletCreatedTitle).waitFor();
-      await onboarding.page.getByText(data.walletCreatedSubtitle).waitFor();
+      await onboarding.page.getByText(data.walletCreatedTitle, { exact: true }).waitFor();
+      await onboarding.page.getByText(data.walletCreatedSubtitle, { exact: true }).waitFor();
+      await expect(onboarding.instruction).toBeVisible();
       await onboarding.buttonCloseTab.click();
       expect(context.pages()).toHaveLength(1);
     });
@@ -59,6 +70,16 @@ test.describe('Onboarding', () => {
       await onboarding.buttonNext.click();
       await onboarding.buttonNext.click();
       await onboarding.buttonContinue.click();
+      await onboarding.linkTOS.click();
+      await context.waitForEvent('page');
+      let newPage = context.pages()[2];
+      await newPage.waitForURL('https://www.xverse.app/terms');
+      await newPage.close();
+      await onboarding.linkPrivacy.click();
+      await context.waitForEvent('page');
+      newPage = context.pages()[2];
+      await newPage.waitForURL('https://www.xverse.app/privacy');
+      await newPage.close();
       await onboarding.buttonAccept.click();
     });
     await test.step('restore wallet with valid seed phrase', async () => {
@@ -75,8 +96,9 @@ test.describe('Onboarding', () => {
       await onboarding.buttonContinue.click();
     });
     await test.step('verify wallet is restored successfully', async () => {
-      await onboarding.page.getByText(data.walletRestoredTitle).waitFor();
-      await onboarding.page.getByText(data.walletRestoredSubtitle).waitFor();
+      await onboarding.page.getByText(data.walletRestoredTitle, { exact: true }).waitFor();
+      await onboarding.page.getByText(data.walletRestoredSubtitle, { exact: true }).waitFor();
+      await expect(onboarding.instruction).toBeVisible();
       await onboarding.buttonCloseTab.click();
       expect(context.pages()).toHaveLength(1);
     });

@@ -19,11 +19,13 @@ export default class Onboarding {
 
   readonly inputPassword: Locator;
 
-  readonly title: Locator;
-
-  readonly subtitle: Locator;
-
   readonly buttonCloseTab: Locator;
+
+  readonly linkTOS: Locator;
+
+  readonly linkPrivacy: Locator;
+
+  readonly instruction: Locator;
 
   constructor(readonly page: Page) {
     this.buttonNext = page.getByRole('button', { name: 'Next' });
@@ -34,10 +36,11 @@ export default class Onboarding {
     this.buttonShowSeed = page.getByRole('button', { name: 'Show' });
     this.textSeedWords = page.locator('p[class^="SeedWord"]');
     this.header = page.locator('h3[class^="Heading"]');
-    this.inputPassword = page.locator('input[type="password"]');
-    this.title = page.locator('h1[class^="Title"]');
-    this.subtitle = page.locator('h3[class^="Subtitle"]');
+    this.inputPassword = page.getByRole('textbox');
     this.buttonCloseTab = page.getByRole('button', { name: 'Close this tab' });
+    this.linkTOS = page.getByRole('link', { name: 'Terms of Service' });
+    this.linkPrivacy = page.getByRole('link', { name: 'Privacy Policy' });
+    this.instruction = page.locator('div[class^="InstructionsContainer"]');
   }
 
   // id starts from 0
