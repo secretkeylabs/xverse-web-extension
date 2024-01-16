@@ -12,7 +12,7 @@ const RowContainer = styled.div((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  marginTop: props.theme.spacing(11),
+  marginTop: props.theme.spacing(8),
 }));
 
 const CoinContainer = styled.div({
