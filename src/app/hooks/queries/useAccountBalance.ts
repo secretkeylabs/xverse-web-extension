@@ -1,4 +1,3 @@
-import { delay } from '@common/utils/ledger';
 import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -14,9 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { PAGINATION_LIMIT } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 
-// fetch as user scrolls and cache it
-
-const useAccountBalances = (accounts: Account[]) => {
+const useAccountBalance = (account: Account | null, shouldFetch: boolean) => {
   const btcClient = useBtcClient();
   const stacksNetworkInstance = useNetworkSelector();
   const { btcFiatRate, stxBtcRate } = useWalletSelector();
@@ -40,40 +37,26 @@ const useAccountBalances = (accounts: Account[]) => {
   };
 
   const fetchBalances = async () => {
-    const balances = {};
+    const btcData: BtcAddressData = await btcClient.getBalance(account!.btcAddress);
+    const btcBalance = btcData.finalBalance;
 
-    accounts.slice(0, 10).forEach(async (account) => {
-      await delay(2000);
-      const btcData: BtcAddressData = await btcClient.getBalance(account.btcAddress);
-      const btcBalance = btcData.finalBalance;
+    const stxData: StxAddressData = await fetchStxAddressData(
+      account!.stxAddress,
+      stacksNetworkInstance,
+      0,
+      PAGINATION_LIMIT,
+    );
+    const stxBalance = stxData.balance.toNumber();
 
-      // TODO: Uncomment this code when the Hiro API rate limit is handled
-      // const stxData: StxAddressData = await fetchStxAddressData(
-      //   account.stxAddress,
-      //   stacksNetworkInstance,
-      //   0,
-      //   PAGINATION_LIMIT,
-      // );
-      // const stxBalance = stxData.balance.toNumber();
-      const stxBalance = 0;
-
-      balances[account.id] = calculateTotalBalance(btcBalance, stxBalance);
-    });
-
-    return balances;
+    return calculateTotalBalance(btcBalance, stxBalance);
   };
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['accounts-balances'],
+  return useQuery({
+    queryKey: ['account-balance', account?.btcAddress],
     queryFn: fetchBalances,
     staleTime: 5 * 60 * 1000, // 5 mins
+    enabled: !!account && shouldFetch,
   });
-
-  return {
-    data,
-    isLoading,
-    error,
-  };
 };
 
-export default useAccountBalances;
+export default useAccountBalance;

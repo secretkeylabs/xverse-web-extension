@@ -3,6 +3,7 @@ import BarLoader from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
@@ -180,14 +181,14 @@ function AccountRow({
   onAccountSelected,
   isAccountListView = false,
   disabledAccountSelect = false,
-  totalBalance,
+  shouldFetch = false,
 }: {
   account: Account | null;
   isSelected: boolean;
   onAccountSelected: (account: Account, goBack?: boolean) => void;
   isAccountListView?: boolean;
   disabledAccountSelect?: boolean;
-  totalBalance?: string;
+  shouldFetch?: boolean;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
@@ -207,6 +208,7 @@ function AccountRow({
     { top: string; left: string } | undefined
   >();
   const { removeLedgerAccount, renameAccount, updateLedgerAccounts } = useWalletReducer();
+  const { data: totalBalance } = useAccountBalance(account, shouldFetch);
 
   useEffect(
     () => () => {
