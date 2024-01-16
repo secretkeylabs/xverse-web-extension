@@ -14,13 +14,18 @@ const rootPersistConfig = {
 };
 
 const migrations = {
-  2: (state: WalletState) => ({
-    ...state,
-    network: {
-      ...state.network,
-      fallbackBtcApiUrl: initialWalletState.network.fallbackBtcApiUrl,
-    },
-  }),
+  2: (state: WalletState) => {
+    if (state.network.type === 'Testnet') {
+      return state;
+    }
+    return {
+      ...state,
+      network: {
+        ...state.network,
+        fallbackBtcApiUrl: initialWalletState.network.fallbackBtcApiUrl,
+      },
+    };
+  },
 };
 
 export const WalletPersistConfig: PersistConfig<WalletState> = {
