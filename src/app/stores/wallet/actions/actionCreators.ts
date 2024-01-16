@@ -274,9 +274,13 @@ export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletU
   };
 }
 
-export function renameAccountAction(updatedAccount: Account): actions.RenameAccount {
+export function renameAccountAction(
+  accountsList: Account[],
+  selectedAccount: Account | null,
+): actions.RenameAccount {
   return {
     type: actions.RenameAccountKey,
-    updatedAccount,
+    accountsList,
+    selectedAccount,
   };
 }

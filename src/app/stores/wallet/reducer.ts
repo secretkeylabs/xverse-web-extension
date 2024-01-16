@@ -63,7 +63,7 @@ import {
  *
  * TODO refactor most of these values out of the store and use query cache instead
  */
-const initialWalletState: WalletState = {
+export const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',
   ordinalsAddress: '',
@@ -267,17 +267,8 @@ const walletReducer = (
     case RenameAccountKey:
       return {
         ...state,
-        accountsList: state.accountsList.map((account) =>
-          account.accountType === action.updatedAccount.accountType &&
-          account.id === action.updatedAccount.id
-            ? action.updatedAccount
-            : account,
-        ),
-        selectedAccount:
-          state.selectedAccount?.accountType === action.updatedAccount.accountType &&
-          state.selectedAccount?.id === action.updatedAccount.id
-            ? { ...state.selectedAccount, accountName: action.updatedAccount.accountName }
-            : state.selectedAccount,
+        accountsList: action.accountsList,
+        selectedAccount: action.selectedAccount,
       };
     default:
       return state;

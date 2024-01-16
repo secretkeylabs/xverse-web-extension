@@ -78,9 +78,11 @@ function NodeInput({
       </NodeInputHeader>
       <InputContainer>
         <Input onChange={onChange} value={value} />
-        <Button onClick={onClear}>
-          <XCircle size={18} weight="fill" color={theme.colors.white_200} />
-        </Button>
+        {value && (
+          <Button onClick={onClear}>
+            <XCircle size={18} weight="fill" color={theme.colors.white_200} />
+          </Button>
+        )}
       </InputContainer>
       <InputFeedback variant="danger" message={error} />
     </div>

@@ -39,7 +39,7 @@ const AnimatedBackButton = styled(BackButton)`
 `;
 
 interface Props {
-  title: string;
+  title?: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   showBackButton?: boolean;
   className?: string;
@@ -53,7 +53,7 @@ function TopRow({ title, onClick, showBackButton = true, className }: Props) {
           <img src={ArrowLeft} alt="back button" />
         </AnimatedBackButton>
       )}
-      <HeaderText>{title}</HeaderText>
+      {title && <HeaderText>{title}</HeaderText>}
     </TopSectionContainer>
   );
 }

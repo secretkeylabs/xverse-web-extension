@@ -1,4 +1,5 @@
 import { Bicycle, CarProfile, RocketLaunch } from '@phosphor-icons/react';
+import { ErrorCodes } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import { MoonLoader } from 'react-spinners';
@@ -54,7 +55,6 @@ const StyledHeading = styled(StyledP)`
 `;
 
 const StyledSubText = styled(StyledP)`
-  color: ${(props) => props.theme.colors.white_200};
   margin-bottom: ${(props) => props.theme.space.xxs};
 `;
 
@@ -75,9 +75,19 @@ interface FeeItemProps {
   fiat: string | JSX.Element;
   selected: boolean;
   onClick?: () => void;
+  error?: string;
 }
 
-function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }: FeeItemProps) {
+function FeeItem({
+  priority,
+  time,
+  feeRate,
+  totalFee,
+  fiat,
+  selected,
+  error,
+  onClick,
+}: FeeItemProps) {
   const { t } = useTranslation('translation');
   const getIcon = () => {
     switch (priority) {
@@ -105,25 +115,50 @@ function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }:
     }
   };
 
+  const getErrorMessage = (btcError: string) => {
+    if (
+      Number(btcError) === ErrorCodes.InSufficientBalance ||
+      Number(btcError) === ErrorCodes.InSufficientBalanceWithTxFee
+    ) {
+      return t('SEND.ERRORS.INSUFFICIENT_BALANCE');
+    }
+    return btcError;
+  };
+
   return (
-    <FeeItemContainer onClick={onClick} isSelected={selected} disabled={!totalFee}>
+    <FeeItemContainer onClick={onClick} isSelected={selected} disabled={!totalFee || !!error}>
       <IconContainer>{getIcon()}</IconContainer>
       <TextsContainer>
         <ColumnsTexts>
           <StyledHeading typography="body_medium_m" color="white_0">
             {getLabel()}
           </StyledHeading>
-          <StyledSubText typography="body_medium_s">{time}</StyledSubText>
-          <StyledSubText typography="body_medium_s">{`${feeRate} Sats/ vByte`}</StyledSubText>
+          <StyledSubText typography="body_medium_s" color="white_200">
+            {time}
+          </StyledSubText>
+          <StyledSubText
+            typography="body_medium_s"
+            color="white_200"
+          >{`${feeRate} Sats/ vByte`}</StyledSubText>
         </ColumnsTexts>
-        {totalFee ? (
-          <EndColumnTexts>
+
+        <EndColumnTexts>
+          {totalFee && (
             <StyledHeading typography="body_medium_m" color="white_0">
               {`${totalFee} Sats`}
             </StyledHeading>
-            <StyledSubText typography="body_medium_s">{fiat}</StyledSubText>
-          </EndColumnTexts>
-        ) : (
+          )}
+          <StyledSubText typography="body_medium_s" color="white_200">
+            {fiat}
+          </StyledSubText>
+          {error && (
+            <StyledSubText typography="body_medium_s" color="danger_medium">
+              {getErrorMessage(error)}
+            </StyledSubText>
+          )}
+        </EndColumnTexts>
+
+        {!totalFee && !error && (
           <LoaderContainer>
             <MoonLoader color="white" size={20} />
           </LoaderContainer>
