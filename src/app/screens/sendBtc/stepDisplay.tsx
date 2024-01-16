@@ -17,6 +17,7 @@ type StepDisplayProps = {
   setFeeRate: (feeRate: string) => void;
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
+  getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number>;
   amountEditable: boolean;
   onConfirm: () => void;
   onBack: () => void;
@@ -36,6 +37,7 @@ function StepDisplay({
   setFeeRate,
   sendMax,
   setSendMax,
+  getFeeForFeeRate,
   amountEditable,
   onConfirm,
   onBack,
@@ -51,6 +53,7 @@ function StepDisplay({
           recipientAddress={recipientAddress}
           setRecipientAddress={setRecipientAddress}
           onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, amountEditable))}
+          isLoading={isLoading}
         />
       );
     case Step.SelectAmount:
@@ -62,6 +65,8 @@ function StepDisplay({
           setFeeRate={setFeeRate}
           sendMax={sendMax}
           setSendMax={setSendMax}
+          fee={summary?.fee.toString()}
+          getFeeForFeeRate={getFeeForFeeRate}
           dustFiltered={summary?.dustFiltered ?? false}
           onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
           isLoading={isLoading}
@@ -75,12 +80,14 @@ function StepDisplay({
           outputs={summary!.outputs}
           feeOutput={summary!.feeOutput}
           isLoading={false}
-          isSubmitting={false}
           confirmText={t('CONFIRM')}
           cancelText={t('CANCEL')}
           onBackClick={onBack}
           onCancel={onCancel}
           onConfirm={onConfirm}
+          getFeeForFeeRate={getFeeForFeeRate}
+          onFeeRateSet={(newFeeRate) => setFeeRate(newFeeRate.toString())}
+          isSubmitting={false}
           isBroadcast
           hideBottomBar
         />

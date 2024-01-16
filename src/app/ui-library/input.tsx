@@ -18,7 +18,7 @@ const TitleContainer = styled.div`
 
 const Title = styled.div`
   ${(props) => props.theme.typography.body_medium_m}
-  color: ${(props) => props.theme.colors.white_0};
+  color: ${(props) => props.theme.colors.white_200};
 `;
 
 const InfoText = styled.div`
@@ -218,7 +218,7 @@ function Input({
           {complications}
         </ComplicationsContainer>
       </InputContainer>
-      <SubText>{subText}</SubText>
+      {subText && <SubText>{subText}</SubText>}
       <Feedback>
         {feedback?.map((f) => (
           <InputFeedback key={f.message} message={f.message} variant={f.variant} />

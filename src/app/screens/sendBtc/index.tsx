@@ -48,13 +48,14 @@ function SendBtcScreen() {
 
   const location = useLocation();
 
-  // TODO: remove amount and address defaults
+  // TODO: remove amount and address defaults, set fee rate to regular
+  // TODO: crashes if amount is set to 1
   const [recipientAddress, setRecipientAddress] = useState(
     location.state?.recipientAddress || '2N3J2uER8xjdNCpBfaA7K4kWpg9EbJfwfUu',
   );
   const [isLoading, setIsLoading] = useState(false);
   const [amountSats, setAmountSats] = useState(location.state?.amount || '10000');
-  const [feeRate, setFeeRate] = useState('1');
+  const [feeRate, setFeeRate] = useState('10');
   const [sendMax, setSendMax] = useState(false);
   const amountEditable = location.state?.disableAmountEdit ?? true;
 
@@ -113,6 +114,30 @@ function SendBtcScreen() {
     }
   };
 
+  const calculateFeeForFeeRate = async (
+    desiredFeeRate: number,
+    useEffectiveFeeRate?: boolean,
+  ): Promise<number> => {
+    if (!transaction) {
+      return 0;
+    }
+
+    transaction.feeRate = desiredFeeRate;
+
+    try {
+      const tempSummary = await transaction.getSummary({ useEffectiveFeeRate });
+      return Number(tempSummary.fee);
+    } finally {
+      transaction.feeRate = +feeRate;
+    }
+  };
+
+  const handleSubmit = async () => {
+    // TODO: validate, set loading, error handling, redirect to txn confirmation screen
+    await transaction?.broadcast();
+    navigate('/');
+  };
+
   return (
     <>
       <Container>
@@ -136,14 +161,11 @@ function SendBtcScreen() {
           setFeeRate={setFeeRate}
           sendMax={sendMax}
           setSendMax={setSendMax}
+          getFeeForFeeRate={calculateFeeForFeeRate}
           amountEditable={amountEditable}
           onBack={handleBackButtonClick}
           onCancel={handleCancel}
-          onConfirm={async () => {
-            // TODO:
-            await transaction?.broadcast();
-            navigate('/');
-          }}
+          onConfirm={handleSubmit}
           isLoading={isLoading}
           summary={summary}
         />

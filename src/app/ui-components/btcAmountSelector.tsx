@@ -2,6 +2,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
   btcToSats,
+  currencySymbolMap,
   getBtcFiatEquivalent,
   getFiatBtcEquivalent,
   satsToBtc,
@@ -10,6 +11,7 @@ import Input from '@ui-library/input';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 const BalanceText = styled.span`
@@ -51,6 +53,11 @@ const btcInputValidator = /^[0-9]+[.]?[0-9]{0,8}$/;
 const fiatInputExtractor = /[0-9]+[.]?[0-9]{0,2}/;
 const fiatInputValidator = /^[0-9]+[.]?[0-9]{0,2}$/;
 
+const satsToBtcString = (num: BigNumber) =>
+  satsToBtc(num)
+    .toFixed(8)
+    .replace(/\.?0+$/, '');
+
 type Props = {
   amountSats: string;
   setAmountSats: (amount: string) => void;
@@ -66,20 +73,17 @@ function AmountSelector({
   setSendMax,
   disabled = false,
 }: Props) {
-  BigNumber.config({ EXPONENTIAL_AT: 8 });
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { btcBalance: btcBalanceSats, btcFiatRate, fiatCurrency } = useWalletSelector();
 
-  const [amountDisplay, setAmountDisplay] = useState(
-    satsToBtc(new BigNumber(amountSats)).toString(),
-  );
+  const [amountDisplay, setAmountDisplay] = useState(satsToBtcString(new BigNumber(amountSats)));
   const [useBtcValue, setUseBtcValue] = useState(true);
 
   useEffect(() => {
     if (!sendMax) return;
 
     const amountToDisplay = useBtcValue
-      ? satsToBtc(new BigNumber(amountSats)).toString()
+      ? satsToBtcString(new BigNumber(amountSats))
       : getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate))
           .toNumber()
           .toFixed(2);
@@ -91,12 +95,12 @@ function AmountSelector({
 
   const btcBalance = new BigNumber(btcBalanceSats);
   const balance = useBtcValue
-    ? satsToBtc(btcBalance).toString()
+    ? satsToBtcString(btcBalance)
     : getBtcFiatEquivalent(btcBalance, new BigNumber(btcFiatRate)).toFixed(2);
 
   const sendAmountConverted = useBtcValue
     ? getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate)).toNumber().toFixed(2)
-    : satsToBtc(new BigNumber(amountSats)).toString();
+    : satsToBtcString(new BigNumber(amountSats));
 
   const handleAmountChange = (newAmount: string) => {
     const isValidInput = inputValidator.test(newAmount);
@@ -134,7 +138,7 @@ function AmountSelector({
 
     if (shouldUseBtcValue) {
       // convert outer sats amount to btc
-      setAmountDisplay(satsToBtc(new BigNumber(amountSats)).toString());
+      setAmountDisplay(satsToBtcString(new BigNumber(amountSats)));
     } else {
       // convert btc to fiat
       const fiatAmount = getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate))
@@ -171,16 +175,34 @@ function AmountSelector({
       onBlur={handleBlur}
       placeholder="0"
       infoPanel={
-        <>
-          <BalanceText>{t('BALANCE')} </BalanceText>
-          {balance} {useBtcValue ? 'BTC' : fiatCurrency}
-        </>
+        <NumericFormat
+          value={balance}
+          displayType="text"
+          thousandSeparator
+          prefix={useBtcValue ? '' : `~${currencySymbolMap[fiatCurrency]}`}
+          renderText={(value: string) => (
+            <div>
+              <BalanceText>{t('BALANCE')} </BalanceText> {value}{' '}
+              {useBtcValue ? 'BTC' : fiatCurrency}
+            </div>
+          )}
+        />
       }
       complications={
         <>
           <ConvertComplication onClick={handleUseBtcValueChange}>
-            {useBtcValue ? '~' : ''}
-            {sendAmountConverted} {useBtcValue ? fiatCurrency : 'BTC'} <ArrowsDownUp />
+            <NumericFormat
+              value={sendAmountConverted}
+              displayType="text"
+              thousandSeparator
+              prefix={useBtcValue ? `~${currencySymbolMap[fiatCurrency]}` : ''}
+              renderText={(value: string) => (
+                <div>
+                  {value} {useBtcValue ? fiatCurrency : 'BTC'}
+                </div>
+              )}
+            />
+            <ArrowsDownUp />
           </ConvertComplication>
           <VertRule />
           <MaxButton $sendMax={sendMax} $disabled={disabled} onClick={handleMaxClick}>

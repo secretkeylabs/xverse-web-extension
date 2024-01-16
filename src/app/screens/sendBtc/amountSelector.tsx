@@ -1,6 +1,10 @@
+import useWalletSelector from '@hooks/useWalletSelector';
+import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import BtcAmountSelector from '@ui-components/btcAmountSelector';
+import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
+import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -23,6 +27,8 @@ type Props = {
   setFeeRate: (feeRate: string) => void;
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
+  fee: string | undefined;
+  getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number>;
   onNext: () => void;
   dustFiltered: boolean;
   isLoading?: boolean;
@@ -35,16 +41,23 @@ function AmountSelector({
   setFeeRate,
   sendMax,
   setSendMax,
+  fee,
+  getFeeForFeeRate,
   onNext,
   isLoading,
   dustFiltered,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  const { btcFiatRate, fiatCurrency } = useWalletSelector();
 
   const handleNext = () => {
     // TODO: validate amount - get fee summary from enhanced txn and ensure amount is payable
+    // TODO: Insufficient funds error handling
     onNext();
   };
+
+  const satsToFiat = (sats: string) =>
+    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
 
   return (
     <Container>
@@ -56,8 +69,17 @@ function AmountSelector({
           setSendMax={setSendMax}
           disabled={isLoading}
         />
-        Fee Rate
-        <input type="text" value={feeRate} onChange={(e) => setFeeRate(e.target.value)} />
+        <SelectFeeRate
+          fee={fee}
+          feeUnits="Sats"
+          feeRate={feeRate}
+          feeRateUnits="sats/vB"
+          setFeeRate={setFeeRate}
+          baseToFiat={satsToFiat}
+          fiatUnit={fiatCurrency}
+          getFeeForFeeRate={getFeeForFeeRate}
+          isLoading={isLoading}
+        />
         {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}
       </div>
       <Buttons>
