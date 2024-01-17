@@ -182,6 +182,7 @@ function AccountRow({
   isAccountListView = false,
   disabledAccountSelect = false,
   shouldFetch = false,
+  fetchBalance,
 }: {
   account: Account | null;
   isSelected: boolean;
@@ -189,6 +190,7 @@ function AccountRow({
   isAccountListView?: boolean;
   disabledAccountSelect?: boolean;
   shouldFetch?: boolean;
+  fetchBalance?: (account: Account | null) => Promise<string | undefined>;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
@@ -208,9 +210,14 @@ function AccountRow({
     { top: string; left: string } | undefined
   >();
   const { removeLedgerAccount, renameAccount, updateLedgerAccounts } = useWalletReducer();
-  useAccountBalance(account, shouldFetch);
 
   const totalBalance = accountBalances[account?.btcAddress ?? ''];
+
+  useEffect(() => {
+    if (fetchBalance && shouldFetch && !totalBalance) {
+      fetchBalance(account);
+    }
+  }, [shouldFetch, totalBalance]);
 
   useEffect(
     () => () => {

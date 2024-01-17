@@ -10,32 +10,19 @@ import {
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
-import { useQuery } from '@tanstack/react-query';
 import { PAGINATION_LIMIT } from '@utils/constants';
 import BigNumber from 'bignumber.js';
-import { useCallback, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-const debounce = <F extends (...args: any[]) => any>(func: F, waitFor: number) => {
-  let timeoutId: NodeJS.Timeout | null = null;
-
-  return (...args: Parameters<F>): Promise<ReturnType<F>> =>
-    new Promise((resolve) => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-
-      timeoutId = setTimeout(() => resolve(func(...args)), waitFor);
-    });
-};
-
-const useAccountBalance = (account: Account | null, shouldFetch: boolean) => {
+const useAccountBalance = () => {
   const btcClient = useBtcClient();
   const stacksNetworkInstance = useNetworkSelector();
-  const { btcFiatRate, stxBtcRate, accountBalances } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useWalletSelector();
   const dispatch = useDispatch();
-
-  const oldFetchedBalance = accountBalances[account?.btcAddress || ''];
+  const queue = useRef<Account[]>([]);
+  const [isProcessingQueue, setIsProcessingQueue] = useState(false);
+  const [queueLength, setQueueLength] = useState(0);
 
   const calculateTotalBalance = (btcBalance?: number, stxBalance?: number): string => {
     let totalBalance = BigNumber(0);
@@ -55,7 +42,7 @@ const useAccountBalance = (account: Account | null, shouldFetch: boolean) => {
     return totalBalance.toNumber().toFixed(2);
   };
 
-  const fetchBalances = async () => {
+  const fetchBalances = async (account: Account | null) => {
     if (!account) {
       return;
     }
@@ -84,21 +71,36 @@ const useAccountBalance = (account: Account | null, shouldFetch: boolean) => {
     return totalBalance;
   };
 
-  const debouncedFetchBalances = useCallback(debounce(fetchBalances, 2000), [account, shouldFetch]);
+  const processQueue = async () => {
+    if (queue.current.length === 0) {
+      setIsProcessingQueue(false);
+      return;
+    }
+
+    const account = queue.current.shift() || null;
+    await fetchBalances(account);
+    setQueueLength(queue.current.length);
+
+    setTimeout(processQueue, 1000);
+  };
 
   useEffect(() => {
-    if (!account || !shouldFetch || !!oldFetchedBalance) return;
+    if (!isProcessingQueue && queue.current.length > 0) {
+      setIsProcessingQueue(true);
+      processQueue();
+    }
+  }, [queueLength]);
 
-    debouncedFetchBalances();
-  }, [debouncedFetchBalances]);
+  const enqueueFetchBalances = (account: Account) => {
+    queue.current.push(account);
+    setQueueLength(queue.current.length);
+    if (!isProcessingQueue) {
+      setIsProcessingQueue(true);
+      processQueue();
+    }
+  };
 
-  return useQuery({
-    queryKey: ['account-balance', account?.btcAddress],
-    queryFn: fetchBalances,
-    staleTime: 5 * 60 * 1000, // 5 mins
-    enabled: !!account && shouldFetch && !oldFetchedBalance,
-    retryDelay: 10000, // 10 secs
-  });
+  return { enqueueFetchBalances };
 };
 
 export default useAccountBalance;
