@@ -4,6 +4,7 @@ import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
+import Spinner from '@ui-library/spinner';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -187,6 +188,8 @@ function FeeSelectPopup({
       };
 
       const onApply = () => {
+        if (!hasSufficientFunds) return;
+
         setFeeRate(customValue);
         onClose();
       };
@@ -201,26 +204,36 @@ function FeeSelectPopup({
             hideClear
           />
           <SummaryContainer>
-            <TotalFeeContainer>
-              <StyledP typography="body_medium_m" color="white_200">
-                {t('TRANSACTION_SETTING.TOTAL_FEE')}:
+            {customValue && hasSufficientFunds && !isCalculatingTotalFee && (
+              <>
+                <TotalFeeContainer>
+                  <StyledP typography="body_medium_m" color="white_200">
+                    {t('TRANSACTION_SETTING.TOTAL_FEE')}:
+                  </StyledP>
+                  <StyledP typography="body_medium_m" color="white_0">
+                    {customValueTotalFee} {feeUnits}
+                  </StyledP>
+                </TotalFeeContainer>
+                <NumericFormat
+                  value={customValueTotalFeeFiat}
+                  displayType="text"
+                  thousandSeparator
+                  prefix={`~ ${currencySymbolMap[fiatUnit]}`}
+                  suffix={` ${fiatUnit}`}
+                  renderText={(value: string) => (
+                    <StyledP typography="body_medium_m" color="white_200">
+                      {value}
+                    </StyledP>
+                  )}
+                />
+              </>
+            )}
+            {customValue && !hasSufficientFunds && (
+              <StyledP typography="body_medium_m" color="danger_light">
+                {t('TRANSACTION_SETTING.INSUFFICIENT_FUNDS')}
               </StyledP>
-              <StyledP typography="body_medium_m" color="white_0">
-                {customValueTotalFee} {feeUnits}
-              </StyledP>
-            </TotalFeeContainer>
-            <NumericFormat
-              value={customValueTotalFeeFiat}
-              displayType="text"
-              thousandSeparator
-              prefix={`~ ${currencySymbolMap[fiatUnit]}`}
-              suffix={` ${fiatUnit}`}
-              renderText={(value: string) => (
-                <StyledP typography="body_medium_m" color="white_200">
-                  {value}
-                </StyledP>
-              )}
-            />
+            )}
+            {isCalculatingTotalFee && <Spinner />}
           </SummaryContainer>
           <Buttons>
             <Button
@@ -228,7 +241,11 @@ function FeeSelectPopup({
               onClick={() => setUseCustom(false)}
               variant="secondary"
             />
-            <Button title={t('COMMON.APPLY')} onClick={onApply} disabled={!hasSufficientFunds} />
+            <Button
+              title={t('COMMON.APPLY')}
+              onClick={onApply}
+              disabled={!hasSufficientFunds || !customValue}
+            />
           </Buttons>
         </>
       );
