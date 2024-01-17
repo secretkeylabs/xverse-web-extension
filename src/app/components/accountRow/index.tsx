@@ -194,7 +194,7 @@ function AccountRow({
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
-  const { accountsList, ledgerAccountsList, fiatCurrency } = useWalletSelector();
+  const { accountsList, ledgerAccountsList, fiatCurrency, accountBalances } = useWalletSelector();
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
@@ -208,7 +208,9 @@ function AccountRow({
     { top: string; left: string } | undefined
   >();
   const { removeLedgerAccount, renameAccount, updateLedgerAccounts } = useWalletReducer();
-  const { data: totalBalance } = useAccountBalance(account, shouldFetch);
+  useAccountBalance(account, shouldFetch);
+
+  const totalBalance = accountBalances[account?.btcAddress ?? ''];
 
   useEffect(
     () => () => {

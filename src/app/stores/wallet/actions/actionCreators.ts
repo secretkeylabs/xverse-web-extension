@@ -284,3 +284,14 @@ export function renameAccountAction(
     selectedAccount,
   };
 }
+
+export function setAccountBalanceAction(
+  btcAddress: string,
+  totalBalance: string,
+): actions.SetAccountBalance {
+  return {
+    type: actions.SetAccountBalanceKey,
+    btcAddress,
+    totalBalance,
+  };
+}

@@ -38,6 +38,7 @@ export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
 export const RenameAccountKey = 'RenameAccountKey';
+export const SetAccountBalanceKey = 'SetAccountBalanceKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -83,6 +84,9 @@ export interface WalletState {
   accountName: string | undefined;
   walletLockPeriod: WalletSessionPeriods;
   isUnlocked: boolean;
+  accountBalances: {
+    [key: string]: string;
+  };
 }
 
 export interface SetWallet {
@@ -232,6 +236,12 @@ export interface RenameAccount {
   selectedAccount: Account | null;
 }
 
+export interface SetAccountBalance {
+  type: typeof SetAccountBalanceKey;
+  btcAddress: string;
+  totalBalance: string;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -259,4 +269,5 @@ export type WalletActions =
   | SetWalletLockPeriod
   | SetRareSatsNoticeDismissed
   | SetWalletUnlocked
-  | RenameAccount;
+  | RenameAccount
+  | SetAccountBalance;
