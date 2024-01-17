@@ -54,12 +54,6 @@ function AmountSelector({
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
   const { data: recommendedFees } = useBtcRecommendedFees();
 
-  const handleNext = () => {
-    // TODO: validate amount - get fee summary from enhanced txn and ensure amount is payable
-    // TODO: Insufficient funds error handling
-    onNext();
-  };
-
   const satsToFiat = (sats: string) =>
     getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
 
@@ -94,7 +88,7 @@ function AmountSelector({
       <Buttons>
         <Button
           title={hasSufficientFunds ? t('NEXT') : t('INSUFFICIENT_FUNDS')}
-          onClick={handleNext}
+          onClick={onNext}
           loading={isLoading}
           disabled={!hasSufficientFunds}
           variant={hasSufficientFunds ? undefined : 'danger'}

@@ -74,12 +74,16 @@ function StepDisplay({
         />
       );
     case Step.Confirm:
-      // TODO: ensure summary is not undefined
+      if (!summary) {
+        // this should never happen as there are gates to prevent getting to this step without a summary
+        setCurrentStep(Step.SelectAmount);
+        return null;
+      }
       return (
         <ConfirmBitcoinTransaction
-          inputs={summary!.inputs}
-          outputs={summary!.outputs}
-          feeOutput={summary!.feeOutput}
+          inputs={summary.inputs}
+          outputs={summary.outputs}
+          feeOutput={summary.feeOutput}
           isLoading={false}
           confirmText={t('CONFIRM')}
           cancelText={t('CANCEL')}
