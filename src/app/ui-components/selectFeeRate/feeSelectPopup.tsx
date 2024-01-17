@@ -230,7 +230,7 @@ function FeeSelectPopup({
             )}
             {customValue && !hasSufficientFunds && (
               <StyledP typography="body_medium_m" color="danger_light">
-                {t('TRANSACTION_SETTING.INSUFFICIENT_FUNDS')}
+                {t('SEND.INSUFFICIENT_FUNDS')}
               </StyledP>
             )}
             {isCalculatingTotalFee && <Spinner />}

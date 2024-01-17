@@ -187,7 +187,7 @@ function FeeItem({
             )}
             {!totalFee && (
               <StyledP typography="body_medium_s" color="danger_light">
-                {t('TRANSACTION_SETTING.INSUFFICIENT_FUNDS')}
+                {t('SEND.INSUFFICIENT_FUNDS')}
               </StyledP>
             )}
           </EndColumnTexts>

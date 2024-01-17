@@ -32,6 +32,7 @@ type Props = {
   getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
   onNext: () => void;
   dustFiltered: boolean;
+  hasSufficientFunds: boolean;
   isLoading?: boolean;
 };
 
@@ -47,6 +48,7 @@ function AmountSelector({
   onNext,
   isLoading,
   dustFiltered,
+  hasSufficientFunds,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
@@ -90,7 +92,13 @@ function AmountSelector({
         {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}
       </div>
       <Buttons>
-        <Button title={t('NEXT')} onClick={handleNext} loading={isLoading} />
+        <Button
+          title={hasSufficientFunds ? t('NEXT') : t('INSUFFICIENT_FUNDS')}
+          onClick={handleNext}
+          loading={isLoading}
+          disabled={!hasSufficientFunds}
+          variant={hasSufficientFunds ? undefined : 'danger'}
+        />
       </Buttons>
     </Container>
   );

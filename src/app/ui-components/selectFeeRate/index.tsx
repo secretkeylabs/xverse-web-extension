@@ -102,7 +102,7 @@ function SelectFeeRate({
           {t('TRANSACTION_SETTING.NETWORK_FEE')}
         </Label>
         <NumericFormat
-          value={fee}
+          value={fee || '-'}
           displayType="text"
           thousandSeparator
           renderText={(value: string) => (

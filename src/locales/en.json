@@ -298,7 +298,8 @@
     "SEND_BRC20_ORDINAL_TO_SELF_WARNING": "You are about to transfer BRC-20 tokens to yourself",
     "SEND_BTC_TO_SELF_WARNING": "You are about to transfer BTC to yourself",
     "YOU_ARE_TRANSFERRING_TO_YOURSELF": "You are transferring to yourself",
-    "COPYRIGHT": "© {{year}} Secret Key Labs Limited"
+    "COPYRIGHT": "© {{year}} Secret Key Labs Limited",
+    "INSUFFICIENT_FUNDS": "Insufficient funds"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -431,8 +432,7 @@
       "MEDIUM": "Medium",
       "HIGH": "High",
       "CUSTOM": "Custom"
-    },
-    "INSUFFICIENT_FUNDS": "Insufficient funds"
+    }
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",

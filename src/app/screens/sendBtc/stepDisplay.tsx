@@ -69,6 +69,7 @@ function StepDisplay({
           getFeeForFeeRate={getFeeForFeeRate}
           dustFiltered={summary?.dustFiltered ?? false}
           onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
+          hasSufficientFunds={!!summary}
           isLoading={isLoading}
         />
       );
