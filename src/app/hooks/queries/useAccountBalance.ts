@@ -84,7 +84,7 @@ const useAccountBalance = (account: Account | null, shouldFetch: boolean) => {
     return totalBalance;
   };
 
-  const debouncedFetchBalances = debounce(fetchBalances, 2000);
+  const debouncedFetchBalances = useCallback(debounce(fetchBalances, 2000), [account, shouldFetch]);
 
   useEffect(() => {
     if (!account || !shouldFetch || !!oldFetchedBalance) return;
