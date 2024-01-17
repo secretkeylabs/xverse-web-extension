@@ -299,7 +299,9 @@
     "SEND_BTC_TO_SELF_WARNING": "You are about to transfer BTC to yourself",
     "YOU_ARE_TRANSFERRING_TO_YOURSELF": "You are transferring to yourself",
     "COPYRIGHT": "© {{year}} Secret Key Labs Limited",
-    "INSUFFICIENT_FUNDS": "Insufficient funds"
+    "INSUFFICIENT_FUNDS": "Insufficient funds",
+    "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} Sats/vByte",
+    "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} Sats/vByte"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",

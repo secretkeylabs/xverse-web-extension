@@ -62,6 +62,10 @@ type Props = {
     medium?: number;
     high?: number;
   };
+  feeRateLimits?: {
+    min?: number;
+    max?: number;
+  };
 };
 
 function SelectFeeRate({
@@ -74,6 +78,7 @@ function SelectFeeRate({
   setFeeRate,
   getFeeForFeeRate,
   feeRates,
+  feeRateLimits,
   isLoading,
 }: Props) {
   const { t } = useTranslation('translation');
@@ -162,6 +167,7 @@ function SelectFeeRate({
           feeRateUnits={feeRateUnits}
           fiatUnit={fiatUnit}
           feeRates={feeRates}
+          feeRateLimits={feeRateLimits}
           onClose={() => setEditing(false)}
           baseToFiat={baseToFiat}
           setFeeRate={setFeeRate}

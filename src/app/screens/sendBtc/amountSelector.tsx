@@ -1,4 +1,4 @@
-import useBtcRecommendedFees from '@hooks/useBtcRecommendedFees';
+import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import BtcAmountSelector from '@ui-components/btcAmountSelector';
@@ -52,7 +52,7 @@ function AmountSelector({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
-  const { data: recommendedFees } = useBtcRecommendedFees();
+  const { data: recommendedFees } = useBtcFeeRate();
 
   const satsToFiat = (sats: string) =>
     getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
@@ -77,10 +77,10 @@ function AmountSelector({
           fiatUnit={fiatCurrency}
           getFeeForFeeRate={getFeeForFeeRate}
           feeRates={{
-            low: recommendedFees?.halfHourFee,
-            medium: recommendedFees?.economyFee,
-            high: recommendedFees?.fastestFee,
+            medium: recommendedFees?.regular,
+            high: recommendedFees?.priority,
           }}
+          feeRateLimits={recommendedFees?.limits}
           isLoading={isLoading}
         />
         {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}
@@ -90,7 +90,7 @@ function AmountSelector({
           title={hasSufficientFunds ? t('NEXT') : t('INSUFFICIENT_FUNDS')}
           onClick={onNext}
           loading={isLoading}
-          disabled={!hasSufficientFunds}
+          disabled={!hasSufficientFunds || +amountSats === 0}
           variant={hasSufficientFunds ? undefined : 'danger'}
         />
       </Buttons>

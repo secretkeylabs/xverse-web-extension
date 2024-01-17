@@ -52,7 +52,6 @@ function SendBtcScreen() {
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
 
   // TODO: remove amount and address defaults, set fee rate to regular
-  // TODO: crashes if amount is set to 1
   const [recipientAddress, setRecipientAddress] = useState(
     location.state?.recipientAddress || '2N3J2uER8xjdNCpBfaA7K4kWpg9EbJfwfUu',
   );
@@ -92,7 +91,6 @@ function SendBtcScreen() {
   };
 
   useEffect(() => {
-    // TODO: validate properly
     if (!recipientAddress || !amountSats || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);

@@ -85,6 +85,10 @@ type Props = {
     medium?: number;
     high?: number;
   };
+  feeRateLimits?: {
+    min?: number;
+    max?: number;
+  };
   onClose: () => void;
   baseToFiat: (base: string) => string;
   setFeeRate: (feeRate: string) => void;
@@ -97,6 +101,7 @@ function FeeSelectPopup({
   feeRateUnits,
   fiatUnit,
   feeRates,
+  feeRateLimits,
   onClose,
   baseToFiat,
   setFeeRate,
@@ -190,9 +195,24 @@ function FeeSelectPopup({
       const onApply = () => {
         if (!hasSufficientFunds) return;
 
-        setFeeRate(customValue);
+        setFeeRate(`${+customValue}`);
         onClose();
       };
+      if (feeRateLimits) feeRateLimits.max = 10;
+      const rateTooLow = !!feeRateLimits?.min && Number(customValue) < feeRateLimits.min;
+      const rateTooHigh = !!feeRateLimits?.max && Number(customValue) > feeRateLimits.max;
+
+      const errorText =
+        // eslint-disable-next-line eqeqeq
+        +customValue == 0
+          ? undefined
+          : !hasSufficientFunds
+          ? t('SEND.INSUFFICIENT_FUNDS')
+          : rateTooLow
+          ? t('SEND.RATE_TOO_LOW', { minFee: feeRateLimits?.min })
+          : rateTooHigh
+          ? t('SEND.RATE_TOO_HIGH', { maxFee: feeRateLimits?.max })
+          : undefined;
 
       return (
         <>
@@ -228,13 +248,13 @@ function FeeSelectPopup({
                 />
               </>
             )}
-            {customValue && !hasSufficientFunds && (
-              <StyledP typography="body_medium_m" color="danger_light">
-                {t('SEND.INSUFFICIENT_FUNDS')}
-              </StyledP>
-            )}
             {isCalculatingTotalFee && <Spinner />}
           </SummaryContainer>
+          {errorText && (
+            <StyledP typography="body_medium_m" color="danger_light">
+              {errorText}
+            </StyledP>
+          )}
           <Buttons>
             <Button
               title={t('COMMON.BACK')}
@@ -244,7 +264,7 @@ function FeeSelectPopup({
             <Button
               title={t('COMMON.APPLY')}
               onClick={onApply}
-              disabled={!hasSufficientFunds || !customValue}
+              disabled={!hasSufficientFunds || !customValue || rateTooLow || rateTooHigh}
             />
           </Buttons>
         </>

@@ -9,10 +9,10 @@ import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
+import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import TransactionSummary from './transactionSummary';
@@ -149,7 +149,7 @@ function ConfirmBtcTransaction({
 
   return isLoading ? (
     <LoaderContainer>
-      <MoonLoader color="white" size={50} />
+      <Spinner size={50} />
     </LoaderContainer>
   ) : (
     <>
