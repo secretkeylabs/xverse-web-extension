@@ -67,13 +67,21 @@ interface BalanceCardProps {
 
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } =
-    useWalletSelector();
+  const {
+    fiatCurrency,
+    btcFiatRate,
+    stxBtcRate,
+    stxBalance,
+    btcBalance,
+    btcAddress,
+    stxAddress,
+    hideStx,
+  } = useWalletSelector();
   const { isLoading, isRefetching } = props;
 
   function calculateTotalBalance() {
     let totalBalance = new BigNumber(0);
-    if (stxAddress) {
+    if (stxAddress && !hideStx) {
       const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
         .multipliedBy(new BigNumber(stxBtcRate))
         .multipliedBy(new BigNumber(btcFiatRate));
