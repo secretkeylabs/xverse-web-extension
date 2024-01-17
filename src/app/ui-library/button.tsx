@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import Theme from 'theme';
+import styled, { useTheme } from 'styled-components';
+
 import Spinner from './spinner';
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger';
@@ -9,6 +9,7 @@ const ButtonContainer = styled.div<{
   $disabled: boolean;
   $loading: boolean;
 }>`
+  width: 100%;
   user-select: none;
 
   display: flex;
@@ -150,6 +151,8 @@ function Button({
   disabled = false,
   variant = 'primary',
 }: Props) {
+  const theme = useTheme();
+
   const handleClick = () => {
     if (!disabled && !loading) {
       onClick();
@@ -164,14 +167,14 @@ function Button({
 
   const spinnerColor =
     variant === 'primary'
-      ? Theme.colors.elevation_n1
+      ? theme.colors.elevation_n1
       : variant === 'secondary'
-      ? Theme.colors.white_0
+      ? theme.colors.white_0
       : variant === 'tertiary'
-      ? Theme.colors.white_0
+      ? theme.colors.white_0
       : variant === 'danger'
-      ? Theme.colors.white_200
-      : Theme.colors.elevation_n1;
+      ? theme.colors.white_200
+      : theme.colors.elevation_n1;
 
   return (
     <ButtonContainer

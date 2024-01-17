@@ -1,5 +1,4 @@
-import styled from 'styled-components';
-import Theme from 'theme';
+import styled, { useTheme } from 'styled-components';
 
 type StyleProps = {
   size?: number;
@@ -42,8 +41,16 @@ type Props = StyleProps & {
   className?: string;
 };
 
-function Spinner({ className, size = 14, width = 1.5, color = Theme.colors.white_0 }: Props) {
-  return <SpinnerElement className={className} $size={size} $width={width} $color={color} />;
+function Spinner({ className, size = 14, width = 1.5, color }: Props) {
+  const theme = useTheme();
+  return (
+    <SpinnerElement
+      className={className}
+      $size={size}
+      $width={width}
+      $color={color ?? theme.colors.white_0}
+    />
+  );
 }
 
 export default Spinner;

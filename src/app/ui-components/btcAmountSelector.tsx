@@ -26,6 +26,12 @@ const ConvertComplication = styled.div`
   display: flex;
   align-items: center;
   gap: 2px;
+
+  color: ${(props) => props.theme.colors.white_200};
+
+  &:hover {
+    color: ${(props) => props.theme.colors.white_0};
+  }
 `;
 
 const VertRule = styled.div`
@@ -38,12 +44,13 @@ const VertRule = styled.div`
 const MaxButton = styled.div<{ $sendMax: boolean; $disabled: boolean }>`
   ${(props) => props.theme.typography.body_medium_m}
   color: ${(props) =>
-    props.$sendMax ? props.theme.colors.tangerine : props.theme.colors.tangerine_dark};
+    props.$sendMax ? props.theme.colors.tangerine : props.theme.colors.tangerine_400};
   cursor: ${(props) => (props.$disabled ? 'not-allowed' : 'pointer')};
   user-select: none;
+  margin-right: ${(props) => props.theme.spacing(2)}px;
 
   &:hover {
-    ${(props) => (props.$disabled ? '' : `color:${props.theme.colors.tangerine_light}`)};
+    ${(props) => (props.$disabled ? '' : `color:${props.theme.colors.tangerine_200}`)};
   }
 `;
 
@@ -179,7 +186,7 @@ function AmountSelector({
           value={balance}
           displayType="text"
           thousandSeparator
-          prefix={useBtcValue ? '' : `~${currencySymbolMap[fiatCurrency]}`}
+          prefix={useBtcValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
             <div>
               <BalanceText>{t('BALANCE')} </BalanceText> {value}{' '}
@@ -195,7 +202,7 @@ function AmountSelector({
               value={sendAmountConverted}
               displayType="text"
               thousandSeparator
-              prefix={useBtcValue ? `~${currencySymbolMap[fiatCurrency]}` : ''}
+              prefix={useBtcValue ? `~ ${currencySymbolMap[fiatCurrency]}` : ''}
               renderText={(value: string) => (
                 <div>
                   {value} {useBtcValue ? fiatCurrency : 'BTC'}

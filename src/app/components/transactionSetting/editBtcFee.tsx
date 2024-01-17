@@ -392,7 +392,7 @@ function EditBtcFee({
           <CustomTextsContainer>
             <Row>
               <TotalFeeText typography="body_medium_m" color="white_200">
-                {t('TRANSACTION_SETTING.TOTAL_FEE')}
+                {t('TRANSACTION_SETTING.TOTAL_FEE')}:
               </TotalFeeText>
               <NumericFormat
                 value={totalFee}

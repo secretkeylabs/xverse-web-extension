@@ -13,7 +13,7 @@ const TitleContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: ${(props) => props.theme.spacing(4)}px;
+  margin-bottom: ${(props) => props.theme.space.xs};
 `;
 
 const Title = styled.div`
@@ -31,6 +31,8 @@ const InputContainer = styled.div`
 `;
 
 const InputField = styled.input<{ $variant: InputVariant }>`
+  ${(props) => props.theme.typography.body_medium_m}
+
   width: 100%;
 
   color: ${(props) => props.theme.colors.white_200};
@@ -127,7 +129,7 @@ const SubText = styled.div`
 const Feedback = styled.div``;
 
 type Props = {
-  title: string;
+  title?: string;
   placeholder?: string;
   value: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -196,10 +198,12 @@ function Input({
 
   return (
     <Container className={className}>
-      <TitleContainer>
-        <Title>{title}</Title>
-        {infoPanel && <InfoText>{infoPanel}</InfoText>}
-      </TitleContainer>
+      {(title || infoPanel) && (
+        <TitleContainer>
+          <Title>{title}</Title>
+          {infoPanel && <InfoText>{infoPanel}</InfoText>}
+        </TitleContainer>
+      )}
       <InputContainer>
         <InputField
           ref={inputRef}

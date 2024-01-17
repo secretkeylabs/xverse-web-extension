@@ -1,3 +1,4 @@
+import useBtcRecommendedFees from '@hooks/useBtcRecommendedFees';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import BtcAmountSelector from '@ui-components/btcAmountSelector';
@@ -49,6 +50,7 @@ function AmountSelector({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
+  const { data: recommendedFees } = useBtcRecommendedFees();
 
   const handleNext = () => {
     // TODO: validate amount - get fee summary from enhanced txn and ensure amount is payable
@@ -78,6 +80,11 @@ function AmountSelector({
           baseToFiat={satsToFiat}
           fiatUnit={fiatCurrency}
           getFeeForFeeRate={getFeeForFeeRate}
+          feeRates={{
+            low: recommendedFees?.halfHourFee,
+            medium: recommendedFees?.economyFee,
+            high: recommendedFees?.fastestFee,
+          }}
           isLoading={isLoading}
         />
         {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}

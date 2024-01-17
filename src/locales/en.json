@@ -7,7 +7,13 @@
     "SATTRIBUTES": "Sattributes",
     "INPUT": "Input",
     "SIZE": "Size",
-    "BUNDLE": "Bundle"
+    "BUNDLE": "Bundle",
+    "EDIT": "Edit",
+    "BACK": "Back",
+    "NEXT": "Next",
+    "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
+    "APPLY": "Apply"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
@@ -306,7 +312,7 @@
     "NEXT": "Next",
     "DONE": "Done",
     "ADVANCED_SETTING": "Advanced Settings",
-    "EDIT_FEES": "Edit Fees",
+    "EDIT_FEES": "Edit fees",
     "CONFIRM": "Confirm",
     "CONFIRM_ALL": "Confirm all",
     "CANCEL": "Cancel",
@@ -401,12 +407,13 @@
     "ADVANCED_SETTING_NONCE_OPTION": "Edit nonce",
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",
+    "NETWORK_FEE": "Network fee",
     "FEE_RATE": "Fee Rate",
     "STANDARD": "Regular",
     "HIGH": "Fast",
     "CUSTOM": "Custom",
     "CUSTOM_FEE": "Custom fee",
-    "TOTAL_FEE": "Total fee:",
+    "TOTAL_FEE": "Total fee",
     "LOW": "Slow",
     "FEE_INFO": "Apply a higher fee to help your transaction confirm quickly, especially when the network is congested.",
     "NONCE": "Nonce",
@@ -417,7 +424,14 @@
     "GREATER_FEE_ERROR": "Fee is more than available balance",
     "LOWER_THAN_MINIMUM": "Set fee is below minimum",
     "NONCE_WARNING": "Entering an erroneous nonce can result in a failed transaction. Only apply changes if you know what you are doing.",
-    "MANUAL_SETTING": "Manual setting"
+    "MANUAL_SETTING": "Manual setting",
+    "PRIORITY": "Priority",
+    "PRIORITIES": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CUSTOM": "Custom"
+    }
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",

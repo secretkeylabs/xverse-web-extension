@@ -1,10 +1,14 @@
 import { Pencil } from '@phosphor-icons/react';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
+import FeeSelectPopup from './feeSelectPopup';
 
 const Container = styled.div`
-  margin: ${(props) => props.theme.spacing(12)}px 0;
+  margin-top: ${(props) => props.theme.spacing(12)}px;
+  margin-bottom: ${(props) => props.theme.spacing(8)}px;
 `;
 
 const RowContainer = styled.div`
@@ -32,6 +36,15 @@ const Label = styled.span<{
       : props.theme.colors.white_400};
   margin-bottom: ${(props) => props.theme.spacing(2)}px;
   cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
+
+  user-select: ${(props) => (props.$clickable ? 'none' : 'auto')};
+
+  ${(props) =>
+    props.$clickable &&
+    `
+  &:hover {
+    color: ${props.theme.colors.tangerine_200};
+  }`}
 `;
 
 type Props = {
@@ -44,6 +57,11 @@ type Props = {
   baseToFiat: (base: string) => string;
   getFeeForFeeRate: (feeRate: number) => Promise<number>;
   isLoading?: boolean;
+  feeRates: {
+    low?: number;
+    medium?: number;
+    high?: number;
+  };
 };
 
 function SelectFeeRate({
@@ -55,13 +73,33 @@ function SelectFeeRate({
   baseToFiat,
   setFeeRate,
   getFeeForFeeRate,
+  feeRates,
   isLoading,
 }: Props) {
+  const { t } = useTranslation('translation');
+  const [editing, setEditing] = useState(false);
+
+  const feeRateSpeed = useMemo(() => {
+    if (feeRate) {
+      if (feeRate === feeRates.high?.toString()) {
+        return t('TRANSACTION_SETTING.PRIORITIES.HIGH');
+      }
+      if (feeRate === feeRates.medium?.toString()) {
+        return t('TRANSACTION_SETTING.PRIORITIES.MEDIUM');
+      }
+      if (feeRate === feeRates.low?.toString()) {
+        return t('TRANSACTION_SETTING.PRIORITIES.LOW');
+      }
+    }
+
+    return t('TRANSACTION_SETTING.PRIORITIES.CUSTOM');
+  }, [feeRates, feeRate]);
+
   return (
     <Container>
       <RowContainer>
         <Label $size="m" $variant="mid">
-          Network Fee
+          {t('TRANSACTION_SETTING.NETWORK_FEE')}
         </Label>
         <NumericFormat
           value={fee}
@@ -77,14 +115,28 @@ function SelectFeeRate({
       <RowContainer>
         <div>
           <Label $size="m" $variant="dark">
-            Medium{' '}
+            {feeRateSpeed}{' '}
           </Label>
-          <Label $size="m" $variant="action" $clickable={!isLoading}>
-            Edit <Pencil />
+          <Label
+            $size="m"
+            $variant="action"
+            $clickable={!isLoading}
+            onClick={() => setEditing((cur) => !cur)}
+          >
+            {t('COMMON.EDIT')} <Pencil />
           </Label>
         </div>
         <Label $size="s" $variant="dark">
-          {feeRate} {feeRateUnits}
+          <NumericFormat
+            value={feeRate}
+            displayType="text"
+            thousandSeparator
+            renderText={(value: string) => (
+              <>
+                {value} {feeRateUnits}
+              </>
+            )}
+          />
         </Label>
       </RowContainer>
       {fee && (
@@ -93,7 +145,7 @@ function SelectFeeRate({
           <NumericFormat
             value={baseToFiat(fee)}
             displayType="text"
-            prefix={`~${currencySymbolMap[fiatUnit]}`}
+            prefix={`~ ${currencySymbolMap[fiatUnit]}`}
             thousandSeparator
             renderText={(value: string) => (
               <Label $size="s" $variant="dark">
@@ -102,6 +154,19 @@ function SelectFeeRate({
             )}
           />
         </RowContainer>
+      )}
+      {editing && (
+        <FeeSelectPopup
+          currentFeeRate={feeRate}
+          feeUnits={feeUnits}
+          feeRateUnits={feeRateUnits}
+          fiatUnit={fiatUnit}
+          feeRates={feeRates}
+          onClose={() => setEditing(false)}
+          baseToFiat={baseToFiat}
+          setFeeRate={setFeeRate}
+          getFeeForFeeRate={getFeeForFeeRate}
+        />
       )}
     </Container>
   );

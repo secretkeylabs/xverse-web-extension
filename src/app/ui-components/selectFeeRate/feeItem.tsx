@@ -1,6 +1,9 @@
 import { Bicycle, CarProfile, RocketLaunch } from '@phosphor-icons/react';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -67,28 +70,61 @@ const LoaderContainer = styled.div`
 
 type FeePriority = 'high' | 'medium' | 'low';
 
+const priorityTimeMap: Record<FeePriority, number> = {
+  high: 10,
+  medium: 30,
+  low: 60,
+};
+
 interface FeeItemProps {
   priority: FeePriority;
-  time: string;
-  feeRate: string;
-  totalFee: string;
-  fiat: string | JSX.Element;
+  time?: string;
+  feeRate: number;
+  feeUnits: string;
+  feeRateUnits: string;
+  fiatUnit: string;
+  baseToFiat: (base: string) => string;
+  getFeeForFeeRate: (feeRate: number) => Promise<number>;
   selected: boolean;
   onClick?: () => void;
 }
 
-function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }: FeeItemProps) {
+function FeeItem({
+  priority,
+  time,
+  feeRate,
+  feeUnits,
+  feeRateUnits,
+  fiatUnit,
+  baseToFiat,
+  getFeeForFeeRate,
+  selected,
+  onClick,
+}: FeeItemProps) {
   const { t } = useTranslation('translation');
+
+  const [totalFee, setTotalFee] = useState<number | undefined>(undefined);
+  const [fiat, setFiat] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const getFee = async () => {
+      const fee = await getFeeForFeeRate(feeRate);
+      setTotalFee(fee);
+      setFiat(baseToFiat(fee.toString()));
+    };
+
+    getFee();
+  }, [feeRate, getFeeForFeeRate, baseToFiat]);
+
   const getIcon = () => {
     switch (priority) {
       case 'high':
         return <RocketLaunch size={20} color={Theme.colors.tangerine} />;
-      case 'medium':
-        return <CarProfile size={20} color={Theme.colors.tangerine} />;
       case 'low':
         return <Bicycle size={20} color={Theme.colors.tangerine} />;
+      case 'medium':
       default:
-        return <RocketLaunch size={20} color={Theme.colors.tangerine} />;
+        return <CarProfile size={20} color={Theme.colors.tangerine} />;
     }
   };
 
@@ -99,9 +135,8 @@ function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }:
       case 'medium':
         return t('SPEED_UP_TRANSACTION.MED_PRIORITY');
       case 'low':
-        return t('SPEED_UP_TRANSACTION.LOW_PRIORITY');
       default:
-        return t('SPEED_UP_TRANSACTION.HIGH_PRIORITY');
+        return t('SPEED_UP_TRANSACTION.LOW_PRIORITY');
     }
   };
 
@@ -113,15 +148,25 @@ function FeeItem({ priority, time, feeRate, totalFee, fiat, selected, onClick }:
           <StyledHeading typography="body_medium_m" color="white_0">
             {getLabel()}
           </StyledHeading>
-          <StyledSubText typography="body_medium_s">{time}</StyledSubText>
-          <StyledSubText typography="body_medium_s">{`${feeRate} Sats/ vByte`}</StyledSubText>
+          <StyledSubText typography="body_medium_s">
+            {time ?? `~${priorityTimeMap[priority]} mins`}
+          </StyledSubText>
+          <StyledSubText typography="body_medium_s">{`${feeRate} ${feeRateUnits}`}</StyledSubText>
         </ColumnsTexts>
         {totalFee ? (
           <EndColumnTexts>
             <StyledHeading typography="body_medium_m" color="white_0">
-              {`${totalFee} Sats`}
+              {`${totalFee} ${feeUnits}`}
             </StyledHeading>
-            <StyledSubText typography="body_medium_s">{fiat}</StyledSubText>
+            <StyledSubText typography="body_medium_s">
+              <NumericFormat
+                value={fiat}
+                displayType="text"
+                prefix={`~${currencySymbolMap[fiatUnit]}`}
+                thousandSeparator
+                renderText={(value: string) => `${value} ${fiatUnit}`}
+              />
+            </StyledSubText>
           </EndColumnTexts>
         ) : (
           <LoaderContainer>

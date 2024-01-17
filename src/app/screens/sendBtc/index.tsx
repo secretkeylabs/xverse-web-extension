@@ -1,6 +1,7 @@
 import BottomBar from '@components/tabBar';
 import TokenImage from '@components/tokenImage';
 import TopRow from '@components/topRow';
+import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
@@ -48,6 +49,8 @@ function SendBtcScreen() {
 
   const location = useLocation();
 
+  const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
+
   // TODO: remove amount and address defaults, set fee rate to regular
   // TODO: crashes if amount is set to 1
   const [recipientAddress, setRecipientAddress] = useState(
@@ -55,7 +58,7 @@ function SendBtcScreen() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [amountSats, setAmountSats] = useState(location.state?.amount || '10000');
-  const [feeRate, setFeeRate] = useState('10');
+  const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const amountEditable = location.state?.disableAmountEdit ?? true;
 
@@ -66,6 +69,29 @@ function SendBtcScreen() {
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
 
   useEffect(() => {
+    if (!feeRate && btcFeeRate && !feeRatesLoading) {
+      setFeeRate(btcFeeRate.regular.toString());
+    }
+  }, [btcFeeRate, feeRatesLoading]);
+
+  const generateTransactionAndSummary = async (feeRateOverride?: number) => {
+    const amountBigInt = BigInt(amountSats);
+    const transactionDetails = sendMax
+      ? await generateSendMaxTransaction(
+          transactionContext,
+          recipientAddress,
+          feeRateOverride ?? +feeRate,
+        )
+      : await generateTransaction(
+          transactionContext,
+          recipientAddress,
+          amountBigInt,
+          feeRateOverride ?? +feeRate,
+        );
+    return transactionDetails;
+  };
+
+  useEffect(() => {
     // TODO: validate properly
     if (!recipientAddress || !amountSats || !feeRate) {
       setTransaction(undefined);
@@ -73,14 +99,10 @@ function SendBtcScreen() {
       return;
     }
 
-    const amountBigInt = BigInt(amountSats);
-
     const generateTxnAndSummary = async () => {
       setIsLoading(true);
       try {
-        const transactionDetails = sendMax
-          ? await generateSendMaxTransaction(transactionContext, recipientAddress, +feeRate)
-          : await generateTransaction(transactionContext, recipientAddress, amountBigInt, +feeRate);
+        const transactionDetails = await generateTransactionAndSummary();
 
         setTransaction(transactionDetails.transaction);
 
@@ -104,7 +126,7 @@ function SendBtcScreen() {
     navigate('/');
   };
 
-  const showNavButtons = !isInOptions();
+  const showNavButtons = !isInOptions() || currentStep > 0;
 
   const handleBackButtonClick = () => {
     if (currentStep > 0) {
@@ -114,22 +136,10 @@ function SendBtcScreen() {
     }
   };
 
-  const calculateFeeForFeeRate = async (
-    desiredFeeRate: number,
-    useEffectiveFeeRate?: boolean,
-  ): Promise<number> => {
-    if (!transaction) {
-      return 0;
-    }
-
-    transaction.feeRate = desiredFeeRate;
-
-    try {
-      const tempSummary = await transaction.getSummary({ useEffectiveFeeRate });
-      return Number(tempSummary.fee);
-    } finally {
-      transaction.feeRate = +feeRate;
-    }
+  const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number> => {
+    // todo: return null if not enough funds
+    const { summary: tempSummary } = await generateTransactionAndSummary(desiredFeeRate);
+    return Number(tempSummary.fee);
   };
 
   const handleSubmit = async () => {

@@ -95,7 +95,7 @@ export default function CustomFee({
           {!error && minimumFeeRate && Number(feeRateInput) >= Number(minimumFeeRate) && (
             <>
               <TotalFeeText>
-                {t('TOTAL_FEE')}
+                {t('TOTAL_FEE')}:
                 <NumericFormat
                   value={totalFee}
                   displayType="text"
