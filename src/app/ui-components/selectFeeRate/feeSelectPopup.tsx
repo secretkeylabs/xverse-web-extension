@@ -87,7 +87,7 @@ type Props = {
   onClose: () => void;
   baseToFiat: (base: string) => string;
   setFeeRate: (feeRate: string) => void;
-  getFeeForFeeRate: (feeRate: number) => Promise<number>;
+  getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
 };
 
 function FeeSelectPopup({
@@ -116,12 +116,14 @@ function FeeSelectPopup({
       setIsCalculatingTotalFee(true);
       try {
         const totalFee = await getFeeForFeeRate(Number(customValue));
-        setCustomValueTotalFee(totalFee.toString());
-        setCustomValueTotalFeeFiat(baseToFiat(totalFee.toString()));
-        setHasSufficientFunds(true);
-      } catch (e) {
-        setHasSufficientFunds(false);
-        console.log(e);
+
+        if (totalFee) {
+          setCustomValueTotalFee(totalFee.toString());
+          setCustomValueTotalFeeFiat(baseToFiat(totalFee.toString()));
+          setHasSufficientFunds(true);
+        } else {
+          setHasSufficientFunds(false);
+        }
       } finally {
         setIsCalculatingTotalFee(false);
       }

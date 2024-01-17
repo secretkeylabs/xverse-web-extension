@@ -431,7 +431,8 @@
       "MEDIUM": "Medium",
       "HIGH": "High",
       "CUSTOM": "Custom"
-    }
+    },
+    "INSUFFICIENT_FUNDS": "Insufficient funds"
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",

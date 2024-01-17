@@ -6,7 +6,7 @@ export type TransactionSummary = btcTransaction.TransactionSummary & {
 
 type TransactionBuildPayload = {
   transaction: btcTransaction.EnhancedTransaction;
-  summary: TransactionSummary;
+  summary?: TransactionSummary;
 };
 
 export const generateTransaction = async (
@@ -26,9 +26,15 @@ export const generateTransaction = async (
     feeRate,
   );
 
-  const summary = await transaction.getSummary();
-
-  return { transaction, summary };
+  try {
+    const summary = await transaction.getSummary();
+    return { transaction, summary };
+  } catch (e) {
+    if (e instanceof Error && e.message.includes('Insufficient funds')) {
+      return { transaction };
+    }
+    throw e;
+  }
 };
 
 export const generateSendMaxTransaction = async (
@@ -42,7 +48,13 @@ export const generateSendMaxTransaction = async (
     feeRate,
   );
 
-  const summary = await transaction.getSummary();
-
-  return { transaction, summary: { ...summary, dustFiltered } };
+  try {
+    const summary = await transaction.getSummary();
+    return { transaction, summary: { ...summary, dustFiltered } };
+  } catch (e) {
+    if (e instanceof Error && e.message.includes('Insufficient funds')) {
+      return { transaction };
+    }
+    throw e;
+  }
 };

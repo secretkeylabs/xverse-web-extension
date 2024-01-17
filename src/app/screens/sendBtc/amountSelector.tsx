@@ -29,7 +29,7 @@ type Props = {
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   fee: string | undefined;
-  getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number>;
+  getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
   onNext: () => void;
   dustFiltered: boolean;
   isLoading?: boolean;

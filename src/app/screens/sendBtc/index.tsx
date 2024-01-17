@@ -108,7 +108,7 @@ function SendBtcScreen() {
 
         setSummary(transactionDetails.summary);
 
-        if (sendMax) {
+        if (sendMax && transactionDetails.summary) {
           setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
         }
       } catch (e) {
@@ -136,10 +136,11 @@ function SendBtcScreen() {
     }
   };
 
-  const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number> => {
-    // todo: return null if not enough funds
+  const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
     const { summary: tempSummary } = await generateTransactionAndSummary(desiredFeeRate);
-    return Number(tempSummary.fee);
+    if (tempSummary) return Number(tempSummary.fee);
+
+    return undefined;
   };
 
   const handleSubmit = async () => {

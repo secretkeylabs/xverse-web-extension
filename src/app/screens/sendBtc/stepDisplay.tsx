@@ -17,7 +17,7 @@ type StepDisplayProps = {
   setFeeRate: (feeRate: string) => void;
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
-  getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number>;
+  getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
   amountEditable: boolean;
   onConfirm: () => void;
   onBack: () => void;

@@ -60,7 +60,10 @@ type Props = {
   onCancel: () => void;
   onBackClick?: () => void;
   confirmDisabled?: boolean;
-  getFeeForFeeRate?: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number>;
+  getFeeForFeeRate?: (
+    feeRate: number,
+    useEffectiveFeeRate?: boolean,
+  ) => Promise<number | undefined>;
   onFeeRateSet?: (feeRate: number) => void;
 };
 

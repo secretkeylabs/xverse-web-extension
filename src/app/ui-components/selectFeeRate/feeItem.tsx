@@ -1,12 +1,11 @@
 import { Bicycle, CarProfile, RocketLaunch } from '@phosphor-icons/react';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import Spinner from '@ui-library/spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { MoonLoader } from 'react-spinners';
-import styled from 'styled-components';
-import Theme from 'theme';
+import styled, { useTheme } from 'styled-components';
 
 interface FeeContainer {
   isSelected: boolean;
@@ -46,10 +45,11 @@ const ColumnsTexts = styled.div`
   align-items: flex-start;
   flex: 1;
 `;
-const EndColumnTexts = styled.div`
+const EndColumnTexts = styled.div<{ $insufficientFunds?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: ${(props) => (props.$insufficientFunds ? 'space-between' : 'flex-start')};
 `;
 
 const StyledHeading = styled(StyledP)`
@@ -57,7 +57,6 @@ const StyledHeading = styled(StyledP)`
 `;
 
 const StyledSubText = styled(StyledP)`
-  color: ${(props) => props.theme.colors.white_200};
   margin-bottom: ${(props) => props.theme.space.xxs};
 `;
 
@@ -84,7 +83,7 @@ interface FeeItemProps {
   feeRateUnits: string;
   fiatUnit: string;
   baseToFiat: (base: string) => string;
-  getFeeForFeeRate: (feeRate: number) => Promise<number>;
+  getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
   selected: boolean;
   onClick?: () => void;
 }
@@ -102,29 +101,40 @@ function FeeItem({
   onClick,
 }: FeeItemProps) {
   const { t } = useTranslation('translation');
+  const theme = useTheme();
 
   const [totalFee, setTotalFee] = useState<number | undefined>(undefined);
   const [fiat, setFiat] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
+
     const getFee = async () => {
-      const fee = await getFeeForFeeRate(feeRate);
-      setTotalFee(fee);
-      setFiat(baseToFiat(fee.toString()));
+      try {
+        const fee = await getFeeForFeeRate(feeRate);
+        if (fee !== undefined) {
+          setTotalFee(fee);
+          setFiat(baseToFiat(fee.toString()));
+        }
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     getFee();
   }, [feeRate, getFeeForFeeRate, baseToFiat]);
 
   const getIcon = () => {
+    const color = totalFee ? theme.colors.tangerine : theme.colors.white_600;
     switch (priority) {
       case 'high':
-        return <RocketLaunch size={20} color={Theme.colors.tangerine} />;
+        return <RocketLaunch size={20} color={color} />;
       case 'low':
-        return <Bicycle size={20} color={Theme.colors.tangerine} />;
+        return <Bicycle size={20} color={color} />;
       case 'medium':
       default:
-        return <CarProfile size={20} color={Theme.colors.tangerine} />;
+        return <CarProfile size={20} color={color} />;
     }
   };
 
@@ -140,37 +150,50 @@ function FeeItem({
     }
   };
 
+  const mainColor = totalFee ? 'white_0' : 'white_400';
+  const secondaryColor = totalFee ? 'white_200' : 'white_400';
+
   return (
     <FeeItemContainer onClick={onClick} isSelected={selected} disabled={!totalFee}>
       <IconContainer>{getIcon()}</IconContainer>
       <TextsContainer>
         <ColumnsTexts>
-          <StyledHeading typography="body_medium_m" color="white_0">
+          <StyledHeading typography="body_medium_m" color={mainColor}>
             {getLabel()}
           </StyledHeading>
-          <StyledSubText typography="body_medium_s">
+          <StyledSubText typography="body_medium_s" color={secondaryColor}>
             {time ?? `~${priorityTimeMap[priority]} mins`}
           </StyledSubText>
-          <StyledSubText typography="body_medium_s">{`${feeRate} ${feeRateUnits}`}</StyledSubText>
+          <StyledP
+            typography="body_medium_s"
+            color={secondaryColor}
+          >{`${feeRate} ${feeRateUnits}`}</StyledP>
         </ColumnsTexts>
-        {totalFee ? (
-          <EndColumnTexts>
-            <StyledHeading typography="body_medium_m" color="white_0">
-              {`${totalFee} ${feeUnits}`}
+        {!isLoading ? (
+          <EndColumnTexts $insufficientFunds={totalFee === undefined}>
+            <StyledHeading typography="body_medium_m" color={mainColor}>
+              {`${totalFee || '-'} ${feeUnits}`}
             </StyledHeading>
-            <StyledSubText typography="body_medium_s">
-              <NumericFormat
-                value={fiat}
-                displayType="text"
-                prefix={`~${currencySymbolMap[fiatUnit]}`}
-                thousandSeparator
-                renderText={(value: string) => `${value} ${fiatUnit}`}
-              />
-            </StyledSubText>
+            {fiat && (
+              <StyledP typography="body_medium_s" color={secondaryColor}>
+                <NumericFormat
+                  value={fiat}
+                  displayType="text"
+                  prefix={`~${currencySymbolMap[fiatUnit]}`}
+                  thousandSeparator
+                  renderText={(value: string) => `${value} ${fiatUnit}`}
+                />
+              </StyledP>
+            )}
+            {!totalFee && (
+              <StyledP typography="body_medium_s" color="danger_light">
+                {t('TRANSACTION_SETTING.INSUFFICIENT_FUNDS')}
+              </StyledP>
+            )}
           </EndColumnTexts>
         ) : (
           <LoaderContainer>
-            <MoonLoader color="white" size={20} />
+            <Spinner size={20} />
           </LoaderContainer>
         )}
       </TextsContainer>

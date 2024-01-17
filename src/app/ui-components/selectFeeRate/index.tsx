@@ -55,7 +55,7 @@ type Props = {
   feeRateUnits: string;
   fiatUnit: string;
   baseToFiat: (base: string) => string;
-  getFeeForFeeRate: (feeRate: number) => Promise<number>;
+  getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
   isLoading?: boolean;
   feeRates: {
     low?: number;
