@@ -35,7 +35,7 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/{owner}/{repo}/releases > releases.json
-          TARGET_COMMITISH=$(cat releases.json | jq '.[] | select(.tag_name | match("$TAG")) | .target_commitish' | head -1)
+          TARGET_COMMITISH=$(cat releases.json | jq -r ".[] | select(.tag_name | match(\"$TAG\")) | .target_commitish" | head -1)
           # publish the latest release
           gh api \
             --method POST \
