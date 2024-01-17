@@ -4,7 +4,7 @@ import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { Transport, btcTransaction } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,16 +17,6 @@ import {
 } from './helpers';
 import StepDisplay from './stepDisplay';
 import { Step, getPreviousStep } from './steps';
-
-const Container = styled.div`
-  flex: 1;
-
-  display: flex;
-  flex-direction: column;
-  padding: 0 16px;
-  margin-top: 16px;
-  overflow-y: auto;
-`;
 
 const TitleContainer = styled.div`
   display: flex;
@@ -53,7 +43,7 @@ function SendBtcScreen() {
 
   // TODO: remove amount and address defaults, set fee rate to regular
   const [recipientAddress, setRecipientAddress] = useState(
-    location.state?.recipientAddress || '2N3J2uER8xjdNCpBfaA7K4kWpg9EbJfwfUu',
+    location.state?.recipientAddress || '2ND4zw8hbn1ydvVwZFo6UjCRWr394b71okg',
   );
   const [isLoading, setIsLoading] = useState(false);
   const [amountSats, setAmountSats] = useState(location.state?.amount || '10000');
@@ -141,44 +131,42 @@ function SendBtcScreen() {
     return undefined;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (ledgerTransport?: Transport) => {
     // TODO: validate, set loading, error handling, redirect to txn confirmation screen
-    await transaction?.broadcast();
+    await transaction?.broadcast({ ledgerTransport });
     navigate('/');
   };
 
   return (
     <>
-      <Container>
-        {currentStep !== Step.Confirm && (
-          <>
-            <TopRow title="" onClick={handleBackButtonClick} showBackButton={showNavButtons} />
-            <TitleContainer>
-              <TokenImage token="BTC" loading={false} />
-              <Title>{t('SEND')}</Title>
-            </TitleContainer>
-          </>
-        )}
-        <StepDisplay
-          currentStep={currentStep}
-          setCurrentStep={setCurrentStep}
-          recipientAddress={recipientAddress}
-          setRecipientAddress={setRecipientAddress}
-          amountSats={amountSats}
-          setAmountSats={setAmountSats}
-          feeRate={feeRate}
-          setFeeRate={setFeeRate}
-          sendMax={sendMax}
-          setSendMax={setSendMax}
-          getFeeForFeeRate={calculateFeeForFeeRate}
-          amountEditable={amountEditable}
-          onBack={handleBackButtonClick}
-          onCancel={handleCancel}
-          onConfirm={handleSubmit}
-          isLoading={isLoading}
-          summary={summary}
-        />
-      </Container>
+      {currentStep !== Step.Confirm && (
+        <>
+          <TopRow title="" onClick={handleBackButtonClick} showBackButton={showNavButtons} />
+          <TitleContainer>
+            <TokenImage token="BTC" loading={false} />
+            <Title>{t('SEND')}</Title>
+          </TitleContainer>
+        </>
+      )}
+      <StepDisplay
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+        recipientAddress={recipientAddress}
+        setRecipientAddress={setRecipientAddress}
+        amountSats={amountSats}
+        setAmountSats={setAmountSats}
+        feeRate={feeRate}
+        setFeeRate={setFeeRate}
+        sendMax={sendMax}
+        setSendMax={setSendMax}
+        getFeeForFeeRate={calculateFeeForFeeRate}
+        amountEditable={amountEditable}
+        onBack={handleBackButtonClick}
+        onCancel={handleCancel}
+        onConfirm={handleSubmit}
+        isLoading={isLoading}
+        summary={summary}
+      />
       <BottomBar tab="dashboard" />
     </>
   );

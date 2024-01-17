@@ -1,9 +1,20 @@
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import AmountSelector from './amountSelector';
 import { TransactionSummary } from './helpers';
 import RecipientSelector from './recipientSelector';
 import { Step, getNextStep } from './steps';
+
+const Container = styled.div`
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+  margin-top: 16px;
+  overflow-y: auto;
+`;
 
 type StepDisplayProps = {
   summary: TransactionSummary | undefined;
@@ -49,29 +60,33 @@ function StepDisplay({
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
-        <RecipientSelector
-          recipientAddress={recipientAddress}
-          setRecipientAddress={setRecipientAddress}
-          onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, amountEditable))}
-          isLoading={isLoading}
-        />
+        <Container>
+          <RecipientSelector
+            recipientAddress={recipientAddress}
+            setRecipientAddress={setRecipientAddress}
+            onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, amountEditable))}
+            isLoading={isLoading}
+          />
+        </Container>
       );
     case Step.SelectAmount:
       return (
-        <AmountSelector
-          amountSats={amountSats}
-          setAmountSats={setAmountSats}
-          feeRate={feeRate}
-          setFeeRate={setFeeRate}
-          sendMax={sendMax}
-          setSendMax={setSendMax}
-          fee={summary?.fee.toString()}
-          getFeeForFeeRate={getFeeForFeeRate}
-          dustFiltered={summary?.dustFiltered ?? false}
-          onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
-          hasSufficientFunds={!!summary}
-          isLoading={isLoading}
-        />
+        <Container>
+          <AmountSelector
+            amountSats={amountSats}
+            setAmountSats={setAmountSats}
+            feeRate={feeRate}
+            setFeeRate={setFeeRate}
+            sendMax={sendMax}
+            setSendMax={setSendMax}
+            fee={summary?.fee.toString()}
+            getFeeForFeeRate={getFeeForFeeRate}
+            dustFiltered={summary?.dustFiltered ?? false}
+            onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
+            hasSufficientFunds={!!summary}
+            isLoading={isLoading}
+          />
+        </Container>
       );
     case Step.Confirm:
       if (!summary) {
