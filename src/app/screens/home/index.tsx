@@ -1,10 +1,10 @@
 import dashboardIcon from '@assets/img/dashboard-icon.svg';
+import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
-import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
-import stacksIcon from '@assets/img/dashboard/stack_icon.svg';
+import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
@@ -193,6 +193,7 @@ function Home() {
     showOrdinalReceiveAlert,
     showDataCollectionAlert,
     network,
+    hideStx,
   } = useWalletSelector();
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
@@ -377,7 +378,7 @@ function Home() {
         <MergedIcon src={ordinalsIcon} />
       </ReceiveCardComponent>
 
-      {stxAddress && (
+      {stxAddress && !hideStx && (
         <ReceiveCardComponent
           title={t('STACKS_AND_TOKEN')}
           address={stxAddress}
@@ -493,7 +494,7 @@ function Home() {
               onPress={handleTokenPressed}
             />
           )}
-          {stxAddress && (
+          {stxAddress && !hideStx && (
             <TokenTile
               title={t('STACKS')}
               currency="STX"

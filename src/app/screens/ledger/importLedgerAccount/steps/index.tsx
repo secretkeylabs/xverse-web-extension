@@ -1,3 +1,5 @@
+import warningIcon from '@assets/img/Warning_red.svg';
+import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import ledgerAccountSwitchIcon from '@assets/img/ledger/account_switch.svg';
 import btcIcon from '@assets/img/ledger/btc_icon.svg';
 import btcOrdinalsIcon from '@assets/img/ledger/btc_ordinals_icon.svg';
@@ -6,8 +8,6 @@ import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.s
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ledgerImportStartIcon from '@assets/img/ledger/ledger_import_start.svg';
 import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
-import stxIcon from '@assets/img/ledger/stx_icon.svg';
-import warningIcon from '@assets/img/Warning_red.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
