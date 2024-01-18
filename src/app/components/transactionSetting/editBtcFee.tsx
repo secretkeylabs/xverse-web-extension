@@ -55,7 +55,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
 }));
 
 const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   backgroundColor: 'transparent',
   color: props.theme.colors.white_0,
   border: 'transparent',
@@ -187,7 +187,7 @@ function EditBtcFee({
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
   const btcClient = useBtcClient();
-  const feeData = useBtcFees({
+  const { feeData, highFeeError, mediumFeeError } = useBtcFees({
     isRestoreFlow: !!isRestoreFlow,
     nonOrdinalUtxos,
     btcRecipients,
@@ -341,6 +341,7 @@ function EditBtcFee({
               setFeeMode('high');
             }}
             selected={feeMode === 'high'}
+            error={highFeeError}
           />
           <FeeItem
             priority="medium"
@@ -358,6 +359,7 @@ function EditBtcFee({
               setFeeMode('medium');
             }}
             selected={feeMode === 'medium'}
+            error={mediumFeeError}
           />
           <FeeItemContainer
             isSelected={feeMode === 'custom'}

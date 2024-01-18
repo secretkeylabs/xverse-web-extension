@@ -20,6 +20,7 @@ import {
   SetCoinRatesKey,
   SetFeeMultiplierKey,
   SetStxWalletDataKey,
+  SetWalletHideStxKey,
   SetWalletKey,
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
@@ -62,7 +63,7 @@ import {
  *
  * TODO refactor most of these values out of the store and use query cache instead
  */
-const initialWalletState: WalletState = {
+export const initialWalletState: WalletState = {
   stxAddress: '',
   btcAddress: '',
   ordinalsAddress: '',
@@ -99,6 +100,7 @@ const initialWalletState: WalletState = {
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
+  hideStx: false,
 };
 
 const walletReducer = (
@@ -262,6 +264,11 @@ const walletReducer = (
       return {
         ...state,
         isUnlocked: action.isUnlocked,
+      };
+    case SetWalletHideStxKey:
+      return {
+        ...state,
+        hideStx: action.hideStx,
       };
     default:
       return state;

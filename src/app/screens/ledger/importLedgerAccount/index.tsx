@@ -6,11 +6,11 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import { useTransition } from '@react-spring/web';
 import {
   Account,
+  LedgerErrors,
   getMasterFingerPrint,
   importNativeSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
-  LedgerErrors,
 } from '@secretkeylabs/xverse-core';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { useEffect, useState } from 'react';

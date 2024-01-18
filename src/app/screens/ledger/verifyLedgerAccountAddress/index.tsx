@@ -16,12 +16,12 @@ import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 import { useLocation } from 'react-router-dom';
 
+import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import btcIcon from '@assets/img/ledger/btc_icon.svg';
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
-import stxIcon from '@assets/img/ledger/stx_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import useResetUserFlow from '@hooks/useResetUserFlow';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';

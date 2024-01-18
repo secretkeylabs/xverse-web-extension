@@ -70,6 +70,9 @@ function ChangeNetworkScreen() {
   };
 
   const onNetworkSelected = (networkSelected: SettingsNetwork) => {
+    if (networkSelected.type === formInputs.type) {
+      return;
+    }
     setFormInputs(networkSelected);
     setFormErrors(initialNodeErrors);
   };
@@ -111,6 +114,8 @@ function ChangeNetworkScreen() {
   const onSubmit = async () => {
     setIsChangingNetwork(true);
 
+    // TODO use formik/yup for all validation if form gets more complex
+    // validate required fields
     if (!formInputs.address) {
       setFormErrors((prevErrors) => ({
         ...prevErrors,
@@ -129,10 +134,17 @@ function ChangeNetworkScreen() {
       return;
     }
 
+    const isChangedStacksUrl = formInputs.address !== network.address;
+    const isChangedBtcApiUrl = formInputs.btcApiUrl !== network.btcApiUrl;
+    const isChangedFallbackBtcApiUrl = formInputs.fallbackBtcApiUrl !== network.fallbackBtcApiUrl;
+
+    // validate against server if inputs were changed
     const [isValidStacksUrl, isValidBtcApiUrl, isValidFallbackBtcApiUrl] = await Promise.all([
-      isValidStacksApi(formInputs.address, formInputs.type),
-      isValidBtcApi(formInputs.btcApiUrl, formInputs.type),
-      !formInputs.fallbackBtcApiUrl || isValidBtcApi(formInputs.fallbackBtcApiUrl, formInputs.type),
+      !isChangedStacksUrl || isValidStacksApi(formInputs.address, formInputs.type),
+      !isChangedBtcApiUrl || isValidBtcApi(formInputs.btcApiUrl, formInputs.type),
+      !formInputs.fallbackBtcApiUrl ||
+        !isChangedFallbackBtcApiUrl ||
+        isValidBtcApi(formInputs.fallbackBtcApiUrl, formInputs.type),
     ]);
 
     if (isValidStacksUrl && isValidBtcApiUrl && isValidFallbackBtcApiUrl) {
