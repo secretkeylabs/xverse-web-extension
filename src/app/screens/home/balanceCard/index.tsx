@@ -1,8 +1,10 @@
 import BarLoader from '@components/barLoader';
+import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
 import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
@@ -67,9 +69,21 @@ interface BalanceCardProps {
 
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const { fiatCurrency, btcFiatRate, stxBtcRate, stxBalance, btcBalance, btcAddress, stxAddress } =
-    useWalletSelector();
+  const {
+    fiatCurrency,
+    btcFiatRate,
+    stxBtcRate,
+    stxBalance,
+    btcBalance,
+    btcAddress,
+    stxAddress,
+    selectedAccount,
+    accountBalances,
+  } = useWalletSelector();
+  const { enqueueFetchBalances } = useAccountBalance();
+  const [balance, setBalance] = useState<string | null>(null);
   const { isLoading, isRefetching } = props;
+  const oldTotalBalance = accountBalances[btcAddress];
 
   const calculateTotalBalance = () => {
     let totalBalance = new BigNumber(0);
@@ -90,6 +104,29 @@ function BalanceCard(props: BalanceCardProps) {
 
     return totalBalance.toNumber().toFixed(2);
   };
+
+  useEffect(() => {
+    if (isLoading || isRefetching) {
+      return;
+    }
+
+    const result = calculateTotalBalance();
+    setBalance(result);
+
+    return () => {
+      setBalance(null);
+    };
+  }, [isLoading, isRefetching]);
+
+  useEffect(() => {
+    if (!balance || !selectedAccount) {
+      return;
+    }
+
+    if (oldTotalBalance !== balance) {
+      enqueueFetchBalances(selectedAccount);
+    }
+  }, [balance, enqueueFetchBalances, oldTotalBalance, selectedAccount]);
 
   return (
     <>

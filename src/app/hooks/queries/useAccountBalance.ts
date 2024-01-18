@@ -46,7 +46,6 @@ const useAccountBalance = () => {
     if (!account) {
       return;
     }
-    console.log('fetching balances...');
 
     let btcBalance = 0;
     let stxBalance = 0;

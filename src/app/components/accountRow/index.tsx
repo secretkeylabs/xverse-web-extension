@@ -3,7 +3,6 @@ import BarLoader from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
-import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
@@ -15,7 +14,6 @@ import { isLedgerAccount, validateAccountName } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import styled from 'styled-components';
 
@@ -71,13 +69,6 @@ const BarLoaderContainer = styled.div((props) => ({
   backgroundColor: 'transparent',
 }));
 
-export const StyledToolTip = styled(Tooltip)`
-  background-color: ${(props) => props.theme.colors.white_0};
-  color: #12151e;
-  border-radius: 8px;
-  padding: 7px;
-`;
-
 const TransparentSpan = styled.span`
   background: transparent;
 `;
@@ -115,10 +106,9 @@ const ButtonRow = styled.button`
   align-items: center;
   background-color: transparent;
   justify-content: flex-start;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-top: 11px;
-  padding-bottom: 11px;
+  padding: ${(props) => props.theme.space.l};
+  padding-top: ${(props) => props.theme.space.s};
+  padding-bottom: ${(props) => props.theme.space.s};
   font: ${(props) => props.theme.typography.body_medium_m};
   color: ${(props) => props.theme.colors.white_0};
   transition: background-color 0.2s ease;
