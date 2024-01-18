@@ -284,3 +284,10 @@ export function renameAccountAction(
     selectedAccount,
   };
 }
+
+export function setWalletHideStxAction(hideStx: boolean): actions.SetWalletHideStx {
+  return {
+    type: actions.SetWalletHideStxKey,
+    hideStx,
+  };
+}

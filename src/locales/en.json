@@ -221,7 +221,8 @@
     }
   },
   "TOKEN_SCREEN": {
-    "ADD_COINS": "Manage tokens"
+    "ADD_COINS": "Manage tokens",
+    "DESCRIPTION": "Select which assets you would like to see on your dashboard."
   },
   "ACCOUNT_SCREEN": {
     "TITLE": "Accounts",

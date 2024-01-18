@@ -21,6 +21,7 @@ import {
   SetCoinRatesKey,
   SetFeeMultiplierKey,
   SetStxWalletDataKey,
+  SetWalletHideStxKey,
   SetWalletKey,
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
@@ -100,6 +101,7 @@ export const initialWalletState: WalletState = {
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
+  hideStx: false,
 };
 
 const walletReducer = (
@@ -269,6 +271,11 @@ const walletReducer = (
         ...state,
         accountsList: action.accountsList,
         selectedAccount: action.selectedAccount,
+      };
+    case SetWalletHideStxKey:
+      return {
+        ...state,
+        hideStx: action.hideStx,
       };
     default:
       return state;
