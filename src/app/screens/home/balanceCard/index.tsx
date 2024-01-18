@@ -81,7 +81,6 @@ function BalanceCard(props: BalanceCardProps) {
     accountBalances,
   } = useWalletSelector();
   const { enqueueFetchBalances } = useAccountBalance();
-  const [balance, setBalance] = useState<string | null>(null);
   const { isLoading, isRefetching } = props;
   const oldTotalBalance = accountBalances[btcAddress];
 
@@ -105,28 +104,17 @@ function BalanceCard(props: BalanceCardProps) {
     return totalBalance.toNumber().toFixed(2);
   };
 
-  useEffect(() => {
-    if (isLoading || isRefetching) {
-      return;
-    }
-
-    const result = calculateTotalBalance();
-    setBalance(result);
-
-    return () => {
-      setBalance(null);
-    };
-  }, [isLoading, isRefetching]);
+  const balance = calculateTotalBalance();
 
   useEffect(() => {
-    if (!balance || !selectedAccount) {
+    if (!balance || !selectedAccount || isLoading || isRefetching) {
       return;
     }
 
     if (oldTotalBalance !== balance) {
       enqueueFetchBalances(selectedAccount);
     }
-  }, [balance, enqueueFetchBalances, oldTotalBalance, selectedAccount]);
+  }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching]);
 
   return (
     <>
@@ -143,7 +131,7 @@ function BalanceCard(props: BalanceCardProps) {
       ) : (
         <BalanceContainer>
           <NumericFormat
-            value={calculateTotalBalance()}
+            value={balance}
             displayType="text"
             prefix={`${currencySymbolMap[fiatCurrency]}`}
             thousandSeparator
