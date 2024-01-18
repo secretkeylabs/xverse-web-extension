@@ -6,11 +6,6 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import FeeSelectPopup from './feeSelectPopup';
 
-const Container = styled.div`
-  margin-top: ${(props) => props.theme.spacing(12)}px;
-  margin-bottom: ${(props) => props.theme.spacing(8)}px;
-`;
-
 const RowContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -101,7 +96,7 @@ function SelectFeeRate({
   }, [feeRates, feeRate]);
 
   return (
-    <Container>
+    <div>
       <RowContainer>
         <Label $size="m" $variant="mid">
           {t('TRANSACTION_SETTING.NETWORK_FEE')}
@@ -174,7 +169,7 @@ function SelectFeeRate({
           getFeeForFeeRate={getFeeForFeeRate}
         />
       )}
-    </Container>
+    </div>
   );
 }
 

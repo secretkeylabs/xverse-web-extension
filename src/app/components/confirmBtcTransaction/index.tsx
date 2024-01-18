@@ -65,6 +65,7 @@ type Props = {
     useEffectiveFeeRate?: boolean,
   ) => Promise<number | undefined>;
   onFeeRateSet?: (feeRate: number) => void;
+  feeRate?: number;
 };
 
 function ConfirmBtcTransaction({
@@ -85,6 +86,7 @@ function ConfirmBtcTransaction({
   confirmDisabled = false,
   getFeeForFeeRate,
   onFeeRateSet,
+  feeRate,
 }: Props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -171,6 +173,7 @@ function ConfirmBtcTransaction({
           isPartialTransaction={isPartialTransaction}
           getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={onFeeRateSet}
+          feeRate={feeRate}
           isSubmitting={isSubmitting}
         />
         {!isLoading && (

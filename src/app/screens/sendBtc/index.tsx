@@ -26,10 +26,10 @@ function SendBtcScreen() {
 
   // TODO: remove amount and address defaults
   const [recipientAddress, setRecipientAddress] = useState(
-    location.state?.recipientAddress || '2ND4zw8hbn1ydvVwZFo6UjCRWr394b71okg',
+    location.state?.recipientAddress || '2MvD5Ug9arybH1K4rJNDwiNaSCw9cPxfyZn',
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [amountSats, setAmountSats] = useState(location.state?.amount || '10000');
+  const [amountSats, setAmountSats] = useState(location.state?.amount || '1000000');
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const amountEditable = location.state?.disableAmountEdit ?? true;
@@ -123,6 +123,13 @@ function SendBtcScreen() {
     navigate('/');
   };
 
+  const handleFeeRateChange = (newFeeRate: string) => {
+    setFeeRate(newFeeRate);
+    if (currentStep === Step.Confirm) {
+      setSendMax(false);
+    }
+  };
+
   return (
     <StepDisplay
       currentStep={currentStep}
@@ -132,7 +139,7 @@ function SendBtcScreen() {
       amountSats={amountSats}
       setAmountSats={setAmountSats}
       feeRate={feeRate}
-      setFeeRate={setFeeRate}
+      setFeeRate={handleFeeRateChange}
       sendMax={sendMax}
       setSendMax={setSendMax}
       getFeeForFeeRate={calculateFeeForFeeRate}

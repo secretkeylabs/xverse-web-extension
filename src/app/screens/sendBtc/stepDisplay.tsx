@@ -130,6 +130,7 @@ function StepDisplay({
           onConfirm={onConfirm}
           getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={(newFeeRate) => setFeeRate(newFeeRate.toString())}
+          feeRate={+feeRate}
           isSubmitting={false}
           isBroadcast
           hideBottomBar

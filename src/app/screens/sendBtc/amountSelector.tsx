@@ -17,6 +17,11 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
+const FeeRateContainer = styled.div`
+  margin-top: ${(props) => props.theme.spacing(12)}px;
+  margin-bottom: ${(props) => props.theme.spacing(8)}px;
+`;
+
 const Buttons = styled.div`
   margin: ${(props) => props.theme.spacing(12)}px 0;
 `;
@@ -70,22 +75,24 @@ function AmountSelector({
           setSendMax={setSendMax}
           disabled={isLoading}
         />
-        <SelectFeeRate
-          fee={fee}
-          feeUnits="Sats"
-          feeRate={feeRate}
-          feeRateUnits="sats/vB"
-          setFeeRate={setFeeRate}
-          baseToFiat={satsToFiat}
-          fiatUnit={fiatCurrency}
-          getFeeForFeeRate={getFeeForFeeRate}
-          feeRates={{
-            medium: recommendedFees?.regular,
-            high: recommendedFees?.priority,
-          }}
-          feeRateLimits={recommendedFees?.limits}
-          isLoading={isLoading}
-        />
+        <FeeRateContainer>
+          <SelectFeeRate
+            fee={fee}
+            feeUnits="Sats"
+            feeRate={feeRate}
+            feeRateUnits="sats/vB"
+            setFeeRate={setFeeRate}
+            baseToFiat={satsToFiat}
+            fiatUnit={fiatCurrency}
+            getFeeForFeeRate={getFeeForFeeRate}
+            feeRates={{
+              medium: recommendedFees?.regular,
+              high: recommendedFees?.priority,
+            }}
+            feeRateLimits={recommendedFees?.limits}
+            isLoading={isLoading}
+          />
+        </FeeRateContainer>
         {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}
       </div>
       <Buttons>
