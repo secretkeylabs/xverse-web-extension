@@ -4,7 +4,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
