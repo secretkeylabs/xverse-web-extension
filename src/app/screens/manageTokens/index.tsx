@@ -6,7 +6,10 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import CoinItem from '@screens/manageTokens/coinItem';
 import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
-import { FetchUpdatedVisibleCoinListAction } from '@stores/wallet/actions/actionCreators';
+import {
+  FetchUpdatedVisibleBrc20CoinListAction,
+  FetchUpdatedVisibleCoinListAction,
+} from '@stores/wallet/actions/actionCreators';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -99,7 +102,7 @@ enum Protocols {
 
 function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
-  const { coinsList, coins } = useSelector((state: StoreState) => state.walletState);
+  const { coinsList, coins, brcCoinsList } = useSelector((state: StoreState) => state.walletState);
   const [selectedProtocol, setSelectedProtocol] = useState<Protocols>(Protocols.SIP_10);
 
   const navigate = useNavigate();
@@ -108,11 +111,19 @@ function ManageTokens() {
   const toggled = (isEnabled: boolean, coin: Pick<Coin, 'name' | 'contract'>) => {
     /* if coins exists in list of fungible token, update the visible property otherwise
      add coin in list if coin is set to visible */
-    const coinToBeUpdated: FungibleToken | undefined = coinsList?.find(
-      (ft) => ft.principal === coin.contract,
-    );
-    if (coinToBeUpdated) coinToBeUpdated.visible = isEnabled;
-    else if (!coinToBeUpdated && isEnabled) {
+
+    let coinToBeUpdated: FungibleToken | undefined;
+    let protocol;
+
+    coinToBeUpdated = coinsList?.find((ft) => ft.principal === coin.contract);
+    if (coinToBeUpdated) protocol = Protocols.SIP_10;
+
+    coinToBeUpdated = brcCoinsList?.find((ft) => ft.ticker === coin.contract);
+    if (coinToBeUpdated) protocol = Protocols.BRC_20;
+
+    if (coinToBeUpdated) {
+      coinToBeUpdated.visible = isEnabled;
+    } else if (isEnabled) {
       const coinToBeAdded: FungibleToken = {
         name: coin?.name,
         visible: true,
@@ -122,11 +133,21 @@ function ManageTokens() {
         total_received: '',
         assetName: '',
       };
-      coinsList?.push(coinToBeAdded);
+      if (protocol === Protocols.SIP_10) {
+        coinsList?.push(coinToBeAdded);
+      } else if (protocol === Protocols.BRC_20) {
+        brcCoinsList?.push(coinToBeAdded);
+      }
     }
-    if (coinsList) {
+
+    if (coinsList && protocol === Protocols.SIP_10) {
       const modifiedCoinsList = [...coinsList];
       dispatch(FetchUpdatedVisibleCoinListAction(modifiedCoinsList));
+    }
+
+    if (brcCoinsList && protocol === Protocols.BRC_20) {
+      const modifiedCoinsList = [...brcCoinsList];
+      dispatch(FetchUpdatedVisibleBrc20CoinListAction(modifiedCoinsList));
     }
   };
 
@@ -138,6 +159,12 @@ function ManageTokens() {
     if (coins) return !(index === coins.length - 1);
     return false;
   }
+
+  const modifiedBrcCoinsList = (brcCoinsList || []).map((coin) => ({
+    ...coin,
+    contract: coin.ticker || '',
+  }));
+  const combinedCoins = [...coins, ...modifiedBrcCoinsList];
 
   return (
     <>
@@ -163,7 +190,7 @@ function ManageTokens() {
           </FtInfoContainer>
           <TokenContainer>
             <Stacks />
-            {coins?.map((coin, index) => (
+            {combinedCoins?.map((coin, index) => (
               <CoinItem
                 key={coin.contract} // contract is not optional and is unique
                 coin={coin}
