@@ -40,6 +40,8 @@ export const SetWalletUnlockedKey = 'SetWalletUnlocked';
 export const RenameAccountKey = 'RenameAccountKey';
 export const SetAccountBalanceKey = 'SetAccountBalanceKey';
 
+export const SetWalletHideStxKey = 'SetWalletHideStx';
+
 export enum WalletSessionPeriods {
   LOW = 15,
   STANDARD = 30,
@@ -87,6 +89,7 @@ export interface WalletState {
   accountBalances: {
     [key: string]: string;
   };
+  hideStx: boolean;
 }
 
 export interface SetWallet {
@@ -242,6 +245,11 @@ export interface SetAccountBalance {
   totalBalance: string;
 }
 
+export interface SetWalletHideStx {
+  type: typeof SetWalletHideStxKey;
+  hideStx: boolean;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -270,4 +278,5 @@ export type WalletActions =
   | SetRareSatsNoticeDismissed
   | SetWalletUnlocked
   | RenameAccount
-  | SetAccountBalance;
+  | SetAccountBalance
+  | SetWalletHideStx;

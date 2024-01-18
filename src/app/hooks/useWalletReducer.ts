@@ -25,6 +25,7 @@ import {
   resetWalletAction,
   selectAccount,
   setWalletAction,
+  setWalletHideStxAction,
   setWalletUnlockedAction,
   storeEncryptedSeedAction,
   updateLedgerAccountsAction,
@@ -55,6 +56,7 @@ const useWalletReducer = () => {
   const { setSessionStartTime, clearSessionTime, setSessionStartTimeAndMigrate } =
     useWalletSession();
   const queryClient = useQueryClient();
+  const { hideStx } = useWalletSelector();
 
   const loadActiveAccounts = async (
     secretKey: string,
@@ -165,6 +167,10 @@ const useWalletReducer = () => {
   const lockWallet = async () => {
     await seedVault.lockVault();
     dispatch(setWalletUnlockedAction(false));
+  };
+
+  const toggleStxVisibility = async () => {
+    dispatch(setWalletHideStxAction(!hideStx));
   };
 
   const resetWallet = async () => {
@@ -396,6 +402,7 @@ const useWalletReducer = () => {
     removeLedgerAccount,
     updateLedgerAccounts,
     renameAccount,
+    toggleStxVisibility,
   };
 };
 

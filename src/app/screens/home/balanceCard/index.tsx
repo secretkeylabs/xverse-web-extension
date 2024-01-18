@@ -77,6 +77,8 @@ function BalanceCard(props: BalanceCardProps) {
     btcBalance,
     btcAddress,
     stxAddress,
+    hideStx,
+    coinsList,
     selectedAccount,
     accountBalances,
   } = useWalletSelector();
@@ -87,7 +89,7 @@ function BalanceCard(props: BalanceCardProps) {
   const calculateTotalBalance = () => {
     let totalBalance = new BigNumber(0);
 
-    if (stxAddress) {
+    if (stxAddress && !hideStx) {
       const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
         .multipliedBy(new BigNumber(stxBtcRate))
         .multipliedBy(new BigNumber(btcFiatRate));
@@ -99,6 +101,20 @@ function BalanceCard(props: BalanceCardProps) {
         new BigNumber(btcFiatRate),
       );
       totalBalance = totalBalance.plus(btcFiatEquiv);
+    }
+
+    if (coinsList) {
+      totalBalance = coinsList.reduce((acc, coin) => {
+        if (coin.visible && coin.tokenFiatRate && coin.decimals) {
+          const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
+          const coinFiatValue = new BigNumber(coin.balance)
+            .dividedBy(tokenUnits)
+            .multipliedBy(new BigNumber(coin.tokenFiatRate));
+          return acc.plus(coinFiatValue);
+        }
+
+        return acc;
+      }, totalBalance);
     }
 
     return totalBalance.toNumber().toFixed(2);
