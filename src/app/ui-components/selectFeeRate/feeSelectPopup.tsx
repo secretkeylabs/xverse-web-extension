@@ -198,7 +198,7 @@ function FeeSelectPopup({
         setFeeRate(`${+customValue}`);
         onClose();
       };
-      if (feeRateLimits) feeRateLimits.max = 10;
+
       const rateTooLow = !!feeRateLimits?.min && Number(customValue) < feeRateLimits.min;
       const rateTooHigh = !!feeRateLimits?.max && Number(customValue) > feeRateLimits.max;
 

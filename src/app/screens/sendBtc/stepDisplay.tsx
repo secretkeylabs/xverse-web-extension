@@ -45,6 +45,7 @@ type StepDisplayProps = {
   onBack: () => void;
   onCancel: () => void;
   isLoading: boolean;
+  isSubmitting: boolean;
 };
 
 function StepDisplay({
@@ -65,6 +66,7 @@ function StepDisplay({
   onBack,
   onCancel,
   isLoading,
+  isSubmitting,
 }: StepDisplayProps) {
   const { t } = useTranslation('translation');
   const header = (
@@ -105,7 +107,7 @@ function StepDisplay({
               getFeeForFeeRate={getFeeForFeeRate}
               dustFiltered={summary?.dustFiltered ?? false}
               onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
-              hasSufficientFunds={!!summary}
+              hasSufficientFunds={!amountSats || !!summary || isLoading}
               isLoading={isLoading}
             />
           </Container>
@@ -131,7 +133,7 @@ function StepDisplay({
           getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={(newFeeRate) => setFeeRate(newFeeRate.toString())}
           feeRate={+feeRate}
-          isSubmitting={false}
+          isSubmitting={isSubmitting}
           isBroadcast
           hideBottomBar
         />

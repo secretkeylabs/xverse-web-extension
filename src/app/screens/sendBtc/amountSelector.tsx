@@ -7,6 +7,7 @@ import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -58,12 +59,15 @@ function AmountSelector({
   header,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const { btcFiatRate, fiatCurrency } = useWalletSelector();
+  const navigate = useNavigate();
+
+  const { btcFiatRate, fiatCurrency, btcBalance } = useWalletSelector();
   const { data: recommendedFees } = useBtcFeeRate();
 
   const satsToFiat = (sats: string) =>
     getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
 
+  const hasBtc = +btcBalance > 0;
   return (
     <Container>
       <div>
@@ -73,36 +77,50 @@ function AmountSelector({
           setAmountSats={setAmountSats}
           sendMax={sendMax}
           setSendMax={setSendMax}
-          disabled={isLoading}
+          disabled={!hasBtc}
         />
-        <FeeRateContainer>
-          <SelectFeeRate
-            fee={fee}
-            feeUnits="Sats"
-            feeRate={feeRate}
-            feeRateUnits="sats/vB"
-            setFeeRate={setFeeRate}
-            baseToFiat={satsToFiat}
-            fiatUnit={fiatCurrency}
-            getFeeForFeeRate={getFeeForFeeRate}
-            feeRates={{
-              medium: recommendedFees?.regular,
-              high: recommendedFees?.priority,
-            }}
-            feeRateLimits={recommendedFees?.limits}
-            isLoading={isLoading}
-          />
-        </FeeRateContainer>
+        {hasBtc && (
+          <FeeRateContainer>
+            <SelectFeeRate
+              fee={fee}
+              feeUnits="Sats"
+              feeRate={feeRate}
+              feeRateUnits="sats/vB"
+              setFeeRate={setFeeRate}
+              baseToFiat={satsToFiat}
+              fiatUnit={fiatCurrency}
+              getFeeForFeeRate={getFeeForFeeRate}
+              feeRates={{
+                medium: recommendedFees?.regular,
+                high: recommendedFees?.priority,
+              }}
+              feeRateLimits={recommendedFees?.limits}
+              isLoading={isLoading}
+            />
+          </FeeRateContainer>
+        )}
         {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}
       </div>
       <Buttons>
-        <Button
-          title={hasSufficientFunds ? t('NEXT') : t('INSUFFICIENT_FUNDS')}
-          onClick={onNext}
-          loading={isLoading}
-          disabled={!hasSufficientFunds || +amountSats === 0}
-          variant={hasSufficientFunds ? undefined : 'danger'}
-        />
+        {hasBtc && (
+          <Button
+            title={hasSufficientFunds ? t('NEXT') : t('INSUFFICIENT_FUNDS')}
+            onClick={onNext}
+            loading={isLoading}
+            disabled={!hasSufficientFunds || +amountSats === 0}
+            variant={hasSufficientFunds ? undefined : 'danger'}
+          />
+        )}
+        {!hasBtc && (
+          <Callout
+            titleText={t('BTC.NO_FUNDS_TITLE')}
+            bodyText={t('BTC.NO_FUNDS')}
+            redirectText={t('BTC.BUY_BTC')}
+            onClickRedirect={() => {
+              navigate('/buy/btc');
+            }}
+          />
+        )}
       </Buttons>
     </Container>
   );

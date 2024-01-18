@@ -254,7 +254,10 @@
     "BTC": {
       "AMOUNT": "{{currency}} amount",
       "RECIPIENT_PLACEHOLDER": "Enter address",
-      "MAX_IGNORING_DUST_UTXO_MSG": "Small amounts may remain in your wallet, as sending them costs more in fees than their value."
+      "MAX_IGNORING_DUST_UTXO_MSG": "Small amounts may remain in your wallet, as sending them costs more in fees than their value.",
+      "NO_FUNDS_TITLE": "Your balance is empty",
+      "NO_FUNDS": "You don't have any funds to send. You can purchase crypto quickly and deposit directly into your Xverse wallet.",
+      "BUY_BTC": "Buy Bitcoin"
     },
     "SEND_TO": "Send to",
     "SEND": "Send",

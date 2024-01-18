@@ -19,8 +19,8 @@ const BalanceText = styled.span`
   color: ${(props) => props.theme.colors.white_200};
 `;
 
-const ConvertComplication = styled.div`
-  cursor: pointer;
+const ConvertComplication = styled.div<{ $disabled?: boolean }>`
+  cursor: ${(props) => (props.$disabled ? 'not-allowed' : 'pointer')};
   user-select: none;
 
   display: flex;
@@ -30,7 +30,8 @@ const ConvertComplication = styled.div`
   color: ${(props) => props.theme.colors.white_200};
 
   &:hover {
-    color: ${(props) => props.theme.colors.white_0};
+    color: ${(props) =>
+      props.$disabled ? props.theme.colors.white_200 : props.theme.colors.white_0};
   }
 `;
 
@@ -83,7 +84,9 @@ function AmountSelector({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { btcBalance: btcBalanceSats, btcFiatRate, fiatCurrency } = useWalletSelector();
 
-  const [amountDisplay, setAmountDisplay] = useState(satsToBtcString(new BigNumber(amountSats)));
+  const [amountDisplay, setAmountDisplay] = useState(
+    amountSats && satsToBtcString(new BigNumber(amountSats)),
+  );
   const [useBtcValue, setUseBtcValue] = useState(true);
 
   useEffect(() => {
@@ -140,8 +143,12 @@ function AmountSelector({
   };
 
   const handleUseBtcValueChange = () => {
+    if (disabled) return;
+
     const shouldUseBtcValue = !useBtcValue;
     setUseBtcValue(shouldUseBtcValue);
+
+    if (!amountDisplay) return;
 
     if (shouldUseBtcValue) {
       // convert outer sats amount to btc
@@ -197,7 +204,7 @@ function AmountSelector({
       }
       complications={
         <>
-          <ConvertComplication onClick={handleUseBtcValueChange}>
+          <ConvertComplication $disabled={disabled} onClick={handleUseBtcValueChange}>
             <NumericFormat
               value={sendAmountConverted}
               displayType="text"

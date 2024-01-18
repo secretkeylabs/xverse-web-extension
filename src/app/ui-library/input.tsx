@@ -173,21 +173,22 @@ function Input({
 
   useLayoutEffect(() => {
     // This ensures that the complications don't overlap the text input
-    if (complicationsRef.current && inputRef.current) {
-      const stickyComplicationsRef = complicationsRef.current;
-      const stickyInputRef = inputRef.current;
+    const stickyComplicationsRef = complicationsRef.current;
+    const stickyInputRef = inputRef.current;
 
+    if (stickyComplicationsRef && stickyInputRef) {
       const padInput = () => {
         const complicationsWidth = stickyComplicationsRef.clientWidth;
         stickyInputRef.style.paddingRight = `${complicationsWidth + 16}px`;
       };
 
-      stickyComplicationsRef.addEventListener('resize', padInput);
-
       padInput();
 
+      const resizeObserver = new ResizeObserver(padInput);
+      resizeObserver.observe(stickyComplicationsRef);
+
       return () => {
-        stickyComplicationsRef.removeEventListener('resize', padInput);
+        resizeObserver.disconnect();
       };
     }
   }, []);

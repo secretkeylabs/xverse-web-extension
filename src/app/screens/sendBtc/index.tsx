@@ -24,12 +24,10 @@ function SendBtcScreen() {
 
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
 
-  // TODO: remove amount and address defaults
-  const [recipientAddress, setRecipientAddress] = useState(
-    location.state?.recipientAddress || '2MvD5Ug9arybH1K4rJNDwiNaSCw9cPxfyZn',
-  );
+  const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [isLoading, setIsLoading] = useState(false);
-  const [amountSats, setAmountSats] = useState(location.state?.amount || '1000000');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [amountSats, setAmountSats] = useState(location.state?.amount || '');
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const amountEditable = location.state?.disableAmountEdit ?? true;
@@ -84,8 +82,9 @@ function SendBtcScreen() {
           setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
         }
       } catch (e) {
-        // TODO: handle error
         console.error(e);
+        setTransaction(undefined);
+        setSummary(undefined);
       } finally {
         setIsLoading(false);
       }
@@ -118,9 +117,28 @@ function SendBtcScreen() {
   };
 
   const handleSubmit = async (ledgerTransport?: Transport) => {
-    // TODO: validate, set loading, error handling, redirect to txn confirmation screen
-    await transaction?.broadcast({ ledgerTransport });
-    navigate('/');
+    try {
+      setIsSubmitting(true);
+      const txnId = await transaction?.broadcast({ ledgerTransport });
+      navigate('/tx-status', {
+        state: {
+          txid: txnId,
+          currency: 'BTC',
+          error: '',
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error: `${e}`,
+        },
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFeeRateChange = (newFeeRate: string) => {
@@ -148,6 +166,7 @@ function SendBtcScreen() {
       onCancel={handleCancel}
       onConfirm={handleSubmit}
       isLoading={isLoading}
+      isSubmitting={isSubmitting}
       summary={summary}
     />
   );
