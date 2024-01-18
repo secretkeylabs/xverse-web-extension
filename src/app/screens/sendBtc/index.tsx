@@ -1,15 +1,10 @@
-import BottomBar from '@components/tabBar';
-import TokenImage from '@components/tokenImage';
-import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { Transport, btcTransaction } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import {
   generateSendMaxTransaction,
   generateTransaction,
@@ -18,22 +13,10 @@ import {
 import StepDisplay from './stepDisplay';
 import { Step, getPreviousStep } from './steps';
 
-const TitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 0 0;
-`;
-
-const Title = styled.div`
-  ${(props) => props.theme.typography.headline_xs}
-  margin-top: ${(props) => props.theme.spacing(6)}px;
-  margin-bottom: ${(props) => props.theme.spacing(12)}px;
-`;
-
 function SendBtcScreen() {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
+
+  const isInOption = isInOptions();
 
   useResetUserFlow('/send-btc');
 
@@ -41,7 +24,7 @@ function SendBtcScreen() {
 
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
 
-  // TODO: remove amount and address defaults, set fee rate to regular
+  // TODO: remove amount and address defaults
   const [recipientAddress, setRecipientAddress] = useState(
     location.state?.recipientAddress || '2ND4zw8hbn1ydvVwZFo6UjCRWr394b71okg',
   );
@@ -65,18 +48,19 @@ function SendBtcScreen() {
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
     const amountBigInt = BigInt(amountSats);
-    const transactionDetails = sendMax
-      ? await generateSendMaxTransaction(
-          transactionContext,
-          recipientAddress,
-          feeRateOverride ?? +feeRate,
-        )
-      : await generateTransaction(
-          transactionContext,
-          recipientAddress,
-          amountBigInt,
-          feeRateOverride ?? +feeRate,
-        );
+    const transactionDetails =
+      sendMax && currentStep !== Step.Confirm
+        ? await generateSendMaxTransaction(
+            transactionContext,
+            recipientAddress,
+            feeRateOverride ?? +feeRate,
+          )
+        : await generateTransaction(
+            transactionContext,
+            recipientAddress,
+            amountBigInt,
+            feeRateOverride ?? +feeRate,
+          );
     return transactionDetails;
   };
 
@@ -111,10 +95,12 @@ function SendBtcScreen() {
   }, [transactionContext, recipientAddress, amountSats, feeRate, sendMax]);
 
   const handleCancel = () => {
+    if (isInOption) {
+      window.close();
+      return;
+    }
     navigate('/');
   };
-
-  const showNavButtons = !isInOptions() || currentStep > 0;
 
   const handleBackButtonClick = () => {
     if (currentStep > 0) {
@@ -138,37 +124,25 @@ function SendBtcScreen() {
   };
 
   return (
-    <>
-      {currentStep !== Step.Confirm && (
-        <>
-          <TopRow title="" onClick={handleBackButtonClick} showBackButton={showNavButtons} />
-          <TitleContainer>
-            <TokenImage token="BTC" loading={false} />
-            <Title>{t('SEND')}</Title>
-          </TitleContainer>
-        </>
-      )}
-      <StepDisplay
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-        recipientAddress={recipientAddress}
-        setRecipientAddress={setRecipientAddress}
-        amountSats={amountSats}
-        setAmountSats={setAmountSats}
-        feeRate={feeRate}
-        setFeeRate={setFeeRate}
-        sendMax={sendMax}
-        setSendMax={setSendMax}
-        getFeeForFeeRate={calculateFeeForFeeRate}
-        amountEditable={amountEditable}
-        onBack={handleBackButtonClick}
-        onCancel={handleCancel}
-        onConfirm={handleSubmit}
-        isLoading={isLoading}
-        summary={summary}
-      />
-      <BottomBar tab="dashboard" />
-    </>
+    <StepDisplay
+      currentStep={currentStep}
+      setCurrentStep={setCurrentStep}
+      recipientAddress={recipientAddress}
+      setRecipientAddress={setRecipientAddress}
+      amountSats={amountSats}
+      setAmountSats={setAmountSats}
+      feeRate={feeRate}
+      setFeeRate={setFeeRate}
+      sendMax={sendMax}
+      setSendMax={setSendMax}
+      getFeeForFeeRate={calculateFeeForFeeRate}
+      amountEditable={amountEditable}
+      onBack={handleBackButtonClick}
+      onCancel={handleCancel}
+      onConfirm={handleSubmit}
+      isLoading={isLoading}
+      summary={summary}
+    />
   );
 }
 

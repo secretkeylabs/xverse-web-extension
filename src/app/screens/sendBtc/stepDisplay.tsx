@@ -1,19 +1,30 @@
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import TokenImage from '@components/tokenImage';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import SendLayout from '../../layouts/sendLayout';
 import AmountSelector from './amountSelector';
 import { TransactionSummary } from './helpers';
 import RecipientSelector from './recipientSelector';
 import { Step, getNextStep } from './steps';
 
-const Container = styled.div`
-  flex: 1;
-
+const TitleContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 0 16px;
-  margin-top: 16px;
-  overflow-y: auto;
+  align-items: center;
+  flex: 0 0;
+`;
+
+const Title = styled.div`
+  ${(props) => props.theme.typography.headline_xs}
+  margin-top: ${(props) => props.theme.spacing(6)}px;
+  margin-bottom: ${(props) => props.theme.spacing(12)}px;
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex: 1 1 100%;
+  min-height: 370px;
 `;
 
 type StepDisplayProps = {
@@ -56,37 +67,49 @@ function StepDisplay({
   isLoading,
 }: StepDisplayProps) {
   const { t } = useTranslation('translation');
+  const header = (
+    <TitleContainer>
+      <TokenImage token="BTC" />
+      <Title>{t('SEND.SEND')}</Title>
+    </TitleContainer>
+  );
 
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
-        <Container>
-          <RecipientSelector
-            recipientAddress={recipientAddress}
-            setRecipientAddress={setRecipientAddress}
-            onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, amountEditable))}
-            isLoading={isLoading}
-          />
-        </Container>
+        <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
+          <Container>
+            <RecipientSelector
+              header={header}
+              recipientAddress={recipientAddress}
+              setRecipientAddress={setRecipientAddress}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, amountEditable))}
+              isLoading={isLoading}
+            />
+          </Container>
+        </SendLayout>
       );
     case Step.SelectAmount:
       return (
-        <Container>
-          <AmountSelector
-            amountSats={amountSats}
-            setAmountSats={setAmountSats}
-            feeRate={feeRate}
-            setFeeRate={setFeeRate}
-            sendMax={sendMax}
-            setSendMax={setSendMax}
-            fee={summary?.fee.toString()}
-            getFeeForFeeRate={getFeeForFeeRate}
-            dustFiltered={summary?.dustFiltered ?? false}
-            onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
-            hasSufficientFunds={!!summary}
-            isLoading={isLoading}
-          />
-        </Container>
+        <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
+          <Container>
+            <AmountSelector
+              header={header}
+              amountSats={amountSats}
+              setAmountSats={setAmountSats}
+              feeRate={feeRate}
+              setFeeRate={setFeeRate}
+              sendMax={sendMax}
+              setSendMax={setSendMax}
+              fee={summary?.fee.toString()}
+              getFeeForFeeRate={getFeeForFeeRate}
+              dustFiltered={summary?.dustFiltered ?? false}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
+              hasSufficientFunds={!!summary}
+              isLoading={isLoading}
+            />
+          </Container>
+        </SendLayout>
       );
     case Step.Confirm:
       if (!summary) {

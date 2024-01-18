@@ -34,6 +34,7 @@ type Props = {
   dustFiltered: boolean;
   hasSufficientFunds: boolean;
   isLoading?: boolean;
+  header?: React.ReactNode;
 };
 
 function AmountSelector({
@@ -49,6 +50,7 @@ function AmountSelector({
   isLoading,
   dustFiltered,
   hasSufficientFunds,
+  header,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
@@ -60,6 +62,7 @@ function AmountSelector({
   return (
     <Container>
       <div>
+        {header}
         <BtcAmountSelector
           amountSats={amountSats}
           setAmountSats={setAmountSats}

@@ -23,10 +23,17 @@ type Props = {
   setRecipientAddress: (address: string) => void;
   onNext: () => void;
   isLoading: boolean;
+  header?: React.ReactNode;
 };
 
 // TODO: this could be extracted into a component for reuse
-function RecipientSelector({ recipientAddress, setRecipientAddress, onNext, isLoading }: Props) {
+function RecipientSelector({
+  recipientAddress,
+  setRecipientAddress,
+  onNext,
+  isLoading,
+  header,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { network } = useWalletSelector();
   const [addressIsValid, setAddressIsValid] = useState(true);
@@ -58,14 +65,17 @@ function RecipientSelector({ recipientAddress, setRecipientAddress, onNext, isLo
 
   return (
     <Container>
-      <Input
-        title={t('RECIPIENT')}
-        placeholder={t('BTC.RECIPIENT_PLACEHOLDER')}
-        value={recipientAddress}
-        onChange={handleAddressChange}
-        variant={addressIsValid ? 'default' : 'danger'}
-        feedback={inputFeedback}
-      />
+      <div>
+        {header}
+        <Input
+          title={t('RECIPIENT')}
+          placeholder={t('BTC.RECIPIENT_PLACEHOLDER')}
+          value={recipientAddress}
+          onChange={handleAddressChange}
+          variant={addressIsValid ? 'default' : 'danger'}
+          feedback={inputFeedback}
+        />
+      </div>
       <Buttons>
         <Button
           title={t('NEXT')}

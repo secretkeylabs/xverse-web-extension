@@ -3,7 +3,8 @@ import useWalletSelector from '@hooks/useWalletSelector';
 
 import AssetModal from '@components/assetModal';
 import TransferFeeView from '@components/transferFeeView';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { btcTransaction, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import SelectFeeRate from '@ui-components/selectFeeRate';
 import Callout from '@ui-library/callout';
 import { BLOG_LINK } from '@utils/constants';
 import BigNumber from 'bignumber.js';
@@ -14,6 +15,13 @@ import ReceiveSection from './receiveSection';
 import TransferSection from './transferSection';
 import TxInOutput from './txInOutput/txInOutput';
 import { getNetAmount, isScriptOutput, isSpendOutput } from './utils';
+
+const Container = styled.div((props) => ({
+  background: props.theme.colors.elevation1,
+  borderRadius: 12,
+  padding: '12px 16px',
+  marginBottom: 12,
+}));
 
 const ScriptCallout = styled(Callout)`
   margin-bottom: ${(props) => props.theme.space.s};
@@ -57,7 +65,7 @@ function TransactionSummary({
     btcTransaction.IOInscription | undefined
   >(undefined);
 
-  const { network } = useWalletSelector();
+  const { network, fiatCurrency, btcFiatRate } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: rareSatsT } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
   const { btcAddress, ordinalsAddress } = useWalletSelector();
@@ -87,6 +95,9 @@ function TransactionSummary({
       );
   const feesHaveInscribedRareSats = feeOutput?.inscriptions.length || feeOutput?.satributes.length;
   const showInscribeRareSatWarning = paymentHasInscribedRareSats || feesHaveInscribedRareSats;
+
+  const satsToFiat = (sats: string) =>
+    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
 
   return (
     <>
@@ -142,6 +153,27 @@ function TransactionSummary({
           inscriptions={feeOutput.inscriptions}
           onShowInscription={setInscriptionToShow}
         />
+      )}
+      {feeOutput && getFeeForFeeRate && (
+        <Container>
+          <SelectFeeRate
+            fee={feeOutput.amount.toString()}
+            feeUnits="Sats"
+            feeRate="10"
+            feeRateUnits="sats/vB"
+            setFeeRate={(newFeeRate) => onFeeRateSet?.(+newFeeRate)}
+            baseToFiat={satsToFiat}
+            fiatUnit={fiatCurrency}
+            getFeeForFeeRate={getFeeForFeeRate}
+            feeRates={
+              {
+                // medium: recommendedFees?.regular,
+                // high: recommendedFees?.priority,
+              }
+            }
+            // feeRateLimits={recommendedFees?.limits}
+          />
+        </Container>
       )}
     </>
   );
