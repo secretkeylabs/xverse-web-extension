@@ -31,6 +31,7 @@ const Container = styled.div({
   overflow: 'hidden',
   paddingLeft: 16,
   paddingRight: 16,
+  height: '100%',
 });
 
 const ScrollableContainer = styled.div`
@@ -112,14 +113,9 @@ function ManageTokens() {
     /* if coins exists in list of fungible token, update the visible property otherwise
      add coin in list if coin is set to visible */
 
-    let coinToBeUpdated: FungibleToken | undefined;
-    let protocol;
-
-    coinToBeUpdated = coinsList?.find((ft) => ft.principal === coin.contract);
-    if (coinToBeUpdated) protocol = Protocols.SIP_10;
-
-    coinToBeUpdated = brcCoinsList?.find((ft) => ft.ticker === coin.contract);
-    if (coinToBeUpdated) protocol = Protocols.BRC_20;
+    const coinToBeUpdated =
+      coinsList?.find((ft) => ft.principal === coin.contract) ??
+      brcCoinsList?.find((ft) => ft.ticker === coin.contract);
 
     if (coinToBeUpdated) {
       coinToBeUpdated.visible = isEnabled;
@@ -133,19 +129,19 @@ function ManageTokens() {
         total_received: '',
         assetName: '',
       };
-      if (protocol === Protocols.SIP_10) {
+      if (selectedProtocol === Protocols.SIP_10) {
         coinsList?.push(coinToBeAdded);
-      } else if (protocol === Protocols.BRC_20) {
+      } else if (selectedProtocol === Protocols.BRC_20) {
         brcCoinsList?.push(coinToBeAdded);
       }
     }
 
-    if (coinsList && protocol === Protocols.SIP_10) {
+    if (coinsList && selectedProtocol === Protocols.SIP_10) {
       const modifiedCoinsList = [...coinsList];
       dispatch(FetchUpdatedVisibleCoinListAction(modifiedCoinsList));
     }
 
-    if (brcCoinsList && protocol === Protocols.BRC_20) {
+    if (brcCoinsList && selectedProtocol === Protocols.BRC_20) {
       const modifiedCoinsList = [...brcCoinsList];
       dispatch(FetchUpdatedVisibleBrc20CoinListAction(modifiedCoinsList));
     }
@@ -155,16 +151,17 @@ function ManageTokens() {
     navigate('/');
   };
 
-  function showDivider(index: number): boolean {
-    if (coins) return !(index === coins.length - 1);
-    return false;
-  }
-
   const modifiedBrcCoinsList = (brcCoinsList || []).map((coin) => ({
     ...coin,
     contract: coin.ticker || '',
   }));
-  const combinedCoins = [...coins, ...modifiedBrcCoinsList];
+
+  const selectedCoins = selectedProtocol === Protocols.SIP_10 ? coins : modifiedBrcCoinsList;
+
+  function showDivider(index: number): boolean {
+    if (selectedCoins) return !(index === selectedCoins.length - 1);
+    return false;
+  }
 
   return (
     <>
@@ -180,24 +177,23 @@ function ManageTokens() {
             >
               {Protocols.SIP_10}
             </Button>
-            {/* To be uncommented when brc-20 tokens are supported */}
-            {/* <Button
+            <Button
               isSelected={selectedProtocol === Protocols.BRC_20}
               onClick={() => setSelectedProtocol(Protocols.BRC_20)}
             >
               {Protocols.BRC_20}
-            </Button> */}
+            </Button>
           </FtInfoContainer>
           <TokenContainer>
-            <Stacks />
-            {combinedCoins?.map((coin, index) => (
+            {selectedProtocol === Protocols.SIP_10 && <Stacks />}
+            {selectedCoins?.map((coin, index) => (
               <CoinItem
                 key={coin.contract} // contract is not optional and is unique
                 coin={coin}
                 disabled={false}
                 toggled={toggled}
                 enabled={coin.visible}
-                showDivider={showDivider(index + 1)}
+                showDivider={showDivider(index)}
               />
             ))}
           </TokenContainer>
