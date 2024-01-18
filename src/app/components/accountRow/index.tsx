@@ -8,12 +8,13 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
 import { Account, currencySymbolMap } from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
-import { LoaderSize, MAX_ACC_NAME_LENGTH } from '@utils/constants';
+import { EMPTY_LABEL, LoaderSize, MAX_ACC_NAME_LENGTH } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
 import { isLedgerAccount, validateAccountName } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
+import { MoonLoader } from 'react-spinners';
 import 'react-tooltip/dist/react-tooltip.css';
 import styled from 'styled-components';
 
@@ -163,6 +164,9 @@ const Balance = styled.div<{ isSelected?: boolean }>((props) => ({
   ...props.theme.typography.body_medium_m,
   marginTop: props.theme.space.xxs,
   color: props.isSelected ? props.theme.colors.white_200 : props.theme.colors.white_400,
+  display: 'flex',
+  alignItems: 'center',
+  columnGap: props.theme.space.xs,
 }));
 
 function AccountRow({
@@ -333,6 +337,12 @@ function AccountRow({
                   thousandSeparator
                   renderText={(value: string) => <Balance isSelected={isSelected}>{value}</Balance>}
                 />
+              )}
+              {isAccountListView && !totalBalance && (
+                <Balance isSelected={isSelected}>
+                  {EMPTY_LABEL}
+                  <MoonLoader color="white" size={12} />
+                </Balance>
               )}
             </TransparentSpan>
           )}
