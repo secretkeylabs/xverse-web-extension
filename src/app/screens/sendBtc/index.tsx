@@ -63,7 +63,7 @@ function SendBtcScreen() {
   };
 
   useEffect(() => {
-    if (!recipientAddress || !amountSats || !feeRate) {
+    if (!recipientAddress || !(amountSats || sendMax) || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);
       return;
@@ -148,6 +148,12 @@ function SendBtcScreen() {
     }
   };
 
+  const setAmountSatsSafe = (newAmount: string) => {
+    if (!Number.isNaN(+newAmount)) {
+      setAmountSats(newAmount);
+    }
+  };
+
   return (
     <StepDisplay
       currentStep={currentStep}
@@ -155,7 +161,7 @@ function SendBtcScreen() {
       recipientAddress={recipientAddress}
       setRecipientAddress={setRecipientAddress}
       amountSats={amountSats}
-      setAmountSats={setAmountSats}
+      setAmountSats={setAmountSatsSafe}
       feeRate={feeRate}
       setFeeRate={handleFeeRateChange}
       sendMax={sendMax}

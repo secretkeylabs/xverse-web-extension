@@ -92,11 +92,14 @@ function AmountSelector({
   useEffect(() => {
     if (!sendMax) return;
 
-    const amountToDisplay = useBtcValue
-      ? satsToBtcString(new BigNumber(amountSats))
-      : getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate))
-          .toNumber()
-          .toFixed(2);
+    const amountToDisplay =
+      amountSats &&
+      (useBtcValue
+        ? satsToBtcString(new BigNumber(amountSats))
+        : getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate))
+            .toNumber()
+            .toFixed(2));
+
     if (amountToDisplay !== amountDisplay) {
       setAmountDisplay(amountToDisplay);
     }
@@ -148,7 +151,7 @@ function AmountSelector({
     const shouldUseBtcValue = !useBtcValue;
     setUseBtcValue(shouldUseBtcValue);
 
-    if (!amountDisplay) return;
+    if (!amountDisplay || Number.isNaN(+amountDisplay)) return;
 
     if (shouldUseBtcValue) {
       // convert outer sats amount to btc

@@ -42,16 +42,12 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
-
-  // TODO: these are for txn screens which we will tackle next
-  // TODO: By having these as generic props here, we can use the generic set fee rate component for all use cases
   getFeeForFeeRate?: (
     feeRate: number,
     useEffectiveFeeRate?: boolean,
   ) => Promise<number | undefined>;
   onFeeRateSet?: (feeRate: number) => void;
   feeRate?: number;
-  // TODO: use this to disable the edit fee component when it is created
   isSubmitting?: boolean;
 };
 
