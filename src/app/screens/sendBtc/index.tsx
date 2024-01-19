@@ -125,6 +125,7 @@ function SendBtcScreen() {
           txid: txnId,
           currency: 'BTC',
           error: '',
+          browserTx: isInOption,
         },
       });
     } catch (e) {
@@ -134,6 +135,7 @@ function SendBtcScreen() {
           txid: '',
           currency: 'BTC',
           error: `${e}`,
+          browserTx: isInOption,
         },
       });
     } finally {
