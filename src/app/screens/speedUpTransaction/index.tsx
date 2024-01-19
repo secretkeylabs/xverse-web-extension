@@ -45,6 +45,9 @@ function SpeedUpTransactionScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const theme = useTheme();
   const navigate = useNavigate();
+
+  const seedVault = useSeedVault();
+
   const [showCustomFee, setShowCustomFee] = useState(false);
   const { selectedAccount, stxAddress, network, stxAvailableBalance } = useWalletSelector();
   const { id } = useParams();
@@ -213,6 +216,7 @@ function SpeedUpTransactionScreen() {
       const signedTx = await rbfTransaction.getReplacementTransaction({
         feeRate: Number(feeRateInput),
         ledgerTransport: transport,
+        getSeedPhrase: seedVault.getSeed,
       });
 
       await btcClient.sendRawTransaction(signedTx.hex);
