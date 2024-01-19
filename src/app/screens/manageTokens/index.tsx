@@ -78,16 +78,14 @@ const Description = styled.h1((props) => ({
 function Stacks() {
   const { hideStx } = useWalletSelector();
   const { toggleStxVisibility } = useWalletReducer();
-  const tickerConstant = 'stx';
+  const tickerConstant = 'STX';
   return (
     <CoinItem
-      key="stx"
-      coin={{
-        name: 'Stacks',
-        ticker: tickerConstant,
-        image: stacksIcon,
-        contract: tickerConstant,
-      }}
+      id={tickerConstant}
+      key={tickerConstant}
+      name="Stacks"
+      ticker={tickerConstant}
+      image={stacksIcon}
       disabled={false}
       toggled={toggleStxVisibility}
       enabled={!hideStx}
@@ -109,21 +107,21 @@ function ManageTokens() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const toggled = (isEnabled: boolean, coin: Pick<Coin, 'name' | 'contract'>) => {
+  const toggled = (isEnabled: boolean, coinName, coinKey) => {
     /* if coins exists in list of fungible token, update the visible property otherwise
      add coin in list if coin is set to visible */
 
     const coinToBeUpdated =
-      coinsList?.find((ft) => ft.principal === coin.contract) ??
-      brcCoinsList?.find((ft) => ft.ticker === coin.contract);
+      coinsList?.find((ft) => ft.principal === coinKey) ??
+      brcCoinsList?.find((ft) => ft.principal === coinKey);
 
     if (coinToBeUpdated) {
       coinToBeUpdated.visible = isEnabled;
     } else if (isEnabled) {
       const coinToBeAdded: FungibleToken = {
-        name: coin?.name,
+        name: coinName,
         visible: true,
-        principal: coin?.contract,
+        principal: coinKey,
         balance: '0',
         total_sent: '',
         total_received: '',
@@ -151,12 +149,7 @@ function ManageTokens() {
     navigate('/');
   };
 
-  const modifiedBrcCoinsList = (brcCoinsList || []).map((coin) => ({
-    ...coin,
-    contract: coin.ticker || '',
-  }));
-
-  const selectedCoins = selectedProtocol === Protocols.SIP_10 ? coins : modifiedBrcCoinsList;
+  const selectedCoins = selectedProtocol === Protocols.SIP_10 ? coins : brcCoinsList;
 
   function showDivider(index: number): boolean {
     if (selectedCoins) return !(index === selectedCoins.length - 1);
@@ -186,16 +179,22 @@ function ManageTokens() {
           </FtInfoContainer>
           <TokenContainer>
             {selectedProtocol === Protocols.SIP_10 && <Stacks />}
-            {selectedCoins?.map((coin, index) => (
-              <CoinItem
-                key={coin.contract} // contract is not optional and is unique
-                coin={coin}
-                disabled={false}
-                toggled={toggled}
-                enabled={coin.visible}
-                showDivider={showDivider(index)}
-              />
-            ))}
+            {selectedCoins?.map((coin, index) => {
+              const coinId = 'principal' in coin ? coin.principal : coin.contract;
+              return (
+                <CoinItem
+                  id={coinId}
+                  key={coinId}
+                  name={coin.name}
+                  image={coin.image}
+                  ticker={coin.ticker}
+                  disabled={false}
+                  toggled={toggled}
+                  enabled={coin.visible}
+                  showDivider={showDivider(index)}
+                />
+              );
+            })}
           </TokenContainer>
         </ScrollableContainer>
       </Container>

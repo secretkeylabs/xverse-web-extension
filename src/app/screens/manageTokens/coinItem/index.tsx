@@ -75,23 +75,25 @@ const UnSelectedCoinTitleText = styled.h1((props) => ({
 }));
 
 interface Props {
-  coin: Pick<Coin, 'name' | 'ticker' | 'contract' | 'image'>;
+  id: string;
+  name: string;
+  image?: string;
+  ticker?: string;
   disabled: boolean;
-  toggled(enabled: boolean, coin: Pick<Coin, 'name' | 'contract'>): void;
+  toggled(enabled: boolean, coinName: string, coinKey: string): void;
   enabled?: boolean;
   showDivider: boolean;
 }
 
-function CoinItem({ coin, disabled, toggled, enabled, showDivider }: Props) {
+function CoinItem({ id, name, image, ticker, disabled, toggled, enabled, showDivider }: Props) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const toggleSwitch = () => {
     setIsEnabled((previousState) => !previousState);
-    toggled(!isEnabled, coin);
+    toggled(!isEnabled, name, id);
   };
 
   function getFtTicker() {
-    const { ticker } = coin;
-    return !ticker && coin.name ? getTicker(coin.name) : ticker;
+    return !ticker && name ? getTicker(name) : ticker;
   }
   const background = stc(getFtTicker());
 
@@ -99,17 +101,17 @@ function CoinItem({ coin, disabled, toggled, enabled, showDivider }: Props) {
     <>
       <RowContainer>
         <CoinContainer>
-          {coin.image ? (
-            <CoinIcon src={coin.image} />
+          {image ? (
+            <CoinIcon src={image} />
           ) : (
             <TickerIconContainer color={background}>
               <TickerText>{getFtTicker()}</TickerText>
             </TickerIconContainer>
           )}
           {isEnabled ? (
-            <SelectedCoinTitleText>{coin.name}</SelectedCoinTitleText>
+            <SelectedCoinTitleText>{name}</SelectedCoinTitleText>
           ) : (
-            <UnSelectedCoinTitleText>{coin.name}</UnSelectedCoinTitleText>
+            <UnSelectedCoinTitleText>{name}</UnSelectedCoinTitleText>
           )}
         </CoinContainer>
         <CustomSwitch
