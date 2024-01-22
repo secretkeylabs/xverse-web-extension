@@ -18,6 +18,9 @@ const useBtcCoinBalance = () => {
         return {
           ...existingToken,
           ...newToken,
+          // The `visible` property from `xverse-core` defaults to true.
+          // We override `visible` to ensure that the existing state is preserved.
+          ...(existingToken ? { visible: existingToken.visible } : {}),
         };
       });
       dispatch(setBrcCoinsDataAction(mergedList));
