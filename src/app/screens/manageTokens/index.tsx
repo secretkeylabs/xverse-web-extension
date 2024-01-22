@@ -1,10 +1,11 @@
 import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
+import Separator from '@components/separator';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import CoinItem from '@screens/manageTokens/coinItem';
-import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
+import { FungibleToken } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import {
   FetchUpdatedVisibleBrc20CoinListAction,
@@ -22,6 +23,14 @@ const TokenContainer = styled.div`
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  ${Separator} {
+    display: none;
+  }
+
+  > ${Separator}:not(:last-child) {
+    display: block;
   }
 `;
 
@@ -80,17 +89,19 @@ function Stacks() {
   const { toggleStxVisibility } = useWalletReducer();
   const tickerConstant = 'STX';
   return (
-    <CoinItem
-      id={tickerConstant}
-      key={tickerConstant}
-      name="Stacks"
-      ticker={tickerConstant}
-      image={stacksIcon}
-      disabled={false}
-      toggled={toggleStxVisibility}
-      enabled={!hideStx}
-      showDivider
-    />
+    <>
+      <CoinItem
+        id={tickerConstant}
+        key={tickerConstant}
+        name="Stacks"
+        ticker={tickerConstant}
+        image={stacksIcon}
+        disabled={false}
+        toggled={toggleStxVisibility}
+        enabled={!hideStx}
+      />
+      <Separator />
+    </>
   );
 }
 
@@ -151,11 +162,6 @@ function ManageTokens() {
 
   const selectedCoins = selectedProtocol === Protocols.SIP_10 ? coins : brcCoinsList;
 
-  function showDivider(index: number): boolean {
-    if (selectedCoins) return !(index === selectedCoins.length - 1);
-    return false;
-  }
-
   return (
     <>
       <TopRow onClick={handleBackButtonClick} />
@@ -179,20 +185,22 @@ function ManageTokens() {
           </FtInfoContainer>
           <TokenContainer>
             {selectedProtocol === Protocols.SIP_10 && <Stacks />}
-            {selectedCoins?.map((coin, index) => {
+            {selectedCoins?.map((coin) => {
               const coinId = 'principal' in coin ? coin.principal : coin.contract;
               return (
-                <CoinItem
-                  id={coinId}
-                  key={coinId}
-                  name={coin.name}
-                  image={coin.image}
-                  ticker={coin.ticker}
-                  disabled={false}
-                  toggled={toggled}
-                  enabled={coin.visible}
-                  showDivider={showDivider(index)}
-                />
+                <>
+                  <CoinItem
+                    id={coinId}
+                    key={coinId}
+                    name={coin.name}
+                    image={coin.image}
+                    ticker={coin.ticker}
+                    disabled={false}
+                    toggled={toggled}
+                    enabled={coin.visible}
+                  />
+                  <Separator />
+                </>
               );
             })}
           </TokenContainer>
