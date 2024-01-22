@@ -20,19 +20,11 @@ const Range = styled.div`
   align-items: center;
 `;
 
-interface ComponentWithDividerProps {
-  showDivider: boolean;
-}
-
-const Container = styled.div<ComponentWithDividerProps>`
-  padding-top:${(props) => props.theme.space.s};
-  padding-bottom:${(props) => props.theme.space.s};
+const Container = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  border-bottom: ${(props) =>
-    props.showDivider ? `1px solid ${props.theme.colors.white_900}` : 'transparent'};
   width: 100%;
 }`;
 
@@ -52,6 +44,7 @@ const InscriptionRow = styled.button`
   flex-direction: row;
   align-items: center;
   background-color: transparent;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `;
 const InscriptionText = styled(StyledP)`
   text-wrap: nowrap;
@@ -69,11 +62,9 @@ const BundleText = styled(StyledP)`
 function BundleItem({
   item,
   ordinalEyePressed,
-  showDivider,
 }: {
   item: BundleSatRange;
-  ordinalEyePressed: (inscription: SatRangeInscription) => void;
-  showDivider?: boolean;
+  ordinalEyePressed?: (inscription: SatRangeInscription) => void;
 }) {
   const renderedIcons = () => (
     <RangeContainer>
@@ -83,14 +74,14 @@ function BundleItem({
           if (index === 4) {
             return <DotsThree color={Theme.colors.white_200} size="20" />;
           }
-          return <RareSatIcon key={satribute} type={satribute} />;
+          return <RareSatIcon key={satribute} type={satribute} size={24} />;
         })}
       </Range>
     </RangeContainer>
   );
 
   return (
-    <Container showDivider={!!showDivider}>
+    <Container>
       {renderedIcons()}
       <Column>
         <BundleText typography="body_medium_m">{getSatLabel(item.satributes)}</BundleText>
@@ -110,14 +101,15 @@ function BundleItem({
             type="button"
             key={inscription.id}
             onClick={() => {
-              ordinalEyePressed(inscription);
+              ordinalEyePressed?.(inscription);
             }}
+            disabled={!ordinalEyePressed}
           >
             <img src={OrdinalIcon} alt="ordinal" />
             <InscriptionText typography="body_medium_m" color="white_0">
               {inscription.inscription_number}
             </InscriptionText>
-            <Eye color={Theme.colors.white_0} size={20} weight="fill" />
+            {ordinalEyePressed && <Eye color={Theme.colors.white_0} size={20} weight="fill" />}
           </InscriptionRow>
         ))}
       </Column>

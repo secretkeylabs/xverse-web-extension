@@ -1,5 +1,5 @@
 import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
-import stxIcon from '@assets/img/ledger/stx_icon.svg';
+import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
 import SelectAccount from '@components/selectAccount';
@@ -173,7 +173,8 @@ function BtcSelectAddressScreen() {
     window.close();
   };
 
-  const switchAccountBasedOnRequest = () => {
+  useEffect(() => {
+    // Handle address requests to a network that's not currently active
     if (payload.network.type !== network.type) {
       navigate('/tx-status', {
         state: {
@@ -185,10 +186,6 @@ function BtcSelectAddressScreen() {
         },
       });
     }
-  };
-
-  useEffect(() => {
-    switchAccountBasedOnRequest();
   }, []);
 
   useEffect(() => {

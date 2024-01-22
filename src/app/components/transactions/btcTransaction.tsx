@@ -23,8 +23,8 @@ const TransactionContainer = styled.button((props) => ({
   alignItems: 'center',
   width: '100%',
   padding: props.theme.spacing(5),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
   background: 'none',
   ':hover': {
     background: props.theme.colors.white_900,
@@ -45,7 +45,7 @@ const TransactionAmountContainer = styled.div({
 const TransactionInfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: props.theme.spacing(6),
+  marginLeft: props.theme.space.s,
   flex: 1,
 }));
 

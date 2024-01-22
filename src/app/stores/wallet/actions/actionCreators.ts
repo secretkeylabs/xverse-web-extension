@@ -176,16 +176,10 @@ export function ChangeFiatCurrencyAction(
   };
 }
 
-export function ChangeNetworkAction(
-  network: SettingsNetwork,
-  networkAddress: string | undefined,
-  btcApiUrl: string,
-): actions.ChangeNetwork {
+export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNetwork {
   return {
     type: actions.ChangeNetworkKey,
     network,
-    networkAddress,
-    btcApiUrl,
   };
 }
 
@@ -277,5 +271,12 @@ export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletU
   return {
     type: actions.SetWalletUnlockedKey,
     isUnlocked,
+  };
+}
+
+export function setWalletHideStxAction(hideStx: boolean): actions.SetWalletHideStx {
+  return {
+    type: actions.SetWalletHideStxKey,
+    hideStx,
   };
 }

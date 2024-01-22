@@ -3,6 +3,7 @@ import AssetModal from '@components/assetModal';
 import { CaretDown } from '@phosphor-icons/react';
 import { Bundle, BundleSatRange, SatRangeInscription } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import Divider from '@ui-library/divider';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -97,8 +98,8 @@ function SatsBundle({ bundle, title }: { bundle: Bundle; title?: string }) {
                   // show ordinal modal to show asset
                   setInscriptionToShow(inscription);
                 }}
-                showDivider={index !== bundle.satRanges.length - 1}
               />
+              {bundle.satRanges.length > index + 1 && <Divider verticalMargin="s" />}
             </BundleItemsContainer>
           ))}
       </SatsBundleContainer>

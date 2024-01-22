@@ -45,7 +45,7 @@ export const InputField = styled.input((props) => ({
   backgroundColor: 'transparent',
   color: props.theme.colors.white_200,
   border: 'transparent',
-  width: '80%',
+  width: '70%',
   '&::-webkit-outer-spin-button': {
     '-webkit-appearance': 'none',
     margin: 0,

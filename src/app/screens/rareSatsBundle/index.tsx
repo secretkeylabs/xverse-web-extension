@@ -322,11 +322,11 @@ function RareSatsBundle() {
         )}
         {showSendOrdinalsAlert && (
           <AlertMessage
-            title={t('ORDINAL_PENDING_SEND_TITLE')}
+            title={t('NFT_DETAIL_SCREEN.ORDINAL_PENDING_SEND_TITLE')}
             onClose={onCloseAlert}
-            buttonText={t('ORDINAL_PENDING_SEND_BUTTON')}
+            buttonText={t('NFT_DETAIL_SCREEN.ORDINAL_PENDING_SEND_BUTTON')}
             onButtonClick={handleRedirectToTx}
-            description={t('ORDINAL_PENDING_SEND_DESCRIPTION')}
+            description={t('NFT_DETAIL_SCREEN.ORDINAL_PENDING_SEND_DESCRIPTION')}
           />
         )}
       </Container>
