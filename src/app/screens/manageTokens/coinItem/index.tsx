@@ -1,5 +1,4 @@
 import Separator from '@components/separator';
-import { Coin } from '@secretkeylabs/xverse-core';
 import { getTicker } from '@utils/helper';
 import { useState } from 'react';
 import Switch from 'react-switch';
@@ -92,10 +91,10 @@ function CoinItem({ id, name, image, ticker, disabled, toggled, enabled, showDiv
     toggled(!isEnabled, name, id);
   };
 
-  function getFtTicker() {
+  function getTickerName() {
     return !ticker && name ? getTicker(name) : ticker;
   }
-  const background = stc(getFtTicker());
+  const background = stc(getTickerName());
 
   return (
     <>
@@ -105,7 +104,7 @@ function CoinItem({ id, name, image, ticker, disabled, toggled, enabled, showDiv
             <CoinIcon src={image} />
           ) : (
             <TickerIconContainer color={background}>
-              <TickerText>{getFtTicker()}</TickerText>
+              <TickerText>{getTickerName()}</TickerText>
             </TickerIconContainer>
           )}
           {isEnabled ? (
