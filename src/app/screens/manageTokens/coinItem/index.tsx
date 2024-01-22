@@ -1,3 +1,4 @@
+import Separator from '@components/separator';
 import { getTicker } from '@utils/helper';
 import { useState } from 'react';
 import Switch from 'react-switch';
@@ -17,6 +18,10 @@ const CoinContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
+});
+
+const BottomContainer = styled.div({
+  marginBottom: 30,
 });
 
 const CoinIcon = styled.img((props) => ({
@@ -76,9 +81,10 @@ interface Props {
   disabled: boolean;
   toggled(enabled: boolean, coinName: string, coinKey: string): void;
   enabled?: boolean;
+  showDivider: boolean;
 }
 
-function CoinItem({ id, name, image, ticker, disabled, toggled, enabled }: Props) {
+function CoinItem({ id, name, image, ticker, disabled, toggled, enabled, showDivider }: Props) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const toggleSwitch = () => {
     setIsEnabled((previousState) => !previousState);
@@ -91,31 +97,34 @@ function CoinItem({ id, name, image, ticker, disabled, toggled, enabled }: Props
   const background = stc(getTickerName());
 
   return (
-    <RowContainer>
-      <CoinContainer>
-        {image ? (
-          <CoinIcon src={image} />
-        ) : (
-          <TickerIconContainer color={background}>
-            <TickerText>{getTickerName()}</TickerText>
-          </TickerIconContainer>
-        )}
-        {isEnabled ? (
-          <SelectedCoinTitleText>{name}</SelectedCoinTitleText>
-        ) : (
-          <UnSelectedCoinTitleText>{name}</UnSelectedCoinTitleText>
-        )}
-      </CoinContainer>
-      <CustomSwitch
-        onColor={Theme.colors.orange_main}
-        offColor={Theme.colors.background.elevation3}
-        onChange={toggleSwitch}
-        checked={isEnabled!}
-        uncheckedIcon={false}
-        checkedIcon={false}
-        disabled={disabled}
-      />
-    </RowContainer>
+    <>
+      <RowContainer>
+        <CoinContainer>
+          {image ? (
+            <CoinIcon src={image} />
+          ) : (
+            <TickerIconContainer color={background}>
+              <TickerText>{getTickerName()}</TickerText>
+            </TickerIconContainer>
+          )}
+          {isEnabled ? (
+            <SelectedCoinTitleText>{name}</SelectedCoinTitleText>
+          ) : (
+            <UnSelectedCoinTitleText>{name}</UnSelectedCoinTitleText>
+          )}
+        </CoinContainer>
+        <CustomSwitch
+          onColor={Theme.colors.orange_main}
+          offColor={Theme.colors.background.elevation3}
+          onChange={toggleSwitch}
+          checked={isEnabled!}
+          uncheckedIcon={false}
+          checkedIcon={false}
+          disabled={disabled}
+        />
+      </RowContainer>
+      {showDivider ? <Separator /> : <BottomContainer />}
+    </>
   );
 }
 
