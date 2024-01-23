@@ -1,24 +1,10 @@
+import InputScreen from '@components/inputScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core';
-import Button from '@ui-library/button';
-import Input from '@ui-library/input';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
-const Container = styled.div`
-  flex: 1 1 100%;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
-
-const Buttons = styled.div`
-  margin: ${(props) => props.theme.spacing(12)}px 0;
-`;
-
-type Props = {
+type BtcRecipientScreenProps = {
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
   onNext: () => void;
@@ -26,14 +12,27 @@ type Props = {
   header?: React.ReactNode;
 };
 
-// TODO: this could be extracted into a component for reuse
-function RecipientSelector({
+interface InputFeedback {
+  variant: 'danger';
+  message: string;
+}
+
+interface Input {
+  title: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  variant: 'danger' | 'default';
+  feedback: InputFeedback[];
+}
+
+function BtcRecipientScreen({
   recipientAddress,
   setRecipientAddress,
   onNext,
   isLoading,
   header,
-}: Props) {
+}: BtcRecipientScreenProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { network } = useWalletSelector();
   const [addressIsValid, setAddressIsValid] = useState(true);
@@ -51,41 +50,39 @@ function RecipientSelector({
     setAddressIsValid(true);
   };
 
-  const inputFeedback = useMemo(() => {
+  const inputFeedback: InputFeedback[] = useMemo(() => {
     if (addressIsValid) {
       return [];
     }
     return [
       {
-        variant: 'danger' as const,
+        variant: 'danger',
         message: t('ERRORS.ADDRESS_INVALID'),
       },
     ];
-  }, [addressIsValid]);
+  }, [addressIsValid, t]);
 
-  return (
-    <Container>
-      <div>
-        {header}
-        <Input
-          title={t('RECIPIENT')}
-          placeholder={t('BTC.RECIPIENT_PLACEHOLDER')}
-          value={recipientAddress}
-          onChange={handleAddressChange}
-          variant={addressIsValid ? 'default' : 'danger'}
-          feedback={inputFeedback}
-        />
-      </div>
-      <Buttons>
-        <Button
-          title={t('NEXT')}
-          onClick={handleNext}
-          disabled={!recipientAddress || !addressIsValid}
-          loading={isLoading}
-        />
-      </Buttons>
-    </Container>
-  );
+  const inputs: Input[] = [
+    {
+      title: t('RECIPIENT'),
+      placeholder: t('BTC.RECIPIENT_PLACEHOLDER'),
+      value: recipientAddress,
+      onChange: handleAddressChange,
+      variant: addressIsValid ? 'default' : 'danger',
+      feedback: inputFeedback,
+    },
+  ];
+
+  const buttons = [
+    {
+      title: t('NEXT'),
+      onClick: handleNext,
+      disabled: !recipientAddress || !addressIsValid,
+      loading: isLoading,
+    },
+  ];
+
+  return <InputScreen inputs={inputs} buttons={buttons} header={header} />;
 }
 
-export default RecipientSelector;
+export default BtcRecipientScreen;
