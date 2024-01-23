@@ -34,7 +34,7 @@ export function RareSatsBundleGridItem({ item }: { item: BundleSatRange }) {
           <RangeContainer>
             <Range>
               {item.satributes.map((satribute) => (
-                <RareSatIcon key={satribute} type={satribute} />
+                <RareSatIcon key={satribute} type={satribute} size={24} />
               ))}
             </Range>
           </RangeContainer>

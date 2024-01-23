@@ -213,6 +213,7 @@ function SpeedUpTransactionScreen() {
       const signedTx = await rbfTransaction.getReplacementTransaction({
         feeRate: Number(feeRateInput),
         ledgerTransport: transport,
+        getSeedPhrase: getSeed,
       });
 
       await btcClient.sendRawTransaction(signedTx.hex);
