@@ -3,7 +3,7 @@ import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
   currencySymbolMap,
   getStxFiatEquivalent,
-  satsToBtc,
+  getStxTokenEquivalent,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import Input from '@ui-library/input';
@@ -55,14 +55,14 @@ const MaxButton = styled.div<{ $sendMax: boolean; $disabled: boolean }>`
 `;
 
 const inputValidator = /^[0-9.]*$/;
-const btcInputExtractor = /[0-9]+[.]?[0-9]{0,8}/;
-const btcInputValidator = /^[0-9]+[.]?[0-9]{0,8}$/;
+const stxInputExtractor = /[0-9]+[.]?[0-9]{0,6}/;
+const stxInputValidator = /^[0-9]+[.]?[0-9]{0,6}$/;
 const fiatInputExtractor = /[0-9]+[.]?[0-9]{0,2}/;
 const fiatInputValidator = /^[0-9]+[.]?[0-9]{0,2}$/;
 
-const satsToBtcString = (num: BigNumber) =>
-  satsToBtc(num)
-    .toFixed(8)
+const microStxtoStxString = (num: string | number | BigNumber) =>
+  microStxToStx(num)
+    .toFixed(6)
     .replace(/\.?0+$/, '');
 
 type Props = {
@@ -77,7 +77,9 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { stxBalance: stxBalanceStr, btcFiatRate, stxBtcRate, fiatCurrency } = useWalletSelector();
 
-  const [amountDisplay, setAmountDisplay] = useState(amount && microStxToStx(amount).toString());
+  const [amountDisplay, setAmountDisplay] = useState(
+    amount && microStxtoStxString(new BigNumber(amount)),
+  );
 
   const [useStxValue, setUseStxValue] = useState(true);
 
@@ -87,7 +89,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
     const amountToDisplay =
       amount &&
       (useStxValue
-        ? satsToBtcString(new BigNumber(amount))
+        ? microStxtoStxString(new BigNumber(amount))
         : getStxFiatEquivalent(
             new BigNumber(amount),
             new BigNumber(stxBtcRate),
@@ -104,7 +106,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
 
   const stxBalance = new BigNumber(stxBalanceStr);
   const balance = useStxValue
-    ? microStxToStx(stxBalance).toString()
+    ? microStxtoStxString(stxBalance)
     : getStxFiatEquivalent(stxBalance, new BigNumber(stxBtcRate), new BigNumber(btcFiatRate))
         .toNumber()
         .toFixed(2);
@@ -117,7 +119,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
       )
         .toNumber()
         .toFixed(2)
-    : microStxToStx(stxBalance).toString();
+    : microStxtoStxString(amount);
 
   const handleAmountChange = (newAmount: string) => {
     const isValidInput = inputValidator.test(newAmount);
@@ -132,7 +134,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
     }
 
     const isValidAmount = useStxValue
-      ? btcInputValidator.test(newAmount)
+      ? stxInputValidator.test(newAmount)
       : fiatInputValidator.test(newAmount);
 
     if (!isValidAmount) return;
@@ -143,7 +145,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
       setAmount(stxToMicrostacks(new BigNumber(newAmount)).toString());
     } else {
       const stxAmount = stxToMicrostacks(
-        getStxFiatEquivalent(
+        getStxTokenEquivalent(
           new BigNumber(newAmount),
           new BigNumber(stxBtcRate),
           new BigNumber(btcFiatRate),
@@ -153,17 +155,17 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
     }
   };
 
-  const handleUseBtcValueChange = () => {
+  const handleUseStxValueChange = () => {
     if (disabled) return;
 
-    const shouldUseBtcValue = !useStxValue;
-    setUseStxValue(shouldUseBtcValue);
+    const shouldUseStxValue = !useStxValue;
+    setUseStxValue(shouldUseStxValue);
 
     if (!amountDisplay || Number.isNaN(+amountDisplay)) return;
 
-    if (shouldUseBtcValue) {
+    if (shouldUseStxValue) {
       // convert outer sats amount to btc
-      setAmountDisplay(satsToBtcString(new BigNumber(amount)));
+      setAmountDisplay(microStxtoStxString(new BigNumber(amount)));
     } else {
       // convert btc to fiat
       const fiatAmount = getStxFiatEquivalent(
@@ -179,12 +181,12 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
 
   const handleBlur = () => {
     const isValidAmount = useStxValue
-      ? btcInputValidator.test(amountDisplay)
+      ? stxInputValidator.test(amountDisplay)
       : fiatInputValidator.test(amountDisplay);
 
     if (!isValidAmount) {
       const newAmount = useStxValue
-        ? btcInputExtractor.exec(amountDisplay)?.[0]
+        ? stxInputExtractor.exec(amountDisplay)?.[0]
         : fiatInputExtractor.exec(amountDisplay)?.[0];
       handleAmountChange(newAmount || '0');
     }
@@ -219,7 +221,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
       }
       complications={
         <>
-          <ConvertComplication $disabled={disabled} onClick={handleUseBtcValueChange}>
+          <ConvertComplication $disabled={disabled} onClick={handleUseStxValueChange}>
             <NumericFormat
               value={sendAmountConverted}
               displayType="text"
