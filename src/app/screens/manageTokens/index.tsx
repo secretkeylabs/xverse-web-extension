@@ -179,8 +179,11 @@ function ManageTokens() {
           </FtInfoContainer>
           <TokenContainer>
             {selectedProtocol === Protocols.SIP_10 && <Stacks />}
-            {selectedCoins?.map((coin, index) => {
-              const coinId = 'principal' in coin ? coin.principal : coin.contract;
+            {selectedCoins?.map((coin: FungibleToken | Coin, index) => {
+              let coinId = 'principal' in coin ? coin.principal : coin.contract;
+
+              // Fallback (shouldn't ever happen with https://github.com/secretkeylabs/xverse-core/pull/353)
+              if (coinId === '' && coin.ticker) coinId = coin.ticker;
               return (
                 <CoinItem
                   id={coinId}
