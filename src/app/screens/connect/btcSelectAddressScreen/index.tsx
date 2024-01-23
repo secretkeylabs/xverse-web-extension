@@ -41,7 +41,7 @@ const AddressBoxContainer = styled.div((props) => ({
 
 const AddressBox = styled.div((props) => ({
   height: 66,
-  padding: props.theme.spacing(10),
+  padding: props.theme.space.m,
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -81,8 +81,8 @@ const DapURL = styled.h2((props) => ({
 }));
 
 const AddressImage = styled.img((props) => ({
-  width: 24,
-  height: 24,
+  width: 20,
+  height: 20,
   marginRight: props.theme.space.xs,
 }));
 
@@ -131,10 +131,6 @@ const Permission = styled.div((props) => ({
 const PermissionIcon = styled.div((props) => ({
   marginRight: props.theme.space.xs,
 }));
-
-const ActionsContainer = styled(StickyHorizontalSplitButtonContainer)({
-  // marginTop: 'auto',
-});
 
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
@@ -274,10 +270,10 @@ function BtcSelectAddressScreen() {
         </PermissionIcon>
         {t('PERMISSION_REQUEST_TX')}
       </Permission>
-      <ActionsContainer>
+      <StickyHorizontalSplitButtonContainer>
         <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
         <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />
-      </ActionsContainer>
+      </StickyHorizontalSplitButtonContainer>
     </OuterContainer>
   );
 }

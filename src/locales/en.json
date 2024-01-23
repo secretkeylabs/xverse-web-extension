@@ -1039,7 +1039,7 @@
   },
   "SELECT_BTC_ADDRESS_SCREEN": {
     "TITLE": "Connection Request",
-    "ACCOUNT": "Account",
+    "ACCOUNT_NAME": "Account",
     "CONNECT_BUTTON": "Connect",
     "CANCEL_BUTTON": "Cancel",
     "BITCOIN_ADDRESS": "Payments address",

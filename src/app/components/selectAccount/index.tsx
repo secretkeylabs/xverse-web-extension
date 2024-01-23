@@ -14,7 +14,7 @@ const AccountInfoContainer = styled.button((props) => ({
   borderRadius: 12,
   border: `1px solid ${props.theme.colors.white_850}`,
   backgroundColor: props.theme.colors.elevation6_800,
-  padding: 16,
+  padding: props.theme.space.m,
 }));
 
 const CurrentAccountContainer = styled.div((props) => ({
@@ -55,7 +55,7 @@ const SwitchAccountContainer = styled.div(() => ({
 const SwitchAccountText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
-  paddingRight: props.theme.spacing(2),
+  marginRight: props.theme.space.xs,
   textAlign: 'start',
 }));
 
@@ -91,7 +91,7 @@ function SelectAccount({ account, handlePressAccount }: SelectAccountProps) {
       </CurrentAccountContainer>
       <SwitchAccountContainer>
         <SwitchAccountText>{t('CHANGE_ACCOUNT_BUTTON')}</SwitchAccountText>
-        <CaretRight color={theme.colors.white_0} />
+        <CaretRight size={theme.space.m} color={theme.colors.white_0} />
       </SwitchAccountContainer>
     </AccountInfoContainer>
   );
