@@ -1,9 +1,12 @@
 import {
   Account,
   BitcoinEsploraApiProvider,
+  FungibleToken,
   getStacksInfo,
+  microstacksToStx,
   NetworkType,
   NftData,
+  satsToBtc,
   SettingsNetwork,
   StxMempoolTransactionData,
 } from '@secretkeylabs/xverse-core';
@@ -236,4 +239,52 @@ export const validateAccountName = (
   }
 
   return null;
+};
+
+export const calculateTotalBalance = ({
+  stxBalance,
+  btcBalance,
+  ftCoinList,
+  stxBtcRate,
+  btcFiatRate,
+  hideStx,
+}: {
+  stxBalance?: string;
+  btcBalance?: string;
+  ftCoinList: FungibleToken[] | null;
+  stxBtcRate: string;
+  btcFiatRate: string;
+  hideStx: boolean;
+}) => {
+  let totalBalance = new BigNumber(0);
+
+  if (stxBalance && !hideStx) {
+    const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
+      .multipliedBy(new BigNumber(stxBtcRate))
+      .multipliedBy(new BigNumber(btcFiatRate));
+    totalBalance = totalBalance.plus(stxFiatEquiv);
+  }
+
+  if (btcBalance) {
+    const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
+      new BigNumber(btcFiatRate),
+    );
+    totalBalance = totalBalance.plus(btcFiatEquiv);
+  }
+
+  if (ftCoinList) {
+    totalBalance = ftCoinList.reduce((acc, coin) => {
+      if (coin.visible && coin.tokenFiatRate && coin.decimals) {
+        const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
+        const coinFiatValue = new BigNumber(coin.balance)
+          .dividedBy(tokenUnits)
+          .multipliedBy(new BigNumber(coin.tokenFiatRate));
+        return acc.plus(coinFiatValue);
+      }
+
+      return acc;
+    }, totalBalance);
+  }
+
+  return totalBalance.toNumber().toFixed(2);
 };

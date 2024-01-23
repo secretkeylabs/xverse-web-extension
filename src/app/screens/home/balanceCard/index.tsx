@@ -3,6 +3,7 @@ import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
+import { calculateTotalBalance } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -76,7 +77,6 @@ function BalanceCard(props: BalanceCardProps) {
     stxBalance,
     btcBalance,
     btcAddress,
-    stxAddress,
     hideStx,
     coinsList,
     selectedAccount,
@@ -86,41 +86,14 @@ function BalanceCard(props: BalanceCardProps) {
   const { isLoading, isRefetching } = props;
   const oldTotalBalance = accountBalances[btcAddress];
 
-  const calculateTotalBalance = () => {
-    let totalBalance = new BigNumber(0);
-
-    if (stxAddress && !hideStx) {
-      const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
-        .multipliedBy(new BigNumber(stxBtcRate))
-        .multipliedBy(new BigNumber(btcFiatRate));
-      totalBalance = totalBalance.plus(stxFiatEquiv);
-    }
-
-    if (btcAddress) {
-      const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
-        new BigNumber(btcFiatRate),
-      );
-      totalBalance = totalBalance.plus(btcFiatEquiv);
-    }
-
-    if (coinsList) {
-      totalBalance = coinsList.reduce((acc, coin) => {
-        if (coin.visible && coin.tokenFiatRate && coin.decimals) {
-          const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
-          const coinFiatValue = new BigNumber(coin.balance)
-            .dividedBy(tokenUnits)
-            .multipliedBy(new BigNumber(coin.tokenFiatRate));
-          return acc.plus(coinFiatValue);
-        }
-
-        return acc;
-      }, totalBalance);
-    }
-
-    return totalBalance.toNumber().toFixed(2);
-  };
-
-  const balance = calculateTotalBalance();
+  const balance = calculateTotalBalance({
+    stxBalance,
+    btcBalance,
+    btcFiatRate,
+    stxBtcRate,
+    hideStx,
+    ftCoinList: coinsList,
+  });
 
   useEffect(() => {
     if (!balance || !selectedAccount || isLoading || isRefetching) {

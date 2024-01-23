@@ -11,10 +11,9 @@ import {
   getCoinsInfo,
   getFtData,
   getNetworkURL,
-  microstacksToStx,
-  satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
+import { calculateTotalBalance } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
@@ -23,64 +22,25 @@ import { useDispatch } from 'react-redux';
 const useAccountBalance = () => {
   const btcClient = useBtcClient();
   const stacksNetwork = useNetworkSelector();
-  const { btcFiatRate, stxBtcRate, fiatCurrency, network, coinsList } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate, fiatCurrency, network, coinsList, hideStx } =
+    useWalletSelector();
   const dispatch = useDispatch();
   const queue = useRef<Account[]>([]);
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);
   const [queueLength, setQueueLength] = useState(0);
-
-  const calculateTotalBalance = ({
-    btcBalance,
-    stxBalance,
-    ftCoinList,
-  }: {
-    btcBalance?: number;
-    stxBalance?: number;
-    ftCoinList?: FungibleToken[];
-  }): string => {
-    let totalBalance = BigNumber(0);
-
-    if (btcBalance) {
-      const btcFiatEquiv = satsToBtc(BigNumber(btcBalance)).multipliedBy(BigNumber(btcFiatRate));
-      totalBalance = totalBalance.plus(btcFiatEquiv);
-    }
-
-    if (stxBalance) {
-      const stxFiatEquiv = microstacksToStx(BigNumber(stxBalance))
-        .multipliedBy(BigNumber(stxBtcRate))
-        .multipliedBy(BigNumber(btcFiatRate));
-      totalBalance = totalBalance.plus(stxFiatEquiv);
-    }
-
-    if (ftCoinList) {
-      totalBalance = ftCoinList.reduce((acc, coin) => {
-        if (coin.visible && coin.tokenFiatRate && coin.decimals) {
-          const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
-          const coinFiatValue = new BigNumber(coin.balance)
-            .dividedBy(tokenUnits)
-            .multipliedBy(new BigNumber(coin.tokenFiatRate));
-          return acc.plus(coinFiatValue);
-        }
-
-        return acc;
-      }, totalBalance);
-    }
-
-    return totalBalance.toNumber().toFixed(2);
-  };
 
   const fetchBalances = async (account: Account | null) => {
     if (!account) {
       return;
     }
 
-    let btcBalance = 0;
-    let stxBalance = 0;
-    let ftCoinList: FungibleToken[] | undefined;
+    let btcBalance = '0';
+    let stxBalance = '0';
+    let ftCoinList: FungibleToken[] | null = null;
 
     if (account.btcAddress) {
       const btcData: BtcAddressData = await btcClient.getBalance(account.btcAddress);
-      btcBalance = btcData.finalBalance;
+      btcBalance = btcData.finalBalance.toString();
     }
 
     if (account.stxAddress) {
@@ -92,7 +52,7 @@ const useAccountBalance = () => {
 
       const availableBalance = new BigNumber(balanceInfo.data.balance);
       const lockedBalance = new BigNumber(balanceInfo.data.locked);
-      stxBalance = availableBalance.plus(lockedBalance).toNumber();
+      stxBalance = availableBalance.plus(lockedBalance).toString();
 
       const fungibleTokenList = await getFtData(account.stxAddress, stacksNetwork);
 
@@ -147,9 +107,12 @@ const useAccountBalance = () => {
     }
 
     const totalBalance = calculateTotalBalance({
-      btcBalance,
       stxBalance,
+      btcBalance,
+      stxBtcRate,
+      btcFiatRate,
       ftCoinList,
+      hideStx,
     });
     dispatch(setAccountBalanceAction(account.btcAddress, totalBalance));
     return totalBalance;
