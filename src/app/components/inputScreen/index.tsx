@@ -1,5 +1,3 @@
-import Button from '@ui-library/button';
-import Input from '@ui-library/input';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -14,25 +12,15 @@ const ButtonsContainer = styled.div`
   margin: ${(props) => props.theme.spacing(12)}px 0;
 `;
 
-export type InputConfig = {
-  title: string;
-  placeholder: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  variant: 'danger' | 'default';
-  feedback?: { variant: 'danger'; message: string }[];
-};
-
-type ButtonConfig = {
-  title: string;
-  onClick: () => void;
-  disabled: boolean;
-  loading?: boolean;
-};
+const InputsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${(props) => props.theme.space.xl};
+`;
 
 type InputScreenProps = {
-  inputs: InputConfig[];
-  buttons: ButtonConfig[];
+  inputs: React.ReactNode;
+  buttons: React.ReactNode;
   header?: React.ReactNode;
 };
 
@@ -41,29 +29,9 @@ function InputScreen({ inputs, buttons, header }: InputScreenProps) {
     <Container>
       <div>
         {header}
-        {inputs.map((input) => (
-          <Input
-            key={input.title}
-            title={input.title}
-            placeholder={input.placeholder}
-            value={input.value}
-            onChange={input.onChange}
-            variant={input.variant}
-            feedback={input.feedback}
-          />
-        ))}
+        <InputsContainer>{inputs}</InputsContainer>
       </div>
-      <ButtonsContainer>
-        {buttons.map((button) => (
-          <Button
-            key={button.title}
-            title={button.title}
-            onClick={button.onClick}
-            disabled={button.disabled}
-            loading={button.loading}
-          />
-        ))}
-      </ButtonsContainer>
+      <ButtonsContainer>{buttons}</ButtonsContainer>
     </Container>
   );
 }

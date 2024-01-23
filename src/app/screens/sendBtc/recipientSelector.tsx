@@ -1,7 +1,9 @@
 import InputScreen from '@components/inputScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core';
-import { useMemo, useState } from 'react';
+import Button from '@ui-library/button';
+import Input from '@ui-library/input';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type BtcRecipientScreenProps = {
@@ -11,20 +13,6 @@ type BtcRecipientScreenProps = {
   isLoading: boolean;
   header?: React.ReactNode;
 };
-
-interface InputFeedback {
-  variant: 'danger';
-  message: string;
-}
-
-interface Input {
-  title: string;
-  placeholder: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  variant: 'danger' | 'default';
-  feedback: InputFeedback[];
-}
 
 function BtcRecipientScreen({
   recipientAddress,
@@ -50,6 +38,11 @@ function BtcRecipientScreen({
     setAddressIsValid(true);
   };
 
+  interface InputFeedback {
+    variant: 'danger';
+    message: string;
+  }
+
   const inputFeedback: InputFeedback[] = useMemo(() => {
     if (addressIsValid) {
       return [];
@@ -62,27 +55,27 @@ function BtcRecipientScreen({
     ];
   }, [addressIsValid, t]);
 
-  const inputs: Input[] = [
-    {
-      title: t('RECIPIENT'),
-      placeholder: t('BTC.RECIPIENT_PLACEHOLDER'),
-      value: recipientAddress,
-      onChange: handleAddressChange,
-      variant: addressIsValid ? 'default' : 'danger',
-      feedback: inputFeedback,
-    },
-  ];
+  const inputElement = (
+    <Input
+      title={t('RECIPIENT')}
+      placeholder={t('BTC.RECIPIENT_PLACEHOLDER')}
+      value={recipientAddress}
+      onChange={handleAddressChange}
+      variant={addressIsValid ? 'default' : 'danger'}
+      feedback={inputFeedback}
+    />
+  );
 
-  const buttons = [
-    {
-      title: t('NEXT'),
-      onClick: handleNext,
-      disabled: !recipientAddress || !addressIsValid,
-      loading: isLoading,
-    },
-  ];
+  const buttonElement = (
+    <Button
+      title={t('NEXT')}
+      onClick={handleNext}
+      disabled={!recipientAddress || !addressIsValid}
+      loading={isLoading}
+    />
+  );
 
-  return <InputScreen inputs={inputs} buttons={buttons} header={header} />;
+  return <InputScreen inputs={inputElement} buttons={buttonElement} header={header} />;
 }
 
 export default BtcRecipientScreen;
