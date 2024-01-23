@@ -16,22 +16,20 @@ import { AddressPurpose } from 'sats-connect';
 import styled, { useTheme } from 'styled-components';
 import { getAppIconFromWebManifest } from './helper';
 
+const OuterContainer = styled(animated.div)((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  ...props.theme.scrollbar,
+}));
+
 const TitleContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  overflow: 'hidden',
-  marginLeft: 30,
-  marginRight: 30,
   marginTop: 48,
-});
-
-const OuterContainer = styled(animated.div)({
-  display: 'flex',
-  flexDirection: 'column',
-  marginLeft: 16,
-  marginRight: 16,
 });
 
 const AddressBoxContainer = styled.div((props) => ({
@@ -42,7 +40,6 @@ const AddressBoxContainer = styled.div((props) => ({
 }));
 
 const AddressBox = styled.div((props) => ({
-  width: 328,
   height: 66,
   padding: props.theme.spacing(10),
   display: 'flex',
@@ -72,9 +69,8 @@ const TopImage = styled.img({
 });
 
 const Title = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_l,
+  ...props.theme.typography.headline_xs,
   color: props.theme.colors.white_0,
-  marginTop: 12,
 }));
 
 const DapURL = styled.h2((props) => ({
@@ -84,11 +80,11 @@ const DapURL = styled.h2((props) => ({
   textAlign: 'center',
 }));
 
-const AddressImage = styled.img({
+const AddressImage = styled.img((props) => ({
   width: 24,
   height: 24,
-  marginRight: 8,
-});
+  marginRight: props.theme.space.xs,
+}));
 
 const AddressTextTitle = styled.h2((props) => ({
   ...props.theme.typography.body_medium_m,
@@ -96,13 +92,13 @@ const AddressTextTitle = styled.h2((props) => ({
   textAlign: 'center',
 }));
 
-const TruncatedAddress = styled.h3((props) => ({
+const TruncatedAddress = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   textAlign: 'right',
 }));
 
-const BnsName = styled.h3((props) => ({
+const BnsName = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   textAlign: 'right',
@@ -129,15 +125,15 @@ const Permission = styled.div((props) => ({
   color: props.theme.colors.white_0,
   marginTop: 12,
   display: 'flex',
-  alignContent: 'center',
+  alignItems: 'center',
 }));
 
-const PermissionIcon = styled.div({
-  marginRight: 4,
-});
+const PermissionIcon = styled.div((props) => ({
+  marginRight: props.theme.space.xs,
+}));
 
 const ActionsContainer = styled(StickyHorizontalSplitButtonContainer)({
-  marginTop: 'auto',
+  // marginTop: 'auto',
 });
 
 function BtcSelectAddressScreen() {
@@ -268,13 +264,13 @@ function BtcSelectAddressScreen() {
       <PermissionsTitle>{t('PERMISSIONS_TITLE')}</PermissionsTitle>
       <Permission>
         <PermissionIcon>
-          <Check color={theme.colors.success_light} />
+          <Check size={theme.space.m} color={theme.colors.success_light} />
         </PermissionIcon>
         {t('PERMISSION_WALLET_BALANCE')}
       </Permission>
       <Permission>
         <PermissionIcon>
-          <Check color={theme.colors.success_light} />
+          <Check size={theme.space.m} color={theme.colors.success_light} />
         </PermissionIcon>
         {t('PERMISSION_REQUEST_TX')}
       </Permission>

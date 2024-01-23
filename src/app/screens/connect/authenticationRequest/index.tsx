@@ -55,7 +55,7 @@ const TopImage = styled.img((props) => ({
 }));
 
 const FunctionTitle = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_l,
+  ...props.theme.typography.headline_xs,
   color: props.theme.colors.white_0,
   marginTop: 12,
 }));

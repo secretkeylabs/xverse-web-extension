@@ -11,9 +11,8 @@ const AccountInfoContainer = styled.button((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  height: 52,
   borderRadius: 12,
-  border: `1px solid ${props.theme.colors.white_800}`,
+  border: `1px solid ${props.theme.colors.white_850}`,
   backgroundColor: props.theme.colors.elevation6_800,
   padding: 16,
 }));
@@ -32,7 +31,7 @@ const CurrentAccountTextContainer = styled.div((props) => ({
 }));
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   textAlign: 'start',
 }));
@@ -45,7 +44,7 @@ interface GradientCircleProps {
 const GradientCircle = styled.div<GradientCircleProps>((props) => ({
   width: 20,
   height: 20,
-  borderRadius: 25,
+  borderRadius: '50%',
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
 
@@ -54,7 +53,7 @@ const SwitchAccountContainer = styled.div(() => ({
   alignItems: 'center',
 }));
 const SwitchAccountText = styled.p((props) => ({
-  ...props.theme.typography.body_bold_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   paddingRight: props.theme.spacing(2),
   textAlign: 'start',
@@ -67,7 +66,8 @@ type SelectAccountProps = {
 
 function SelectAccount({ account, handlePressAccount }: SelectAccountProps) {
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
-  const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  // const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const theme = useTheme();
   const getName = () =>
     account?.accountName ??
@@ -90,7 +90,7 @@ function SelectAccount({ account, handlePressAccount }: SelectAccountProps) {
         )}
       </CurrentAccountContainer>
       <SwitchAccountContainer>
-        <SwitchAccountText>Change account</SwitchAccountText>
+        <SwitchAccountText>{t('CHANGE_ACCOUNT_BUTTON')}</SwitchAccountText>
         <CaretRight color={theme.colors.white_0} />
       </SwitchAccountContainer>
     </AccountInfoContainer>
