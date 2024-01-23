@@ -126,7 +126,9 @@ const SubText = styled.div`
   ${(props) => props.theme.typography.body_s}
 `;
 
-const Feedback = styled.div``;
+const Feedback = styled.div`
+  margin-top: 8px;
+`;
 
 type Props = {
   title?: string;
