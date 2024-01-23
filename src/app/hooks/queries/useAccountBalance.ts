@@ -2,22 +2,23 @@ import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  API_TIMEOUT_MILLI,
   Account,
   BtcAddressData,
-  StxAddressData,
-  fetchStxAddressData,
+  StxAddressDataResponse,
+  getNetworkURL,
   microstacksToStx,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
-import { PAGINATION_LIMIT } from '@utils/constants';
+import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const useAccountBalance = () => {
   const btcClient = useBtcClient();
-  const stacksNetworkInstance = useNetworkSelector();
+  const stacksNetwork = useNetworkSelector();
   const { btcFiatRate, stxBtcRate } = useWalletSelector();
   const dispatch = useDispatch();
   const queue = useRef<Account[]>([]);
@@ -51,18 +52,20 @@ const useAccountBalance = () => {
     let stxBalance = 0;
 
     if (account.btcAddress) {
-      const btcData: BtcAddressData = await btcClient.getBalance(account?.btcAddress);
+      const btcData: BtcAddressData = await btcClient.getBalance(account.btcAddress);
       btcBalance = btcData.finalBalance;
     }
 
     if (account.stxAddress) {
-      const stxData: StxAddressData = await fetchStxAddressData(
-        account?.stxAddress,
-        stacksNetworkInstance,
-        0,
-        PAGINATION_LIMIT,
-      );
-      stxBalance = stxData.balance.toNumber();
+      const apiUrl = `${getNetworkURL(stacksNetwork)}/v2/accounts/${account.stxAddress}?proof=0`;
+
+      const balanceInfo = await axios.get<StxAddressDataResponse>(apiUrl, {
+        timeout: API_TIMEOUT_MILLI,
+      });
+
+      const availableBalance = new BigNumber(balanceInfo.data.balance);
+      const lockedBalance = new BigNumber(balanceInfo.data.locked);
+      stxBalance = availableBalance.plus(lockedBalance).toNumber();
     }
 
     const totalBalance = calculateTotalBalance(btcBalance, stxBalance);
@@ -90,7 +93,11 @@ const useAccountBalance = () => {
     }
   }, [queueLength]);
 
-  const enqueueFetchBalances = (account: Account) => {
+  const enqueueFetchBalances = (account: Account | null) => {
+    if (!account) {
+      return;
+    }
+
     queue.current.push(account);
     setQueueLength(queue.current.length);
     if (!isProcessingQueue) {

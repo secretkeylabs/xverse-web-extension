@@ -175,22 +175,19 @@ function AccountRow({
   onAccountSelected,
   isAccountListView = false,
   disabledAccountSelect = false,
-  shouldFetch = false,
-  fetchBalance,
 }: {
   account: Account | null;
   isSelected: boolean;
   onAccountSelected: (account: Account, goBack?: boolean) => void;
   isAccountListView?: boolean;
   disabledAccountSelect?: boolean;
-  shouldFetch?: boolean;
-  fetchBalance?: (account: Account | null) => Promise<string | undefined>;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
   const { accountsList, ledgerAccountsList, fiatCurrency, accountBalances } = useWalletSelector();
+  const totalBalance = accountBalances[account?.btcAddress ?? ''];
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
@@ -204,14 +201,6 @@ function AccountRow({
     { top: string; left: string } | undefined
   >();
   const { removeLedgerAccount, renameAccount, updateLedgerAccounts } = useWalletReducer();
-
-  const totalBalance = accountBalances[account?.btcAddress ?? ''];
-
-  useEffect(() => {
-    if (fetchBalance && shouldFetch && !totalBalance) {
-      fetchBalance(account);
-    }
-  }, [shouldFetch, totalBalance]);
 
   useEffect(
     () => () => {
