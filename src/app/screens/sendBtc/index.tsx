@@ -31,8 +31,15 @@ function SendBtcScreen() {
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const amountEditable = location.state?.disableAmountEdit ?? true;
+  const addressEditable = location.state?.disableAddressEdit ?? true;
 
-  const [currentStep, setCurrentStep] = useState<Step>(0);
+  const initialStep = addressEditable
+    ? Step.SelectRecipient
+    : amountEditable
+    ? Step.SelectRecipient
+    : Step.Confirm;
+
+  const [currentStep, setCurrentStep] = useState<Step>(initialStep);
 
   const transactionContext = useTransactionContext();
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
@@ -103,7 +110,7 @@ function SendBtcScreen() {
 
   const handleBackButtonClick = () => {
     if (currentStep > 0) {
-      setCurrentStep(getPreviousStep(currentStep, amountEditable));
+      setCurrentStep(getPreviousStep(currentStep, addressEditable, amountEditable));
     } else {
       handleCancel();
     }
@@ -169,6 +176,7 @@ function SendBtcScreen() {
       sendMax={sendMax}
       setSendMax={setSendMax}
       getFeeForFeeRate={calculateFeeForFeeRate}
+      addressEditable={addressEditable}
       amountEditable={amountEditable}
       onBack={handleBackButtonClick}
       onCancel={handleCancel}

@@ -17,11 +17,16 @@ export const getNextStep = (currentStep: Step, amountEditable: boolean) => {
   }
 };
 
-export const getPreviousStep = (currentStep: Step, amountEditable: boolean) => {
+export const getPreviousStep = (
+  currentStep: Step,
+  addressEditable: boolean,
+  amountEditable: boolean,
+) => {
   switch (currentStep) {
     case Step.SelectRecipient:
       return Step.SelectRecipient;
     case Step.SelectAmount:
+      return addressEditable ? Step.SelectRecipient : Step.SelectAmount;
       return Step.SelectRecipient;
     case Step.Confirm:
       return amountEditable ? Step.SelectAmount : Step.SelectRecipient;

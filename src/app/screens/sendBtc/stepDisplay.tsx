@@ -40,6 +40,7 @@ type StepDisplayProps = {
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
+  addressEditable: boolean;
   amountEditable: boolean;
   onConfirm: () => void;
   onBack: () => void;
@@ -61,6 +62,7 @@ function StepDisplay({
   sendMax,
   setSendMax,
   getFeeForFeeRate,
+  addressEditable,
   amountEditable,
   onConfirm,
   onBack,
@@ -116,7 +118,6 @@ function StepDisplay({
     case Step.Confirm:
       if (!summary) {
         // this should never happen as there are gates to prevent getting to this step without a summary
-        setCurrentStep(Step.SelectAmount);
         return null;
       }
       return (
