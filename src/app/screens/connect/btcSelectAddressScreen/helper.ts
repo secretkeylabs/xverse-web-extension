@@ -28,6 +28,23 @@ export async function getAppIconFromWebManifest(url: string): Promise<string> {
 
     return `${url}${icons[0].src}`;
   } catch (error: any) {
+    if (error.message.includes('Failed to fetch web manifest')) {
+      const response = await fetch(`${url}/manifest.webmanifest`);
+      if (!response.ok) {
+        return '';
+      }
+      const manifest: WebManifest = await response.json();
+      // Ensure the manifest contains the 'icons' property
+      if (!manifest.icons || !Array.isArray(manifest.icons)) {
+        throw new Error('Web manifest is missing the icons property');
+      }
+
+      // Extract the app icons' URLs
+      const icons = manifest.icons.filter((icon) => icon.sizes === '48x48');
+      console.log('🚀 ~ file: helper.ts:44 ~ getAppIconFromWebManifest ~ icons:', icons);
+
+      return `${url}/${icons[0].src}`;
+    }
     return '';
   }
 }

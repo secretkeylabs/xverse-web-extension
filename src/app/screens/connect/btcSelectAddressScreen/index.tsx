@@ -2,18 +2,18 @@ import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
-import SelectAccount from '@components/selectAccount';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Check } from '@phosphor-icons/react';
 import { animated, useSpring } from '@react-spring/web';
+import SelectAccount from '@screens/connect/selectAccount';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
-import { getTruncatedAddress } from '@utils/helper';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AddressPurpose } from 'sats-connect';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
+import AddressPurposeBox from '../addressPurposeBox';
+import PermissionsList from '../permissionsList';
 import { getAppIconFromWebManifest } from './helper';
 
 const OuterContainer = styled(animated.div)((props) => ({
@@ -24,7 +24,7 @@ const OuterContainer = styled(animated.div)((props) => ({
   ...props.theme.scrollbar,
 }));
 
-const TitleContainer = styled.div({
+const HeadingContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -39,34 +39,11 @@ const AddressBoxContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-const AddressBox = styled.div((props) => ({
-  height: 66,
-  padding: props.theme.space.m,
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  backgroundColor: props.theme.colors.elevation6_800,
-  marginBottom: 1,
-  ':first-of-type': {
-    borderTopLeftRadius: props.theme.radius(2),
-    borderTopRightRadius: props.theme.radius(2),
-  },
-  ':last-of-type': {
-    borderBottomLeftRadius: props.theme.radius(2),
-    borderBottomRightRadius: props.theme.radius(2),
-  },
+const TopImage = styled.img((props) => ({
+  maxHeight: 48,
+  maxWidth: 48,
+  marginBottom: props.theme.space.m,
 }));
-
-const AddressContainer = styled.div({
-  display: 'flex',
-  alignItems: 'center',
-});
-
-const TopImage = styled.img({
-  maxHeight: 32,
-  maxWidth: 32,
-});
 
 const Title = styled.h1((props) => ({
   ...props.theme.typography.headline_xs,
@@ -80,30 +57,6 @@ const DapURL = styled.h2((props) => ({
   textAlign: 'center',
 }));
 
-const AddressImage = styled.img((props) => ({
-  width: 20,
-  height: 20,
-  marginRight: props.theme.space.xs,
-}));
-
-const AddressTextTitle = styled.h2((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  textAlign: 'center',
-}));
-
-const TruncatedAddress = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'right',
-}));
-
-const BnsName = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'right',
-}));
-
 const RequestMessage = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
@@ -113,29 +66,13 @@ const RequestMessage = styled.p((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const PermissionsTitle = styled.h3((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  textAlign: 'left',
-  marginTop: 24,
-}));
-
-const Permission = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  marginTop: 12,
-  display: 'flex',
-  alignItems: 'center',
-}));
-
-const PermissionIcon = styled.div((props) => ({
-  marginRight: props.theme.space.xs,
+const PermissionsContainer = styled.div((props) => ({
+  paddingBottom: props.theme.space.xxl,
 }));
 
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const { network, btcAddress, ordinalsAddress, stxAddress, selectedAccount } = useWalletSelector();
   const [appIcon, setAppIcon] = useState<string>('');
@@ -178,6 +115,24 @@ function BtcSelectAddressScreen() {
         },
       });
     }
+    // Handle address requests with an unsupported purpose
+    payload.purposes.forEach((purpose) => {
+      if (
+        purpose !== AddressPurpose.Ordinals &&
+        purpose !== AddressPurpose.Payment &&
+        purpose !== AddressPurpose.Stacks
+      ) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'BTC',
+            errorTitle: t('INVALID_PURPOSE_ERROR_TITLE'),
+            error: t('INVALID_PURPOSE_ERROR_DESCRIPTION'),
+            browserTx: true,
+          },
+        });
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -197,79 +152,54 @@ function BtcSelectAddressScreen() {
   const AddressPurposeRow = useCallback((purpose: AddressPurpose) => {
     if (purpose === AddressPurpose.Payment) {
       return (
-        <AddressBox key={purpose}>
-          <AddressContainer>
-            <AddressImage src={BitcoinIcon} />
-            <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
-          </AddressContainer>
-          <TruncatedAddress>{getTruncatedAddress(btcAddress)}</TruncatedAddress>
-        </AddressBox>
+        <AddressPurposeBox
+          purpose={purpose}
+          icon={BitcoinIcon}
+          title={t('BITCOIN_ADDRESS')}
+          address={btcAddress}
+        />
       );
     }
     if (purpose === AddressPurpose.Ordinals) {
       return (
-        <AddressBox key={purpose}>
-          <AddressContainer>
-            <AddressImage src={OrdinalsIcon} />
-            <AddressTextTitle>{t('ORDINAL_ADDRESS')}</AddressTextTitle>
-          </AddressContainer>
-          <TruncatedAddress>{getTruncatedAddress(ordinalsAddress)}</TruncatedAddress>
-        </AddressBox>
+        <AddressPurposeBox
+          purpose={purpose}
+          icon={OrdinalsIcon}
+          title={t('ORDINAL_ADDRESS')}
+          address={ordinalsAddress}
+        />
       );
     }
     if (purpose === AddressPurpose.Stacks) {
       return (
-        <AddressBox key={purpose}>
-          <AddressContainer>
-            <AddressImage src={stxIcon} />
-            <AddressTextTitle>{t('STX_ADDRESS')}</AddressTextTitle>
-          </AddressContainer>
-          <div>
-            {selectedAccount?.bnsName ? <BnsName>{selectedAccount?.bnsName}</BnsName> : null}
-            <TruncatedAddress>{getTruncatedAddress(stxAddress)}</TruncatedAddress>
-          </div>
-        </AddressBox>
+        <AddressPurposeBox
+          purpose={purpose}
+          icon={stxIcon}
+          title={t('STX_ADDRESS')}
+          address={stxAddress}
+          bnsName={selectedAccount?.bnsName}
+        />
       );
     }
-
-    navigate('/tx-status', {
-      state: {
-        txid: '',
-        currency: 'BTC',
-        errorTitle: t('INVALID_PURPOSE_ERROR_TITLE'),
-        error: t('INVALID_PURPOSE_ERROR_DESCRIPTION'),
-        browserTx: true,
-      },
-    });
   }, []);
 
   const handleSwitchAccount = () => {
-    navigate('/account-list');
+    navigate('/account-list?hideListActions=true');
   };
 
   return (
     <OuterContainer style={styles}>
-      <TitleContainer>
+      <HeadingContainer>
         {appIcon !== '' ? <TopImage src={appIcon} alt="Dapp Logo" /> : null}
         <Title>{t('TITLE')}</Title>
         <DapURL>{appUrl}</DapURL>
-      </TitleContainer>
+      </HeadingContainer>
       {payload.message ? <RequestMessage>{payload.message.substring(0, 80)}</RequestMessage> : null}
       <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
       <AddressBoxContainer>{payload.purposes.map(AddressPurposeRow)}</AddressBoxContainer>
-      <PermissionsTitle>{t('PERMISSIONS_TITLE')}</PermissionsTitle>
-      <Permission>
-        <PermissionIcon>
-          <Check size={theme.space.m} color={theme.colors.success_light} />
-        </PermissionIcon>
-        {t('PERMISSION_WALLET_BALANCE')}
-      </Permission>
-      <Permission>
-        <PermissionIcon>
-          <Check size={theme.space.m} color={theme.colors.success_light} />
-        </PermissionIcon>
-        {t('PERMISSION_REQUEST_TX')}
-      </Permission>
+      <PermissionsContainer>
+        <PermissionsList />
+      </PermissionsContainer>
       <StickyHorizontalSplitButtonContainer>
         <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
         <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />

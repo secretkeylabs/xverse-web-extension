@@ -10,7 +10,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 export const Container = styled.div({
@@ -82,8 +82,12 @@ const ButtonsWrapper = styled.div(
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
   const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
   const { createAccount, switchAccount } = useWalletReducer();
+
+  const hideListActions = Boolean(params.get('hideListActions')) || false;
 
   const displayedAccountsList = useMemo(() => {
     const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
@@ -132,20 +136,22 @@ function AccountList(): JSX.Element {
           </div>
         ))}
       </AccountContainer>
-      <ButtonsWrapper>
-        <ButtonContainer onClick={onCreateAccount}>
-          <AddAccountContainer>
-            <ButtonImage src={Plus} />
-          </AddAccountContainer>
-          <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
-        </ButtonContainer>
-        <ButtonContainer onClick={onImportLedgerAccount}>
-          <AddAccountContainer>
-            <ButtonImage src={ConnectLedger} />
-          </AddAccountContainer>
-          <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
-        </ButtonContainer>
-      </ButtonsWrapper>
+      {!hideListActions ? (
+        <ButtonsWrapper>
+          <ButtonContainer onClick={onCreateAccount}>
+            <AddAccountContainer>
+              <ButtonImage src={Plus} />
+            </AddAccountContainer>
+            <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
+          </ButtonContainer>
+          <ButtonContainer onClick={onImportLedgerAccount}>
+            <AddAccountContainer>
+              <ButtonImage src={ConnectLedger} />
+            </AddAccountContainer>
+            <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
+          </ButtonContainer>
+        </ButtonsWrapper>
+      ) : null}
     </Container>
   );
 }

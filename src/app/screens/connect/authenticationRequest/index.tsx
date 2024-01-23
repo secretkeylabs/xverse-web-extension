@@ -6,36 +6,37 @@ import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
-import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import SelectAccount from '@components/selectAccount';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { Check } from '@phosphor-icons/react';
+import SelectAccount from '@screens/connect/selectAccount';
 import {
   AuthRequest,
   createAuthResponse,
   handleLedgerStxJWTAuth,
 } from '@secretkeylabs/xverse-core';
 import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
-import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
+import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
+import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled, { useTheme } from 'styled-components';
+import { AddressPurpose } from 'sats-connect';
+import styled from 'styled-components';
 import validUrl from 'valid-url';
+import AddressPurposeBox from '../addressPurposeBox';
+import PermissionsList from '../permissionsList';
 
-const MainContainer = styled.div({
+const MainContainer = styled.div((props) => ({
   display: 'flex',
-  alignItems: 'center',
   flexDirection: 'column',
-  overflow: 'hidden',
-  marginLeft: 16,
-  marginRight: 16,
-});
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  ...props.theme.scrollbar,
+}));
 
 const SuccessActionsContainer = styled.div((props) => ({
   width: '100%',
@@ -52,15 +53,21 @@ const TopImage = styled.img((props) => ({
   maxHeight: 48,
   maxWidth: 48,
   marginTop: props.theme.space.xxl,
+  alignSelf: 'center',
 }));
 
-const FunctionTitle = styled.h1((props) => ({
+const ImagePlaceholder = styled.div((props) => ({
+  marginTop: props.theme.space.xxl,
+}));
+
+const Title = styled.h1((props) => ({
   ...props.theme.typography.headline_xs,
   color: props.theme.colors.white_0,
+  textAlign: 'center',
   marginTop: 12,
 }));
 
-const DappTitle = styled.h2((props) => ({
+const DappName = styled.h2((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(2),
@@ -75,79 +82,13 @@ const InfoContainerWrapper = styled.div((props) => ({
 
 const AddressesContainer = styled.div((props) => ({
   marginTop: props.theme.space.s,
-}));
-
-const AddressBox = styled.div((props) => ({
-  width: 328,
-  height: 66,
-  padding: props.theme.spacing(10),
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  backgroundColor: props.theme.colors.elevation6_800,
-  marginBottom: 1,
-  ':first-of-type': {
-    borderTopLeftRadius: props.theme.radius(2),
-    borderTopRightRadius: props.theme.radius(2),
-  },
-  ':last-of-type': {
-    borderBottomLeftRadius: props.theme.radius(2),
-    borderBottomRightRadius: props.theme.radius(2),
-  },
-}));
-
-const AddressContainer = styled.div({
-  display: 'flex',
-  alignItems: 'center',
-});
-
-const AddressImage = styled.img({
-  width: 24,
-  height: 24,
-  marginRight: 8,
-});
-
-const AddressTextTitle = styled.h2((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  textAlign: 'center',
-}));
-
-const TruncatedAddress = styled.h3((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'right',
-}));
-
-const BnsName = styled.h3((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'right',
-}));
-
-const PermissionsContainer = styled.div({
   width: '100%',
-});
-
-const PermissionsTitle = styled.h3((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  textAlign: 'left',
-  marginTop: 24,
 }));
 
-const Permission = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  marginTop: 12,
-  display: 'flex',
-  alignContent: 'center',
+const PermissionsContainer = styled.div((props) => ({
+  width: '100%',
+  paddingBottom: props.theme.space.xxl,
 }));
-
-const PermissionIcon = styled.div({
-  marginRight: 4,
-});
 
 function AuthenticationRequest() {
   const [loading, setLoading] = useState(false);
@@ -164,9 +105,8 @@ function AuthenticationRequest() {
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
-  const { selectedAccount } = useWalletSelector();
+  const { selectedAccount, btcAddress, stxAddress } = useWalletSelector();
   const { getSeed } = useSeedVault();
-  const theme = useTheme();
   const isDisabled = !selectedAccount?.stxAddress;
 
   const confirmCallback = async () => {
@@ -218,7 +158,9 @@ function AuthenticationRequest() {
     () =>
       validUrl.isWebUri(authRequest?.payload?.appDetails?.icon) ? (
         <TopImage src={authRequest?.payload?.appDetails?.icon} alt="Dapp Logo" />
-      ) : null,
+      ) : (
+        <ImagePlaceholder />
+      ),
     [authRequest],
   );
 
@@ -289,75 +231,54 @@ function AuthenticationRequest() {
   };
 
   const handleSwitchAccount = () => {
-    navigate('/account-list');
+    navigate('/account-list?hideListActions=true');
+  };
+
+  const handleAddStxLedgerAccount = async () => {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+    });
+
+    window.close();
   };
 
   return (
-    <ConfirmScreen
-      onConfirm={confirmCallback}
-      onCancel={cancelCallback}
-      confirmText={t('CONNECT_BUTTON')}
-      cancelText={t('CANCEL_BUTTON')}
-      loading={loading}
-      disabled={isDisabled}
-    >
-      <MainContainer>
-        {getDappLogo()}
-        <FunctionTitle>{t('TITLE')}</FunctionTitle>
-        <DappTitle>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappTitle>
-        <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
-        <AddressesContainer>
-          <AddressBox>
-            <AddressContainer>
-              <AddressImage src={stxIcon} />
-              <AddressTextTitle>{t('STX_ADDRESS')}</AddressTextTitle>
-            </AddressContainer>
-            <div>
-              {selectedAccount?.bnsName ? <BnsName>{selectedAccount?.bnsName}</BnsName> : null}
-              <TruncatedAddress>
-                {getTruncatedAddress(selectedAccount?.stxAddress!)}
-              </TruncatedAddress>
-            </div>
-          </AddressBox>
-          <AddressBox>
-            <AddressContainer>
-              <AddressImage src={BitcoinIcon} />
-              <AddressTextTitle>{t('BITCOIN_ADDRESS')}</AddressTextTitle>
-            </AddressContainer>
-            <TruncatedAddress>{getTruncatedAddress(selectedAccount?.btcAddress!)}</TruncatedAddress>
-          </AddressBox>
-        </AddressesContainer>
-        <PermissionsContainer>
-          <PermissionsTitle>{t('PERMISSIONS_TITLE')}</PermissionsTitle>
-          <Permission>
-            <PermissionIcon>
-              <Check color={theme.colors.success_light} />
-            </PermissionIcon>
-            {t('PERMISSION_WALLET_BALANCE')}
-          </Permission>
-          <Permission>
-            <PermissionIcon>
-              <Check color={theme.colors.success_light} />
-            </PermissionIcon>
-            {t('PERMISSION_REQUEST_TX')}
-          </Permission>
-        </PermissionsContainer>
-        {isDisabled && (
-          <InfoContainerWrapper>
-            <InfoContainer
-              bodyText={t('NO_STACKS_AUTH_SUPPORT.TITLE')}
-              redirectText={t('NO_STACKS_AUTH_SUPPORT.LINK')}
-              onClick={async () => {
-                await chrome.tabs.create({
-                  url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
-                });
-
-                window.close();
-              }}
-            />
-          </InfoContainerWrapper>
-        )}
-      </MainContainer>
+    <MainContainer>
+      {getDappLogo()}
+      <Title>{t('TITLE')}</Title>
+      <DappName>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappName>
+      <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
+      <AddressesContainer>
+        <AddressPurposeBox
+          purpose={AddressPurpose.Stacks}
+          icon={stxIcon}
+          title={t('STX_ADDRESS')}
+          address={selectedAccount?.stxAddress || stxAddress}
+          bnsName={selectedAccount?.bnsName}
+        />
+        <AddressPurposeBox
+          purpose={AddressPurpose.Payment}
+          icon={BitcoinIcon}
+          title={t('BITCOIN_ADDRESS')}
+          address={selectedAccount?.btcAddress || btcAddress}
+        />
+      </AddressesContainer>
+      <PermissionsContainer>
+        <PermissionsList />
+      </PermissionsContainer>
+      <StickyHorizontalSplitButtonContainer>
+        <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
+        <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />
+      </StickyHorizontalSplitButtonContainer>
+      {isDisabled && (
+        <InfoContainerWrapper>
+          <InfoContainer
+            bodyText={t('NO_STACKS_AUTH_SUPPORT.TITLE')}
+            redirectText={t('NO_STACKS_AUTH_SUPPORT.LINK')}
+            onClick={handleAddStxLedgerAccount}
+          />
+        </InfoContainerWrapper>
+      )}
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (
           <LedgerConnectionView
@@ -391,7 +312,7 @@ function AuthenticationRequest() {
           <ActionButton onPress={cancelCallback} text={t('CANCEL_BUTTON')} transparent />
         </SuccessActionsContainer>
       </BottomModal>
-    </ConfirmScreen>
+    </MainContainer>
   );
 }
 
