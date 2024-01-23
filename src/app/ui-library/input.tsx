@@ -77,7 +77,7 @@ const InputField = styled.input<{ $variant: InputVariant }>`
 
 const ComplicationsContainer = styled.div`
   position: absolute;
-  right: ${(props) => props.theme.spacing(4)}px;
+  right: ${(props) => props.theme.spacing(8)}px;
   top: 0;
 
   height: 100%;
