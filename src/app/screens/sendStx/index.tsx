@@ -1,12 +1,13 @@
 import TokenImage from '@components/tokenImage';
 import { isInOptions } from '@utils/helper';
+import SendLayout from 'app/layouts/sendLayout';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import SendLayout from 'app/layouts/sendLayout';
 import { Step, getNextStep, getPreviousStep } from './stepResolver';
 import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipient';
+import Step2SelectAmount from './steps/Step2SelectAmount';
 
 const Container = styled.div`
   display: flex;
@@ -36,6 +37,9 @@ function SendStxScreen() {
   // Step 1 states
   const [recipientAddress, setRecipientAddress] = useState('');
   const [memo, setMemo] = useState('');
+
+  // Step 2 states
+  const [amount, setAmount] = useState('0');
 
   const handleCancel = () => {
     if (isInOption) {
@@ -72,6 +76,28 @@ function SendStxScreen() {
               memo={memo}
               setMemo={setMemo}
               onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, true))}
+              isLoading={false}
+            />
+          </Container>
+        </SendLayout>
+      );
+    case Step.SelectAmount:
+      return (
+        <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
+          <Container>
+            <Step2SelectAmount
+              header={header}
+              amount={amount}
+              setAmount={setAmount}
+              feeRate="1"
+              setFeeRate={() => {}}
+              sendMax
+              setSendMax={() => {}}
+              fee="50"
+              getFeeForFeeRate={(feeRate, useEffectiveFeeRate) => Promise.resolve(undefined)}
+              dustFiltered={false}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, true))}
+              hasSufficientFunds
               isLoading={false}
             />
           </Container>
