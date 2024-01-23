@@ -18,7 +18,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import useBtcClient from './useBtcClient';
 import useNetworkSelector from './useNetwork';
-import useSeedVault from './useSeedVault';
 import useWalletSelector from './useWalletSelector';
 
 // TODO: move the types and helper functions below to xverse-core
@@ -117,7 +116,6 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
   const [rbfData, setRbfData] = useState<RbfData>({});
   const { accountType, network, selectedAccount, stxAvailableBalance, feeMultipliers } =
     useWalletSelector();
-  const seedVault = useSeedVault();
   const btcClient = useBtcClient();
   const selectedNetwork = useNetworkSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
@@ -227,7 +225,6 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
             : selectedAccount.id,
         network: network.type,
         esploraProvider: btcClient,
-        getSeedPhrase: seedVault.getSeed,
       });
 
       const mempoolFees = await mempoolApi.getRecommendedFees(network.type);
@@ -253,7 +250,6 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
     transaction,
     accountType,
     network.type,
-    seedVault,
     btcClient,
     fetchStxData,
     t,

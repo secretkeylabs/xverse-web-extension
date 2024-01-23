@@ -74,7 +74,7 @@ function BundleItem({
           if (index === 4) {
             return <DotsThree color={Theme.colors.white_200} size="20" />;
           }
-          return <RareSatIcon key={satribute} type={satribute} />;
+          return <RareSatIcon key={satribute} type={satribute} size={24} />;
         })}
       </Range>
     </RangeContainer>
