@@ -77,6 +77,7 @@ function BalanceCard(props: BalanceCardProps) {
     stxAddress,
     hideStx,
     coinsList,
+    brcCoinsList,
   } = useWalletSelector();
   const { isLoading, isRefetching } = props;
 
@@ -102,6 +103,19 @@ function BalanceCard(props: BalanceCardProps) {
           const coinFiatValue = new BigNumber(coin.balance)
             .dividedBy(tokenUnits)
             .multipliedBy(new BigNumber(coin.tokenFiatRate));
+          return acc.plus(coinFiatValue);
+        }
+
+        return acc;
+      }, totalBalance);
+    }
+
+    if (brcCoinsList) {
+      totalBalance = brcCoinsList.reduce((acc, coin) => {
+        if (coin.visible && coin.tokenFiatRate) {
+          const coinFiatValue = new BigNumber(coin.balance).multipliedBy(
+            new BigNumber(coin.tokenFiatRate),
+          );
           return acc.plus(coinFiatValue);
         }
 

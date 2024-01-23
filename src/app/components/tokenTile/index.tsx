@@ -249,6 +249,8 @@ function TokenTile({
           .toString();
       case 'FT':
         return getFtFiatEquivalent();
+      case 'brc20':
+        return getFtFiatEquivalent();
       default:
         return '';
     }
@@ -278,6 +280,20 @@ function TokenTile({
             renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
           />
         );
+      case 'brc20':
+        if (fungibleToken?.tokenFiatRate) {
+          return (
+            <NumericFormat
+              value={getFiatEquivalent()}
+              displayType="text"
+              thousandSeparator
+              prefix={`${currencySymbolMap[fiatCurrency]} `}
+              suffix={` ${fiatCurrency}`}
+              renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
+            />
+          );
+        }
+        break;
       case 'FT':
         if (fungibleToken?.tokenFiatRate) {
           return (
