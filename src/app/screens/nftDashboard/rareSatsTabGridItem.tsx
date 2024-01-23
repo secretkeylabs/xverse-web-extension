@@ -103,8 +103,10 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: Bundle; maxItems: n
               </TileText>
             );
           }
-          // eslint-disable-next-line react/no-array-index-key
-          return <RareSatIcon key={`${sattribute}-${indexSatributes}`} type={sattribute} />;
+          return (
+            // eslint-disable-next-line react/no-array-index-key
+            <RareSatIcon key={`${sattribute}-${indexSatributes}`} type={sattribute} size={24} />
+          );
         })}
       </Range>
     ));

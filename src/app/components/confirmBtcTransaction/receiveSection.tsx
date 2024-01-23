@@ -57,7 +57,8 @@ function ReceiveSection({ outputs, netAmount, onShowInscription }: Props) {
     (output) => output.inscriptions.length > 0 || output.satributes.length > 0,
   );
   const areInscriptionsRareSatsInPayment = inscriptionsRareSatsInPayment.length > 0;
-  const showPaymentSection = areInscriptionsRareSatsInPayment || netAmount > 0;
+  const amountIsBiggerThanZero = netAmount > 0;
+  const showPaymentSection = areInscriptionsRareSatsInPayment || amountIsBiggerThanZero;
 
   return (
     <>
@@ -98,7 +99,7 @@ function ReceiveSection({ outputs, netAmount, onShowInscription }: Props) {
               <AddressLabel typography="body_medium_m">{t('YOUR_PAYMENT_ADDRESS')}</AddressLabel>
             </RowCenter>
           </Header>
-          {netAmount > 0 && (
+          {amountIsBiggerThanZero && (
             <RowContainer>
               <Amount amount={netAmount} />
             </RowContainer>
@@ -113,7 +114,7 @@ function ReceiveSection({ outputs, netAmount, onShowInscription }: Props) {
                 satributes={output.satributes}
                 amount={output.amount}
                 onShowInscription={onShowInscription}
-                showTopDivider={areInscriptionsRareSatsInPayment && index === 0}
+                showTopDivider={amountIsBiggerThanZero && index === 0}
                 showBottomDivider={inscriptionsRareSatsInPayment.length > index + 1}
               />
             ))}
