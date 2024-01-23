@@ -82,6 +82,7 @@ const useWalletReducer = () => {
       stxAddress: walletAccounts[0].stxAddress,
       stxPublicKey: walletAccounts[0].stxPublicKey,
       bnsName: walletAccounts[0].bnsName,
+      accountName: walletAccounts[0].accountName,
     };
 
     let selectedAccountData: Account | undefined;
