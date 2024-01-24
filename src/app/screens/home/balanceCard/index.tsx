@@ -83,7 +83,7 @@ function BalanceCard(props: BalanceCardProps) {
     accountBalances,
     brcCoinsList,
   } = useWalletSelector();
-  const { enqueueFetchBalances } = useAccountBalance();
+  const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
   const oldTotalBalance = accountBalances[btcAddress];
 
@@ -103,7 +103,7 @@ function BalanceCard(props: BalanceCardProps) {
     }
 
     if (oldTotalBalance !== balance) {
-      enqueueFetchBalances(selectedAccount);
+      setAccountBalance(selectedAccount, balance);
     }
   }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching]);
 

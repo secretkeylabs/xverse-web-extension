@@ -158,7 +158,13 @@ const useAccountBalance = () => {
     }
   };
 
-  return { enqueueFetchBalances };
+  const setAccountBalance = (account: Account | null, balance: string) => {
+    if (account) {
+      dispatch(setAccountBalanceAction(account.btcAddress, balance));
+    }
+  };
+
+  return { enqueueFetchBalances, setAccountBalance };
 };
 
 export default useAccountBalance;
