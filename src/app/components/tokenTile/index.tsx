@@ -347,7 +347,7 @@ function TokenTile({
     onPress({
       coin: currency as CurrencyTypes,
       ft: fungibleToken && fungibleToken.principal,
-      brc20Ft: !fungibleToken?.principal ? fungibleToken?.name : undefined,
+      brc20Ft: currency === 'brc20' ? fungibleToken?.principal : undefined,
     });
   };
 
