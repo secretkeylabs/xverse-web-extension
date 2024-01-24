@@ -5,6 +5,7 @@ import styled from 'styled-components';
 const AddressBox = styled.div((props) => ({
   padding: `${props.theme.spacing(10)}px ${props.theme.space.m}`,
   display: 'flex',
+  maxHeight: 60,
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',

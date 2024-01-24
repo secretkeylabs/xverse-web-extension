@@ -41,6 +41,7 @@ const AddressBoxContainer = styled.div((props) => ({
 
 const TopImage = styled.img((props) => ({
   maxHeight: 48,
+  borderRadius: props.theme.radius(2),
   maxWidth: 48,
   marginBottom: props.theme.space.m,
 }));
