@@ -1,42 +1,24 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  Coin,
-  CoinsResponse,
+  Brc20Token,
   FungibleToken,
+  getBrc20Tokens,
   getOrdinalsFtBalance,
 } from '@secretkeylabs/xverse-core';
 import { setBrcCoinsDataAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { useDispatch } from 'react-redux';
 
-const coinToFungibleToken = (coin: Coin): FungibleToken => ({
+const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
   name: coin.name,
-  principal: coin.ticker ?? coin.name,
+  principal: coin.ticker,
   balance: '0',
   total_sent: '',
   total_received: '',
-  assetName: coin.ticker ?? coin.name,
-  visible: coin.visible ?? false,
+  assetName: coin.ticker,
+  visible: false,
   ticker: coin.ticker,
 });
-
-export async function getBrc20Tokens(
-  tickers: string[],
-  fiatCurrency: string,
-): Promise<CoinsResponse | null> {
-  const url = `http://localhost:3001/v1/brc20/tokens`;
-
-  const params = {
-    currency: fiatCurrency,
-    tickers,
-  };
-
-  return axios
-    .get<CoinsResponse>(url, { params })
-    .then((response) => response.data)
-    .catch(() => null);
-}
 
 const useBtcCoinBalance = () => {
   const dispatch = useDispatch();
@@ -52,6 +34,7 @@ const useBtcCoinBalance = () => {
       const ordinalsFtBalance = await getOrdinalsFtBalance(network.type, ordinalsAddress);
 
       const brc20Tokens = await getBrc20Tokens(
+        network.type,
         ordinalsFtBalance.map((o) => o.ticker!),
         fiatCurrency,
       );
@@ -70,7 +53,7 @@ const useBtcCoinBalance = () => {
         const existingToken = brcCoinsList?.find((c) => c.ticker === ticker);
         const newToken = ordinalsFtBalance?.find((o) => o.ticker === ticker);
         const brc20Coin = brc20Tokens?.find((t) => t.ticker === ticker);
-        const brc20Ft = brc20Coin && coinToFungibleToken(brc20Coin);
+        const brc20Ft = brc20Coin && brc20TokenToFungibleToken(brc20Coin);
         const tokenFiatRate = brc20Coin?.tokenFiatRate;
 
         return {
