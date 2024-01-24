@@ -41,8 +41,6 @@ export async function getAppIconFromWebManifest(url: string): Promise<string> {
 
       // Extract the app icons' URLs
       const icons = manifest.icons.filter((icon) => icon.sizes === '48x48');
-      console.log('🚀 ~ file: helper.ts:44 ~ getAppIconFromWebManifest ~ icons:', icons);
-
       return `${url}/${icons[0].src}`;
     }
     return '';
