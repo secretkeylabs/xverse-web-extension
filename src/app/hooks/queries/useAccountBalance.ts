@@ -6,10 +6,8 @@ import {
   Account,
   BtcAddressData,
   FungibleToken,
-  StxAddressDataResponse,
-  getCoinMetaData,
+  TokensResponse,
   getCoinsInfo,
-  getFtData,
   getNetworkURL,
 } from '@secretkeylabs/xverse-core';
 import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
@@ -44,17 +42,27 @@ const useAccountBalance = () => {
     }
 
     if (account.stxAddress) {
-      const apiUrl = `${getNetworkURL(stacksNetwork)}/v2/accounts/${account.stxAddress}?proof=0`;
+      const apiUrl = `${getNetworkURL(stacksNetwork)}/extended/v1/address/${
+        account.stxAddress
+      }/balances`;
 
-      const balanceInfo = await axios.get<StxAddressDataResponse>(apiUrl, {
+      const response = await axios.get<TokensResponse>(apiUrl, {
         timeout: API_TIMEOUT_MILLI,
       });
 
-      const availableBalance = new BigNumber(balanceInfo.data.balance);
-      const lockedBalance = new BigNumber(balanceInfo.data.locked);
+      const availableBalance = new BigNumber(response.data.stx.balance);
+      const lockedBalance = new BigNumber(response.data.stx.locked);
       stxBalance = availableBalance.plus(lockedBalance).toString();
 
-      const fungibleTokenList = await getFtData(account.stxAddress, stacksNetwork);
+      const fungibleTokenList: FungibleToken[] = [];
+      Object.entries(response.data.fungible_tokens).forEach(([key, value]: [string, any]) => {
+        const fungibleToken: FungibleToken = value;
+        const index = key.indexOf('::');
+        fungibleToken.assetName = key.substring(index + 2);
+        fungibleToken.principal = key.substring(0, index);
+        fungibleToken.protocol = 'stacks';
+        fungibleTokenList.push(fungibleToken);
+      });
 
       const visibleCoins: FungibleToken[] | null = coinsList;
       if (visibleCoins) {
@@ -75,7 +83,6 @@ const useAccountBalance = () => {
       }
 
       const contractids: string[] = fungibleTokenList.map((ft) => ft.principal);
-
       const coinsResponse = await getCoinsInfo(network.type, contractids, fiatCurrency);
 
       if (coinsResponse) {
