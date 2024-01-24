@@ -33,7 +33,7 @@ const TickerIconContainer = styled.div<{ size?: number; round?: boolean }>((prop
   justifyContent: 'center',
   height: props.size ?? 44,
   width: props.size ?? 44,
-  borderRadius: props.round ? '50%' : props.theme.radius(2),
+  borderRadius: '50%',
   backgroundColor: props.color,
 }));
 
