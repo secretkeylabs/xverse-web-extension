@@ -67,7 +67,7 @@ const useBtcCoinBalance = () => {
         if (existingToken) {
           mergedList.push({
             ...existingToken,
-            ...(tokenFiatRate ? { tokenFiatRate } : {}),
+            tokenFiatRate,
           });
         } else {
           mergedList.push(brc20TokenToFungibleToken(b));
