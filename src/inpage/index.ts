@@ -5,14 +5,10 @@ import SatsMethodsProvider from './sats.inpage';
 import StacksMethodsProvider from './stacks.inpage';
 
 declare global {
-  interface Window {
-    XverseProviders: {
-      StacksProvider: StacksProvider;
-      BitcoinProvider: BitcoinProvider;
-    };
+  interface XverseProviders {
+    StacksProvider: StacksProvider;
   }
 }
-
 // we inject these in case implementors call the default providers
 window.StacksProvider = StacksMethodsProvider as StacksProvider;
 window.BitcoinProvider = SatsMethodsProvider as BitcoinProvider;
