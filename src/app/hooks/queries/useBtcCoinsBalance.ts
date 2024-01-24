@@ -27,7 +27,7 @@ const useBtcCoinBalance = () => {
   // For future lost souls:
   // brcCoinsList = current local store
   // ordinalsFtBalance = latest brc20 balance
-  // brc20Tokens = brc20 coin data,
+  // brc20Tokens = brc20 coin metadata,
   // WITH additional supported tokens returned even if not passed
   const fetchBrcCoinsBalances = async () => {
     try {
