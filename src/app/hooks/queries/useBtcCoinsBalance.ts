@@ -48,22 +48,35 @@ const useBtcCoinBalance = () => {
             ticker !== undefined && array.indexOf(ticker) === index,
         );
 
-      const mergedList = allKnownTickers.map((ticker) => {
+      const mergedList = allKnownTickers.reduce((acc, ticker) => {
         const existingToken = brcCoinsList?.find((c) => c.ticker === ticker);
         const newToken = ordinalsFtBalance?.find((o) => o.ticker === ticker);
         const brc20Coin = brc20Tokens?.find((t) => t.ticker === ticker);
         const brc20Ft = brc20Coin && brc20TokenToFungibleToken(brc20Coin);
-        const tokenFiatRate = brc20Coin?.tokenFiatRate;
+        const tokenFiatRate = Number(brc20Coin?.tokenFiatRate);
 
-        return {
+        if (!existingToken && !newToken && !brc20Ft) {
+          // Skip over the ticker as none of the tokens exist
+          return acc;
+        }
+
+        const reconstitutedFt = {
           ...existingToken,
           ...(newToken || brc20Ft),
-          tokenFiatRate,
+          ...(tokenFiatRate ? { tokenFiatRate } : {}),
           // The `visible` property from `xverse-core` defaults to true.
           // We override `visible` to ensure that the existing state is preserved.
           ...(existingToken ? { visible: existingToken.visible } : {}),
-        };
-      }) as FungibleToken[];
+          // One of the 3 FungibleTokens (existingToken / newToken / brc20Ft)
+          // is GUARANTEED to be properly formed, otherwise the element is skipped.
+          // However, TypeScript fails to infer this.
+          // As such, we can safely assert the type here:
+        } as FungibleToken;
+
+        acc.push(reconstitutedFt);
+
+        return acc;
+      }, [] as FungibleToken[]);
 
       dispatch(setBrcCoinsDataAction(mergedList));
       return mergedList;
