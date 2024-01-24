@@ -16,7 +16,6 @@ export const FetchAccountKey = 'FetchAccount';
 export const SelectAccountKey = 'SelectAccount';
 export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
 export const UpdateVisibleCoinListKey = 'UpdateVisibleCoinList';
-export const UpdateVisibleBrc20CoinListKey = 'UpdateVisibleBrc20CoinList';
 export const AddAccountKey = 'AddAccount';
 export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
@@ -164,11 +163,6 @@ export interface SetCoinData {
 export interface UpdateVisibleCoinList {
   type: typeof UpdateVisibleCoinListKey;
   coinsList: FungibleToken[];
-}
-
-export interface UpdateVisibleBrc20CoinList {
-  type: typeof UpdateVisibleBrc20CoinListKey;
-  brc20Coins: FungibleToken[];
 }
 
 export interface ChangeFiatCurrency {

@@ -7,8 +7,8 @@ import CoinItem from '@screens/manageTokens/coinItem';
 import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import {
-  FetchUpdatedVisibleBrc20CoinListAction,
   FetchUpdatedVisibleCoinListAction,
+  setBrcCoinsDataAction,
 } from '@stores/wallet/actions/actionCreators';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -145,7 +145,7 @@ function ManageTokens() {
 
     if (brcCoinsList && selectedProtocol === Protocols.BRC_20) {
       const modifiedCoinsList = [...brcCoinsList];
-      dispatch(FetchUpdatedVisibleBrc20CoinListAction(modifiedCoinsList));
+      dispatch(setBrcCoinsDataAction(modifiedCoinsList));
     }
   };
 
@@ -157,27 +157,6 @@ function ManageTokens() {
 
   return (
     <>
-      {/* <AlertMessage
-        title={t('BTC_TRANSFER_DANGER_ALERT_TITLE')}
-        description={t('BTC_TRANSFER_DANGER_ALERT_DESC')}
-        buttonText={t('BACK')}
-        onClose={() => {}}
-        secondButtonText={t('CONITNUE')}
-        onButtonClick={() => {}}
-        onSecondButtonClick={() => {}}
-        isWarningAlert
-      /> */}
-      {/* <Dialog
-        title="Hi"
-        description="Hello"
-        rightButtonText="Submit"
-        leftButtonText="Cancel"
-        // onRightButtonClick={onActivateRareSatsAlertEnablePress}
-        // onLeftButtonClick={onActivateRareSatsAlertDenyPress}
-        onClose={() => {}}
-        type="feedback"
-        // icon={<img src={FeatureIcon} width="60" height="60" alt="new feature" />}
-      /> */}
       <TopRow onClick={handleBackButtonClick} />
       <Container>
         <ScrollableContainer>

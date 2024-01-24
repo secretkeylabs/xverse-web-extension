@@ -167,15 +167,6 @@ export function FetchUpdatedVisibleCoinListAction(
   };
 }
 
-export function FetchUpdatedVisibleBrc20CoinListAction(
-  brc20Coins: FungibleToken[],
-): actions.UpdateVisibleBrc20CoinList {
-  return {
-    type: actions.UpdateVisibleBrc20CoinListKey,
-    brc20Coins,
-  };
-}
-
 export function ChangeFiatCurrencyAction(
   fiatCurrency: SupportedCurrency,
 ): actions.ChangeFiatCurrency {
