@@ -37,46 +37,42 @@ const useBtcCoinBalance = () => {
         getBrc20Tokens(network.type, brcCoinsList?.map((o) => o.ticker!) ?? [], fiatCurrency),
       ]);
 
-      const allKnownTickers = [
-        ...ordinalsFtBalance,
-        ...(brc20Tokens ?? []),
-        ...(brcCoinsList ?? []),
-      ]
-        .map((x) => x.ticker)
-        .filter(
-          (ticker, index, array): ticker is string =>
-            ticker !== undefined && array.indexOf(ticker) === index,
-        );
+      const brcCoinsListMap = new Map(brcCoinsList?.map((token) => [token.ticker, token]));
 
-      const mergedList = allKnownTickers.reduce((acc, ticker) => {
-        const existingToken = brcCoinsList?.find((c) => c.ticker === ticker);
-        const newToken = ordinalsFtBalance?.find((o) => o.ticker === ticker);
-        const brc20Coin = brc20Tokens?.find((t) => t.ticker === ticker);
-        const brc20Ft = brc20Coin && brc20TokenToFungibleToken(brc20Coin);
-        const tokenFiatRate = Number(brc20Coin?.tokenFiatRate);
-
-        if (!existingToken && !newToken && !brc20Ft) {
-          // Skip over the ticker as none of the tokens exist
-          return acc;
-        }
+      const mergedList: FungibleToken[] = ordinalsFtBalance.map((newToken) => {
+        const existingToken = brcCoinsListMap.get(newToken.ticker);
 
         const reconstitutedFt = {
           ...existingToken,
-          ...(newToken || brc20Ft),
-          ...(tokenFiatRate ? { tokenFiatRate } : {}),
+          ...newToken,
           // The `visible` property from `xverse-core` defaults to true.
           // We override `visible` to ensure that the existing state is preserved.
           ...(existingToken ? { visible: existingToken.visible } : {}),
-          // One of the 3 FungibleTokens (existingToken / newToken / brc20Ft)
-          // is GUARANTEED to be properly formed, otherwise the element is skipped.
-          // However, TypeScript fails to infer this.
-          // As such, we can safely assert the type here:
-        } as FungibleToken;
+        };
 
-        acc.push(reconstitutedFt);
+        return reconstitutedFt;
+      });
 
-        return acc;
-      }, [] as FungibleToken[]);
+      brc20Tokens?.forEach((b) => {
+        const existingToken = brcCoinsListMap.get(b.ticker);
+        const pendingToken = mergedList?.find((m) => m.ticker === b.ticker);
+        const tokenFiatRate = Number(b?.tokenFiatRate);
+
+        // No duplicates
+        if (pendingToken) {
+          pendingToken.tokenFiatRate = tokenFiatRate;
+          return;
+        }
+
+        if (existingToken) {
+          mergedList.push({
+            ...existingToken,
+            ...(tokenFiatRate ? { tokenFiatRate } : {}),
+          });
+        } else {
+          mergedList.push(brc20TokenToFungibleToken(b));
+        }
+      });
 
       dispatch(setBrcCoinsDataAction(mergedList));
       return mergedList;
