@@ -11,11 +11,11 @@ import { useDispatch } from 'react-redux';
 
 const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
   name: coin.name,
-  principal: coin.ticker,
+  principal: coin.ticker ?? coin.name,
   balance: '0',
   total_sent: '',
   total_received: '',
-  assetName: coin.ticker,
+  assetName: coin.name ?? coin.ticker,
   visible: false,
   ticker: coin.ticker,
 });
