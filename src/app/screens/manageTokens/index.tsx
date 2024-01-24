@@ -6,7 +6,10 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import CoinItem from '@screens/manageTokens/coinItem';
 import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
-import { FetchUpdatedVisibleCoinListAction } from '@stores/wallet/actions/actionCreators';
+import {
+  FetchUpdatedVisibleCoinListAction,
+  setBrcCoinsDataAction,
+} from '@stores/wallet/actions/actionCreators';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +23,11 @@ const TokenContainer = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+
+  margin-bottom: ${(props) => props.theme.space.xl};
+  > *:not(:last-child) {
+    border-bottom: 1px solid ${(props) => props.theme.colors.elevation3};
+  }
 `;
 
 const Container = styled.div({
@@ -28,6 +36,7 @@ const Container = styled.div({
   overflow: 'hidden',
   paddingLeft: 16,
   paddingRight: 16,
+  height: '100%',
 });
 
 const ScrollableContainer = styled.div`
@@ -74,20 +83,17 @@ const Description = styled.h1((props) => ({
 function Stacks() {
   const { hideStx } = useWalletSelector();
   const { toggleStxVisibility } = useWalletReducer();
-  const tickerConstant = 'stx';
+  const tickerConstant = 'STX';
   return (
     <CoinItem
-      key="stx"
-      coin={{
-        name: 'Stacks',
-        ticker: tickerConstant,
-        image: stacksIcon,
-        contract: tickerConstant,
-      }}
+      id={tickerConstant}
+      key={tickerConstant}
+      name="Stacks"
+      ticker={tickerConstant}
+      image={stacksIcon}
       disabled={false}
       toggled={toggleStxVisibility}
       enabled={!hideStx}
-      showDivider
     />
   );
 }
@@ -99,34 +105,47 @@ enum Protocols {
 
 function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
-  const { coinsList, coins } = useSelector((state: StoreState) => state.walletState);
+  const { coinsList, coins, brcCoinsList } = useSelector((state: StoreState) => state.walletState);
   const [selectedProtocol, setSelectedProtocol] = useState<Protocols>(Protocols.SIP_10);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const toggled = (isEnabled: boolean, coin: Pick<Coin, 'name' | 'contract'>) => {
+  const toggled = (isEnabled: boolean, coinName, coinKey) => {
     /* if coins exists in list of fungible token, update the visible property otherwise
      add coin in list if coin is set to visible */
-    const coinToBeUpdated: FungibleToken | undefined = coinsList?.find(
-      (ft) => ft.principal === coin.contract,
-    );
-    if (coinToBeUpdated) coinToBeUpdated.visible = isEnabled;
-    else if (!coinToBeUpdated && isEnabled) {
+
+    const coinToBeUpdated =
+      coinsList?.find((ft) => ft.principal === coinKey) ??
+      brcCoinsList?.find((ft) => ft.principal === coinKey);
+
+    if (coinToBeUpdated) {
+      coinToBeUpdated.visible = isEnabled;
+    } else if (isEnabled) {
       const coinToBeAdded: FungibleToken = {
-        name: coin?.name,
+        name: coinName,
         visible: true,
-        principal: coin?.contract,
+        principal: coinKey,
         balance: '0',
         total_sent: '',
         total_received: '',
         assetName: '',
       };
-      coinsList?.push(coinToBeAdded);
+      if (selectedProtocol === Protocols.SIP_10) {
+        coinsList?.push(coinToBeAdded);
+      } else if (selectedProtocol === Protocols.BRC_20) {
+        brcCoinsList?.push(coinToBeAdded);
+      }
     }
-    if (coinsList) {
+
+    if (coinsList && selectedProtocol === Protocols.SIP_10) {
       const modifiedCoinsList = [...coinsList];
       dispatch(FetchUpdatedVisibleCoinListAction(modifiedCoinsList));
+    }
+
+    if (brcCoinsList && selectedProtocol === Protocols.BRC_20) {
+      const modifiedCoinsList = [...brcCoinsList];
+      dispatch(setBrcCoinsDataAction(modifiedCoinsList));
     }
   };
 
@@ -134,10 +153,7 @@ function ManageTokens() {
     navigate('/');
   };
 
-  function showDivider(index: number): boolean {
-    if (coins) return !(index === coins.length - 1);
-    return false;
-  }
+  const selectedCoins = selectedProtocol === Protocols.SIP_10 ? coins : brcCoinsList;
 
   return (
     <>
@@ -153,26 +169,30 @@ function ManageTokens() {
             >
               {Protocols.SIP_10}
             </Button>
-            {/* To be uncommented when brc-20 tokens are supported */}
-            {/* <Button
+            <Button
               isSelected={selectedProtocol === Protocols.BRC_20}
               onClick={() => setSelectedProtocol(Protocols.BRC_20)}
             >
               {Protocols.BRC_20}
-            </Button> */}
+            </Button>
           </FtInfoContainer>
           <TokenContainer>
-            <Stacks />
-            {coins?.map((coin, index) => (
-              <CoinItem
-                key={coin.contract} // contract is not optional and is unique
-                coin={coin}
-                disabled={false}
-                toggled={toggled}
-                enabled={coin.visible}
-                showDivider={showDivider(index + 1)}
-              />
-            ))}
+            {selectedProtocol === Protocols.SIP_10 && <Stacks />}
+            {selectedCoins?.map((coin: FungibleToken | Coin) => {
+              const coinId = 'principal' in coin ? coin.principal : coin.contract;
+              return (
+                <CoinItem
+                  id={coinId}
+                  key={coinId}
+                  name={coin.name}
+                  image={coin.image}
+                  ticker={coin.ticker}
+                  disabled={false}
+                  toggled={toggled}
+                  enabled={coin.visible}
+                />
+              );
+            })}
           </TokenContainer>
         </ScrollableContainer>
       </Container>

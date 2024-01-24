@@ -20,7 +20,7 @@ import { useDispatch } from 'react-redux';
 const useAccountBalance = () => {
   const btcClient = useBtcClient();
   const stacksNetwork = useNetworkSelector();
-  const { btcFiatRate, stxBtcRate, fiatCurrency, network, coinsList, hideStx } =
+  const { btcFiatRate, stxBtcRate, fiatCurrency, network, coinsList, brcCoinsList, hideStx } =
     useWalletSelector();
   const dispatch = useDispatch();
   const queue = useRef<Account[]>([]);
@@ -115,9 +115,10 @@ const useAccountBalance = () => {
     const totalBalance = calculateTotalBalance({
       stxBalance,
       btcBalance,
+      ftCoinList,
+      brcCoinsList,
       stxBtcRate,
       btcFiatRate,
-      ftCoinList,
       hideStx,
     });
     dispatch(setAccountBalanceAction(account.btcAddress, totalBalance));

@@ -521,17 +521,19 @@ function Home() {
                     onPress={handleTokenPressed}
                   />
                 ))}
-            {brcCoinsList?.map((coin) => (
-              <TokenTile
-                key={coin.name}
-                title={coin.name}
-                currency="brc20"
-                loading={loadingBtcCoinData}
-                underlayColor={Theme.colors.background.elevation1}
-                fungibleToken={coin}
-                onPress={handleTokenPressed}
-              />
-            ))}
+            {brcCoinsList
+              ?.filter((ft) => ft.visible)
+              .map((coin) => (
+                <TokenTile
+                  key={coin.name}
+                  title={coin.name}
+                  currency="brc20"
+                  loading={loadingBtcCoinData}
+                  underlayColor={Theme.colors.background.elevation1}
+                  fungibleToken={coin}
+                  onPress={handleTokenPressed}
+                />
+              ))}
           </CoinContainer>
         )}
         <UpdatedBottomModal

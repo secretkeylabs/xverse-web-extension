@@ -39,7 +39,6 @@ export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
 export const RenameAccountKey = 'RenameAccountKey';
 export const SetAccountBalanceKey = 'SetAccountBalanceKey';
-
 export const SetWalletHideStxKey = 'SetWalletHideStx';
 
 export enum WalletSessionPeriods {

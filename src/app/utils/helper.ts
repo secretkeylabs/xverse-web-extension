@@ -245,6 +245,7 @@ export const calculateTotalBalance = ({
   stxBalance,
   btcBalance,
   ftCoinList,
+  brcCoinsList,
   stxBtcRate,
   btcFiatRate,
   hideStx,
@@ -252,6 +253,7 @@ export const calculateTotalBalance = ({
   stxBalance?: string;
   btcBalance?: string;
   ftCoinList: FungibleToken[] | null;
+  brcCoinsList: FungibleToken[] | null;
   stxBtcRate: string;
   btcFiatRate: string;
   hideStx: boolean;
@@ -279,6 +281,19 @@ export const calculateTotalBalance = ({
         const coinFiatValue = new BigNumber(coin.balance)
           .dividedBy(tokenUnits)
           .multipliedBy(new BigNumber(coin.tokenFiatRate));
+        return acc.plus(coinFiatValue);
+      }
+
+      return acc;
+    }, totalBalance);
+  }
+
+  if (brcCoinsList) {
+    totalBalance = brcCoinsList.reduce((acc, coin) => {
+      if (coin.visible && coin.tokenFiatRate) {
+        const coinFiatValue = new BigNumber(coin.balance).multipliedBy(
+          new BigNumber(coin.tokenFiatRate),
+        );
         return acc.plus(coinFiatValue);
       }
 

@@ -81,6 +81,7 @@ function BalanceCard(props: BalanceCardProps) {
     coinsList,
     selectedAccount,
     accountBalances,
+    brcCoinsList,
   } = useWalletSelector();
   const { enqueueFetchBalances } = useAccountBalance();
   const { isLoading, isRefetching } = props;
@@ -89,10 +90,11 @@ function BalanceCard(props: BalanceCardProps) {
   const balance = calculateTotalBalance({
     stxBalance,
     btcBalance,
+    ftCoinList: coinsList,
+    brcCoinsList,
     btcFiatRate,
     stxBtcRate,
     hideStx,
-    ftCoinList: coinsList,
   });
 
   useEffect(() => {
