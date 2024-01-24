@@ -76,34 +76,33 @@ const useAccountBalance = () => {
 
       const contractids: string[] = fungibleTokenList.map((ft) => ft.principal);
 
-      let coinsResponse = await getCoinsInfo(network.type, contractids, fiatCurrency);
-      if (!coinsResponse) {
-        coinsResponse = await getCoinMetaData(contractids, stacksNetwork);
-      }
+      const coinsResponse = await getCoinsInfo(network.type, contractids, fiatCurrency);
 
-      coinsResponse.forEach((coin) => {
-        if (!coin.name) {
-          const coinName = coin.contract.split('.')[1];
-          coin.name = coinName;
-        }
-      });
-
-      // update attributes of fungible token list
-      fungibleTokenList.forEach((ft) => {
-        coinsResponse!.forEach((coin) => {
-          if (ft.principal === coin.contract) {
-            ft.ticker = coin.ticker;
-            ft.decimals = coin.decimals;
-            ft.supported = coin.supported;
-            ft.image = coin.image;
-            ft.name = coin.name;
-            ft.tokenFiatRate = coin.tokenFiatRate;
-            coin.visible = ft.visible;
+      if (coinsResponse) {
+        coinsResponse.forEach((coin) => {
+          if (!coin.name) {
+            const coinName = coin.contract.split('.')[1];
+            coin.name = coinName;
           }
         });
-      });
 
-      ftCoinList = fungibleTokenList;
+        // update attributes of fungible token list
+        fungibleTokenList.forEach((ft) => {
+          coinsResponse.forEach((coin) => {
+            if (ft.principal === coin.contract) {
+              ft.ticker = coin.ticker;
+              ft.decimals = coin.decimals;
+              ft.supported = coin.supported;
+              ft.image = coin.image;
+              ft.name = coin.name;
+              ft.tokenFiatRate = coin.tokenFiatRate;
+              coin.visible = ft.visible;
+            }
+          });
+        });
+
+        ftCoinList = fungibleTokenList;
+      }
     }
 
     const totalBalance = calculateTotalBalance({
