@@ -158,6 +158,27 @@ function ManageTokens() {
 
   return (
     <>
+      {/* <AlertMessage
+        title={t('BTC_TRANSFER_DANGER_ALERT_TITLE')}
+        description={t('BTC_TRANSFER_DANGER_ALERT_DESC')}
+        buttonText={t('BACK')}
+        onClose={() => {}}
+        secondButtonText={t('CONITNUE')}
+        onButtonClick={() => {}}
+        onSecondButtonClick={() => {}}
+        isWarningAlert
+      /> */}
+      {/* <Dialog
+        title="Hi"
+        description="Hello"
+        rightButtonText="Submit"
+        leftButtonText="Cancel"
+        // onRightButtonClick={onActivateRareSatsAlertEnablePress}
+        // onLeftButtonClick={onActivateRareSatsAlertDenyPress}
+        onClose={() => {}}
+        type="feedback"
+        // icon={<img src={FeatureIcon} width="60" height="60" alt="new feature" />}
+      /> */}
       <TopRow onClick={handleBackButtonClick} />
       <Container>
         <ScrollableContainer>
@@ -180,10 +201,7 @@ function ManageTokens() {
           <TokenContainer>
             {selectedProtocol === Protocols.SIP_10 && <Stacks />}
             {selectedCoins?.map((coin: FungibleToken | Coin, index) => {
-              let coinId = 'principal' in coin ? coin.principal : coin.contract;
-
-              // Fallback (shouldn't ever happen with https://github.com/secretkeylabs/xverse-core/pull/353)
-              if (coinId === '' && coin.ticker) coinId = coin.ticker;
+              const coinId = 'principal' in coin ? coin.principal : coin.contract;
               return (
                 <CoinItem
                   id={coinId}
