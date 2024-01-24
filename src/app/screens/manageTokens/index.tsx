@@ -23,6 +23,11 @@ const TokenContainer = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+
+  margin-bottom: ${(props) => props.theme.space.xl};
+  > *:not(:last-child) {
+    border-bottom: 1px solid ${(props) => props.theme.colors.elevation3};
+  }
 `;
 
 const Container = styled.div({
@@ -89,7 +94,6 @@ function Stacks() {
       disabled={false}
       toggled={toggleStxVisibility}
       enabled={!hideStx}
-      showDivider
     />
   );
 }
@@ -151,11 +155,6 @@ function ManageTokens() {
 
   const selectedCoins = selectedProtocol === Protocols.SIP_10 ? coins : brcCoinsList;
 
-  function showDivider(index: number): boolean {
-    if (selectedCoins) return !(index === selectedCoins.length - 1);
-    return false;
-  }
-
   return (
     <>
       {/* <AlertMessage
@@ -200,7 +199,7 @@ function ManageTokens() {
           </FtInfoContainer>
           <TokenContainer>
             {selectedProtocol === Protocols.SIP_10 && <Stacks />}
-            {selectedCoins?.map((coin: FungibleToken | Coin, index) => {
+            {selectedCoins?.map((coin: FungibleToken | Coin) => {
               const coinId = 'principal' in coin ? coin.principal : coin.contract;
               return (
                 <CoinItem
@@ -212,7 +211,6 @@ function ManageTokens() {
                   disabled={false}
                   toggled={toggled}
                   enabled={coin.visible}
-                  showDivider={showDivider(index)}
                 />
               );
             })}
