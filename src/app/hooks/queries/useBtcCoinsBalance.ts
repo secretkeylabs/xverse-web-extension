@@ -31,11 +31,12 @@ const useBtcCoinBalance = () => {
   // WITH additional supported tokens returned even if not passed
   const fetchBrcCoinsBalances = async () => {
     try {
-      // Fetch concurrently to speed things up
-      const [ordinalsFtBalance, brc20Tokens] = await Promise.all([
-        getOrdinalsFtBalance(network.type, ordinalsAddress),
-        getBrc20Tokens(network.type, brcCoinsList?.map((o) => o.ticker!) ?? [], fiatCurrency),
-      ]);
+      const ordinalsFtBalance = await getOrdinalsFtBalance(network.type, ordinalsAddress);
+      const brc20Tokens = await getBrc20Tokens(
+        network.type,
+        ordinalsFtBalance?.map((o) => o.ticker!) ?? [],
+        fiatCurrency,
+      );
 
       const brcCoinsListMap = new Map(brcCoinsList?.map((token) => [token.ticker, token]));
 
