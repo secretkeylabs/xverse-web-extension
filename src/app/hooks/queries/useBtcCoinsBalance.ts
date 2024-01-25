@@ -9,7 +9,7 @@ import { setBrcCoinsDataAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 
-const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
+export const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
   name: coin.name,
   principal: coin.ticker ?? coin.name,
   balance: '0',

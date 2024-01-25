@@ -7,8 +7,10 @@ import {
   BtcAddressData,
   FungibleToken,
   TokensResponse,
+  getBrc20Tokens,
   getCoinsInfo,
   getNetworkURL,
+  getOrdinalsFtBalance,
 } from '@secretkeylabs/xverse-core';
 import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
 import { calculateTotalBalance } from '@utils/helper';
@@ -16,6 +18,7 @@ import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { brc20TokenToFungibleToken } from './useBtcCoinsBalance';
 
 const useAccountBalance = () => {
   const btcClient = useBtcClient();
@@ -27,6 +30,58 @@ const useAccountBalance = () => {
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);
   const [queueLength, setQueueLength] = useState(0);
 
+  const fetchBrcCoinsBalances = async (ordinalsAddress: string) => {
+    try {
+      const ordinalsFtBalance = await getOrdinalsFtBalance(network.type, ordinalsAddress);
+      const brc20Tokens = await getBrc20Tokens(
+        network.type,
+        ordinalsFtBalance?.map((o) => o.ticker!) ?? [],
+        fiatCurrency,
+      );
+
+      const brcCoinsListMap = new Map(brcCoinsList?.map((token) => [token.ticker, token]));
+
+      const mergedList: FungibleToken[] = ordinalsFtBalance.map((newToken) => {
+        const existingToken = brcCoinsListMap.get(newToken.ticker);
+
+        const reconstitutedFt = {
+          ...existingToken,
+          ...newToken,
+          // The `visible` property from `xverse-core` defaults to true.
+          // We override `visible` to ensure that the existing state is preserved.
+          ...(existingToken ? { visible: existingToken.visible } : {}),
+        };
+
+        return reconstitutedFt;
+      });
+
+      brc20Tokens?.forEach((b) => {
+        const existingToken = brcCoinsListMap.get(b.ticker);
+        const pendingToken = mergedList?.find((m) => m.ticker === b.ticker);
+        const tokenFiatRate = Number(b?.tokenFiatRate);
+
+        // No duplicates
+        if (pendingToken) {
+          pendingToken.tokenFiatRate = tokenFiatRate;
+          return;
+        }
+
+        if (existingToken) {
+          mergedList.push({
+            ...existingToken,
+            tokenFiatRate,
+          });
+        } else {
+          mergedList.push(brc20TokenToFungibleToken(b));
+        }
+      });
+
+      return mergedList;
+    } catch (e: any) {
+      return Promise.reject(e);
+    }
+  };
+
   const fetchBalances = async (account: Account | null) => {
     if (!account) {
       return;
@@ -35,10 +90,15 @@ const useAccountBalance = () => {
     let btcBalance = '0';
     let stxBalance = '0';
     let ftCoinList: FungibleToken[] | null = null;
+    let finalBrcCoinList: FungibleToken[] | null = null;
 
     if (account.btcAddress) {
       const btcData: BtcAddressData = await btcClient.getBalance(account.btcAddress);
       btcBalance = btcData.finalBalance.toString();
+    }
+
+    if (account.ordinalsAddress) {
+      finalBrcCoinList = await fetchBrcCoinsBalances(account.ordinalsAddress);
     }
 
     if (account.stxAddress) {
@@ -116,7 +176,7 @@ const useAccountBalance = () => {
       stxBalance,
       btcBalance,
       ftCoinList,
-      brcCoinsList,
+      brcCoinsList: finalBrcCoinList,
       stxBtcRate,
       btcFiatRate,
       hideStx,
