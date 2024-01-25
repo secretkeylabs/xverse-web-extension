@@ -4,8 +4,12 @@ export const chromeLocalStorageKeys = {
 
 export function getIsPriorityWallet(): Promise<boolean> {
   return new Promise((resolve) => {
-    chrome.storage.local.get(chromeLocalStorageKeys.isPriorityWallet, (result) => {
-      resolve(result[chromeLocalStorageKeys.isPriorityWallet]);
-    });
+    try {
+      chrome.storage.local.get(chromeLocalStorageKeys.isPriorityWallet, (result) => {
+        resolve(result[chromeLocalStorageKeys.isPriorityWallet]);
+      });
+    } catch (e) {
+      resolve(false);
+    }
   });
 }
