@@ -86,6 +86,7 @@ jobs:
           PR_ID: ${{ github.event.pull_request.number }}
         run: |
           # update PR description
+          cd scripts
           cat release.json | jq -r .body > body.md
           echo -e "\n\nRelease candidate: $(cat release.json | jq -r .html_url)" >> body.md
           echo -e "\nTo publish this rc as latest: Merge Commit this PR" >> body.md
