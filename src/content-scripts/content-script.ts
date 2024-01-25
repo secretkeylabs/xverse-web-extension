@@ -22,6 +22,7 @@ import {
 } from '@common/types/message-types';
 import getEventSourceWindow from '@common/utils/get-event-source-window';
 import RequestsRoutes from '@common/utils/route-urls';
+import { getIsPriorityWallet } from '@utils/chromeLocalStorage';
 
 // Legacy messaging to work with older versions of Connect
 window.addEventListener('message', (event) => {
@@ -203,8 +204,11 @@ document.addEventListener(DomEventName.createRepeatInscriptionsRequest, ((
   });
 }) as EventListener);
 
-// Inject inpage script (Stacks Provider)
-const inpage = document.createElement('script');
-inpage.src = chrome.runtime.getURL('inpage.js');
-inpage.id = 'xverse-wallet-provider';
-document.body.appendChild(inpage);
+// Inject in-page script (Stacks and Bitcoin Providers)
+getIsPriorityWallet().then((isPriorityWallet) => {
+  const inpage = document.createElement('script');
+  inpage.src = chrome.runtime.getURL('inpage.js');
+  inpage.id = 'xverse-wallet-provider';
+  inpage.setAttribute('data-is-priority', isPriorityWallet ? 'true' : '');
+  document.body.appendChild(inpage);
+});

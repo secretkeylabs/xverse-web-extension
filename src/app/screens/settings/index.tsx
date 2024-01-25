@@ -3,6 +3,7 @@ import ArrowIcon from '@assets/img/settings/arrow.svg';
 import XverseLogo from '@assets/img/settings/logo.svg';
 import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
+import useChromeLocalStorage from '@hooks/useChromeLocalStorage';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -11,6 +12,7 @@ import {
   ChangeActivateRareSatsAction,
   ChangeActivateRBFAction,
 } from '@stores/wallet/actions/actionCreators';
+import { chromeLocalStorageKeys } from '@utils/chromeLocalStorage';
 import { PRIVACY_POLICY_LINK, SUPPORT_LINK, TERMS_LINK } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
@@ -67,6 +69,10 @@ function Setting() {
     hasActivatedRBFKey,
     selectedAccount,
   } = useWalletSelector();
+  const [isPriorityWallet, setIsPriorityWallet] = useChromeLocalStorage<boolean>(
+    chromeLocalStorageKeys.isPriorityWallet,
+    true,
+  );
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { resetWallet } = useWalletReducer();
@@ -98,6 +104,10 @@ function Setting() {
 
   const openBackUpWalletScreen = () => {
     navigate('/backup-wallet');
+  };
+
+  const switchIsPriorityWallet = () => {
+    setIsPriorityWallet(!isPriorityWallet);
   };
 
   const switchActivateOrdinalState = () => {
@@ -202,6 +212,7 @@ function Setting() {
           onClick={openChangeNetworkScreen}
           textDetail={network.type}
         />
+
         <SettingComponent
           title={t('SECURITY')}
           text={t('UPDATE_PASSWORD')}
@@ -226,6 +237,7 @@ function Setting() {
           onClick={openResetWalletPrompt}
           showWarningTitle
         />
+
         <SettingComponent
           title={t('ADVANCED')}
           text={t('ACTIVATE_ORDINAL_NFTS')}
@@ -241,7 +253,6 @@ function Setting() {
           showDivider
           disabled={!hasActivatedOrdinalsKey}
         />
-
         <SettingComponent
           text={t('ENABLE_RARE_SATS')}
           description={t('ENABLE_RARE_SATS_DETAIL')}
@@ -251,7 +262,14 @@ function Setting() {
           disabled={!hasActivatedOrdinalsKey}
           showDivider
         />
-
+        <SettingComponent
+          text={t('XVERSE_DEFAULT')}
+          description={t('XVERSE_DEFAULT_DESCRIPTION')}
+          toggle
+          toggleFunction={switchIsPriorityWallet}
+          toggleValue={isPriorityWallet}
+          showDivider
+        />
         <SettingComponent
           text={t('ENABLE_SPEED_UP_TRANSACTIONS')}
           description={t('ENABLE_SPEED_UP_TRANSACTIONS_DETAIL')}
