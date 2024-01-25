@@ -21,6 +21,7 @@ import {
   addAccountAction,
   fetchAccountAction,
   getActiveAccountsAction,
+  renameAccountAction,
   resetWalletAction,
   selectAccount,
   setWalletAction,
@@ -81,6 +82,7 @@ const useWalletReducer = () => {
       stxAddress: walletAccounts[0].stxAddress,
       stxPublicKey: walletAccounts[0].stxPublicKey,
       bnsName: walletAccounts[0].bnsName,
+      accountName: walletAccounts[0].accountName,
     };
 
     let selectedAccountData: Account | undefined;
@@ -373,6 +375,21 @@ const useWalletReducer = () => {
     }
   };
 
+  const renameAccount = async (updatedAccount: Account) => {
+    const newAccountsList = accountsList.map((account) =>
+      account.accountType === updatedAccount.accountType && account.id === updatedAccount.id
+        ? updatedAccount
+        : account,
+    );
+    const newSelectedAccount =
+      selectedAccount?.accountType === updatedAccount.accountType &&
+      selectedAccount?.id === updatedAccount.id
+        ? { ...selectedAccount, accountName: updatedAccount.accountName }
+        : selectedAccount;
+
+    dispatch(renameAccountAction(newAccountsList, newSelectedAccount));
+  };
+
   return {
     unlockWallet,
     lockWallet,
@@ -385,6 +402,7 @@ const useWalletReducer = () => {
     addLedgerAccount,
     removeLedgerAccount,
     updateLedgerAccounts,
+    renameAccount,
     toggleStxVisibility,
   };
 };

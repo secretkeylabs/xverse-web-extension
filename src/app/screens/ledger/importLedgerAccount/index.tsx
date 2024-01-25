@@ -13,7 +13,8 @@ import {
   importTaprootAccountFromLedger,
 } from '@secretkeylabs/xverse-core';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
-import { useEffect, useState } from 'react';
+import { validateAccountName } from '@utils/helper';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StepControls from './stepControls';
 import Steps from './steps';
@@ -45,12 +46,14 @@ function ImportLedger(): JSX.Element {
   const [isStxAddressRejected, setIsStxAddressRejected] = useState(false);
   const [isBtcAddressRejected, setIsBtcAddressRejected] = useState(false);
   const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
-  const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'OPTIONS_DIALOG',
+  });
   const { addLedgerAccount, updateLedgerAccounts } = useWalletReducer();
   const [selectedLedgerLiveOption, setSelectedLedgerLiveOption] =
     useState<LedgerLiveOptions | null>(null);
   const [isTogglerChecked, setIsTogglerChecked] = useState(false);
-  const { ledgerAccountsList, network } = useWalletSelector();
+  const { accountsList, ledgerAccountsList, network } = useWalletSelector();
   const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
 
   const importBtcAccounts = async (showAddress: boolean, masterFingerPrint?: string) => {
@@ -335,6 +338,12 @@ function ImportLedger(): JSX.Element {
       return;
     }
 
+    const validationError = validateAccountName(accountName, t, accountsList, ledgerAccountsList);
+    if (validationError) {
+      setAccountNameError(validationError);
+      return;
+    }
+
     try {
       setIsButtonDisabled(true);
       const accountToUpdate = ledgerAccountsList.find(
@@ -346,10 +355,10 @@ function ImportLedger(): JSX.Element {
       const updatedAccount: Account = { ...accountToUpdate, accountName };
       await updateLedgerAccounts(updatedAccount);
       await delay(1000);
-      setIsButtonDisabled(false);
       handleClickNext();
     } catch (err) {
       console.error(err);
+    } finally {
       setIsButtonDisabled(false);
     }
   };
@@ -379,26 +388,6 @@ function ImportLedger(): JSX.Element {
       setIsStacksSelected(!isStacksSelected);
     }
   };
-
-  const validateAccountName = () => {
-    const MAX_LENGTH = 20;
-
-    if (accountName.length > MAX_LENGTH) {
-      setAccountNameError(t('LEDGER_ADD_ACCOUNT_NAME.ERRORS.MAX_LENGTH', { number: MAX_LENGTH }));
-      return;
-    }
-
-    if (ledgerAccountsList.find((account) => account.accountName === accountName)) {
-      setAccountNameError(t('LEDGER_ADD_ACCOUNT_NAME.ERRORS.ALREADY_EXISTS'));
-      return;
-    }
-
-    setAccountNameError(undefined);
-  };
-
-  useEffect(() => {
-    validateAccountName();
-  }, [accountName]);
 
   return (
     <Container>

@@ -1,4 +1,3 @@
-import threeDotsIcon from '@assets/img/dots_three_vertical.svg';
 import AccountRow from '@components/accountRow';
 import PasswordInput from '@components/passwordInput';
 import ResetWalletPrompt from '@components/resetWallet';
@@ -11,6 +10,7 @@ import styled from 'styled-components';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { DotsThreeVertical } from '@phosphor-icons/react';
 
 const SelectedAccountContainer = styled.div<{ showBorderBottom?: boolean }>((props) => ({
   display: 'flex',
@@ -177,7 +177,7 @@ function AccountHeaderComponent({
         />
         {!disableMenuOption && (
           <OptionsButton onClick={openOptionsDialog}>
-            <img src={threeDotsIcon} alt="Options" />
+            <DotsThreeVertical size={20} fill="white" />
           </OptionsButton>
         )}
         {showOptionsDialog && (

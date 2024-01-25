@@ -53,7 +53,7 @@ function TopRow({ title, onClick, showBackButton = true, className }: Props) {
           <img src={ArrowLeft} alt="back button" />
         </AnimatedBackButton>
       )}
-      <HeaderText>{title}</HeaderText>
+      {title && <HeaderText>{title}</HeaderText>}
     </TopSectionContainer>
   );
 }

@@ -37,6 +37,7 @@ export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
 export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
+export const RenameAccountKey = 'RenameAccountKey';
 
 export const SetWalletHideStxKey = 'SetWalletHideStx';
 
@@ -228,10 +229,17 @@ export interface SetWalletUnlocked {
   isUnlocked: boolean;
 }
 
+export interface RenameAccount {
+  type: typeof RenameAccountKey;
+  accountsList: Account[];
+  selectedAccount: Account | null;
+}
+
 export interface SetWalletHideStx {
   type: typeof SetWalletHideStxKey;
   hideStx: boolean;
 }
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -259,4 +267,5 @@ export type WalletActions =
   | SetWalletLockPeriod
   | SetRareSatsNoticeDismissed
   | SetWalletUnlocked
+  | RenameAccount
   | SetWalletHideStx;
