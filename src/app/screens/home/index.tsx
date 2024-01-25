@@ -378,7 +378,7 @@ function Home() {
         <MergedIcon src={ordinalsIcon} />
       </ReceiveCardComponent>
 
-      {stxAddress && !hideStx && (
+      {stxAddress && (
         <ReceiveCardComponent
           title={t('STACKS_AND_TOKEN')}
           address={stxAddress}
