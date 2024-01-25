@@ -30,6 +30,7 @@ const useAccountBalance = () => {
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);
   const [queueLength, setQueueLength] = useState(0);
 
+  // TODO: reuse it for both useAccountBalance and useBtcCoinBalance hooks
   const fetchBrcCoinsBalances = async (ordinalsAddress: string) => {
     try {
       const ordinalsFtBalance = await getOrdinalsFtBalance(network.type, ordinalsAddress);
