@@ -12,6 +12,7 @@ import {
   FetchAccountKey,
   GetActiveAccountsKey,
   RareSatsNoticeDismissedKey,
+  RenameAccountKey,
   ResetWalletKey,
   SelectAccountKey,
   SetBrcCoinsListKey,
@@ -264,6 +265,12 @@ const walletReducer = (
       return {
         ...state,
         isUnlocked: action.isUnlocked,
+      };
+    case RenameAccountKey:
+      return {
+        ...state,
+        accountsList: action.accountsList,
+        selectedAccount: action.selectedAccount,
       };
     case SetWalletHideStxKey:
       return {

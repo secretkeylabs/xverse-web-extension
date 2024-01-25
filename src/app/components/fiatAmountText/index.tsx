@@ -9,11 +9,17 @@ export function FiatAmountText({
   fiatCurrency,
 }: {
   className?: string;
-  fiatAmount: BigNumber;
+  fiatAmount?: BigNumber;
   fiatCurrency: SupportedCurrency;
 }) {
   if (!fiatAmount || !fiatCurrency) {
     return null;
+  }
+
+  if (fiatAmount.isEqualTo(0)) {
+    return (
+      <span className={className}>{`${currencySymbolMap[fiatCurrency]}0.00 ${fiatCurrency}`}</span>
+    );
   }
 
   if (fiatAmount.isLessThan(0.01)) {

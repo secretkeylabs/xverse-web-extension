@@ -123,7 +123,7 @@ export default function CoinDashboard() {
   const ft = coinsList?.find((ftCoin) => ftCoin.principal === ftAddress);
   let brc20Ft: FungibleToken | undefined;
   if (brc20FtName) {
-    brc20Ft = brcCoinsList?.find((brc20FtCoin) => brc20FtCoin.name === brc20FtName);
+    brc20Ft = brcCoinsList?.find((brc20FtCoin) => brc20FtCoin.principal === brc20FtName);
   }
 
   const openContractDeployment = () => {
@@ -147,7 +147,7 @@ export default function CoinDashboard() {
 
   return (
     <>
-      <TopRow title="" onClick={handleBack} />
+      <TopRow onClick={handleBack} />
       <Container>
         <CoinHeader coin={coin as CurrencyTypes} fungibleToken={ft || brc20Ft} />
         {ft && (
