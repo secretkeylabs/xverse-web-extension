@@ -6,14 +6,15 @@ import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/o
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
-import { Account } from '@secretkeylabs/xverse-core';
+import { Account, currencySymbolMap } from '@secretkeylabs/xverse-core';
 import InputFeedback from '@ui-library/inputFeedback';
-import { LoaderSize, MAX_ACC_NAME_LENGTH } from '@utils/constants';
+import { EMPTY_LABEL, LoaderSize, MAX_ACC_NAME_LENGTH } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
 import { isLedgerAccount, validateAccountName } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip } from 'react-tooltip';
+import { NumericFormat } from 'react-number-format';
+import { MoonLoader } from 'react-spinners';
 import 'react-tooltip/dist/react-tooltip.css';
 import styled from 'styled-components';
 
@@ -69,13 +70,6 @@ const BarLoaderContainer = styled.div((props) => ({
   backgroundColor: 'transparent',
 }));
 
-export const StyledToolTip = styled(Tooltip)`
-  background-color: ${(props) => props.theme.colors.white_0};
-  color: #12151e;
-  border-radius: 8px;
-  padding: 7px;
-`;
-
 const TransparentSpan = styled.span`
   background: transparent;
 `;
@@ -113,11 +107,10 @@ const ButtonRow = styled.button`
   align-items: center;
   background-color: transparent;
   justify-content: flex-start;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-top: 11px;
-  padding-bottom: 11px;
-  font: ${(props) => props.theme.body_medium_m};
+  padding: ${(props) => props.theme.space.l};
+  padding-top: ${(props) => props.theme.space.s};
+  padding-bottom: ${(props) => props.theme.space.s};
+  font: ${(props) => props.theme.typography.body_medium_m};
   color: ${(props) => props.theme.colors.white_0};
   transition: background-color 0.2s ease;
   :hover {
@@ -167,6 +160,15 @@ const InputField = styled.input((props) => ({
   },
 }));
 
+const Balance = styled.div<{ isSelected?: boolean }>((props) => ({
+  ...props.theme.typography.body_medium_m,
+  marginTop: props.theme.space.xxs,
+  color: props.isSelected ? props.theme.colors.white_200 : props.theme.colors.white_400,
+  display: 'flex',
+  alignItems: 'center',
+  columnGap: props.theme.space.xs,
+}));
+
 function AccountRow({
   account,
   isSelected,
@@ -184,7 +186,8 @@ function AccountRow({
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
-  const { accountsList, ledgerAccountsList } = useWalletSelector();
+  const { accountsList, ledgerAccountsList, fiatCurrency, accountBalances } = useWalletSelector();
+  const totalBalance = accountBalances[account?.btcAddress ?? ''];
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
@@ -315,6 +318,21 @@ function AccountRow({
                   <CaretDown weight="bold" size={16} />
                 )}
               </CurrentAccountTextContainer>
+              {isAccountListView && totalBalance && (
+                <NumericFormat
+                  value={totalBalance}
+                  displayType="text"
+                  prefix={`${currencySymbolMap[fiatCurrency]}`}
+                  thousandSeparator
+                  renderText={(value: string) => <Balance isSelected={isSelected}>{value}</Balance>}
+                />
+              )}
+              {isAccountListView && !totalBalance && (
+                <Balance isSelected={isSelected}>
+                  {EMPTY_LABEL}
+                  <MoonLoader color="white" size={12} />
+                </Balance>
+              )}
             </TransparentSpan>
           )}
 

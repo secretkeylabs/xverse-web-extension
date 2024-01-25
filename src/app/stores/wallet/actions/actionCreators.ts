@@ -285,6 +285,17 @@ export function renameAccountAction(
   };
 }
 
+export function setAccountBalanceAction(
+  btcAddress: string,
+  totalBalance: string,
+): actions.SetAccountBalance {
+  return {
+    type: actions.SetAccountBalanceKey,
+    btcAddress,
+    totalBalance,
+  };
+}
+
 export function setWalletHideStxAction(hideStx: boolean): actions.SetWalletHideStx {
   return {
     type: actions.SetWalletHideStxKey,

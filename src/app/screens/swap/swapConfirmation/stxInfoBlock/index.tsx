@@ -2,13 +2,13 @@ import AddressIcon from '@assets/img/swap/address.svg';
 import CopyIcon from '@assets/img/swap/copy.svg';
 import FoldDownIcon from '@assets/img/swap/fold_arrow_down.svg';
 import FoldIconUp from '@assets/img/swap/fold_arrow_up.svg';
-import { StyledToolTip } from '@components/accountRow';
 import TokenImage from '@components/tokenImage';
 import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
 import { getTruncatedAddress } from '@utils/helper';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
 
 export const Container = styled.div((props) => ({
@@ -28,7 +28,7 @@ export const TitleContainer = styled.div(() => ({
 }));
 
 export const TitleText = styled.h3((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   fontSize: 14,
   fontWeight: 500,
@@ -41,7 +41,7 @@ export const FoldArrow = styled.img(() => ({
 }));
 
 const DescriptionText = styled.h3((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
   fontSize: 14,
   fontWeight: 500,
@@ -56,7 +56,7 @@ const AmountContainer = styled.div(() => ({
 }));
 
 const AmountLabel = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   fontSize: 14,
   fontWeight: 500,
@@ -81,7 +81,7 @@ const ItemsCenterContainer = styled.div(() => ({
 }));
 
 const AddressLabelText = styled.h3((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   marginLeft: props.theme.spacing(5),
 }));
@@ -98,14 +98,21 @@ const CopyImg = styled.img(() => ({
 }));
 
 const AddressText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   marginRight: props.theme.spacing(4),
 }));
 
 const CurrencyText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   marginLeft: props.theme.spacing(4),
 }));
+
+const StyledTooltip = styled(Tooltip)`
+  background-color: ${(props) => props.theme.colors.white_0};
+  color: #12151e;
+  border-radius: 8px;
+  padding: 7px;
+`;
 
 interface StxInfoCardProps {
   type: 'transfer' | 'receive';
@@ -161,7 +168,7 @@ export default function StxInfoBlock({ type, swap }: StxInfoCardProps) {
               <AddressText>{getTruncatedAddress(swap.address)}</AddressText>
               <CopyImg src={CopyIcon} />
             </CopyButton>
-            <StyledToolTip
+            <StyledTooltip
               anchorId={copyId}
               variant="light"
               content={isCopied ? t('COPIED') : t('COPY_YOUR_ADDRESS')}

@@ -544,16 +544,14 @@ function Home() {
           {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
         </UpdatedBottomModal>
 
-        {!!stxAddress && (
-          <TokenListButtonContainer>
-            <Button onClick={handleManageTokenListOnClick}>
-              <>
-                <ButtonImage src={ListDashes} />
-                <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
-              </>
-            </Button>
-          </TokenListButtonContainer>
-        )}
+        <TokenListButtonContainer>
+          <Button onClick={handleManageTokenListOnClick}>
+            <>
+              <ButtonImage src={ListDashes} />
+              <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
+            </>
+          </Button>
+        </TokenListButtonContainer>
 
         <CoinSelectModal
           onSelectBitcoin={onBtcSendClick}
