@@ -16,6 +16,7 @@ window.BitcoinProvider = SatsMethodsProvider as BitcoinProvider;
 // We also inject the providers in an Xverse object in order to have them exclusively available for Xverse wallet
 // and not clash with providers from other wallets
 window.XverseProviders = {
+  // @ts-ignore
   StacksProvider: StacksMethodsProvider as StacksProvider,
   BitcoinProvider: SatsMethodsProvider as BitcoinProvider,
 };

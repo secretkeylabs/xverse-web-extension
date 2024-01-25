@@ -494,10 +494,17 @@
     "CANCEL_BUTTON": "Cancel"
   },
   "AUTH_REQUEST_SCREEN": {
-    "TITLE": "Connection",
+    "TITLE": "Connection Request",
+    "ACCOUNT": "Account",
+    "BITCOIN_ADDRESS": "Bitcoin address",
+    "ORDINAL_ADDRESS": "Ordinal address",
+    "STX_ADDRESS": "Stacks address",
     "REQUEST_TOOLTIP": "Requested by",
     "CONNECT_BUTTON": "Connect",
     "CANCEL_BUTTON": "Cancel",
+    "PERMISSIONS_TITLE": "The app will be able to:",
+    "PERMISSION_WALLET_BALANCE": "See your wallet balance and activity",
+    "PERMISSION_REQUEST_TX": "Request transaction signing",
     "NO_STACKS_AUTH_SUPPORT": {
       "TITLE": "This wallet does not have a Stacks address.",
       "LINK": "Create an address here"
@@ -1036,14 +1043,21 @@
     "DO_NOT_SHOW_MESSAGE": "Do not show this message again"
   },
   "SELECT_BTC_ADDRESS_SCREEN": {
-    "TITLE": "Bitcoin Address Request",
-    "ACCOUNT": "Account",
-    "CONNECT_BUTTON": "Approve",
-    "CANCEL_BUTTON": "Dismiss",
-    "BITCOIN_ADDRESS": "Bitcoin address",
-    "ORDINAL_ADDRESS": "Ordinal address",
+    "TITLE": "Connection Request",
+    "ACCOUNT_NAME": "Account",
+    "CONNECT_BUTTON": "Connect",
+    "CANCEL_BUTTON": "Cancel",
+    "BITCOIN_ADDRESS": "Payments address",
+    "ORDINAL_ADDRESS": "Ordinals address",
+    "STX_ADDRESS": "Stacks address",
+    "CHANGE_ACCOUNT_BUTTON": "Change account",
     "NETWORK_MISMATCH_ERROR_TITLE": "Mismatched Network",
-    "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings."
+    "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings.",
+    "INVALID_PURPOSE_ERROR_TITLE": "Invalid Request",
+    "INVALID_PURPOSE_ERROR_DESCRIPTION": "The app is requesting a wallet address with an invalid purpose. Please contact the developer of the requesting app for support.",
+    "PERMISSIONS_TITLE": "The app will be able to:",
+    "PERMISSION_WALLET_BALANCE": "See your wallet balance and activity",
+    "PERMISSION_REQUEST_TX": "Request transaction signing"
   },
   "SEND_BRC20": {
     "BRC20_TOKEN": "BRC-20",

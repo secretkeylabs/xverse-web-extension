@@ -11,7 +11,7 @@ import { Plus } from '@phosphor-icons/react';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 export const Container = styled.div({
@@ -56,8 +56,12 @@ const Title = styled.div((props) => ({
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
   const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
   const { createAccount, switchAccount } = useWalletReducer();
+
+  const hideListActions = Boolean(params.get('hideListActions')) || false;
 
   const displayedAccountsList = useMemo(() => {
     const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
@@ -109,20 +113,22 @@ function AccountList(): JSX.Element {
           ))}
         </AccountContainer>
       </div>
-      <ButtonsWrapper>
-        <ActionButton
-          icon={<Plus size={16} fill="white" />}
-          onPress={onCreateAccount}
-          text={t('NEW_ACCOUNT')}
-          transparent
-        />
-        <ActionButton
-          icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
-          onPress={onImportLedgerAccount}
-          text={t('LEDGER_ACCOUNT')}
-          transparent
-        />
-      </ButtonsWrapper>
+      {!hideListActions ? (
+        <ButtonsWrapper>
+          <ActionButton
+            icon={<Plus size={16} fill="white" />}
+            onPress={onCreateAccount}
+            text={t('NEW_ACCOUNT')}
+            transparent
+          />
+          <ActionButton
+            icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
+            onPress={onImportLedgerAccount}
+            text={t('LEDGER_ACCOUNT')}
+            transparent
+          />
+        </ButtonsWrapper>
+      ) : null}
     </Container>
   );
 }
