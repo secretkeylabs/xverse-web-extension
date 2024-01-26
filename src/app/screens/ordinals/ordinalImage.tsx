@@ -262,7 +262,7 @@ function OrdinalImage({
     );
   }
 
-  if (contentType.includes('text')) {
+  if (contentType.includes('text') || contentType === 'application/json') {
     if (!textContent) {
       return <StyledBarLoader width={loaderSize} height={loaderSize} />;
     }
