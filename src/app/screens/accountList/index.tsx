@@ -1,9 +1,10 @@
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import { filterLedgerAccounts } from '@common/utils/ledger';
-import AccountRow from '@components/accountRow';
+import LazyAccountRow from '@components/accountRow/lazyAccountRow';
 import ActionButton from '@components/button';
 import Separator from '@components/separator';
 import TopRow from '@components/topRow';
+import useAccountBalance from '@hooks/queries/useAccountBalance';
 import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -58,6 +59,7 @@ function AccountList(): JSX.Element {
   const navigate = useNavigate();
   const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
   const { createAccount, switchAccount } = useWalletReducer();
+  const { enqueueFetchBalances } = useAccountBalance();
 
   const displayedAccountsList = useMemo(() => {
     const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
@@ -98,10 +100,11 @@ function AccountList(): JSX.Element {
           <Title>{t('TITLE')}</Title>
           {displayedAccountsList.map((account) => (
             <div key={account.btcAddress}>
-              <AccountRow
+              <LazyAccountRow
                 account={account}
                 isSelected={isAccountSelected(account)}
                 onAccountSelected={handleAccountSelect}
+                fetchBalance={enqueueFetchBalances}
                 isAccountListView
               />
               <Separator />

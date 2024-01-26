@@ -105,8 +105,12 @@ enum Protocols {
 
 function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
-  const { coinsList, coins, brcCoinsList } = useSelector((state: StoreState) => state.walletState);
-  const [selectedProtocol, setSelectedProtocol] = useState<Protocols>(Protocols.SIP_10);
+  const { coinsList, coins, brcCoinsList, selectedAccount } = useSelector(
+    (state: StoreState) => state.walletState,
+  );
+  const [selectedProtocol, setSelectedProtocol] = useState<Protocols>(
+    selectedAccount?.stxAddress ? Protocols.SIP_10 : Protocols.BRC_20,
+  );
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -163,12 +167,14 @@ function ManageTokens() {
           <Header>{t('ADD_COINS')}</Header>
           <Description>{t('DESCRIPTION')}</Description>
           <FtInfoContainer>
-            <Button
-              isSelected={selectedProtocol === Protocols.SIP_10}
-              onClick={() => setSelectedProtocol(Protocols.SIP_10)}
-            >
-              {Protocols.SIP_10}
-            </Button>
+            {selectedAccount?.stxAddress && (
+              <Button
+                isSelected={selectedProtocol === Protocols.SIP_10}
+                onClick={() => setSelectedProtocol(Protocols.SIP_10)}
+              >
+                {Protocols.SIP_10}
+              </Button>
+            )}
             <Button
               isSelected={selectedProtocol === Protocols.BRC_20}
               onClick={() => setSelectedProtocol(Protocols.BRC_20)}
