@@ -4,8 +4,12 @@ import { BetterBarLoader } from '@components/barLoader';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TextT } from '@phosphor-icons/react';
-import { CondensedInscription, getErc721Metadata, Inscription } from '@secretkeylabs/xverse-core';
-import { getBrc20Details } from '@utils/brc20';
+import {
+  CondensedInscription,
+  Inscription,
+  getBrc20Details,
+  getErc721Metadata,
+} from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getFetchableUrl } from '@utils/helper';
 import Image from 'rc-image';
