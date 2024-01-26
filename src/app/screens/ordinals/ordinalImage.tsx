@@ -237,7 +237,8 @@ function OrdinalImage({
     );
   }
 
-  if (contentType.includes('image')) {
+  // if content type is undefined or "", we treat it the same as an image and fall back to ordiview thumbnail
+  if (!contentType || contentType.includes('image')) {
     return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/content/${ordinal.id}`);
   }
 
