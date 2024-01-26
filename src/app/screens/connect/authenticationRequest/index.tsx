@@ -1,41 +1,42 @@
+import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
+import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import DappPlaceholderIcon from '@assets/img/webInteractions/authPlaceholder.svg';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { delay } from '@common/utils/ledger';
-import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
-import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import SelectAccount from '@screens/connect/selectAccount';
 import {
   AuthRequest,
   createAuthResponse,
   handleLedgerStxJWTAuth,
 } from '@secretkeylabs/xverse-core';
-import { AddressVersion, publicKeyToAddress, StacksMessageType } from '@stacks/transactions';
+import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
+import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
 import validUrl from 'valid-url';
+import AddressPurposeBox from '../addressPurposeBox';
+import PermissionsList from '../permissionsList';
 
-const MainContainer = styled.div({
+const MainContainer = styled.div((props) => ({
   display: 'flex',
-  flex: 1,
   flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '100%',
-  height: '100%',
-  overflow: 'hidden',
-});
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  ...props.theme.scrollbar,
+}));
 
 const SuccessActionsContainer = styled.div((props) => ({
   width: '100%',
@@ -48,28 +49,45 @@ const SuccessActionsContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(20),
 }));
 
-const TopImage = styled.img({
-  aspectRatio: 1,
-  height: 88,
-  borderWidth: 10,
-  borderColor: 'white',
-});
-
-const FunctionTitle = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white_0,
-  marginTop: props.theme.spacing(8),
+const TopImage = styled.img((props) => ({
+  maxHeight: 48,
+  maxWidth: 48,
+  marginTop: props.theme.space.xxl,
+  alignSelf: 'center',
 }));
 
-const DappTitle = styled.h2((props) => ({
-  ...props.theme.body_l,
+const ImagePlaceholder = styled.div((props) => ({
+  marginTop: props.theme.space.xxl,
+}));
+
+const Title = styled.h1((props) => ({
+  ...props.theme.typography.headline_xs,
+  color: props.theme.colors.white_0,
+  textAlign: 'center',
+  marginTop: 12,
+}));
+
+const DappName = styled.h2((props) => ({
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(2),
+  marginBottom: props.theme.spacing(12),
+  textAlign: 'center',
 }));
 
 const InfoContainerWrapper = styled.div((props) => ({
   margin: props.theme.spacing(10),
   marginBottom: 0,
+}));
+
+const AddressesContainer = styled.div((props) => ({
+  marginTop: props.theme.space.s,
+  width: '100%',
+}));
+
+const PermissionsContainer = styled.div((props) => ({
+  width: '100%',
+  paddingBottom: props.theme.space.xxl,
 }));
 
 function AuthenticationRequest() {
@@ -82,12 +100,12 @@ function AuthenticationRequest() {
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'AUTH_REQUEST_SCREEN' });
-
+  const navigate = useNavigate();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
-  const { selectedAccount } = useWalletSelector();
+  const { selectedAccount, btcAddress, stxAddress } = useWalletSelector();
   const { getSeed } = useSeedVault();
   const isDisabled = !selectedAccount?.stxAddress;
 
@@ -104,6 +122,9 @@ function AuthenticationRequest() {
         seedPhrase,
         selectedAccount?.id ?? 0,
         authRequest,
+        {
+          btcAddress: selectedAccount?.btcAddress,
+        },
       );
       chrome.tabs.sendMessage(+(params.get('tabId') ?? '0'), {
         source: MESSAGE_SOURCE,
@@ -133,10 +154,15 @@ function AuthenticationRequest() {
     window.close();
   };
 
-  const getDappLogo = () =>
-    validUrl.isWebUri(authRequest?.payload?.appDetails?.icon)
-      ? authRequest?.payload?.appDetails?.icon
-      : DappPlaceholderIcon;
+  const getDappLogo = useCallback(
+    () =>
+      validUrl.isWebUri(authRequest?.payload?.appDetails?.icon) ? (
+        <TopImage src={authRequest?.payload?.appDetails?.icon} alt="Dapp Logo" />
+      ) : (
+        <ImagePlaceholder />
+      ),
+    [authRequest],
+  );
 
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {
@@ -191,7 +217,6 @@ function AuthenticationRequest() {
       });
       window.close();
     } catch (e) {
-      console.error(e);
       setIsTxRejected(true);
       setIsButtonDisabled(false);
     } finally {
@@ -205,36 +230,55 @@ function AuthenticationRequest() {
     setCurrentStepIndex(0);
   };
 
-  return (
-    <ConfirmScreen
-      onConfirm={confirmCallback}
-      onCancel={cancelCallback}
-      confirmText={t('CONNECT_BUTTON')}
-      cancelText={t('CANCEL_BUTTON')}
-      loading={loading}
-      disabled={isDisabled}
-    >
-      <AccountHeaderComponent />
-      <MainContainer>
-        <TopImage src={getDappLogo()} alt="Dapp Logo" />
-        <FunctionTitle>{t('TITLE')}</FunctionTitle>
-        <DappTitle>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappTitle>
-        {isDisabled && (
-          <InfoContainerWrapper>
-            <InfoContainer
-              bodyText={t('NO_STACKS_AUTH_SUPPORT.TITLE')}
-              redirectText={t('NO_STACKS_AUTH_SUPPORT.LINK')}
-              onClick={async () => {
-                await chrome.tabs.create({
-                  url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
-                });
+  const handleSwitchAccount = () => {
+    navigate('/account-list?hideListActions=true');
+  };
 
-                window.close();
-              }}
-            />
-          </InfoContainerWrapper>
-        )}
-      </MainContainer>
+  const handleAddStxLedgerAccount = async () => {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
+    });
+
+    window.close();
+  };
+
+  return (
+    <MainContainer>
+      {getDappLogo()}
+      <Title>{t('TITLE')}</Title>
+      <DappName>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappName>
+      <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
+      <AddressesContainer>
+        <AddressPurposeBox
+          purpose={AddressPurpose.Stacks}
+          icon={stxIcon}
+          title={t('STX_ADDRESS')}
+          address={selectedAccount?.stxAddress || stxAddress}
+          bnsName={selectedAccount?.bnsName}
+        />
+        <AddressPurposeBox
+          purpose={AddressPurpose.Payment}
+          icon={BitcoinIcon}
+          title={t('BITCOIN_ADDRESS')}
+          address={selectedAccount?.btcAddress || btcAddress}
+        />
+      </AddressesContainer>
+      <PermissionsContainer>
+        <PermissionsList />
+      </PermissionsContainer>
+      <StickyHorizontalSplitButtonContainer>
+        <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
+        <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />
+      </StickyHorizontalSplitButtonContainer>
+      {isDisabled && (
+        <InfoContainerWrapper>
+          <InfoContainer
+            bodyText={t('NO_STACKS_AUTH_SUPPORT.TITLE')}
+            redirectText={t('NO_STACKS_AUTH_SUPPORT.LINK')}
+            onClick={handleAddStxLedgerAccount}
+          />
+        </InfoContainerWrapper>
+      )}
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (
           <LedgerConnectionView
@@ -268,7 +312,7 @@ function AuthenticationRequest() {
           <ActionButton onPress={cancelCallback} text={t('CANCEL_BUTTON')} transparent />
         </SuccessActionsContainer>
       </BottomModal>
-    </ConfirmScreen>
+    </MainContainer>
   );
 }
 
