@@ -237,9 +237,13 @@ function OrdinalImage({
     );
   }
 
-  // if content type is undefined or "", we treat it the same as an image and fall back to ordiview thumbnail
-  if (!contentType || contentType.includes('image')) {
+  if (contentType.includes('image')) {
     return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/content/${ordinal.id}`);
+  }
+  
+  // if content type is undefined or "", we fall back to ordiview thumbnail
+  if (!contentType) {
+    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`);
   }
 
   if (textContent?.includes('brc-721e')) {
