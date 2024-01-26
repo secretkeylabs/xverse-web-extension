@@ -2,15 +2,30 @@ import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types
 import useWalletSelector from '@hooks/useWalletSelector';
 import { decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
-import { Address, AddressPurpose, GetAddressOptions, GetAddressResponse } from 'sats-connect';
+import {
+  Address,
+  AddressPurpose,
+  AddressType,
+  GetAddressOptions,
+  GetAddressResponse,
+} from 'sats-connect';
 
 const useBtcAddressRequest = () => {
-  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useWalletSelector();
+  const {
+    btcAddress,
+    ordinalsAddress,
+    btcPublicKey,
+    ordinalsPublicKey,
+    stxAddress,
+    stxPublicKey,
+    selectedAccount,
+  } = useWalletSelector();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('addressRequest') ?? '';
   const request = decodeToken(requestToken) as any as GetAddressOptions;
   const tabId = params.get('tabId') ?? '0';
+  const origin = params.get('origin') ?? '';
 
   const approveBtcAddressRequest = () => {
     const addressesResponse: Address[] = request.payload.purposes.map((purpose: AddressPurpose) => {
@@ -19,12 +34,23 @@ const useBtcAddressRequest = () => {
           address: ordinalsAddress,
           publicKey: ordinalsPublicKey,
           purpose: AddressPurpose.Ordinals,
+          addressType: AddressType.p2tr,
+        };
+      }
+      if (purpose === AddressPurpose.Stacks) {
+        return {
+          address: stxAddress,
+          publicKey: stxPublicKey,
+          purpose: AddressPurpose.Stacks,
+          addressType: AddressType.stacks,
         };
       }
       return {
         address: btcAddress,
         publicKey: btcPublicKey,
         purpose: AddressPurpose.Payment,
+        addressType:
+          selectedAccount?.accountType === 'ledger' ? AddressType.p2wpkh : AddressType.p2sh,
       };
     });
     const response: GetAddressResponse = {
@@ -50,6 +76,7 @@ const useBtcAddressRequest = () => {
   return {
     payload: request.payload,
     tabId,
+    origin,
     requestToken,
     approveBtcAddressRequest,
     cancelAddressRequest,
