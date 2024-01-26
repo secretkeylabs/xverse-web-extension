@@ -1,3 +1,4 @@
+import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { BetterBarLoader } from '@components/barLoader';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
@@ -312,13 +313,10 @@ function OrdinalImage({
     );
   }
 
-  return placeholderIcon ? (
+  return (
     <ImageContainer>
-      <img src={placeholderIcon} alt="ordinal" />
+      <img src={placeholderIcon ?? PlaceholderImage} alt="ordinal" />
     </ImageContainer>
-  ) : (
-    // fall back to the ordiview thumbnail
-    renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`)
   );
 }
 
