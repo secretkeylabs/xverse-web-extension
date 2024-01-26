@@ -507,7 +507,7 @@
     "PERMISSION_REQUEST_TX": "Request transaction signing",
     "NO_STACKS_AUTH_SUPPORT": {
       "TITLE": "This wallet does not have a Stacks address.",
-      "LINK": "Create an address here"
+      "LINK": "Create a Stacks address"
     },
     "LEDGER": {
       "CONNECT": {

@@ -1,3 +1,4 @@
+import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import { CaretRight } from '@phosphor-icons/react';
 import { Account } from '@secretkeylabs/xverse-core';
 import { getAccountGradient } from '@utils/gradient';
@@ -21,11 +22,18 @@ const CurrentAccountContainer = styled.div({
   alignItems: 'center',
 });
 
+const CurrentAccountTextContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: props.theme.spacing(4),
+  paddingLeft: props.theme.space.xs,
+}));
+
 const CurrentSelectedAccountText = styled.h1((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   textAlign: 'start',
-  paddingLeft: props.theme.space.xs,
 }));
 
 interface GradientCircleProps {
@@ -63,18 +71,17 @@ type SelectAccountProps = {
 
 function SelectAccount({ account, handlePressAccount }: SelectAccountProps) {
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
-  // const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const theme = useTheme();
   const getName = () => {
-    const maxNameCharacters = isHardwareAccount(account) ? 12 : 20;
+    const maxNameCharacters = isHardwareAccount(account) || account.bnsName ? 12 : 20;
     const maxLength =
-      account?.accountName && account?.accountName?.length > maxNameCharacters ? '....' : '';
+      account?.accountName && account?.accountName?.length > maxNameCharacters ? '...' : '';
     if (account.accountName) {
-      return `${account?.accountName?.slice(0, 20)}${maxLength}`;
+      return `${account?.accountName?.slice(0, maxNameCharacters)}${maxLength}`;
     }
     if (account.bnsName) {
-      return account.bnsName;
+      return `${account.bnsName.slice(0, maxNameCharacters)}${maxLength}`;
     }
     return `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
   };
@@ -88,7 +95,12 @@ function SelectAccount({ account, handlePressAccount }: SelectAccountProps) {
             secondGradient={gradient[1]}
             thirdGradient={gradient[2]}
           />
-          {account && <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>}
+          {account && (
+            <CurrentAccountTextContainer>
+              <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+              {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+            </CurrentAccountTextContainer>
+          )}
         </AccountTag>
       </CurrentAccountContainer>
       <SwitchAccountContainer>
