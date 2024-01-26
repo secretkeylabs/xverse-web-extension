@@ -44,6 +44,7 @@ function CreatePassword(): JSX.Element {
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [isCreatingWallet, setIsCreatingWallet] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const { createWallet } = useWalletReducer();
@@ -56,11 +57,17 @@ function CreatePassword(): JSX.Element {
 
   const handleConfirmPassword = async () => {
     if (confirmPassword === password) {
-      disableWalletExistsGuard?.();
-      const seedPhrase = await getSeed();
-      await createWallet(seedPhrase);
-      await changePassword('', password);
-      navigate('/wallet-success/create', { replace: true });
+      try {
+        setIsCreatingWallet(true);
+        disableWalletExistsGuard?.();
+        const seedPhrase = await getSeed();
+        await createWallet(seedPhrase);
+        await changePassword('', password);
+        navigate('/wallet-success/create', { replace: true });
+      } catch (err) {
+        setIsCreatingWallet(false);
+        setError(err as string);
+      }
     } else {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));
     }
@@ -104,6 +111,7 @@ function CreatePassword(): JSX.Element {
             handleContinue={handleConfirmPassword}
             handleBack={handleConfirmPasswordBack}
             passwordError={error}
+            loading={isCreatingWallet}
           />
         )}
       </PasswordContainer>
