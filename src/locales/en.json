@@ -507,7 +507,7 @@
     "PERMISSION_REQUEST_TX": "Request transaction signing",
     "NO_STACKS_AUTH_SUPPORT": {
       "TITLE": "This wallet does not have a Stacks address.",
-      "LINK": "Create an address here"
+      "LINK": "Create a Stacks address"
     },
     "LEDGER": {
       "CONNECT": {
@@ -1050,7 +1050,7 @@
     "BITCOIN_ADDRESS": "Payments address",
     "ORDINAL_ADDRESS": "Ordinals address",
     "STX_ADDRESS": "Stacks address",
-    "CHANGE_ACCOUNT_BUTTON": "Change account",
+    "CHANGE_ACCOUNT_BUTTON": "Select",
     "NETWORK_MISMATCH_ERROR_TITLE": "Mismatched Network",
     "NETWORK_MISMATCH_ERROR_DESCRIPTION": "The app is requesting your wallet address for a different network. You may have to switch your active network in wallet settings.",
     "INVALID_PURPOSE_ERROR_TITLE": "Invalid Request",

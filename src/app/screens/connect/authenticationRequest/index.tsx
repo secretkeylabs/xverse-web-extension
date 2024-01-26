@@ -6,11 +6,11 @@ import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
-import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { animated, useSpring } from '@react-spring/web';
 import SelectAccount from '@screens/connect/selectAccount';
 import {
   AuthRequest,
@@ -18,6 +18,7 @@ import {
   handleLedgerStxJWTAuth,
 } from '@secretkeylabs/xverse-core';
 import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
+import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
@@ -30,9 +31,10 @@ import validUrl from 'valid-url';
 import AddressPurposeBox from '../addressPurposeBox';
 import PermissionsList from '../permissionsList';
 
-const MainContainer = styled.div((props) => ({
+const MainContainer = styled(animated.div)((props) => ({
   display: 'flex',
   flexDirection: 'column',
+  flex: 1,
   paddingLeft: props.theme.space.m,
   paddingRight: props.theme.space.m,
   ...props.theme.scrollbar,
@@ -76,8 +78,8 @@ const DappName = styled.h2((props) => ({
 }));
 
 const InfoContainerWrapper = styled.div((props) => ({
-  margin: props.theme.spacing(10),
-  marginBottom: 0,
+  marginTop: props.theme.spacing(10),
+  marginBottom: 'auto',
 }));
 
 const AddressesContainer = styled.div((props) => ({
@@ -108,6 +110,17 @@ function AuthenticationRequest() {
   const { selectedAccount, btcAddress, stxAddress } = useWalletSelector();
   const { getSeed } = useSeedVault();
   const isDisabled = !selectedAccount?.stxAddress;
+
+  const styles = useSpring({
+    from: {
+      opacity: 0,
+      y: 24,
+    },
+    to: {
+      y: 0,
+      opacity: 1,
+    },
+  });
 
   const confirmCallback = async () => {
     setLoading(true);
@@ -243,42 +256,52 @@ function AuthenticationRequest() {
   };
 
   return (
-    <MainContainer>
+    <MainContainer style={styles}>
       {getDappLogo()}
       <Title>{t('TITLE')}</Title>
       <DappName>{`${t('REQUEST_TOOLTIP')} ${authRequest.payload.appDetails?.name}`}</DappName>
       <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
-      <AddressesContainer>
-        <AddressPurposeBox
-          purpose={AddressPurpose.Stacks}
-          icon={stxIcon}
-          title={t('STX_ADDRESS')}
-          address={selectedAccount?.stxAddress || stxAddress}
-          bnsName={selectedAccount?.bnsName}
-        />
-        <AddressPurposeBox
-          purpose={AddressPurpose.Payment}
-          icon={BitcoinIcon}
-          title={t('BITCOIN_ADDRESS')}
-          address={selectedAccount?.btcAddress || btcAddress}
-        />
-      </AddressesContainer>
-      <PermissionsContainer>
-        <PermissionsList />
-      </PermissionsContainer>
-      <StickyHorizontalSplitButtonContainer>
-        <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
-        <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />
-      </StickyHorizontalSplitButtonContainer>
-      {isDisabled && (
+      {!isDisabled ? (
+        <>
+          <AddressesContainer>
+            <AddressPurposeBox
+              purpose={AddressPurpose.Stacks}
+              icon={stxIcon}
+              title={t('STX_ADDRESS')}
+              address={selectedAccount?.stxAddress || stxAddress}
+              bnsName={selectedAccount?.bnsName}
+            />
+            <AddressPurposeBox
+              purpose={AddressPurpose.Payment}
+              icon={BitcoinIcon}
+              title={t('BITCOIN_ADDRESS')}
+              address={selectedAccount?.btcAddress || btcAddress}
+            />
+          </AddressesContainer>
+          <PermissionsContainer>
+            <PermissionsList />
+          </PermissionsContainer>
+        </>
+      ) : (
         <InfoContainerWrapper>
-          <InfoContainer
+          <Callout
             bodyText={t('NO_STACKS_AUTH_SUPPORT.TITLE')}
             redirectText={t('NO_STACKS_AUTH_SUPPORT.LINK')}
-            onClick={handleAddStxLedgerAccount}
+            onClickRedirect={handleAddStxLedgerAccount}
           />
         </InfoContainerWrapper>
       )}
+
+      <StickyHorizontalSplitButtonContainer>
+        <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
+        <ActionButton
+          text={t('CONNECT_BUTTON')}
+          processing={loading}
+          onPress={confirmCallback}
+          disabled={isDisabled}
+        />
+      </StickyHorizontalSplitButtonContainer>
+
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (
           <LedgerConnectionView
@@ -306,7 +329,7 @@ function AuthenticationRequest() {
           <ActionButton
             onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
             text={t(isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'CONNECT_BUTTON')}
-            disabled={isButtonDisabled}
+            disabled={isButtonDisabled || isDisabled}
             processing={isButtonDisabled}
           />
           <ActionButton onPress={cancelCallback} text={t('CANCEL_BUTTON')} transparent />
