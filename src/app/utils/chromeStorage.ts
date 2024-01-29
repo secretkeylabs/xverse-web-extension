@@ -19,35 +19,35 @@ class ChromeStorage {
     return runtimeMap.get(this).lastError;
   }
 
-  setItem(key: string, item: any): Promise<true> {
+  setItem(key: string, item: any): Promise<void> {
     return new Promise((resolve, reject) => {
       this.getDriver().set({ [key]: item }, () => {
         if (this.hasError()) {
           return reject(this.getError());
         }
-        return resolve(true);
+        return resolve();
       });
     });
   }
 
-  getItem<T = any>(key: string): Promise<T | undefined> {
+  getItem<T = any, D = undefined>(key: string, defaultValue?: D): Promise<T | D> {
     return new Promise((resolve, reject) => {
       this.getDriver().get(key, (response: any) => {
         if (this.hasError()) {
           return reject(this.getError());
         }
-        return resolve(response[key]);
+        return resolve(response[key] || defaultValue);
       });
     });
   }
 
-  removeItem(key: string): Promise<true> {
+  removeItem(key: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.getDriver().remove(key, () => {
         if (this.hasError()) {
           return reject(this.getError());
         }
-        return resolve(true);
+        return resolve();
       });
     });
   }
