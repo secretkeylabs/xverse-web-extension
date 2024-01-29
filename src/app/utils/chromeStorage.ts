@@ -36,7 +36,7 @@ class ChromeStorage {
         if (this.hasError()) {
           return reject(this.getError());
         }
-        return resolve(response[key] || defaultValue);
+        return resolve(response[key] ?? defaultValue);
       });
     });
   }
