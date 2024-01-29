@@ -205,10 +205,18 @@ document.addEventListener(DomEventName.createRepeatInscriptionsRequest, ((
 }) as EventListener);
 
 // Inject in-page script (Stacks and Bitcoin Providers)
-getIsPriorityWallet().then((isPriorityWallet) => {
+const injectInPageScript = (isPriority) => {
   const inpage = document.createElement('script');
   inpage.src = chrome.runtime.getURL('inpage.js');
   inpage.id = 'xverse-wallet-provider';
-  inpage.setAttribute('data-is-priority', isPriorityWallet ? 'true' : '');
+  inpage.setAttribute('data-is-priority', isPriority ? 'true' : '');
   document.body.appendChild(inpage);
-});
+};
+
+getIsPriorityWallet()
+  .then((isPriorityWallet) => {
+    injectInPageScript(isPriorityWallet);
+  })
+  .catch(() => {
+    injectInPageScript(false);
+  });

@@ -1,3 +1,4 @@
+import { chromeLocalStorage } from '@utils/chromeStorage';
 import { useEffect, useState } from 'react';
 
 export const useChromeLocalStorage = <T extends unknown>(key: string, defaultValue?: T) => {
@@ -5,14 +6,14 @@ export const useChromeLocalStorage = <T extends unknown>(key: string, defaultVal
 
   useEffect(() => {
     setValueState(undefined);
-    chrome.storage.local.get(key, (result) => {
-      const newValue = result[key] === undefined ? defaultValue : result[key];
+    chromeLocalStorage.getItem<T>(key).then((result) => {
+      const newValue = result === undefined ? defaultValue : result;
       setValueState(newValue);
     });
   }, [key]);
 
   const setValue = (newValue: T) => {
-    chrome.storage.local.set({ [key]: newValue });
+    chromeLocalStorage.setItem(key, newValue);
     setValueState(newValue);
   };
 

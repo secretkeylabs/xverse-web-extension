@@ -19,7 +19,7 @@ class ChromeStorage {
     return runtimeMap.get(this).lastError;
   }
 
-  setItem(key: string, item: any): Promise<any> {
+  setItem(key: string, item: any): Promise<true> {
     return new Promise((resolve, reject) => {
       this.getDriver().set({ [key]: item }, () => {
         if (this.hasError()) {
@@ -30,7 +30,7 @@ class ChromeStorage {
     });
   }
 
-  getItem<T = any>(key: string): Promise<T> {
+  getItem<T = any>(key: string): Promise<T | undefined> {
     return new Promise((resolve, reject) => {
       this.getDriver().get(key, (response: any) => {
         if (this.hasError()) {
@@ -41,7 +41,7 @@ class ChromeStorage {
     });
   }
 
-  removeItem(key: string): Promise<any> {
+  removeItem(key: string): Promise<true> {
     return new Promise((resolve, reject) => {
       this.getDriver().remove(key, () => {
         if (this.hasError()) {
