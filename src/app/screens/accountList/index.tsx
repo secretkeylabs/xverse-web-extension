@@ -1,42 +1,30 @@
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
-import Plus from '@assets/img/dashboard/plus.svg';
 import { filterLedgerAccounts } from '@common/utils/ledger';
-import AccountRow from '@components/accountRow';
+import LazyAccountRow from '@components/accountRow/lazyAccountRow';
+import ActionButton from '@components/button';
 import Separator from '@components/separator';
 import TopRow from '@components/topRow';
+import useAccountBalance from '@hooks/queries/useAccountBalance';
 import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { Plus } from '@phosphor-icons/react';
 import { Account } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 export const Container = styled.div({
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
+  justifyContent: 'space-between',
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
     display: 'none',
   },
 });
-
-const ButtonContainer = styled.button((props) => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  background: 'transparent',
-  paddingTop: props.theme.spacing(4),
-  paddingBottom: props.theme.spacing(4),
-  paddingLeft: props.theme.spacing(11),
-  paddingRight: props.theme.spacing(11),
-  transition: 'background-color 0.2s ease',
-  ':hover': {
-    backgroundColor: props.theme.colors.elevation1,
-  },
-}));
 
 const AccountContainer = styled.div((props) => ({
   display: 'flex',
@@ -47,43 +35,35 @@ const AccountContainer = styled.div((props) => ({
   gap: props.theme.spacing(8),
 }));
 
-const AddAccountContainer = styled.div((props) => ({
-  display: 'flex',
-  height: 40,
-  width: 40,
-  borderRadius: 25,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: props.theme.colors.elevation1,
-  marginRight: props.theme.spacing(8),
-}));
-
-const ButtonImage = styled.img({
-  alignSelf: 'center',
-  transform: 'all',
-});
-
-const AddAccountText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  opacity: 0.8,
-  color: props.theme.colors.white_0,
-}));
-
 const ButtonsWrapper = styled.div(
   (props) => `
+  display: flex;
+  flex-direction: column;
   position: sticky;
   bottom: 0;
+  row-gap: ${props.theme.space.s};
   background-color: ${props.theme.colors.elevation0};
-  margin-top: ${props.theme.spacing(8)}px;
-  margin-bottom: ${props.theme.spacing(11)}px;
+  padding: ${props.theme.space.m};
+  padding-top: ${props.theme.space.l};
+  padding-bottom: ${props.theme.space.xxl};
 `,
 );
+
+const Title = styled.div((props) => ({
+  ...props.theme.typography.headline_xs,
+  marginBottom: props.theme.space.m,
+}));
 
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
   const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
   const { createAccount, switchAccount } = useWalletReducer();
+  const { enqueueFetchBalances } = useAccountBalance();
+
+  const hideListActions = Boolean(params.get('hideListActions')) || false;
 
   const displayedAccountsList = useMemo(() => {
     const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
@@ -118,34 +98,40 @@ function AccountList(): JSX.Element {
 
   return (
     <Container>
-      <TopRow title={t('CHANGE_ACCOUNT')} onClick={handleBackButtonClick} />
-      <AccountContainer>
-        {displayedAccountsList.map((account) => (
-          <div key={account.btcAddress}>
-            <AccountRow
-              account={account}
-              isSelected={isAccountSelected(account)}
-              onAccountSelected={handleAccountSelect}
-              isAccountListView
-            />
-            <Separator />
-          </div>
-        ))}
-      </AccountContainer>
-      <ButtonsWrapper>
-        <ButtonContainer onClick={onCreateAccount}>
-          <AddAccountContainer>
-            <ButtonImage src={Plus} />
-          </AddAccountContainer>
-          <AddAccountText>{t('NEW_ACCOUNT')}</AddAccountText>
-        </ButtonContainer>
-        <ButtonContainer onClick={onImportLedgerAccount}>
-          <AddAccountContainer>
-            <ButtonImage src={ConnectLedger} />
-          </AddAccountContainer>
-          <AddAccountText>{t('LEDGER_ACCOUNT')}</AddAccountText>
-        </ButtonContainer>
-      </ButtonsWrapper>
+      <div>
+        <TopRow onClick={handleBackButtonClick} />
+        <AccountContainer>
+          <Title>{t('TITLE')}</Title>
+          {displayedAccountsList.map((account) => (
+            <div key={account.btcAddress}>
+              <LazyAccountRow
+                account={account}
+                isSelected={isAccountSelected(account)}
+                onAccountSelected={handleAccountSelect}
+                fetchBalance={enqueueFetchBalances}
+                isAccountListView
+              />
+              <Separator />
+            </div>
+          ))}
+        </AccountContainer>
+      </div>
+      {!hideListActions ? (
+        <ButtonsWrapper>
+          <ActionButton
+            icon={<Plus size={16} fill="white" />}
+            onPress={onCreateAccount}
+            text={t('NEW_ACCOUNT')}
+            transparent
+          />
+          <ActionButton
+            icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
+            onPress={onImportLedgerAccount}
+            text={t('LEDGER_ACCOUNT')}
+            transparent
+          />
+        </ButtonsWrapper>
+      ) : null}
     </Container>
   );
 }

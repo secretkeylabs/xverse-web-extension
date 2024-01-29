@@ -819,7 +819,7 @@ function OrdinalDetailScreen() {
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow title="" onClick={handleBackButtonClick} />
+        <TopRow onClick={handleBackButtonClick} />
       )}
       {showSendOridnalsAlert && (
         <AlertMessage
