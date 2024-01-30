@@ -36,6 +36,7 @@ function SendStxScreen() {
 
   // Step 1 states
   const [recipientAddress, setRecipientAddress] = useState('');
+  const [recipientDomain, setRecipientDomain] = useState('');
   const [memo, setMemo] = useState('');
 
   // Step 2 states
@@ -73,6 +74,8 @@ function SendStxScreen() {
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}
+              recipientDomain={recipientDomain}
+              setRecipientDomain={setRecipientDomain}
               memo={memo}
               setMemo={setMemo}
               onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, true))}

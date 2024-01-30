@@ -269,6 +269,7 @@
     "MEMO": "Memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
+    "ASSOCIATED_DOMAIN": "Associated Domain",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee.",
     "NEXT": "Next",
     "NO_FUNDS": "You don't have any funds to send.",

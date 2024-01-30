@@ -1,17 +1,21 @@
 import InputScreen from '@components/inputScreen';
+import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
+import useDebounce from '@hooks/useDebounce';
 // import { useBnsResolver } from '@hooks/queries/useBnsName';
 // import useDebounce from '@hooks/useDebounce';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { validateStacksAddress } from '@stacks/transactions';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type StxRecipientScreenProps = {
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
+  recipientDomain: string;
+  setRecipientDomain: (address: string) => void;
   memo: string;
   setMemo: (memo: string) => void;
   onNext: () => void;
@@ -27,13 +31,15 @@ const MemoInput = styled(Input)`
 `;
 
 interface InputFeedback {
-  variant: 'danger';
+  variant: 'danger' | 'info';
   message: string;
 }
 
 function Step1SelectRecipient({
   recipientAddress,
   setRecipientAddress,
+  recipientDomain,
+  setRecipientDomain,
   memo,
   setMemo,
   onNext,
@@ -43,13 +49,28 @@ function Step1SelectRecipient({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { stxAddress } = useWalletSelector();
   const [inputFeedback, setInputFeedback] = useState<InputFeedback[] | undefined>();
-  // const debouncedSearchTerm = useDebounce(recipientAddress, 300);
-  // const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress, 'STX');
+  const [recipient, setRecipient] = useState('');
+
+  const debouncedSearchTerm = useDebounce(recipient, 300);
+  const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress, 'STX');
+  const associatedDomain = useBnsName(debouncedSearchTerm);
+
+  useEffect(() => {
+    setRecipientAddress(associatedAddress);
+    setInputFeedback([{ variant: 'info', message: t('ASSOCIATED_ADDRESS') }]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [associatedAddress]);
+
+  useEffect(() => {
+    setRecipientDomain(associatedDomain);
+    setInputFeedback([{ variant: 'info', message: t('ASSOCIATED_DOMAIN') }]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [associatedDomain]);
 
   const handleNext = () => {
-    if (stxAddress === recipientAddress) {
+    if (stxAddress === recipient) {
       setInputFeedback([{ variant: 'danger', message: t('ERRORS.SEND_TO_SELF') }]);
-    } else if (validateStacksAddress(recipientAddress)) {
+    } else if (validateStacksAddress(recipient)) {
       onNext();
     } else {
       setInputFeedback([{ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') }]);
@@ -58,7 +79,7 @@ function Step1SelectRecipient({
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setRecipientAddress(newValue);
+    setRecipient(newValue);
     setInputFeedback(undefined);
   };
 
@@ -71,7 +92,7 @@ function Step1SelectRecipient({
       <Input
         title={t('RECIPIENT')}
         placeholder={t('RECIPIENT_PLACEHOLDER')}
-        value={recipientAddress}
+        value={recipient}
         onChange={handleAddressChange}
         variant={inputFeedback ? 'danger' : 'default'}
         feedback={inputFeedback}
@@ -92,12 +113,7 @@ function Step1SelectRecipient({
   );
 
   const buttonElement = (
-    <Button
-      title={t('NEXT')}
-      onClick={handleNext}
-      disabled={!recipientAddress}
-      loading={isLoading}
-    />
+    <Button title={t('NEXT')} onClick={handleNext} disabled={!recipient} loading={isLoading} />
   );
 
   return <InputScreen inputs={inputElement} buttons={buttonElement} header={header} />;
