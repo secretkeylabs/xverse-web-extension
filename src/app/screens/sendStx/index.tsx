@@ -1,6 +1,12 @@
 import TokenImage from '@components/tokenImage';
+import {
+  generateUnsignedStxTokenTransferTransaction,
+  stxToMicrostacks,
+} from '@secretkeylabs/xverse-core';
+import { StacksTransaction } from '@stacks/transactions';
 import { isInOptions } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -42,6 +48,20 @@ function SendStxScreen() {
   // Step 2 states
   const [amount, setAmount] = useState('0');
 
+  // Step 3 logic
+
+  async function send() {
+    const unsignedSendStxTx: StacksTransaction = await generateUnsignedStxTokenTransferTransaction(
+      recipientAddress,
+      stxToMicrostacks(new BigNumber(amount)).toString(),
+      memo,
+      stxPendingTxData?.pendingTransactions ?? [],
+      stxPublicKey,
+      selectedNetwork,
+    );
+    applyFeeMultiplier(unsignedSendStxTx, feeMultipliers);
+  }
+
   const handleCancel = () => {
     if (isInOption) {
       window.close();
@@ -74,7 +94,7 @@ function SendStxScreen() {
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}
-              recipientDomain={recipientDomain}
+              // recipientDomain={recipientDomain}
               setRecipientDomain={setRecipientDomain}
               memo={memo}
               setMemo={setMemo}
