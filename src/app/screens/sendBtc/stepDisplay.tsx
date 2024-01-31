@@ -126,8 +126,8 @@ function StepDisplay({
           outputs={summary.outputs}
           feeOutput={summary.feeOutput}
           isLoading={false}
-          confirmText={t('CONFIRM')}
-          cancelText={t('CANCEL')}
+          confirmText={t('COMMON.CONFIRM')}
+          cancelText={t('COMMON.CANCEL')}
           onBackClick={onBack}
           onCancel={onCancel}
           onConfirm={onConfirm}
