@@ -1,8 +1,11 @@
 import BarLoader from '@components/barLoader';
+import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
+import { calculateTotalBalance } from '@utils/helper';
 import BigNumber from 'bignumber.js';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { MoonLoader } from 'react-spinners';
@@ -74,43 +77,35 @@ function BalanceCard(props: BalanceCardProps) {
     stxBalance,
     btcBalance,
     btcAddress,
-    stxAddress,
     hideStx,
     coinsList,
+    selectedAccount,
+    accountBalances,
+    brcCoinsList,
   } = useWalletSelector();
+  const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
+  const oldTotalBalance = accountBalances[btcAddress];
 
-  function calculateTotalBalance() {
-    let totalBalance = new BigNumber(0);
-    if (stxAddress && !hideStx) {
-      const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
-        .multipliedBy(new BigNumber(stxBtcRate))
-        .multipliedBy(new BigNumber(btcFiatRate));
-      totalBalance = totalBalance.plus(stxFiatEquiv);
-    }
-    if (btcAddress) {
-      const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
-        new BigNumber(btcFiatRate),
-      );
-      totalBalance = totalBalance.plus(btcFiatEquiv);
-    }
+  const balance = calculateTotalBalance({
+    stxBalance,
+    btcBalance,
+    ftCoinList: coinsList,
+    brcCoinsList,
+    btcFiatRate,
+    stxBtcRate,
+    hideStx,
+  });
 
-    if (coinsList) {
-      totalBalance = coinsList.reduce((acc, coin) => {
-        if (coin.visible && coin.tokenFiatRate && coin.decimals) {
-          const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
-          const coinFiatValue = new BigNumber(coin.balance)
-            .dividedBy(tokenUnits)
-            .multipliedBy(new BigNumber(coin.tokenFiatRate));
-          return acc.plus(coinFiatValue);
-        }
-
-        return acc;
-      }, totalBalance);
+  useEffect(() => {
+    if (!balance || !selectedAccount || isLoading || isRefetching) {
+      return;
     }
 
-    return totalBalance.toNumber().toFixed(2);
-  }
+    if (oldTotalBalance !== balance) {
+      setAccountBalance(selectedAccount, balance);
+    }
+  }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching]);
 
   return (
     <>
@@ -127,7 +122,7 @@ function BalanceCard(props: BalanceCardProps) {
       ) : (
         <BalanceContainer>
           <NumericFormat
-            value={calculateTotalBalance()}
+            value={balance}
             displayType="text"
             prefix={`${currencySymbolMap[fiatCurrency]}`}
             thousandSeparator

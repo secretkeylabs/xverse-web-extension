@@ -87,7 +87,7 @@ function SendLayout({
       {isScreenLargerThanXs || showAccountHeader ? (
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
-        <TopRow title="" onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
+        <TopRow onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
       )}
       <ScrollContainer>
         <Container>

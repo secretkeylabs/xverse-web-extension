@@ -378,7 +378,7 @@ function Home() {
         <MergedIcon src={ordinalsIcon} />
       </ReceiveCardComponent>
 
-      {stxAddress && !hideStx && (
+      {stxAddress && (
         <ReceiveCardComponent
           title={t('STACKS_AND_TOKEN')}
           address={stxAddress}
@@ -521,17 +521,19 @@ function Home() {
                     onPress={handleTokenPressed}
                   />
                 ))}
-            {brcCoinsList?.map((coin) => (
-              <TokenTile
-                key={coin.name}
-                title={coin.name}
-                currency="brc20"
-                loading={loadingBtcCoinData}
-                underlayColor={Theme.colors.background.elevation1}
-                fungibleToken={coin}
-                onPress={handleTokenPressed}
-              />
-            ))}
+            {brcCoinsList
+              ?.filter((ft) => ft.visible)
+              .map((coin) => (
+                <TokenTile
+                  key={coin.name}
+                  title={coin.name}
+                  currency="brc20"
+                  loading={loadingBtcCoinData}
+                  underlayColor={Theme.colors.background.elevation1}
+                  fungibleToken={coin}
+                  onPress={handleTokenPressed}
+                />
+              ))}
           </CoinContainer>
         )}
         <UpdatedBottomModal
@@ -542,16 +544,14 @@ function Home() {
           {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
         </UpdatedBottomModal>
 
-        {!!stxAddress && (
-          <TokenListButtonContainer>
-            <Button onClick={handleManageTokenListOnClick}>
-              <>
-                <ButtonImage src={ListDashes} />
-                <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
-              </>
-            </Button>
-          </TokenListButtonContainer>
-        )}
+        <TokenListButtonContainer>
+          <Button onClick={handleManageTokenListOnClick}>
+            <>
+              <ButtonImage src={ListDashes} />
+              <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
+            </>
+          </Button>
+        </TokenListButtonContainer>
 
         <CoinSelectModal
           onSelectBitcoin={onBtcSendClick}

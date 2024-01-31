@@ -274,6 +274,28 @@ export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletU
   };
 }
 
+export function renameAccountAction(
+  accountsList: Account[],
+  selectedAccount: Account | null,
+): actions.RenameAccount {
+  return {
+    type: actions.RenameAccountKey,
+    accountsList,
+    selectedAccount,
+  };
+}
+
+export function setAccountBalanceAction(
+  btcAddress: string,
+  totalBalance: string,
+): actions.SetAccountBalance {
+  return {
+    type: actions.SetAccountBalanceKey,
+    btcAddress,
+    totalBalance,
+  };
+}
+
 export function setWalletHideStxAction(hideStx: boolean): actions.SetWalletHideStx {
   return {
     type: actions.SetWalletHideStxKey,

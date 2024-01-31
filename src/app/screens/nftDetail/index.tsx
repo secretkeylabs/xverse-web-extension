@@ -576,7 +576,7 @@ function NftDetailScreen() {
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow title="" onClick={handleBackButtonClick} />
+        <TopRow onClick={handleBackButtonClick} />
       )}
       {isGalleryOpen ? galleryView : extensionView}
       {!isGalleryOpen && (

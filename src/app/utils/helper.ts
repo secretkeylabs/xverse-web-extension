@@ -1,17 +1,22 @@
 import {
   Account,
   BitcoinEsploraApiProvider,
+  FungibleToken,
   getStacksInfo,
+  microstacksToStx,
   NetworkType,
   NftData,
+  satsToBtc,
   SettingsNetwork,
   StxMempoolTransactionData,
 } from '@secretkeylabs/xverse-core';
 import { ChainID } from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
+import { TFunction } from 'react-i18next';
 import {
   BTC_TRANSACTION_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
+  MAX_ACC_NAME_LENGTH,
   TRANSACTION_STATUS_URL,
 } from './constants';
 
@@ -202,4 +207,99 @@ export const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElemen
   if (e.key.match(/^[!-\/:-@[-`{-~]$/)) {
     e.preventDefault();
   }
+};
+
+export const validateAccountName = (
+  name: string,
+  t: TFunction<'translation', 'OPTIONS_DIALOG'>,
+  accountsList: Account[],
+  ledgerAccountsList: Account[],
+) => {
+  const regex = /^[a-zA-Z0-9 ]*$/;
+
+  if (!name.length) {
+    return t('RENAME_ACCOUNT_MODAL.REQUIRED_ERR');
+  }
+
+  if (name.length > MAX_ACC_NAME_LENGTH) {
+    return t('RENAME_ACCOUNT_MODAL.MAX_SYMBOLS_ERR', {
+      maxLength: MAX_ACC_NAME_LENGTH,
+    });
+  }
+
+  if (
+    ledgerAccountsList.find((account) => account.accountName === name) ||
+    accountsList.find((account) => account.accountName === name)
+  ) {
+    return t('RENAME_ACCOUNT_MODAL.ALREADY_EXISTS_ERR');
+  }
+
+  if (!regex.test(name)) {
+    return t('RENAME_ACCOUNT_MODAL.PROHIBITED_SYMBOLS_ERR');
+  }
+
+  return null;
+};
+
+export const calculateTotalBalance = ({
+  stxBalance,
+  btcBalance,
+  ftCoinList,
+  brcCoinsList,
+  stxBtcRate,
+  btcFiatRate,
+  hideStx,
+}: {
+  stxBalance?: string;
+  btcBalance?: string;
+  ftCoinList: FungibleToken[] | null;
+  brcCoinsList: FungibleToken[] | null;
+  stxBtcRate: string;
+  btcFiatRate: string;
+  hideStx: boolean;
+}) => {
+  let totalBalance = new BigNumber(0);
+
+  if (stxBalance && !hideStx) {
+    const stxFiatEquiv = microstacksToStx(new BigNumber(stxBalance))
+      .multipliedBy(new BigNumber(stxBtcRate))
+      .multipliedBy(new BigNumber(btcFiatRate));
+    totalBalance = totalBalance.plus(stxFiatEquiv);
+  }
+
+  if (btcBalance) {
+    const btcFiatEquiv = satsToBtc(new BigNumber(btcBalance)).multipliedBy(
+      new BigNumber(btcFiatRate),
+    );
+    totalBalance = totalBalance.plus(btcFiatEquiv);
+  }
+
+  if (ftCoinList) {
+    totalBalance = ftCoinList.reduce((acc, coin) => {
+      if (coin.visible && coin.tokenFiatRate && coin.decimals) {
+        const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
+        const coinFiatValue = new BigNumber(coin.balance)
+          .dividedBy(tokenUnits)
+          .multipliedBy(new BigNumber(coin.tokenFiatRate));
+        return acc.plus(coinFiatValue);
+      }
+
+      return acc;
+    }, totalBalance);
+  }
+
+  if (brcCoinsList) {
+    totalBalance = brcCoinsList.reduce((acc, coin) => {
+      if (coin.visible && coin.tokenFiatRate) {
+        const coinFiatValue = new BigNumber(coin.balance).multipliedBy(
+          new BigNumber(coin.tokenFiatRate),
+        );
+        return acc.plus(coinFiatValue);
+      }
+
+      return acc;
+    }, totalBalance);
+  }
+
+  return totalBalance.toNumber().toFixed(2);
 };

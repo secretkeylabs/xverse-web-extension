@@ -358,7 +358,7 @@ function SpeedUpTransactionScreen() {
 
   return (
     <>
-      <TopRow title="" onClick={handleGoBack} />
+      <TopRow onClick={handleGoBack} />
       {isLoading ? (
         <LoaderContainer>
           <MoonLoader color="white" size={30} />

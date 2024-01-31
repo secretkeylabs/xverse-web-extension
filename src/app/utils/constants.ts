@@ -62,5 +62,7 @@ export const DEFAULT_TRANSITION_OPTIONS = {
   },
 };
 
+export const MAX_ACC_NAME_LENGTH = 20;
+
 // UI
 export const EMPTY_LABEL = '--';
