@@ -74,11 +74,16 @@ const ComplicationsContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  > *:first-child {
+    margin-left: ${(props) => props.theme.spacing(4)}px;
+  }
 `;
 
 const ClearButton = styled.div<{ $hasSiblings?: boolean }>`
   cursor: pointer;
 
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
