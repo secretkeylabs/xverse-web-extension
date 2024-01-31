@@ -80,7 +80,7 @@ function RecipientSelector({
         <Button
           title={t('NEXT')}
           onClick={handleNext}
-          disabled={!recipientAddress}
+          disabled={!recipientAddress || !addressIsValid}
           loading={isLoading}
         />
       </Buttons>

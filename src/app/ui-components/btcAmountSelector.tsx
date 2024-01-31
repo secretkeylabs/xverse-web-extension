@@ -19,19 +19,25 @@ const BalanceText = styled.span`
   color: ${(props) => props.theme.colors.white_200};
 `;
 
-const ConvertComplication = styled.div<{ $disabled?: boolean }>`
-  cursor: ${(props) => (props.$disabled ? 'not-allowed' : 'pointer')};
+const ConvertComplication = styled.button`
+  ${(props) => props.theme.typography.body_medium_s}
   user-select: none;
 
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: ${(props) => props.theme.space.xs};
 
+  cursor: pointer;
+  background-color: transparent;
   color: ${(props) => props.theme.colors.white_200};
 
-  &:hover {
-    color: ${(props) =>
-      props.$disabled ? props.theme.colors.white_200 : props.theme.colors.white_0};
+  &:hover:enabled {
+    color: ${(props) => props.theme.colors.white_400};
+  }
+
+  &:disabled {
+    color: ${(props) => props.theme.colors.white_600};
+    cursor: not-allowed;
   }
 `;
 
@@ -42,16 +48,28 @@ const VertRule = styled.div`
   margin: 0 8px;
 `;
 
-const MaxButton = styled.div<{ $sendMax: boolean; $disabled: boolean }>`
+const MaxButton = styled.button<{ $sendMax: boolean }>`
   ${(props) => props.theme.typography.body_medium_m}
-  color: ${(props) =>
-    props.$sendMax ? props.theme.colors.tangerine : props.theme.colors.tangerine_400};
-  cursor: ${(props) => (props.$disabled ? 'not-allowed' : 'pointer')};
   user-select: none;
-  margin-right: ${(props) => props.theme.spacing(2)}px;
+  margin-right: ${(props) => props.theme.space.xxs};
 
-  &:hover {
-    ${(props) => (props.$disabled ? '' : `color:${props.theme.colors.tangerine_200}`)};
+  cursor: pointer;
+  background-color: transparent;
+  color: ${(props) => props.theme.colors.tangerine};
+
+  ${(props) =>
+    props.$sendMax &&
+    `
+    color: ${props.theme.colors.tangerine_400};
+  `}
+
+  &:hover:enabled {
+    color: ${(props) => props.theme.colors.tangerine_400};
+  }
+
+  &:disabled {
+    color: ${(props) => props.theme.colors.tangerine_dark};
+    cursor: not-allowed;
   }
 `;
 
@@ -196,7 +214,7 @@ function AmountSelector({
           value={balance}
           displayType="text"
           thousandSeparator
-          prefix={useBtcValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
+          prefix={useBtcValue ? '' : `~${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
             <div>
               <BalanceText>{t('BALANCE')} </BalanceText> {value}{' '}
@@ -207,22 +225,22 @@ function AmountSelector({
       }
       complications={
         <>
-          <ConvertComplication $disabled={disabled} onClick={handleUseBtcValueChange}>
+          <ConvertComplication disabled={disabled} onClick={handleUseBtcValueChange}>
             <NumericFormat
               value={sendAmountConverted}
               displayType="text"
               thousandSeparator
-              prefix={useBtcValue ? `~ ${currencySymbolMap[fiatCurrency]}` : ''}
+              prefix={useBtcValue ? `~${currencySymbolMap[fiatCurrency]}` : ''}
               renderText={(value: string) => (
                 <div>
                   {value} {useBtcValue ? fiatCurrency : 'BTC'}
                 </div>
               )}
             />
-            <ArrowsDownUp />
+            <ArrowsDownUp size={16} weight="fill" />
           </ConvertComplication>
           <VertRule />
-          <MaxButton $sendMax={sendMax} $disabled={disabled} onClick={handleMaxClick}>
+          <MaxButton $sendMax={sendMax} disabled={disabled} onClick={handleMaxClick}>
             MAX
           </MaxButton>
         </>
