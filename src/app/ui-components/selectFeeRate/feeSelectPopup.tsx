@@ -16,10 +16,6 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const DetailText = styled(StyledP)`
-  margin-bottom: ${(props) => props.theme.space.l};
-`;
-
 const FeePrioritiesContainer = styled.div`
   display: flex;
   margin-top: ${(props) => props.theme.space.m};
@@ -297,9 +293,9 @@ function FeeSelectPopup({
   return (
     <Sheet title={t('CONFIRM_TRANSACTION.EDIT_FEES')} onClose={onClose} visible>
       <Container>
-        <DetailText typography="body_m" color="white_200">
+        <StyledP typography="body_m" color="white_200">
           {t('TRANSACTION_SETTING.FEE_INFO')}
-        </DetailText>
+        </StyledP>
         {renderFeeSelectors()}
       </Container>
     </Sheet>
