@@ -7,6 +7,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { validateStacksAddress } from '@stacks/transactions';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
+import { FeedbackVariant } from '@ui-library/inputFeedback';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -14,7 +15,7 @@ import styled from 'styled-components';
 type StxRecipientScreenProps = {
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
-  recipientDomain: string;
+  // recipientDomain: string;
   setRecipientDomain: (address: string) => void;
   memo: string;
   setMemo: (memo: string) => void;
@@ -31,14 +32,14 @@ const MemoInput = styled(Input)`
 `;
 
 interface InputFeedback {
-  variant: 'danger' | 'info';
+  variant: FeedbackVariant;
   message: string;
 }
 
 function Step1SelectRecipient({
   recipientAddress,
   setRecipientAddress,
-  recipientDomain,
+  // recipientDomain,
   setRecipientDomain,
   memo,
   setMemo,
@@ -56,21 +57,40 @@ function Step1SelectRecipient({
   const associatedDomain = useBnsName(debouncedSearchTerm);
 
   useEffect(() => {
-    setRecipientAddress(associatedAddress);
-    setInputFeedback([{ variant: 'info', message: t('ASSOCIATED_ADDRESS') }]);
+    setRecipientAddress('');
+    setInputFeedback(undefined);
+
+    if (associatedAddress !== '') {
+      setRecipientAddress(associatedAddress);
+      setRecipientDomain(recipient);
+      setInputFeedback([
+        { variant: 'checkmark', message: t('ASSOCIATED_ADDRESS') },
+        { variant: 'plainIndented', message: associatedAddress },
+      ]);
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [associatedAddress]);
 
   useEffect(() => {
-    setRecipientDomain(associatedDomain);
-    setInputFeedback([{ variant: 'info', message: t('ASSOCIATED_DOMAIN') }]);
+    setRecipientDomain('');
+    setInputFeedback(undefined);
+
+    if (associatedDomain !== '') {
+      setRecipientDomain(associatedDomain);
+      setRecipientAddress(recipient);
+      setInputFeedback([
+        { variant: 'checkmark', message: t('ASSOCIATED_DOMAIN') },
+        { variant: 'plainIndented', message: associatedDomain },
+      ]);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [associatedDomain]);
 
   const handleNext = () => {
-    if (stxAddress === recipient) {
+    if (stxAddress === recipientAddress) {
       setInputFeedback([{ variant: 'danger', message: t('ERRORS.SEND_TO_SELF') }]);
-    } else if (validateStacksAddress(recipient)) {
+    } else if (validateStacksAddress(recipientAddress)) {
       onNext();
     } else {
       setInputFeedback([{ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') }]);
@@ -94,7 +114,7 @@ function Step1SelectRecipient({
         placeholder={t('RECIPIENT_PLACEHOLDER')}
         value={recipient}
         onChange={handleAddressChange}
-        variant={inputFeedback ? 'danger' : 'default'}
+        variant={inputFeedback?.some((i) => i.variant === 'danger') ? 'danger' : 'default'}
         feedback={inputFeedback}
       />
       <MemoInput
@@ -103,7 +123,7 @@ function Step1SelectRecipient({
         onChange={handleMemoChange}
         feedback={[
           {
-            variant: 'info',
+            variant: 'plain',
             message: t('MEMO_INFO'),
           },
         ]}
