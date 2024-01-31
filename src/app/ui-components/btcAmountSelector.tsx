@@ -114,9 +114,7 @@ function AmountSelector({
       amountSats &&
       (useBtcValue
         ? satsToBtcString(new BigNumber(amountSats))
-        : getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate))
-            .toNumber()
-            .toFixed(2));
+        : getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate)).toFixed(2));
 
     if (amountToDisplay !== amountDisplay) {
       setAmountDisplay(amountToDisplay);
@@ -130,7 +128,7 @@ function AmountSelector({
     : getBtcFiatEquivalent(btcBalance, new BigNumber(btcFiatRate)).toFixed(2);
 
   const sendAmountConverted = useBtcValue
-    ? getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate)).toNumber().toFixed(2)
+    ? getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate)).toFixed(2)
     : satsToBtcString(new BigNumber(amountSats));
 
   const handleAmountChange = (newAmount: string) => {
@@ -176,9 +174,10 @@ function AmountSelector({
       setAmountDisplay(satsToBtcString(new BigNumber(amountSats)));
     } else {
       // convert btc to fiat
-      const fiatAmount = getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate))
-        .toNumber()
-        .toFixed(2);
+      const fiatAmount = getBtcFiatEquivalent(
+        new BigNumber(amountSats),
+        BigNumber(btcFiatRate),
+      ).toFixed(2);
       setAmountDisplay(fiatAmount);
     }
   };
