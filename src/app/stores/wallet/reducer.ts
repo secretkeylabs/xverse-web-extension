@@ -12,14 +12,17 @@ import {
   FetchAccountKey,
   GetActiveAccountsKey,
   RareSatsNoticeDismissedKey,
+  RenameAccountKey,
   ResetWalletKey,
   SelectAccountKey,
+  SetAccountBalanceKey,
   SetBrcCoinsListKey,
   SetBtcWalletDataKey,
   SetCoinDataKey,
   SetCoinRatesKey,
   SetFeeMultiplierKey,
   SetStxWalletDataKey,
+  SetWalletHideStxKey,
   SetWalletKey,
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
@@ -99,6 +102,8 @@ export const initialWalletState: WalletState = {
   accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
+  hideStx: false,
+  accountBalances: {},
 };
 
 const walletReducer = (
@@ -153,6 +158,15 @@ const walletReducer = (
         network: action.network,
         accountType: action.accountType,
         accountName: action.accountName,
+        btcBalance: '',
+        stxBalance: '',
+        stxAvailableBalance: '',
+        coinsList: state.coinsList
+          ? state.coinsList.map((coin) => ({ ...coin, balance: '0' }))
+          : [],
+        brcCoinsList: state.brcCoinsList
+          ? state.brcCoinsList.map((coin) => ({ ...coin, balance: '0' }))
+          : [],
       };
     case StoreEncryptedSeedKey:
       return {
@@ -262,6 +276,25 @@ const walletReducer = (
       return {
         ...state,
         isUnlocked: action.isUnlocked,
+      };
+    case RenameAccountKey:
+      return {
+        ...state,
+        accountsList: action.accountsList,
+        selectedAccount: action.selectedAccount,
+      };
+    case SetAccountBalanceKey:
+      return {
+        ...state,
+        accountBalances: {
+          ...state.accountBalances,
+          [action.btcAddress]: action.totalBalance,
+        },
+      };
+    case SetWalletHideStxKey:
+      return {
+        ...state,
+        hideStx: action.hideStx,
       };
     default:
       return state;

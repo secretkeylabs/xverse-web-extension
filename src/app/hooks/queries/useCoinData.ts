@@ -8,7 +8,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { setCoinDataAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
-import { handleRetries, InvalidParamsError } from '@utils/query';
+import { InvalidParamsError, handleRetries } from '@utils/query';
 import { useDispatch } from 'react-redux';
 
 export const useCoinsData = () => {
@@ -22,7 +22,7 @@ export const useCoinsData = () => {
         throw new InvalidParamsError('No stx address');
       }
 
-      const fungibleTokenList: Array<FungibleToken> = await getFtData(
+      const fungibleTokenList: FungibleToken[] = await getFtData(
         stxAddress,
         currentNetworkInstance,
       );
@@ -44,11 +44,9 @@ export const useCoinsData = () => {
         });
       }
 
-      const contractids: string[] = [];
       // getting contract ids of all fts
-      fungibleTokenList.forEach((ft) => {
-        contractids.push(ft.principal);
-      });
+      const contractids: string[] = fungibleTokenList.map((ft) => ft.principal);
+
       let coinsResponse = await getCoinsInfo(network.type, contractids, fiatCurrency);
       if (!coinsResponse) {
         coinsResponse = await getCoinMetaData(contractids, currentNetworkInstance);

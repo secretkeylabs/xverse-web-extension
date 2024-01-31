@@ -600,7 +600,7 @@ function OrdinalDetailScreen() {
   const satributesIcons = showSatributes && (
     <SatributesIconsContainer isGallery={isGalleryOpen}>
       {ordinalSatributes.map((satribute) => (
-        <RareSatIcon key={satribute} type={satribute} />
+        <RareSatIcon key={satribute} type={satribute} size={24} />
       ))}
     </SatributesIconsContainer>
   );
@@ -618,7 +618,7 @@ function OrdinalDetailScreen() {
               backgroundColor={backgroundColor}
               isLastItem={index + 1 >= ordinalSatributes.length}
             >
-              <RareSatIcon key={satribute} type={satribute} />
+              <RareSatIcon key={satribute} type={satribute} size={24} />
               <SatributeBadgeLabel typography="body_medium_m">
                 {getRareSatsLabelByType(satribute)}
               </SatributeBadgeLabel>
@@ -819,7 +819,7 @@ function OrdinalDetailScreen() {
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow title="" onClick={handleBackButtonClick} />
+        <TopRow onClick={handleBackButtonClick} />
       )}
       {showSendOridnalsAlert && (
         <AlertMessage

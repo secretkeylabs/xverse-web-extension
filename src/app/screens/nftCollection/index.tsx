@@ -192,7 +192,7 @@ function NftCollection() {
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow title="" onClick={handleBackButtonClick} />
+        <TopRow onClick={handleBackButtonClick} />
       )}
       <Container>
         <PageHeader isGalleryOpen={isGalleryOpen}>

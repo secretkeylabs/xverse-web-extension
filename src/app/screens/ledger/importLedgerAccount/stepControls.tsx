@@ -143,7 +143,7 @@ function StepControls({
     case ImportLedgerSteps.ADD_ACCOUNT_NAME:
       return (
         <ActionButton
-          disabled={isButtonDisabled || !!accountNameError}
+          disabled={isButtonDisabled}
           processing={isButtonDisabled}
           onPress={updateAccountName}
           text={t('LEDGER_IMPORT_CONFIRM_BUTTON')}

@@ -5,61 +5,43 @@ import ThreeDPali from '@assets/img/nftDashboard/rareSats/3Dpali.png';
 import Alpha from '@assets/img/nftDashboard/rareSats/alpha.png';
 import Block78 from '@assets/img/nftDashboard/rareSats/b78.png';
 import Block9 from '@assets/img/nftDashboard/rareSats/b9.png';
-import BlackEpic from '@assets/img/nftDashboard/rareSats/black_epic.svg';
-import BlackLegendary from '@assets/img/nftDashboard/rareSats/black_legendary.svg';
-import BlackRare from '@assets/img/nftDashboard/rareSats/black_rare.svg';
-import BlackUncommon from '@assets/img/nftDashboard/rareSats/black_uncommon.svg';
-import Epic from '@assets/img/nftDashboard/rareSats/epic.svg';
+import BlackEpic from '@assets/img/nftDashboard/rareSats/black_epic.png';
+import BlackLegendary from '@assets/img/nftDashboard/rareSats/black_legendary.png';
+import BlackRare from '@assets/img/nftDashboard/rareSats/black_rare.png';
+import BlackUncommon from '@assets/img/nftDashboard/rareSats/black_uncommon.png';
+import Epic from '@assets/img/nftDashboard/rareSats/epic.png';
 import FibonacciSequence from '@assets/img/nftDashboard/rareSats/fibonacci.png';
 import Hitman from '@assets/img/nftDashboard/rareSats/hitman.png';
 import Jpeg from '@assets/img/nftDashboard/rareSats/jpeg.png';
-import Legendary from '@assets/img/nftDashboard/rareSats/legendary.svg';
-import Mythic from '@assets/img/nftDashboard/rareSats/mythic.svg';
+import Legendary from '@assets/img/nftDashboard/rareSats/legendary.png';
+import Mythic from '@assets/img/nftDashboard/rareSats/mythic.png';
 import Nakamoto from '@assets/img/nftDashboard/rareSats/nakamoto.png';
 import Omega from '@assets/img/nftDashboard/rareSats/omega.png';
 import Palindrome from '@assets/img/nftDashboard/rareSats/pali.png';
 import BlockPali from '@assets/img/nftDashboard/rareSats/paliblock.png';
 import Palinception from '@assets/img/nftDashboard/rareSats/perfectpaliception.png';
 import Pizza from '@assets/img/nftDashboard/rareSats/pizza.png';
-import Rare from '@assets/img/nftDashboard/rareSats/rare.svg';
+import Rare from '@assets/img/nftDashboard/rareSats/rare.png';
 import SequencePali from '@assets/img/nftDashboard/rareSats/seqpali.png';
 import SilkRoad from '@assets/img/nftDashboard/rareSats/silkroad.png';
-import Uncommon from '@assets/img/nftDashboard/rareSats/uncommon.svg';
-import Unknown from '@assets/img/nftDashboard/rareSats/unknown.svg';
+import Uncommon from '@assets/img/nftDashboard/rareSats/uncommon.png';
+import Unknown from '@assets/img/nftDashboard/rareSats/unknown.png';
 import Vintage from '@assets/img/nftDashboard/rareSats/vintage.png';
 import { RareSatsType } from '@secretkeylabs/xverse-core';
 import styled from 'styled-components';
-import Theme from '../../../theme';
 
-const Container = styled.div<{ bgColor: string; padding: number }>((props) => ({
-  backgroundColor: props.bgColor,
-  padding: props.padding,
-  borderRadius: props.bgColor && props.padding ? '100%' : 0,
-}));
-const ImageContainer = styled.div<{ size: number; dynamicSize: boolean }>((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: props.dynamicSize ? '100%' : props.size,
-  height: props.dynamicSize ? '100%' : props.size,
-  position: 'relative',
-}));
-const Image = styled.img`
-  width: 100%;
-  height: 100%;
-  zindex: 2;
+const Image = styled.img<{ size?: number }>`
   object-fit: cover;
+  width: ${(props) => `${props.size}px` ?? '100%'};
+  height: ${(props) => `${props.size}px` ?? '100%'};
 `;
 
 interface Props {
   type: RareSatsType;
   size?: number;
-  bgColor?: keyof (typeof Theme)['colors']['background'];
-  padding?: number;
-  isDynamicSize?: boolean;
 }
 
-function RareSatIcon({ type, size = 24, bgColor, padding = 0, isDynamicSize = false }: Props) {
+function RareSatIcon({ type, size }: Props) {
   const src = {
     EPIC: Epic,
     LEGENDARY: Legendary,
@@ -95,14 +77,7 @@ function RareSatIcon({ type, size = 24, bgColor, padding = 0, isDynamicSize = fa
   if (!src) {
     return null;
   }
-  const backgroundColor = bgColor ? Theme.colors.background[bgColor] : 'transparent';
-  return (
-    <Container bgColor={backgroundColor} padding={padding}>
-      <ImageContainer size={size} dynamicSize={isDynamicSize}>
-        <Image src={src} alt={type} />
-      </ImageContainer>
-    </Container>
-  );
+  return <Image src={src} alt={type} size={size} />;
 }
 
 export default RareSatIcon;

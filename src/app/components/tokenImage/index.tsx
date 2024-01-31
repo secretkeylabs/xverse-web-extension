@@ -1,5 +1,5 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import BarLoader from '@components/barLoader';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 import { LoaderSize } from '@utils/constants';
@@ -17,10 +17,10 @@ export interface TokenImageProps {
   round?: boolean;
 }
 
-const TickerImage = styled.img<{ size?: number; round?: boolean }>((props) => ({
+const TickerImage = styled.img<{ size?: number }>((props) => ({
   height: props.size ?? 44,
   width: props.size ?? 44,
-  borderRadius: props.round ? '50%' : 'none',
+  borderRadius: '50%',
 }));
 
 const LoaderImageContainer = styled.div({
@@ -33,7 +33,7 @@ const TickerIconContainer = styled.div<{ size?: number; round?: boolean }>((prop
   justifyContent: 'center',
   height: props.size ?? 44,
   width: props.size ?? 44,
-  borderRadius: props.round ? '50%' : props.theme.radius(2),
+  borderRadius: '50%',
   backgroundColor: props.color,
 }));
 
@@ -85,5 +85,5 @@ export default function TokenImage({
       </LoaderImageContainer>
     );
   }
-  return <TickerImage size={size} src={getCoinIcon()} round={round} />;
+  return <TickerImage size={size} src={getCoinIcon()} />;
 }

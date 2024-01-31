@@ -1,5 +1,5 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import IconStacks from '@assets/img/dashboard/stack_icon.svg';
+import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import BottomModal from '@components/bottomModal';
 import TokenTile from '@components/tokenTile';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -35,7 +35,7 @@ function CoinSelectModal({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const theme = useTheme();
-  const { btcAddress, stxAddress } = useWalletSelector();
+  const { btcAddress, stxAddress, hideStx } = useWalletSelector();
   const handleOnBitcoinPress = () => {
     onSelectBitcoin?.();
     onClose();
@@ -61,7 +61,7 @@ function CoinSelectModal({
             onPress={handleOnBitcoinPress}
           />
         )}
-        {stxAddress && (
+        {stxAddress && !hideStx && (
           <TokenTile
             title={t('STACKS')}
             currency="STX"

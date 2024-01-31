@@ -18,8 +18,8 @@ if cat releases.json | jq '.[].tag_name' | grep $TAG; then
     echo $TAG was already released
     exit 1;
   elif [[ -n "$LATEST_RC" ]]; then
-    ((LATEST_RC++))
-    NEXT_TAG="$TAG-rc.$LATEST_RC"
+    echo incrementing rc
+    NEXT_TAG="$TAG-rc.$((LATEST_RC+1))"
   fi
 else
   echo no releases matching $TAG yet

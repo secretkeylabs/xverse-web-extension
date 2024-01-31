@@ -213,6 +213,7 @@ function SpeedUpTransactionScreen() {
       const signedTx = await rbfTransaction.getReplacementTransaction({
         feeRate: Number(feeRateInput),
         ledgerTransport: transport,
+        getSeedPhrase: getSeed,
       });
 
       await btcClient.sendRawTransaction(signedTx.hex);
@@ -356,7 +357,7 @@ function SpeedUpTransactionScreen() {
 
   return (
     <>
-      <TopRow title="" onClick={handleGoBack} />
+      <TopRow onClick={handleGoBack} />
       {isLoading ? (
         <LoaderContainer>
           <MoonLoader color="white" size={30} />

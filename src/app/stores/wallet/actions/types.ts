@@ -37,6 +37,9 @@ export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
 export const SetBrcCoinsListKey = 'SetBrcCoinsList';
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
+export const RenameAccountKey = 'RenameAccountKey';
+export const SetAccountBalanceKey = 'SetAccountBalanceKey';
+export const SetWalletHideStxKey = 'SetWalletHideStx';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -82,6 +85,10 @@ export interface WalletState {
   accountName: string | undefined;
   walletLockPeriod: WalletSessionPeriods;
   isUnlocked: boolean;
+  accountBalances: {
+    [key: string]: string;
+  };
+  hideStx: boolean;
 }
 
 export interface SetWallet {
@@ -224,6 +231,24 @@ export interface SetWalletUnlocked {
   type: typeof SetWalletUnlockedKey;
   isUnlocked: boolean;
 }
+
+export interface RenameAccount {
+  type: typeof RenameAccountKey;
+  accountsList: Account[];
+  selectedAccount: Account | null;
+}
+
+export interface SetAccountBalance {
+  type: typeof SetAccountBalanceKey;
+  btcAddress: string;
+  totalBalance: string;
+}
+
+export interface SetWalletHideStx {
+  type: typeof SetWalletHideStxKey;
+  hideStx: boolean;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -250,4 +275,7 @@ export type WalletActions =
   | SetBrcCoinsData
   | SetWalletLockPeriod
   | SetRareSatsNoticeDismissed
-  | SetWalletUnlocked;
+  | SetWalletUnlocked
+  | RenameAccount
+  | SetAccountBalance
+  | SetWalletHideStx;

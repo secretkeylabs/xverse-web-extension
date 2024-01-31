@@ -1,6 +1,7 @@
 import { BetterBarLoader } from '@components/barLoader';
+import { StyledFiatAmountText } from '@components/fiatAmountText';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
-import { currencySymbolMap, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
+import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import { CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';
@@ -38,6 +39,7 @@ const TickerImage = styled.img<TickerProps>((props) => ({
   transform: 'all',
   height: props.enlargeTicker ? 40 : 32,
   width: props.enlargeTicker ? 40 : 32,
+  borderRadius: '50%',
 }));
 
 const TickerIconContainer = styled.div<TickerProps>((props) => ({
@@ -47,12 +49,12 @@ const TickerIconContainer = styled.div<TickerProps>((props) => ({
   height: props.enlargeTicker ? 40 : 32,
   width: props.enlargeTicker ? 40 : 32,
   marginRight: props.theme.spacing(3),
-  borderRadius: props.theme.radius(2),
+  borderRadius: '50%',
   backgroundColor: props.color,
 }));
 
 const TickerIconText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
@@ -72,7 +74,9 @@ const TextContainer = styled.div((props) => ({
 }));
 
 const AmountContainer = styled.div({
-  alignContent: 'flex-end',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
 });
 
 const LoaderMainContainer = styled.div({
@@ -90,7 +94,7 @@ const LoaderImageContainer = styled.div((props) => ({
 }));
 
 const CoinTickerText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_0,
 }));
 
@@ -104,15 +108,8 @@ const SubText = styled.h1((props) => ({
   textOverflow: 'ellipsis',
 }));
 
-const FiatAmountText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white_400,
-  fontSize: 12,
-  textAlign: 'end',
-}));
-
 const CoinBalanceText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   textAlign: 'end',
 }));
@@ -191,107 +188,21 @@ function TokenTile({
     }
   }
 
-  const renderStxBalanceView = (
-    <NumericFormat
-      value={getBalanceAmount()}
-      displayType="text"
-      thousandSeparator
-      renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
-    />
-  );
-
-  const renderBtcBalanceView = (
-    <NumericFormat
-      value={getBalanceAmount()}
-      displayType="text"
-      thousandSeparator
-      renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
-    />
-  );
-
-  const renderFtBalanceView = (
-    <NumericFormat
-      value={getBalanceAmount()}
-      displayType="text"
-      thousandSeparator
-      renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
-    />
-  );
-
-  function getBalance() {
-    if (currency === 'STX') return renderStxBalanceView;
-    if (currency === 'BTC') return renderBtcBalanceView;
-    return renderFtBalanceView;
-  }
-
-  function getFtFiatEquivalent() {
-    if (fungibleToken?.tokenFiatRate) {
-      const balance = new BigNumber(getFtBalance(fungibleToken));
-      const rate = new BigNumber(fungibleToken.tokenFiatRate);
-      return balance.multipliedBy(rate).toFixed(2).toString();
-    }
-    return '';
-  }
-
-  function getFiatEquivalent() {
+  function getFiatEquivalent(): BigNumber | undefined {
     switch (currency) {
       case 'STX':
         return microstacksToStx(new BigNumber(stxBalance))
-          .multipliedBy(new BigNumber(stxBtcRate))
-          .multipliedBy(new BigNumber(btcFiatRate))
-          .toFixed(2)
-          .toString();
+          .multipliedBy(stxBtcRate)
+          .multipliedBy(btcFiatRate);
       case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance))
-          .multipliedBy(new BigNumber(btcFiatRate))
-          .toFixed(2)
-          .toString();
+        return satsToBtc(new BigNumber(btcBalance)).multipliedBy(btcFiatRate);
       case 'FT':
-        return getFtFiatEquivalent();
+      case 'brc20':
+        return fungibleToken?.tokenFiatRate
+          ? new BigNumber(getFtBalance(fungibleToken)).multipliedBy(fungibleToken.tokenFiatRate)
+          : undefined;
       default:
-        return '';
-    }
-  }
-
-  function renderFiatEquivalentView() {
-    switch (currency) {
-      case 'STX':
-        return (
-          <NumericFormat
-            value={getFiatEquivalent()}
-            displayType="text"
-            thousandSeparator
-            prefix={`${currencySymbolMap[fiatCurrency]} `}
-            suffix={` ${fiatCurrency}`}
-            renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
-          />
-        );
-      case 'BTC':
-        return (
-          <NumericFormat
-            value={getFiatEquivalent()}
-            displayType="text"
-            thousandSeparator
-            prefix={`${currencySymbolMap[fiatCurrency]} `}
-            suffix={` ${fiatCurrency}`}
-            renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
-          />
-        );
-      case 'FT':
-        if (fungibleToken?.tokenFiatRate) {
-          return (
-            <NumericFormat
-              value={getFiatEquivalent()}
-              displayType="text"
-              thousandSeparator
-              prefix={`${currencySymbolMap[fiatCurrency]} `}
-              suffix={` ${fiatCurrency}`}
-              renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
-            />
-          );
-        }
-        break;
-      default:
+        return undefined;
     }
   }
 
@@ -330,7 +241,7 @@ function TokenTile({
     onPress({
       coin: currency as CurrencyTypes,
       ft: fungibleToken && fungibleToken.principal,
-      brc20Ft: !fungibleToken?.principal ? fungibleToken?.name : undefined,
+      brc20Ft: currency === 'brc20' ? fungibleToken?.principal : undefined,
     });
   };
 
@@ -354,8 +265,13 @@ function TokenTile({
         <TokenLoader />
       ) : (
         <AmountContainer>
-          {getBalance()}
-          {renderFiatEquivalentView()}
+          <NumericFormat
+            value={getBalanceAmount()}
+            displayType="text"
+            thousandSeparator
+            renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
+          />
+          <StyledFiatAmountText fiatAmount={getFiatEquivalent()} fiatCurrency={fiatCurrency} />
         </AmountContainer>
       )}
     </TileContainer>
