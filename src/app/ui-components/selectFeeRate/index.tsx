@@ -1,4 +1,4 @@
-import { Pencil } from '@phosphor-icons/react';
+import { PencilSimple } from '@phosphor-icons/react';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +40,18 @@ const Label = styled.span<{
   &:hover {
     color: ${props.theme.colors.tangerine_200};
   }`}
+
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+`;
+
+const EditRow = styled.span`
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
 `;
 
 type Props = {
@@ -113,7 +125,7 @@ function SelectFeeRate({
         />
       </RowContainer>
       <RowContainer>
-        <div>
+        <EditRow>
           <Label $size="m" $variant="dark">
             {feeRateSpeed}{' '}
           </Label>
@@ -123,9 +135,9 @@ function SelectFeeRate({
             $clickable={!isLoading}
             onClick={() => setEditing((cur) => !cur)}
           >
-            {t('COMMON.EDIT')} <Pencil />
+            {t('COMMON.EDIT')} <PencilSimple size={16} weight="fill" />
           </Label>
-        </div>
+        </EditRow>
         <Label $size="s" $variant="dark">
           <NumericFormat
             value={feeRate}
