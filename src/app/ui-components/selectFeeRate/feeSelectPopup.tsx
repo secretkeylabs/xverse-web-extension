@@ -214,6 +214,15 @@ function FeeSelectPopup({
           ? t('SEND.RATE_TOO_HIGH', { maxFee: feeRateLimits?.max })
           : undefined;
 
+      const inputFeedback = errorText
+        ? [
+            {
+              variant: 'danger' as const,
+              message: errorText,
+            },
+          ]
+        : [];
+
       return (
         <>
           <Input
@@ -221,6 +230,7 @@ function FeeSelectPopup({
             value={customValue}
             placeholder="0"
             complications={feeRateUnits}
+            feedback={inputFeedback}
             hideClear
           />
           <SummaryContainer>
@@ -250,11 +260,6 @@ function FeeSelectPopup({
             )}
             {isCalculatingTotalFee && <Spinner />}
           </SummaryContainer>
-          {errorText && (
-            <StyledP typography="body_medium_m" color="danger_light">
-              {errorText}
-            </StyledP>
-          )}
           <Buttons>
             <Button
               title={t('COMMON.BACK')}

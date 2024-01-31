@@ -188,6 +188,8 @@ function Input({
     onChange({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
   };
 
+  const displayVariant = feedback?.some((f) => f.variant === 'danger') ? 'danger' : variant;
+
   return (
     <Container className={className}>
       {(title || infoPanel) && (
@@ -198,7 +200,7 @@ function Input({
       )}
       <InputContainer>
         <InputField
-          className={variant}
+          className={displayVariant}
           ref={inputRef}
           type={type}
           value={value}
