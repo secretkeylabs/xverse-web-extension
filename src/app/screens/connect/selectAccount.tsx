@@ -17,17 +17,17 @@ const AccountInfoContainer = styled.button((props) => ({
   padding: props.theme.space.m,
 }));
 
-const CurrentAccountContainer = styled.div((props) => ({
+const CurrentAccountContainer = styled.div({
   display: 'flex',
   alignItems: 'center',
-}));
+});
 
 const CurrentAccountTextContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   gap: props.theme.spacing(4),
-  paddingLeft: props.theme.spacing(4),
+  paddingLeft: props.theme.space.xs,
 }));
 
 const CurrentSelectedAccountText = styled.h1((props) => ({
@@ -48,6 +48,11 @@ const GradientCircle = styled.div<GradientCircleProps>((props) => ({
   background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
 }));
 
+const AccountTag = styled.div(() => ({
+  display: 'flex',
+  alignItems: 'center',
+}));
+
 const SwitchAccountContainer = styled.div(() => ({
   display: 'flex',
   alignItems: 'center',
@@ -66,28 +71,37 @@ type SelectAccountProps = {
 
 function SelectAccount({ account, handlePressAccount }: SelectAccountProps) {
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
-  // const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const theme = useTheme();
-  const getName = () =>
-    account?.accountName ??
-    account?.bnsName ??
-    `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
+  const getName = () => {
+    const maxNameCharacters = isHardwareAccount(account) || account.bnsName ? 12 : 20;
+    const maxLength =
+      account?.accountName && account?.accountName?.length > maxNameCharacters ? '...' : '';
+    if (account.accountName) {
+      return `${account?.accountName?.slice(0, maxNameCharacters)}${maxLength}`;
+    }
+    if (account.bnsName) {
+      return `${account.bnsName.slice(0, maxNameCharacters)}${maxLength}`;
+    }
+    return `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
+  };
 
   return (
     <AccountInfoContainer onClick={handlePressAccount}>
       <CurrentAccountContainer>
-        <GradientCircle
-          firstGradient={gradient[0]}
-          secondGradient={gradient[1]}
-          thirdGradient={gradient[2]}
-        />
-        {account && (
-          <CurrentAccountTextContainer>
-            <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
-            {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
-          </CurrentAccountTextContainer>
-        )}
+        <AccountTag>
+          <GradientCircle
+            firstGradient={gradient[0]}
+            secondGradient={gradient[1]}
+            thirdGradient={gradient[2]}
+          />
+          {account && (
+            <CurrentAccountTextContainer>
+              <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+              {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+            </CurrentAccountTextContainer>
+          )}
+        </AccountTag>
       </CurrentAccountContainer>
       <SwitchAccountContainer>
         <SwitchAccountText>{t('CHANGE_ACCOUNT_BUTTON')}</SwitchAccountText>
