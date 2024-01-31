@@ -1,4 +1,4 @@
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 
 type StyleProps = {
   size?: number;
@@ -42,13 +42,12 @@ type Props = StyleProps & {
 };
 
 function Spinner({ className, size = 14, width = 1.5, color }: Props) {
-  const theme = useTheme();
   return (
     <SpinnerElement
       className={className}
       $size={size}
       $width={width}
-      $color={color ?? theme.colors.white_0}
+      $color={color ?? 'currentColor'}
     />
   );
 }
