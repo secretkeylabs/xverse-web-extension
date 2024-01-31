@@ -30,44 +30,33 @@ const InputContainer = styled.div`
   position: relative;
 `;
 
-const InputField = styled.input<{ $variant: InputVariant }>`
+const InputField = styled.input`
   ${(props) => props.theme.typography.body_medium_m}
 
   width: 100%;
 
   color: ${(props) => props.theme.colors.white_200};
   background-color: ${(props) => props.theme.colors.elevation_n1};
-  padding: ${(props) => props.theme.spacing(5)}px ${(props) => props.theme.spacing(8)}px;
+  padding: ${(props) => props.theme.spacing(5)}px ${(props) => props.theme.space.m};
   border-radius: 8px;
 
   caret-color: ${(props) => props.theme.colors.tangerine};
 
-  ${(props) => {
-    switch (props.$variant) {
-      case 'danger':
-        return `
-          border: 1px solid ${props.theme.colors.danger_dark_200};
-        `;
-      default:
-        return `
-          border: 1px solid ${props.theme.colors.white_800};
-        `;
-    }
-  }}
+  border: 1px solid ${(props) => props.theme.colors.white_800};
+  &:focus:enabled {
+    border: 1px solid ${(props) => props.theme.colors.white_600};
+  }
 
-  &:focus {
-    ${(props) => {
-      switch (props.$variant) {
-        case 'danger':
-          return `
-            border: 1px solid ${props.theme.colors.danger_dark_200};
-          `;
-        default:
-          return `
-            border: 1px solid ${props.theme.colors.white_600};
-          `;
-      }
-    }}
+  &:disabled {
+    border: 1px solid ${(props) => props.theme.colors.white_900};
+    cursor: not-allowed;
+  }
+
+  &.danger:enabled {
+    border: 1px solid ${(props) => props.theme.colors.danger_dark_200};
+    :focus {
+      border: 1px solid ${(props) => props.theme.colors.danger_dark_200};
+    }
   }
 
   ::placeholder {
@@ -209,6 +198,7 @@ function Input({
       )}
       <InputContainer>
         <InputField
+          className={variant}
           ref={inputRef}
           type={type}
           value={value}
@@ -216,7 +206,6 @@ function Input({
           onBlur={onBlur}
           placeholder={placeholder}
           disabled={disabled}
-          $variant={variant}
         />
         <ComplicationsContainer ref={complicationsRef}>
           {!hideClear && value && (
