@@ -53,6 +53,8 @@ export default function CustomFee({
   const { t } = useTranslation('translation', {
     keyPrefix: 'TRANSACTION_SETTING',
   });
+  const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
+
   const { btcFiatRate, stxBtcRate, fiatCurrency } = useWalletSelector();
   const [feeRateInput, setFeeRateInput] = useState(feeRate || minimumFeeRate);
   const [totalFee, setTotalFee] = useState(fee || initialTotalFee);
@@ -103,7 +105,7 @@ export default function CustomFee({
             />
             <InputLabel>
               {isBtc ? (
-                'Sats /vB'
+                tUnits('SATS_PER_VB')
               ) : (
                 <StyledFiatAmountText fiatAmount={fiatFee} fiatCurrency={fiatCurrency} />
               )}

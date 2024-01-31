@@ -236,6 +236,8 @@ const MAX_REPEATS = 24;
 
 function CreateInscription() {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
+  const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
+
   const { search } = useLocation();
 
   const [payload, requestToken, tabId, origin] = useMemo(() => {
@@ -560,7 +562,7 @@ function CreateInscription() {
                   value={feeRate}
                   displayType="text"
                   thousandSeparator
-                  suffix=" sats/vB"
+                  suffix={` ${tUnits('SATS_PER_VB')}`}
                   renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
                 />
                 <NumericFormat

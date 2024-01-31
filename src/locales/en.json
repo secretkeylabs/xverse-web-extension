@@ -15,6 +15,9 @@
     "CONFIRM": "Confirm",
     "APPLY": "Apply"
   },
+  "UNITS": {
+    "SATS_PER_VB": "sats/vByte"
+  },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
     "CREATE_WALLET_BUTTON": "Create Wallet",

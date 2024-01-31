@@ -158,6 +158,7 @@ export function EditFees({
   error: string;
 }) {
   const { t } = useTranslation('translation');
+
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
   const { data: feeRates } = useBtcFeeRate();
 
@@ -236,7 +237,7 @@ export function EditFees({
               onKeyDown={handleKeyDownFeeRateInput}
               onChange={handleChangeFeeRateInput}
             />
-            <FeeText>sats /vB</FeeText>
+            <FeeText>{t('UNITS.SATS_PER_VB')}</FeeText>
             <TickerContainer>
               {isFeeLoading ? (
                 <>

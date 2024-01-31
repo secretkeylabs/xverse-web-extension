@@ -178,6 +178,7 @@ function EditBtcFee({
   feeOptionSelected,
 }: Props) {
   const { t } = useTranslation('translation');
+
   const { network, btcAddress, btcFiatRate, fiatCurrency, selectedAccount, ordinalsAddress } =
     useWalletSelector();
   const [totalFee, setTotalFee] = useState(fee);
@@ -389,7 +390,7 @@ function EditBtcFee({
               value={feeRateInput?.toString()}
               onChange={onInputEditFeesChange}
             />
-            <FeeText>Sats /vByte</FeeText>
+            <FeeText>{t('UNITS.SATS_PER_VB')}</FeeText>
           </InputContainer>
           <CustomTextsContainer>
             <Row>

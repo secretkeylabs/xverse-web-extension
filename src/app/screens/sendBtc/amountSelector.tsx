@@ -59,6 +59,7 @@ function AmountSelector({
   header,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
   const navigate = useNavigate();
 
   const { btcFiatRate, fiatCurrency, btcBalance } = useWalletSelector();
@@ -85,7 +86,7 @@ function AmountSelector({
               fee={fee}
               feeUnits="Sats"
               feeRate={feeRate}
-              feeRateUnits="sats/vB"
+              feeRateUnits={tUnits('SATS_PER_VB')}
               setFeeRate={setFeeRate}
               baseToFiat={satsToFiat}
               fiatUnit={fiatCurrency}

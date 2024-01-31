@@ -68,6 +68,8 @@ function TransactionSummary({
   const { network, fiatCurrency, btcFiatRate } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: rareSatsT } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
+  const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
+
   const { btcAddress, ordinalsAddress } = useWalletSelector();
   const { data: recommendedFees } = useBtcFeeRate();
 
@@ -163,7 +165,7 @@ function TransactionSummary({
             fee={feeOutput.amount.toString()}
             feeUnits="Sats"
             feeRate={feeRate.toString()}
-            feeRateUnits="sats/vB"
+            feeRateUnits={tUnits('SATS_PER_VB')}
             setFeeRate={(newFeeRate) => onFeeRateSet(+newFeeRate)}
             baseToFiat={satsToFiat}
             fiatUnit={fiatCurrency}
