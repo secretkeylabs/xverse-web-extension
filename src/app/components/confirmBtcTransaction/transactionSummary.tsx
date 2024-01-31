@@ -98,7 +98,7 @@ function TransactionSummary({
   const showInscribeRareSatWarning = paymentHasInscribedRareSats || feesHaveInscribedRareSats;
 
   const satsToFiat = (sats: string) =>
-    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
+    getBtcFiatEquivalent(new BigNumber(sats), new BigNumber(btcFiatRate)).toNumber().toFixed(2);
 
   const showFeeSelector = !!(feeRate && getFeeForFeeRate && onFeeRateSet);
 
