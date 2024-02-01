@@ -158,6 +158,15 @@ const walletReducer = (
         network: action.network,
         accountType: action.accountType,
         accountName: action.accountName,
+        btcBalance: '',
+        stxBalance: '',
+        stxAvailableBalance: '',
+        coinsList: state.coinsList
+          ? state.coinsList.map((coin) => ({ ...coin, balance: '0' }))
+          : [],
+        brcCoinsList: state.brcCoinsList
+          ? state.brcCoinsList.map((coin) => ({ ...coin, balance: '0' }))
+          : [],
       };
     case StoreEncryptedSeedKey:
       return {

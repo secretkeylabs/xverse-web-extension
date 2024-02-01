@@ -2,7 +2,6 @@ import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareS
 import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useCollectionMarketData';
 import useAddressInscription from '@hooks/queries/ordinals/useInscription';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
@@ -24,8 +23,7 @@ export default function useOrdinalDetail() {
   const { ordinalsAddress, network, selectedAccount, hasActivatedRareSatsKey } =
     useWalletSelector();
   const { id } = useParams();
-  const { selectedOrdinal } = useNftDataSelector();
-  const { data: ordinalData, isLoading } = useAddressInscription(id!, selectedOrdinal);
+  const { data: ordinalData, isLoading } = useAddressInscription(id!);
   const { data: collectionMarketData } = useInscriptionCollectionMarketData(
     ordinalData?.collection_id,
   );
