@@ -7,10 +7,10 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
 import SelectAccount from '@screens/connect/selectAccount';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
+import Spinner from '@ui-library/spinner';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MoonLoader } from 'react-spinners';
 import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
 import AddressPurposeBox from '../addressPurposeBox';
@@ -196,7 +196,7 @@ function BtcSelectAddressScreen() {
 
   return isLoadingIcon ? (
     <LoaderContainer>
-      <MoonLoader color="white" size={50} />
+      <Spinner color="white" size={50} />
     </LoaderContainer>
   ) : (
     <OuterContainer>
