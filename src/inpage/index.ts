@@ -10,8 +10,15 @@ declare global {
   }
 }
 // we inject these in case implementors call the default providers
-window.StacksProvider = StacksMethodsProvider as StacksProvider;
-window.BitcoinProvider = SatsMethodsProvider as BitcoinProvider;
+if (document.currentScript?.dataset.isPriority) {
+  Object.defineProperties(window, {
+    StacksProvider: { get: () => StacksMethodsProvider, set: () => {} },
+    BitcoinProvider: { get: () => SatsMethodsProvider, set: () => {} },
+  });
+} else {
+  window.StacksProvider = StacksMethodsProvider as StacksProvider;
+  window.BitcoinProvider = SatsMethodsProvider;
+}
 
 // We also inject the providers in an Xverse object in order to have them exclusively available for Xverse wallet
 // and not clash with providers from other wallets
