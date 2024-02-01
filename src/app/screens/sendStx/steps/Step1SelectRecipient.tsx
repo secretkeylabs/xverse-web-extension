@@ -31,6 +31,10 @@ const MemoInput = styled(Input)`
   }
 `;
 
+const RecipientInput = styled(Input)`
+  min-height: 125px;
+`;
+
 interface InputFeedback {
   variant: FeedbackVariant;
   message: string;
@@ -50,14 +54,14 @@ function Step1SelectRecipient({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { stxAddress } = useWalletSelector();
   const [inputFeedback, setInputFeedback] = useState<InputFeedback[] | undefined>();
-  const [recipient, setRecipient] = useState('');
+  const [recipient, setRecipient] = useState(recipientAddress);
 
   const debouncedSearchTerm = useDebounce(recipient, 300);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress, 'STX');
   const associatedDomain = useBnsName(debouncedSearchTerm);
 
   useEffect(() => {
-    setRecipientAddress('');
+    setRecipientAddress(recipientAddress);
     setInputFeedback(undefined);
 
     if (associatedAddress !== '') {
@@ -109,7 +113,7 @@ function Step1SelectRecipient({
 
   const inputElement = (
     <>
-      <Input
+      <RecipientInput
         title={t('RECIPIENT')}
         placeholder={t('RECIPIENT_PLACEHOLDER')}
         value={recipient}

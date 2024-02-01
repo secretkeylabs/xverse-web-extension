@@ -1,19 +1,15 @@
 import TokenImage from '@components/tokenImage';
-import {
-  generateUnsignedStxTokenTransferTransaction,
-  stxToMicrostacks,
-} from '@secretkeylabs/xverse-core';
-import { StacksTransaction } from '@stacks/transactions';
+
 import { isInOptions } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
-import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Step, getNextStep, getPreviousStep } from './stepResolver';
 import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipient';
 import Step2SelectAmount from './steps/Step2SelectAmount';
+import Step3Confirm from './steps/Step3Confirm';
 
 const Container = styled.div`
   display: flex;
@@ -40,27 +36,15 @@ function SendStxScreen() {
   const [currentStep, setCurrentStep] = useState<Step>(0);
   const { t } = useTranslation('translation');
 
+  const location = useLocation();
+  const { recipientAddress: stateAddress, amountToSend, stxMemo } = location.state || {};
   // Step 1 states
-  const [recipientAddress, setRecipientAddress] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState(stateAddress ?? '');
   const [recipientDomain, setRecipientDomain] = useState('');
-  const [memo, setMemo] = useState('');
+  const [memo, setMemo] = useState(stxMemo ?? '');
 
   // Step 2 states
-  const [amount, setAmount] = useState('0');
-
-  // Step 3 logic
-
-  async function send() {
-    const unsignedSendStxTx: StacksTransaction = await generateUnsignedStxTokenTransferTransaction(
-      recipientAddress,
-      stxToMicrostacks(new BigNumber(amount)).toString(),
-      memo,
-      stxPendingTxData?.pendingTransactions ?? [],
-      stxPublicKey,
-      selectedNetwork,
-    );
-    applyFeeMultiplier(unsignedSendStxTx, feeMultipliers);
-  }
+  const [amount, setAmount] = useState(amountToSend ?? '0');
 
   const handleCancel = () => {
     if (isInOption) {
@@ -126,6 +110,8 @@ function SendStxScreen() {
           </Container>
         </SendLayout>
       );
+    case Step.Confirm:
+      return <Step3Confirm recipientAddress={recipientAddress} amount={amount} memo={memo} />;
     default:
       throw new Error(`Unknown step: ${currentStep}`);
   }
