@@ -34,9 +34,11 @@ const useAccountBalance = () => {
   const fetchBrcCoinsBalances = async (ordinalsAddress: string) => {
     try {
       const ordinalsFtBalance = await getOrdinalsFtBalance(network.type, ordinalsAddress);
+      const tickers = ordinalsFtBalance?.map((o) => o.ticker!) ?? [];
       const brc20Tokens = await getBrc20Tokens(
         network.type,
-        ordinalsFtBalance?.map((o) => o.ticker!) ?? [],
+        // workaround for brc20 tokens not being returned
+        tickers.length ? tickers : ['ORDI'],
         fiatCurrency,
       );
 
