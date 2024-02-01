@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.28.1",
+  "version": "0.29.0",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -11,7 +11,7 @@
     "@phosphor-icons/react": "^2.0.10",
     "@react-spring/web": "^9.6.1",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "9.1.0",
+    "@secretkeylabs/xverse-core": "9.1.2",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
     "@stacks/transactions": "6.9.0",
