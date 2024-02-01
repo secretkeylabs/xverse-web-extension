@@ -4,19 +4,20 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
 import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { animated, useSpring } from '@react-spring/web';
+import { animated, useTransition } from '@react-spring/web';
 import SelectAccount from '@screens/connect/selectAccount';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { MoonLoader } from 'react-spinners';
 import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
 import AddressPurposeBox from '../addressPurposeBox';
 import PermissionsList from '../permissionsList';
 import { getAppIconFromWebManifest } from './helper';
 
-const OuterContainer = styled(animated.div)((props) => ({
+const OuterContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   paddingLeft: props.theme.space.m,
@@ -71,25 +72,28 @@ const PermissionsContainer = styled.div((props) => ({
   paddingBottom: props.theme.space.xxl,
 }));
 
+const LoaderContainer = styled.div(() => ({
+  justifySelf: 'center',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  flex: 1,
+}));
+
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const { network, btcAddress, ordinalsAddress, stxAddress, selectedAccount } = useWalletSelector();
   const [appIcon, setAppIcon] = useState<string>('');
+  const [isLoadingIcon, setIsLoadingIcon] = useState(false);
   const { payload, origin, approveBtcAddressRequest, cancelAddressRequest } =
     useBtcAddressRequest();
   const appUrl = useMemo(() => origin.replace(/(^\w+:|^)\/\//, ''), [origin]);
 
-  const styles = useSpring({
-    from: {
-      opacity: 0,
-      y: 24,
-    },
-    to: {
-      y: 0,
-      opacity: 1,
-    },
+  const transition = useTransition(isLoadingIcon, {
+    from: { opacity: 0, y: 30 },
+    enter: { opacity: 1, y: 0 },
   });
 
   const confirmCallback = async () => {
@@ -139,8 +143,10 @@ function BtcSelectAddressScreen() {
   useEffect(() => {
     (async () => {
       if (origin !== '') {
+        setIsLoadingIcon(true);
         getAppIconFromWebManifest(origin).then((appIcons) => {
           setAppIcon(appIcons);
+          setIsLoadingIcon(false);
         });
       }
     })();
@@ -188,23 +194,37 @@ function BtcSelectAddressScreen() {
     navigate('/account-list?hideListActions=true');
   };
 
-  return (
-    <OuterContainer style={styles}>
-      <HeadingContainer>
-        {appIcon !== '' ? <TopImage src={appIcon} alt="Dapp Logo" /> : null}
-        <Title>{t('TITLE')}</Title>
-        <DapURL>{appUrl}</DapURL>
-      </HeadingContainer>
-      {payload.message ? <RequestMessage>{payload.message.substring(0, 80)}</RequestMessage> : null}
-      <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
-      <AddressBoxContainer>{payload.purposes.map(AddressPurposeRow)}</AddressBoxContainer>
-      <PermissionsContainer>
-        <PermissionsList />
-      </PermissionsContainer>
-      <StickyHorizontalSplitButtonContainer>
-        <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
-        <ActionButton text={t('CONNECT_BUTTON')} processing={loading} onPress={confirmCallback} />
-      </StickyHorizontalSplitButtonContainer>
+  return isLoadingIcon ? (
+    <LoaderContainer>
+      <MoonLoader color="white" size={50} />
+    </LoaderContainer>
+  ) : (
+    <OuterContainer>
+      {transition((style) => (
+        <animated.div style={style}>
+          <HeadingContainer>
+            {appIcon !== '' ? <TopImage src={appIcon} alt="Dapp Logo" /> : null}
+            <Title>{t('TITLE')}</Title>
+            <DapURL>{appUrl}</DapURL>
+          </HeadingContainer>
+          {payload.message ? (
+            <RequestMessage>{payload.message.substring(0, 80)}</RequestMessage>
+          ) : null}
+          <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
+          <AddressBoxContainer>{payload.purposes.map(AddressPurposeRow)}</AddressBoxContainer>
+          <PermissionsContainer>
+            <PermissionsList />
+          </PermissionsContainer>
+          <StickyHorizontalSplitButtonContainer>
+            <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
+            <ActionButton
+              text={t('CONNECT_BUTTON')}
+              processing={loading}
+              onPress={confirmCallback}
+            />
+          </StickyHorizontalSplitButtonContainer>
+        </animated.div>
+      ))}
     </OuterContainer>
   );
 }
