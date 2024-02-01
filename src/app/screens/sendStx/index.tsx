@@ -45,6 +45,7 @@ function SendStxScreen() {
 
   // Step 2 states
   const [amount, setAmount] = useState(amountToSend ?? '0');
+  const [sendMax, setSendMax] = useState(false);
 
   const handleCancel = () => {
     if (isInOption) {
@@ -98,8 +99,8 @@ function SendStxScreen() {
               setAmount={setAmount}
               feeRate="1"
               setFeeRate={() => {}}
-              sendMax
-              setSendMax={() => {}}
+              sendMax={sendMax}
+              setSendMax={setSendMax}
               fee="50"
               getFeeForFeeRate={(feeRate, useEffectiveFeeRate) => Promise.resolve(undefined)}
               dustFiltered={false}

@@ -6,6 +6,7 @@ import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import BigNumber from 'bignumber.js';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -69,6 +70,12 @@ function Step2SelectAmount({
     getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
 
   const hasStx = +stxBalance > 0;
+
+  useEffect(() => {
+    setAmount(stxBalance);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sendMax]);
+
   return (
     <Container>
       <div>
