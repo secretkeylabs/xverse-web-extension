@@ -67,6 +67,10 @@ const Buttons = styled.div`
   margin: ${(props) => props.theme.space.l} 0;
 `;
 
+const RotatedFaders = styled(Faders)`
+  transform: rotate(90deg);
+`;
+
 const inputValidator = /^[0-9]*$/;
 
 type FeePriority = 'high' | 'medium' | 'low';
@@ -276,7 +280,7 @@ function FeeSelectPopup({
       <FeePrioritiesContainer>
         {knownRates.map((rate) => renderFeeItem(rate, feeRates[rate]!))}
         <FeeItemContainer $isSelected={!selected} onClick={() => setUseCustom(true)}>
-          <Faders size={20} color={theme.colors.tangerine} />
+          <RotatedFaders size={20} color={theme.colors.tangerine} />
           <TextRow>
             <StyledP typography="body_medium_m" color="white_0">
               {t('TRANSACTION_SETTING.CUSTOM')}
