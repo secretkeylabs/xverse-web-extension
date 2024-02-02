@@ -27,7 +27,9 @@ function SeedPhraseWord({ index, word }: Props) {
   return (
     <Container>
       <OrdinalNumber>{index + 1}.</OrdinalNumber>
-      <SeedWord key={word}>{word}</SeedWord>
+      <SeedWord key={word} translate="no">
+        {word}
+      </SeedWord>
     </Container>
   );
 }
