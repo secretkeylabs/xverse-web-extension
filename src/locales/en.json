@@ -788,7 +788,9 @@
     "ENABLE_RARE_SATS_DETAIL": "Automatically scan and display rare sats in your Ordinals wallet.",
     "ENABLE_SPEED_UP_TRANSACTIONS": "Enable speed up transactions",
     "ENABLE_SPEED_UP_TRANSACTIONS_DETAIL": "Allows you to speed up unconfirmed transactions by paying a higher fee.",
-    "ADVANCED": "Advanced"
+    "ADVANCED": "Advanced",
+    "XVERSE_DEFAULT": "Use Xverse as default wallet",
+    "XVERSE_DEFAULT_DESCRIPTION": "Allow apps to prioritize Xverse when looking for a wallet with which to connect."
   },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
