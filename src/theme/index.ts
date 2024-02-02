@@ -59,6 +59,7 @@ const Theme = {
     elevation3: '#2A2F39',
     elevation5: '#303643',
     elevation6: '#4C525F',
+    elevation6_400: 'rgba(76, 82, 95, 0.6)',
     elevation6_600: 'rgba(76, 82, 95, 0.4)',
     elevation6_800: 'rgba(76, 82, 95, 0.2)',
     elevation8: '#7A7688',

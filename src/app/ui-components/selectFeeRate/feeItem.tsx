@@ -8,21 +8,28 @@ import { NumericFormat } from 'react-number-format';
 import styled, { useTheme } from 'styled-components';
 
 interface FeeContainer {
-  isSelected: boolean;
+  $isSelected: boolean;
 }
 
-const FeeItemContainer = styled.button<FeeContainer>`
+export const FeeItemContainer = styled.button<FeeContainer>`
   display: flex;
   padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
   align-items: center;
   gap: ${(props) => props.theme.space.s};
   align-self: stretch;
   border-radius: ${(props) => props.theme.space.s};
-  border: 1px solid ${(props) => props.theme.colors.elevation6};
+  border: 1px solid ${(props) => props.theme.colors.white_850};
   flex-direction: row;
-  background: ${(props) => (props.isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
-  margin-top: ${(props) => props.theme.space.xs};
+  background: ${(props) => (props.$isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
   flex: 1;
+
+  &:hover:enabled {
+    background: ${(props) => props.theme.colors.elevation6_400};
+  }
+
+  &:active:enabled {
+    background: ${(props) => props.theme.colors.elevation6_600};
+  }
 `;
 
 const IconContainer = styled.div`
@@ -154,7 +161,7 @@ function FeeItem({
   const secondaryColor = totalFee ? 'white_200' : 'white_400';
 
   return (
-    <FeeItemContainer onClick={onClick} isSelected={selected} disabled={!totalFee}>
+    <FeeItemContainer onClick={onClick} $isSelected={selected} disabled={!totalFee}>
       <IconContainer>{getIcon()}</IconContainer>
       <TextsContainer>
         <ColumnsTexts>

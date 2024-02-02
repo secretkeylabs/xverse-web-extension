@@ -128,7 +128,7 @@ function Button({
         <Spinner />
       ) : (
         <>
-          <div>{icon}</div>
+          {icon && <div>{icon}</div>}
           <div>{title}</div>
         </>
       )}

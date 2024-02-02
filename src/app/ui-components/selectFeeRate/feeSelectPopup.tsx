@@ -1,7 +1,7 @@
 import { Faders } from '@phosphor-icons/react';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
-import { StyledP } from '@ui-library/common.styled';
+import { HorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
@@ -9,7 +9,7 @@ import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled, { useTheme } from 'styled-components';
-import FeeItem from './feeItem';
+import FeeItem, { FeeItemContainer } from './feeItem';
 
 const Container = styled.div`
   display: flex;
@@ -22,22 +22,9 @@ const DetailText = styled(StyledP)`
 
 const FeePrioritiesContainer = styled.div`
   display: flex;
-  margin-top: ${(props) => props.theme.space.m};
   flex-direction: column;
-`;
-
-const FeeItemContainer = styled.button<{ $isSelected: boolean }>`
-  display: flex;
-  padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
-  align-items: center;
-  gap: ${(props) => props.theme.space.s};
-  align-self: stretch;
-  border-radius: ${(props) => props.theme.space.s};
-  border: 1px solid ${(props) => props.theme.colors.elevation6};
-  flex-direction: row;
-  background: ${(props) => (props.$isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
-  margin-top: ${(props) => props.theme.space.xs};
-  flex: 1;
+  gap: ${(props) => props.theme.space.xs};
+  margin-bottom: ${(props) => props.theme.space.l};
 `;
 
 const TextRow = styled.div`
@@ -62,12 +49,7 @@ const TotalFeeContainer = styled.div`
   gap: ${(props) => props.theme.space.xxs};
 `;
 
-const Buttons = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: stretch;
-  gap: ${(props) => props.theme.space.s};
-
+const Buttons = styled(HorizontalSplitButtonContainer)`
   margin: ${(props) => props.theme.space.l} 0;
 `;
 
