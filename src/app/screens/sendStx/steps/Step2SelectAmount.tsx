@@ -1,12 +1,21 @@
-import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
-import BtcAmountSelector from '@ui-components/btcAmountSelector';
-import SelectFeeRate from '@ui-components/selectFeeRate';
+import {
+  StacksTransaction,
+  applyFeeMultiplier,
+  buf2hex,
+  generateUnsignedStxTokenTransferTransaction,
+  getStxFiatEquivalent,
+  microstacksToStx,
+  stxToMicrostacks,
+} from '@secretkeylabs/xverse-core';
+import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
+import SelectFeeRate, { FeeRates } from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import BigNumber from 'bignumber.js';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -40,12 +49,23 @@ type Props = {
   getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
   onNext: () => void;
   dustFiltered: boolean;
-  hasSufficientFunds: boolean;
+  setIsLoading: (isLoading: boolean) => void;
   isLoading?: boolean;
   header?: React.ReactNode;
+  recipientAddress: string;
+  memo: string;
+  unsignedSendStxTx: string;
+  setUnsignedSendStxTx: (unsignedSendStxTx: string) => void;
 };
 
+interface FeeEstimation {
+  fee: number;
+  fee_rate: number;
+}
+
 function Step2SelectAmount({
+  recipientAddress,
+  memo,
   amount,
   setAmount,
   feeRate,
@@ -55,26 +75,97 @@ function Step2SelectAmount({
   fee,
   getFeeForFeeRate,
   onNext,
+  setIsLoading,
   isLoading,
   dustFiltered,
-  hasSufficientFunds,
   header,
+  unsignedSendStxTx,
+  setUnsignedSendStxTx,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
 
-  const { btcFiatRate, fiatCurrency, stxBalance } = useWalletSelector();
-  const { data: recommendedFees } = useBtcFeeRate();
+  const { btcFiatRate, stxBtcRate, fiatCurrency, stxBalance, stxPublicKey, feeMultipliers } =
+    useWalletSelector();
 
-  const satsToFiat = (sats: string) =>
-    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
+  const stxToFiat = (stx: string) =>
+    getStxFiatEquivalent(
+      stxToMicrostacks(new BigNumber(stx)),
+      new BigNumber(stxBtcRate),
+      new BigNumber(btcFiatRate),
+    )
+      .toNumber()
+      .toFixed(2);
 
   const hasStx = +stxBalance > 0;
 
+  const hasSufficientFunds = amount <= stxBalance;
+
   useEffect(() => {
-    setAmount(stxBalance);
+    if (sendMax) setAmount(stxBalance);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendMax]);
+
+  const { data: stxPendingTxData } = useStxPendingTxData();
+  const selectedNetwork = useNetworkSelector();
+
+  const [fees, setFees] = useState<FeeRates>({});
+
+  // Reactively construct a tx
+  useEffect(() => {
+    setIsLoading(true);
+
+    const createTx = async () => {
+      const rawUnsignedSendStxTx: StacksTransaction =
+        await generateUnsignedStxTokenTransferTransaction(
+          recipientAddress,
+          amount,
+          memo,
+          stxPendingTxData?.pendingTransactions ?? [],
+          stxPublicKey,
+          selectedNetwork,
+        );
+
+      // This function directly modifies unsignedSendStxTx lol
+      applyFeeMultiplier(rawUnsignedSendStxTx, feeMultipliers);
+      setUnsignedSendStxTx(buf2hex(rawUnsignedSendStxTx.serialize()));
+      setIsLoading(false);
+    };
+
+    createTx();
+  }, [
+    amount,
+    feeMultipliers,
+    memo,
+    recipientAddress,
+    selectedNetwork,
+    setIsLoading,
+    setUnsignedSendStxTx,
+    stxPendingTxData?.pendingTransactions,
+    stxPublicKey,
+  ]);
+
+  // Reactively estimate fees
+  useEffect(() => {
+    const fetchStxFees = async () => {
+      // const txRaw: string = await getRawTransaction(transaction.txid, network);
+
+      const unsignedTx: StacksTransaction = deserializeTransaction(unsignedSendStxTx);
+
+      const [low, medium, high] = await estimateTransaction(
+        unsignedTx.payload,
+        undefined,
+        selectedNetwork,
+      );
+      setFees({
+        low: Number(microstacksToStx(new BigNumber(low.fee)).toFixed(2)),
+        medium: Number(microstacksToStx(new BigNumber(medium.fee)).toFixed(2)),
+        high: Number(microstacksToStx(new BigNumber(high.fee)).toFixed(2)),
+      });
+    };
+
+    fetchStxFees();
+  }, [selectedNetwork, unsignedSendStxTx]);
 
   return (
     <Container>
@@ -91,18 +182,14 @@ function Step2SelectAmount({
           <FeeRateContainer>
             <SelectFeeRate
               fee={fee}
-              feeUnits="Sats"
+              feeUnits="STX"
               feeRate={feeRate}
-              feeRateUnits="sats/vB"
               setFeeRate={setFeeRate}
-              baseToFiat={satsToFiat}
+              baseToFiat={stxToFiat}
               fiatUnit={fiatCurrency}
               getFeeForFeeRate={getFeeForFeeRate}
-              feeRates={{
-                medium: recommendedFees?.regular,
-                high: recommendedFees?.priority,
-              }}
-              feeRateLimits={recommendedFees?.limits}
+              feeRates={fees}
+              feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
               isLoading={isLoading}
             />
           </FeeRateContainer>
@@ -123,9 +210,9 @@ function Step2SelectAmount({
           <Callout
             titleText={t('BTC.NO_FUNDS_TITLE')}
             bodyText={t('BTC.NO_FUNDS')}
-            redirectText={t('BTC.BUY_BTC')}
+            redirectText={t('STX.BUY_STX')}
             onClickRedirect={() => {
-              navigate('/buy/btc');
+              navigate('/buy/STX');
             }}
           />
         )}

@@ -74,7 +74,7 @@ type FeePriority = 'high' | 'medium' | 'low';
 type Props = {
   currentFeeRate: string;
   feeUnits: string;
-  feeRateUnits: string;
+  feeRateUnits?: string;
   fiatUnit: string;
   feeRates: {
     low?: number;

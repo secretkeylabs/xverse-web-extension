@@ -54,21 +54,23 @@ const EditRow = styled.span`
   gap: 7px;
 `;
 
+export type FeeRates = {
+  low?: number;
+  medium?: number;
+  high?: number;
+};
+
 type Props = {
   fee: string | undefined;
   feeUnits: string;
   feeRate: string;
   setFeeRate: (feeRate: string) => void;
-  feeRateUnits: string;
+  feeRateUnits?: string;
   fiatUnit: string;
   baseToFiat: (base: string) => string;
   getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
   isLoading?: boolean;
-  feeRates: {
-    low?: number;
-    medium?: number;
-    high?: number;
-  };
+  feeRates: FeeRates;
   feeRateLimits?: {
     min?: number;
     max?: number;
@@ -150,8 +152,24 @@ function SelectFeeRate({
             )}
           />
         </Label>
+        {fee && !feeRateUnits && (
+          <RowContainer>
+            <div />
+            <NumericFormat
+              value={baseToFiat(fee)}
+              displayType="text"
+              prefix={`~ ${currencySymbolMap[fiatUnit]}`}
+              thousandSeparator
+              renderText={(value: string) => (
+                <Label $size="s" $variant="dark">
+                  {value} {fiatUnit}
+                </Label>
+              )}
+            />
+          </RowContainer>
+        )}
       </RowContainer>
-      {fee && (
+      {fee && feeRateUnits && (
         <RowContainer>
           <div />
           <NumericFormat

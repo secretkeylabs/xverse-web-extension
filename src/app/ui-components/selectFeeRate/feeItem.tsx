@@ -80,7 +80,7 @@ interface FeeItemProps {
   time?: string;
   feeRate: number;
   feeUnits: string;
-  feeRateUnits: string;
+  feeRateUnits?: string;
   fiatUnit: string;
   baseToFiat: (base: string) => string;
   getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
@@ -164,17 +164,30 @@ function FeeItem({
           <StyledSubText typography="body_medium_s" color={secondaryColor}>
             {time ?? `~${priorityTimeMap[priority]} mins`}
           </StyledSubText>
-          <StyledP
-            typography="body_medium_s"
-            color={secondaryColor}
-          >{`${feeRate} ${feeRateUnits}`}</StyledP>
+          {feeRateUnits && (
+            <StyledP
+              typography="body_medium_s"
+              color={secondaryColor}
+            >{`${feeRate} ${feeRateUnits}`}</StyledP>
+          )}
+          {!feeRateUnits && fiat && (
+            <StyledP typography="body_medium_s" color={secondaryColor}>
+              <NumericFormat
+                value={fiat}
+                displayType="text"
+                prefix={`~${currencySymbolMap[fiatUnit]}`}
+                thousandSeparator
+                renderText={(value: string) => `${value} ${fiatUnit}`}
+              />
+            </StyledP>
+          )}
         </ColumnsTexts>
         {!isLoading ? (
           <EndColumnTexts $insufficientFunds={totalFee === undefined}>
             <StyledHeading typography="body_medium_m" color={mainColor}>
               {`${totalFee || '-'} ${feeUnits}`}
             </StyledHeading>
-            {fiat && (
+            {fiat && feeRateUnits && (
               <StyledP typography="body_medium_s" color={secondaryColor}>
                 <NumericFormat
                   value={fiat}

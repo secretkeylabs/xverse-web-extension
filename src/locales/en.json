@@ -259,6 +259,9 @@
       "NO_FUNDS": "You don't have any funds to send. You can purchase crypto quickly and deposit directly into your Xverse wallet.",
       "BUY_BTC": "Buy Bitcoin"
     },
+    "STX": {
+      "BUY_STX": "Buy Stacks"
+    },
     "SEND_TO": "Send to",
     "SEND": "Send",
     "AMOUNT": "Amount",

@@ -38,6 +38,10 @@ function SendStxScreen() {
 
   const location = useLocation();
   const { recipientAddress: stateAddress, amountToSend, stxMemo } = location.state || {};
+
+  // Shared states
+  const [isLoading, setIsLoading] = useState(false);
+
   // Step 1 states
   const [recipientAddress, setRecipientAddress] = useState(stateAddress ?? '');
   const [recipientDomain, setRecipientDomain] = useState('');
@@ -46,6 +50,8 @@ function SendStxScreen() {
   // Step 2 states
   const [amount, setAmount] = useState(amountToSend ?? '0');
   const [sendMax, setSendMax] = useState(false);
+  const [feeRate, setFeeRate] = useState('');
+  const [unsignedSendStxTx, setUnsignedSendStxTx] = useState('');
 
   const handleCancel = () => {
     if (isInOption) {
@@ -84,7 +90,7 @@ function SendStxScreen() {
               memo={memo}
               setMemo={setMemo}
               onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, true))}
-              isLoading={false}
+              isLoading={isLoading}
             />
           </Container>
         </SendLayout>
@@ -97,22 +103,26 @@ function SendStxScreen() {
               header={header}
               amount={amount}
               setAmount={setAmount}
-              feeRate="1"
-              setFeeRate={() => {}}
+              feeRate={feeRate}
+              setFeeRate={setFeeRate}
               sendMax={sendMax}
               setSendMax={setSendMax}
-              fee="50"
-              getFeeForFeeRate={(feeRate, useEffectiveFeeRate) => Promise.resolve(undefined)}
+              fee=""
+              getFeeForFeeRate={(fee) => Promise.resolve(fee)}
               dustFiltered={false}
               onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, true))}
-              hasSufficientFunds
-              isLoading={false}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+              unsignedSendStxTx={unsignedSendStxTx}
+              setUnsignedSendStxTx={setUnsignedSendStxTx}
+              recipientAddress={recipientAddress}
+              memo={memo}
             />
           </Container>
         </SendLayout>
       );
     case Step.Confirm:
-      return <Step3Confirm recipientAddress={recipientAddress} amount={amount} memo={memo} />;
+      return <Step3Confirm unsignedSendStxTx={unsignedSendStxTx} />;
     default:
       throw new Error(`Unknown step: ${currentStep}`);
   }
