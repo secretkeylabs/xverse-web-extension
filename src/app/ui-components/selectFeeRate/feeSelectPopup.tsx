@@ -124,7 +124,7 @@ function FeeSelectPopup({
     calculateTotalFee();
   }, [baseToFiat, customValue, getFeeForFeeRate]);
 
-  const handleClick = (newRate) => () => {
+  const handleClick = (newRate: string) => () => {
     setFeeRate(newRate);
     onClose();
   };
@@ -157,20 +157,6 @@ function FeeSelectPopup({
 
     return { knownRates: rates, selected: selectedRate };
   }, [feeRates, currentFeeRate]);
-
-  const renderFeeItem = (priority: FeePriority, rate: number) => (
-    <FeeItem
-      priority={priority}
-      feeRate={rate}
-      onClick={handleClick(rate.toString())}
-      selected={priority === selected}
-      feeUnits={feeUnits}
-      feeRateUnits={feeRateUnits}
-      fiatUnit={fiatUnit}
-      baseToFiat={baseToFiat}
-      getFeeForFeeRate={getFeeForFeeRate}
-    />
-  );
 
   const renderFeeSelectors = () => {
     if (useCustom) {
@@ -264,7 +250,20 @@ function FeeSelectPopup({
 
     return (
       <FeePrioritiesContainer>
-        {knownRates.map((rate) => renderFeeItem(rate, feeRates[rate]!))}
+        {knownRates.map((rate) => (
+          <FeeItem
+            key={rate}
+            priority={rate}
+            feeRate={feeRates[rate]!}
+            onClick={handleClick(feeRates[rate]!.toString())}
+            selected={rate === selected}
+            feeUnits={feeUnits}
+            feeRateUnits={feeRateUnits}
+            fiatUnit={fiatUnit}
+            baseToFiat={baseToFiat}
+            getFeeForFeeRate={getFeeForFeeRate}
+          />
+        ))}
         <FeeItemContainer $isSelected={!selected} onClick={() => setUseCustom(true)}>
           <RotatedFaders size={20} color={theme.colors.tangerine} />
           <TextRow>
