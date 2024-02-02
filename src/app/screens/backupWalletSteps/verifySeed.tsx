@@ -143,7 +143,7 @@ export default function VerifySeed({
       </Heading>
       <WordGrid>
         {quiz.words.map((word) => (
-          <WordButton key={word} onClick={handleClickWord} value={word}>
+          <WordButton key={word} onClick={handleClickWord} value={word} translate="no">
             {word}
           </WordButton>
         ))}
