@@ -75,6 +75,7 @@ type Props = {
     min?: number;
     max?: number;
   };
+  absoluteBalance?: number;
 };
 
 function SelectFeeRate({
@@ -89,6 +90,7 @@ function SelectFeeRate({
   feeRates,
   feeRateLimits,
   isLoading,
+  absoluteBalance,
 }: Props) {
   const { t } = useTranslation('translation');
   const [editing, setEditing] = useState(false);
@@ -140,18 +142,20 @@ function SelectFeeRate({
             {t('COMMON.EDIT')} <PencilSimple size={16} weight="fill" />
           </Label>
         </EditRow>
-        <Label $size="s" $variant="dark">
-          <NumericFormat
-            value={feeRate}
-            displayType="text"
-            thousandSeparator
-            renderText={(value: string) => (
-              <>
-                {value} {feeRateUnits}
-              </>
-            )}
-          />
-        </Label>
+        {feeRateUnits && (
+          <Label $size="s" $variant="dark">
+            <NumericFormat
+              value={feeRate}
+              displayType="text"
+              thousandSeparator
+              renderText={(value: string) => (
+                <>
+                  {value} {feeRateUnits}
+                </>
+              )}
+            />
+          </Label>
+        )}
         {fee && !feeRateUnits && (
           <RowContainer>
             <div />
@@ -197,6 +201,7 @@ function SelectFeeRate({
           baseToFiat={baseToFiat}
           setFeeRate={setFeeRate}
           getFeeForFeeRate={getFeeForFeeRate}
+          absoluteBalance={absoluteBalance}
         />
       )}
     </div>

@@ -130,6 +130,7 @@ interface Props {
   title?: string;
   subTitle?: string;
   hasSignatures?: boolean;
+  feeOverride?: BigNumber;
 }
 
 function ConfirmStxTransactionComponent({
@@ -144,6 +145,7 @@ function ConfirmStxTransactionComponent({
   onCancelClick,
   skipModal = false,
   hasSignatures = false,
+  feeOverride,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: signatureRequestTranslate } = useTranslation('translation', {
@@ -183,7 +185,11 @@ function ConfirmStxTransactionComponent({
       ? new BigNumber(0)
       : new BigNumber(
           initialStxTransactions
-            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
+            .map((tx) =>
+              feeOverride
+                ? BigInt(feeOverride?.toString())
+                : tx?.auth?.spendingCondition?.fee ?? BigInt(0),
+            )
             .reduce((prev, curr) => prev + curr, BigInt(0))
             .toString(10),
         );

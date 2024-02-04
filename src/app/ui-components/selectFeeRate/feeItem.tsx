@@ -86,6 +86,7 @@ interface FeeItemProps {
   getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
   selected: boolean;
   onClick?: () => void;
+  absoluteBalance?: number;
 }
 
 function FeeItem({
@@ -99,6 +100,7 @@ function FeeItem({
   getFeeForFeeRate,
   selected,
   onClick,
+  absoluteBalance,
 }: FeeItemProps) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
@@ -153,8 +155,16 @@ function FeeItem({
   const mainColor = totalFee ? 'white_0' : 'white_400';
   const secondaryColor = totalFee ? 'white_200' : 'white_400';
 
+  const feesExceedBalance = Boolean(
+    totalFee && absoluteBalance && absoluteBalance < Number(totalFee),
+  );
+
   return (
-    <FeeItemContainer onClick={onClick} isSelected={selected} disabled={!totalFee}>
+    <FeeItemContainer
+      onClick={onClick}
+      isSelected={selected}
+      disabled={!totalFee || feesExceedBalance}
+    >
       <IconContainer>{getIcon()}</IconContainer>
       <TextsContainer>
         <ColumnsTexts>
@@ -183,7 +193,7 @@ function FeeItem({
           )}
         </ColumnsTexts>
         {!isLoading ? (
-          <EndColumnTexts $insufficientFunds={totalFee === undefined}>
+          <EndColumnTexts $insufficientFunds={totalFee === undefined || feesExceedBalance}>
             <StyledHeading typography="body_medium_m" color={mainColor}>
               {`${totalFee || '-'} ${feeUnits}`}
             </StyledHeading>
@@ -198,7 +208,7 @@ function FeeItem({
                 />
               </StyledP>
             )}
-            {!totalFee && (
+            {(!totalFee || feesExceedBalance) && (
               <StyledP typography="body_medium_s" color="danger_light">
                 {t('SEND.INSUFFICIENT_FUNDS')}
               </StyledP>

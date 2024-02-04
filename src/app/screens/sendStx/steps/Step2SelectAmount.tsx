@@ -58,11 +58,6 @@ type Props = {
   setUnsignedSendStxTx: (unsignedSendStxTx: string) => void;
 };
 
-interface FeeEstimation {
-  fee: number;
-  fee_rate: number;
-}
-
 function Step2SelectAmount({
   recipientAddress,
   memo,
@@ -99,12 +94,21 @@ function Step2SelectAmount({
 
   const hasStx = +stxBalance > 0;
 
-  const hasSufficientFunds = amount <= stxBalance;
+  const hasSufficientFunds = new BigNumber(stxBalance).isGreaterThanOrEqualTo(
+    new BigNumber(amount).plus(stxToMicrostacks(new BigNumber(fee ?? 0))),
+  );
 
   useEffect(() => {
-    if (sendMax) setAmount(stxBalance);
+    if (sendMax) {
+      const newAmount = new BigNumber(stxBalance).minus(stxToMicrostacks(new BigNumber(fee ?? 0)));
+
+      if (newAmount.isGreaterThan(new BigNumber(0))) {
+        setAmount(newAmount.toString());
+      }
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sendMax]);
+  }, [sendMax, fee]);
 
   const { data: stxPendingTxData } = useStxPendingTxData();
   const selectedNetwork = useNetworkSelector();
@@ -162,6 +166,8 @@ function Step2SelectAmount({
         medium: Number(microstacksToStx(new BigNumber(medium.fee)).toFixed(2)),
         high: Number(microstacksToStx(new BigNumber(high.fee)).toFixed(2)),
       });
+      if (!fee)
+        setFeeRate(Number(microstacksToStx(new BigNumber(medium.fee)).toFixed(2)).toString());
     };
 
     fetchStxFees();
@@ -191,6 +197,7 @@ function Step2SelectAmount({
               feeRates={fees}
               feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
               isLoading={isLoading}
+              absoluteBalance={Number(microstacksToStx(new BigNumber(stxBalance)))}
             />
           </FeeRateContainer>
         )}

@@ -1,7 +1,9 @@
 import TokenImage from '@components/tokenImage';
 
+import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -33,11 +35,17 @@ const Title = styled.div`
 function SendStxScreen() {
   const isInOption = isInOptions();
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<Step>(0);
   const { t } = useTranslation('translation');
 
   const location = useLocation();
-  const { recipientAddress: stateAddress, amountToSend, stxMemo } = location.state || {};
+  const {
+    recipientAddress: stateAddress,
+    amountToSend,
+    stxMemo,
+    fee: previousFee,
+  } = location.state || {};
+
+  const [currentStep, setCurrentStep] = useState<Step>(stateAddress && amountToSend ? 1 : 0);
 
   // Shared states
   const [isLoading, setIsLoading] = useState(false);
@@ -48,9 +56,13 @@ function SendStxScreen() {
   const [memo, setMemo] = useState(stxMemo ?? '');
 
   // Step 2 states
-  const [amount, setAmount] = useState(amountToSend ?? '0');
+  const [amount, setAmount] = useState(
+    amountToSend ? stxToMicrostacks(new BigNumber(amountToSend)).toString() : '0',
+  );
   const [sendMax, setSendMax] = useState(false);
-  const [feeRate, setFeeRate] = useState('');
+  const [feeRate, setFeeRate] = useState(
+    previousFee ? microstacksToStx(new BigNumber(previousFee)).toString() : '',
+  );
   const [unsignedSendStxTx, setUnsignedSendStxTx] = useState('');
 
   const handleCancel = () => {
@@ -107,7 +119,7 @@ function SendStxScreen() {
               setFeeRate={setFeeRate}
               sendMax={sendMax}
               setSendMax={setSendMax}
-              fee=""
+              fee={feeRate}
               getFeeForFeeRate={(fee) => Promise.resolve(fee)}
               dustFiltered={false}
               onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, true))}
@@ -122,7 +134,7 @@ function SendStxScreen() {
         </SendLayout>
       );
     case Step.Confirm:
-      return <Step3Confirm unsignedSendStxTx={unsignedSendStxTx} />;
+      return <Step3Confirm unsignedSendStxTx={unsignedSendStxTx} fee={feeRate} />;
     default:
       throw new Error(`Unknown step: ${currentStep}`);
   }
