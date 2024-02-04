@@ -261,6 +261,12 @@ function ConfirmStxTransactionComponent({
     setOpenTransactionSettingModal(false);
   };
 
+  useEffect(() => {
+    if (feeOverride) {
+      applyTxSettings({ fee: microstacksToStx(feeOverride).toString() });
+    }
+  }, [feeOverride]);
+
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {
       console.error('No account selected');
