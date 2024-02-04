@@ -1,7 +1,7 @@
 import { Faders } from '@phosphor-icons/react';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
-import { StyledP } from '@ui-library/common.styled';
+import { HorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
@@ -9,31 +9,22 @@ import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled, { useTheme } from 'styled-components';
-import FeeItem from './feeItem';
+import FeeItem, { FeeItemContainer } from './feeItem';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
-const FeePrioritiesContainer = styled.div`
-  display: flex;
-  margin-top: ${(props) => props.theme.space.m};
-  flex-direction: column;
+const DetailText = styled(StyledP)`
+  margin-bottom: ${(props) => props.theme.space.l};
 `;
 
-const FeeItemContainer = styled.button<{ $isSelected: boolean }>`
+const FeePrioritiesContainer = styled.div`
   display: flex;
-  padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
-  align-items: center;
-  gap: ${(props) => props.theme.space.s};
-  align-self: stretch;
-  border-radius: ${(props) => props.theme.space.s};
-  border: 1px solid ${(props) => props.theme.colors.elevation6};
-  flex-direction: row;
-  background: ${(props) => (props.$isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
-  margin-top: ${(props) => props.theme.space.xs};
-  flex: 1;
+  flex-direction: column;
+  gap: ${(props) => props.theme.space.xs};
+  margin-bottom: ${(props) => props.theme.space.l};
 `;
 
 const TextRow = styled.div`
@@ -58,13 +49,12 @@ const TotalFeeContainer = styled.div`
   gap: ${(props) => props.theme.space.xxs};
 `;
 
-const Buttons = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: stretch;
-  gap: ${(props) => props.theme.space.s};
-
+const Buttons = styled(HorizontalSplitButtonContainer)`
   margin: ${(props) => props.theme.space.l} 0;
+`;
+
+const RotatedFaders = styled(Faders)`
+  transform: rotate(90deg);
 `;
 
 type FeePriority = 'high' | 'medium' | 'low';
@@ -137,7 +127,7 @@ function FeeSelectPopup({
     calculateTotalFee();
   }, [baseToFiat, customValue, getFeeForFeeRate]);
 
-  const handleClick = (newRate) => () => {
+  const handleClick = (newRate: string) => () => {
     setFeeRate(newRate);
     onClose();
   };
@@ -170,21 +160,6 @@ function FeeSelectPopup({
 
     return { knownRates: rates, selected: selectedRate };
   }, [feeRates, currentFeeRate]);
-
-  const renderFeeItem = (priority: FeePriority, rate: number) => (
-    <FeeItem
-      priority={priority}
-      feeRate={rate}
-      onClick={handleClick(rate.toString())}
-      selected={priority === selected}
-      feeUnits={feeUnits}
-      feeRateUnits={feeRateUnits}
-      fiatUnit={fiatUnit}
-      baseToFiat={baseToFiat}
-      getFeeForFeeRate={getFeeForFeeRate}
-      absoluteBalance={absoluteBalance}
-    />
-  );
 
   const renderFeeSelectors = () => {
     if (useCustom) {
@@ -278,9 +253,23 @@ function FeeSelectPopup({
 
     return (
       <FeePrioritiesContainer>
-        {knownRates.map((rate) => renderFeeItem(rate, feeRates[rate]!))}
+        {knownRates.map((rate) => (
+          <FeeItem
+            key={rate}
+            priority={rate}
+            feeRate={feeRates[rate]!}
+            onClick={handleClick(feeRates[rate]!.toString())}
+            selected={rate === selected}
+            feeUnits={feeUnits}
+            feeRateUnits={feeRateUnits}
+            fiatUnit={fiatUnit}
+            baseToFiat={baseToFiat}
+            getFeeForFeeRate={getFeeForFeeRate}
+            absoluteBalance={absoluteBalance}
+          />
+        ))}
         <FeeItemContainer $isSelected={!selected} onClick={() => setUseCustom(true)}>
-          <Faders size={20} color={theme.colors.tangerine} />
+          <RotatedFaders size={20} color={theme.colors.tangerine} />
           <TextRow>
             <StyledP typography="body_medium_m" color="white_0">
               {t('TRANSACTION_SETTING.CUSTOM')}
@@ -297,9 +286,9 @@ function FeeSelectPopup({
   return (
     <Sheet title={t('CONFIRM_TRANSACTION.EDIT_FEES')} onClose={onClose} visible>
       <Container>
-        <StyledP typography="body_m" color="white_200">
+        <DetailText typography="body_m" color="white_200">
           {t('TRANSACTION_SETTING.FEE_INFO')}
-        </StyledP>
+        </DetailText>
         {renderFeeSelectors()}
       </Container>
     </Sheet>

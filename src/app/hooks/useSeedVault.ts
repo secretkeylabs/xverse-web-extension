@@ -20,13 +20,13 @@ const cryptoUtilsAdapter: CryptoUtilsAdapter = {
 };
 
 const secureStorageAdapter: StorageAdapter = {
-  get: async (key: string) => chromeSessionStorage.getItem<string>(key),
+  get: async (key: string) => chromeSessionStorage.getItem<string, null>(key, null),
   set: async (key: string, value: string) => chromeSessionStorage.setItem(key, value),
   remove: async (key: string) => chromeSessionStorage.removeItem(key),
 };
 
 const commonStorageAdapter: StorageAdapter = {
-  get: async (key: string) => chromeLocalStorage.getItem<string>(key),
+  get: async (key: string) => chromeLocalStorage.getItem<string, null>(key, null),
   set: async (key: string, value: string) => chromeLocalStorage.setItem(key, value),
   remove: async (key: string) => chromeLocalStorage.removeItem(key),
 };

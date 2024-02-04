@@ -271,6 +271,7 @@ function SignatureRequest(): JSX.Element {
         const signature = await handleBip322LedgerMessageSigning({
           transport,
           addressIndex: selectedAccount.deviceAccountIndex,
+          address: payload.address,
           networkType: network.type,
           message: payload.message,
         });
