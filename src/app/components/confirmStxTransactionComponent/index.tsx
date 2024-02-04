@@ -185,11 +185,7 @@ function ConfirmStxTransactionComponent({
       ? new BigNumber(0)
       : new BigNumber(
           initialStxTransactions
-            .map((tx) =>
-              feeOverride
-                ? BigInt(feeOverride?.toString())
-                : tx?.auth?.spendingCondition?.fee ?? BigInt(0),
-            )
+            .map((tx) => tx?.auth?.spendingCondition?.fee ?? BigInt(0))
             .reduce((prev, curr) => prev + curr, BigInt(0))
             .toString(10),
         );
