@@ -129,7 +129,7 @@ function IsVisibleOrPlaceholder({ children }: PropsWithChildren) {
       {isVisible ? (
         children
       ) : (
-        <CollectibleCollectionGridItem item={{}} itemId="">
+        <CollectibleCollectionGridItem>
           <NftImage />
         </CollectibleCollectionGridItem>
       )}

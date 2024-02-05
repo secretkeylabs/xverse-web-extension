@@ -1,6 +1,6 @@
 import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import type { BtcOrdinal, Inscription } from '@secretkeylabs/xverse-core';
+import type { BtcOrdinal } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
@@ -62,7 +62,7 @@ interface Props {
   ordinal: BtcOrdinal;
   isLoading: boolean;
   disableTransfer: boolean;
-  handleOrdinalTransfer: (ordinal: BtcOrdinal, ordinalData: Inscription) => Promise<void>;
+  handleOrdinalTransfer: (ordinal: BtcOrdinal) => Promise<void>;
 }
 
 function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer }: Props) {
@@ -71,7 +71,7 @@ function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer
 
   const onClick = async () => {
     if (ordinalData && ordinalData.data) {
-      await handleOrdinalTransfer(ordinal, ordinalData.data);
+      await handleOrdinalTransfer(ordinal);
     }
   };
 
@@ -80,7 +80,6 @@ function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer
       <OrdinalImageContainer>
         <OrdinalImage isSmallImage withoutSizeIncrease ordinal={ordinalData?.data!} />
       </OrdinalImageContainer>
-
       <ColumnContainer>
         <TitleText>{`Inscription ${ordinalData?.data?.number}`}</TitleText>
         <ValueText>Ordinal</ValueText>

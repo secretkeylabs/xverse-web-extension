@@ -1,7 +1,6 @@
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
@@ -10,7 +9,6 @@ import {
   BtcOrdinal,
   ErrorCodes,
   getBtcFiatEquivalent,
-  Inscription,
   SignedBtcTx,
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core';
@@ -69,7 +67,6 @@ function RestoreOrdinals() {
   const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
   const { getSeed } = useSeedVault();
-  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const [error, setError] = useState('');
@@ -119,11 +116,10 @@ function RestoreOrdinals() {
     }
   };
 
-  const onClickTransfer = async (selectedOrdinal: BtcOrdinal, ordinalData: Inscription) => {
+  const onClickTransfer = async (selectedOrdinal: BtcOrdinal) => {
     setTransferringOrdinalId(selectedOrdinal.id);
     const seedPhrase = await getSeed();
     const signedTx = await mutateAsync({ ordinal: selectedOrdinal, seedPhrase });
-    setSelectedOrdinalDetails(ordinalData);
     navigate(`/nft-dashboard/confirm-ordinal-tx/${selectedOrdinal.id}`, {
       state: {
         signedTxHex: signedTx.signedTx,
