@@ -67,36 +67,38 @@ interface Props {
 
 function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer }: Props) {
   const { t } = useTranslation('translation');
-  const ordinalData = useInscriptionDetails(ordinal.id);
+  const inscriptionQuery = useInscriptionDetails(ordinal.id);
 
   const onClick = async () => {
-    if (ordinalData && ordinalData.data) {
+    if (inscriptionQuery && inscriptionQuery.data) {
       await handleOrdinalTransfer(ordinal);
     }
   };
 
-  return (
-    <OrdinalCard>
-      <OrdinalImageContainer>
-        <OrdinalImage isSmallImage withoutSizeIncrease ordinal={ordinalData?.data!} />
-      </OrdinalImageContainer>
-      <ColumnContainer>
-        <TitleText>{`Inscription ${ordinalData?.data?.number}`}</TitleText>
-        <ValueText>Ordinal</ValueText>
-      </ColumnContainer>
-      <ButtonContainer>
-        <TransferButton onClick={onClick} disabled={disableTransfer}>
-          {isLoading ? (
-            <LoaderContainer>
-              <MoonLoader color="white" size={15} />
-            </LoaderContainer>
-          ) : (
-            t('RESTORE_ORDINAL_SCREEN.TRANSFER')
-          )}
-        </TransferButton>
-      </ButtonContainer>
-    </OrdinalCard>
-  );
+  if (!inscriptionQuery.isLoading) {
+    return (
+      <OrdinalCard>
+        <OrdinalImageContainer>
+          <OrdinalImage isSmallImage withoutSizeIncrease ordinal={inscriptionQuery.data!} />
+        </OrdinalImageContainer>
+        <ColumnContainer>
+          <TitleText>{`Inscription ${inscriptionQuery.data!.number}`}</TitleText>
+          <ValueText>Ordinal</ValueText>
+        </ColumnContainer>
+        <ButtonContainer>
+          <TransferButton onClick={onClick} disabled={disableTransfer}>
+            {isLoading ? (
+              <LoaderContainer>
+                <MoonLoader color="white" size={15} />
+              </LoaderContainer>
+            ) : (
+              t('RESTORE_ORDINAL_SCREEN.TRANSFER')
+            )}
+          </TransferButton>
+        </ButtonContainer>
+      </OrdinalCard>
+    );
+  }
 }
 
 export default OrdinalRow;

@@ -68,7 +68,7 @@ function RestoreOrdinals() {
     useWalletSelector();
   const { getSeed } = useSeedVault();
   const navigate = useNavigate();
-  const { ordinals } = useOrdinalsByAddress(btcAddress);
+  const ordinalsQuery = useOrdinalsByAddress(btcAddress);
   const [error, setError] = useState('');
   const [transferringOrdinalId, setTransferringOrdinalId] = useState<string | null>(null);
   const location = useLocation();
@@ -76,7 +76,10 @@ function RestoreOrdinals() {
 
   const isRestoreFundFlow = location.state?.isRestoreFundFlow;
 
-  const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
+  const ordinalsUtxos = useMemo(
+    () => ordinalsQuery.ordinals?.map((ord) => ord.utxo),
+    [ordinalsQuery.ordinals],
+  );
 
   const {
     isLoading,
@@ -134,42 +137,37 @@ function RestoreOrdinals() {
     });
   };
 
-  const showContent =
-    ordinals?.length === 0 ? (
-      <>
-        <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
-        <ButtonContainer>
-          <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
-        </ButtonContainer>
-      </>
-    ) : (
-      <>
-        <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
-        {ordinals?.map((ordinal) => (
-          <OrdinalRow
-            isLoading={transferringOrdinalId === ordinal.id}
-            disableTransfer={isLoading}
-            handleOrdinalTransfer={onClickTransfer}
-            ordinal={ordinal}
-            key={ordinal.id}
-          />
-        ))}
-        <ErrorContainer>
-          <ErrorText>{error}</ErrorText>
-        </ErrorContainer>
-      </>
-    );
-
   return (
     <>
       <TopRow title={t('RESTORE_ORDINAL_SCREEN.TITLE')} onClick={handleOnCancelClick} />
       <Container>
-        {!ordinals ? (
+        {ordinalsQuery.isLoading ? (
           <LoaderContainer>
             <MoonLoader color="white" size={25} />
           </LoaderContainer>
+        ) : ordinalsQuery.ordinals!.length > 0 ? (
+          <>
+            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
+            {ordinalsQuery.ordinals!.map((ordinal) => (
+              <OrdinalRow
+                isLoading={transferringOrdinalId === ordinal.id}
+                disableTransfer={isLoading}
+                handleOrdinalTransfer={onClickTransfer}
+                ordinal={ordinal}
+                key={ordinal.id}
+              />
+            ))}
+            <ErrorContainer>
+              <ErrorText>{error}</ErrorText>
+            </ErrorContainer>
+          </>
         ) : (
-          showContent
+          <>
+            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
+            <ButtonContainer>
+              <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
+            </ButtonContainer>
+          </>
         )}
       </Container>
       <BottomTabBar tab="nft" />
