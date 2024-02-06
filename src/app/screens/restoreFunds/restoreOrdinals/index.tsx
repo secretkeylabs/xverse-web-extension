@@ -145,10 +145,17 @@ function RestoreOrdinals() {
           <LoaderContainer>
             <MoonLoader color="white" size={25} />
           </LoaderContainer>
-        ) : ordinalsQuery.ordinals!.length > 0 ? (
+        ) : ordinalsQuery.ordinals?.length === 0 ? (
+          <>
+            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
+            <ButtonContainer>
+              <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
+            </ButtonContainer>
+          </>
+        ) : (
           <>
             <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
-            {ordinalsQuery.ordinals!.map((ordinal) => (
+            {ordinalsQuery.ordinals?.map((ordinal) => (
               <OrdinalRow
                 isLoading={transferringOrdinalId === ordinal.id}
                 disableTransfer={isLoading}
@@ -160,13 +167,6 @@ function RestoreOrdinals() {
             <ErrorContainer>
               <ErrorText>{error}</ErrorText>
             </ErrorContainer>
-          </>
-        ) : (
-          <>
-            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
-            <ButtonContainer>
-              <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
-            </ButtonContainer>
           </>
         )}
       </Container>
