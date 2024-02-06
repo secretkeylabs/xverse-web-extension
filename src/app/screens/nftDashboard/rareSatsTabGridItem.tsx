@@ -85,8 +85,8 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: Bundle; maxItems: n
 
     return icons.map((sats, index) => (
       <Range key={`${bundle.satRanges[index].block}-${bundle.satRanges[index].offset}`}>
-        {sats.map((sattribute, indexSatributes) => {
-          if (sattribute === 'ellipsis') {
+        {sats.map((satribute, indexSatributes) => {
+          if (satribute === 'ellipsis') {
             return (
               <DotsThree
                 key={`${totalTilesDisplayed}-ellipsis`}
@@ -96,7 +96,7 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: Bundle; maxItems: n
             );
           }
 
-          if (sattribute === '+X') {
+          if (satribute === '+X') {
             return (
               <TileText key={`${totalTilesDisplayed}-+X`} typography="body_m">
                 +{totalTiles - totalTilesDisplayed}
@@ -105,7 +105,7 @@ function RareSatsTabGridItem({ bundle, maxItems }: { bundle: Bundle; maxItems: n
           }
           return (
             // eslint-disable-next-line react/no-array-index-key
-            <RareSatIcon key={`${sattribute}-${indexSatributes}`} type={sattribute} size={24} />
+            <RareSatIcon key={`${satribute}-${indexSatributes}`} type={satribute} size={24} />
           );
         })}
       </Range>
