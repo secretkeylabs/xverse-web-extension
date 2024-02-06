@@ -219,6 +219,11 @@ function RareSatsBundle() {
     navigate('/nft-dashboard/supported-rarity-scale');
   };
 
+  const goBackText =
+    location.state && location.state.source === 'OrdinalDetail'
+      ? t('SEND.MOVE_TO_ASSET_DETAIL')
+      : t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL');
+
   const isEmpty = !bundle?.satRanges?.length;
 
   return (
@@ -235,9 +240,7 @@ function RareSatsBundle() {
               <Button onClick={handleBackButtonClick}>
                 <>
                   <ButtonImage src={ArrowLeft} />
-                  <AssetDetailButtonText>
-                    {t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL')}
-                  </AssetDetailButtonText>
+                  <AssetDetailButtonText>{goBackText}</AssetDetailButtonText>
                 </>
               </Button>
             </BackButtonContainer>
