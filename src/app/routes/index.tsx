@@ -480,7 +480,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'nft-dashboard/send-rare-sat',
+        path: 'nft-dashboard/send-rare-sat/:output',
         element: (
           <AuthGuard>
             <SendRareSat />

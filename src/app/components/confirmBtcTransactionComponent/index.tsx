@@ -4,7 +4,6 @@ import ActionButton from '@components/button';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
@@ -141,7 +140,6 @@ function ConfirmBtcTransactionComponent({
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
   const { btcAddress, selectedAccount, network, btcFiatRate, feeMultipliers } = useWalletSelector();
-  const { selectedSatBundle } = useNftDataSelector();
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const [error, setError] = useState('');
@@ -150,7 +148,6 @@ function ConfirmBtcTransactionComponent({
   const [showFeeWarning, setShowFeeWarning] = useState(false);
   const btcClient = useBtcClient();
 
-  const bundle = selectedSatBundle ?? ordinalBundle ?? undefined;
   const {
     isLoading,
     data,
@@ -372,7 +369,7 @@ function ConfirmBtcTransactionComponent({
             <Callout bodyText={t('NFT_DASHBOARD_SCREEN.HOLDS_RARE_SAT')} variant="warning" />
           </CalloutContainer>
         )}
-        {currencyType !== 'BTC' && bundle && <SatsBundle bundle={bundle} />}
+        {currencyType !== 'BTC' && ordinalBundle && <SatsBundle bundle={ordinalBundle} />}
         {ordinalTxUtxo ? (
           <RecipientComponent
             address={recipients[0]?.address}

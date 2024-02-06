@@ -1,5 +1,5 @@
 import ActionButton from '@components/button';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
@@ -20,7 +20,7 @@ import InputFeedback, { InputFeedbackProps, isDangerFeedback } from '@ui-library
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 
@@ -92,9 +92,11 @@ const StyledCallout = styled(Callout)`
 function SendOrdinal() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { selectedSatBundle } = useNftDataSelector();
-  const btcClient = useBtcClient();
   const location = useLocation();
+  const { output } = useParams();
+  const [txid, vout] = output!.split(':');
+  const { bundle } = useGetUtxoOrdinalBundle(output, true);
+  const btcClient = useBtcClient();
   const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
   const { getSeed } = useSeedVault();
@@ -112,8 +114,7 @@ function SendOrdinal() {
     mutationFn: async (recipient) => {
       const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
       const ordUtxo = addressUtxos.find(
-        (utxo) =>
-          `${utxo.txid}:${utxo.vout}` === `${selectedSatBundle?.txid}:${selectedSatBundle?.vout}`,
+        (utxo) => `${utxo.txid}:${utxo.vout}` === `${txid}:${vout}`,
       );
       setOrdinalUtxo(ordUtxo);
       if (ordUtxo) {
@@ -135,7 +136,7 @@ function SendOrdinal() {
 
   useEffect(() => {
     if (data) {
-      navigate(`/nft-dashboard/confirm-ordinal-tx/${selectedSatBundle?.txid}`, {
+      navigate(`/nft-dashboard/confirm-ordinal-tx/${txid}`, {
         state: {
           signedTxHex: data.signedTx,
           recipientAddress,

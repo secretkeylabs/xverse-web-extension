@@ -185,7 +185,7 @@ function RareSatsBundle() {
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
-      url: chrome.runtime.getURL('options.html#/nft-dashboard/rare-sats-bundle'),
+      url: chrome.runtime.getURL(`options.html#/nft-dashboard/rare-sats-bundle/${output}`),
     });
   };
 
@@ -200,12 +200,11 @@ function RareSatsBundle() {
 
     if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/nft-dashboard/send-rare-sat'),
+        url: chrome.runtime.getURL(`options.html#/nft-dashboard/send-rare-sat/${output}`),
       });
       return;
     }
-
-    navigate('/nft-dashboard/send-rare-sat');
+    navigate(`/nft-dashboard/send-rare-sat/${output}`);
   };
 
   const handleRedirectToTx = () => {
