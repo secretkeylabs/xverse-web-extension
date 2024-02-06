@@ -8,12 +8,3 @@ export function setSelectedSatBundleAction(
     selectedSatBundle,
   };
 }
-
-export function setSelectedSatBundleItemIndexAction(
-  selectedSatBundleItemIndex: actions.NftDataState['selectedSatBundleItemIndex'],
-): actions.SetSelectedSatBundleItemIndex {
-  return {
-    type: actions.SetSelectedSatBundleItemIndexKey,
-    selectedSatBundleItemIndex,
-  };
-}

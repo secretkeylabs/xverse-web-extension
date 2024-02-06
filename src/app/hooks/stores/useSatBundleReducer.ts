@@ -1,7 +1,4 @@
-import {
-  setSelectedSatBundleAction,
-  setSelectedSatBundleItemIndexAction,
-} from '@stores/nftData/actions/actionCreator';
+import { setSelectedSatBundleAction } from '@stores/nftData/actions/actionCreator';
 import { NftDataState } from '@stores/nftData/actions/types';
 import { useDispatch } from 'react-redux';
 
@@ -12,13 +9,8 @@ const useSatBundleDataReducer = () => {
     dispatch(setSelectedSatBundleAction(data));
   };
 
-  const setSelectedSatBundleItemIndex = (data: NftDataState['selectedSatBundleItemIndex']) => {
-    dispatch(setSelectedSatBundleItemIndexAction(data));
-  };
-
   return {
     setSelectedSatBundleDetails,
-    setSelectedSatBundleItemIndex,
   };
 };
 
