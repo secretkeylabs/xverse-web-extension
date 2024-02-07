@@ -9,21 +9,29 @@ declare global {
     StacksProvider: StacksProvider;
   }
 }
-// we inject these in case implementors call the default providers
-if (document.currentScript?.dataset.isPriority) {
-  Object.defineProperties(window, {
-    StacksProvider: { get: () => StacksMethodsProvider, set: () => {} },
-    BitcoinProvider: { get: () => SatsMethodsProvider, set: () => {} },
-  });
-} else {
-  window.StacksProvider = StacksMethodsProvider as StacksProvider;
-  window.BitcoinProvider = SatsMethodsProvider;
-}
 
-// We also inject the providers in an Xverse object in order to have them exclusively available for Xverse wallet
+// We inject the providers in an Xverse object in order to have them exclusively available for Xverse wallet
 // and not clash with providers from other wallets
 window.XverseProviders = {
   // @ts-ignore
   StacksProvider: StacksMethodsProvider as StacksProvider,
   BitcoinProvider: SatsMethodsProvider as BitcoinProvider,
 };
+
+// we inject these in case implementors call the default providers
+try {
+  if (document.currentScript?.dataset.isPriority) {
+    Object.defineProperties(window, {
+      StacksProvider: { get: () => StacksMethodsProvider, set: () => {} },
+      BitcoinProvider: { get: () => SatsMethodsProvider, set: () => {} },
+    });
+  } else {
+    window.StacksProvider = StacksMethodsProvider as StacksProvider;
+    window.BitcoinProvider = SatsMethodsProvider;
+  }
+} catch (e) {
+  console.log(
+    'Failed setting Xverse default providers. Another wallet may have already set them in an immutable way.',
+  );
+  console.error(e);
+}
