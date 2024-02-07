@@ -1,5 +1,4 @@
 import ActionButton from '@components/button';
-import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
@@ -95,7 +94,6 @@ function SendOrdinal() {
   const location = useLocation();
   const { output } = useParams();
   const [txid, vout] = output!.split(':');
-  const { bundle } = useGetUtxoOrdinalBundle(output, true);
   const btcClient = useBtcClient();
   const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
@@ -136,7 +134,7 @@ function SendOrdinal() {
 
   useEffect(() => {
     if (data) {
-      navigate(`/nft-dashboard/confirm-ordinal-tx/${txid}`, {
+      navigate(`/nft-dashboard/confirm-ordinal-tx/${output}`, {
         state: {
           signedTxHex: data.signedTx,
           recipientAddress,

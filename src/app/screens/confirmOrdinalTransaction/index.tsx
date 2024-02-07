@@ -52,10 +52,23 @@ function ConfirmOrdinalTransaction() {
     fee = BigNumber(fee);
   }
   const { id } = useParams();
-  const { data: selectedOrdinal } = useAddressInscription(id!);
+  const [txid, vout] = id!.split(':');
+  const { data: selectedOrdinal } = useAddressInscription(txid!);
   const { refetch } = useBtcWalletData();
   const [currentFee, setCurrentFee] = useState(fee);
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
+
+  const {
+    bundle: ordinalBundle,
+    isPartOfABundle,
+    ordinalSatributes,
+  } = useGetUtxoOrdinalBundle(
+    selectedOrdinal?.output || id,
+    hasActivatedRareSatsKey,
+    selectedOrdinal?.number,
+  );
+
+  const holdsRareSats = ordinalSatributes?.length > 0;
 
   const {
     isLoading,
@@ -99,18 +112,6 @@ function ConfirmOrdinalTransaction() {
       });
     }
   }, [txError]);
-
-  const {
-    bundle: ordinalBundle,
-    isPartOfABundle,
-    ordinalSatributes,
-  } = useGetUtxoOrdinalBundle(
-    selectedOrdinal?.output,
-    hasActivatedRareSatsKey,
-    selectedOrdinal?.number,
-  );
-
-  const holdsRareSats = ordinalSatributes?.length > 0;
 
   const handleOnConfirmClick = (txHex: string) => {
     if (isLedgerAccount(selectedAccount)) {
