@@ -233,7 +233,7 @@ function OrdinalsCollection() {
                     itemId={getInscriptionsCollectionGridItemId(inscription)}
                     itemSubText={getInscriptionsCollectionGridItemSubText(inscription)}
                     itemSubTextColor={getInscriptionsCollectionGridItemSubTextColor(inscription)}
-                    onClick={(ordinalId) => navigate(`/nft-dashboard/ordinal-detail/${ordinalId}`)}
+                    onClick={() => navigate(`/nft-dashboard/ordinal-detail/${inscription.id}`)}
                   >
                     <OrdinalImage ordinal={inscription} />
                   </CollectibleCollectionGridItem>
