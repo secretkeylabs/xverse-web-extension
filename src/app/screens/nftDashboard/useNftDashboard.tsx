@@ -108,7 +108,6 @@ export const useNftDashboard = (): NftDashboardState => {
   const stacksNftsQuery = useStacksCollectibles();
   const inscriptionsQuery = useAddressInscriptionCollections();
   const rareSatsQuery = useAddressRareSats();
-
   const totalInscriptions = inscriptionsQuery.data?.pages?.[0]?.total_inscriptions ?? 0;
   const totalNfts = stacksNftsQuery.data?.total_nfts ?? 0;
 

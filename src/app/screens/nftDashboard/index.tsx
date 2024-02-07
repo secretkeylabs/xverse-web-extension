@@ -143,8 +143,8 @@ function NftDashboard() {
           </ButtonContainer>
         </PageHeader>
         <StyledCollectiblesTabs
-          nftListView={<NftListView />}
           inscriptionListView={<InscriptionListView />}
+          nftListView={<NftListView />}
           nftDashboard={nftDashboard}
         />
       </Container>

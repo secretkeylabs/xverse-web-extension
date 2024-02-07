@@ -3,7 +3,6 @@ import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionCom
 import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
 import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -54,7 +53,6 @@ function ConfirmOrdinalTransaction() {
   }
   const { id } = useParams();
   const { data: selectedOrdinal } = useAddressInscription(id!);
-  const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
   const { refetch } = useBtcWalletData();
   const [currentFee, setCurrentFee] = useState(fee);
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
@@ -74,7 +72,6 @@ function ConfirmOrdinalTransaction() {
 
   useEffect(() => {
     if (btcTxBroadcastData) {
-      setSelectedSatBundleDetails(null);
       navigate('/tx-status', {
         state: {
           txid: btcTxBroadcastData.tx.hash,
@@ -92,7 +89,6 @@ function ConfirmOrdinalTransaction() {
 
   useEffect(() => {
     if (txError) {
-      setSelectedSatBundleDetails(null);
       navigate('/tx-status', {
         state: {
           txid: '',

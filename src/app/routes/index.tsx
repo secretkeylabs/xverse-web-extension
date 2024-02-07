@@ -432,7 +432,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'nft-dashboard/rare-sats-bundle',
+        path: 'nft-dashboard/rare-sats-bundle/:output',
         element: (
           <AuthGuard>
             <RareSatsBundle />

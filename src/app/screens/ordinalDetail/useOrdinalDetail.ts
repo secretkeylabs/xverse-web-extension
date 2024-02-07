@@ -2,7 +2,6 @@ import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription
 import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useCollectionMarketData';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
-import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
@@ -28,7 +27,6 @@ export default function useOrdinalDetail() {
 
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(ordinalData?.tx_id);
   const textContent = useTextOrdinalContent(ordinalData!);
-  const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
   const { bundle, isPartOfABundle, ordinalSatributes } = useGetUtxoOrdinalBundle(
     ordinalData?.output,
     hasActivatedRareSatsKey,
@@ -101,8 +99,9 @@ export default function useOrdinalDetail() {
     if (!bundle || !ordinalData) {
       return;
     }
-    setSelectedSatBundleDetails(bundle);
-    navigate('/nft-dashboard/rare-sats-bundle', { state: { source: 'OrdinalDetail' } });
+    navigate(`/nft-dashboard/rare-sats-bundle/${bundle.txid}:${bundle.vout}`, {
+      state: { source: 'OrdinalDetail' },
+    });
   };
 
   const onCopyClick = () => {

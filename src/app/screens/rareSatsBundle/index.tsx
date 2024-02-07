@@ -6,9 +6,8 @@ import Separator from '@components/separator';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import WebGalleryButton from '@components/webGalleryButton';
+import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
-import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
@@ -22,7 +21,7 @@ import {
 } from '@utils/helper';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import OrdinalAttributeComponent from '../ordinalDetail/ordinalAttributeComponent';
 import { RareSatsBundleGridItem } from './rareSatsBundleGridItem';
@@ -165,11 +164,12 @@ function RareSatsBundle() {
   const navigate = useNavigate();
   const location = useLocation();
   const { source } = location.state || {};
+  const { output } = useParams();
+  const [txid, vout] = output!.split(':');
   const { network, selectedAccount, ordinalsAddress } = useWalletSelector();
-  const { selectedSatBundle: bundle } = useNftDataSelector();
-  const { isPending, pendingTxHash } = usePendingOrdinalTxs(bundle?.txid);
+  const { bundle } = useGetUtxoOrdinalBundle(output, true);
+  const { isPending, pendingTxHash } = usePendingOrdinalTxs(txid);
   const [showSendOrdinalsAlert, setShowSendOrdinalsAlert] = useState<boolean>(false);
-  const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
@@ -181,7 +181,6 @@ function RareSatsBundle() {
     } else {
       navigate('/nft-dashboard?tab=rareSats');
     }
-    setSelectedSatBundleDetails(null);
   };
 
   const openInGalleryView = async () => {
