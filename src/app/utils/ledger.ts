@@ -3,11 +3,13 @@ import { NetworkType, signSimpleBip322Message, Transport } from '@secretkeylabs/
 export const handleBip322LedgerMessageSigning = async ({
   transport,
   addressIndex,
+  address,
   networkType,
   message,
 }: {
   transport: Transport;
   addressIndex?: number;
+  address: string;
   networkType: NetworkType;
   message: string;
 }) => {
@@ -19,6 +21,7 @@ export const handleBip322LedgerMessageSigning = async ({
     transport,
     networkType,
     addressIndex,
+    address,
     message,
   });
 
