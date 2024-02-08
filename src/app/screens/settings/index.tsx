@@ -1,6 +1,6 @@
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
+import XverseLogo from '@assets/img/full_logo_horizontal.svg';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
-import XverseLogo from '@assets/img/settings/logo.svg';
 import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
 import useChromeLocalStorage from '@hooks/useChromeLocalStorage';

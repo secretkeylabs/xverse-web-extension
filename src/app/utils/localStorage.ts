@@ -1,6 +1,5 @@
 const userPrefBackupRemindKey = 'UserPref:BackupRemind';
 const isTermsAccepted = 'isTermsAccepted';
-const hasFinishedOnboardingKey = 'hasFinishedOnboarding';
 const nonOrdinalTransferTime = 'nonOrdinalTransferTime';
 
 export function saveMultiple(items: { [x: string]: string }) {
@@ -8,18 +7,6 @@ export function saveMultiple(items: { [x: string]: string }) {
   itemKeys.forEach((key) => {
     localStorage.setItem(key, items[key]);
   });
-}
-
-export function saveHasFinishedOnboarding(finished: boolean) {
-  localStorage.setItem(hasFinishedOnboardingKey, finished.toString());
-}
-
-export function getHasFinishedOnboarding(): boolean {
-  const accepted = localStorage.getItem(hasFinishedOnboardingKey);
-  if (accepted !== null) {
-    return true;
-  }
-  return false;
 }
 
 export function saveIsTermsAccepted(termsDisplayed: boolean) {

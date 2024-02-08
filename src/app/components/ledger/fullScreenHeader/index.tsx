@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import XverseLogoSVG from '@assets/img/settings/logo.svg';
+import XverseLogoSVG from '@assets/img/full_logo_horizontal.svg';
 
 declare const VERSION: string;
 
@@ -16,7 +16,7 @@ const HeaderRow = styled.div((props) => ({
   padding: '32px 100px',
 }));
 
-const XverseLogo = styled.img((props) => ({
+const XverseLogo = styled.img(() => ({
   height: '18px',
 }));
 

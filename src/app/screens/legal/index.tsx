@@ -5,6 +5,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { CustomSwitch } from '@screens/ledger/importLedgerAccount/steps/index.styled';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
+import { isInOptions } from '@utils/helper';
 import { saveIsTermsAccepted } from '@utils/localStorage';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
@@ -66,12 +67,12 @@ const SwitchContainer = styled.div((props) => ({
 }));
 
 const DataCollectionDescription = styled.p((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(32),
 }));
 
-function LegalLinks() {
+function Legal() {
   const { t } = useTranslation('translation', { keyPrefix: 'LEGAL_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -82,7 +83,7 @@ function LegalLinks() {
 
   const handleSwitchToggle = () => setIsToggleEnabled((prevEnabledState) => !prevEnabledState);
 
-  const handleLegalAccept = () => {
+  const handleLegalAccept = async () => {
     if (isToggleEnabled) {
       optInMixPanel(selectedAccount?.masterPubKey);
     } else {
@@ -92,7 +93,13 @@ function LegalLinks() {
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {
-      navigate('/restoreWallet', { replace: true });
+      if (!isInOptions()) {
+        await chrome.tabs.create({
+          url: chrome.runtime.getURL(`options.html#/restoreWallet`),
+        });
+      } else {
+        navigate('/restoreWallet', { replace: true });
+      }
     } else {
       navigate('/backup', { replace: true });
     }
@@ -133,4 +140,4 @@ function LegalLinks() {
   );
 }
 
-export default LegalLinks;
+export default Legal;
