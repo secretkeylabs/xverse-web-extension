@@ -144,10 +144,15 @@ function BtcSelectAddressScreen() {
     (async () => {
       if (origin !== '') {
         setIsLoadingIcon(true);
-        getAppIconFromWebManifest(origin).then((appIcons) => {
-          setAppIcon(appIcons);
-          setIsLoadingIcon(false);
-        });
+        getAppIconFromWebManifest(origin)
+          .then((appIcons) => {
+            setAppIcon(appIcons);
+            setIsLoadingIcon(false);
+          })
+          .catch(() => {
+            setIsLoadingIcon(false);
+            setAppIcon('');
+          });
       }
     })();
 
