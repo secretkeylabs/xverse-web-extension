@@ -89,7 +89,11 @@ function SendBtcScreen() {
           setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
         }
       } catch (e) {
-        console.error(e);
+        if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
+          // don't log the error if it's just an insufficient funds error
+          console.error(e);
+        }
+
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
