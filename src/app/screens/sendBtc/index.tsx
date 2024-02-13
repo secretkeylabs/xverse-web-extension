@@ -130,7 +130,7 @@ function SendBtcScreen() {
   const handleSubmit = async (ledgerTransport?: Transport) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport });
+      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
       navigate('/tx-status', {
         state: {
           txid: txnId,
