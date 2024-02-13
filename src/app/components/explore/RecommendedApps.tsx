@@ -2,17 +2,17 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Container = styled.div`
-  margin-top: 24px;
+  margin-top: ${({ theme }) => theme.space.l};
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: ${({ theme }) => theme.space.l};
   width: 100%;
 `;
 
 const Card = styled(Link)`
   display: flex;
   align-items: center;
-  column-gap: 16px;
+  column-gap: ${({ theme }) => theme.space.m};
   width: 100%;
   max-width: 282px;
   color: ${({ theme }) => theme.colors.white_0};

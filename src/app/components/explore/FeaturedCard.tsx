@@ -18,7 +18,7 @@ const CardImage = styled.img`
 `;
 
 const CardText = styled.div`
-  padding: 16px;
+  padding: ${({ theme }) => theme.space.m};
   ${({ theme }) => theme.typography.body_medium_m};
 `;
 

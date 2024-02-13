@@ -29,7 +29,7 @@ const Subheader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 32px;
+  margin-top: ${({ theme }) => theme.space.xl};
   font-weight: 500;
   color: ${({ theme }) => theme.colors.white_200};
 `;

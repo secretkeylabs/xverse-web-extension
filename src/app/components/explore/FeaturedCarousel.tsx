@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import FeaturedCard, { FeaturedCardProps } from './FeaturedCard';
 
 const CarouselContainer = styled.div`
-  margin-top: 24px;
+  margin-top: ${({ theme }) => theme.space.l};
 
   .swiper {
     padding-bottom: 35px;
