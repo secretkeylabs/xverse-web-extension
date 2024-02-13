@@ -215,7 +215,7 @@ const injectInPageScript = (isPriority) => {
 
 getIsPriorityWallet()
   .then((isPriorityWallet) => {
-    injectInPageScript(isPriorityWallet);
+    requestAnimationFrame(() => injectInPageScript(isPriorityWallet));
   })
   .catch(() => {
     injectInPageScript(false);
