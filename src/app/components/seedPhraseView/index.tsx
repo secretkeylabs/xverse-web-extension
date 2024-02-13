@@ -1,5 +1,4 @@
 import Eye from '@assets/img/createPassword/Eye.svg';
-import { useMemo } from 'react';
 import styled from 'styled-components';
 import SeedPhraseWord from './word';
 

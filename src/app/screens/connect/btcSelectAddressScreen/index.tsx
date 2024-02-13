@@ -6,6 +6,7 @@ import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
 import SelectAccount from '@screens/connect/selectAccount';
+import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -15,7 +16,6 @@ import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
 import AddressPurposeBox from '../addressPurposeBox';
 import PermissionsList from '../permissionsList';
-import { getAppIconFromWebManifest } from './helper';
 
 const OuterContainer = styled.div((props) => ({
   display: 'flex',
@@ -144,10 +144,15 @@ function BtcSelectAddressScreen() {
     (async () => {
       if (origin !== '') {
         setIsLoadingIcon(true);
-        getAppIconFromWebManifest(origin).then((appIcons) => {
-          setAppIcon(appIcons);
-          setIsLoadingIcon(false);
-        });
+        getAppIconFromWebManifest(origin)
+          .then((appIcons) => {
+            setAppIcon(appIcons);
+            setIsLoadingIcon(false);
+          })
+          .catch(() => {
+            setIsLoadingIcon(false);
+            setAppIcon('');
+          });
       }
     })();
 

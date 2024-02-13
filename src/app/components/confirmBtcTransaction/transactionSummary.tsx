@@ -135,7 +135,7 @@ function TransactionSummary({
         inputs={inputs}
         isPartialTransaction={isPartialTransaction}
         onShowInscription={setInscriptionToShow}
-        netAmount={(netAmount + (feeOutput?.amount ?? 0)) * -1}
+        netAmount={-netAmount}
       />
 
       <ReceiveSection
