@@ -5,8 +5,10 @@ import RecommendedApps from '@components/explore/RecommendedApps';
 import SwiperNavigation from '@components/explore/SwiperNavigation';
 import BottomBar from '@components/tabBar';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { ArrowsOut } from '@phosphor-icons/react';
 import { getFeaturedDapps } from '@secretkeylabs/xverse-core';
 import { StyledHeading } from '@ui-library/common.styled';
+import { XVERSE_EXPLORE_URL } from '@utils/constants';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -30,6 +32,15 @@ const Subheader = styled.div`
   margin-top: 32px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.white_200};
+`;
+
+const ExternalLink = styled.a`
+  ${({ theme }) => theme.typography.body_medium_m};
+  display: flex;
+  align-items: center;
+  column-gap: ${({ theme }) => theme.space.xs};
+  color: ${({ theme }) => theme.colors.white_0};
+  margin-top: ${({ theme }) => theme.space.s};
 `;
 
 const featuredApps = [
@@ -117,13 +128,16 @@ function ExploreScreen() {
     <>
       <Container>
         <StyledHeading typography="headline_l">{t('TITLE')}</StyledHeading>
-
+        <ExternalLink href={XVERSE_EXPLORE_URL} target="_blank" rel="noreferrer">
+          <ArrowsOut size={16} />
+          {t('EXPAND_VIEW')}
+        </ExternalLink>
         <Subheader>
-          Featured
+          {t('FEATURED')}
           <SwiperNavigation />
         </Subheader>
         <FeaturedCardCarousel items={featuredApps} />
-        <Subheader>Recommended</Subheader>
+        <Subheader>{t('RECOMMENDED')}</Subheader>
         <RecommendedApps items={recommendedApps} />
       </Container>
       <BottomBar tab="explore" />
