@@ -52,7 +52,7 @@ function SendBtcScreen() {
   }, [btcFeeRate, feeRatesLoading]);
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
-    const amountBigInt = BigInt(amountSats);
+    const amountBigInt = Number.isNaN(Number(amountSats)) ? 0n : BigInt(amountSats);
     const transactionDetails =
       sendMax && currentStep !== Step.Confirm
         ? await generateSendMaxTransaction(
@@ -70,7 +70,7 @@ function SendBtcScreen() {
   };
 
   useEffect(() => {
-    if (!recipientAddress || !(amountSats || sendMax) || !feeRate) {
+    if (!recipientAddress || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);
       return;
