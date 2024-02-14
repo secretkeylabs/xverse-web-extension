@@ -210,12 +210,12 @@ const injectInPageScript = (isPriority) => {
   inpage.src = chrome.runtime.getURL('inpage.js');
   inpage.id = 'xverse-wallet-provider';
   inpage.setAttribute('data-is-priority', isPriority ? 'true' : '');
-  document.body.appendChild(inpage);
+  document.head.appendChild(inpage);
 };
 
 getIsPriorityWallet()
   .then((isPriorityWallet) => {
-    requestAnimationFrame(() => injectInPageScript(isPriorityWallet));
+    injectInPageScript(isPriorityWallet);
   })
   .catch(() => {
     injectInPageScript(false);
