@@ -1,3 +1,4 @@
+// @ts-nocheck - TODO: remove this once the API is updated
 import magicEdenLogo from '@assets/img/explore/magicEden.jpg';
 import ordMarketLogo from '@assets/img/explore/ordinalsMarketLogo.jpg';
 import FeaturedCardCarousel from '@components/explore/FeaturedCarousel';
@@ -6,10 +7,10 @@ import SwiperNavigation from '@components/explore/SwiperNavigation';
 import BottomBar from '@components/tabBar';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsOut } from '@phosphor-icons/react';
-import { getFeaturedDapps } from '@secretkeylabs/xverse-core';
+import { FeaturedDapp, getFeaturedDapps } from '@secretkeylabs/xverse-core';
 import { StyledHeading } from '@ui-library/common.styled';
 import { XVERSE_EXPLORE_URL } from '@utils/constants';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -41,9 +42,10 @@ const ExternalLink = styled.a`
   column-gap: ${({ theme }) => theme.space.xs};
   color: ${({ theme }) => theme.colors.white_0};
   margin-top: ${({ theme }) => theme.space.s};
+  cursor: pointer;
 `;
 
-const featuredApps = [
+const mockedFeaturedApps = [
   {
     link: 'https://magiceden.io/',
     src: magicEdenLogo,
@@ -71,7 +73,7 @@ const featuredApps = [
   },
 ];
 
-const recommendedApps = [
+const mockedRecommendedApps = [
   {
     link: 'https://ordinals.market/',
     src: ordMarketLogo,
@@ -110,18 +112,31 @@ const recommendedApps = [
   },
 ];
 
+// TODO: Use fetched data instead of the mocked data once the API is updated
+const MOCK_DATA_ENABLED = true;
+
 function ExploreScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'EXPLORE_SCREEN' });
   const { network } = useWalletSelector();
+  const [featuredApps, setFeaturedApps] = useState<FeaturedDapp[]>();
+  const [recommendedApps, setRecommendedApps] = useState<FeaturedDapp[]>();
 
   const fetchFeaturedApps = async () => {
-    const data = await getFeaturedDapps(network.type, true);
-    console.log('Featured Apps:', data);
-    // TODO: Use this data instead of the mocked data
+    const response = await getFeaturedDapps(network.type, true);
+
+    const featured = response.find((f) => f.section === 'Featured')?.apps;
+    const recommended = response.find((f) => f.section === 'Recommended')?.apps;
+    setFeaturedApps(featured);
+    setRecommendedApps(recommended);
   };
 
   useEffect(() => {
-    fetchFeaturedApps();
+    if (MOCK_DATA_ENABLED) {
+      setFeaturedApps(mockedFeaturedApps);
+      setRecommendedApps(mockedRecommendedApps);
+    } else {
+      fetchFeaturedApps();
+    }
   }, []);
 
   return (
@@ -136,9 +151,9 @@ function ExploreScreen() {
           {t('FEATURED')}
           <SwiperNavigation />
         </Subheader>
-        <FeaturedCardCarousel items={featuredApps} />
+        {!!featuredApps?.length && <FeaturedCardCarousel items={featuredApps} />}
         <Subheader>{t('RECOMMENDED')}</Subheader>
-        <RecommendedApps items={recommendedApps} />
+        {!!recommendedApps?.length && <RecommendedApps items={recommendedApps} />}
       </Container>
       <BottomBar tab="explore" />
     </>
