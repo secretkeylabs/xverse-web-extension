@@ -15,7 +15,6 @@ const ButtonsContainer = styled.div`
 const InputsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  // gap: ${(props) => props.theme.space.xl};
 `;
 
 type InputScreenProps = {

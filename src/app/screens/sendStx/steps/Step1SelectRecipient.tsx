@@ -1,8 +1,6 @@
 import InputScreen from '@components/inputScreen';
 import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
 import useDebounce from '@hooks/useDebounce';
-// import { useBnsResolver } from '@hooks/queries/useBnsName';
-// import useDebounce from '@hooks/useDebounce';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { validateStacksAddress } from '@stacks/transactions';
 import Button from '@ui-library/button';
@@ -15,7 +13,6 @@ import styled from 'styled-components';
 type StxRecipientScreenProps = {
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
-  // recipientDomain: string;
   setRecipientDomain: (address: string) => void;
   memo: string;
   setMemo: (memo: string) => void;
@@ -43,7 +40,6 @@ interface InputFeedback {
 function Step1SelectRecipient({
   recipientAddress,
   setRecipientAddress,
-  // recipientDomain,
   setRecipientDomain,
   memo,
   setMemo,

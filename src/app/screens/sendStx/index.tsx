@@ -2,12 +2,12 @@ import TokenImage from '@components/tokenImage';
 
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
-import SendLayout from 'app/layouts/sendLayout';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import SendLayout from 'app/layouts/sendLayout';
 import { Step, getNextStep, getPreviousStep } from './stepResolver';
 import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipient';
 import Step2SelectAmount from './steps/Step2SelectAmount';
@@ -52,7 +52,8 @@ function SendStxScreen() {
 
   // Step 1 states
   const [recipientAddress, setRecipientAddress] = useState(stateAddress ?? '');
-  const [recipientDomain, setRecipientDomain] = useState('');
+  // Will be used in the future when the summary screen is refactored
+  const [, setRecipientDomain] = useState('');
   const [memo, setMemo] = useState(stxMemo ?? '');
 
   // Step 2 states
@@ -97,7 +98,6 @@ function SendStxScreen() {
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}
-              // recipientDomain={recipientDomain}
               setRecipientDomain={setRecipientDomain}
               memo={memo}
               setMemo={setMemo}
