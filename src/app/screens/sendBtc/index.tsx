@@ -52,7 +52,7 @@ function SendBtcScreen() {
   }, [btcFeeRate, feeRatesLoading]);
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
-    const amountBigInt = BigInt(amountSats);
+    const amountBigInt = Number.isNaN(Number(amountSats)) ? 0n : BigInt(amountSats);
     const transactionDetails =
       sendMax && currentStep !== Step.Confirm
         ? await generateSendMaxTransaction(
@@ -70,7 +70,7 @@ function SendBtcScreen() {
   };
 
   useEffect(() => {
-    if (!recipientAddress || !(amountSats || sendMax) || !feeRate) {
+    if (!recipientAddress || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);
       return;
@@ -89,7 +89,11 @@ function SendBtcScreen() {
           setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
         }
       } catch (e) {
-        console.error(e);
+        if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
+          // don't log the error if it's just an insufficient funds error
+          console.error(e);
+        }
+
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
@@ -126,7 +130,7 @@ function SendBtcScreen() {
   const handleSubmit = async (ledgerTransport?: Transport) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport });
+      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
       navigate('/tx-status', {
         state: {
           txid: txnId,

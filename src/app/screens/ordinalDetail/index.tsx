@@ -607,7 +607,7 @@ function OrdinalDetailScreen() {
   const stributesBadges = showSatributes && (
     <SatributesBadgeContainer isGallery={isGalleryOpen}>
       <StyledP typography="body_medium_m" color="white_400">
-        {commonT('SATTRIBUTES')}
+        {commonT('SATRIBUTES')}
       </StyledP>
       <SatributesBadges isGallery={isGalleryOpen}>
         {ordinalSatributes.map((satribute, index) => {
