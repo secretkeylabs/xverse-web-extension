@@ -73,9 +73,6 @@ function Step1SelectRecipient({
   }, [associatedAddress]);
 
   useEffect(() => {
-    setRecipientDomain('');
-    setInputFeedback(undefined);
-
     if (associatedDomain !== '') {
       setRecipientDomain(associatedDomain);
       setRecipientAddress(recipient);
@@ -83,6 +80,9 @@ function Step1SelectRecipient({
         { variant: 'checkmark', message: t('ASSOCIATED_DOMAIN') },
         { variant: 'plainIndented', message: associatedDomain },
       ]);
+    } else {
+      setRecipientDomain('');
+      setInputFeedback(undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [associatedDomain]);
