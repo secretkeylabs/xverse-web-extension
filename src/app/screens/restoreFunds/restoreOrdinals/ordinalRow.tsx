@@ -1,8 +1,8 @@
 import useInscriptionDetails from '@hooks/queries/ordinals/useInscriptionDetails';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import type { BtcOrdinal, Inscription } from '@secretkeylabs/xverse-core';
+import Spinner from '@ui-library/spinner';
 import { useTranslation } from 'react-i18next';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
 const OrdinalCard = styled.div((props) => ({
@@ -89,7 +89,7 @@ function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer
         <TransferButton onClick={onClick} disabled={disableTransfer}>
           {isLoading ? (
             <LoaderContainer>
-              <MoonLoader color="white" size={15} />
+              <Spinner color="white" size={15} />
             </LoaderContainer>
           ) : (
             t('RESTORE_ORDINAL_SCREEN.TRANSFER')

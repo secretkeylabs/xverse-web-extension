@@ -1,12 +1,12 @@
 import useSendBtcRequest from '@hooks/useSendBtcRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ErrorCodes, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import Spinner from '@ui-library/spinner';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
 const OuterContainer = styled.div`
@@ -120,7 +120,7 @@ function BtcSendScreen() {
       });
     }
   }, [signedTx]);
-  return <OuterContainer>{isLoading && <MoonLoader color="white" size={50} />}</OuterContainer>;
+  return <OuterContainer>{isLoading && <Spinner color="white" size={50} />}</OuterContainer>;
 }
 
 export default BtcSendScreen;

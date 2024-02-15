@@ -15,11 +15,11 @@ import {
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
+import Spinner from '@ui-library/spinner';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import OrdinalRow from './ordinalRow';
 
@@ -170,7 +170,7 @@ function RestoreOrdinals() {
       <Container>
         {!ordinals ? (
           <LoaderContainer>
-            <MoonLoader color="white" size={25} />
+            <Spinner color="white" size={25} />
           </LoaderContainer>
         ) : (
           showContent

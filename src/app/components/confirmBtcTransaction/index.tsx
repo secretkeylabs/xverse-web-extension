@@ -9,10 +9,10 @@ import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
+import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import TransactionSummary from './transactionSummary';
@@ -60,8 +60,12 @@ type Props = {
   onCancel: () => void;
   onBackClick?: () => void;
   confirmDisabled?: boolean;
-  getFeeForFeeRate?: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number>;
+  getFeeForFeeRate?: (
+    feeRate: number,
+    useEffectiveFeeRate?: boolean,
+  ) => Promise<number | undefined>;
   onFeeRateSet?: (feeRate: number) => void;
+  feeRate?: number;
 };
 
 function ConfirmBtcTransaction({
@@ -82,6 +86,7 @@ function ConfirmBtcTransaction({
   confirmDisabled = false,
   getFeeForFeeRate,
   onFeeRateSet,
+  feeRate,
 }: Props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -146,7 +151,7 @@ function ConfirmBtcTransaction({
 
   return isLoading ? (
     <LoaderContainer>
-      <MoonLoader color="white" size={50} />
+      <Spinner size={50} />
     </LoaderContainer>
   ) : (
     <>
@@ -168,6 +173,7 @@ function ConfirmBtcTransaction({
           isPartialTransaction={isPartialTransaction}
           getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={onFeeRateSet}
+          feeRate={feeRate}
           isSubmitting={isSubmitting}
         />
         {!isLoading && (

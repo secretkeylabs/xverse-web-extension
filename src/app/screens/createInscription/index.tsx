@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useLocation } from 'react-router-dom';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
 import {
@@ -33,6 +32,7 @@ import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
 import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
+import Spinner from '@ui-library/spinner';
 import CompleteScreen from './CompleteScreen';
 import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
@@ -236,6 +236,8 @@ const MAX_REPEATS = 24;
 
 function CreateInscription() {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
+  const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
+
   const { search } = useLocation();
 
   const [payload, requestToken, tabId, origin] = useMemo(() => {
@@ -533,7 +535,7 @@ function CreateInscription() {
           <CardContainer bottomPadding>
             <CardRow>
               <div>{t('FEES.TITLE')}</div>
-              <div>{isLoading && <MoonLoader color="white" size={20} />}</div>
+              <div>{isLoading && <Spinner color="white" size={20} />}</div>
             </CardRow>
             <FeeRow
               label={t('FEES.INSCRIPTION')}
@@ -560,7 +562,7 @@ function CreateInscription() {
                   value={feeRate}
                   displayType="text"
                   thousandSeparator
-                  suffix=" sats/vB"
+                  suffix={` ${tUnits('SATS_PER_VB')}`}
                   renderText={(value: string) => <NumberSuffix>{value}</NumberSuffix>}
                 />
                 <NumericFormat

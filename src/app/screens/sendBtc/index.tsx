@@ -1,202 +1,194 @@
-import SendForm from '@components/sendForm';
-import BottomBar from '@components/tabBar';
-import TopRow from '@components/topRow';
-import useBtcClient from '@hooks/useBtcClient';
+import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useSeedVault from '@hooks/useSeedVault';
-import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  btcToSats,
-  ErrorCodes,
-  getBtcFiatEquivalent,
-  Recipient,
-  ResponseError,
-  satsToBtc,
-  signBtcTransaction,
-  SignedBtcTx,
-  validateBtcAddress,
-} from '@secretkeylabs/xverse-core';
-import { useMutation } from '@tanstack/react-query';
-import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
+import useTransactionContext from '@hooks/useTransactionContext';
+import { Transport, btcTransaction } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
-import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  generateSendMaxTransaction,
+  generateTransaction,
+  type TransactionSummary,
+} from './helpers';
+import StepDisplay from './stepDisplay';
+import { Step, getPreviousStep } from './steps';
 
 function SendBtcScreen() {
-  const location = useLocation();
-  let enteredAddress: string | undefined;
-  let enteredAmountToSend: string | undefined;
-  if (location.state) {
-    enteredAddress = location.state.recipientAddress;
-    enteredAmountToSend = location.state.amount;
-  }
-  const [amountError, setAmountError] = useState('');
-  const [addressError, setAddressError] = useState('');
-  const [recipientAddress, setRecipientAddress] = useState(enteredAddress ?? '');
-  const [warning, setWarning] = useState('');
-  const [recipient, setRecipient] = useState<Recipient[]>();
-  const [amount, setAmount] = useState(enteredAmountToSend ?? '');
-  const { btcAddress, network, btcBalance, selectedAccount, btcFiatRate } = useWalletSelector();
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { getSeed } = useSeedVault();
-  const btcClient = useBtcClient();
 
-  const {
-    isLoading,
-    data,
-    error: txError,
-    mutate,
-  } = useMutation<
-    SignedBtcTx,
-    ResponseError,
-    {
-      recipients: Recipient[];
-      seedPhrase: string;
-    }
-  >({
-    mutationFn: async ({ recipients, seedPhrase }) =>
-      signBtcTransaction(
-        recipients,
-        btcAddress,
-        selectedAccount?.id ?? 0,
-        seedPhrase,
-        btcClient,
-        network.type,
-      ),
-  });
-
-  const handleBackButtonClick = () => {
-    navigate('/');
-  };
-
-  useEffect(() => {
-    if (data) {
-      const parsedAmountSats = btcToSats(new BigNumber(amount));
-      navigate('/confirm-btc-tx', {
-        state: {
-          signedTxHex: data.signedTx,
-          recipientAddress,
-          amount,
-          recipient,
-          fiatAmount: getBtcFiatEquivalent(parsedAmountSats, BigNumber(btcFiatRate)),
-          fee: data.fee,
-          feePerVByte: data.feePerVByte,
-          fiatFee: getBtcFiatEquivalent(data.fee, BigNumber(btcFiatRate)),
-          total: data.total,
-          fiatTotal: getBtcFiatEquivalent(data.total, BigNumber(btcFiatRate)),
-        },
-      });
-    }
-  }, [data]);
+  const isInOption = isInOptions();
 
   useResetUserFlow('/send-btc');
 
+  const location = useLocation();
+
+  const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
+
+  const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [amountSats, setAmountSats] = useState(location.state?.amount || '');
+  const [feeRate, setFeeRate] = useState('');
+  const [sendMax, setSendMax] = useState(false);
+  const amountEditable = location.state?.disableAmountEdit ?? true;
+  const addressEditable = location.state?.disableAddressEdit ?? true;
+
+  const initialStep = addressEditable
+    ? Step.SelectRecipient
+    : amountEditable
+    ? Step.SelectRecipient
+    : Step.Confirm;
+
+  const [currentStep, setCurrentStep] = useState<Step>(initialStep);
+
+  const transactionContext = useTransactionContext();
+  const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
+  const [summary, setSummary] = useState<TransactionSummary | undefined>();
+
   useEffect(() => {
-    if (recipientAddress && amount && txError) {
-      if (Number(txError) === ErrorCodes.InSufficientBalance) {
-        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
-      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
-        setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
-      } else setAmountError(txError.toString());
+    if (!feeRate && btcFeeRate && !feeRatesLoading) {
+      setFeeRate(btcFeeRate.regular.toString());
     }
-  }, [txError]);
+  }, [btcFeeRate, feeRatesLoading]);
 
-  function validateFields(address: string, amountToSend: string): boolean {
-    if (!address) {
-      setAddressError(t('ERRORS.ADDRESS_REQUIRED'));
-      return false;
+  const generateTransactionAndSummary = async (feeRateOverride?: number) => {
+    const amountBigInt = Number.isNaN(Number(amountSats)) ? 0n : BigInt(amountSats);
+    const transactionDetails =
+      sendMax && currentStep !== Step.Confirm
+        ? await generateSendMaxTransaction(
+            transactionContext,
+            recipientAddress,
+            feeRateOverride ?? +feeRate,
+          )
+        : await generateTransaction(
+            transactionContext,
+            recipientAddress,
+            amountBigInt,
+            feeRateOverride ?? +feeRate,
+          );
+    return transactionDetails;
+  };
+
+  useEffect(() => {
+    if (!recipientAddress || !feeRate) {
+      setTransaction(undefined);
+      setSummary(undefined);
+      return;
     }
 
-    if (!amountToSend) {
-      setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
-      return false;
-    }
+    const generateTxnAndSummary = async () => {
+      setIsLoading(true);
+      try {
+        const transactionDetails = await generateTransactionAndSummary();
 
-    if (!validateBtcAddress({ btcAddress: address, network: network.type })) {
-      setAddressError(t('ERRORS.ADDRESS_INVALID'));
-      return false;
-    }
+        setTransaction(transactionDetails.transaction);
 
-    let parsedAmount = new BigNumber(0);
+        setSummary(transactionDetails.summary);
 
-    try {
-      if (!Number.isNaN(Number(amountToSend))) {
-        parsedAmount = new BigNumber(amountToSend);
-      } else {
-        setAmountError(t('ERRORS.INVALID_AMOUNT'));
-        return false;
+        if (sendMax && transactionDetails.summary) {
+          setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
+        }
+      } catch (e) {
+        if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
+          // don't log the error if it's just an insufficient funds error
+          console.error(e);
+        }
+
+        setTransaction(undefined);
+        setSummary(undefined);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (e) {
-      setAmountError(t('ERRORS.INVALID_AMOUNT'));
-      return false;
-    }
+    };
 
-    if (parsedAmount.isZero()) {
-      setAmountError(t('ERRORS.INVALID_AMOUNT'));
-      return false;
-    }
+    generateTxnAndSummary();
+  }, [transactionContext, recipientAddress, amountSats, feeRate, sendMax]);
 
-    if (btcToSats(parsedAmount).lt(BITCOIN_DUST_AMOUNT_SATS)) {
-      setAmountError(t('ERRORS.BELOW_MINIMUM_AMOUNT'));
-      return false;
+  const handleCancel = () => {
+    if (isInOption) {
+      window.close();
+      return;
     }
+    navigate('/');
+  };
 
-    if (btcToSats(parsedAmount).gt(btcBalance)) {
-      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE_FEES'));
-      return false;
-    }
-    return true;
-  }
-
-  const handleNextClick = async (address: string, amountToSend: string) => {
-    setRecipientAddress(address);
-    setAmount(amountToSend);
-    const seedPhrase = await getSeed();
-    const recipients: Recipient[] = [
-      {
-        address,
-        amountSats: btcToSats(new BigNumber(amountToSend)),
-      },
-    ];
-    setRecipient(recipients);
-    if (validateFields(address, amountToSend)) {
-      mutate({ recipients, seedPhrase });
+  const handleBackButtonClick = () => {
+    if (currentStep > 0) {
+      setCurrentStep(getPreviousStep(currentStep, addressEditable, amountEditable));
+    } else {
+      handleCancel();
     }
   };
 
-  function getBalance() {
-    return satsToBtc(new BigNumber(btcBalance)).toNumber();
-  }
+  const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
+    const { summary: tempSummary } = await generateTransactionAndSummary(desiredFeeRate);
+    if (tempSummary) return Number(tempSummary.fee);
 
-  const showNavButtons = !isInOptions();
+    return undefined;
+  };
 
-  const handleInputChange = (inputAddress: string) => {
-    if (inputAddress === btcAddress) {
-      return setWarning(t('SEND_BTC_TO_SELF_WARNING'));
+  const handleSubmit = async (ledgerTransport?: Transport) => {
+    try {
+      setIsSubmitting(true);
+      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      navigate('/tx-status', {
+        state: {
+          txid: txnId,
+          currency: 'BTC',
+          error: '',
+          browserTx: isInOption,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error: `${e}`,
+          browserTx: isInOption,
+        },
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-    setWarning('');
+  };
+
+  const handleFeeRateChange = (newFeeRate: string) => {
+    setFeeRate(newFeeRate);
+    if (currentStep === Step.Confirm) {
+      setSendMax(false);
+    }
+  };
+
+  const setAmountSatsSafe = (newAmount: string) => {
+    if (!Number.isNaN(+newAmount)) {
+      setAmountSats(newAmount);
+    }
   };
 
   return (
-    <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton={showNavButtons} />
-      <SendForm
-        currencyType="BTC"
-        amountError={amountError}
-        recepientError={addressError}
-        balance={getBalance()}
-        onPressSend={handleNextClick}
-        recipient={recipientAddress}
-        amountToSend={amount}
-        processing={recipientAddress !== '' && amount !== '' && isLoading}
-        onAddressInputChange={handleInputChange}
-        warning={warning}
-      />
-      <BottomBar tab="dashboard" />
-    </>
+    <StepDisplay
+      currentStep={currentStep}
+      setCurrentStep={setCurrentStep}
+      recipientAddress={recipientAddress}
+      setRecipientAddress={setRecipientAddress}
+      amountSats={amountSats}
+      setAmountSats={setAmountSatsSafe}
+      feeRate={feeRate}
+      setFeeRate={handleFeeRateChange}
+      sendMax={sendMax}
+      setSendMax={setSendMax}
+      getFeeForFeeRate={calculateFeeForFeeRate}
+      addressEditable={addressEditable}
+      amountEditable={amountEditable}
+      onBack={handleBackButtonClick}
+      onCancel={handleCancel}
+      onConfirm={handleSubmit}
+      isLoading={isLoading}
+      isSubmitting={isSubmitting}
+      summary={summary}
+    />
   );
 }
 

@@ -57,6 +57,8 @@ function TransferFeeView({
   onShowInscription = () => {},
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
+
   const { btcFiatRate, stxBtcRate, fiatCurrency } = useSelector(
     (state: StoreState) => state.walletState,
   );
@@ -112,7 +114,7 @@ function TransferFeeView({
               value={feePerVByte?.toString()}
               displayType="text"
               thousandSeparator
-              suffix=" sats/vB"
+              suffix={` ${tUnits('SATS_PER_VB')}`}
               renderText={(value: string) => (
                 <StyledP typography="body_s" color="white_400">
                   {value}

@@ -7,7 +7,16 @@
     "SATRIBUTES": "Satributes",
     "INPUT": "Input",
     "SIZE": "Size",
-    "BUNDLE": "Bundle"
+    "BUNDLE": "Bundle",
+    "EDIT": "Edit",
+    "BACK": "Back",
+    "NEXT": "Next",
+    "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
+    "APPLY": "Apply"
+  },
+  "UNITS": {
+    "SATS_PER_VB": "sats/vByte"
   },
   "LANDING_SCREEN": {
     "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
@@ -242,20 +251,27 @@
     "BTC_RECEIVE_MESSAGE": "Do not send Ordinals to this address, use your Ordinals NFT receive address."
   },
   "SEND": {
+    "BTC": {
+      "AMOUNT": "{{currency}} amount",
+      "RECIPIENT_PLACEHOLDER": "Enter address",
+      "MAX_IGNORING_DUST_UTXO_MSG": "Small amounts may remain in your wallet, as sending them costs more in fees than their value.",
+      "NO_FUNDS_TITLE": "Your balance is empty",
+      "NO_FUNDS": "You don't have any funds to send. You can purchase crypto quickly and deposit directly into your Xverse wallet.",
+      "BUY_BTC": "Buy Bitcoin"
+    },
     "SEND_TO": "Send to",
     "SEND": "Send",
     "AMOUNT": "Amount",
     "BALANCE": "Balance",
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
-    "BTC_RECIPIENT_PLACEHOLDER": "Enter Bitcoin address",
     "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter address",
     "MEMO": "Add a memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
     "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
     "NEXT": "Next",
-    "NO_FUNDS": "You don’t have any funds to send.",
+    "NO_FUNDS": "You don't have any funds to send.",
     "BUY_CRYPTO": "Buy crypto",
     "MOVE_TO_ASSET_DETAIL": "Back to asset detail",
     "ERRORS": {
@@ -286,7 +302,10 @@
     "SEND_BRC20_ORDINAL_TO_SELF_WARNING": "You are about to transfer BRC-20 tokens to yourself",
     "SEND_BTC_TO_SELF_WARNING": "You are about to transfer BTC to yourself",
     "YOU_ARE_TRANSFERRING_TO_YOURSELF": "You are transferring to yourself",
-    "COPYRIGHT": "© {{year}} Secret Key Labs Limited"
+    "COPYRIGHT": "© {{year}} Secret Key Labs Limited",
+    "INSUFFICIENT_FUNDS": "Insufficient funds",
+    "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} Sats/vByte",
+    "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} Sats/vByte"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -300,7 +319,7 @@
     "NEXT": "Next",
     "DONE": "Done",
     "ADVANCED_SETTING": "Advanced Settings",
-    "EDIT_FEES": "Edit Fees",
+    "EDIT_FEES": "Edit fees",
     "CONFIRM": "Confirm",
     "CONFIRM_ALL": "Confirm all",
     "CANCEL": "Cancel",
@@ -395,12 +414,13 @@
     "ADVANCED_SETTING_NONCE_OPTION": "Edit nonce",
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",
+    "NETWORK_FEE": "Network fee",
     "FEE_RATE": "Fee Rate",
     "STANDARD": "Regular",
     "HIGH": "Fast",
     "CUSTOM": "Custom",
     "CUSTOM_FEE": "Custom fee",
-    "TOTAL_FEE": "Total fee:",
+    "TOTAL_FEE": "Total fee",
     "LOW": "Slow",
     "FEE_INFO": "Apply a higher fee to help your transaction confirm quickly, especially when the network is congested.",
     "NONCE": "Nonce",
@@ -411,7 +431,14 @@
     "GREATER_FEE_ERROR": "Fee is more than available balance",
     "LOWER_THAN_MINIMUM": "Set fee is below minimum",
     "NONCE_WARNING": "Entering an erroneous nonce can result in a failed transaction. Only apply changes if you know what you are doing.",
-    "MANUAL_SETTING": "Manual setting"
+    "MANUAL_SETTING": "Manual setting",
+    "PRIORITY": "Priority",
+    "PRIORITIES": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CUSTOM": "Custom"
+    }
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction Broadcasted",
