@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: remove this once the API is updated
 import magicEdenLogo from '@assets/img/explore/magicEden.jpg';
 import ordMarketLogo from '@assets/img/explore/ordinalsMarketLogo.jpg';
 import FeaturedCardCarousel from '@components/explore/FeaturedCarousel';
@@ -45,76 +44,6 @@ const ExternalLink = styled.a`
   cursor: pointer;
 `;
 
-const mockedFeaturedApps = [
-  {
-    link: 'https://magiceden.io/',
-    src: magicEdenLogo,
-    text: 'Discover and trade NFTs, Ordinals & more',
-  },
-  {
-    link: 'https://magiceden.io/',
-    src: magicEdenLogo,
-    text: 'Start creating your digital legacy on Bitcoin',
-  },
-  {
-    link: 'https://magiceden.io/',
-    src: magicEdenLogo,
-    text: 'The launchpad for the biggest and best.',
-  },
-  {
-    link: 'https://magiceden.io/',
-    src: magicEdenLogo,
-    text: 'Start creating your digital legacy on Bitcoin',
-  },
-  {
-    link: 'https://magiceden.io/',
-    src: magicEdenLogo,
-    text: 'Discover and trade NFTs, Ordinals & more',
-  },
-];
-
-const mockedRecommendedApps = [
-  {
-    link: 'https://ordinals.market/',
-    src: ordMarketLogo,
-    title: 'Ninjalerts',
-    text: 'Get Ordinals Allowlist Now',
-  },
-  {
-    link: 'https://ordinals.market/',
-    src: ordMarketLogo,
-    title: 'Block Survey',
-    text: 'Private, Secure, and Anonymous Surveys',
-  },
-  {
-    link: 'https://ordinals.market/',
-    src: ordMarketLogo,
-    title: 'Ordinals.Market',
-    text: 'Discover thousands of Ordinals collections',
-  },
-  {
-    link: 'https://ordinals.market/',
-    src: ordMarketLogo,
-    title: 'Gamma.io',
-    text: 'Start creating your digital legacy on Bitcoin',
-  },
-  {
-    link: 'https://ordinals.market/',
-    src: ordMarketLogo,
-    title: 'Console.xyz',
-    text: 'Discover and trade NFTs, Ordinals & more',
-  },
-  {
-    link: 'https://ordinals.market/',
-    src: ordMarketLogo,
-    title: 'Ord.io',
-    text: 'Discover and trade NFTs, Ordinals & more',
-  },
-];
-
-// TODO: Use fetched data instead of the mocked data once the API is updated
-const MOCK_DATA_ENABLED = true;
-
 function ExploreScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'EXPLORE_SCREEN' });
   const { network } = useWalletSelector();
@@ -122,7 +51,7 @@ function ExploreScreen() {
   const [recommendedApps, setRecommendedApps] = useState<FeaturedDapp[]>();
 
   const fetchFeaturedApps = async () => {
-    const response = await getFeaturedDapps(network.type, true);
+    const response = await getFeaturedDapps(network.type);
 
     const featured = response.find((f) => f.section === 'Featured')?.apps;
     const recommended = response.find((f) => f.section === 'Recommended')?.apps;
@@ -131,12 +60,8 @@ function ExploreScreen() {
   };
 
   useEffect(() => {
-    if (MOCK_DATA_ENABLED) {
-      setFeaturedApps(mockedFeaturedApps);
-      setRecommendedApps(mockedRecommendedApps);
-    } else {
-      fetchFeaturedApps();
-    }
+    fetchFeaturedApps();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
