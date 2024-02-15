@@ -33,17 +33,17 @@ const CardText = styled.div`
   color: ${({ theme }) => theme.colors.white_400};
 `;
 
-type Props = { items: { link: string; src: string; title: string; text: string }[] };
+type Props = { items: { url: string; icon: string; name: string; description: string }[] };
 
 function RecommendedApps({ items }: Props) {
   return (
     <Container>
       {items.map((item) => (
-        <Card to={item.link} key={item.title} target="_blank">
-          <CardImage src={item.src} />
+        <Card to={item.url} key={item.url} target="_blank">
+          <CardImage src={item.icon} />
           <div>
-            <CardTitle>{item.title}</CardTitle>
-            <CardText>{item.text}</CardText>
+            <CardTitle>{item.name}</CardTitle>
+            <CardText>{item.description}</CardText>
           </div>
         </Card>
       ))}

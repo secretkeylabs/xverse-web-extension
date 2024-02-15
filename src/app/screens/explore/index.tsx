@@ -1,5 +1,3 @@
-import magicEdenLogo from '@assets/img/explore/magicEden.jpg';
-import ordMarketLogo from '@assets/img/explore/ordinalsMarketLogo.jpg';
 import FeaturedCardCarousel from '@components/explore/FeaturedCarousel';
 import RecommendedApps from '@components/explore/RecommendedApps';
 import SwiperNavigation from '@components/explore/SwiperNavigation';
