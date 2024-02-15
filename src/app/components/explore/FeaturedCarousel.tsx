@@ -47,7 +47,7 @@ function FeaturedCardCarousel({ items }: FeaturedCardCarouselProps) {
         allowTouchMove
       >
         {items.map((item) => (
-          <SwiperSlide key={item.text}>
+          <SwiperSlide key={item.url}>
             <FeaturedCard {...item} />
           </SwiperSlide>
         ))}

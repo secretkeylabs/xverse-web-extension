@@ -23,16 +23,16 @@ const CardText = styled.div`
 `;
 
 export interface FeaturedCardProps {
-  link: string;
-  src: string;
-  text: string;
+  url: string;
+  banner?: string;
+  description: string;
 }
 
-function FeaturedCard({ link, src, text }: FeaturedCardProps) {
+function FeaturedCard({ url, banner, description }: FeaturedCardProps) {
   return (
-    <Card to={link} target="_blank">
-      <CardImage src={src} />
-      <CardText>{text}</CardText>
+    <Card to={url} target="_blank">
+      <CardImage src={banner} />
+      <CardText>{description}</CardText>
     </Card>
   );
 }
