@@ -3,17 +3,27 @@ import useWalletSelector from '@hooks/useWalletSelector';
 
 import AssetModal from '@components/assetModal';
 import TransferFeeView from '@components/transferFeeView';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import { btcTransaction, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import SelectFeeRate from '@ui-components/selectFeeRate';
 import Callout from '@ui-library/callout';
 import { BLOG_LINK } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import ReceiveSection from './receiveSection';
 import TransferSection from './transferSection';
 import TxInOutput from './txInOutput/txInOutput';
 import { getNetAmount, isScriptOutput, isSpendOutput } from './utils';
+
+const Container = styled.div((props) => ({
+  background: props.theme.colors.elevation1,
+  borderRadius: 12,
+  padding: '12px 16px',
+  marginBottom: 12,
+}));
 
 const ScriptCallout = styled(Callout)`
   margin-bottom: ${(props) => props.theme.space.s};
@@ -32,12 +42,12 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
-
-  // TODO: these are for txn screens which we will tackle next
-  // TODO: By having these as generic props here, we can use the generic set fee rate component for all use cases
-  getFeeForFeeRate?: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number>;
+  getFeeForFeeRate?: (
+    feeRate: number,
+    useEffectiveFeeRate?: boolean,
+  ) => Promise<number | undefined>;
   onFeeRateSet?: (feeRate: number) => void;
-  // TODO: use this to disable the edit fee component when it is created
+  feeRate?: number;
   isSubmitting?: boolean;
 };
 
@@ -49,15 +59,19 @@ function TransactionSummary({
   isSubmitting,
   getFeeForFeeRate,
   onFeeRateSet,
+  feeRate,
 }: Props) {
   const [inscriptionToShow, setInscriptionToShow] = useState<
     btcTransaction.IOInscription | undefined
   >(undefined);
 
-  const { network } = useWalletSelector();
+  const { network, fiatCurrency, btcFiatRate } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: rareSatsT } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
+  const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
+
   const { btcAddress, ordinalsAddress } = useWalletSelector();
+  const { data: recommendedFees } = useBtcFeeRate();
 
   const hasOutputScript = outputs.some((output) => isScriptOutput(output));
 
@@ -84,6 +98,11 @@ function TransactionSummary({
       );
   const feesHaveInscribedRareSats = feeOutput?.inscriptions.length || feeOutput?.satributes.length;
   const showInscribeRareSatWarning = paymentHasInscribedRareSats || feesHaveInscribedRareSats;
+
+  const satsToFiat = (sats: string) =>
+    getBtcFiatEquivalent(new BigNumber(sats), new BigNumber(btcFiatRate)).toNumber().toFixed(2);
+
+  const showFeeSelector = !!(feeRate && getFeeForFeeRate && onFeeRateSet);
 
   return (
     <>
@@ -131,7 +150,7 @@ function TransactionSummary({
 
       <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
 
-      {feeOutput && (
+      {feeOutput && !showFeeSelector && (
         <TransferFeeView
           fee={new BigNumber(feeOutput.amount)}
           currency={t('SATS')}
@@ -139,6 +158,31 @@ function TransactionSummary({
           inscriptions={feeOutput.inscriptions}
           onShowInscription={setInscriptionToShow}
         />
+      )}
+      {feeOutput && showFeeSelector && (
+        <Container>
+          <SelectFeeRate
+            fee={feeOutput.amount.toString()}
+            feeUnits="Sats"
+            feeRate={feeRate.toString()}
+            feeRateUnits={tUnits('SATS_PER_VB')}
+            setFeeRate={(newFeeRate) => onFeeRateSet(+newFeeRate)}
+            baseToFiat={satsToFiat}
+            fiatUnit={fiatCurrency}
+            getFeeForFeeRate={getFeeForFeeRate}
+            feeRates={{
+              medium: recommendedFees?.regular,
+              high: recommendedFees?.priority,
+            }}
+            feeRateLimits={recommendedFees?.limits}
+            isLoading={isSubmitting}
+          />
+          <AmountWithInscriptionSatribute
+            inscriptions={feeOutput.inscriptions}
+            satributes={feeOutput.satributes}
+            onShowInscription={setInscriptionToShow}
+          />
+        </Container>
       )}
     </>
   );

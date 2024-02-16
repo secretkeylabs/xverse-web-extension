@@ -23,15 +23,28 @@ try {
   if (document.currentScript?.dataset.isPriority) {
     Object.defineProperties(window, {
       StacksProvider: { get: () => StacksMethodsProvider, set: () => {} },
-      BitcoinProvider: { get: () => SatsMethodsProvider, set: () => {} },
     });
   } else {
     window.StacksProvider = StacksMethodsProvider as StacksProvider;
+  }
+} catch (e) {
+  console.log(
+    'Failed setting Xverse Stacks default provider. Another wallet may have already set it in an immutable way.',
+  );
+  console.error(e);
+}
+
+try {
+  if (document.currentScript?.dataset.isPriority) {
+    Object.defineProperties(window, {
+      BitcoinProvider: { get: () => SatsMethodsProvider, set: () => {} },
+    });
+  } else {
     window.BitcoinProvider = SatsMethodsProvider;
   }
 } catch (e) {
   console.log(
-    'Failed setting Xverse default providers. Another wallet may have already set them in an immutable way.',
+    'Failed setting Xverse Bitcoin default provider. Another wallet may have already set it in an immutable way.',
   );
   console.error(e);
 }

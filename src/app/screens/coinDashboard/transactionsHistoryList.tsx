@@ -11,6 +11,7 @@ import {
   MempoolTransaction,
   PostConditionFungible,
 } from '@stacks/stacks-blockchain-api-types';
+import Spinner from '@ui-library/spinner';
 import { CurrencyTypes } from '@utils/constants';
 import { formatDate } from '@utils/date';
 import { isLedgerAccount } from '@utils/helper';
@@ -24,7 +25,6 @@ import {
 } from '@utils/transactions/transactions';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
 const ListItemsContainer = styled.div({
@@ -251,7 +251,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
         ))}
       {isLoading && (
         <LoadingContainer>
-          <MoonLoader color="white" size={20} />
+          <Spinner color="white" size={20} />
         </LoadingContainer>
       )}
       {!isLoading && !!error && (

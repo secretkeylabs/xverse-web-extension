@@ -184,7 +184,7 @@ function EditFee({ feeRate, feeRates, onDone, onCancel }: Props) {
               value={feeRateInput?.toString()}
               onChange={onInputEditFeesChange}
             />
-            <FeeText>sats/vB</FeeText>
+            <FeeText>{t('UNITS.SATS_PER_VB')}</FeeText>
           </InputContainer>
         </FeeContainer>
         <ButtonContainer>

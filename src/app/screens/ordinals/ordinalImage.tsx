@@ -4,8 +4,12 @@ import { BetterBarLoader } from '@components/barLoader';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TextT } from '@phosphor-icons/react';
-import { CondensedInscription, getErc721Metadata, Inscription } from '@secretkeylabs/xverse-core';
-import { getBrc20Details } from '@utils/brc20';
+import {
+  CondensedInscription,
+  Inscription,
+  getBrc20Details,
+  getErc721Metadata,
+} from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getFetchableUrl } from '@utils/helper';
 import Image from 'rc-image';
@@ -240,6 +244,11 @@ function OrdinalImage({
   if (contentType.includes('image')) {
     return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/content/${ordinal.id}`);
   }
+  
+  // if content type is undefined or "", we fall back to ordiview thumbnail
+  if (!contentType) {
+    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`);
+  }
 
   if (textContent?.includes('brc-721e')) {
     return renderImage('BRC-721e', brc721eImage);
@@ -261,7 +270,7 @@ function OrdinalImage({
     );
   }
 
-  if (contentType.includes('text')) {
+  if (contentType.includes('text') || contentType === 'application/json') {
     if (!textContent) {
       return <StyledBarLoader width={loaderSize} height={loaderSize} />;
     }

@@ -18,12 +18,12 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
+import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MoonLoader } from 'react-spinners';
 import { SignMultiplePsbtPayload } from 'sats-connect';
 import styled from 'styled-components';
 
@@ -328,7 +328,7 @@ function SignBatchPsbtRequest() {
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       {isLoading ? (
         <LoaderContainer>
-          <MoonLoader color="white" size={50} />
+          <Spinner color="white" size={50} />
         </LoaderContainer>
       ) : (
         <>

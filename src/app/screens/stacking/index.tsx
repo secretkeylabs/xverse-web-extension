@@ -2,9 +2,9 @@ import AccountHeaderComponent from '@components/accountHeader';
 import BottomBar from '@components/tabBar';
 import useStackingData from '@hooks/queries/useStackingData';
 import useWalletSelector from '@hooks/useWalletSelector';
+import Spinner from '@ui-library/spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import StackingProgress from './stackingProgress';
 import StartStacking from './startStacking';
@@ -49,7 +49,7 @@ function Stacking() {
       {!stxAddress && <Text>{t('NO_EARN_OPTION')}</Text>}
       {isStackingLoading && stxAddress && (
         <LoaderContainer>
-          <MoonLoader color="white" size={30} />
+          <Spinner color="white" size={30} />
         </LoaderContainer>
       )}
       {showStatus}

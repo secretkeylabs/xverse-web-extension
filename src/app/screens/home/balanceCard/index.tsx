@@ -1,14 +1,13 @@
 import BarLoader from '@components/barLoader';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { currencySymbolMap, microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
+import { currencySymbolMap } from '@secretkeylabs/xverse-core';
+import Spinner from '@ui-library/spinner';
 import { LoaderSize } from '@utils/constants';
 import { calculateTotalBalance } from '@utils/helper';
-import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
 const RowContainer = styled.div((props) => ({
@@ -130,7 +129,7 @@ function BalanceCard(props: BalanceCardProps) {
           />
           {isRefetching && (
             <ReloadContainer>
-              <MoonLoader color="white" size={16} />
+              <Spinner color="white" size={16} />
             </ReloadContainer>
           )}
         </BalanceContainer>

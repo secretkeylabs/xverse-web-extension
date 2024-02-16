@@ -71,6 +71,7 @@ function SpeedUpBtcTransaction({
   isBroadcasting,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
+  const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
   const { btcFiatRate, fiatCurrency } = useWalletSelector();
   const theme = useTheme();
 
@@ -91,7 +92,7 @@ function SpeedUpBtcTransaction({
             value={rbfTxSummary?.currentFeeRate}
             displayType="text"
             thousandSeparator
-            suffix=" Sats /vB"
+            suffix={` ${tUnits('SATS_PER_VB')}`}
           />
         </HighlightedText>
       </DetailText>
@@ -124,7 +125,7 @@ function SpeedUpBtcTransaction({
                         value={obj.feeRate}
                         displayType="text"
                         thousandSeparator
-                        suffix=" Sats /vByte"
+                        suffix={` ${tUnits('SATS_PER_VB')}`}
                       />
                     </SecondaryText>
                   </div>
@@ -179,7 +180,7 @@ function SpeedUpBtcTransaction({
                       value={customFeeRate}
                       displayType="text"
                       thousandSeparator
-                      suffix=" Sats /vByte"
+                      suffix={` ${tUnits('SATS_PER_VB')}`}
                     />
                   </SecondaryText>
                 </>
