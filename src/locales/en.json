@@ -719,6 +719,7 @@
     "BRC20_TRANSFER_STATUS": "Status",
     "TOTAL_SUPPLY": "Total supply",
     "MINT_LIMIT": "Mint limit",
+    "DECIMALS": "Decimals",
     "VIEW_IN": "Open in",
     "ORDINAL_VIEWER": "Ordinal Viewer",
     "VIEW_IN_ORDINALS_EXPLORER": "Open in Ordinal Viewer",
