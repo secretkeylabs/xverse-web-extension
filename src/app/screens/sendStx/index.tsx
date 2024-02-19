@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import SendLayout from 'app/layouts/sendLayout';
+import SendLayout from '../../layouts/sendLayout';
 import { Step, getNextStep, getPreviousStep } from './stepResolver';
 import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipient';
 import Step2SelectAmount from './steps/Step2SelectAmount';
@@ -101,7 +101,10 @@ function SendStxScreen() {
               setRecipientDomain={setRecipientDomain}
               memo={memo}
               setMemo={setMemo}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, true))}
+              onNext={() => {
+                setIsLoading(false);
+                setCurrentStep(getNextStep(Step.SelectRecipient, true));
+              }}
               isLoading={isLoading}
             />
           </Container>

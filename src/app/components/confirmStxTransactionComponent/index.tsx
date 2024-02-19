@@ -1,4 +1,3 @@
-import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { delay } from '@common/utils/ledger';
@@ -12,6 +11,7 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { FadersHorizontal } from '@phosphor-icons/react';
 import type { StacksTransaction } from '@secretkeylabs/xverse-core';
 import {
   getNonce,
@@ -23,11 +23,13 @@ import {
   signTransaction,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
 import { isHardwareAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import Theme from 'theme';
 
 const Container = styled.div`
   display: flex;
@@ -66,20 +68,11 @@ const Button = styled.button((props) => ({
   borderRadius: props.theme.radius(1),
   backgroundColor: 'transparent',
   width: '100%',
-  marginTop: props.theme.spacing(10),
 }));
 
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
+const ButtonText = styled(StyledP)`
+  margin-left: ${(props) => props.theme.space.xxs};
+`;
 
 const SponsoredInfoText = styled.h1((props) => ({
   ...props.theme.body_m,
@@ -328,7 +321,13 @@ function ConfirmStxTransactionComponent({
         )}
 
         {children}
-        <TransferFeeView fee={microstacksToStx(getFee())} currency="STX" />
+        <TransferFeeView
+          fee={microstacksToStx(getFee())}
+          currency="STX"
+          title="Network Fee"
+          customFeeClick={() => {}}
+        />
+
         {/* TODO fix type error as any */}
         {(initialStxTransactions[0]?.payload as any)?.amount && (
           <TransferFeeView
@@ -339,6 +338,7 @@ function ConfirmStxTransactionComponent({
             )}
             currency="STX"
             title={t('TOTAL')}
+            subtitle="Amount + fees"
           />
         )}
         {isSponsored ? (
@@ -347,8 +347,10 @@ function ConfirmStxTransactionComponent({
           !hasSignatures && (
             <Button onClick={onAdvancedSettingClick}>
               <>
-                <ButtonImage src={SettingIcon} />
-                <ButtonText>{t('ADVANCED_SETTING')}</ButtonText>
+                <FadersHorizontal size={20} color={Theme.colors.tangerine} />
+                <ButtonText typography="body_medium_m" color="tangerine">
+                  Edit Nonce
+                </ButtonText>
               </>
             </Button>
           )

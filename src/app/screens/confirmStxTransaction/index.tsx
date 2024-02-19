@@ -216,7 +216,7 @@ function ConfirmStxTransaction() {
       {isBrowserTx ? (
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
-        <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleCancelClick} />
+        <TopRow onClick={handleCancelClick} />
       )}
       <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx]}
