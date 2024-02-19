@@ -14,11 +14,20 @@ const Button = styled.button`
     transition: color 0.1s ease;
   }
 
-  &:disabled {
+  &:hover {
     svg {
-      color: ${({ theme }) => theme.colors.white_600};
+      color: ${({ theme }) => theme.colors.white_200};
     }
   }
+
+  &:disabled {
+    svg {
+      color: ${({ theme }) => theme.colors.white_400};
+    }
+  }
+  width: 18px;
+  height: 18px;
+  margin: 6px;
 `;
 
 function SwiperNavigation() {
