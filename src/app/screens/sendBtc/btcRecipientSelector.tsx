@@ -3,7 +3,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type BtcRecipientScreenProps = {

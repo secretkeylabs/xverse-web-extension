@@ -162,11 +162,8 @@ const Row = styled.div({
   display: 'flex',
   justifyContent: 'space-between',
   flexDirection: 'row',
+  width: '100%',
 });
-
-const MintLimitContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(30),
-}));
 
 const DescriptionContainer = styled.div((props) => ({
   display: 'flex',
@@ -402,13 +399,12 @@ function OrdinalDetailScreen() {
     isLoading,
     ordinalsAddress,
     showSendOridnalsAlert,
-    isBrc20Ordinal,
+    brc20Details,
     isPartOfABundle,
     ordinalSatributes,
     isGalleryOpen,
     brc20InscriptionStatus,
     brc20InscriptionStatusColor,
-    textContent,
     handleSendOrdinal,
     onCloseAlert,
     handleBackButtonClick,
@@ -420,23 +416,9 @@ function OrdinalDetailScreen() {
     backButtonText,
   } = ordinalDetails;
 
-  useResetUserFlow('/ordinal-detail');
+  const isBrc20Ordinal = Boolean(brc20Details);
 
-  const ownedByView = (
-    <RowContainer>
-      <NftOwnedByText>{t('OWNED_BY')}</NftOwnedByText>
-      <OwnerAddressText>
-        {`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-          ordinalsAddress.length - 4,
-          ordinalsAddress.length,
-        )}`}
-      </OwnerAddressText>
-      <OrdinalsTag>
-        <ButtonIcon src={OrdinalsIcon} />
-        <Text>{t('ORDINALS')}</Text>
-      </OrdinalsTag>
-    </RowContainer>
-  );
+  useResetUserFlow('/ordinal-detail');
 
   const ordinalDetailAttributes = (
     <OrdinalDetailsContainer isGallery={isGalleryOpen}>
@@ -509,81 +491,82 @@ function OrdinalDetailScreen() {
   );
 
   const showBrc20OrdinalDetail = (isGallery: boolean) => {
-    try {
-      const regex = /”/g;
-      const validBrcContentValue = (textContent ?? '').replace(regex, '"');
-      const content = JSON.parse(validBrcContentValue);
+    if (!brc20Details) {
+      return null;
+    }
 
-      switch (content.op) {
-        case 'mint':
-          return (
-            <ColumnContainer>
-              <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={content.amt} />
-              {!isGallery && (
-                <OrdinalAttributeComponent
-                  title={t('OWNED_BY')}
-                  value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-                    ordinalsAddress.length - 4,
-                    ordinalsAddress.length,
-                  )}`}
-                  showOridnalTag
-                  isAddress
-                />
-              )}
-            </ColumnContainer>
-          );
-        case 'transfer':
-          return (
-            <ColumnContainer>
-              <DetailSection isGallery={isGalleryOpen}>
-                <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={content.amt} />
-                <OrdinalAttributeComponent
-                  title={t('BRC20_TRANSFER_STATUS')}
-                  value={brc20InscriptionStatus}
-                  valueColor={brc20InscriptionStatusColor}
-                  isAddress
-                />
-              </DetailSection>
-              {!isGallery && (
-                <OrdinalAttributeComponent
-                  title={t('OWNED_BY')}
-                  value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-                    ordinalsAddress.length - 4,
-                    ordinalsAddress.length,
-                  )}`}
-                  showOridnalTag
-                  isAddress
-                />
-              )}
-            </ColumnContainer>
-          );
-        case 'deploy':
-          return (
-            <ColumnContainer>
+    const { op, value, lim, dec } = brc20Details;
+
+    switch (op) {
+      case 'mint':
+        return (
+          <ColumnContainer>
+            <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={value} />
+            {!isGallery && (
+              <OrdinalAttributeComponent
+                title={t('OWNED_BY')}
+                value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+                  ordinalsAddress.length - 4,
+                  ordinalsAddress.length,
+                )}`}
+                showOridnalTag
+                isAddress
+              />
+            )}
+          </ColumnContainer>
+        );
+      case 'transfer':
+        return (
+          <ColumnContainer>
+            <DetailSection isGallery={isGalleryOpen}>
+              <OrdinalAttributeComponent title={t('AMOUNT_TO_TRANSFER')} value={value} />
+              <OrdinalAttributeComponent
+                title={t('BRC20_TRANSFER_STATUS')}
+                value={brc20InscriptionStatus}
+                valueColor={brc20InscriptionStatusColor}
+                isAddress
+              />
+            </DetailSection>
+            {!isGallery && (
+              <OrdinalAttributeComponent
+                title={t('OWNED_BY')}
+                value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+                  ordinalsAddress.length - 4,
+                  ordinalsAddress.length,
+                )}`}
+                showOridnalTag
+                isAddress
+              />
+            )}
+          </ColumnContainer>
+        );
+      case 'deploy':
+        return (
+          <ColumnContainer>
+            <Row>
+              <OrdinalAttributeComponent title={t('TOTAL_SUPPLY')} value={value} />
+              {lim && <OrdinalAttributeComponent title={t('MINT_LIMIT')} value={lim} />}
+            </Row>
+            {dec && (
               <Row>
-                <OrdinalAttributeComponent title={t('TOTAL_SUPPLY')} value={content.max} />
-                <MintLimitContainer>
-                  <OrdinalAttributeComponent title={t('MINT_LIMIT')} value={content.lim} />
-                </MintLimitContainer>
+                <OrdinalAttributeComponent title={t('DECIMALS')} value={dec} />
               </Row>
-              {!isGallery && (
-                <OrdinalAttributeComponent
-                  title={t('OWNED_BY')}
-                  value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
-                    ordinalsAddress.length - 4,
-                    ordinalsAddress.length,
-                  )}`}
-                  showOridnalTag
-                  isAddress
-                />
-              )}
-            </ColumnContainer>
-          );
-        default:
-          return null;
-      }
-    } catch (error) {
-      return isGallery ? ordinalDetailAttributes : ownedByView;
+            )}
+            {!isGallery && (
+              <OrdinalAttributeComponent
+                title={t('OWNED_BY')}
+                value={`${ordinalsAddress.substring(0, 4)}...${ordinalsAddress.substring(
+                  ordinalsAddress.length - 4,
+                  ordinalsAddress.length,
+                )}`}
+                showOridnalTag
+                isAddress
+              />
+            )}
+          </ColumnContainer>
+        );
+      default:
+        return null;
     }
   };
 
