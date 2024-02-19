@@ -1,11 +1,22 @@
 import { getFeaturedDapps } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import useWalletSelector from './useWalletSelector';
 import useWalletSession from './useWalletSession';
 
 function useFeaturedDapps() {
   const { network } = useWalletSelector();
   const { getSessionStartTime } = useWalletSession();
+  const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
+
+  const fetchSessionStartTime = async () => {
+    const time = await getSessionStartTime();
+    setSessionStartTime(time);
+  };
+
+  useEffect(() => {
+    fetchSessionStartTime();
+  }, []);
 
   const fetchFeaturedDapps = async () => {
     const response = await getFeaturedDapps(network.type);
@@ -16,10 +27,8 @@ function useFeaturedDapps() {
     return { featured, recommended };
   };
 
-  console.log('getSessionStartTime()', getSessionStartTime());
-
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['featuredApps', getSessionStartTime()],
+    queryKey: ['featuredApps', sessionStartTime],
     queryFn: fetchFeaturedDapps,
     staleTime: 60 * 60 * 1000, // 1 hour
   });
