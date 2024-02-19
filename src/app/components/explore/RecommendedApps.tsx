@@ -31,6 +31,10 @@ const CardTitle = styled.div`
 const CardText = styled.div`
   ${({ theme }) => theme.typography.body_medium_m};
   color: ${({ theme }) => theme.colors.white_400};
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;
 
 type Props = { items: { url: string; icon: string; name: string; description: string }[] };
