@@ -1,8 +1,8 @@
 import { Bicycle, CarProfile, RocketLaunch } from '@phosphor-icons/react';
 import { ErrorCodes } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import Spinner from '@ui-library/spinner';
 import { useTranslation } from 'react-i18next';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 import Theme from 'theme';
 
@@ -160,7 +160,7 @@ function FeeItem({
 
         {!totalFee && !error && (
           <LoaderContainer>
-            <MoonLoader color="white" size={20} />
+            <Spinner color="white" size={20} />
           </LoaderContainer>
         )}
       </TextsContainer>

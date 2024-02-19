@@ -25,6 +25,7 @@
   },
   "content_scripts": [
     {
+      "run_at": "document_start",
       "js": ["browser-polyfill.js", "content-script.js"],
       "matches": ["*://*/*"],
       "all_frames": true

@@ -149,10 +149,6 @@ const router = createHashRouter([
         element: <SendFtScreen />,
       },
       {
-        path: 'send-btc',
-        element: <SendBtcScreen />,
-      },
-      {
         path: 'add-stx-address-ledger',
         element: <LedgerAddStxAddress />,
       },
@@ -428,6 +424,10 @@ const router = createHashRouter([
     element: <ExtendedScreenContainer />,
     errorElement: <ErrorBoundary />,
     children: [
+      {
+        path: 'send-btc',
+        element: <SendBtcScreen />,
+      },
       {
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,

@@ -1,6 +1,6 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { DotsThreeVertical, Eye, Share } from '@phosphor-icons/react';
-import { getBrc20Details } from '@utils/brc20';
+import { getBrc20Details } from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { formatNumber } from '@utils/helper';
 import axios from 'axios';

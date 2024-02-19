@@ -1,4 +1,4 @@
-import { MoonLoader } from 'react-spinners';
+import Spinner from '@ui-library/spinner';
 import styled from 'styled-components';
 
 interface ButtonProps {
@@ -117,7 +117,7 @@ function ActionButton({
         disabled={disabled || processing}
       >
         {processing ? (
-          <MoonLoader color="white" size={10} />
+          <Spinner color="white" size={10} />
         ) : (
           <>
             {src && <ButtonImage src={src} />}
@@ -138,7 +138,7 @@ function ActionButton({
       warning={warning}
     >
       {processing ? (
-        <MoonLoader color="#12151E" size={12} />
+        <Spinner color="#12151E" size={12} />
       ) : (
         <>
           {src && <ButtonImage src={src} />}

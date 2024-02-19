@@ -6,13 +6,14 @@ import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { getBrc20Details } from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getBtcTxStatusUrl, isInOptions, isLedgerAccount } from '@utils/helper';
 import {
   getInscriptionsCollectionGridItemSubText,
   getInscriptionsCollectionGridItemSubTextColor,
 } from '@utils/inscriptions';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTheme } from 'styled-components';
@@ -40,7 +41,6 @@ export default function useOrdinalDetail() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
 
   const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState(false);
-  const [isBrc20Ordinal, setIsBrc20Ordinal] = useState(false);
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
@@ -48,11 +48,10 @@ export default function useOrdinalDetail() {
   const brc20InscriptionStatusColor =
     theme.colors[getInscriptionsCollectionGridItemSubTextColor(ordinalData)];
 
-  useEffect(() => {
-    if (textContent?.includes('brc-20')) {
-      setIsBrc20Ordinal(true);
-    }
-  }, [textContent]);
+  const brc20Details = useMemo(
+    () => getBrc20Details(textContent ?? '', ordinalData?.content_type ?? ''),
+    [textContent, ordinalData?.content_type],
+  );
 
   const handleBackButtonClick = () => {
     setSelectedOrdinalDetails(null);
@@ -127,13 +126,12 @@ export default function useOrdinalDetail() {
     isLoading,
     ordinalsAddress,
     showSendOridnalsAlert,
-    isBrc20Ordinal,
+    brc20Details,
     isPartOfABundle: isPartOfABundle && hasActivatedRareSatsKey,
     ordinalSatributes: hasActivatedRareSatsKey ? ordinalSatributes : [],
     isGalleryOpen,
     brc20InscriptionStatus,
     brc20InscriptionStatusColor,
-    textContent,
     handleSendOrdinal,
     onCloseAlert,
     handleBackButtonClick,
