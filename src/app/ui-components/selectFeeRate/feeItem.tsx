@@ -94,6 +94,7 @@ interface FeeItemProps {
   selected: boolean;
   onClick?: () => void;
   absoluteBalance?: number;
+  amount?: number;
 }
 
 function FeeItem({
@@ -108,6 +109,7 @@ function FeeItem({
   selected,
   onClick,
   absoluteBalance,
+  amount,
 }: FeeItemProps) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
@@ -163,8 +165,27 @@ function FeeItem({
   const secondaryColor = totalFee ? 'white_200' : 'white_400';
 
   const feesExceedBalance = Boolean(
-    totalFee && absoluteBalance && absoluteBalance < Number(totalFee),
+    totalFee && absoluteBalance && absoluteBalance + Number(amount ?? 0) < Number(totalFee),
   );
+
+  // Fee can either be an absolute amount or a rate
+  // If feeRateUnits is not defined, therefore an absolute fee is used
+  const absoluteFeeOnly = !feeRateUnits
+
+  function renderAbsoluteFeeAmountAndUnit() {
+    return (
+      <StyledP typography="body_medium_s" color={secondaryColor}>
+          <NumericFormat
+            value={fiat}
+            displayType="text"
+            prefix={`~${currencySymbolMap[fiatUnit]}`}
+            thousandSeparator
+            renderText={(value: string) => `${value} ${fiatUnit}`}
+          />
+      </StyledP>
+    )
+  }
+
 
   return (
     <FeeItemContainer
@@ -187,34 +208,14 @@ function FeeItem({
               color={secondaryColor}
             >{`${feeRate} ${feeRateUnits}`}</StyledP>
           )}
-          {!feeRateUnits && fiat && (
-            <StyledP typography="body_medium_s" color={secondaryColor}>
-              <NumericFormat
-                value={fiat}
-                displayType="text"
-                prefix={`~${currencySymbolMap[fiatUnit]}`}
-                thousandSeparator
-                renderText={(value: string) => `${value} ${fiatUnit}`}
-              />
-            </StyledP>
-          )}
+          {absoluteFeeOnly && fiat && renderAbsoluteFeeAmountAndUnit()}
         </ColumnsTexts>
         {!isLoading ? (
           <EndColumnTexts $insufficientFunds={totalFee === undefined || feesExceedBalance}>
             <StyledHeading typography="body_medium_m" color={mainColor}>
               {`${totalFee || '-'} ${feeUnits}`}
             </StyledHeading>
-            {fiat && feeRateUnits && (
-              <StyledP typography="body_medium_s" color={secondaryColor}>
-                <NumericFormat
-                  value={fiat}
-                  displayType="text"
-                  prefix={`~${currencySymbolMap[fiatUnit]}`}
-                  thousandSeparator
-                  renderText={(value: string) => `${value} ${fiatUnit}`}
-                />
-              </StyledP>
-            )}
+            {fiat && !absoluteFeeOnly && renderAbsoluteFeeAmountAndUnit()}
             {(!totalFee || feesExceedBalance) && (
               <StyledP typography="body_medium_s" color="danger_light">
                 {t('SEND.INSUFFICIENT_FUNDS')}

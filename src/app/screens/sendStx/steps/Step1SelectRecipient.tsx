@@ -57,22 +57,8 @@ function Step1SelectRecipient({
   const associatedDomain = useBnsName(debouncedSearchTerm);
 
   useEffect(() => {
-    setRecipientAddress(recipientAddress);
     setInputFeedback(undefined);
 
-    if (associatedAddress !== '') {
-      setRecipientAddress(associatedAddress);
-      setRecipientDomain(recipient);
-      setInputFeedback([
-        { variant: 'checkmark', message: t('ASSOCIATED_ADDRESS') },
-        { variant: 'plainIndented', message: associatedAddress },
-      ]);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [associatedAddress]);
-
-  useEffect(() => {
     if (associatedDomain !== '') {
       setRecipientDomain(associatedDomain);
       setRecipientAddress(recipient);
@@ -84,13 +70,22 @@ function Step1SelectRecipient({
       setRecipientDomain('');
       setInputFeedback(undefined);
     }
+
+    if (associatedAddress !== '') {
+      setRecipientAddress(associatedAddress);
+      setRecipientDomain(recipient);
+      setInputFeedback([
+        { variant: 'checkmark', message: t('ASSOCIATED_ADDRESS') },
+        { variant: 'plainIndented', message: associatedAddress },
+      ]);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [associatedDomain]);
+  }, [associatedDomain, associatedAddress]);
 
   const handleNext = () => {
     if (stxAddress === recipientAddress) {
       setInputFeedback([{ variant: 'danger', message: t('ERRORS.SEND_TO_SELF') }]);
-    } else if (validateStacksAddress(recipientAddress)) {
+    } else if (validateStacksAddress(recipientAddress) || validateStacksAddress(recipient)) {
       onNext();
     } else {
       setInputFeedback([{ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') }]);

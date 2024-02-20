@@ -78,6 +78,7 @@ type Props = {
   setFeeRate: (feeRate: string) => void;
   getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
   absoluteBalance?: number;
+  amount?: number;
 };
 
 function FeeSelectPopup({
@@ -92,6 +93,7 @@ function FeeSelectPopup({
   setFeeRate,
   getFeeForFeeRate,
   absoluteBalance,
+  amount,
 }: Props) {
   const stxInputExtractor = /[0-9]+[.]?[0-9]{0,6}/;
   const inputValidator = absoluteBalance ? stxInputExtractor : /^[0-9]*$/;
@@ -266,6 +268,7 @@ function FeeSelectPopup({
             baseToFiat={baseToFiat}
             getFeeForFeeRate={getFeeForFeeRate}
             absoluteBalance={absoluteBalance}
+            amount={amount}
           />
         ))}
         <FeeItemContainer $isSelected={!selected} onClick={() => setUseCustom(true)}>

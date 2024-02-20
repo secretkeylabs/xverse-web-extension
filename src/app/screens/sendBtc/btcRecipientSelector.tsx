@@ -14,6 +14,11 @@ type BtcRecipientScreenProps = {
   header?: React.ReactNode;
 };
 
+type InputFeedback = {
+  variant: 'danger';
+  message: string;
+}
+
 function BtcRecipientScreen({
   recipientAddress,
   setRecipientAddress,
@@ -37,11 +42,6 @@ function BtcRecipientScreen({
     setRecipientAddress(e.target.value);
     setAddressIsValid(true);
   };
-
-  interface InputFeedback {
-    variant: 'danger';
-    message: string;
-  }
 
   const inputFeedback: InputFeedback[] = useMemo(() => {
     if (addressIsValid) {
