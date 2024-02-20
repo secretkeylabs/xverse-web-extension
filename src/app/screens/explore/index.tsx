@@ -29,6 +29,7 @@ const Subheader = styled.div`
   margin-top: ${({ theme }) => theme.space.xl};
   font-weight: 500;
   color: ${({ theme }) => theme.colors.white_200};
+  text-transform: uppercase;
 `;
 
 const ExternalLink = styled.a`
