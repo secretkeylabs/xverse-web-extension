@@ -227,6 +227,8 @@ function ConfirmStxTransaction() {
         skipModal={isLedgerAccount(selectedAccount)}
         hasSignatures={hasSignatures}
         feeOverride={fee}
+        fee={fee.toString()}
+        setFeeRate={(feeRate: string) => setStateFee(new BigNumber(feeRate))}
       >
         <RecipientComponent
           address={recipient}

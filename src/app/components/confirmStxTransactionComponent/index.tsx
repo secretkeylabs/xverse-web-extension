@@ -15,14 +15,16 @@ import { FadersHorizontal } from '@phosphor-icons/react';
 import type { StacksTransaction } from '@secretkeylabs/xverse-core';
 import {
   getNonce,
+  getStxFiatEquivalent,
   microstacksToStx,
-  setFee,
   setNonce,
   signLedgerStxTransaction,
   signMultiStxTransactions,
   signTransaction,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
+import { estimateTransaction } from '@stacks/transactions';
+import SelectFeeRate from '@ui-components/selectFeeRate';
 import { StyledP } from '@ui-library/common.styled';
 import { isHardwareAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -111,6 +113,12 @@ const WarningWrapper = styled.div((props) => ({
   marginBottom: props.theme.spacing(8),
 }));
 
+const FeeRateContainer = styled.div`
+  margin-top: ${(props) => props.theme.space.m};
+  margin-bottom: ${(props) => props.theme.space.m};
+`;
+
+// todo: make fee non option - that'll require change in all components using it
 interface Props {
   initialStxTransactions: StacksTransaction[];
   loading: boolean;
@@ -124,6 +132,8 @@ interface Props {
   subTitle?: string;
   hasSignatures?: boolean;
   feeOverride?: BigNumber;
+  fee?: string | undefined;
+  setFeeRate?: (feeRate: string) => void;
 }
 
 function ConfirmStxTransactionComponent({
@@ -139,12 +149,15 @@ function ConfirmStxTransactionComponent({
   skipModal = false,
   hasSignatures = false,
   feeOverride,
+  fee,
+  setFeeRate,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
   const selectedNetwork = useNetworkSelector();
+  const { stxBalance, stxBtcRate, btcFiatRate, fiatCurrency } = useWalletSelector();
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const { selectedAccount, feeMultipliers } = useWalletSelector();
@@ -159,19 +172,53 @@ function ConfirmStxTransactionComponent({
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [showFeeWarning, setShowFeeWarning] = useState(false);
 
+  const [feeRates, setFeeRates] = useState({ low: 0, medium: 0, high: 0 });
+
   useEffect(() => {
     setButtonLoading(loading);
   }, [loading]);
 
+  // Reactively estimate fees
   useEffect(() => {
-    const fee = new BigNumber(initialStxTransactions[0].auth.spendingCondition.fee.toString());
+    const fetchStxFees = async () => {
+      const [low, medium, high] = await estimateTransaction(
+        initialStxTransactions[0].payload,
+        undefined,
+        selectedNetwork,
+      );
+      setFeeRates({
+        low: Number(microstacksToStx(new BigNumber(low.fee)).toFixed(2)),
+        medium: Number(microstacksToStx(new BigNumber(medium.fee)).toFixed(2)),
+        high: Number(microstacksToStx(new BigNumber(high.fee)).toFixed(2)),
+      });
+      if (!fee)
+        setFeeRate?.(Number(microstacksToStx(new BigNumber(medium.fee)).toFixed(2)).toString());
+    };
 
-    if (feeMultipliers && fee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighStacksFee))) {
+    fetchStxFees();
+  }, [selectedNetwork, initialStxTransactions]);
+
+  useEffect(() => {
+    const stxTxFee = new BigNumber(initialStxTransactions[0].auth.spendingCondition.fee.toString());
+
+    if (
+      feeMultipliers &&
+      stxTxFee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighStacksFee))
+    ) {
       setShowFeeWarning(true);
     } else if (showFeeWarning) {
       setShowFeeWarning(false);
     }
   }, [initialStxTransactions, feeMultipliers]);
+
+  const stxToFiat = (stx: string) =>
+    getStxFiatEquivalent(
+      stxToMicrostacks(new BigNumber(stx)),
+      new BigNumber(stxBtcRate),
+      new BigNumber(btcFiatRate),
+    )
+      .toNumber()
+      .toFixed(2);
 
   const getFee = () =>
     isSponsored
@@ -227,6 +274,7 @@ function ConfirmStxTransactionComponent({
     onConfirmClick(signedTxs);
   };
 
+  // todo: remove this
   const applyTxSettings = ({
     fee: settingFee,
     nonce,
@@ -235,26 +283,28 @@ function ConfirmStxTransactionComponent({
     feeRate?: string;
     nonce?: string;
   }) => {
-    const fee = stxToMicrostacks(new BigNumber(settingFee));
+    // const fee = stxToMicrostacks(new BigNumber(settingFee));
 
-    if (feeMultipliers && fee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighStacksFee))) {
-      setShowFeeWarning(true);
-    } else if (showFeeWarning) {
-      setShowFeeWarning(false);
-    }
+    // if (feeMultipliers && fee.isGreaterThan(new BigNumber(feeMultipliers.thresholdHighStacksFee))) {
+    //   setShowFeeWarning(true);
+    // } else if (showFeeWarning) {
+    //   setShowFeeWarning(false);
+    // }
 
-    setFee(initialStxTransactions[0], BigInt(fee.toString()));
+    // // todo: fix deprecated
+    // setFee(initialStxTransactions[0], BigInt(fee.toString()));
     if (nonce && nonce !== '') {
       setNonce(initialStxTransactions[0], BigInt(nonce));
     }
     setOpenTransactionSettingModal(false);
   };
 
-  useEffect(() => {
-    if (feeOverride) {
-      applyTxSettings({ fee: microstacksToStx(feeOverride).toString() });
-    }
-  }, [feeOverride]);
+  // todo: remove this
+  // useEffect(() => {
+  //   if (feeOverride) {
+  //     applyTxSettings({ fee: microstacksToStx(feeOverride).toString() });
+  //   }
+  // }, [feeOverride]);
 
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {
@@ -327,6 +377,22 @@ function ConfirmStxTransactionComponent({
           title="Network Fee"
           customFeeClick={() => {}}
         />
+
+        <FeeRateContainer>
+          <SelectFeeRate
+            fee={microstacksToStx(new BigNumber(fee ?? '0')).toString()}
+            feeUnits="STX"
+            feeRate={fee ?? ''}
+            setFeeRate={setFeeRate ?? (() => {})}
+            baseToFiat={stxToFiat}
+            fiatUnit={fiatCurrency}
+            getFeeForFeeRate={(feeForFeeRate) => Promise.resolve(feeForFeeRate)}
+            feeRates={feeRates}
+            feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
+            isLoading={loading}
+            absoluteBalance={Number(microstacksToStx(new BigNumber(stxBalance)))}
+          />
+        </FeeRateContainer>
 
         {/* TODO fix type error as any */}
         {(initialStxTransactions[0]?.payload as any)?.amount && (
