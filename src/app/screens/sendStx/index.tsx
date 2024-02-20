@@ -45,7 +45,9 @@ function SendStxScreen() {
     fee: previousFee,
   } = location.state || {};
 
-  const [currentStep, setCurrentStep] = useState<Step>(stateAddress && amountToSend ? 1 : 0);
+  const [currentStep, setCurrentStep] = useState<Step>(
+    stateAddress ? Step.SelectAmount : Step.SelectRecipient,
+  );
 
   // Shared states
   const [isLoading, setIsLoading] = useState(false);

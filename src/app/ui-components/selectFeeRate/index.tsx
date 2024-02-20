@@ -76,6 +76,7 @@ type Props = {
     max?: number;
   };
   absoluteBalance?: number;
+  amount?: number;
 };
 
 function SelectFeeRate({
@@ -91,6 +92,7 @@ function SelectFeeRate({
   feeRateLimits,
   isLoading,
   absoluteBalance,
+  amount,
 }: Props) {
   const { t } = useTranslation('translation');
   const [editing, setEditing] = useState(false);
@@ -109,6 +111,7 @@ function SelectFeeRate({
     }
 
     return t('TRANSACTION_SETTING.PRIORITIES.CUSTOM');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feeRates, feeRate]);
 
   return (
@@ -142,6 +145,8 @@ function SelectFeeRate({
             {t('COMMON.EDIT')} <PencilSimple size={16} weight="fill" />
           </Label>
         </EditRow>
+        {/* Fee can either be an absolute amount or a rate */}
+        {/* If feeRateUnits is not defined, therefore an absolute fee is used */}
         {feeRateUnits && (
           <Label $size="s" $variant="dark">
             <NumericFormat
@@ -156,7 +161,7 @@ function SelectFeeRate({
             />
           </Label>
         )}
-        {fee && !feeRateUnits && (
+        {fee && (
           <RowContainer>
             <div />
             <NumericFormat
@@ -173,22 +178,6 @@ function SelectFeeRate({
           </RowContainer>
         )}
       </RowContainer>
-      {fee && feeRateUnits && (
-        <RowContainer>
-          <div />
-          <NumericFormat
-            value={baseToFiat(fee)}
-            displayType="text"
-            prefix={`~ ${currencySymbolMap[fiatUnit]}`}
-            thousandSeparator
-            renderText={(value: string) => (
-              <Label $size="s" $variant="dark">
-                {value} {fiatUnit}
-              </Label>
-            )}
-          />
-        </RowContainer>
-      )}
       {editing && (
         <FeeSelectPopup
           currentFeeRate={feeRate}
@@ -202,6 +191,7 @@ function SelectFeeRate({
           setFeeRate={setFeeRate}
           getFeeForFeeRate={getFeeForFeeRate}
           absoluteBalance={absoluteBalance}
+          amount={amount}
         />
       )}
     </div>

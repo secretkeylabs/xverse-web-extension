@@ -171,6 +171,7 @@ function Step2SelectAmount({
     };
 
     fetchStxFees();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedNetwork, unsignedSendStxTx]);
 
   return (
@@ -198,6 +199,7 @@ function Step2SelectAmount({
               feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
               isLoading={isLoading}
               absoluteBalance={Number(microstacksToStx(new BigNumber(stxBalance)))}
+              amount={Number(amount)}
             />
           </FeeRateContainer>
         )}

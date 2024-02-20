@@ -17,7 +17,7 @@ function Step3Confirm({ unsignedSendStxTx, fee }: Props) {
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unsignedSendStxTx]);
+  }, []);
 
   return <div />;
 }
