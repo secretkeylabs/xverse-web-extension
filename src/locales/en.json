@@ -794,6 +794,12 @@
     "XVERSE_DEFAULT": "Use Xverse as default wallet",
     "XVERSE_DEFAULT_DESCRIPTION": "Allow apps to prioritize Xverse when looking for a wallet with which to connect."
   },
+  "EXPLORE_SCREEN": {
+    "TITLE": "Explore",
+    "EXPAND_VIEW": "Expand view",
+    "FEATURED": "Featured",
+    "RECOMMENDED": "Recommended"
+  },
   "OPTIONS_DIALOG": {
     "SWITCH_ACCOUNT": "Switch Account",
     "LOCK": "Lock",

@@ -23,6 +23,7 @@ import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import ErrorBoundary from '@screens/error';
 import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
+import Explore from '@screens/explore';
 import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
 import Landing from '@screens/landing';
@@ -300,6 +301,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <Stacking />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'explore',
+        element: (
+          <AuthGuard>
+            <Explore />
           </AuthGuard>
         ),
       },

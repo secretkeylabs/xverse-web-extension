@@ -1,4 +1,4 @@
-import { ChartLineUp, Gear, SketchLogo, Wallet } from '@phosphor-icons/react';
+import { ChartLineUp, Gear, Globe, SketchLogo, Wallet } from '@phosphor-icons/react';
 import { animated, easings, useSpring } from '@react-spring/web';
 import { isInOptions } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,7 @@ const Button = styled.button({
   zIndex: 2,
 });
 
-export type Tab = 'dashboard' | 'nft' | 'stacking' | 'settings';
+export type Tab = 'dashboard' | 'nft' | 'stacking' | 'explore' | 'settings';
 
 interface Props {
   tab: Tab;
@@ -41,10 +41,11 @@ function BottomTabBar({ tab }: Props) {
   const theme = useTheme();
 
   const getPosition = () => {
-    if (tab === 'nft') return 96;
-    if (tab === 'stacking') return 168;
-    if (tab === 'settings') return 240;
-    return 24;
+    if (tab === 'nft') return 78;
+    if (tab === 'stacking') return 132;
+    if (tab === 'explore') return 186;
+    if (tab === 'settings') return 239;
+    return 25;
   };
 
   const styles = useSpring({
@@ -74,6 +75,12 @@ function BottomTabBar({ tab }: Props) {
     }
   };
 
+  const handleExploreButtonClick = () => {
+    if (tab !== 'explore') {
+      navigate('/explore');
+    }
+  };
+
   const handleSettingButtonClick = () => {
     if (tab !== 'settings') {
       navigate('/settings');
@@ -100,6 +107,12 @@ function BottomTabBar({ tab }: Props) {
       <Button onClick={handleStackingButtonClick}>
         <ChartLineUp
           color={tab === 'stacking' ? theme.colors.white_0 : theme.colors.white_600}
+          size="24"
+        />
+      </Button>
+      <Button onClick={handleExploreButtonClick}>
+        <Globe
+          color={tab === 'explore' ? theme.colors.white_0 : theme.colors.white_600}
           size="24"
         />
       </Button>

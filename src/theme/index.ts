@@ -396,7 +396,6 @@ const Theme = {
     fontWeight: '400',
     fontSize: 14,
     letterSpacing: 0.02,
-    textTransform: 'uppercase',
   },
 
   /**
