@@ -114,8 +114,10 @@ const WarningWrapper = styled.div((props) => ({
 }));
 
 const FeeRateContainer = styled.div`
-  margin-top: ${(props) => props.theme.space.m};
   margin-bottom: ${(props) => props.theme.space.m};
+  background-color: ${(props) => props.theme.colors.background.elevation1};
+  border-radius: ${(props) => props.theme.space.s};
+  padding: ${(props) => props.theme.space.s};
 `;
 
 // todo: make fee non option - that'll require change in all components using it
@@ -371,28 +373,30 @@ function ConfirmStxTransactionComponent({
         )}
 
         {children}
-        <TransferFeeView
-          fee={microstacksToStx(getFee())}
-          currency="STX"
-          title="Network Fee"
-          customFeeClick={() => {}}
-        />
-
-        <FeeRateContainer>
-          <SelectFeeRate
-            fee={microstacksToStx(new BigNumber(fee ?? '0')).toString()}
-            feeUnits="STX"
-            feeRate={fee ?? ''}
-            setFeeRate={setFeeRate ?? (() => {})}
-            baseToFiat={stxToFiat}
-            fiatUnit={fiatCurrency}
-            getFeeForFeeRate={(feeForFeeRate) => Promise.resolve(feeForFeeRate)}
-            feeRates={feeRates}
-            feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
-            isLoading={loading}
-            absoluteBalance={Number(microstacksToStx(new BigNumber(stxBalance)))}
+        {fee && setFeeRate ? (
+          <FeeRateContainer>
+            <SelectFeeRate
+              fee={microstacksToStx(new BigNumber(fee ?? '0')).toFixed(2)}
+              feeUnits="STX"
+              feeRate={fee}
+              setFeeRate={setFeeRate}
+              baseToFiat={stxToFiat}
+              fiatUnit={fiatCurrency}
+              getFeeForFeeRate={(feeForFeeRate) => Promise.resolve(feeForFeeRate)}
+              feeRates={feeRates}
+              feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
+              isLoading={loading}
+              absoluteBalance={Number(microstacksToStx(new BigNumber(stxBalance)))}
+            />
+          </FeeRateContainer>
+        ) : (
+          <TransferFeeView
+            fee={microstacksToStx(getFee())}
+            currency="STX"
+            title="Network Fee"
+            customFeeClick={() => {}}
           />
-        </FeeRateContainer>
+        )}
 
         {/* TODO fix type error as any */}
         {(initialStxTransactions[0]?.payload as any)?.amount && (
