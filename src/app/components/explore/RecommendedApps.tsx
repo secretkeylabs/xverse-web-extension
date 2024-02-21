@@ -32,7 +32,7 @@ const CardText = styled.div`
   ${({ theme }) => theme.typography.body_medium_m};
   color: ${({ theme }) => theme.colors.white_400};
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
