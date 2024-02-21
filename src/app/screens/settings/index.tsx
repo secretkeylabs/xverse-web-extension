@@ -14,7 +14,7 @@ import {
 } from '@stores/wallet/actions/actionCreators';
 import { chromeLocalStorageKeys } from '@utils/chromeLocalStorage';
 import { PRIVACY_POLICY_LINK, SUPPORT_LINK, TERMS_LINK } from '@utils/constants';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { getLockCountdownLabel, isInOptions, isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -44,8 +44,8 @@ const ResetWalletContainer = styled.div((props) => ({
   zIndex: 10,
   background: 'rgba(25, 25, 48, 0.5)',
   backdropFilter: 'blur(10px)',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
   paddingTop: props.theme.spacing(50),
 }));
 
@@ -56,13 +56,14 @@ const LogoContainer = styled.div((props) => ({
 
 function Setting() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
-  const [showResetWalletPrompt, setShowResetWalletPrompt] = useState<boolean>(false);
-  const [showResetWalletDisplay, setShowResetWalletDisplay] = useState<boolean>(false);
-  const [password, setPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [showResetWalletPrompt, setShowResetWalletPrompt] = useState(false);
+  const [showResetWalletDisplay, setShowResetWalletDisplay] = useState(false);
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const {
     fiatCurrency,
+    walletLockPeriod,
     network,
     hasActivatedOrdinalsKey,
     hasActivatedRareSatsKey,
@@ -159,6 +160,7 @@ function Setting() {
 
     navigate('/restore-funds');
   };
+
   const handlePasswordNextClick = async () => {
     try {
       setLoading(true);
@@ -229,7 +231,7 @@ function Setting() {
         <SettingComponent
           text={t('LOCK_COUNTDOWN')}
           onClick={openLockCountdownScreen}
-          icon={ArrowIcon}
+          textDetail={getLockCountdownLabel(walletLockPeriod, t)}
           showDivider
         />
         <SettingComponent

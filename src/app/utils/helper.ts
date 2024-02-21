@@ -303,3 +303,14 @@ export const calculateTotalBalance = ({
 
   return totalBalance.toNumber().toFixed(2);
 };
+
+export const getLockCountdownLabel = (
+  period: number,
+  t: TFunction<'translation', 'SETTING_SCREEN'>,
+) => {
+  if (period < 60) {
+    return t('LOCK_COUNTDOWN_MIN', { count: period });
+  }
+  const hours = period / 60;
+  return t('LOCK_COUNTDOWN_HS', { count: hours });
+};

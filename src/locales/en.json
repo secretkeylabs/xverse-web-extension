@@ -782,6 +782,7 @@
     "LOCK_COUNTDOWN_MIN": "{{count}} minutes",
     "LOCK_COUNTDOWN_HS_one": "{{count}} hour",
     "LOCK_COUNTDOWN_HS_other": "{{count}} hours",
+    "LOCK_COUNTDOWN_SET_TO": "Countdown set to",
     "ENTER_YOUR_NEW_PASSWORD": "Enter your new password",
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",

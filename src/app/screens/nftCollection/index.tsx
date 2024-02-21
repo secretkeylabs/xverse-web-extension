@@ -12,7 +12,6 @@ import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import Nft from '@screens/nftDashboard/nft';
 import NftImage from '@screens/nftDashboard/nftImage';
 import { NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
-import SnackBar from '@ui-library/snackBar';
 import { EMPTY_LABEL } from '@utils/constants';
 import { getFullyQualifiedKey, getNftCollectionsGridItemId, isBnsCollection } from '@utils/nfts';
 import { PropsWithChildren, useRef } from 'react';
@@ -159,7 +158,7 @@ function CollectionGridItemWithData({
         if (nftData?.data?.token_metadata) {
           navigate(`/nft-dashboard/nft-detail/${getFullyQualifiedKey(nft.identifier)}`);
         } else {
-          toast.custom(<SnackBar text={t('ERRORS.FAILED_TO_FETCH')} type="error" />);
+          toast.error(t('ERRORS.FAILED_TO_FETCH'));
         }
       };
 
