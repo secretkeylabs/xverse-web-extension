@@ -67,7 +67,7 @@
     "stream-browserify": "^3.0.0",
     "string-to-color": "^2.2.2",
     "styled-components": "^5.3.5",
-    "swiper": "^11.0.6",
+    "swiper": "11.0.6",
     "valid-url": "^1.0.9",
     "webextension-polyfill": "^0.10.0",
     "zxcvbn": "^4.4.2"
