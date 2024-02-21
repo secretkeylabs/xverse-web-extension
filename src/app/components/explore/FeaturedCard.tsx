@@ -5,7 +5,7 @@ const Card = styled(Link)`
   display: block;
   border-radius: 12px;
   background-color: ${({ theme }) => theme.colors.elevation2};
-  height: 168px;
+  height: 182px;
   width: 212px;
   color: ${({ theme }) => theme.colors.white_0};
 `;
@@ -13,13 +13,18 @@ const Card = styled(Link)`
 const CardImage = styled.img`
   border-radius: 12px 12px 0 0;
   width: 100%;
-  height: auto;
+  height: 93px;
   display: block;
+  object-fit: cover;
 `;
 
 const CardText = styled.div`
-  padding: ${({ theme }) => theme.space.m};
+  margin: ${({ theme }) => theme.space.m};
   ${({ theme }) => theme.typography.body_medium_m};
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;
 
 export interface FeaturedCardProps {
