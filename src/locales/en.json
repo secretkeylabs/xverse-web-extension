@@ -19,20 +19,11 @@
     "SATS_PER_VB": "sats/vByte"
   },
   "LANDING_SCREEN": {
-    "SCREEN_TITLE": "Wallet for Stacks & Bitcoin",
-    "CREATE_WALLET_BUTTON": "Create Wallet",
-    "RESTORE_WALLET_BUTTON": "Restore Wallet"
-  },
-  "ONBOARDING_SCREEN": {
-    "ONBOARDING_1_TITlE": "All your Bitcoin, Stacks assets and NFTs in one place",
-    "ONBOARDING_1_SUBTITlE": "Manage all your Bitcoin and Stacks based digital assets directly from Xverse",
-    "ONBOARDING_2_TITlE": "Stack your STX to earn rewards in Bitcoin",
-    "ONBOARDING_2_SUBTITlE": "Earn Bitcoin yield on your STX without them ever leaving your wallet.",
-    "ONBOARDING_3_TITlE": "Access your favorites Dapps from your wallet",
-    "ONBOARDING_3_SUBTITlE": "From marketplaces to DeFi, and so much more.",
-    "ONBOARDING_NEXT_BUTTON": "Next",
-    "ONBOARDING_SKIP_BUTTON": "Skip",
-    "ONBOARDING_CONTINUE_BUTTON": "Continue"
+    "SCREEN_TITLE": "The Bitcoin wallet for everyone",
+    "CREATE_WALLET_BUTTON": "Create a new wallet",
+    "RESTORE_WALLET_BUTTON": "Restore an existing wallet",
+    "ONBOARDING_1_TITlE": "Store BTC, Ordinals, Rare Sats, BRC20, STX and more!",
+    "ONBOARDING_2_TITlE": "Connect to your favorite Bitcoin apps"
   },
   "LEDGER_IMPORT_SCREEN": {
     "LEDGER_IMPORT_1_TITLE": "Secure Your Assets with Ledger",

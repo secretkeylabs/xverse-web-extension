@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import XverseLogoSVG from '@assets/img/settings/logo.svg';
+import XverseLogoSVG from '@assets/img/full_logo_horizontal.svg';
 
 declare const VERSION: string;
 

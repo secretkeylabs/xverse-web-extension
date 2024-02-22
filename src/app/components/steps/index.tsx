@@ -18,6 +18,7 @@ const StepsDot = styled.div<StepDotProps>((props) => ({
 interface StepsProps {
   data: any[];
   activeIndex: number;
+  dotStrategy?: 'completion' | 'selection';
 }
 
 interface StepDotProps {
@@ -25,11 +26,17 @@ interface StepDotProps {
 }
 
 export default function Steps(props: StepsProps): JSX.Element {
-  const { data, activeIndex } = props;
+  const { data, activeIndex, dotStrategy } = props;
+  const getStrategy = (index: number) => {
+    if (dotStrategy === 'selection') {
+      return index === activeIndex;
+    }
+    return index <= activeIndex;
+  };
   return (
     <StepsContainer>
       {data.map((view, index) => (
-        <StepsDot active={index <= activeIndex} key={nanoid()} />
+        <StepsDot active={getStrategy(index)} key={nanoid()} />
       ))}
     </StepsContainer>
   );
