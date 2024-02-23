@@ -73,6 +73,13 @@ function TransferSection({
     satributesFromPayment.push(...item.satributes);
   });
 
+  const hasData =
+    showAmount ||
+    (isPartialTransaction && inputFromOrdinal.length > 0) ||
+    outputsFromOrdinal.length > 0;
+
+  if (!hasData) return null;
+
   return (
     <Container>
       <Header spaceBetween>

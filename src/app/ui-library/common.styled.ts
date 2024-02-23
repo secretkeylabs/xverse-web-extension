@@ -31,7 +31,7 @@ export const StyledHeading = styled.h1<TypographyProps>`
 export const VerticalStackButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${(props) => props.theme.spacing(6)}px;
+  gap: ${(props) => props.theme.space.s};
 `;
 
 export const HorizontalSplitButtonContainer = styled.div`

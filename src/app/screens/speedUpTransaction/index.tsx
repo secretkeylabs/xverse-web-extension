@@ -29,6 +29,7 @@ import {
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
+import Spinner from '@ui-library/spinner';
 import { EMPTY_LABEL } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -36,7 +37,6 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { MoonLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 import CustomFee from './customFee';
 import { LoaderContainer, SuccessActionsContainer } from './index.styled';
@@ -45,6 +45,7 @@ function SpeedUpTransactionScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const theme = useTheme();
   const navigate = useNavigate();
+
   const [showCustomFee, setShowCustomFee] = useState(false);
   const { selectedAccount, stxAddress, network, stxAvailableBalance } = useWalletSelector();
   const { id } = useParams();
@@ -360,7 +361,7 @@ function SpeedUpTransactionScreen() {
       <TopRow onClick={handleGoBack} />
       {isLoading ? (
         <LoaderContainer>
-          <MoonLoader color="white" size={30} />
+          <Spinner color="white" size={30} />
         </LoaderContainer>
       ) : (
         <>

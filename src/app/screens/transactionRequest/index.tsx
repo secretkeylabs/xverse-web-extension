@@ -17,11 +17,11 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
 import { StacksTransaction } from '@stacks/transactions';
+import Spinner from '@ui-library/spinner';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { MoonLoader } from 'react-spinners';
 import styled from 'styled-components';
 
 const LoaderContainer = styled.div((props) => ({
@@ -206,7 +206,7 @@ function TransactionRequest() {
     <>
       {!unsignedTx ? (
         <LoaderContainer>
-          <MoonLoader color="white" size={50} />
+          <Spinner color="white" size={50} />
         </LoaderContainer>
       ) : null}
       {payload.txType === 'contract_call' && unsignedTx ? (
