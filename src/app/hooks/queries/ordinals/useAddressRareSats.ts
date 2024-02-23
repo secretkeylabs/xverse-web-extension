@@ -5,7 +5,7 @@ import {
   mapRareSatsAPIResponseToBundle,
 } from '@secretkeylabs/xverse-core';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { handleRetries, InvalidParamsError } from '@utils/query';
+import { InvalidParamsError, handleRetries } from '@utils/query';
 
 const PAGE_SIZE = 30;
 
@@ -67,15 +67,31 @@ export const useGetUtxoOrdinalBundle = (
   });
 
   const bundle = data?.txid ? mapRareSatsAPIResponseToBundle(data) : undefined;
-  const inscriptionRange = bundle?.satRanges.find((range) =>
-    range.inscriptions.some((inscription) => inscription.inscription_number === ordinalNumber),
-  );
+
+  if (ordinalNumber) {
+    const inscriptionRange = bundle?.satRanges.find((range) =>
+      range.inscriptions.some((inscription) => inscription.inscription_number === ordinalNumber),
+    );
+    const ordinalSatributes =
+      inscriptionRange?.satributes.filter((satribute) => satribute !== 'COMMON') ?? [];
+    const exoticRangesCount = (
+      bundle?.satributes.filter((range) => !range.includes('COMMON')) ?? []
+    ).length;
+    const isPartOfABundle = exoticRangesCount > ordinalSatributes.length;
+    return {
+      bundle,
+      isPartOfABundle,
+      ordinalSatributes,
+      isLoading,
+    };
+  }
   const ordinalSatributes =
-    inscriptionRange?.satributes.filter((satribute) => satribute !== 'COMMON') ?? [];
+    bundle?.satRanges
+      ?.map((range) => range.satributes.filter((satribute) => satribute !== 'COMMON'))
+      .flat() ?? [];
   const exoticRangesCount = (bundle?.satributes.filter((range) => !range.includes('COMMON')) ?? [])
     .length;
   const isPartOfABundle = exoticRangesCount > ordinalSatributes.length;
-
   return {
     bundle,
     isPartOfABundle,

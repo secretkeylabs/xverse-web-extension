@@ -1,6 +1,5 @@
 import ExoticSatsRow from '@components/exoticSatsRow/exoticSatsRow';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
-import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { DotsThree } from '@phosphor-icons/react';
 import { Bundle, RareSatsType } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
@@ -33,12 +32,12 @@ const Pressable = styled.button((props) => ({
 
 function RareSatsTabGridItem({ bundle, maxItems }: { bundle: Bundle; maxItems: number }) {
   const navigate = useNavigate();
-  const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
 
   const handleOnClick = () => {
     // exotics v1 wont show range details only bundle details
-    setSelectedSatBundleDetails(bundle);
-    navigate('/nft-dashboard/rare-sats-bundle', { state: { source: 'RareSatsTab' } });
+    navigate(`/nft-dashboard/rare-sats-bundle/${bundle.txid}:${bundle.vout}`, {
+      state: { source: 'RareSatsTab' },
+    });
   };
 
   const renderedIcons = () => {

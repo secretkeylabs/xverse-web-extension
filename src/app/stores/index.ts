@@ -2,7 +2,6 @@ import { chromeLocalStorage } from '@utils/chromeStorage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { PersistConfig, createMigrate, persistReducer, persistStore } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
-import NftDataStateReducer from './nftData/reducer';
 import { WalletState } from './wallet/actions/types';
 import walletReducer, { initialWalletState } from './wallet/reducer';
 
@@ -37,7 +36,6 @@ export const WalletPersistConfig: PersistConfig<WalletState> = {
 
 const appReducer = combineReducers({
   walletState: persistReducer(WalletPersistConfig, walletReducer),
-  nftDataState: NftDataStateReducer,
 });
 
 const rootReducer = (state: any, action: any) => appReducer(state, action);

@@ -1,7 +1,6 @@
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { StyledP } from '@ui-library/common.styled';
 import { useMemo } from 'react';
@@ -29,7 +28,6 @@ function RareSatsDetailScreen() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { setSelectedSatBundleItemIndex } = useSatBundleDataReducer();
   useResetUserFlow('/rare-sats-detail');
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
@@ -41,7 +39,6 @@ function RareSatsDetailScreen() {
     } else {
       navigate('/nft-dashboard?tab=rareSats');
     }
-    setSelectedSatBundleItemIndex(null);
   };
 
   return (

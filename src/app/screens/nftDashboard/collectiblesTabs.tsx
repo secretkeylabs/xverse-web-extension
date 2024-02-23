@@ -219,7 +219,6 @@ export default function CollectiblesTabs({
               {t('TOTAL_ITEMS', { count: ordinalBundleCount })}
             </StyledTotalItems>
           )}
-
           {!rareSatsQuery.isLoading && showNoticeAlert && (
             <NoticeContainer>
               <Notice
@@ -235,7 +234,6 @@ export default function CollectiblesTabs({
             </NoticeContainer>
           )}
           {showNoBundlesNotice && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
-
           {!!rareSatsQuery.error && <StyledWrenchErrorMessage />}
           {rareSatsQuery.isInitialLoading ? (
             <SkeletonLoader isGalleryOpen={isGalleryOpen} />
