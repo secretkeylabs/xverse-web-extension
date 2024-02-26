@@ -23,6 +23,7 @@ import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import ErrorBoundary from '@screens/error';
 import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
+import Explore from '@screens/explore';
 import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
 import Landing from '@screens/landing';
@@ -30,14 +31,13 @@ import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
 import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
-import LegalLinks from '@screens/legalLinks';
+import Legal from '@screens/legal';
 import Login from '@screens/login';
 import ManageTokens from '@screens/manageTokens';
 import NftCollection from '@screens/nftCollection';
 import NftDashboard from '@screens/nftDashboard';
 import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
-import Onboarding from '@screens/onboarding';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
 import OrdinalsCollection from '@screens/ordinalsCollection';
 import RareSatsBundle from '@screens/rareSatsBundle';
@@ -84,14 +84,6 @@ const router = createHashRouter([
         element: <Landing />,
       },
       {
-        path: 'onboarding',
-        element: (
-          <OnboardingGuard>
-            <Onboarding />
-          </OnboardingGuard>
-        ),
-      },
-      {
         path: 'import-ledger',
         element: (
           <AuthGuard>
@@ -123,7 +115,7 @@ const router = createHashRouter([
         path: 'legal',
         element: (
           <OnboardingGuard>
-            <LegalLinks />
+            <Legal />
           </OnboardingGuard>
         ),
       },
@@ -300,6 +292,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <Stacking />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'explore',
+        element: (
+          <AuthGuard>
+            <Explore />
           </AuthGuard>
         ),
       },
