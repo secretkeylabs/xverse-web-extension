@@ -1,4 +1,3 @@
-import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import type { Inscription } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -46,15 +45,8 @@ const GridItemContainer = styled.button((props) => ({
 function Ordinal({ asset, isGalleryOpen }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
-  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
-
-  const handleOnClick = () => {
-    setSelectedOrdinalDetails(asset);
-    navigate(`/nft-dashboard/ordinal-detail/${asset.id}`);
-  };
-
   return (
-    <GridItemContainer onClick={handleOnClick}>
+    <GridItemContainer onClick={() => navigate(`/nft-dashboard/ordinal-detail/${asset.id}`)}>
       {isGalleryOpen ? (
         <NftImageContainer>
           <OrdinalImage isNftDashboard ordinal={asset} />
