@@ -434,6 +434,7 @@ function ConfirmStxTransactionComponent({
           onCrossClick={closeTransactionSettingAlert}
           showFeeSettings={showFeeSettings}
           setShowFeeSettings={setShowFeeSettings}
+          nonceSettings
         />
       </Container>
       <ButtonContainer>

@@ -85,6 +85,7 @@ interface Props {
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: UTXO[];
   showFeeSettings: boolean;
+  nonceSettings?: boolean;
   setShowFeeSettings: (value: boolean) => void;
 }
 
@@ -102,6 +103,7 @@ function TransactionSettingAlert({
   isRestoreFlow,
   nonOrdinalUtxos,
   showFeeSettings,
+  nonceSettings = false,
   setShowFeeSettings,
 }: Props) {
   const { t } = useTranslation('translation');
@@ -198,7 +200,7 @@ function TransactionSettingAlert({
   };
 
   const renderContent = () => {
-    if (showNonceSettings) {
+    if (showNonceSettings || nonceSettings) {
       return <EditNonce nonce={nonce!} setNonce={setNonceInput} />;
     }
 
@@ -285,7 +287,7 @@ function TransactionSettingAlert({
       }}
     >
       {renderContent()}
-      {type === 'STX' && (showFeeSettings || showNonceSettings) && (
+      {type === 'STX' && (showFeeSettings || showNonceSettings || nonceSettings) && (
         <ButtonContainer>
           <ActionButton
             text={t('TRANSACTION_SETTING.APPLY')}
