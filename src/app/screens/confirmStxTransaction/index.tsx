@@ -226,9 +226,10 @@ function ConfirmStxTransaction() {
         isSponsored={sponsored}
         skipModal={isLedgerAccount(selectedAccount)}
         hasSignatures={hasSignatures}
-        feeOverride={fee}
-        fee={fee.toString()}
-        setFeeRate={(feeRate: string) => setStateFee(new BigNumber(feeRate))}
+        fee={microstacksToStx(fee).toString()}
+        setFeeRate={(feeRate: string) => {
+          setStateFee(stxToMicrostacks(new BigNumber(feeRate)));
+        }}
       >
         <RecipientComponent
           address={recipient}

@@ -301,12 +301,11 @@ function ConfirmStxTransactionComponent({
     setOpenTransactionSettingModal(false);
   };
 
-  // todo: remove this
-  // useEffect(() => {
-  //   if (feeOverride) {
-  //     applyTxSettings({ fee: microstacksToStx(feeOverride).toString() });
-  //   }
-  // }, [feeOverride]);
+  useEffect(() => {
+    if (feeOverride) {
+      applyTxSettings({ fee: microstacksToStx(feeOverride).toString() });
+    }
+  }, [feeOverride]);
 
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {
@@ -376,7 +375,7 @@ function ConfirmStxTransactionComponent({
         {fee && setFeeRate ? (
           <FeeRateContainer>
             <SelectFeeRate
-              fee={microstacksToStx(new BigNumber(fee ?? '0')).toFixed(2)}
+              fee={fee}
               feeUnits="STX"
               feeRate={fee}
               setFeeRate={setFeeRate}
@@ -401,8 +400,8 @@ function ConfirmStxTransactionComponent({
         {/* TODO fix type error as any */}
         {(initialStxTransactions[0]?.payload as any)?.amount && (
           <TransferFeeView
-            fee={microstacksToStx(
-              getFee().plus(
+            fee={new BigNumber(fee ?? 0).plus(
+              microstacksToStx(
                 new BigNumber((initialStxTransactions[0]?.payload as any).amount?.toString(10)),
               ),
             )}
