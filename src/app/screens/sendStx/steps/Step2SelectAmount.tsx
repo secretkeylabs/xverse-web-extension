@@ -88,9 +88,7 @@ function Step2SelectAmount({
       stxToMicrostacks(new BigNumber(stx)),
       new BigNumber(stxBtcRate),
       new BigNumber(btcFiatRate),
-    )
-      .toNumber()
-      .toFixed(2);
+    ).toFixed(2);
 
   const hasStx = +stxBalance > 0;
 

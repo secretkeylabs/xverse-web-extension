@@ -6,7 +6,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger';
 
 const StyledButton = styled.button`
   width: 100%;
-  min-height: 42.5px;
+  min-height: 44px;
   user-select: none;
 
   display: flex;

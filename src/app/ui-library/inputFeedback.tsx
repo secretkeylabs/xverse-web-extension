@@ -8,7 +8,7 @@ export type FeedbackVariant = 'info' | 'danger' | 'plain' | 'plainIndented' | 'c
 const colors: Record<FeedbackVariant, string> = {
   info: Theme.colors.white_200,
   danger: Theme.colors.danger_light,
-  plain: Theme.colors.white_200,
+  plain: Theme.colors.white_400,
   plainIndented: Theme.colors.white_200,
   checkmark: Theme.colors.success_light,
 };

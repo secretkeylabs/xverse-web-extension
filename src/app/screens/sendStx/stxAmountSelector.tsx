@@ -6,6 +6,7 @@ import {
   getStxTokenEquivalent,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
 import { microStxToStx } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -13,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
+import Theme from 'theme';
 
 const BalanceText = styled.span`
   ${(props) => props.theme.typography.body_medium_m}
@@ -52,6 +54,10 @@ const MaxButton = styled.div<{ $sendMax: boolean; $disabled: boolean }>`
   &:hover {
     ${(props) => (props.$disabled ? '' : `color:${props.theme.colors.tangerine_200}`)};
   }
+`;
+
+const AmountText = styled(StyledP)`
+  margin-right: ${(props) => props.theme.space.xxs};
 `;
 
 const inputValidator = /^[0-9.]*$/;
@@ -213,8 +219,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
           prefix={useStxValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
             <div>
-              <BalanceText>{t('BALANCE')} </BalanceText> {value}{' '}
-              {useStxValue ? 'STX' : fiatCurrency}
+              <BalanceText>{t('BALANCE')}</BalanceText> {value} {useStxValue ? 'STX' : fiatCurrency}
             </div>
           )}
         />
@@ -229,11 +234,14 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
               prefix={useStxValue ? `~ ${currencySymbolMap[fiatCurrency]}` : ''}
               renderText={(value: string) => (
                 <div>
-                  {value} {useStxValue ? fiatCurrency : 'STX'}
+                  <AmountText typography="body_medium_s" color="white_200">
+                    {' '}
+                    {value} {useStxValue ? fiatCurrency : 'STX'}
+                  </AmountText>
                 </div>
               )}
             />
-            <ArrowsDownUp />
+            <ArrowsDownUp size={16} color={Theme.colors.white_200} />
           </ConvertComplication>
           <VertRule />
           <MaxButton $sendMax={sendMax} $disabled={disabled} onClick={handleMaxClick}>
