@@ -16,6 +16,8 @@ import {
   ContractFunction,
   extractFromPayload,
   isMultiSig,
+  microstacksToStx,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import { ContractCallPayload } from '@stacks/connect';
 import {
@@ -27,6 +29,7 @@ import {
   SomeCV,
   StacksTransaction,
 } from '@stacks/transactions';
+import BigNumber from 'bignumber.js';
 import { createContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -87,6 +90,7 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
+  const [fee, setFee] = useState<BigNumber | undefined>(undefined);
 
   // SignTransaction Params
   const isMultiSigTx = isMultiSig(unsignedTx);
@@ -272,6 +276,10 @@ export default function ContractCallRequest(props: ContractCallRequestProps) {
         title={request.functionName}
         subTitle={`Requested by ${request.appDetails?.name}`}
         hasSignatures={hasSignatures}
+        fee={fee ? microstacksToStx(fee).toString() : undefined}
+        setFeeRate={(feeRate: string) => {
+          setFee(stxToMicrostacks(new BigNumber(feeRate)));
+        }}
       >
         <>
           {hasTabClosed && (

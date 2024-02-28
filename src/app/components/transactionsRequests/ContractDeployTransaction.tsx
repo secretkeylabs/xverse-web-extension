@@ -6,8 +6,15 @@ import StxPostConditionCard from '@components/postCondition/stxPostConditionCard
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
-import { broadcastSignedTransaction, buf2hex, isMultiSig } from '@secretkeylabs/xverse-core';
+import {
+  broadcastSignedTransaction,
+  buf2hex,
+  isMultiSig,
+  microstacksToStx,
+  stxToMicrostacks,
+} from '@secretkeylabs/xverse-core';
 import { MultiSigSpendingCondition, PostCondition, StacksTransaction } from '@stacks/transactions';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -109,6 +116,7 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
   const [loaderForBroadcastingTx, setLoaderForBroadcastingTx] = useState<boolean>(false);
+  const [fee, setFee] = useState<BigNumber | undefined>(undefined);
   const navigate = useNavigate();
 
   // SignTransaction Params
@@ -220,6 +228,10 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         isSponsored={sponsored}
         title={t('DEPLOY_CONTRACT_REQUEST.DEPLOY_CONTRACT')}
         hasSignatures={hasSignatures}
+        fee={fee ? microstacksToStx(fee).toString() : undefined}
+        setFeeRate={(feeRate: string) => {
+          setFee(stxToMicrostacks(new BigNumber(feeRate)));
+        }}
       >
         {hasTabClosed && (
           <InfoContainer
