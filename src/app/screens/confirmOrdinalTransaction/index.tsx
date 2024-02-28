@@ -1,9 +1,8 @@
 import { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
+import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
 import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
-import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -14,7 +13,7 @@ import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 
@@ -53,9 +52,8 @@ function ConfirmOrdinalTransaction() {
   if (!BigNumber.isBigNumber(fee)) {
     fee = BigNumber(fee);
   }
-
-  const { selectedOrdinal } = useNftDataSelector();
-  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
+  const { id } = useParams();
+  const { data: selectedOrdinal } = useAddressInscription(id!);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
   const { refetch } = useBtcWalletData();
   const [currentFee, setCurrentFee] = useState(fee);
@@ -76,7 +74,6 @@ function ConfirmOrdinalTransaction() {
 
   useEffect(() => {
     if (btcTxBroadcastData) {
-      setSelectedOrdinalDetails(null);
       setSelectedSatBundleDetails(null);
       navigate('/tx-status', {
         state: {
@@ -95,7 +92,6 @@ function ConfirmOrdinalTransaction() {
 
   useEffect(() => {
     if (txError) {
-      setSelectedOrdinalDetails(null);
       setSelectedSatBundleDetails(null);
       navigate('/tx-status', {
         state: {

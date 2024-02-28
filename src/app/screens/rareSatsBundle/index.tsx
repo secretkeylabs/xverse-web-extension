@@ -166,7 +166,7 @@ function RareSatsBundle() {
   const location = useLocation();
   const { source } = location.state || {};
   const { network, selectedAccount, ordinalsAddress } = useWalletSelector();
-  const { selectedSatBundle: bundle, selectedOrdinal } = useNftDataSelector();
+  const { selectedSatBundle: bundle } = useNftDataSelector();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(bundle?.txid);
   const [showSendOrdinalsAlert, setShowSendOrdinalsAlert] = useState<boolean>(false);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
@@ -219,11 +219,12 @@ function RareSatsBundle() {
     navigate('/nft-dashboard/supported-rarity-scale');
   };
 
-  const isEmpty = !bundle?.satRanges?.length;
+  const goBackText =
+    location.state && location.state.source === 'OrdinalDetail'
+      ? t('SEND.MOVE_TO_ASSET_DETAIL')
+      : t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL');
 
-  const goBackText = selectedOrdinal?.id
-    ? t('SEND.MOVE_TO_ASSET_DETAIL')
-    : t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL');
+  const isEmpty = !bundle?.satRanges?.length;
 
   return (
     <>

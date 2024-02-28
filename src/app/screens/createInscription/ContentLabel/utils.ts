@@ -1,4 +1,4 @@
-import { isValidContentType, isValidFields } from '@utils/brc20';
+import { isValidContentType, isValidFields } from '@secretkeylabs/xverse-core';
 
 type SatsDefinition = {
   op: 'ns' | 'reg';

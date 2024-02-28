@@ -1,3 +1,4 @@
+import { Inscription, NonFungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
@@ -48,12 +49,12 @@ const GridItemContainer = styled.button`
 `;
 
 interface Props {
-  item: any;
-  itemId: string;
+  item?: Inscription | NonFungibleToken;
+  itemId?: string;
   itemSubText?: string;
   itemSubTextColor?: Color;
   children: ReactNode;
-  onClick?: (collectible: any) => void;
+  onClick?: (item: Inscription | NonFungibleToken) => void;
 }
 export function CollectibleCollectionGridItem({
   item,
@@ -63,11 +64,12 @@ export function CollectibleCollectionGridItem({
   children,
   onClick,
 }: Props) {
-  const handleOnClick = onClick
-    ? () => {
-        onClick(item);
-      }
-    : undefined;
+  const handleOnClick =
+    onClick && item
+      ? () => {
+          onClick(item);
+        }
+      : undefined;
 
   return (
     <GridItemContainer onClick={handleOnClick}>

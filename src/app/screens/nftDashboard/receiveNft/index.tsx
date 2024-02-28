@@ -1,5 +1,5 @@
-import plusIcon from '@assets/img/dashboard/plus.svg';
 import Cross from '@assets/img/dashboard/X.svg';
+import plusIcon from '@assets/img/dashboard/plus.svg';
 import ordinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import stacksIcon from '@assets/img/nftDashboard/stacks_icon.svg';
 import ActionButton from '@components/button';

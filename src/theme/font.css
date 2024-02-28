@@ -1,0 +1,52 @@
+@font-face{
+    font-family: 'Satoshi-Bold';
+    src: url("../assets/fonts/Satoshi-Bold.otf");
+    font-display: block;
+}
+@font-face{
+    font-family: 'Satoshi-Medium';
+    src: url("../assets/fonts/Satoshi-Medium.otf");
+    font-display: block;
+
+}
+@font-face{
+    font-family: 'Satoshi-Regular';
+    src: url("../assets/fonts/Satoshi-Regular.otf");
+    font-display: block;
+
+}
+@font-face{
+    font-family: 'Satoshi-Black';
+    src: url("../assets/fonts/Satoshi-Black.otf");
+    font-display: block;
+}
+@font-face{
+    font-family: 'IBMPlexSans-Regular';
+    src: url("../assets/fonts/IBMPlexSans-Regular.ttf");
+    font-display: block;
+}
+@font-face{
+    font-family: 'IBMPlexSans-Bold';
+    src: url("../assets/fonts/IBMPlexSans-Bold.ttf");
+    font-display: block;
+}
+@font-face{
+    font-family: 'IBMPlexSans-Medium';
+    src: url("../assets/fonts/IBMPlexSans-Medium.ttf");
+    font-display: block;
+}
+@font-face{
+    font-family: 'DMSans-Bold';
+    src: url("../assets/fonts/DMSans-Bold.ttf");
+    font-display: block;
+}
+@font-face{
+    font-family: 'DMSans-Medium';
+    src: url("../assets/fonts/DMSans-Medium.ttf");
+    font-display: block;
+}
+@font-face{
+    font-family: 'DMSans-Regular';
+    src: url("../assets/fonts/DMSans-Regular.ttf");
+    font-display: block;
+}
