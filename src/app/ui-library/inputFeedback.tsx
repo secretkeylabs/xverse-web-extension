@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledP } from './common.styled';
 
-export type FeedbackVariant = 'info' | 'danger' | 'plain' | 'plainIndented' | 'checkmark';
+export type FeedbackVariant = 'info' | 'danger' | 'explicative' | 'plainIndented' | 'checkmark';
 
 const colors: Record<FeedbackVariant, string> = {
   info: Theme.colors.white_200,
   danger: Theme.colors.danger_light,
-  plain: Theme.colors.white_400,
+  explicative: Theme.colors.white_400,
   plainIndented: Theme.colors.white_200,
   checkmark: Theme.colors.success_light,
 };
@@ -21,7 +21,7 @@ const getStyledIcon = (icon: Icon) => styled(icon)`
 const icons: Record<FeedbackVariant, ReturnType<typeof getStyledIcon> | undefined> = {
   info: getStyledIcon(Info),
   danger: getStyledIcon(Warning),
-  plain: undefined,
+  explicative: undefined,
   plainIndented: undefined,
   checkmark: getStyledIcon(CheckCircle),
 };
