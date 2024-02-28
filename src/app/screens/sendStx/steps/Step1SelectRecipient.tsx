@@ -118,7 +118,7 @@ function Step1SelectRecipient({
         onChange={handleMemoChange}
         feedback={[
           {
-            variant: 'plain',
+            variant: 'explicative',
             message: t('MEMO_INFO'),
           },
         ]}
