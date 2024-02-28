@@ -157,6 +157,9 @@ function ConfirmStxTransactionComponent({
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
+  const { t: settingsTranslate } = useTranslation('translation', {
+    keyPrefix: 'TRANSACTION_SETTING',
+  });
   const selectedNetwork = useNetworkSelector();
   const { stxBalance, stxBtcRate, btcFiatRate, fiatCurrency } = useWalletSelector();
   const { getSeed } = useSeedVault();
@@ -418,7 +421,7 @@ function ConfirmStxTransactionComponent({
               <>
                 <FadersHorizontal size={20} color={Theme.colors.tangerine} />
                 <ButtonText typography="body_medium_m" color="tangerine">
-                  Edit Nonce
+                  {settingsTranslate('ADVANCED_SETTING_NONCE_OPTION')}
                 </ButtonText>
               </>
             </Button>
