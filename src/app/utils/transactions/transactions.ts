@@ -121,3 +121,23 @@ export function isBrc20Transaction(
 ): tx is Brc20HistoryTransactionData {
   return (tx as Brc20HistoryTransactionData).txType === 'brc20';
 }
+
+// todo: move this to xverse-core
+export const capStxFee = (
+  low: number,
+  medium: number,
+  high: number,
+  highCap: number,
+): { low: number; medium: number; high: number } => {
+  let adjustedMedium = medium;
+  let adjustedHigh = high;
+
+  if (highCap < medium) {
+    adjustedMedium = highCap;
+    adjustedHigh = highCap * 1.25;
+  } else if (medium < highCap && highCap < high) {
+    adjustedHigh = highCap;
+  }
+
+  return { low, medium: adjustedMedium, high: adjustedHigh };
+};

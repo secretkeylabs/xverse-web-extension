@@ -14,6 +14,7 @@ import { deserializeTransaction, estimateTransaction } from '@stacks/transaction
 import SelectFeeRate, { FeeRates } from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
+import { capStxFee } from '@utils/transactions/transactions';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -150,8 +151,6 @@ function Step2SelectAmount({
   // Reactively estimate fees
   useEffect(() => {
     const fetchStxFees = async () => {
-      // const txRaw: string = await getRawTransaction(transaction.txid, network);
-
       const unsignedTx: StacksTransaction = deserializeTransaction(unsignedSendStxTx);
 
       const [low, medium, high] = await estimateTransaction(
@@ -159,10 +158,27 @@ function Step2SelectAmount({
         undefined,
         selectedNetwork,
       );
+
+      let stxFees = {
+        low: low.fee,
+        medium: medium.fee,
+        high: high.fee,
+      };
+
+      if (feeMultipliers?.thresholdHighStacksFee) {
+        const adjustedFees = capStxFee(
+          low.fee,
+          medium.fee,
+          high.fee,
+          feeMultipliers.thresholdHighStacksFee,
+        );
+        stxFees = { low: adjustedFees.low, medium: adjustedFees.medium, high: adjustedFees.high };
+      }
+
       setFees({
-        low: Number(microstacksToStx(new BigNumber(low.fee)).toFixed(2)),
-        medium: Number(microstacksToStx(new BigNumber(medium.fee)).toFixed(2)),
-        high: Number(microstacksToStx(new BigNumber(high.fee)).toFixed(2)),
+        low: Number(microstacksToStx(new BigNumber(stxFees.low)).toFixed(2)),
+        medium: Number(microstacksToStx(new BigNumber(stxFees.medium)).toFixed(2)),
+        high: Number(microstacksToStx(new BigNumber(stxFees.high)).toFixed(2)),
       });
       if (!fee)
         setFeeRate(Number(microstacksToStx(new BigNumber(medium.fee)).toFixed(2)).toString());
