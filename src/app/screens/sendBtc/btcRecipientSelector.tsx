@@ -17,7 +17,7 @@ type BtcRecipientScreenProps = {
 type InputFeedback = {
   variant: 'danger';
   message: string;
-}
+};
 
 function BtcRecipientScreen({
   recipientAddress,

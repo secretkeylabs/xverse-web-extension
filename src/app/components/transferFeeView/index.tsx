@@ -1,4 +1,5 @@
 import AmountWithInscriptionSatribute from '@components/confirmBtcTransaction/itemRow/amountWithInscriptionSatribute';
+import { PencilSimple } from '@phosphor-icons/react';
 import {
   btcTransaction,
   currencySymbolMap,
@@ -12,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import Theme from 'theme';
 
 const Container = styled.div((props) => ({
   background: props.theme.colors.elevation1,
@@ -38,6 +40,23 @@ const FeeContainer = styled.div({
   alignItems: 'flex-end',
 });
 
+const CustomRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const EditButton = styled.button`
+  display: flex;
+  flex-direction: row;
+  background: transparent;
+  align-items: center;
+  gap: ${(props) => props.theme.space.xxs};
+  cursor: ${(props) => (props.onClick ? 'pointer' : 'initial')};
+  width: 100%;
+  margin-left: ${(props) => props.theme.space.xs};
+`;
+
 interface Props {
   feePerVByte?: BigNumber;
   fee: BigNumber;
@@ -45,6 +64,8 @@ interface Props {
   title?: string;
   inscriptions?: btcTransaction.IOInscription[];
   satributes?: btcTransaction.IOSatribute[];
+  customFeeClick?: () => void;
+  subtitle?: string;
   onShowInscription?: (inscription: btcTransaction.IOInscription) => void;
 }
 function TransferFeeView({
@@ -54,6 +75,8 @@ function TransferFeeView({
   title,
   inscriptions = [],
   satributes = [],
+  customFeeClick,
+  subtitle,
   onShowInscription = () => {},
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -96,6 +119,24 @@ function TransferFeeView({
           <StyledP typography="body_medium_m" color="white_200">
             {title ?? t('FEES')}
           </StyledP>
+          {customFeeClick && (
+            <CustomRow>
+              <StyledP typography="body_medium_m" color="white_400">
+                Custom
+              </StyledP>
+              <EditButton onClick={() => {}}>
+                <StyledP typography="body_medium_m" color="tangerine">
+                  Edit
+                </StyledP>
+                <PencilSimple size="16" color={Theme.colors.tangerine} weight="fill" />
+              </EditButton>
+            </CustomRow>
+          )}
+          {subtitle && (
+            <StyledP typography="body_s" color="white_400">
+              {subtitle}
+            </StyledP>
+          )}
         </FeeTitleContainer>
         <FeeContainer>
           <NumericFormat

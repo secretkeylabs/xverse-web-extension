@@ -170,22 +170,21 @@ function FeeItem({
 
   // Fee can either be an absolute amount or a rate
   // If feeRateUnits is not defined, therefore an absolute fee is used
-  const absoluteFeeOnly = !feeRateUnits
+  const absoluteFeeOnly = !feeRateUnits;
 
   function renderAbsoluteFeeAmountAndUnit() {
     return (
       <StyledP typography="body_medium_s" color={secondaryColor}>
-          <NumericFormat
-            value={fiat}
-            displayType="text"
-            prefix={`~${currencySymbolMap[fiatUnit]}`}
-            thousandSeparator
-            renderText={(value: string) => `${value} ${fiatUnit}`}
-          />
+        <NumericFormat
+          value={fiat}
+          displayType="text"
+          prefix={`~${currencySymbolMap[fiatUnit]}`}
+          thousandSeparator
+          renderText={(value: string) => `${value} ${fiatUnit}`}
+        />
       </StyledP>
-    )
+    );
   }
-
 
   return (
     <FeeItemContainer

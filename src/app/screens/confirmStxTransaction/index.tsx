@@ -216,7 +216,7 @@ function ConfirmStxTransaction() {
       {isBrowserTx ? (
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
-        <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleCancelClick} />
+        <TopRow onClick={handleCancelClick} />
       )}
       <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx]}
@@ -226,7 +226,10 @@ function ConfirmStxTransaction() {
         isSponsored={sponsored}
         skipModal={isLedgerAccount(selectedAccount)}
         hasSignatures={hasSignatures}
-        feeOverride={fee}
+        fee={microstacksToStx(fee).toString()}
+        setFeeRate={(feeRate: string) => {
+          setStateFee(stxToMicrostacks(new BigNumber(feeRate)));
+        }}
       >
         <RecipientComponent
           address={recipient}

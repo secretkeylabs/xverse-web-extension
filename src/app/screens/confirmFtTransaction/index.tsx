@@ -8,12 +8,17 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { StacksTransaction, broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
+import {
+  StacksTransaction,
+  broadcastSignedTransaction,
+  microstacksToStx,
+  stxToMicrostacks,
+} from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -29,6 +34,7 @@ function ConfirmFtTransaction() {
     memo,
     recepientAddress,
   } = location.state;
+  const [fee, setFee] = useState<BigNumber | undefined>(undefined);
   const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
   const { refetch } = useStxWalletData();
   const { network, selectedAccount } = useWalletSelector();
@@ -106,6 +112,10 @@ function ConfirmFtTransaction() {
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleBackButtonClick}
         skipModal={isLedgerAccount(selectedAccount)}
+        fee={fee ? microstacksToStx(fee).toString() : undefined}
+        setFeeRate={(feeRate: string) => {
+          setFee(stxToMicrostacks(new BigNumber(feeRate)));
+        }}
       >
         <RecipientComponent
           address={recepientAddress}

@@ -92,7 +92,7 @@ function SelectFeeRate({
   feeRateLimits,
   isLoading,
   absoluteBalance,
-  amount
+  amount,
 }: Props) {
   const { t } = useTranslation('translation');
   const [editing, setEditing] = useState(false);
@@ -111,7 +111,7 @@ function SelectFeeRate({
     }
 
     return t('TRANSACTION_SETTING.PRIORITIES.CUSTOM');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feeRates, feeRate]);
 
   return (
@@ -162,20 +162,20 @@ function SelectFeeRate({
           </Label>
         )}
         {fee && (
-        <RowContainer>
-          <div />
-          <NumericFormat
-            value={baseToFiat(fee)}
-            displayType="text"
-            prefix={`~ ${currencySymbolMap[fiatUnit]}`}
-            thousandSeparator
-            renderText={(value: string) => (
-              <Label $size="s" $variant="dark">
-                {value} {fiatUnit}
-              </Label>
-            )}
-          />
-        </RowContainer>
+          <RowContainer>
+            <div />
+            <NumericFormat
+              value={baseToFiat(fee)}
+              displayType="text"
+              prefix={`~ ${currencySymbolMap[fiatUnit]}`}
+              thousandSeparator
+              renderText={(value: string) => (
+                <Label $size="s" $variant="dark">
+                  {value} {fiatUnit}
+                </Label>
+              )}
+            />
+          </RowContainer>
         )}
       </RowContainer>
       {editing && (
