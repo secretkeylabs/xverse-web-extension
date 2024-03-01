@@ -97,42 +97,44 @@ function AccountList(): JSX.Element {
   };
 
   return (
-    <Container>
-      <div>
-        <TopRow onClick={handleBackButtonClick} />
-        <AccountContainer>
-          <Title>{t('TITLE')}</Title>
-          {displayedAccountsList.map((account) => (
-            <div key={account.btcAddress}>
-              <LazyAccountRow
-                account={account}
-                isSelected={isAccountSelected(account)}
-                onAccountSelected={handleAccountSelect}
-                fetchBalance={enqueueFetchBalances}
-                isAccountListView
-              />
-              <Separator />
-            </div>
-          ))}
-        </AccountContainer>
-      </div>
-      {!hideListActions ? (
-        <ButtonsWrapper>
-          <ActionButton
-            icon={<Plus size={16} fill="white" />}
-            onPress={onCreateAccount}
-            text={t('NEW_ACCOUNT')}
-            transparent
-          />
-          <ActionButton
-            icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
-            onPress={onImportLedgerAccount}
-            text={t('LEDGER_ACCOUNT')}
-            transparent
-          />
-        </ButtonsWrapper>
-      ) : null}
-    </Container>
+    <>
+      <TopRow onClick={handleBackButtonClick} />
+      <Container>
+        <div>
+          <AccountContainer>
+            <Title>{t('TITLE')}</Title>
+            {displayedAccountsList.map((account) => (
+              <div key={account.btcAddress}>
+                <LazyAccountRow
+                  account={account}
+                  isSelected={isAccountSelected(account)}
+                  onAccountSelected={handleAccountSelect}
+                  fetchBalance={enqueueFetchBalances}
+                  isAccountListView
+                />
+                <Separator />
+              </div>
+            ))}
+          </AccountContainer>
+        </div>
+        {!hideListActions ? (
+          <ButtonsWrapper>
+            <ActionButton
+              icon={<Plus size={16} fill="white" />}
+              onPress={onCreateAccount}
+              text={t('NEW_ACCOUNT')}
+              transparent
+            />
+            <ActionButton
+              icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
+              onPress={onImportLedgerAccount}
+              text={t('LEDGER_ACCOUNT')}
+              transparent
+            />
+          </ButtonsWrapper>
+        ) : null}
+      </Container>
+    </>
   );
 }
 
