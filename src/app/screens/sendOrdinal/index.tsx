@@ -1,5 +1,5 @@
 import ActionButton from '@components/button';
-import useNftDataSelector from '@hooks/stores/useNftDataSelector';
+import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
@@ -21,7 +21,7 @@ import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 
@@ -93,9 +93,10 @@ const StyledCallout = styled(Callout)`
 function SendOrdinal() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { selectedOrdinal } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
+  const { id } = useParams();
+  const { data: selectedOrdinal } = useAddressInscription(id!);
   const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
   const { getSeed } = useSeedVault();
