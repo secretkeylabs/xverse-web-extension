@@ -80,6 +80,16 @@ function App(): JSX.Element {
                         color: Theme.colors.white_0,
                       },
                     },
+                    blank: {
+                      style: {
+                        ...Theme.typography.body_medium_m,
+                        backgroundColor: Theme.colors.white_0,
+                        borderRadius: Theme.radius(2),
+                        padding: Theme.space.s,
+                        color: Theme.colors.elevation0,
+                      },
+                      duration: 2000,
+                    },
                   }}
                 />
               </ThemeProvider>

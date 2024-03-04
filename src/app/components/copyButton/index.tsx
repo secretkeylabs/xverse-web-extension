@@ -24,7 +24,7 @@ const Img = styled.img({
 });
 
 const StyledToolTip = styled(Tooltip)`
-  background-color: #ffffff;
+  background-color: ${(props) => props.theme.colors.white_0};
   color: #12151e;
   border-radius: 8px;
   padding: 7px;
@@ -33,8 +33,9 @@ const StyledToolTip = styled(Tooltip)`
 interface Props {
   text: string;
 }
+
 function CopyButton({ text }: Props) {
-  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isCopied, setIsCopied] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
 
   const onCopyClick = () => {

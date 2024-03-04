@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { handleRetries, InvalidParamsError } from '@utils/query';
 
 /**
- * Get inscriptions details by collection id
+ * Get inscription details belonging to an address by ordinalId
  */
 const useAddressInscription = (ordinalId: string, ordinal?: Inscription | null) => {
   const { ordinalsAddress, network } = useWalletSelector();

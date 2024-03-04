@@ -2,13 +2,13 @@ import Timer15 from '@assets/img/settings/Timer15m.svg';
 import Timer1 from '@assets/img/settings/Timer1h.svg';
 import Timer30 from '@assets/img/settings/Timer30m.svg';
 import Timer3 from '@assets/img/settings/Timer3h.svg';
-import ActionButton from '@components/button';
 import TopRow from '@components/topRow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletSession from '@hooks/useWalletSession';
 import { WalletSessionPeriods } from '@stores/wallet/actions/types';
-import { useState } from 'react';
-import { TFunction, useTranslation } from 'react-i18next';
+import { getLockCountdownLabel } from '@utils/helper';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -17,23 +17,18 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   flex: 1,
   overflowY: 'auto',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  paddingBottom: props.theme.spacing(8),
+  padding: props.theme.space.m,
+  paddingTop: 0,
   '&::-webkit-scrollbar': {
     display: 'none',
   },
 }));
 
 const Title = styled.p((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(21),
-  marginBottom: props.theme.spacing(21),
-}));
-
-const SaveButtonContainer = styled.div((props) => ({
-  marginTop: 'auto',
-  marginBottom: props.theme.spacing(10),
+  ...props.theme.typography.body_m,
+  color: props.theme.colors.white_200,
+  marginTop: props.theme.space.l,
+  marginBottom: props.theme.space.l,
 }));
 
 interface TimeSelectionBoxProps {
@@ -57,32 +52,24 @@ const TimeSelectionBox = styled.button<TimeSelectionBoxProps>((props) => ({
 const TimerIcon = styled.img<TimeSelectionBoxProps>((props) => ({
   width: 18,
   height: 21,
-  marginRight: props.theme.space.l,
+  marginRight: props.theme.space.m,
   opacity: props.selected ? 1 : 0.8,
 }));
-
-const getLabel = (period: number, t: TFunction<'translation', 'SETTING_SCREEN'>) => {
-  if (period < 60) {
-    return t('LOCK_COUNTDOWN_MIN', { count: period });
-  }
-  const hours = period / 60;
-  return t('LOCK_COUNTDOWN_HS', { count: hours });
-};
 
 function LockCountdown() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const { walletLockPeriod } = useWalletSelector();
-  const [selectedTime, setSelectedTime] = useState(walletLockPeriod);
   const { setWalletLockPeriod } = useWalletSession();
 
-  const handleBackButtonClick = () => {
+  const handleGoBack = () => {
     navigate(-1);
   };
 
-  const onSave = () => {
-    setWalletLockPeriod(selectedTime);
-    navigate(-1);
+  const onTimeSelect = (period: number) => {
+    setWalletLockPeriod(period);
+    toast(`${t('LOCK_COUNTDOWN_SET_TO')} ${getLockCountdownLabel(period, t)}`);
+    handleGoBack();
   };
 
   const periodOptions: number[] = Object.keys(WalletSessionPeriods)
@@ -98,26 +85,23 @@ function LockCountdown() {
 
   return (
     <>
-      <TopRow title={t('LOCK_COUNTDOWN')} onClick={handleBackButtonClick} />
+      <TopRow title={t('LOCK_COUNTDOWN')} onClick={handleGoBack} />
       <Container>
         <Title>{t('LOCK_COUNTDOWN_TITLE')}</Title>
         {periodOptions.map((period) => (
           <TimeSelectionBox
             key={period}
-            selected={selectedTime === period}
-            onClick={() => setSelectedTime(period)}
+            selected={walletLockPeriod === period}
+            onClick={() => onTimeSelect(period)}
           >
             <TimerIcon
-              selected={selectedTime === period}
+              selected={walletLockPeriod === period}
               src={iconsByPeriod[period]}
               alt={period.toString()}
             />
-            {getLabel(period, t)}
+            {getLockCountdownLabel(period, t)}
           </TimeSelectionBox>
         ))}
-        <SaveButtonContainer>
-          <ActionButton onPress={onSave} text={t('SAVE')} />
-        </SaveButtonContainer>
       </Container>
     </>
   );

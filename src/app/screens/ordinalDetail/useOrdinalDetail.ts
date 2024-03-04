@@ -1,8 +1,7 @@
+import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
 import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useCollectionMarketData';
-import useAddressInscription from '@hooks/queries/ordinals/useInscription';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
-import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -28,7 +27,6 @@ export default function useOrdinalDetail() {
     ordinalData?.collection_id,
   );
 
-  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(ordinalData?.tx_id);
   const textContent = useTextOrdinalContent(ordinalData!);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
@@ -54,14 +52,12 @@ export default function useOrdinalDetail() {
   );
 
   const handleBackButtonClick = () => {
-    setSelectedOrdinalDetails(null);
     if (ordinalData?.collection_id)
       navigate(`/nft-dashboard/ordinals-collection/${ordinalData?.collection_id}`);
     else navigate('/nft-dashboard?tab=inscriptions');
   };
 
   const openInGalleryView = async () => {
-    if (ordinalData) setSelectedOrdinalDetails(ordinalData);
     await chrome.tabs.create({
       url: chrome.runtime.getURL(`options.html#/nft-dashboard/ordinal-detail/${id}`),
     });
@@ -80,7 +76,6 @@ export default function useOrdinalDetail() {
       showAlert();
       return;
     }
-    if (ordinalData) setSelectedOrdinalDetails(ordinalData);
     if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#/nft-dashboard/ordinal-detail/${id}/send-ordinal`),
@@ -105,7 +100,6 @@ export default function useOrdinalDetail() {
     if (!bundle || !ordinalData) {
       return;
     }
-    setSelectedOrdinalDetails(ordinalData);
     setSelectedSatBundleDetails(bundle);
     navigate('/nft-dashboard/rare-sats-bundle', { state: { source: 'OrdinalDetail' } });
   };

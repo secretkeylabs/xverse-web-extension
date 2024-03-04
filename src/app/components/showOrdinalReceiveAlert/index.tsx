@@ -6,12 +6,13 @@ import { useDispatch } from 'react-redux';
 interface Props {
   onOrdinalReceiveAlertClose: () => void;
 }
+
 function ShowOrdinalReceiveAlert({ onOrdinalReceiveAlertClose }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'ADDRESS_RECEIVE_ALERT_MESSAGE' });
   const dispatch = useDispatch();
 
-  const onDontShowReceiveOrdinalAlert = () => {
-    dispatch(ChangeShowOrdinalReceiveAlertAction(false));
+  const onToggleReceiveOrdinalAlert = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(ChangeShowOrdinalReceiveAlertAction(!e.target.checked));
   };
 
   return (
@@ -22,7 +23,7 @@ function ShowOrdinalReceiveAlert({ onOrdinalReceiveAlertClose }: Props) {
       onClose={onOrdinalReceiveAlertClose}
       onButtonClick={onOrdinalReceiveAlertClose}
       tickMarkButtonText={t('DO_NOT_SHOW_MESSAGE')}
-      tickMarkButtonClick={onDontShowReceiveOrdinalAlert}
+      tickMarkButtonClick={onToggleReceiveOrdinalAlert}
     />
   );
 }

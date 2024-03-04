@@ -11,12 +11,10 @@ import WebGalleryButton from '@components/webGalleryButton';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import useAddressInscriptions from '@hooks/queries/ordinals/useAddressInscriptions';
 import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useCollectionMarketData';
-import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { Inscription } from '@secretkeylabs/xverse-core';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { EMPTY_LABEL } from '@utils/constants';
 import {
@@ -138,7 +136,6 @@ const StyledBarLoader = styled(BetterBarLoader)((props) => ({
 function OrdinalsCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
   const navigate = useNavigate();
-  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const { id: collectionId } = useParams();
   const { data, error, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useAddressInscriptions(collectionId);
@@ -169,11 +166,6 @@ function OrdinalsCollection() {
   const collectionFloorPrice = collectionMarketData?.floor_price
     ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
     : EMPTY_LABEL;
-
-  const handleOnClick = (item: Inscription) => {
-    setSelectedOrdinalDetails(item);
-    navigate(`/nft-dashboard/ordinal-detail/${item.id}`);
-  };
 
   return (
     <>
@@ -241,7 +233,7 @@ function OrdinalsCollection() {
                     itemId={getInscriptionsCollectionGridItemId(inscription)}
                     itemSubText={getInscriptionsCollectionGridItemSubText(inscription)}
                     itemSubTextColor={getInscriptionsCollectionGridItemSubTextColor(inscription)}
-                    onClick={handleOnClick}
+                    onClick={() => navigate(`/nft-dashboard/ordinal-detail/${inscription.id}`)}
                   >
                     <OrdinalImage ordinal={inscription} />
                   </CollectibleCollectionGridItem>

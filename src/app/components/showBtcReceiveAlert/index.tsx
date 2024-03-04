@@ -6,12 +6,13 @@ import { useDispatch } from 'react-redux';
 interface Props {
   onReceiveAlertClose: () => void;
 }
+
 function ShowBtcReceiveAlert({ onReceiveAlertClose }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'ADDRESS_RECEIVE_ALERT_MESSAGE' });
   const dispatch = useDispatch();
 
-  const onDontShowReceiveBtcAlert = () => {
-    dispatch(ChangeShowBtcReceiveAlertAction(false));
+  const onToggleReceiveBtcAlert = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(ChangeShowBtcReceiveAlertAction(!e.target.checked));
   };
 
   return (
@@ -22,7 +23,7 @@ function ShowBtcReceiveAlert({ onReceiveAlertClose }: Props) {
       onClose={onReceiveAlertClose}
       onButtonClick={onReceiveAlertClose}
       tickMarkButtonText={t('DO_NOT_SHOW_MESSAGE')}
-      tickMarkButtonClick={onDontShowReceiveBtcAlert}
+      tickMarkButtonClick={onToggleReceiveBtcAlert}
     />
   );
 }

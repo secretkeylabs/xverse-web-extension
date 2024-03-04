@@ -1,7 +1,6 @@
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useOrdinalDataReducer from '@hooks/stores/useOrdinalReducer';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
@@ -10,7 +9,6 @@ import {
   BtcOrdinal,
   ErrorCodes,
   getBtcFiatEquivalent,
-  Inscription,
   SignedBtcTx,
   signOrdinalSendTransaction,
 } from '@secretkeylabs/xverse-core';
@@ -69,9 +67,8 @@ function RestoreOrdinals() {
   const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
     useWalletSelector();
   const { getSeed } = useSeedVault();
-  const { setSelectedOrdinalDetails } = useOrdinalDataReducer();
   const navigate = useNavigate();
-  const { ordinals } = useOrdinalsByAddress(btcAddress);
+  const ordinalsQuery = useOrdinalsByAddress(btcAddress);
   const [error, setError] = useState('');
   const [transferringOrdinalId, setTransferringOrdinalId] = useState<string | null>(null);
   const location = useLocation();
@@ -79,7 +76,10 @@ function RestoreOrdinals() {
 
   const isRestoreFundFlow = location.state?.isRestoreFundFlow;
 
-  const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);
+  const ordinalsUtxos = useMemo(
+    () => ordinalsQuery.ordinals?.map((ord) => ord.utxo),
+    [ordinalsQuery.ordinals],
+  );
 
   const {
     isLoading,
@@ -119,11 +119,10 @@ function RestoreOrdinals() {
     }
   };
 
-  const onClickTransfer = async (selectedOrdinal: BtcOrdinal, ordinalData: Inscription) => {
+  const onClickTransfer = async (selectedOrdinal: BtcOrdinal) => {
     setTransferringOrdinalId(selectedOrdinal.id);
     const seedPhrase = await getSeed();
     const signedTx = await mutateAsync({ ordinal: selectedOrdinal, seedPhrase });
-    setSelectedOrdinalDetails(ordinalData);
     navigate(`/nft-dashboard/confirm-ordinal-tx/${selectedOrdinal.id}`, {
       state: {
         signedTxHex: signedTx.signedTx,
@@ -138,42 +137,37 @@ function RestoreOrdinals() {
     });
   };
 
-  const showContent =
-    ordinals?.length === 0 ? (
-      <>
-        <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
-        <ButtonContainer>
-          <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
-        </ButtonContainer>
-      </>
-    ) : (
-      <>
-        <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
-        {ordinals?.map((ordinal) => (
-          <OrdinalRow
-            isLoading={transferringOrdinalId === ordinal.id}
-            disableTransfer={isLoading}
-            handleOrdinalTransfer={onClickTransfer}
-            ordinal={ordinal}
-            key={ordinal.id}
-          />
-        ))}
-        <ErrorContainer>
-          <ErrorText>{error}</ErrorText>
-        </ErrorContainer>
-      </>
-    );
-
   return (
     <>
       <TopRow title={t('RESTORE_ORDINAL_SCREEN.TITLE')} onClick={handleOnCancelClick} />
       <Container>
-        {!ordinals ? (
+        {ordinalsQuery.isLoading ? (
           <LoaderContainer>
             <Spinner color="white" size={25} />
           </LoaderContainer>
+        ) : ordinalsQuery.ordinals?.length === 0 ? (
+          <>
+            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
+            <ButtonContainer>
+              <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
+            </ButtonContainer>
+          </>
         ) : (
-          showContent
+          <>
+            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
+            {ordinalsQuery.ordinals?.map((ordinal) => (
+              <OrdinalRow
+                isLoading={transferringOrdinalId === ordinal.id}
+                disableTransfer={isLoading}
+                handleOrdinalTransfer={onClickTransfer}
+                ordinal={ordinal}
+                key={ordinal.id}
+              />
+            ))}
+            <ErrorContainer>
+              <ErrorText>{error}</ErrorText>
+            </ErrorContainer>
+          </>
         )}
       </Container>
       <BottomTabBar tab="nft" />

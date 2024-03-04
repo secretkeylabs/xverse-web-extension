@@ -35,7 +35,8 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/{owner}/{repo}/releases > releases.json
-          TARGET_COMMITISH=$(cat releases.json | jq -r ".[] | select(.tag_name | match(\"$TAG\")) | .target_commitish" | head -1)
+          TAG_RC=$(cat releases.json | jq -r ".[] | select(.tag_name | match(\"$TAG\")) | .tag_name" | head -1)
+          TARGET_COMMITISH=$(cat releases.json | jq -r ".[] | select(.tag_name==\"$TAG_RC\") | .target_commitish")
           # publish the latest release
           gh api \
             --method POST \
@@ -46,10 +47,10 @@ jobs:
             -f target_commitish="$TARGET_COMMITISH" \
             -f name="$TAG" \
             -F generate_release_notes=true > release.json
-          # TODO attach the rc asset to latest release
-          # save output for upload
-          # echo "FILENAME=xverse-web-extension.$TAG.zip" >> $GITHUB_OUTPUT
-          # echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_OUTPUT
+          # save env for upload
+          echo "TAG_RC=$TAG_RC" >> $GITHUB_ENV
+          echo "FILENAME=xverse-web-extension.$TAG.zip" >> $GITHUB_ENV
+          echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_ENV
       - id: update-description
         name: Update PR description with release notes
         env:
@@ -64,3 +65,21 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/{owner}/{repo}/pulls/$PR_ID \
             -F 'body=@body.md'
+      - id: download-latest-asset
+        name: Download latest asset from rc
+        run: |
+          RELEASE_ID=$(cat releases.json | jq -r ".[] | select(.tag_name==\"$TAG_RC\") | .id")
+          gh api \
+            -H "Accept: application/octet-stream" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/{owner}/{repo}/releases/assets/$RELEASE_ID > build.zip
+      - id: upload-latest-asset
+        name: Upload latest asset to latest release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL}}
+          asset_path: build.zip
+          asset_name: ${{ env.FILENAME }}
+          asset_content_type: application/zip
