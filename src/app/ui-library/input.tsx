@@ -62,6 +62,27 @@ const InputField = styled.input`
   ::placeholder {
     color: ${(props) => props.theme.colors.white_400};
   }
+
+  ::selection {
+    background-color: ${(props) => props.theme.colors.tangerine};
+    color: ${(props) => props.theme.colors.elevation0};
+  }
+
+  ::-webkit-input-placeholder {
+    color: ${(props) => props.theme.colors.tangerine};
+  }
+
+  ::-moz-placeholder {
+    color: ${(props) => props.theme.colors.tangerine};
+  }
+
+  :-ms-input-placeholder {
+    color: ${(props) => props.theme.colors.tangerine};
+  }
+
+  :-moz-placeholder {
+    color: ${(props) => props.theme.colors.tangerine};
+  }
 `;
 
 const ComplicationsContainer = styled.div`
@@ -142,6 +163,7 @@ type Props = {
     message: string;
     variant?: FeedbackVariant;
   }[];
+  autoFocus?: boolean;
 };
 
 function Input({
@@ -159,6 +181,7 @@ function Input({
   className,
   feedback,
   disabled = false,
+  autoFocus = false,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const complicationsRef = useRef<HTMLDivElement>(null);
@@ -191,6 +214,7 @@ function Input({
 
   const handleClear = () => {
     onChange({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
+    inputRef.current?.focus();
   };
 
   const displayVariant = feedback?.some((f) => f.variant === 'danger') ? 'danger' : variant;
@@ -213,6 +237,7 @@ function Input({
           onBlur={onBlur}
           placeholder={placeholder}
           disabled={disabled}
+          autoFocus={autoFocus}
         />
         <ComplicationsContainer ref={complicationsRef}>
           {!hideClear && value && (

@@ -205,6 +205,7 @@
     "SWAP": "Swap",
     "BUY": "Buy",
     "SAVE": "Save",
+    "CONFIRM": "Confirm",
     "MANAGE_TOKEN": "Manage token list",
     "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
     "ORDINALS": "Ordinals & BRC-20 Tokens",
@@ -212,7 +213,7 @@
     "VIEW_ADDRESSES": "View addresses",
     "ADD_STACKS_ADDRESS": "Add a Stacks address",
     "REMOVE_FROM_LIST_TITLE": "Remove from list",
-    "REMOVE_FROM_LIST_DESCRIPTION": "This will disconnect and remove the account from Xverse. You can import the same account again later by reconnecting your hardware wallet device.",
+    "REMOVE_FROM_LIST_DESCRIPTION": "This will remove this wallet from this list. You can import it again by connecting your device.",
     "DATA_COLLECTION_POPUP": {
       "TITLE": "Help us improve Xverse!",
       "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
@@ -797,12 +798,14 @@
     "RESET_WALLET": "Reset Wallet",
     "REMOVE_FROM_LIST": "Remove from list",
     "RENAME_ACCOUNT": "Rename account",
+    "ACCOUNT_NAME": "Account",
     "RENAME_ACCOUNT_MODAL": {
       "LABEL": "Account name",
-      "REQUIRED_ERR": "Account name is required",
       "MAX_SYMBOLS_ERR": "Account name cannot be more than {{maxLength}} characters",
       "PROHIBITED_SYMBOLS_ERR": "Account name can only contain alphabetic and numeric characters and space",
-      "ALREADY_EXISTS_ERR": "Account with the same name already exists. Please choose another name."
+      "ALREADY_EXISTS_ERR": "You already have an account with this name",
+      "NAME_RULES": "Your account's name can only include alphabetical and numerical characters.",
+      "RESET_NAME": "Reset name"
     }
   },
   "BUY_SCREEN": {
