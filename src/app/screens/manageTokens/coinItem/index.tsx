@@ -30,7 +30,7 @@ const CustomSwitch = styled(Switch)`
 const CoinTitleText = styled.p<{ isEnabled?: boolean }>((props) => ({
   ...props.theme.typography[props.isEnabled ? 'body_bold_m' : 'body_m'],
   color: props.theme.colors[props.isEnabled ? 'white_0' : 'white_400'],
-  textAlign: 'center',
+  textAlign: 'left',
   marginLeft: props.theme.space.m,
 }));
 
