@@ -29,13 +29,13 @@ const useSendBtcRequestParams = (btcAddress: string, network: SettingsNetwork) =
       };
     }
     const recipients = JSON.parse(params.get('recipients')!);
-    recipients?.map(async (value) => ({
+    const transferRecipients = recipients?.map((value) => ({
       address: value.address,
-      amountSats: new BigNumber(value.amount),
+      amountSats: BigInt(value.amount),
     }));
     const rpcPayload: SendBtcTransactionPayload = {
       senderAddress: btcAddress,
-      recipients,
+      recipients: transferRecipients,
       network:
         network.type === 'Mainnet'
           ? { type: BitcoinNetworkType.Mainnet }
@@ -46,6 +46,7 @@ const useSendBtcRequestParams = (btcAddress: string, network: SettingsNetwork) =
       requestToken: null,
     };
   }, []);
+
   return { payload, tabId, requestToken, requestId };
 };
 
