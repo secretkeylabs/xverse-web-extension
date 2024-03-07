@@ -19,6 +19,8 @@ import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
 import AuthenticationRequest from '@screens/connect/authenticationRequest';
 import BtcSelectAddressScreen from '@screens/connect/btcSelectAddressScreen';
+import StxSelectAccountScreen from '@screens/connect/stxSelectAccountScreen';
+import StxSelectAddressScreen from '@screens/connect/stxSelectAddressScreen';
 import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
@@ -226,6 +228,22 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <BtcSelectAddressScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'stx-select-address-request',
+        element: (
+          <AuthGuard>
+            <StxSelectAddressScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'stx-select-account-request',
+        element: (
+          <AuthGuard>
+            <StxSelectAccountScreen />
           </AuthGuard>
         ),
       },

@@ -1293,6 +1293,7 @@
   },
   "REQUEST_ERRORS": {
     "INVALID_REQUEST": "Invalid request",
+    "MISSING_ARGUMENTS": "Contract function call missing arguments",
     "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
     "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",

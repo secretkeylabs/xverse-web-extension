@@ -3,7 +3,7 @@ import { getTabIdFromPort } from '@common/utils';
 import { RpcErrorCode } from 'sats-connect';
 import { z } from 'zod';
 import {
-  OtherParams,
+  ParamsKeyValueArray,
   listenForOriginTabClose,
   listenForPopupClose,
   makeSearchParamsWithDefaults,
@@ -35,7 +35,7 @@ export const handleSendTransfer = async (
     sendRpcResponse(getTabIdFromPort(port), invalidParamsError);
     return;
   }
-  const requestParams: OtherParams = [
+  const requestParams: ParamsKeyValueArray = [
     ['recipients', JSON.stringify(paramsParseResult.data.recipients)],
     ['requestId', message.id as string],
   ];

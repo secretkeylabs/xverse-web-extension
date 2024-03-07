@@ -1,6 +1,11 @@
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
+import {
+  sendAddressMismatchMessage,
+  sendMissingFunctionArgumentsMessage,
+  sendNetworkMismatchMessage,
+} from '@common/utils/rpc/stx/rpcResponseMessages';
 import ActionButton from '@components/button';
 import CopyButton from '@components/copyButton';
 import InfoContainer from '@components/infoContainer';
@@ -139,6 +144,7 @@ const Button = styled.button((props) => ({
 
 function TransactionStatus() {
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_STATUS' });
+  const { t: tReqErrors } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const navigate = useNavigate();
   const location = useLocation();
   const { network } = useWalletSelector();
@@ -156,7 +162,9 @@ function TransactionStatus() {
     isBrc20TokenFlow,
     isSponsorServiceError,
     isSwapTransaction,
-  } = location.state;
+    tabId,
+    messageId,
+  } = location.state as { tabId?: chrome.tabs.Tab['id']; messageId?: string; [key: string]: any };
 
   const renderTransactionSuccessStatus = (
     <Container>
@@ -185,8 +193,16 @@ function TransactionStatus() {
   };
 
   const onCloseClick = () => {
-    if (browserTx) window.close();
-    else if (isRareSat) navigate('/nft-dashboard?tab=rareSats');
+    if (browserTx) {
+      if (error === tReqErrors('NETWORK_MISMATCH') && tabId && messageId)
+        sendNetworkMismatchMessage({ tabId, messageId });
+      if (error === tReqErrors('ADDRESS_MISMATCH') && tabId && messageId)
+        sendAddressMismatchMessage({ tabId, messageId });
+      if (error === tReqErrors('MISSING_ARGUMENTS') && tabId && messageId)
+        sendMissingFunctionArgumentsMessage({ tabId, messageId });
+
+      window.close();
+    } else if (isRareSat) navigate('/nft-dashboard?tab=rareSats');
     else if (isOrdinal) navigate('/nft-dashboard?tab=inscriptions');
     else if (isNft) navigate('/nft-dashboard?tab=nfts');
     else navigate('/');

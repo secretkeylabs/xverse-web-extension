@@ -2,7 +2,7 @@ import { WebBtcMessage } from '@common/types/message-types';
 import { RpcErrorCode } from 'sats-connect';
 import { z } from 'zod';
 import {
-  OtherParams,
+  ParamsKeyValueArray,
   listenForOriginTabClose,
   listenForPopupClose,
   makeSearchParamsWithDefaults,
@@ -30,7 +30,7 @@ export const handleSignMessage = async (
     return;
   }
 
-  const requestParams: OtherParams = [
+  const requestParams: ParamsKeyValueArray = [
     ['address', safeParseResult.data.address],
     ['message', safeParseResult.data.message],
     ['requestId', message.id as string],

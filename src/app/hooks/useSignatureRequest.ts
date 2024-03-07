@@ -8,7 +8,7 @@ import {
   signStructuredData,
 } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SignMessagePayload } from 'sats-connect';
 import useSeedVault from './useSeedVault';
@@ -35,7 +35,7 @@ function useSignatureRequest() {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const requestToken = params.get('request') || params.get('signMessageRequest');
-  const request = decodeToken(requestToken as string);
+  const request = useMemo(() => decodeToken(requestToken as string), [requestToken]);
   const messageType = params.get('messageType') || '';
   const tabId = params.get('tabId') ?? '0';
   return {

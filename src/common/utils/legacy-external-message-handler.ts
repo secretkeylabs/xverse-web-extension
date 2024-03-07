@@ -28,19 +28,29 @@ function getOriginFromPort(port: chrome.runtime.Port) {
   return port.sender?.origin;
 }
 
-export type OtherParams = [string, string][];
+export type ParamsObject = Record<string, string | null | undefined>;
+export type ParamsKeyValueArray = [string, string | null | undefined][];
 
-export function makeSearchParamsWithDefaults(
-  port: chrome.runtime.Port,
-  otherParams: OtherParams = [],
-) {
+export type Params = ParamsObject | ParamsKeyValueArray;
+export function makeSearchParamsWithDefaults(port: chrome.runtime.Port, additionalParams?: Params) {
   const urlParams = new URLSearchParams();
   // All actions must have a corresponding `origin` and `tabId`
   const origin = getOriginFromPort(port);
   const tabId = getTabIdFromPort(port);
   urlParams.set('origin', origin ?? '');
   urlParams.set('tabId', tabId?.toString() ?? '');
-  otherParams.forEach(([key, value]) => urlParams.set(key, value));
+
+  let additionalParamsEntries: ParamsKeyValueArray = [];
+  if (Array.isArray(additionalParams)) {
+    additionalParamsEntries = additionalParams;
+  } else if (typeof additionalParams === 'object') {
+    additionalParamsEntries = Object.entries(additionalParams);
+  }
+
+  additionalParamsEntries.forEach(
+    ([key, value]) => typeof value === 'string' && urlParams.set(key, value),
+  );
+
   return { urlParams, origin, tabId };
 }
 

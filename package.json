@@ -68,6 +68,7 @@
     "stream-browserify": "^3.0.0",
     "string-to-color": "^2.2.2",
     "styled-components": "^5.3.5",
+    "superjson": "2.2.1",
     "swiper": "11.0.6",
     "ts-transformer-keys": "^0.4.4",
     "valid-url": "^1.0.9",

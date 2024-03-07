@@ -4,6 +4,11 @@ import { getTabIdFromPort } from '..';
 import { handleGetAddresses, handleSendTransfer, handleSignMessage, handleSignPsbt } from './btc';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
+import callContract from './stx/callContract/index.ts';
+import handleGetStxAccounts from './stx/getAccounts';
+import handleGetStxAddresses from './stx/getAddresses';
+import signTransaction from './stx/signTransaction';
+import transferStx from './stx/transferStx';
 
 const handleRPCRequest = async (
   message: WebBtcMessage<keyof Requests>,
@@ -26,6 +31,29 @@ const handleRPCRequest = async (
       case 'signPsbt':
         await handleSignPsbt(message as WebBtcMessage<'signPsbt'>, port);
         break;
+
+      // Stacks methods
+
+      case 'stx_callContract': {
+        await callContract(message as WebBtcMessage<'stx_callContract'>, port);
+        break;
+      }
+      case 'stx_getAccounts': {
+        await handleGetStxAccounts(message as WebBtcMessage<'stx_getAccounts'>, port);
+        break;
+      }
+      case 'stx_getAddresses': {
+        await handleGetStxAddresses(message as WebBtcMessage<'stx_getAddresses'>, port);
+        break;
+      }
+      case 'stx_signTransaction': {
+        await signTransaction(message as WebBtcMessage<'stx_signTransaction'>, port);
+        break;
+      }
+      case 'stx_transferStx': {
+        await transferStx(message as WebBtcMessage<'stx_transferStx'>, port);
+        break;
+      }
       default:
         sendRpcResponse(
           getTabIdFromPort(port),

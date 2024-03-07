@@ -3,7 +3,7 @@ import { getTabIdFromPort } from '@common/utils';
 import { AddressPurpose, RpcErrorCode } from 'sats-connect';
 import { z } from 'zod';
 import {
-  OtherParams,
+  ParamsKeyValueArray,
   listenForOriginTabClose,
   listenForPopupClose,
   makeSearchParamsWithDefaults,
@@ -34,7 +34,7 @@ export const handleGetAddresses = async (
     return;
   }
 
-  const requestParams: OtherParams = [
+  const requestParams: ParamsKeyValueArray = [
     ['purposes', message.params.purposes.toString()],
     ['requestId', message.id as string],
   ];
