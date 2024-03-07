@@ -1,6 +1,5 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stx_icon.svg';
-import StacksIcon from '@assets/img/nftDashboard/stacks_icon.svg';
 import OrdinalIcon from '@assets/img/transactions/ordinal.svg';
 import RunesIcon from '@assets/img/transactions/runes.svg';
 import { StyledBarLoader } from '@components/tilesSkeletonLoader';
@@ -98,7 +97,7 @@ export default function TokenImage({
     }
     switch (ftProtocol) {
       case 'stacks':
-        return <ProtocolImage src={StacksIcon} alt="stacks" />;
+        return <ProtocolImage src={IconStacks} alt="stacks" />;
       case 'brc-20':
         return <ProtocolImage src={OrdinalIcon} alt="brc20" />;
       case 'runes':
