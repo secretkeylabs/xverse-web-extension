@@ -2,10 +2,10 @@ import { getStxAddressKeyChain, signBip322Message, signMessage } from '@secretke
 import { SignaturePayload } from '@stacks/connect';
 import {
   ChainID,
+  TupleCV,
   createStacksPrivateKey,
   deserializeCV,
   signStructuredData,
-  TupleCV,
 } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useCallback } from 'react';
@@ -80,21 +80,6 @@ export function useSignMessage(messageType: SignatureMessageType) {
     },
     [selectedAccount],
   );
-}
-
-export function useSignBip322Message(message: string, address: string) {
-  const { accountsList, network } = useWalletSelector();
-  const { getSeed } = useSeedVault();
-  return useCallback(async () => {
-    const seedPhrase = await getSeed();
-    return signBip322Message({
-      accounts: accountsList,
-      message,
-      signatureAddress: address,
-      seedPhrase,
-      network: network.type,
-    });
-  }, []);
 }
 
 export default useSignatureRequest;

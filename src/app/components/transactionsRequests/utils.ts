@@ -1,6 +1,6 @@
 import {
-  ExternalMethods,
   MESSAGE_SOURCE,
+  StacksLegacyMethods,
   TransactionResponseMessage,
   TxResult,
 } from '@common/types/message-types';
@@ -15,7 +15,7 @@ export function formatTxSignatureResponse({
 }: FormatTxSignatureResponseArgs): TransactionResponseMessage {
   return {
     source: MESSAGE_SOURCE,
-    method: ExternalMethods.transactionResponse,
+    method: StacksLegacyMethods.transactionResponse,
     payload: {
       transactionRequest: payload,
       transactionResponse: response,

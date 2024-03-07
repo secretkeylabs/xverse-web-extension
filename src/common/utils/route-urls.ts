@@ -3,6 +3,7 @@ enum RequestsRoutes {
   TransactionRequest = '/transaction-request',
   AuthenticationRequest = '/authentication-request',
   SignatureRequest = '/signature-request',
+  SignMessageRequest = '/sign-message-request',
   AddressRequest = '/btc-select-address-request',
   SignBtcTx = '/psbt-signing-request',
   SignBatchBtcTx = '/batch-psbt-signing-request',

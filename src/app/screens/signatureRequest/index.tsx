@@ -1,7 +1,7 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
@@ -12,12 +12,12 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useSignatureRequest, {
   isStructuredMessage,
   isUtf8Message,
-  useSignBip322Message,
   useSignMessage,
 } from '@hooks/useSignatureRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { useSignBip322Message } from '@screens/signMessageRequest/useSignMessageRequest';
 import { bip0322Hash, buf2hex, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
@@ -230,7 +230,7 @@ function SignatureRequest(): JSX.Element {
         const bip322signature = await handleBip322MessageSigning();
         const signingMessage = {
           source: MESSAGE_SOURCE,
-          method: ExternalSatsMethods.signMessageResponse,
+          method: SatsConnectMethods.signMessageResponse,
           payload: {
             signMessageRequest: request,
             signMessageResponse: bip322signature,
@@ -277,7 +277,7 @@ function SignatureRequest(): JSX.Element {
         });
         const signingMessage = {
           source: MESSAGE_SOURCE,
-          method: ExternalSatsMethods.signMessageResponse,
+          method: SatsConnectMethods.signMessageResponse,
           payload: {
             signMessageRequest: request,
             signMessageResponse: signature,
@@ -406,7 +406,7 @@ function SignatureRequest(): JSX.Element {
                 </RequestSource>
               ) : null}
               {(isUtf8Message(messageType) || isSignMessageBip322) && (
-                <SignatureRequestMessage request={payload as SignaturePayload} />
+                <SignatureRequestMessage message={(payload as SignaturePayload).message} />
               )}
               {!isSignMessageBip322 && isStructuredMessage(messageType) && (
                 <SignatureRequestStructuredData

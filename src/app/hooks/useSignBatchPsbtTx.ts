@@ -1,4 +1,4 @@
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { InputToSign, signPsbt } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
@@ -36,7 +36,7 @@ const useSignBatchPsbtTx = () => {
   const cancelSignPsbt = () => {
     const signingMessage = {
       source: MESSAGE_SOURCE,
-      method: ExternalSatsMethods.signBatchPsbtResponse,
+      method: SatsConnectMethods.signBatchPsbtResponse,
       payload: { signBatchPsbtRequest: requestToken, signBatchPsbtResponse: 'cancel' },
     };
     chrome.tabs.sendMessage(+tabId, signingMessage);

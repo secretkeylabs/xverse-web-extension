@@ -2,7 +2,6 @@ import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import ActionButton from '@components/button';
-import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
 import SelectAccount from '@screens/connect/selectAccount';
@@ -16,6 +15,7 @@ import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
 import AddressPurposeBox from '../addressPurposeBox';
 import PermissionsList from '../permissionsList';
+import useBtcAddressRequest from './useBtcAddressRequest';
 
 const OuterContainer = styled.div((props) => ({
   display: 'flex',
@@ -165,6 +165,7 @@ function BtcSelectAddressScreen() {
     if (purpose === AddressPurpose.Payment) {
       return (
         <AddressPurposeBox
+          key={purpose}
           purpose={purpose}
           icon={BitcoinIcon}
           title={t('BITCOIN_ADDRESS')}
@@ -175,6 +176,7 @@ function BtcSelectAddressScreen() {
     if (purpose === AddressPurpose.Ordinals) {
       return (
         <AddressPurposeBox
+          key={purpose}
           purpose={purpose}
           icon={OrdinalsIcon}
           title={t('ORDINAL_ADDRESS')}
@@ -185,6 +187,7 @@ function BtcSelectAddressScreen() {
     if (purpose === AddressPurpose.Stacks) {
       return (
         <AddressPurposeBox
+          key={purpose}
           purpose={purpose}
           icon={stxIcon}
           title={t('STX_ADDRESS')}

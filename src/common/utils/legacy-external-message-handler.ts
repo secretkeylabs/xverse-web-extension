@@ -1,28 +1,26 @@
 import { SignatureData } from '@stacks/connect';
+import { RpcErrorResponse } from 'sats-connect';
+import { getTabIdFromPort } from '.';
 import {
-  ExternalMethods,
-  ExternalSatsMethods,
   InternalMethods,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
   MESSAGE_SOURCE,
   SatsConnectMessageFromContentScript,
   SatsConnectMessageToContentScript,
+  SatsConnectMethods,
   SignatureResponseMessage,
+  StacksLegacyMethods,
 } from '../types/message-types';
 import { sendMessage } from '../types/messages';
 import popupCenter from './popup-center';
 import RequestsRoutes from './route-urls';
 
-export function inferLegacyMessage(message: any): message is LegacyMessageFromContentScript {
+export function isLegacyMessage(message: any): message is LegacyMessageFromContentScript {
   // Now that we use a RPC communication style, we can infer
   // legacy message types by presence of an id
   const hasIdProp = 'id' in message;
   return !hasIdProp;
-}
-
-function getTabIdFromPort(port: chrome.runtime.Port) {
-  return port.sender?.tab?.id;
 }
 
 function getOriginFromPort(port: chrome.runtime.Port) {
@@ -30,9 +28,11 @@ function getOriginFromPort(port: chrome.runtime.Port) {
   return port.sender?.origin;
 }
 
-function makeSearchParamsWithDefaults(
+export type OtherParams = [string, string][];
+
+export function makeSearchParamsWithDefaults(
   port: chrome.runtime.Port,
-  otherParams: [string, string][] = [],
+  otherParams: OtherParams = [],
 ) {
   const urlParams = new URLSearchParams();
   // All actions must have a corresponding `origin` and `tabId`
@@ -49,9 +49,9 @@ interface ListenForPopupCloseArgs {
   id?: number;
   // TabID from requesting tab, to which request should be returned
   tabId?: number;
-  response: LegacyMessageToContentScript | SatsConnectMessageToContentScript;
+  response: LegacyMessageToContentScript | SatsConnectMessageToContentScript | RpcErrorResponse;
 }
-function listenForPopupClose({ id, tabId, response }: ListenForPopupCloseArgs) {
+export function listenForPopupClose({ id, tabId, response }: ListenForPopupCloseArgs) {
   chrome.windows.onRemoved.addListener((winId) => {
     if (winId !== id || !tabId) return;
     const responseMessage = response;
@@ -69,7 +69,7 @@ export function formatMessageSigningResponse({
 }: FormatMessageSigningResponseArgs): SignatureResponseMessage {
   return {
     source: MESSAGE_SOURCE,
-    method: ExternalMethods.signatureResponse,
+    method: StacksLegacyMethods.signatureResponse,
     payload: { signatureRequest: request, signatureResponse: response },
   };
 }
@@ -77,14 +77,14 @@ export function formatMessageSigningResponse({
 interface ListenForOriginTabCloseArgs {
   tabId?: number;
 }
-function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) {
+export function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) {
   chrome.tabs.onRemoved.addListener((closedTabId) => {
     if (tabId !== closedTabId) return;
     sendMessage({ method: InternalMethods.OriginatingTabClosed, payload: { tabId } });
   });
 }
 
-async function triggerRequestWindowOpen(path: RequestsRoutes, urlParams: URLSearchParams) {
+export async function triggerRequestWindowOpen(path: RequestsRoutes, urlParams: URLSearchParams) {
   return popupCenter({ url: `/popup.html#${path}?${urlParams.toString()}` });
 }
 
@@ -94,7 +94,7 @@ export async function handleLegacyExternalMethodFormat(
 ) {
   const { payload } = message;
   switch (message.method) {
-    case ExternalMethods.authenticationRequest: {
+    case StacksLegacyMethods.authenticationRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['authRequest', payload]]);
       const { id } = await triggerRequestWindowOpen(
         RequestsRoutes.AuthenticationRequest,
@@ -109,14 +109,14 @@ export async function handleLegacyExternalMethodFormat(
             authenticationRequest: payload,
             authenticationResponse: 'cancel',
           },
-          method: ExternalMethods.authenticationResponse,
+          method: StacksLegacyMethods.authenticationResponse,
         },
       });
       listenForOriginTabClose({ tabId });
       break;
     }
 
-    case ExternalMethods.transactionRequest: {
+    case StacksLegacyMethods.transactionRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [['request', payload]]);
 
       const { id } = await triggerRequestWindowOpen(RequestsRoutes.TransactionRequest, urlParams);
@@ -125,7 +125,7 @@ export async function handleLegacyExternalMethodFormat(
         tabId,
         response: {
           source: MESSAGE_SOURCE,
-          method: ExternalMethods.transactionResponse,
+          method: StacksLegacyMethods.transactionResponse,
           payload: {
             transactionRequest: payload,
             transactionResponse: 'cancel',
@@ -136,7 +136,7 @@ export async function handleLegacyExternalMethodFormat(
       break;
     }
 
-    case ExternalMethods.signatureRequest: {
+    case StacksLegacyMethods.signatureRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['request', payload],
         ['messageType', 'utf8'],
@@ -152,7 +152,7 @@ export async function handleLegacyExternalMethodFormat(
       break;
     }
 
-    case ExternalMethods.structuredDataSignatureRequest: {
+    case StacksLegacyMethods.structuredDataSignatureRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['request', payload],
         ['messageType', 'structured'],
@@ -167,7 +167,7 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.getAddressRequest: {
+    case SatsConnectMethods.getAddressRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['addressRequest', payload],
       ]);
@@ -182,13 +182,13 @@ export async function handleLegacyExternalMethodFormat(
             addressRequest: payload,
             addressResponse: 'cancel',
           },
-          method: ExternalSatsMethods.getAddressResponse,
+          method: SatsConnectMethods.getAddressResponse,
         },
       });
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.signPsbtRequest: {
+    case SatsConnectMethods.signPsbtRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['signPsbtRequest', payload],
       ]);
@@ -203,13 +203,13 @@ export async function handleLegacyExternalMethodFormat(
             signPsbtRequest: payload,
             signPsbtResponse: 'cancel',
           },
-          method: ExternalSatsMethods.signPsbtResponse,
+          method: SatsConnectMethods.signPsbtResponse,
         },
       });
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.signBatchPsbtRequest: {
+    case SatsConnectMethods.signBatchPsbtRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['signBatchPsbtRequest', payload],
       ]);
@@ -224,18 +224,18 @@ export async function handleLegacyExternalMethodFormat(
             signBatchPsbtRequest: payload,
             signBatchPsbtResponse: 'cancel',
           },
-          method: ExternalSatsMethods.signBatchPsbtResponse,
+          method: SatsConnectMethods.signBatchPsbtResponse,
         },
       });
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.signMessageRequest: {
+    case SatsConnectMethods.signMessageRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['signMessageRequest', payload],
       ]);
 
-      const { id } = await triggerRequestWindowOpen(RequestsRoutes.SignatureRequest, urlParams);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.SignMessageRequest, urlParams);
       listenForPopupClose({
         id,
         tabId,
@@ -245,13 +245,13 @@ export async function handleLegacyExternalMethodFormat(
             signMessageRequest: payload,
             signMessageResponse: 'cancel',
           },
-          method: ExternalSatsMethods.signMessageResponse,
+          method: SatsConnectMethods.signMessageResponse,
         },
       });
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.sendBtcRequest: {
+    case SatsConnectMethods.sendBtcRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['sendBtcRequest', payload],
       ]);
@@ -266,13 +266,13 @@ export async function handleLegacyExternalMethodFormat(
             sendBtcRequest: payload,
             sendBtcResponse: 'cancel',
           },
-          method: ExternalSatsMethods.sendBtcResponse,
+          method: SatsConnectMethods.sendBtcResponse,
         },
       });
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.createInscriptionRequest: {
+    case SatsConnectMethods.createInscriptionRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['createInscription', payload],
       ]);
@@ -287,13 +287,13 @@ export async function handleLegacyExternalMethodFormat(
             createInscriptionRequest: payload,
             createInscriptionResponse: 'cancel',
           },
-          method: ExternalSatsMethods.createInscriptionResponse,
+          method: SatsConnectMethods.createInscriptionResponse,
         },
       });
       listenForOriginTabClose({ tabId });
       break;
     }
-    case ExternalSatsMethods.createRepeatInscriptionsRequest: {
+    case SatsConnectMethods.createRepeatInscriptionsRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
         ['createRepeatInscriptions', payload],
       ]);
@@ -311,7 +311,7 @@ export async function handleLegacyExternalMethodFormat(
             createRepeatInscriptionsRequest: payload,
             createRepeatInscriptionsResponse: 'cancel',
           },
-          method: ExternalSatsMethods.createRepeatInscriptionsResponse,
+          method: SatsConnectMethods.createRepeatInscriptionsResponse,
         },
       });
       listenForOriginTabClose({ tabId });
