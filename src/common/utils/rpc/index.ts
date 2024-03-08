@@ -7,6 +7,8 @@ import { makeRPCError, sendRpcResponse } from './helpers';
 import callContract from './stx/callContract/index.ts';
 import handleGetStxAccounts from './stx/getAccounts';
 import handleGetStxAddresses from './stx/getAddresses';
+import handleStacksSignMessage from './stx/signMessage';
+import handleStacksSignStructuredMessage from './stx/signStructuredMessage';
 import signTransaction from './stx/signTransaction';
 import transferStx from './stx/transferStx';
 
@@ -52,6 +54,10 @@ const handleRPCRequest = async (
       }
       case 'stx_transferStx': {
         await transferStx(message as WebBtcMessage<'stx_transferStx'>, port);
+        break;
+      }
+      case 'stx_signMessage': {
+        await handleStacksSignMessage(message as WebBtcMessage<'stx_signMessage'>, port);
         break;
       }
       default:

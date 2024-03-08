@@ -1,5 +1,5 @@
-import { getStxAddressKeyChain, signBip322Message, signMessage } from '@secretkeylabs/xverse-core';
-import { SignaturePayload } from '@stacks/connect';
+import { getStxAddressKeyChain, signMessage } from '@secretkeylabs/xverse-core';
+import { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
 import {
   ChainID,
   TupleCV,
@@ -10,7 +10,7 @@ import {
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { SignMessagePayload } from 'sats-connect';
+import useNetworkSelector from './useNetwork';
 import useSeedVault from './useSeedVault';
 import useWalletSelector from './useWalletSelector';
 
@@ -25,28 +25,51 @@ export function isUtf8Message(messageType: SignatureMessageType): messageType is
   return messageType === 'utf8';
 }
 
-export function isSignBip322Request(
-  requestPayload: SignMessagePayload | SignaturePayload,
-): requestPayload is SignMessagePayload {
-  return (requestPayload as SignMessagePayload).address !== undefined;
-}
-
 function useSignatureRequest() {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
-  const requestToken = params.get('request') || params.get('signMessageRequest');
-  const request = useMemo(() => decodeToken(requestToken as string), [requestToken]);
-  const messageType = params.get('messageType') || '';
   const tabId = params.get('tabId') ?? '0';
+  const requestId = params.get('messageId') ?? '';
+  const { stxPublicKey, stxAddress } = useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
+
+  const { payload, domain, messageType, requestToken } = useMemo(() => {
+    const token = params.get('request') || params.get('signMessageRequest');
+    if (token) {
+      const request = decodeToken(token as string);
+      const type = params.get('messageType') || '';
+      return {
+        payload: request.payload as any, // TODO: fix type error
+        requestToken: token,
+        messageType: type as SignatureMessageType,
+        domain: (request.payload as any).domain // TODO: fix type error
+          ? deserializeCV(Buffer.from((request.payload as any).domain, 'hex')) // TODO: fix type error
+          : null,
+      };
+    }
+    const message = params.get('message') || '';
+    const requestDomain = params.get('domain') || '';
+    const rpcPayload: SignaturePayload | StructuredDataSignatureRequestOptions = {
+      message,
+      stxAddress,
+      domain: requestDomain ? deserializeCV(Buffer.from(requestDomain, 'hex')) : undefined,
+      publicKey: stxPublicKey,
+      network: selectedNetwork,
+    };
+    return {
+      payload: rpcPayload,
+      messageType: message.startsWith('0x') ? 'structured' : ('utf8' as SignatureMessageType),
+      requestToken: null,
+    };
+  }, [params, stxAddress, stxPublicKey, selectedNetwork]);
+
   return {
-    payload: request.payload as any,
-    isSignMessageBip322: isSignBip322Request(request.payload as any),
-    request: requestToken as string,
-    domain: (request.payload as any).domain // TODO: fix type error
-      ? deserializeCV(Buffer.from((request.payload as any).domain, 'hex')) // TODO: fix type error
-      : null,
-    messageType: messageType as SignatureMessageType,
     tabId,
+    requestId,
+    requestToken,
+    payload,
+    domain,
+    messageType,
   };
 }
 
