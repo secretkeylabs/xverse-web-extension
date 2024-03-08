@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { txPayloadToRequest } from '@secretkeylabs/xverse-core';
-import { StacksTransaction } from '@stacks/transactions';
+import { PayloadType, StacksTransaction } from '@stacks/transactions';
 
 interface GetPayloadArgs {
   decodedToken: Record<string, any>;
@@ -21,3 +21,7 @@ export const getPayload = ({ decodedToken, transaction: stacksTransaction }: Get
   }
   return decodedToken.payload;
 };
+
+export function isDeployContractPayload(payload: PayloadType) {
+  return [PayloadType.SmartContract, PayloadType.VersionedSmartContract].includes(payload);
+}

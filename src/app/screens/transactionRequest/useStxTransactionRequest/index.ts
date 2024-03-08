@@ -4,11 +4,11 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { txPayloadToRequest } from '@secretkeylabs/xverse-core';
 import { ContractCallPayload, TransactionTypes } from '@stacks/connect';
-import { deserializeTransaction } from '@stacks/transactions';
+import { AuthType, PayloadType, deserializeTransaction } from '@stacks/transactions';
 import { createUnsecuredToken, decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
 import { Return } from './types';
-import { getPayload } from './utils';
+import { getPayload, isDeployContractPayload } from './utils';
 
 const useStxTransactionRequest = (): Return => {
   // Params
@@ -47,7 +47,28 @@ const useStxTransactionRequest = (): Return => {
     case 'stx_signTransaction': {
       const transactionHex = params.get('transaction') ?? '';
       const transaction = deserializeTransaction(transactionHex);
-      const payload = txPayloadToRequest(transaction, stxAddress);
+
+      let legacyPayload: any;
+      const txPayload = transaction.payload;
+      if (txPayload.payloadType === PayloadType.TokenTransfer) {
+        legacyPayload = {
+          txType: 'token_transfer',
+          recipient: txPayload.recipient,
+          amount: txPayload.amount,
+          memo: txPayload.memo,
+          sponsored: transaction.auth.authType === AuthType.Sponsored,
+        };
+      }
+      if (txPayload.payloadType === PayloadType.ContractCall) {
+        legacyPayload = txPayloadToRequest(transaction, stxAddress);
+      }
+
+      if (isDeployContractPayload(txPayload.payloadType)) {
+        legacyPayload = {
+          network,
+          ...txPayloadToRequest(transaction, stxAddress),
+        };
+      }
 
       return {
         // Metadata
@@ -56,7 +77,7 @@ const useStxTransactionRequest = (): Return => {
         rpcMethod,
 
         // Legacy
-        payload,
+        payload: legacyPayload,
         transaction,
         requestToken: '',
       };
