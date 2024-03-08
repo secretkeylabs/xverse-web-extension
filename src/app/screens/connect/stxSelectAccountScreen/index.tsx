@@ -43,7 +43,7 @@ function StxSelectAccountScreen() {
 
   const confirmCallback = async () => {
     setLoading(true);
-    approveStxAccountRequest();
+    await approveStxAccountRequest();
     window.close();
   };
 

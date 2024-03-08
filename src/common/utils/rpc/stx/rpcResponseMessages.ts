@@ -127,3 +127,25 @@ export function sendStxTransferSuccessResponseMessage({
 }: StxTransferSuccessArgs) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
+
+type GetAccountsSuccess = BaseArgs & {
+  result: Return<'stx_getAccounts'>;
+};
+export function sendGetAccountsSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: GetAccountsSuccess) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
+
+type GetAddressesSuccess = BaseArgs & {
+  result: Return<'stx_getAddresses'>;
+};
+export function sendGetAddressesSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: GetAddressesSuccess) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
