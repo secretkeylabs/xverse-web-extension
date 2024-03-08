@@ -94,7 +94,6 @@ function ConfirmBtcTransaction() {
           },
         };
         chrome.tabs.sendMessage(+tabId, btcSendMessage);
-        window.close();
       } else {
         const result: Return<'sendTransfer'> = {
           txid: broadCastResult.tx.hash,
@@ -102,6 +101,7 @@ function ConfirmBtcTransaction() {
         const response = makeRpcSuccessResponse(requestId, result);
         sendRpcResponse(+tabId, response);
       }
+      window.close();
     },
     [btcTxBroadcastData, requestToken, tabId],
   );
