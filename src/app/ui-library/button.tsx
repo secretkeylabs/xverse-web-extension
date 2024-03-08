@@ -15,7 +15,7 @@ const StyledButton = styled.button`
   padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
   border-radius: 12px;
 
-  ${(props) => props.theme.typography.body_m}
+  ${(props) => props.theme.typography.body_medium_m}
 
   cursor: pointer;
   &:disabled {
@@ -106,6 +106,7 @@ type Props = {
   loading?: boolean;
   className?: string;
   variant?: ButtonVariant;
+  type?: 'button' | 'submit' | 'reset';
 };
 
 function Button({
@@ -116,6 +117,7 @@ function Button({
   loading = false,
   disabled = false,
   variant = 'primary',
+  type,
 }: Props) {
   return (
     <StyledButton
@@ -123,6 +125,7 @@ function Button({
       onClick={onClick}
       tabIndex={0}
       disabled={disabled || loading}
+      type={type}
     >
       {loading ? (
         <Spinner />

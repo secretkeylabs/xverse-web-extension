@@ -1,5 +1,11 @@
 import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import {
+  sendInternalErrorMessage,
+  sendSignTransactionSuccessResponseMessage,
+  sendStxTransferSuccessResponseMessage,
+  sendUserRejectionMessage,
+} from '@common/utils/rpc/stx/rpcResponseMessages';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
@@ -30,6 +36,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { StxRequests } from 'sats-connect';
 import styled from 'styled-components';
 
 const AlertContainer = styled.div((props) => ({
@@ -53,7 +60,20 @@ function ConfirmStxTransaction() {
   const { refetch } = useStxWalletData();
 
   const location = useLocation();
-  const { unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken } = location.state;
+  const {
+    unsignedTx: stringHex,
+    sponsored,
+    isBrowserTx,
+    tabId,
+    messageId,
+    rpcMethod,
+    requestToken,
+  } = location.state as {
+    tabId?: chrome.tabs.Tab['id'];
+    messageId?: string;
+    rpcMethod?: keyof StxRequests;
+    [key: string]: any;
+  };
   const unsignedTx = useMemo(() => deserializeTransaction(stringHex), [stringHex]);
 
   // SignTransaction Params
@@ -80,13 +100,38 @@ function ConfirmStxTransaction() {
   });
 
   useEffect(() => {
+    // This useEffect runs when the tx has been broadcasted
     if (stxTxBroadcastData) {
       if (isBrowserTx) {
-        finalizeTxSignature({
-          requestPayload: requestToken,
-          tabId: Number(tabId),
-          data: { txId: stxTxBroadcastData, txRaw },
-        });
+        if (tabId && messageId && rpcMethod) {
+          switch (rpcMethod) {
+            case 'stx_signTransaction': {
+              sendSignTransactionSuccessResponseMessage({
+                tabId,
+                messageId,
+                result: { transaction: txRaw },
+              });
+              break;
+            }
+            case 'stx_transferStx': {
+              sendStxTransferSuccessResponseMessage({
+                tabId,
+                messageId,
+                result: { transaction: txRaw, txid: stxTxBroadcastData },
+              });
+              break;
+            }
+            default: {
+              sendInternalErrorMessage({ tabId, messageId });
+            }
+          }
+        } else {
+          finalizeTxSignature({
+            requestPayload: requestToken,
+            tabId: Number(tabId),
+            data: { txId: stxTxBroadcastData, txRaw },
+          });
+        }
       }
       navigate('/tx-status', {
         state: {
@@ -110,6 +155,8 @@ function ConfirmStxTransaction() {
           currency: 'STX',
           error: txError.toString(),
           browserTx: isBrowserTx,
+          tabId,
+          messageId,
         },
       });
     }
@@ -172,12 +219,37 @@ function ConfirmStxTransaction() {
     const rawTx = buf2hex(txs[0].serialize());
     setTxRaw(rawTx);
     if (isMultiSigTx && isBrowserTx) {
-      finalizeTxSignature({
-        requestPayload: requestToken,
-        tabId: Number(tabId),
-        // No TxId since the tx was not broadcasted
-        data: { txId: '', txRaw: rawTx },
-      });
+      // A quick way to infer whether the app is responding to an RPC request.
+      if (tabId && messageId) {
+        switch (rpcMethod) {
+          case 'stx_signTransaction': {
+            sendSignTransactionSuccessResponseMessage({
+              tabId,
+              messageId,
+              result: { transaction: rawTx },
+            });
+            break;
+          }
+          case 'stx_transferStx': {
+            sendStxTransferSuccessResponseMessage({
+              tabId,
+              messageId,
+              result: { transaction: txRaw, txid: stxTxBroadcastData ?? '' },
+            });
+            break;
+          }
+          default: {
+            sendInternalErrorMessage({ tabId, messageId });
+          }
+        }
+      } else {
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId: Number(tabId),
+          // No TxId since the tx was not broadcasted
+          data: { txId: '', txRaw: rawTx },
+        });
+      }
       window.close();
     } else {
       mutate({ signedTx: txs[0] });
@@ -186,7 +258,12 @@ function ConfirmStxTransaction() {
 
   const handleCancelClick = () => {
     if (isBrowserTx) {
-      finalizeTxSignature({ requestPayload: requestToken, tabId: Number(tabId), data: 'cancel' });
+      // A quick way to infer whether the app is responding to an RPC request.
+      if (tabId && messageId) {
+        sendUserRejectionMessage({ tabId, messageId });
+      } else {
+        finalizeTxSignature({ requestPayload: requestToken, tabId: Number(tabId), data: 'cancel' });
+      }
       window.close();
     } else {
       navigate('/send-stx', {

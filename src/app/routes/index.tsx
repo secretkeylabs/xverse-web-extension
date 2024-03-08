@@ -1,3 +1,4 @@
+import RequestsRoutes from '@common/utils/route-urls';
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import AuthGuard from '@components/guards/auth';
 import OnboardingGuard from '@components/guards/onboarding';
@@ -18,6 +19,8 @@ import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
 import AuthenticationRequest from '@screens/connect/authenticationRequest';
 import BtcSelectAddressScreen from '@screens/connect/btcSelectAddressScreen';
+import StxSelectAccountScreen from '@screens/connect/stxSelectAccountScreen';
+import StxSelectAddressScreen from '@screens/connect/stxSelectAddressScreen';
 import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
@@ -62,6 +65,7 @@ import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import LockCountdown from '@screens/settings/lockCountdown';
 import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
+import SignMessageRequest from '@screens/signMessageRequest';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import SignatureRequest from '@screens/signatureRequest';
 import SpeedUpTransactionScreen from '@screens/speedUpTransaction';
@@ -220,7 +224,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'btc-select-address-request',
+        path: RequestsRoutes.AddressRequest,
         element: (
           <AuthGuard>
             <BtcSelectAddressScreen />
@@ -228,7 +232,23 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'psbt-signing-request',
+        path: 'stx-select-address-request',
+        element: (
+          <AuthGuard>
+            <StxSelectAddressScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'stx-select-account-request',
+        element: (
+          <AuthGuard>
+            <StxSelectAccountScreen />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.SignBtcTx,
         element: (
           <AuthGuard>
             <SignPsbtRequest />
@@ -244,7 +264,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'btc-send-request',
+        path: RequestsRoutes.SendBtcTx,
         element: (
           <AuthGuard>
             <BtcSendScreen />
@@ -356,6 +376,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SignatureRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.SignMessageRequest,
+        element: (
+          <AuthGuard>
+            <SignMessageRequest />
           </AuthGuard>
         ),
       },

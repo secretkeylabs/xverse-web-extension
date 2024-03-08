@@ -1,18 +1,21 @@
+import { RpcBase } from 'sats-connect';
+
 /**
- * Inpage Script (Stacks Provider) <-> Content Script
+ * Inpage Script (Stacks Provider / BitcoinProvider) <-> Content Script
  */
 export enum DomEventName {
-  authenticationRequest = 'stacksAuthenticationRequest',
-  signatureRequest = 'signatureRequest',
-  structuredDataSignatureRequest = 'structuredDataSignatureRequest',
-  transactionRequest = 'stacksTransactionRequest',
-  getAddressRequest = 'SatsAddressRequest',
-  signPsbtRequest = 'SatsPsbtRequest',
-  signBatchPsbtRequest = 'SatsBatchPsbtRequest',
-  signMessageRequest = 'SatsSignMessage',
-  sendBtcRequest = 'SatsSendBtcRequest',
-  createInscriptionRequest = 'SatsCreateInscriptionRequest',
-  createRepeatInscriptionsRequest = 'SatsCreateRepeatInscriptionsRequest',
+  authenticationRequest = 'xverse_stx_authentication_request',
+  signatureRequest = 'xverse_stx_signature_request',
+  structuredDataSignatureRequest = 'xverse_stx_structured_data_signature_request',
+  transactionRequest = 'xverse_stx_transaction_request',
+  getAddressRequest = 'xverse_btc_address_request',
+  signPsbtRequest = 'xverse_btc_sats_psbt_request',
+  signBatchPsbtRequest = 'xverse_btc_batch_psbt_request',
+  signMessageRequest = 'xverse_btc_sign_message_request',
+  sendBtcRequest = 'xverse_btc_send_request',
+  createInscriptionRequest = 'xverse_btc_create_inscription_Request',
+  createRepeatInscriptionsRequest = 'xverse_btc_create_repeat_inscriptions_request',
+  rpcRequest = 'xverse_rpc_request',
 }
 
 export interface AuthenticationRequestEventDetails {
@@ -74,3 +77,8 @@ export interface CreateRepeatInscriptionsEventDetails {
 }
 
 export type CreateRepeatInscriptionsEvent = CustomEvent<CreateRepeatInscriptionsEventDetails>;
+
+export interface RpcRequest<T extends string, U> extends RpcBase {
+  method: T;
+  params: U;
+}

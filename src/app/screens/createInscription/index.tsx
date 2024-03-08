@@ -21,7 +21,7 @@ import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from 'sats-
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -356,8 +356,8 @@ function CreateInscription() {
     const response = {
       source: MESSAGE_SOURCE,
       method: repeat
-        ? ExternalSatsMethods.createRepeatInscriptionsResponse
-        : ExternalSatsMethods.createInscriptionResponse,
+        ? SatsConnectMethods.createRepeatInscriptionsResponse
+        : SatsConnectMethods.createInscriptionResponse,
       payload: {
         createInscriptionRequest: requestToken,
         createInscriptionResponse: 'cancel',
@@ -420,8 +420,8 @@ function CreateInscription() {
       const response = {
         source: MESSAGE_SOURCE,
         method: repeat
-          ? ExternalSatsMethods.createRepeatInscriptionsResponse
-          : ExternalSatsMethods.createInscriptionResponse,
+          ? SatsConnectMethods.createRepeatInscriptionsResponse
+          : SatsConnectMethods.createInscriptionResponse,
         payload: repeat
           ? {
               createRepeatInscriptionsRequest: requestToken,

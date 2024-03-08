@@ -3,19 +3,22 @@ import {
   CreateInscriptionResponse,
   CreateRepeatInscriptionsResponse,
   GetAddressResponse,
+  RpcId,
   SignMultipleTransactionsResponse,
   SignTransactionResponse,
+  type Params,
+  type Requests,
 } from 'sats-connect';
 
-export const MESSAGE_SOURCE = 'xverse-wallet' as const;
+export const MESSAGE_SOURCE = 'xverse-wallet';
 
-export const CONTENT_SCRIPT_PORT = 'xverse-content-script' as const;
+export const CONTENT_SCRIPT_PORT = 'xverse-content-script';
 
 /**
  * Stacks External Callable Methods
  * @enum {string}
  */
-export enum ExternalMethods {
+export enum StacksLegacyMethods {
   transactionRequest = 'transactionRequest',
   transactionResponse = 'transactionResponse',
   authenticationRequest = 'authenticationRequest',
@@ -26,15 +29,19 @@ export enum ExternalMethods {
   structuredDataSignatureResponse = 'structuredDataSignatureResponse',
 }
 
+export enum RpcMethods {
+  request = 'request',
+}
+
 export enum InternalMethods {
-  RequestDerivedStxAccounts = 'RequestDerivedStxAccounts',
-  ShareInMemoryKeyToBackground = 'ShareInMemoryKeyToBackground',
-  RequestInMemoryKeys = 'RequestInMemoryKeys',
-  RemoveInMemoryKeys = 'RemoveInMemoryKeys',
   OriginatingTabClosed = 'OriginatingTabClosed',
 }
 
-export type ExtensionMethods = ExternalMethods | ExternalSatsMethods | InternalMethods;
+export type ExtensionMethods =
+  | StacksLegacyMethods
+  | SatsConnectMethods
+  | InternalMethods
+  | RpcMethods;
 
 interface BaseMessage {
   source: typeof MESSAGE_SOURCE;
@@ -50,20 +57,20 @@ export interface Message<Methods extends ExtensionMethods, Payload = undefined>
   payload: Payload;
 }
 
-type AuthenticationRequestMessage = Message<ExternalMethods.authenticationRequest, string>;
+type AuthenticationRequestMessage = Message<StacksLegacyMethods.authenticationRequest, string>;
 
 export type AuthenticationResponseMessage = Message<
-  ExternalMethods.authenticationResponse,
+  StacksLegacyMethods.authenticationResponse,
   {
     authenticationRequest: string;
     authenticationResponse: string;
   }
 >;
 
-type SignatureRequestMessage = Message<ExternalMethods.signatureRequest, string>;
+type SignatureRequestMessage = Message<StacksLegacyMethods.signatureRequest, string>;
 
 export type SignatureResponseMessage = Message<
-  ExternalMethods.signatureResponse,
+  StacksLegacyMethods.signatureResponse,
   {
     signatureRequest: string;
     signatureResponse: SignatureData | string;
@@ -71,16 +78,16 @@ export type SignatureResponseMessage = Message<
 >;
 
 type StructuredDataSignatureRequestMessage = Message<
-  ExternalMethods.structuredDataSignatureRequest,
+  StacksLegacyMethods.structuredDataSignatureRequest,
   string
 >;
 
-type TransactionRequestMessage = Message<ExternalMethods.transactionRequest, string>;
+type TransactionRequestMessage = Message<StacksLegacyMethods.transactionRequest, string>;
 
 export type TxResult = SponsoredFinishedTxPayload | FinishedTxPayload;
 
 export type TransactionResponseMessage = Message<
-  ExternalMethods.transactionResponse,
+  StacksLegacyMethods.transactionResponse,
   {
     transactionRequest: string;
     transactionResponse: TxResult | string;
@@ -102,7 +109,7 @@ export type LegacyMessageToContentScript =
  * Sats External Callable Methods
  * @enum {string}
  */
-export enum ExternalSatsMethods {
+export enum SatsConnectMethods {
   getAddressRequest = 'getAddressRequest',
   getAddressResponse = 'getAddressResponse',
   signPsbtRequest = 'signPsbtRequest',
@@ -117,24 +124,25 @@ export enum ExternalSatsMethods {
   createInscriptionResponse = 'createInscriptionResponse',
   createRepeatInscriptionsRequest = 'createRepeatInscriptionsRequest',
   createRepeatInscriptionsResponse = 'createRepeatInscriptionsResponse',
+  request = 'request',
 }
 
-type GetAddressRequestMessage = Message<ExternalSatsMethods.getAddressRequest, string>;
+type GetAddressRequestMessage = Message<SatsConnectMethods.getAddressRequest, string>;
 
 export type GetAddressResponseMessage = Message<
-  ExternalSatsMethods.getAddressResponse,
+  SatsConnectMethods.getAddressResponse,
   {
     addressRequest: string;
     addressResponse: GetAddressResponse | string;
   }
 >;
 
-type SignPsbtRequestMessage = Message<ExternalSatsMethods.signPsbtRequest, string>;
+type SignPsbtRequestMessage = Message<SatsConnectMethods.signPsbtRequest, string>;
 
-type SignBatchPsbtRequestMessage = Message<ExternalSatsMethods.signBatchPsbtRequest, string>;
+type SignBatchPsbtRequestMessage = Message<SatsConnectMethods.signBatchPsbtRequest, string>;
 
 export type SignPsbtResponseMessage = Message<
-  ExternalSatsMethods.signPsbtResponse,
+  SatsConnectMethods.signPsbtResponse,
   {
     signPsbtRequest: string;
     signPsbtResponse: SignTransactionResponse | string;
@@ -142,40 +150,37 @@ export type SignPsbtResponseMessage = Message<
 >;
 
 export type SignBatchPsbtResponseMessage = Message<
-  ExternalSatsMethods.signBatchPsbtResponse,
+  SatsConnectMethods.signBatchPsbtResponse,
   {
     signBatchPsbtRequest: string;
     signBatchPsbtResponse: SignMultipleTransactionsResponse | string;
   }
 >;
 
-type SignMessageRequestMessage = Message<ExternalSatsMethods.signMessageRequest, string>;
+type SignMessageRequestMessage = Message<SatsConnectMethods.signMessageRequest, string>;
 
 export type SignMessageResponseMessage = Message<
-  ExternalSatsMethods.signMessageResponse,
+  SatsConnectMethods.signMessageResponse,
   {
     signMessageRequest: string;
     signMessageResponse: string;
   }
 >;
 
-type SendBtcRequestMessage = Message<ExternalSatsMethods.sendBtcRequest, string>;
+type SendBtcRequestMessage = Message<SatsConnectMethods.sendBtcRequest, string>;
 
 export type SendBtcResponseMessage = Message<
-  ExternalSatsMethods.sendBtcResponse,
+  SatsConnectMethods.sendBtcResponse,
   {
     sendBtcRequest: string;
     sendBtcResponse: string;
   }
 >;
 
-type CreateInscriptionRequestMessage = Message<
-  ExternalSatsMethods.createInscriptionRequest,
-  string
->;
+type CreateInscriptionRequestMessage = Message<SatsConnectMethods.createInscriptionRequest, string>;
 
 export type CreateInscriptionResponseMessage = Message<
-  ExternalSatsMethods.createInscriptionResponse,
+  SatsConnectMethods.createInscriptionResponse,
   {
     createInscriptionRequest: string;
     createInscriptionResponse: CreateInscriptionResponse | string;
@@ -183,17 +188,23 @@ export type CreateInscriptionResponseMessage = Message<
 >;
 
 type CreateRepeatInscriptionsRequestMessage = Message<
-  ExternalSatsMethods.createRepeatInscriptionsRequest,
+  SatsConnectMethods.createRepeatInscriptionsRequest,
   string
 >;
 
 export type CreateRepeatInscriptionsResponseMessage = Message<
-  ExternalSatsMethods.createRepeatInscriptionsResponse,
+  SatsConnectMethods.createRepeatInscriptionsResponse,
   {
     createRepeatInscriptionsRequest: string;
     createRepeatInscriptionsResponse: CreateRepeatInscriptionsResponse | string;
   }
 >;
+
+export type WebBtcMessage<Method extends keyof Requests> = {
+  id: RpcId;
+  method: Method;
+  params: Params<Method>;
+};
 
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage

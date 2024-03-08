@@ -1,4 +1,9 @@
 import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
+import {
+  sendInternalErrorMessage,
+  sendSignTransactionSuccessResponseMessage,
+  sendUserRejectionMessage,
+} from '@common/utils/rpc/stx/rpcResponseMessages';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import InfoContainer from '@components/infoContainer';
@@ -101,10 +106,21 @@ interface ContractDeployRequestProps {
   sponsored: boolean;
   tabId: number;
   requestToken: string;
+  messageId: string | null;
+  rpcMethod: string | null;
 }
 
 export default function ContractDeployRequest(props: ContractDeployRequestProps) {
-  const { unsignedTx, codeBody, contractName, sponsored, tabId, requestToken } = props;
+  const {
+    unsignedTx,
+    codeBody,
+    contractName,
+    sponsored,
+    tabId,
+    requestToken,
+    messageId,
+    rpcMethod,
+  } = props;
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
@@ -125,26 +141,41 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   const broadcastTx = async (tx: StacksTransaction[]) => {
     try {
       setLoaderForBroadcastingTx(true);
-      const broadcastResult = await broadcastSignedTransaction(tx[0], selectedNetwork);
-      if (broadcastResult) {
+      const txId = await broadcastSignedTransaction(tx[0], selectedNetwork);
+      if (rpcMethod && messageId && tabId) {
+        switch (rpcMethod) {
+          case 'stx_signTransaction':
+            sendSignTransactionSuccessResponseMessage({
+              tabId,
+              messageId,
+              result: { transaction: buf2hex(tx[0].serialize()) },
+            });
+            break;
+          default:
+            sendInternalErrorMessage({ tabId, messageId });
+            break;
+        }
+      } else {
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId: broadcastResult, txRaw: buf2hex(tx[0].serialize()) },
-        });
-        navigate('/tx-status', {
-          state: {
-            txid: broadcastResult,
-            currency: 'STX',
-            error: '',
-            browserTx: true,
-            tabId,
-            requestToken,
-          },
+          data: { txId, txRaw: buf2hex(tx[0].serialize()) },
         });
       }
+
+      navigate('/tx-status', {
+        state: {
+          txid: txId,
+          currency: 'STX',
+          error: '',
+          browserTx: true,
+          tabId,
+          requestToken,
+        },
+      });
     } catch (error: any) {
       setLoaderForBroadcastingTx(false);
+      sendInternalErrorMessage({ tabId, messageId });
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -160,6 +191,25 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
 
   const confirmCallback = (txs: StacksTransaction[]) => {
     if (sponsored) {
+      if (rpcMethod && messageId && tabId) {
+        switch (rpcMethod) {
+          case 'stx_signTransaction':
+            sendSignTransactionSuccessResponseMessage({
+              tabId,
+              messageId,
+              result: { transaction: buf2hex(unsignedTx.serialize()) },
+            });
+            break;
+          default:
+            sendInternalErrorMessage({ tabId, messageId });
+            break;
+        }
+        sendSignTransactionSuccessResponseMessage({
+          tabId,
+          messageId,
+          result: { transaction: buf2hex(unsignedTx.serialize()) },
+        });
+      }
       navigate('/tx-status', {
         state: {
           sponsored: true,
@@ -167,11 +217,26 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
         },
       });
     } else if (isMultiSigTx) {
-      finalizeTxSignature({
-        requestPayload: requestToken,
-        tabId,
-        data: { txId: '', txRaw: buf2hex(unsignedTx.serialize()) },
-      });
+      if (rpcMethod && messageId && tabId) {
+        switch (rpcMethod) {
+          case 'stx_signTransaction':
+            sendSignTransactionSuccessResponseMessage({
+              tabId,
+              messageId,
+              result: { transaction: buf2hex(unsignedTx.serialize()) },
+            });
+            break;
+          default:
+            sendInternalErrorMessage({ tabId, messageId });
+            break;
+        }
+      } else {
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId,
+          data: { txId: '', txRaw: buf2hex(unsignedTx.serialize()) },
+        });
+      }
       window.close();
     } else {
       broadcastTx(txs);
@@ -188,6 +253,9 @@ export default function ContractDeployRequest(props: ContractDeployRequestProps)
   };
 
   const cancelCallback = () => {
+    if (rpcMethod && messageId && tabId) {
+      sendUserRejectionMessage({ tabId, messageId });
+    }
     finalizeTxSignature({ requestPayload: requestToken, tabId, data: 'cancel' });
     window.close();
   };

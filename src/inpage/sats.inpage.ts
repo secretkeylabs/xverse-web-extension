@@ -11,30 +11,27 @@ import {
 import {
   CreateInscriptionResponseMessage,
   CreateRepeatInscriptionsResponseMessage,
-  ExternalSatsMethods,
   GetAddressResponseMessage,
-  MESSAGE_SOURCE,
-  SatsConnectMessageToContentScript,
+  SatsConnectMethods,
   SendBtcResponseMessage,
   SignBatchPsbtResponseMessage,
   SignMessageResponseMessage,
   SignPsbtResponseMessage,
 } from '@common/types/message-types';
+import { nanoid } from 'nanoid';
 import {
   BitcoinProvider,
   CreateInscriptionResponse,
   CreateRepeatInscriptionsResponse,
   GetAddressResponse,
+  Params,
+  Requests,
+  RpcRequest,
+  RpcResponse,
   SignMultipleTransactionsResponse,
   SignTransactionResponse,
 } from 'sats-connect';
-
-const isValidEvent = (event: MessageEvent, method: SatsConnectMessageToContentScript['method']) => {
-  const { data } = event;
-  const correctSource = data.source === MESSAGE_SOURCE;
-  const correctMethod = data.method === method;
-  return correctSource && correctMethod && !!data.payload;
-};
+import { isValidLegacyEvent, isValidRpcEvent } from './utils';
 
 const SatsMethodsProvider: BitcoinProvider = {
   connect: async (btcAddressRequest): Promise<GetAddressResponse> => {
@@ -44,7 +41,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<GetAddressResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.getAddressResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.getAddressResponse)) return;
         if (eventMessage.data.payload?.addressRequest !== btcAddressRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.addressResponse === 'cancel') {
@@ -65,7 +62,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<SignPsbtResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.signPsbtResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.signPsbtResponse)) return;
         if (eventMessage.data.payload?.signPsbtRequest !== signPsbtRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.signPsbtResponse === 'cancel') {
@@ -91,7 +88,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<SignBatchPsbtResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.signBatchPsbtResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.signBatchPsbtResponse)) return;
         if (eventMessage.data.payload?.signBatchPsbtRequest !== signBatchPsbtRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.signBatchPsbtResponse === 'cancel') {
@@ -112,7 +109,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<SignMessageResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.signMessageResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.signMessageResponse)) return;
         if (eventMessage.data.payload?.signMessageRequest !== signMessageRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.signMessageResponse === 'cancel') {
@@ -133,7 +130,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<SendBtcResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.sendBtcResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.sendBtcResponse)) return;
         if (eventMessage.data.payload?.sendBtcRequest !== sendBtcRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.sendBtcResponse === 'cancel') {
@@ -159,7 +156,7 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<CreateInscriptionResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.createInscriptionResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.createInscriptionResponse)) return;
         if (eventMessage.data.payload?.createInscriptionRequest !== createInscriptionRequest)
           return;
         window.removeEventListener('message', handleMessage);
@@ -188,7 +185,7 @@ const SatsMethodsProvider: BitcoinProvider = {
       const handleMessage = (
         eventMessage: MessageEvent<CreateRepeatInscriptionsResponseMessage>,
       ) => {
-        if (!isValidEvent(eventMessage, ExternalSatsMethods.createRepeatInscriptionsResponse))
+        if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.createRepeatInscriptionsResponse))
           return;
         if (
           eventMessage.data.payload?.createRepeatInscriptionsRequest !==
@@ -207,8 +204,31 @@ const SatsMethodsProvider: BitcoinProvider = {
       window.addEventListener('message', handleMessage);
     });
   },
-  call(request: string): Promise<Record<string, any>> {
-    throw new Error('`call` function is not implemented');
+  request: async <Method extends keyof Requests>(
+    method: Method,
+    params: Params<Method>,
+  ): Promise<RpcResponse<Method>> => {
+    const id = nanoid();
+    const rpcRequest: RpcRequest<Method, Params<Method>> = {
+      jsonrpc: '2.0',
+      id,
+      method,
+      params,
+    };
+    const rpcRequestEvent = new CustomEvent(DomEventName.rpcRequest, { detail: rpcRequest });
+    document.dispatchEvent(rpcRequestEvent);
+    return new Promise((resolve) => {
+      function handleRpcResponseEvent(eventMessage: MessageEvent<any>) {
+        if (!isValidRpcEvent(eventMessage)) return;
+        const response = eventMessage.data;
+        if (response.id !== id) {
+          return;
+        }
+        window.removeEventListener('message', handleRpcResponseEvent);
+        return resolve(response);
+      }
+      window.addEventListener('message', handleRpcResponseEvent);
+    });
   },
 };
 export default SatsMethodsProvider;

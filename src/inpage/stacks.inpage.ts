@@ -6,59 +6,14 @@ import {
 } from '@common/types/inpage-types';
 import {
   AuthenticationResponseMessage,
-  ExternalMethods,
-  LegacyMessageToContentScript,
-  MESSAGE_SOURCE,
   SignatureResponseMessage,
+  StacksLegacyMethods,
   TransactionResponseMessage,
 } from '@common/types/message-types';
 import { StacksProvider } from '@stacks/connect';
+import { callAndReceive, isValidLegacyEvent } from './utils';
 
 declare const VERSION: string;
-type CallableMethods = keyof typeof ExternalMethods;
-
-interface ExtensionResponse {
-  source: 'xverse-extension';
-  method: CallableMethods;
-
-  [key: string]: any;
-}
-
-const callAndReceive = async (
-  methodName: CallableMethods | 'getURL',
-  opts: any = {},
-): Promise<ExtensionResponse> =>
-  new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error('Unable to get response from xverse extension'));
-    }, 1000);
-    const waitForResponse = (event: MessageEvent) => {
-      if (
-        event.data.source === 'xverse-extension' &&
-        event.data.method === `${methodName}Response`
-      ) {
-        clearTimeout(timeout);
-        window.removeEventListener('message', waitForResponse);
-        resolve(event.data);
-      }
-    };
-    window.addEventListener('message', waitForResponse);
-    window.postMessage(
-      {
-        method: methodName,
-        source: 'xverse-app',
-        ...opts,
-      },
-      window.location.origin,
-    );
-  });
-
-const isValidEvent = (event: MessageEvent, method: LegacyMessageToContentScript['method']) => {
-  const { data } = event;
-  const correctSource = data.source === MESSAGE_SOURCE;
-  const correctMethod = data.method === method;
-  return correctSource && correctMethod && !!data.payload;
-};
 
 const StacksMethodsProvider: Partial<StacksProvider> = {
   getURL: async () => {
@@ -75,7 +30,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<SignatureResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalMethods.signatureResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, StacksLegacyMethods.signatureResponse)) return;
         if (eventMessage.data.payload?.signatureRequest !== signatureRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.signatureResponse === 'cancel') {
@@ -96,7 +51,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<SignatureResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalMethods.signatureResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, StacksLegacyMethods.signatureResponse)) return;
         if (eventMessage.data.payload?.signatureRequest !== signatureRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.signatureResponse === 'cancel') {
@@ -120,7 +75,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<AuthenticationResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalMethods.authenticationResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, StacksLegacyMethods.authenticationResponse)) return;
         if (eventMessage.data.payload?.authenticationRequest !== authenticationRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.authenticationResponse === 'cancel') {
@@ -139,7 +94,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
     document.dispatchEvent(event);
     return new Promise((resolve, reject) => {
       const handleMessage = (eventMessage: MessageEvent<TransactionResponseMessage>) => {
-        if (!isValidEvent(eventMessage, ExternalMethods.transactionResponse)) return;
+        if (!isValidLegacyEvent(eventMessage, StacksLegacyMethods.transactionResponse)) return;
         if (eventMessage.data.payload?.transactionRequest !== transactionRequest) return;
         window.removeEventListener('message', handleMessage);
         if (eventMessage.data.payload.transactionResponse === 'cancel') {

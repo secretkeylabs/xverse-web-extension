@@ -87,8 +87,12 @@ interface Props {
   transparent?: boolean;
   warning?: boolean;
   hoverDialogId?: string;
+  type?: 'button' | 'submit' | 'reset';
 }
 
+/**
+ * @deprecated use ui-library/button
+ */
 function ActionButton({
   className,
   src,
@@ -101,6 +105,7 @@ function ActionButton({
   transparent,
   warning,
   hoverDialogId,
+  type,
 }: Props) {
   const handleOnPress = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled) {
@@ -115,6 +120,7 @@ function ActionButton({
         className={className}
         onClick={handleOnPress}
         disabled={disabled || processing}
+        type={type}
       >
         {processing ? (
           <Spinner color="white" size={10} />
@@ -136,6 +142,7 @@ function ActionButton({
       onClick={handleOnPress}
       disabled={disabled || processing}
       warning={warning}
+      type={type}
     >
       {processing ? (
         <Spinner color="#12151E" size={12} />

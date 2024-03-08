@@ -217,10 +217,6 @@ export const validateAccountName = (
 ) => {
   const regex = /^[a-zA-Z0-9 ]*$/;
 
-  if (!name.length) {
-    return t('RENAME_ACCOUNT_MODAL.REQUIRED_ERR');
-  }
-
   if (name.length > MAX_ACC_NAME_LENGTH) {
     return t('RENAME_ACCOUNT_MODAL.MAX_SYMBOLS_ERR', {
       maxLength: MAX_ACC_NAME_LENGTH,
@@ -229,7 +225,11 @@ export const validateAccountName = (
 
   if (
     ledgerAccountsList.find((account) => account.accountName === name) ||
-    accountsList.find((account) => account.accountName === name)
+    accountsList.find((account) => account.accountName === name) ||
+    accountsList.some(
+      (account) =>
+        `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}` === name && !account.bnsName,
+    )
   ) {
     return t('RENAME_ACCOUNT_MODAL.ALREADY_EXISTS_ERR');
   }

@@ -4,9 +4,9 @@ import styled from 'styled-components';
 const TopSectionContainer = styled.div((props) => ({
   display: 'flex',
   minHeight: 18,
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.space.l,
   marginBottom: props.theme.spacing(9),
-  marginLeft: props.theme.spacing(8),
+  marginLeft: props.theme.space.m,
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
@@ -14,7 +14,7 @@ const TopSectionContainer = styled.div((props) => ({
 }));
 
 const HeaderText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   paddingRight: props.theme.spacing(10),
 }));
 

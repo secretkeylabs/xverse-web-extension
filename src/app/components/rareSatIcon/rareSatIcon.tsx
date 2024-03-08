@@ -42,7 +42,7 @@ interface Props {
 }
 
 function RareSatIcon({ type, size }: Props) {
-  const src = {
+  const sourceByType: Record<RareSatsType, string> = {
     EPIC: Epic,
     LEGENDARY: Legendary,
     MYTHIC: Mythic,
@@ -61,7 +61,7 @@ function RareSatIcon({ type, size }: Props) {
     PERFECT_PALINCEPTION: Palinception,
     PALIBLOCK_PALINDROME: BlockPali,
     PALINDROME: Palindrome,
-    NAME_PALINDROME: Palindrome,
+    // NAME_PALINDROME: Palindrome,
     ALPHA: Alpha,
     OMEGA: Omega,
     FIRST_TRANSACTION: FirstTx,
@@ -73,7 +73,8 @@ function RareSatIcon({ type, size }: Props) {
     JPEG: Jpeg,
     HITMAN: Hitman,
     SILK_ROAD: SilkRoad,
-  }[type];
+  };
+  const src = sourceByType[type];
   if (!src) {
     return null;
   }

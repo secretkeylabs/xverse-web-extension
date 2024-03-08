@@ -13,12 +13,12 @@ import {
 } from '@common/types/inpage-types';
 import {
   CONTENT_SCRIPT_PORT,
-  ExternalMethods,
-  ExternalSatsMethods,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
   MESSAGE_SOURCE,
   SatsConnectMessageFromContentScript,
+  SatsConnectMethods,
+  StacksLegacyMethods,
 } from '@common/types/message-types';
 import getEventSourceWindow from '@common/utils/get-event-source-window';
 import RequestsRoutes from '@common/utils/route-urls';
@@ -46,7 +46,8 @@ window.addEventListener('message', (event) => {
 
 // Connection to background script - fires onConnect event in background script
 // and establishes two-way communication
-let backgroundPort;
+let backgroundPort: chrome.runtime.Port;
+
 function connect() {
   backgroundPort = chrome.runtime.connect({ name: CONTENT_SCRIPT_PORT });
   backgroundPort.onDisconnect.addListener(connect);
@@ -92,7 +93,7 @@ document.addEventListener(DomEventName.authenticationRequest, ((
     path: RequestsRoutes.AuthenticationRequest,
     payload: event.detail.authenticationRequest,
     urlParam: 'authRequest',
-    method: ExternalMethods.authenticationRequest,
+    method: StacksLegacyMethods.authenticationRequest,
   });
 }) as EventListener);
 
@@ -102,7 +103,7 @@ document.addEventListener(DomEventName.transactionRequest, ((event: TransactionR
     path: RequestsRoutes.TransactionRequest,
     payload: event.detail.transactionRequest,
     urlParam: 'request',
-    method: ExternalMethods.transactionRequest,
+    method: StacksLegacyMethods.transactionRequest,
   });
 }) as EventListener);
 
@@ -112,7 +113,7 @@ document.addEventListener(DomEventName.signatureRequest, ((event: SignatureReque
     path: RequestsRoutes.SignatureRequest,
     payload: event.detail.signatureRequest,
     urlParam: 'request',
-    method: ExternalMethods.signatureRequest,
+    method: StacksLegacyMethods.signatureRequest,
   });
 }) as EventListener);
 
@@ -124,7 +125,7 @@ document.addEventListener(DomEventName.structuredDataSignatureRequest, ((
     path: RequestsRoutes.SignatureRequest,
     payload: event.detail.signatureRequest,
     urlParam: 'request',
-    method: ExternalMethods.structuredDataSignatureRequest,
+    method: StacksLegacyMethods.structuredDataSignatureRequest,
   });
 }) as EventListener);
 
@@ -134,7 +135,7 @@ document.addEventListener(DomEventName.getAddressRequest, ((event: GetAddressReq
     path: RequestsRoutes.AddressRequest,
     payload: event.detail.btcAddressRequest,
     urlParam: 'addressRequest',
-    method: ExternalSatsMethods.getAddressRequest,
+    method: SatsConnectMethods.getAddressRequest,
   });
 }) as EventListener);
 
@@ -144,7 +145,7 @@ document.addEventListener(DomEventName.signPsbtRequest, ((event: SignPsbtRequest
     path: RequestsRoutes.SignBtcTx,
     payload: event.detail.signPsbtRequest,
     urlParam: 'signPsbtRequest',
-    method: ExternalSatsMethods.signPsbtRequest,
+    method: SatsConnectMethods.signPsbtRequest,
   });
 }) as EventListener);
 
@@ -156,17 +157,17 @@ document.addEventListener(DomEventName.signBatchPsbtRequest, ((
     path: RequestsRoutes.SignBatchBtcTx,
     payload: event.detail.signBatchPsbtRequest,
     urlParam: 'signBatchPsbtRequest',
-    method: ExternalSatsMethods.signBatchPsbtRequest,
+    method: SatsConnectMethods.signBatchPsbtRequest,
   });
 }) as EventListener);
 
 // Listen for a CustomEvent (Message Signing request) coming from the web app
 document.addEventListener(DomEventName.signMessageRequest, ((event: SignMessageRequestEvent) => {
   forwardDomEventToBackground({
-    path: RequestsRoutes.SignatureRequest,
+    path: RequestsRoutes.SignMessageRequest,
     payload: event.detail.signMessageRequest,
     urlParam: 'signMessageRequest',
-    method: ExternalSatsMethods.signMessageRequest,
+    method: SatsConnectMethods.signMessageRequest,
   });
 }) as EventListener);
 
@@ -176,7 +177,7 @@ document.addEventListener(DomEventName.sendBtcRequest, ((event: SendBtcRequestEv
     path: RequestsRoutes.SendBtcTx,
     payload: event.detail.sendBtcRequest,
     urlParam: 'sendBtcRequest',
-    method: ExternalSatsMethods.sendBtcRequest,
+    method: SatsConnectMethods.sendBtcRequest,
   });
 }) as EventListener);
 
@@ -188,7 +189,7 @@ document.addEventListener(DomEventName.createInscriptionRequest, ((
     path: RequestsRoutes.CreateInscription,
     payload: event.detail.createInscriptionRequest,
     urlParam: 'createInscriptionRequest',
-    method: ExternalSatsMethods.createInscriptionRequest,
+    method: SatsConnectMethods.createInscriptionRequest,
   });
 }) as EventListener);
 
@@ -200,9 +201,13 @@ document.addEventListener(DomEventName.createRepeatInscriptionsRequest, ((
     path: RequestsRoutes.CreateRepeatInscriptions,
     payload: event.detail.createRepeatInscriptionsRequest,
     urlParam: 'createRepeatInscriptionsRequest',
-    method: ExternalSatsMethods.createRepeatInscriptionsRequest,
+    method: SatsConnectMethods.createRepeatInscriptionsRequest,
   });
 }) as EventListener);
+
+document.addEventListener(DomEventName.rpcRequest, (event: any) => {
+  sendMessageToBackground({ source: MESSAGE_SOURCE, ...event.detail });
+});
 
 // Inject in-page script (Stacks and Bitcoin Providers)
 const injectInPageScript = (isPriority) => {

@@ -1,9 +1,9 @@
-import { SignatureData } from '@stacks/connect';
 import {
-  ExternalMethods,
   MESSAGE_SOURCE,
   SignatureResponseMessage,
+  StacksLegacyMethods,
 } from '@common/types/message-types';
+import { SignatureData } from '@stacks/connect';
 
 interface FormatMessageSigningResponseArgs {
   request: string;
@@ -15,7 +15,7 @@ export function formatMessageSigningResponse({
 }: FormatMessageSigningResponseArgs): SignatureResponseMessage {
   return {
     source: MESSAGE_SOURCE,
-    method: ExternalMethods.signatureResponse,
+    method: StacksLegacyMethods.signatureResponse,
     payload: { signatureRequest: request, signatureResponse: response },
   };
 }

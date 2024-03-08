@@ -1,4 +1,4 @@
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import AssetModal from '@components/assetModal';
@@ -241,7 +241,7 @@ function SignBatchPsbtRequest() {
 
       const signingMessage = {
         source: MESSAGE_SOURCE,
-        method: ExternalSatsMethods.signBatchPsbtResponse,
+        method: SatsConnectMethods.signBatchPsbtResponse,
         payload: {
           signBatchPsbtRequest: requestToken,
           signBatchPsbtResponse: signedPsbts,

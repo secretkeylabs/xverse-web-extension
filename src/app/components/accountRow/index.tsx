@@ -1,13 +1,13 @@
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
-import ActionButton from '@components/button';
 import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
 import { Account, currencySymbolMap } from '@secretkeylabs/xverse-core';
-import InputFeedback from '@ui-library/inputFeedback';
+import Button from '@ui-library/button';
+import Input from '@ui-library/input';
 import Spinner from '@ui-library/spinner';
 import { EMPTY_LABEL, LoaderSize, MAX_ACC_NAME_LENGTH } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
@@ -48,7 +48,7 @@ const AccountInfoContainer = styled.div({
 const CurrentAcountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(6),
+  paddingLeft: props.theme.space.s,
 }));
 
 const CurrentAccountTextContainer = styled.div((props) => ({
@@ -81,21 +81,23 @@ const OptionsButton = styled.button({
   background: 'transparent',
 });
 
-const ModalContent = styled.div((props) => ({
-  padding: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(20),
+const ModalContent = styled.form((props) => ({
+  padding: props.theme.space.m,
+  paddingTop: props.theme.space.m,
+  paddingBottom: props.theme.space.xxl,
 }));
 
 const ModalDescription = styled.div((props) => ({
-  fontSize: '0.875rem',
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
 }));
 
-const ModalControlsContainer = styled.div((props) => ({
+const ModalControlsContainer = styled.div<{
+  $bigSpacing?: boolean;
+}>((props) => ({
   display: 'flex',
   columnGap: props.theme.space.s,
-  marginTop: props.theme.space.xl,
+  marginTop: props.$bigSpacing ? props.theme.space.l : props.theme.space.m,
 }));
 
 const ModalButtonContainer = styled.div({
@@ -123,41 +125,12 @@ const ButtonRow = styled.button`
 
 const InputLabel = styled.div((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  marginBottom: props.theme.space.xs,
-}));
-
-const InputContainer = styled.div<{ withError?: boolean }>((props) => ({
   display: 'flex',
-  flexDirection: 'row',
+  justifyContent: 'space-between',
   alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(6),
-  border: `1px solid ${
-    props.withError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_800
-  }`,
-  backgroundColor: props.theme.colors.elevation1,
-  borderRadius: props.theme.radius(1),
-  padding: props.theme.spacing(5),
-}));
-
-const InputField = styled.input((props) => ({
-  ...props.theme.typography.body_m,
-  backgroundColor: 'transparent',
-  color: props.theme.colors.white_0,
-  border: 'transparent',
-  width: '100%',
-  '&::-webkit-outer-spin-button': {
-    '-webkit-appearance': 'none',
-    margin: 0,
-  },
-  '&::-webkit-inner-spin-button': {
-    '-webkit-appearance': 'none',
-    margin: 0,
-  },
-  '&[type=number]': {
-    '-moz-appearance': 'textfield',
-  },
+  color: props.theme.colors.white_200,
+  marginTop: props.theme.space.m,
+  marginBottom: props.theme.space.xs,
 }));
 
 const Balance = styled.div<{ isSelected?: boolean }>((props) => ({
@@ -167,6 +140,21 @@ const Balance = styled.div<{ isSelected?: boolean }>((props) => ({
   display: 'flex',
   alignItems: 'center',
   columnGap: props.theme.space.xs,
+}));
+
+const StyledButton = styled(Button)((props) => ({
+  padding: 0,
+  width: 'auto',
+  transition: 'opacity 0.1s ease',
+  div: {
+    color: props.theme.colors.tangerine,
+  },
+  ':hover:enabled': {
+    opacity: 0.8,
+  },
+  ':active:enabled': {
+    opacity: 0.6,
+  },
 }));
 
 function AccountRow({
@@ -209,6 +197,20 @@ function AccountRow({
     },
     [],
   );
+
+  useEffect(() => {
+    const validationError = validateAccountName(
+      accountName,
+      optionsDialogTranslation,
+      accountsList,
+      ledgerAccountsList,
+    );
+    if (validationError) {
+      setAccountNameError(validationError);
+    } else {
+      setAccountNameError(null);
+    }
+  }, [accountName]);
 
   const getName = () => {
     const name =
@@ -299,6 +301,27 @@ function AccountRow({
     }
   };
 
+  const handleResetAccountName = () => {
+    if (!account) {
+      return;
+    }
+
+    try {
+      setIsAccountNameChangeLoading(true);
+      if (isLedgerAccount(account)) {
+        updateLedgerAccounts({ ...account, accountName: undefined });
+      } else {
+        renameAccount({ ...account, accountName: undefined });
+      }
+      setAccountName('');
+      handleRenameAccountModalClose();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsAccountNameChangeLoading(false);
+    }
+  };
+
   return (
     <TopSectionContainer disableClick={disabledAccountSelect}>
       <AccountInfoContainer onClick={handleClick}>
@@ -372,19 +395,19 @@ function AccountRow({
         >
           <ModalContent>
             <ModalDescription>{t('REMOVE_FROM_LIST_DESCRIPTION')}</ModalDescription>
-            <ModalControlsContainer>
+            <ModalControlsContainer $bigSpacing>
               <ModalButtonContainer>
-                <ActionButton
-                  transparent
-                  text={t('CANCEL')}
-                  onPress={handleRemoveAccountModalClose}
+                <Button
+                  variant="secondary"
+                  title={t('CANCEL')}
+                  onClick={handleRemoveAccountModalClose}
                 />
               </ModalButtonContainer>
               <ModalButtonContainer>
-                <ActionButton
-                  warning
-                  text={t('REMOVE_WALLET')}
-                  onPress={handleRemoveLedgerAccount}
+                <Button
+                  variant="danger"
+                  title={t('REMOVE_WALLET')}
+                  onClick={handleRemoveLedgerAccount}
                 />
               </ModalButtonContainer>
             </ModalControlsContainer>
@@ -399,21 +422,36 @@ function AccountRow({
           onClose={handleRenameAccountModalClose}
         >
           <ModalContent>
-            <InputLabel>{optionsDialogTranslation('RENAME_ACCOUNT_MODAL.LABEL')}</InputLabel>
-            <InputContainer withError={!!accountNameError}>
-              <InputField
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
-                autoFocus
+            <ModalDescription>
+              {optionsDialogTranslation('RENAME_ACCOUNT_MODAL.NAME_RULES')}
+            </ModalDescription>
+            <InputLabel>
+              {optionsDialogTranslation('RENAME_ACCOUNT_MODAL.LABEL')}
+              <StyledButton
+                variant="tertiary"
+                onClick={handleResetAccountName}
+                title={optionsDialogTranslation('RENAME_ACCOUNT_MODAL.RESET_NAME')}
+                type="reset"
               />
-            </InputContainer>
-            {accountNameError && <InputFeedback variant="danger" message={accountNameError} />}
+            </InputLabel>
+            <Input
+              value={accountName}
+              onChange={(e) => setAccountName(e.target.value)}
+              feedback={[
+                {
+                  message: accountNameError || '',
+                  variant: accountNameError ? 'danger' : undefined,
+                },
+              ]}
+              autoFocus
+            />
             <ModalControlsContainer>
               <ModalButtonContainer>
-                <ActionButton
-                  text={t('SAVE')}
-                  onPress={handleRenameAccount}
-                  processing={isAccountNameChangeLoading}
+                <Button
+                  title={t('CONFIRM')}
+                  onClick={handleRenameAccount}
+                  disabled={!accountName || !!accountNameError}
+                  loading={isAccountNameChangeLoading}
                 />
               </ModalButtonContainer>
             </ModalControlsContainer>
