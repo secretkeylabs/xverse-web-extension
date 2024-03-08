@@ -1,4 +1,5 @@
-import { Return, RpcId } from 'sats-connect';
+import { Requests, Return, RpcId } from 'sats-connect';
+import { keys } from 'ts-transformer-keys';
 import { makeRpcSuccessResponse, sendRpcResponse } from './helpers';
 
 declare const VERSION: string;
@@ -6,8 +7,7 @@ declare const VERSION: string;
 const handleGetInfo = (requestId: RpcId, tabId: number) => {
   const response: Return<'getInfo'> = {
     version: VERSION,
-    // TODO fill the array based on the requests interface
-    methods: [],
+    methods: keys<Requests>(),
     supports: [],
   };
   sendRpcResponse(tabId, makeRpcSuccessResponse(requestId, response));
