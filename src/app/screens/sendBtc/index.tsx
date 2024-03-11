@@ -1,8 +1,9 @@
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { Transport, btcTransaction } from '@secretkeylabs/xverse-core';
-import { isInOptions } from '@utils/helper';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
+import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -11,7 +12,7 @@ import {
   type TransactionSummary,
 } from './helpers';
 import StepDisplay from './stepDisplay';
-import { Step, getPreviousStep } from './steps';
+import { getPreviousStep, Step } from './steps';
 
 function SendBtcScreen() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ function SendBtcScreen() {
   const location = useLocation();
 
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
-
+  const { selectedAccount } = useWalletSelector();
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,20 +54,18 @@ function SendBtcScreen() {
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
     const amountBigInt = Number.isNaN(Number(amountSats)) ? 0n : BigInt(amountSats);
-    const transactionDetails =
-      sendMax && currentStep !== Step.Confirm
-        ? await generateSendMaxTransaction(
-            transactionContext,
-            recipientAddress,
-            feeRateOverride ?? +feeRate,
-          )
-        : await generateTransaction(
-            transactionContext,
-            recipientAddress,
-            amountBigInt,
-            feeRateOverride ?? +feeRate,
-          );
-    return transactionDetails;
+    return sendMax && currentStep !== Step.Confirm
+      ? generateSendMaxTransaction(
+          transactionContext,
+          recipientAddress,
+          feeRateOverride ?? +feeRate,
+        )
+      : generateTransaction(
+          transactionContext,
+          recipientAddress,
+          amountBigInt,
+          feeRateOverride ?? +feeRate,
+        );
   };
 
   useEffect(() => {
@@ -105,7 +104,7 @@ function SendBtcScreen() {
   }, [transactionContext, recipientAddress, amountSats, feeRate, sendMax]);
 
   const handleCancel = () => {
-    if (isInOption) {
+    if (isLedgerAccount(selectedAccount) && isInOption) {
       window.close();
       return;
     }

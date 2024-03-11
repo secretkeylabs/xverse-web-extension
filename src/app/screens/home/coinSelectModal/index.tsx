@@ -1,5 +1,3 @@
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import BottomModal from '@components/bottomModal';
 import TokenTile from '@components/tokenTile';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -53,7 +51,6 @@ function CoinSelectModal({
           <TokenTile
             title={t('BITCOIN')}
             currency="BTC"
-            icon={IconBitcoin}
             loading={loadingWalletData}
             underlayColor={theme.colors.elevation2}
             margin={14}
@@ -65,7 +62,6 @@ function CoinSelectModal({
           <TokenTile
             title={t('STACKS')}
             currency="STX"
-            icon={IconStacks}
             loading={loadingWalletData}
             underlayColor={theme.colors.elevation2}
             margin={14}
@@ -87,7 +83,6 @@ function CoinSelectModal({
               key={coin.principal}
               title={coin.name}
               currency="FT"
-              icon={IconStacks}
               loading={loadingWalletData}
               underlayColor={theme.colors.elevation2}
               margin={14}

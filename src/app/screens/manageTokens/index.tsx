@@ -1,18 +1,23 @@
 import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
+import runesComingSoon from '@assets/img/manageTokens/runes_coming_soon.svg';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
+import { useGetRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import useHasFeature from '@hooks/useHasFeature';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import CoinItem from '@screens/manageTokens/coinItem';
-import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
-import { StoreState } from '@stores/index';
+import { FungibleToken, FungibleTokenProtocol } from '@secretkeylabs/xverse-core';
 import {
-  FetchUpdatedVisibleCoinListAction,
-  setBrcCoinsDataAction,
+  setBrc20ManageTokensAction,
+  setRunesManageTokensAction,
+  setSip10ManageTokensAction,
 } from '@stores/wallet/actions/actionCreators';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -80,6 +85,26 @@ const Description = styled.h1((props) => ({
   marginBottom: props.theme.spacing(16),
 }));
 
+const RunesContainer = styled.div((props) => ({
+  marginTop: props.theme.spacing(24),
+  marginRight: props.theme.spacing(5),
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+}));
+
+const ErrorsText = styled.p((props) => ({
+  ...props.theme.typography.body_bold_m,
+  color: props.theme.colors.white_200,
+  marginTop: props.theme.spacing(16),
+  marginBottom: 'auto',
+  textAlign: 'center',
+}));
+
+const RunesComingSoon = styled.img({
+  width: '70%',
+});
+
 function Stacks() {
   const { hideStx } = useWalletSelector();
   const { toggleStxVisibility } = useWalletReducer();
@@ -98,66 +123,88 @@ function Stacks() {
   );
 }
 
-enum Protocols {
-  SIP_10 = 'SIP-10',
-  BRC_20 = 'BRC-20',
-}
-
 function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
-  const { coinsList, coins, brcCoinsList, selectedAccount } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
-  const [selectedProtocol, setSelectedProtocol] = useState<Protocols>(
-    selectedAccount?.stxAddress ? Protocols.SIP_10 : Protocols.BRC_20,
-  );
 
+  const { sip10ManageTokens, brc20ManageTokens, runesManageTokens, selectedAccount } =
+    useWalletSelector();
+  const { data: runesList, isError: runeError } = useGetRuneFungibleTokens();
+  const { data: sip10List, isError: sip10Error } = useGetSip10FungibleTokens();
+  const { data: brc20List, isError: brc20Error } = useGetBrc20FungibleTokens();
+
+  const [selectedProtocol, setSelectedProtocol] = useState<FungibleTokenProtocol>(
+    selectedAccount?.stxAddress ? 'stacks' : 'brc-20',
+  );
+  const showRunes = useHasFeature('RUNES_SUPPORT');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const toggled = (isEnabled: boolean, coinName, coinKey) => {
-    /* if coins exists in list of fungible token, update the visible property otherwise
-     add coin in list if coin is set to visible */
+  const toggled = (isEnabled: boolean, _coinName: string, coinKey: string) => {
+    const runeFt = runesList?.find((ft) => ft.principal === coinKey);
+    const sip10Ft = sip10List?.find((ft) => ft.principal === coinKey);
+    const brc20Ft = brc20List?.find((ft) => ft.principal === coinKey);
 
-    const coinToBeUpdated =
-      coinsList?.find((ft) => ft.principal === coinKey) ??
-      brcCoinsList?.find((ft) => ft.principal === coinKey);
-
-    if (coinToBeUpdated) {
-      coinToBeUpdated.visible = isEnabled;
-    } else if (isEnabled) {
-      const coinToBeAdded: FungibleToken = {
-        name: coinName,
-        visible: true,
-        principal: coinKey,
-        balance: '0',
-        total_sent: '',
-        total_received: '',
-        assetName: '',
-      };
-      if (selectedProtocol === Protocols.SIP_10) {
-        coinsList?.push(coinToBeAdded);
-      } else if (selectedProtocol === Protocols.BRC_20) {
-        brcCoinsList?.push(coinToBeAdded);
-      }
-    }
-
-    if (coinsList && selectedProtocol === Protocols.SIP_10) {
-      const modifiedCoinsList = [...coinsList];
-      dispatch(FetchUpdatedVisibleCoinListAction(modifiedCoinsList));
-    }
-
-    if (brcCoinsList && selectedProtocol === Protocols.BRC_20) {
-      const modifiedCoinsList = [...brcCoinsList];
-      dispatch(setBrcCoinsDataAction(modifiedCoinsList));
+    if (selectedProtocol === 'runes' && runeFt) {
+      dispatch(setRunesManageTokensAction({ principal: coinKey, isEnabled }));
+    } else if (selectedProtocol === 'stacks' && sip10Ft) {
+      dispatch(setSip10ManageTokensAction({ principal: coinKey, isEnabled }));
+    } else if (selectedProtocol === 'brc-20' && brc20Ft) {
+      dispatch(setBrc20ManageTokensAction({ principal: coinKey, isEnabled }));
     }
   };
 
-  const handleBackButtonClick = () => {
-    navigate('/');
-  };
+  const handleBackButtonClick = () => navigate('/');
 
-  const selectedCoins = selectedProtocol === Protocols.SIP_10 ? coins : brcCoinsList;
+  const getCoinsList = () => {
+    let coins: FungibleToken[];
+    let error: boolean;
+    switch (selectedProtocol) {
+      case 'stacks':
+        coins = (sip10List ?? []).map((ft) => ({
+          ...ft,
+          visible: sip10ManageTokens[ft.principal] ?? ft.visible,
+        }));
+        error = sip10Error;
+        break;
+      case 'brc-20':
+        coins = (brc20List ?? []).map((ft) => ({
+          ...ft,
+          visible: brc20ManageTokens[ft.principal] ?? ft.visible,
+        }));
+        error = brc20Error;
+        break;
+      case 'runes':
+        coins = (runesList ?? []).map((ft) => ({
+          ...ft,
+          visible: runesManageTokens[ft.principal] ?? ft.visible,
+        }));
+        error = runeError;
+        break;
+      default:
+        coins = [];
+        error = false;
+    }
+
+    if (error) return <ErrorsText>{t('FAILED_TO_FETCH')}</ErrorsText>;
+    return (
+      <>
+        {selectedProtocol === 'stacks' && <Stacks />}
+        {coins.map((coin: FungibleToken) => (
+          <CoinItem
+            id={coin.principal}
+            key={coin.principal}
+            name={coin.name}
+            image={coin.image}
+            ticker={coin.ticker}
+            disabled={false}
+            toggled={toggled}
+            enabled={coin.visible}
+          />
+        ))}
+        {!coins.length && <ErrorsText>{t('NO_COINS')}</ErrorsText>}
+      </>
+    );
+  };
 
   return (
     <>
@@ -169,36 +216,33 @@ function ManageTokens() {
           <FtInfoContainer>
             {selectedAccount?.stxAddress && (
               <Button
-                isSelected={selectedProtocol === Protocols.SIP_10}
-                onClick={() => setSelectedProtocol(Protocols.SIP_10)}
+                isSelected={selectedProtocol === 'stacks'}
+                onClick={() => setSelectedProtocol('stacks')}
               >
-                {Protocols.SIP_10}
+                SIP-10
               </Button>
             )}
             <Button
-              isSelected={selectedProtocol === Protocols.BRC_20}
-              onClick={() => setSelectedProtocol(Protocols.BRC_20)}
+              isSelected={selectedProtocol === 'brc-20'}
+              onClick={() => setSelectedProtocol('brc-20')}
             >
-              {Protocols.BRC_20}
+              BRC-20
+            </Button>
+            <Button
+              isSelected={selectedProtocol === 'runes'}
+              onClick={() => setSelectedProtocol('runes')}
+            >
+              RUNES
             </Button>
           </FtInfoContainer>
           <TokenContainer>
-            {selectedProtocol === Protocols.SIP_10 && <Stacks />}
-            {selectedCoins?.map((coin: FungibleToken | Coin) => {
-              const coinId = 'principal' in coin ? coin.principal : coin.contract;
-              return (
-                <CoinItem
-                  id={coinId}
-                  key={coinId}
-                  name={coin.name}
-                  image={coin.image}
-                  ticker={coin.ticker}
-                  disabled={false}
-                  toggled={toggled}
-                  enabled={coin.visible}
-                />
-              );
-            })}
+            {selectedProtocol === 'runes' && !showRunes ? (
+              <RunesContainer>
+                <RunesComingSoon src={runesComingSoon} />
+              </RunesContainer>
+            ) : (
+              getCoinsList()
+            )}
           </TokenContainer>
         </ScrollableContainer>
       </Container>

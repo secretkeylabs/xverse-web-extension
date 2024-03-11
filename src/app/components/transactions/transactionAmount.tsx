@@ -1,8 +1,9 @@
-import useWalletSelector from '@hooks/useWalletSelector';
+import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import {
   Brc20HistoryTransactionData,
   BtcTransactionData,
   FungibleToken,
+  FungibleTokenProtocol,
   microstacksToStx,
   satsToBtc,
   StxTransactionData,
@@ -15,18 +16,19 @@ import styled from 'styled-components';
 
 interface TransactionAmountProps {
   transaction: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData;
-  coin: CurrencyTypes;
+  currency: CurrencyTypes;
+  protocol?: FungibleTokenProtocol;
 }
 
 const TransactionValue = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
 }));
 
 export default function TransactionAmount(props: TransactionAmountProps): JSX.Element | null {
-  const { transaction, coin } = props;
-  const { coinsList } = useWalletSelector();
-  if (coin === 'STX' || coin === 'FT') {
+  const { transaction, currency, protocol } = props;
+  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  if (currency === 'STX' || (currency === 'FT' && protocol === 'stacks')) {
     if (transaction.txType === 'token_transfer') {
       const prefix = transaction.incoming ? '' : '-';
       return (
@@ -35,13 +37,16 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
           displayType="text"
           thousandSeparator
           prefix={prefix}
-          renderText={(value: string) => <TransactionValue>{`${value} ${coin}`}</TransactionValue>}
+          allowNegative={false}
+          renderText={(value: string) => (
+            <TransactionValue>{`${value} ${currency}`}</TransactionValue>
+          )}
         />
       );
     }
     if (transaction.txType === 'contract_call') {
       if (transaction.tokenType === 'fungible') {
-        const token = coinsList?.find(
+        const token = sip10CoinsList.find(
           (cn) => cn.principal === transaction.contractCall?.contract_id,
         );
         const prefix = transaction.incoming ? '' : '-';
@@ -51,6 +56,7 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
             displayType="text"
             thousandSeparator
             prefix={prefix}
+            allowNegative={false}
             renderText={(value: string) => (
               <TransactionValue>{`${value} ${getFtTicker(
                 token as FungibleToken,
@@ -60,7 +66,7 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
         );
       }
     }
-  } else if (coin === 'BTC') {
+  } else if (currency === 'BTC') {
     const btcTransaction = transaction as BtcTransactionData;
     const prefix = btcTransaction.incoming ? '' : '-';
     if (btcTransaction.isOrdinal && btcTransaction.txStatus === 'pending') {
@@ -72,14 +78,13 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
           value={satsToBtc(BigNumber(btcTransaction.amount)).toString()}
           displayType="text"
           thousandSeparator
-          prefix=""
-          renderText={(value: string) => (
-            <TransactionValue>{`${prefix}${value} BTC`}</TransactionValue>
-          )}
+          prefix={prefix}
+          allowNegative={false}
+          renderText={(value: string) => <TransactionValue>{`${value} BTC`}</TransactionValue>}
         />
       );
     }
-  } else if (coin === 'brc20') {
+  } else if (currency === 'FT' && protocol === 'brc-20') {
     const brc20Transaction = transaction as Brc20HistoryTransactionData;
     const prefix = brc20Transaction.incoming ? '' : '-';
     if (!new BigNumber(brc20Transaction.amount).isEqualTo(0)) {
@@ -88,9 +93,10 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
           value={BigNumber(brc20Transaction.amount).toString()}
           displayType="text"
           thousandSeparator
-          prefix=""
+          prefix={prefix}
+          allowNegative={false}
           renderText={(value: string) => (
-            <TransactionValue>{`${prefix}${value} ${brc20Transaction.ticker.toUpperCase()}`}</TransactionValue>
+            <TransactionValue>{`${value} ${brc20Transaction.ticker.toUpperCase()}`}</TransactionValue>
           )}
         />
       );

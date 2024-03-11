@@ -67,26 +67,23 @@ interface Props {
 
 function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer }: Props) {
   const { t } = useTranslation('translation');
-  const inscriptionQuery = useInscriptionDetails(ordinal.id);
+  const { data: ordinalData, isLoading: isQuerying } = useInscriptionDetails(ordinal.id);
 
-  const onClick = async () => {
-    if (inscriptionQuery && inscriptionQuery.data) {
-      await handleOrdinalTransfer(ordinal);
-    }
-  };
-
-  if (!inscriptionQuery.isLoading) {
+  if (!isQuerying && ordinalData) {
     return (
       <OrdinalCard>
         <OrdinalImageContainer>
-          <OrdinalImage isSmallImage withoutSizeIncrease ordinal={inscriptionQuery.data!} />
+          <OrdinalImage isSmallImage withoutSizeIncrease ordinal={ordinalData} />
         </OrdinalImageContainer>
         <ColumnContainer>
-          <TitleText>{`Inscription ${inscriptionQuery.data!.number}`}</TitleText>
+          <TitleText>{`Inscription ${ordinalData.number}`}</TitleText>
           <ValueText>Ordinal</ValueText>
         </ColumnContainer>
         <ButtonContainer>
-          <TransferButton onClick={onClick} disabled={disableTransfer}>
+          <TransferButton
+            onClick={() => handleOrdinalTransfer(ordinal)}
+            disabled={disableTransfer}
+          >
             {isLoading ? (
               <LoaderContainer>
                 <Spinner color="white" size={15} />

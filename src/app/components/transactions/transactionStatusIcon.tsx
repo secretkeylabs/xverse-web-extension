@@ -7,6 +7,7 @@ import SendIcon from '@assets/img/transactions/sent.svg';
 import {
   Brc20HistoryTransactionData,
   BtcTransactionData,
+  FungibleTokenProtocol,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
@@ -14,11 +15,12 @@ import { CurrencyTypes } from '@utils/constants';
 interface TransactionStatusIconPros {
   transaction: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData;
   currency: CurrencyTypes;
+  protocol?: FungibleTokenProtocol;
 }
 
 function TransactionStatusIcon(props: TransactionStatusIconPros) {
-  const { currency, transaction } = props;
-  if (currency === 'STX' || currency === 'FT') {
+  const { currency, transaction, protocol } = props;
+  if (currency === 'STX' || (currency === 'FT' && protocol === 'stacks')) {
     const tx = transaction as StxTransactionData;
     if (tx.txStatus === 'abort_by_response' || tx.txStatus === 'abort_by_post_condition') {
       return <img src={FailedIcon} alt="pending" />;
@@ -50,7 +52,7 @@ function TransactionStatusIcon(props: TransactionStatusIconPros) {
     }
     return <img src={SendIcon} alt="sent" />;
   }
-  if (currency === 'brc20') {
+  if (currency === 'FT' && protocol === 'brc-20') {
     const tx = transaction as Brc20HistoryTransactionData;
     if (tx.txStatus === 'pending') {
       return <img src={PendingIcon} alt="pending" />;

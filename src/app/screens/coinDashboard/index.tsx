@@ -2,9 +2,10 @@ import linkIcon from '@assets/img/linkIcon.svg';
 import CopyButton from '@components/copyButton';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
+import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { getExplorerUrl } from '@utils/helper';
 import { useState } from 'react';
@@ -108,11 +109,12 @@ export default function CoinDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const [showFtContractDetails, setShowFtContractDetails] = useState(false);
-  const { coin } = useParams();
+  const { currency } = useParams();
   const [searchParams] = useSearchParams();
-  const { coinsList, brcCoinsList } = useWalletSelector();
-  const ftAddress = searchParams.get('ft');
-  const brc20FtName = searchParams.get('brc20ft');
+  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
+  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
+  const ftKey = searchParams.get('ftKey');
 
   useBtcWalletData();
 
@@ -120,27 +122,22 @@ export default function CoinDashboard() {
     navigate(-1);
   };
 
-  const ft = coinsList?.find((ftCoin) => ftCoin.principal === ftAddress);
-  let brc20Ft: FungibleToken | undefined;
-  if (brc20FtName) {
-    brc20Ft = brcCoinsList?.find((brc20FtCoin) => brc20FtCoin.principal === brc20FtName);
-  }
+  const selectedFt =
+    sip10CoinsList.find((ft) => ft.principal === ftKey) ??
+    brc20CoinsList.find((ft) => ft.principal === ftKey) ??
+    runesCoinsList.find((ft) => ft.principal === ftKey);
 
-  const openContractDeployment = () => {
-    window.open(getExplorerUrl(ft?.principal as string), '_blank');
-  };
+  const protocol = selectedFt?.protocol;
 
-  const onContractClick = () => {
-    setShowFtContractDetails(true);
-  };
+  const openContractDeployment = () =>
+    window.open(getExplorerUrl(selectedFt?.principal as string), '_blank');
 
-  const handleCopyContractAddress = () => {
-    navigator.clipboard.writeText(ft?.principal as string);
-  };
+  const onContractClick = () => setShowFtContractDetails(true);
 
-  const onTransactionsClick = () => {
-    setShowFtContractDetails(false);
-  };
+  const handleCopyContractAddress = () =>
+    navigator.clipboard.writeText(selectedFt?.principal as string);
+
+  const onTransactionsClick = () => setShowFtContractDetails(false);
 
   const formatAddress = (addr: string): string =>
     addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
@@ -149,24 +146,34 @@ export default function CoinDashboard() {
     <>
       <TopRow onClick={handleBack} />
       <Container>
-        <CoinHeader coin={coin as CurrencyTypes} fungibleToken={ft || brc20Ft} />
-        {ft && (
+        <CoinHeader coin={currency as CurrencyTypes} fungibleToken={selectedFt} />
+        {protocol === 'stacks' && (
           <FtInfoContainer>
-            <Button isSelected={!showFtContractDetails} onClick={onTransactionsClick}>
+            <Button
+              disabled={!showFtContractDetails}
+              isSelected={!showFtContractDetails}
+              onClick={onTransactionsClick}
+            >
               {t('TRANSACTIONS')}
             </Button>
-            <Button onClick={onContractClick} isSelected={showFtContractDetails}>
+            <Button
+              disabled={showFtContractDetails}
+              onClick={onContractClick}
+              isSelected={showFtContractDetails}
+            >
               {t('CONTRACT')}
             </Button>
           </FtInfoContainer>
         )}
-        {ft && showFtContractDetails ? (
+        {protocol === 'stacks' && showFtContractDetails && (
           <TokenContractContainer>
             <h1>{t('FT_CONTRACT_PREFIX')}</h1>
             <ContractAddressCopyButton onClick={handleCopyContractAddress}>
-              <TokenContractAddress>{formatAddress(ft?.principal as string)}</TokenContractAddress>
+              <TokenContractAddress>
+                {formatAddress(selectedFt?.principal as string)}
+              </TokenContractAddress>
               <CopyButtonContainer>
-                <CopyButton text={ft?.principal as string} />
+                <CopyButton text={selectedFt?.principal as string} />
               </CopyButtonContainer>
             </ContractAddressCopyButton>
             <ContractDeploymentButton onClick={openContractDeployment}>
@@ -175,11 +182,12 @@ export default function CoinDashboard() {
               <ShareIcon src={linkIcon} alt="link" />
             </ContractDeploymentButton>
           </TokenContractContainer>
-        ) : (
+        )}
+        {protocol !== 'runes' && (
           <TransactionsHistoryList
-            coin={coin as CurrencyTypes}
-            txFilter={`${ft?.principal}::${ft?.assetName}`}
-            brc20Token={brc20FtName}
+            coin={currency as CurrencyTypes}
+            txFilter={`${selectedFt?.principal}::${selectedFt?.assetName}`}
+            brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
           />
         )}
       </Container>

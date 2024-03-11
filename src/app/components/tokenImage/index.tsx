@@ -1,89 +1,147 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stx_icon.svg';
-import BarLoader from '@components/barLoader';
+import StacksIcon from '@assets/img/nftDashboard/stacks_icon.svg';
+import OrdinalIcon from '@assets/img/transactions/ordinal.svg';
+import RunesIcon from '@assets/img/transactions/runes.svg';
+import { StyledBarLoader } from '@components/tilesSkeletonLoader';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
-import { LoaderSize } from '@utils/constants';
+import { CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import { useCallback } from 'react';
-import stc from 'string-to-color';
 import styled from 'styled-components';
 
 export interface TokenImageProps {
-  token?: string;
-  loading?: boolean;
+  currency?: CurrencyTypes;
   fungibleToken?: FungibleToken;
+  loading?: boolean;
   size?: number;
-  loaderSize?: LoaderSize;
   round?: boolean;
+  showProtocolIcon?: boolean;
 }
 
+const DEFAULT_SIZE = 40;
+
 const TickerImage = styled.img<{ size?: number }>((props) => ({
-  height: props.size ?? 44,
-  width: props.size ?? 44,
+  height: props.size ?? DEFAULT_SIZE,
+  width: props.size ?? DEFAULT_SIZE,
   borderRadius: '50%',
 }));
 
 const LoaderImageContainer = styled.div({
-  flex: 0.5,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 });
 
 const TickerIconContainer = styled.div<{ size?: number; round?: boolean }>((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: props.size ?? 44,
-  width: props.size ?? 44,
+  height: props.size ?? DEFAULT_SIZE,
+  width: props.size ?? DEFAULT_SIZE,
   borderRadius: '50%',
-  backgroundColor: props.color,
+  backgroundColor: props.theme.colors.white_400,
 }));
 
 const TickerIconText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.white_0,
+  ...props.theme.typography.body_bold_m,
+  color: props.theme.colors.elevation0,
   textAlign: 'center',
   wordBreak: 'break-all',
-  fontSize: 13,
+  fontSize: 11,
 }));
 
+const TickerProtocolContainer = styled.div({
+  position: 'relative',
+  alignSelf: 'center',
+  display: 'inline-flex',
+});
+
+const ProtocolIcon = styled.div<{ isSquare?: boolean }>((props) => ({
+  width: props.isSquare ? 18 : 22,
+  height: props.isSquare ? 18 : 22,
+  borderRadius: props.isSquare ? 0 : 22,
+  position: 'absolute',
+  right: props.isSquare ? -9 : -11,
+  bottom: -2,
+  backgroundColor: props.theme.colors.elevation1,
+  padding: 2,
+}));
+
+const ProtocolImage = styled.img({
+  height: '100%',
+  width: '100%',
+});
+
 export default function TokenImage({
-  token,
-  loading,
+  currency,
   fungibleToken,
+  loading,
   size,
-  loaderSize,
   round,
+  showProtocolIcon = true,
 }: TokenImageProps) {
-  const getCoinIcon = useCallback(() => {
-    if (token === 'STX') {
+  const ftProtocol = fungibleToken?.protocol;
+
+  const getCurrencyIcon = useCallback(() => {
+    if (currency === 'STX') {
       return IconStacks;
     }
-    if (token === 'BTC') {
+    if (currency === 'BTC') {
       return IconBitcoin;
     }
-  }, [token]);
+  }, [currency]);
 
-  if (fungibleToken) {
-    if (!loading) {
-      if (fungibleToken?.image) {
-        return <TickerImage size={size} src={fungibleToken.image} />;
-      }
-      let ticker = fungibleToken?.ticker;
-      if (!ticker && fungibleToken?.name) {
-        ticker = getTicker(fungibleToken?.name);
-      }
-      const background = stc(ticker);
-      ticker = ticker && ticker.substring(0, 4);
-      return (
-        <TickerIconContainer size={size} color={background} round={round}>
-          <TickerIconText>{ticker}</TickerIconText>
-        </TickerIconContainer>
-      );
+  const getProtocolIcon = () => {
+    if (!ftProtocol) {
+      return null;
     }
+    switch (ftProtocol) {
+      case 'stacks':
+        return <ProtocolImage src={StacksIcon} alt="stacks" />;
+      case 'brc-20':
+        return <ProtocolImage src={OrdinalIcon} alt="brc20" />;
+      case 'runes':
+        return <ProtocolImage src={RunesIcon} alt="runes" />;
+      default:
+        return null;
+    }
+  };
+
+  const renderIcon = () => {
+    if (!fungibleToken) {
+      return <TickerImage size={size} src={getCurrencyIcon()} />;
+    }
+    if (fungibleToken?.image) {
+      return <TickerImage size={size} src={fungibleToken.image} />;
+    }
+    const ticker = fungibleToken?.name
+      ? getTicker(fungibleToken.name)
+      : fungibleToken?.ticker || fungibleToken?.assetName || '';
+
     return (
-      <LoaderImageContainer>
-        <BarLoader loaderSize={loaderSize ?? LoaderSize.LARGE} />
-      </LoaderImageContainer>
+      <TickerIconContainer size={size} round={round}>
+        <TickerIconText>{ticker.substring(0, 4)}</TickerIconText>
+      </TickerIconContainer>
+    );
+  };
+
+  if (loading) {
+    return (
+      <TickerProtocolContainer>
+        <LoaderImageContainer>
+          <StyledBarLoader width={size ?? DEFAULT_SIZE} height={size ?? DEFAULT_SIZE} />
+        </LoaderImageContainer>
+      </TickerProtocolContainer>
     );
   }
-  return <TickerImage size={size} src={getCoinIcon()} />;
+
+  return (
+    <TickerProtocolContainer>
+      {renderIcon()}
+      {ftProtocol && showProtocolIcon && (
+        <ProtocolIcon isSquare={ftProtocol === 'runes'}>{getProtocolIcon()}</ProtocolIcon>
+      )}
+    </TickerProtocolContainer>
+  );
 }

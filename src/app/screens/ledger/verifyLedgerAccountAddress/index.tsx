@@ -69,7 +69,7 @@ function VerifyLedger(): JSX.Element {
   const transition = useTransition(currentStepIndex, DEFAULT_TRANSITION_OPTIONS);
 
   const isBitcoinSelected = currency === 'BTC';
-  const isOrdinalSelected = currency === 'ORD' || currency === 'brc-20';
+  const isOrdinalSelected = currency === 'ORD';
   const isStacksSelected = currency === 'STX';
 
   useResetUserFlow('/verify-ledger');
@@ -80,10 +80,7 @@ function VerifyLedger(): JSX.Element {
         return selectedAccount?.stxAddress || '';
       case 'BTC':
         return selectedAccount?.btcAddress || '';
-      case 'FT':
-        return selectedAccount?.stxAddress || '';
       case 'ORD':
-      case 'brc-20':
         return selectedAccount?.ordinalsAddress || '';
       default:
         return '';

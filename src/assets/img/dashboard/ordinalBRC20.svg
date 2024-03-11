@@ -1,19 +1,18 @@
-<svg width="44" height="24" viewBox="0 0 44 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_4661_151780)">
-<mask id="mask0_4661_151780" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="22" y="0" width="22" height="24">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M22 18.6356C23.2637 16.735 24 14.4535 24 12C24 9.54653 23.2637 7.26502 22 5.36441C24.1498 2.13102 27.8261 0 32 0C38.6274 0 44 5.37258 44 12C44 18.6274 38.6274 24 32 24C27.8261 24 24.1498 21.869 22 18.6356Z" fill="#D9D9D9"/>
+<svg width="64" height="24" viewBox="0 0 64 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="mask0_8067_221237" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="39" y="0" width="25" height="24">
+<rect x="39.9629" width="24" height="24" rx="12" fill="white" fill-opacity="0.1"/>
+<path d="M47.8379 12H56.0879" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M51.9629 7.875V16.125" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
 </mask>
-<g mask="url(#mask0_4661_151780)">
-<rect x="20" width="24" height="24" rx="12" fill="#3F4263"/>
-<path d="M27.875 12H36.125" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M32 7.875V16.125" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g mask="url(#mask0_8067_221237)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M45 21.7479C46.9702 23.1652 49.3876 24 52 24C58.6274 24 64 18.6274 64 12C64 5.37258 58.6274 0 52 0C49.3876 0 46.9702 0.834762 45 2.25209V21.7479Z" fill="#D9D9D9"/>
+</g>
+<mask id="mask1_8067_221237" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="19" y="0" width="24" height="24">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M19 23.4906C22.627 20.9607 25 16.7575 25 12C25 7.24251 22.627 3.03927 19 0.50938V0H43V24H19V23.4906Z" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask1_8067_221237)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M22.4411 2.49339H41.5066V21.5589H22.4411V2.49339ZM20.9478 1.00006H22.4411H41.5066H42.9999V2.49339V21.5589V23.0522H41.5066H22.4411H20.9478V21.5589V2.49339V1.00006ZM36.9999 7.0262H27V17.0261H36.9999V7.0262Z" fill="white"/>
 </g>
 <circle cx="12" cy="12" r="11.25" stroke="white" stroke-width="1.5"/>
-<ellipse cx="12.0022" cy="12" rx="7" ry="7" fill="white"/>
-</g>
-<defs>
-<clipPath id="clip0_4661_151780">
-<rect width="44" height="24" fill="white"/>
-</clipPath>
-</defs>
+<circle cx="12" cy="12" r="6" fill="white"/>
 </svg>

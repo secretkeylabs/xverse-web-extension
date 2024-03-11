@@ -16,7 +16,7 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAlexSponsoredTransaction } from '../useAlexSponsoredTransaction';
-import { useCurrencyConversion } from '../useCurrencyConversion';
+import { useStxCurrencyConversion } from '../useStxCurrencyConversion';
 
 export type SwapConfirmationInput = {
   from: Currency;
@@ -48,7 +48,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
   const { isSponsored, sponsorTransaction, isSponsorDisabled } = useAlexSponsoredTransaction(
     input.userOverrideSponsorValue,
   );
-  const { currencyToToken } = useCurrencyConversion();
+  const { currencyToToken } = useStxCurrencyConversion();
   const { getSeed } = useSeedVault();
   const navigate = useNavigate();
   const [unsignedTx, setUnsignedTx] = useState<StacksTransaction>(

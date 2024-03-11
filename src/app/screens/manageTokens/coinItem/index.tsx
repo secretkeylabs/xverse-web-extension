@@ -1,7 +1,7 @@
-import { getTicker } from '@utils/helper';
+import TokenImage from '@components/tokenImage';
+import { FungibleToken } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import Switch from 'react-switch';
-import stc from 'string-to-color';
 import styled from 'styled-components';
 import Theme from 'theme';
 
@@ -19,14 +19,6 @@ const CoinContainer = styled.div({
   alignItems: 'center',
 });
 
-const CoinIcon = styled.img((props) => ({
-  marginRight: props.theme.spacing(7),
-  width: 32,
-  height: 32,
-  resizeMode: 'stretch',
-  borderRadius: '50%',
-}));
-
 const CustomSwitch = styled(Switch)`
   .react-switch-handle {
     background-color: ${({ checked }) =>
@@ -35,37 +27,11 @@ const CustomSwitch = styled(Switch)`
   }
 `;
 
-const TickerIconContainer = styled.div((props) => ({
-  display: 'flex',
-  marginRight: props.theme.spacing(7),
-  height: '32px',
-  width: '32px',
-  borderRadius: props.theme.radius(3),
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: props.color,
-  flexShrink: 0,
-}));
-
-const TickerText = styled.h1((props) => ({
-  ...props.theme.typography.body_s,
-  color: props.theme.colors.white_0,
+const CoinTitleText = styled.p<{ isEnabled?: boolean }>((props) => ({
+  ...props.theme.typography[props.isEnabled ? 'body_bold_m' : 'body_m'],
+  color: props.theme.colors[props.isEnabled ? 'white_0' : 'white_400'],
   textAlign: 'center',
-  wordBreak: 'break-all',
-  fontSize: 10,
-  width: '100%',
-}));
-
-const SelectedCoinTitleText = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const UnSelectedCoinTitleText = styled.h1((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_400,
-  textAlign: 'center',
+  marginLeft: props.theme.space.m,
 }));
 
 interface Props {
@@ -73,38 +39,24 @@ interface Props {
   name: string;
   image?: string;
   ticker?: string;
+  protocol?: string;
   disabled: boolean;
   toggled(enabled: boolean, coinName: string, coinKey: string): void;
   enabled?: boolean;
 }
 
-function CoinItem({ id, name, image, ticker, disabled, toggled, enabled }: Props) {
+function CoinItem({ id, name, image, ticker, protocol, disabled, toggled, enabled }: Props) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const toggleSwitch = () => {
     setIsEnabled((previousState) => !previousState);
     toggled(!isEnabled, name, id);
   };
 
-  function getTickerName() {
-    return !ticker && name ? getTicker(name) : ticker;
-  }
-  const background = stc(getTickerName());
-
   return (
     <RowContainer>
       <CoinContainer>
-        {image ? (
-          <CoinIcon src={image} />
-        ) : (
-          <TickerIconContainer color={background}>
-            <TickerText>{getTickerName()}</TickerText>
-          </TickerIconContainer>
-        )}
-        {isEnabled ? (
-          <SelectedCoinTitleText>{name}</SelectedCoinTitleText>
-        ) : (
-          <UnSelectedCoinTitleText>{name}</UnSelectedCoinTitleText>
-        )}
+        <TokenImage fungibleToken={{ name, ticker, image, protocol } as FungibleToken} size={32} />
+        <CoinTitleText isEnabled={isEnabled}>{name}</CoinTitleText>
       </CoinContainer>
       <CustomSwitch
         onColor={Theme.colors.tangerine}

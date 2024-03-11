@@ -87,7 +87,7 @@ function ConfirmFtTransaction() {
   };
 
   const handleBackButtonClick = () => {
-    navigate('/send-ft', {
+    navigate('/send-sip10', {
       state: {
         recipientAddress: recepientAddress,
         amountToSend: amount.toString(),

@@ -19,13 +19,13 @@ import Brc20Tile from '@screens/ordinals/brc20Tile';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import {
   BtcTransactionBroadcastResponse,
-  getBtcFiatEquivalent,
-  parseOrdinalTextContentData,
   Recipient,
   ResponseError,
+  SignedBtcTx,
+  getBtcFiatEquivalent,
+  parseOrdinalTextContentData,
   satsToBtc,
   signBtcTransaction,
-  SignedBtcTx,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
@@ -224,7 +224,7 @@ function ConfirmInscriptionRequest() {
   };
 
   const onClick = () => {
-    navigate('/recover-ordinals');
+    navigate('/restore-ordinals');
   };
 
   useEffect(() => {

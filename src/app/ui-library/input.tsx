@@ -13,6 +13,8 @@ const TitleContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: flex-end;
+  gap: ${(props) => props.theme.space.l};
   margin-bottom: ${(props) => props.theme.space.xs};
 `;
 
@@ -24,6 +26,7 @@ const Title = styled.div`
 const InfoText = styled.div`
   ${(props) => props.theme.typography.body_medium_m}
   color: ${(props) => props.theme.colors.white_0};
+  overflow: hidden;
 `;
 
 const InputContainer = styled.div`
@@ -137,7 +140,6 @@ const ClearButton = styled.div<{ $hasSiblings?: boolean }>`
 const SubText = styled.div`
   color: ${(props) => props.theme.colors.white_400};
   margin-top: ${(props) => props.theme.spacing(4)}px;
-
   ${(props) => props.theme.typography.body_s}
 `;
 
@@ -257,3 +259,54 @@ function Input({
 }
 
 export default Input;
+
+// some complications that can be used with the input
+export const ConvertComplication = styled.button`
+  ${(props) => props.theme.typography.body_medium_s}
+  user-select: none;
+
+  display: flex;
+  align-items: center;
+  gap: ${(props) => props.theme.space.xs};
+
+  cursor: pointer;
+  background-color: transparent;
+  color: ${(props) => props.theme.colors.white_200};
+
+  &:hover:enabled {
+    color: ${(props) => props.theme.colors.white_400};
+  }
+
+  &:disabled {
+    color: ${(props) => props.theme.colors.white_600};
+    cursor: not-allowed;
+  }
+`;
+
+export const VertRule = styled.div`
+  width: 1px;
+  height: 16px;
+  background-color: ${(props) => props.theme.colors.white_800};
+  margin: 0 8px;
+`;
+
+export const MaxButton = styled.button<{ $sendMax: boolean }>`
+  ${(props) => props.theme.typography.body_medium_m}
+  user-select: none;
+  margin-right: ${(props) => props.theme.space.xxs};
+
+  cursor: pointer;
+  background-color: transparent;
+  color: ${(props) => props.theme.colors.tangerine};
+
+  ${(props) => props.$sendMax && `color: ${props.theme.colors.tangerine_400};`}
+
+  &:hover:enabled {
+    color: ${(props) => props.theme.colors.tangerine_400};
+  }
+
+  &:disabled {
+    color: ${(props) => props.theme.colors.tangerine_dark};
+    cursor: not-allowed;
+  }
+`;

@@ -4,7 +4,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import AssetModal from '@components/assetModal';
 import TransferFeeView from '@components/transferFeeView';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
-import { btcTransaction, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { btcTransaction, FungibleToken, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Callout from '@ui-library/callout';
 import { BLOG_LINK } from '@utils/constants';
@@ -38,10 +38,12 @@ const UnconfirmedInputCallout = styled(Callout)`
 
 type Props = {
   isPartialTransaction: boolean;
-
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
+  token?: FungibleToken;
+  amountToSend?: string;
+  recipientAddress?: string;
   getFeeForFeeRate?: (
     feeRate: number,
     useEffectiveFeeRate?: boolean,
@@ -52,10 +54,13 @@ type Props = {
 };
 
 function TransactionSummary({
+  isPartialTransaction,
   inputs,
   outputs,
   feeOutput,
-  isPartialTransaction,
+  token,
+  amountToSend,
+  recipientAddress,
   isSubmitting,
   getFeeForFeeRate,
   onFeeRateSet,
@@ -104,6 +109,9 @@ function TransactionSummary({
 
   const showFeeSelector = !!(feeRate && getFeeForFeeRate && onFeeRateSet);
 
+  // TODO - TEMP SOLUTION - we should detect this via the txContext (input/outputs) for proper PSBT support (v2)
+  const isRuneTransaction = token && token.protocol === 'runes' && amountToSend && recipientAddress;
+
   return (
     <>
       {inscriptionToShow && (
@@ -125,31 +133,27 @@ function TransactionSummary({
           anchorRedirect={`${BLOG_LINK}/rare-satoshis`}
         />
       )}
-
       {isUnConfirmedInput && (
         <UnconfirmedInputCallout bodyText={t('UNCONFIRMED_UTXO_WARNING')} variant="warning" />
       )}
-
       <TransferSection
         outputs={outputs}
         inputs={inputs}
         isPartialTransaction={isPartialTransaction}
+        token={token}
+        amountToSend={amountToSend}
+        recipientAddress={recipientAddress}
         onShowInscription={setInscriptionToShow}
         netAmount={-netAmount}
       />
-
       <ReceiveSection
         outputs={outputs}
         onShowInscription={setInscriptionToShow}
         netAmount={netAmount}
       />
-
       <TxInOutput inputs={inputs} outputs={outputs} />
-
-      {hasOutputScript && <ScriptCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
-
+      {!isRuneTransaction && hasOutputScript && <ScriptCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
       <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
-
       {feeOutput && !showFeeSelector && (
         <TransferFeeView
           fee={new BigNumber(feeOutput.amount)}

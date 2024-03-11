@@ -132,22 +132,15 @@ function RecipientComponent({
   const { stxBtcRate, btcFiatRate, fiatCurrency, ordinalsAddress } = useWalletSelector();
 
   useEffect(() => {
-    let amountInCurrency;
-    if (currencyType === 'FT') {
-      amountInCurrency = new BigNumber(value).multipliedBy(fungibleToken?.tokenFiatRate!);
-      if (amountInCurrency.isLessThan(0.01)) {
-        amountInCurrency = '0.01';
-      }
-    } else {
-      amountInCurrency = getFiatEquivalent(
+    setFiatAmount(
+      getFiatEquivalent(
         Number(value),
         currencyType,
         BigNumber(stxBtcRate),
         BigNumber(btcFiatRate),
         fungibleToken,
-      );
-    }
-    setFiatAmount(amountInCurrency);
+      ),
+    );
   }, [value]);
 
   function getFtTicker() {
@@ -193,7 +186,12 @@ function RecipientComponent({
 
     return (
       <TokenContainer>
-        <TokenImage token={currencyType} loading={false} size={32} fungibleToken={fungibleToken} />
+        <TokenImage
+          currency={currencyType}
+          loading={false}
+          size={32}
+          fungibleToken={fungibleToken}
+        />
       </TokenContainer>
     );
   };
