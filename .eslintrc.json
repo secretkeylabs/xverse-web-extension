@@ -50,7 +50,8 @@
       }
     ],
     "no-plusplus": "off",
-    "@tanstack/query/exhaustive-deps": 1
+    "@tanstack/query/exhaustive-deps": 1,
+    "import/order": 0
   },
   "settings": {
     "import/resolver": {
