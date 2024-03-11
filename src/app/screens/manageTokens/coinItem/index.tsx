@@ -32,6 +32,12 @@ const CoinTitleText = styled.p<{ isEnabled?: boolean }>((props) => ({
   color: props.theme.colors[props.isEnabled ? 'white_0' : 'white_400'],
   textAlign: 'left',
   marginLeft: props.theme.space.m,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  maxWidth: '200px',
+  display: '-webkit-box',
+  WebkitLineClamp: 1,
+  WebkitBoxOrient: 'vertical',
 }));
 
 interface Props {
