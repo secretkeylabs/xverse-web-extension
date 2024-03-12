@@ -5,7 +5,7 @@ import { MIX_PANEL_TOKEN } from './constants';
 
 export const isMixPanelInited = () => !!MIX_PANEL_TOKEN && !!mixpanelInstance.config;
 export const isMixPanelExploreAppInited = () =>
-  !!MIX_PANEL_TOKEN && !!mixpanelInstanceExploreApp.config;
+  !!MIX_PANEL_TOKEN_EXPLORE_APP && !!mixpanelInstanceExploreApp.config;
 
 export const trackMixPanel = (event: string, properties?: any, options?: any, callback?: any) => {
   if (!isMixPanelInited()) {
