@@ -1,7 +1,7 @@
 import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import { mixpanelInstance, mixpanelInstanceExploreApp } from 'app/mixpanelSetup';
 import { sha256 } from 'js-sha256';
-import { MIX_PANEL_TOKEN } from './constants';
+import { MIX_PANEL_TOKEN, MIX_PANEL_TOKEN_EXPLORE_APP } from './constants';
 
 export const isMixPanelInited = () => !!MIX_PANEL_TOKEN && !!mixpanelInstance.config;
 export const isMixPanelExploreAppInited = () =>
