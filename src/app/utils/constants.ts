@@ -21,7 +21,7 @@ export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;
 export const MOON_PAY_URL = 'https://buy.moonpay.com';
 export const MOON_PAY_API_KEY = process.env.MOON_PAY_API_KEY;
 export const MIX_PANEL_TOKEN = process.env.MIX_PANEL_TOKEN;
-export const MIX_PANEL_TOKEN_EXPLORE_APP = process.env.MIX_PANEL_TOKEN_EXPLORE_APP;
+export const MIX_PANEL_EXPLORE_APP_TOKEN = process.env.MIX_PANEL_EXPLORE_APP_TOKEN;
 
 export type CurrencyTypes =
   | 'STX'

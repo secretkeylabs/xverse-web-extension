@@ -1,4 +1,4 @@
-import { mixpanelInstanceExploreApp } from 'app/mixpanelSetup';
+import { trackMixPanel } from '@utils/mixpanel';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -46,12 +46,18 @@ function RecommendedApps({ items }: Props) {
       {items.map((item) => (
         <Card
           onClick={() => {
-            mixpanelInstanceExploreApp.track('click_app', {
-              title: item.name,
-              link: item.url,
-              section: 'recommended',
-              source: 'web-extension',
-            });
+            trackMixPanel(
+              'click_app',
+              {
+                title: item.name,
+                link: item.url,
+                section: 'recommended',
+                source: 'web-extension',
+              },
+              undefined,
+              undefined,
+              'explore-app',
+            );
           }}
           to={item.url}
           key={item.url}

@@ -13,7 +13,6 @@ import '../locales';
 import Theme from '../theme';
 import GlobalStyle from '../theme/global';
 import SessionGuard from './components/guards/session';
-import './mixpanelSetup';
 import router from './routes';
 
 // needed to keep the svg icon scale for toasts over multiple lines

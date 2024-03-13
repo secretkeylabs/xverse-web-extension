@@ -1,4 +1,4 @@
-import { trackMixPanelExploreApp } from '@utils/mixpanel';
+import { trackMixPanel } from '@utils/mixpanel';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -38,11 +38,17 @@ function FeaturedCard({ url, banner, description }: FeaturedCardProps) {
   return (
     <Card
       onClick={() => {
-        trackMixPanelExploreApp('click_app', {
-          link: url,
-          section: 'featured',
-          source: 'web-extension',
-        });
+        trackMixPanel(
+          'click_app',
+          {
+            link: url,
+            section: 'featured',
+            source: 'web-extension',
+          },
+          undefined,
+          undefined,
+          'explore-app',
+        );
       }}
       to={url}
       target="_blank"

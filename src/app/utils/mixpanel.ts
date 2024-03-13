@@ -1,35 +1,26 @@
 import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
-import { mixpanelInstance, mixpanelInstanceExploreApp } from 'app/mixpanelSetup';
+import { getMixpanelInstance, mixpanelInstances } from 'app/mixpanelSetup';
 import { sha256 } from 'js-sha256';
-import { MIX_PANEL_TOKEN, MIX_PANEL_TOKEN_EXPLORE_APP } from './constants';
 
-export const isMixPanelInited = () => !!MIX_PANEL_TOKEN && !!mixpanelInstance.config;
-export const isMixPanelExploreAppInited = () =>
-  !!MIX_PANEL_TOKEN_EXPLORE_APP && !!mixpanelInstanceExploreApp.config;
-
-export const trackMixPanel = (event: string, properties?: any, options?: any, callback?: any) => {
-  if (!isMixPanelInited()) {
-    return;
-  }
-
-  mixpanelInstance.track(event, properties, options, callback);
-};
-
-export const trackMixPanelExploreApp = (
+export const trackMixPanel = (
   event: string,
   properties?: any,
   options?: any,
   callback?: any,
+  instanceKey: keyof typeof mixpanelInstances = 'web-extension',
 ) => {
-  if (!isMixPanelExploreAppInited()) {
+  const instance = getMixpanelInstance(instanceKey);
+  if (!instance) {
     return;
   }
 
-  mixpanelInstanceExploreApp.track(event, properties, options, callback);
+  instance.track(event, properties, options, callback);
 };
 
 export const optOutMixPanel = () => {
-  if (!isMixPanelInited()) {
+  const mixpanelInstance = getMixpanelInstance('web-extension');
+  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
+  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
     return;
   }
 
@@ -40,7 +31,9 @@ export const optOutMixPanel = () => {
 };
 
 export const optInMixPanel = (masterPubKey?: string) => {
-  if (!isMixPanelInited() || !isMixPanelExploreAppInited()) {
+  const mixpanelInstance = getMixpanelInstance('web-extension');
+  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
+  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
     return;
   }
 
@@ -53,8 +46,10 @@ export const optInMixPanel = (masterPubKey?: string) => {
 };
 
 export const hasOptedInMixPanelTracking = async () => {
-  if (!isMixPanelInited() || !isMixPanelExploreAppInited()) {
-    return false;
+  const mixpanelInstance = getMixpanelInstance('web-extension');
+  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
+  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
+    return;
   }
 
   const hasOptedIn =
@@ -64,7 +59,9 @@ export const hasOptedInMixPanelTracking = async () => {
 };
 
 export const resetMixPanel = () => {
-  if (!isMixPanelInited() || !isMixPanelExploreAppInited()) {
+  const mixpanelInstance = getMixpanelInstance('web-extension');
+  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
+  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
     return;
   }
 
