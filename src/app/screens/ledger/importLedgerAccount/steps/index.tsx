@@ -149,6 +149,7 @@ function Steps({
               id="stx_select_card"
               isChecked={isStacksSelected}
               onChange={handleAssetSelect}
+              squareIcon
             />
             <SelectAssetFootNote>{t('LEDGER_IMPORT_2_FOOTNOTE')}</SelectAssetFootNote>
           </ImportCardContainer>
