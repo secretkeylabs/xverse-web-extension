@@ -95,4 +95,7 @@ function UpdatedBottomModal({
   );
 }
 
+/**
+ * @deprecated use @ui-library/sheet
+ */
 export default UpdatedBottomModal;

@@ -11,12 +11,7 @@ import { NumericFormat } from 'react-number-format';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-interface TileProps {
-  margin?: number;
-  inModel: boolean;
-}
-
-const TileContainer = styled.button<TileProps>((props) => ({
+const TileContainer = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   backgroundColor: props.color,
@@ -24,9 +19,9 @@ const TileContainer = styled.button<TileProps>((props) => ({
   paddingLeft: props.theme.spacing(8),
   paddingRight: props.theme.spacing(8),
   paddingTop: props.theme.spacing(7.25),
-  paddingBottom: props.margin ?? props.theme.spacing(7.25),
+  paddingBottom: props.theme.spacing(7.25),
   borderRadius: props.theme.radius(2),
-  marginBottom: props.inModel ? props.theme.spacing(0) : props.theme.spacing(6),
+  marginBottom: props.theme.spacing(0),
 }));
 
 const RowContainer = styled.div({
@@ -62,8 +57,8 @@ const CoinTickerText = styled.p((props) => ({
 }));
 
 const SubText = styled.p((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white_400,
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
   fontSize: 12,
   textAlign: 'left',
   maxWidth: 100,
@@ -105,24 +100,22 @@ function TokenLoader() {
 
 interface Props {
   title: string;
-  underlayColor: string;
   loading: boolean;
-  margin?: number;
   currency: CurrencyTypes;
   onPress: (coin: CurrencyTypes, ftKey: string | undefined) => void;
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
+  className?: string;
 }
 
 function TokenTile({
   title,
-  underlayColor,
   loading,
-  margin,
   currency,
   onPress,
   fungibleToken,
   enlargeTicker = false,
+  className,
 }: Props) {
   const { fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate } = useSelector(
     (state: StoreState) => state.walletState,
@@ -165,12 +158,7 @@ function TokenTile({
   const handleTokenPressed = () => onPress(currency, fungibleToken?.principal);
 
   return (
-    <TileContainer
-      inModel={enlargeTicker}
-      color={underlayColor}
-      margin={margin}
-      onClick={handleTokenPressed}
-    >
+    <TileContainer onClick={handleTokenPressed} className={className}>
       <RowContainer>
         <TokenImage
           currency={currency}
