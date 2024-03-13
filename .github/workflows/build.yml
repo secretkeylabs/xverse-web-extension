@@ -36,6 +36,7 @@ jobs:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
           MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
+          MIX_PANEL_TOKEN_EXPLORE_APP: ${{ secrets.MIX_PANEL_TOKEN_EXPLORE_APP }}
         run: npm run build --if-present
       - name: Save Filename
         run: |
