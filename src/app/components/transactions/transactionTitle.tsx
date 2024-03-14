@@ -1,4 +1,4 @@
-import useWalletSelector from '@hooks/useWalletSelector';
+import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import {
   Brc20HistoryTransactionData,
   BtcTransactionData,
@@ -14,7 +14,7 @@ interface TransactionTitleProps {
 }
 
 const TransactionTitleText = styled.p((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_0,
   textAlign: 'left',
 }));
@@ -22,7 +22,7 @@ const TransactionTitleText = styled.p((props) => ({
 export default function TransactionTitle(props: TransactionTitleProps) {
   const { transaction } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const { coins } = useWalletSelector();
+  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const isPending = transaction.txStatus === 'pending';
 
   const getTokenTransferTitle = (tx: TransactionData): string => {
@@ -61,8 +61,8 @@ export default function TransactionTitle(props: TransactionTitleProps) {
   };
 
   const getFtName = (tx: TransactionData): string => {
-    const coinDisplayName = coins?.find(
-      (coin) => coin.contract === tx.contractCall?.contract_id,
+    const coinDisplayName = sip10CoinsList.find(
+      (coin) => coin.principal === tx.contractCall?.contract_id,
     )?.name;
 
     return coinDisplayName ?? '';

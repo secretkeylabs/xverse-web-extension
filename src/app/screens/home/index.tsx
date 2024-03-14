@@ -1,41 +1,41 @@
 import dashboardIcon from '@assets/img/dashboard-icon.svg';
 import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
-import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
-import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
-import ActionButton from '@components/button';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomBar from '@components/tabBar';
 import TokenTile from '@components/tokenTile';
-import UpdatedBottomModal from '@components/updatedBottomModal';
+import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
+import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAppConfig from '@hooks/queries/useAppConfig';
-import useBtcCoinBalance from '@hooks/queries/useBtcCoinsBalance';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinsData from '@hooks/queries/useCoinData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useHasFeature from '@hooks/useHasFeature';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import Button from '@ui-library/button';
+import Sheet from '@ui-library/sheet';
 import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import Theme from 'theme';
 import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
 
@@ -52,7 +52,9 @@ const ColumnContainer = styled.div((props) => ({
   flexDirection: 'column',
   alignItems: 'space-between',
   justifyContent: 'space-between',
-  marginTop: props.theme.spacing(12),
+  gap: props.theme.space.s,
+  marginTop: props.theme.space.l,
+  marginBottom: props.theme.space.s,
 }));
 
 const ReceiveContainer = styled.div((props) => ({
@@ -60,19 +62,10 @@ const ReceiveContainer = styled.div((props) => ({
   flexDirection: 'column',
   marginTop: props.theme.spacing(12),
   marginBottom: props.theme.spacing(16),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
   gap: props.theme.space.m,
 }));
 
-const CoinContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'space-between',
-  justifyContent: 'space-between',
-});
-
-const Button = styled.button((props) => ({
+const TokenListButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'flex-end',
@@ -85,7 +78,7 @@ const Button = styled.button((props) => ({
 }));
 
 const ButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.typography.body_s,
   fontWeight: 700,
   color: props.theme.colors.white_0,
   textAlign: 'center',
@@ -112,6 +105,10 @@ const TokenListButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(22),
 }));
 
+const StyledTokenTile = styled(TokenTile)`
+  background-color: ${(props) => props.theme.colors.elevation1};
+`;
+
 const Icon = styled.img({
   width: 24,
   height: 24,
@@ -119,11 +116,15 @@ const Icon = styled.img({
 
 const MergedIcon = styled.img({
   width: 40,
-  height: 40,
+  height: 24,
+});
+
+const MergedOrdinalsIcon = styled.img({
+  width: 64,
+  height: 24,
 });
 
 const VerifyOrViewContainer = styled.div((props) => ({
-  margin: props.theme.spacing(8),
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(20),
 }));
@@ -153,7 +154,7 @@ const ModalTitle = styled.div((props) => ({
 
 const ModalDescription = styled.div((props) => ({
   ...props.theme.typography.body_m,
-  color: props.theme.colors.white['200'],
+  color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(16),
   textAlign: 'center',
 }));
@@ -183,12 +184,10 @@ function Home() {
   const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const {
-    coinsList,
     stxAddress,
     btcAddress,
     ordinalsAddress,
     selectedAccount,
-    brcCoinsList,
     showBtcReceiveAlert,
     showOrdinalReceiveAlert,
     showDataCollectionAlert,
@@ -204,9 +203,21 @@ function Home() {
     stxAddress ? useStxWalletData() : { isLoading: false, isRefetching: false };
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
     useBtcWalletData();
-  const { isLoading: loadingCoinData, isRefetching: refetchingCoinData } = useCoinsData();
-  const { isLoading: loadingBtcCoinData, isRefetching: refetchingBtcCoinData } =
-    useBtcCoinBalance();
+  const {
+    visible: sip10CoinsList,
+    isLoading: loadingStxCoinData,
+    isRefetching: refetchingStxCoinData,
+  } = useVisibleSip10FungibleTokens();
+  const {
+    visible: brc20CoinsList,
+    isLoading: loadingBtcCoinData,
+    isRefetching: refetchingBtcCoinData,
+  } = useVisibleBrc20FungibleTokens();
+  const {
+    visible: runesCoinsList,
+    isLoading: loadingRunesData,
+    isRefetching: refetchingRunesData,
+  } = useVisibleRuneFungibleTokens();
   useFeeMultipliers();
   useCoinRates();
   useAppConfig();
@@ -240,10 +251,10 @@ function Home() {
     setOpenBuyModal(false);
   };
 
-  function getCoinsList() {
-    const list = coinsList ? coinsList?.filter((ft) => ft.visible) : [];
-    return brcCoinsList ? list.concat(brcCoinsList) : list;
-  }
+  const sendSheetCoinsList = (stxAddress ? sip10CoinsList : [])
+    .concat(brc20CoinsList)
+    .concat(runesCoinsList)
+    .filter((ft) => new BigNumber(ft.balance).gt(0));
 
   const handleManageTokenListOnClick = () => {
     navigate('/manage-tokens');
@@ -277,37 +288,49 @@ function Home() {
     navigate('/receive/STX');
   };
 
-  const onSendFtSelect = async (coin: FungibleToken) => {
-    if (coin.protocol === 'brc-20') {
-      if (isLedgerAccount(selectedAccount)) {
-        if (!isInOptions()) {
-          await chrome.tabs.create({
-            // TODO replace with send-brc20-one-step route, when ledger support is ready
-            url: chrome.runtime.getURL(`options.html#/send-brc20?coinName=${coin.name}`),
-          });
-          return;
-        }
-        navigate(`send-brc20?coinName=${coin.name}`);
+  const onSendFtSelect = async (fungibleToken: FungibleToken) => {
+    if (fungibleToken.protocol === 'brc-20') {
+      if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+        await chrome.tabs.create({
+          // TODO replace with send-brc20-one-step route, when ledger support is ready
+          url: chrome.runtime.getURL(`options.html#/send-brc20?coinTicker=${fungibleToken.ticker}`),
+        });
         return;
       }
-      navigate('send-brc20-one-step', {
+      navigate('/send-brc20-one-step', {
         state: {
-          fungibleToken: coin,
+          fungibleToken,
         },
       });
       return;
     }
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
-      await chrome.tabs.create({
-        url: chrome.runtime.getURL(`options.html#/send-ft?coinTicker=${coin.ticker}`),
+    if (fungibleToken.protocol === 'stacks') {
+      if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+        await chrome.tabs.create({
+          // TODO - check why use coin ticker when its kinda risky? shouldnt fungibalToken.principal be the main identifier?
+          url: chrome.runtime.getURL(`options.html#/send-sip10?coinTicker=${fungibleToken.ticker}`),
+        });
+        return;
+      }
+      navigate('/send-sip10', {
+        state: {
+          fungibleToken,
+        },
       });
-      return;
     }
-    navigate('send-ft', {
-      state: {
-        fungibleToken: coin,
-      },
-    });
+    if (fungibleToken.protocol === 'runes') {
+      if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+        await chrome.tabs.create({
+          url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken.ticker}`),
+        });
+        return;
+      }
+      navigate('/send-rune', {
+        state: {
+          fungibleToken,
+        },
+      });
+    }
   };
 
   const onBuyStxClick = () => {
@@ -334,15 +357,11 @@ function Home() {
     if (showBtcReceiveAlert) setIsBtcReceiveAlertVisible(true);
   };
 
-  const handleTokenPressed = (token: {
-    coin: CurrencyTypes;
-    ft: string | undefined;
-    brc20Ft?: string;
-  }) => {
-    if (token.brc20Ft) {
-      navigate(`/coinDashboard/${token.coin}?brc20ft=${token.brc20Ft}`);
+  const handleTokenPressed = (currency: CurrencyTypes, ftKey?: string) => {
+    if (ftKey) {
+      navigate(`/coinDashboard/${currency}?ftKey=${ftKey}`);
     } else {
-      navigate(`/coinDashboard/${token.coin}?ft=${token.ft}`);
+      navigate(`/coinDashboard/${currency}`);
     }
   };
 
@@ -368,14 +387,14 @@ function Home() {
       </ReceiveCardComponent>
 
       <ReceiveCardComponent
-        title={t('ORDINALS')}
+        title={t('ORDINALS_AND_BRC20')}
         address={ordinalsAddress}
         onQrAddressClick={onOrdinalsReceivePress}
         onCopyAddressClick={onOrdinalReceiveAlertOpen}
         showVerifyButton={choseToVerifyAddresses}
         currency="ORD"
       >
-        <MergedIcon src={ordinalsIcon} />
+        <MergedOrdinalsIcon src={ordinalsIcon} />
       </ReceiveCardComponent>
 
       {stxAddress && (
@@ -391,11 +410,11 @@ function Home() {
       )}
 
       {isLedgerAccount(selectedAccount) && !stxAddress && (
-        <ActionButton
-          transparent
-          icon={<Plus color="white" size={20} />}
-          text={t('ADD_STACKS_ADDRESS')}
-          onPress={async () => {
+        <Button
+          variant="secondary"
+          icon={<Plus color="white" size={16} />}
+          title={t('ADD_STACKS_ADDRESS')}
+          onClick={async () => {
             if (!isInOptions()) {
               await chrome.tabs.create({
                 url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
@@ -412,18 +431,18 @@ function Home() {
   const verifyOrViewAddresses = (
     <VerifyOrViewContainer>
       <VerifyButtonContainer>
-        <ActionButton
-          text={t('VERIFY_ADDRESSES_ON_LEDGER')}
-          onPress={() => {
+        <Button
+          title={t('VERIFY_ADDRESSES_ON_LEDGER')}
+          onClick={() => {
             setChoseToVerifyAddresses(true);
             setAreReceivingAddressesVisible(true);
           }}
         />
       </VerifyButtonContainer>
-      <ActionButton
-        transparent
-        text={t('VIEW_ADDRESSES')}
-        onPress={() => {
+      <Button
+        variant="secondary"
+        title={t('VIEW_ADDRESSES')}
+        onClick={() => {
           if (choseToVerifyAddresses) {
             setChoseToVerifyAddresses(false);
           }
@@ -444,6 +463,7 @@ function Home() {
   };
 
   const showSwaps = !isLedgerAccount(selectedAccount) && network.type !== 'Testnet';
+  const showRunes = useHasFeature('RUNES_SUPPORT');
 
   return (
     <>
@@ -460,8 +480,9 @@ function Home() {
           isRefetching={
             refetchingBtcCoinData ||
             refetchingBtcWalletData ||
-            refetchingCoinData ||
-            refetchingStxWalletData
+            refetchingStxCoinData ||
+            refetchingStxWalletData ||
+            refetchingRunesData
           }
         />
         <RowButtonContainer>
@@ -485,72 +506,65 @@ function Home() {
 
         <ColumnContainer>
           {btcAddress && (
-            <TokenTile
+            <StyledTokenTile
               title={t('BITCOIN')}
               currency="BTC"
-              icon={BitcoinIcon}
               loading={loadingBtcWalletData}
-              underlayColor={Theme.colors.background.elevation1}
               onPress={handleTokenPressed}
             />
           )}
           {stxAddress && !hideStx && (
-            <TokenTile
+            <StyledTokenTile
               title={t('STACKS')}
               currency="STX"
-              icon={stacksIcon}
               loading={loadingStxWalletData}
-              underlayColor={Theme.colors.background.elevation1}
               onPress={handleTokenPressed}
             />
           )}
+          {!!stxAddress &&
+            sip10CoinsList.map((coin) => (
+              <StyledTokenTile
+                key={coin.name}
+                title={coin.name}
+                currency="FT"
+                loading={loadingStxCoinData}
+                fungibleToken={coin}
+                onPress={handleTokenPressed}
+              />
+            ))}
+          {brc20CoinsList.map((coin) => (
+            <StyledTokenTile
+              key={coin.name}
+              title={coin.name}
+              currency="FT"
+              loading={loadingBtcCoinData}
+              fungibleToken={coin}
+              onPress={handleTokenPressed}
+            />
+          ))}
+          {showRunes &&
+            runesCoinsList.map((coin) => (
+              <StyledTokenTile
+                key={coin.name}
+                title={coin.name}
+                currency="FT"
+                loading={loadingRunesData}
+                fungibleToken={coin}
+                onPress={handleTokenPressed}
+              />
+            ))}
         </ColumnContainer>
-        {(!!coinsList?.length || !!brcCoinsList?.length) && (
-          <CoinContainer>
-            {!!stxAddress &&
-              coinsList
-                ?.filter((ft) => ft.visible)
-                .map((coin) => (
-                  <TokenTile
-                    key={coin.name}
-                    title={coin.name}
-                    currency="FT"
-                    loading={loadingCoinData}
-                    underlayColor={Theme.colors.background.elevation1}
-                    fungibleToken={coin}
-                    onPress={handleTokenPressed}
-                  />
-                ))}
-            {brcCoinsList
-              ?.filter((ft) => ft.visible)
-              .map((coin) => (
-                <TokenTile
-                  key={coin.name}
-                  title={coin.name}
-                  currency="brc20"
-                  loading={loadingBtcCoinData}
-                  underlayColor={Theme.colors.background.elevation1}
-                  fungibleToken={coin}
-                  onPress={handleTokenPressed}
-                />
-              ))}
-          </CoinContainer>
-        )}
-        <UpdatedBottomModal
-          visible={openReceiveModal}
-          header={t('RECEIVE')}
-          onClose={onReceiveModalClose}
-        >
+        <Sheet visible={openReceiveModal} title={t('RECEIVE')} onClose={onReceiveModalClose}>
           {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
-        </UpdatedBottomModal>
+        </Sheet>
 
         <TokenListButtonContainer>
-          <Button onClick={handleManageTokenListOnClick}>
+          <TokenListButton onClick={handleManageTokenListOnClick}>
             <>
               <ButtonImage src={ListDashes} />
               <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
             </>
-          </Button>
+          </TokenListButton>
         </TokenListButtonContainer>
 
         <CoinSelectModal
@@ -559,7 +573,7 @@ function Home() {
           onClose={onSendModalClose}
           onSelectCoin={onSendFtSelect}
           visible={openSendModal}
-          coins={getCoinsList()}
+          coins={sendSheetCoinsList}
           title={t('SEND')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
@@ -599,16 +613,16 @@ function Home() {
           <ModalDescription>{t('DATA_COLLECTION_POPUP.DESCRIPTION')}</ModalDescription>
           <ModalControlsContainer>
             <ModalButtonContainer>
-              <ActionButton
-                transparent
-                text={t('DATA_COLLECTION_POPUP.DENY')}
-                onPress={handleDataCollectionDeny}
+              <Button
+                variant="secondary"
+                title={t('DATA_COLLECTION_POPUP.DENY')}
+                onClick={handleDataCollectionDeny}
               />
             </ModalButtonContainer>
             <ModalButtonContainer>
-              <ActionButton
-                text={t('DATA_COLLECTION_POPUP.ALLOW')}
-                onPress={handleDataCollectionAllow}
+              <Button
+                title={t('DATA_COLLECTION_POPUP.ALLOW')}
+                onClick={handleDataCollectionAllow}
               />
             </ModalButtonContainer>
           </ModalControlsContainer>

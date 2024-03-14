@@ -73,7 +73,7 @@ function StepDisplay({
   const { t } = useTranslation('translation');
   const header = (
     <TitleContainer>
-      <TokenImage token="BTC" />
+      <TokenImage currency="BTC" />
       <Title>{t('SEND.SEND')}</Title>
     </TitleContainer>
   );

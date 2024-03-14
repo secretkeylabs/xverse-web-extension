@@ -1,5 +1,6 @@
 import ReceiveIcon from '@assets/img/transactions/received.svg';
 import SendIcon from '@assets/img/transactions/sent.svg';
+import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
@@ -31,22 +32,22 @@ const TransactionRow = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
 }));
 
 const TransactionTitleText = styled.p((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_0,
 }));
 
 const RecipientAddress = styled.p((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.typography.body_s,
   color: props.theme.colors.white_400,
   textAlign: 'left',
 }));
 
 const TransactionValue = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
 }));
 
@@ -58,7 +59,8 @@ interface TxTransfersProps {
 
 export default function TxTransfers(props: TxTransfersProps) {
   const { transaction, coin, txFilter } = props;
-  const { selectedAccount, coinsList } = useWalletSelector();
+  const { selectedAccount } = useWalletSelector();
+  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   function formatAddress(addr: string): string {
@@ -80,7 +82,7 @@ export default function TxTransfers(props: TxTransfersProps) {
   function renderTransaction(transactionList) {
     return transactionList.map((transfer) => {
       const isFT = coin === 'FT';
-      const ft = coinsList?.find((ftCoin) => ftCoin.principal === txFilter!.split('::')[0]);
+      const ft = sip10CoinsList.find((ftCoin) => ftCoin.principal === txFilter!.split('::')[0]);
       const isSentTransaction = selectedAccount?.stxAddress !== transfer.recipient;
       if (isFT && transfer.asset_identifier !== txFilter) {
         return null;
@@ -100,6 +102,7 @@ export default function TxTransfers(props: TxTransfersProps) {
                 }
                 displayType="text"
                 thousandSeparator
+                allowNegative={false}
                 prefix={isSentTransaction ? '-' : ''}
                 renderText={(value: string) => (
                   <TransactionValue>

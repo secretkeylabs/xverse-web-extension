@@ -1,4 +1,4 @@
-import BtcTransactionHistoryItem from '@components/transactions/btcTransaction';
+import BtcOrBrc20TransactionHistoryItem from '@components/transactions/btcOrBrc20Transaction';
 import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
 import useTransactions from '@hooks/queries/useTransactions';
 import useBtcClient from '@hooks/useBtcClient';
@@ -231,10 +231,10 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
             {groupedTxs[group].map((transaction) => {
               if (wallet && (isBtcTransaction(transaction) || isBrc20Transaction(transaction))) {
                 return (
-                  <BtcTransactionHistoryItem
+                  <BtcOrBrc20TransactionHistoryItem
                     transaction={transaction}
                     wallet={wallet}
-                    key={transaction.txid}
+                    key={`${transaction.txid}:${transaction.incoming}:${transaction.txType}`}
                   />
                 );
               }

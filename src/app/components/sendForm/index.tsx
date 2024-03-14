@@ -255,14 +255,15 @@ function SendForm({
       return;
     }
 
-    const amountInCurrency = getFiatEquivalent(
-      Number(amountToSend),
-      currencyType,
-      BigNumber(stxBtcRate),
-      BigNumber(btcFiatRate),
-      fungibleToken,
+    setFiatAmount(
+      getFiatEquivalent(
+        Number(amountToSend),
+        currencyType,
+        BigNumber(stxBtcRate),
+        BigNumber(btcFiatRate),
+        fungibleToken,
+      ),
     );
-    setFiatAmount(amountInCurrency);
   }, [amountToSend]);
 
   function getTokenCurrency(): string {
@@ -290,15 +291,15 @@ function SendForm({
     } else {
       setAmount(newValue);
     }
-
-    const amountInCurrency = getFiatEquivalent(
-      Number(newValue),
-      currencyType,
-      BigNumber(stxBtcRate),
-      BigNumber(btcFiatRate),
-      fungibleToken,
+    setFiatAmount(
+      getFiatEquivalent(
+        Number(amountToSend),
+        currencyType,
+        BigNumber(stxBtcRate),
+        BigNumber(btcFiatRate),
+        fungibleToken,
+      ),
     );
-    setFiatAmount(amountInCurrency);
   };
 
   const getTokenEquivalent = (tokenAmount: string): string => {
@@ -465,7 +466,7 @@ function SendForm({
           !hideTokenImage && (
             <TokenContainer>
               <TokenImage
-                token={currencyType || undefined}
+                currency={currencyType || undefined}
                 loading={false}
                 fungibleToken={fungibleToken || undefined}
               />

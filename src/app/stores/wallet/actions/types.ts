@@ -3,8 +3,6 @@ import type {
   AccountType,
   AppInfo,
   BaseWallet,
-  Coin,
-  FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
@@ -15,7 +13,6 @@ export const ResetWalletKey = 'ResetWallet';
 export const FetchAccountKey = 'FetchAccount';
 export const SelectAccountKey = 'SelectAccount';
 export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
-export const UpdateVisibleCoinListKey = 'UpdateVisibleCoinList';
 export const AddAccountKey = 'AddAccount';
 export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
@@ -25,7 +22,6 @@ export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const SetStxWalletDataKey = 'SetStxWalletDataKey';
 export const SetBtcWalletDataKey = 'SetBtcWalletData';
 export const SetCoinRatesKey = 'SetCoinRatesKey';
-export const SetCoinDataKey = 'SetCoinDataKey';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
@@ -34,7 +30,9 @@ export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 export const ChangeShowDataCollectionAlertKey = 'ChangeShowDataCollectionAlertKey';
 export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
-export const SetBrcCoinsListKey = 'SetBrcCoinsList';
+export const SetSip10ManageTokensKey = 'SetSip10ManageTokensKey';
+export const SetBrc20ManageTokensKey = 'SetBrc20ManageTokensKey';
+export const SetRunesManageTokensKey = 'SetRunesManageTokens';
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
 export const RenameAccountKey = 'RenameAccountKey';
@@ -70,9 +68,9 @@ export interface WalletState {
   stxLockedBalance: string;
   stxNonce: number;
   btcBalance: string;
-  coinsList: FungibleToken[] | null;
-  coins: Coin[];
-  brcCoinsList: FungibleToken[] | null;
+  sip10ManageTokens: Record<string, boolean>;
+  brc20ManageTokens: Record<string, boolean>;
+  runesManageTokens: Record<string, boolean>;
   feeMultipliers: AppInfo | null;
   hasActivatedOrdinalsKey: boolean | undefined;
   hasActivatedRareSatsKey: boolean | undefined;
@@ -159,16 +157,6 @@ export interface SetBtcWalletData {
   balance: string;
 }
 
-export interface SetCoinData {
-  type: typeof SetCoinDataKey;
-  coinsList: FungibleToken[];
-  supportedCoins: Coin[];
-}
-export interface UpdateVisibleCoinList {
-  type: typeof UpdateVisibleCoinListKey;
-  coinsList: FungibleToken[];
-}
-
 export interface ChangeFiatCurrency {
   type: typeof ChangeFiatCurrencyKey;
   fiatCurrency: SupportedCurrency;
@@ -218,9 +206,22 @@ export interface ChangeShowDataCollectionAlert {
   showDataCollectionAlert: boolean | null;
 }
 
-export interface SetBrcCoinsData {
-  type: typeof SetBrcCoinsListKey;
-  brcCoinsList: FungibleToken[];
+export interface SetSip10ManageTokens {
+  type: typeof SetSip10ManageTokensKey;
+  principal: string;
+  isEnabled: boolean;
+}
+
+export interface SetBrc20ManageTokens {
+  type: typeof SetBrc20ManageTokensKey;
+  principal: string;
+  isEnabled: boolean;
+}
+
+export interface SetRunesManageTokens {
+  type: typeof SetRunesManageTokensKey;
+  principal: string;
+  isEnabled: boolean;
 }
 
 export interface SetWalletLockPeriod {
@@ -261,8 +262,6 @@ export type WalletActions =
   | SetCoinRates
   | SetStxWalletData
   | SetBtcWalletData
-  | SetCoinData
-  | UpdateVisibleCoinList
   | ChangeFiatCurrency
   | ChangeNetwork
   | GetActiveAccounts
@@ -272,7 +271,9 @@ export type WalletActions =
   | ChangeShowBtcReceiveAlert
   | ChangeShowOrdinalReceiveAlert
   | ChangeShowDataCollectionAlert
-  | SetBrcCoinsData
+  | SetSip10ManageTokens
+  | SetBrc20ManageTokens
+  | SetRunesManageTokens
   | SetWalletLockPeriod
   | SetRareSatsNoticeDismissed
   | SetWalletUnlocked

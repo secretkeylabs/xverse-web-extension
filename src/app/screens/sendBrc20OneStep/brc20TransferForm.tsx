@@ -153,7 +153,7 @@ function Brc20TransferForm(props: Props) {
           </BRC20TokenTag>
         </BRC20TokenTagContainer>
         <TokenContainer>
-          <TokenImage token="FT" loading={false} fungibleToken={token} />
+          <TokenImage currency="FT" loading={false} fungibleToken={token} />
         </TokenContainer>
         <InputGroup>
           <RowContainer>

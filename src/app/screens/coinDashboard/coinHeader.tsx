@@ -66,14 +66,15 @@ const BalanceValuesContainer = styled.div({
   flexDirection: 'column',
 });
 
-const CoinBalanceText = styled.h1((props) => ({
+const CoinBalanceText = styled.p((props) => ({
   ...props.theme.headline_l,
   fontSize: '1.5rem',
   color: props.theme.colors.white_0,
   textAlign: 'center',
+  wordBreak: 'break-all',
 }));
 
-const FiatAmountText = styled.h1((props) => ({
+const FiatAmountText = styled.p((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white_200,
   fontSize: '0.875rem',
@@ -81,7 +82,7 @@ const FiatAmountText = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
-const BalanceTitleText = styled.h1((props) => ({
+const BalanceTitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white_400,
   textAlign: 'center',
@@ -278,12 +279,18 @@ export default function CoinHeader(props: CoinBalanceProps) {
             url: chrome.runtime.getURL('options.html#/send-stx'),
           });
           return;
-        case 'FT':
+        default:
+          break;
+      }
+      switch (fungibleToken?.protocol) {
+        case 'stacks':
           await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/send-ft?coinTicker=${fungibleToken?.ticker}`),
+            url: chrome.runtime.getURL(
+              `options.html#/send-sip10?coinTicker=${fungibleToken?.ticker}`,
+            ),
           });
           return;
-        case 'brc20':
+        case 'brc-20':
           // TODO replace with send-brc20-one-step route, when ledger support is ready
           await chrome.tabs.create({
             url: chrome.runtime.getURL(
@@ -291,30 +298,61 @@ export default function CoinHeader(props: CoinBalanceProps) {
             ),
           });
           return;
+        case 'runes':
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL(
+              `options.html#/send-rune?coinTicker=${fungibleToken?.ticker}`,
+            ),
+          });
+          return;
         default:
           break;
       }
     }
-    if (coin === 'STX' || coin === 'BTC') {
-      navigate(`/send-${coin}`);
-    } else if (coin === 'FT') {
-      navigate('/send-ft', {
-        state: {
-          fungibleToken,
-        },
-      });
-    } else if (coin === 'brc20') {
-      navigate('/send-brc20-one-step', {
-        state: {
-          fungibleToken,
-        },
-      });
+    switch (coin) {
+      case 'BTC':
+      case 'STX':
+        navigate(`/send-${coin}`);
+        break;
+      default:
+        break;
+    }
+    switch (fungibleToken?.protocol) {
+      case 'stacks':
+        navigate('/send-sip10', {
+          state: {
+            fungibleToken,
+          },
+        });
+        break;
+      case 'brc-20':
+        navigate('/send-brc20-one-step', {
+          state: {
+            fungibleToken,
+          },
+        });
+        break;
+      case 'runes':
+        navigate('/send-rune', {
+          state: {
+            fungibleToken,
+          },
+        });
+        break;
+      default:
+        break;
     }
   };
 
   const getDashboardTitle = () => {
-    if (fungibleToken) {
-      return `${getFtTicker(fungibleToken)} ${t('BALANCE')}`;
+    if (fungibleToken?.name) {
+      return `${fungibleToken.name} ${t('BALANCE')}`;
+    }
+    if (coin === 'STX') {
+      return `Stacks ${t('BALANCE')}`;
+    }
+    if (coin === 'BTC') {
+      return `Bitcoin ${t('BALANCE')}`;
     }
     if (coin) {
       return `${coin} ${t('BALANCE')}`;
@@ -329,7 +367,11 @@ export default function CoinHeader(props: CoinBalanceProps) {
           text={t('VERIFY_ADDRESS_ON_LEDGER')}
           onPress={async () => {
             await chrome.tabs.create({
-              url: chrome.runtime.getURL(`options.html#/verify-ledger?currency=${coin}`),
+              url: chrome.runtime.getURL(
+                `options.html#/verify-ledger?currency=${
+                  !fungibleToken ? coin : fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'
+                }`,
+              ),
             });
           }}
         />
@@ -338,7 +380,11 @@ export default function CoinHeader(props: CoinBalanceProps) {
         transparent
         text={t('VIEW_ADDRESS')}
         onPress={() => {
-          navigate(`/receive/${coin}`);
+          navigate(
+            `/receive/${
+              !fungibleToken ? coin : fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'
+            }`,
+          );
         }}
       />
     </VerifyOrViewContainer>
@@ -348,14 +394,19 @@ export default function CoinHeader(props: CoinBalanceProps) {
     <Container>
       <BalanceInfoContainer>
         <TokenImage
-          token={coin || undefined}
+          currency={coin || undefined}
           loading={false}
           fungibleToken={fungibleToken || undefined}
         />
         <RowContainer>
           <BalanceTitleText>{getDashboardTitle()}</BalanceTitleText>
-          {coin === 'brc20' && <ProtocolText>BRC-20</ProtocolText>}
-          {fungibleToken?.protocol === 'stacks' && <ProtocolText>SIP-10</ProtocolText>}
+          {fungibleToken?.protocol && (
+            <ProtocolText>
+              {fungibleToken?.protocol === 'stacks'
+                ? 'SIP-10'
+                : fungibleToken.protocol?.toUpperCase()}
+            </ProtocolText>
+          )}
         </RowContainer>
         <BalanceValuesContainer>
           <NumericFormat
@@ -404,7 +455,10 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <SmallActionButton
               src={ArrowDown}
               text={t('RECEIVE')}
-              onPress={() => navigate(coin === 'brc20' ? '/receive/ORD' : `/receive/${coin}`)}
+              // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
+              onPress={() =>
+                navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`)
+              }
             />
           </RecieveButtonContainer>
         )}

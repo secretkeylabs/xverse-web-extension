@@ -4,8 +4,6 @@ import type {
   AccountType,
   AppInfo,
   BaseWallet,
-  Coin,
-  FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
   TransactionData,
@@ -147,26 +145,6 @@ export function SetBtcWalletDataAction(balance: NumberLike): actions.SetBtcWalle
   };
 }
 
-export function setCoinDataAction(
-  coinsList: FungibleToken[],
-  supportedCoins: Coin[],
-): actions.SetCoinData {
-  return {
-    type: actions.SetCoinDataKey,
-    coinsList,
-    supportedCoins,
-  };
-}
-
-export function FetchUpdatedVisibleCoinListAction(
-  coinsList: FungibleToken[],
-): actions.UpdateVisibleCoinList {
-  return {
-    type: actions.UpdateVisibleCoinListKey,
-    coinsList,
-  };
-}
-
 export function ChangeFiatCurrencyAction(
   fiatCurrency: SupportedCurrency,
 ): actions.ChangeFiatCurrency {
@@ -251,12 +229,29 @@ export function changeShowDataCollectionAlertAction(
   };
 }
 
-export function setBrcCoinsDataAction(brcCoinsList: FungibleToken[]): actions.SetBrcCoinsData {
-  return {
-    type: actions.SetBrcCoinsListKey,
-    brcCoinsList,
-  };
-}
+export const setSip10ManageTokensAction = (params: {
+  principal: string;
+  isEnabled: boolean;
+}): actions.SetSip10ManageTokens => ({
+  type: actions.SetSip10ManageTokensKey,
+  ...params,
+});
+
+export const setBrc20ManageTokensAction = (params: {
+  principal: string;
+  isEnabled: boolean;
+}): actions.SetBrc20ManageTokens => ({
+  type: actions.SetBrc20ManageTokensKey,
+  ...params,
+});
+
+export const setRunesManageTokensAction = (params: {
+  principal: string;
+  isEnabled: boolean;
+}): actions.SetRunesManageTokens => ({
+  type: actions.SetRunesManageTokensKey,
+  ...params,
+});
 
 export function setWalletLockPeriodAction(
   walletLockPeriod: actions.WalletSessionPeriods,

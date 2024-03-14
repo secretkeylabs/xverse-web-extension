@@ -95,4 +95,7 @@ function BottomModal({
   );
 }
 
+/**
+ * @deprecated use @ui-library/sheet
+ */
 export default BottomModal;

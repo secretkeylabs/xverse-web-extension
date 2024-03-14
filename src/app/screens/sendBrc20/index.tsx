@@ -1,6 +1,7 @@
 import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
@@ -28,15 +29,15 @@ const BRC20TokenTagContainer = styled.div((props) => ({
 }));
 
 const BRC20TokenTag = styled.div((props) => ({
-  background: props.theme.colors.white[400],
+  background: props.theme.colors.white_400,
   borderRadius: 40,
   width: 54,
   height: 19,
   padding: '2px 6px',
   h1: {
-    ...props.theme.body_bold_l,
+    ...props.theme.typography.body_bold_l,
     fontSize: 11,
-    color: props.theme.colors.background.elevation0,
+    color: props.theme.colors.elevation0,
   },
 }));
 
@@ -55,8 +56,9 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
 function SendBrc20Screen() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
-  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate, brcCoinsList } =
+  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
     useWalletSelector();
+  const { data: brc20CoinsList } = useGetBrc20FungibleTokens();
   const { getSeed } = useSeedVault();
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
@@ -67,7 +69,7 @@ function SendBrc20Screen() {
 
   const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
   const fungibleToken =
-    location.state?.fungibleToken || brcCoinsList?.find((coin) => coin.ticker === coinTicker);
+    location.state?.fungibleToken || brc20CoinsList?.find((coin) => coin.ticker === coinTicker);
 
   const isSendButtonEnabled =
     amountToSend !== '' &&

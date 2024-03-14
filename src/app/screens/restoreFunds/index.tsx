@@ -30,8 +30,8 @@ function RestoreFunds() {
     navigate(-1);
   };
 
-  const handleOnRestoreOridnalClick = () => {
-    navigate('/recover-ordinals');
+  const handleOnRestoreOrdinalClick = () => {
+    navigate('/restore-ordinals');
   };
 
   return (
@@ -43,7 +43,7 @@ function RestoreFunds() {
           image={OrdinalsIcon}
           title={t('RECOVER_ORDINALS')}
           description={t('RECOVER_ORDINALS_DESC')}
-          onClick={handleOnRestoreOridnalClick}
+          onClick={handleOnRestoreOrdinalClick}
         />
       </Container>
       <BottomTabBar tab="nft" />

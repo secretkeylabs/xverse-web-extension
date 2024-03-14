@@ -1,3 +1,4 @@
+import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
 import { chromeLocalStorage } from '@utils/chromeStorage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { PersistConfig, createMigrate, persistReducer, persistStore } from 'redux-persist';
@@ -26,10 +27,36 @@ const migrations = {
       },
     };
   },
+  3: (
+    state: WalletState & {
+      brcCoinsList: FungibleToken[] | null; // removed in v3
+      coinsList: FungibleToken[] | null; // removed in v3
+      coins: Coin[]; // removed in v3
+    },
+  ) => ({
+    ...state,
+    brc20ManageTokens:
+      state.brcCoinsList?.reduce((acc, coin) => {
+        if (coin.principal && coin.visible !== undefined) {
+          acc[coin.principal] = coin.visible;
+        }
+        return acc;
+      }, {}) ?? {},
+    sip10ManageTokens:
+      state.coinsList?.reduce((acc, coin) => {
+        if (coin.principal && coin.visible !== undefined) {
+          acc[coin.principal] = coin.visible;
+        }
+        return acc;
+      }, {}) ?? {},
+    coins: undefined,
+    coinsList: undefined,
+    brcCoinsList: undefined,
+  }),
 };
 
 export const WalletPersistConfig: PersistConfig<WalletState> = {
-  version: 2,
+  version: 3,
   key: 'walletState',
   storage: chromeLocalStorage,
   migrate: createMigrate(migrations as any, { debug: false }),
