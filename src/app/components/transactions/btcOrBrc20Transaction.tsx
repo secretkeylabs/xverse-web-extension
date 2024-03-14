@@ -77,12 +77,13 @@ interface TransactionHistoryItemProps {
   transaction: BtcTransactionData | Brc20HistoryTransactionData;
   wallet: RBFProps;
 }
-export default function BtcTransactionHistoryItem({
+export default function BtcOrBrc20TransactionHistoryItem({
   transaction,
   wallet,
 }: TransactionHistoryItemProps) {
   const { network, hasActivatedRBFKey } = useWalletSelector();
-  const isBtc = isBtcTransaction(transaction) ? 'BTC' : 'brc20';
+  const currency = isBtcTransaction(transaction) ? 'BTC' : 'FT';
+  const protocol = currency === 'FT' ? 'brc-20' : undefined;
   const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
@@ -94,10 +95,9 @@ export default function BtcTransactionHistoryItem({
     hasActivatedRBFKey &&
     isBtcTransaction(transaction) &&
     rbf.isTransactionRbfEnabled(transaction, wallet);
-
   return (
     <TransactionContainer onClick={openBtcTxStatusLink}>
-      <TransactionStatusIcon transaction={transaction} currency={isBtc} />
+      <TransactionStatusIcon transaction={transaction} currency={currency} protocol={protocol} />
       <TransactionInfoContainer>
         <TransactionRow>
           <div>
@@ -105,7 +105,7 @@ export default function BtcTransactionHistoryItem({
             <TransactionRecipient transaction={transaction} />
           </div>
           <TransactionAmountContainer>
-            <TransactionAmount transaction={transaction} coin={isBtc} />
+            <TransactionAmount transaction={transaction} currency={currency} protocol={protocol} />
             {showAccelerateButton && (
               <Link to={`/speed-up-tx/${transaction.txid}`}>
                 <StyledButton

@@ -111,7 +111,7 @@ function Brc20TransferForm(props: Props) {
   return (
     <Container>
       <TokenContainer>
-        <TokenImage token="FT" loading={false} fungibleToken={token || undefined} />
+        <TokenImage currency="FT" loading={false} fungibleToken={token || undefined} />
       </TokenContainer>
       <RowContainer>
         <TitleText>{t('AMOUNT')}</TitleText>

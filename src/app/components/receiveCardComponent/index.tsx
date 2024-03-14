@@ -94,7 +94,7 @@ function ReceiveCardComponent({
 }: Props) {
   const [isCopied, setIsCopied] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
-  let addressText = 'Receive Ordinals & BRC20 tokens';
+  let addressText = 'Receive Ordinals, Runes & BRC20 tokens';
 
   if (currency === 'BTC') addressText = 'Receive payments in BTC';
   if (currency === 'STX') addressText = 'Receive STX, Stacks NFTs & SIP-10';

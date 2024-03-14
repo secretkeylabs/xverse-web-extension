@@ -1,5 +1,6 @@
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import useBtcClient from '@hooks/useBtcClient';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -29,7 +30,8 @@ function SendBrc20Screen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
   const navigate = useNavigate();
   const location = useLocation();
-  const { btcAddress, ordinalsAddress, network, brcCoinsList } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, network } = useWalletSelector();
+  const { data: brc20CoinsList } = useGetBrc20FungibleTokens();
   const { data: feeRate } = useBtcFeeRate();
   const [amountError, setAmountError] = useState<InputFeedbackProps | null>(null);
   const [amountToSend, setAmountToSend] = useState('');
@@ -48,7 +50,7 @@ function SendBrc20Screen() {
 
   const { fungibleToken: ft }: SendBrc20TransferState = location.state || {};
   const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
-  const fungibleToken = ft || brcCoinsList?.find((coin) => coin.name === coinName);
+  const fungibleToken = ft || brc20CoinsList?.find((coin) => coin.name === coinName);
 
   const handleBackButtonClick = () => {
     navigate(-1);

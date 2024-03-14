@@ -22,21 +22,19 @@ export default function useTransactions(coinType: CurrencyTypes, brc20Token: str
     | (AddressTransactionWithTransfers | MempoolTransaction)[]
     | Brc20HistoryTransactionData[]
   > => {
+    if (coinType === 'FT' && brc20Token) {
+      return getBrc20History(network.type, ordinalsAddress, brc20Token);
+    }
     if (coinType === 'STX' || coinType === 'FT' || coinType === 'NFT') {
       return getStxAddressTransactions(stxAddress, selectedNetwork, 0, PAGINATION_LIMIT);
     }
     if (coinType === 'BTC') {
-      const btcData = await fetchBtcTransactionsData(
+      return fetchBtcTransactionsData(
         btcAddress,
         ordinalsAddress,
         btcClient,
         hasActivatedOrdinalsKey as boolean,
       );
-      return btcData;
-    }
-    if (coinType === 'brc20' && brc20Token) {
-      const brc20Data = await getBrc20History(network.type, ordinalsAddress, brc20Token);
-      return brc20Data;
     }
     return [];
   };

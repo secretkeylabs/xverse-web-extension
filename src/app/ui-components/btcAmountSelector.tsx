@@ -7,7 +7,7 @@ import {
   getFiatBtcEquivalent,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
-import Input from '@ui-library/input';
+import Input, { ConvertComplication, MaxButton, VertRule } from '@ui-library/input';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,58 +19,9 @@ const BalanceText = styled.span`
   color: ${(props) => props.theme.colors.white_200};
 `;
 
-const ConvertComplication = styled.button`
-  ${(props) => props.theme.typography.body_medium_s}
-  user-select: none;
-
-  display: flex;
-  align-items: center;
-  gap: ${(props) => props.theme.space.xs};
-
-  cursor: pointer;
-  background-color: transparent;
-  color: ${(props) => props.theme.colors.white_200};
-
-  &:hover:enabled {
-    color: ${(props) => props.theme.colors.white_400};
-  }
-
-  &:disabled {
-    color: ${(props) => props.theme.colors.white_600};
-    cursor: not-allowed;
-  }
-`;
-
-const VertRule = styled.div`
-  width: 1px;
-  height: 16px;
-  background-color: ${(props) => props.theme.colors.white_800};
-  margin: 0 8px;
-`;
-
-const MaxButton = styled.button<{ $sendMax: boolean }>`
-  ${(props) => props.theme.typography.body_medium_m}
-  user-select: none;
-  margin-right: ${(props) => props.theme.space.xxs};
-
-  cursor: pointer;
-  background-color: transparent;
-  color: ${(props) => props.theme.colors.tangerine};
-
-  ${(props) =>
-    props.$sendMax &&
-    `
-    color: ${props.theme.colors.tangerine_400};
-  `}
-
-  &:hover:enabled {
-    color: ${(props) => props.theme.colors.tangerine_400};
-  }
-
-  &:disabled {
-    color: ${(props) => props.theme.colors.tangerine_dark};
-    cursor: not-allowed;
-  }
+const BalanceDiv = styled.div`
+  word-break: break-all;
+  text-align: end;
 `;
 
 const inputValidator = /^[0-9.]*$/;
@@ -215,10 +166,10 @@ function AmountSelector({
           thousandSeparator
           prefix={useBtcValue ? '' : `~${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
-            <div>
+            <BalanceDiv>
               <BalanceText>{t('BALANCE')} </BalanceText> {value}{' '}
               {useBtcValue ? 'BTC' : fiatCurrency}
-            </div>
+            </BalanceDiv>
           )}
         />
       }

@@ -60,7 +60,7 @@ export default function Amount({ amount }: Props) {
   return (
     <RowCenter>
       <AvatarContainer>
-        <Avatar src={<TokenImage token="BTC" loading={false} size={32} />} />
+        <Avatar src={<TokenImage currency="BTC" loading={false} size={32} />} />
       </AvatarContainer>
       <RowCenter spaceBetween>
         <div>

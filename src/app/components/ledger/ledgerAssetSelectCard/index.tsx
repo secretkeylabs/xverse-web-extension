@@ -23,19 +23,26 @@ const CardInput = styled.input({
   display: 'none',
 });
 
-const CardImageContainer = styled.div((props) => ({
+const CardIconContainer = styled.div((props) => ({
   display: 'flex',
   width: props.theme.spacing(24),
   justifyContent: 'flex-start',
   alignItems: 'center',
 }));
 
+const CardIcon = styled.img<{
+  $squareIcon: boolean;
+}>((props) => ({
+  width: props.$squareIcon ? 24 : 'auto',
+  height: props.$squareIcon ? 24 : 'auto',
+}));
+
 const CardTitle = styled.h3((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
 }));
 
 const CardText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
 }));
 
@@ -46,6 +53,7 @@ interface Props {
   id: string;
   isChecked: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  squareIcon?: boolean;
 }
 
 function LedgerAssetSelectCard({
@@ -55,13 +63,14 @@ function LedgerAssetSelectCard({
   id,
   isChecked,
   onChange: handleChange,
+  squareIcon = false,
 }: Props) {
   return (
     <div>
       <CardContainer htmlFor={id} className={isChecked ? 'checked' : ''}>
-        <CardImageContainer>
-          <img src={icon} alt={`${title} icon`} />
-        </CardImageContainer>
+        <CardIconContainer>
+          <CardIcon src={icon} alt={`${title} icon`} $squareIcon={squareIcon} />
+        </CardIconContainer>
         <div>
           <CardTitle>{title}</CardTitle>
           <CardText>{text}</CardText>

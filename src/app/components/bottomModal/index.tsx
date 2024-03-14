@@ -1,4 +1,3 @@
-import Separator from '@components/separator';
 import { XCircle } from '@phosphor-icons/react';
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
@@ -14,6 +13,7 @@ const RowContainer = styled.div((props) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   margin: props.theme.space.m,
+  marginBottom: 0,
 }));
 
 const ButtonImage = styled.button({
@@ -90,10 +90,12 @@ function BottomModal({
           <XCircle color={theme.colors.white_200} weight="fill" size="28" />
         </ButtonImage>
       </RowContainer>
-      {header && <Separator />}
       {children}
     </CustomisedModal>
   );
 }
 
+/**
+ * @deprecated use @ui-library/sheet
+ */
 export default BottomModal;

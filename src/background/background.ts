@@ -24,3 +24,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Listener fn must return `true` to indicate the response will be async
   return true;
 });
+
+if (process.env.NODE_ENV === 'development') {
+  chrome.action.setBadgeText({ text: 'DEV' });
+}

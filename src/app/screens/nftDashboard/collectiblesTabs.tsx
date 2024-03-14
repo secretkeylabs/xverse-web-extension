@@ -1,17 +1,13 @@
 import ActionButton from '@components/button';
+import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
-import {
-  Bundle,
-  mapRareSatsAPIResponseToBundle,
-  UtxoOrdinalBundle,
-} from '@secretkeylabs/xverse-core';
+import { Bundle, mapRareSatsAPIResponseToBundle } from '@secretkeylabs/xverse-core';
 import { StyledP, StyledTab, StyledTabList } from '@ui-library/common.styled';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TabPanel, Tabs } from 'react-tabs';
 import styled from 'styled-components';
-import { StyledBarLoader, TilesSkeletonLoader } from '../../components/tilesSkeletonLoader';
 import Notice from './notice';
 import RareSatsTabGridItem from './rareSatsTabGridItem';
 import type { NftDashboardState } from './useNftDashboard';
@@ -246,7 +242,7 @@ export default function CollectiblesTabs({
                 rareSatsQuery.data?.pages
                   ?.map((page) => page?.results)
                   .flat()
-                  .map((utxo: UtxoOrdinalBundle) => mapRareSatsAPIResponseToBundle(utxo))
+                  .map((utxo) => mapRareSatsAPIResponseToBundle(utxo))
                   .map((bundle: Bundle) => (
                     <RareSatsTabGridItem
                       key={bundle.txid}

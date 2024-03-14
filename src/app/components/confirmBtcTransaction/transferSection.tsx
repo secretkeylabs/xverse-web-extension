@@ -1,8 +1,12 @@
+import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { ArrowRight } from '@phosphor-icons/react';
+import { btcTransaction, FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import Theme from '../../../theme';
 import Amount from './itemRow/amount';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
@@ -34,12 +38,24 @@ const Header = styled(RowCenter)((props) => ({
   padding: `0 ${props.theme.space.m}`,
 }));
 
+const StyledStyledP = styled(StyledP)`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledArrowRight = styled(ArrowRight)({
+  marginRight: 4,
+});
+
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   inputs: btcTransaction.EnhancedInput[];
   isPartialTransaction: boolean;
   netAmount: number;
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
+  token?: FungibleToken;
+  amountToSend?: string;
+  recipientAddress?: string;
 };
 
 // if isPartialTransaction, we use inputs instead of outputs
@@ -49,6 +65,9 @@ function TransferSection({
   isPartialTransaction,
   netAmount,
   onShowInscription,
+  token,
+  amountToSend,
+  recipientAddress,
 }: Props) {
   const { btcAddress, ordinalsAddress } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -80,16 +99,27 @@ function TransferSection({
 
   if (!hasData) return null;
 
+  const isRuneTransaction = token && amountToSend && recipientAddress;
+
   return (
     <Container>
       <Header spaceBetween>
         <StyledP typography="body_medium_m" color="white_200">
           {t('YOU_WILL_TRANSFER')}
         </StyledP>
+        {isRuneTransaction && (
+          <StyledStyledP typography="body_medium_m" color="white_200">
+            <StyledArrowRight weight="bold" color={Theme.colors.white_0} size={16} />
+            {getTruncatedAddress(recipientAddress, 6)}
+          </StyledStyledP>
+        )}
       </Header>
       {showAmount && (
         <RowContainer>
-          <Amount amount={netAmount} />
+          {isRuneTransaction && (
+            <RuneAmount amountSats={546} token={token} amountToSend={amountToSend} />
+          )}
+          {!isRuneTransaction && <Amount amount={netAmount} />}
           <AmountWithInscriptionSatribute
             inscriptions={inscriptionsFromPayment}
             satributes={satributesFromPayment}

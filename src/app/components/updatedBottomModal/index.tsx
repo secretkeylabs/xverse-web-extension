@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
 
 const BottomModalHeaderText = styled.h1((props) => ({
-  ...props.theme.body_bold_l,
+  ...props.theme.typography.body_bold_l,
   flex: 1,
 }));
 
@@ -64,8 +64,8 @@ function UpdatedBottomModal({
       maxWidth: 360,
       maxHeight: '90%',
       border: 'transparent',
-      background: theme.colors.background.elevation6_600,
-      backdropFilter: 'blur(10px)',
+      background: theme.colors.elevation6_600,
+      backdropFilter: 'blur(24px)',
       margin: 0,
       padding: 0,
       borderTopLeftRadius: isGalleryOpen ? 12 : 16,
@@ -95,4 +95,7 @@ function UpdatedBottomModal({
   );
 }
 
+/**
+ * @deprecated use @ui-library/sheet
+ */
 export default UpdatedBottomModal;

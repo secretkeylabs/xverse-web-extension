@@ -16,11 +16,12 @@ import {
   ResetWalletKey,
   SelectAccountKey,
   SetAccountBalanceKey,
-  SetBrcCoinsListKey,
+  SetBrc20ManageTokensKey,
   SetBtcWalletDataKey,
-  SetCoinDataKey,
   SetCoinRatesKey,
   SetFeeMultiplierKey,
+  SetRunesManageTokensKey,
+  SetSip10ManageTokensKey,
   SetStxWalletDataKey,
   SetWalletHideStxKey,
   SetWalletKey,
@@ -28,7 +29,6 @@ import {
   SetWalletUnlockedKey,
   StoreEncryptedSeedKey,
   UpdateLedgerAccountsKey,
-  UpdateVisibleCoinListKey,
   WalletActions,
   WalletSessionPeriods,
   WalletState,
@@ -87,9 +87,9 @@ export const initialWalletState: WalletState = {
   stxLockedBalance: '0',
   stxNonce: 0,
   btcBalance: '0',
-  coinsList: null,
-  coins: [],
-  brcCoinsList: [],
+  sip10ManageTokens: {},
+  brc20ManageTokens: {},
+  runesManageTokens: {},
   feeMultipliers: null,
   hasActivatedOrdinalsKey: undefined,
   hasActivatedRareSatsKey: undefined,
@@ -161,12 +161,6 @@ const walletReducer = (
         btcBalance: '',
         stxBalance: '',
         stxAvailableBalance: '',
-        coinsList: state.coinsList
-          ? state.coinsList.map((coin) => ({ ...coin, balance: '0' }))
-          : [],
-        brcCoinsList: state.brcCoinsList
-          ? state.brcCoinsList.map((coin) => ({ ...coin, balance: '0' }))
-          : [],
       };
     case StoreEncryptedSeedKey:
       return {
@@ -191,17 +185,6 @@ const walletReducer = (
       return {
         ...state,
         btcBalance: action.balance,
-      };
-    case SetCoinDataKey:
-      return {
-        ...state,
-        coinsList: action.coinsList,
-        coins: action.supportedCoins,
-      };
-    case UpdateVisibleCoinListKey:
-      return {
-        ...state,
-        coinsList: action.coinsList,
       };
     case SetFeeMultiplierKey:
       return {
@@ -262,10 +245,29 @@ const walletReducer = (
         ...state,
         showDataCollectionAlert: action.showDataCollectionAlert,
       };
-    case SetBrcCoinsListKey:
+    case SetSip10ManageTokensKey:
       return {
         ...state,
-        brcCoinsList: action.brcCoinsList,
+        sip10ManageTokens: {
+          ...state.sip10ManageTokens,
+          [action.principal]: action.isEnabled,
+        },
+      };
+    case SetBrc20ManageTokensKey:
+      return {
+        ...state,
+        brc20ManageTokens: {
+          ...state.brc20ManageTokens,
+          [action.principal]: action.isEnabled,
+        },
+      };
+    case SetRunesManageTokensKey:
+      return {
+        ...state,
+        runesManageTokens: {
+          ...state.runesManageTokens,
+          [action.principal]: action.isEnabled,
+        },
       };
     case SetWalletLockPeriodKey:
       return {

@@ -1,12 +1,12 @@
-import styled from 'styled-components';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { useTranslation } from 'react-i18next';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ChangeFiatCurrencyAction } from '@stores/wallet/actions/actionCreators';
 import { SupportedCurrency } from '@secretkeylabs/xverse-core';
+import { ChangeFiatCurrencyAction } from '@stores/wallet/actions/actionCreators';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { currencyList } from '../../../utils/currency';
 import CurrencyRow from './currencyRow';
 
@@ -15,9 +15,8 @@ const Container = styled.div`
   flex-direction: column;
   flex: 1;
   overflow-y: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-bottom: 16px;
+  padding: ${(props) => props.theme.space.m};
+  padding-top: 0;
   &::-webkit-scrollbar {
     display: none;
   }
