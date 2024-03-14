@@ -62,12 +62,7 @@ function TransferFeeView({
   const { btcFiatRate, stxBtcRate, fiatCurrency } = useSelector(
     (state: StoreState) => state.walletState,
   );
-  const fiatRate = getFiatEquivalent(
-    Number(fee),
-    currency,
-    BigNumber(stxBtcRate),
-    BigNumber(btcFiatRate),
-  );
+
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (!fiatAmount) {
       return '';
@@ -126,7 +121,14 @@ function TransferFeeView({
             {getFiatAmountString(
               currency === 'sats'
                 ? getBtcFiatEquivalent(new BigNumber(fee), BigNumber(btcFiatRate))
-                : new BigNumber(fiatRate!),
+                : new BigNumber(
+                    getFiatEquivalent(
+                      Number(fee),
+                      'STX',
+                      BigNumber(stxBtcRate),
+                      BigNumber(btcFiatRate),
+                    )!,
+                  ),
             )}
           </StyledP>
         </FeeContainer>

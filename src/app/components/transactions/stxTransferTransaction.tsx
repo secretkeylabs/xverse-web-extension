@@ -97,7 +97,7 @@ export default function StxTransferTransaction({
             <TransactionRecipient transaction={transaction} />
           </div>
           <TransactionAmountContainer>
-            <TransactionAmount transaction={transaction} coin={transactionCoin} />
+            <TransactionAmount transaction={transaction} currency={transactionCoin} />
             {showAccelerateButton && (
               <StyledButton
                 transparent

@@ -6,7 +6,7 @@ import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
+import { btcTransaction, FungibleToken, Transport } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
@@ -52,6 +52,9 @@ type Props = {
   isSubmitting: boolean;
   isBroadcast?: boolean;
   isError?: boolean;
+  token?: FungibleToken;
+  amountToSend?: string;
+  recipientAddress?: string;
   showAccountHeader?: boolean;
   hideBottomBar?: boolean;
   cancelText: string;
@@ -76,6 +79,9 @@ function ConfirmBtcTransaction({
   isSubmitting,
   isBroadcast,
   isError = false,
+  token,
+  amountToSend,
+  recipientAddress,
   cancelText,
   confirmText,
   onConfirm,
@@ -167,6 +173,9 @@ function ConfirmBtcTransaction({
         </ReviewTransactionText>
         {!isBroadcast && <BroadcastCallout bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
         <TransactionSummary
+          token={token}
+          amountToSend={amountToSend}
+          recipientAddress={recipientAddress}
           inputs={inputs}
           outputs={outputs}
           feeOutput={feeOutput}

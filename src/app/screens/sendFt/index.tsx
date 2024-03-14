@@ -1,6 +1,7 @@
 import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -21,7 +22,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function SendFtScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxPublicKey, network, coinsList, feeMultipliers } = useWalletSelector();
+  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
+  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
@@ -34,7 +36,7 @@ function SendFtScreen() {
 
   const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
   const fungibleToken =
-    location.state?.fungibleToken || coinsList?.find((coin) => coin.ticker === coinTicker);
+    location.state?.fungibleToken || sip10CoinsList.find((coin) => coin.ticker === coinTicker);
 
   let recipientAddress: string | undefined;
   let ftAmountToSend: string | undefined;

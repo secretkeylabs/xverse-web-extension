@@ -1,4 +1,6 @@
 import BarLoader from '@components/barLoader';
+import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
+import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
@@ -77,20 +79,20 @@ function BalanceCard(props: BalanceCardProps) {
     btcBalance,
     btcAddress,
     hideStx,
-    coinsList,
     selectedAccount,
     accountBalances,
-    brcCoinsList,
   } = useWalletSelector();
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
   const oldTotalBalance = accountBalances[btcAddress];
+  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
 
   const balance = calculateTotalBalance({
     stxBalance,
     btcBalance,
-    ftCoinList: coinsList,
-    brcCoinsList,
+    sipCoinsList: sip10CoinsList,
+    brcCoinsList: brc20CoinsList,
     btcFiatRate,
     stxBtcRate,
     hideStx,

@@ -2,15 +2,12 @@ import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  API_TIMEOUT_MILLI,
   Account,
+  API_TIMEOUT_MILLI,
   BtcAddressData,
   FungibleToken,
-  TokensResponse,
-  getBrc20Tokens,
-  getCoinsInfo,
   getNetworkURL,
-  getOrdinalsFtBalance,
+  TokensResponse,
 } from '@secretkeylabs/xverse-core';
 import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
 import { calculateTotalBalance } from '@utils/helper';
@@ -18,72 +15,25 @@ import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { brc20TokenToFungibleToken } from './useBtcCoinsBalance';
+import { fetchBrc20FungibleTokens } from './ordinals/useGetBrc20FungibleTokens';
+import { fetchSip10FungibleTokens } from './stx/useGetSip10FungibleTokens';
 
 const useAccountBalance = () => {
   const btcClient = useBtcClient();
   const stacksNetwork = useNetworkSelector();
-  const { btcFiatRate, stxBtcRate, fiatCurrency, network, coinsList, brcCoinsList, hideStx } =
-    useWalletSelector();
+  const {
+    btcFiatRate,
+    stxBtcRate,
+    fiatCurrency,
+    network,
+    hideStx,
+    brc20ManageTokens,
+    sip10ManageTokens,
+  } = useWalletSelector();
   const dispatch = useDispatch();
   const queue = useRef<Account[]>([]);
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);
   const [queueLength, setQueueLength] = useState(0);
-
-  // TODO: reuse it for both useAccountBalance and useBtcCoinBalance hooks
-  const fetchBrcCoinsBalances = async (ordinalsAddress: string) => {
-    try {
-      const ordinalsFtBalance = await getOrdinalsFtBalance(network.type, ordinalsAddress);
-      const tickers = ordinalsFtBalance?.map((o) => o.ticker!) ?? [];
-      const brc20Tokens = await getBrc20Tokens(
-        network.type,
-        // workaround for brc20 tokens not being returned
-        tickers.length ? tickers : ['ORDI'],
-        fiatCurrency,
-      );
-
-      const brcCoinsListMap = new Map(brcCoinsList?.map((token) => [token.ticker, token]));
-
-      const mergedList: FungibleToken[] = ordinalsFtBalance.map((newToken) => {
-        const existingToken = brcCoinsListMap.get(newToken.ticker);
-
-        const reconstitutedFt = {
-          ...existingToken,
-          ...newToken,
-          // The `visible` property from `xverse-core` defaults to true.
-          // We override `visible` to ensure that the existing state is preserved.
-          ...(existingToken ? { visible: existingToken.visible } : {}),
-        };
-
-        return reconstitutedFt;
-      });
-
-      brc20Tokens?.forEach((b) => {
-        const existingToken = brcCoinsListMap.get(b.ticker);
-        const pendingToken = mergedList?.find((m) => m.ticker === b.ticker);
-        const tokenFiatRate = Number(b?.tokenFiatRate);
-
-        // No duplicates
-        if (pendingToken) {
-          pendingToken.tokenFiatRate = tokenFiatRate;
-          return;
-        }
-
-        if (existingToken) {
-          mergedList.push({
-            ...existingToken,
-            tokenFiatRate,
-          });
-        } else {
-          mergedList.push(brc20TokenToFungibleToken(b));
-        }
-      });
-
-      return mergedList;
-    } catch (e: any) {
-      return Promise.reject(e);
-    }
-  };
 
   const fetchBalances = async (account: Account | null) => {
     if (!account) {
@@ -92,8 +42,8 @@ const useAccountBalance = () => {
 
     let btcBalance = '0';
     let stxBalance = '0';
-    let ftCoinList: FungibleToken[] | null = null;
-    let finalBrcCoinList: FungibleToken[] | null = null;
+    let finalSipCoinsList: FungibleToken[] = [];
+    let finalBrcCoinsList: FungibleToken[] = [];
 
     if (account.btcAddress) {
       const btcData: BtcAddressData = await btcClient.getBalance(account.btcAddress);
@@ -101,7 +51,14 @@ const useAccountBalance = () => {
     }
 
     if (account.ordinalsAddress) {
-      finalBrcCoinList = await fetchBrcCoinsBalances(account.ordinalsAddress);
+      const fetchBrc20Balances = fetchBrc20FungibleTokens(
+        account.ordinalsAddress,
+        fiatCurrency,
+        network,
+      );
+      finalBrcCoinsList = (await fetchBrc20Balances()).filter(
+        (ft) => brc20ManageTokens[ft.principal] !== false,
+      );
     }
 
     if (account.stxAddress) {
@@ -117,69 +74,22 @@ const useAccountBalance = () => {
       const lockedBalance = new BigNumber(response.data.stx.locked);
       stxBalance = availableBalance.plus(lockedBalance).toString();
 
-      const fungibleTokenList: FungibleToken[] = [];
-      Object.entries(response.data.fungible_tokens).forEach(([key, value]: [string, any]) => {
-        const fungibleToken: FungibleToken = value;
-        const index = key.indexOf('::');
-        fungibleToken.assetName = key.substring(index + 2);
-        fungibleToken.principal = key.substring(0, index);
-        fungibleToken.protocol = 'stacks';
-        fungibleTokenList.push(fungibleToken);
-      });
-
-      const visibleCoins: FungibleToken[] | null = coinsList;
-      if (visibleCoins) {
-        visibleCoins.forEach((visibleCoin) => {
-          const coinToBeUpdated = fungibleTokenList.find(
-            (ft) => ft.principal === visibleCoin.principal,
-          );
-          if (coinToBeUpdated) coinToBeUpdated.visible = visibleCoin.visible;
-          else if (visibleCoin.visible) {
-            visibleCoin.balance = '0';
-            fungibleTokenList.push(visibleCoin);
-          }
-        });
-      } else {
-        fungibleTokenList.forEach((ft) => {
-          ft.visible = true;
-        });
-      }
-
-      const contractids: string[] = fungibleTokenList.map((ft) => ft.principal);
-      const coinsResponse = await getCoinsInfo(network.type, contractids, fiatCurrency);
-
-      if (coinsResponse) {
-        coinsResponse.forEach((coin) => {
-          if (!coin.name) {
-            const coinName = coin.contract.split('.')[1];
-            coin.name = coinName;
-          }
-        });
-
-        // update attributes of fungible token list
-        fungibleTokenList.forEach((ft) => {
-          coinsResponse.forEach((coin) => {
-            if (ft.principal === coin.contract) {
-              ft.ticker = coin.ticker;
-              ft.decimals = coin.decimals;
-              ft.supported = coin.supported;
-              ft.image = coin.image;
-              ft.name = coin.name;
-              ft.tokenFiatRate = coin.tokenFiatRate;
-              coin.visible = ft.visible;
-            }
-          });
-        });
-
-        ftCoinList = fungibleTokenList;
-      }
+      const fetchSip10Balances = fetchSip10FungibleTokens(
+        account.stxAddress,
+        fiatCurrency,
+        network,
+        stacksNetwork,
+      );
+      finalSipCoinsList = (await fetchSip10Balances()).filter(
+        (ft) => sip10ManageTokens[ft.principal] !== false,
+      );
     }
 
     const totalBalance = calculateTotalBalance({
       stxBalance,
       btcBalance,
-      ftCoinList,
-      brcCoinsList: finalBrcCoinList,
+      sipCoinsList: finalSipCoinsList,
+      brcCoinsList: finalBrcCoinsList,
       stxBtcRate,
       btcFiatRate,
       hideStx,

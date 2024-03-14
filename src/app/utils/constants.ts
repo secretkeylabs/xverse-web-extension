@@ -22,15 +22,7 @@ export const MOON_PAY_URL = 'https://buy.moonpay.com';
 export const MOON_PAY_API_KEY = process.env.MOON_PAY_API_KEY;
 export const MIX_PANEL_TOKEN = process.env.MIX_PANEL_TOKEN;
 
-export type CurrencyTypes =
-  | 'STX'
-  | 'BTC'
-  | 'FT'
-  | 'NFT'
-  | 'Ordinal'
-  | 'brc20'
-  | 'brc20-Ordinal'
-  | 'RareSat';
+export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal' | 'brc20-Ordinal' | 'RareSat';
 export enum LoaderSize {
   SMALLEST,
   SMALL,

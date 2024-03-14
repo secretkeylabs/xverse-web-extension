@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { SelectedCurrencyState, Side, STXOrFungibleToken, UseSwap } from './types';
 import { useAlexSponsoredTransaction } from './useAlexSponsoredTransaction';
-import { useCurrencyConversion } from './useCurrencyConversion';
+import { useStxCurrencyConversion } from './useStxCurrencyConversion';
 
 const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
 
@@ -76,7 +76,7 @@ export function useSwap(): UseSwap {
   const alexSDK = useState(() => new AlexSDK())[0];
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const { stxAddress, stxPublicKey } = useWalletSelector();
-  const { acceptableCoinList, currencyToToken } = useCurrencyConversion();
+  const { acceptableCoinList, currencyToToken } = useStxCurrencyConversion();
   const [userOverrideSponsorValue, setUserOverrideSponsorValue] = useState(true);
   const { data: stxPendingTxData } = useStxPendingTxData();
   const { isSponsored, isServiceRunning, isSponsorDisabled } =

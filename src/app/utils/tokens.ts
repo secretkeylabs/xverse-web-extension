@@ -1,4 +1,5 @@
 import { FungibleToken } from '@secretkeylabs/xverse-core';
+import BigNumber from 'bignumber.js';
 import { ftDecimals, getTicker } from './helper';
 
 export function getFtTicker(ft: FungibleToken) {
@@ -15,5 +16,5 @@ export function getFtBalance(ft: FungibleToken) {
   if (ft && ft.decimals) {
     return ftDecimals(ft.balance, ft.decimals);
   }
-  return ft?.balance;
+  return BigNumber(ft?.balance).toFixed();
 }

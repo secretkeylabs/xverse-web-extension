@@ -35,7 +35,7 @@ function RecipientCard({ address, amountBrc20, amountSats, fungibleToken }: Reci
   return (
     <Container>
       <AmountRow
-        icon={<TokenImage token="FT" loading={false} size={32} fungibleToken={fungibleToken} />}
+        icon={<TokenImage currency="FT" loading={false} size={32} fungibleToken={fungibleToken} />}
         amountLabel={t('CONFIRM_TRANSACTION.AMOUNT')}
         amount={
           <NumericFormat

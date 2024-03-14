@@ -28,7 +28,7 @@ export function initBigNumber(num: string | number | BigNumber) {
 
 export function ftDecimals(value: number | string | BigNumber, decimals: number): string {
   const amount = initBigNumber(value);
-  return amount.shiftedBy(-decimals).toNumber().toString();
+  return amount.shiftedBy(-decimals).toString();
 }
 
 export function convertAmountToFtDecimalPlaces(
@@ -244,7 +244,7 @@ export const validateAccountName = (
 export const calculateTotalBalance = ({
   stxBalance,
   btcBalance,
-  ftCoinList,
+  sipCoinsList,
   brcCoinsList,
   stxBtcRate,
   btcFiatRate,
@@ -252,8 +252,8 @@ export const calculateTotalBalance = ({
 }: {
   stxBalance?: string;
   btcBalance?: string;
-  ftCoinList: FungibleToken[] | null;
-  brcCoinsList: FungibleToken[] | null;
+  sipCoinsList: FungibleToken[];
+  brcCoinsList: FungibleToken[];
   stxBtcRate: string;
   btcFiatRate: string;
   hideStx: boolean;
@@ -274,8 +274,8 @@ export const calculateTotalBalance = ({
     totalBalance = totalBalance.plus(btcFiatEquiv);
   }
 
-  if (ftCoinList) {
-    totalBalance = ftCoinList.reduce((acc, coin) => {
+  if (sipCoinsList) {
+    totalBalance = sipCoinsList.reduce((acc, coin) => {
       if (coin.visible && coin.tokenFiatRate && coin.decimals) {
         const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
         const coinFiatValue = new BigNumber(coin.balance)

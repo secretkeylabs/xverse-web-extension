@@ -49,10 +49,11 @@ import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20Screen from '@screens/sendBrc20';
 import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
-import SendFtScreen from '@screens/sendFt';
+import SendSip10Screen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
 import SendRareSat from '@screens/sendRareSat';
+import SendRuneScreen from '@screens/sendRune';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import BackupWalletScreen from '@screens/settings/backupWallet';
@@ -136,8 +137,8 @@ const router = createHashRouter([
         element: <SendStxScreen />,
       },
       {
-        path: 'send-ft',
-        element: <SendFtScreen />,
+        path: 'send-sip10',
+        element: <SendSip10Screen />,
       },
       {
         path: 'add-stx-address-ledger',
@@ -316,7 +317,7 @@ const router = createHashRouter([
         element: <RestoreFunds />,
       },
       {
-        path: 'recover-ordinals',
+        path: 'restore-ordinals',
         element: <RestoreOrdinals />,
       },
       {
@@ -348,7 +349,7 @@ const router = createHashRouter([
         element: <Buy />,
       },
       {
-        path: 'coinDashboard/:coin',
+        path: 'coinDashboard/:currency',
         element: <CoinDashboard />,
       },
       {
@@ -422,6 +423,10 @@ const router = createHashRouter([
       {
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,
+      },
+      {
+        path: 'send-rune',
+        element: <SendRuneScreen />,
       },
       {
         path: 'nft-dashboard',
