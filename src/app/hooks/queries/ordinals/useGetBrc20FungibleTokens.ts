@@ -7,6 +7,7 @@ import {
   getOrdinalsFtBalance,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import BigNumber from 'bignumber.js';
 
 export const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
   name: coin.name,
@@ -43,7 +44,6 @@ export const fetchBrc20FungibleTokens =
           ...ft,
           tokenFiatRate: Number(found.tokenFiatRate),
           name: found.name,
-          supported: found.supported,
         };
       })
       .concat(
@@ -71,6 +71,9 @@ export const useVisibleBrc20FungibleTokens = (): ReturnType<typeof useGetBrc20Fu
   const brc20Query = useGetBrc20FungibleTokens();
   return {
     ...brc20Query,
-    visible: (brc20Query.data ?? []).filter((ft) => brc20ManageTokens[ft.principal] !== false),
+    visible: (brc20Query.data ?? []).filter((ft) => {
+      const userSetting = brc20ManageTokens[ft.principal];
+      return userSetting === true || (userSetting === undefined && new BigNumber(ft.balance).gt(0));
+    }),
   };
 };
