@@ -3,6 +3,7 @@ import useRunesApi from '@hooks/useRunesApi';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import BigNumber from 'bignumber.js';
 
 export const useGetRuneFungibleTokens = () => {
   const { ordinalsAddress, network } = useWalletSelector();
@@ -26,6 +27,9 @@ export const useVisibleRuneFungibleTokens = (): ReturnType<typeof useGetRuneFung
   const runesQuery = useGetRuneFungibleTokens();
   return {
     ...runesQuery,
-    visible: (runesQuery.data ?? []).filter((rune) => runesManageTokens[rune.principal] !== false),
+    visible: (runesQuery.data ?? []).filter((ft) => {
+      const userSetting = runesManageTokens[ft.principal];
+      return userSetting === true || (userSetting === undefined && new BigNumber(ft.balance).gt(0));
+    }),
   };
 };

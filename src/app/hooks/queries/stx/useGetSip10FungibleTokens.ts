@@ -9,6 +9,7 @@ import {
   getFtData,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import BigNumber from 'bignumber.js';
 
 export const fetchSip10FungibleTokens =
   (
@@ -35,7 +36,6 @@ export const fetchSip10FungibleTokens =
         return {
           ...ft,
           ...found,
-          visible: true,
           name: found.name || ft.principal.split('.')[1],
         };
       })
@@ -48,7 +48,6 @@ export const fetchSip10FungibleTokens =
             assetName: coin.name || coin.contract.split('.')[1],
             protocol: 'stacks',
             balance: '0',
-            visible: true,
             total_sent: '',
             total_received: '',
           })),
@@ -80,6 +79,9 @@ export const useVisibleSip10FungibleTokens = (): ReturnType<typeof useGetSip10Fu
   const sip10Query = useGetSip10FungibleTokens();
   return {
     ...sip10Query,
-    visible: (sip10Query.data ?? []).filter((ft) => sip10ManageTokens[ft.principal] !== false),
+    visible: (sip10Query.data ?? []).filter((ft) => {
+      const userSetting = sip10ManageTokens[ft.principal];
+      return userSetting === true || (userSetting === undefined && new BigNumber(ft.balance).gt(0));
+    }),
   };
 };
