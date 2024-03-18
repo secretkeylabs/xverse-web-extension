@@ -189,10 +189,10 @@ function AmountSelector({
             />
             <ArrowsDownUp size={16} weight="fill" />
           </ConvertComplication>
-          {/* <VertRule /> */}
-          {/* <MaxButton $sendMax={sendMax} disabled={disabled} onClick={handleMaxClick}>
+          <VertRule />
+          <MaxButton $sendMax={sendMax} disabled={disabled} onClick={handleMaxClick}>
             MAX
-          </MaxButton> */}
+          </MaxButton>
         </>
       }
       disabled={disabled}
