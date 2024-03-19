@@ -54,25 +54,29 @@ const EditRow = styled.span`
   gap: 7px;
 `;
 
+export type FeeRates = {
+  low?: number;
+  medium?: number;
+  high?: number;
+};
+
 type Props = {
   fee: string | undefined;
   feeUnits: string;
   feeRate: string;
   setFeeRate: (feeRate: string) => void;
-  feeRateUnits: string;
+  feeRateUnits?: string;
   fiatUnit: string;
   baseToFiat: (base: string) => string;
   getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
   isLoading?: boolean;
-  feeRates: {
-    low?: number;
-    medium?: number;
-    high?: number;
-  };
+  feeRates: FeeRates;
   feeRateLimits?: {
     min?: number;
     max?: number;
   };
+  absoluteBalance?: number;
+  amount?: number;
 };
 
 function SelectFeeRate({
@@ -87,6 +91,8 @@ function SelectFeeRate({
   feeRates,
   feeRateLimits,
   isLoading,
+  absoluteBalance,
+  amount
 }: Props) {
   const { t } = useTranslation('translation');
   const [editing, setEditing] = useState(false);
@@ -105,6 +111,7 @@ function SelectFeeRate({
     }
 
     return t('TRANSACTION_SETTING.PRIORITIES.CUSTOM');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feeRates, feeRate]);
 
   return (
@@ -138,20 +145,23 @@ function SelectFeeRate({
             {t('COMMON.EDIT')} <PencilSimple size={16} weight="fill" />
           </Label>
         </EditRow>
-        <Label $size="s" $variant="dark">
-          <NumericFormat
-            value={feeRate}
-            displayType="text"
-            thousandSeparator
-            renderText={(value: string) => (
-              <>
-                {value} {feeRateUnits}
-              </>
-            )}
-          />
-        </Label>
-      </RowContainer>
-      {fee && (
+        {/* Fee can either be an absolute amount or a rate */}
+        {/* If feeRateUnits is not defined, therefore an absolute fee is used */}
+        {feeRateUnits && (
+          <Label $size="s" $variant="dark">
+            <NumericFormat
+              value={feeRate}
+              displayType="text"
+              thousandSeparator
+              renderText={(value: string) => (
+                <>
+                  {value} {feeRateUnits}
+                </>
+              )}
+            />
+          </Label>
+        )}
+        {fee && (
         <RowContainer>
           <div />
           <NumericFormat
@@ -166,7 +176,8 @@ function SelectFeeRate({
             )}
           />
         </RowContainer>
-      )}
+        )}
+      </RowContainer>
       {editing && (
         <FeeSelectPopup
           currentFeeRate={feeRate}
@@ -179,6 +190,8 @@ function SelectFeeRate({
           baseToFiat={baseToFiat}
           setFeeRate={setFeeRate}
           getFeeForFeeRate={getFeeForFeeRate}
+          absoluteBalance={absoluteBalance}
+          amount={amount}
         />
       )}
     </div>

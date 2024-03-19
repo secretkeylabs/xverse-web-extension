@@ -253,6 +253,9 @@
       "NO_FUNDS": "You don't have any funds to send. You can purchase crypto quickly and deposit directly into your Xverse wallet.",
       "BUY_BTC": "Buy Bitcoin"
     },
+    "STX": {
+      "BUY_STX": "Buy Stacks"
+    },
     "SEND_TO": "Send to",
     "SEND": "Send",
     "AMOUNT": "Amount",
@@ -260,10 +263,11 @@
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
     "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter address",
-    "MEMO": "Add a memo (optional)",
+    "MEMO": "Memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
-    "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
+    "ASSOCIATED_DOMAIN": "Associated Domain",
+    "MEMO_INFO": "Adding a memo can have an impact on the transaction fee.",
     "NEXT": "Next",
     "NO_FUNDS": "You don't have any funds to send.",
     "BUY_CRYPTO": "Buy crypto",

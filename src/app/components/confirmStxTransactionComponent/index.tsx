@@ -130,6 +130,7 @@ interface Props {
   title?: string;
   subTitle?: string;
   hasSignatures?: boolean;
+  feeOverride?: BigNumber;
 }
 
 function ConfirmStxTransactionComponent({
@@ -144,6 +145,7 @@ function ConfirmStxTransactionComponent({
   onCancelClick,
   skipModal = false,
   hasSignatures = false,
+  feeOverride,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: signatureRequestTranslate } = useTranslation('translation', {
@@ -254,6 +256,12 @@ function ConfirmStxTransactionComponent({
     }
     setOpenTransactionSettingModal(false);
   };
+
+  useEffect(() => {
+    if (feeOverride) {
+      applyTxSettings({ fee: microstacksToStx(feeOverride).toString() });
+    }
+  }, [feeOverride]);
 
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {

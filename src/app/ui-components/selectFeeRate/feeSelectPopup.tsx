@@ -57,14 +57,12 @@ const RotatedFaders = styled(Faders)`
   transform: rotate(90deg);
 `;
 
-const inputValidator = /^[0-9]*$/;
-
 type FeePriority = 'high' | 'medium' | 'low';
 
 type Props = {
   currentFeeRate: string;
   feeUnits: string;
-  feeRateUnits: string;
+  feeRateUnits?: string;
   fiatUnit: string;
   feeRates: {
     low?: number;
@@ -79,6 +77,8 @@ type Props = {
   baseToFiat: (base: string) => string;
   setFeeRate: (feeRate: string) => void;
   getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
+  absoluteBalance?: number;
+  amount?: number;
 };
 
 function FeeSelectPopup({
@@ -92,7 +92,12 @@ function FeeSelectPopup({
   baseToFiat,
   setFeeRate,
   getFeeForFeeRate,
+  absoluteBalance,
+  amount,
 }: Props) {
+  const stxInputExtractor = /[0-9]+[.]?[0-9]{0,6}/;
+  const inputValidator = absoluteBalance ? stxInputExtractor : /^[0-9]*$/;
+
   const { t } = useTranslation('translation');
   const theme = useTheme();
 
@@ -262,6 +267,8 @@ function FeeSelectPopup({
             fiatUnit={fiatUnit}
             baseToFiat={baseToFiat}
             getFeeForFeeRate={getFeeForFeeRate}
+            absoluteBalance={absoluteBalance}
+            amount={amount}
           />
         ))}
         <FeeItemContainer $isSelected={!selected} onClick={() => setUseCustom(true)}>

@@ -22,6 +22,7 @@ import {
   getStxFiatEquivalent,
   isMultiSig,
   microstacksToStx,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import { MultiSigSpendingCondition, deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
@@ -38,7 +39,6 @@ const AlertContainer = styled.div((props) => ({
 
 function ConfirmStxTransaction() {
   const { t } = useTranslation('translation');
-  const [fee, setStateFee] = useState(new BigNumber(0));
   const [amount, setAmount] = useState(new BigNumber(0));
   const [fiatAmount, setFiatAmount] = useState(new BigNumber(0));
   const [total, setTotal] = useState(new BigNumber(0));
@@ -53,7 +53,18 @@ function ConfirmStxTransaction() {
   const { refetch } = useStxWalletData();
 
   const location = useLocation();
-  const { unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken } = location.state;
+  const {
+    unsignedTx: stringHex,
+    sponsored,
+    isBrowserTx,
+    tabId,
+    requestToken,
+    fee: stateFee,
+  } = location.state;
+  const [fee, setStateFee] = useState(
+    stateFee ? stxToMicrostacks(new BigNumber(stateFee)) : new BigNumber(0),
+  );
+
   const unsignedTx = useMemo(() => deserializeTransaction(stringHex), [stringHex]);
 
   // SignTransaction Params
@@ -123,7 +134,7 @@ function ConfirmStxTransaction() {
     }
 
     const txAmount = new BigNumber(txPayload.amount.toString(10));
-    const txFee = new BigNumber(unsignedTx.auth.spendingCondition.fee.toString());
+    const txFee = new BigNumber(fee.toString() ?? unsignedTx.auth.spendingCondition.fee.toString());
     const txTotal = amount.plus(fee);
     const txFiatAmount = getStxFiatEquivalent(
       amount,
@@ -137,7 +148,7 @@ function ConfirmStxTransaction() {
     const modifiedMemoString = txMemo.content.split('\u0000').join('');
 
     setAmount(txAmount);
-    setStateFee(txFee);
+    if (!fee) setStateFee(txFee);
     setFiatAmount(txFiatAmount);
     setTotal(txTotal);
     setFiatTotal(txFiatTotal);
@@ -194,6 +205,7 @@ function ConfirmStxTransaction() {
           recipientAddress: recipient,
           amountToSend: getAmount().toString(),
           stxMemo: memo,
+          fee: fee.toString(),
         },
       });
     }
@@ -214,6 +226,7 @@ function ConfirmStxTransaction() {
         isSponsored={sponsored}
         skipModal={isLedgerAccount(selectedAccount)}
         hasSignatures={hasSignatures}
+        feeOverride={fee}
       >
         <RecipientComponent
           address={recipient}
