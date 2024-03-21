@@ -1,12 +1,12 @@
 import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
 import Steps from '@components/steps';
+import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import useSeedVault from '@hooks/useSeedVault';
 import SeedCheck from './seedCheck';
 import VerifySeed from './verifySeed';
 
@@ -14,9 +14,9 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(12),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  paddingTop: props.theme.space.l,
 }));
 
 const SeedContainer = styled.div((props) => ({
@@ -24,8 +24,8 @@ const SeedContainer = styled.div((props) => ({
 }));
 
 const PasswordContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(32),
-  marginBottom: props.theme.spacing(32),
+  marginTop: props.theme.space.xxxl,
+  marginBottom: props.theme.space.xxxl,
   display: 'flex',
   flex: 1,
 }));
@@ -107,6 +107,7 @@ export default function BackupWalletSteps(): JSX.Element {
         handleContinue={handleNewPasswordContinue}
         handleBack={handleNewPasswordBack}
         checkPasswordStrength
+        autoFocus
       />
     </PasswordContainer>,
     <PasswordContainer key="CONFIRM_PASSWORD">
@@ -118,6 +119,7 @@ export default function BackupWalletSteps(): JSX.Element {
         handleContinue={handleConfirmPasswordContinue}
         handleBack={handleConfirmPasswordBack}
         passwordError={error}
+        autoFocus
       />
     </PasswordContainer>,
   ];
