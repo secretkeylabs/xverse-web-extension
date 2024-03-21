@@ -19,6 +19,7 @@
     "SATS_PER_VB": "sats/vByte"
   },
   "LANDING_SCREEN": {
+    "BETA": "Beta",
     "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "CREATE_WALLET_BUTTON": "Create a new wallet",
     "RESTORE_WALLET_BUTTON": "Restore an existing wallet",

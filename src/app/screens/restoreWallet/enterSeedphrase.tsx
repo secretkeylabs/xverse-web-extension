@@ -1,9 +1,9 @@
-import ActionButton from '@components/button';
 import SeedPhraseInput from '@components/seedPhraseInput';
+import Button from '@ui-library/button';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-const Container = styled.div({
+const Form = styled.form({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
@@ -38,13 +38,13 @@ function EnterSeedPhrase(props: Props): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
 
   return (
-    <Container>
+    <Form onSubmit={onContinue}>
       <Title>{t('ENTER_SEED_HEADER')}</Title>
       <SeedPhraseInput onSeedChange={setSeed} seedError={seedError} setSeedError={setSeedError} />
       <ButtonContainer>
-        <ActionButton onPress={onContinue} disabled={seed === ''} text={t('CONTINUE_BUTTON')} />
+        <Button onClick={onContinue} disabled={seed === ''} title={t('CONTINUE_BUTTON')} />
       </ButtonContainer>
-    </Container>
+    </Form>
   );
 }
 
