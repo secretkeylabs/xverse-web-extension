@@ -2,6 +2,7 @@ import CheckCircle from '@assets/img/createWalletSuccess/CheckCircle.svg';
 import Extension from '@assets/img/createWalletSuccess/extension.svg';
 import Logo from '@assets/img/createWalletSuccess/logo.svg';
 import Pin from '@assets/img/createWalletSuccess/pin.svg';
+import Button from '@ui-library/button';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -29,7 +30,7 @@ const RowContainer = styled.div({
 });
 
 const InstructionsText = styled.h1((props) => ({
-  ...props.theme.body_medium_l,
+  ...props.theme.typography.body_medium_l,
   color: 'rgba(255, 255, 255, 0.7)',
 }));
 
@@ -56,29 +57,16 @@ const Title = styled.h1((props) => ({
 }));
 
 const Subtitle = styled.h2((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_400,
   marginTop: props.theme.spacing(8),
   textAlign: 'center',
 }));
 
-const ContinueButton = styled.button((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.elevation0,
-  backgroundColor: props.theme.colors.action.classic,
-  borderRadius: props.theme.radius(1),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(30),
-  height: 44,
-  textAlign: 'center',
-  ':hover': {
-    background: props.theme.colors.action.classicLight,
-  },
-  ':focus': {
-    background: props.theme.colors.action.classicLight,
-    opacity: 0.6,
-  },
+const ContinueButton = styled(Button)((props) => ({
+  width: `calc(100% - ${props.theme.space.xl})`,
+  margin: '0 auto',
+  marginBottom: props.theme.space.xxxl,
 }));
 
 function CreateWalletSuccess(): JSX.Element {
@@ -98,7 +86,7 @@ function CreateWalletSuccess(): JSX.Element {
           {action === 'restore' ? t('RESTORE_SCREEN_SUBTITLE') : t('SCREEN_SUBTITLE')}
         </Subtitle>
       </ContentContainer>
-      <ContinueButton onClick={handleCloseTab}>{t('CLOSE_TAB')}</ContinueButton>
+      <ContinueButton onClick={handleCloseTab} title={t('CLOSE_TAB')} />
       <InstructionsContainer>
         <RowContainer>
           <InstructionsText>{`1. ${t('CLICK')}`}</InstructionsText>

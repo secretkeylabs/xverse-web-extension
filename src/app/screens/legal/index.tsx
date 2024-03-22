@@ -1,11 +1,10 @@
 import LinkIcon from '@assets/img/linkIcon.svg';
-import ActionButton from '@components/button';
 import Separator from '@components/separator';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CustomSwitch } from '@screens/ledger/importLedgerAccount/steps/index.styled';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import Button from '@ui-library/button';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
-import { isInOptions } from '@utils/helper';
 import { saveIsTermsAccepted } from '@utils/localStorage';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
@@ -49,7 +48,8 @@ const Link = styled.a((props) => ({
 
 const CustomizedLink = styled(Link)`
   transition: opacity 0.1s ease;
-  :hover {
+  :hover,
+  &:focus {
     opacity: 0.8;
   }
   :active {
@@ -129,7 +129,7 @@ function Legal() {
           </SwitchContainer>
         </LinksContainer>
       </div>
-      <ActionButton text={t('ACCEPT_LEGAL_BUTTON')} onPress={handleLegalAccept} />
+      <Button title={t('ACCEPT_LEGAL_BUTTON')} onClick={handleLegalAccept} />
     </Container>
   );
 }

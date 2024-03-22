@@ -7,9 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-interface StepDotProps {
-  active: boolean;
-}
 const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
@@ -31,7 +28,9 @@ const PasswordContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(32),
 }));
 
-const StepDot = styled.div<StepDotProps>((props) => ({
+const StepDot = styled.div<{
+  active: boolean;
+}>((props) => ({
   width: 8,
   height: 8,
   borderRadius: 4,
@@ -101,6 +100,7 @@ function CreatePassword(): JSX.Element {
             handleBack={handleNewPasswordBack}
             checkPasswordStrength
             createPasswordFlow
+            autoFocus
           />
         ) : (
           <PasswordInput
@@ -112,6 +112,7 @@ function CreatePassword(): JSX.Element {
             handleBack={handleConfirmPasswordBack}
             passwordError={error}
             loading={isCreatingWallet}
+            autoFocus
           />
         )}
       </PasswordContainer>

@@ -7,9 +7,12 @@ type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger';
 const StyledButton = styled.button`
   width: 100%;
   user-select: none;
+  transition: all 0.1s ease;
+  min-height: 44px;
 
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: ${(props) => props.theme.space.xs};
 
   padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
@@ -24,6 +27,7 @@ const StyledButton = styled.button`
 
   &.primary {
     background-color: ${(props) => props.theme.colors.white_0};
+    border: 1px solid;
     color: ${(props) => props.theme.colors.elevation0};
 
     :focus:enabled,
