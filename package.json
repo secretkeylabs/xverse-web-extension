@@ -32,6 +32,7 @@
     "classnames": "^2.3.2",
     "crypto-browserify": "^3.12.0",
     "date-fns": "^2.29.3",
+    "dotenv": "^16.4.5",
     "i": "0.3.7",
     "i18next": "^21.9.1",
     "js-sha256": "^0.10.1",
@@ -79,7 +80,9 @@
     "clean": "rimraf build",
     "test": "vitest ./src",
     "style": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "uitest": "npx playwright test",
+    "uitest:report": "playwright show-report"
   },
   "overrides": {
     "buffer": "6.0.3"
@@ -95,10 +98,12 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.42.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@tanstack/eslint-plugin-query": "^4.29.4",
     "@types/argon2-browser": "^1.18.1",
     "@types/chrome": "^0.0.237",
+    "@types/node": "^20.11.30",
     "@types/react": "^18.0.20",
     "@types/react-dom": "^18.0.6",
     "@types/react-lottie": "^1.2.10",

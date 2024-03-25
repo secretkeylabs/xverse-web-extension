@@ -12,9 +12,10 @@
    3. Username: GITHUB USERNAME
       Password: PERSONAL_ACCESS_TOKEN
       Email: PUBLIC-EMAIL-ADDRESS
-4. Run `npm install` to install the dependencies.
-5. Run `npm start`
-6. Load your extension on Chrome following:
+4. Add .env file (example: .env.example)
+5. Run `npm install` to install the dependencies.
+6. Run `npm start`
+7. Load your extension on Chrome following:
    1. Access `chrome://extensions/`
    2. Check `Developer mode`
    3. Click on `Load unpacked extension`
@@ -30,4 +31,15 @@ make or pull your local changes to xverse-core, then:
 ```
 cd ../xverse-core && npm i && npm run build:esm && \
 cd $OLDPWD && npm i --legacy-peer-deps @secretkeylabs/xverse-core@../xverse-core && npm start
+```
+
+### Run UI Tests
+To run ui tests, run:
+```
+npm run uitest
+```
+
+To generate test report, run:
+```
+npm run uitest:report
 ```
