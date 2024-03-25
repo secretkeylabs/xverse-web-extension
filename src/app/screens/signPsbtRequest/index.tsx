@@ -1,7 +1,6 @@
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import useSignPsbtTx from '@hooks/useSignPsbtTx';
 import useTransactionContext from '@hooks/useTransactionContext';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +16,7 @@ function SignPsbtRequest() {
   const [inputs, setInputs] = useState<btcTransaction.EnhancedInput[]>([]);
   const [outputs, setOutputs] = useState<btcTransaction.EnhancedOutput[]>([]);
   const [feeOutput, setFeeOutput] = useState<btcTransaction.TransactionFeeOutput | undefined>();
+  const [hasSigHashNone, setHasSigHashNone] = useState(false);
 
   const { payload, confirmSignPsbt, cancelSignPsbt } = useSignPsbtTx();
   const txnContext = useTransactionContext();
@@ -30,17 +30,22 @@ function SignPsbtRequest() {
 
   useSignPsbtValidationGate({ payload, parsedPsbt });
 
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
   useEffect(() => {
     if (!parsedPsbt) return;
 
     parsedPsbt
       .getSummary()
       .then((summary) => {
-        const { feeOutput: psbtFeeOutput, inputs: psbtInputs, outputs: psbtOutputs } = summary;
+        const {
+          feeOutput: psbtFeeOutput,
+          inputs: psbtInputs,
+          outputs: psbtOutputs,
+          hasSigHashNone: psbtHasSigHashNone,
+        } = summary;
         setFeeOutput(psbtFeeOutput);
         setInputs(psbtInputs);
         setOutputs(psbtOutputs);
+        setHasSigHashNone(psbtHasSigHashNone);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -112,6 +117,7 @@ function SignPsbtRequest() {
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast={payload.broadcast}
+      hasSigHashNone={hasSigHashNone}
       confirmText={t('CONFIRM')}
       cancelText={t('CANCEL')}
       onCancel={onCancel}

@@ -29,7 +29,7 @@ const ReviewTransactionText = styled(StyledP)`
   margin-bottom: ${(props) => props.theme.space.l};
 `;
 
-const BroadcastCallout = styled(Callout)`
+const SpacedCallout = styled(Callout)`
   margin-bottom: ${(props) => props.theme.space.m};
 `;
 
@@ -69,6 +69,7 @@ type Props = {
   ) => Promise<number | undefined>;
   onFeeRateSet?: (feeRate: number) => void;
   feeRate?: number;
+  hasSigHashNone?: boolean;
 };
 
 function ConfirmBtcTransaction({
@@ -93,6 +94,7 @@ function ConfirmBtcTransaction({
   getFeeForFeeRate,
   onFeeRateSet,
   feeRate,
+  hasSigHashNone = false,
 }: Props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -171,7 +173,14 @@ function ConfirmBtcTransaction({
         <ReviewTransactionText typography="headline_s">
           {t('REVIEW_TRANSACTION')}
         </ReviewTransactionText>
-        {!isBroadcast && <BroadcastCallout bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
+        {hasSigHashNone && (
+          <SpacedCallout
+            variant="danger"
+            titleText={t('PSBT_SIG_HASH_NONE_DISCLAIMER_TITLE')}
+            bodyText={t('PSBT_SIG_HASH_NONE_DISCLAIMER')}
+          />
+        )}
+        {!isBroadcast && <SpacedCallout bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
         <TransactionSummary
           token={token}
           amountToSend={amountToSend}

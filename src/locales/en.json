@@ -349,6 +349,8 @@
     "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
     "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",
     "PSBTS_NO_BROADCAST_DISCLAIMER": "These transactions will not be broadcasted from your wallet. They may be broadcasted later by a third party.",
+    "PSBT_SIG_HASH_NONE_DISCLAIMER_TITLE": "Transaction uses SIGHASH_NONE",
+    "PSBT_SIG_HASH_NONE_DISCLAIMER": "Signing this transaction gives the requester full authority over your funds; they may alter fund destinations. Use with understanding of potential fund loss.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
     "PSBT_INDEX_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction at {{index}} index is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
