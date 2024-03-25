@@ -103,7 +103,7 @@ function ReceiveCardComponent({
     if (isCopied) {
       setTimeout(() => {
         setIsCopied(false);
-      }, 5000);
+      }, 2000);
     }
   }, [isCopied]);
 

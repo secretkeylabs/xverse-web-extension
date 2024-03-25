@@ -21,15 +21,15 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { useTransition } from '@react-spring/web';
 import {
+  Recipient,
+  StacksRecipient,
+  UTXO,
   broadcastSignedTransaction,
   microstacksToStx,
-  Recipient,
   satsToBtc,
   signLedgerMixedBtcTransaction,
   signLedgerNativeSegwitBtcTransaction,
   signLedgerStxTransaction,
-  StacksRecipient,
-  UTXO,
 } from '@secretkeylabs/xverse-core';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { getBtcTxStatusUrl, getStxTxStatusUrl, getTruncatedAddress } from '@utils/helper';

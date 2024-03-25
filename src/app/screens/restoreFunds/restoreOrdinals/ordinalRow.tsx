@@ -80,10 +80,7 @@ function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer
           <ValueText>Ordinal</ValueText>
         </ColumnContainer>
         <ButtonContainer>
-          <TransferButton
-            onClick={() => handleOrdinalTransfer(ordinal)}
-            disabled={disableTransfer}
-          >
+          <TransferButton onClick={() => handleOrdinalTransfer(ordinal)} disabled={disableTransfer}>
             {isLoading ? (
               <LoaderContainer>
                 <Spinner color="white" size={15} />

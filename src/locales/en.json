@@ -389,7 +389,13 @@
         "TITLE": "Transaction broadcasted",
         "SUBTITLE": "Your transaction have been successfully broadcasted. You can close this tab."
       },
+      "INPUTS_WARNING": {
+        "EXTERNAL_INPUTS": "External inputs",
+        "NON_DEFAULT_SIGHASH": "Non-default sighash",
+        "SUBTITLE": "Your device may display a warning regarding external inputs and the use of default sighash signature type. This is expected as you'll be signing inputs from two addresses in one transaction, using a non-default signature type."
+      },
       "CONFIRM_BUTTON": "Confirm",
+      "CONTINUE_BUTTON": "Continue",
       "CONNECT_BUTTON": "Connect",
       "CLOSE_BUTTON": "Close",
       "CANCEL_BUTTON": "Cancel",

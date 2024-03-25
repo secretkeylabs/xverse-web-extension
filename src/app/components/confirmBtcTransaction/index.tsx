@@ -1,12 +1,9 @@
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
-import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import { btcTransaction, FungibleToken, Transport } from '@secretkeylabs/xverse-core';
+import { FungibleToken, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
@@ -15,6 +12,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
+import LedgerStepView, { Steps } from './ledgerStepView';
 import TransactionSummary from './transactionSummary';
 
 const LoaderContainer = styled.div(() => ({
@@ -97,7 +95,7 @@ function ConfirmBtcTransaction({
   hasSigHashNone = false,
 }: Props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState(Steps.ConnectLedger);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
@@ -138,7 +136,15 @@ function ConfirmBtcTransaction({
 
     setIsConnectSuccess(true);
     await delay(1500);
-    setCurrentStepIndex(1);
+
+    if (currentStep !== Steps.ExternalInputs && currentStep !== Steps.ConfirmTransaction) {
+      setCurrentStep(Steps.ExternalInputs);
+      return;
+    }
+
+    if (currentStep !== Steps.ConfirmTransaction) {
+      setCurrentStep(Steps.ConfirmTransaction);
+    }
 
     try {
       onConfirm(transport);
@@ -148,10 +154,16 @@ function ConfirmBtcTransaction({
     }
   };
 
+  const goToConfirmationStep = () => {
+    setCurrentStep(Steps.ConfirmTransaction);
+
+    handleConnectAndConfirm();
+  };
+
   const handleRetry = async () => {
     setIsTxRejected(false);
     setIsConnectSuccess(false);
-    setCurrentStepIndex(0);
+    setCurrentStep(Steps.ConnectLedger);
   };
 
   // TODO: this is a bit naive, but should be correct. We may want to look at the sig hash types of the inputs instead
@@ -208,42 +220,34 @@ function ConfirmBtcTransaction({
         )}
       </SendLayout>
       <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
-        {currentStepIndex === 0 && (
-          <LedgerConnectionView
-            title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
-            text={signatureRequestTranslate('LEDGER.CONNECT.SUBTITLE', { name: 'Bitcoin' })}
-            titleFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_TITLE')}
-            textFailed={signatureRequestTranslate('LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={ledgerConnectBtcIcon}
-            isConnectSuccess={isConnectSuccess}
-            isConnectFailed={isConnectFailed}
-          />
-        )}
-        {currentStepIndex === 1 && (
-          <LedgerConnectionView
-            title={signatureRequestTranslate('LEDGER.CONFIRM.TITLE')}
-            text={signatureRequestTranslate('LEDGER.CONFIRM.SUBTITLE')}
-            titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
-            textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
-            imageDefault={ledgerConnectDefaultIcon}
-            isConnectSuccess={false}
-            isConnectFailed={isTxRejected}
-          />
-        )}
+        <LedgerStepView
+          currentStep={currentStep}
+          isConnectSuccess={isConnectSuccess}
+          isConnectFailed={isConnectFailed}
+          isTxRejected={isTxRejected}
+          t={t}
+          signatureRequestTranslate={signatureRequestTranslate}
+        />
         <SuccessActionsContainer>
-          <ActionButton
-            onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
-            text={signatureRequestTranslate(
-              isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
-            )}
-            disabled={isButtonDisabled}
-            processing={isButtonDisabled}
-          />
-          <ActionButton
-            onPress={onCancel}
-            text={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
-            transparent
-          />
+          {currentStep === Steps.ExternalInputs && !isTxRejected && !isConnectFailed ? (
+            <ActionButton onPress={goToConfirmationStep} text={t('LEDGER.CONTINUE_BUTTON')} />
+          ) : (
+            <>
+              <ActionButton
+                onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+                text={signatureRequestTranslate(
+                  isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
+                )}
+                disabled={isButtonDisabled}
+                processing={isButtonDisabled}
+              />
+              <ActionButton
+                onPress={onCancel}
+                text={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
+                transparent
+              />
+            </>
+          )}
         </SuccessActionsContainer>
       </BottomModal>
     </>
