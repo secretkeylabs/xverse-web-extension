@@ -43,7 +43,7 @@ function QrCode({ image, data, gradientColor }: Props) {
         type: 'dot',
       },
       imageOptions: {
-        hideBackgroundDots: true,
+        hideBackgroundDots: false,
         imageSize: 1,
       },
       qrOptions: {
